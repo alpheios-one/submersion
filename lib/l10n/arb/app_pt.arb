@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Como os mergulhos são agrupados",
   "statistics_trend_aggregation_weekly": "Média semanal",
   "statistics_trend_band_semanticLabel": "A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo",
-  "statistics_trend_legend_rate": "Taxa",
+  "statistics_trend_legend_rate": "Tendência geral",
   "statistics_trend_legend_rollingAverage": "Média móvel",
   "statistics_trend_rate_perYear": "{value}/ano",
   "statistics_conditions_tempTrend_title": "Evolução da temperatura da água",

@@ -180,4 +180,65 @@ void main() {
       expect(axis.labelFor(axis.min), isNotNull);
     });
   });
+
+  group('year disambiguation', () {
+    List<String> drawn(DateAxis axis) {
+      final out = <String>[];
+      for (var v = axis.min; v <= axis.max; v += axis.labelInterval) {
+        final label = axis.labelFor(v);
+        if (label != null) out.add(label);
+      }
+      return out;
+    }
+
+    test('carries the year on the first month label', () {
+      // "Oct" alone never says which October.
+      final axis = DateAxis.forRange(
+        DateTime.utc(2025, 9, 1),
+        DateTime.utc(2026, 5, 1),
+      );
+
+      expect(drawn(axis).first, contains('2025'));
+    });
+
+    test('repeats the year only when it changes', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2025, 9, 1),
+        DateTime.utc(2026, 5, 1),
+      );
+
+      final labels = drawn(axis);
+      final withYear = labels.where(
+        (l) => l.contains('2025') || l.contains('2026'),
+      );
+
+      // One for the opening month, one for the January the year turns over.
+      expect(withYear, hasLength(2));
+    });
+
+    test('a span inside a single year names the year once', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2025, 2, 1),
+        DateTime.utc(2025, 11, 1),
+      );
+
+      final labels = drawn(axis);
+      final withYear = labels.where((l) => l.contains('2025'));
+
+      expect(withYear, hasLength(1));
+      expect(labels.first, contains('2025'));
+    });
+
+    test('year granularity is untouched', () {
+      final axis = DateAxis.forRange(
+        DateTime.utc(2019, 1, 1),
+        DateTime.utc(2026, 1, 1),
+      );
+
+      expect(axis.granularity, DateAxisGranularity.year);
+      for (final label in drawn(axis)) {
+        expect(RegExp(r'^\d{4}$').hasMatch(label), isTrue, reason: label);
+      }
+    });
+  });
 }

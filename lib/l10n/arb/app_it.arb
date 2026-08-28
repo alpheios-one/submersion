@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Come sono raggruppate le immersioni",
   "statistics_trend_aggregation_weekly": "Media settimanale",
   "statistics_trend_band_semanticLabel": "La banda ombreggiata copre il valore minimo e massimo di ogni gruppo",
-  "statistics_trend_legend_rate": "Tasso",
+  "statistics_trend_legend_rate": "Tendenza complessiva",
   "statistics_trend_legend_rollingAverage": "Media mobile",
   "statistics_trend_rate_perYear": "{value}/anno",
   "statistics_conditions_tempTrend_title": "Andamento della temperatura dell'acqua",

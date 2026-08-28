@@ -34176,7 +34176,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'La bande ombrée couvre la valeur la plus basse et la plus haute de chaque groupe';
 
   @override
-  String get statistics_trend_legend_rate => 'Taux';
+  String get statistics_trend_legend_rate => 'Tendance globale';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Moyenne glissante';

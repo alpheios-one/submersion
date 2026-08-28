@@ -27,6 +27,7 @@ void main() {
           onToggleRollingMean: onToggleRollingMean ?? () {},
           showLinearFit: showLinearFit,
           onToggleLinearFit: onToggleLinearFit ?? () {},
+          seriesColor: Colors.indigo,
           rollingColor: Colors.blue,
           rateColor: Colors.orange,
           rateLabel: rateLabel,
@@ -86,7 +87,23 @@ void main() {
   testWidgets('shows the plain rate label when the fit is off', (tester) async {
     await tester.pumpWidget(host(rateLabel: '+4.4 m'));
 
-    expect(find.text('Rate'), findsOneWidget);
+    expect(find.text('Overall trend'), findsOneWidget);
     expect(find.text('+4.4 m/yr'), findsNothing);
+  });
+
+  testWidgets('the mode control carries the series colour as its swatch', (
+    tester,
+  ) async {
+    // "What is the blue line?" The control that chooses what the series shows
+    // also identifies it, so the legend explains all three layers without
+    // naming the mode twice on one row.
+    await tester.pumpWidget(host());
+
+    final swatch = tester.widget<Container>(
+      find.byKey(const ValueKey('trend-series-swatch-depth')),
+    );
+    final decoration = swatch.decoration! as BoxDecoration;
+
+    expect(decoration.color, Colors.indigo);
   });
 }

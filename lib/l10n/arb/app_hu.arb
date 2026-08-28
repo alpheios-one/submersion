@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Hogyan csoportosulnak a merülések",
   "statistics_trend_aggregation_weekly": "Heti átlag",
   "statistics_trend_band_semanticLabel": "Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át",
-  "statistics_trend_legend_rate": "Ütem",
+  "statistics_trend_legend_rate": "Általános trend",
   "statistics_trend_legend_rollingAverage": "Mozgóátlag",
   "statistics_trend_rate_perYear": "{value}/év",
   "statistics_conditions_tempTrend_title": "Vízhőmérséklet alakulása",

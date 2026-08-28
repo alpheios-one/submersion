@@ -34010,7 +34010,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der schattierte Bereich umfasst den niedrigsten und höchsten Wert jeder Gruppe';
 
   @override
-  String get statistics_trend_legend_rate => 'Rate';
+  String get statistics_trend_legend_rate => 'Gesamttrend';
 
   @override
   String get statistics_trend_legend_rollingAverage =>

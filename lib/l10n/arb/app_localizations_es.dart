@@ -34123,7 +34123,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'La banda sombreada abarca el valor más bajo y más alto de cada grupo';
 
   @override
-  String get statistics_trend_legend_rate => 'Tasa';
+  String get statistics_trend_legend_rate => 'Tendencia general';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Media móvil';

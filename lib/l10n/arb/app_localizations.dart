@@ -56069,7 +56069,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_trend_legend_rate.
   ///
   /// In en, this message translates to:
-  /// **'Rate'**
+  /// **'Overall trend'**
   String get statistics_trend_legend_rate;
 
   /// No description provided for @statistics_trend_legend_rollingAverage.

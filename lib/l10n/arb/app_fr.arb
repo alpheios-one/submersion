@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Regroupement des plongées",
   "statistics_trend_aggregation_weekly": "Moyenne hebdomadaire",
   "statistics_trend_band_semanticLabel": "La bande ombrée couvre la valeur la plus basse et la plus haute de chaque groupe",
-  "statistics_trend_legend_rate": "Taux",
+  "statistics_trend_legend_rate": "Tendance globale",
   "statistics_trend_legend_rollingAverage": "Moyenne glissante",
   "statistics_trend_rate_perYear": "{value}/an",
   "statistics_conditions_tempTrend_title": "Évolution de la température de l'eau",

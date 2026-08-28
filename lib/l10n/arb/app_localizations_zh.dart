@@ -32109,7 +32109,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_trend_band_semanticLabel => '阴影区间涵盖每组的最低值和最高值';
 
   @override
-  String get statistics_trend_legend_rate => '变化率';
+  String get statistics_trend_legend_rate => '总体趋势';
 
   @override
   String get statistics_trend_legend_rollingAverage => '滑动平均';

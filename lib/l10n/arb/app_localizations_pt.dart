@@ -34089,7 +34089,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo';
 
   @override
-  String get statistics_trend_legend_rate => 'Taxa';
+  String get statistics_trend_legend_rate => 'Tendência geral';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Média móvel';

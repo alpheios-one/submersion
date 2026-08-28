@@ -69,7 +69,8 @@ class DateAxis {
   String? labelFor(double value, {double? step}) {
     if (!showsLabelAt(value)) return null;
 
-    final text = _format(_dateOf(value));
+    final date = _dateOf(value);
+    final text = _format(date);
 
     // The previously drawn label is one step back, or the lower bound when
     // that step would fall outside the axis. fl_chart does not anchor its
@@ -78,15 +79,24 @@ class DateAxis {
     // is exactly how "Sep Sep" survived.
     var previous = value - (step ?? labelInterval);
     if (previous < min) previous = min;
-    if (previous < value && showsLabelAt(previous)) {
-      if (_format(_dateOf(previous)) == text) return null;
+    final hasPrevious = previous < value && showsLabelAt(previous);
+
+    if (hasPrevious) {
+      final previousDate = _dateOf(previous);
+      if (_format(previousDate) == text) return null;
+      // A bare "Oct" never says which October, so the year is spelled out
+      // wherever it changes. Repeating it on every tick would just crowd the
+      // axis, which is what makes labels collide.
+      if (previousDate.year == date.year) return text;
     }
-    return text;
+    return _formatWithYear(date);
   }
 
   static DateTime _dateOf(double ms) =>
       DateTime.fromMillisecondsSinceEpoch(ms.toInt(), isUtc: true);
 
+  /// The label without a year. Also the key the duplicate check compares on,
+  /// so "Sep 2025" and "Sep" still count as the same month.
   String _format(DateTime date) {
     switch (granularity) {
       case DateAxisGranularity.year:
@@ -96,6 +106,19 @@ class DateAxis {
         return DateFormat.MMM().format(date);
       case DateAxisGranularity.day:
         return DateFormat.Md().format(date);
+    }
+  }
+
+  String _formatWithYear(DateTime date) {
+    switch (granularity) {
+      case DateAxisGranularity.year:
+        // Already a year.
+        return DateFormat.y().format(date);
+      case DateAxisGranularity.quarter:
+      case DateAxisGranularity.month:
+        return DateFormat.yMMM().format(date);
+      case DateAxisGranularity.day:
+        return DateFormat.yMd().format(date);
     }
   }
 

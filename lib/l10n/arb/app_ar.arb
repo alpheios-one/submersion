@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "كيفية تجميع الغطسات",
   "statistics_trend_aggregation_weekly": "المتوسط الأسبوعي",
   "statistics_trend_band_semanticLabel": "يمتد النطاق المظلل بين أدنى وأعلى قيمة في كل مجموعة",
-  "statistics_trend_legend_rate": "المعدل",
+  "statistics_trend_legend_rate": "الاتجاه العام",
   "statistics_trend_legend_rollingAverage": "المتوسط المتحرك",
   "statistics_trend_rate_perYear": "{value}/سنة",
   "statistics_conditions_tempTrend_title": "اتجاه درجة حرارة الماء",

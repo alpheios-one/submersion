@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "潜水的分组方式",
   "statistics_trend_aggregation_weekly": "每周平均",
   "statistics_trend_band_semanticLabel": "阴影区间涵盖每组的最低值和最高值",
-  "statistics_trend_legend_rate": "变化率",
+  "statistics_trend_legend_rate": "总体趋势",
   "statistics_trend_legend_rollingAverage": "滑动平均",
   "statistics_trend_rate_perYear": "{value}/年",
   "statistics_conditions_tempTrend_title": "水温趋势",

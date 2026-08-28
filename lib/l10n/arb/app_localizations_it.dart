@@ -34076,7 +34076,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'La banda ombreggiata copre il valore minimo e massimo di ogni gruppo';
 
   @override
-  String get statistics_trend_legend_rate => 'Tasso';
+  String get statistics_trend_legend_rate => 'Tendenza complessiva';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Media mobile';

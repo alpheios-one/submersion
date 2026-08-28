@@ -33843,7 +33843,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'De gearceerde band omvat de laagste en hoogste waarde van elke groep';
 
   @override
-  String get statistics_trend_legend_rate => 'Tempo';
+  String get statistics_trend_legend_rate => 'Algemene trend';
 
   @override
   String get statistics_trend_legend_rollingAverage =>

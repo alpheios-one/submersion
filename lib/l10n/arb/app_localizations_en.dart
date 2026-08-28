@@ -33548,7 +33548,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Shaded band spans the lowest and highest value in each group';
 
   @override
-  String get statistics_trend_legend_rate => 'Rate';
+  String get statistics_trend_legend_rate => 'Overall trend';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Rolling avg';

@@ -82,6 +82,7 @@ class TrendChartSection extends ConsumerWidget {
               ),
               TrendControlStrip(
                 chartId: chartId,
+                seriesColor: lineColor,
                 aggregation: settings.aggregation,
                 onAggregationChanged: (mode) =>
                     _update(ref, settings.copyWith(aggregation: mode)),

@@ -23,6 +23,7 @@ class TrendControlStrip extends StatelessWidget {
     required this.onToggleRollingMean,
     required this.showLinearFit,
     required this.onToggleLinearFit,
+    required this.seriesColor,
     required this.rollingColor,
     required this.rateColor,
     this.rateLabel,
@@ -33,6 +34,11 @@ class TrendControlStrip extends StatelessWidget {
 
   final TrendAggregation aggregation;
   final ValueChanged<TrendAggregation> onAggregationChanged;
+
+  /// Colour of the data series itself. The mode control doubles as that
+  /// series' legend entry, so the row explains all three layers without
+  /// naming the current mode twice.
+  final Color seriesColor;
   final bool showRollingMean;
   final VoidCallback onToggleRollingMean;
   final bool showLinearFit;
@@ -83,6 +89,16 @@ class TrendControlStrip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Container(
+                  key: ValueKey('trend-series-swatch-$chartId'),
+                  width: 12,
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: seriesColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 6),
                 Text(
                   _modeLabel(context, aggregation),
                   style: theme.textTheme.bodySmall,

@@ -33395,7 +33395,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'הרצועה המוצללת משתרעת בין הערך הנמוך לגבוה ביותר בכל קבוצה';
 
   @override
-  String get statistics_trend_legend_rate => 'קצב';
+  String get statistics_trend_legend_rate => 'מגמה כללית';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'ממוצע נע';

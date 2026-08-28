@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Cómo se agrupan las inmersiones",
   "statistics_trend_aggregation_weekly": "Media semanal",
   "statistics_trend_band_semanticLabel": "La banda sombreada abarca el valor más bajo y más alto de cada grupo",
-  "statistics_trend_legend_rate": "Tasa",
+  "statistics_trend_legend_rate": "Tendencia general",
   "statistics_trend_legend_rollingAverage": "Media móvil",
   "statistics_trend_rate_perYear": "{value}/año",
   "statistics_conditions_tempTrend_title": "Evolución de la temperatura del agua",

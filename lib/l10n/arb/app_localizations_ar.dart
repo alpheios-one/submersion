@@ -33743,7 +33743,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'يمتد النطاق المظلل بين أدنى وأعلى قيمة في كل مجموعة';
 
   @override
-  String get statistics_trend_legend_rate => 'المعدل';
+  String get statistics_trend_legend_rate => 'الاتجاه العام';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'المتوسط المتحرك';

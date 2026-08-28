@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "כיצד הצלילות מקובצות",
   "statistics_trend_aggregation_weekly": "ממוצע שבועי",
   "statistics_trend_band_semanticLabel": "הרצועה המוצללת משתרעת בין הערך הנמוך לגבוה ביותר בכל קבוצה",
-  "statistics_trend_legend_rate": "קצב",
+  "statistics_trend_legend_rate": "מגמה כללית",
   "statistics_trend_legend_rollingAverage": "ממוצע נע",
   "statistics_trend_rate_perYear": "{value}/שנה",
   "statistics_conditions_tempTrend_title": "מגמת טמפרטורת המים",

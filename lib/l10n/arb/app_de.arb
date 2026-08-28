@@ -9984,7 +9984,7 @@
   "statistics_trend_aggregation_tooltip": "Wie Tauchgänge gruppiert werden",
   "statistics_trend_aggregation_weekly": "Wöchentlicher Durchschnitt",
   "statistics_trend_band_semanticLabel": "Der schattierte Bereich umfasst den niedrigsten und höchsten Wert jeder Gruppe",
-  "statistics_trend_legend_rate": "Rate",
+  "statistics_trend_legend_rate": "Gesamttrend",
   "statistics_trend_legend_rollingAverage": "Gleitender Durchschnitt",
   "statistics_trend_rate_perYear": "{value}/Jahr",
   "statistics_conditions_tempTrend_title": "Wassertemperatur-Verlauf",

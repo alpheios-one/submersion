@@ -33952,7 +33952,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át';
 
   @override
-  String get statistics_trend_legend_rate => 'Ütem';
+  String get statistics_trend_legend_rate => 'Általános trend';
 
   @override
   String get statistics_trend_legend_rollingAverage => 'Mozgóátlag';
