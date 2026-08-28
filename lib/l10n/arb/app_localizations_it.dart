@@ -23780,7 +23780,25 @@ class AppLocalizationsIt extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return 'Controllati $checked oggetti nel cloud ($originals originali, $thumbs miniature, $renditions versioni compresse): $removed orfani rimossi, $repaired riparazioni in coda, $aborted caricamenti obsoleti annullati';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originali',
+      one: '1 originale',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs miniature',
+      one: '1 miniatura',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions versioni compresse',
+      one: '1 versione compressa',
+    );
+    return 'Controllati $checked oggetti nel cloud ($_temp0, $_temp1, $_temp2): $removed orfani rimossi, $repaired riparazioni in coda, $aborted caricamenti obsoleti annullati';
   }
 
   @override

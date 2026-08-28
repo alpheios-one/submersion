@@ -23797,7 +23797,25 @@ class AppLocalizationsEs extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return 'Se comprobaron $checked objetos en la nube ($originals originales, $thumbs miniaturas, $renditions versiones comprimidas): $removed huérfanos eliminados, $repaired reparaciones en cola, $aborted subidas obsoletas canceladas';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originales',
+      one: '1 original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs miniaturas',
+      one: '1 miniatura',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions versiones comprimidas',
+      one: '1 versión comprimida',
+    );
+    return 'Se comprobaron $checked objetos en la nube ($_temp0, $_temp1, $_temp2): $removed huérfanos eliminados, $repaired reparaciones en cola, $aborted subidas obsoletas canceladas';
   }
 
   @override

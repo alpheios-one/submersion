@@ -23732,7 +23732,25 @@ class AppLocalizationsDe extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return '$checked Cloud-Objekte geprüft ($originals Originale, $thumbs Miniaturansichten, $renditions komprimierte Versionen): $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals Originale',
+      one: '1 Original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs Miniaturansichten',
+      one: '1 Miniaturansicht',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions komprimierte Versionen',
+      one: '1 komprimierte Version',
+    );
+    return '$checked Cloud-Objekte geprüft ($_temp0, $_temp1, $_temp2): $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
   }
 
   @override

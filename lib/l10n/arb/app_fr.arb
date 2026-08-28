@@ -6717,7 +6717,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} en attente de nouvelle tentative",
   "settings_mediaStorage_verify_action": "Vérifier la bibliothèque",
   "settings_mediaStorage_verify_running": "Vérification de la médiathèque...",
-  "settings_mediaStorage_verify_summary": "{checked} objets cloud vérifiés ({originals} originaux, {thumbs} miniatures, {renditions} versions compressées) : {removed} orphelins supprimés, {repaired} réparations en file, {aborted} envois périmés annulés",
+  "settings_mediaStorage_verify_summary": "{checked} objets cloud vérifiés ({originals, plural, =1{1 original} other{{originals} originaux}}, {thumbs, plural, =1{1 miniature} other{{thumbs} miniatures}}, {renditions, plural, =1{1 version compressée} other{{renditions} versions compressées}}) : {removed} orphelins supprimés, {repaired} réparations en file, {aborted} envois périmés annulés",
   "settings_mediaStorage_backfill_action": "Envoyer la bibliothèque existante",
   "settings_mediaStorage_backfill_enqueued": "{count} envois en file",
   "settings_mediaStorage_policy_autoUpload": "Envoyer les photos automatiquement",

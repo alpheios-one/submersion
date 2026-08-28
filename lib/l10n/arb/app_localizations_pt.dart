@@ -23779,7 +23779,25 @@ class AppLocalizationsPt extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return '$checked objetos na nuvem verificados ($originals originais, $thumbs miniaturas, $renditions versões comprimidas): $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originais',
+      one: '1 original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs miniaturas',
+      one: '1 miniatura',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions versões comprimidas',
+      one: '1 versão comprimida',
+    );
+    return '$checked objetos na nuvem verificados ($_temp0, $_temp1, $_temp2): $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
   }
 
   @override

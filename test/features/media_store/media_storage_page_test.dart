@@ -743,7 +743,7 @@ void main() {
     // summary says so rather than leaving the reader to count twice.
     expect(
       find.textContaining(
-        'Checked 12 cloud objects (7 originals, 4 thumbnails, 1 compressed versions)',
+        'Checked 12 cloud objects (7 originals, 4 thumbnails, 1 compressed version)',
       ),
       findsOneWidget,
     );

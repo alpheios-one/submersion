@@ -23384,7 +23384,25 @@ class AppLocalizationsEn extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return 'Checked $checked cloud objects ($originals originals, $thumbs thumbnails, $renditions compressed versions): removed $removed orphans, queued $repaired repairs, aborted $aborted stale uploads';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originals',
+      one: '1 original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs thumbnails',
+      one: '1 thumbnail',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions compressed versions',
+      one: '1 compressed version',
+    );
+    return 'Checked $checked cloud objects ($_temp0, $_temp1, $_temp2): removed $removed orphans, queued $repaired repairs, aborted $aborted stale uploads';
   }
 
   @override

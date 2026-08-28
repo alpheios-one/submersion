@@ -6717,7 +6717,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} wachten op nieuwe poging",
   "settings_mediaStorage_verify_action": "Bibliotheek verifiëren",
   "settings_mediaStorage_verify_running": "Mediabibliotheek wordt geverifieerd...",
-  "settings_mediaStorage_verify_summary": "{checked} cloudobjecten gecontroleerd ({originals} originelen, {thumbs} miniaturen, {renditions} gecomprimeerde versies): {removed} wezen verwijderd, {repaired} reparaties in wachtrij, {aborted} verouderde uploads afgebroken",
+  "settings_mediaStorage_verify_summary": "{checked} cloudobjecten gecontroleerd ({originals, plural, =1{1 origineel} other{{originals} originelen}}, {thumbs, plural, =1{1 miniatuur} other{{thumbs} miniaturen}}, {renditions, plural, =1{1 gecomprimeerde versie} other{{renditions} gecomprimeerde versies}}): {removed} wezen verwijderd, {repaired} reparaties in wachtrij, {aborted} verouderde uploads afgebroken",
   "settings_mediaStorage_backfill_action": "Bestaande bibliotheek uploaden",
   "settings_mediaStorage_backfill_enqueued": "{count} uploads in wachtrij",
   "settings_mediaStorage_policy_autoUpload": "Foto's automatisch uploaden",

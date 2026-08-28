@@ -23598,7 +23598,25 @@ class AppLocalizationsNl extends AppLocalizations {
     int repaired,
     int aborted,
   ) {
-    return '$checked cloudobjecten gecontroleerd ($originals originelen, $thumbs miniaturen, $renditions gecomprimeerde versies): $removed wezen verwijderd, $repaired reparaties in wachtrij, $aborted verouderde uploads afgebroken';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originelen',
+      one: '1 origineel',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs miniaturen',
+      one: '1 miniatuur',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions gecomprimeerde versies',
+      one: '1 gecomprimeerde versie',
+    );
+    return '$checked cloudobjecten gecontroleerd ($_temp0, $_temp1, $_temp2): $removed wezen verwijderd, $repaired reparaties in wachtrij, $aborted verouderde uploads afgebroken';
   }
 
   @override
