@@ -6537,6 +6537,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get siteMatchReview_empty => 'Nothing to match.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Location found in photos';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Location from dive computer';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Assign $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Choose nearby site ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Add location to $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return 'Assigned $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'from photo';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'from dive computer';
+
+  @override
+  String get siteMatchReview_currentSiteCard => 'Add location to this site';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Create site here';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected selected · $review to review · $none no match';
   }
@@ -6568,8 +6606,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return 'Linked $dives dives · added $sites sites';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return 'Linked $dives dives · added $sites sites · located $located sites';
   }
 
   @override
@@ -12877,6 +12915,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Dismiss GPS suggestion';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count dives could get a site from their photos';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Review sites';
 
   @override
   String get media_gpsBanner_title => 'GPS found in photos';

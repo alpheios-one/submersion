@@ -23,8 +23,17 @@ void main() {
   });
 
   /// Helper to create a dive in the database for tests that need dive associations
-  Future<Dive> createTestDiveInDb({String id = '', int diveNumber = 1}) async {
-    final dive = Dive(id: id, diveNumber: diveNumber, dateTime: DateTime.now());
+  Future<Dive> createTestDiveInDb({
+    String id = '',
+    int diveNumber = 1,
+    DateTime? entryTime,
+  }) async {
+    final dive = Dive(
+      id: id,
+      diveNumber: diveNumber,
+      dateTime: entryTime ?? DateTime.now(),
+      entryTime: entryTime,
+    );
     return diveRepository.createDive(dive);
   }
 
@@ -1046,5 +1055,80 @@ void main() {
         );
       });
     });
+  });
+
+  group('getBestPhotoGpsForDives', () {
+    test(
+      'selects the photo nearest entry per dive and skips dives without GPS',
+      () async {
+        final entry = DateTime.utc(2025, 12, 27, 11, 26);
+        await createTestDiveInDb(id: 'd1', diveNumber: 1, entryTime: entry);
+        await createTestDiveInDb(id: 'd2', diveNumber: 2, entryTime: entry);
+        await repository.createMedia(
+          createTestMediaItem(
+            id: 'hotel',
+            diveId: 'd1',
+            latitude: 10,
+            longitude: 10,
+            takenAt: DateTime.utc(2025, 12, 27, 7),
+          ),
+        );
+        await repository.createMedia(
+          createTestMediaItem(
+            id: 'boat',
+            diveId: 'd1',
+            latitude: 20.5,
+            longitude: -87.25,
+            takenAt: DateTime.utc(2025, 12, 27, 11, 20),
+          ),
+        );
+        await repository.createMedia(
+          createTestMediaItem(id: 'nogps', diveId: 'd2', takenAt: entry),
+        );
+
+        final best = await repository.getBestPhotoGpsForDives(['d1', 'd2']);
+
+        expect(best.keys, ['d1']);
+        expect(best['d1']!.mediaId, 'boat');
+        expect(best['d1']!.location.latitude, 20.5);
+        expect(best['d1']!.takenAt.isUtc, isTrue);
+      },
+    );
+
+    test('ignores (0,0) fixes and an empty id list', () async {
+      await createTestDiveInDb(id: 'd1', diveNumber: 1);
+      await repository.createMedia(
+        createTestMediaItem(
+          id: 'zero',
+          diveId: 'd1',
+          latitude: 0,
+          longitude: 0,
+        ),
+      );
+      expect(await repository.getBestPhotoGpsForDives(['d1']), isEmpty);
+      expect(await repository.getBestPhotoGpsForDives(const []), isEmpty);
+    });
+
+    test(
+      'getBestGpsFromDiveMedia delegates and getGpsFromDiveMedia is UTC',
+      () async {
+        final entry = DateTime.utc(2025, 12, 27, 11, 26);
+        await createTestDiveInDb(id: 'd1', diveNumber: 1, entryTime: entry);
+        await repository.createMedia(
+          createTestMediaItem(
+            id: 'm',
+            diveId: 'd1',
+            latitude: 1.5,
+            longitude: 2.5,
+            takenAt: DateTime.utc(2025, 12, 27, 11, 30),
+          ),
+        );
+        final best = await repository.getBestGpsFromDiveMedia('d1');
+        expect(best, (latitude: 1.5, longitude: 2.5));
+        final all = await repository.getGpsFromDiveMedia('d1');
+        expect(all.single.takenAt.isUtc, isTrue);
+        expect(all.single.takenAt, DateTime.utc(2025, 12, 27, 11, 30));
+      },
+    );
   });
 }

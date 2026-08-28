@@ -6662,6 +6662,45 @@ class AppLocalizationsEs extends AppLocalizations {
   String get siteMatchReview_empty => 'Nada que asociar.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Ubicación encontrada en las fotos';
+
+  @override
+  String get siteSuggestion_titleDiveComputer =>
+      'Ubicación del ordenador de buceo';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Asignar $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Elegir punto cercano ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Añadir ubicación a $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return 'Asignado $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'de foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'del ordenador de buceo';
+
+  @override
+  String get siteMatchReview_currentSiteCard => 'Añadir ubicación a este punto';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Crear punto aquí';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected seleccionadas · $review por revisar · $none sin coincidencia';
   }
@@ -6694,8 +6733,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives inmersiones asociadas · $sites puntos añadidos';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives inmersiones asociadas · $sites puntos añadidos · $located puntos ubicados';
   }
 
   @override
@@ -13072,6 +13111,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Descartar sugerencia de GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count inmersiones podrían obtener un punto a partir de sus fotos';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Revisar puntos';
 
   @override
   String get media_gpsBanner_title => 'GPS encontrado en las fotos';

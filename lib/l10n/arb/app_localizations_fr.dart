@@ -6687,6 +6687,46 @@ class AppLocalizationsFr extends AppLocalizations {
   String get siteMatchReview_empty => 'Rien à associer.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Position trouvée dans les photos';
+
+  @override
+  String get siteSuggestion_titleDiveComputer =>
+      'Position de l\'ordinateur de plongée';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Attribuer $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Choisir un site proche ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Ajouter la position à $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name attribué';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'depuis photo';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer =>
+      'de l\'ordinateur de plongée';
+
+  @override
+  String get siteMatchReview_currentSiteCard => 'Ajouter la position à ce site';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Créer un site ici';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected sélectionnées · $review à vérifier · $none sans correspondance';
   }
@@ -6718,8 +6758,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives plongées associées · $sites sites ajoutés';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives plongées associées · $sites sites ajoutés · $located sites localisés';
   }
 
   @override
@@ -13126,6 +13166,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Ignorer la suggestion GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count plongées pourraient obtenir un site à partir de leurs photos';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Vérifier les sites';
 
   @override
   String get media_gpsBanner_title => 'GPS trouve dans les photos';

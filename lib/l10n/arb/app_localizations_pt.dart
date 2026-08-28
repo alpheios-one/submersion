@@ -6662,6 +6662,46 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteMatchReview_empty => 'Nada para associar.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Localização encontrada nas fotos';
+
+  @override
+  String get siteSuggestion_titleDiveComputer =>
+      'Localização do computador de mergulho';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Atribuir $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Escolher ponto próximo ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Adicionar localização a $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name atribuído';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'da foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'do computador de mergulho';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Adicionar localização a este ponto';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Criar ponto aqui';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected selecionados · $review para revisar · $none sem correspondência';
   }
@@ -6693,8 +6733,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives mergulhos associados · $sites pontos adicionados';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives mergulhos associados · $sites pontos adicionados · $located pontos localizados';
   }
 
   @override
@@ -13084,6 +13124,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Dispensar sugestao de GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count mergulhos podem obter um ponto a partir das fotos';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Rever pontos';
 
   @override
   String get media_gpsBanner_title => 'GPS encontrado nas fotos';

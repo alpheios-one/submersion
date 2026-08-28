@@ -6523,6 +6523,44 @@ class AppLocalizationsAr extends AppLocalizations {
   String get siteMatchReview_empty => 'لا شيء للمطابقة.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'تم العثور على الموقع في الصور';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'الموقع من كمبيوتر الغوص';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'تعيين $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'اختيار موقع قريب ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'إضافة الموقع إلى $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return 'تم تعيين $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'من صورة';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'من كمبيوتر الغوص';
+
+  @override
+  String get siteMatchReview_currentSiteCard => 'إضافة الموقع إلى هذا الموقع';
+
+  @override
+  String get siteMatchReview_createHereButton => 'إنشاء موقع هنا';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected محددة · $review للمراجعة · $none بدون تطابق';
   }
@@ -6554,8 +6592,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return 'تم ربط $dives غوصات · تمت إضافة $sites مواقع';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return 'تم ربط $dives غوصات · تمت إضافة $sites مواقع · تم تحديد موقع $located مواقع';
   }
 
   @override
@@ -12851,6 +12889,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'تجاهل اقتراح GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return 'يمكن لـ $count غوصات الحصول على موقع من صورها';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'مراجعة المواقع';
 
   @override
   String get media_gpsBanner_title => 'تم العثور على GPS في الصور';

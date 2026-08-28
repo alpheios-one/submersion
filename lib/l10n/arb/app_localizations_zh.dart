@@ -6319,6 +6319,44 @@ class AppLocalizationsZh extends AppLocalizations {
   String get siteMatchReview_empty => '没有可匹配的内容。';
 
   @override
+  String get siteSuggestion_titlePhoto => '在照片中找到位置';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => '来自潜水电脑的位置';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '指定 $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return '选择附近潜水点 ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return '为 $name 添加位置';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '已指定 $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => '来自照片';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => '来自潜水电脑';
+
+  @override
+  String get siteMatchReview_currentSiteCard => '为此潜水点添加位置';
+
+  @override
+  String get siteMatchReview_createHereButton => '在此创建潜水点';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '已选择 $selected · 待审核 $review · 无匹配 $none';
   }
@@ -6350,8 +6388,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '已关联 $dives 次潜水 · 已添加 $sites 个潜水点';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '已关联 $dives 次潜水 · 已添加 $sites 个潜水点 · 已定位 $located 个潜水点';
   }
 
   @override
@@ -12470,6 +12508,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => '忽略 GPS 建议';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count 次潜水可根据照片获得潜水点';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => '查看潜水点';
 
   @override
   String get media_gpsBanner_title => 'GPS 已找到在照片';

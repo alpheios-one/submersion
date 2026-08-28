@@ -6608,6 +6608,45 @@ class AppLocalizationsNl extends AppLocalizations {
   String get siteMatchReview_empty => 'Niets om te koppelen.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Locatie gevonden in foto\'s';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Locatie van duikcomputer';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '$name toewijzen';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Nabijgelegen stek kiezen ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Locatie toevoegen aan $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name toegewezen';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'uit foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'van duikcomputer';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Locatie toevoegen aan deze stek';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Stek hier aanmaken';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected geselecteerd · $review te beoordelen · $none geen match';
   }
@@ -6639,8 +6678,8 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives duiken gekoppeld · $sites stekken toegevoegd';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives duiken gekoppeld · $sites stekken toegevoegd · $located stekken gelokaliseerd';
   }
 
   @override
@@ -12989,6 +13028,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'GPS-suggestie sluiten';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count duiken kunnen een stek krijgen uit hun foto\'s';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Stekken bekijken';
 
   @override
   String get media_gpsBanner_title => 'GPS gevonden in foto\'s';

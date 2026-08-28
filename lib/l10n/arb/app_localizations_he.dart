@@ -6489,6 +6489,44 @@ class AppLocalizationsHe extends AppLocalizations {
   String get siteMatchReview_empty => 'אין מה להתאים.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'נמצא מיקום בתמונות';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'מיקום ממחשב הצלילה';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'שיוך $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'בחירת אתר קרוב ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'הוספת מיקום ל-$name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name שויך';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'מתמונה';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'ממחשב הצלילה';
+
+  @override
+  String get siteMatchReview_currentSiteCard => 'הוספת מיקום לאתר זה';
+
+  @override
+  String get siteMatchReview_createHereButton => 'יצירת אתר כאן';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected נבחרו · $review לבדיקה · $none ללא התאמה';
   }
@@ -6520,8 +6558,8 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives צלילות שויכו · $sites אתרים נוספו';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives צלילות שויכו · $sites אתרים נוספו · $located אתרים מוקמו';
   }
 
   @override
@@ -12764,6 +12802,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'סגור הצעת GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count צלילות יכולות לקבל אתר מהתמונות שלהן';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'סקירת אתרים';
 
   @override
   String get media_gpsBanner_title => 'נמצא GPS בתמונות';

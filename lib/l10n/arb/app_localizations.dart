@@ -11105,6 +11105,66 @@ abstract class AppLocalizations {
   /// **'Nothing to match.'**
   String get siteMatchReview_empty;
 
+  /// No description provided for @siteSuggestion_titlePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Location found in photos'**
+  String get siteSuggestion_titlePhoto;
+
+  /// No description provided for @siteSuggestion_titleDiveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Location from dive computer'**
+  String get siteSuggestion_titleDiveComputer;
+
+  /// No description provided for @siteSuggestion_assignButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign {name}'**
+  String siteSuggestion_assignButton(Object name);
+
+  /// No description provided for @siteSuggestion_chooseNearbyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose nearby site ({count})'**
+  String siteSuggestion_chooseNearbyButton(int count);
+
+  /// No description provided for @siteSuggestion_addLocationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add location to {name}'**
+  String siteSuggestion_addLocationButton(Object name);
+
+  /// No description provided for @siteSuggestion_assignedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned {name}'**
+  String siteSuggestion_assignedSnack(Object name);
+
+  /// No description provided for @siteMatchReview_sourcePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'from photo'**
+  String get siteMatchReview_sourcePhoto;
+
+  /// No description provided for @siteMatchReview_sourceDiveComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'from dive computer'**
+  String get siteMatchReview_sourceDiveComputer;
+
+  /// No description provided for @siteMatchReview_currentSiteCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Add location to this site'**
+  String get siteMatchReview_currentSiteCard;
+
+  /// No description provided for @siteMatchReview_createHereButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create site here'**
+  String get siteMatchReview_createHereButton;
+
   /// No description provided for @siteMatchReview_summary.
   ///
   /// In en, this message translates to:
@@ -11150,8 +11210,8 @@ abstract class AppLocalizations {
   /// No description provided for @siteMatchReview_appliedSnack.
   ///
   /// In en, this message translates to:
-  /// **'Linked {dives} dives · added {sites} sites'**
-  String siteMatchReview_appliedSnack(int dives, int sites);
+  /// **'Linked {dives} dives · added {sites} sites · located {located} sites'**
+  String siteMatchReview_appliedSnack(int dives, int sites, int located);
 
   /// No description provided for @siteMatchReview_applyError.
   ///
@@ -21964,6 +22024,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismiss GPS suggestion'**
   String get media_gpsBanner_dismissTooltip;
+
+  /// No description provided for @mediaImport_offerSiteReview.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives could get a site from their photos'**
+  String mediaImport_offerSiteReview(int count);
+
+  /// No description provided for @mediaImport_reviewSitesAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Review sites'**
+  String get mediaImport_reviewSitesAction;
 
   /// No description provided for @media_gpsBanner_title.
   ///

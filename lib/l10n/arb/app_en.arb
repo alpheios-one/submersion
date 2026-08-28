@@ -3645,6 +3645,44 @@
     }
   },
   "siteMatchReview_empty": "Nothing to match.",
+  "siteSuggestion_titlePhoto": "Location found in photos",
+  "siteSuggestion_titleDiveComputer": "Location from dive computer",
+  "siteSuggestion_assignButton": "Assign {name}",
+  "@siteSuggestion_assignButton": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "siteSuggestion_chooseNearbyButton": "Choose nearby site ({count})",
+  "@siteSuggestion_chooseNearbyButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteSuggestion_addLocationButton": "Add location to {name}",
+  "@siteSuggestion_addLocationButton": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "siteSuggestion_assignedSnack": "Assigned {name}",
+  "@siteSuggestion_assignedSnack": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "siteMatchReview_sourcePhoto": "from photo",
+  "siteMatchReview_sourceDiveComputer": "from dive computer",
+  "siteMatchReview_currentSiteCard": "Add location to this site",
+  "siteMatchReview_createHereButton": "Create site here",
   "siteMatchReview_summary": "{selected} selected · {review} to review · {none} no match",
   "@siteMatchReview_summary": {
     "placeholders": {
@@ -3696,13 +3734,16 @@
       }
     }
   },
-  "siteMatchReview_appliedSnack": "Linked {dives} dives · added {sites} sites",
+  "siteMatchReview_appliedSnack": "Linked {dives} dives · added {sites} sites · located {located} sites",
   "@siteMatchReview_appliedSnack": {
     "placeholders": {
       "dives": {
         "type": "int"
       },
       "sites": {
+        "type": "int"
+      },
+      "located": {
         "type": "int"
       }
     }
@@ -7449,6 +7490,15 @@
   "media_gpsBanner_coordinates": "Coordinates: {coordinates}",
   "media_gpsBanner_createSiteButton": "Create Site",
   "media_gpsBanner_dismissTooltip": "Dismiss GPS suggestion",
+  "mediaImport_offerSiteReview": "{count} dives could get a site from their photos",
+  "@mediaImport_offerSiteReview": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mediaImport_reviewSitesAction": "Review sites",
   "media_gpsBanner_title": "GPS found in photos",
   "media_import_failedToImport": "Failed to import {count, plural, =1{photo} other{photos}}",
   "media_import_failedToImportError": "Failed to import photos: {error}",

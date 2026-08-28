@@ -33,6 +33,7 @@ import 'package:submersion/features/equipment/domain/entities/equipment_set.dart
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/equipment/domain/services/equipment_set_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/geofence_suggestion_banner.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
@@ -88,9 +89,6 @@ import 'package:submersion/features/weather/presentation/providers/weather_provi
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/courses/presentation/widgets/course_picker.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/widgets/photo_gps_suggestion_banner.dart';
-import 'package:submersion/features/media/presentation/widgets/quick_site_from_gps_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_multi_select_field.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/add_section_row.dart';
@@ -294,7 +292,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   bool _isCapturingLocation = false;
 
   // GPS suggestion from photos
-  bool _gpsSuggestionDismissed = false;
 
   /// Smart-collapse expansion state, keyed by group. Defaults are computed
   /// at the call sites (new dive vs editing); user toggles override them
@@ -2188,14 +2185,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
       );
     }
-    if (widget.diveId != null && !_gpsSuggestionDismissed) {
+    if (widget.diveId != null) {
       children.add(
-        PhotoGpsSuggestionBanner(
+        SiteSuggestionCard(
           diveId: widget.diveId!,
           currentSite: _selectedSite,
-          onCreateSite: () => _createSiteFromPhotoGps(),
-          onUpdateSite: (gps) => _updateSiteWithPhotoGps(gps),
-          onDismiss: () => setState(() => _gpsSuggestionDismissed = true),
+          onSiteChanged: (site) => setState(() => _assignSite(site)),
         ),
       );
     }
@@ -2207,81 +2202,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         children: children,
       ),
     );
-  }
-
-  Future<void> _createSiteFromPhotoGps() async {
-    final gps = await ref.read(divePhotoGpsProvider(widget.diveId!).future);
-    if (gps == null || !mounted) return;
-
-    final newSite = await QuickSiteFromGpsDialog.show(
-      context,
-      latitude: gps.latitude,
-      longitude: gps.longitude,
-    );
-
-    if (newSite != null && mounted) {
-      // Create the site via the notifier
-      final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-      final createdSite = await siteNotifier.addSite(newSite);
-
-      setState(() {
-        _assignSite(createdSite);
-        _gpsSuggestionDismissed = true;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.l10n.diveLog_edit_createdSite(createdSite.name),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
-    if (_selectedSite == null) return;
-
-    var updatedSite = _selectedSite!.copyWith(location: gps);
-    // A site gaining coordinates should also gain its altitude, so later dives
-    // there resolve locally without a lookup.
-    double? lookedUpAltitude;
-    if (updatedSite.altitude == null) {
-      lookedUpAltitude = await ref
-          .read(elevationServiceProvider)
-          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
-      if (!mounted) return;
-      if (lookedUpAltitude != null) {
-        updatedSite = updatedSite.copyWith(altitude: lookedUpAltitude);
-      }
-    }
-
-    // Patch only the coordinate columns: _selectedSite may be a partially
-    // hydrated entity, and a whole-entity update would wipe the rest
-    // (issue #1187).
-    final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-    await siteNotifier.updateSiteCoordinates(
-      updatedSite.id,
-      gps,
-      altitude: lookedUpAltitude,
-    );
-
-    setState(() {
-      _selectedSite = updatedSite;
-      _gpsSuggestionDismissed = true;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.diveLog_edit_addedGps(updatedSite.name)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
   /// Assigns [site] to the dive and snaps the water type and the entry/exit
