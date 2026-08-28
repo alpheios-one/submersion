@@ -12397,6 +12397,75 @@ class AppLocalizationsHe extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => 'חיפוש מינים...';
 
   @override
+  String get marineLife_lookup_button => 'חיפוש מקוון';
+
+  @override
+  String get marineLife_lookup_title => 'חיפוש מין';
+
+  @override
+  String get marineLife_lookup_searchHint => 'שם עממי או מדעי';
+
+  @override
+  String get marineLife_lookup_search => 'חיפוש';
+
+  @override
+  String get marineLife_lookup_createWithout => 'יצירה ללא חיפוש';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'נתוני מינים ותמונות מ-iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => 'הקלידו שם והקישו על חיפוש.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'לא נמצאו מינים עבור \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'נראה שאין חיבור לאינטרנט.';
+
+  @override
+  String get marineLife_lookup_errorTimeout => 'תם הזמן המוקצב לחיפוש.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'iNaturalist החזיר שגיאה. נסו שוב מאוחר יותר.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'תגובה לא צפויה מ-iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'ניסיון חוזר';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תצפיות',
+      one: 'תצפית אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: בחרו מין';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog => 'הצעה לקטלוג';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => 'לא ניתן לפתוח את הדפדפן';
+
+  @override
+  String get marineLife_suggest_copyLink => 'העתקת קישור';
+
+  @override
   String marineLife_speciesPhotos_title(Object count) {
     return 'תמונות ($count)';
   }
@@ -25468,6 +25537,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'הוספה למינים צפויים';
+
+  @override
+  String get reef_species_addFromLookup => 'חיפוש והוספה למינים שלכם';
 
   @override
   String reef_species_showAll(int count) {

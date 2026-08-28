@@ -12107,6 +12107,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesManage_searchHint => '搜索物种...';
 
   @override
+  String get marineLife_lookup_button => '在线查找';
+
+  @override
+  String get marineLife_lookup_title => '查找物种';
+
+  @override
+  String get marineLife_lookup_searchHint => '常用名或学名';
+
+  @override
+  String get marineLife_lookup_search => '查找';
+
+  @override
+  String get marineLife_lookup_createWithout => '不查找直接创建';
+
+  @override
+  String get marineLife_lookup_attribution => '物种数据和照片来自 iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => '输入名称，然后点按“查找”。';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return '未找到与“$query”匹配的物种';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => '你似乎处于离线状态。';
+
+  @override
+  String get marineLife_lookup_errorTimeout => '查找超时。';
+
+  @override
+  String get marineLife_lookup_errorServer => 'iNaturalist 返回了错误。请稍后重试。';
+
+  @override
+  String get marineLife_lookup_errorMalformed => '来自 iNaturalist 的意外响应。';
+
+  @override
+  String get marineLife_lookup_retry => '重试';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条观察记录',
+      one: '1 条观察记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank：请选择一个物种';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog => '推荐加入目录';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => '无法打开浏览器';
+
+  @override
+  String get marineLife_suggest_copyLink => '复制链接';
+
+  @override
   String marineLife_speciesPhotos_title(Object count) {
     return '照片 ($count)';
   }
@@ -24786,6 +24852,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String get reef_species_addFromLookup => '查找并添加到你的物种';
 
   @override
   String reef_species_showAll(int count) {

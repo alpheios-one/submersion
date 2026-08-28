@@ -140,6 +140,24 @@ class SpeciesRepository {
     );
   }
 
+  /// The species whose scientific name equals [scientificName], ignoring
+  /// case, or null. Lets a lookup select an existing row (built-in or
+  /// custom) instead of creating a twin.
+  Future<domain.Species?> findSpeciesByScientificName(
+    String scientificName,
+  ) async {
+    final needle = scientificName.trim().toLowerCase();
+    if (needle.isEmpty) return null;
+    final row = await _db
+        .customSelect(
+          'SELECT id FROM species WHERE LOWER(scientific_name) = ? LIMIT 1',
+          variables: [Variable.withString(needle)],
+        )
+        .getSingleOrNull();
+    if (row == null) return null;
+    return getSpeciesById(row.data['id'] as String);
+  }
+
   /// Add sighting to a dive
   Future<domain.Sighting> addSighting({
     required String diveId,
