@@ -769,4 +769,19 @@ void main() {
       expect(tapped, isNull);
     });
   });
+
+  testWidgets('frames the plot area like the dive profile chart', (
+    tester,
+  ) async {
+    // Without a border the plot floats on the card with nothing bounding it.
+    await tester.pumpWidget(host(DiveTrendChart(points: series(20))));
+
+    final border = readData(tester).borderData;
+
+    expect(border.show, isTrue);
+    expect(border.border.top.width, greaterThan(0));
+    expect(border.border.bottom.width, greaterThan(0));
+    expect(border.border.left.width, greaterThan(0));
+    expect(border.border.right.width, greaterThan(0));
+  });
 }

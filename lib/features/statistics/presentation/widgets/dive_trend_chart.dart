@@ -371,7 +371,12 @@ class _DiveTrendChartState extends State<DiveTrendChart> {
             maxY: yAxis.max,
             lineTouchData: _touchData(context, bars, seriesLabels),
             titlesData: _titles(context, dateAxis, yAxis),
-            borderData: FlBorderData(show: false),
+            // Framed like the dive profile chart: an unbounded plot floats
+            // on the card with nothing to read the axes against.
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
             gridData: FlGridData(
               show: true,
               drawVerticalLine: false,
