@@ -94,14 +94,18 @@ List<String> _memberChunks(String source) {
       if (!_readsDives.hasMatch(chunk)) continue;
       scanned++;
 
-      // `_diveFilter` is StatisticsRepository's own wrapper, and it emits
-      // DiveStatsScope unconditionally, so calling it counts as applying the
-      // scope. This is the one indirection the census accepts; anything else
-      // has to name DiveStatsScope or the column outright.
+      // Only two things count as applying the scope: naming DiveStatsScope,
+      // or calling StatisticsRepository's own `_diveFilter` wrapper, which
+      // emits it unconditionally.
+      //
+      // A bare `excluded_from_stats` mention deliberately does NOT count.
+      // Hand-writing that one column satisfies the letter of the rule while
+      // silently missing `is_planned = 0` (and, on a gas query, the gas flag
+      // and the gauge-mode rule), which is exactly the partial-copy rot this
+      // census exists to prevent. Go through the helper or mark the query
+      // exempt; there is no third option.
       final applied =
-          chunk.contains('DiveStatsScope') ||
-          chunk.contains('excluded_from_stats') ||
-          chunk.contains('_diveFilter(');
+          chunk.contains('DiveStatsScope') || chunk.contains('_diveFilter(');
       final exempt = chunk.contains('stats-scope-exempt');
 
       if (!applied && !exempt) {

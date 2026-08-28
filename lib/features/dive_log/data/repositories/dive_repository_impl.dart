@@ -2059,6 +2059,9 @@ class DiveRepository {
     );
   }
 
+  // stats-scope-exempt: the logbook list itself. It SELECTS the exclusion
+  // columns so the row can render its badge, but must never filter on them:
+  // an excluded dive is still in the logbook and still shown.
   Future<List<DiveSummary>> getDiveSummaries({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2788,6 +2791,9 @@ class DiveRepository {
 
   /// Loads [DiveSummary] rows for [ids] (slim SELECT plus batched tags and
   /// dive types), ordered most recent first.
+  // stats-scope-exempt: hydrates rows for an already-chosen id set. It
+  // SELECTS the exclusion columns for the list badge and must not filter on
+  // them; whoever produced the ids decided what belongs.
   Future<List<DiveSummary>> _summariesForIds(
     List<String> ids, {
     Set<String> disabledSafetyRules = const {},
