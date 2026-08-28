@@ -713,4 +713,213 @@ void main() {
       );
     });
   });
+
+  /// Issue #1340. Every recovery action (restore, Reset Sync State, adopting a
+  /// replaced library, rejoining after retirement, a backend switch) leaves
+  /// this device with NO sync horizon (`lastSyncMs == null`). The "edited
+  /// since the last sync" check is then unreachable, so without an age guard
+  /// of its own a peer tombstone deleted every matching local row
+  /// unconditionally: a freshly restored library silently undid itself on the
+  /// next sync. The guard must compare the tombstone's own `deletedAt` against
+  /// the local row, with or without a horizon.
+  group('Remote tombstone age guard', () {
+    late FakeCloudStorageProvider cloud;
+
+    setUp(() async {
+      await setUpTestDatabase();
+      cloud = FakeCloudStorageProvider();
+    });
+
+    tearDown(() async {
+      await tearDownTestDatabase();
+    });
+
+    SyncService buildService() => SyncService(
+      syncRepository: SyncRepository(),
+      serializer: SyncDataSerializer(),
+      cloudProvider: cloud,
+    );
+
+    Map<String, dynamic> siteRow(String id, {required int updatedAt}) => {
+      'id': id,
+      'name': 'Wall Site',
+      'description': '',
+      'notes': '',
+      'isShared': false,
+      'createdAt': 1000,
+      'updatedAt': updatedAt,
+    };
+
+    /// Publish a peer base whose only content is one diveSites tombstone.
+    Future<void> seedPeerTombstone(
+      String id, {
+      required int deletedAt,
+      required int exportedAt,
+    }) async {
+      const data = SyncData();
+      final checksum = sha256
+          .convert(utf8.encode(jsonEncode(data.toJson())))
+          .toString();
+      final payload = SyncPayload(
+        version: syncFormatVersion,
+        exportedAt: exportedAt,
+        deviceId: 'peer-dev',
+        checksum: checksum,
+        data: data,
+        deletions: {
+          'diveSites': [SyncDeletion(id: id, deletedAt: deletedAt)],
+        },
+      );
+      await seedPeerBaseFromPayload(cloud, 'peer-dev', payload);
+    }
+
+    Future<Map<String, dynamic>?> deletionConflictFor(String recordId) async {
+      final conflicts = await SyncRepository().getConflictRecords();
+      for (final c in conflicts) {
+        if (c.entityType == 'diveSites' && c.recordId == recordId) {
+          return jsonDecode(c.conflictData!) as Map<String, dynamic>;
+        }
+      }
+      return null;
+    }
+
+    test('after a restore (no sync horizon) a peer tombstone OLDER than the '
+        'local row is a conflict, not a deletion', () async {
+      final serializer = SyncDataSerializer();
+      final syncRepo = SyncRepository();
+
+      // The restored library: a site last edited at t=8000.
+      await serializer.upsertRecord(
+        'diveSites',
+        siteRow('site-restored', updatedAt: 8000),
+      );
+      // A peer still republishes a tombstone from t=5000, older than the
+      // row's own last edit.
+      await seedPeerTombstone(
+        'site-restored',
+        deletedAt: 5000,
+        exportedAt: 9000,
+      );
+
+      // The restore path: rebaselineAfterRestore nulls lastSyncTimestamp.
+      await syncRepo.rebaselineAfterRestore(
+        preserveDeviceId: await syncRepo.getDeviceId(),
+      );
+      expect(
+        await syncRepo.getLastSyncTime(),
+        isNull,
+        reason: 'precondition: a restore leaves no sync horizon',
+      );
+
+      final result = await buildService().performSync();
+
+      expect(result.status, isNot(SyncResultStatus.error));
+      expect(
+        await serializer.fetchRecord('diveSites', 'site-restored'),
+        isNotNull,
+        reason:
+            'the row was edited (8000) after the tombstone (5000); with no '
+            'sync horizon the tombstone age is the only guard and it must '
+            'not delete the restored row',
+      );
+      final conflict = await deletionConflictFor('site-restored');
+      expect(
+        conflict,
+        isNotNull,
+        reason: 'the stale tombstone surfaces as a deletion conflict',
+      );
+      expect(conflict!['_deleted'], isTrue);
+      expect(conflict['deletedAt'], 5000);
+    });
+
+    test('after a restore (no sync horizon) a peer tombstone NEWER than the '
+        'local row still deletes it', () async {
+      final serializer = SyncDataSerializer();
+      final syncRepo = SyncRepository();
+
+      await serializer.upsertRecord(
+        'diveSites',
+        siteRow('site-gone', updatedAt: 8000),
+      );
+      await seedPeerTombstone('site-gone', deletedAt: 9000, exportedAt: 9500);
+
+      await syncRepo.rebaselineAfterRestore(
+        preserveDeviceId: await syncRepo.getDeviceId(),
+      );
+
+      final result = await buildService().performSync();
+
+      expect(result.status, isNot(SyncResultStatus.error));
+      expect(
+        await serializer.fetchRecord('diveSites', 'site-gone'),
+        isNull,
+        reason:
+            'a deletion newer than the row (9000 > 8000) is a genuine '
+            'peer delete and must still converge after a restore',
+      );
+      expect(await deletionConflictFor('site-gone'), isNull);
+    });
+
+    test(
+      'with a sync horizon, a tombstone older than the local row is a '
+      'conflict even when the row is unchanged since the last sync',
+      () async {
+        final serializer = SyncDataSerializer();
+
+        await serializer.upsertRecord(
+          'diveSites',
+          siteRow('site-lww', updatedAt: 8000),
+        );
+        await seedPeerTombstone('site-lww', deletedAt: 5000, exportedAt: 9000);
+
+        // Horizon AFTER the local edit: the three-way check reads the row as
+        // unchanged, so only the tombstone's own age can protect it (the
+        // mirror of the merge's remote-live-vs-local-tombstone rule).
+        await impersonateFreshDevice();
+        await setLastSync(DateTime.fromMillisecondsSinceEpoch(9000));
+
+        final result = await buildService().performSync();
+
+        expect(result.status, isNot(SyncResultStatus.error));
+        expect(
+          await serializer.fetchRecord('diveSites', 'site-lww'),
+          isNotNull,
+          reason: 'the local edit (8000) is newer than the deletion (5000)',
+        );
+        expect(await deletionConflictFor('site-lww'), isNotNull);
+      },
+    );
+
+    test(
+      'a legacy tombstone without deletedAt is aged by the payload exportedAt',
+      () async {
+        final serializer = SyncDataSerializer();
+        final syncRepo = SyncRepository();
+
+        await serializer.upsertRecord(
+          'diveSites',
+          siteRow('site-legacy', updatedAt: 8000),
+        );
+        // deletedAt 0 is the pre-timestamp wire format; the payload's
+        // exportedAt (7000) is the best available bound and is older than
+        // the row's edit.
+        await seedPeerTombstone('site-legacy', deletedAt: 0, exportedAt: 7000);
+
+        await syncRepo.rebaselineAfterRestore(
+          preserveDeviceId: await syncRepo.getDeviceId(),
+        );
+
+        final result = await buildService().performSync();
+
+        expect(result.status, isNot(SyncResultStatus.error));
+        expect(
+          await serializer.fetchRecord('diveSites', 'site-legacy'),
+          isNotNull,
+        );
+        final conflict = await deletionConflictFor('site-legacy');
+        expect(conflict, isNotNull);
+        expect(conflict!['deletedAt'], 7000);
+      },
+    );
+  });
 }

@@ -1879,8 +1879,9 @@ class SyncService {
           }
           final local = await _serializer.fetchRecord(entityType, recordId);
           // _extractUpdatedAtMillis falls back to createdAt, so a row created
-          // locally after our last sync is protected from a stale remote
-          // tombstone even on append-only child tables that have a createdAt.
+          // locally after our last sync (or after the tombstone itself) is
+          // protected from a stale remote tombstone even on append-only child
+          // tables that have a createdAt.
           // Clockless child tables with neither updatedAt nor createdAt
           // (dive_profiles, dive_tanks, tank_pressure_profiles, sightings) have
           // no age signal: the uuid-keyed ones regenerate with fresh ids on
@@ -1893,10 +1894,24 @@ class SyncService {
               ? deletion.deletedAt
               : remoteExportedAt;
 
-          final hasConflict =
+          // Two independent guards; either one routes to a conflict:
+          //  * edited since our last sync (three-way; needs a horizon), and
+          //  * the tombstone's own age: a local row edited AFTER the peer
+          //    deleted it is newer than the deletion. This mirrors the
+          //    remote-live-vs-local-tombstone rule in _mergeEntity.
+          // The age guard is the ONLY protection when there is no horizon,
+          // which is exactly the state every recovery action leaves behind
+          // (restore, Reset Sync State, adopt, rejoin, backend switch):
+          // lastSyncMs is null there, and without this guard a peer tombstone
+          // deleted every matching row unconditionally, so a freshly restored
+          // library silently undid itself on the next sync (#1340).
+          final editedSinceLastSync =
               localUpdatedAt != null &&
               lastSyncMs != null &&
               localUpdatedAt > lastSyncMs;
+          final newerThanTombstone =
+              localUpdatedAt != null && localUpdatedAt > deletionTimestamp;
+          final hasConflict = editedSinceLastSync || newerThanTombstone;
 
           if (hasConflict) {
             conflicts += 1;
