@@ -56111,13 +56111,13 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_filter_presetLast5Years.
   ///
   /// In en, this message translates to:
-  /// **'Last 5 Years'**
+  /// **'Last 5 years'**
   String get diveLog_filter_presetLast5Years;
 
   /// No description provided for @diveLog_filter_presetLast10Years.
   ///
   /// In en, this message translates to:
-  /// **'Last 10 Years'**
+  /// **'Last 10 years'**
   String get diveLog_filter_presetLast10Years;
 }
 

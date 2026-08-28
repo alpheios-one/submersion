@@ -33573,8 +33573,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Failed to load temperature trend';
 
   @override
-  String get diveLog_filter_presetLast5Years => 'Last 5 Years';
+  String get diveLog_filter_presetLast5Years => 'Last 5 years';
 
   @override
-  String get diveLog_filter_presetLast10Years => 'Last 10 Years';
+  String get diveLog_filter_presetLast10Years => 'Last 10 years';
 }
