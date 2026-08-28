@@ -46,13 +46,21 @@ Future<WidgetRef> _pump(WidgetTester tester) async {
 }
 
 void main() {
-  testWidgets('starts empty', (tester) async {
-    await _pump(tester);
-    expect(find.text('No saved cylinder sizes yet.'), findsOneWidget);
+  testWidgets('starts seeded with the blending-bench sizes', (tester) async {
+    // Issue #1335 follow-up: seeded here the same way mix templates are, so
+    // the billing card's dropdown has something to offer on a first run.
+    final ref = await _pump(tester);
+    expect(find.text('No saved cylinder sizes yet.'), findsNothing);
+    expect(
+      ref.read(blenderCylinderTemplatesProvider),
+      CylinderTemplate.seedTemplates,
+    );
   });
 
   testWidgets('adding a template appends it and persists', (tester) async {
     final ref = await _pump(tester);
+    ref.read(blenderCylinderTemplatesProvider.notifier).state = const [];
+    await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).first, 'Deco bottle');
     await tester.enterText(find.byType(TextField).last, '3');

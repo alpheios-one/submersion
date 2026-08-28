@@ -12,7 +12,12 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// sets once per session don't compete with the ones they retype every fill
 /// (issue #1335). Each card keeps its existing internal layout unchanged.
 class BlenderSettingsPage extends ConsumerStatefulWidget {
-  const BlenderSettingsPage({super.key});
+  const BlenderSettingsPage({super.key, this.scrollToDefaults = false});
+
+  /// Opens straight to "Default settings and billing" instead of the top of
+  /// the page -- the billing card's own settings gear uses this, since its
+  /// cylinder dropdown is what that section manages (issue #1335 follow-up).
+  final bool scrollToDefaults;
 
   @override
   ConsumerState<BlenderSettingsPage> createState() =>
@@ -22,6 +27,7 @@ class BlenderSettingsPage extends ConsumerStatefulWidget {
 class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
   late final List<TextEditingController> _gasO2;
   late final List<TextEditingController> _gasHe;
+  final _defaultsKey = GlobalKey();
 
   @override
   void initState() {
@@ -42,6 +48,20 @@ class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
       TextEditingController(text: n(g2.he)),
       TextEditingController(text: n(g3.he)),
     ];
+
+    if (widget.scrollToDefaults) {
+      // The target card is not laid out yet on the frame that pushes this
+      // page, so ensureVisible has to wait for the first one that is.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final target = _defaultsKey.currentContext;
+        if (target != null) {
+          Scrollable.ensureVisible(
+            target,
+            duration: const Duration(milliseconds: 300),
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -71,7 +91,10 @@ class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
                 const SizedBox(height: 16),
                 const BlenderConditionsCard(),
                 const SizedBox(height: 16),
-                const BlenderDefaultsCard(),
+                KeyedSubtree(
+                  key: _defaultsKey,
+                  child: const BlenderDefaultsCard(),
+                ),
               ],
             ),
           ),

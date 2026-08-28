@@ -33,6 +33,23 @@ class CylinderTemplate {
 
   @override
   String toString() => 'CylinderTemplate($name, $liters L)';
+
+  /// The blending-bench sizes named in issue #1100 -- the 2 and 3 litre decant
+  /// bottles, an AL80, and a steel twinset -- seeded on first use only.
+  ///
+  /// Formerly a separate, hard-coded list (`blenderTankChoices` in
+  /// `tank_spec.dart`) offered alongside the diver's own templates in the
+  /// cylinder dropdown. Issue #1335's follow-up asks for one editable list
+  /// instead of two, so these now seed that list the same way
+  /// [BlenderPreferences.seedTemplates] seeds the mix templates: a diver who
+  /// deletes all of them keeps an empty list, because seeding keys on the
+  /// absence of the whole blob rather than on an empty list.
+  static const List<CylinderTemplate> seedTemplates = [
+    CylinderTemplate(name: '2 L', liters: 2),
+    CylinderTemplate(name: '3 L', liters: 3),
+    CylinderTemplate(name: 'AL80', liters: 11.1),
+    CylinderTemplate(name: 'Steel 12 L twinset', liters: 24),
+  ];
 }
 
 /// Why a cylinder size cannot be saved as a template.

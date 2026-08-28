@@ -6,7 +6,7 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
-import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
@@ -14,9 +14,11 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// One entry in the cylinder-size dropdown: a static preset or a diver's own
-/// saved cylinder template, reduced to just what the row needs to show and
-/// select.
+/// One entry in the cylinder-size dropdown, reduced to just what the row
+/// needs to show and select. Every entry comes from the diver's own saved
+/// cylinder templates (issue #1335 follow-up): there is no separate,
+/// hard-coded preset list any more, so renaming or deleting a size in
+/// settings is renaming or deleting it here too.
 class _CylinderChoice {
   const _CylinderChoice({required this.label, required this.liters});
 
@@ -79,13 +81,35 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 BlenderSectionTitle(
                   context.l10n.gasCalculators_blender_billing,
                 ),
-                if (billing.lines.isNotEmpty)
-                  TextButton.icon(
-                    key: const Key('blender-save-fill'),
-                    onPressed: () => _saveFill(context, billing, currency),
-                    icon: const Icon(Icons.playlist_add, size: 18),
-                    label: Text(context.l10n.gasCalculators_blender_saveFill),
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Opens the settings page scrolled straight to "Default
+                    // settings and billing" rather than to its top, since
+                    // that section's cylinder templates are what this card's
+                    // dropdown reads (issue #1335 follow-up).
+                    IconButton(
+                      key: const Key('blender-billing-settings'),
+                      icon: const Icon(Icons.settings_outlined),
+                      tooltip: context.l10n.nav_settings,
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (context) =>
+                              const BlenderSettingsPage(scrollToDefaults: true),
+                        ),
+                      ),
+                    ),
+                    if (billing.lines.isNotEmpty)
+                      TextButton.icon(
+                        key: const Key('blender-save-fill'),
+                        onPressed: () => _saveFill(context, billing, currency),
+                        icon: const Icon(Icons.playlist_add, size: 18),
+                        label: Text(
+                          context.l10n.gasCalculators_blender_saveFill,
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
             _cylinderRow(context, settings, units),
@@ -146,21 +170,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     AppSettings settings,
     UnitFormatter units,
   ) {
-    // The blending-bench presets, not the dive-planning ones, plus whatever
-    // the diver has saved under Settings -> Default settings and billing
-    // (issue #1335). The same presets serve both unit systems because
-    // formatTankVolume renders them in the diver's own unit (issue #1100
-    // review).
+    // Sourced entirely from Settings -> Default settings and billing
+    // (issue #1335 follow-up): the blending-bench sizes seed that list on
+    // first use, so there is nothing left to hard-code here.
     final choices = [
-      for (final preset in blenderTankChoices())
-        _CylinderChoice(
-          label: units.formatTankVolume(
-            preset.waterVolumeLiters,
-            preset.workingPressureBar,
-            ratedCapacityCuft: preset.ratedCapacityCuft,
-          ),
-          liters: preset.waterVolumeLiters,
-        ),
       for (final t in ref.watch(blenderCylinderTemplatesProvider))
         _CylinderChoice(
           label: '${t.name} (${units.formatTankVolume(t.liters, null)})',

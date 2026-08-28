@@ -72,6 +72,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Cylinder sizes'), findsOneWidget);
-    expect(find.text('No saved cylinder sizes yet.'), findsOneWidget);
+    // Seeded with the blending-bench sizes named in issue #1100, not empty
+    // (issue #1335 follow-up: this is now the dropdown's only source).
+    expect(find.text('AL80'), findsOneWidget);
+  });
+
+  testWidgets('the billing card gear also opens settings, scrolled down', (
+    tester,
+  ) async {
+    await _pump(tester);
+    await tester.tap(find.byKey(const Key('blender-billing-settings')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Default settings and billing'), findsOneWidget);
   });
 }

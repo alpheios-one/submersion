@@ -54,7 +54,17 @@ void main() {
       expect(prefs.fillGas1, const GasMix(o2: 100));
       expect(prefs.fillGas2, const GasMix(o2: 0, he: 100));
       expect(prefs.fillGas3, const GasMix(o2: 21));
-      expect(prefs.cylinderTemplates, isEmpty);
+      expect(prefs.cylinderTemplates, CylinderTemplate.seedTemplates);
+    });
+
+    test('seeds the blending-bench cylinder sizes named in issue #1100', () {
+      final prefs = BlenderPreferences.defaults(cylinderWaterLiters: 12);
+      expect(prefs.cylinderTemplates.map((t) => t.name).toList(), [
+        '2 L',
+        '3 L',
+        'AL80',
+        'Steel 12 L twinset',
+      ]);
     });
   });
 

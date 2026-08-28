@@ -23,6 +23,12 @@ void main() {
       expect(CylinderTemplate.fromJson({'name': 'x', 'liters': 0}), isNull);
       expect(CylinderTemplate.fromJson('not a map'), isNull);
     });
+
+    test('the seeded blending-bench sizes are all valid', () {
+      for (final t in CylinderTemplate.seedTemplates) {
+        expect(t.isValid, isTrue, reason: t.toString());
+      }
+    });
   });
 
   group('cylinderTemplateRejectionFor', () {

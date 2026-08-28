@@ -91,33 +91,39 @@ void main() {
   });
 
   testWidgets('a cylinder preset fills the volume field', (tester) async {
-    // The presets are the blending-bench sizes named in issue #1100: the 2 and
-    // 3 litre decant bottles, an AL80, and a steel twinset.
+    // The seeded sizes are the blending-bench ones named in issue #1100: the
+    // 2 and 3 litre decant bottles, an AL80, and a steel twinset (issue #1335
+    // follow-up: seeded into the editable list, not a separate static one).
     final ref = await _pump(tester);
     await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('3 L').last);
+    await tester.tap(find.text('3 L (3 L)'));
     await tester.pumpAndSettle();
 
     expect(ref.read(blenderCylinderLitersProvider), closeTo(3, 0.01));
   });
 
-  testWidgets('the preset list offers the blending-bench sizes', (
+  testWidgets('the preset list offers only the diver-managed sizes', (
     tester,
   ) async {
     await _pump(tester);
     await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
     await tester.pumpAndSettle();
-    for (final label in ['2 L', '3 L', '24 L']) {
+    for (final label in [
+      '2 L (2 L)',
+      '3 L (3 L)',
+      'AL80 (11.1 L)',
+      'Steel 12 L twinset (24 L)',
+    ]) {
       expect(find.text(label), findsOneWidget);
     }
   });
 
-  testWidgets('a saved cylinder template joins the preset list', (
+  testWidgets('the dropdown reflects an edited template list exactly', (
     tester,
   ) async {
-    // Issue #1335: the diver's own saved cylinder sizes feed the same
-    // dropdown as the static blending-bench presets.
+    // Issue #1335 follow-up: no separate static preset list any more, so a
+    // provider override fully replaces what the dropdown offers.
     final ref = await _pump(tester);
     ref.read(blenderCylinderTemplatesProvider.notifier).state = const [
       CylinderTemplate(name: 'Deco bottle', liters: 5),
@@ -127,9 +133,21 @@ void main() {
     await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
     await tester.pumpAndSettle();
     expect(find.textContaining('Deco bottle'), findsOneWidget);
+    expect(find.text('2 L (2 L)'), findsNothing);
 
     await tester.tap(find.textContaining('Deco bottle'));
     await tester.pumpAndSettle();
     expect(ref.read(blenderCylinderLitersProvider), closeTo(5, 0.01));
+  });
+
+  testWidgets('a second gear opens settings scrolled to billing defaults', (
+    tester,
+  ) async {
+    await _pump(tester);
+    await tester.tap(find.byKey(const Key('blender-billing-settings')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Default settings and billing'), findsOneWidget);
+    expect(find.text('Cylinder sizes'), findsOneWidget);
   });
 }

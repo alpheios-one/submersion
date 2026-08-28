@@ -151,11 +151,11 @@ class BlenderPreferences {
   final GasMix fillGas2;
   final GasMix fillGas3;
 
-  /// User-managed cylinder sizes (name + litres) offered alongside
-  /// [blenderTankChoices] in the cylinder dropdown. Empty by default: the
-  /// static choices already cover a first run, matching how [templates] seeds
-  /// itself only when the whole blob is absent rather than when this list is
-  /// empty.
+  /// User-managed cylinder sizes (name + litres) that feed the cylinder
+  /// dropdown. Seeded from [CylinderTemplate.seedTemplates] on first use only,
+  /// the same way [templates] seeds itself -- keyed on the whole blob being
+  /// absent rather than on this list being empty, so deleting every seeded
+  /// entry keeps it deleted.
   final List<CylinderTemplate> cylinderTemplates;
 
   static const int maxCylinderTemplates = kMaxCylinderTemplates;
@@ -178,7 +178,7 @@ class BlenderPreferences {
         fillGas1: const GasMix(o2: 100),
         fillGas2: const GasMix(o2: 0, he: 100),
         fillGas3: const GasMix(o2: 21),
-        cylinderTemplates: const [],
+        cylinderTemplates: CylinderTemplate.seedTemplates,
       );
 
   BlenderPreferences copyWith({

@@ -74,11 +74,11 @@ final blenderTemplatesProvider = StateProvider<List<MixTemplate>>(
   (ref) => BlenderPreferences.seedTemplates,
 );
 
-/// User-managed cylinder sizes, offered alongside [blenderTankChoices] in the
-/// cylinder dropdown. Empty until the diver adds one -- unlike templates,
-/// there is nothing to seed here.
+/// User-managed cylinder sizes that feed the cylinder dropdown, seeded with
+/// the blending-bench sizes from [CylinderTemplate.seedTemplates] the same
+/// way [blenderTemplatesProvider] seeds mix templates.
 final blenderCylinderTemplatesProvider = StateProvider<List<CylinderTemplate>>(
-  (ref) => const [],
+  (ref) => CylinderTemplate.seedTemplates,
 );
 
 /// Cylinders already finished and put on the bill, oldest first.

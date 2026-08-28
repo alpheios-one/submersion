@@ -3,6 +3,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -98,10 +99,13 @@ void main() {
     );
   });
 
-  test('cylinder templates start empty', () {
-    // Unlike mix templates, there is nothing to seed: the static presets
-    // already cover a first run (issue #1335).
-    expect(container.read(blenderCylinderTemplatesProvider), isEmpty);
+  test('cylinder templates start from the seeded blending-bench sizes', () {
+    // Issue #1335 follow-up: the dropdown reads only this list now, so it
+    // seeds the same way blenderTemplatesProvider does.
+    expect(
+      container.read(blenderCylinderTemplatesProvider),
+      CylinderTemplate.seedTemplates,
+    );
   });
 
   test('reset restores the defaults and bumps the epoch', () {
