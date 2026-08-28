@@ -21,11 +21,11 @@ Future<void> _pump(WidgetTester tester) async {
           (ref) => _TestSettingsNotifier(const AppSettings()),
         ),
       ],
-      child: MaterialApp(
-        locale: const Locale('en'),
+      child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const Scaffold(body: GasBlenderCalculator()),
+        home: Scaffold(body: GasBlenderCalculator()),
       ),
     ),
   );

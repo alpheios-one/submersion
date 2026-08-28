@@ -142,6 +142,11 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
   );
 });
 
+/// Loads the saved preferences once and pushes them into the state providers.
+///
+/// A first run has no stored blob, which is exactly what seeds the default
+/// templates. Deleting every template afterwards stores an empty list, and an
+/// empty list is not an absent blob, so the deletion sticks.
 // no-tick: a one-shot SEED with side effects, not a cached query. Re-running
 // it rewrites every StateProvider the blender persists and bumps the reset
 // epoch, so a tick from the blender's own save would re-seed every text field
@@ -149,11 +154,6 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
 // bounded: preferences changed on another device arrive on the next open of
 // the calculator rather than mid-session, and nothing here renders a stale
 // query result.
-/// Loads the saved preferences once and pushes them into the state providers.
-///
-/// A first run has no stored blob, which is exactly what seeds the default
-/// templates. Deleting every template afterwards stores an empty list, and an
-/// empty list is not an absent blob, so the deletion sticks.
 final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   final stored = await ref
       .read(appSettingsRepositoryProvider)
