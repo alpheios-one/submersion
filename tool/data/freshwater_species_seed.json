@@ -1,0 +1,1142 @@
+[
+  {
+    "id": "sp_northern_pike",
+    "scientificName": "Esox lucius",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Northern Pike",
+    "description": {
+      "en": "Long-bodied ambush predator with a duckbill snout, hanging motionless among weeds at lake margins.",
+      "de": "Langgestreckter Lauerjäger mit entenschnabelartigem Maul, der reglos zwischen Wasserpflanzen am Seeufer steht.",
+      "es": "Depredador alargado de hocico en forma de pico de pato que acecha inmóvil entre las plantas de la orilla.",
+      "fr": "Prédateur allongé au museau en bec de canard, immobile à l'affût dans les herbiers des bords de lac.",
+      "it": "Predatore allungato dal muso a becco d'anatra, immobile in agguato tra le piante delle rive lacustri.",
+      "pt": "Predador alongado de focinho em bico de pato, imóvel à espreita entre as plantas das margens dos lagos.",
+      "nl": "Langgerekte roofvis met een eendenbeksnuit die roerloos tussen de waterplanten langs de oever loert.",
+      "hu": "Megnyúlt testű, kacsacsőrszerű orrú lesből támadó ragadozó, mozdulatlanul áll a parti hínár között.",
+      "zh": "身体细长、吻部像鸭嘴的伏击型掠食鱼，常一动不动地悬停在湖岸水草间。",
+      "ar": "مفترس طويل الجسم بخطم يشبه منقار البط، يترصد بلا حراك بين نباتات حواف البحيرات.",
+      "he": "טורף ארוך גוף עם חרטום דמוי מקור ברווז, אורב ללא תנועה בין צמחי המים בשולי האגם."
+    }
+  },
+  {
+    "id": "sp_muskellunge",
+    "scientificName": "Esox masquinongy",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Muskellunge",
+    "description": {
+      "en": "The largest pike, a barred or spotted giant of clear northern lakes, rarely seen and never forgotten.",
+      "de": "Der größte Hecht, ein gestreifter oder gefleckter Riese klarer nördlicher Seen, selten gesehen und unvergesslich.",
+      "es": "El mayor de los lucios, un gigante rayado o moteado de lagos claros del norte, raro de ver e inolvidable.",
+      "fr": "Le plus grand des brochets, géant rayé ou tacheté des lacs clairs du nord, rarement vu et inoubliable.",
+      "it": "Il più grande dei lucci, un gigante striato o maculato dei limpidi laghi del nord, raro e indimenticabile.",
+      "pt": "O maior dos lúcios, um gigante listrado ou pintado dos lagos límpidos do norte, raro de ver e inesquecível.",
+      "nl": "De grootste snoek, een gestreepte of gevlekte reus van heldere noordelijke meren, zelden gezien en onvergetelijk.",
+      "hu": "A legnagyobb csukafaj, a tiszta északi tavak csíkos vagy pettyes óriása, ritkán látni, de felejthetetlen.",
+      "zh": "最大的狗鱼，北方清澈湖泊中带条纹或斑点的巨型鱼，难得一见但令人难忘。",
+      "ar": "أكبر أنواع الكراكي، عملاق مخطط أو مرقط في البحيرات الشمالية الصافية، نادر الرؤية ولا يُنسى.",
+      "he": "הגדול שבזאבי המים, ענק מפוספס או מנוקד של אגמים צפוניים צלולים, נדיר לראייה ובלתי נשכח."
+    }
+  },
+  {
+    "id": "sp_chain_pickerel",
+    "scientificName": "Esox niger",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Chain Pickerel",
+    "description": {
+      "en": "Slender pike of weedy eastern North American ponds, named for the chain-like pattern along its flanks.",
+      "de": "Schlanker Hecht verkrauteter Teiche im Osten Nordamerikas, benannt nach dem kettenartigen Muster seiner Flanken.",
+      "es": "Lucio esbelto de lagunas con vegetación del este de Norteamérica, llamado así por el dibujo en cadena de sus flancos.",
+      "fr": "Brochet élancé des étangs herbeux de l'est de l'Amérique du Nord, nommé pour le motif en chaîne de ses flancs.",
+      "it": "Luccio snello degli stagni erbosi del Nord America orientale, chiamato così per il disegno a catena sui fianchi.",
+      "pt": "Lúcio esguio dos lagos com vegetação do leste da América do Norte, nomeado pelo padrão em cadeia dos flancos.",
+      "nl": "Slanke snoek van begroeide vijvers in oostelijk Noord-Amerika, genoemd naar het kettingpatroon op zijn flanken.",
+      "hu": "Karcsú csuka Észak-Amerika keleti, hínáros tavaiból, oldalán láncszerű mintázatáról kapta a nevét.",
+      "zh": "北美东部水草茂密池塘中的细长狗鱼，因体侧链状花纹而得名。",
+      "ar": "كراكي نحيل يعيش في برك شرق أمريكا الشمالية العشبية، سُمي بذلك بسبب النمط الشبيه بالسلسلة على جانبيه.",
+      "he": "זאב מים דק של בריכות עשירות בצמחייה במזרח צפון אמריקה, שנקרא על שם דוגמת השרשרת שעל צדדיו."
+    }
+  },
+  {
+    "id": "sp_walleye",
+    "scientificName": "Sander vitreus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Walleye",
+    "description": {
+      "en": "Golden-olive perch relative with large reflective eyes, hunting at dusk over rocky and sandy lake bottoms.",
+      "de": "Goldoliv gefärbter Barschverwandter mit großen reflektierenden Augen, jagt in der Dämmerung über Fels- und Sandgrund.",
+      "es": "Pariente de la perca de color oliva dorado con grandes ojos reflectantes, caza al anochecer sobre fondos rocosos y arenosos.",
+      "fr": "Cousin doré de la perche aux grands yeux réfléchissants, il chasse au crépuscule sur les fonds rocheux et sableux.",
+      "it": "Parente del persico color oliva dorato con grandi occhi riflettenti, caccia al crepuscolo su fondali rocciosi e sabbiosi.",
+      "pt": "Parente da perca de tom oliva dourado com grandes olhos refletores, caça ao anoitecer sobre fundos rochosos e arenosos.",
+      "nl": "Goudolijfkleurige baarsachtige met grote, lichtweerkaatsende ogen die in de schemering boven rots- en zandbodems jaagt.",
+      "hu": "Aranyzöld sügérrokon nagy, fényvisszaverő szemekkel, alkonyatkor vadászik sziklás és homokos tófenék fölött.",
+      "zh": "金橄榄色的鲈科近亲，眼睛大而反光，黄昏时在岩石和沙质湖底上方捕食。",
+      "ar": "قريب للفرخ بلون زيتوني ذهبي وعينين كبيرتين عاكستين، يصطاد عند الغسق فوق قيعان البحيرات الصخرية والرملية.",
+      "he": "קרוב של הדקר בצבע זית זהוב ועיניים גדולות מחזירות אור, צד בדמדומים מעל קרקעיות סלעיות וחוליות."
+    }
+  },
+  {
+    "id": "sp_sauger",
+    "scientificName": "Sander canadensis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Sauger",
+    "description": {
+      "en": "Smaller, blotchier cousin of the walleye that favours turbid rivers and reservoirs.",
+      "de": "Kleinerer, fleckigerer Vetter des Glasaugenbarschs, der trübe Flüsse und Stauseen bevorzugt.",
+      "es": "Primo más pequeño y moteado del lucioperca americano, prefiere ríos turbios y embalses.",
+      "fr": "Cousin plus petit et plus tacheté du doré jaune, il préfère les rivières troubles et les réservoirs.",
+      "it": "Cugino più piccolo e macchiato del walleye, predilige fiumi torbidi e bacini artificiali.",
+      "pt": "Primo menor e mais manchado do walleye, prefere rios turvos e represas.",
+      "nl": "Kleinere, vlekkerigere neef van de walleye die troebele rivieren en stuwmeren verkiest.",
+      "hu": "A walleye kisebb, foltosabb rokona, zavaros folyókat és víztározókat kedvel.",
+      "zh": "大眼梭鲈体型更小、斑纹更多的近亲，偏爱浑浊的河流和水库。",
+      "ar": "ابن عم أصغر وأكثر تبقعاً لسمك الوالاي، يفضل الأنهار العكرة والخزانات.",
+      "he": "בן דוד קטן ומנומר יותר של הוואליי, מעדיף נהרות עכורים ומאגרים."
+    }
+  },
+  {
+    "id": "sp_yellow_perch",
+    "scientificName": "Perca flavescens",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Yellow Perch",
+    "description": {
+      "en": "Schooling golden perch with dark vertical bars, common around docks and weed beds across North America.",
+      "de": "Schwarmbildender goldgelber Barsch mit dunklen Querbinden, häufig an Stegen und Krautbetten in ganz Nordamerika.",
+      "es": "Perca dorada gregaria con barras verticales oscuras, común junto a muelles y praderas de plantas en Norteamérica.",
+      "fr": "Perche dorée grégaire aux barres verticales sombres, courante près des pontons et des herbiers en Amérique du Nord.",
+      "it": "Persico dorato gregario con barre verticali scure, comune presso pontili e praterie di piante in Nord America.",
+      "pt": "Perca dourada de cardume com barras verticais escuras, comum junto a cais e leitos de plantas na América do Norte.",
+      "nl": "Goudgele scholenvormende baars met donkere dwarsbanden, algemeen bij steigers en waterplanten in Noord-Amerika.",
+      "hu": "Rajokban járó aranysárga sügér sötét függőleges csíkokkal, gyakori stégek és hínárosok körül Észak-Amerikában.",
+      "zh": "成群活动的金黄色鲈鱼，体侧有深色竖纹，在北美的码头和水草丛附近很常见。",
+      "ar": "فرخ ذهبي يعيش في أسراب بخطوط عمودية داكنة، شائع حول الأرصفة ونباتات المياه في أمريكا الشمالية.",
+      "he": "דקר זהוב החי בלהקות עם פסים אנכיים כהים, נפוץ ליד מזחים ומצעי צמחייה ברחבי צפון אמריקה."
+    }
+  },
+  {
+    "id": "sp_european_perch",
+    "scientificName": "Perca fluviatilis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "European Perch",
+    "description": {
+      "en": "Striped, spiny-finned perch with red-orange lower fins, found in nearly every European lake and slow river.",
+      "de": "Gestreifter Barsch mit stacheliger Rückenflosse und rot-orangen Bauchflossen, in fast jedem See und langsamen Fluss Europas.",
+      "es": "Perca rayada de aletas espinosas y aletas inferiores rojo anaranjadas, presente en casi todos los lagos y ríos lentos de Europa.",
+      "fr": "Perche rayée aux nageoires épineuses et aux nageoires inférieures rouge orangé, présente dans presque tous les lacs et rivières lentes d'Europe.",
+      "it": "Persico striato dalle pinne spinose e pinne inferiori rosso arancio, presente in quasi ogni lago e fiume lento d'Europa.",
+      "pt": "Perca listrada de barbatanas espinhosas e barbatanas inferiores vermelho alaranjadas, presente em quase todos os lagos e rios lentos da Europa.",
+      "nl": "Gestreepte baars met stekelige vinnen en roodoranje buikvinnen, in vrijwel elk Europees meer en elke trage rivier.",
+      "hu": "Csíkos, tüskés úszójú sügér vörös-narancs alsó úszókkal, szinte minden európai tóban és lassú folyóban megtalálható.",
+      "zh": "带条纹、鳍有硬棘的鲈鱼，下鳍呈红橙色，几乎遍布欧洲所有湖泊和缓流河流。",
+      "ar": "فرخ مخطط بزعانف شوكية وزعانف سفلية حمراء برتقالية، يوجد في كل بحيرة ونهر بطيء تقريباً في أوروبا.",
+      "he": "דקר מפוספס עם סנפירים קוצניים וסנפירים תחתונים אדומים-כתומים, מצוי כמעט בכל אגם ונהר איטי באירופה."
+    }
+  },
+  {
+    "id": "sp_zander",
+    "scientificName": "Sander lucioperca",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Zander",
+    "description": {
+      "en": "Large pale predator with glassy eyes and fanged jaws, patrolling murky European lakes and rivers after dark.",
+      "de": "Großer, blasser Raubfisch mit glasigen Augen und Fangzähnen, der nachts trübe europäische Seen und Flüsse durchstreift.",
+      "es": "Gran depredador pálido de ojos vidriosos y mandíbulas con colmillos, patrulla lagos y ríos turbios de Europa de noche.",
+      "fr": "Grand prédateur pâle aux yeux vitreux et aux mâchoires à crocs, il patrouille les lacs et rivières troubles d'Europe la nuit.",
+      "it": "Grande predatore pallido dagli occhi vitrei e dalle mascelle con canini, pattuglia di notte laghi e fiumi torbidi d'Europa.",
+      "pt": "Grande predador pálido de olhos vítreos e mandíbulas com presas, patrulha lagos e rios turvos da Europa à noite.",
+      "nl": "Grote, bleke roofvis met glazige ogen en hoektanden die na donker door troebele Europese meren en rivieren patrouilleert.",
+      "hu": "Nagy, sápadt ragadozó üveges szemekkel és agyarszerű fogakkal, sötétedés után járja a zavaros európai tavakat és folyókat.",
+      "zh": "体型大、颜色淡的掠食鱼，眼睛呈玻璃状，口有尖牙，夜间在欧洲浑浊的湖河中巡游。",
+      "ar": "مفترس كبير شاحب اللون بعينين زجاجيتين وفكين ذوي أنياب، يجوب بحيرات وأنهار أوروبا العكرة بعد حلول الظلام.",
+      "he": "טורף גדול וחיוור עם עיניים זגוגיות ולסתות עם ניבים, מסייר באגמים ובנהרות עכורים באירופה אחרי רדת החשכה."
+    }
+  },
+  {
+    "id": "sp_ruffe",
+    "scientificName": "Gymnocephalus cernua",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Ruffe",
+    "description": {
+      "en": "Small mottled perch with a spiny joined dorsal fin, abundant on soft bottoms of European lakes.",
+      "de": "Kleiner, marmorierter Barsch mit durchgehender stacheliger Rückenflosse, häufig auf weichen Böden europäischer Seen.",
+      "es": "Pequeña perca moteada con aleta dorsal espinosa continua, abundante en fondos blandos de lagos europeos.",
+      "fr": "Petite perche marbrée à la nageoire dorsale épineuse continue, abondante sur les fonds meubles des lacs européens.",
+      "it": "Piccolo persico marmorizzato con pinna dorsale spinosa continua, abbondante sui fondali molli dei laghi europei.",
+      "pt": "Pequena perca mosqueada com barbatana dorsal espinhosa contínua, abundante em fundos moles de lagos europeus.",
+      "nl": "Kleine gevlekte pos met een doorlopende stekelige rugvin, talrijk op zachte bodems van Europese meren.",
+      "hu": "Kis, márványozott mintájú vágó durbincs egybefüggő tüskés hátúszóval, gyakori az európai tavak puha fenekén.",
+      "zh": "小型斑纹鲈鱼，背鳍连成一片且有硬棘，在欧洲湖泊的软质湖底大量出现。",
+      "ar": "فرخ صغير مرقط بزعنفة ظهرية شوكية متصلة، وفير على القيعان الطرية في بحيرات أوروبا.",
+      "he": "דקר קטן ומנומר עם סנפיר גב קוצני מחובר, שכיח על קרקעיות רכות של אגמים אירופיים."
+    }
+  },
+  {
+    "id": "sp_largemouth_bass",
+    "scientificName": "Micropterus salmoides",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Largemouth Bass",
+    "description": {
+      "en": "Green-backed bass with a dark side stripe and a huge mouth, lurking beside logs and weed edges in warm lakes.",
+      "de": "Grünrückiger Barsch mit dunklem Seitenstreifen und riesigem Maul, lauert an Baumstämmen und Krautkanten warmer Seen.",
+      "es": "Lubina negra de lomo verde, franja lateral oscura y boca enorme, acecha junto a troncos y bordes de vegetación en lagos cálidos.",
+      "fr": "Achigan au dos vert, à la bande latérale sombre et à l'énorme bouche, à l'affût près des troncs et des bordures d'herbiers des lacs chauds.",
+      "it": "Persico trota dal dorso verde con striscia laterale scura e bocca enorme, in agguato accanto a tronchi e bordi di vegetazione nei laghi caldi.",
+      "pt": "Achigã de dorso verde, faixa lateral escura e boca enorme, à espreita junto a troncos e bordas de vegetação em lagos quentes.",
+      "nl": "Groenrugbaars met een donkere zijstreep en enorme bek die bij boomstammen en plantenranden in warme meren loert.",
+      "hu": "Zöld hátú sügér sötét oldalcsíkkal és hatalmas szájjal, fatörzsek és hínárszegélyek mellett les a meleg tavakban.",
+      "zh": "背部绿色的黑鲈，体侧有深色条纹，嘴巴极大，潜伏在温暖湖泊的倒木和水草边缘。",
+      "ar": "قاروص أخضر الظهر بخط جانبي داكن وفم ضخم، يترصد قرب جذوع الأشجار وحواف النباتات في البحيرات الدافئة.",
+      "he": "בס ירוק גב עם פס צד כהה ופה עצום, אורב ליד גזעים ושולי צמחייה באגמים חמימים."
+    }
+  },
+  {
+    "id": "sp_smallmouth_bass",
+    "scientificName": "Micropterus dolomieu",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Smallmouth Bass",
+    "description": {
+      "en": "Bronze bass with faint vertical bars, holding over rock and gravel in clear, cool lakes and rivers.",
+      "de": "Bronzefarbener Barsch mit schwachen Querbinden, steht über Fels und Kies in klaren, kühlen Seen und Flüssen.",
+      "es": "Lubina bronceada con barras verticales tenues, se mantiene sobre roca y grava en lagos y ríos claros y frescos.",
+      "fr": "Achigan bronzé aux barres verticales discrètes, posté sur la roche et le gravier des lacs et rivières clairs et frais.",
+      "it": "Persico bronzeo con deboli barre verticali, staziona su roccia e ghiaia in laghi e fiumi limpidi e freschi.",
+      "pt": "Achigã bronzeado com barras verticais ténues, mantém-se sobre rocha e cascalho em lagos e rios claros e frescos.",
+      "nl": "Bronskleurige baars met vage dwarsbanden die boven rots en grind in heldere, koele meren en rivieren staat.",
+      "hu": "Bronzszínű sügér halvány függőleges csíkokkal, sziklás és kavicsos aljzat fölött áll tiszta, hűvös tavakban és folyókban.",
+      "zh": "古铜色的黑鲈，体侧有淡淡的竖纹，栖息在清凉湖河的岩石和砾石上方。",
+      "ar": "قاروص برونزي بخطوط عمودية باهتة، يستقر فوق الصخور والحصى في البحيرات والأنهار الصافية الباردة.",
+      "he": "בס ארדי עם פסים אנכיים עדינים, שוהה מעל סלע וחצץ באגמים ובנהרות צלולים וקרירים."
+    }
+  },
+  {
+    "id": "sp_rock_bass",
+    "scientificName": "Ambloplites rupestris",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Rock Bass",
+    "description": {
+      "en": "Chunky red-eyed sunfish with rows of dark spots, sheltering among boulders in clear streams and lakes.",
+      "de": "Gedrungener rotäugiger Sonnenbarsch mit Reihen dunkler Flecken, versteckt sich zwischen Felsblöcken klarer Bäche und Seen.",
+      "es": "Pez sol robusto de ojos rojos con filas de puntos oscuros, se refugia entre bloques de roca en arroyos y lagos claros.",
+      "fr": "Crapet trapu aux yeux rouges et aux rangées de points sombres, abrité parmi les blocs des ruisseaux et lacs clairs.",
+      "it": "Tozzo persico sole dagli occhi rossi con file di punti scuri, si ripara tra i massi di torrenti e laghi limpidi.",
+      "pt": "Peixe-sol atarracado de olhos vermelhos com fileiras de pontos escuros, abriga-se entre pedregulhos em riachos e lagos claros.",
+      "nl": "Gedrongen roodogige zonnebaars met rijen donkere vlekken die tussen rotsblokken in heldere beken en meren schuilt.",
+      "hu": "Zömök, vörös szemű naphal sötét pontsorokkal, sziklatömbök között rejtőzik tiszta patakokban és tavakban.",
+      "zh": "体型粗壮、眼睛发红的太阳鱼，体侧有成排深色斑点，藏身于清澈溪流和湖泊的巨石间。",
+      "ar": "سمكة شمس ممتلئة بعينين حمراوين وصفوف من البقع الداكنة، تحتمي بين الصخور الكبيرة في الجداول والبحيرات الصافية.",
+      "he": "דג שמש גוץ אדום עיניים עם שורות כתמים כהים, מסתתר בין סלעים גדולים בנחלים ובאגמים צלולים."
+    }
+  },
+  {
+    "id": "sp_bluegill",
+    "scientificName": "Lepomis macrochirus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Bluegill",
+    "description": {
+      "en": "Disc-shaped sunfish with a blue-black ear flap and orange breast, nesting in colonies on shallow sandy bottoms.",
+      "de": "Scheibenförmiger Sonnenbarsch mit blauschwarzem Kiemenlappen und oranger Brust, nistet in Kolonien auf flachen Sandböden.",
+      "es": "Pez sol discoidal con opérculo azul negruzco y pecho anaranjado, anida en colonias sobre fondos arenosos someros.",
+      "fr": "Crapet discoïde à l'opercule bleu-noir et à la poitrine orange, il niche en colonies sur les fonds sableux peu profonds.",
+      "it": "Persico sole discoidale con lobo opercolare blu-nero e petto arancione, nidifica in colonie su fondali sabbiosi bassi.",
+      "pt": "Peixe-sol discoide com opérculo azul-escuro e peito laranja, nidifica em colónias em fundos arenosos rasos.",
+      "nl": "Schijfvormige zonnebaars met een blauwzwarte kieuwflap en oranje borst die in kolonies nestelt op ondiepe zandbodems.",
+      "hu": "Korong alakú naphal kékesfekete kopoltyúfedő-lebennyel és narancssárga mellel, kolóniákban fészkel sekély homokos aljzaton.",
+      "zh": "圆盘状的太阳鱼，鳃盖有蓝黑色耳片，胸部橙色，在浅沙底成群筑巢。",
+      "ar": "سمكة شمس قرصية الشكل بغطاء خيشومي أزرق مسوّد وصدر برتقالي، تعشش في مستعمرات على القيعان الرملية الضحلة.",
+      "he": "דג שמש דמוי דיסקה עם דש זימים כחול-שחור וחזה כתום, מקנן במושבות על קרקעיות חוליות רדודות."
+    }
+  },
+  {
+    "id": "sp_pumpkinseed",
+    "scientificName": "Lepomis gibbosus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Pumpkinseed",
+    "description": {
+      "en": "Brightly speckled sunfish with a red-tipped ear flap and wavy blue cheek lines, common in weedy shallows.",
+      "de": "Bunt gesprenkelter Sonnenbarsch mit rot gesäumtem Kiemenlappen und welligen blauen Wangenlinien, häufig im krautigen Flachwasser.",
+      "es": "Pez sol de moteado vivo con opérculo de punta roja y líneas azules onduladas en las mejillas, común en aguas someras con vegetación.",
+      "fr": "Crapet-soleil vivement moucheté à l'opercule bordé de rouge et aux lignes bleues ondulées sur les joues, courant dans les hauts-fonds herbeux.",
+      "it": "Persico sole vivacemente punteggiato con lobo opercolare bordato di rosso e linee blu ondulate sulle guance, comune nei bassifondi erbosi.",
+      "pt": "Peixe-sol vivamente salpicado com opérculo de ponta vermelha e linhas azuis onduladas nas bochechas, comum em águas rasas com vegetação.",
+      "nl": "Felgevlekte zonnebaars met een roodgerande kieuwflap en golvende blauwe wanglijnen, algemeen in begroeid ondiep water.",
+      "hu": "Élénken pettyezett naphal vörös szegélyű kopoltyúlebennyel és hullámos kék pofacsíkokkal, gyakori a hínáros sekélyesekben.",
+      "zh": "色彩斑斓的太阳鱼，耳片末端红色，面颊有波浪状蓝纹，常见于水草茂密的浅水区。",
+      "ar": "سمكة شمس منقطة بألوان زاهية بغطاء خيشومي ذي طرف أحمر وخطوط زرقاء متموجة على الخدين، شائعة في المياه الضحلة العشبية.",
+      "he": "דג שמש מנוקד בצבעים עזים עם דש זימים בקצה אדום וקווי לחי כחולים גליים, נפוץ ברדודים עשירי צמחייה."
+    }
+  },
+  {
+    "id": "sp_black_crappie",
+    "scientificName": "Pomoxis nigromaculatus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Black Crappie",
+    "description": {
+      "en": "Silvery, deep-bodied panfish speckled with black, schooling around submerged brush and pilings.",
+      "de": "Silbriger, hochrückiger Sonnenbarsch mit schwarzen Sprenkeln, schwärmt um versunkenes Geäst und Pfähle.",
+      "es": "Pez de cuerpo alto y plateado salpicado de negro, forma bancos alrededor de ramas sumergidas y pilotes.",
+      "fr": "Poisson argenté au corps haut moucheté de noir, en bancs autour des branchages immergés et des pilotis.",
+      "it": "Pesce argenteo dal corpo alto punteggiato di nero, in banchi attorno a rami sommersi e pali.",
+      "pt": "Peixe prateado de corpo alto salpicado de preto, em cardumes junto a ramos submersos e estacas.",
+      "nl": "Zilverkleurige, hoogrugge zonnebaars met zwarte spikkels die in scholen rond verzonken takken en palen zwemt.",
+      "hu": "Ezüstös, magas testű, fekete pettyes naphalféle, elmerült ágak és cölöpök körül rajzik.",
+      "zh": "银色高身的小型鱼，布满黑色斑点，成群聚集在沉没的树枝和桩柱周围。",
+      "ar": "سمكة فضية عالية الجسم مرقطة بالأسود، تتجمع في أسراب حول الأغصان الغارقة والأعمدة.",
+      "he": "דג כסוף וגבוה גוף מנוקד בשחור, נע בלהקות סביב ענפים שקועים ועמודים."
+    }
+  },
+  {
+    "id": "sp_white_crappie",
+    "scientificName": "Pomoxis annularis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "White Crappie",
+    "description": {
+      "en": "Paler crappie with faint vertical bands, favouring turbid reservoirs and slow rivers.",
+      "de": "Blasserer Crappie mit schwachen Querbändern, bevorzugt trübe Stauseen und langsame Flüsse.",
+      "es": "Crappie más pálido con bandas verticales tenues, prefiere embalses turbios y ríos lentos.",
+      "fr": "Crapet plus pâle aux bandes verticales discrètes, il préfère les réservoirs troubles et les rivières lentes.",
+      "it": "Crappie più pallido con deboli bande verticali, predilige bacini torbidi e fiumi lenti.",
+      "pt": "Crappie mais pálido com faixas verticais ténues, prefere represas turvas e rios lentos.",
+      "nl": "Bleker crappie met vage dwarsbanden die troebele stuwmeren en trage rivieren verkiest.",
+      "hu": "Halványabb crappie gyenge függőleges sávokkal, zavaros víztározókat és lassú folyókat kedvel.",
+      "zh": "颜色较淡的莓鲈，体侧有淡淡的竖带，偏爱浑浊的水库和缓流河流。",
+      "ar": "كرابي أكثر شحوباً بأشرطة عمودية باهتة، يفضل الخزانات العكرة والأنهار البطيئة.",
+      "he": "קראפי חיוור יותר עם פסים אנכיים עדינים, מעדיף מאגרים עכורים ונהרות איטיים."
+    }
+  },
+  {
+    "id": "sp_brown_trout",
+    "scientificName": "Salmo trutta",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Brown Trout",
+    "description": {
+      "en": "Golden-brown trout with red and black spots, holding in the current of cool, clear rivers and lakes.",
+      "de": "Goldbraune Forelle mit roten und schwarzen Punkten, steht in der Strömung kühler, klarer Flüsse und Seen.",
+      "es": "Trucha pardo dorada con puntos rojos y negros, se mantiene en la corriente de ríos y lagos frescos y claros.",
+      "fr": "Truite brun doré aux points rouges et noirs, postée dans le courant des rivières et lacs frais et clairs.",
+      "it": "Trota bruno dorata con punti rossi e neri, staziona nella corrente di fiumi e laghi freschi e limpidi.",
+      "pt": "Truta castanho dourada com pintas vermelhas e pretas, mantém-se na corrente de rios e lagos frescos e claros.",
+      "nl": "Goudbruine forel met rode en zwarte stippen die in de stroming van koele, heldere rivieren en meren staat.",
+      "hu": "Aranybarna pisztráng vörös és fekete pettyekkel, hűvös, tiszta folyók és tavak sodrában áll.",
+      "zh": "金棕色的鳟鱼，身上有红色和黑色斑点，栖息在清凉河流和湖泊的水流中。",
+      "ar": "تروتة بنية ذهبية ببقع حمراء وسوداء، تستقر في تيار الأنهار والبحيرات الباردة الصافية.",
+      "he": "פורל חום-זהוב עם נקודות אדומות ושחורות, שוהה בזרם של נהרות ואגמים קרירים וצלולים."
+    }
+  },
+  {
+    "id": "sp_rainbow_trout",
+    "scientificName": "Oncorhynchus mykiss",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Rainbow Trout",
+    "description": {
+      "en": "Silvery trout with a pink lateral band and fine black speckling, stocked and wild in cold waters worldwide.",
+      "de": "Silbrige Forelle mit rosafarbenem Seitenband und feiner schwarzer Sprenkelung, besetzt und wild in kalten Gewässern weltweit.",
+      "es": "Trucha plateada con banda lateral rosada y fino moteado negro, repoblada y salvaje en aguas frías de todo el mundo.",
+      "fr": "Truite argentée à la bande latérale rose et au fin moucheté noir, introduite et sauvage dans les eaux froides du monde entier.",
+      "it": "Trota argentea con banda laterale rosa e fine punteggiatura nera, immessa e selvatica nelle acque fredde di tutto il mondo.",
+      "pt": "Truta prateada com faixa lateral rosada e fino salpicado preto, repovoada e selvagem em águas frias de todo o mundo.",
+      "nl": "Zilverkleurige forel met een roze zijband en fijne zwarte spikkels, uitgezet en wild in koud water wereldwijd.",
+      "hu": "Ezüstös pisztráng rózsaszín oldalsávval és finom fekete pettyezéssel, telepített és vad populációi hideg vizekben világszerte.",
+      "zh": "银色的鳟鱼，体侧有粉红色带，布满细小黑斑，在全球冷水中既有放流也有野生种群。",
+      "ar": "تروتة فضية بشريط جانبي وردي ونقاط سوداء دقيقة، تُستزرع وتعيش برياً في المياه الباردة حول العالم.",
+      "he": "פורל כסוף עם פס צד ורוד ונקודות שחורות עדינות, מאוכלס ופראי במים קרים ברחבי העולם."
+    }
+  },
+  {
+    "id": "sp_brook_trout",
+    "scientificName": "Salvelinus fontinalis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Brook Trout",
+    "description": {
+      "en": "Char with worm-like markings on its back, red spots in blue halos and white-edged fins, in cold headwater streams.",
+      "de": "Saibling mit wurmartiger Rückenzeichnung, roten Punkten in blauen Höfen und weiß gesäumten Flossen, in kalten Quellbächen.",
+      "es": "Salvelino con marcas vermiformes en el lomo, puntos rojos con halos azules y aletas de borde blanco, en arroyos fríos de cabecera.",
+      "fr": "Omble aux marbrures vermiculées sur le dos, points rouges cerclés de bleu et nageoires bordées de blanc, dans les ruisseaux froids de tête de bassin.",
+      "it": "Salmerino con marcature vermiformi sul dorso, punti rossi in aloni blu e pinne bordate di bianco, nei freddi torrenti di testata.",
+      "pt": "Truta-das-fontes com marcas vermiformes no dorso, pintas vermelhas com halos azuis e barbatanas orladas de branco, em riachos frios de cabeceira.",
+      "nl": "Bronforel met wormvormige tekening op de rug, rode stippen in blauwe ringen en witgerande vinnen, in koude bovenlopen.",
+      "hu": "Pataki szaibling féregszerű hátmintázattal, kék udvarú vörös pettyekkel és fehér szegélyű úszókkal, hideg forrásvidéki patakokban.",
+      "zh": "背部有蠕虫状花纹的红点鲑，红点外有蓝色光晕，鳍缘白色，栖息于寒冷的源头溪流。",
+      "ar": "شار بعلامات دودية الشكل على ظهره وبقع حمراء بهالات زرقاء وزعانف بحواف بيضاء، في جداول المنبع الباردة.",
+      "he": "שאר עם סימנים דמויי תולעים על הגב, נקודות אדומות בהילות כחולות וסנפירים בשוליים לבנים, בנחלי מקור קרים."
+    }
+  },
+  {
+    "id": "sp_lake_trout",
+    "scientificName": "Salvelinus namaycush",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Lake Trout",
+    "description": {
+      "en": "Big grey char covered in pale spots with a forked tail, cruising the deep cold water of northern lakes.",
+      "de": "Großer grauer Saibling mit hellen Flecken und gegabelter Schwanzflosse, zieht durch das tiefe kalte Wasser nördlicher Seen.",
+      "es": "Gran salvelino gris cubierto de manchas claras y cola ahorquillada, recorre las aguas frías y profundas de lagos del norte.",
+      "fr": "Grand omble gris couvert de taches pâles à la queue fourchue, il sillonne les eaux froides et profondes des lacs du nord.",
+      "it": "Grande salmerino grigio coperto di macchie chiare con coda forcuta, percorre le acque fredde e profonde dei laghi del nord.",
+      "pt": "Grande truta-de-lago cinzenta coberta de manchas claras e cauda bifurcada, percorre as águas frias e profundas dos lagos do norte.",
+      "nl": "Grote grijze forel bedekt met lichte vlekken en een gevorkte staart die door het diepe koude water van noordelijke meren kruist.",
+      "hu": "Nagy, szürke, világos foltokkal borított szaibling villás farokkal, az északi tavak mély, hideg vizét járja.",
+      "zh": "大型灰色红点鲑，布满淡色斑点，尾鳍分叉，在北方湖泊深冷水域中巡游。",
+      "ar": "شار رمادي كبير مغطى ببقع باهتة وذيل متشعب، يجوب المياه العميقة الباردة في البحيرات الشمالية.",
+      "he": "שאר אפור גדול מכוסה כתמים בהירים עם זנב מפוצל, משייט במים העמוקים והקרים של אגמים צפוניים."
+    }
+  },
+  {
+    "id": "sp_arctic_char",
+    "scientificName": "Salvelinus alpinus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Arctic Char",
+    "description": {
+      "en": "Northernmost freshwater fish, a slender char whose belly flushes orange-red in autumn spawning colours.",
+      "de": "Nördlichster Süßwasserfisch, ein schlanker Saibling, dessen Bauch sich zur Herbstlaichzeit orangerot färbt.",
+      "es": "El pez de agua dulce más septentrional, un salvelino esbelto cuyo vientre se tiñe de rojo anaranjado en la freza otoñal.",
+      "fr": "Poisson d'eau douce le plus septentrional, omble élancé dont le ventre se teinte de rouge orangé aux couleurs de frai d'automne.",
+      "it": "Il pesce d'acqua dolce più settentrionale, un salmerino snello il cui ventre si tinge di rosso arancio nella livrea riproduttiva autunnale.",
+      "pt": "O peixe de água doce mais setentrional, uma truta esguia cujo ventre se tinge de vermelho alaranjado nas cores de desova outonais.",
+      "nl": "Noordelijkste zoetwatervis, een slanke forel waarvan de buik in de herfstpaaitijd oranjerood kleurt.",
+      "hu": "A legészakibb édesvízi hal, karcsú szaibling, amelynek hasa az őszi ívási időszakban narancsvörösre színeződik.",
+      "zh": "分布最北的淡水鱼，体形细长的红点鲑，秋季繁殖期腹部泛出橙红色。",
+      "ar": "أقصى أسماك المياه العذبة شمالاً، شار نحيل يتورد بطنه باللون الأحمر البرتقالي في ألوان التزاوج الخريفية.",
+      "he": "דג המים המתוקים הצפוני ביותר, שאר דק שבטנו מסמיקה לכתום-אדום בצבעי ההטלה של הסתיו."
+    }
+  },
+  {
+    "id": "sp_atlantic_salmon",
+    "scientificName": "Salmo salar",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Atlantic Salmon",
+    "description": {
+      "en": "Silver sea-run salmon with black X-shaped spots, leaping falls on its return to natal rivers to spawn.",
+      "de": "Silberner Wanderlachs mit schwarzen X-förmigen Punkten, überspringt Wasserfälle auf dem Rückweg in seine Geburtsflüsse.",
+      "es": "Salmón plateado anádromo con puntos negros en forma de X, salta cascadas al regresar a sus ríos natales para desovar.",
+      "fr": "Saumon argenté migrateur aux points noirs en forme de X, franchissant les chutes pour regagner sa rivière natale et frayer.",
+      "it": "Salmone argenteo anadromo con punti neri a forma di X, salta le cascate tornando ai fiumi natali per riprodursi.",
+      "pt": "Salmão prateado migrador com pintas pretas em forma de X, salta quedas de água ao regressar aos rios natais para desovar.",
+      "nl": "Zilveren zeeforelachtige zalm met zwarte X-vormige stippen die watervallen overspringt op weg naar zijn geboorterivier.",
+      "hu": "Ezüstös, tengerjáró lazac fekete X alakú pettyekkel, vízeséseket ugrik át, amikor ívni visszatér szülőfolyójába.",
+      "zh": "银色的溯河洄游鲑鱼，身上有X形黑斑，返回出生河流产卵时会跃过瀑布。",
+      "ar": "سلمون فضي مهاجر ببقع سوداء على شكل X، يقفز فوق الشلالات عند عودته إلى أنهار مولده للتكاثر.",
+      "he": "סלמון כסוף נודד בים עם נקודות שחורות בצורת X, מזנק מעל מפלים בדרכו חזרה לנהרות הולדתו להטלה."
+    }
+  },
+  {
+    "id": "sp_chinook_salmon",
+    "scientificName": "Oncorhynchus tshawytscha",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Chinook Salmon",
+    "description": {
+      "en": "The largest Pacific salmon, blue-green backed with black gums, ascending big western rivers to spawn.",
+      "de": "Der größte Pazifiklachs, blaugrüner Rücken und schwarzes Zahnfleisch, steigt zum Laichen in große westliche Flüsse auf.",
+      "es": "El mayor salmón del Pacífico, de lomo azul verdoso y encías negras, remonta los grandes ríos del oeste para desovar.",
+      "fr": "Le plus grand saumon du Pacifique, au dos bleu-vert et aux gencives noires, remonte les grands fleuves de l'ouest pour frayer.",
+      "it": "Il più grande salmone del Pacifico, dorso blu-verde e gengive nere, risale i grandi fiumi occidentali per riprodursi.",
+      "pt": "O maior salmão do Pacífico, de dorso azul-esverdeado e gengivas pretas, sobe os grandes rios ocidentais para desovar.",
+      "nl": "De grootste Pacifische zalm, met blauwgroene rug en zwart tandvlees, die grote westelijke rivieren opzwemt om te paaien.",
+      "hu": "A legnagyobb csendes-óceáni lazac, kékeszöld háttal és fekete ínnyel, ívni a nagy nyugati folyókba vándorol fel.",
+      "zh": "体型最大的太平洋鲑，背部蓝绿色，牙龈黑色，溯游西部大河产卵。",
+      "ar": "أكبر سلمون المحيط الهادئ، بظهر أزرق مخضر ولثة سوداء، يصعد الأنهار الغربية الكبيرة للتكاثر.",
+      "he": "הסלמון הגדול ביותר של האוקיינוס השקט, בעל גב כחול-ירוק וחניכיים שחורות, עולה בנהרות המערב הגדולים להטלה."
+    }
+  },
+  {
+    "id": "sp_sockeye_salmon",
+    "scientificName": "Oncorhynchus nerka",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Sockeye Salmon",
+    "description": {
+      "en": "Salmon that turns brilliant red with a green head at spawning, crowding gravel beds of lake-fed rivers.",
+      "de": "Lachs, der zur Laichzeit leuchtend rot mit grünem Kopf wird und die Kiesbetten seengespeister Flüsse füllt.",
+      "es": "Salmón que se vuelve rojo brillante con cabeza verde al desovar, abarrotando los lechos de grava de ríos alimentados por lagos.",
+      "fr": "Saumon qui devient rouge vif à tête verte au frai, se pressant sur les lits de gravier des rivières alimentées par des lacs.",
+      "it": "Salmone che al momento della frega diventa rosso acceso con la testa verde, affollando i letti di ghiaia dei fiumi alimentati da laghi.",
+      "pt": "Salmão que fica vermelho vivo com cabeça verde na desova, enchendo os leitos de cascalho de rios alimentados por lagos.",
+      "nl": "Zalm die bij het paaien felrood met een groene kop wordt en de grindbedden van door meren gevoede rivieren vult.",
+      "hu": "Íváskor élénkvörösre színeződő, zöld fejű lazac, ellepi a tavak táplálta folyók kavicságyait.",
+      "zh": "产卵期体色变为鲜红、头部呈绿色的鲑鱼，成群聚集在湖泊补给河流的砾石床上。",
+      "ar": "سلمون يتحول عند التكاثر إلى الأحمر الزاهي برأس أخضر، ويزدحم على قيعان الحصى في الأنهار التي تغذيها البحيرات.",
+      "he": "סלמון שהופך אדום בוהק עם ראש ירוק בעת ההטלה, וממלא את מצעי החצץ של נהרות הניזונים מאגמים."
+    }
+  },
+  {
+    "id": "sp_coho_salmon",
+    "scientificName": "Oncorhynchus kisutch",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Coho Salmon",
+    "description": {
+      "en": "Silver salmon with white gums and spots only on the upper tail, spawning in small coastal streams.",
+      "de": "Silberlachs mit weißem Zahnfleisch und Punkten nur auf der oberen Schwanzhälfte, laicht in kleinen Küstenbächen.",
+      "es": "Salmón plateado de encías blancas y puntos solo en la parte superior de la cola, desova en pequeños arroyos costeros.",
+      "fr": "Saumon argenté aux gencives blanches et aux points limités au haut de la queue, il fraie dans les petits ruisseaux côtiers.",
+      "it": "Salmone argenteo con gengive bianche e punti solo sulla parte superiore della coda, si riproduce in piccoli torrenti costieri.",
+      "pt": "Salmão prateado de gengivas brancas e pintas apenas na parte superior da cauda, desova em pequenos riachos costeiros.",
+      "nl": "Zilverzalm met wit tandvlees en stippen alleen op het bovenste deel van de staart, paait in kleine kustbeken.",
+      "hu": "Ezüstlazac fehér ínnyel és csak a farok felső felén lévő pettyekkel, kis parti patakokban ívik.",
+      "zh": "银鲑，牙龈白色，斑点仅分布于尾鳍上半部，在小型沿海溪流中产卵。",
+      "ar": "سلمون فضي بلثة بيضاء وبقع على الجزء العلوي من الذيل فقط، يتكاثر في الجداول الساحلية الصغيرة.",
+      "he": "סלמון כסוף עם חניכיים לבנות ונקודות רק בחלק העליון של הזנב, מטיל בנחלי חוף קטנים."
+    }
+  },
+  {
+    "id": "sp_kokanee",
+    "scientificName": "Oncorhynchus nerka kokanee",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Kokanee",
+    "description": {
+      "en": "Landlocked sockeye that never goes to sea, schooling in deep clear lakes and turning red each autumn.",
+      "de": "Binnenlandform des Rotlachses, die nie ins Meer zieht, schwärmt in tiefen klaren Seen und färbt sich jeden Herbst rot.",
+      "es": "Salmón rojo confinado a agua dulce que nunca va al mar, forma bancos en lagos profundos y claros y enrojece cada otoño.",
+      "fr": "Saumon rouge cantonné en eau douce qui ne rejoint jamais la mer, en bancs dans les lacs profonds et clairs, rougissant chaque automne.",
+      "it": "Salmone rosso confinato in acqua dolce che non raggiunge mai il mare, in banchi nei laghi profondi e limpidi, si arrossa ogni autunno.",
+      "pt": "Salmão vermelho confinado à água doce que nunca vai ao mar, em cardumes em lagos profundos e claros, ficando vermelho a cada outono.",
+      "nl": "Rode zalm die in zoet water opgesloten zit en nooit naar zee gaat, scholen in diepe heldere meren en kleurt elke herfst rood.",
+      "hu": "Édesvízbe zárt vörös lazac, amely sosem jut a tengerre, mély, tiszta tavakban rajzik és minden ősszel vörösre színeződik.",
+      "zh": "陆封型红鲑，终生不入海，在深邃清澈的湖泊中成群生活，每年秋季变红。",
+      "ar": "سلمون أحمر محبوس في المياه العذبة لا يذهب إلى البحر أبداً، يعيش في أسراب في البحيرات العميقة الصافية ويحمرّ كل خريف.",
+      "he": "סלמון אדום כלוא במים מתוקים שלעולם אינו יוצא לים, נע בלהקות באגמים עמוקים וצלולים ומאדים בכל סתיו."
+    }
+  },
+  {
+    "id": "sp_lake_whitefish",
+    "scientificName": "Coregonus clupeaformis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Lake Whitefish",
+    "description": {
+      "en": "Silvery, small-mouthed whitefish of deep cold lakes, feeding on the bottom in large schools.",
+      "de": "Silbrige, kleinmäulige Renke tiefer kalter Seen, frisst in großen Schwärmen am Grund.",
+      "es": "Corégono plateado de boca pequeña de lagos fríos y profundos, se alimenta en el fondo en grandes bancos.",
+      "fr": "Corégone argenté à petite bouche des lacs froids et profonds, se nourrissant sur le fond en grands bancs.",
+      "it": "Coregone argenteo dalla bocca piccola dei laghi freddi e profondi, si nutre sul fondo in grandi banchi.",
+      "pt": "Peixe-branco prateado de boca pequena dos lagos frios e profundos, alimenta-se no fundo em grandes cardumes.",
+      "nl": "Zilverkleurige houting met kleine bek uit diepe koude meren, die in grote scholen op de bodem foerageert.",
+      "hu": "Ezüstös, kis szájú maréna mély, hideg tavakból, nagy rajokban táplálkozik a fenéken.",
+      "zh": "银色小嘴的白鲑，生活在寒冷的深水湖泊，成大群在湖底觅食。",
+      "ar": "سمكة بيضاء فضية صغيرة الفم تعيش في البحيرات العميقة الباردة، تتغذى على القاع في أسراب كبيرة.",
+      "he": "דג לבן כסוף קטן פה של אגמים קרים ועמוקים, ניזון על הקרקעית בלהקות גדולות."
+    }
+  },
+  {
+    "id": "sp_cisco",
+    "scientificName": "Coregonus artedi",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Cisco",
+    "description": {
+      "en": "Slender herring-like whitefish that shoals in open water of cold northern lakes, prey for lake trout.",
+      "de": "Schlanke, heringsähnliche Renke, die im Freiwasser kalter nördlicher Seen schwärmt, Beute des Seesaiblings.",
+      "es": "Corégono esbelto parecido a un arenque que forma bancos en aguas abiertas de lagos fríos del norte, presa de la trucha lacustre.",
+      "fr": "Corégone élancé semblable à un hareng, en bancs en pleine eau des lacs froids du nord, proie du touladi.",
+      "it": "Coregone snello simile a un'aringa che forma banchi in acque aperte dei freddi laghi del nord, preda del salmerino di lago.",
+      "pt": "Peixe-branco esguio semelhante a um arenque que forma cardumes em águas abertas de lagos frios do norte, presa da truta-de-lago.",
+      "nl": "Slanke haringachtige houting die in open water van koude noordelijke meren schoolt, prooi voor de meerforel.",
+      "hu": "Karcsú, heringre emlékeztető maréna, az északi hideg tavak nyílt vizében rajzik, a tavi szaibling zsákmánya.",
+      "zh": "体形细长、似鲱鱼的白鲑，在北方冷水湖的开阔水域成群活动，是湖鳟的猎物。",
+      "ar": "سمكة بيضاء نحيلة تشبه الرنجة تتجمع في أسراب في المياه المفتوحة للبحيرات الشمالية الباردة، فريسة لتروتة البحيرات.",
+      "he": "דג לבן דק דמוי הרינג שנע בלהקות במים הפתוחים של אגמים צפוניים קרים, טרף לפורל האגמים."
+    }
+  },
+  {
+    "id": "sp_european_grayling",
+    "scientificName": "Thymallus thymallus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "European Grayling",
+    "description": {
+      "en": "Silver-grey river fish with a tall, sail-like dorsal fin edged in purple, holding in fast clean gravel runs.",
+      "de": "Silbergrauer Flussfisch mit hoher, segelartiger, purpurn gesäumter Rückenflosse, steht in schnellen sauberen Kiesläufen.",
+      "es": "Pez fluvial gris plateado con alta aleta dorsal en forma de vela ribeteada de púrpura, se mantiene en tramos rápidos y limpios de grava.",
+      "fr": "Poisson de rivière gris argenté à la haute nageoire dorsale en voile bordée de pourpre, posté dans les courants rapides sur gravier propre.",
+      "it": "Pesce di fiume grigio argento con alta pinna dorsale a vela bordata di porpora, staziona nelle correnti veloci su ghiaia pulita.",
+      "pt": "Peixe de rio cinzento prateado com barbatana dorsal alta em forma de vela orlada de púrpura, mantém-se em correntes rápidas sobre cascalho limpo.",
+      "nl": "Zilvergrijze riviervis met een hoge, zeilachtige rugvin met paarse rand die in snelle, schone grindstromen staat.",
+      "hu": "Ezüstszürke folyami hal magas, vitorlaszerű, lila szegélyű hátúszóval, gyors, tiszta kavicsos szakaszokon áll.",
+      "zh": "银灰色的河鱼，背鳍高耸如帆且边缘泛紫，栖息于水流湍急、砾石洁净的河段。",
+      "ar": "سمكة نهرية رمادية فضية بزعنفة ظهرية عالية تشبه الشراع بحافة أرجوانية، تستقر في المجاري السريعة النظيفة ذات الحصى.",
+      "he": "דג נהר אפור-כסוף עם סנפיר גב גבוה דמוי מפרש בשוליים סגולים, שוהה בקטעי חצץ נקיים ומהירים."
+    }
+  },
+  {
+    "id": "sp_common_carp",
+    "scientificName": "Cyprinus carpio",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Common Carp",
+    "description": {
+      "en": "Heavy bronze carp with large scales and two barbels, rooting through soft bottoms of warm lakes and rivers.",
+      "de": "Schwerer bronzefarbener Karpfen mit großen Schuppen und zwei Barteln, wühlt in weichen Böden warmer Seen und Flüsse.",
+      "es": "Carpa robusta de color bronce con escamas grandes y dos barbillones, remueve los fondos blandos de lagos y ríos cálidos.",
+      "fr": "Carpe massive bronzée aux grandes écailles et à deux barbillons, fouillant les fonds meubles des lacs et rivières chauds.",
+      "it": "Carpa massiccia color bronzo con grandi squame e due barbigli, fruga nei fondali molli di laghi e fiumi caldi.",
+      "pt": "Carpa robusta cor de bronze com escamas grandes e dois barbilhos, revolve os fundos moles de lagos e rios quentes.",
+      "nl": "Zware bronskleurige karper met grote schubben en twee baarddraden die in zachte bodems van warme meren en rivieren wroet.",
+      "hu": "Testes, bronzszínű ponty nagy pikkelyekkel és két bajuszszállal, meleg tavak és folyók puha fenekét túrja.",
+      "zh": "体态厚重的古铜色鲤鱼，鳞片大，有两对须，在温暖湖河的软底中翻找食物。",
+      "ar": "شبوط ثقيل برونزي اللون بحراشف كبيرة وزوجين من الزوائد اللمسية، ينبش القيعان الطرية في البحيرات والأنهار الدافئة.",
+      "he": "קרפיון כבד בצבע ארד עם קשקשים גדולים ושני זיפי חישה, נובר בקרקעיות רכות של אגמים ונהרות חמימים."
+    }
+  },
+  {
+    "id": "sp_grass_carp",
+    "scientificName": "Ctenopharyngodon idella",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Grass Carp",
+    "description": {
+      "en": "Torpedo-shaped Asian carp introduced worldwide to graze on aquatic weeds, often seen in clear quarry lakes.",
+      "de": "Torpedoförmiger asiatischer Karpfen, weltweit zur Beweidung von Wasserpflanzen eingeführt, oft in klaren Baggerseen zu sehen.",
+      "es": "Carpa asiática con forma de torpedo introducida en todo el mundo para consumir plantas acuáticas, frecuente en lagos de cantera claros.",
+      "fr": "Carpe asiatique fuselée introduite dans le monde entier pour brouter les herbiers, souvent observée dans les lacs de carrière clairs.",
+      "it": "Carpa asiatica affusolata introdotta in tutto il mondo per brucare le piante acquatiche, spesso visibile nei limpidi laghi di cava.",
+      "pt": "Carpa asiática fusiforme introduzida em todo o mundo para consumir plantas aquáticas, frequente em lagos de pedreira límpidos.",
+      "nl": "Torpedovormige Aziatische karper die wereldwijd is uitgezet om waterplanten te begrazen, vaak te zien in heldere groevemeren.",
+      "hu": "Torpedó alakú ázsiai ponty, világszerte betelepítették a vízinövények legelésére, gyakran látható tiszta bányatavakban.",
+      "zh": "鱼雷形的亚洲鲤鱼，被引入世界各地以啃食水草，常见于清澈的采石场湖泊。",
+      "ar": "شبوط آسيوي على شكل طوربيد أُدخل حول العالم لرعي الأعشاب المائية، يُشاهد كثيراً في بحيرات المحاجر الصافية.",
+      "he": "קרפיון אסייתי דמוי טורפדו שהוכנס ברחבי העולם כדי לרעות צמחי מים, נראה לעיתים קרובות באגמי מחצבה צלולים."
+    }
+  },
+  {
+    "id": "sp_tench",
+    "scientificName": "Tinca tinca",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Tench",
+    "description": {
+      "en": "Olive-green fish with tiny scales, red eyes and rounded fins, sliding through mud and reeds of still waters.",
+      "de": "Olivgrüner Fisch mit winzigen Schuppen, roten Augen und abgerundeten Flossen, gleitet durch Schlamm und Schilf stiller Gewässer.",
+      "es": "Pez verde oliva de escamas diminutas, ojos rojos y aletas redondeadas, se desliza entre el lodo y los carrizos de aguas quietas.",
+      "fr": "Poisson vert olive aux écailles minuscules, aux yeux rouges et aux nageoires arrondies, glissant dans la vase et les roseaux des eaux calmes.",
+      "it": "Pesce verde oliva con squame minuscole, occhi rossi e pinne arrotondate, scivola tra fango e canne delle acque ferme.",
+      "pt": "Peixe verde-oliva de escamas minúsculas, olhos vermelhos e barbatanas arredondadas, desliza pela lama e pelos caniços de águas paradas.",
+      "nl": "Olijfgroene vis met piepkleine schubben, rode ogen en afgeronde vinnen die door modder en riet van stilstaand water glijdt.",
+      "hu": "Olajzöld hal apró pikkelyekkel, vörös szemekkel és lekerekített úszókkal, az állóvizek iszapjában és nádasában siklik.",
+      "zh": "橄榄绿色的鱼，鳞片细小，眼睛红色，鳍圆钝，在静水的淤泥和芦苇间滑行。",
+      "ar": "سمكة خضراء زيتونية بحراشف دقيقة وعينين حمراوين وزعانف مستديرة، تنساب بين الطين والقصب في المياه الراكدة.",
+      "he": "דג ירוק-זית עם קשקשים זעירים, עיניים אדומות וסנפירים מעוגלים, מחליק בבוץ ובקנים של מים עומדים."
+    }
+  },
+  {
+    "id": "sp_common_bream",
+    "scientificName": "Abramis brama",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Common Bream",
+    "description": {
+      "en": "Deep, laterally flattened bronze fish that feeds head-down in muddy shoals, common across European lowlands.",
+      "de": "Hochrückiger, seitlich abgeflachter Bronzefisch, der kopfüber in schlammigen Schwärmen frisst, häufig im europäischen Flachland.",
+      "es": "Pez bronceado de cuerpo alto y comprimido que se alimenta cabeza abajo en bancos sobre fondos fangosos, común en las tierras bajas europeas.",
+      "fr": "Poisson bronzé au corps haut et comprimé, se nourrissant tête en bas en bancs sur les fonds vaseux, courant dans les plaines d'Europe.",
+      "it": "Pesce bronzeo dal corpo alto e compresso che si nutre a testa in giù in banchi su fondali fangosi, comune nelle pianure europee.",
+      "pt": "Peixe bronzeado de corpo alto e comprimido que se alimenta de cabeça para baixo em cardumes sobre fundos lodosos, comum nas planícies europeias.",
+      "nl": "Hoge, zijdelings afgeplatte bronskleurige vis die met de kop omlaag in modderige scholen foerageert, algemeen in de Europese laaglanden.",
+      "hu": "Magas testű, oldalról lapított bronzszínű hal, fejjel lefelé táplálkozik iszapos rajokban, gyakori az európai síkvidékeken.",
+      "zh": "体高而侧扁的古铜色鱼，成群头朝下在泥底觅食，广泛分布于欧洲低地。",
+      "ar": "سمكة برونزية عالية الجسم مفلطحة الجانبين تتغذى ورأسها إلى الأسفل في أسراب على القيعان الطينية، شائعة في سهول أوروبا.",
+      "he": "דג ארד גבוה ושטוח מהצדדים שניזון בראש כלפי מטה בלהקות על קרקעיות בוציות, נפוץ בשפלות אירופה."
+    }
+  },
+  {
+    "id": "sp_roach",
+    "scientificName": "Rutilus rutilus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Roach",
+    "description": {
+      "en": "Silver shoaling fish with red fins and a red iris, the most abundant fish in many European lakes and canals.",
+      "de": "Silberner Schwarmfisch mit roten Flossen und roter Iris, der häufigste Fisch in vielen europäischen Seen und Kanälen.",
+      "es": "Pez plateado gregario de aletas rojas e iris rojo, el más abundante en muchos lagos y canales de Europa.",
+      "fr": "Poisson argenté grégaire aux nageoires rouges et à l'iris rouge, le plus abondant de nombreux lacs et canaux européens.",
+      "it": "Pesce argenteo gregario con pinne rosse e iride rossa, il più abbondante in molti laghi e canali europei.",
+      "pt": "Peixe prateado de cardume com barbatanas vermelhas e íris vermelha, o mais abundante em muitos lagos e canais europeus.",
+      "nl": "Zilverkleurige scholenvis met rode vinnen en een rode iris, de talrijkste vis in veel Europese meren en kanalen.",
+      "hu": "Ezüstös, rajokban élő hal vörös úszókkal és vörös szivárványhártyával, sok európai tó és csatorna leggyakoribb hala.",
+      "zh": "银色的群游鱼，鳍红色，虹膜红色，是许多欧洲湖泊和运河中数量最多的鱼。",
+      "ar": "سمكة فضية تعيش في أسراب بزعانف حمراء وقزحية حمراء، أكثر الأسماك وفرة في كثير من بحيرات أوروبا وقنواتها.",
+      "he": "דג כסוף החי בלהקות עם סנפירים אדומים וקשתית אדומה, הדג השכיח ביותר באגמים ובתעלות רבים באירופה."
+    }
+  },
+  {
+    "id": "sp_rudd",
+    "scientificName": "Scardinius erythrophthalmus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Rudd",
+    "description": {
+      "en": "Golden-flanked relative of the roach with bright red fins and an upturned mouth, feeding just under the surface.",
+      "de": "Goldflankiger Verwandter des Rotauges mit leuchtend roten Flossen und oberständigem Maul, frisst knapp unter der Oberfläche.",
+      "es": "Pariente del rutilo de flancos dorados con aletas rojo vivo y boca vuelta hacia arriba, se alimenta justo bajo la superficie.",
+      "fr": "Cousin du gardon aux flancs dorés, aux nageoires rouge vif et à la bouche tournée vers le haut, se nourrissant juste sous la surface.",
+      "it": "Parente del rutilo dai fianchi dorati con pinne rosso vivo e bocca rivolta verso l'alto, si nutre appena sotto la superficie.",
+      "pt": "Parente da ruivaca de flancos dourados com barbatanas vermelho vivo e boca virada para cima, alimenta-se logo abaixo da superfície.",
+      "nl": "Goudflankige verwant van de blankvoorn met felrode vinnen en een opwaarts gerichte bek die vlak onder het oppervlak foerageert.",
+      "hu": "A bodorka aranyoldalú rokona élénkvörös úszókkal és felfelé álló szájjal, közvetlenül a felszín alatt táplálkozik.",
+      "zh": "拟鲤的近亲，体侧金色，鳍鲜红，口上位，在水面下方觅食。",
+      "ar": "قريب للروش بجوانب ذهبية وزعانف حمراء زاهية وفم متجه للأعلى، يتغذى تحت السطح مباشرة.",
+      "he": "קרוב של הרואץ' עם צדדים זהובים, סנפירים אדומים בוהקים ופה מופנה כלפי מעלה, ניזון ממש מתחת לפני המים."
+    }
+  },
+  {
+    "id": "sp_chub",
+    "scientificName": "Squalius cephalus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Chub",
+    "description": {
+      "en": "Thick-set river fish with a broad head, large dark-edged scales and a big mouth, holding under overhanging trees.",
+      "de": "Gedrungener Flussfisch mit breitem Kopf, großen dunkel gerandeten Schuppen und großem Maul, steht unter überhängenden Bäumen.",
+      "es": "Pez fluvial robusto de cabeza ancha, escamas grandes de borde oscuro y boca grande, se resguarda bajo árboles que cuelgan sobre el agua.",
+      "fr": "Poisson de rivière trapu à la tête large, aux grandes écailles bordées de sombre et à la grande bouche, posté sous les arbres surplombants.",
+      "it": "Pesce di fiume tozzo dalla testa larga, grandi squame bordate di scuro e bocca grande, staziona sotto gli alberi sporgenti.",
+      "pt": "Peixe de rio robusto de cabeça larga, escamas grandes de bordo escuro e boca grande, mantém-se sob árvores debruçadas sobre a água.",
+      "nl": "Gedrongen riviervis met een brede kop, grote donkergerande schubben en een grote bek die onder overhangende bomen staat.",
+      "hu": "Zömök folyami hal széles fejjel, nagy, sötét szegélyű pikkelyekkel és nagy szájjal, a víz fölé hajló fák alatt áll.",
+      "zh": "体格粗壮的河鱼，头宽，鳞片大且边缘深色，嘴大，常停留在悬垂的树下。",
+      "ar": "سمكة نهرية ممتلئة برأس عريض وحراشف كبيرة ذات حواف داكنة وفم كبير، تستقر تحت الأشجار المتدلية فوق الماء.",
+      "he": "דג נהר מוצק עם ראש רחב, קשקשים גדולים בשוליים כהים ופה גדול, שוהה מתחת לעצים הנוטים מעל המים."
+    }
+  },
+  {
+    "id": "sp_barbel",
+    "scientificName": "Barbus barbus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Barbel",
+    "description": {
+      "en": "Streamlined bottom-dweller with four barbels and an underslung mouth, hugging gravel in fast European rivers.",
+      "de": "Stromlinienförmiger Grundfisch mit vier Barteln und unterständigem Maul, hält sich am Kies schneller europäischer Flüsse.",
+      "es": "Pez de fondo hidrodinámico con cuatro barbillones y boca ventral, pegado a la grava de ríos europeos rápidos.",
+      "fr": "Poisson de fond fuselé à quatre barbillons et à la bouche infère, collé au gravier des rivières rapides d'Europe.",
+      "it": "Pesce di fondo affusolato con quattro barbigli e bocca infera, aderente alla ghiaia dei fiumi veloci europei.",
+      "pt": "Peixe de fundo hidrodinâmico com quatro barbilhos e boca ventral, colado ao cascalho dos rios rápidos europeus.",
+      "nl": "Gestroomlijnde bodemvis met vier baarddraden en een onderstandige bek die op het grind van snelle Europese rivieren ligt.",
+      "hu": "Áramvonalas fenéklakó hal négy bajuszszállal és alsó állású szájjal, a gyors európai folyók kavicsához simul.",
+      "zh": "流线型的底栖鱼，有四条须，口下位，紧贴欧洲湍急河流的砾石底。",
+      "ar": "سمكة قاعية انسيابية بأربع زوائد لمسية وفم سفلي، تلتصق بالحصى في أنهار أوروبا السريعة.",
+      "he": "דג קרקעית זרים עם ארבעה זיפי חישה ופה תחתון, נצמד לחצץ בנהרות אירופיים מהירים."
+    }
+  },
+  {
+    "id": "sp_european_eel",
+    "scientificName": "Anguilla anguilla",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "European Eel",
+    "description": {
+      "en": "Snake-like fish that spends decades in rivers and lakes before migrating to the Sargasso Sea to spawn once.",
+      "de": "Schlangenförmiger Fisch, der Jahrzehnte in Flüssen und Seen lebt, bevor er zum einmaligen Laichen in die Sargassosee zieht.",
+      "es": "Pez serpentiforme que pasa décadas en ríos y lagos antes de migrar al mar de los Sargazos para desovar una sola vez.",
+      "fr": "Poisson serpentiforme qui passe des décennies en rivière et en lac avant de migrer vers la mer des Sargasses pour frayer une seule fois.",
+      "it": "Pesce serpentiforme che trascorre decenni in fiumi e laghi prima di migrare nel Mar dei Sargassi per riprodursi una sola volta.",
+      "pt": "Peixe serpentiforme que passa décadas em rios e lagos antes de migrar para o Mar dos Sargaços para desovar uma única vez.",
+      "nl": "Slangachtige vis die tientallen jaren in rivieren en meren leeft voordat hij naar de Sargassozee trekt om eenmalig te paaien.",
+      "hu": "Kígyószerű hal, amely évtizedeket tölt folyókban és tavakban, mielőtt egyetlen ívásra a Sargasso-tengerbe vándorol.",
+      "zh": "蛇形鱼类，在河流湖泊中生活数十年后洄游至马尾藻海，一生仅产卵一次。",
+      "ar": "سمكة تشبه الثعبان تقضي عقوداً في الأنهار والبحيرات قبل أن تهاجر إلى بحر سارجاسو لتتكاثر مرة واحدة.",
+      "he": "דג דמוי נחש המבלה עשרות שנים בנהרות ובאגמים לפני שהוא נודד לים הסרגסו להטלה אחת ויחידה."
+    }
+  },
+  {
+    "id": "sp_american_eel",
+    "scientificName": "Anguilla rostrata",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "American Eel",
+    "description": {
+      "en": "North American eel that hides under rocks by day in rivers and lakes and returns to the Sargasso Sea to breed.",
+      "de": "Nordamerikanischer Aal, der sich tagsüber in Flüssen und Seen unter Steinen versteckt und zum Laichen in die Sargassosee zurückkehrt.",
+      "es": "Anguila norteamericana que se esconde bajo las rocas durante el día en ríos y lagos y regresa al mar de los Sargazos para reproducirse.",
+      "fr": "Anguille nord-américaine qui se cache le jour sous les rochers des rivières et lacs et retourne frayer dans la mer des Sargasses.",
+      "it": "Anguilla nordamericana che di giorno si nasconde sotto le rocce di fiumi e laghi e torna nel Mar dei Sargassi per riprodursi.",
+      "pt": "Enguia norte-americana que de dia se esconde sob as rochas em rios e lagos e regressa ao Mar dos Sargaços para se reproduzir.",
+      "nl": "Noord-Amerikaanse paling die zich overdag onder stenen in rivieren en meren verbergt en naar de Sargassozee terugkeert om te paaien.",
+      "hu": "Észak-amerikai angolna, nappal folyók és tavak kövei alatt rejtőzik, szaporodni a Sargasso-tengerbe tér vissza.",
+      "zh": "北美鳗鱼，白天藏身于河流湖泊的岩石下，返回马尾藻海繁殖。",
+      "ar": "ثعبان ماء أمريكي شمالي يختبئ نهاراً تحت الصخور في الأنهار والبحيرات ويعود إلى بحر سارجاسو للتكاثر.",
+      "he": "צלופח צפון אמריקאי המסתתר ביום מתחת לסלעים בנהרות ובאגמים וחוזר לים הסרגסו להתרבות."
+    }
+  },
+  {
+    "id": "sp_burbot",
+    "scientificName": "Lota lota",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Burbot",
+    "description": {
+      "en": "The only freshwater cod, a mottled eel-like fish with a single chin barbel, hiding in cold deep water by day.",
+      "de": "Der einzige Süßwasserdorsch, ein marmorierter aalähnlicher Fisch mit einer Kinnbartel, versteckt sich tagsüber im kalten Tiefenwasser.",
+      "es": "El único bacalao de agua dulce, pez moteado con aspecto de anguila y un solo barbillón en el mentón, se oculta de día en aguas frías y profundas.",
+      "fr": "La seule morue d'eau douce, poisson marbré à l'allure d'anguille et au barbillon unique sous le menton, caché le jour en eau froide et profonde.",
+      "it": "L'unico merluzzo d'acqua dolce, pesce marmorizzato simile a un'anguilla con un solo barbiglio sul mento, di giorno si nasconde in acque fredde e profonde.",
+      "pt": "O único bacalhau de água doce, peixe mosqueado semelhante a uma enguia com um único barbilho no queixo, escondido de dia em águas frias e profundas.",
+      "nl": "De enige zoetwaterkabeljauw, een gevlekte, palingachtige vis met één kindraad die zich overdag in koud diep water verbergt.",
+      "hu": "Az egyetlen édesvízi tőkehalféle, márványozott, angolnaszerű hal egyetlen állbajuszszállal, nappal a hideg mélyvízben rejtőzik.",
+      "zh": "唯一的淡水鳕鱼，体表斑驳、形似鳗鱼，下颌有一根须，白天藏于寒冷深水中。",
+      "ar": "سمك القد الوحيد في المياه العذبة، سمكة مرقطة تشبه ثعبان الماء بزائدة لمسية واحدة على الذقن، تختبئ نهاراً في المياه العميقة الباردة.",
+      "he": "דג הבקלה היחיד במים מתוקים, דג מנומר דמוי צלופח עם זיף חישה בודד בסנטר, מסתתר ביום במים קרים ועמוקים."
+    }
+  },
+  {
+    "id": "sp_channel_catfish",
+    "scientificName": "Ictalurus punctatus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Channel Catfish",
+    "description": {
+      "en": "Grey catfish with scattered dark spots, a forked tail and eight barbels, common in rivers and reservoirs across North America.",
+      "de": "Grauer Wels mit verstreuten dunklen Flecken, gegabelter Schwanzflosse und acht Barteln, häufig in Flüssen und Stauseen Nordamerikas.",
+      "es": "Bagre gris con puntos oscuros dispersos, cola ahorquillada y ocho barbillones, común en ríos y embalses de Norteamérica.",
+      "fr": "Poisson-chat gris aux points sombres épars, à la queue fourchue et aux huit barbillons, courant dans les rivières et réservoirs d'Amérique du Nord.",
+      "it": "Pesce gatto grigio con punti scuri sparsi, coda forcuta e otto barbigli, comune in fiumi e bacini del Nord America.",
+      "pt": "Bagre cinzento com pintas escuras dispersas, cauda bifurcada e oito barbilhos, comum em rios e represas da América do Norte.",
+      "nl": "Grijze meerval met verspreide donkere vlekken, een gevorkte staart en acht baarddraden, algemeen in rivieren en stuwmeren van Noord-Amerika.",
+      "hu": "Szürke harcsa elszórt sötét foltokkal, villás farokkal és nyolc bajuszszállal, gyakori Észak-Amerika folyóiban és víztározóiban.",
+      "zh": "灰色的鲶鱼，体表散布深色斑点，尾鳍分叉，有八根须，常见于北美的河流和水库。",
+      "ar": "سمكة سلور رمادية ببقع داكنة متناثرة وذيل متشعب وثماني زوائد لمسية، شائعة في أنهار وخزانات أمريكا الشمالية.",
+      "he": "שפמנון אפור עם כתמים כהים פזורים, זנב מפוצל ושמונה זיפי חישה, נפוץ בנהרות ובמאגרים ברחבי צפון אמריקה."
+    }
+  },
+  {
+    "id": "sp_flathead_catfish",
+    "scientificName": "Pylodictis olivaris",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Flathead Catfish",
+    "description": {
+      "en": "Huge mottled brown catfish with a flattened head and protruding lower jaw, lying in deep river holes.",
+      "de": "Riesiger, braun marmorierter Wels mit abgeflachtem Kopf und vorstehendem Unterkiefer, liegt in tiefen Flusskolken.",
+      "es": "Enorme bagre pardo moteado de cabeza aplanada y mandíbula inferior prominente, reposa en pozas profundas de los ríos.",
+      "fr": "Énorme poisson-chat brun marbré à la tête aplatie et à la mâchoire inférieure proéminente, tapi dans les fosses profondes des rivières.",
+      "it": "Enorme pesce gatto bruno marmorizzato con testa appiattita e mascella inferiore sporgente, giace nelle buche profonde dei fiumi.",
+      "pt": "Enorme bagre castanho mosqueado de cabeça achatada e maxilar inferior saliente, repousa em poços profundos dos rios.",
+      "nl": "Enorme bruingevlekte meerval met een afgeplatte kop en vooruitstekende onderkaak die in diepe rivierkuilen ligt.",
+      "hu": "Hatalmas, barnán márványozott harcsa lapított fejjel és előreálló alsó állkapoccsal, mély folyami gödrökben fekszik.",
+      "zh": "体型巨大的褐色斑纹鲶鱼，头部扁平，下颌突出，潜伏在河流深潭中。",
+      "ar": "سلور بني مرقط ضخم برأس مسطح وفك سفلي بارز، يرقد في الحفر النهرية العميقة.",
+      "he": "שפמנון חום מנומר ענק עם ראש שטוח ולסת תחתונה בולטת, רובץ בבורות עמוקים בנהרות."
+    }
+  },
+  {
+    "id": "sp_brown_bullhead",
+    "scientificName": "Ameiurus nebulosus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Brown Bullhead",
+    "description": {
+      "en": "Small stocky catfish with dark barbels and a squared tail, tolerating muddy, warm and low-oxygen ponds.",
+      "de": "Kleiner, gedrungener Zwergwels mit dunklen Barteln und gerader Schwanzflosse, verträgt schlammige, warme und sauerstoffarme Teiche.",
+      "es": "Bagre pequeño y robusto de barbillones oscuros y cola recta, tolera lagunas fangosas, cálidas y pobres en oxígeno.",
+      "fr": "Petit poisson-chat trapu aux barbillons sombres et à la queue carrée, tolérant les étangs vaseux, chauds et pauvres en oxygène.",
+      "it": "Piccolo pesce gatto tozzo con barbigli scuri e coda squadrata, tollera stagni fangosi, caldi e poveri di ossigeno.",
+      "pt": "Pequeno bagre atarracado de barbilhos escuros e cauda reta, tolera lagoas lodosas, quentes e pobres em oxigénio.",
+      "nl": "Kleine gedrongen dwergmeerval met donkere baarddraden en een rechte staart die modderige, warme en zuurstofarme vijvers verdraagt.",
+      "hu": "Kis, zömök törpeharcsa sötét bajuszszálakkal és egyenes farokkal, elviseli az iszapos, meleg, oxigénszegény tavakat.",
+      "zh": "小型粗壮的鲶鱼，须呈深色，尾鳍平直，能耐受泥泞、温暖且缺氧的池塘。",
+      "ar": "سلور صغير ممتلئ بزوائد لمسية داكنة وذيل مربع، يتحمل البرك الطينية الدافئة قليلة الأكسجين.",
+      "he": "שפמנון קטן וגוץ עם זיפי חישה כהים וזנב ישר, סובל בריכות בוציות, חמות ודלות חמצן."
+    }
+  },
+  {
+    "id": "sp_wels_catfish",
+    "scientificName": "Silurus glanis",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Wels Catfish",
+    "description": {
+      "en": "Europe's largest freshwater fish, a scaleless giant with a broad flat head and long whiskers, lying in deep river holes.",
+      "de": "Europas größter Süßwasserfisch, ein schuppenloser Riese mit breitem flachem Kopf und langen Barteln, liegt in tiefen Flusskolken.",
+      "es": "El mayor pez de agua dulce de Europa, un gigante sin escamas de cabeza ancha y plana y largos bigotes, reposa en pozas profundas.",
+      "fr": "Le plus grand poisson d'eau douce d'Europe, géant sans écailles à la tête large et plate et aux longs barbillons, tapi dans les fosses profondes.",
+      "it": "Il più grande pesce d'acqua dolce d'Europa, un gigante senza squame dalla testa larga e piatta e dai lunghi barbigli, giace nelle buche profonde dei fiumi.",
+      "pt": "O maior peixe de água doce da Europa, um gigante sem escamas de cabeça larga e achatada e longos bigodes, repousa em poços fundos dos rios.",
+      "nl": "Europa's grootste zoetwatervis, een schubloze reus met een brede platte kop en lange baarddraden die in diepe rivierkuilen ligt.",
+      "hu": "Európa legnagyobb édesvízi hala, pikkely nélküli óriás széles, lapos fejjel és hosszú bajuszszálakkal, mély folyami gödrökben fekszik.",
+      "zh": "欧洲最大的淡水鱼，无鳞巨物，头宽而平，长须，潜伏在河流深潭中。",
+      "ar": "أكبر أسماك المياه العذبة في أوروبا، عملاق بلا حراشف برأس عريض مسطح وشوارب طويلة، يرقد في الحفر النهرية العميقة.",
+      "he": "דג המים המתוקים הגדול ביותר באירופה, ענק חסר קשקשים עם ראש רחב ושטוח ושפמים ארוכים, רובץ בבורות עמוקים בנהרות."
+    }
+  },
+  {
+    "id": "sp_white_sturgeon",
+    "scientificName": "Acipenser transmontanus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "White Sturgeon",
+    "description": {
+      "en": "North America's largest freshwater fish, an armoured grey giant with a shark-like tail cruising big western rivers.",
+      "de": "Nordamerikas größter Süßwasserfisch, ein gepanzerter grauer Riese mit haiähnlicher Schwanzflosse in großen westlichen Flüssen.",
+      "es": "El mayor pez de agua dulce de Norteamérica, un gigante gris acorazado con cola de tiburón que recorre los grandes ríos del oeste.",
+      "fr": "Le plus grand poisson d'eau douce d'Amérique du Nord, géant gris cuirassé à la queue de requin, parcourant les grands fleuves de l'ouest.",
+      "it": "Il più grande pesce d'acqua dolce del Nord America, un gigante grigio corazzato dalla coda di squalo che percorre i grandi fiumi occidentali.",
+      "pt": "O maior peixe de água doce da América do Norte, um gigante cinzento couraçado com cauda de tubarão que percorre os grandes rios ocidentais.",
+      "nl": "Noord-Amerika's grootste zoetwatervis, een gepantserde grijze reus met een haaiachtige staart die door grote westelijke rivieren kruist.",
+      "hu": "Észak-Amerika legnagyobb édesvízi hala, páncélos szürke óriás cápaszerű farokkal, a nagy nyugati folyókat járja.",
+      "zh": "北美最大的淡水鱼，披甲的灰色巨物，尾鳍似鲨鱼，在西部大河中巡游。",
+      "ar": "أكبر أسماك المياه العذبة في أمريكا الشمالية، عملاق رمادي مدرع بذيل يشبه ذيل القرش يجوب الأنهار الغربية الكبيرة.",
+      "he": "דג המים המתוקים הגדול ביותר בצפון אמריקה, ענק אפור משוריין עם זנב דמוי כריש המשייט בנהרות המערב הגדולים."
+    }
+  },
+  {
+    "id": "sp_lake_sturgeon",
+    "scientificName": "Acipenser fulvescens",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Lake Sturgeon",
+    "description": {
+      "en": "Slow-growing armoured sturgeon of the Great Lakes and Mississippi basin, vacuuming the bottom with its tube mouth.",
+      "de": "Langsam wachsender gepanzerter Stör der Großen Seen und des Mississippi-Beckens, saugt mit seinem Rüsselmaul den Grund ab.",
+      "es": "Esturión acorazado de crecimiento lento de los Grandes Lagos y la cuenca del Misisipi, aspira el fondo con su boca tubular.",
+      "fr": "Esturgeon cuirassé à croissance lente des Grands Lacs et du bassin du Mississippi, aspirant le fond avec sa bouche en tube.",
+      "it": "Storione corazzato a crescita lenta dei Grandi Laghi e del bacino del Mississippi, aspira il fondale con la bocca a tubo.",
+      "pt": "Esturjão couraçado de crescimento lento dos Grandes Lagos e da bacia do Mississípi, aspira o fundo com a boca tubular.",
+      "nl": "Traag groeiende gepantserde steur van de Grote Meren en het Mississippibekken die de bodem met zijn buisvormige bek afzuigt.",
+      "hu": "Lassan növő páncélos tok a Nagy-tavakból és a Mississippi vízgyűjtőjéből, csöves szájával a fenéket szívja fel.",
+      "zh": "生长缓慢的披甲鲟鱼，分布于五大湖和密西西比流域，用管状口吸食底部食物。",
+      "ar": "حفش مدرع بطيء النمو من البحيرات العظمى وحوض المسيسيبي، يكنس القاع بفمه الأنبوبي.",
+      "he": "חדקן משוריין איטי גדילה מהאגמים הגדולים ואגן המיסיסיפי, שואב את הקרקעית בפיו הצינורי."
+    }
+  },
+  {
+    "id": "sp_european_sturgeon",
+    "scientificName": "Acipenser sturio",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "European Sturgeon",
+    "description": {
+      "en": "Critically endangered armoured sturgeon of Atlantic rivers, now bred and released in the Garonne and Elbe.",
+      "de": "Vom Aussterben bedrohter gepanzerter Stör atlantischer Flüsse, heute in Garonne und Elbe nachgezüchtet und ausgesetzt.",
+      "es": "Esturión acorazado en peligro crítico de los ríos atlánticos, hoy criado y liberado en el Garona y el Elba.",
+      "fr": "Esturgeon cuirassé en danger critique des fleuves atlantiques, aujourd'hui élevé et relâché dans la Garonne et l'Elbe.",
+      "it": "Storione corazzato in pericolo critico dei fiumi atlantici, oggi allevato e rilasciato nella Garonna e nell'Elba.",
+      "pt": "Esturjão couraçado criticamente ameaçado dos rios atlânticos, hoje criado e libertado no Garona e no Elba.",
+      "nl": "Ernstig bedreigde gepantserde steur van Atlantische rivieren, nu gekweekt en uitgezet in de Garonne en de Elbe.",
+      "hu": "Kritikusan veszélyeztetett páncélos tok az atlanti folyókból, ma a Garonne-ba és az Elbába tenyésztik és telepítik vissza.",
+      "zh": "极度濒危的披甲鲟鱼，原产大西洋沿岸河流，如今在加龙河和易北河进行人工繁育放流。",
+      "ar": "حفش مدرع مهدد بالانقراض بشدة من الأنهار الأطلسية، يُربى اليوم ويُطلق في نهري غارون وإلبه.",
+      "he": "חדקן משוריין בסכנת הכחדה חמורה מנהרות האטלנטי, כיום מגודל ומשוחרר בגארון ובאלבה."
+    }
+  },
+  {
+    "id": "sp_alligator_gar",
+    "scientificName": "Atractosteus spatula",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Alligator Gar",
+    "description": {
+      "en": "Prehistoric giant with a broad toothy snout and diamond-shaped armour scales, surfacing to gulp air in southern rivers.",
+      "de": "Urzeitlicher Riese mit breiter, zahnbewehrter Schnauze und rautenförmigen Panzerschuppen, taucht in südlichen Flüssen zum Luftschnappen auf.",
+      "es": "Gigante prehistórico de hocico ancho y dentado con escamas acorazadas romboidales, sube a tragar aire en ríos del sur.",
+      "fr": "Géant préhistorique au large museau denté et aux écailles cuirassées en losange, remontant gober de l'air dans les rivières du sud.",
+      "it": "Gigante preistorico dal muso largo e dentato con squame corazzate a rombo, risale a ingoiare aria nei fiumi meridionali.",
+      "pt": "Gigante pré-histórico de focinho largo e dentado com escamas couraçadas em losango, sobe para engolir ar em rios do sul.",
+      "nl": "Prehistorische reus met een brede tandenrijke snuit en ruitvormige pantserschubben die in zuidelijke rivieren lucht komt happen.",
+      "hu": "Őskori óriás széles, fogas orral és rombusz alakú páncélpikkelyekkel, a déli folyókban levegőért jön a felszínre.",
+      "zh": "史前巨鱼，吻宽而多齿，菱形甲鳞，在南方河流中会浮出水面吞气。",
+      "ar": "عملاق ما قبل التاريخ بخطم عريض مسنن وحراشف مدرعة معينية الشكل، يصعد لابتلاع الهواء في الأنهار الجنوبية.",
+      "he": "ענק פרהיסטורי עם חרטום רחב ומשונן וקשקשי שריון בצורת מעוין, עולה לבלוע אוויר בנהרות הדרום."
+    }
+  },
+  {
+    "id": "sp_longnose_gar",
+    "scientificName": "Lepisosteus osseus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Longnose Gar",
+    "description": {
+      "en": "Slender armoured fish with a needle-like snout, hanging motionless just below the surface of warm rivers.",
+      "de": "Schlanker gepanzerter Fisch mit nadelartiger Schnauze, steht reglos knapp unter der Oberfläche warmer Flüsse.",
+      "es": "Pez acorazado esbelto de hocico en forma de aguja, se mantiene inmóvil justo bajo la superficie de ríos cálidos.",
+      "fr": "Poisson cuirassé élancé au museau en aiguille, suspendu immobile juste sous la surface des rivières chaudes.",
+      "it": "Pesce corazzato snello dal muso ad ago, sospeso immobile appena sotto la superficie dei fiumi caldi.",
+      "pt": "Peixe couraçado esguio de focinho em agulha, suspenso imóvel logo abaixo da superfície de rios quentes.",
+      "nl": "Slanke gepantserde vis met een naaldvormige snuit die roerloos vlak onder het oppervlak van warme rivieren hangt.",
+      "hu": "Karcsú páncélos hal tűszerű orral, mozdulatlanul lebeg közvetlenül a meleg folyók felszíne alatt.",
+      "zh": "体形细长的甲鳞鱼，吻如针状，一动不动地悬停在温暖河流的水面下方。",
+      "ar": "سمكة مدرعة نحيلة بخطم يشبه الإبرة، تتعلق بلا حراك تحت سطح الأنهار الدافئة مباشرة.",
+      "he": "דג משוריין דק עם חרטום דמוי מחט, תלוי ללא תנועה ממש מתחת לפני נהרות חמימים."
+    }
+  },
+  {
+    "id": "sp_bowfin",
+    "scientificName": "Amia calva",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Bowfin",
+    "description": {
+      "en": "Living fossil with a long undulating dorsal fin and a bony head, guarding its fry in weedy backwaters.",
+      "de": "Lebendes Fossil mit langer wellenförmiger Rückenflosse und knöchernem Kopf, bewacht seine Brut in verkrauteten Altwassern.",
+      "es": "Fósil viviente con larga aleta dorsal ondulante y cabeza ósea, custodia a sus crías en remansos con vegetación.",
+      "fr": "Fossile vivant à la longue nageoire dorsale ondulante et à la tête osseuse, gardant ses alevins dans les bras morts herbeux.",
+      "it": "Fossile vivente con lunga pinna dorsale ondulante e testa ossea, custodisce gli avannotti nelle lanche erbose.",
+      "pt": "Fóssil vivo com longa barbatana dorsal ondulante e cabeça óssea, guarda os alevins em remansos com vegetação.",
+      "nl": "Levend fossiel met een lange golvende rugvin en benige kop dat zijn jongen bewaakt in begroeide dode rivierarmen.",
+      "hu": "Élő kövület hosszú, hullámzó hátúszóval és csontos fejjel, ivadékait hínáros holtágakban őrzi.",
+      "zh": "活化石，背鳍长而波状起伏，头部骨质，在水草丛生的回水区守护幼鱼。",
+      "ar": "أحفورة حية بزعنفة ظهرية طويلة متموجة ورأس عظمي، يحرس صغاره في المياه الراكدة العشبية.",
+      "he": "מאובן חי עם סנפיר גב ארוך ומתנועע וראש גרמי, שומר על צאצאיו במים אחוריים עשירי צמחייה."
+    }
+  },
+  {
+    "id": "sp_american_paddlefish",
+    "scientificName": "Polyodon spathula",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "American Paddlefish",
+    "description": {
+      "en": "Filter-feeding giant with a paddle-shaped snout a third of its length, swimming open-mouthed through big rivers.",
+      "de": "Filtrierender Riese mit paddelförmiger Schnauze von einem Drittel seiner Länge, schwimmt mit offenem Maul durch große Flüsse.",
+      "es": "Gigante filtrador con hocico en forma de pala que ocupa un tercio de su longitud, nada con la boca abierta por grandes ríos.",
+      "fr": "Géant filtreur au museau en pagaie représentant un tiers de sa longueur, nageant bouche ouverte dans les grands fleuves.",
+      "it": "Gigante filtratore con muso a pagaia lungo un terzo del corpo, nuota a bocca aperta nei grandi fiumi.",
+      "pt": "Gigante filtrador com focinho em forma de remo que ocupa um terço do comprimento, nada de boca aberta pelos grandes rios.",
+      "nl": "Filtervoedende reus met een peddelvormige snuit van een derde van zijn lengte die met open bek door grote rivieren zwemt.",
+      "hu": "Szűrögető óriás lapátszerű orral, amely testhosszának harmadát teszi ki, nyitott szájjal úszik a nagy folyókban.",
+      "zh": "滤食性巨鱼，桨状吻部占体长的三分之一，在大河中张口游动。",
+      "ar": "عملاق مرشح للغذاء بخطم يشبه المجداف يبلغ ثلث طوله، يسبح بفم مفتوح في الأنهار الكبيرة.",
+      "he": "ענק מסנן מזון עם חרטום דמוי משוט באורך שליש מגופו, שוחה בפה פתוח בנהרות גדולים."
+    }
+  },
+  {
+    "id": "sp_sea_lamprey",
+    "scientificName": "Petromyzon marinus",
+    "category": "fish",
+    "taxonomyClass": "Petromyzontida",
+    "commonName": "Sea Lamprey",
+    "description": {
+      "en": "Jawless eel-like parasite with a sucker mouth ringed with teeth, spawning in gravel streams after feeding at sea or in lakes.",
+      "de": "Kieferloser aalähnlicher Parasit mit zahnbewehrtem Saugmaul, laicht in Kiesbächen nach dem Fressen im Meer oder in Seen.",
+      "es": "Parásito sin mandíbulas parecido a una anguila con boca en ventosa rodeada de dientes, desova en arroyos de grava tras alimentarse en el mar o en lagos.",
+      "fr": "Parasite sans mâchoires à l'allure d'anguille, à la bouche en ventouse cerclée de dents, frayant dans les ruisseaux de gravier après s'être nourri en mer ou en lac.",
+      "it": "Parassita privo di mascelle simile a un'anguilla con bocca a ventosa cerchiata di denti, si riproduce nei torrenti ghiaiosi dopo essersi nutrito in mare o nei laghi.",
+      "pt": "Parasita sem mandíbulas semelhante a uma enguia com boca em ventosa rodeada de dentes, desova em riachos de cascalho após se alimentar no mar ou em lagos.",
+      "nl": "Kaakloze palingachtige parasiet met een zuigmond omringd door tanden die in grindbeken paait na zich in zee of meren te hebben gevoed.",
+      "hu": "Állkapocs nélküli, angolnaszerű élősködő fogakkal körülvett tapadószájjal, kavicsos patakokban ívik, miután a tengerben vagy tavakban táplálkozott.",
+      "zh": "无颌、形似鳗鱼的寄生鱼，口为环形齿盘状吸盘，在海洋或湖泊觅食后到砾石溪流产卵。",
+      "ar": "طفيلي عديم الفكين يشبه ثعبان الماء بفم ماص محاط بالأسنان، يتكاثر في جداول الحصى بعد التغذي في البحر أو البحيرات.",
+      "he": "טפיל חסר לסתות דמוי צלופח עם פה מצץ מוקף שיניים, מטיל בנחלי חצץ לאחר שניזון בים או באגמים."
+    }
+  },
+  {
+    "id": "sp_freshwater_drum",
+    "scientificName": "Aplodinotus grunniens",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Freshwater Drum",
+    "description": {
+      "en": "Silvery humpbacked fish that grunts audibly and crushes mussels with throat teeth, common in big rivers and lakes.",
+      "de": "Silbriger Buckelfisch, der hörbar grunzt und Muscheln mit Schlundzähnen knackt, häufig in großen Flüssen und Seen.",
+      "es": "Pez plateado de lomo jorobado que gruñe de forma audible y tritura mejillones con dientes faríngeos, común en grandes ríos y lagos.",
+      "fr": "Poisson argenté au dos bossu qui grogne de façon audible et broie les moules avec ses dents pharyngiennes, courant dans les grands fleuves et lacs.",
+      "it": "Pesce argenteo dal dorso gibboso che grugnisce in modo udibile e frantuma i mitili con i denti faringei, comune in grandi fiumi e laghi.",
+      "pt": "Peixe prateado de dorso corcunda que grunhe audivelmente e tritura mexilhões com dentes faríngeos, comum em grandes rios e lagos.",
+      "nl": "Zilverkleurige vis met een bochel die hoorbaar knort en mosselen met keeltanden kraakt, algemeen in grote rivieren en meren.",
+      "hu": "Ezüstös, púpos hátú hal, amely hallhatóan morog és garatfogaival kagylókat tör, gyakori nagy folyókban és tavakban.",
+      "zh": "银色驼背鱼，能发出可闻的咕噜声，用咽齿碾碎贻贝，常见于大河和湖泊。",
+      "ar": "سمكة فضية محدبة الظهر تصدر أصوات همهمة مسموعة وتسحق بلح البحر بأسنان بلعومية، شائعة في الأنهار والبحيرات الكبيرة.",
+      "he": "דג כסוף גבנוני שמשמיע נהמות נשמעות ומועך צדפות בשיני לוע, נפוץ בנהרות גדולים ובאגמים."
+    }
+  },
+  {
+    "id": "sp_white_sucker",
+    "scientificName": "Catostomus commersonii",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "White Sucker",
+    "description": {
+      "en": "Cylindrical bottom-feeder with a fleshy downturned mouth, running up streams in spring spawning crowds.",
+      "de": "Zylindrischer Grundfisch mit fleischigem, nach unten gerichtetem Maul, zieht im Frühjahr in Laichscharen die Bäche hinauf.",
+      "es": "Pez de fondo cilíndrico de boca carnosa orientada hacia abajo, remonta los arroyos en primavera en multitudes de desove.",
+      "fr": "Poisson de fond cylindrique à la bouche charnue tournée vers le bas, remontant les ruisseaux au printemps en foules de frai.",
+      "it": "Pesce di fondo cilindrico con bocca carnosa rivolta verso il basso, risale i torrenti in primavera in folle riproduttive.",
+      "pt": "Peixe de fundo cilíndrico de boca carnuda virada para baixo, sobe os riachos na primavera em multidões de desova.",
+      "nl": "Cilindrische bodemvis met een vlezige, naar beneden gerichte bek die in het voorjaar in paaimenigten beken opzwemt.",
+      "hu": "Hengeres testű fenéklakó hal húsos, lefelé álló szájjal, tavasszal ívó tömegekben vonul fel a patakokba.",
+      "zh": "圆筒形底栖鱼，口肉质且朝下，春季成群溯溪产卵。",
+      "ar": "سمكة قاعية أسطوانية بفم لحمي متجه للأسفل، تصعد الجداول في الربيع في حشود التكاثر.",
+      "he": "דג קרקעית גלילי עם פה בשרני מופנה מטה, עולה בנחלים באביב בהמוני הטלה."
+    }
+  },
+  {
+    "id": "sp_common_minnow",
+    "scientificName": "Phoxinus phoxinus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Common Minnow",
+    "description": {
+      "en": "Tiny striped shoaling fish of clear cool streams and lakes, the males turning red and green in spring.",
+      "de": "Winziger gestreifter Schwarmfisch klarer kühler Bäche und Seen, die Männchen färben sich im Frühjahr rot und grün.",
+      "es": "Diminuto pez rayado gregario de arroyos y lagos claros y frescos, los machos se vuelven rojos y verdes en primavera.",
+      "fr": "Minuscule poisson rayé grégaire des ruisseaux et lacs clairs et frais, les mâles devenant rouges et verts au printemps.",
+      "it": "Minuscolo pesce striato gregario di torrenti e laghi limpidi e freschi, i maschi diventano rossi e verdi in primavera.",
+      "pt": "Minúsculo peixe listrado de cardume de riachos e lagos claros e frescos, os machos ficam vermelhos e verdes na primavera.",
+      "nl": "Piepkleine gestreepte scholenvis van heldere koele beken en meren, waarvan de mannetjes in het voorjaar rood en groen kleuren.",
+      "hu": "Apró, csíkos, rajokban élő hal tiszta, hűvös patakokból és tavakból, a hímek tavasszal vörös és zöld színt öltenek.",
+      "zh": "微小的条纹群游鱼，栖息于清凉的溪流和湖泊，雄鱼春季变为红绿色。",
+      "ar": "سمكة صغيرة جداً مخططة تعيش في أسراب في الجداول والبحيرات الصافية الباردة، يتحول ذكورها إلى الأحمر والأخضر في الربيع.",
+      "he": "דג זעיר מפוספס החי בלהקות בנחלים ובאגמים צלולים וקרירים, הזכרים מאדימים ומוריקים באביב."
+    }
+  },
+  {
+    "id": "sp_three_spined_stickleback",
+    "scientificName": "Gasterosteus aculeatus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Three-spined Stickleback",
+    "description": {
+      "en": "Tiny armoured fish with three dorsal spines whose red-throated males build and guard nests of plant fibres.",
+      "de": "Winziger gepanzerter Fisch mit drei Rückenstacheln, dessen rotkehlige Männchen Nester aus Pflanzenfasern bauen und bewachen.",
+      "es": "Diminuto pez acorazado con tres espinas dorsales cuyos machos de garganta roja construyen y custodian nidos de fibras vegetales.",
+      "fr": "Minuscule poisson cuirassé à trois épines dorsales, dont les mâles à gorge rouge bâtissent et gardent des nids de fibres végétales.",
+      "it": "Minuscolo pesce corazzato con tre spine dorsali i cui maschi dalla gola rossa costruiscono e custodiscono nidi di fibre vegetali.",
+      "pt": "Minúsculo peixe couraçado com três espinhos dorsais cujos machos de garganta vermelha constroem e guardam ninhos de fibras vegetais.",
+      "nl": "Piepklein gepantserd visje met drie rugstekels waarvan de roodkelige mannetjes nesten van plantenvezels bouwen en bewaken.",
+      "hu": "Apró, páncélos hal három háttüskével, vörös torkú hímjei növényi rostokból építenek és őriznek fészket.",
+      "zh": "微小的披甲鱼，背部有三根硬棘，喉部红色的雄鱼会用植物纤维筑巢并守护。",
+      "ar": "سمكة صغيرة جداً مدرعة بثلاث أشواك ظهرية، يبني ذكورها ذوو الحلق الأحمر أعشاشاً من الألياف النباتية ويحرسونها.",
+      "he": "דג זעיר משוריין עם שלושה קוצי גב, שזכריו אדומי הגרון בונים ושומרים על קנים מסיבי צמחים."
+    }
+  },
+  {
+    "id": "sp_alewife",
+    "scientificName": "Alosa pseudoharengus",
+    "category": "fish",
+    "taxonomyClass": "Actinopterygii",
+    "commonName": "Alewife",
+    "description": {
+      "en": "Silver herring that runs up rivers in spring and now fills the Great Lakes in vast schools.",
+      "de": "Silberner Hering, der im Frühjahr die Flüsse hinaufzieht und heute die Großen Seen in riesigen Schwärmen füllt.",
+      "es": "Arenque plateado que remonta los ríos en primavera y hoy llena los Grandes Lagos en inmensos bancos.",
+      "fr": "Hareng argenté qui remonte les rivières au printemps et peuple aujourd'hui les Grands Lacs en immenses bancs.",
+      "it": "Aringa argentea che risale i fiumi in primavera e oggi riempie i Grandi Laghi in immensi banchi.",
+      "pt": "Arenque prateado que sobe os rios na primavera e hoje enche os Grandes Lagos em cardumes imensos.",
+      "nl": "Zilveren haring die in het voorjaar rivieren opzwemt en nu de Grote Meren in enorme scholen vult.",
+      "hu": "Ezüstös hering, tavasszal a folyókba vonul fel, és ma hatalmas rajokban tölti meg a Nagy-tavakat.",
+      "zh": "银色的鲱鱼，春季溯河洄游，如今在五大湖中形成庞大鱼群。",
+      "ar": "رنجة فضية تصعد الأنهار في الربيع وتملأ اليوم البحيرات العظمى بأسراب هائلة.",
+      "he": "הרינג כסוף שעולה בנהרות באביב וממלא כיום את האגמים הגדולים בלהקות עצומות."
+    }
+  }
+]
