@@ -35416,4 +35416,50 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Legmagasabb';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Tartsd meg ezt a merülést a naplóban, de hagyd ki minden statisztikából, beleértve a merülésszámot is.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Csak a SAC-, RMV- és gázkeverék-statisztikákból hagyd ki ezt a merülést. Hasznos, ha a gázérték nem reprezentatív.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Kizárva a statisztikákból';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Kizárva a gázstatisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'Csak a statisztikákból kizártak';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Kizárva';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés kizárva a statisztikákból',
+      one: '1 merülés kizárva a statisztikákból',
+    );
+    return '$_temp0';
+  }
 }

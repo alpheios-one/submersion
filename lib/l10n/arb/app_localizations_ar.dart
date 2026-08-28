@@ -35210,4 +35210,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'الأعلى';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'استبعاد من الإحصائيات';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'احتفظ بهذه الغطسة في سجلك، لكن استبعدها من كل الإحصائيات، بما في ذلك عدد غطساتك.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'استبعاد من إحصائيات الغاز';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'استبعد هذه الغطسة من إحصائيات SAC وRMV وخليط الغاز فقط. مفيد عندما تكون قراءة الغاز غير ممثلة.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'مستبعدة من الإحصائيات';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => 'مستبعدة من إحصائيات الغاز';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => 'استبعاد من الإحصائيات';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'استبعاد من إحصائيات الغاز';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'المستبعدة من الإحصائيات فقط';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'مستبعدة';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غطسة مستبعدة من الإحصائيات',
+      many: '$count غطسة مستبعدة من الإحصائيات',
+      few: '$count غطسات مستبعدة من الإحصائيات',
+      two: 'غطستان مستبعدتان من الإحصائيات',
+      one: 'غطسة واحدة مستبعدة من الإحصائيات',
+      zero: 'لا غطسات مستبعدة من الإحصائيات',
+    );
+    return '$_temp0';
+  }
 }

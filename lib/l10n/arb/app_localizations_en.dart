@@ -35017,4 +35017,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Highest';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Exclude from statistics';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Keep this dive in your logbook, but leave it out of every statistic, including your dive count.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'Exclude from gas statistics';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Leave this dive out of SAC, RMV and gas mix statistics only. Useful when the gas reading is not representative.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Excluded from statistics';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Excluded from gas statistics';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Exclude from statistics';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Exclude from gas statistics';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'Excluded from statistics only';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Excluded';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives excluded from statistics',
+      one: '1 dive excluded from statistics',
+    );
+    return '$_temp0';
+  }
 }

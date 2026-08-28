@@ -7333,15 +7333,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Nem lett megfigyelés elvetve} =1{1 megfigyelés elvetve} other{{count} megfigyelés elvetve}}, {failed, plural, =1{1 merülést nem sikerült frissíteni} other{{failed} merülést nem sikerült frissíteni}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "A merüléslista nem olvasható. Semmi sem változott.",
   "safetySettings_analyzeAll_failed": "A merüléseket nem sikerült elemezni.",
   "safetyReview_details": "Részletek",
@@ -10388,5 +10388,16 @@
   "diveLog_filter_presetLast5Years": "Elmúlt 5 év",
   "diveLog_filter_presetLast10Years": "Elmúlt 10 év",
   "statistics_trend_tooltip_lowest": "Legalacsonyabb",
-  "statistics_trend_tooltip_highest": "Legmagasabb"
+  "statistics_trend_tooltip_highest": "Legmagasabb",
+  "diveLog_edit_excludeFromStats": "Kizárás a statisztikákból",
+  "diveLog_edit_excludeFromStatsHelp": "Tartsd meg ezt a merülést a naplóban, de hagyd ki minden statisztikából, beleértve a merülésszámot is.",
+  "diveLog_edit_excludeFromGasStats": "Kizárás a gázstatisztikákból",
+  "diveLog_edit_excludeFromGasStatsHelp": "Csak a SAC-, RMV- és gázkeverék-statisztikákból hagyd ki ezt a merülést. Hasznos, ha a gázérték nem reprezentatív.",
+  "diveLog_badge_excludedFromStats": "Kizárva a statisztikákból",
+  "diveLog_badge_excludedFromGasStats": "Kizárva a gázstatisztikákból",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Kizárás a statisztikákból",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Kizárás a gázstatisztikákból",
+  "diveLog_filter_excludedOnly": "Csak a statisztikákból kizártak",
+  "diveLog_edit_summary_excluded": "Kizárva",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 merülés kizárva a statisztikákból} other{{count} merülés kizárva a statisztikákból}}"
 }

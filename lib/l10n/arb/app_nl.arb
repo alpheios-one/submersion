@@ -7333,15 +7333,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Geen observaties genegeerd} =1{1 observatie genegeerd} other{{count} observaties genegeerd}}, {failed, plural, =1{1 duik kon niet worden bijgewerkt} other{{failed} duiken konden niet worden bijgewerkt}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "Kan de duiklijst niet lezen. Er is niets gewijzigd.",
   "safetySettings_analyzeAll_failed": "Kan de duiken niet analyseren.",
   "safetyReview_details": "Details",
@@ -10388,5 +10388,16 @@
   "diveLog_filter_presetLast5Years": "Afgelopen 5 jaar",
   "diveLog_filter_presetLast10Years": "Afgelopen 10 jaar",
   "statistics_trend_tooltip_lowest": "Laagste",
-  "statistics_trend_tooltip_highest": "Hoogste"
+  "statistics_trend_tooltip_highest": "Hoogste",
+  "diveLog_edit_excludeFromStats": "Uitsluiten van statistieken",
+  "diveLog_edit_excludeFromStatsHelp": "Houd deze duik in je logboek, maar laat hem buiten elke statistiek, inclusief je duikaantal.",
+  "diveLog_edit_excludeFromGasStats": "Uitsluiten van gasstatistieken",
+  "diveLog_edit_excludeFromGasStatsHelp": "Laat deze duik alleen buiten SAC-, RMV- en gasmengselstatistieken. Handig wanneer de gaswaarde niet representatief is.",
+  "diveLog_badge_excludedFromStats": "Uitgesloten van statistieken",
+  "diveLog_badge_excludedFromGasStats": "Uitgesloten van gasstatistieken",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Uitsluiten van statistieken",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Uitsluiten van gasstatistieken",
+  "diveLog_filter_excludedOnly": "Alleen uitgesloten van statistieken",
+  "diveLog_edit_summary_excluded": "Uitgesloten",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 duik uitgesloten van statistieken} other{{count} duiken uitgesloten van statistieken}}"
 }

@@ -118,6 +118,15 @@ class Dive extends Equatable {
   final double? weightingFeedbackKg;
   // Favorites and tags (v1.1/v1.5)
   final bool isFavorite;
+
+  /// Excluded from every descriptive statistic, its count included (#526).
+  /// The dive stays fully visible and editable in the logbook.
+  final bool excludedFromStats;
+
+  /// Excluded from SAC/RMV and gas-mix aggregates only (#1272), for a dive
+  /// whose gas number is unrepresentative. Implied by [excludedFromStats];
+  /// the implication is applied in SQL by DiveStatsScope, not stored here.
+  final bool excludedFromGasStats;
   final List<Tag> tags;
 
   // Dive mode (v1.5) - OC, CCR, or SCR
@@ -233,6 +242,8 @@ class Dive extends Equatable {
     this.weightingFeedback,
     this.weightingFeedbackKg,
     this.isFavorite = false,
+    this.excludedFromStats = false,
+    this.excludedFromGasStats = false,
     this.tags = const [],
     // CCR/SCR fields (v1.5)
     this.diveMode = DiveMode.oc,
@@ -585,6 +596,8 @@ class Dive extends Equatable {
     WeightingFeedback? weightingFeedback,
     double? weightingFeedbackKg,
     bool? isFavorite,
+    bool? excludedFromStats,
+    bool? excludedFromGasStats,
     List<Tag>? tags,
     // CCR/SCR fields
     DiveMode? diveMode,
@@ -680,6 +693,8 @@ class Dive extends Equatable {
       weightingFeedback: weightingFeedback ?? this.weightingFeedback,
       weightingFeedbackKg: weightingFeedbackKg ?? this.weightingFeedbackKg,
       isFavorite: isFavorite ?? this.isFavorite,
+      excludedFromStats: excludedFromStats ?? this.excludedFromStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       tags: tags ?? this.tags,
       // CCR/SCR fields
       diveMode: diveMode ?? this.diveMode,
@@ -778,6 +793,8 @@ class Dive extends Equatable {
     weightingFeedback,
     weightingFeedbackKg,
     isFavorite,
+    excludedFromStats,
+    excludedFromGasStats,
     tags,
     // CCR/SCR fields
     diveMode,

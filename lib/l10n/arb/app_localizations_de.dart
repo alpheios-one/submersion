@@ -35482,4 +35482,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Höchster';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Behalte diesen Tauchgang im Logbuch, lasse ihn aber aus jeder Statistik heraus, einschließlich der Tauchgangszahl.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Lasse diesen Tauchgang nur aus AMV-, RMV- und Gasgemisch-Statistiken heraus. Nützlich, wenn der Gaswert nicht repräsentativ ist.';
+
+  @override
+  String get diveLog_badge_excludedFromStats =>
+      'Von Statistiken ausgeschlossen';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Von Gasstatistiken ausgeschlossen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Nur von Statistiken ausgeschlossene';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Ausgeschlossen';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge von Statistiken ausgeschlossen',
+      one: '1 Tauchgang von Statistiken ausgeschlossen',
+    );
+    return '$_temp0';
+  }
 }

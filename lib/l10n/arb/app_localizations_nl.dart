@@ -35312,4 +35312,52 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Hoogste';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Uitsluiten van statistieken';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Houd deze duik in je logboek, maar laat hem buiten elke statistiek, inclusief je duikaantal.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Uitsluiten van gasstatistieken';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Laat deze duik alleen buiten SAC-, RMV- en gasmengselstatistieken. Handig wanneer de gaswaarde niet representatief is.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Uitgesloten van statistieken';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Uitgesloten van gasstatistieken';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Uitsluiten van statistieken';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Uitsluiten van gasstatistieken';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Alleen uitgesloten van statistieken';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Uitgesloten';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken uitgesloten van statistieken',
+      one: '1 duik uitgesloten van statistieken',
+    );
+    return '$_temp0';
+  }
 }
