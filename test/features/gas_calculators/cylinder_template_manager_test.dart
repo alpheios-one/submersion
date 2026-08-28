@@ -59,10 +59,9 @@ void main() {
     await tester.tap(find.byTooltip('Add'));
     await tester.pumpAndSettle();
 
-    expect(
-      ref.read(blenderCylinderTemplatesProvider),
-      const [CylinderTemplate(name: 'Deco bottle', liters: 3)],
-    );
+    expect(ref.read(blenderCylinderTemplatesProvider), const [
+      CylinderTemplate(name: 'Deco bottle', liters: 3),
+    ]);
     expect(find.text('Deco bottle'), findsOneWidget);
   });
 

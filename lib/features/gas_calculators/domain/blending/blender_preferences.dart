@@ -310,8 +310,7 @@ class BlenderPreferences {
       targetMix: _gasMixFromJson(json['targetMix']) ?? const GasMix(o2: 32),
       fillGas1: _gasMixFromJson(json['fillGas1']) ?? const GasMix(o2: 100),
       fillGas2:
-          _gasMixFromJson(json['fillGas2']) ??
-          const GasMix(o2: 0, he: 100),
+          _gasMixFromJson(json['fillGas2']) ?? const GasMix(o2: 0, he: 100),
       fillGas3: _gasMixFromJson(json['fillGas3']) ?? const GasMix(o2: 21),
       cylinderTemplates: cylinderTemplates,
     );

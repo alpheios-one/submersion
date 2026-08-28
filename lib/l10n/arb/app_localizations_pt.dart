@@ -12278,8 +12278,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Definições por defeito e faturação';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates =>
-      'Tamanhos de cilindro';
+  String get gasCalculators_blender_cylinderTemplates => 'Tamanhos de cilindro';
 
   @override
   String get gasCalculators_blender_cylinderTemplateName => 'Nome';

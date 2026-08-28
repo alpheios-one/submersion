@@ -12267,8 +12267,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ajustes por defecto y facturación';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates =>
-      'Tamaños de cilindro';
+  String get gasCalculators_blender_cylinderTemplates => 'Tamaños de cilindro';
 
   @override
   String get gasCalculators_blender_cylinderTemplateName => 'Nombre';

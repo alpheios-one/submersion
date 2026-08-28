@@ -127,7 +127,10 @@ class _CylinderTemplateManagerState
         if (_message != null)
           Padding(
             padding: const EdgeInsets.only(top: 4, bottom: 8),
-            child: Text(_message!, style: Theme.of(context).textTheme.bodySmall),
+            child: Text(
+              _message!,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,

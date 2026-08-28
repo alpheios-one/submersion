@@ -45,10 +45,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     final settings = ref.read(settingsProvider);
     final liters = ref.read(blenderCylinderLitersProvider);
     _cylinder = TextEditingController(
-      text: formatRoundedForInput(
-        litersToDisplayVolume(liters, settings),
-        2,
-      ),
+      text: formatRoundedForInput(litersToDisplayVolume(liters, settings), 2),
     );
   }
 

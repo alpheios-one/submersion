@@ -11704,15 +11704,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_cylinderTemplateNone => '尚未保存气瓶规格。';
 
   @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      '请输入名称和大于零的容积。';
+  String get gasCalculators_blender_cylinderTemplateInvalid => '请输入名称和大于零的容积。';
 
   @override
   String get gasCalculators_blender_cylinderTemplateExists => '该气瓶规格已保存。';
 
   @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      '已达到已保存气瓶规格的上限。';
+  String get gasCalculators_blender_cylinderTemplateLimit => '已达到已保存气瓶规格的上限。';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';

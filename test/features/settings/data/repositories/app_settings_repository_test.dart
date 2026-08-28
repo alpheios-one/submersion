@@ -99,7 +99,8 @@ void main() {
       final pending = await SyncRepository().getPendingRecords();
       expect(
         pending.any(
-          (r) => r.entityType == 'settings' && r.recordId == 'gas_blender_prefs',
+          (r) =>
+              r.entityType == 'settings' && r.recordId == 'gas_blender_prefs',
         ),
         isTrue,
       );
