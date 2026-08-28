@@ -93,4 +93,99 @@ void main() {
       expect(buckets[1].date, DateTime.utc(2024, 3, 11));
     });
   });
+
+  group('rollingMean', () {
+    test('returns an empty list below the minimum point count', () {
+      final points = List.generate(4, (i) => p(2024, 1, i + 1, 10));
+      expect(rollingMean(points), isEmpty);
+    });
+
+    test('leaves a flat series flat', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, 7));
+      final smoothed = rollingMean(points, window: 3);
+
+      expect(smoothed, hasLength(10));
+      for (final s in smoothed) {
+        expect(s.value, closeTo(7, 1e-9));
+      }
+    });
+
+    test('averages the centred window', () {
+      // Values 0..9, window 3: interior point i averages i-1, i, i+1.
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, i.toDouble()));
+      final smoothed = rollingMean(points, window: 3);
+
+      expect(smoothed[5].value, closeTo(5, 1e-9));
+      expect(smoothed[1].value, closeTo(1, 1e-9));
+    });
+
+    test('truncates the window at both ends rather than padding', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, i.toDouble()));
+      final smoothed = rollingMean(points, window: 5);
+
+      // First point sees indices 0,1,2 only: mean 1.
+      expect(smoothed.first.value, closeTo(1, 1e-9));
+      // Last point sees indices 7,8,9 only: mean 8.
+      expect(smoothed.last.value, closeTo(8, 1e-9));
+    });
+
+    test('keeps each smoothed point on its own date', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, i.toDouble()));
+      final smoothed = rollingMean(points, window: 3);
+
+      expect(smoothed[3].date, points[3].date);
+    });
+
+    test('counts dives rather than calendar time', () {
+      // Two clusters far apart. A time-based window would average across the
+      // gap; a count-based window of 3 must not.
+      final points = <TrendDataPoint>[
+        p(2024, 1, 1, 10),
+        p(2024, 1, 2, 10),
+        p(2024, 1, 3, 10),
+        p(2026, 1, 1, 50),
+        p(2026, 1, 2, 50),
+        p(2026, 1, 3, 50),
+      ];
+      final smoothed = rollingMean(points, window: 3);
+
+      expect(smoothed.first.value, closeTo(10, 1e-9));
+      expect(smoothed.last.value, closeTo(50, 1e-9));
+    });
+  });
+
+  group('linearFit', () {
+    test('returns null below the minimum point count', () {
+      final points = List.generate(4, (i) => p(2024, 1, i + 1, 10));
+      expect(linearFit(points), isNull);
+    });
+
+    test('recovers a known slope of one unit per day', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, i.toDouble()));
+      final fit = linearFit(points)!;
+
+      expect(fit.slopePerDay, closeTo(1.0, 1e-9));
+      expect(fit.perYear, closeTo(365.25, 1e-6));
+    });
+
+    test('reports a zero slope for a flat series', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, 7));
+      final fit = linearFit(points)!;
+
+      expect(fit.slopePerDay, closeTo(0, 1e-9));
+    });
+
+    test('valueAt reproduces the fitted line at the origin and beyond', () {
+      final points = List.generate(10, (i) => p(2024, 1, i + 1, i.toDouble()));
+      final fit = linearFit(points)!;
+
+      expect(fit.valueAt(DateTime.utc(2024, 1, 1)), closeTo(0, 1e-9));
+      expect(fit.valueAt(DateTime.utc(2024, 1, 11)), closeTo(10, 1e-9));
+    });
+
+    test('returns null when every point shares one date', () {
+      final points = List.generate(10, (i) => p(2024, 1, 1, i.toDouble()));
+      expect(linearFit(points), isNull);
+    });
+  });
 }

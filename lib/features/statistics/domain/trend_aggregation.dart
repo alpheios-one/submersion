@@ -106,3 +106,95 @@ DateTime _bucketStart(DateTime date, TrendAggregation mode) {
       return date;
   }
 }
+
+/// Fewer points than this and neither fit is drawn: a confident line through
+/// four dives says more than the data supports.
+const int kMinTrendFitPoints = 5;
+
+/// Centred mean over [window] neighbouring dives, ordered by date.
+///
+/// The window counts dives rather than calendar days on purpose. A time-based
+/// window would compute some points from a liveaboard's forty dives and others
+/// from none, so the line would be least stable exactly where the diving was
+/// densest. At the ends the window truncates rather than padding.
+///
+/// Returns an empty list below [kMinTrendFitPoints].
+List<TrendDataPoint> rollingMean(
+  List<TrendDataPoint> points, {
+  int window = 21,
+}) {
+  if (points.length < kMinTrendFitPoints) return const [];
+
+  final ordered = [...points]..sort((a, b) => a.date.compareTo(b.date));
+  final half = window ~/ 2;
+
+  return List<TrendDataPoint>.generate(ordered.length, (i) {
+    final lo = (i - half) < 0 ? 0 : i - half;
+    final hi = (i + half + 1) > ordered.length ? ordered.length : i + half + 1;
+    var sum = 0.0;
+    for (var j = lo; j < hi; j++) {
+      sum += ordered[j].value;
+    }
+    return TrendDataPoint(date: ordered[i].date, value: sum / (hi - lo));
+  }, growable: false);
+}
+
+/// A least-squares line through a per-dive series, expressed against a fixed
+/// [origin] so it can be evaluated at any date.
+class LinearFit {
+  const LinearFit({
+    required this.origin,
+    required this.slopePerDay,
+    required this.intercept,
+  });
+
+  /// Date the fit is anchored to. [intercept] is the fitted value here.
+  final DateTime origin;
+  final double slopePerDay;
+  final double intercept;
+
+  /// The rate a diver can actually state, for example "+4.4 m per year".
+  double get perYear => slopePerDay * 365.25;
+
+  double valueAt(DateTime date) =>
+      intercept +
+      slopePerDay *
+          (date.difference(origin).inSeconds / Duration.secondsPerDay);
+}
+
+/// Ordinary least squares over [points], with x measured in days since the
+/// earliest point.
+///
+/// Returns null below [kMinTrendFitPoints], and null when every point shares a
+/// single date (the slope would be undefined).
+LinearFit? linearFit(List<TrendDataPoint> points) {
+  if (points.length < kMinTrendFitPoints) return null;
+
+  final ordered = [...points]..sort((a, b) => a.date.compareTo(b.date));
+  final origin = ordered.first.date;
+
+  final xs = ordered
+      .map((p) => p.date.difference(origin).inSeconds / Duration.secondsPerDay)
+      .toList(growable: false);
+  final ys = ordered.map((p) => p.value).toList(growable: false);
+
+  final n = xs.length;
+  final meanX = xs.reduce((a, b) => a + b) / n;
+  final meanY = ys.reduce((a, b) => a + b) / n;
+
+  var numerator = 0.0;
+  var denominator = 0.0;
+  for (var i = 0; i < n; i++) {
+    final dx = xs[i] - meanX;
+    numerator += dx * (ys[i] - meanY);
+    denominator += dx * dx;
+  }
+  if (denominator == 0) return null;
+
+  final slope = numerator / denominator;
+  return LinearFit(
+    origin: origin,
+    slopePerDay: slope,
+    intercept: meanY - slope * meanX,
+  );
+}
