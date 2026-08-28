@@ -201,7 +201,8 @@ New keys in all 11 locales: `marineLife_lookup_*` (button, sheet title,
 search hint, look up, create without lookup, footer attribution, empty,
 error per kind, retry, resolving, observations count plural, unresolvable
 rank hint), `marineLife_speciesDetail_suggestForCatalog`,
-`marineLife_suggest_copiedUrl`, and `reef_species_addFromLookup` for the
+`marineLife_suggest_copyLink`, `marineLife_suggest_couldNotOpen`, and
+`reef_species_addFromLookup` for the
 unmatched chip tooltip. The GitHub issue title and body stay English: the
 maintainer reads them.
 

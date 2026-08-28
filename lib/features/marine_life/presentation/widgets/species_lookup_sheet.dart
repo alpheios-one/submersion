@@ -66,6 +66,10 @@ class _SpeciesLookupSheetState extends ConsumerState<SpeciesLookupSheet> {
   }
 
   Future<void> _search() async {
+    // The button disables itself; the field's onSubmitted does not, so a
+    // second Enter while a search is in flight is dropped here rather than
+    // racing the first one's result.
+    if (_searching) return;
     final query = _controller.text.trim();
     if (query.isEmpty) return;
     setState(() {
