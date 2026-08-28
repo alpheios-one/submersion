@@ -36,6 +36,11 @@ test/
 
 ## Running Tests
 
+Local runs are limited by disk throughput rather than CPU. See
+[Local Test Performance](local-test-performance.md) for the machine setup that
+makes them roughly twice as fast, particularly when several worktrees run tests
+at once.
+
 ### All Tests
 
 ```bash
