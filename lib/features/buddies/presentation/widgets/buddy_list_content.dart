@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
 
@@ -613,6 +614,14 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           adapter: BuddyFieldAdapter.instance,
           config: config,
           units: units,
+          // A photo is not a sortable text value, so it rides in the row's
+          // leading slot rather than joining BuddyField, which also avoids the
+          // saved-layout breakage that renaming that enum causes.
+          leadingBuilder: (entry) => ProfileAvatar(
+            photo: entry.buddy.photo,
+            initials: entry.buddy.initials,
+            radius: 14,
+          ),
           onSortFieldChanged: notifier.setSortField,
           onResizeColumn: notifier.resizeColumn,
           onEntityTapDown: (id) {
