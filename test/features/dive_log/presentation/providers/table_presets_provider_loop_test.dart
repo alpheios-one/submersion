@@ -6,6 +6,10 @@
 /// `field_presets`, the tick fired, the provider invalidated itself, and the
 /// rebuild seeded again -- an unbounded write/invalidate loop for as long as
 /// anything listened to the provider.
+///
+/// Every settle here is `pumpEventQueue()` rather than a wall-clock delay: the
+/// loop is driven by queued events, so draining the queue is both the exact
+/// thing that lets it run and a bound the runaway case cannot outlast.
 library;
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
@@ -35,22 +39,25 @@ void main() {
   late _CountingViewConfigRepository repository;
   const diverId = 'diver-1355';
 
-  setUp(() async {
-    db = AppDatabase(NativeDatabase.memory());
-    repository = _CountingViewConfigRepository(db);
-    DatabaseService.instance.setTestDatabase(db);
-
+  Future<void> insertDiver(String id, String name) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await db
         .into(db.divers)
         .insert(
           DiversCompanion(
-            id: const Value(diverId),
-            name: const Value('Test Diver'),
+            id: Value(id),
+            name: Value(name),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
         );
+  }
+
+  setUp(() async {
+    db = AppDatabase(NativeDatabase.memory());
+    repository = _CountingViewConfigRepository(db);
+    DatabaseService.instance.setTestDatabase(db);
+    await insertDiver(diverId, 'Test Diver');
   });
 
   tearDown(() async {
@@ -71,13 +78,23 @@ void main() {
       fireImmediately: true,
     );
 
-    await container.read(tablePresetsProvider(diverId).future);
-    // Let every queued invalidation drain.
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+    // Drain every queued rebuild. Asserting the count BEFORE awaiting the
+    // provider's future is deliberate: under the loop that future never
+    // completes, and a count is a far clearer failure than a timeout.
+    await pumpEventQueue();
 
-    // One seeding pass, plus at most one rebuild from the seeding write
-    // itself. Anything beyond that is the runaway loop.
-    expect(repository.ensureCalls, lessThanOrEqualTo(2));
+    expect(
+      repository.ensureCalls,
+      lessThanOrEqualTo(2),
+      reason:
+          'one seeding pass, plus at most one rebuild from the seeding write '
+          'itself. Anything beyond that is the runaway loop.',
+    );
+
+    // Settling must not have cost the presets themselves.
+    expect(await container.read(tablePresetsProvider(diverId).future), [
+      isA<FieldPreset>().having((p) => p.isBuiltIn, 'isBuiltIn', isTrue),
+    ]);
   });
 
   test('two live divers settle instead of trading writes', () async {
@@ -86,17 +103,7 @@ void main() {
     // diver's seed rewrites the other's -- a real change, which a per-build
     // seed would bounce back and forth forever.
     const otherDiverId = 'diver-1355-b';
-    final now = DateTime.now().millisecondsSinceEpoch;
-    await db
-        .into(db.divers)
-        .insert(
-          DiversCompanion(
-            id: const Value(otherDiverId),
-            name: const Value('Second Diver'),
-            createdAt: Value(now),
-            updatedAt: Value(now),
-          ),
-        );
+    await insertDiver(otherDiverId, 'Second Diver');
 
     final container = ProviderContainer(
       overrides: [viewConfigRepositoryProvider.overrideWithValue(repository)],
@@ -111,13 +118,15 @@ void main() {
       );
     }
 
-    await container.read(tablePresetsProvider(diverId).future);
-    await container.read(tablePresetsProvider(otherDiverId).future);
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+    await pumpEventQueue();
 
-    // One seeding pass per diver; neither reacts to the other's write by
-    // seeding again.
-    expect(repository.ensureCalls, lessThanOrEqualTo(2));
+    expect(
+      repository.ensureCalls,
+      lessThanOrEqualTo(2),
+      reason:
+          'one seeding pass per diver; neither may react to the other write '
+          'by seeding again',
+    );
   });
 
   test('ensureBuiltInPresets does not rewrite unchanged built-ins', () async {
@@ -128,17 +137,21 @@ void main() {
     var ticks = 0;
     final sub = repository.watchPresetsChanges().listen((_) => ticks++);
     addTearDown(sub.cancel);
-    // Drop the tick drift emits on subscribe.
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    ticks = 0;
+    await pumpEventQueue();
+    // Whatever the subscription itself delivered is the baseline; only the
+    // delta across the reseed is under test.
+    final before = ticks;
 
     await repository.ensureBuiltInPresets(diverId);
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await pumpEventQueue();
 
-    expect(ticks, isZero, reason: 'a no-op reseed must not fire a table tick');
-    final after = await db.select(db.fieldPresets).get();
     expect(
-      after.map((r) => r.createdAt).toList(),
+      ticks,
+      equals(before),
+      reason: 'a no-op reseed must not fire a table tick',
+    );
+    expect(
+      (await db.select(db.fieldPresets).get()).map((r) => r.createdAt).toList(),
       equals(seeded.map((r) => r.createdAt).toList()),
       reason: 'createdAt must survive a reseed',
     );
