@@ -403,7 +403,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
             (r) => ServiceRecord(
               id: r.id,
               equipmentId: r.equipmentId,
-              serviceType: r.serviceType,
+              serviceCategory: r.serviceCategory,
               serviceDate: r.serviceDate,
               provider: r.provider,
               cost: r.cost,
@@ -690,8 +690,8 @@ class ExportNotifier extends StateNotifier<ExportState> {
           equipmentName: item.name,
           equipmentType: item.type.displayName,
           // Blank when the record is not tied to a clock.
-          taskName: kindsById[record.serviceKindId]?.name ?? '',
-          serviceType: record.serviceType,
+          serviceTypeName: kindsById[record.serviceKindId]?.name ?? '',
+          serviceCategory: record.serviceCategory,
           record: record,
         ));
       }
@@ -1009,7 +1009,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
             (r) => ServiceRecord(
               id: r.id,
               equipmentId: r.equipmentId,
-              serviceType: r.serviceType,
+              serviceCategory: r.serviceCategory,
               serviceDate: r.serviceDate,
               provider: r.provider,
               cost: r.cost,

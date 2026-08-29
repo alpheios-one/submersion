@@ -10,6 +10,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/backup_bookmark_service.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/restore_source_missing_exception.dart';
 import 'package:submersion/core/services/sync/crypto/keyslots.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
@@ -32,6 +33,11 @@ class FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   String? lastBackupPath;
   String? lastRestorePath;
 
+  /// When set, [restore] records the call and then throws this, modelling a
+  /// swap that DatabaseService refused (e.g. the source vanished between
+  /// materialization and the swap, issue #1344).
+  Object? restoreError;
+
   @override
   Future<void> backup(String destinationPath) async {
     backupCallCount++;
@@ -49,6 +55,8 @@ class FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   }) async {
     restoreCallCount++;
     lastRestorePath = backupPath;
+    final error = restoreError;
+    if (error != null) throw error;
   }
 
   @override
@@ -324,6 +332,87 @@ void main() {
           intentStore.pending,
           isFalse,
           reason: 'Replace uses pendingReplace, not the merge intent',
+        );
+      });
+    });
+
+    group('missing restore source (issue #1344)', () {
+      // DatabaseService.restore leaves the live database untouched when the
+      // source file is gone and reports that as RestoreSourceMissingException.
+      // BackupService must let that through unchanged, so the notifier can
+      // land on an error instead of restoreComplete, and must not treat the
+      // untouched live library as freshly restored on the way out.
+      Future<File> vanishingSource(String tag) async {
+        final src = File(
+          '${Directory.systemTemp.path}/restore_${tag}_'
+          '${DateTime.now().microsecondsSinceEpoch}.db',
+        );
+        await src.writeAsString('db');
+        addTearDown(() async {
+          if (await src.exists()) await src.delete();
+        });
+        return src;
+      }
+
+      test('a merge restore propagates it and arms no sync fix-up', () async {
+        final prefs = await SharedPreferences.getInstance();
+        final intentStore = PostRestoreSyncStore(prefs);
+        final spy = _SpySyncRepository();
+        fakeDb.restoreError = const RestoreSourceMissingException('/gone.db');
+        final service = BackupService(
+          dbAdapter: fakeDb,
+          preferences: preferences,
+          syncRepository: spy,
+          postRestoreSyncStore: intentStore,
+        );
+        final src = await vanishingSource('missing_merge');
+
+        await expectLater(
+          service.restoreFromFile(src.path),
+          throwsA(isA<RestoreSourceMissingException>()),
+        );
+
+        expect(fakeDb.restoreCallCount, 1);
+        expect(
+          spy.rebaselineCalls,
+          0,
+          reason:
+              'nothing was swapped in, so there is no restored sync '
+              'position to re-baseline',
+        );
+        expect(
+          intentStore.pending,
+          isFalse,
+          reason:
+              'a restore that did not happen must not arm the '
+              'post-restore reconciling sync',
+        );
+      });
+
+      test('a replace restore propagates it and mints no replace', () async {
+        final prefs = await SharedPreferences.getInstance();
+        final epochStore = LibraryEpochStore(prefs);
+        fakeDb.restoreError = const RestoreSourceMissingException('/gone.db');
+        final service = BackupService(
+          dbAdapter: fakeDb,
+          preferences: preferences,
+          syncRepository: _SpySyncRepository(),
+          epochStore: epochStore,
+          postRestoreSyncStore: PostRestoreSyncStore(prefs),
+        );
+        final src = await vanishingSource('missing_replace');
+
+        await expectLater(
+          service.restoreFromFile(src.path, mode: RestoreMode.replace),
+          throwsA(isA<RestoreSourceMissingException>()),
+        );
+
+        expect(
+          epochStore.pendingReplace,
+          isNull,
+          reason:
+              'minting a replace here would push the UNTOUCHED live '
+              'library to every synced device as the "restored" one',
         );
       });
     });

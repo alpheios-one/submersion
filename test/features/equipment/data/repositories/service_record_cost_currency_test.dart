@@ -38,7 +38,7 @@ void main() {
       ServiceRecord(
         id: '',
         equipmentId: equipmentId,
-        serviceType: ServiceType.annual,
+        serviceCategory: ServiceCategory.annual,
         serviceDate: now,
         cost: cost,
         currency: currency,
@@ -90,7 +90,7 @@ void main() {
       ServiceRecord(
         id: '',
         equipmentId: other.id,
-        serviceType: ServiceType.annual,
+        serviceCategory: ServiceCategory.annual,
         serviceDate: now,
         cost: 500,
         currency: 'EUR',

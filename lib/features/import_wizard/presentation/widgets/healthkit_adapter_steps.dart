@@ -177,10 +177,16 @@ class _HealthKitPermissionsStepState
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.health_and_safety),
+            // Neutral wording is a store requirement, not a style choice.
+            // App Review rejected 1.7.4 under Guideline 5.1.1(iv) because this
+            // button read "Grant HealthKit Access": a custom screen may not
+            // urge the user toward the system authorization sheet. Apple named
+            // "Continue" and "Next" as acceptable. Keep the label neutral, and
+            // keep the headline a bare brand name, if this copy is revisited.
             label: Text(
               _state == HealthKitPermissionUiState.requesting
                   ? context.l10n.diveImport_healthkit_requesting
-                  : context.l10n.diveImport_healthkit_grantAccessButton,
+                  : context.l10n.diveImport_healthkit_grantAccess,
             ),
             onPressed: _state == HealthKitPermissionUiState.requesting
                 ? null

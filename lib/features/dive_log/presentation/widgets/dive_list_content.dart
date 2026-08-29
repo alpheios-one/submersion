@@ -556,6 +556,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     // Saving opens the native save panel, which must not be raised while a
     // modal route is up - so that path drops the progress dialog first.
+    //
+    // Every pop below passes rootNavigator: true. showDialog defaults to
+    // useRootNavigator: true, while a bare Navigator.of(context) resolves to
+    // the ShellRoute's navigator; on master-detail layouts that navigator
+    // holds a single route, so a bare pop blanks the screen and strands the
+    // dialog.
     final keepDialogForDelivery = destination == ExportDestination.share;
     var dialogVisible = true;
 
@@ -592,7 +598,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
       if (!keepDialogForDelivery) {
         if (!mounted) return;
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
         dialogVisible = false;
       }
 
@@ -626,7 +632,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
       if (!mounted) return;
       if (dialogVisible) {
-        Navigator.of(context).pop();
+        Navigator.of(context, rootNavigator: true).pop();
         dialogVisible = false;
       }
       // A null path means the save panel was dismissed - not a failure.
@@ -642,7 +648,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       );
     } catch (e) {
       if (mounted) {
-        if (dialogVisible) Navigator.of(context).pop();
+        if (dialogVisible) {
+          Navigator.of(context, rootNavigator: true).pop();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.l10n.diveLog_bulkExport_failed(e.toString())),
@@ -1357,6 +1365,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     // Built once for the whole list, not per row: the lookup map is shared by
     // every tile and only this widget subscribes to the dive-type list.
     final diveTypeLabelResolver = watchDiveTypeLabelResolver(ref, context.l10n);
+    final diveTypeShortLabelResolver = watchDiveTypeShortLabelResolver(
+      ref,
+      context.l10n,
+    );
+    final diveTypeListVisibilityPredicate =
+        watchDiveTypeListVisibilityPredicate(ref);
 
     // Check if detailed mode needs full Dive objects for non-summary fields
     final detailedConfig = ref.watch(detailedCardConfigProvider);
@@ -1410,6 +1424,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                 return DiveListItem(
                   summary: dive,
                   diveTypeLabelResolver: diveTypeLabelResolver,
+                  diveTypeShortLabelResolver: diveTypeShortLabelResolver,
+                  diveTypeListVisibilityPredicate:
+                      diveTypeListVisibilityPredicate,
                   fullDive: fullDiveLookup[dive.id],
                   diveNumber: dive.diveNumber ?? index + 1,
                   colorValue: getCardColorValue(dive, colorAttribute),
@@ -1575,6 +1592,16 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
             );
           },
         ),
+      );
+    }
+
+    if (filter.noBuddyOnly == true) {
+      chips.add(
+        _buildFilterChip(context, context.l10n.diveLog_filterChip_noBuddy, () {
+          ref.read(diveFilterProvider.notifier).state = filter.copyWith(
+            clearNoBuddyOnly: true,
+          );
+        }),
       );
     }
 

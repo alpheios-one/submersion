@@ -388,6 +388,17 @@ jobs:
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
 
+      - name: Run chamber directory pipeline tests
+        # The harvester generates a safety-critical dataset: its validation
+        # gates are what stop a broken parser shipping blank phone numbers or
+        # duplicate ids. Kept out of the guards coverage set above so it does
+        # not perturb that report; pypdf is installed here because the FFESSM
+        # registry is a PDF (the test skips itself without it).
+        run: |
+          python3 -m pip install pypdf
+          python3 scripts/chamber_harvester_test.py
+          python3 scripts/chamber_sources_test.py
+
       - name: Run appcast beta feed test
         run: ./scripts/generate_appcast_beta_test.sh
 
@@ -400,6 +411,12 @@ jobs:
       - name: Run changelog generator test
         run: ./scripts/release/generate_changelog_test.sh
 
+      - name: Run release contributors test
+        # Stubs the GitHub API, so no token or network is needed here. Guards
+        # the two properties the credits depend on: PR numbers resolve from
+        # git alone, and no API failure can abort a release.
+        run: ./scripts/release/contributors_test.sh
+
       - name: Run fastlane beta changelog test
         run: ruby scripts/release/fastlane_beta_changelog_test.rb
 
@@ -409,6 +426,14 @@ jobs:
         # still in review, which renamed the in-review version instead of
         # creating a new one and left it carrying the wrong build.
         run: ruby scripts/release/fastlane_submit_guard_test.rb
+
+      - name: Run App Review notes test
+        # Guards the committed App Review notes deliver uploads with every
+        # submission: present on both platforms, identical, within Apple's
+        # length limit, and free of other-platform names (2.3.10). iOS 1.7.4
+        # and 1.7.5 were rejected under 5.1.1(v) because nothing told the
+        # reviewer the app has no accounts.
+        run: ./scripts/release/app_review_notes_test.sh
 
       - name: Run pre-push hook test
         # Guards two hook bugs that both rejected pushes for reasons unrelated
@@ -685,7 +710,7 @@ jobs:
             macos/Runner.xcodeproj/project.pbxproj
 
           # Build with Flutter
-          flutter build macos --release "${{ env.DART_DEFINES }}"
+          flutter build macos --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}"
 
           # Re-sign with ad-hoc signature and no-sandbox entitlements
           codesign --force --deep --sign - \
@@ -922,7 +947,7 @@ jobs:
         run: tar -xzf generated-code.tar.gz
 
       - name: Build Linux
-        run: flutter build linux --release "${{ env.DART_DEFINES }}" -v
+        run: flutter build linux --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}" -v
 
       - name: Check bundled native assets
         # Same guard as the Windows job. Linux uses the stock Flutter install
@@ -1004,7 +1029,7 @@ jobs:
         run: tar -xzf generated-code.tar.gz
 
       - name: Build Windows
-        run: flutter build windows --release "${{ env.DART_DEFINES }}" -v
+        run: flutter build windows --release "${{ env.DART_DEFINES }}" "--dart-define=GOOGLE_DRIVE_CLIENT_SECRET=${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}" -v
 
       - name: Check bundled native assets
         # A Windows build that never bundles sqlcipher.dll still compiles,

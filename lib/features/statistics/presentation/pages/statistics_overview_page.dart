@@ -5,7 +5,6 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/add_dive_bottom_sheet.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -81,7 +80,7 @@ class _OverviewBody extends ConsumerWidget {
 
     final settings = ref.watch(settingsProvider);
     final fmt = UnitFormatter(settings);
-    final recordsAsync = ref.watch(diveRecordsProvider);
+    final recordsAsync = ref.watch(filteredDiveRecordsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -114,6 +113,33 @@ class _OverviewBody extends ConsumerWidget {
           _TopSitesSection(sites: stats.topSites),
           const SizedBox(height: 16),
           _DistributionsSection(stats: stats, fmt: fmt),
+          // Explains why the statistics dive count and the logbook dive count
+          // differ, so the discrepancy never has to be discovered (#526).
+          ref
+              .watch(excludedDiveCountProvider)
+              .maybeWhen(
+                data: (count) => count == 0
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Center(
+                          child: Text(
+                            key: const Key('statistics-excluded-footnote'),
+                            context.l10n.statistics_excludedDivesFootnote(
+                              count,
+                            ),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                      ),
+                orElse: () => const SizedBox.shrink(),
+              ),
         ],
       ),
     );

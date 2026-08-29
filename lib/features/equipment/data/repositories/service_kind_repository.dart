@@ -67,6 +67,7 @@ class ServiceKindRepository {
             defaultIntervalHours: Value(kind.defaultIntervalHours),
             defaultCost: Value(kind.defaultCost),
             defaultCurrency: Value(kind.defaultCurrency),
+            defaultCategory: Value(kind.defaultCategory?.name),
             autoAttach: Value(kind.autoAttach),
             isBuiltIn: const Value(false),
             createdAt: Value(now.millisecondsSinceEpoch),
@@ -105,6 +106,7 @@ class ServiceKindRepository {
         defaultIntervalHours: Value(kind.defaultIntervalHours),
         defaultCost: Value(kind.defaultCost),
         defaultCurrency: Value(kind.defaultCurrency),
+        defaultCategory: Value(kind.defaultCategory?.name),
         autoAttach: Value(kind.autoAttach),
         updatedAt: Value(now),
       ),
@@ -167,6 +169,12 @@ class ServiceKindRepository {
       defaultIntervalHours: row.defaultIntervalHours,
       defaultCost: row.defaultCost,
       defaultCurrency: row.defaultCurrency,
+      defaultCategory: row.defaultCategory == null
+          ? null
+          : ServiceCategory.values.firstWhere(
+              (c) => c.name == row.defaultCategory,
+              orElse: () => ServiceCategory.other,
+            ),
       autoAttach: row.autoAttach,
       isBuiltIn: row.isBuiltIn,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),

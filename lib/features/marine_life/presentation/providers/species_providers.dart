@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Repository provider
 final speciesRepositoryProvider = Provider<SpeciesRepository>((ref) {
@@ -80,7 +81,7 @@ class SightingsNotifier extends StateNotifier<List<Sighting>> {
 
   SightingsNotifier(this._repository, this._diveId) : super([]) {
     if (_diveId != null) {
-      _loadSightings();
+      logFailure(_loadSightings(), SightingsNotifier, 'load sightings');
     }
   }
 
@@ -301,7 +302,11 @@ class SiteExpectedSpeciesNotifier
   final String _siteId;
 
   SiteExpectedSpeciesNotifier(this._repository, this._siteId) : super([]) {
-    _loadExpectedSpecies();
+    logFailure(
+      _loadExpectedSpecies(),
+      SiteExpectedSpeciesNotifier,
+      'load expected species',
+    );
   }
 
   Future<void> _loadExpectedSpecies() async {
@@ -309,12 +314,25 @@ class SiteExpectedSpeciesNotifier
     state = entries;
   }
 
+  /// Species with an insert in flight. `site_species` has no uniqueness
+  /// constraint, and `state` only gains the entry once the write returns, so
+  /// two calls that start together would both find the species absent.
+  /// Claiming the id here is what makes the check hold: nothing else runs
+  /// between reading `state` and adding to this set.
+  final Set<String> _adding = {};
+
   Future<void> addSpecies(String speciesId) async {
-    final entry = await _repository.addExpectedSpecies(
-      siteId: _siteId,
-      speciesId: speciesId,
-    );
-    state = [...state, entry];
+    if (state.any((e) => e.speciesId == speciesId)) return;
+    if (!_adding.add(speciesId)) return;
+    try {
+      final entry = await _repository.addExpectedSpecies(
+        siteId: _siteId,
+        speciesId: speciesId,
+      );
+      state = [...state, entry];
+    } finally {
+      _adding.remove(speciesId);
+    }
   }
 
   Future<void> removeSpecies(String speciesId) async {
@@ -340,7 +358,11 @@ class SiteExpectedSpeciesNotifier
   }
 
   void refresh() {
-    _loadExpectedSpecies();
+    logFailure(
+      _loadExpectedSpecies(),
+      SiteExpectedSpeciesNotifier,
+      'load expected species',
+    );
   }
 }
 

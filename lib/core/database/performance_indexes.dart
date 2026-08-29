@@ -129,6 +129,15 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'CREATE INDEX IF NOT EXISTS idx_dive_buddies_dive_id '
         'ON dive_buddies(dive_id)',
   ),
+  // The reverse direction: getDiveIdsForBuddy, getDiveCountForBuddy and
+  // addBuddyToDive's existing-row check all filter on buddy_id, which had no
+  // index and scanned the link table.
+  (
+    name: 'idx_dive_buddies_buddy_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_buddies_buddy_id '
+        'ON dive_buddies(buddy_id, dive_id)',
+  ),
   (
     name: 'idx_dive_custom_fields_dive_id',
     ddl:
@@ -272,6 +281,27 @@ const List<PerformanceIndex> kPerformanceIndexes = [
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_media_local_path '
         'ON media(local_path)',
+  ),
+  // Library sort keys, one per MediaSortField. Expression indexes: COALESCE
+  // is deterministic, so SQLite accepts it here. The date one also covers the
+  // default library ordering, which had no index before.
+  (
+    name: 'idx_media_sort_date',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_date '
+        'ON media(COALESCE(taken_at, created_at) DESC, id DESC)',
+  ),
+  (
+    name: 'idx_media_sort_name',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_name '
+        'ON media(COALESCE(original_filename, file_path), id)',
+  ),
+  (
+    name: 'idx_media_sort_size',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_sort_size '
+        'ON media(COALESCE(content_size_bytes, -1) DESC, id DESC)',
   ),
   (
     name: 'idx_media_file_path',

@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_category_label.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -49,6 +50,7 @@ class _ServiceKindListPageState extends ConsumerState<ServiceKindListPage> {
         l10n.equipment_serviceKinds_everyHours(
           kind.defaultIntervalHours!.toStringAsFixed(1),
         ),
+      if (kind.defaultCategory != null) kind.defaultCategory!.label(l10n),
     ];
     return parts.join(' · ');
   }
@@ -302,6 +304,11 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
   /// Null means "no opinion, use the diver's default currency". A dropdown
   /// entry maps to it explicitly so a chosen currency can be cleared again.
   String? _defaultCurrency;
+
+  /// Null means "no default": a record logged against this type starts with
+  /// whatever the dialog would have chosen anyway, rather than a category the
+  /// diver never asked for.
+  ServiceCategory? _defaultCategory;
   late Set<EquipmentType> _types;
   late bool _autoAttach;
 
@@ -329,6 +336,7 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
       text: cost == null ? '' : formatDecimalForInput(cost),
     );
     _defaultCurrency = k?.defaultCurrency;
+    _defaultCategory = k?.defaultCategory;
     _types = {...(k?.applicableTypes ?? const [])};
     _autoAttach = k?.autoAttach ?? false;
   }
@@ -446,6 +454,36 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
                   onChanged: (value) =>
                       setState(() => _defaultCurrency = value),
                 ),
+                const SizedBox(height: 12),
+                // Full width for the same reason as the currency dropdown
+                // above: the "no default" entry is a phrase, not a code.
+                DropdownButtonFormField<ServiceCategory?>(
+                  key: const Key('service-kind-default-category'),
+                  initialValue: _defaultCategory,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.equipment_serviceKinds_defaultCategoryLabel,
+                  ),
+                  items: [
+                    DropdownMenuItem<ServiceCategory?>(
+                      value: null,
+                      child: Text(
+                        l10n.equipment_serviceKinds_defaultCategoryNone,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    for (final category in ServiceCategory.values)
+                      DropdownMenuItem<ServiceCategory?>(
+                        value: category,
+                        child: Text(
+                          category.label(l10n),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
+                  onChanged: (value) =>
+                      setState(() => _defaultCategory = value),
+                ),
                 const SizedBox(height: 16),
                 Text(
                   l10n.equipment_serviceKinds_appliesTo,
@@ -516,6 +554,7 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalHours: parseUserDecimal(_hours.text),
           defaultCost: parseUserDecimal(_defaultCost.text),
           defaultCurrency: _defaultCurrency,
+          defaultCategory: _defaultCategory,
           autoAttach: _autoAttach,
           createdAt: now,
           updatedAt: now,
@@ -534,6 +573,7 @@ class _ServiceKindEditDialogState extends State<_ServiceKindEditDialog> {
           defaultIntervalHours: parseUserDecimal(_hours.text),
           defaultCost: parseUserDecimal(_defaultCost.text),
           defaultCurrency: _defaultCurrency,
+          defaultCategory: _defaultCategory,
           autoAttach: _autoAttach,
           isBuiltIn: false,
           createdAt: existing.createdAt,

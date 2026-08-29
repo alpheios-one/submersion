@@ -56,6 +56,7 @@ void main() {
     int? gradientFactorHigh,
     String? importId,
     int? diveDateTime,
+    String? buddy,
   }) async {
     final diveId = id ?? 'dive-${DateTime.now().microsecondsSinceEpoch}';
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -82,11 +83,40 @@ void main() {
             gradientFactorLow: Value(gradientFactorLow),
             gradientFactorHigh: Value(gradientFactorHigh),
             importId: Value(importId),
+            buddy: Value(buddy),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
         );
     return diveId;
+  }
+
+  Future<void> insertBuddy({required String id, required String name}) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.buddies)
+        .insert(
+          BuddiesCompanion(
+            id: Value(id),
+            name: Value(name),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+  }
+
+  Future<void> linkBuddy(String diveId, String buddyId) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.diveBuddies)
+        .insert(
+          DiveBuddiesCompanion(
+            id: Value('$diveId-$buddyId'),
+            diveId: Value(diveId),
+            buddyId: Value(buddyId),
+            createdAt: Value(now),
+          ),
+        );
   }
 
   DiveDataSourcesCompanion buildReading({
@@ -1432,6 +1462,41 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // noBuddyOnly filter in getDiveSummaries
+  // ---------------------------------------------------------------------------
+
+  group('noBuddyOnly filter', () {
+    test('excludes dives with a legacy buddy or a linked buddy', () async {
+      await insertTestDive(id: 'dive-legacy-buddy', buddy: 'Alice Diver');
+      await insertBuddy(id: 'b1', name: 'Bob Buddy');
+      await insertTestDive(id: 'dive-linked-buddy');
+      await linkBuddy('dive-linked-buddy', 'b1');
+      await insertTestDive(id: 'dive-no-buddy');
+      await insertTestDive(id: 'dive-empty-buddy', buddy: '');
+
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(noBuddyOnly: true),
+      );
+
+      expect(summaries.map((s) => s.id).toSet(), {
+        'dive-no-buddy',
+        'dive-empty-buddy',
+      });
+    });
+
+    test('returns all dives when noBuddyOnly is not set', () async {
+      await insertTestDive(id: 'dive-a', buddy: 'Alice Diver');
+      await insertTestDive(id: 'dive-b');
+
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(),
+      );
+
+      expect(summaries.length, equals(2));
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // createDive and updateDive with importSource / importId
   // ---------------------------------------------------------------------------
 
@@ -1704,59 +1769,65 @@ void main() {
       }
     });
 
-    test('handles reading with null computerId (no profile swap)', () async {
-      final diveId = await insertTestDive(id: 'dive-null-comp');
+    test(
+      'promoting a null-computerId reading keeps a primary profile',
+      () async {
+        final diveId = await insertTestDive(id: 'dive-null-comp');
 
-      // Save a reading without computerId.
-      await repository.saveComputerReading(
-        buildReading(
-          id: 'reading-no-comp',
-          diveId: diveId,
-          isPrimary: false,
-          computerModel: 'Manual Entry',
-          maxDepth: 20.0,
-        ),
-      );
+        // Save a reading without computerId.
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-no-comp',
+            diveId: diveId,
+            isPrimary: false,
+            computerModel: 'Manual Entry',
+            maxDepth: 20.0,
+          ),
+        );
 
-      await repository.saveComputerReading(
-        buildReading(
-          id: 'reading-primary',
+        await repository.saveComputerReading(
+          buildReading(
+            id: 'reading-primary',
+            diveId: diveId,
+            isPrimary: true,
+            computerModel: 'Original',
+          ),
+        );
+
+        // Insert a profile with no computerId.
+        await insertTestProfile(
           diveId: diveId,
+          sourceTag: 'p1',
           isPrimary: true,
-          computerModel: 'Original',
-        ),
-      );
+          timestamp: 0,
+          depth: 15.0,
+        );
 
-      // Insert a profile with no computerId.
-      await insertTestProfile(
-        diveId: diveId,
-        sourceTag: 'p1',
-        isPrimary: true,
-        timestamp: 0,
-        depth: 15.0,
-      );
+        // Switch primary to reading with no computerId.
+        await repository.setPrimaryDataSource(
+          diveId: diveId,
+          computerReadingId: 'reading-no-comp',
+        );
 
-      // Switch primary to reading with no computerId.
-      await repository.setPrimaryDataSource(
-        diveId: diveId,
-        computerReadingId: 'reading-no-comp',
-      );
+        // The data source should be promoted.
+        final sources = await repository.getDataSources(diveId);
+        final promoted = sources.firstWhere((s) => s.id == 'reading-no-comp');
+        expect(promoted.isPrimary, isTrue);
 
-      // The data source should be promoted.
-      final sources = await repository.getDataSources(diveId);
-      final promoted = sources.firstWhere((s) => s.id == 'reading-no-comp');
-      expect(promoted.isPrimary, isTrue);
+        // The unattributed null-computerId row belongs to whichever source is
+        // primary, so promoting a null-computerId reading takes it along.
+        //
+        // This asserted the opposite until issue #1149 ("no profiles are
+        // re-promoted"), which is precisely the stranding: the dive kept its
+        // samples but every is_primary consumer -- getDiveProfile,
+        // getAscentDescentRates, the data-quality prefilters -- skipped it.
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
 
-      // Profile should be demoted (since computerId is null, no profiles
-      // are re-promoted).
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
-
-      for (final p in profiles) {
-        expect(p.isPrimary, isFalse);
-      }
-    });
+        expect(profiles.where((p) => p.isPrimary), isNotEmpty);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

@@ -17,6 +17,7 @@ import 'package:submersion/features/media_store/presentation/widgets/media_trans
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 
 /// Configuration page for the media store's S3 backend (design spec
 /// section 14). Sibling of the sync backend's S3ConfigPage: same field
@@ -61,7 +62,7 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
     _regionController.addListener(_onRegionChanged);
     _loadExisting();
     _checkSyncConfig();
-    _loadPolicies();
+    logFailure(_loadPolicies(), _MediaStoragePageState, 'load policies');
   }
 
   Future<void> _loadPolicies() async {
@@ -317,6 +318,9 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
       _showSnack(
         l10n.settings_mediaStorage_verify_summary(
           report.objectsChecked,
+          report.originalsChecked,
+          report.thumbsChecked,
+          report.renditionsChecked,
           report.orphansRemoved,
           report.repairsQueued,
           report.sessionsAborted,

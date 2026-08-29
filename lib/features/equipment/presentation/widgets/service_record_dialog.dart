@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -10,7 +11,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/equipment/domain/services/default_service_cost_resolver.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/utils/service_type_label.dart';
+import 'package:submersion/features/equipment/presentation/utils/service_category_label.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
@@ -39,7 +40,7 @@ class ServiceRecordDialog extends ConsumerStatefulWidget {
 
 class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   final _formKey = GlobalKey<FormState>();
-  late ServiceType _serviceType;
+  late ServiceCategory _serviceCategory;
   late DateTime _serviceDate;
   final _providerController = TextEditingController();
   final _costController = TextEditingController();
@@ -59,6 +60,11 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   /// diver picked, and vice versa.
   bool _currencyTouched = false;
 
+  /// The same guard for the category: it is prefilled from the chosen service
+  /// type, so without this flag changing the type would silently overwrite a
+  /// category the diver had already picked.
+  bool _categoryTouched = false;
+
   /// The code this dialog opened with: the record's stored currency when
   /// editing, the diver's default for a new record. Currency is free text, so
   /// this can be outside the presets; keeping it lets the dropdown offer it.
@@ -71,7 +77,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
     super.initState();
     if (isEditing) {
       final record = widget.existingRecord!;
-      _serviceType = record.serviceType;
+      _serviceCategory = record.serviceCategory;
       _serviceDate = record.serviceDate;
       _providerController.text = record.provider ?? '';
       // Seeded in the diver's locale to match how the field is read back;
@@ -83,7 +89,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _nextServiceDue = record.nextServiceDue;
       _serviceKindId = record.serviceKindId;
     } else {
-      _serviceType = ServiceType.annual;
+      _serviceCategory = ServiceCategory.annual;
       _serviceDate = DateTime.now();
       _serviceKindId = widget.serviceKindId;
       _initialCurrencyCode = _fallbackCurrencyCode();
@@ -107,7 +113,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
     super.dispose();
   }
 
-  /// Fills the cost field from the schedule-then-kind default.
+  /// Fills the cost, currency and category fields from their defaults.
   ///
   /// A convenience, not a binding value: it only ever fills an untouched
   /// field on a NEW record. Editing must never re-prefill, or a cost the
@@ -115,11 +121,23 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   ///
   /// This cannot live in initState, because the kinds and schedules arrive
   /// from FutureProviders that have not resolved when the dialog is built.
-  void _maybePrefillCost(
+  void _maybePrefillFromKind(
     List<ServiceKind> kinds,
     List<ServiceSchedule> schedules,
   ) {
     if (isEditing) return;
+    // Guarded on its own flag for the same reason as the currency below: this
+    // runs on every build, so a category the diver picked must survive any
+    // later setState, including changing the service type.
+    if (!_categoryTouched) {
+      final category = resolveDefaultServiceCategory(
+        serviceKindId: _serviceKindId,
+        kinds: kinds,
+      );
+      if (category != null && category != _serviceCategory) {
+        _serviceCategory = category;
+      }
+    }
     final resolved = resolveDefaultServiceCost(
       serviceKindId: _serviceKindId,
       schedules: schedules,
@@ -161,7 +179,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
 
     // Resolved every build while the field is untouched, so switching the
     // clock re-prices the record.
-    _maybePrefillCost(
+    _maybePrefillFromKind(
       ref.watch(serviceKindsProvider).valueOrNull ?? const <ServiceKind>[],
       ref
               .watch(serviceSchedulesForEquipmentProvider(widget.equipmentId))
@@ -183,29 +201,9 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Service type dropdown
-                DropdownButtonFormField<ServiceType>(
-                  initialValue: _serviceType,
-                  decoration: InputDecoration(
-                    labelText:
-                        context.l10n.equipment_serviceDialog_serviceTypeLabel,
-                    prefixIcon: const Icon(Icons.build),
-                  ),
-                  items: ServiceType.values.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(type.label(context.l10n)),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _serviceType = value);
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-
-                // Service clock this record fulfills (resets that clock)
+                // The service type this record fulfills, which is also the
+                // clock it resets. Leads the form: it is the one thing the
+                // diver must choose, and the category below follows from it.
                 ref
                     .watch(serviceKindsProvider)
                     .maybeWhen(
@@ -213,6 +211,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           DropdownButtonFormField<String?>(
+                            key: const Key('service-record-service-type'),
                             initialValue:
                                 kinds.any((k) => k.id == _serviceKindId)
                                 ? _serviceKindId
@@ -220,16 +219,28 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                             decoration: InputDecoration(
                               labelText: context
                                   .l10n
-                                  .equipment_serviceClocks_appliesToClock,
-                              prefixIcon: const Icon(Icons.av_timer),
+                                  .equipment_serviceDialog_serviceTypeLabel,
+                              helperText: context
+                                  .l10n
+                                  .equipment_serviceDialog_serviceTypeHelper,
+                              helperMaxLines: 2,
+                              prefixIcon: const Icon(Icons.build),
                             ),
+                            // Required when creating, optional when editing:
+                            // forcing a pick on an existing record would
+                            // attach a clock and move its anchor.
+                            validator: (value) => !isEditing && value == null
+                                ? context
+                                      .l10n
+                                      .equipment_serviceDialog_serviceTypeRequired
+                                : null,
                             items: [
                               DropdownMenuItem<String?>(
                                 value: null,
                                 child: Text(
                                   context
                                       .l10n
-                                      .equipment_serviceClocks_noClockOption,
+                                      .equipment_serviceDialog_serviceTypeNotSet,
                                 ),
                               ),
                               for (final kind in kinds)
@@ -242,11 +253,50 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                               setState(() => _serviceKindId = value);
                             },
                           ),
-                          const SizedBox(height: 16),
+                          Align(
+                            alignment: AlignmentDirectional.centerEnd,
+                            child: TextButton(
+                              onPressed: () =>
+                                  context.pushNamed('manageServiceTypes'),
+                              child: Text(
+                                context
+                                    .l10n
+                                    .equipment_serviceDialog_manageServiceTypes,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
                         ],
                       ),
                       orElse: () => const SizedBox.shrink(),
                     ),
+
+                // What kind of work it was. Secondary to the service type
+                // above, and prefilled from it.
+                DropdownButtonFormField<ServiceCategory>(
+                  key: const Key('service-record-category'),
+                  initialValue: _serviceCategory,
+                  decoration: InputDecoration(
+                    labelText:
+                        context.l10n.equipment_serviceDialog_categoryLabel,
+                    helperText:
+                        context.l10n.equipment_serviceDialog_categoryHelper,
+                    prefixIcon: const Icon(Icons.category_outlined),
+                  ),
+                  items: ServiceCategory.values.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category.label(context.l10n)),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      _categoryTouched = true;
+                      setState(() => _serviceCategory = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
 
                 // Service date picker
                 Semantics(
@@ -478,7 +528,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       final record = ServiceRecord(
         id: widget.existingRecord?.id ?? '',
         equipmentId: widget.equipmentId,
-        serviceType: _serviceType,
+        serviceCategory: _serviceCategory,
         serviceKindId: _serviceKindId,
         serviceDate: _serviceDate,
         provider: _providerController.text.trim().isEmpty

@@ -138,6 +138,28 @@ class UddfImportParsers {
         : element?.innerText.trim();
   }
 
+  /// Reads a dive computer's vendor from a `<divecomputer>` element.
+  ///
+  /// UDDF nests the vendor as `<manufacturer><name>`, alongside optional
+  /// address and contact children, so the nested `<name>` is read first.
+  ///
+  /// The bare-text fallback keeps exporters that write
+  /// `<manufacturer>Shearwater</manufacturer>` working, but applies only when
+  /// the element has no child elements at all: `innerText` walks the whole
+  /// subtree, so a `<manufacturer>` carrying only an address would otherwise
+  /// yield a vendor of "VancouverCanada".
+  static String? getManufacturerName(XmlElement computerElement) {
+    final manufacturer = computerElement
+        .findElements('manufacturer')
+        .firstOrNull;
+    if (manufacturer == null) return null;
+    final named = getElementText(manufacturer, 'name');
+    if (named != null) return named;
+    if (manufacturer.childElements.isNotEmpty) return null;
+    final text = manufacturer.innerText.trim();
+    return text.isEmpty ? null : text;
+  }
+
   /// Maximum O2 cells the profile schema can hold (o2Sensor1..o2Sensor6).
   static const int maxO2Sensors = 6;
 
@@ -832,11 +854,16 @@ class UddfImportParsers {
 
     record['equipmentRef'] = getElementText(recordElement, 'equipmentref');
 
-    final serviceType = getElementText(recordElement, 'servicetype');
-    if (serviceType != null) {
-      record['serviceType'] = parseEnumValue(
-        serviceType,
-        enums.ServiceType.values,
+    // Files exported before v160 spell this 'servicetype'. UDDF files have no
+    // version handshake and live on disk indefinitely, so both spellings are
+    // read forever rather than behind a version gate.
+    final serviceCategory =
+        getElementText(recordElement, 'servicecategory') ??
+        getElementText(recordElement, 'servicetype');
+    if (serviceCategory != null) {
+      record['serviceCategory'] = parseEnumValue(
+        serviceCategory,
+        enums.ServiceCategory.values,
       );
     }
 
