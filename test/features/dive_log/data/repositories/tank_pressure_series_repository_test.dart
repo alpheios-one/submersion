@@ -191,6 +191,32 @@ void main() {
     expect(verbatim.hlc, captured.hlc);
   });
 
+  test('restoreSeriesRow removes the tombstone the delete logged', () async {
+    final id = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      samples: samples,
+      now: now,
+    );
+    final row = await (db.select(
+      db.tankPressureSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    await repo.deleteForDive('dive-1');
+    var tombstones = await (db.select(
+      db.deletionLog,
+    )..where((t) => t.recordId.equals(id))).get();
+    expect(tombstones, hasLength(1));
+
+    await repo.restoreSeriesRow(row, now: now + 1);
+
+    tombstones = await (db.select(
+      db.deletionLog,
+    )..where((t) => t.recordId.equals(id))).get();
+    expect(tombstones, isEmpty);
+    final read = await repo.getSeriesForTank('dive-1', 'tank-a');
+    expect(read, isNotEmpty);
+  });
+
   test('deleteForDive removes every series of the dive', () async {
     await repo.insertSeries(
       diveId: 'dive-1',

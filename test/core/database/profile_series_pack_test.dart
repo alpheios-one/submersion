@@ -292,4 +292,69 @@ void main() {
     expect(report.droppedSamples, 0);
     expect(report.skippedOrphans, 0);
   });
+
+  test('skippedRows counts legacy rows without a timestamp or depth', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    seedParents(raw);
+    // Loosen the columns the fixture declares NOT NULL by rebuilding the
+    // table without those constraints.
+    raw.execute('DROP TABLE dive_profiles');
+    raw.execute('''
+      CREATE TABLE dive_profiles (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL,
+        computer_id TEXT,
+        source_id TEXT,
+        is_primary INTEGER NOT NULL DEFAULT 1,
+        timestamp INTEGER,
+        depth REAL
+      )
+    ''');
+    raw.execute(
+      "INSERT INTO dive_profiles (id, dive_id, timestamp, depth) VALUES "
+      "('p1', 'd1', 0, 1.0), ('p2', 'd1', NULL, 2.0), ('p3', 'd1', 10, 3.0)",
+    );
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    // The backstop already packed on open; measure a fresh pack instead.
+    await db.customSelect('SELECT 1').get();
+    await db.customStatement('DELETE FROM dive_profile_series');
+    final report = await packLegacyProfileRows(db, nowMs: 1);
+    expect(report.profileSeries, 1);
+    expect(report.skippedRows, 1);
+  });
+
+  test(
+    'the migration hlc carries the device id, not the persisted node id',
+    () async {
+      // legacyFixture no longer accepts a seed callback: build the database
+      // the way hlcAfterPack (above) does, seeding after the open so the
+      // beforeOpen backstop finds nothing to pack.
+      final open = await openLegacy();
+      seedParents(open.raw);
+      seedProfiles(open.raw);
+      open.raw.execute(
+        'CREATE TABLE sync_metadata (id TEXT NOT NULL PRIMARY KEY, '
+        'device_id TEXT NOT NULL, hlc TEXT, created_at INTEGER NOT NULL, '
+        'updated_at INTEGER NOT NULL)',
+      );
+      open.raw.execute(
+        'INSERT INTO sync_metadata (id, device_id, hlc, created_at, '
+        "updated_at) VALUES ('global', 'dev-1', "
+        "'000001800000000000:000005:other', 0, 0)",
+      );
+      await packLegacyProfileRows(open.db, nowMs: 1700000000000);
+      final row = await open.db
+          .customSelect('SELECT hlc FROM dive_profile_series LIMIT 1')
+          .getSingle();
+      expect(
+        row.read<String>('hlc'),
+        const Hlc(1800000000000, 6, 'dev-1').toString(),
+      );
+    },
+  );
 }

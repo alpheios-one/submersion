@@ -153,4 +153,28 @@ void main() {
       expect(back.updatedAt, captured.updatedAt);
     },
   );
+
+  test('restoreSeriesRow removes the tombstone the delete logged', () async {
+    final id = await repo.insertSeries(
+      diveId: 'dive-1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: now,
+    );
+    final row = await (db.select(
+      db.diveProfileSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    await repo.deleteForDive('dive-1');
+    var tombstones = await (db.select(
+      db.deletionLog,
+    )..where((t) => t.recordId.equals(id))).get();
+    expect(tombstones, hasLength(1));
+
+    await repo.restoreSeriesRow(row, now: now + 1);
+
+    tombstones = await (db.select(
+      db.deletionLog,
+    )..where((t) => t.recordId.equals(id))).get();
+    expect(tombstones, isEmpty);
+    expect(await repo.getSeriesById(id), isNotNull);
+  });
 }

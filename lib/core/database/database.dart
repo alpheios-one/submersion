@@ -9728,7 +9728,20 @@ class AppDatabase extends _$AppDatabase {
         // (an indexed NOT EXISTS per legacy dive) and a no-op after the
         // legacy tables are gone.
         await _assertProfileSeriesSchema();
-        await packLegacyProfileRows(this);
+        // Best effort: the ladder's own call is where a packing failure is
+        // visible and retried. Here a malformed legacy table, a series table
+        // a parallel branch shaped differently, or a busy lock from the
+        // second isolate must not turn into a database that cannot open.
+        try {
+          await packLegacyProfileRows(this);
+        } catch (e, stackTrace) {
+          developer.log(
+            'Backstop pack of legacy profile rows failed; continuing',
+            name: 'AppDatabase',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

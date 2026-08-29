@@ -15,6 +15,13 @@ void main() {
       r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
       multiLine: true,
     );
+    expect(
+      File(queue.single).existsSync(),
+      isTrue,
+      reason:
+          'the walk must start at the real database.dart; a wrong '
+          'working directory would make this test pass vacuously',
+    );
     while (queue.isNotEmpty) {
       final path = queue.removeLast();
       if (!seen.add(path)) continue;

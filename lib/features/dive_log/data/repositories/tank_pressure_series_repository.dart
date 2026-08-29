@@ -123,16 +123,25 @@ class TankPressureSeriesRepository {
     bool markPending = true,
     int? now,
   }) async {
-    await _db
-        .into(_db.tankPressureSeries)
-        .insertOnConflictUpdate(row.toCompanion(false));
-    if (markPending) {
-      await _syncRepository.markRecordPending(
+    await _db.transaction(() async {
+      await _db
+          .into(_db.tankPressureSeries)
+          .insertOnConflictUpdate(row.toCompanion(false));
+      // The delete that preceded a restore logged a tombstone; left in place
+      // it would ride the next changeset beside the upsert and delete the
+      // restored row on every peer.
+      await _syncRepository.removeDeletion(
         entityType: entityType,
         recordId: row.id,
-        localUpdatedAt: now ?? DateTime.now().millisecondsSinceEpoch,
       );
-    }
+      if (markPending) {
+        await _syncRepository.markRecordPending(
+          entityType: entityType,
+          recordId: row.id,
+          localUpdatedAt: now ?? DateTime.now().millisecondsSinceEpoch,
+        );
+      }
+    });
     SyncEventBus.notifyLocalChange();
   }
 

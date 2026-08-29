@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:submersion/core/database/profile_series_pack_rows.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
@@ -12,6 +13,10 @@ typedef ProfilePackReport = ({
   int tankSeries,
   int droppedSamples,
   int skippedOrphans,
+
+  /// Legacy rows without a timestamp or depth (pressure, tank id for tanks),
+  /// stepped over.
+  int skippedRows,
 });
 
 /// Packs every legacy `dive_profiles` and `tank_pressure_profiles` row into
@@ -55,6 +60,44 @@ Future<ProfilePackReport> packLegacyProfileRows(
   int? nowMs,
 }) async {
   final now = nowMs ?? DateTime.now().millisecondsSinceEpoch;
+  final profileColumns = await _columnNames(db, 'dive_profiles');
+  final canPackProfiles = profileColumns.containsAll(const {
+    'dive_id',
+    'timestamp',
+    'depth',
+  });
+  final tankColumns = await _columnNames(db, 'tank_pressure_profiles');
+  final canPackTanks = tankColumns.containsAll(const {
+    'dive_id',
+    'tank_id',
+    'timestamp',
+    'pressure',
+  });
+  final unpackedProfileDives = canPackProfiles
+      ? await _unpackedDiveIds(
+          db,
+          legacyTable: 'dive_profiles',
+          seriesTable: 'dive_profile_series',
+        )
+      : const <String>[];
+  final unpackedTankDives = canPackTanks
+      ? await _unpackedDiveIds(
+          db,
+          legacyTable: 'tank_pressure_profiles',
+          seriesTable: 'tank_pressure_series',
+        )
+      : const <String>[];
+  if (unpackedProfileDives.isEmpty && unpackedTankDives.isEmpty) {
+    // The common case on every open once a database is packed: nothing to
+    // do, so nothing else is loaded.
+    return (
+      profileSeries: 0,
+      tankSeries: 0,
+      droppedSamples: 0,
+      skippedOrphans: 0,
+      skippedRows: 0,
+    );
+  }
   final hlc = await _migrationHlc(db, now);
   final diveIds = await _parentIds(db, 'dives');
   final computerIds = await _parentIds(db, 'dive_computers');
@@ -64,17 +107,12 @@ Future<ProfilePackReport> packLegacyProfileRows(
   var tankSeries = 0;
   var dropped = 0;
   var skipped = 0;
+  var skippedRows = 0;
 
-  final profileColumns = await _columnNames(db, 'dive_profiles');
-  if (profileColumns.containsAll(const {'dive_id', 'timestamp', 'depth'})) {
+  if (canPackProfiles) {
     const codec = ProfileSeriesCodec();
     final hasPrimary = profileColumns.contains('is_primary');
-    final unpacked = await _unpackedDiveIds(
-      db,
-      legacyTable: 'dive_profiles',
-      seriesTable: 'dive_profile_series',
-    );
-    for (final diveId in unpacked) {
+    for (final diveId in unpackedProfileDives) {
       // Ordered by timestamp alone: the map below does the grouping, and
       // ordering by the identity columns first would interleave two raw
       // groups that resolve to one key (a dangling computer id merging into
@@ -88,12 +126,17 @@ Future<ProfilePackReport> packLegacyProfileRows(
           .get();
       final groups = <_ProfileKey, List<ProfileSample>>{};
       for (final row in rows) {
+        final sample = profileSampleOf(row.data);
+        if (sample == null) {
+          skippedRows++;
+          continue;
+        }
         final key = _ProfileKey(
           computerId: _resolvedParent(row.data['computer_id'], computerIds),
           sourceId: _resolvedParent(row.data['source_id'], sourceIds),
           isPrimary: hasPrimary ? _boolOf(row.data['is_primary']) : true,
         );
-        groups.putIfAbsent(key, () => []).add(_profileSampleOf(row.data));
+        groups.putIfAbsent(key, () => []).add(sample);
       }
       for (final entry in groups.entries) {
         if (!diveIds.contains(diveId)) {
@@ -147,20 +190,9 @@ Future<ProfilePackReport> packLegacyProfileRows(
     }
   }
 
-  final tankColumns = await _columnNames(db, 'tank_pressure_profiles');
-  if (tankColumns.containsAll(const {
-    'dive_id',
-    'tank_id',
-    'timestamp',
-    'pressure',
-  })) {
+  if (canPackTanks) {
     const codec = TankPressureSeriesCodec();
-    final unpacked = await _unpackedDiveIds(
-      db,
-      legacyTable: 'tank_pressure_profiles',
-      seriesTable: 'tank_pressure_series',
-    );
-    for (final diveId in unpacked) {
+    for (final diveId in unpackedTankDives) {
       final rows = await db
           .customSelect(
             'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
@@ -170,16 +202,23 @@ Future<ProfilePackReport> packLegacyProfileRows(
           .get();
       final groups = <_TankKey, List<TankPressureSample>>{};
       for (final row in rows) {
+        final tankId = row.data['tank_id'] as String?;
+        final timestamp = row.data['timestamp'] as num?;
+        final pressure = row.data['pressure'] as num?;
+        if (tankId == null || timestamp == null || pressure == null) {
+          skippedRows++;
+          continue;
+        }
         final key = _TankKey(
-          tankId: row.data['tank_id'] as String,
+          tankId: tankId,
           computerId: _resolvedParent(row.data['computer_id'], computerIds),
         );
         groups
             .putIfAbsent(key, () => [])
             .add(
               TankPressureSample(
-                timestamp: (row.data['timestamp'] as num).toInt(),
-                pressure: (row.data['pressure'] as num).toDouble(),
+                timestamp: timestamp.toInt(),
+                pressure: pressure.toDouble(),
               ),
             );
       }
@@ -229,6 +268,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
     tankSeries: tankSeries,
     droppedSamples: dropped,
     skippedOrphans: skipped,
+    skippedRows: skippedRows,
   );
 }
 
@@ -342,7 +382,9 @@ Future<String?> _migrationHlc(DatabaseConnectionUser db, int nowMs) async {
   final persisted = rows.first.data['hlc'] as String?;
   if (persisted != null && persisted.isNotEmpty) {
     try {
-      return Hlc.parse(persisted).increment(nowMs).toString();
+      final advanced = Hlc.parse(persisted).increment(nowMs);
+      // The device id column is the authority on this device's node id.
+      return Hlc(advanced.physicalTime, advanced.counter, deviceId).toString();
     } on FormatException {
       // Fall through to a fresh clock.
     }
@@ -357,43 +399,4 @@ bool _boolOf(Object? value) {
   // here means the column is not carrying a value at all; a legacy row with
   // no flag is the dive's live profile, which is what true says.
   return true;
-}
-
-double? _realOf(Object? value) => (value as num?)?.toDouble();
-
-int? _intOf(Object? value) => (value as num?)?.toInt();
-
-/// Reads a legacy `dive_profiles` row by column name. Absent columns (an
-/// older fixture or a partially migrated table) read as null.
-ProfileSample _profileSampleOf(Map<String, Object?> data) {
-  return ProfileSample(
-    timestamp: (data['timestamp'] as num).toInt(),
-    depth: (data['depth'] as num).toDouble(),
-    pressure: _realOf(data['pressure']),
-    temperature: _realOf(data['temperature']),
-    heartRate: _intOf(data['heart_rate']),
-    ascentRate: _realOf(data['ascent_rate']),
-    ceiling: _realOf(data['ceiling']),
-    ndl: _intOf(data['ndl']),
-    setpoint: _realOf(data['setpoint']),
-    ppO2: _realOf(data['pp_o2']),
-    o2Sensor1: _realOf(data['o2_sensor1']),
-    o2Sensor2: _realOf(data['o2_sensor2']),
-    o2Sensor3: _realOf(data['o2_sensor3']),
-    o2Sensor4: _realOf(data['o2_sensor4']),
-    o2Sensor5: _realOf(data['o2_sensor5']),
-    o2Sensor6: _realOf(data['o2_sensor6']),
-    cns: _realOf(data['cns']),
-    tts: _intOf(data['tts']),
-    rbt: _intOf(data['rbt']),
-    decoType: _intOf(data['deco_type']),
-    heartRateSource: data['heart_rate_source'] as String?,
-    heading: _realOf(data['heading']),
-    o2SensorMv1: _intOf(data['o2_sensor_mv1']),
-    o2SensorMv2: _intOf(data['o2_sensor_mv2']),
-    o2SensorMv3: _intOf(data['o2_sensor_mv3']),
-    o2SensorMv4: _intOf(data['o2_sensor_mv4']),
-    o2SensorMv5: _intOf(data['o2_sensor_mv5']),
-    o2SensorMv6: _intOf(data['o2_sensor_mv6']),
-  );
 }
