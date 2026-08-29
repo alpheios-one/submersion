@@ -21323,6 +21323,12 @@ abstract class AppLocalizations {
   /// **'Error saving species: {error}'**
   String marineLife_speciesEdit_errorSaving(Object error);
 
+  /// No description provided for @marineLife_speciesEdit_notFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This species no longer exists.'**
+  String get marineLife_speciesEdit_notFoundMessage;
+
   /// No description provided for @marineLife_speciesEdit_saveButton.
   ///
   /// In en, this message translates to:

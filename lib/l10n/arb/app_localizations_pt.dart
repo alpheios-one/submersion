@@ -12610,6 +12610,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Esta espécie já não existe.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Salvar';
 
   @override

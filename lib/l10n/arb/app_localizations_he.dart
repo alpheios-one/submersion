@@ -12290,6 +12290,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage => 'מין זה כבר אינו קיים.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'שמירה';
 
   @override

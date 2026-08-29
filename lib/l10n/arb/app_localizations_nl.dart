@@ -12512,6 +12512,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Deze soort bestaat niet meer.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Opslaan';
 
   @override

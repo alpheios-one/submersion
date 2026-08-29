@@ -4039,6 +4039,7 @@
   "marineLife_speciesEdit_editTitle": "Soort bewerken",
   "marineLife_speciesEdit_errorLoading": "Fout bij laden van soort: {error}",
   "marineLife_speciesEdit_errorSaving": "Fout bij opslaan van soort: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "Deze soort bestaat niet meer.",
   "marineLife_speciesEdit_saveButton": "Opslaan",
   "marineLife_speciesEdit_scientificNameHint": "bijv. Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Wetenschappelijke naam",

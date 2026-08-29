@@ -3966,6 +3966,7 @@
   "marineLife_speciesEdit_editTitle": "Faj szerkesztese",
   "marineLife_speciesEdit_errorLoading": "Hiba a faj betoltesekor: {error}",
   "marineLife_speciesEdit_errorSaving": "Hiba a faj mentesekor: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "Ez a faj már nem létezik.",
   "marineLife_speciesEdit_saveButton": "Mentes",
   "marineLife_speciesEdit_scientificNameHint": "pl. Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Tudomanyos nev",

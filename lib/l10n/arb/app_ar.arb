@@ -4039,6 +4039,7 @@
   "marineLife_speciesEdit_editTitle": "تعديل النوع",
   "marineLife_speciesEdit_errorLoading": "خطأ في تحميل النوع: {error}",
   "marineLife_speciesEdit_errorSaving": "خطأ في حفظ النوع: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "لم يعد هذا النوع موجودًا.",
   "marineLife_speciesEdit_saveButton": "حفظ",
   "marineLife_speciesEdit_scientificNameHint": "مثال: Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "الاسم العلمي",

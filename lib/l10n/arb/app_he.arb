@@ -3966,6 +3966,7 @@
   "marineLife_speciesEdit_editTitle": "ערוך מין",
   "marineLife_speciesEdit_errorLoading": "שגיאה בטעינת מין: {error}",
   "marineLife_speciesEdit_errorSaving": "שגיאה בשמירת מין: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "מין זה כבר אינו קיים.",
   "marineLife_speciesEdit_saveButton": "שמירה",
   "marineLife_speciesEdit_scientificNameHint": "לדוגמה, Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "שם מדעי",
