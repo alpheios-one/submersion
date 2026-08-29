@@ -14,7 +14,7 @@ typedef ProfilePackReport = ({
 });
 
 /// Packs every legacy `dive_profiles` and `tank_pressure_profiles` row into
-/// the series tables (v181, spec 2026-08-28-profile-sample-storage).
+/// the series tables (v182, spec 2026-08-28-profile-sample-storage).
 ///
 /// Raw SQL throughout, never the legacy Drift classes: plan 2e removes those
 /// classes and drops the tables, and this function must keep compiling and

@@ -13,7 +13,7 @@ const String kProfileSeriesNamespace = '7c2d9b1e-4f3a-4e8b-9c5d-2a1f6e8b3d47';
 const String kTankPressureSeriesNamespace =
     'b8e1f2c3-5d6a-4b7c-8e9f-1a2b3c4d5e6f';
 
-/// The series id the v181 migration assigns to a packed
+/// The series id the v182 migration assigns to a packed
 /// (dive, computer, source, is_primary) group.
 ///
 /// Every device runs the migration independently. A random id per device
@@ -36,7 +36,7 @@ String profileSeriesMigratedId({
   '$diveId|${computerId ?? 'null'}|${sourceId ?? 'null'}|${isPrimary ? 1 : 0}',
 );
 
-/// The series id the v181 migration assigns to a packed
+/// The series id the v182 migration assigns to a packed
 /// (dive, tank, computer) pressure group. See [profileSeriesMigratedId].
 String tankPressureSeriesMigratedId({
   required String diveId,

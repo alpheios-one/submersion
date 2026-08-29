@@ -8,13 +8,13 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 
-/// A database already at v181 (no ladder runs) with the legacy tables and
+/// A database already at v182 (no ladder runs) with the legacy tables and
 /// the FK parents the series tables reference. `beforeOpen` creates the
 /// series tables through the backstop.
 NativeDatabase legacyFixture({void Function(dynamic rawDb)? seed}) {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 181');
+      rawDb.execute('PRAGMA user_version = 182');
       rawDb.execute('CREATE TABLE dives (id TEXT NOT NULL PRIMARY KEY)');
       rawDb.execute(
         'CREATE TABLE dive_computers (id TEXT NOT NULL PRIMARY KEY)',
@@ -340,7 +340,7 @@ void main() {
           seed: (raw) {
             seedParents(raw);
             seedProfiles(raw);
-            // A fixture stamped at 181 never runs onCreate, so the table a
+            // A fixture stamped at 182 never runs onCreate, so the table a
             // synced device would have is created here with its global row.
             raw.execute(
               'CREATE TABLE sync_metadata (id TEXT NOT NULL PRIMARY KEY, '
@@ -390,7 +390,7 @@ void main() {
   test('no-ops when the legacy tables are absent', () async {
     final db = AppDatabase(
       NativeDatabase.memory(
-        setup: (raw) => raw.execute('PRAGMA user_version = 181'),
+        setup: (raw) => raw.execute('PRAGMA user_version = 182'),
       ),
     );
     addTearDown(db.close);
@@ -405,14 +405,14 @@ void main() {
   test('tolerates legacy tables that lack optional sample columns', () async {
     // A minimal fixture like the older migration tests: the identity columns
     // and the two required sample columns only. The identity columns are
-    // always present by the time the v181 rung runs (earlier rungs add
+    // always present by the time the v182 rung runs (earlier rungs add
     // source_id first, and rungs run in order), so the packer may name them
     // in ORDER BY; every optional sample column is absent here and must
     // decode as null.
     final db = AppDatabase(
       NativeDatabase.memory(
         setup: (raw) {
-          raw.execute('PRAGMA user_version = 181');
+          raw.execute('PRAGMA user_version = 182');
           raw.execute('CREATE TABLE dives (id TEXT NOT NULL PRIMARY KEY)');
           raw.execute("INSERT INTO dives (id) VALUES ('d1')");
           // dive_profile_series.computer_id/source_id carry FK references to
@@ -421,7 +421,7 @@ void main() {
           // statement is prepared, not when it runs, so both parent tables
           // must exist even though every row below leaves computer_id and
           // source_id null. Every real database has carried both tables since
-          // long before v181. dive_data_sources needs the columns the
+          // long before v182. dive_data_sources needs the columns the
           // unconditional beforeOpen self-heal _backfillMissingDataSources
           // names once dives, dive_profiles, and dive_data_sources all exist
           // (see legacyFixture above); it never touches dive_profiles.source_id.

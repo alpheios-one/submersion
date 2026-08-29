@@ -3418,7 +3418,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 181;
+  static const int currentSchemaVersion = 182;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3807,15 +3807,17 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
-    // v181 (packed profile series, spec 2026-08-28-profile-sample-storage):
+    // v182 (packed profile series, spec 2026-08-28-profile-sample-storage):
     // dive_profile_series and tank_pressure_series, one zlib columnar blob
     // per (dive, computer, source, is_primary) group and per (dive, tank,
     // computer) group, packed from the row-per-sample tables by
     // packLegacyProfileRows with ids derived from the identity tuple so every
     // device converges (the #1360 lesson). The legacy tables stay until the
     // consumers move; the same PR retires them in a later plan. 176 remains
-    // skipped; the ladder is non-contiguous by design.
-    181,
+    // skipped; the ladder is non-contiguous by design. Numbered 182 because
+    // PR #1390 (profile photos) holds 181; 181 is absent from this ladder
+    // until that PR merges into main and main merges here.
+    182,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4304,11 +4306,11 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// v181: the packed profile series tables.
+  /// v182: the packed profile series tables.
   ///
   /// Raw idempotent DDL so it doubles as the beforeOpen backstop for a
-  /// database stranded at 181 by a parallel branch. The DDL must agree with
-  /// the Drift declarations column for column; the v181 migration test
+  /// database stranded at 182 by a parallel branch. The DDL must agree with
+  /// the Drift declarations column for column; the v182 migration test
   /// compares the two on a fresh database.
   Future<void> _assertProfileSeriesSchema() async {
     await customStatement('''
@@ -9423,16 +9425,16 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
-        // v181: packed profile series tables, then pack every legacy
+        // v182: packed profile series tables, then pack every legacy
         // row-per-sample row into them. Both steps are idempotent (IF NOT
         // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
         // tuple), so a retry after a failed ladder, or a collision re-run,
         // is safe. The legacy tables stay until plan 2e retires them.
-        if (from < 181) {
+        if (from < 182) {
           await _assertProfileSeriesSchema();
           await packLegacyProfileRows(this);
         }
-        if (from < 181) await reportProgress();
+        if (from < 182) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9685,7 +9687,7 @@ class AppDatabase extends _$AppDatabase {
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
 
-        // v181 backstop: re-assert the packed profile series tables (same
+        // v182 backstop: re-assert the packed profile series tables (same
         // parallel-branch version-collision self-heal). Schema only: packing
         // is not re-run on open.
         await _assertProfileSeriesSchema();

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v181 shape stamped at v180 so only the 181 rung runs. The FK
+/// Minimal pre-v182 shape stamped at v180 so only the 182 rung runs. The FK
 /// parents exist because the series tables reference them and foreign keys
 /// are on once the database opens. Shared by [dbAt180] and the two-open
 /// tests, which need the same DDL on a raw handle.
@@ -127,7 +127,7 @@ const tankSeriesColumns = {
 void main() {
   group('schema', () {
     test(
-      'v181 creates both series tables and their indexes on upgrade',
+      'v182 creates both series tables and their indexes on upgrade',
       () async {
         final db = AppDatabase(dbAt180());
         addTearDown(db.close);
@@ -206,13 +206,13 @@ void main() {
         final version = await second
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(version.data.values.first, 181);
+        expect(version.data.values.first, 182);
       },
     );
 
-    test('v181 is present in the migration ladder', () {
-      expect(AppDatabase.currentSchemaVersion, 181);
-      expect(AppDatabase.migrationVersions, contains(181));
+    test('v182 is present in the migration ladder', () {
+      expect(AppDatabase.currentSchemaVersion, 182);
+      expect(AppDatabase.migrationVersions, contains(182));
       expect(AppDatabase.minimumCompatibleSchemaVersion, 170);
     });
   });
@@ -284,7 +284,7 @@ void main() {
       },
     );
 
-    test('a database already at 181 is not packed again on open', () async {
+    test('a database already at 182 is not packed again on open', () async {
       // Two executors over one handle (see the schema group): the first
       // open runs the ladder and packs; a legacy row written afterwards must
       // survive the second open unpacked, because the backstop is schema
