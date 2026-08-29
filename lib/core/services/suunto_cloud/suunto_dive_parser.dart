@@ -38,10 +38,7 @@ class SuuntoDiveParser {
   }) {
     final device = header['Device'] as Map<String, dynamic>?;
     final deviceInternalName = device?['Name'] as String?;
-    final gasOffset =
-        (deviceInternalName == 'Vaasa' || deviceInternalName == 'Porvoo')
-        ? 0
-        : 1;
+    final gasOffset = _gasOffsetFor(deviceInternalName, samples);
 
     final headerStart = _parseIso8601(header['DateTime'] as String?);
 
@@ -130,13 +127,72 @@ class SuuntoDiveParser {
   /// product names are shown in submersion.
   static String? _mapDeviceName(String? internalName) {
     if (internalName == null || internalName.isEmpty) return null;
-    return switch (internalName) {
-      'Vaasa' => 'Suunto Nautic',
-      'Porvoo' => 'Suunto Ocean',
-      // Falls back to "Suunto <codename>" for unknown devices. This covers
-      // the EON Core and EON Steel automatically.
-      _ => 'Suunto $internalName',
-    };
+    return _knownDeviceNames[internalName] ??
+        // Falls back to "Suunto <codename>" for unknown devices. This covers
+        // the EON Core and EON Steel automatically.
+        'Suunto $internalName';
+  }
+
+  /// Suunto device codenames whose commercial name and gas numbering are
+  /// known. Every entry here is a current-generation ("Seal") computer that
+  /// numbers its gases from 0; the EON family numbers from 1, and so does
+  /// anything else absent from this map unless its samples say otherwise
+  /// (see [_gasOffsetFor]).
+  static const Map<String, String> _knownDeviceNames = {
+    'Vaasa': 'Suunto Nautic',
+    'Ylivieska': 'Suunto Nautic S',
+    'Porvoo': 'Suunto Ocean',
+  };
+
+  /// The value to subtract from a sample's `GasNumber` to get a zero-based
+  /// cylinder index.
+  ///
+  /// Current-generation computers number gases from 0 and the EON family
+  /// from 1, with nothing in the header stating which. A codename allowlist
+  /// alone silently mis-assigns every gas on a device nobody has catalogued
+  /// yet -- a Suunto Nautic S, for instance, reports `Ylivieska`, which no
+  /// published list covers.
+  ///
+  /// So for an unrecognized codename the data gets a say, but only where it
+  /// is conclusive: a sample reporting `GasNumber` 0 can only come from a
+  /// zero-based device. A lowest observed number of 1 or more proves
+  /// nothing (a one-based dive may simply never have touched its first
+  /// cylinder), so those keep the EON default rather than guessing.
+  static int _gasOffsetFor(
+    String? internalName,
+    List<Map<String, dynamic>> samples,
+  ) {
+    if (internalName != null && _knownDeviceNames.containsKey(internalName)) {
+      return 0;
+    }
+    return _lowestGasNumber(samples) == 0 ? 0 : 1;
+  }
+
+  static int? _lowestGasNumber(List<Map<String, dynamic>> samples) {
+    int? lowest;
+    void consider(num? gasNumber) {
+      if (gasNumber == null) return;
+      final value = gasNumber.toInt();
+      if (lowest == null || value < lowest!) lowest = value;
+    }
+
+    for (final sample in samples) {
+      for (final entry in (sample['Cylinders'] as List<dynamic>? ?? const [])) {
+        consider((entry as Map<String, dynamic>)['GasNumber'] as num?);
+      }
+
+      final diveEvents = sample['DiveEvents'] as Map<String, dynamic>?;
+      final gasSwitch = diveEvents?['GasSwitch'] as Map<String, dynamic>?;
+      consider(gasSwitch?['GasNumber'] as num?);
+
+      for (final entry in (sample['Events'] as List<dynamic>? ?? const [])) {
+        final gs =
+            (entry as Map<String, dynamic>)['GasSwitch']
+                as Map<String, dynamic>?;
+        consider(gs?['GasNumber'] as num?);
+      }
+    }
+    return lowest;
   }
 
   static List<DownloadedTank> _buildTanks(
@@ -425,10 +481,66 @@ class SuuntoDiveParser {
     return parsed?.millisecondsSinceEpoch;
   }
 
+  /// Matches an ISO-8601 zone designator at the end of a timestamp: either a
+  /// literal `Z` or a numeric `+HH:MM` / `-HHMM` offset. Applied only to the
+  /// portion after the `T` so the date's own hyphens can never match.
+  static final RegExp _zoneDesignator = RegExp(
+    r'(?:(Z)|([+-])(\d{2}):?(\d{2}))$',
+    caseSensitive: false,
+  );
+
+  /// The UTC offset [value] declares, or null when it declares none.
+  static Duration? _declaredOffset(String value) {
+    final timeStart = value.indexOf(RegExp('[Tt]'));
+    if (timeStart < 0) return null;
+    final match = _zoneDesignator.firstMatch(value.substring(timeStart));
+    if (match == null) return null;
+    if (match.group(1) != null) return Duration.zero;
+    final sign = match.group(2) == '-' ? -1 : 1;
+    return Duration(
+      hours: sign * int.parse(match.group(3)!),
+      minutes: sign * int.parse(match.group(4)!),
+    );
+  }
+
+  /// Parses a Suunto timestamp into the diver's **local wall clock, flagged
+  /// as UTC** -- submersion's storage convention for dive times (see
+  /// `parsedDiveToDownloadedDive`, which stamps libdivecomputer's local
+  /// date/time fields with `DateTime.utc`).
+  ///
+  /// Suunto writes the dive computer's local time together with its offset
+  /// (`2026-08-20T15:27:23.140+02:00`), so the offset has to be re-applied
+  /// rather than resolved away: resolving it to a true UTC instant files a
+  /// diver in UTC+2 an hour-shifted dive (15:27 lands at 13:27), which is the
+  /// long-standing "dives import hours off" complaint against Suunto JSON
+  /// imports. Subsurface's `import-suunto-json.cpp`, which this parser is a
+  /// port of, uses `parse_iso8601_local_ms()` for the same reason.
+  ///
+  /// A timestamp with no offset at all is taken at face value; without this
+  /// its fields would be shifted by whatever zone the *importing machine*
+  /// happens to sit in. A `Z` designator means Suunto recorded UTC and there
+  /// is no local offset to recover, so the wall clock is the UTC time.
+  ///
+  /// Elapsed sample times are unaffected either way: they are differences
+  /// between two timestamps that carry the same offset.
   static DateTime? _parseIso8601(String? value) {
     if (value == null || value.isEmpty) return null;
     try {
-      return DateTime.parse(value).toUtc();
+      final parsed = DateTime.parse(value);
+      final offset = _declaredOffset(value);
+      if (offset == null) {
+        return DateTime.utc(
+          parsed.year,
+          parsed.month,
+          parsed.day,
+          parsed.hour,
+          parsed.minute,
+          parsed.second,
+          parsed.millisecond,
+          parsed.microsecond,
+        );
+      }
+      return parsed.add(offset);
     } on FormatException {
       return null;
     }
