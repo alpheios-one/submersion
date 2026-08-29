@@ -16,19 +16,7 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 
 import '../../helpers/in_memory_media_object_store.dart';
 import '../../helpers/test_database.dart';
-
-/// Polls [condition] until true or [within] elapses.
-Future<bool> _waitFor(
-  bool Function() condition, {
-  Duration within = const Duration(seconds: 5),
-}) async {
-  final deadline = DateTime.now().add(within);
-  while (DateTime.now().isBefore(deadline)) {
-    if (condition()) return true;
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-  return condition();
-}
+import '../../helpers/wait_until.dart';
 
 /// The settings pages read the worker's suspension through this provider
 /// (issue #1356); it must follow the live worker, not a snapshot.
@@ -94,20 +82,16 @@ void main() {
       );
 
       await worker.drain();
-      expect(
-        await _waitFor(
-          () => container.read(mediaTransfersSuspendedProvider).value == true,
-        ),
-        isTrue,
+      await waitUntil(
+        () async =>
+            container.read(mediaTransfersSuspendedProvider).value == true,
       );
 
       verified = true;
       await worker.drain();
-      expect(
-        await _waitFor(
-          () => container.read(mediaTransfersSuspendedProvider).value == false,
-        ),
-        isTrue,
+      await waitUntil(
+        () async =>
+            container.read(mediaTransfersSuspendedProvider).value == false,
       );
     },
   );

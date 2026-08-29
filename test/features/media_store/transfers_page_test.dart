@@ -6,8 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
-import 'package:submersion/features/media/domain/entities/media_item.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/pages/transfers_page.dart';
@@ -53,7 +51,7 @@ void main() {
 
   Widget app(
     List<MediaTransferQueueEntry> entries, {
-    Map<String, MediaItem> media = const {},
+    Map<String, String> labels = const {},
     bool suspended = false,
   }) => ProviderScope(
     overrides: [
@@ -63,7 +61,7 @@ void main() {
       mediaStoreRuntimeProvider.overrideWith((ref) async => null),
       // The rows name their media; without this the lookup would reach for
       // an uninitialised database.
-      mediaByIdProvider.overrideWith((ref, id) async => media[id]),
+      mediaTransferLabelsProvider.overrideWith((ref) async => labels),
       mediaTransfersSuspendedProvider.overrideWith(
         (ref) => Stream.value(suspended),
       ),
@@ -478,16 +476,8 @@ void main() {
       await repo.enqueueUpload(mediaId: 'm-a');
       snapshot = await repo.watchEntries().first;
     });
-    final photo = MediaItem(
-      id: 'm-a',
-      originalFilename: 'IMG_0042.HEIC',
-      mediaType: MediaType.photo,
-      takenAt: DateTime(2026, 8, 1),
-      createdAt: DateTime(2026, 8, 1),
-      updatedAt: DateTime(2026, 8, 1),
-    );
 
-    await tester.pumpWidget(app(snapshot, media: {'m-a': photo}));
+    await tester.pumpWidget(app(snapshot, labels: {'m-a': 'IMG_0042.HEIC'}));
     await tester.pump();
     await tester.pump();
 

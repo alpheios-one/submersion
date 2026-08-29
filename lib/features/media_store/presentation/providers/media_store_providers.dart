@@ -222,6 +222,31 @@ final mediaTransferEntriesProvider =
       (ref) => ref.watch(mediaTransferQueueRepositoryProvider).watchEntries(),
     );
 
+/// Display labels (file name, else caption) for every media row the transfer
+/// queue names, in one lean query.
+///
+/// Keyed on the SET of media ids, not the rows: progress ticks and state
+/// changes re-emit the rows many times per transfer without changing which
+/// media the queue names, and none of those should touch the media table.
+/// A lookup per visible row was the first shape; it hydrated a full
+/// MediaItem (imageData BLOB included) into a non-autoDispose family per
+/// row and re-ran for every visible row on every media write.
+final mediaTransferLabelsProvider = FutureProvider<Map<String, String>>((
+  ref,
+) async {
+  final key = ref.watch(
+    mediaTransferEntriesProvider.select((entries) {
+      final rows = entries.value;
+      if (rows == null) return null;
+      return (rows.map((e) => e.mediaId).toSet().toList()..sort()).join('\n');
+    }),
+  );
+  if (key == null || key.isEmpty) return const {};
+  final repository = ref.watch(mediaRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchMediaChanges());
+  return repository.getDisplayLabels(key.split('\n'));
+});
+
 /// Whether this device has any media store attached. Deliberately not
 /// mediaStoreRuntimeProvider: that constructs the full runtime and kicks a
 /// queue drain, which must not happen merely because a media grid scrolled

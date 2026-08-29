@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -192,8 +191,10 @@ class _TransferTile extends ConsumerWidget {
 
 /// Names the row's media. The queue row carries only the media id, and a
 /// column of bare UUIDs was the reporter's whole picture of the queue (issue
-/// #1356). Blank until the row resolves rather than flashing the id first;
-/// the id is the fallback for a media row that no longer exists.
+/// #1356). Labels come from one batched lookup for the whole queue
+/// ([mediaTransferLabelsProvider]); blank until it resolves rather than
+/// flashing the id first, and the id is the fallback for a media row that
+/// has no name or no longer exists.
 class _MediaLabel extends ConsumerWidget {
   const _MediaLabel(this.mediaId);
 
@@ -201,21 +202,9 @@ class _MediaLabel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(mediaByIdProvider(mediaId))
-        .when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, _) => Text(mediaId, maxLines: 1),
-          data: (item) {
-            final name = item?.originalFilename;
-            final caption = item?.caption;
-            final label = name != null && name.isNotEmpty
-                ? name
-                : caption != null && caption.isNotEmpty
-                ? caption
-                : mediaId;
-            return Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
-          },
-        );
+    final labels = ref.watch(mediaTransferLabelsProvider);
+    if (labels.isLoading && !labels.hasValue) return const SizedBox.shrink();
+    final label = labels.value?[mediaId] ?? mediaId;
+    return Text(label, maxLines: 1, overflow: TextOverflow.ellipsis);
   }
 }

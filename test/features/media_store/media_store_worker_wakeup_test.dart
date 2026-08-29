@@ -14,6 +14,7 @@ import 'package:submersion/features/media_store/data/media_upload_pipeline.dart'
 
 import '../../helpers/in_memory_media_object_store.dart';
 import '../../helpers/test_database.dart';
+import '../../helpers/wait_until.dart';
 
 class _RecordingPipeline extends MediaUploadPipeline {
   _RecordingPipeline({
@@ -64,21 +65,6 @@ class _LaggingQueue extends MediaTransferQueueRepository {
     }
     return entry;
   }
-}
-
-/// Polls [condition] until true or [within] elapses. Condition-based rather
-/// than a fixed sleep: the wakeup fires on a real timer, and a fixed delay
-/// either flakes under load or pads every run.
-Future<bool> _waitFor(
-  bool Function() condition, {
-  Duration within = const Duration(seconds: 5),
-}) async {
-  final deadline = DateTime.now().add(within);
-  while (DateTime.now().isBefore(deadline)) {
-    if (condition()) return true;
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-  return condition();
 }
 
 void main() {
@@ -148,11 +134,7 @@ void main() {
     await worker.drain();
     expect(pipeline.processed, isEmpty, reason: 'not due at drain time');
 
-    expect(
-      await _waitFor(() => pipeline.processed.isNotEmpty),
-      isTrue,
-      reason: 'wakeup timer should have re-drained the row',
-    );
+    await waitUntil(() async => pipeline.processed.isNotEmpty);
     expect(pipeline.processed, ['m1']);
   });
 
@@ -194,11 +176,7 @@ void main() {
         reason: 'not due at drain time',
       );
 
-      expect(
-        await _waitFor(() => laggingPipeline.processed.isNotEmpty),
-        isTrue,
-        reason: 'the row came due during the drain and must still be picked up',
-      );
+      await waitUntil(() async => laggingPipeline.processed.isNotEmpty);
     },
   );
 
@@ -287,11 +265,7 @@ void main() {
     pipeline.gate = Completer<void>();
 
     final draining = worker.drain();
-    expect(
-      await _waitFor(() => pipeline.processed.isNotEmpty),
-      isTrue,
-      reason: 'the drain should be parked inside process()',
-    );
+    await waitUntil(() async => pipeline.processed.isNotEmpty);
 
     worker.dispose();
     pipeline.gate!.complete();
