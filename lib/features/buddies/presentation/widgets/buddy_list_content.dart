@@ -1,6 +1,3 @@
-import 'dart:io' show Platform;
-
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +6,7 @@ import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/utils/contact_import_support.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -75,12 +73,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
   bool get _isSelectionMode => _selection.value.isActive;
   Set<String> get _selectedIds => _selection.value.checkedIds;
   BuddyMergeSnapshot? _mergeSnapshot;
-
-  /// Check if contact import is supported on this platform
-  bool get _isContactImportSupported {
-    if (kIsWeb) return false;
-    return Platform.isIOS || Platform.isAndroid;
-  }
 
   @override
   void initState() {
@@ -328,7 +320,7 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
   }
 
   Future<void> _importFromContacts(BuildContext context) async {
-    if (!_isContactImportSupported) {
+    if (!isContactImportSupported) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
