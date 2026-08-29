@@ -35,8 +35,11 @@ void main() {
   }) => Dive(
     id: 'dive-stats',
     diveNumber: 1,
-    dateTime: DateTime(2026, 3, 28, 10, 0),
-    entryTime: DateTime(2026, 3, 28, 10, 5),
+    // Dives round-trip through the repository as UTC-flagged wall clocks
+    // (`fromMillisecondsSinceEpoch(..., isUtc: true)`), so a local DateTime
+    // would come back shifted by the machine's offset.
+    dateTime: DateTime.utc(2026, 3, 28, 10, 0),
+    entryTime: DateTime.utc(2026, 3, 28, 10, 5),
     bottomTime: const Duration(minutes: 40),
     maxDepth: 20.0,
     excludedFromStats: excludedFromStats,
@@ -128,6 +131,37 @@ void main() {
     await pumpEditPage(tester, created.id);
 
     expect(masterToggle(), findsOneWidget);
+  });
+
+  testWidgets('the gas flag reaches page state on its own', (tester) async {
+    // The narrower flag has its own handler on the page, and it is the one a
+    // diver reaches for when only the gas reading is unrepresentative.
+    final created = await repository.createDive(buildDive());
+    await pumpEditPage(tester, created.id);
+
+    final header = find.text('Statistics');
+    await tester.ensureVisible(header.first);
+    await tester.pumpAndSettle();
+    await tester.tap(header.first);
+    await tester.pumpAndSettle();
+
+    final gas = find.byKey(const Key('dive-edit-exclude-from-gas-stats'));
+    final gasSwitch = find.descendant(of: gas, matching: find.byType(Switch));
+    await tester.ensureVisible(gasSwitch);
+    await tester.pumpAndSettle();
+    await tester.tap(gasSwitch);
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Switch>(gasSwitch).value, isTrue);
+    expect(
+      tester
+          .widget<Switch>(
+            find.descendant(of: masterToggle(), matching: find.byType(Switch)),
+          )
+          .value,
+      isFalse,
+      reason: 'the gas flag must not imply the master one',
+    );
   });
 
   testWidgets('clearing the last flag does not shut the group', (tester) async {
