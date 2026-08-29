@@ -18727,13 +18727,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV、UDDF、PDF 日志本';
 
   @override
-  String get transfer_section_exportTitle => '导出';
+  String get transfer_section_exportTitle => '文件导出';
 
   @override
   String get transfer_section_importSubtitle => 'CSV、UDDF 文件';
 
   @override
-  String get transfer_section_importTitle => '导入';
+  String get transfer_section_importTitle => '文件导入';
 
   @override
   String get transfer_summary_description => '导入和导出潜水数据';

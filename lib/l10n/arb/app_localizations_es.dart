@@ -19781,13 +19781,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'CSV, UDDF, libro de registro PDF';
 
   @override
-  String get transfer_section_exportTitle => 'Exportar';
+  String get transfer_section_exportTitle => 'Exportar archivo';
 
   @override
   String get transfer_section_importSubtitle => 'Archivos CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'Importar';
+  String get transfer_section_importTitle => 'Importar archivo';
 
   @override
   String get transfer_summary_description =>

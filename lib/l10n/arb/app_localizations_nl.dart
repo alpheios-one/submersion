@@ -19603,13 +19603,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF-logboek';
 
   @override
-  String get transfer_section_exportTitle => 'Exporteren';
+  String get transfer_section_exportTitle => 'Bestandsexport';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF-bestanden';
 
   @override
-  String get transfer_section_importTitle => 'Importeren';
+  String get transfer_section_importTitle => 'Bestandsimport';
 
   @override
   String get transfer_summary_description =>

@@ -19846,13 +19846,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, carnet PDF';
 
   @override
-  String get transfer_section_exportTitle => 'Exporter';
+  String get transfer_section_exportTitle => 'Export de fichier';
 
   @override
   String get transfer_section_importSubtitle => 'Fichiers CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'Importer';
+  String get transfer_section_importTitle => 'Import de fichier';
 
   @override
   String get transfer_summary_description =>

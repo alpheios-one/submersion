@@ -19256,13 +19256,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, יומן PDF';
 
   @override
-  String get transfer_section_exportTitle => 'ייצוא';
+  String get transfer_section_exportTitle => 'ייצוא קובץ';
 
   @override
   String get transfer_section_importSubtitle => 'קבצי CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'ייבוא';
+  String get transfer_section_importTitle => 'ייבוא קובץ';
 
   @override
   String get transfer_summary_description => 'ייבוא וייצוא נתוני צלילה';

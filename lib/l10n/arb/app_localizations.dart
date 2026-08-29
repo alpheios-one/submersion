@@ -32595,7 +32595,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_exportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export'**
+  /// **'File Export'**
   String get transfer_section_exportTitle;
 
   /// No description provided for @transfer_section_importSubtitle.
@@ -32607,7 +32607,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_importTitle.
   ///
   /// In en, this message translates to:
-  /// **'Import'**
+  /// **'File Import'**
   String get transfer_section_importTitle;
 
   /// No description provided for @transfer_summary_description.

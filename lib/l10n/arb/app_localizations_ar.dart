@@ -19405,13 +19405,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV، UDDF، سجل PDF';
 
   @override
-  String get transfer_section_exportTitle => 'تصدير';
+  String get transfer_section_exportTitle => 'تصدير ملف';
 
   @override
   String get transfer_section_importSubtitle => 'ملفات CSV، UDDF';
 
   @override
-  String get transfer_section_importTitle => 'استيراد';
+  String get transfer_section_importTitle => 'استيراد ملف';
 
   @override
   String get transfer_summary_description => 'استيراد وتصدير بيانات الغوص';

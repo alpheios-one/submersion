@@ -19705,13 +19705,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF naplokonyv';
 
   @override
-  String get transfer_section_exportTitle => 'Exportalas';
+  String get transfer_section_exportTitle => 'Fájlexportálás';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF fajlok';
 
   @override
-  String get transfer_section_importTitle => 'Importalas';
+  String get transfer_section_importTitle => 'Fájlimportálás';
 
   @override
   String get transfer_summary_description =>

@@ -19772,13 +19772,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, logbook PDF';
 
   @override
-  String get transfer_section_exportTitle => 'Exportar';
+  String get transfer_section_exportTitle => 'Exportar arquivo';
 
   @override
   String get transfer_section_importSubtitle => 'Arquivos CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'Importar';
+  String get transfer_section_importTitle => 'Importar arquivo';
 
   @override
   String get transfer_summary_description =>

@@ -19427,13 +19427,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF logbook';
 
   @override
-  String get transfer_section_exportTitle => 'Export';
+  String get transfer_section_exportTitle => 'File Export';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF files';
 
   @override
-  String get transfer_section_importTitle => 'Import';
+  String get transfer_section_importTitle => 'File Import';
 
   @override
   String get transfer_summary_description => 'Import and export dive data';
