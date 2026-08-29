@@ -2,7 +2,7 @@
 
 Status: approved design, ready for an implementation plan
 Date: 2026-08-29
-Branch: `worktree-profile-photos` (based on `origin/main` at schema v179)
+Branch: `worktree-profile-photos` (rebased onto `origin/main` at schema v180; this feature claims v181)
 
 ## Goal
 
@@ -126,18 +126,19 @@ Future<void> _assertProfilePhotoColumns() async {
 }
 ```
 
-Wired in five places: the `if (from < 180)` rung and its `reportProgress()`, an
-appended `180` in `migrationVersions` with a comment naming the claim, the
+Wired in five places: the `if (from < 181)` rung and its `reportProgress()`, an
+appended `181` in `migrationVersions` with a comment naming the claim, the
 `currentSchemaVersion` bump, and a `beforeOpen` backstop call so databases
 arriving by restore or sync-adopt, which never run `onUpgrade`, still get the
 column.
 
 `minimumCompatibleSchemaVersion` stays at 170. A nullable column is additive
-and Drift's generated `fromJson` ignores unknown keys, so a v179 peer keeps
-syncing with a v180 peer and simply ignores `photo`.
+and Drift's generated `fromJson` ignores unknown keys, so a v180 peer keeps
+syncing with a v181 peer and simply ignores `photo`.
 
 The rung number must be re-verified against `origin/main` at implementation
-time. PR #1374 is open and holds a rung that needs to move. A rung at or below
+time. It already moved once: PR #1374 landed and took 180 while this design
+was being written, so the claim is now 181. A rung at or below
 main's scalar merges with no conflict marker and its step then never runs.
 
 ### Entities
@@ -190,11 +191,11 @@ bookkeeping is needed in the repositories.
 ### Sync
 
 Six edits per entity, following the `certifications` pattern. Line numbers are
-against the worktree base (`origin/main` at v179):
+against the worktree base (`origin/main` at v180, after the rebase of 2026-08-29):
 
 | Site | divers | buddies | Change |
 | --- | --- | --- | --- |
-| `_baseTables` | `:653` | `:718` | `blob: false` becomes `blob: true` |
+| `_baseTables` | `:654` | `:718` | `blob: false` becomes `blob: true` |
 | delta exporter | `_exportDivers` `:4535` | `_exportBuddies` `:4803` | `r.toJson(serializer: _syncBlobSerializer)` |
 | `fetchRecord` | `:1555` | `:1650` | `row?.toJson(serializer: _syncBlobSerializer)` |
 | `fetchRecords` (batch) | `:1971` | `:2026` | same serializer in the map comprehension |
@@ -506,7 +507,8 @@ To be filed rather than built:
 
 ## Risks
 
-- The v180 rung is contested by open PR #1374. Re-verify against `origin/main`
-  before claiming it.
+- PR #1374 landed and took v180, so this feature claims v181. Re-verify against
+  `origin/main` again before claiming it: the ladder moved twice while this
+  design was being written.
 - Decode memory on desktop, mitigated by the `maxSourcePixels` ceiling.
 - Image cache pressure, mitigated by `ResizeImage`.

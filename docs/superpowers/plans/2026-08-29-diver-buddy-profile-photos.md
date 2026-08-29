@@ -17,7 +17,8 @@
 - **No emojis** in code, comments, or documentation.
 - **Stored avatar format:** 512x512 square JPEG, quality 85.
 - **Stored certification card format:** 2000px longest edge, quality 85, aspect ratio preserved.
-- **Schema:** claim rung **180**. Re-verify against `origin/main` before Task 1; PR #1374 is open and may take it. `minimumCompatibleSchemaVersion` stays **170** and must not be changed.
+- **Schema:** claim rung **181**. Re-verify against `origin/main` before Task 1. PR #1374 already landed and took 180, which is why this is 181. `minimumCompatibleSchemaVersion` stays **170** and must not be changed.
+- **Line numbers are advisory, the quoted code is authoritative.** They were re-derived after rebasing onto `origin/main` at v180. If a number does not match, locate the quoted snippet by text and proceed.
 - **Analyze must be run as** `flutter analyze --fatal-infos` (CI fails on info-level diagnostics).
 - **Format must be run as** `dart format .` before committing; CI runs `dart format --set-exit-if-changed .`.
 - **Never pipe `flutter test` through `grep`.** The pipeline returns grep's exit status, so a failing suite reads as success.
@@ -45,17 +46,17 @@
 
 ---
 
-## Task 1: Schema column and v180 migration
+## Task 1: Schema column and v181 migration
 
 **Files:**
 - Modify: `lib/core/database/database.dart` (table classes, helper, ladder, `migrationVersions`, `currentSchemaVersion`, `beforeOpen`)
-- Test: `test/core/database/migration_v180_profile_photo_test.dart` (create)
+- Test: `test/core/database/migration_v181_profile_photo_test.dart` (create)
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `divers.photo` and `buddies.photo` as `BlobColumn` (`Uint8List?`), generated Drift row fields `Diver.photo` and `Buddy.photo`, and `AppDatabase.currentSchemaVersion == 180`.
+- Produces: `divers.photo` and `buddies.photo` as `BlobColumn` (`Uint8List?`), generated Drift row fields `Diver.photo` and `Buddy.photo`, and `AppDatabase.currentSchemaVersion == 181`.
 
-- [ ] **Step 1: Confirm rung 180 is still free**
+- [ ] **Step 1: Confirm rung 181 is still free**
 
 Run:
 ```bash
@@ -63,23 +64,23 @@ cd /Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/profile-
 git fetch origin main
 git show origin/main:lib/core/database/database.dart | grep -n "currentSchemaVersion = "
 ```
-Expected: `currentSchemaVersion = 179`. If it reports 180 or higher, use the next free integer above it everywhere this task says 180, and say so in the commit message.
+Expected: `currentSchemaVersion = 180`. If it reports 181 or higher, use the next free integer above it everywhere this task says 181, and say so in the commit message.
 
 - [ ] **Step 2: Write the failing migration test**
 
-Create `test/core/database/migration_v180_profile_photo_test.dart`:
+Create `test/core/database/migration_v181_profile_photo_test.dart`:
 
 ```dart
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v180 shape: divers and buddies without the photo column,
-/// stamped at v179 so the upgrade to 180 runs.
-NativeDatabase _dbAt179() {
+/// Minimal pre-v181 shape: divers and buddies without the photo column,
+/// stamped at v180 so the upgrade to 181 runs.
+NativeDatabase _dbAt180() {
   return NativeDatabase.memory(
     setup: (rawDb) {
-      rawDb.execute('PRAGMA user_version = 179');
+      rawDb.execute('PRAGMA user_version = 180');
       rawDb.execute('''
         CREATE TABLE divers (
           id TEXT NOT NULL PRIMARY KEY
@@ -102,8 +103,8 @@ Future<Set<String>> _columns(AppDatabase db, String table) async {
 }
 
 void main() {
-  test('v180 adds a nullable photo column to divers and buddies', () async {
-    final db = AppDatabase(_dbAt179());
+  test('v181 adds a nullable photo column to divers and buddies', () async {
+    final db = AppDatabase(_dbAt180());
     addTearDown(() => db.close());
 
     expect(await _columns(db, 'divers'), contains('photo'));
@@ -125,7 +126,7 @@ void main() {
 
   test('the helper no-ops when the tables are absent', () async {
     final native = NativeDatabase.memory(
-      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 179'),
+      setup: (rawDb) => rawDb.execute('PRAGMA user_version = 180'),
     );
     final db = AppDatabase(native);
     addTearDown(db.close);
@@ -133,9 +134,9 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
   });
 
-  test('v180 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(180));
-    expect(AppDatabase.migrationVersions, contains(180));
+  test('v181 is present in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(181));
+    expect(AppDatabase.migrationVersions, contains(181));
   });
 
   test('the sync compatibility floor is unchanged', () {
@@ -146,16 +147,16 @@ void main() {
 
 - [ ] **Step 3: Run the test to verify it fails**
 
-Run: `flutter test test/core/database/migration_v180_profile_photo_test.dart`
-Expected: FAIL. The `photo` column is missing and `migrationVersions` does not contain 180.
+Run: `flutter test test/core/database/migration_v181_profile_photo_test.dart`
+Expected: FAIL. The `photo` column is missing and `migrationVersions` does not contain 181.
 
 - [ ] **Step 4: Add the Drift columns**
 
-In `lib/core/database/database.dart`, in `class Divers extends Table` (around line 19), replace the `photoPath` line with these two lines:
+In `lib/core/database/database.dart`, in `class Divers extends Table` (around line 20), replace the `photoPath` line with these two lines:
 
 ```dart
   /// Deprecated, superseded by [photo]. Never written for divers; kept so a
-  /// database that predates v180 still maps.
+  /// database that predates v181 still maps.
   TextColumn get photoPath => text().nullable()();
 
   /// Profile photo: a 512x512 square JPEG produced by
@@ -164,14 +165,14 @@ In `lib/core/database/database.dart`, in `class Divers extends Table` (around li
   BlobColumn get photo => blob().nullable()();
 ```
 
-In `class Buddies extends Table` (around line 1966), make the identical change, with "buddy" in place of "diver" in the second comment.
+In `class Buddies extends Table` (around line 1983), make the identical change, with "buddy" in place of "diver" in the second comment.
 
 - [ ] **Step 5: Add the idempotent DDL helper**
 
-In `lib/core/database/database.dart`, directly after `_assertBuddyFavoriteColumn` (around line 5533), add:
+In `lib/core/database/database.dart`, directly after `_assertBuddyFavoriteColumn` (around line 5569), add:
 
 ```dart
-  /// Idempotent DDL for the v180 divers.photo and buddies.photo columns.
+  /// Idempotent DDL for the v181 divers.photo and buddies.photo columns.
   /// Holds a 512x512 square JPEG, so it is nullable with no default. Self-
   /// guards on each table existing, which is what makes it safe to call from
   /// both the ladder and beforeOpen.
@@ -189,40 +190,40 @@ In `lib/core/database/database.dart`, directly after `_assertBuddyFavoriteColumn
 
 - [ ] **Step 6: Add the ladder rung**
 
-In `lib/core/database/database.dart`, immediately after the `if (from < 179) await reportProgress();` line (around line 9212), add:
+In `lib/core/database/database.dart`, immediately after the `if (from < 180) await reportProgress();` line (around line 9265), add:
 
 ```dart
-        // v180: divers.photo and buddies.photo, the profile photo blobs.
-        if (from < 180) {
+        // v181: divers.photo and buddies.photo, the profile photo blobs.
+        if (from < 181) {
           await _assertProfilePhotoColumns();
         }
-        if (from < 180) await reportProgress();
+        if (from < 181) await reportProgress();
 ```
 
 - [ ] **Step 7: Append to migrationVersions**
 
-In `lib/core/database/database.dart`, change the tail of `migrationVersions` (around line 3696) from `    179,\n  ];` to:
+In `lib/core/database/database.dart`, change the tail of `migrationVersions` (around line 3717) from `    180,\n  ];` to:
 
 ```dart
-    179,
-    // v180: divers.photo and buddies.photo, the profile photo blobs. Claimed
-    // against origin/main at 179. A rung at or below the shipped version
+    180,
+    // v181: divers.photo and buddies.photo, the profile photo blobs. Claimed
+    // against origin/main at 180. A rung at or below the shipped version
     // merges with no conflict marker and its onUpgrade step then never runs,
     // so re-verify this number if this branch sits open while main advances.
-    180,
+    181,
   ];
 ```
 
 - [ ] **Step 8: Bump currentSchemaVersion**
 
-In `lib/core/database/database.dart` line 3317, change `static const int currentSchemaVersion = 179;` to `static const int currentSchemaVersion = 180;`. Do **not** touch `minimumCompatibleSchemaVersion`.
+In `lib/core/database/database.dart` line 3329, change `static const int currentSchemaVersion = 180;` to `static const int currentSchemaVersion = 181;`. Do **not** touch `minimumCompatibleSchemaVersion`.
 
 - [ ] **Step 9: Add the beforeOpen backstop**
 
-In `lib/core/database/database.dart`, in the `beforeOpen` block after the `_assertSiteSuggestionDismissedAtColumn()` backstop call (around line 9421), add:
+In `lib/core/database/database.dart`, in the `beforeOpen` block after the `_assertSiteSuggestionDismissedAtColumn()` backstop call (around line 9472), add:
 
 ```dart
-        // v180 backstop: re-assert divers.photo and buddies.photo. A database
+        // v181 backstop: re-assert divers.photo and buddies.photo. A database
         // that arrives by restore or sync-adopt never runs onUpgrade, and
         // every read of a diver or buddy row would throw without the column.
         await _assertProfilePhotoColumns();
@@ -239,7 +240,7 @@ Expected: succeeds. `lib/core/database/database.g.dart` now has `photo` on the d
 
 - [ ] **Step 11: Run the test to verify it passes**
 
-Run: `flutter test test/core/database/migration_v180_profile_photo_test.dart`
+Run: `flutter test test/core/database/migration_v181_profile_photo_test.dart`
 Expected: PASS, all five tests.
 
 - [ ] **Step 12: Format, analyze, commit**
@@ -247,8 +248,8 @@ Expected: PASS, all five tests.
 ```bash
 dart format .
 flutter analyze --fatal-infos
-git add lib/core/database/database.dart lib/core/database/database.g.dart test/core/database/migration_v180_profile_photo_test.dart
-git commit -m "feat(db): add profile photo blob columns to divers and buddies (v180)"
+git add lib/core/database/database.dart lib/core/database/database.g.dart test/core/database/migration_v181_profile_photo_test.dart
+git commit -m "feat(db): add profile photo blob columns to divers and buddies (v181)"
 ```
 
 ---
@@ -443,8 +444,8 @@ git commit -m "feat(entities): carry a profile photo on Diver and Buddy"
 ## Task 3: Repository wiring
 
 **Files:**
-- Modify: `lib/features/buddies/data/repositories/buddy_repository.dart` (lines 140-162, 165-206, 277-312, 887, 918, 1100-1117)
-- Modify: `lib/features/divers/data/repositories/diver_repository.dart` (lines 128-194, 196-239, 660-699)
+- Modify: `lib/features/buddies/data/repositories/buddy_repository.dart` (every `photoPath` site: lines 152, 182, 244, 292, 385, 447, 838, 1117)
+- Modify: `lib/features/divers/data/repositories/diver_repository.dart` (every `photoPath` site: lines 144, 208, 676)
 - Modify: `lib/features/buddies/data/repositories/buddy_merge_repository.dart` (lines 115, 446, 594)
 - Modify: `lib/features/buddies/presentation/pages/buddy_merge_form_controller.dart` (line 81)
 - Test: `test/features/buddies/data/buddy_photo_persistence_test.dart` (create)
@@ -537,7 +538,7 @@ Expected: FAIL. The photo reads back null after create, because the mapper and c
 
 In `lib/features/buddies/data/repositories/buddy_repository.dart`:
 
-In `_mapRowToBuddy` (line 1100), after `photoPath: row.photoPath,` add `photo: row.photo,`.
+In `_mapRowToBuddy` (line 1106, the `photoPath: row.photoPath,` at line 1117), add `photo: row.photo,` directly after it.
 
 In the inline row-to-`Buddy` construction feeding `_withPrimaryCerts` (lines 140-162), which reads columns via `row.data[...]`, after the `photoPath:` entry add:
 
@@ -545,11 +546,16 @@ In the inline row-to-`Buddy` construction feeding `_withPrimaryCerts` (lines 140
         photo: row.data['photo'] as Uint8List?,
 ```
 
-In `createBuddy`'s `BuddiesCompanion` (line 165-206), after `photoPath: Value(buddy.photoPath),` add `photo: Value(buddy.photo),`.
+In `createBuddy`'s `BuddiesCompanion` (method at line 167, the `photoPath:` line at 182), after `photoPath: Value(buddy.photoPath),` add `photo: Value(buddy.photo),`.
 
-In `updateBuddy`'s `BuddiesCompanion` (line 277-312), make the identical addition.
+In `updateBuddy`'s `BuddiesCompanion` (method at line 279, the `photoPath:` line at 292), make the identical addition.
 
-Open lines 887 and 918. For each `BuddiesCompanion`, if it writes `photoPath`, add the matching `photo: Value(...)` line reading from the same source object. If it writes only a couple of fields and not `photoPath`, leave it alone and note why in the commit message.
+There are four further `photoPath` sites in this file, and every one of them needs a `photo` sibling or the photo silently vanishes on that path:
+
+- **Lines 244, 385, 838** are row mappers reading `row.data['photo_path'] as String?`. Add `photo: row.data['photo'] as Uint8List?,` directly after each.
+- **Line 447** is an entity-to-entity copy reading `photoPath: b.photoPath,`. Add `photo: b.photo,` after it.
+
+Use `grep -n "photoPath" lib/features/buddies/data/repositories/buddy_repository.dart` and confirm you end with exactly eight `photo` siblings, one per `photoPath`.
 
 Add `import 'dart:typed_data';` if the file does not already import it.
 
@@ -557,13 +563,13 @@ Add `import 'dart:typed_data';` if the file does not already import it.
 
 In `lib/features/divers/data/repositories/diver_repository.dart`:
 
-In `_mapRowToDiver` (line 660), after `photoPath: row.photoPath,` add `photo: row.photo,`.
+In `_mapRowToDiver` (method at line 670, the `photoPath: row.photoPath,` at line 676), add `photo: row.photo,` directly after it.
 
-In `createDiver`'s `DiversCompanion` (line 128-194), after `photoPath: Value(diver.photoPath),` add `photo: Value(diver.photo),`.
+In `createDiver`'s `DiversCompanion` (method at line 130, companion at 139, the `photoPath:` line at 144), after `photoPath: Value(diver.photoPath),` add `photo: Value(diver.photo),`.
 
-In `updateDiver`'s `DiversCompanion` (line 196-239), make the identical addition.
+In `updateDiver`'s `DiversCompanion` (method at line 198, companion at 204, the `photoPath:` line at 208), make the identical addition.
 
-Leave the `DiversCompanion` at line 551 alone: it writes only `isDefault` and `updatedAt`.
+Leave the `DiversCompanion` at line 558 alone: it writes only `isDefault` and `updatedAt`.
 
 Add `import 'dart:typed_data';` if absent.
 
@@ -600,7 +606,7 @@ git commit -m "feat(repos): persist diver and buddy profile photos"
 ## Task 4: Sync serialization
 
 **Files:**
-- Modify: `lib/core/services/sync/sync_data_serializer.dart` (12 sites: lines 653, 718, 1555, 1650, 1971, 2026, 2444, 2549, 2951, 3115, 4535, 4803)
+- Modify: `lib/core/services/sync/sync_data_serializer.dart` (12 sites: lines 654, 718, 1555, 1650, 1971, 2026, 2444, 2549, 2951, 3115, 4535, 4803)
 - Test: `test/core/services/sync/sync_blob_base64_test.dart` (modify)
 
 **Interfaces:**
@@ -717,7 +723,7 @@ Expected: FAIL. `row['photo']` is a `List<int>`, not a `String`.
 
 In `lib/core/services/sync/sync_data_serializer.dart`:
 
-Line 653, change to:
+Line 654, change to:
 ```dart
     (key: 'divers', table: _db.divers, blob: true, full: null),
 ```
@@ -1930,7 +1936,7 @@ bool get isContactImportSupported {
 }
 ```
 
-In `lib/features/buddies/presentation/widgets/buddy_list_content.dart`, delete the private `_isContactImportSupported` getter at lines 80-83, add the import for the new file, and replace the single use at line 331 with `isContactImportSupported`.
+In `lib/features/buddies/presentation/widgets/buddy_list_content.dart`, delete the private `_isContactImportSupported` getter at lines 80-83 (it has one use, at line 331), add the import for the new file, and replace the single use at line 331 with `isContactImportSupported`.
 
 - [ ] **Step 4: Write the source sheet**
 
@@ -2317,7 +2323,7 @@ git commit -m "feat(profile-photo): add the shared ProfileAvatar widget"
 
 **Files:**
 - Modify: `lib/features/buddies/presentation/widgets/buddy_summary_widget.dart` (line 177)
-- Modify: `lib/features/buddies/presentation/widgets/buddy_list_tile.dart` (lines 285-318)
+- Modify: `lib/features/buddies/presentation/widgets/buddy_list_tile.dart` (lines 293-321)
 - Modify: `lib/features/buddies/presentation/pages/buddy_detail_page.dart` (lines 232, 413)
 - Modify: `lib/features/buddies/presentation/widgets/buddy_picker.dart` (lines 201, 264, 615)
 - Modify: `lib/features/divers/presentation/widgets/diver_switcher_sheet.dart` (line 55)
@@ -2382,7 +2388,7 @@ Expected: FAIL. `backgroundImage` is a `FileImage` built from `photoPath`, not a
 
 - [ ] **Step 3: Replace the buddy list tile avatar**
 
-In `lib/features/buddies/presentation/widgets/buddy_list_tile.dart`, replace the whole `build` body of the avatar widget (lines 291-318) with:
+In `lib/features/buddies/presentation/widgets/buddy_list_tile.dart`, replace the whole `build` body of the avatar widget (lines 292-321, starting at `final path = buddy.photoPath;`) with:
 
 ```dart
   @override
@@ -2761,8 +2767,8 @@ git commit -m "feat(tables): show profile photos in buddy and diver table rows"
 ## Task 14: Contact photos and the master-detail fix
 
 **Files:**
-- Modify: `lib/features/buddies/presentation/widgets/buddy_list_content.dart` (lines 330-405)
-- Modify: `lib/core/router/app_router.dart` (the `newBuddy` route builder, lines 583-600)
+- Modify: `lib/features/buddies/presentation/widgets/buddy_list_content.dart` (`_importFromContacts` at 330, `FlutterContacts.get` at 365, master-detail branch at 386)
+- Modify: `lib/core/router/app_router.dart` (the `newBuddy` route builder, around line 599, `initialName:` at 609)
 - Modify: `lib/features/buddies/presentation/pages/buddy_edit_page.dart` (constructor)
 - Test: `test/features/buddies/presentation/widgets/buddy_contact_import_test.dart` (create)
 
@@ -2887,7 +2893,7 @@ Add `import 'dart:typed_data';` and `import 'package:submersion/core/services/im
 
 - [ ] **Step 4: Delete the master-detail branch**
 
-Replace the whole `if (ResponsiveBreakpoints.isMasterDetail(context)) { ... } else { ... }` block (lines 383-396) with:
+Replace the whole `if (ResponsiveBreakpoints.isMasterDetail(context)) { ... } else { ... }` block inside `_importFromContacts` (starts line 386) with the code below. Note there is a SECOND `isMasterDetail` at line 888 that belongs to a different flow: leave it alone.
 
 ```dart
       if (context.mounted) {
@@ -2912,7 +2918,7 @@ Remove the now-unused `ResponsiveBreakpoints` and `GoRouterState` imports if not
 
 - [ ] **Step 5: Carry the photo through the route**
 
-In `lib/core/router/app_router.dart`, in the `newBuddy` route builder (line 593), add:
+In `lib/core/router/app_router.dart`, in the `newBuddy` route builder (the `initialName:` line at 609), add:
 
 ```dart
                     initialPhoto: extra?['photo'] as Uint8List?,
@@ -2984,7 +2990,7 @@ git commit -m "feat(buddies): import contact photos and fix master-detail data l
 ## Task 15: Certification photo reroute
 
 **Files:**
-- Modify: `lib/features/certifications/presentation/pages/certification_edit_page.dart` (lines 175-227)
+- Modify: `lib/features/certifications/presentation/pages/certification_edit_page.dart` (`_pickPhoto` at 175, `pickImage` block at 201-212)
 - Test: `test/features/certifications/certification_photo_bound_test.dart` (create)
 
 **Interfaces:**
@@ -3053,7 +3059,7 @@ Expected: PASS. This test guards the codec spec, which Task 5 already built. If 
 
 - [ ] **Step 3: Reroute the picker**
 
-In `lib/features/certifications/presentation/pages/certification_edit_page.dart`, replace the `pickImage` call and the byte read inside `_pickPhoto` (lines 200-212) with:
+In `lib/features/certifications/presentation/pages/certification_edit_page.dart`, replace the `pickImage` call and the byte read inside `_pickPhoto` (lines 201-212, from `final picked = await _imagePicker.pickImage(` through `return await file.readAsBytes();`) with:
 
 ```dart
       // No maxWidth / maxHeight / imageQuality here: image_picker_macos,
@@ -3140,7 +3146,7 @@ If a test fails that is listed in the repo's known-flaky index, rerun that one f
 git fetch origin main
 git show origin/main:lib/core/database/database.dart | grep -n "currentSchemaVersion = "
 ```
-Expected: still 179. If main has advanced to 180 or beyond, renumber this branch's rung above it in `database.dart` (the ladder `if (from < N)`, the `migrationVersions` entry, `currentSchemaVersion`) and in `migration_v180_profile_photo_test.dart`, then rerun Step 3.
+Expected: still 180. If main has advanced to 181 or beyond, renumber this branch's rung above it in `database.dart` (the ladder `if (from < N)`, the `migrationVersions` entry, `currentSchemaVersion`) and in `migration_v181_profile_photo_test.dart`, then rerun Step 3.
 
 - [ ] **Step 5: Commit any fixes**
 
