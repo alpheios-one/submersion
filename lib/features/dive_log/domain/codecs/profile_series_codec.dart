@@ -160,6 +160,15 @@ class ProfileSeriesCodec {
       throw ProfileSeriesCodecException('unknown codec version $blobVersion');
     }
     final count = reader.readVarUint();
+    // Every sample carries at least a one-byte timestamp delta, so a count
+    // the remaining payload cannot hold is corruption, not a large series.
+    // Guarding here keeps a bogus count from sizing 28 column lists.
+    if (count > reader.remaining) {
+      throw ProfileSeriesCodecException(
+        'sample count $count exceeds the ${reader.remaining} remaining '
+        'byte(s)',
+      );
+    }
     final columns = <String, List<Object?>>{};
     for (final field in table) {
       columns[field.name] = _readColumn(reader, field.kind, count);
@@ -285,6 +294,12 @@ class ProfileSeriesCodec {
     final values = <String>[];
     for (var run = 0; run < runCount; run++) {
       final length = reader.readVarUint();
+      if (values.length + length > presentCount) {
+        throw ProfileSeriesCodecException(
+          'string run $run of length $length overruns the $presentCount '
+          'present values',
+        );
+      }
       final byteLength = reader.readVarUint();
       final String value;
       try {

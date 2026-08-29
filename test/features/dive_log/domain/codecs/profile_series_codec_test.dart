@@ -250,6 +250,46 @@ void main() {
         throwsA(isA<ProfileSeriesCodecException>()),
       );
     });
+
+    test('a sample count larger than the payload', () {
+      final body = inflate(validBytes());
+      // Replace the one-byte count (8) with a five-byte varint for 2^32.
+      const huge = [0x80, 0x80, 0x80, 0x80, 0x10];
+      final tampered = Uint8List.fromList([
+        body[0],
+        ...huge,
+        ...body.sublist(2),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('a string run longer than the present values', () {
+      // A three-field table keeps the body small enough to address by hand:
+      // [version][count 3][timestamp: mode, 3 deltas][depth: mode, 3 floats]
+      // [heart_rate_source: mode, run count, run length, byte length, 'a'].
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+        ProfileField('heart_rate_source', ProfileFieldKind.runLengthString),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 1, depth: 2.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 2, depth: 3.0, heartRateSource: 'a'),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      const runLengthOffset = 1 + 1 + (1 + 3) + (1 + 24) + 1 + 1;
+      expect(body[runLengthOffset], 3);
+      body[runLengthOffset] = 5;
+      expect(
+        () => small.decode(recompress(body)),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
   });
 
   group('forward tolerance', () {
