@@ -6,11 +6,12 @@ import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_sample_dedupe.dart';
 
-/// What one packing pass inserted and dropped.
+/// What one packing pass inserted, dropped, and skipped.
 typedef ProfilePackReport = ({
   int profileSeries,
   int tankSeries,
   int droppedSamples,
+  int skippedOrphans,
 });
 
 /// Packs every legacy `dive_profiles` and `tank_pressure_profiles` row into
@@ -20,50 +21,87 @@ typedef ProfilePackReport = ({
 /// classes and drops the tables, and this function must keep compiling and
 /// keep no-oping on a database that has already lost them.
 ///
-/// Memory is bounded by one dive's rows, never the table. Each identity
-/// group becomes one row whose id is derived from the tuple
+/// Memory is bounded by one dive's rows, never the table. Each identity group
+/// becomes one row whose id is derived from the tuple
 /// ([profileSeriesMigratedId]), so a second run, a retry after a failed
-/// ladder, or a second device migrating the same synced rows all converge:
-/// the insert is `INSERT OR IGNORE`.
+/// ladder, or a second device migrating the same synced rows all converge on
+/// the same id: the insert is `INSERT OR IGNORE`.
 ///
-/// Exact duplicate samples (a repeated import) are dropped before packing,
-/// which is what every read did on the way out until now.
+/// Only dives with legacy rows and no series row are visited, which is what
+/// lets the beforeOpen backstop call this on every open. Exact duplicate
+/// samples (a repeated import) are dropped before packing, which is what
+/// every read did on the way out until now.
 ///
-/// [nowMs] stamps `created_at` and `updated_at`. `hlc` is minted from the
-/// device id in `sync_metadata` when one exists, so the first sync after the
-/// upgrade publishes the rows; a device that never synced has nothing to
-/// publish to and its rows stay unstamped until a base publish, which
-/// exports everything regardless.
+/// Orphans are skipped and counted in [ProfilePackReport.skippedOrphans]: a
+/// legacy row whose dive (or, for a pressure row, whose tank) is already
+/// gone could never have been rendered, and under `PRAGMA foreign_keys = ON`
+/// inserting it would abort the whole ladder on every retry. A dangling
+/// `computer_id` or `source_id` is weaker: the samples are still the dive's,
+/// so the group packs with that member resolved to null, and the derived id
+/// uses the resolved value so every device agrees.
+///
+/// Both legacy tables are read through `PRAGMA table_info`: a database from
+/// a very old backup can lack the identity columns entirely. A missing
+/// `computer_id`/`source_id` reads as null, a missing `is_primary` as true,
+/// and a table without `dive_id`, `timestamp`, or `depth` (`pressure` for
+/// tanks) holds nothing packable and is skipped whole.
+///
+/// [nowMs] stamps `created_at` and `updated_at`; `hlc` advances the clock
+/// persisted in `sync_metadata` so the first sync after the upgrade
+/// publishes the rows. A device that never synced has nothing to publish to
+/// and stays unstamped until a base publish, which exports everything.
 Future<ProfilePackReport> packLegacyProfileRows(
   DatabaseConnectionUser db, {
   int? nowMs,
 }) async {
   final now = nowMs ?? DateTime.now().millisecondsSinceEpoch;
   final hlc = await _migrationHlc(db, now);
+  final diveIds = await _parentIds(db, 'dives');
+  final computerIds = await _parentIds(db, 'dive_computers');
+  final sourceIds = await _parentIds(db, 'dive_data_sources');
+  final tankIds = await _parentIds(db, 'dive_tanks');
   var profileSeries = 0;
   var tankSeries = 0;
   var dropped = 0;
+  var skipped = 0;
 
-  if (await _tableExists(db, 'dive_profiles')) {
+  final profileColumns = await _columnNames(db, 'dive_profiles');
+  if (profileColumns.containsAll(const {'dive_id', 'timestamp', 'depth'})) {
     const codec = ProfileSeriesCodec();
-    for (final diveId in await _diveIds(db, 'dive_profiles')) {
+    final hasPrimary = profileColumns.contains('is_primary');
+    final unpacked = await _unpackedDiveIds(
+      db,
+      legacyTable: 'dive_profiles',
+      seriesTable: 'dive_profile_series',
+    );
+    for (final diveId in unpacked) {
+      // Ordered by timestamp alone: the map below does the grouping, and
+      // ordering by the identity columns first would interleave two raw
+      // groups that resolve to one key (a dangling computer id merging into
+      // the null-computer group) out of timestamp order.
       final rows = await db
           .customSelect(
             'SELECT * FROM dive_profiles WHERE dive_id = ? '
-            'ORDER BY computer_id, source_id, is_primary, timestamp, rowid',
+            'ORDER BY timestamp, rowid',
             variables: [Variable<String>(diveId)],
           )
           .get();
       final groups = <_ProfileKey, List<ProfileSample>>{};
       for (final row in rows) {
         final key = _ProfileKey(
-          computerId: row.data['computer_id'] as String?,
-          sourceId: row.data['source_id'] as String?,
-          isPrimary: _boolOf(row.data['is_primary'], fallback: true),
+          computerId: _resolvedParent(row.data['computer_id'], computerIds),
+          sourceId: _resolvedParent(row.data['source_id'], sourceIds),
+          isPrimary: hasPrimary
+              ? _boolOf(row.data['is_primary'], fallback: true)
+              : true,
         );
         groups.putIfAbsent(key, () => []).add(_profileSampleOf(row.data));
       }
       for (final entry in groups.entries) {
+        if (!diveIds.contains(diveId)) {
+          skipped++;
+          continue;
+        }
         final key = entry.key;
         final samples = dedupeExactSamples(entry.value);
         dropped += entry.value.length - samples.length;
@@ -111,13 +149,24 @@ Future<ProfilePackReport> packLegacyProfileRows(
     }
   }
 
-  if (await _tableExists(db, 'tank_pressure_profiles')) {
+  final tankColumns = await _columnNames(db, 'tank_pressure_profiles');
+  if (tankColumns.containsAll(const {
+    'dive_id',
+    'tank_id',
+    'timestamp',
+    'pressure',
+  })) {
     const codec = TankPressureSeriesCodec();
-    for (final diveId in await _diveIds(db, 'tank_pressure_profiles')) {
+    final unpacked = await _unpackedDiveIds(
+      db,
+      legacyTable: 'tank_pressure_profiles',
+      seriesTable: 'tank_pressure_series',
+    );
+    for (final diveId in unpacked) {
       final rows = await db
           .customSelect(
             'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
-            'ORDER BY tank_id, computer_id, timestamp, rowid',
+            'ORDER BY timestamp, rowid',
             variables: [Variable<String>(diveId)],
           )
           .get();
@@ -125,7 +174,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
       for (final row in rows) {
         final key = _TankKey(
           tankId: row.data['tank_id'] as String,
-          computerId: row.data['computer_id'] as String?,
+          computerId: _resolvedParent(row.data['computer_id'], computerIds),
         );
         groups
             .putIfAbsent(key, () => [])
@@ -138,6 +187,10 @@ Future<ProfilePackReport> packLegacyProfileRows(
       }
       for (final entry in groups.entries) {
         final key = entry.key;
+        if (!diveIds.contains(diveId) || !tankIds.contains(key.tankId)) {
+          skipped++;
+          continue;
+        }
         final samples = dedupeExactPressureSamples(entry.value);
         dropped += entry.value.length - samples.length;
         final encoded = codec.encode(samples);
@@ -177,6 +230,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
     profileSeries: profileSeries,
     tankSeries: tankSeries,
     droppedSamples: dropped,
+    skippedOrphans: skipped,
   );
 }
 
@@ -228,11 +282,50 @@ Future<bool> _tableExists(DatabaseConnectionUser db, String table) async {
   return rows.isNotEmpty;
 }
 
-Future<List<String>> _diveIds(DatabaseConnectionUser db, String table) async {
+/// Dives that still have legacy rows and no series rows yet. Cheap once a
+/// database is packed (an indexed NOT EXISTS per legacy dive), which is what
+/// lets the beforeOpen backstop call the packer on every open. Empty when
+/// the series table is absent: `_assertProfileSeriesSchema` waits for that
+/// table's foreign-key parents, so there is nothing to pack into yet.
+Future<List<String>> _unpackedDiveIds(
+  DatabaseConnectionUser db, {
+  required String legacyTable,
+  required String seriesTable,
+}) async {
+  if (!await _tableExists(db, seriesTable)) return const [];
   final rows = await db
-      .customSelect('SELECT DISTINCT dive_id FROM $table ORDER BY dive_id')
+      .customSelect(
+        'SELECT DISTINCT p.dive_id AS dive_id FROM $legacyTable p '
+        'WHERE NOT EXISTS (SELECT 1 FROM $seriesTable s '
+        'WHERE s.dive_id = p.dive_id) ORDER BY p.dive_id',
+      )
       .get();
   return [for (final row in rows) row.read<String>('dive_id')];
+}
+
+/// Every id in [table], or an empty set when the table is absent. Loaded
+/// once per run so the per-group parent checks below cost nothing.
+Future<Set<String>> _parentIds(DatabaseConnectionUser db, String table) async {
+  if (!await _tableExists(db, table)) return const {};
+  final rows = await db.customSelect('SELECT id FROM $table').get();
+  return {for (final row in rows) row.read<String>('id')};
+}
+
+/// The column names of [table], empty when the table does not exist.
+Future<Set<String>> _columnNames(
+  DatabaseConnectionUser db,
+  String table,
+) async {
+  final rows = await db.customSelect("PRAGMA table_info('$table')").get();
+  return {for (final row in rows) row.read<String>('name')};
+}
+
+/// [value] when it still names a row in [parents], null otherwise. A legacy
+/// row can point at a computer or source that has since been deleted, which
+/// under `PRAGMA foreign_keys = ON` no insert could carry.
+String? _resolvedParent(Object? value, Set<String> parents) {
+  final id = value as String?;
+  return id != null && parents.contains(id) ? id : null;
 }
 
 /// The clock value migrated rows carry. Null when this device has never
@@ -240,13 +333,22 @@ Future<List<String>> _diveIds(DatabaseConnectionUser db, String table) async {
 Future<String?> _migrationHlc(DatabaseConnectionUser db, int nowMs) async {
   if (!await _tableExists(db, 'sync_metadata')) return null;
   final rows = await db
-      .customSelect(
-        "SELECT device_id FROM sync_metadata WHERE id = 'global' LIMIT 1",
-      )
+      .customSelect("SELECT * FROM sync_metadata WHERE id = 'global' LIMIT 1")
       .get();
   if (rows.isEmpty) return null;
-  final deviceId = rows.first.readNullable<String>('device_id');
+  final deviceId = rows.first.data['device_id'] as String?;
   if (deviceId == null || deviceId.isEmpty) return null;
+  // Advance the persisted clock rather than minting from wall-clock time:
+  // a peer merge can have moved this device's clock ahead of now, and a
+  // stamp below the publish watermark would never ride a changeset.
+  final persisted = rows.first.data['hlc'] as String?;
+  if (persisted != null && persisted.isNotEmpty) {
+    try {
+      return Hlc.parse(persisted).increment(nowMs).toString();
+    } on FormatException {
+      // Fall through to a fresh clock.
+    }
+  }
   return Hlc(nowMs, 0, deviceId).toString();
 }
 

@@ -284,36 +284,42 @@ void main() {
       },
     );
 
-    test('a database already at 182 is not packed again on open', () async {
-      // Two executors over one handle (see the schema group): the first
-      // open runs the ladder and packs; a legacy row written afterwards must
-      // survive the second open unpacked, because the backstop is schema
-      // only.
-      final raw = sqlite3.sqlite3.openInMemory();
-      addTearDown(raw.close);
-      legacyDdlAt180(raw);
-      seed(raw);
+    test(
+      'the backstop packs a dive whose legacy rows arrived after the rung',
+      () async {
+        // Two executors over one handle: the first open runs the ladder and
+        // packs d1; a legacy row for a second dive written afterwards must be
+        // packed by the backstop on the next open, because a device that took
+        // a parallel branch's rung number never runs this rung at all.
+        final raw = sqlite3.sqlite3.openInMemory();
+        addTearDown(raw.close);
+        legacyDdlAt180(raw);
+        seed(raw);
 
-      final first = AppDatabase(
-        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-      );
-      await first.customSelect('SELECT 1').get();
-      await first.close();
+        final first = AppDatabase(
+          NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+        );
+        await first.customSelect('SELECT 1').get();
+        await first.close();
 
-      raw.execute(
-        "INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, "
-        "is_primary, timestamp, depth) VALUES ('p9', 'd1', NULL, NULL, 1, 0, 1.0)",
-      );
+        raw.execute("INSERT INTO dives (id) VALUES ('d2')");
+        raw.execute(
+          "INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, "
+          "is_primary, timestamp, depth) VALUES ('p9', 'd2', NULL, NULL, 1, 0, 1.0)",
+        );
 
-      final second = AppDatabase(
-        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-      );
-      addTearDown(second.close);
-      await second.customSelect('SELECT 1').get();
-      final series = await second
-          .customSelect('SELECT COUNT(*) AS n FROM dive_profile_series')
-          .getSingle();
-      expect(series.read<int>('n'), 1);
-    });
+        final second = AppDatabase(
+          NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+        );
+        addTearDown(second.close);
+        await second.customSelect('SELECT 1').get();
+        final series = await second
+            .customSelect(
+              'SELECT dive_id FROM dive_profile_series ORDER BY dive_id',
+            )
+            .get();
+        expect(series.map((r) => r.read<String>('dive_id')), ['d1', 'd2']);
+      },
+    );
   });
 }

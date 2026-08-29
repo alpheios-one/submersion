@@ -4312,7 +4312,32 @@ class AppDatabase extends _$AppDatabase {
   /// database stranded at 182 by a parallel branch. The DDL must agree with
   /// the Drift declarations column for column; the v182 migration test
   /// compares the two on a fresh database.
+  ///
+  /// Each table waits for its own foreign-key parents. A child table whose
+  /// parent is absent poisons the parents that ARE present: SQLite resolves
+  /// the child's references when a cascade fires, so `DELETE FROM dives`
+  /// would fail with "no such table: main.dive_tanks" on a partial schema
+  /// (the older migration-test fixtures, and a database caught mid-upgrade).
+  /// Every real database has carried all four parents for many versions, and
+  /// the beforeOpen backstop creates whatever was skipped on the next open.
   Future<void> _assertProfileSeriesSchema() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table'",
+    ).get();
+    final present = tables.map((r) => r.read<String>('name')).toSet();
+    if (present.containsAll(const {
+      'dives',
+      'dive_computers',
+      'dive_data_sources',
+    })) {
+      await _assertDiveProfileSeriesTable();
+    }
+    if (present.containsAll(const {'dives', 'dive_computers', 'dive_tanks'})) {
+      await _assertTankPressureSeriesTable();
+    }
+  }
+
+  Future<void> _assertDiveProfileSeriesTable() async {
     await customStatement('''
       CREATE TABLE IF NOT EXISTS dive_profile_series (
         id TEXT NOT NULL PRIMARY KEY,
@@ -4343,6 +4368,9 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
       'ON dive_profile_series (dive_id, is_primary)',
     );
+  }
+
+  Future<void> _assertTankPressureSeriesTable() async {
     await customStatement('''
       CREATE TABLE IF NOT EXISTS tank_pressure_series (
         id TEXT NOT NULL PRIMARY KEY,
@@ -9687,10 +9715,16 @@ class AppDatabase extends _$AppDatabase {
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
 
-        // v182 backstop: re-assert the packed profile series tables (same
-        // parallel-branch version-collision self-heal). Schema only: packing
-        // is not re-run on open.
+        // v182 backstop: re-assert the packed profile series tables, then
+        // pack any dive that still has legacy rows and no series row. A
+        // schema-version collision with a parallel branch skips the rung on
+        // devices that took the other branch's number first; without this
+        // self-heal those devices would carry empty series tables and lose
+        // every sample once the legacy tables are dropped. Cheap once packed
+        // (an indexed NOT EXISTS per legacy dive) and a no-op after the
+        // legacy tables are gone.
         await _assertProfileSeriesSchema();
+        await packLegacyProfileRows(this);
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
