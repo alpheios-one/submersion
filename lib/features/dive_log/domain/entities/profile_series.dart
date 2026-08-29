@@ -23,9 +23,9 @@ const String kTankPressureSeriesNamespace =
 /// Only the migration uses this; repository writes mint uuid v4, because a
 /// fresh download or edit genuinely is a new series.
 ///
-/// Absent members are spelled `null` in the key. A member that is literally
-/// the string "null" cannot collide with absence because the migration
-/// never sees one: ids are uuids.
+/// Absent members are spelled `null` in the key (spec section 8). A member
+/// that is literally the string "null" would collide with absence, and
+/// cannot occur: every member is a uuid.
 String profileSeriesMigratedId({
   required String diveId,
   required String? computerId,
@@ -33,7 +33,7 @@ String profileSeriesMigratedId({
   required bool isPrimary,
 }) => const Uuid().v5(
   kProfileSeriesNamespace,
-  '$diveId|${computerId ?? ''}|${sourceId ?? ''}|${isPrimary ? 1 : 0}',
+  '$diveId|${computerId ?? 'null'}|${sourceId ?? 'null'}|${isPrimary ? 1 : 0}',
 );
 
 /// The series id the v181 migration assigns to a packed

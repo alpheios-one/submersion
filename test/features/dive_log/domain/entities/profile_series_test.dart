@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   group('profileSeriesMigratedId', () {
@@ -68,22 +69,19 @@ void main() {
       );
     });
 
-    test('a literal "null" string and an absent member are distinct', () {
-      // The key joins members with '|' and spells absence as `null`; a
-      // computer literally named "null" must not collide with none.
-      final absent = profileSeriesMigratedId(
-        diveId: 'd1',
-        computerId: null,
-        sourceId: null,
-        isPrimary: true,
+    test('absent members are spelled null in the key, per the spec', () {
+      // Spec section 8: uuid v5 over `dive_id|computer_id|source_id|
+      // is_primary` with the literal `null` for absent members. Pinning the
+      // key format keeps every device deriving the same id.
+      expect(
+        profileSeriesMigratedId(
+          diveId: 'd1',
+          computerId: null,
+          sourceId: null,
+          isPrimary: true,
+        ),
+        const Uuid().v5(kProfileSeriesNamespace, 'd1|null|null|1'),
       );
-      final literal = profileSeriesMigratedId(
-        diveId: 'd1',
-        computerId: 'null',
-        sourceId: null,
-        isPrimary: true,
-      );
-      expect(absent, isNot(literal));
     });
   });
 
