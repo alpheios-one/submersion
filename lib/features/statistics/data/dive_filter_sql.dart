@@ -15,17 +15,20 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
   final conditions = <String>[];
   final params = <Object?>[];
 
-  // Date range. dive_date_time is epoch MILLISECONDS (wall-clock-as-UTC).
-  if (filter.startDate != null) {
+  // Date range. dive_date_time is epoch MILLISECONDS (wall-clock-as-UTC), and
+  // the bounds are already normalized to that frame by DiveFilterState, so the
+  // two sides of the comparison agree on where a day starts (issue #1368).
+  // Half-open: the end bound is the start of the day AFTER endDate, which
+  // keeps the whole end day and matches apply() and the paginated list.
+  final startBoundMs = filter.startDateBoundMs;
+  if (startBoundMs != null) {
     conditions.add('dive_date_time >= ?');
-    params.add(filter.startDate!.millisecondsSinceEpoch);
+    params.add(startBoundMs);
   }
-  if (filter.endDate != null) {
-    // apply() keeps dives up to endDate + 1 day (inclusive of the end day).
-    conditions.add('dive_date_time <= ?');
-    params.add(
-      filter.endDate!.add(const Duration(days: 1)).millisecondsSinceEpoch,
-    );
+  final endBoundMs = filter.endDateBoundMs;
+  if (endBoundMs != null) {
+    conditions.add('dive_date_time < ?');
+    params.add(endBoundMs);
   }
 
   // Dive type: membership against the many-to-many junction.

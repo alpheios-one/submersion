@@ -248,10 +248,11 @@ jobs:
         # must equal (shard count + 1) for the scripts job -- Codecov holds the
         # patch/project status until every partial lcov arrives (see codecov.yml).
         # It is also bounded by the account-wide concurrent-job cap: this workflow
-        # already fans out ~9-10 non-test jobs (analyze + 5 builds + scripts +
-        # integration) that share the pool AND gate ci-success, so oversharding
-        # queues the builds and makes total CI slower, not faster. 8 keeps us
-        # under the cap while roughly halving test wall-clock.
+        # already fans out ~10-11 non-test jobs (analyze + 5 builds + scripts +
+        # timezone + integration) that share the pool AND gate ci-success, so
+        # oversharding queues the builds and makes total CI slower, not
+        # faster. 8 keeps us under the cap while roughly halving test
+        # wall-clock.
         shard: [0, 1, 2, 3, 4, 5, 6, 7]
     env:
       TOTAL_SHARDS: 8
@@ -337,6 +338,96 @@ jobs:
           # Per-shard flag so Codecov merges the partial reports for this commit.
           flags: shard-${{ matrix.shard }}
           fail_ci_if_error: false  # Enable after configuring repo on codecov.io
+
+  # Replays the timezone-sensitive tests under a non-UTC zone. The runners are
+  # UTC, where a device's UTC offset is zero and a whole class of frame bug
+  # cannot reproduce: `dives.dive_date_time` holds a wall clock flagged as UTC
+  # while the filter's dates are built LOCAL, so mixing the two frames shifts
+  # the day boundary by exactly that offset and stays invisible here
+  # (issue #1368).
+  #
+  # Two zones, because they fail differently: America/New_York is a whole hour
+  # WEST of UTC (a boundary pulls dives out), Australia/Adelaide is a HALF hour
+  # EAST (a boundary pulls extra dives in, and the half hour catches rounding a
+  # whole-hour offset hides). Both observe DST, so a `Duration(days: 1)` added
+  # to a local date lands 23 or 25 hours out at a transition.
+  #
+  # Scoped to a hand-maintained file list rather than the whole suite: an
+  # unscoped `flutter test --tags ...` still compiles every test file, which is
+  # the dominant cost. Add any new test whose result depends on the machine's
+  # zone here.
+  timezone-tests:
+    name: Timezone Tests
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Read Flutter version
+        id: flutter-ver
+        run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        id: setup-flutter
+        with:
+          flutter-version: ${{ steps.flutter-ver.outputs.version }}
+          channel: 'stable'
+
+      - name: Cache Flutter SDK
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.setup-flutter.outputs.CACHE-PATH }}
+          key: ${{ steps.setup-flutter.outputs.CACHE-KEY }}
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.pub-cache
+            ${{ github.workspace }}/.dart_tool
+          key: pub-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Disable Swift Package Manager (project uses CocoaPods)
+        run: flutter config --no-enable-swift-package-manager
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Download generated code
+        uses: actions/download-artifact@v8
+        with:
+          name: generated-code
+
+      - name: Unpack generated code
+        run: tar -xzf generated-code.tar.gz
+
+      - name: Run zone-sensitive tests under non-UTC zones
+        run: |
+          set -euo pipefail
+          files=(
+            test/features/dive_log/dive_filter_date_boundary_test.dart
+            test/features/dive_log/domain/models/dive_filter_state_test.dart
+            test/features/dive_log/data/repositories/dive_records_filter_test.dart
+            test/features/dive_log/data/repositories/dive_repository_weekday_filter_test.dart
+            test/features/statistics/data/dive_filter_sql_test.dart
+          )
+          # Guard against a rename silently emptying the list: with no paths,
+          # `flutter test` would run the ENTIRE suite twice and look green.
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Listed test file is missing: $f"
+              exit 1
+            fi
+          done
+          for zone in America/New_York Australia/Adelaide; do
+            echo "::group::TZ=$zone"
+            TZ="$zone" flutter test "${files[@]}"
+            echo "::endgroup::"
+          done
 
   # Unit-tests the dependency-free Python guard scripts (e.g. the issue #318
   # ProGuard keep-rule checker). No Flutter/codegen needed, so it runs in
@@ -1082,6 +1173,7 @@ jobs:
       - codegen
       - analyze
       - test
+      - timezone-tests
       - integration-test
       - build-ios
       - build-macos
