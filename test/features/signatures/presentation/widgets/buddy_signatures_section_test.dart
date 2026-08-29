@@ -49,6 +49,8 @@ void main() {
   }) async {
     await tester.pumpWidget(
       testApp(
+        // Pinned: the assertions match English strings.
+        locale: const Locale('en'),
         overrides: [
           buddiesForDiveProvider.overrideWith(
             (ref, id) async => [

@@ -138,4 +138,28 @@ void main() {
       expect(image.height, 200);
     },
   );
+
+  // A layout width is routinely fractional on a scaled display. Truncating
+  // it would drop the last column and crop the signature again, so the
+  // encoder rounds up.
+  test('a fractional canvas width rounds up rather than truncating', () async {
+    final signature = await container
+        .read(buddySignatureSaveNotifierProvider.notifier)
+        .saveFromStrokes(
+          diveId: diveId,
+          buddyId: buddyId,
+          buddyName: 'Reef Buddy',
+          role: 'buddy',
+          strokes: <List<Offset>>[
+            [const Offset(10, 100), const Offset(607, 100)],
+          ],
+          width: 607.5,
+          height: 199.25,
+        );
+
+    expect(signature, isNotNull);
+    final image = await decodeImageFromList(signature!.imageData!);
+    expect(image.width, 608);
+    expect(image.height, 200);
+  });
 }

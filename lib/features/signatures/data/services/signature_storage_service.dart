@@ -385,9 +385,15 @@ class SignatureStorageService {
       canvas.drawPath(path, paint);
     }
 
-    // Convert to image
+    // Convert to image.
+    //
+    // Rounded up, not truncated: the size comes from layout constraints and
+    // is routinely fractional on a scaled display, and a stroke may sit at
+    // x = 607.8 on a 607.5-wide canvas. `toInt()` would drop that last
+    // column and crop the signature again, in miniature. Rounding up costs
+    // at most one transparent pixel.
     final picture = recorder.endRecording();
-    final image = await picture.toImage(width.toInt(), height.toInt());
+    final image = await picture.toImage(width.ceil(), height.ceil());
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
     return byteData!.buffer.asUint8List();
