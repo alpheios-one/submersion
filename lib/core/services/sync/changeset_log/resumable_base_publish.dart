@@ -307,8 +307,9 @@ Future<Directory> resolveBasePublishDir() async {
 /// Where an export at [sourcePath] is moved to inside the publish directory.
 ///
 /// Takes the name with [p.Context.basename] rather than splitting on
-/// [Platform.pathSeparator]. Sync assembles its paths by interpolating a
-/// literal `/`, so on Windows an export path mixes separators
+/// [Platform.pathSeparator]. Sync used to assemble its paths by interpolating a
+/// literal `/` (every such site now joins instead -- #1304, #1327), so on
+/// Windows an export path mixed separators
 /// (`C:\Users\...\Local\Temp/ssv1_base_x.json`) and a backslash split kept the
 /// `Temp/` in front of the name. That moved the export into a subdirectory of
 /// the publish directory which nothing ever creates, so every base publish on

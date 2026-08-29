@@ -113,6 +113,33 @@ class _OverviewBody extends ConsumerWidget {
           _TopSitesSection(sites: stats.topSites),
           const SizedBox(height: 16),
           _DistributionsSection(stats: stats, fmt: fmt),
+          // Explains why the statistics dive count and the logbook dive count
+          // differ, so the discrepancy never has to be discovered (#526).
+          ref
+              .watch(excludedDiveCountProvider)
+              .maybeWhen(
+                data: (count) => count == 0
+                    ? const SizedBox.shrink()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Center(
+                          child: Text(
+                            key: const Key('statistics-excluded-footnote'),
+                            context.l10n.statistics_excludedDivesFootnote(
+                              count,
+                            ),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                          ),
+                        ),
+                      ),
+                orElse: () => const SizedBox.shrink(),
+              ),
         ],
       ),
     );

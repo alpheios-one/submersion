@@ -85,4 +85,40 @@ void main() {
   test('returns null for a null context', () {
     expect(shareAnchorFrom(null), isNull);
   });
+
+  testWidgets('resolves a button addressed by GlobalKey, not its page', (
+    tester,
+  ) async {
+    // The other way to name a share button, used by the dive detail page's
+    // two overflow menus: their onSelected bodies are large switch statements
+    // that a Builder wrapper would have re-indented wholesale, and the state
+    // class already addresses widgets by key.
+    final key = GlobalKey();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            actions: [
+              PopupMenuButton<String>(
+                key: key,
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'export', child: Text('Export')),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final rect = shareAnchorFrom(key.currentContext);
+    expect(rect, tester.getRect(find.byKey(key)));
+
+    // And it really is the button rather than the app bar or the page behind
+    // it, which is the whole point of naming a control.
+    final pageWidth =
+        tester.view.physicalSize.width / tester.view.devicePixelRatio;
+    expect(rect!.width, lessThan(pageWidth));
+  });
 }

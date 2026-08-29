@@ -53,6 +53,7 @@ import 'package:submersion/features/auto_update/domain/entities/update_status.da
 import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_mode_provider.dart';
 import 'package:submersion/features/settings/presentation/pages/debug_log_viewer_page.dart';
+import 'package:submersion/features/settings/presentation/widgets/gtr_reserve_dialog.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1235,6 +1236,17 @@ class _DecompressionSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildSourceDropdownTile(
                   context,
+                  title: context.l10n.settings_decompression_gtrSource,
+                  value: settings.defaultGtrSource,
+                  onChanged: (source) => ref
+                      .read(settingsProvider.notifier)
+                      .setDefaultGtrSource(source),
+                ),
+                const Divider(height: 1),
+                _buildGtrReserveTile(context, ref, settings),
+                const Divider(height: 1),
+                _buildSourceDropdownTile(
+                  context,
                   title: context.l10n.settings_decompression_cnsSource,
                   value: settings.defaultCnsSource,
                   onChanged: (source) => ref
@@ -1360,6 +1372,42 @@ class _DecompressionSectionContent extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Reserve pressure the calculated GTR counts down to, shown and edited in
+  /// the diver's pressure unit, stored in bar.
+  Widget _buildGtrReserveTile(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) {
+    final units = UnitFormatter(settings);
+    return ListTile(
+      dense: true,
+      title: Text(context.l10n.settings_decompression_gtrReserve),
+      subtitle: Text(context.l10n.settings_decompression_gtrReserve_subtitle),
+      trailing: Text(units.formatPressure(settings.gtrReservePressure)),
+      onTap: () => _showGtrReserveDialog(context, ref, settings),
+    );
+  }
+
+  Future<void> _showGtrReserveDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) async {
+    final units = UnitFormatter(settings);
+    final entered = await showDialog<double>(
+      context: context,
+      builder: (_) => GtrReserveDialog(
+        initialValue: units.convertPressure(settings.gtrReservePressure),
+        unitSymbol: units.pressureSymbol,
+      ),
+    );
+    if (entered == null || !entered.isFinite || entered <= 0) return;
+    await ref
+        .read(settingsProvider.notifier)
+        .setGtrReservePressure(units.pressureToBar(entered));
   }
 
   String _cnsMethodLabel(BuildContext context, CnsCalculationMethod method) {
@@ -2606,6 +2654,20 @@ class _DataSectionContent extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Card(
+            child: SwitchListTile(
+              secondary: const Icon(Icons.compress),
+              title: Text(context.l10n.settings_tankPressureAtSurfacing_title),
+              subtitle: Text(
+                context.l10n.settings_tankPressureAtSurfacing_subtitle,
+              ),
+              value: ref.watch(settingsProvider).trimTankPressureAtSurfacing,
+              onChanged: (value) => ref
+                  .read(settingsProvider.notifier)
+                  .setTrimTankPressureAtSurfacing(value),
             ),
           ),
           const SizedBox(height: 16),

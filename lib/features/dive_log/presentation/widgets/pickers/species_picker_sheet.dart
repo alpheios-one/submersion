@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/domain/entities/species_lookup.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
+import 'package:submersion/features/marine_life/presentation/widgets/species_lookup_sheet.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Species picker bottom sheet with search
@@ -307,14 +310,36 @@ class _SpeciesPickerSheetState extends ConsumerState<SpeciesPickerSheet> {
     );
   }
 
-  void _addCustomSpecies(String name) async {
+  /// The empty state's "add" path: look the name up first so a custom
+  /// species gets its scientific name, category and class; "Create without
+  /// lookup" (or a dismissed sheet) keeps the old name-only creation, so an
+  /// offline diver loses nothing.
+  Future<void> _addCustomSpecies(String name) async {
+    final result = await showSpeciesLookupSheet(context, initialQuery: name);
+    if (!mounted) return;
     final repository = ref.read(speciesRepositoryProvider);
-    final species = await repository.getOrCreateSpecies(
-      commonName: name,
-      category: SpeciesCategory.other,
+    final species = result == null
+        ? await repository.getOrCreateSpecies(
+            commonName: name,
+            category: SpeciesCategory.other,
+          )
+        : await _speciesFromLookup(repository, result);
+    if (mounted) _showSightingDetails(species);
+  }
+
+  Future<Species> _speciesFromLookup(
+    SpeciesRepository repository,
+    SpeciesLookupResult result,
+  ) async {
+    final existing = await repository.findSpeciesByScientificName(
+      result.scientificName,
     );
-    if (mounted) {
-      _showSightingDetails(species);
-    }
+    if (existing != null) return existing;
+    return repository.createSpecies(
+      commonName: result.commonName,
+      scientificName: result.scientificName,
+      category: result.category,
+      taxonomyClass: result.taxonomyClass,
+    );
   }
 }

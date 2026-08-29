@@ -92,6 +92,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setDefaultShowGtr(bool value) async =>
+      state = state.copyWith(defaultShowGtr: value);
+
+  @override
+  Future<void> setDefaultGtrSource(MetricDataSource value) async =>
+      state = state.copyWith(defaultGtrSource: value);
+
+  @override
+  Future<void> setGtrReservePressure(double value) async =>
+      state = state.copyWith(gtrReservePressure: value);
   @override
   Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
       state = state.copyWith(defaultShowEstimatedTankPressure: value);
@@ -329,6 +341,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async =>
       state = state.copyWith(siteMatchSensitivity: value);
+  @override
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async =>
+      state = state.copyWith(trimTankPressureAtSurfacing: value);
   @override
   Future<void> setCardColorGradientPreset(String preset) async =>
       state = state.copyWith(cardColorGradientPreset: preset);
@@ -1772,6 +1787,60 @@ void main() {
         ),
         findsOneWidget,
       );
+    });
+  });
+
+  group('Decompression GTR settings', () {
+    Widget buildDecompressionWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings?selected=decompression',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    testWidgets('shows the GTR source and reserve pressure tiles', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(500, 6000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('GTR Source'), findsOneWidget);
+      expect(find.text('GTR reserve pressure'), findsOneWidget);
+      expect(find.text('50 bar'), findsOneWidget);
+    });
+
+    testWidgets('saving a new reserve updates the tile', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(500, 6000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildDecompressionWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('GTR reserve pressure'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, '70');
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('70 bar'), findsOneWidget);
+      expect(find.text('50 bar'), findsNothing);
     });
   });
 }

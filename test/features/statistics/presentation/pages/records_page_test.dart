@@ -312,6 +312,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async =>
       state = state.copyWith(siteMatchSensitivity: value);
   @override
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async =>
+      state = state.copyWith(trimTankPressureAtSurfacing: value);
+  @override
   Future<void> setCardColorGradientPreset(String preset) async =>
       state = state.copyWith(cardColorGradientPreset: preset);
   @override
@@ -440,6 +443,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setDefaultShowGtr(bool value) async =>
+      state = state.copyWith(defaultShowGtr: value);
+
+  @override
+  Future<void> setDefaultGtrSource(MetricDataSource value) async =>
+      state = state.copyWith(defaultGtrSource: value);
+
+  @override
+  Future<void> setGtrReservePressure(double value) async =>
+      state = state.copyWith(gtrReservePressure: value);
   @override
   Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
       state = state.copyWith(defaultShowEstimatedTankPressure: value);

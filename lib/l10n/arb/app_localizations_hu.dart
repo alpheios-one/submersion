@@ -4897,6 +4897,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Tengeri elet';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó',
+      one: '1 fotó',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Jegyzetek';
 
   @override
@@ -5968,6 +5979,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -6633,6 +6647,45 @@ class AppLocalizationsHu extends AppLocalizations {
   String get siteMatchReview_empty => 'Nincs mit hozzárendelni.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Helyszín található a fotókban';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Helyszín a búvárkomputerből';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '$name hozzárendelése';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Közeli helyszín választása ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Helyszín hozzáadása: $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name hozzárendelve';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'fotóból';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'búvárkomputerből';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Helyszín hozzáadása ehhez a helyhez';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Helyszín létrehozása itt';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected kiválasztva · $review ellenőrzendő · $none nincs találat';
   }
@@ -6664,8 +6717,8 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives merülés összekapcsolva · $sites hely hozzáadva';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives merülés összekapcsolva · $sites hely hozzáadva · $located helyszín elhelyezve';
   }
 
   @override
@@ -7566,6 +7619,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Adat';
@@ -9163,46 +9219,91 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveType_builtin_altitude => 'Magaslati';
 
   @override
+  String get diveType_builtin_altitude_short => 'Magaslati';
+
+  @override
   String get diveType_builtin_boat => 'Hajóról';
+
+  @override
+  String get diveType_builtin_boat_short => 'Hajó';
 
   @override
   String get diveType_builtin_cave => 'Barlang';
 
   @override
+  String get diveType_builtin_cave_short => 'Barlang';
+
+  @override
   String get diveType_builtin_cavern => 'Barlangbejárat';
+
+  @override
+  String get diveType_builtin_cavern_short => 'Bejárat';
 
   @override
   String get diveType_builtin_deep => 'Mély';
 
   @override
+  String get diveType_builtin_deep_short => 'Mély';
+
+  @override
   String get diveType_builtin_drift => 'Sodrásos';
+
+  @override
+  String get diveType_builtin_drift_short => 'Sodrásos';
 
   @override
   String get diveType_builtin_freedive => 'Szabadtüdős';
 
   @override
+  String get diveType_builtin_freedive_short => 'Szabad';
+
+  @override
   String get diveType_builtin_ice => 'Jég';
+
+  @override
+  String get diveType_builtin_ice_short => 'Jég';
 
   @override
   String get diveType_builtin_liveaboard => 'Búvárhajós';
 
   @override
+  String get diveType_builtin_liveaboard_short => 'Szafari';
+
+  @override
   String get diveType_builtin_night => 'Éjszakai';
+
+  @override
+  String get diveType_builtin_night_short => 'Éjszakai';
 
   @override
   String get diveType_builtin_recreational => 'Szabadidős';
 
   @override
+  String get diveType_builtin_recreational_short => 'Rec';
+
+  @override
   String get diveType_builtin_shore => 'Partról';
+
+  @override
+  String get diveType_builtin_shore_short => 'Part';
 
   @override
   String get diveType_builtin_technical => 'Technikai';
 
   @override
+  String get diveType_builtin_technical_short => 'Tec';
+
+  @override
   String get diveType_builtin_training => 'Képzés';
 
   @override
+  String get diveType_builtin_training_short => 'Képzés';
+
+  @override
   String get diveType_builtin_wreck => 'Roncs';
+
+  @override
+  String get diveType_builtin_wreck_short => 'Roncs';
 
   @override
   String get diveTypes_addDialog_addButton => 'Hozzáadás';
@@ -9215,6 +9316,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveTypes_addDialog_nameValidation => 'Adj meg egy nevet';
+
+  @override
+  String get diveTypes_addDialog_shortNameHelper =>
+      'A merülés részletek fejlécében jelenik meg, ha kevés a hely';
+
+  @override
+  String get diveTypes_addDialog_shortNameHint => 'pl. K&M';
+
+  @override
+  String get diveTypes_addDialog_shortNameLabel => 'Rövid név (opcionális)';
 
   @override
   String get diveTypes_addDialog_title => 'Egyedi merülés típus hozzáadása';
@@ -9249,6 +9360,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveTypes_deleteTooltip => 'Merülés típus törlése';
 
   @override
+  String get diveTypes_editDialog_builtInNameHelper =>
+      'A beépített nevek nem módosíthatók';
+
+  @override
+  String get diveTypes_editDialog_saveButton => 'Mentés';
+
+  @override
+  String get diveTypes_editDialog_title => 'Merülési típus szerkesztése';
+
+  @override
+  String get diveTypes_showInHeaderLabel => 'Fejléc';
+
+  @override
+  String get diveTypes_showInHeaderTooltip =>
+      'Ezen típus jelvényének megjelenítése a merülés részleteinek fejlécében';
+
+  @override
+  String get diveTypes_showInListLabel => 'Lista';
+
+  @override
+  String get diveTypes_showInListTooltip =>
+      'Ezen típus jelvényének megjelenítése a merülési listában';
+
+  @override
   String diveTypes_snackbar_added(Object name) {
     return 'Merülés típus hozzáadva: $name';
   }
@@ -9271,6 +9406,16 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveTypes_snackbar_errorDeleting(Object error) {
     return 'Hiba a merülés típus törlésekor: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_errorUpdating(Object error) {
+    return 'Hiba a merülési típus frissítésekor: $error';
+  }
+
+  @override
+  String diveTypes_snackbar_updated(Object name) {
+    return '\"$name\" frissítve';
   }
 
   @override
@@ -10166,6 +10311,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_profileMetric_tts_short => 'TTS';
+
+  @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
 
   @override
   String get enum_scrType_cmf => 'Allando tomegaram';
@@ -12245,6 +12396,33 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_title => 'Gáz kalkulátorok';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Legnagyobb biztonságos mélység egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Leggazdagabb keverék a célmélységhez';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Egy tervezett merülés gázfogyasztása';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Tartalék két búvár felhozatalához';
+
+  @override
+  String get gasCalculators_desc_mnd =>
+      'Narkózis szerinti mélységhatár egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_blender => 'Töltési eljárás a célkeverékhez';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Válasszon egy számológépet a kezdéshez';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Vart fajok szerkesztese';
 
@@ -12491,6 +12669,172 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'Fajok keresese...';
+
+  @override
+  String get marineLife_lookup_button => 'Keresés online';
+
+  @override
+  String get marineLife_lookup_title => 'Faj keresése';
+
+  @override
+  String get marineLife_lookup_searchHint => 'Köznapi vagy tudományos név';
+
+  @override
+  String get marineLife_lookup_search => 'Keresés';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Létrehozás keresés nélkül';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Fajadatok és fotók az iNaturalisttól';
+
+  @override
+  String get marineLife_lookup_idle =>
+      'Írj be egy nevet, és koppints a Keresés gombra.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Nincs találat erre: \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline =>
+      'Úgy tűnik, nincs internetkapcsolat.';
+
+  @override
+  String get marineLife_lookup_errorTimeout =>
+      'A keresés túllépte az időkorlátot.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'Az iNaturalist hibát adott vissza. Próbáld újra később.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Váratlan válasz az iNaturalisttól.';
+
+  @override
+  String get marineLife_lookup_retry => 'Újra';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megfigyelés',
+      one: '1 megfigyelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: válassz egy fajt';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Javaslat a katalógusba';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Nem sikerült megnyitni a böngészőt';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Link másolása';
+
+  @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotók ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Az ezzel a fajjal címkézett fotók itt jelennek meg.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Fotók címkézése';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Fotók hozzáadása';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Fajfotó';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó hozzáadva',
+      one: '1 fotó hozzáadva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kihagyva',
+      one: '1 kihagyva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sikertelen',
+      one: '1 sikertelen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Fotók címkézése';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Nincs címkézetlen fotó azokon a merüléseken, ahol ezt a fajt naplóztad.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Használd a Fotók hozzáadása gombot képek importálásához a kameratekercsből.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Összes kijelölése';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó címkézése',
+      one: '1 fotó címkézése',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó címkézve',
+      one: '1 fotó címkézve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return '$number. merülés';
+  }
 
   @override
   String get marineLife_speciesPage_title => 'Fajok';
@@ -12842,6 +13186,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'GPS javaslat elvetese';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count merülés kaphat helyszínt a fotóiból';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Helyszínek áttekintése';
 
   @override
   String get media_gpsBanner_title => 'GPS adat talalhato a fotokban';
@@ -13735,6 +14087,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Merülőhely';
+
+  @override
+  String get media_library_filter_species => 'Faj';
 
   @override
   String get media_library_filter_trip => 'Utazás';
@@ -15067,6 +15422,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Ido a felszinig)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Hátralévő gázidő)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2 toxicitás)';
@@ -17481,11 +17839,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Atl/Max homersekletek';
+      'Min, átlag és max naptári hónap szerint, minden évre összevonva';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Vizhomerseklet honaponkent';
+      'Szezonális vízhőmérséklet';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17530,7 +17888,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Atlagos suly az ido fuggvenyeben';
+      'Összes ólom merülésenként';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Suly trend';
@@ -17613,7 +17971,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerult a fogyasztasi trend betoltese';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => 'Havi atlag 5 even at';
+  String get statistics_gas_sacTrend_subtitle =>
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gázfogyasztási trend';
@@ -17877,7 +18236,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Atlagos idotartam honaponkent';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_bottomTime_title => 'Fenekido trend';
@@ -17900,7 +18259,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Havi max melyseg 5 even at';
+      'Minden merülés a tartományban';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -20797,6 +21156,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveComputer_detail_lastDownload => 'Utolso letoltes';
 
   @override
+  String get diveComputer_detail_linkedGear => 'Felszerelés';
+
+  @override
   String get diveComputer_detail_notesTitle => 'Megjegyzesek';
 
   @override
@@ -22688,6 +23050,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Mennyire agresszíven rendelődnek a letöltött merülések a helyekhez';
 
   @override
+  String get settings_tankPressureAtSurfacing_title =>
+      'Palacknyomás felbukkanáskor';
+
+  @override
+  String get settings_tankPressureAtSurfacing_subtitle =>
+      'A végnyomás a felszínre érkezéskor legyen leolvasva, ne a rögzítés végén';
+
+  @override
   String get settings_siteMatch_strict => 'Szigorú';
 
   @override
@@ -23481,11 +23851,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objektum ellenőrizve: $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
+    return '$checked felhőobjektum ellenőrizve ($originals eredeti, $thumbs bélyegkép, $renditions tömörített változat): $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
   }
 
   @override
@@ -25734,6 +26107,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
+
+  @override
+  String get reef_species_addFromLookup => 'Keresés és hozzáadás a fajaidhoz';
 
   @override
   String reef_species_showAll(int count) {
@@ -30502,6 +30878,1225 @@ class AppLocalizationsHu extends AppLocalizations {
       'A legnagyobb élő hüllő, amely az Indo-csendes-óceán part menti és torkolati vizeiben él.';
 
   @override
+  String get species_northern_pike_name => 'csuka';
+
+  @override
+  String get species_northern_pike_desc =>
+      'Megnyúlt testű, kacsacsőrszerű orrú lesből támadó ragadozó, mozdulatlanul áll a parti hínár között.';
+
+  @override
+  String get species_muskellunge_name => 'Muskellunge csuka';
+
+  @override
+  String get species_muskellunge_desc =>
+      'A legnagyobb csukafaj, a tiszta északi tavak csíkos vagy pettyes óriása, ritkán látni, de felejthetetlen.';
+
+  @override
+  String get species_chain_pickerel_name => 'Láncos csuka';
+
+  @override
+  String get species_chain_pickerel_desc =>
+      'Karcsú csuka Észak-Amerika keleti, hínáros tavaiból, oldalán láncszerű mintázatáról kapta a nevét.';
+
+  @override
+  String get species_walleye_name => 'Walleye';
+
+  @override
+  String get species_walleye_desc =>
+      'Aranyzöld sügérrokon nagy, fényvisszaverő szemekkel, alkonyatkor vadászik sziklás és homokos tófenék fölött.';
+
+  @override
+  String get species_sauger_name => 'Sauger';
+
+  @override
+  String get species_sauger_desc =>
+      'A walleye kisebb, foltosabb rokona, zavaros folyókat és víztározókat kedvel.';
+
+  @override
+  String get species_yellow_perch_name => 'Sárga sügér';
+
+  @override
+  String get species_yellow_perch_desc =>
+      'Rajokban járó aranysárga sügér sötét függőleges csíkokkal, gyakori stégek és hínárosok körül Észak-Amerikában.';
+
+  @override
+  String get species_european_perch_name => 'csapósügér';
+
+  @override
+  String get species_european_perch_desc =>
+      'Csíkos, tüskés úszójú sügér vörös-narancs alsó úszókkal, szinte minden európai tóban és lassú folyóban megtalálható.';
+
+  @override
+  String get species_zander_name => 'Fogassüllő';
+
+  @override
+  String get species_zander_desc =>
+      'Nagy, sápadt ragadozó üveges szemekkel és agyarszerű fogakkal, sötétedés után járja a zavaros európai tavakat és folyókat.';
+
+  @override
+  String get species_ruffe_name => 'vágó durbincs';
+
+  @override
+  String get species_ruffe_desc =>
+      'Kis, márványozott mintájú vágó durbincs egybefüggő tüskés hátúszóval, gyakori az európai tavak puha fenekén.';
+
+  @override
+  String get species_largemouth_bass_name => 'pisztrángsügér';
+
+  @override
+  String get species_largemouth_bass_desc =>
+      'Zöld hátú sügér sötét oldalcsíkkal és hatalmas szájjal, fatörzsek és hínárszegélyek mellett les a meleg tavakban.';
+
+  @override
+  String get species_smallmouth_bass_name => 'Kisszájú sügér';
+
+  @override
+  String get species_smallmouth_bass_desc =>
+      'Bronzszínű sügér halvány függőleges csíkokkal, sziklás és kavicsos aljzat fölött áll tiszta, hűvös tavakban és folyókban.';
+
+  @override
+  String get species_rock_bass_name => 'Sziklasügér';
+
+  @override
+  String get species_rock_bass_desc =>
+      'Zömök, vörös szemű naphal sötét pontsorokkal, sziklatömbök között rejtőzik tiszta patakokban és tavakban.';
+
+  @override
+  String get species_bluegill_name => 'Kékkopoltyús naphal';
+
+  @override
+  String get species_bluegill_desc =>
+      'Korong alakú naphal kékesfekete kopoltyúfedő-lebennyel és narancssárga mellel, kolóniákban fészkel sekély homokos aljzaton.';
+
+  @override
+  String get species_pumpkinseed_name => 'naphal';
+
+  @override
+  String get species_pumpkinseed_desc =>
+      'Élénken pettyezett naphal vörös szegélyű kopoltyúlebennyel és hullámos kék pofacsíkokkal, gyakori a hínáros sekélyesekben.';
+
+  @override
+  String get species_black_crappie_name => 'Fekete crappie';
+
+  @override
+  String get species_black_crappie_desc =>
+      'Ezüstös, magas testű, fekete pettyes naphalféle, elmerült ágak és cölöpök körül rajzik.';
+
+  @override
+  String get species_white_crappie_name => 'Fehér crappie';
+
+  @override
+  String get species_white_crappie_desc =>
+      'Halványabb crappie gyenge függőleges sávokkal, zavaros víztározókat és lassú folyókat kedvel.';
+
+  @override
+  String get species_brown_trout_name => 'sebes pisztráng';
+
+  @override
+  String get species_brown_trout_desc =>
+      'Aranybarna pisztráng vörös és fekete pettyekkel, hűvös, tiszta folyók és tavak sodrában áll.';
+
+  @override
+  String get species_rainbow_trout_name => 'Szivárványos pisztráng';
+
+  @override
+  String get species_rainbow_trout_desc =>
+      'Ezüstös pisztráng rózsaszín oldalsávval és finom fekete pettyezéssel, telepített és vad populációi hideg vizekben világszerte.';
+
+  @override
+  String get species_brook_trout_name => 'pataki szaibling';
+
+  @override
+  String get species_brook_trout_desc =>
+      'Pataki szaibling féregszerű hátmintázattal, kék udvarú vörös pettyekkel és fehér szegélyű úszókkal, hideg forrásvidéki patakokban.';
+
+  @override
+  String get species_lake_trout_name => 'Tavi szaibling';
+
+  @override
+  String get species_lake_trout_desc =>
+      'Nagy, szürke, világos foltokkal borított szaibling villás farokkal, az északi tavak mély, hideg vizét járja.';
+
+  @override
+  String get species_arctic_char_name => 'Sarki szaibling';
+
+  @override
+  String get species_arctic_char_desc =>
+      'A legészakibb édesvízi hal, karcsú szaibling, amelynek hasa az őszi ívási időszakban narancsvörösre színeződik.';
+
+  @override
+  String get species_atlantic_salmon_name => 'Atlanti lazac';
+
+  @override
+  String get species_atlantic_salmon_desc =>
+      'Ezüstös, tengerjáró lazac fekete X alakú pettyekkel, vízeséseket ugrik át, amikor ívni visszatér szülőfolyójába.';
+
+  @override
+  String get species_chinook_salmon_name => 'Királylazac';
+
+  @override
+  String get species_chinook_salmon_desc =>
+      'A legnagyobb csendes-óceáni lazac, kékeszöld háttal és fekete ínnyel, ívni a nagy nyugati folyókba vándorol fel.';
+
+  @override
+  String get species_sockeye_salmon_name => 'Vörös lazac';
+
+  @override
+  String get species_sockeye_salmon_desc =>
+      'Íváskor élénkvörösre színeződő, zöld fejű lazac, ellepi a tavak táplálta folyók kavicságyait.';
+
+  @override
+  String get species_coho_salmon_name => 'Ezüstlazac';
+
+  @override
+  String get species_coho_salmon_desc =>
+      'Ezüstlazac fehér ínnyel és csak a farok felső felén lévő pettyekkel, kis parti patakokban ívik.';
+
+  @override
+  String get species_lake_whitefish_name => 'Tavi maréna';
+
+  @override
+  String get species_lake_whitefish_desc =>
+      'Ezüstös, kis szájú maréna mély, hideg tavakból, nagy rajokban táplálkozik a fenéken.';
+
+  @override
+  String get species_cisco_name => 'Cisco maréna';
+
+  @override
+  String get species_cisco_desc =>
+      'Karcsú, heringre emlékeztető maréna, az északi hideg tavak nyílt vizében rajzik, a tavi szaibling zsákmánya.';
+
+  @override
+  String get species_european_grayling_name => 'pénzes pér';
+
+  @override
+  String get species_european_grayling_desc =>
+      'Ezüstszürke folyami hal magas, vitorlaszerű, lila szegélyű hátúszóval, gyors, tiszta kavicsos szakaszokon áll.';
+
+  @override
+  String get species_common_carp_name => 'ponty';
+
+  @override
+  String get species_common_carp_desc =>
+      'Testes, bronzszínű ponty nagy pikkelyekkel és két bajuszszállal, meleg tavak és folyók puha fenekét túrja.';
+
+  @override
+  String get species_grass_carp_name => 'amur';
+
+  @override
+  String get species_grass_carp_desc =>
+      'Torpedó alakú ázsiai ponty, világszerte betelepítették a vízinövények legelésére, gyakran látható tiszta bányatavakban.';
+
+  @override
+  String get species_tench_name => 'compó';
+
+  @override
+  String get species_tench_desc =>
+      'Olajzöld hal apró pikkelyekkel, vörös szemekkel és lekerekített úszókkal, az állóvizek iszapjában és nádasában siklik.';
+
+  @override
+  String get species_common_bream_name => 'dévérkeszeg';
+
+  @override
+  String get species_common_bream_desc =>
+      'Magas testű, oldalról lapított bronzszínű hal, fejjel lefelé táplálkozik iszapos rajokban, gyakori az európai síkvidékeken.';
+
+  @override
+  String get species_roach_name => 'Bodorka';
+
+  @override
+  String get species_roach_desc =>
+      'Ezüstös, rajokban élő hal vörös úszókkal és vörös szivárványhártyával, sok európai tó és csatorna leggyakoribb hala.';
+
+  @override
+  String get species_rudd_name => 'vörösszárnyú keszeg';
+
+  @override
+  String get species_rudd_desc =>
+      'A bodorka aranyoldalú rokona élénkvörös úszókkal és felfelé álló szájjal, közvetlenül a felszín alatt táplálkozik.';
+
+  @override
+  String get species_chub_name => 'Fejes domolykó';
+
+  @override
+  String get species_chub_desc =>
+      'Zömök folyami hal széles fejjel, nagy, sötét szegélyű pikkelyekkel és nagy szájjal, a víz fölé hajló fák alatt áll.';
+
+  @override
+  String get species_barbel_name => 'márna';
+
+  @override
+  String get species_barbel_desc =>
+      'Áramvonalas fenéklakó hal négy bajuszszállal és alsó állású szájjal, a gyors európai folyók kavicsához simul.';
+
+  @override
+  String get species_european_eel_name => 'európai angolna';
+
+  @override
+  String get species_european_eel_desc =>
+      'Kígyószerű hal, amely évtizedeket tölt folyókban és tavakban, mielőtt egyetlen ívásra a Sargasso-tengerbe vándorol.';
+
+  @override
+  String get species_american_eel_name => 'Amerikai angolna';
+
+  @override
+  String get species_american_eel_desc =>
+      'Észak-amerikai angolna, nappal folyók és tavak kövei alatt rejtőzik, szaporodni a Sargasso-tengerbe tér vissza.';
+
+  @override
+  String get species_burbot_name => 'menyhal';
+
+  @override
+  String get species_burbot_desc =>
+      'Az egyetlen édesvízi tőkehalféle, márványozott, angolnaszerű hal egyetlen állbajuszszállal, nappal a hideg mélyvízben rejtőzik.';
+
+  @override
+  String get species_channel_catfish_name => 'Pettyes harcsa';
+
+  @override
+  String get species_channel_catfish_desc =>
+      'Szürke harcsa elszórt sötét foltokkal, villás farokkal és nyolc bajuszszállal, gyakori Észak-Amerika folyóiban és víztározóiban.';
+
+  @override
+  String get species_flathead_catfish_name => 'Laposfejű harcsa';
+
+  @override
+  String get species_flathead_catfish_desc =>
+      'Hatalmas, barnán márványozott harcsa lapított fejjel és előreálló alsó állkapoccsal, mély folyami gödrökben fekszik.';
+
+  @override
+  String get species_brown_bullhead_name => 'törpeharcsa';
+
+  @override
+  String get species_brown_bullhead_desc =>
+      'Kis, zömök törpeharcsa sötét bajuszszálakkal és egyenes farokkal, elviseli az iszapos, meleg, oxigénszegény tavakat.';
+
+  @override
+  String get species_wels_catfish_name => 'Harcsa';
+
+  @override
+  String get species_wels_catfish_desc =>
+      'Európa legnagyobb édesvízi hala, pikkely nélküli óriás széles, lapos fejjel és hosszú bajuszszálakkal, mély folyami gödrökben fekszik.';
+
+  @override
+  String get species_white_sturgeon_name => 'Fehér tok';
+
+  @override
+  String get species_white_sturgeon_desc =>
+      'Észak-Amerika legnagyobb édesvízi hala, páncélos szürke óriás cápaszerű farokkal, a nagy nyugati folyókat járja.';
+
+  @override
+  String get species_lake_sturgeon_name => 'Tavi tok';
+
+  @override
+  String get species_lake_sturgeon_desc =>
+      'Lassan növő páncélos tok a Nagy-tavakból és a Mississippi vízgyűjtőjéből, csöves szájával a fenéket szívja fel.';
+
+  @override
+  String get species_european_sturgeon_name => 'Közönséges tok';
+
+  @override
+  String get species_european_sturgeon_desc =>
+      'Kritikusan veszélyeztetett páncélos tok az atlanti folyókból, ma a Garonne-ba és az Elbába tenyésztik és telepítik vissza.';
+
+  @override
+  String get species_alligator_gar_name => 'Aligátor kajmánhal';
+
+  @override
+  String get species_alligator_gar_desc =>
+      'Őskori óriás széles, fogas orral és rombusz alakú páncélpikkelyekkel, a déli folyókban levegőért jön a felszínre.';
+
+  @override
+  String get species_longnose_gar_name => 'Hosszúorrú kajmánhal';
+
+  @override
+  String get species_longnose_gar_desc =>
+      'Karcsú páncélos hal tűszerű orral, mozdulatlanul lebeg közvetlenül a meleg folyók felszíne alatt.';
+
+  @override
+  String get species_bowfin_name => 'Iszaphal';
+
+  @override
+  String get species_bowfin_desc =>
+      'Élő kövület hosszú, hullámzó hátúszóval és csontos fejjel, ivadékait hínáros holtágakban őrzi.';
+
+  @override
+  String get species_american_paddlefish_name => 'Amerikai lapátorrú hal';
+
+  @override
+  String get species_american_paddlefish_desc =>
+      'Szűrögető óriás lapátszerű orral, amely testhosszának harmadát teszi ki, nyitott szájjal úszik a nagy folyókban.';
+
+  @override
+  String get species_sea_lamprey_name => 'Nagy tengeri ingola';
+
+  @override
+  String get species_sea_lamprey_desc =>
+      'Állkapocs nélküli, angolnaszerű élősködő fogakkal körülvett tapadószájjal, kavicsos patakokban ívik, miután a tengerben vagy tavakban táplálkozott.';
+
+  @override
+  String get species_freshwater_drum_name => 'Édesvízi dobhal';
+
+  @override
+  String get species_freshwater_drum_desc =>
+      'Ezüstös, púpos hátú hal, amely hallhatóan morog és garatfogaival kagylókat tör, gyakori nagy folyókban és tavakban.';
+
+  @override
+  String get species_white_sucker_name => 'Fehér szívóhal';
+
+  @override
+  String get species_white_sucker_desc =>
+      'Hengeres testű fenéklakó hal húsos, lefelé álló szájjal, tavasszal ívó tömegekben vonul fel a patakokba.';
+
+  @override
+  String get species_common_minnow_name => 'fürge cselle';
+
+  @override
+  String get species_common_minnow_desc =>
+      'Apró, csíkos, rajokban élő hal tiszta, hűvös patakokból és tavakból, a hímek tavasszal vörös és zöld színt öltenek.';
+
+  @override
+  String get species_three_spined_stickleback_name => 'tüskés pikó';
+
+  @override
+  String get species_three_spined_stickleback_desc =>
+      'Apró, páncélos hal három háttüskével, vörös torkú hímjei növényi rostokból építenek és őriznek fészket.';
+
+  @override
+  String get species_alewife_name => 'Alewife hering';
+
+  @override
+  String get species_alewife_desc =>
+      'Ezüstös hering, tavasszal a folyókba vonul fel, és ma hatalmas rajokban tölti meg a Nagy-tavakat.';
+
+  @override
+  String get species_nile_perch_name => 'Nílusi sügér';
+
+  @override
+  String get species_nile_perch_desc =>
+      'Hatalmas ezüstös ragadozó fekete szegélyű szemmel, a Viktória-tóba telepítették, ahol uralja a nyílt vizet.';
+
+  @override
+  String get species_nile_tilapia_name => 'Nílusi tilápia';
+
+  @override
+  String get species_nile_tilapia_desc =>
+      'Szürke bölcsőszájú hal függőleges farokcsíkokkal, ivadékait a szájában költi, világszerte tenyésztik és elvadult a meleg vizekben.';
+
+  @override
+  String get species_african_tigerfish_name => 'Afrikai tigrishal';
+
+  @override
+  String get species_african_tigerfish_desc =>
+      'Csíkos ezüstös ragadozó egymásba illeszkedő tőrszerű fogakkal, gyors afrikai folyókban, például a Zambéziben vadászik.';
+
+  @override
+  String get species_marbled_lungfish_name => 'Márványos tüdőshal';
+
+  @override
+  String get species_marbled_lungfish_desc =>
+      'Angolna alakú, levegőt lélegző hal fonalszerű úszókkal, a szárazságot iszapgubóba zárkózva vészeli át.';
+
+  @override
+  String get species_electric_catfish_name => 'Elektromos harcsa';
+
+  @override
+  String get species_electric_catfish_desc =>
+      'Kövér szürke harcsa a Nílusból és a Kongóból, több száz voltos áramütéssel bénítja meg zsákmányát.';
+
+  @override
+  String get species_zebra_mbuna_name => 'Zebra mbuna';
+
+  @override
+  String get species_zebra_mbuna_desc =>
+      'Kék csíkos sziklalakó bölcsőszájú hal a Malawi-tóból, sűrű, territoriális tömegekben legeli az algát a sziklákról.';
+
+  @override
+  String get species_malawi_butterfly_peacock_name => 'Pillangó pávacichlida';
+
+  @override
+  String get species_malawi_butterfly_peacock_desc =>
+      'Irizáló kék pávacichlida a Malawi-tó barlangjaiból, a hímek fehér szegélyű úszókkal pompáznak.';
+
+  @override
+  String get species_fuelleborn_cichlid_name => 'Fuelleborn-cichlida';
+
+  @override
+  String get species_fuelleborn_cichlid_desc =>
+      'Tompa orrú mbuna a Malawi-tóból húsos, előreálló orral, amellyel a hullámverés zónájában kaparja az algát.';
+
+  @override
+  String get species_princess_of_burundi_name => 'Burundi hercegnő';
+
+  @override
+  String get species_princess_of_burundi_desc =>
+      'Elegáns Tanganyika-tavi bölcsőszájú hal líra alakú úszókkal, nagycsaládokban él, amelyek megosztják a fészekgondozást.';
+
+  @override
+  String get species_frontosa_name => 'Frontosa';
+
+  @override
+  String get species_frontosa_desc =>
+      'Mélyvízi Tanganyika-tavi bölcsőszájú hal erős kékesfehér sávokkal és púpos homlokkal, lassan, csoportosan mozog a sziklák fölött.';
+
+  @override
+  String get species_tropheus_moorii_name => 'Moore-cichlida';
+
+  @override
+  String get species_tropheus_moorii_desc =>
+      'Zömök Tanganyika-tavi sziklalakó bölcsőszájú hal több tucat színváltozatban, mindegyik saját partszakaszára korlátozódik.';
+
+  @override
+  String get species_arapaima_name => 'arapaima (pirarucu)';
+
+  @override
+  String get species_arapaima_desc =>
+      'Az egyik legnagyobb édesvízi hal, páncélos amazonasi óriás vörös pettyes farokkal, levegőért emelkedik a felszínre.';
+
+  @override
+  String get species_silver_arowana_name => 'Ezüst arowana';
+
+  @override
+  String get species_silver_arowana_desc =>
+      'Szalagszerű ezüstös amazonasi hal két állbajuszszállal, kiugrik a vízből, hogy rovarokat kapjon el az ágakról.';
+
+  @override
+  String get species_red_bellied_piranha_name => 'Vöröshasú piranha';
+
+  @override
+  String get species_red_bellied_piranha_desc =>
+      'Magas testű ezüstös hal karmazsinvörös hassal és borotvaéles fogakkal, rajokban vonul az Amazonas holtágain.';
+
+  @override
+  String get species_black_piranha_name => 'Fekete piranha';
+
+  @override
+  String get species_black_piranha_desc =>
+      'Nagy, magányos piranha vörös szemekkel és sötét, rombusz alakú testtel, tiszta, sziklás amazonasi mellékfolyókban les.';
+
+  @override
+  String get species_red_bellied_pacu_name => 'Vöröshasú pacu';
+
+  @override
+  String get species_red_bellied_pacu_desc =>
+      'Piranhára emlékeztető gyümölcsevő lapos, zúzó fogakkal és vörös hassal, elárasztott erdők fái alatt gyülekezik.';
+
+  @override
+  String get species_tambaqui_name => 'Tambaqui';
+
+  @override
+  String get species_tambaqui_desc =>
+      'Hatalmas, sötét pacu az Amazonasból, az elárasztott erdő lombkoronája alatt lehullott dióféléket és magvakat ropogtat.';
+
+  @override
+  String get species_electric_eel_name => 'Elektromos angolna';
+
+  @override
+  String get species_electric_eel_desc =>
+      'Nem angolna, hanem késhal, hosszú, sötét, levegőt lélegző hal, amely akár 600 voltos ütéssel bénítja meg zsákmányát.';
+
+  @override
+  String get species_redtail_catfish_name => 'Vörösfarkú harcsa';
+
+  @override
+  String get species_redtail_catfish_desc =>
+      'Nagy amazonasi harcsa sötét háttal, fehér hassal és élénk narancsvörös farokkal, mély folyami medencékben pihen.';
+
+  @override
+  String get species_tiger_shovelnose_catfish_name => 'Tigrisharcsa';
+
+  @override
+  String get species_tiger_shovelnose_catfish_desc =>
+      'Karcsú, csíkos harcsa hosszú, lapított orral, éjjel vadászik a dél-amerikai folyók homokos medrei mentén.';
+
+  @override
+  String get species_peacock_bass_name => 'Pávasügér';
+
+  @override
+  String get species_peacock_bass_desc =>
+      'Agresszív amazonasi bölcsőszájú hal három sötét sávval és farokfoltjával, elsüllyedt fák mentén les halakra.';
+
+  @override
+  String get species_oscar_name => 'Oszkár';
+
+  @override
+  String get species_oscar_desc =>
+      'Zömök, sötét bölcsőszájú hal narancssárga márványozással és farokfolttal, lassú amazonasi vizeket és elárasztott partokat jár be.';
+
+  @override
+  String get species_freshwater_angelfish_name => 'Vitorláshal';
+
+  @override
+  String get species_freshwater_angelfish_desc =>
+      'Magas, korong alakú amazonasi bölcsőszájú hal hosszú úszókkal és függőleges csíkokkal, elmerült gyökerek között lebeg.';
+
+  @override
+  String get species_discus_name => 'Diszkoszhal';
+
+  @override
+  String get species_discus_desc =>
+      'Kerek, oldalról lapított bölcsőszájú hal hullámos kék vonalakkal, ivadékait saját bőrének nyálkájával táplálja.';
+
+  @override
+  String get species_sailfin_pleco_name => 'Vitorlás algaevő harcsa';
+
+  @override
+  String get species_sailfin_pleco_desc =>
+      'Páncélos, tapadószájú harcsa magas hátúszóval és leopárdfoltokkal, fáról és szikláról kaparja le az algát.';
+
+  @override
+  String get species_cardinal_tetra_name => 'Kardinálishal';
+
+  @override
+  String get species_cardinal_tetra_desc =>
+      'Apró pontylazac neonkék csíkkal egy teljes hosszúságú vörös sáv fölött, a Rio Negro sötét vizében rajzik.';
+
+  @override
+  String get species_mexican_tetra_name => 'Vak barlangi hal';
+
+  @override
+  String get species_mexican_tetra_desc =>
+      'Ezüstös pontylazac a mexikói folyókból, barlangi populációi vakok és sápadtak, a cenote-búvárok kedvence.';
+
+  @override
+  String get species_mekong_giant_catfish_name => 'Mekongi óriásharcsa';
+
+  @override
+  String get species_mekong_giant_catfish_desc =>
+      'Kritikusan veszélyeztetett, fogatlan óriás a Mekongból, szürke és bajuszszál nélküli, egykor három méteresre nőtt.';
+
+  @override
+  String get species_giant_barb_name => 'Óriásmárna';
+
+  @override
+  String get species_giant_barb_desc =>
+      'A világ legnagyobb pontyféléje, nagy pikkelyű mekongi óriás hatalmas fejjel, ma már ritka a mély folyami medencékben.';
+
+  @override
+  String get species_asian_arowana_name => 'Ázsiai csontnyelvű hal';
+
+  @override
+  String get species_asian_arowana_desc =>
+      'Fémes vörös vagy arany sárkányhal Délkelet-Ázsia feketevizű folyóiból, közvetlenül a felszín alatt siklik.';
+
+  @override
+  String get species_striped_snakehead_name => 'Csíkos kígyófejű hal';
+
+  @override
+  String get species_striped_snakehead_desc =>
+      'Torpedó alakú, levegőt lélegző ragadozó lapos, kígyószerű fejjel, ivadékait hínáros ázsiai tavakban őrzi.';
+
+  @override
+  String get species_giant_snakehead_name => 'Óriás kígyófejű hal';
+
+  @override
+  String get species_giant_snakehead_desc =>
+      'Nagy, harcias kígyófejű hal, fiatalon csíkos, felnőttként sötét, élénkvörös ivadékait délkelet-ázsiai tavakban védi.';
+
+  @override
+  String get species_climbing_perch_name => 'Kúszó sügér';
+
+  @override
+  String get species_climbing_perch_desc =>
+      'Szívós olajzöld hal, levegőt lélegzik és tüskés kopoltyúfedőin kúszik a szárazföldön a kiszáradó tócsák között.';
+
+  @override
+  String get species_golden_mahseer_name => 'Márna';
+
+  @override
+  String get species_golden_mahseer_desc =>
+      'Aranypikkelyű pontyféle a Himalája folyóiból, erős úszó, a zúgók alatti gyors, tiszta medencékben áll.';
+
+  @override
+  String get species_koi_name => 'Koi';
+
+  @override
+  String get species_koi_desc =>
+      'Japánban fehér, vörös, fekete és arany mintázatúra nemesített díszponty, tavakban és meleg, tiszta tavakban érzi otthon magát.';
+
+  @override
+  String get species_goldfish_name => 'Aranyhal';
+
+  @override
+  String get species_goldfish_desc =>
+      'Háziasított ázsiai pontyféle, a vadonban olívabronz színűvé válik, meleg tavakban nagy elvadult rajokat alkot.';
+
+  @override
+  String get species_giant_gourami_name => 'Óriásgurámi';
+
+  @override
+  String get species_giant_gourami_desc =>
+      'Széles, púpos délkelet-ázsiai hal fonalszerű hasúszókkal, lassú, hínáros vízben habfészket épít.';
+
+  @override
+  String get species_clown_knifefish_name => 'Bohóc késhal';
+
+  @override
+  String get species_clown_knifefish_desc =>
+      'Ezüstös, pengeszerű hal szemfoltokkal a hosszú, hullámzó farokalatti úszó mentén, ázsiai folyók fatörzsei alatt lebeg.';
+
+  @override
+  String get species_walking_catfish_name => 'Vándorló harcsa';
+
+  @override
+  String get species_walking_catfish_desc =>
+      'Karcsú, levegőt lélegző harcsa, nedves talajon tekereg a tavak között, ma Floridában elvadult.';
+
+  @override
+  String get species_japanese_eel_name => 'Japán angolna';
+
+  @override
+  String get species_japanese_eel_desc =>
+      'Kelet-ázsiai angolna, folyókban és tavakban nő fel, ívni a Csendes-óceán nyugati részére vándorol.';
+
+  @override
+  String get species_ayu_name => 'Ayu';
+
+  @override
+  String get species_ayu_desc =>
+      'Karcsú, ezüstös japán hal, tiszta folyók kövein legeli az algát és táplálkozóterületet véd.';
+
+  @override
+  String get species_baikal_omul_name => 'Bajkáli omul';
+
+  @override
+  String get species_baikal_omul_desc =>
+      'Ezüstös maréna, amely csak a Bajkál-tóban él, a hideg nyílt vízben rajzik és ívni a folyókba vonul fel.';
+
+  @override
+  String get species_baikal_oilfish_name => 'Golomjanka';
+
+  @override
+  String get species_baikal_oilfish_desc =>
+      'Áttetsző, pikkely nélküli hal a Bajkál-tó mélyéből, olyan olajdús, hogy szinte átlátszó, és elevenszülő.';
+
+  @override
+  String get species_murray_cod_name => 'Murray-tőkehal';
+
+  @override
+  String get species_murray_cod_desc =>
+      'Ausztrália legnagyobb édesvízi hala, zöldesen márványozott óriás fehér hassal, a Murray-Darling fatörzsei mellett áll.';
+
+  @override
+  String get species_golden_perch_name => 'Aranysügér';
+
+  @override
+  String get species_golden_perch_desc =>
+      'Magas testű, aranyzöld sügér Ausztrália belső folyóiból, kidőlt fák és sziklapárkányok mellett rejtőzik.';
+
+  @override
+  String get species_australian_bass_name => 'Ausztrál sügér';
+
+  @override
+  String get species_australian_bass_desc =>
+      'Bronzzöld sügér Kelet-Ausztrália parti folyóiból, ívni lefelé vándorol a brakkvizű torkolatokba.';
+
+  @override
+  String get species_barramundi_name => 'Barramundi';
+
+  @override
+  String get species_barramundi_desc =>
+      'Ezüstös, púpos hátú sügér Észak-Ausztrália folyóiból és torkolataiból, korával hímből nősténnyé alakul.';
+
+  @override
+  String get species_silver_perch_name => 'Ezüstsügér';
+
+  @override
+  String get species_silver_perch_desc =>
+      'Ezüstszürke hal a Murray-Darlingból kis szájjal és villás farokkal, egykor hatalmas rajokban járt.';
+
+  @override
+  String get species_gulf_saratoga_name => 'Északi saratoga';
+
+  @override
+  String get species_gulf_saratoga_desc =>
+      'Bronzszínű ausztrál arowana vörös pettyes pikkelyekkel, ikráit a szájában költi az északi billabongokban.';
+
+  @override
+  String get species_sooty_grunter_name => 'Fekete morgóhal';
+
+  @override
+  String get species_sooty_grunter_desc =>
+      'Sötét, zömök hal Észak-Ausztrália folyóiból, sziklák és zúgók körül algát és gyümölcsöt legel.';
+
+  @override
+  String get species_eel_tailed_catfish_name => 'Angolnafarkú harcsa';
+
+  @override
+  String get species_eel_tailed_catfish_desc =>
+      'Ausztrál harcsa elkeskenyedő, angolnaszerű farokkal, tiszta folyói sekélyesekben kavicsfészket épít és őriz.';
+
+  @override
+  String get species_spangled_perch_name => 'Flitteres sügér';
+
+  @override
+  String get species_spangled_perch_desc =>
+      'Kis, ezüstpettyes hal Ausztrália egész belső részén, minden víznyelőt benépesít, amelyet egy árvíz összeköt.';
+
+  @override
+  String get species_eastern_rainbowfish_name => 'Keleti szivárványhal';
+
+  @override
+  String get species_eastern_rainbowfish_desc =>
+      'Kis, irizáló hal Kelet-Ausztrália patakjaiból, a hímek a napfényben vörös és kék csíkokat villantanak.';
+
+  @override
+  String get species_signal_crayfish_name => 'jelzőrák';
+
+  @override
+  String get species_signal_crayfish_desc =>
+      'Nagy, barna folyami rák fehér folttal az olló ízületénél, invazív észak-amerikai faj, amely Európa folyóiban terjed.';
+
+  @override
+  String get species_red_swamp_crayfish_name => 'kaliforniai vörösrák';
+
+  @override
+  String get species_red_swamp_crayfish_desc =>
+      'Sötétvörös folyami rák dudoros ollókkal Louisiana mocsaraiból, ma minden kontinens meleg vizes élőhelyeibe ássa be magát.';
+
+  @override
+  String get species_noble_crayfish_name => 'folyami rák';
+
+  @override
+  String get species_noble_crayfish_desc =>
+      'Európa őshonos folyami rákja, sötétbarna, alul vörös ollókkal, tiszta, hűvös patakok és tavak parti üregeiben rejtőzik.';
+
+  @override
+  String get species_white_clawed_crayfish_name => 'Fehérkarmú rák';
+
+  @override
+  String get species_white_clawed_crayfish_desc =>
+      'Kis, olajzöld folyami rák halvány ollóaljjal, Nyugat-Európa tiszta mészkőpatakjainak veszélyeztetett őshonos faja.';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_name =>
+      'Tasmán óriásrák';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_desc =>
+      'A világ legnagyobb édesvízi gerinctelenje, lassan növő kékesbarna folyami rák Tasmania árnyékos folyóiból.';
+
+  @override
+  String get species_zebra_mussel_name => 'vándorkagyló';
+
+  @override
+  String get species_zebra_mussel_desc =>
+      'Hüvelykujjköröm méretű, csíkos kagyló, ezrével borítja be a sziklákat, roncsokat és csöveket, terjedése közben kitisztítja a vizet.';
+
+  @override
+  String get species_quagga_mussel_name => 'bugi vándorkagyló';
+
+  @override
+  String get species_quagga_mussel_desc =>
+      'A vándorkagyló kerekebb, halványabb rokona, puha aljzatot és mély, hideg vizet népesít be, ahová a vándorkagyló nem jut el.';
+
+  @override
+  String get species_freshwater_pearl_mussel_name => 'Folyami gyöngykagyló';
+
+  @override
+  String get species_freshwater_pearl_mussel_desc =>
+      'Sötét, megnyúlt kagyló, amely több mint egy évszázadig élhet félig beásva a gyors lazacos folyók tiszta kavicsába.';
+
+  @override
+  String get species_swan_mussel_name => 'tavikagyló';
+
+  @override
+  String get species_swan_mussel_desc =>
+      'Nagy, vékony héjú kagyló iszapos tavakból és csatornákból, szifóival közvetlenül az iszap fölött szűri a vizet.';
+
+  @override
+  String get species_chinese_pond_mussel_name => 'Amuri kagyló';
+
+  @override
+  String get species_chinese_pond_mussel_desc =>
+      'Nagyon nagy, invazív ázsiai kagyló fényes barna héjjal, tenyésztett halakkal érkezett és meleg tavakban terjed.';
+
+  @override
+  String get species_freshwater_sponge_name => 'Édesvízi szivacs';
+
+  @override
+  String get species_freshwater_sponge_desc =>
+      'Zöld vagy szürke, elágazó szivacs, tiszta tavakban ágakat és köveket von be, színét a benne élő algák adják.';
+
+  @override
+  String get species_freshwater_jellyfish_name => 'Édesvízi medúza';
+
+  @override
+  String get species_freshwater_jellyfish_desc =>
+      'Érme méretű, átlátszó medúza, nyár végén rajokban jelenik meg meleg bányatavakban és víztározókban.';
+
+  @override
+  String get species_great_pond_snail_name => 'nagy mocsáricsiga';
+
+  @override
+  String get species_great_pond_snail_desc =>
+      'Nagy, hegyes házú csiga, az európai állóvizek növényein siklik és a felszínen levegőt lélegzik.';
+
+  @override
+  String get species_great_ramshorn_snail_name => 'nagy tányércsiga';
+
+  @override
+  String get species_great_ramshorn_snail_desc =>
+      'Lapos, kosszarvra emlékeztető tekercses csiga, hínáros tavak levelein és kövein legeli az algát.';
+
+  @override
+  String get species_channeled_apple_snail_name => 'Almacsiga';
+
+  @override
+  String get species_channeled_apple_snail_desc =>
+      'Nagy, aranybarna csiga, élénk rózsaszín petecsomóit a vízvonal fölé rakja, invazív a meleg vizes élőhelyeken és rizsföldeken.';
+
+  @override
+  String get species_magnificent_bryozoan_name => 'óriási mohaállat';
+
+  @override
+  String get species_magnificent_bryozoan_desc =>
+      'Focilabda méretű, kocsonyás telep, apró állatokkal telehintve, ágakon és köteleken tapad meleg, csendes vízben.';
+
+  @override
+  String get species_chinese_mitten_crab_name => 'Kínai gyapjasollós rák';
+
+  @override
+  String get species_chinese_mitten_crab_desc =>
+      'Üregásó rák szőrös ollókkal, éveket tölt folyókban, mielőtt a torkolatokba vándorol szaporodni.';
+
+  @override
+  String get species_giant_freshwater_prawn_name => 'Óriás édesvízi garnéla';
+
+  @override
+  String get species_giant_freshwater_prawn_desc =>
+      'Nagy, kék ollójú garnéla Ázsia és Ausztrália folyóiból, az idős hímek ollói hosszabbak a testüknél.';
+
+  @override
+  String get species_common_snapping_turtle_name => 'aligátorteknős';
+
+  @override
+  String get species_common_snapping_turtle_desc =>
+      'Nehéz, érdes páncélú teknős hosszú, fűrészes farokkal, kidugott fejjel fekszik tavak és lassú folyók iszapjában.';
+
+  @override
+  String get species_alligator_snapping_turtle_name => 'keselyűteknős';
+
+  @override
+  String get species_alligator_snapping_turtle_desc =>
+      'Őskori külsejű óriás három tarajos gerinccel és féregszerű nyelvcsalival, nyitott szájjal várakozik a déli folyók fenekén.';
+
+  @override
+  String get species_painted_turtle_name => 'díszes ékszerteknős';
+
+  @override
+  String get species_painted_turtle_desc =>
+      'Sima, sötét teknős vörös és sárga csíkokkal a nyakán és a páncél szegélyén, sorban napozik fatörzseken Észak-Amerika-szerte.';
+
+  @override
+  String get species_red_eared_slider_name => 'Vörösfülű ékszerteknős';
+
+  @override
+  String get species_red_eared_slider_desc =>
+      'Zöld csíkos mocsári teknős vörös sávval mindkét szeme mögött, a kedvtelésből tartott teknős, ma világszerte elvadult a meleg vizekben.';
+
+  @override
+  String get species_northern_map_turtle_name => 'térképes tarajosteknős';
+
+  @override
+  String get species_northern_map_turtle_desc =>
+      'Olajzöld teknős térképszerű sárga vonalakkal a páncélján és alacsony gerinccel, tiszta folyók és nagy tavak szikláin napozik.';
+
+  @override
+  String get species_spiny_softshell_turtle_name => 'tüskés lágyhéjúteknős';
+
+  @override
+  String get species_spiny_softshell_turtle_desc =>
+      'Lapos, bőrszerű, palacsintára emlékeztető teknős szipkaszerű orral, sekély folyók homokjába ásva, csak a feje látszik ki.';
+
+  @override
+  String get species_florida_softshell_turtle_name => 'floridai lágyhéjúteknős';
+
+  @override
+  String get species_florida_softshell_turtle_desc =>
+      'Nagy, sötét lágyhéjú teknős hosszú, csőszerű orral, gyakori Florida forrásaiban, csatornáiban és tavaiban.';
+
+  @override
+  String get species_pig_nosed_turtle_name => 'kétkarmú teknős';
+
+  @override
+  String get species_pig_nosed_turtle_desc =>
+      'Egyedülálló folyami teknős Új-Guineából és Észak-Ausztráliából tengeri teknősre emlékeztető uszonyokkal és húsos, disznószerű orral.';
+
+  @override
+  String get species_mary_river_turtle_name => 'Mary-folyói teknős';
+
+  @override
+  String get species_mary_river_turtle_desc =>
+      'Ritka ausztrál teknős, kloákáján át lélegzik és zöld algataréjt visel, egyetlen queenslandi folyóban él.';
+
+  @override
+  String get species_yellow_spotted_river_turtle_name => 'Terekay-folyamteknős';
+
+  @override
+  String get species_yellow_spotted_river_turtle_desc =>
+      'Amazonasi nyakfordító teknős sárga fejfoltokkal, csoportosan napozik nagy folyók fatörzsein és homokpadjain.';
+
+  @override
+  String get species_european_pond_turtle_name => 'mocsári teknős';
+
+  @override
+  String get species_european_pond_turtle_desc =>
+      'Sárga pöttyökkel hintett sötét teknős, Európa őshonos mocsári teknőse, napos partokról hínáros tavakba csusszan.';
+
+  @override
+  String get species_american_alligator_name => 'mississippi aligátor';
+
+  @override
+  String get species_american_alligator_desc =>
+      'Széles orrú páncélos hüllő az USA délkeleti mocsaraiból, forrásaiból és folyóiból, csak a szeme és az orrlyukai látszanak ki a vízből.';
+
+  @override
+  String get species_spectacled_caiman_name => 'pápaszemes kajmán';
+
+  @override
+  String get species_spectacled_caiman_desc =>
+      'Kis, olajzöld kajmán csontos taréjjal a szemei között, gyakori Közép- és Dél-Amerika lassú folyóiban és lagúnáiban.';
+
+  @override
+  String get species_black_caiman_name => 'fekete kajmán';
+
+  @override
+  String get species_black_caiman_desc =>
+      'Az Amazonas legnagyobb ragadozója, akár öt méteres fekete páncélos kajmán, éjjel vadászik tavakban és elárasztott erdőben.';
+
+  @override
+  String get species_freshwater_crocodile_name => 'Johnson-krokodil';
+
+  @override
+  String get species_freshwater_crocodile_desc =>
+      'Keskeny orrú ausztrál krokodil az északi folyókból és szurdokokból, félénk és jóval kisebb a bordás krokodilnál.';
+
+  @override
+  String get species_northern_water_snake_name => 'Északi vízisikló';
+
+  @override
+  String get species_northern_water_snake_desc =>
+      'Vaskos testű, sávos barna kígyó, Észak-Amerika keleti patakjai fölött sziklákon és ágakon napozik, ártalmatlan, de gyorsan harap.';
+
+  @override
+  String get species_green_anaconda_name => 'zöld anakonda';
+
+  @override
+  String get species_green_anaconda_desc =>
+      'A Föld legnehezebb kígyója, olajzöld óriás fekete foltokkal, az Amazonas mocsaraiban és lassú folyóiban fekszik a víz alatt.';
+
+  @override
+  String get species_hellbender_name => 'mocsári ördög';
+
+  @override
+  String get species_hellbender_desc =>
+      'Óriási, lapos fejű szalamandra ráncos bőrredőkkel, az Appalache-hegység hideg, tiszta folyóiban nagy kövek alatt rejtőzik.';
+
+  @override
+  String get species_mudpuppy_name => 'Iszapkutya';
+
+  @override
+  String get species_mudpuppy_desc =>
+      'Barna, foltos szalamandra, tollas vörös kopoltyúit egész életében megtartja, éjjel tó- és folyófenéken mászik.';
+
+  @override
+  String get species_axolotl_name => 'mexikói axolotl';
+
+  @override
+  String get species_axolotl_desc =>
+      'Mosolygós, kopoltyús szalamandra, sosem hagyja el a vizet, kritikusan veszélyeztetett Xochimilco csatornáiban Mexikóváros mellett.';
+
+  @override
+  String get species_chinese_giant_salamander_name => 'Kínai óriásszalamandra';
+
+  @override
+  String get species_chinese_giant_salamander_desc =>
+      'A legnagyobb élő kétéltű, ráncos, barna, közel két méteres óriás, hűvös, sziklás hegyi patakokban rejtőzik.';
+
+  @override
+  String get species_smooth_newt_name => 'Pettyes gőte';
+
+  @override
+  String get species_smooth_newt_desc =>
+      'Kis, olajzöld gőte, minden tavasszal visszatér a tavakba, a hímek hullámos tarajt és foltos narancssárga hasat növesztenek.';
+
+  @override
+  String get species_great_crested_newt_name => 'Közönséges tarajosgőte';
+
+  @override
+  String get species_great_crested_newt_desc =>
+      'Nagy, fekete, szemölcsös gőte tűznarancs hassal, a nászruhás hímek csipkézett, sárkányszerű tarajt viselnek.';
+
+  @override
+  String get species_american_bullfrog_name => 'ökörbéka';
+
+  @override
+  String get species_american_bullfrog_desc =>
+      'Hatalmas zöld béka mély, bőgő hanggal, meleg tavak tavirózsái között ül, ma több kontinensen invazív.';
+
+  @override
+  String get species_common_frog_name => 'Gyepi béka';
+
+  @override
+  String get species_common_frog_desc =>
+      'Barna béka sötét szemmaszkkal, tavasszal hangos tömegekben gyűlik össze petézni az európai tavakban és árkokban.';
+
+  @override
+  String get species_north_american_river_otter_name => 'kanadai vidra';
+
+  @override
+  String get species_north_american_river_otter_desc =>
+      'Karcsú, játékos vidra, Észak-Amerika folyóiban és tavaiban halakra és rákokra vadászik, a partokon sárcsúszdákat hagy.';
+
+  @override
+  String get species_eurasian_otter_name => 'európai vidra';
+
+  @override
+  String get species_eurasian_otter_desc =>
+      'Félénk, barna vidra Európa folyóiból, tavaiból és partjairól, évtizedes hanyatlás után egész elterjedési területén erősödik.';
+
+  @override
+  String get species_giant_otter_name => 'óriásvidra';
+
+  @override
+  String get species_giant_otter_desc =>
+      'Közel két méteres vidra krémszínű torokfolttal, zajos családi csoportokban él az Amazonas folyóin és morotvatavain.';
+
+  @override
+  String get species_north_american_beaver_name => 'kanadai hód';
+
+  @override
+  String get species_north_american_beaver_desc =>
+      'Nagy, lapos farkú rágcsáló, patakokat duzzaszt tavakká és a jég alatt úszik, ágakból épített várában húzza meg magát.';
+
+  @override
+  String get species_eurasian_beaver_name => 'eurázsiai hód';
+
+  @override
+  String get species_eurasian_beaver_desc =>
+      'Európa legnagyobb rágcsálója, a kontinens egészén visszatelepítették, parti fákat dönt ki, gátakat és várakat épít.';
+
+  @override
+  String get species_muskrat_name => 'Pézsmapocok';
+
+  @override
+  String get species_muskrat_desc =>
+      'Patkány méretű, barna rágcsáló pikkelyes, lapított farokkal, gyékényes mocsarakban úszik és kupolás nádvárakat épít.';
+
+  @override
+  String get species_platypus_name => 'kacsacsőrű emlős';
+
+  @override
+  String get species_platypus_desc =>
+      'Tojásrakó emlős kacsacsőrrel és úszóhártyás lábakkal, csukott szemmel keres táplálékot Kelet-Ausztrália patakjaiban hajnalban és alkonyatkor.';
+
+  @override
+  String get species_amazonian_manatee_name => 'dél-amerikai manátusz';
+
+  @override
+  String get species_amazonian_manatee_desc =>
+      'A legkisebb manátusz, sima, sötét növényevő fehér mellfolttal, az Amazonas tavaiban és folyóiban vízinövényeket legel.';
+
+  @override
+  String get species_amazon_river_dolphin_name => 'amazonasi folyamidelfin';
+
+  @override
+  String get species_amazon_river_dolphin_desc =>
+      'Rózsaszín, hosszú csőrű delfin hajlékony nyakkal, az Amazonas és az Orinoco elárasztott erdőinek fatörzsei között kanyarog.';
+
+  @override
+  String get species_baikal_seal_name => 'bajkáli fóka';
+
+  @override
+  String get species_baikal_seal_desc =>
+      'A világ egyetlen édesvízi fókája, kis, ezüstszürke fóka, a Bajkál-tó jegén és sziklás partjain pihen.';
+
+  @override
+  String get species_capybara_name => 'vízidisznó';
+
+  @override
+  String get species_capybara_desc =>
+      'A legnagyobb rágcsáló, hordó alakú növényevő, nyugodt csordákban gázol és úszik Dél-Amerika folyóiban és vizes élőhelyein.';
+
+  @override
+  String get species_hippopotamus_name => 'nílusi víziló';
+
+  @override
+  String get species_hippopotamus_desc =>
+      'Hatalmas afrikai folyami óriás, a napot csoportokban a víz alatt tölti, és inkább jár a fenéken, mint úszik; veszélyes megközelíteni.';
+
+  @override
+  String get species_white_water_lily_name => 'fehér tündérrózsa';
+
+  @override
+  String get species_white_water_lily_desc =>
+      'Úszó, kerek levelek és nagy fehér virágok, amelyek az európai állóvizek iszapjában gyökerező vastag rizómákból emelkednek ki.';
+
+  @override
+  String get species_yellow_pond_lily_name => 'sárga vízitök';
+
+  @override
+  String get species_yellow_pond_lily_desc =>
+      'Szív alakú úszólevelek és kehelyszerű sárga virágok, nagy, áttetsző víz alatti levelekkel, amelyeket a búvárok alulról látnak.';
+
+  @override
+  String get species_american_eelgrass_name => 'Amerikai vízicsavar';
+
+  @override
+  String get species_american_eelgrass_desc =>
+      'Szalagszerű, akár két méter hosszú levelek, tiszta folyók és források sodrában ringatóznak, a manátuszok kedvence.';
+
+  @override
+  String get species_coontail_name => 'érdes tócsagaz';
+
+  @override
+  String get species_coontail_desc =>
+      'Gyökértelen, alámerült növény merev, villás levelekből álló örvökkel, mint egy mosómedve farka, sűrű tömegekben sodródik az állóvízben.';
+
+  @override
+  String get species_eurasian_watermilfoil_name => 'füzéres süllőhínár';
+
+  @override
+  String get species_eurasian_watermilfoil_desc =>
+      'Tollszerű, alámerült növény finoman szeldelt levelekből álló örvökkel, a felszín közelében vastag szőnyeget alkot, sok tóban invazív.';
+
+  @override
+  String get species_muskgrass_name => 'Csillárka';
+
+  @override
+  String get species_muskgrass_desc =>
+      'Törékeny, pézsmaillatú zöldalga örvös ágakkal, gyakran mészkéreggel borítva, tiszta, kemény vizű tavak fenekét szőnyegezi be.';
+
+  @override
+  String get species_canadian_waterweed_name => 'kanadai átokhínár';
+
+  @override
+  String get species_canadian_waterweed_desc =>
+      'Sűrű, alámerült növény három kis sötétzöld levélből álló örvökkel, töredékekkel terjed hűvös tavakban és csatornákban világszerte.';
+
+  @override
+  String get species_curly_leaf_pondweed_name => 'Bodros békaszőlő';
+
+  @override
+  String get species_curly_leaf_pondweed_desc =>
+      'Alámerült növény hullámos szélű, vörösesnek tűnő zöld levelekkel, mint a fodros lasagne, kora tavasszal nő, más hínárok előtt.';
+
+  @override
+  String get species_water_hyacinth_name => 'közönséges vízijácint';
+
+  @override
+  String get species_water_hyacinth_desc =>
+      'Úszó növény fényes levelekkel levegővel telt szárakon és levendulaszínű virágfüzérekkel, világszerte elfojtja a meleg vízi utakat.';
+
+  @override
+  String get species_common_reed_name => 'Közönséges nád';
+
+  @override
+  String get species_common_reed_desc =>
+      'Magas, tollas bugájú fűféle, sűrű nádasokat alkot a tópartokon; víz alatti szárai ivadékoknak és szitakötőlárváknak adnak menedéket.';
+
+  @override
   String get common_action_done => 'Kész';
 
   @override
@@ -31344,6 +32939,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'TTS forrása';
+
+  @override
+  String get settings_decompression_gtrSource => 'GTR forrása';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR tartaléknyomás';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Az a palacknyomás, amelyig a hátralévő gázidő visszaszámol. A számított GTR 10 m/perc sebességű, megállás nélküli közvetlen felemelkedést feltételez.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
@@ -33263,6 +34868,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get backup_operation_restoreSourceMissing =>
+      'Nem történt visszaállítás: a biztonsági mentés fájlja nem található. A jelenlegi adatok változatlanok.';
+
+  @override
   String get backup_operation_deleting => 'Biztonsági mentés törlése...';
 
   @override
@@ -33449,6 +35058,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A lecserélt könyvtár feltöltése még folyamatban van. Próbálja újra rövidesen.';
 
   @override
+  String get settings_cloudSync_result_cloudLibraryNewerSchema =>
+      'A felhőkönyvtárat a Submersion egy újabb verziója tette közzé. Frissítse ezt az eszközt, majd próbálja újra.';
+
+  @override
   String settings_cloudSync_result_recordsFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -33516,6 +35129,25 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_info_title => 'Média infó';
+
+  @override
+  String get media_species_actionTooltip => 'Fajok';
+
+  @override
+  String get media_species_sheetTitle => 'Fajok ezen a fotón';
+
+  @override
+  String get media_species_sightedOnDive => 'Ezen a merülésen észlelve';
+
+  @override
+  String get media_species_otherSpecies => 'Más fajok...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Ez a fotó nincs merüléshez kapcsolva. Keress egy fajt a címkézéshez.';
+
+  @override
+  String get media_species_chipsLabel => 'Fajcímkék';
 
   @override
   String get media_info_fileSection => 'Fájl';
@@ -33835,6 +35467,118 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'A HealthKit nem érhető el ezen az eszközön';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Havi átlag';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Minden merülés';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Hogyan csoportosulnak a merülések';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Heti átlag';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Az árnyékolt sáv az egyes csoportok legalacsonyabb és legmagasabb értékét fogja át';
+
+  @override
+  String get statistics_trend_legend_rate => 'Általános trend';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Mozgóátlag';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/év';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Vízhőmérséklet alakulása';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Minden merülés a tartományban';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Nincs elérhető hőmérsékleti adat';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'A hőmérséklet alakulása nem tölthető be';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Elmúlt 5 év';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Elmúlt 10 év';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Legalacsonyabb';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Legmagasabb';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Tartsd meg ezt a merülést a naplóban, de hagyd ki minden statisztikából, beleértve a merülésszámot is.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Csak a SAC-, RMV- és gázkeverék-statisztikákból hagyd ki ezt a merülést. Hasznos, ha a gázérték nem reprezentatív.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Kizárva a statisztikákból';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Kizárva a gázstatisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'Csak a statisztikákból kizártak';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Kizárva';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés kizárva a statisztikákból',
+      one: '1 merülés kizárva a statisztikákból',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statisztikák';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gáz kizárva';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Minden statisztikában szerepel';
 
   @override
   String get suuntoCloud_signIn_title => 'Sign in to Suunto';

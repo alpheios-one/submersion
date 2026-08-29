@@ -278,6 +278,15 @@ class AppSettings {
   /// Default data source for CNS metric (computer or calculated)
   final MetricDataSource defaultCnsSource;
 
+  /// Default data source for GTR (gas time remaining): the computer's own
+  /// reading or the app's calculation.
+  final MetricDataSource defaultGtrSource;
+
+  /// Tank pressure (bar) the calculated GTR counts down to, i.e. what the
+  /// diver wants left on surfacing. Mirrors the reserve setting on an
+  /// air-integrated computer.
+  final double gtrReservePressure;
+
   /// Algorithm used for calculated CNS%; see
   /// docs/plans/2026-07-16-cns-calculation-method-setting-design.md
   final CnsCalculationMethod cnsCalculationMethod;
@@ -309,6 +318,10 @@ class AppSettings {
 
   /// How aggressively downloaded dives are auto-matched to sites.
   final SiteMatchSensitivity siteMatchSensitivity;
+
+  /// Whether an import reads cylinder end pressure at the moment of surfacing
+  /// rather than at the end of the recording (issue #1092).
+  final bool trimTankPressureAtSurfacing;
 
   /// Name of the selected gradient preset ('ocean', 'thermal', etc.)
   final String cardColorGradientPreset;
@@ -384,6 +397,9 @@ class AppSettings {
 
   /// Default visibility for TTS on dive profile
   final bool defaultShowTts;
+
+  /// Default visibility for GTR on dive profile
+  final bool defaultShowGtr;
 
   /// Default visibility for CNS% on dive profile
   final bool defaultShowCns;
@@ -534,6 +550,9 @@ class AppSettings {
     this.defaultDecoStopSource = MetricDataSource.calculated,
     this.defaultTtsSource = MetricDataSource.calculated,
     this.defaultCnsSource = MetricDataSource.calculated,
+    this.defaultGtrSource = MetricDataSource.calculated,
+    // Same default as the planner's reserve and defaultGtrReserveBar.
+    this.gtrReservePressure = 50.0,
     this.cnsCalculationMethod = CnsCalculationMethod.shearwater,
     // Appearance defaults
     this.cardColorAttribute = CardColorAttribute.none,
@@ -545,6 +564,7 @@ class AppSettings {
     this.diveCenterListViewMode = ListViewMode.detailed,
     this.mapStyle = MapStyle.openStreetMap,
     this.siteMatchSensitivity = SiteMatchSensitivity.balanced,
+    this.trimTankPressureAtSurfacing = true,
     this.cardColorGradientPreset = 'ocean',
     this.cardColorGradientStart,
     this.cardColorGradientEnd,
@@ -570,6 +590,7 @@ class AppSettings {
     this.defaultShowSurfaceGf = false,
     this.defaultShowMeanDepth = false,
     this.defaultShowTts = false,
+    this.defaultShowGtr = false,
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
@@ -697,6 +718,8 @@ class AppSettings {
     MetricDataSource? defaultDecoStopSource,
     MetricDataSource? defaultTtsSource,
     MetricDataSource? defaultCnsSource,
+    MetricDataSource? defaultGtrSource,
+    double? gtrReservePressure,
     CnsCalculationMethod? cnsCalculationMethod,
     CardColorAttribute? cardColorAttribute,
     ListViewMode? diveListViewMode,
@@ -707,6 +730,7 @@ class AppSettings {
     ListViewMode? diveCenterListViewMode,
     MapStyle? mapStyle,
     SiteMatchSensitivity? siteMatchSensitivity,
+    bool? trimTankPressureAtSurfacing,
     String? cardColorGradientPreset,
     int? cardColorGradientStart,
     int? cardColorGradientEnd,
@@ -732,6 +756,7 @@ class AppSettings {
     bool? defaultShowSurfaceGf,
     bool? defaultShowMeanDepth,
     bool? defaultShowTts,
+    bool? defaultShowGtr,
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
@@ -835,6 +860,8 @@ class AppSettings {
           defaultDecoStopSource ?? this.defaultDecoStopSource,
       defaultTtsSource: defaultTtsSource ?? this.defaultTtsSource,
       defaultCnsSource: defaultCnsSource ?? this.defaultCnsSource,
+      defaultGtrSource: defaultGtrSource ?? this.defaultGtrSource,
+      gtrReservePressure: gtrReservePressure ?? this.gtrReservePressure,
       cnsCalculationMethod: cnsCalculationMethod ?? this.cnsCalculationMethod,
       cardColorAttribute: cardColorAttribute ?? this.cardColorAttribute,
       diveListViewMode: diveListViewMode ?? this.diveListViewMode,
@@ -847,6 +874,8 @@ class AppSettings {
           diveCenterListViewMode ?? this.diveCenterListViewMode,
       mapStyle: mapStyle ?? this.mapStyle,
       siteMatchSensitivity: siteMatchSensitivity ?? this.siteMatchSensitivity,
+      trimTankPressureAtSurfacing:
+          trimTankPressureAtSurfacing ?? this.trimTankPressureAtSurfacing,
       cardColorGradientPreset:
           cardColorGradientPreset ?? this.cardColorGradientPreset,
       cardColorGradientStart: clearCardColorGradientStart
@@ -881,6 +910,7 @@ class AppSettings {
       defaultShowSurfaceGf: defaultShowSurfaceGf ?? this.defaultShowSurfaceGf,
       defaultShowMeanDepth: defaultShowMeanDepth ?? this.defaultShowMeanDepth,
       defaultShowTts: defaultShowTts ?? this.defaultShowTts,
+      defaultShowGtr: defaultShowGtr ?? this.defaultShowGtr,
       defaultShowCns: defaultShowCns ?? this.defaultShowCns,
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
@@ -1622,6 +1652,16 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultGtrSource(MetricDataSource value) async {
+    state = state.copyWith(defaultGtrSource: value);
+    await _saveSettings();
+  }
+
+  Future<void> setGtrReservePressure(double value) async {
+    state = state.copyWith(gtrReservePressure: value);
+    await _saveSettings();
+  }
+
   Future<void> setCnsCalculationMethod(CnsCalculationMethod value) async {
     state = state.copyWith(cnsCalculationMethod: value);
     await _saveSettings();
@@ -1671,6 +1711,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async {
     state = state.copyWith(siteMatchSensitivity: value);
+    await _saveSettings();
+  }
+
+  Future<void> setTrimTankPressureAtSurfacing(bool value) async {
+    state = state.copyWith(trimTankPressureAtSurfacing: value);
     await _saveSettings();
   }
 
@@ -1796,6 +1841,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultShowTts(bool value) async {
     state = state.copyWith(defaultShowTts: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowGtr(bool value) async {
+    state = state.copyWith(defaultShowGtr: value);
     await _saveSettings();
   }
 
@@ -2255,6 +2305,10 @@ final defaultShowMeanDepthProvider = Provider<bool>((ref) {
 
 final defaultShowTtsProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.defaultShowTts));
+});
+
+final defaultShowGtrProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultShowGtr));
 });
 
 final defaultShowCnsProvider = Provider<bool>((ref) {

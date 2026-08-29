@@ -28,6 +28,7 @@ import 'package:submersion/core/services/database_service.dart'
     show DatabaseService;
 import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/backup/data/services/backup_database_adapter.dart';
 import 'package:submersion/features/backup/data/services/backup_saf_port.dart';
 import 'package:submersion/features/backup/data/services/backup_target.dart';
@@ -109,6 +110,10 @@ class BackupService {
   /// `_activeBackupKey` fails closed when the flag is on but the store is null.
   final BackupEncryptionKeyStore? _backupEncryptionKeyStore;
 
+  /// Cleared after a restore so the next launch re-applies the bundled
+  /// species catalog to the restored rows.
+  final BuiltInSpeciesSeedVersionStore? _seedVersionStore;
+
   /// SAF write/read/delete seam for Android custom (`content://`) backup
   /// locations. Defaults to the real platform channel; injectable for tests.
   final BackupSafPort _safPort;
@@ -129,6 +134,7 @@ class BackupService {
     EncryptionKeyStore? encryptionKeyStore,
     SyncPreferences? syncPreferences,
     BackupEncryptionKeyStore? backupEncryptionKeyStore,
+    BuiltInSpeciesSeedVersionStore? seedVersionStore,
   }) : _dbAdapter = dbAdapter,
        _preferences = preferences,
        _cloudProvider = cloudProvider,
@@ -138,7 +144,8 @@ class BackupService {
        _safPort = safPort ?? const MethodChannelBackupSafPort(),
        _encryptionKeyStore = encryptionKeyStore,
        _syncPreferences = syncPreferences,
-       _backupEncryptionKeyStore = backupEncryptionKeyStore;
+       _backupEncryptionKeyStore = backupEncryptionKeyStore,
+       _seedVersionStore = seedVersionStore;
 
   // ===========================================================================
   // Backup
@@ -912,6 +919,20 @@ class BackupService {
       sourcePath,
       onMigrationProgress: onMigrationProgress,
     );
+
+    // The restored file carries whatever built-in species rows its backup
+    // had; forgetting the applied catalog version makes the next launch run
+    // the upgrade pass again (diver-edited rows keep their hlc and are
+    // skipped by it).
+    try {
+      await _seedVersionStore?.clear();
+    } catch (e, st) {
+      _log.warning(
+        'Could not clear the built-in species seed version after restore',
+        error: e,
+        stackTrace: st,
+      );
+    }
 
     try {
       await _syncRepository.rebaselineAfterRestore(
