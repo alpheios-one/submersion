@@ -35027,91 +35027,94 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_statisticsIncludedHint => 'נכללת בכל הסטטיסטיקות';
 
   @override
-  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+  String get suuntoCloud_signIn_title => 'התחברות ל-Suunto';
 
   @override
   String get suuntoCloud_signIn_description =>
-      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+      'התחבר עם חשבון app.suunto.com שלך כדי לייבא את הצלילות שלך ישירות. הסיסמה שלך לעולם אינה נשמרת, רק ההפעלה שנוצרת ממנה.';
 
   @override
-  String get suuntoCloud_signIn_emailLabel => 'Email';
+  String get suuntoCloud_signIn_emailLabel => 'דוא\"ל';
 
   @override
-  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+  String get suuntoCloud_signIn_emailRequired => 'נדרש דוא\"ל';
 
   @override
-  String get suuntoCloud_signIn_passwordLabel => 'Password';
+  String get suuntoCloud_signIn_passwordLabel => 'סיסמה';
 
   @override
-  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+  String get suuntoCloud_signIn_passwordRequired => 'נדרשת סיסמה';
 
   @override
-  String get suuntoCloud_signIn_button => 'Sign In';
+  String get suuntoCloud_signIn_button => 'התחברות';
 
   @override
-  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+  String get suuntoCloud_signIn_signingIn => 'מתחבר…';
 
   @override
   String suuntoCloud_signIn_signedInAs(String email) {
-    return 'Signed in as $email';
+    return 'מחובר כ-$email';
   }
 
   @override
-  String get suuntoCloud_fetch_listing => 'Listing dives…';
+  String get suuntoCloud_fetch_listing => 'מציג רשימת צלילות…';
 
   @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
-    return 'Fetching dive $current of $total…';
+    return 'מוריד צלילה $current מתוך $total…';
   }
 
   @override
-  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+  String get suuntoCloud_fetch_failedTitle => 'לא ניתן להוריד את הצלילות';
 
   @override
-  String suuntoCloud_fetch_foundDives(num count) {
+  String get suuntoCloud_fetch_retry => 'נסה שוב';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Found $count dives',
-      one: 'Found 1 dive',
-      zero: 'No dives found',
+      other: 'נמצאו $count צלילות',
+      one: 'נמצאה צלילה אחת',
+      zero: 'לא נמצאו צלילות',
     );
     return '$_temp0';
   }
 
   @override
-  String suuntoCloud_fetch_someFailed(num count) {
+  String suuntoCloud_fetch_someFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count dives could not be converted and were skipped.',
-      one: '1 dive could not be converted and was skipped.',
+      other: 'לא ניתן היה להמיר $count צלילות והן דולגו.',
+      one: 'לא ניתן היה להמיר צלילה אחת והיא דולגה.',
     );
     return '$_temp0';
   }
 
   @override
-  String get importWizard_review_sortTooltip => 'Sort';
+  String get importWizard_review_sortTooltip => 'מיון';
 
   @override
-  String get importWizard_review_sortByDate => 'Date';
+  String get importWizard_review_sortByDate => 'תאריך';
 
   @override
-  String get importWizard_review_sortByDepth => 'Depth';
+  String get importWizard_review_sortByDepth => 'עומק';
 
   @override
-  String get importWizard_review_sortByDuration => 'Time';
+  String get importWizard_review_sortByDuration => 'זמן';
 
   @override
   String get transfer_importCloud_suuntoTitle => 'Suunto';
 
   @override
   String get transfer_importCloud_suuntoSubtitle =>
-      'Import dives from your Suunto app / app.suunto.com account';
+      'ייבוא צלילות מאפליקציית Suunto או מחשבון app.suunto.com';
 
   @override
-  String get transfer_section_cloudTitle => 'Cloud';
+  String get transfer_section_cloudTitle => 'ענן';
 
   @override
-  String get transfer_section_cloudSubtitle => 'Import from cloud';
+  String get transfer_section_cloudSubtitle => 'ייבוא מהענן';
 }

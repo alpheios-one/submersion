@@ -35384,91 +35384,94 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_statisticsIncludedHint => 'محتسبة في كل الإحصائيات';
 
   @override
-  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+  String get suuntoCloud_signIn_title => 'تسجيل الدخول إلى Suunto';
 
   @override
   String get suuntoCloud_signIn_description =>
-      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+      'سجّل الدخول بحساب app.suunto.com لاستيراد غوصاتك مباشرة. لا يتم تخزين كلمة المرور مطلقًا، بل يتم تخزين الجلسة الناتجة فقط.';
 
   @override
-  String get suuntoCloud_signIn_emailLabel => 'Email';
+  String get suuntoCloud_signIn_emailLabel => 'البريد الإلكتروني';
 
   @override
-  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+  String get suuntoCloud_signIn_emailRequired => 'البريد الإلكتروني مطلوب';
 
   @override
-  String get suuntoCloud_signIn_passwordLabel => 'Password';
+  String get suuntoCloud_signIn_passwordLabel => 'كلمة المرور';
 
   @override
-  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+  String get suuntoCloud_signIn_passwordRequired => 'كلمة المرور مطلوبة';
 
   @override
-  String get suuntoCloud_signIn_button => 'Sign In';
+  String get suuntoCloud_signIn_button => 'تسجيل الدخول';
 
   @override
-  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+  String get suuntoCloud_signIn_signingIn => 'جارٍ تسجيل الدخول…';
 
   @override
   String suuntoCloud_signIn_signedInAs(String email) {
-    return 'Signed in as $email';
+    return 'تم تسجيل الدخول باسم $email';
   }
 
   @override
-  String get suuntoCloud_fetch_listing => 'Listing dives…';
+  String get suuntoCloud_fetch_listing => 'جارٍ سرد الغوصات…';
 
   @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
-    return 'Fetching dive $current of $total…';
+    return 'جلب الغوصة $current من $total…';
   }
 
   @override
-  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+  String get suuntoCloud_fetch_failedTitle => 'تعذّر جلب الغوصات';
 
   @override
-  String suuntoCloud_fetch_foundDives(num count) {
+  String get suuntoCloud_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Found $count dives',
-      one: 'Found 1 dive',
-      zero: 'No dives found',
+      other: 'تم العثور على $count غوصة',
+      one: 'تم العثور على غوصة واحدة',
+      zero: 'لم يتم العثور على غوصات',
     );
     return '$_temp0';
   }
 
   @override
-  String suuntoCloud_fetch_someFailed(num count) {
+  String suuntoCloud_fetch_someFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count dives could not be converted and were skipped.',
-      one: '1 dive could not be converted and was skipped.',
+      other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
     );
     return '$_temp0';
   }
 
   @override
-  String get importWizard_review_sortTooltip => 'Sort';
+  String get importWizard_review_sortTooltip => 'ترتيب';
 
   @override
-  String get importWizard_review_sortByDate => 'Date';
+  String get importWizard_review_sortByDate => 'التاريخ';
 
   @override
-  String get importWizard_review_sortByDepth => 'Depth';
+  String get importWizard_review_sortByDepth => 'العمق';
 
   @override
-  String get importWizard_review_sortByDuration => 'Time';
+  String get importWizard_review_sortByDuration => 'الوقت';
 
   @override
   String get transfer_importCloud_suuntoTitle => 'Suunto';
 
   @override
   String get transfer_importCloud_suuntoSubtitle =>
-      'Import dives from your Suunto app / app.suunto.com account';
+      'استيراد الغوصات من تطبيق Suunto أو حساب app.suunto.com';
 
   @override
-  String get transfer_section_cloudTitle => 'Cloud';
+  String get transfer_section_cloudTitle => 'السحابة';
 
   @override
-  String get transfer_section_cloudSubtitle => 'Import from cloud';
+  String get transfer_section_cloudSubtitle => 'الاستيراد من السحابة';
 }

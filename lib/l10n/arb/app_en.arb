@@ -21679,6 +21679,7 @@
   "suuntoCloud_fetch_listing": "Listing dives…",
   "suuntoCloud_fetch_fetchingDiveOf": "Fetching dive {current} of {total}…",
   "suuntoCloud_fetch_failedTitle": "Could not fetch dives",
+  "suuntoCloud_fetch_retry": "Try Again",
   "suuntoCloud_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
   "suuntoCloud_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
   "@suuntoCloud_signIn_signedInAs": {
@@ -21704,7 +21705,7 @@
     "description": "Result headline after fetching dives from the Suunto cloud.",
     "placeholders": {
       "count": {
-        "type": "num"
+        "type": "int"
       }
     }
   },
@@ -21712,7 +21713,7 @@
     "description": "Shown when one or more fetched Suunto dives could not be converted and were skipped.",
     "placeholders": {
       "count": {
-        "type": "num"
+        "type": "int"
       }
     }
   },

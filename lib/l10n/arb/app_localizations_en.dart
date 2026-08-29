@@ -35232,7 +35232,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
 
   @override
-  String suuntoCloud_fetch_foundDives(num count) {
+  String get suuntoCloud_fetch_retry => 'Try Again';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
@@ -35244,7 +35247,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String suuntoCloud_fetch_someFailed(num count) {
+  String suuntoCloud_fetch_someFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,

@@ -35732,91 +35732,97 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inclusa in tutte le statistiche';
 
   @override
-  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+  String get suuntoCloud_signIn_title => 'Accedi a Suunto';
 
   @override
   String get suuntoCloud_signIn_description =>
-      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+      'Accedi con il tuo account app.suunto.com per importare direttamente le tue immersioni. La password non viene mai memorizzata: viene salvata solo la sessione risultante.';
 
   @override
   String get suuntoCloud_signIn_emailLabel => 'Email';
 
   @override
-  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+  String get suuntoCloud_signIn_emailRequired => 'L\'email è obbligatoria';
 
   @override
   String get suuntoCloud_signIn_passwordLabel => 'Password';
 
   @override
-  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+  String get suuntoCloud_signIn_passwordRequired =>
+      'La password è obbligatoria';
 
   @override
-  String get suuntoCloud_signIn_button => 'Sign In';
+  String get suuntoCloud_signIn_button => 'Accedi';
 
   @override
-  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+  String get suuntoCloud_signIn_signingIn => 'Accesso in corso…';
 
   @override
   String suuntoCloud_signIn_signedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Connesso come $email';
   }
 
   @override
-  String get suuntoCloud_fetch_listing => 'Listing dives…';
+  String get suuntoCloud_fetch_listing => 'Elenco delle immersioni…';
 
   @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
-    return 'Fetching dive $current of $total…';
+    return 'Download dell\'immersione $current di $total…';
   }
 
   @override
-  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+  String get suuntoCloud_fetch_failedTitle =>
+      'Impossibile scaricare le immersioni';
 
   @override
-  String suuntoCloud_fetch_foundDives(num count) {
+  String get suuntoCloud_fetch_retry => 'Riprova';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Found $count dives',
-      one: 'Found 1 dive',
-      zero: 'No dives found',
+      other: 'Trovate $count immersioni',
+      one: 'Trovata 1 immersione',
+      zero: 'Nessuna immersione trovata',
     );
     return '$_temp0';
   }
 
   @override
-  String suuntoCloud_fetch_someFailed(num count) {
+  String suuntoCloud_fetch_someFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count dives could not be converted and were skipped.',
-      one: '1 dive could not be converted and was skipped.',
+      other:
+          '$count immersioni non sono state convertite e sono state saltate.',
+      one: '1 immersione non è stata convertita ed è stata saltata.',
     );
     return '$_temp0';
   }
 
   @override
-  String get importWizard_review_sortTooltip => 'Sort';
+  String get importWizard_review_sortTooltip => 'Ordina';
 
   @override
-  String get importWizard_review_sortByDate => 'Date';
+  String get importWizard_review_sortByDate => 'Data';
 
   @override
-  String get importWizard_review_sortByDepth => 'Depth';
+  String get importWizard_review_sortByDepth => 'Profondità';
 
   @override
-  String get importWizard_review_sortByDuration => 'Time';
+  String get importWizard_review_sortByDuration => 'Tempo';
 
   @override
   String get transfer_importCloud_suuntoTitle => 'Suunto';
 
   @override
   String get transfer_importCloud_suuntoSubtitle =>
-      'Import dives from your Suunto app / app.suunto.com account';
+      'Importa le immersioni dalla tua app Suunto o dal tuo account app.suunto.com';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';
 
   @override
-  String get transfer_section_cloudSubtitle => 'Import from cloud';
+  String get transfer_section_cloudSubtitle => 'Importa dal cloud';
 }

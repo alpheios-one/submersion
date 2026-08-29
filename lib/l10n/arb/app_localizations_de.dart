@@ -35667,91 +35667,97 @@ class AppLocalizationsDe extends AppLocalizations {
       'In allen Statistiken enthalten';
 
   @override
-  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+  String get suuntoCloud_signIn_title => 'Bei Suunto anmelden';
 
   @override
   String get suuntoCloud_signIn_description =>
-      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+      'Melde dich mit deinem app.suunto.com-Konto an, um deine Tauchgänge direkt zu importieren. Dein Passwort wird nie gespeichert, nur die daraus entstehende Sitzung.';
 
   @override
-  String get suuntoCloud_signIn_emailLabel => 'Email';
+  String get suuntoCloud_signIn_emailLabel => 'E-Mail';
 
   @override
-  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+  String get suuntoCloud_signIn_emailRequired => 'E-Mail ist erforderlich';
 
   @override
-  String get suuntoCloud_signIn_passwordLabel => 'Password';
+  String get suuntoCloud_signIn_passwordLabel => 'Passwort';
 
   @override
-  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+  String get suuntoCloud_signIn_passwordRequired => 'Passwort ist erforderlich';
 
   @override
-  String get suuntoCloud_signIn_button => 'Sign In';
+  String get suuntoCloud_signIn_button => 'Anmelden';
 
   @override
-  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+  String get suuntoCloud_signIn_signingIn => 'Anmeldung läuft…';
 
   @override
   String suuntoCloud_signIn_signedInAs(String email) {
-    return 'Signed in as $email';
+    return 'Angemeldet als $email';
   }
 
   @override
-  String get suuntoCloud_fetch_listing => 'Listing dives…';
+  String get suuntoCloud_fetch_listing => 'Tauchgänge werden aufgelistet…';
 
   @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
-    return 'Fetching dive $current of $total…';
+    return 'Tauchgang $current von $total wird geladen…';
   }
 
   @override
-  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+  String get suuntoCloud_fetch_failedTitle =>
+      'Tauchgänge konnten nicht geladen werden';
 
   @override
-  String suuntoCloud_fetch_foundDives(num count) {
+  String get suuntoCloud_fetch_retry => 'Wiederholen';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Found $count dives',
-      one: 'Found 1 dive',
-      zero: 'No dives found',
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+      zero: 'Keine Tauchgänge gefunden',
     );
     return '$_temp0';
   }
 
   @override
-  String suuntoCloud_fetch_someFailed(num count) {
+  String suuntoCloud_fetch_someFailed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count dives could not be converted and were skipped.',
-      one: '1 dive could not be converted and was skipped.',
+      other:
+          '$count Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.',
+      one:
+          '1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.',
     );
     return '$_temp0';
   }
 
   @override
-  String get importWizard_review_sortTooltip => 'Sort';
+  String get importWizard_review_sortTooltip => 'Sortieren';
 
   @override
-  String get importWizard_review_sortByDate => 'Date';
+  String get importWizard_review_sortByDate => 'Datum';
 
   @override
-  String get importWizard_review_sortByDepth => 'Depth';
+  String get importWizard_review_sortByDepth => 'Tiefe';
 
   @override
-  String get importWizard_review_sortByDuration => 'Time';
+  String get importWizard_review_sortByDuration => 'Zeit';
 
   @override
   String get transfer_importCloud_suuntoTitle => 'Suunto';
 
   @override
   String get transfer_importCloud_suuntoSubtitle =>
-      'Import dives from your Suunto app / app.suunto.com account';
+      'Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';
 
   @override
-  String get transfer_section_cloudSubtitle => 'Import from cloud';
+  String get transfer_section_cloudSubtitle => 'Aus der Cloud importieren';
 }

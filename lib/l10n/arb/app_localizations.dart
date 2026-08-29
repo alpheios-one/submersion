@@ -58811,17 +58811,23 @@ abstract class AppLocalizations {
   /// **'Could not fetch dives'**
   String get suuntoCloud_fetch_failedTitle;
 
+  /// No description provided for @suuntoCloud_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get suuntoCloud_fetch_retry;
+
   /// Result headline after fetching dives from the Suunto cloud.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
-  String suuntoCloud_fetch_foundDives(num count);
+  String suuntoCloud_fetch_foundDives(int count);
 
   /// Shown when one or more fetched Suunto dives could not be converted and were skipped.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
-  String suuntoCloud_fetch_someFailed(num count);
+  String suuntoCloud_fetch_someFailed(int count);
 
   /// No description provided for @importWizard_review_sortTooltip.
   ///
