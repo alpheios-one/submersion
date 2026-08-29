@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/buddies/data/services/contact_photo_loader.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
 import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -335,37 +339,33 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
     }
 
     try {
-      if (!await FlutterContacts.permissions.has(PermissionType.read)) {
-        await FlutterContacts.permissions.request(PermissionType.read);
-        if (!await FlutterContacts.permissions.has(PermissionType.read)) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  context.l10n.buddies_message_contactPermissionRequired,
-                ),
-              ),
-            );
-          }
-          return;
-        }
-      }
-
-      final pickedContact = await FlutterContacts.native.showPicker();
-      final contactId = pickedContact?.id;
-      if (contactId == null) return;
-
-      final fullContact = await FlutterContacts.get(contactId);
-      if (fullContact == null) {
+      // Only Android needs a permission here. The native picker itself is
+      // permissionless on both platforms, and asking it for properties always
+      // works on iOS, so the iOS build never shows an address-book prompt.
+      if (!await ensureContactPropertyAccess()) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.l10n.buddies_message_contactLoadFailed),
+              content: Text(
+                context.l10n.buddies_message_contactPermissionRequired,
+              ),
             ),
           );
         }
         return;
       }
+
+      // One call: flutter_contacts 2.3.1's picker returns the contact with the
+      // requested properties already populated, so there is no follow-up get.
+      final fullContact = await FlutterContacts.native.showPicker(
+        properties: {
+          ContactProperty.name,
+          ContactProperty.email,
+          ContactProperty.phone,
+          ...contactPhotoProperties,
+        },
+      );
+      if (fullContact == null) return;
 
       final name = fullContact.displayName;
       final email = fullContact.emails.isNotEmpty
@@ -375,17 +375,35 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           ? fullContact.phones.first.number
           : null;
 
-      if (context.mounted) {
-        if (ResponsiveBreakpoints.isMasterDetail(context)) {
-          // For desktop, pass data via query params (simplified approach)
-          final state = GoRouterState.of(context);
-          context.go('${state.uri.path}?mode=new');
-        } else {
-          context.push(
-            '/buddies/new',
-            extra: {'name': name, 'email': email, 'phone': phone},
-          );
+      // Centered automatically with no crop dialog: the user is mid-import and
+      // did not ask to frame a photo. They can adjust it afterwards from the
+      // edit page.
+      final rawPhoto =
+          fullContact.photo?.fullSize ?? fullContact.photo?.thumbnail;
+      Uint8List? photo;
+      if (rawPhoto != null) {
+        final encoded = await encodeStoredImage(
+          ImageEncodeRequest.fromBytes(
+            bytes: rawPhoto,
+            spec: ImageEncodeSpec.avatar,
+            declaredName: 'contact.jpg',
+          ),
+        );
+        if (encoded.outcome == ImageEncodeOutcome.encoded) {
+          photo = encoded.bytes;
         }
+      }
+
+      if (context.mounted) {
+        // One push for every layout. `/buddies/new` declares
+        // parentNavigatorKey: rootNavigatorKey so it renders in the foreground
+        // rather than under the shell, which is why the old master-detail
+        // special case was not just buggy (it carried no data, so an iPad in
+        // landscape landed on a blank form) but unnecessary.
+        context.push(
+          '/buddies/new',
+          extra: {'name': name, 'email': email, 'phone': phone, 'photo': photo},
+        );
       }
     } catch (e) {
       if (context.mounted) {
