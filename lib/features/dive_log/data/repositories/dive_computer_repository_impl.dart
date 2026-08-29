@@ -14,13 +14,13 @@ import 'package:submersion/core/database/database.dart'
         DivesCompanion,
         DiveTanksCompanion,
         GasSwitchesCompanion,
-        DiveProfile,
         DiveProfileEvent,
         TankPressureProfilesCompanion;
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
@@ -44,6 +44,7 @@ class DiveComputerRepository {
 
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final ProfileSeriesRepository _profileSeries = ProfileSeriesRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
 
@@ -690,49 +691,17 @@ class DiveComputerRepository {
   // Multi-Profile Operations
   // ============================================================================
 
-  /// Get all profile points for a dive, optionally filtered by computer
-  Future<List<DiveProfile>> getProfilesForDive(
-    String diveId, {
-    String? computerId,
-  }) async {
-    try {
-      final query = _db.select(_db.diveProfiles)
-        ..where((t) => t.diveId.equals(diveId))
-        ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-
-      if (computerId != null) {
-        query.where((t) => t.computerId.equals(computerId));
-      }
-
-      return await query.get();
-    } catch (e, stackTrace) {
-      _log.error(
-        'Failed to get profiles for dive: $diveId',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      rethrow;
-    }
-  }
-
   /// Get all computer IDs that have profiles for a given dive
   Future<List<String>> getComputerIdsForDive(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND computer_id IS NOT NULL
-      ''',
-            variables: [Variable(diveId)],
-          )
-          .get();
-
-      return result
-          .map((row) => row.data['computer_id'] as String?)
-          .whereType<String>()
-          .toList();
+      final series = await _profileSeries.getSeriesForDive(diveId);
+      if (series.isNotEmpty) {
+        return {
+          for (final s in series)
+            if (s.computerId != null) s.computerId!,
+        }.toList();
+      }
+      return await _getComputerIdsForDiveLegacy(diveId);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get computer ids for dive: $diveId',
@@ -741,6 +710,24 @@ class DiveComputerRepository {
       );
       rethrow;
     }
+  }
+
+  Future<List<String>> _getComputerIdsForDiveLegacy(String diveId) async {
+    final result = await _db
+        .customSelect(
+          '''
+        SELECT DISTINCT computer_id
+        FROM dive_profiles
+        WHERE dive_id = ? AND computer_id IS NOT NULL
+      ''',
+          variables: [Variable(diveId)],
+        )
+        .get();
+
+    return result
+        .map((row) => row.data['computer_id'] as String?)
+        .whereType<String>()
+        .toList();
   }
 
   /// Get computers with profiles for a given dive
@@ -789,19 +776,14 @@ class DiveComputerRepository {
   /// Get the primary profile's computer for a dive
   Future<String?> getPrimaryComputerId(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND is_primary = 1 AND computer_id IS NOT NULL
-        LIMIT 1
-      ''',
-            variables: [Variable(diveId)],
-          )
-          .getSingleOrNull();
-
-      return result?.data['computer_id'] as String?;
+      final series = await _profileSeries.getSeriesForDive(diveId);
+      if (series.isNotEmpty) {
+        for (final s in series) {
+          if (s.isPrimary && s.computerId != null) return s.computerId;
+        }
+        return null;
+      }
+      return await _getPrimaryComputerIdLegacy(diveId);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get primary computer for dive: $diveId',
@@ -810,6 +792,22 @@ class DiveComputerRepository {
       );
       return null;
     }
+  }
+
+  Future<String?> _getPrimaryComputerIdLegacy(String diveId) async {
+    final result = await _db
+        .customSelect(
+          '''
+        SELECT DISTINCT computer_id
+        FROM dive_profiles
+        WHERE dive_id = ? AND is_primary = 1 AND computer_id IS NOT NULL
+        LIMIT 1
+      ''',
+          variables: [Variable(diveId)],
+        )
+        .getSingleOrNull();
+
+    return result?.data['computer_id'] as String?;
   }
 
   /// Set the primary profile for a dive (by computer ID)
