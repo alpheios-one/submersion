@@ -2,10 +2,10 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show compute;
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:submersion/features/media/data/services/image_dimensions_reader.dart';
 import 'package:submersion/features/media/data/services/local_media_metadata.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
@@ -56,11 +56,12 @@ class PhotoPickerServiceDesktop implements PhotoPickerService {
       return [];
     }
 
-    // Reading capture time and dimensions means reading each file's bytes,
-    // which would jank the UI thread for a pick of large photos (the old
-    // stat()-only implementation was cheap enough to inline). Do the batch on
-    // a background isolate, then register the paths here -- the isolate only
-    // ever mutates its own copy of [_filePathCache].
+    // Reading the capture time still means reading each file's bytes -- a
+    // JPEG's EXIF comes out of a full-file parse -- which would jank the UI
+    // thread for a pick of large photos (the old stat()-only implementation
+    // was cheap enough to inline). Do the batch on a background isolate, then
+    // register the paths here -- the isolate only ever mutates its own copy
+    // of [_filePathCache].
     final assets = await compute(
       _extractAssets,
       files.map((f) => f.path).toList(),
@@ -181,7 +182,7 @@ AssetInfo? _assetInfoForPath(String path) {
           capturedUtc.microsecond,
         );
 
-  final size = _dimensionsOf(ioFile, mime);
+  final size = readImageDimensions(ioFile, mime);
 
   return AssetInfo(
     // Keyed on mtime + path so re-picking the same file in one session reuses
@@ -199,31 +200,6 @@ AssetInfo? _assetInfoForPath(String path) {
     filename: p.basename(path),
     filePath: path,
   );
-}
-
-/// Reads pixel dimensions from an image's header.
-///
-/// Only the header is parsed -- `startDecode` stops before any pixel decode --
-/// but the decoder API takes bytes, so the file is read in full first. That
-/// read is why the batch runs on a [compute] isolate; on the main thread a
-/// pick of large images would visibly jank the UI.
-///
-/// Returns null for videos and for anything the decoder cannot read.
-({int width, int height})? _dimensionsOf(File file, String mime) {
-  if (!mime.startsWith('image/')) return null;
-  try {
-    final bytes = file.readAsBytesSync();
-    // Extension first, then content sniffing for files whose name lies.
-    final decoder =
-        img.findDecoderForNamedImage(file.path) ??
-        img.findDecoderForData(bytes);
-    final info = decoder?.startDecode(bytes);
-    if (info == null) return null;
-    return (width: info.width, height: info.height);
-  } on Object {
-    // Unsupported or truncated container: dimensions are optional here.
-    return null;
-  }
 }
 
 String _mimeFromExtension(String ext) => switch (ext) {
