@@ -23489,7 +23489,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'تعذّر التحقق من التخزين السحابي. يواصل Submersion المحاولة؛ إذا استمرت المشكلة، افصل تخزين الوسائط ثم أعد توصيله.';
+      'لم يعد هذا الجهاز والتخزين السحابي متفقين على المخزن المستخدم. تؤدي إعادة توصيل تخزين الوسائط إلى اعتماد المخزن الموجود في السحابة الآن.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

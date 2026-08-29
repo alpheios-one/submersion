@@ -39346,7 +39346,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_mediaStorage_transfers_suspended_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'The cloud store could not be verified. Submersion keeps retrying; if this persists, disconnect and reconnect media storage.'**
+  /// **'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.'**
   String get settings_mediaStorage_transfers_suspended_subtitle;
 
   /// No description provided for @settings_mediaStorage_transfers_queued.

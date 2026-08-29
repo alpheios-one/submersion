@@ -6753,7 +6753,7 @@
   "settings_mediaStorage_transfers_state_done": "הושלם",
   "settings_mediaStorage_transfers_state_failed": "נכשל",
   "settings_mediaStorage_transfers_suspended_title": "ההעברות מושהות",
-  "settings_mediaStorage_transfers_suspended_subtitle": "לא ניתן היה לאמת את אחסון הענן. Submersion ממשיך לנסות; אם הבעיה נמשכת, נתקו את אחסון המדיה וחברו אותו מחדש.",
+  "settings_mediaStorage_transfers_suspended_subtitle": "המכשיר הזה ואחסון הענן כבר לא מסכימים על המאגר שבשימוש. חיבור מחדש של אחסון המדיה מאמץ את המאגר שנמצא כעת בענן.",
   "settings_mediaStorage_transfers_queued": "{count} בתור",
   "settings_mediaStorage_transfers_waitingRetry": "{count} ממתינים לניסיון חוזר",
   "settings_mediaStorage_verify_action": "אימות הספרייה",

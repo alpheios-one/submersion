@@ -23935,7 +23935,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'No se pudo verificar el almacenamiento en la nube. Submersion sigue reintentando; si persiste, desconecta y vuelve a conectar el almacenamiento de medios.';
+      'Este dispositivo y el almacenamiento en la nube ya no coinciden en qué almacén está en uso. Volver a conectar adopta el almacén que la nube tiene ahora.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

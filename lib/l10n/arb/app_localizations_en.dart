@@ -23515,7 +23515,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'The cloud store could not be verified. Submersion keeps retrying; if this persists, disconnect and reconnect media storage.';
+      'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

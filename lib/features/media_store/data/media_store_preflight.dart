@@ -1,4 +1,3 @@
-import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
 import 'package:submersion/core/services/media_store/media_store_attach_state.dart';
 import 'package:submersion/core/services/media_store/store_marker.dart';
@@ -12,48 +11,33 @@ import 'package:submersion/core/services/media_store/store_marker.dart';
 /// land while a drain is running, and the rest of that drain must stop.
 ///
 /// A marker that is present but not the attached one means the store was
-/// wiped and re-minted, or repointed. The spec's answer is to suspend and let
-/// the user decide; [adoptMarker], when supplied, is the one exception. On
-/// iCloud the container is fixed per Apple ID, so a foreign marker can only be
-/// the app's own two-device race (issue #1356), and the runtime passes an
-/// adopter that re-attaches this device to it. A missing marker is never
-/// adopted: there is nothing to adopt, and minting is the connect flow's job.
+/// wiped and re-minted, or repointed, and this check deliberately does NOT
+/// resolve that on its own. Adopting the store the container happens to hold
+/// looked attractive for iCloud, where the container is fixed per Apple ID,
+/// but `media` rows carry no store id: their `remoteUploadedAt` stamps would
+/// survive an adoption and keep reading "backed up" while pointing at
+/// objects the new store never held. Spec section 13 makes adopt one of
+/// three GUIDED choices (adopt / rebuild / detach) for that reason. Until
+/// those exist, suspending and telling the user is the honest answer.
 class MediaStorePreflight {
   MediaStorePreflight({
     required MediaStoreAttachState attachState,
     required MediaObjectStore store,
     required String attachedStoreId,
-    Future<void> Function(StoreMarker marker)? adoptMarker,
   }) : _attachState = attachState,
        _store = store,
-       _attachedStoreId = attachedStoreId,
-       _adoptMarker = adoptMarker;
+       _attachedStoreId = attachedStoreId;
 
   final MediaStoreAttachState _attachState;
   final MediaObjectStore _store;
-  final Future<void> Function(StoreMarker marker)? _adoptMarker;
-  final _log = LoggerService.forClass(MediaStorePreflight);
-  String _attachedStoreId;
-
-  /// The store this check holds the runtime to: the id it was built with,
-  /// or the marker it adopted since.
-  String get attachedStoreId => _attachedStoreId;
+  final String _attachedStoreId;
 
   /// Whether the drain may proceed. Throws when the marker cannot be read;
-  /// the worker treats that the same as a false answer.
+  /// the worker separates that from a determinate refusal.
   Future<bool> call() async {
     final currentId = await _attachState.attachedStoreId();
     if (currentId == null || currentId != _attachedStoreId) return false;
     final marker = await StoreMarkerStore(store: _store).read();
-    if (marker == null) return false;
-    if (marker.storeId == currentId) return true;
-    final adopt = _adoptMarker;
-    if (adopt == null) return false;
-    _log.info(
-      'Adopting media store marker ${marker.storeId} in place of $currentId',
-    );
-    await adopt(marker);
-    _attachedStoreId = marker.storeId;
-    return true;
+    return marker != null && marker.storeId == currentId;
   }
 }

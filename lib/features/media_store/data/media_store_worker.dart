@@ -111,8 +111,22 @@ class MediaStoreWorker {
   /// not tell "paused" from "queued" (issue #1356).
   bool get isSuspended => _suspended;
 
-  /// Emits on every change of [isSuspended].
-  Stream<bool> get suspensionChanges => _suspensionChanges.stream;
+  /// The current value on subscribe, then every change.
+  ///
+  /// Emitting the current value is load-bearing, not a convenience: the
+  /// runtime fires its first drain before any reader can subscribe, and
+  /// [_setSuspended] never repeats a value it has already sent. A reader
+  /// that sampled [isSuspended] and then subscribed would silently lose a
+  /// flip that landed in between, and nothing would ever re-send it.
+  Stream<bool> get suspensionChanges => Stream<bool>.multi((controller) {
+    controller.add(_suspended);
+    final subscription = _suspensionChanges.stream.listen(
+      controller.add,
+      onError: controller.addError,
+      onDone: controller.close,
+    );
+    controller.onCancel = subscription.cancel;
+  });
 
   void _setSuspended(bool value) {
     if (_suspended == value) return;
@@ -234,15 +248,23 @@ class MediaStoreWorker {
         _setSuspended(false);
         return true;
       }
+      // A determinate refusal: this device has detached, or the store no
+      // longer carries the marker it attached to. Only this answer is
+      // reported as a suspension, because only this one is about the store.
       _log.warning('Media store preflight failed; drain suspended');
+      _setSuspended(true);
     } on Object catch (e, stackTrace) {
+      // Could not determine, which is not the same thing and must not be
+      // dressed up as a store problem. Being offline lands here on every
+      // provider - the marker read goes to the network, and drain() runs
+      // this check BEFORE the gate that owns offline - and an ordinary
+      // offline moment must not tell the user their store is broken.
       _log.warning(
         'Media store preflight could not run; drain suspended',
         error: e,
         stackTrace: stackTrace,
       );
     }
-    _setSuspended(true);
     return false;
   }
 
@@ -284,12 +306,26 @@ class MediaStoreWorker {
       // cannot be handed a negative duration by the query's own latency.
       final now = DateTime.now();
       if (suspended) {
-        final anythingPending =
-            await _queue.nextPending(now) != null ||
-            await _queue.earliestPendingWakeup(now) != null;
-        if (!anythingPending) return;
-        _wakeupDelay = _preflightRetryWindow;
-        _wakeup = Timer(_preflightRetryWindow, () => unawaited(drain()));
+        // Always arm, even with an empty queue. A suspension is cleared only
+        // from inside a passing preflight, so a drain that armed nothing
+        // here could never clear one in this process: the loop checks the
+        // preflight before asking what is due, so the final iteration of an
+        // emptying drain can record a suspension with nothing left to carry
+        // a timer, and the notice would then stand forever over a queue with
+        // nothing in it.
+        //
+        // Never later than a row's own backoff. That timer is the one this
+        // branch replaces, and a row deferred for thirty seconds must not
+        // wait out the retry window because an unrelated check failed.
+        final due = await _queue.earliestPendingWakeup(now);
+        final backoff = due?.difference(now);
+        final delay = backoff != null && backoff > Duration.zero
+            ? (backoff < _preflightRetryWindow
+                  ? backoff
+                  : _preflightRetryWindow)
+            : _preflightRetryWindow;
+        _wakeupDelay = delay;
+        _wakeup = Timer(delay, () => unawaited(drain()));
         return;
       }
       // The drain asked "what is due?" against its own clock reading, and

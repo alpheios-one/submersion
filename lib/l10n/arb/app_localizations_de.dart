@@ -23870,7 +23870,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'Der Cloud-Speicher konnte nicht überprüft werden. Submersion versucht es weiter; falls das anhält, den Medienspeicher trennen und neu verbinden.';
+      'Dieses Gerät und der Cloud-Speicher sind sich nicht mehr einig, welcher Speicher verwendet wird. Beim erneuten Verbinden wird der Speicher übernommen, den die Cloud jetzt enthält.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

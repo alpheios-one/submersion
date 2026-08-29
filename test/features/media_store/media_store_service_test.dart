@@ -436,30 +436,4 @@ void main() {
       reason: 'the marker the other device wrote must survive untouched',
     );
   });
-
-  test('adoptICloudStore re-attaches this device to the marker the container '
-      'holds, keeping its account', () async {
-    await attachState.setAttached(
-      'store-a',
-      providerType: CloudProviderType.icloud,
-      accountId: 'acct-1',
-    );
-    final svc = MediaStoreService(
-      credentials: credentials,
-      attachState: attachState,
-      storesRepository: storesRepository,
-      accountsRepository: accountsRepository,
-      accountCredentials: accountCredentials,
-    );
-
-    await svc.adoptICloudStore('store-b');
-
-    expect(await attachState.attachedStoreId(), 'store-b');
-    expect(await attachState.attachedProviderType(), CloudProviderType.icloud);
-    expect(await attachState.attachedAccountId(), 'acct-1');
-    final active = await storesRepository.getActive();
-    expect(active!.id, 'store-b');
-    expect(active.providerType, 'icloud');
-    expect(active.displayHint, 'iCloud');
-  });
 }

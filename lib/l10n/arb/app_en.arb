@@ -15494,7 +15494,7 @@
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
   "settings_mediaStorage_transfers_suspended_title": "Transfers paused",
-  "settings_mediaStorage_transfers_suspended_subtitle": "The cloud store could not be verified. Submersion keeps retrying; if this persists, disconnect and reconnect media storage.",
+  "settings_mediaStorage_transfers_suspended_subtitle": "This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.",
   "settings_mediaStorage_transfers_queued": "{count} queued",
   "@settings_mediaStorage_transfers_queued": {
     "placeholders": {

@@ -38,7 +38,17 @@ class ICloudMediaObjectStore implements MediaObjectStore {
   @override
   Future<StoreObjectInfo?> head(String key) async {
     final path = await _pathFor(key);
-    if (!await _platform.ensureDownloaded(path)) return null;
+    // Same distinction getFile draws below, and it matters more here: null
+    // means "not in the store" to every caller, and the upload pipeline
+    // answers that by uploading. Reporting a placeholder still coming down
+    // as absent re-uploads the whole library from the second device, and
+    // lets the dedup stamp fall back to this device's local byte count.
+    if (!await _platform.ensureDownloaded(path)) {
+      throw MediaStoreException(
+        'still downloading from iCloud: $key',
+        kind: MediaStoreErrorKind.transient,
+      );
+    }
     final file = File(path);
     if (!await file.exists()) return null;
     final stat = await file.stat();

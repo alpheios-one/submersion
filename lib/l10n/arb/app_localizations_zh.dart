@@ -22683,7 +22683,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      '无法验证云存储。Submersion 会持续重试；如果问题持续存在，请断开并重新连接媒体存储。';
+      '此设备与云存储对正在使用的存储库不再一致。重新连接媒体存储将采用云端当前保存的存储库。';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

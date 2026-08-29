@@ -6,7 +6,6 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
 import 'package:submersion/core/services/media_store/media_store_attach_state.dart';
 import 'package:submersion/core/services/media_store/store_keys.dart';
-import 'package:submersion/core/services/media_store/store_marker.dart';
 import 'package:submersion/features/media_store/data/media_store_preflight.dart';
 
 import '../../helpers/in_memory_media_object_store.dart';
@@ -70,7 +69,7 @@ void main() {
     expect(await preflight(), isFalse);
   });
 
-  test('suspends on a foreign marker when adoption is not offered', () async {
+  test('suspends on a foreign marker rather than adopting it', () async {
     await attach('a');
     writeMarker('b');
     final preflight = MediaStorePreflight(
@@ -79,79 +78,37 @@ void main() {
       attachedStoreId: 'a',
     );
     expect(await preflight(), isFalse);
-    expect(await attachState.attachedStoreId(), 'a');
+    expect(
+      await attachState.attachedStoreId(),
+      'a',
+      reason:
+          'the marker a wiped or repointed store holds is the user\'s '
+          'call to adopt, not the drain loop\'s (spec section 13)',
+    );
   });
 
-  // Issue #1356: on iCloud the container is the identity, so a marker this
-  // device does not recognise can only be the app's own two-device race.
-  // Adopting it is what the manual disconnect/reconnect workaround did.
-  test(
-    'adopts the container marker on a mismatch when adoption is offered',
-    () async {
-      await attach('a');
-      writeMarker('b');
-      final adopted = <String>[];
-      final preflight = MediaStorePreflight(
-        attachState: attachState,
-        store: store,
-        attachedStoreId: 'a',
-        adoptMarker: (marker) async {
-          adopted.add(marker.storeId);
-          await attach(marker.storeId);
-        },
-      );
-
-      expect(await preflight(), isTrue);
-      expect(adopted, ['b']);
-      expect(preflight.attachedStoreId, 'b');
-
-      // Settled: the next check passes against the adopted id without
-      // adopting again.
-      expect(await preflight(), isTrue);
-      expect(adopted, ['b']);
-    },
-  );
-
-  test('suspends on a missing marker even when adoption is offered', () async {
+  test('suspends on a missing marker', () async {
     await attach('a');
-    final adopted = <String>[];
     final preflight = MediaStorePreflight(
       attachState: attachState,
       store: store,
       attachedStoreId: 'a',
-      adoptMarker: (marker) async => adopted.add(marker.storeId),
     );
     expect(await preflight(), isFalse);
-    expect(adopted, isEmpty);
   });
 
-  test(
-    'a marker read that fails propagates for the worker to suspend on',
-    () async {
-      await attach('a');
-      store.failNextWith = const MediaStoreException(
-        'still downloading: smv1/store.json',
-        kind: MediaStoreErrorKind.transient,
-      );
-      final preflight = MediaStorePreflight(
-        attachState: attachState,
-        store: store,
-        attachedStoreId: 'a',
-      );
-      await expectLater(preflight(), throwsA(isA<MediaStoreException>()));
-    },
-  );
-
-  test('exposes the marker it settled on', () async {
+  test('a marker read that fails propagates for the worker to '
+      'classify', () async {
     await attach('a');
-    writeMarker('a');
+    store.failNextWith = const MediaStoreException(
+      'still downloading: smv1/store.json',
+      kind: MediaStoreErrorKind.transient,
+    );
     final preflight = MediaStorePreflight(
       attachState: attachState,
       store: store,
       attachedStoreId: 'a',
     );
-    await preflight();
-    expect(preflight.attachedStoreId, 'a');
-    expect(StoreMarker.fromJson({'storeId': 'a'})!.storeId, 'a');
+    await expectLater(preflight(), throwsA(isA<MediaStoreException>()));
   });
 }

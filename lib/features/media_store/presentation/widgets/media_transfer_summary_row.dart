@@ -25,7 +25,14 @@ class MediaTransferSummaryRow extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final summary = ref.watch(mediaTransferSummaryProvider).value;
-    if (summary == null || summary.isEmpty) return const SizedBox.shrink();
+    if (summary == null || summary.isEmpty) {
+      // Still render the notice: a suspension can outlast the work that was
+      // queued when it started, and watchSummary counts only pending and
+      // transferring rows.
+      return const MediaTransfersSuspendedNotice(
+        contentPadding: EdgeInsets.zero,
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,

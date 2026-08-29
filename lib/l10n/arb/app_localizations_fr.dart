@@ -24000,7 +24000,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'Le stockage cloud n\'a pas pu être vérifié. Submersion réessaie régulièrement ; si le problème persiste, déconnectez puis reconnectez le stockage des médias.';
+      'Cet appareil et le stockage cloud ne s\'accordent plus sur le magasin utilisé. Reconnecter le stockage des médias adopte celui que le cloud contient désormais.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

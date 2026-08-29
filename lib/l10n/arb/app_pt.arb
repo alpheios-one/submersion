@@ -6753,7 +6753,7 @@
   "settings_mediaStorage_transfers_state_done": "Concluído",
   "settings_mediaStorage_transfers_state_failed": "Falhou",
   "settings_mediaStorage_transfers_suspended_title": "Transferências pausadas",
-  "settings_mediaStorage_transfers_suspended_subtitle": "Não foi possível verificar o armazenamento na nuvem. O Submersion continua tentando; se isso persistir, desconecte e reconecte o armazenamento de mídia.",
+  "settings_mediaStorage_transfers_suspended_subtitle": "Este dispositivo e o armazenamento na nuvem não concordam mais sobre qual repositório está em uso. Reconectar o armazenamento de mídia adota o que a nuvem contém agora.",
   "settings_mediaStorage_transfers_queued": "{count} na fila",
   "settings_mediaStorage_transfers_waitingRetry": "{count} aguardando nova tentativa",
   "settings_mediaStorage_verify_action": "Verificar biblioteca",

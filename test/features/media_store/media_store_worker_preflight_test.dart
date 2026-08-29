@@ -179,7 +179,11 @@ void main() {
     await waitUntil(() async => pipeline.processed.contains('m1'));
   });
 
-  test('a suspended drain with nothing queued arms no retry', () async {
+  // A suspension clears only from inside a passing preflight, so a drain
+  // that armed nothing could never clear one. The loop checks the preflight
+  // before asking what is due, so the last iteration of an emptying drain is
+  // exactly where a suspension with an empty queue comes from.
+  test('a suspended drain retries even with nothing queued', () async {
     final worker = MediaStoreWorker(
       queue: queue,
       pipeline: pipeline,
@@ -188,7 +192,29 @@ void main() {
     addTearDown(worker.dispose);
 
     await worker.drain();
-    expect(worker.wakeupDelayForTesting, isNull);
+    expect(
+      worker.wakeupDelayForTesting,
+      MediaStoreWorker.defaultPreflightRetryWindow,
+    );
+  });
+
+  // The timer this branch replaced. A row deferred for thirty seconds must
+  // not wait out the retry window because an unrelated check failed.
+  test('a suspended drain never delays a row past its own backoff', () async {
+    final id = await queue.enqueueUpload(mediaId: 'm1');
+    await queue.defer(id, DateTime.now().add(const Duration(seconds: 30)));
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => false,
+    );
+    addTearDown(worker.dispose);
+
+    await worker.drain();
+    expect(
+      worker.wakeupDelayForTesting,
+      lessThan(MediaStoreWorker.defaultPreflightRetryWindow),
+    );
   });
 
   test('the suspension is observable and clears once the preflight '
@@ -214,22 +240,35 @@ void main() {
     expect(worker.isSuspended, isFalse);
     expect(pipeline.processed, ['m1']);
     await Future<void>.delayed(Duration.zero);
-    expect(seen, [true, false]);
+    expect(
+      seen,
+      [false, true, false],
+      reason:
+          'the stream opens with the value at subscribe time, so a '
+          'reader can never miss a flip it arrived just after',
+    );
   });
 
-  test('a preflight that throws reads as suspended too', () async {
+  // Being offline lands here on every provider: the marker read goes to the
+  // network and drain() runs the preflight BEFORE the gate that owns
+  // offline. Reporting that as a suspension told the user their store could
+  // not be verified, over a store that was fine.
+  test('a preflight that throws suspends the drain without reporting a '
+      'store problem', () async {
     await queue.enqueueUpload(mediaId: 'm1');
     final worker = MediaStoreWorker(
       queue: queue,
       pipeline: pipeline,
       preflight: () async => throw const MediaStoreException(
-        'get smv1/store.json failed',
+        'Could not reach S3 endpoint',
         kind: MediaStoreErrorKind.transient,
       ),
     );
     addTearDown(worker.dispose);
 
     await worker.drain();
-    expect(worker.isSuspended, isTrue);
+
+    expect(pipeline.processed, isEmpty);
+    expect(worker.isSuspended, isFalse);
   });
 }

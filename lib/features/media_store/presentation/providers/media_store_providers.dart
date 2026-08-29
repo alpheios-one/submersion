@@ -231,20 +231,21 @@ final mediaTransferEntriesProvider =
 /// A lookup per visible row was the first shape; it hydrated a full
 /// MediaItem (imageData BLOB included) into a non-autoDispose family per
 /// row and re-ran for every visible row on every media write.
-final mediaTransferLabelsProvider = FutureProvider<Map<String, String>>((
-  ref,
-) async {
-  final queued = ref.watch(
-    mediaTransferEntriesProvider.select((entries) {
-      final rows = entries.value;
-      return rows == null ? null : _QueuedMediaIds(rows.map((e) => e.mediaId));
-    }),
-  );
-  if (queued == null || queued.ids.isEmpty) return const {};
-  final repository = ref.watch(mediaRepositoryProvider);
-  ref.invalidateSelfWhen(repository.watchMediaChanges());
-  return repository.getDisplayLabels(queued.ids);
-});
+final mediaTransferLabelsProvider =
+    FutureProvider.autoDispose<Map<String, String>>((ref) async {
+      final queued = ref.watch(
+        mediaTransferEntriesProvider.select((entries) {
+          final rows = entries.value;
+          return rows == null
+              ? null
+              : _QueuedMediaIds(rows.map((e) => e.mediaId));
+        }),
+      );
+      if (queued == null || queued.ids.isEmpty) return const {};
+      final repository = ref.watch(mediaRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchMediaChanges());
+      return repository.getDisplayLabels(queued.ids);
+    });
 
 /// The set of media ids the transfer queue names, as a value: `select`
 /// compares successive results with `==`, and a List or Set compares by
@@ -392,21 +393,13 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         store: store,
         mediaRepository: mediaRepository,
       );
-      // Read now, not inside the adopter: the adopter runs from a drain
-      // that can outlive this provider's ref.
-      final service = ref.read(mediaStoreServiceProvider);
+      // Suspend all transfers when this device detached or when the store no
+      // longer carries the marker this device attached to (wiped or
+      // repointed; spec section 13).
       final preflight = MediaStorePreflight(
         attachState: attachState,
         store: store,
         attachedStoreId: attachedId,
-        // Suspend all transfers when this device detached or when the bucket
-        // no longer carries the store this device attached to (wiped or
-        // repointed; spec section 13). iCloud alone adopts a foreign marker:
-        // its container is fixed per Apple ID, so the only way to find one
-        // there is the two-device race in issue #1356.
-        adoptMarker: providerType == CloudProviderType.icloud
-            ? (marker) => service.adoptICloudStore(marker.storeId)
-            : null,
       );
       final worker = MediaStoreWorker(
         queue: MediaTransferQueueRepository(),
@@ -518,7 +511,8 @@ final mediaTransfersSuspendedProvider = StreamProvider<bool>((ref) async* {
     yield false;
     return;
   }
-  yield worker.isSuspended;
+  // suspensionChanges opens with the current value, so there is no window
+  // between sampling it and subscribing.
   yield* worker.suspensionChanges;
 });
 

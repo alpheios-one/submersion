@@ -4,7 +4,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
-import 'package:submersion/features/media_store/presentation/widgets/media_transfers_suspended_notice.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 
@@ -40,38 +39,31 @@ class TransfersView extends ConsumerWidget {
           Center(child: Text('${context.l10n.common_label_error}: $e')),
       data: (rows) => rows.isEmpty
           ? Center(child: Text(l10n.settings_mediaStorage_transfers_empty))
-          : Column(
-              children: [
-                const MediaTransfersSuspendedNotice(),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: rows.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final entry = rows[index];
-                      final id = entry.id.toString();
-                      final tile = _TransferTile(
-                        entry: entry,
-                        isSelectionMode: isSelectionMode,
-                        isChecked: selectedIds.contains(id),
-                        onCheckChanged: onToggle == null
-                            ? null
-                            : (_) => onToggle!(id),
-                      );
-                      // The tile has no tap handler of its own, so while
-                      // selecting the whole row has to toggle -- otherwise
-                      // the checkbox is the only target.
-                      return isSelectionMode && onToggle != null
-                          ? GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => onToggle!(id),
-                              child: tile,
-                            )
-                          : tile;
-                    },
-                  ),
-                ),
-              ],
+          : ListView.separated(
+              itemCount: rows.length,
+              separatorBuilder: (_, _) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final entry = rows[index];
+                final id = entry.id.toString();
+                final tile = _TransferTile(
+                  entry: entry,
+                  isSelectionMode: isSelectionMode,
+                  isChecked: selectedIds.contains(id),
+                  onCheckChanged: onToggle == null
+                      ? null
+                      : (_) => onToggle!(id),
+                );
+                // The tile has no tap handler of its own, so while selecting
+                // the whole row has to toggle -- otherwise the checkbox is
+                // the only target.
+                return isSelectionMode && onToggle != null
+                    ? GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onToggle!(id),
+                        child: tile,
+                      )
+                    : tile;
+              },
             ),
     );
   }

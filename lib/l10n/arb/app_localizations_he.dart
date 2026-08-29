@@ -23320,7 +23320,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'לא ניתן היה לאמת את אחסון הענן. Submersion ממשיך לנסות; אם הבעיה נמשכת, נתקו את אחסון המדיה וחברו אותו מחדש.';
+      'המכשיר הזה ואחסון הענן כבר לא מסכימים על המאגר שבשימוש. חיבור מחדש של אחסון המדיה מאמץ את המאגר שנמצא כעת בענן.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

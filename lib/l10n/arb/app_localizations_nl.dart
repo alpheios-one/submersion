@@ -23733,7 +23733,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'De cloudopslag kon niet worden geverifieerd. Submersion blijft het proberen; als dit aanhoudt, koppel de mediaopslag los en verbind opnieuw.';
+      'Dit apparaat en de cloudopslag zijn het niet meer eens over welke opslag in gebruik is. Opnieuw verbinden neemt de opslag over die de cloud nu bevat.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

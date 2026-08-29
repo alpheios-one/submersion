@@ -23,14 +23,6 @@ class _FailedMovePlatform extends DirectoryICloudMediaPlatform {
   Future<bool> moveIntoContainer(String s, String d) async => false;
 }
 
-/// Claims a file is downloaded when it is not on disk.
-class _PhantomDownloadPlatform extends DirectoryICloudMediaPlatform {
-  _PhantomDownloadPlatform(super.root);
-
-  @override
-  Future<bool> ensureDownloaded(String path) async => true;
-}
-
 /// Reports a file iCloud knows about but could not materialize in time. The
 /// native downloadIfNeeded answers false only on that path: the placeholder
 /// exists, startDownloadingUbiquitousItem succeeded, and the 12 s poll ran out.
@@ -162,11 +154,8 @@ void main() {
 
   test('getFile treats a phantom download (no file on disk) as not '
       'found', () async {
-    final store = ICloudMediaObjectStore(
-      platform: _PhantomDownloadPlatform(container),
-    );
     await expectLater(
-      store.getFile('smv1/objects/aa/ghost.bin', File('${tmp.path}/o')),
+      build().getFile('smv1/objects/aa/ghost.bin', File('${tmp.path}/o')),
       throwsA(
         isA<MediaStoreException>().having(
           (e) => e.kind,
@@ -243,6 +232,33 @@ void main() {
         ),
       ),
     );
+  });
+
+  // null means "not in the store" to every caller, and the upload pipeline
+  // answers that by uploading: reporting a placeholder still coming down as
+  // absent re-uploads the whole library from the second device.
+  test('head on a placeholder that would not download in time is transient, '
+      'not absent', () async {
+    final store = ICloudMediaObjectStore(
+      platform: _UndownloadablePlatform(container),
+    );
+    File('${container.path}/submersion-media/smv1/objects/aa/x.jpg')
+      ..createSync(recursive: true)
+      ..writeAsBytesSync([1, 2, 3]);
+    await expectLater(
+      store.head('smv1/objects/aa/x.jpg'),
+      throwsA(
+        isA<MediaStoreException>().having(
+          (e) => e.kind,
+          'kind',
+          MediaStoreErrorKind.transient,
+        ),
+      ),
+    );
+  });
+
+  test('head on a key the container has never held is absent', () async {
+    expect(await build().head('smv1/objects/aa/never.bin'), isNull);
   });
 
   test('getFile on a key the container has never held is notFound', () async {

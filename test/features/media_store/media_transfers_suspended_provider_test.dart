@@ -95,4 +95,49 @@ void main() {
       );
     },
   );
+
+  // The runtime fires its first drain before any reader can subscribe, and
+  // _setSuspended never repeats a value. A reader that sampled isSuspended
+  // and then subscribed lost a flip that landed in between, and nothing
+  // re-sent it: the queue stayed suspended with no notice, which is the
+  // symptom #1356 reported.
+  test('a reader that arrives after the flip still sees it', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: MediaUploadPipeline(
+        mediaRepository: MediaRepository(),
+        queue: queue,
+        store: store,
+        registry: MediaSourceResolverRegistry({}),
+        cache: cache,
+      ),
+      preflight: () async => false,
+    );
+    addTearDown(worker.dispose);
+    await worker.drain();
+    expect(worker.isSuspended, isTrue);
+
+    final container = ProviderContainer(
+      overrides: [
+        mediaStoreRuntimeProvider.overrideWith(
+          (ref) async => MediaStoreRuntime(
+            storeId: 'a',
+            store: store,
+            cache: cache,
+            resolver: MediaStoreResolver(store: store, cache: cache),
+            worker: worker,
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    final sub = container.listen(mediaTransfersSuspendedProvider, (_, _) {});
+    addTearDown(sub.close);
+
+    expect(
+      await container.read(mediaTransfersSuspendedProvider.future),
+      isTrue,
+    );
+  });
 }

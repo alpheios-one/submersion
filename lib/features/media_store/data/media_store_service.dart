@@ -262,29 +262,6 @@ class MediaStoreService {
     _icloudStoreFactory,
   );
 
-  /// Re-attaches this device to [storeId], the marker its iCloud container
-  /// actually holds, keeping the account it connected through.
-  ///
-  /// The runtime's preflight calls this when the container carries a marker
-  /// this device did not attach to. On iCloud that cannot mean a repointed
-  /// bucket (the container is fixed per Apple ID); it means two devices each
-  /// minted an identity, the second overwriting the first's marker before
-  /// it had downloaded (issue #1356). Adopting the container's marker is
-  /// exactly what the manual disconnect-and-reconnect workaround did.
-  Future<void> adoptICloudStore(String storeId) async {
-    final accountId = await _attachState.attachedAccountId();
-    await _attachState.setAttached(
-      storeId,
-      providerType: CloudProviderType.icloud,
-      accountId: accountId,
-    );
-    await _storesRepository.upsertActive(
-      storeId: storeId,
-      providerType: CloudProviderType.icloud.name,
-      displayHint: _icloudDisplayHint,
-    );
-  }
-
   /// Shared managed-provider flow: no credentials-store write - managed
   /// providers keep credentials in their own auth stores.
   Future<MediaStoreConnectResult> _connectManaged(

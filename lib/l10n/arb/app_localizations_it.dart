@@ -23919,7 +23919,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'Impossibile verificare l\'archivio cloud. Submersion continua a riprovare; se il problema persiste, disconnetti e ricollega l\'archivio multimediale.';
+      'Questo dispositivo e l\'archivio cloud non concordano più su quale archivio sia in uso. Riconnettere l\'archivio multimediale adotta quello che il cloud contiene ora.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

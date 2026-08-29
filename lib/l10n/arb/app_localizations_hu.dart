@@ -23838,7 +23838,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_suspended_subtitle =>
-      'A felhőtárolót nem sikerült ellenőrizni. A Submersion tovább próbálkozik; ha ez tartósan fennáll, válassza le, majd csatlakoztassa újra a médiatárolót.';
+      'Ez az eszköz és a felhőtároló már nem egyezik abban, melyik tárolót használják. A médiatároló újracsatlakoztatása a felhőben most található tárolót veszi át.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
