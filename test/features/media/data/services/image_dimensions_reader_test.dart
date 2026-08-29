@@ -263,6 +263,53 @@ void main() {
       expect(readImageDimensions(f, 'image/heic'), (width: 4032, height: 3024));
     });
 
+    test('counts an extended-size (64-bit) property when indexing ipco', () {
+      // ipma indices are positional over ipco's full child list, so a child
+      // using the size==1 form has to be walked correctly or every later
+      // index is off by one and resolves to the wrong property.
+      final f = write(
+        'largesize.heic',
+        heicWithProperties(
+          properties: [
+            ...ispe(320, 240), // the thumbnail's, first in ipco
+            ...box('hvcC', List.filled(8, 0), largeSize: true),
+            ...ispe(4032, 3024), // the primary's, index 3
+          ],
+          associations: [
+            ipmaEntry(1, [1]),
+            ipmaEntry(2, [3]),
+          ],
+          primaryItem: 2,
+        ),
+      );
+
+      expect(readImageDimensions(f, 'image/heic'), (width: 4032, height: 3024));
+    });
+
+    test('counts a to-end-of-range (size 0) property when indexing ipco', () {
+      // The size==0 form means "runs to the end of the enclosing box"; it can
+      // only be the last child, and it must still occupy one index.
+      final f = write(
+        'sizezero.heic',
+        heicWithProperties(
+          properties: [
+            ...ispe(320, 240),
+            // ispe with a size field of 0 rather than its real length.
+            ...u32(0), ...'ispe'.codeUnits,
+            0, 0, 0, 0, // version + flags
+            ...u32(4032), ...u32(3024),
+          ],
+          associations: [
+            ipmaEntry(1, [1]),
+            ipmaEntry(2, [2]),
+          ],
+          primaryItem: 2,
+        ),
+      );
+
+      expect(readImageDimensions(f, 'image/heic'), (width: 4032, height: 3024));
+    });
+
     test('falls back to the first ispe when pitm is absent', () {
       final f = write(
         'nopitm.heic',

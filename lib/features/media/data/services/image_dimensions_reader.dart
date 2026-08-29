@@ -152,7 +152,7 @@ ImageDimensions? _isoBmffDimensions(RandomAccessFile raf, int end) {
   final properties = findBoxesInBytes(metaBytes, ipco.start, ipco.end, 'ispe');
   if (properties.isEmpty) return null;
 
-  final wanted = _primaryIspe(metaBytes, iprp, ipco, properties);
+  final wanted = _primaryIspe(metaBytes, iprp, ipco);
   // A file with no usable pitm/ipma pair still has exactly one plausible
   // answer in the common single-image case: the first ispe.
   return _readIspe(metaBytes, wanted ?? properties.first);
@@ -160,12 +160,7 @@ ImageDimensions? _isoBmffDimensions(RandomAccessFile raf, int end) {
 
 /// Resolves the `ispe` associated with the `pitm` primary item, or null when
 /// either the primary item or its association is missing.
-BoxRange? _primaryIspe(
-  Uint8List b,
-  BoxRange iprp,
-  BoxRange ipco,
-  List<BoxRange> ispeRanges,
-) {
+BoxRange? _primaryIspe(Uint8List b, BoxRange iprp, BoxRange ipco) {
   final pitm = findBoxInBytes(b, 0, b.length, 'pitm');
   if (pitm == null) return null;
   final version = b[pitm.start];
@@ -179,30 +174,16 @@ BoxRange? _primaryIspe(
   // Property indices are 1-based into ipco's full child list, which holds
   // `hvcC`, `colr`, `pixi` and `irot` alongside the `ispe` entries -- an item
   // is associated with several of them, in no guaranteed order, so every
-  // association is tried and the one that lands on an ispe wins.
-  final children = _ipcoChildren(b, ipco);
+  // association is tried and the one that lands on an ispe wins. The list has
+  // to come from the shared walker: it is positional, so a child using the
+  // 64-bit or to-end-of-range size form must still occupy exactly one slot.
+  final children = boxesInBytes(b, ipco.start, ipco.end);
   for (final index in _propertyIndicesFor(b, ipma, primaryId)) {
     if (index < 1 || index > children.length) continue;
-    final target = children[index - 1];
-    for (final range in ispeRanges) {
-      if (range.start == target.start) return range;
-    }
+    final child = children[index - 1];
+    if (child.type == 'ispe') return child.range;
   }
   return null;
-}
-
-/// Every child property of `ipco`, in declaration order, since `ipma`
-/// indices count all of them and not just the `ispe` ones.
-List<BoxRange> _ipcoChildren(Uint8List b, BoxRange ipco) {
-  final children = <BoxRange>[];
-  var pos = ipco.start;
-  while (pos + 8 <= ipco.end) {
-    final size = beU32(b, pos);
-    if (size < 8 || pos + size > ipco.end) break;
-    children.add(BoxRange(pos + 8, pos + size));
-    pos += size;
-  }
-  return children;
 }
 
 /// Every property index associated with [wantId] in an `ipma` box, in
