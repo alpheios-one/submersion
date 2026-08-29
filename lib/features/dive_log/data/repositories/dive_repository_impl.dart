@@ -12,6 +12,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -104,6 +105,8 @@ class DiveRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final ProfileSeriesRepository _profileSeries = ProfileSeriesRepository();
+  final TankPressureSeriesRepository _tankSeries =
+      TankPressureSeriesRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveRepository);
   final TagRepository _tagRepository = TagRepository();
@@ -1426,6 +1429,10 @@ class DiveRepository {
   /// roughly one point per pixel — enough resolution to render the dive's
   /// shape (descents, safety stops, multilevel profiles) without spline
   /// smoothing flattening short features.
+  ///
+  /// Series-first: a dive with series rows merges every series (primary and
+  /// demoted alike, since a batch summary is not the edit-aware chart); a
+  /// dive with none falls back to the legacy table.
   Future<Map<String, List<domain.DiveProfilePoint>>> getBatchProfileSummaries(
     List<String> diveIds, {
     int maxSamples = 120,
@@ -1433,42 +1440,22 @@ class DiveRepository {
     if (diveIds.isEmpty) return {};
     try {
       return await PerfTimer.measure('batchProfileSummaries', () async {
-        final query = _db.select(_db.diveProfiles)
-          ..where((t) => t.diveId.isIn(diveIds))
-          ..orderBy([
-            (t) => OrderingTerm.asc(t.diveId),
-            (t) => OrderingTerm.asc(t.timestamp),
-          ]);
-        final rows = await query.get();
-
-        // Group by diveId
-        final grouped = <String, List<domain.DiveProfilePoint>>{};
-        for (final row in rows) {
-          grouped
-              .putIfAbsent(row.diveId, () => [])
-              .add(
-                domain.DiveProfilePoint(
-                  timestamp: row.timestamp,
-                  depth: row.depth,
-                ),
-              );
-        }
-
-        // Downsample each dive's profile to maxSamples points
-        final result = <String, List<domain.DiveProfilePoint>>{};
-        for (final entry in grouped.entries) {
-          final points = entry.value;
-          if (points.length <= maxSamples) {
-            result[entry.key] = points;
-          } else {
-            // Evenly space samples across the profile
-            final sampled = <domain.DiveProfilePoint>[];
-            for (var i = 0; i < maxSamples; i++) {
-              final index = (i * (points.length - 1)) ~/ (maxSamples - 1);
-              sampled.add(points[index]);
-            }
-            result[entry.key] = sampled;
-          }
+        final byDive = await _profileSeries.getSeriesForDives(diveIds);
+        final result = <String, List<domain.DiveProfilePoint>>{
+          for (final entry in byDive.entries)
+            entry.key: _downsample([
+              for (final p in mergeSeriesPoints(entry.value))
+                domain.DiveProfilePoint(timestamp: p.timestamp, depth: p.depth),
+            ], maxSamples),
+        };
+        final legacyIds = [
+          for (final id in diveIds)
+            if (!byDive.containsKey(id)) id,
+        ];
+        if (legacyIds.isNotEmpty) {
+          result.addAll(
+            await _getBatchProfileSummariesLegacy(legacyIds, maxSamples),
+          );
         }
         return result;
       });
@@ -1480,6 +1467,47 @@ class DiveRepository {
       );
       return {};
     }
+  }
+
+  Future<Map<String, List<domain.DiveProfilePoint>>>
+  _getBatchProfileSummariesLegacy(List<String> diveIds, int maxSamples) async {
+    final query = _db.select(_db.diveProfiles)
+      ..where((t) => t.diveId.isIn(diveIds))
+      ..orderBy([
+        (t) => OrderingTerm.asc(t.diveId),
+        (t) => OrderingTerm.asc(t.timestamp),
+      ]);
+    final rows = await query.get();
+
+    // Group by diveId
+    final grouped = <String, List<domain.DiveProfilePoint>>{};
+    for (final row in rows) {
+      grouped
+          .putIfAbsent(row.diveId, () => [])
+          .add(
+            domain.DiveProfilePoint(timestamp: row.timestamp, depth: row.depth),
+          );
+    }
+
+    // Downsample each dive's profile to maxSamples points
+    final result = <String, List<domain.DiveProfilePoint>>{};
+    for (final entry in grouped.entries) {
+      result[entry.key] = _downsample(entry.value, maxSamples);
+    }
+    return result;
+  }
+
+  /// Evenly spaces [points] down to at most [maxSamples], keeping the first
+  /// and last point. Returns [points] unchanged when already short enough.
+  static List<domain.DiveProfilePoint> _downsample(
+    List<domain.DiveProfilePoint> points,
+    int maxSamples,
+  ) {
+    if (points.length <= maxSamples) return points;
+    return [
+      for (var i = 0; i < maxSamples; i++)
+        points[(i * (points.length - 1)) ~/ (maxSamples - 1)],
+    ];
   }
 
   /// Create a new dive
@@ -3809,16 +3837,32 @@ class DiveRepository {
       ..orderBy([(t) => OrderingTerm.asc(t.tankOrder)]);
     final tankRows = await tanksQuery.get();
 
-    // Get per-tank pressure profile data to derive start/end pressure
-    // when the dive computer provided time-series readings
-    final tankPressureRows =
-        await (_db.select(_db.tankPressureProfiles)
-              ..where((t) => t.diveId.equals(row.id))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
-    final tankPressuresByTankId = <String, List<TankPressureProfile>>{};
-    for (final p in tankPressureRows) {
-      tankPressuresByTankId.putIfAbsent(p.tankId, () => []).add(p);
+    // Get per-tank pressure data to derive start/end pressure when the dive
+    // computer provided time-series readings. Series-first: a dive with tank
+    // pressure series uses those; a dive with none falls back to the legacy
+    // `tank_pressure_profiles` rows.
+    final tankSeries = await _tankSeries.getSeriesForDive(row.id);
+    final startPressureByTank = <String, double>{};
+    final endPressureByTank = <String, double>{};
+    if (tankSeries.isNotEmpty) {
+      for (final s in tankSeries) {
+        if (s.samples.isEmpty) continue;
+        startPressureByTank.putIfAbsent(
+          s.tankId,
+          () => s.samples.first.pressure,
+        );
+        endPressureByTank[s.tankId] = s.samples.last.pressure;
+      }
+    } else {
+      final tankPressureRows =
+          await (_db.select(_db.tankPressureProfiles)
+                ..where((t) => t.diveId.equals(row.id))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      for (final p in tankPressureRows) {
+        startPressureByTank.putIfAbsent(p.tankId, () => p.pressure);
+        endPressureByTank[p.tankId] = p.pressure;
+      }
     }
 
     // Get profile for this dive. Series-first: a dive with series rows uses
@@ -4104,27 +4148,13 @@ class DiveRepository {
           ? DateTime.fromMillisecondsSinceEpoch(row.weatherFetchedAt! * 1000)
           : null,
       tanks: tankRows.map((t) {
-        // Derive start/end pressure from profile data when available.
-        // Profile time-series from AI transmitters is the fallback
-        // source, if values entered by the user are not available in the
-        // dive tanks table.
-        final profilePoints = tankPressuresByTankId[t.id];
-        final profileStartPressure =
-            profilePoints != null && profilePoints.isNotEmpty
-            ? profilePoints.first.pressure
-            : null;
-        final profileEndPressure =
-            profilePoints != null && profilePoints.isNotEmpty
-            ? profilePoints.last.pressure
-            : null;
-
         return domain.DiveTank(
           id: t.id,
           name: t.tankName,
           volume: t.volume,
           workingPressure: t.workingPressure,
-          startPressure: t.startPressure ?? profileStartPressure,
-          endPressure: t.endPressure ?? profileEndPressure,
+          startPressure: t.startPressure ?? startPressureByTank[t.id],
+          endPressure: t.endPressure ?? endPressureByTank[t.id],
           gasMix: domain.GasMix(o2: t.o2Percent, he: t.hePercent),
           role: TankRole.values.firstWhere(
             (r) => r.name == t.tankRole,

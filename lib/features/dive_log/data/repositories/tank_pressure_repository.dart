@@ -5,6 +5,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
 /// Repository for managing per-tank time-series pressure data
@@ -14,13 +15,40 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 class TankPressureRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final TankPressureSeriesRepository _tankSeries =
+      TankPressureSeriesRepository();
   final _uuid = const Uuid();
 
   /// Get all tank pressure data for a dive, grouped by tank ID
   ///
   /// Returns a map where keys are tank IDs and values are lists of
-  /// pressure points sorted by timestamp.
+  /// pressure points sorted by timestamp. Series-first: a dive with tank
+  /// pressure series uses those; a dive with none falls back to the legacy
+  /// `tank_pressure_profiles` rows.
   Future<Map<String, List<TankPressurePoint>>> getTankPressuresForDive(
+    String diveId,
+  ) async {
+    final series = await _tankSeries.getSeriesForDive(diveId);
+    if (series.isEmpty) return _getTankPressuresForDiveLegacy(diveId);
+    final result = <String, List<TankPressurePoint>>{};
+    for (final s in series) {
+      final points = result.putIfAbsent(s.tankId, () => []);
+      for (var i = 0; i < s.samples.length; i++) {
+        final sample = s.samples[i];
+        points.add(
+          TankPressurePoint(
+            id: '${s.id}:$i',
+            tankId: s.tankId,
+            timestamp: sample.timestamp,
+            pressure: sample.pressure,
+          ),
+        );
+      }
+    }
+    return result;
+  }
+
+  Future<Map<String, List<TankPressurePoint>>> _getTankPressuresForDiveLegacy(
     String diveId,
   ) async {
     final rows =
@@ -46,8 +74,27 @@ class TankPressureRepository {
     return result;
   }
 
-  /// Get pressure data for a specific tank
+  /// Get pressure data for a specific tank. Series-first: falls back to the
+  /// legacy rows when the tank has no series.
   Future<List<TankPressurePoint>> getPressuresForTank(
+    String diveId,
+    String tankId,
+  ) async {
+    final series = await _tankSeries.getSeriesForTank(diveId, tankId);
+    if (series.isEmpty) return _getPressuresForTankLegacy(diveId, tankId);
+    return [
+      for (final s in series)
+        for (var i = 0; i < s.samples.length; i++)
+          TankPressurePoint(
+            id: '${s.id}:$i',
+            tankId: s.tankId,
+            timestamp: s.samples[i].timestamp,
+            pressure: s.samples[i].pressure,
+          ),
+    ];
+  }
+
+  Future<List<TankPressurePoint>> _getPressuresForTankLegacy(
     String diveId,
     String tankId,
   ) async {
@@ -214,7 +261,11 @@ class TankPressureRepository {
   }
 
   /// Check if a dive has any per-tank pressure data
-  Future<bool> hasTankPressures(String diveId) async {
+  Future<bool> hasTankPressures(String diveId) async =>
+      await _tankSeries.hasSeriesForDive(diveId) ||
+      await _hasTankPressuresLegacy(diveId);
+
+  Future<bool> _hasTankPressuresLegacy(String diveId) async {
     final count =
         await (_db.selectOnly(_db.tankPressureProfiles)
               ..addColumns([_db.tankPressureProfiles.id.count()])
