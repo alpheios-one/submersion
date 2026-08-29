@@ -87,6 +87,9 @@ class ProfileSeries extends Equatable {
 }
 
 /// One packed tank pressure series: a `tank_pressure_series` row decoded.
+///
+/// Not the Drift table class of the same name (lib/core/database/
+/// database.dart); consumers that need both import this one as domain.
 class TankPressureSeries extends Equatable {
   const TankPressureSeries({
     required this.id,

@@ -145,6 +145,41 @@ void main() {
     },
   );
 
+  test('restoreSeriesRow puts the captured row back and queues it', () async {
+    final id = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      computerId: 'comp-1',
+      samples: samples,
+      now: now,
+    );
+    final captured = await (db.select(
+      db.tankPressureSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    await repo.deleteForDive('dive-1');
+    await (db.delete(db.syncRecords)..where((t) => t.recordId.equals(id))).go();
+
+    await repo.restoreSeriesRow(captured, now: now + 5);
+
+    final back = await (db.select(
+      db.tankPressureSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    expect(back.createdAt, captured.createdAt);
+    expect(back.samples, captured.samples);
+    expect(back.hlc, isNotNull);
+    final pending = await (db.select(
+      db.syncRecords,
+    )..where((t) => t.recordId.equals(id))).getSingle();
+    expect(pending.entityType, TankPressureSeriesRepository.entityType);
+
+    await repo.deleteForDive('dive-1');
+    await repo.restoreSeriesRow(captured, markPending: false);
+    final verbatim = await (db.select(
+      db.tankPressureSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    expect(verbatim.hlc, captured.hlc);
+  });
+
   test('deleteForDive removes every series of the dive', () async {
     await repo.insertSeries(
       diveId: 'dive-1',

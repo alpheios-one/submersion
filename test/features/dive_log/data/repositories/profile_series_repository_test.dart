@@ -252,6 +252,30 @@ void main() {
       },
     );
 
+    test('promoteWinnerOwnedBy promotes the null-computer edit only', () async {
+      await repo.demoteAll('dive-1');
+      final promoted = await repo.promoteWinnerOwnedBy(
+        'dive-1',
+        sourceId: 'src-1',
+        computerId: 'comp-1',
+        now: now + 3,
+      );
+      expect(promoted, editSeries, reason: 'a manual edit outranks its source');
+      expect((await repo.getSeriesById(editSeries))!.isPrimary, isTrue);
+      expect((await repo.getSeriesById(computerSeries))!.isPrimary, isFalse);
+    });
+
+    test('promoteWinnerOwnedBy returns null when nothing is owned', () async {
+      expect(
+        await repo.promoteWinnerOwnedBy(
+          'dive-1',
+          sourceId: 'other-source',
+          computerId: 'other-computer',
+        ),
+        isNull,
+      );
+    });
+
     test(
       'deleteOwnedBy removes the matching series and logs tombstones',
       () async {

@@ -2882,6 +2882,10 @@ class DiveProfileSeries extends Table {
 /// One packed series of tank pressure readings for a (dive, tank, computer)
 /// group, encoded by `TankPressureSeriesCodec`. Replaces row-per-sample
 /// `tank_pressure_profiles`, which stays until plan 2e retires it.
+///
+/// Not the domain entity of the same name
+/// (lib/features/dive_log/domain/entities/profile_series.dart); consumers
+/// import that one as domain.
 @DataClassName('TankPressureSeriesRow')
 class TankPressureSeries extends Table {
   // coverage:ignore-start

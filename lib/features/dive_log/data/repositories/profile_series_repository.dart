@@ -101,26 +101,28 @@ class ProfileSeriesRepository {
     return row == null ? null : _decode(row);
   }
 
-  /// Clears `is_primary` on every series of [diveId]. Returns how many rows
-  /// changed; each changed row is marked pending.
-  Future<int> demoteAll(String diveId, {int? now}) async {
-    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    final ids = await _ids((t) => t.diveId.equals(diveId));
-    if (ids.isEmpty) return 0;
-    await (_db.update(
-      _db.diveProfileSeries,
-    )..where((t) => t.id.isIn(ids))).write(
-      DiveProfileSeriesCompanion(
-        isPrimary: const Value(false),
-        updatedAt: Value(nowMs),
-      ),
-    );
-    for (final id in ids) {
-      await _markPending(id, nowMs);
-    }
-    SyncEventBus.notifyLocalChange();
-    return ids.length;
+  /// Whether [diveId] has any primary series. A count, so no blob is read
+  /// or decoded.
+  Future<bool> hasPrimarySeries(String diveId) async {
+    final count = _db.diveProfileSeries.id.count();
+    final query = _db.selectOnly(_db.diveProfileSeries)
+      ..addColumns([count])
+      ..where(
+        _db.diveProfileSeries.diveId.equals(diveId) &
+            _db.diveProfileSeries.isPrimary.equals(true),
+      );
+    return ((await query.getSingle()).read(count) ?? 0) > 0;
   }
+
+  /// Clears `is_primary` on the primary series of [diveId]. Returns how many
+  /// rows changed; each changed row is marked pending. Series that are
+  /// already demoted are not touched, so an untouched row keeps its
+  /// `updated_at` and stays out of the next changeset.
+  Future<int> demoteAll(String diveId, {int? now}) => _setPrimary(
+    (t) => t.diveId.equals(diveId) & t.isPrimary.equals(true),
+    value: false,
+    now: now,
+  );
 
   /// Sets `is_primary` on the series [sourceId] or [computerId] own.
   ///
@@ -128,30 +130,123 @@ class ProfileSeriesRepository {
   /// rows that carry no source: `source_id = ?` OR (`source_id IS NULL` AND
   /// `computer_id IS ?`). The IS-semantics on the computer id are load
   /// bearing: `=` never matches NULL, which is how issue #1149 began.
+  ///
+  /// Promotes EVERY series the source owns, which is what the split path
+  /// wants. Use [promoteWinnerOwnedBy] for a primary swap, where exactly one
+  /// of them may end up live.
   Future<int> promoteOwnedBy(
+    String diveId, {
+    required String? sourceId,
+    required String? computerId,
+    int? now,
+  }) => _setPrimary(
+    (t) =>
+        t.diveId.equals(diveId) &
+        _ownedBy(t, sourceId: sourceId, computerId: computerId),
+    value: true,
+    now: now,
+  );
+
+  /// Sets `is_primary` on exactly one of the series [sourceId] or
+  /// [computerId] own: the null-computer one first (a manual edit is the
+  /// live version of its source's samples, the rule `restoreOriginalProfile`
+  /// encodes), then the greatest id. Both halves are derived from synced
+  /// values, so every device resolves the same winner. Returns the promoted
+  /// id, or null when the source owns nothing.
+  Future<String?> promoteWinnerOwnedBy(
     String diveId, {
     required String? sourceId,
     required String? computerId,
     int? now,
   }) async {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    final ids = await _ids(
-      (t) =>
-          t.diveId.equals(diveId) &
-          _ownedBy(t, sourceId: sourceId, computerId: computerId),
-    );
-    if (ids.isEmpty) return 0;
-    await (_db.update(
-      _db.diveProfileSeries,
-    )..where((t) => t.id.isIn(ids))).write(
-      DiveProfileSeriesCompanion(
-        isPrimary: const Value(true),
-        updatedAt: Value(nowMs),
-      ),
-    );
-    for (final id in ids) {
-      await _markPending(id, nowMs);
+    final query = _db.select(_db.diveProfileSeries)
+      ..where(
+        (t) =>
+            t.diveId.equals(diveId) &
+            _ownedBy(t, sourceId: sourceId, computerId: computerId),
+      )
+      ..orderBy([
+        (t) => OrderingTerm.desc(t.computerId.isNull()),
+        (t) => OrderingTerm.desc(t.id),
+      ])
+      ..limit(1);
+    final winner = await query.getSingleOrNull();
+    if (winner == null) return null;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.diveProfileSeries,
+      )..where((t) => t.id.equals(winner.id))).write(
+        DiveProfileSeriesCompanion(
+          isPrimary: const Value(true),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      await _markPending(winner.id, nowMs);
+    });
+    SyncEventBus.notifyLocalChange();
+    return winner.id;
+  }
+
+  /// Sets `is_primary` on every series [computerId] contributed, whatever
+  /// source they carry. The multi-computer branch of a profile restore, where
+  /// each computer's own samples become live again.
+  Future<int> promoteByComputer(String diveId, String computerId, {int? now}) =>
+      _setPrimary(
+        (t) => t.diveId.equals(diveId) & t.computerId.equals(computerId),
+        value: true,
+        now: now,
+      );
+
+  /// Sets `is_primary` on every series of [diveId]. The single-computer
+  /// branch of a profile restore, where nothing else can be the live series.
+  Future<int> promoteAll(String diveId, {int? now}) =>
+      _setPrimary((t) => t.diveId.equals(diveId), value: true, now: now);
+
+  /// Re-inserts [row] verbatim, `created_at`, `updated_at` and `hlc`
+  /// included: consolidation undo puts back the row it captured rather than
+  /// re-encoding it, and a re-encode could differ byte for byte. When
+  /// [markPending] the row is queued for sync, which restamps its hlc so the
+  /// restore wins last-writer-wins on every peer.
+  Future<void> restoreSeriesRow(
+    DiveProfileSeriesRow row, {
+    bool markPending = true,
+    int? now,
+  }) async {
+    await _db
+        .into(_db.diveProfileSeries)
+        .insertOnConflictUpdate(row.toCompanion(false));
+    if (markPending) {
+      await _markPending(row.id, now ?? DateTime.now().millisecondsSinceEpoch);
     }
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Writes `is_primary` = [value] on every matching series, marking each
+  /// changed row pending. The write and the pending stamps are one
+  /// transaction: a failure between them would leave rows whose flag moved
+  /// but which no changeset will ever carry.
+  Future<int> _setPrimary(
+    Expression<bool> Function($DiveProfileSeriesTable t) where, {
+    required bool value,
+    required int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(where);
+    if (ids.isEmpty) return 0;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.diveProfileSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        DiveProfileSeriesCompanion(
+          isPrimary: Value(value),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
     SyncEventBus.notifyLocalChange();
     return ids.length;
   }
@@ -172,6 +267,17 @@ class ProfileSeriesRepository {
   /// Deletes every series of [diveId], one tombstone per series.
   Future<List<String>> deleteForDive(String diveId) =>
       _delete((t) => t.diveId.equals(diveId));
+
+  /// Deletes the manual-edit series of [diveId]: primary and with no
+  /// computer, which is exactly the set `restoreOriginalProfile` removes
+  /// before putting a computer's own samples back. Returns the deleted ids,
+  /// one tombstone each.
+  Future<List<String>> deleteEditedSeries(String diveId) => _delete(
+    (t) =>
+        t.diveId.equals(diveId) &
+        t.isPrimary.equals(true) &
+        t.computerId.isNull(),
+  );
 
   Expression<bool> _ownedBy(
     $DiveProfileSeriesTable t, {
@@ -204,12 +310,17 @@ class ProfileSeriesRepository {
   ) async {
     final ids = await _ids(where);
     if (ids.isEmpty) return ids;
-    for (final id in ids) {
-      await _syncRepository.logDeletion(entityType: entityType, recordId: id);
-    }
-    await (_db.delete(
-      _db.diveProfileSeries,
-    )..where((t) => t.id.isIn(ids))).go();
+    // The tombstones and the delete are one logical write. A failure between
+    // them would leave tombstones for rows that are still live here, and the
+    // next sync would delete them on every peer.
+    await _db.transaction(() async {
+      for (final id in ids) {
+        await _syncRepository.logDeletion(entityType: entityType, recordId: id);
+      }
+      await (_db.delete(
+        _db.diveProfileSeries,
+      )..where((t) => t.id.isIn(ids))).go();
+    });
     SyncEventBus.notifyLocalChange();
     return ids;
   }

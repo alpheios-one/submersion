@@ -114,6 +114,28 @@ class TankPressureSeriesRepository {
             : t.computerId.equals(computerId)),
   );
 
+  /// Re-inserts [row] verbatim, `created_at`, `updated_at` and `hlc`
+  /// included: consolidation undo puts back the row it captured rather than
+  /// re-encoding it. When [markPending] the row is queued for sync, which
+  /// restamps its hlc so the restore wins last-writer-wins on every peer.
+  Future<void> restoreSeriesRow(
+    TankPressureSeriesRow row, {
+    bool markPending = true,
+    int? now,
+  }) async {
+    await _db
+        .into(_db.tankPressureSeries)
+        .insertOnConflictUpdate(row.toCompanion(false));
+    if (markPending) {
+      await _syncRepository.markRecordPending(
+        entityType: entityType,
+        recordId: row.id,
+        localUpdatedAt: now ?? DateTime.now().millisecondsSinceEpoch,
+      );
+    }
+    SyncEventBus.notifyLocalChange();
+  }
+
   Future<List<String>> _delete(
     Expression<bool> Function($TankPressureSeriesTable t) where,
   ) async {
@@ -124,12 +146,17 @@ class TankPressureSeriesRepository {
       for (final row in await query.get()) row.read(_db.tankPressureSeries.id)!,
     ];
     if (ids.isEmpty) return ids;
-    for (final id in ids) {
-      await _syncRepository.logDeletion(entityType: entityType, recordId: id);
-    }
-    await (_db.delete(
-      _db.tankPressureSeries,
-    )..where((t) => t.id.isIn(ids))).go();
+    // The tombstones and the delete are one logical write. A failure between
+    // them would leave tombstones for rows that are still live here, and the
+    // next sync would delete them on every peer.
+    await _db.transaction(() async {
+      for (final id in ids) {
+        await _syncRepository.logDeletion(entityType: entityType, recordId: id);
+      }
+      await (_db.delete(
+        _db.tankPressureSeries,
+      )..where((t) => t.id.isIn(ids))).go();
+    });
     SyncEventBus.notifyLocalChange();
     return ids;
   }
