@@ -95,6 +95,15 @@ class TankPressureSeriesRepository {
     return [for (final row in rows) _decode(row)];
   }
 
+  /// Whether [diveId] has any tank pressure series. A count, no decode.
+  Future<bool> hasSeriesForDive(String diveId) async {
+    final query = _db.selectOnly(_db.tankPressureSeries)
+      ..addColumns([_db.tankPressureSeries.id.count()])
+      ..where(_db.tankPressureSeries.diveId.equals(diveId));
+    final row = await query.getSingle();
+    return (row.read(_db.tankPressureSeries.id.count()) ?? 0) > 0;
+  }
+
   Future<List<String>> deleteForDive(String diveId) =>
       _delete((t) => t.diveId.equals(diveId));
 

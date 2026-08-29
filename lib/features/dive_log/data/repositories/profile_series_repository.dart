@@ -94,6 +94,30 @@ class ProfileSeriesRepository {
     return [for (final row in rows) _decode(row)];
   }
 
+  /// Every series of every dive in [diveIds], grouped by dive, each list in
+  /// the same order [getSeriesForDive] uses. Dives without series are absent
+  /// from the map, which is how a caller tells "not yet migrated" apart
+  /// from "no samples". One statement for the whole batch.
+  Future<Map<String, List<ProfileSeries>>> getSeriesForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const {};
+    final rows =
+        await (_db.select(_db.diveProfileSeries)
+              ..where((t) => t.diveId.isIn(diveIds))
+              ..orderBy([
+                (t) => OrderingTerm.asc(t.diveId),
+                (t) => OrderingTerm.asc(t.startTimestamp),
+                (t) => OrderingTerm.asc(t.id),
+              ]))
+            .get();
+    final byDive = <String, List<ProfileSeries>>{};
+    for (final row in rows) {
+      byDive.putIfAbsent(row.diveId, () => []).add(_decode(row));
+    }
+    return byDive;
+  }
+
   Future<ProfileSeries?> getSeriesById(String id) async {
     final row = await (_db.select(
       _db.diveProfileSeries,

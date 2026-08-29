@@ -231,4 +231,14 @@ void main() {
     expect(await repo.deleteForDive('dive-1'), hasLength(2));
     expect(await repo.getSeriesForDive('dive-1'), isEmpty);
   });
+
+  test('hasSeriesForDive answers without decoding', () async {
+    expect(await repo.hasSeriesForDive('dive-1'), isFalse);
+    await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      samples: samples,
+    );
+    expect(await repo.hasSeriesForDive('dive-1'), isTrue);
+  });
 }

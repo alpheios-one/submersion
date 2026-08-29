@@ -173,6 +173,43 @@ void main() {
     test('getSeriesById returns null for an unknown id', () async {
       expect(await repo.getSeriesById('nope'), isNull);
     });
+
+    test(
+      'getSeriesForDives groups by dive and omits dives without series',
+      () async {
+        await db
+            .into(db.dives)
+            .insert(
+              const DivesCompanion(
+                id: Value('dive-2'),
+                diveDateTime: Value(now),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+              ),
+            );
+        await repo.insertSeries(
+          diveId: 'dive-1',
+          samples: samples,
+          id: 'a',
+          now: now,
+        );
+        await repo.insertSeries(
+          diveId: 'dive-2',
+          samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+          id: 'b',
+          now: now,
+        );
+        final byDive = await repo.getSeriesForDives([
+          'dive-1',
+          'dive-2',
+          'dive-9',
+        ]);
+        expect(byDive.keys.toSet(), {'dive-1', 'dive-2'});
+        expect(byDive['dive-1']!.single.id, 'a');
+        expect(byDive['dive-2']!.single.id, 'b');
+        expect(await repo.getSeriesForDives(const []), isEmpty);
+      },
+    );
   });
 
   group('flags and deletes', () {
