@@ -730,6 +730,18 @@ class Dives extends Table {
   RealColumn get weightingFeedbackKg => real().nullable()();
   // Favorite flag (v1.1)
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  // Statistics exclusion (schema v180, issues #526 and #1272).
+  // excludedFromStats is the master flag: the dive stays in the logbook but
+  // contributes to no descriptive aggregate, its count included.
+  // excludedFromGasStats drops the dive from SAC/RMV and gas-mix aggregates
+  // only, for an otherwise ordinary dive whose gas number is unrepresentative
+  // (for example purging the tank for an end-of-dive weight check).
+  // The master flag implies the gas flag; the implication is applied in SQL by
+  // DiveStatsScope, not stored on the row.
+  BoolColumn get excludedFromStats =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get excludedFromGasStats =>
+      boolean().withDefault(const Constant(false))();
   // Dive mode for CCR/SCR (v1.5)
   TextColumn get diveMode =>
       text().withDefault(const Constant('oc'))(); // oc, ccr, scr
@@ -823,6 +835,10 @@ class Dives extends Table {
   /// Hybrid Logical Clock for cross-device conflict resolution
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
+
+  /// When the diver dismissed the site suggestion for this dive (photo GPS or
+  /// dive-computer GPS). Null = never dismissed. Synced with the row.
+  IntColumn get siteSuggestionDismissedAt => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -3310,7 +3326,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 178;
+  static const int currentSchemaVersion = 180;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3676,12 +3692,29 @@ class AppDatabase extends _$AppDatabase {
     177,
     // v178: one dive_dive_types row per (dive, type), collapsing the
     // duplicates the unguarded v92 seed minted on every device and the sync
-    // merge then unioned by row id. Issue #1360. 176 is claimed by PR #1328
-    // (photo-GPS site suggestions), still open; 177 above landed while this
-    // branch was open. This stays above main's scalar deliberately -- a rung
-    // at or below it merges with no conflict marker and its onUpgrade step
-    // then never runs.
+    // merge then unioned by row id. Issue #1360. (That comment originally
+    // recorded PR #1328 as holding 176; #1328 has since moved to 179, the
+    // rung below.)
     178,
+    // v179: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
+    // of the photo / dive-computer site suggestion. Renumbered twice while
+    // this branch was open -- from 172 when main landed 173-175, then from
+    // 176 when main landed 177 (GTR) -- because a rung below the shipped
+    // version never runs its onUpgrade step: a database already at the
+    // shipped version gains the column only through the beforeOpen backstop.
+    // 178 shipped with the dive-type uniqueness work while this branch was
+    // open, so this sits above it. 162, 167, 169 and 176 are skipped; the
+    // ladder is non-contiguous by design.
+    179,
+    // v180 (statistics exclusion): dives.excluded_from_stats and
+    // dives.excluded_from_gas_stats, letting a diver keep a dive in the
+    // logbook while removing it from statistics. Issues #526 and #1272.
+    // Renumbered from 178: main landed 178 (dive-type uniqueness) and 179
+    // (site-suggestion dismissal) while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    // Column-only rung with no backfill, so the beforeOpen backstop is
+    // safe to re-run.
+    180,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5233,6 +5266,19 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v179: site_suggestion_dismissed_at on dives. Null means the site
+  /// suggestion (from photo GPS or dive-computer GPS) was never dismissed.
+  Future<void> _assertSiteSuggestionDismissedAtColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('site_suggestion_dismissed_at')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN site_suggestion_dismissed_at INTEGER',
+      );
+    }
+  }
+
   /// v161: default_show_o2_cell_mv on diver_settings (issue #1235). The
   /// per-cell O2 mV toggle previously had no persisted default; this lets a
   /// diver make it visible by default on the profile chart.
@@ -5496,6 +5542,30 @@ class AppDatabase extends _$AppDatabase {
   /// letting frequently-dived buddies be pinned to the top of the "Add
   /// buddy" picker regardless of sort. Self-guards on the table existing, and
   /// defaults every pre-existing row to not-favorited.
+  /// Idempotent DDL for the v180 dives.excluded_from_stats and
+  /// dives.excluded_from_gas_stats columns (issues #526 and #1272), letting a
+  /// diver keep a dive in the logbook while removing it from statistics.
+  /// Self-guards on the table existing, and defaults every pre-existing row to
+  /// included. Same dual-call contract (onUpgrade + beforeOpen backstop) as
+  /// the other column-assert helpers.
+  Future<void> _assertDiveStatsExclusionColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('excluded_from_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+    if (!names.contains('excluded_from_gas_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_gas_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+  }
+
   Future<void> _assertBuddyFavoriteColumn() async {
     final cols = await customSelect("PRAGMA table_info('buddies')").get();
     if (cols.isEmpty) return;
@@ -9181,6 +9251,18 @@ class AppDatabase extends _$AppDatabase {
           await assertDiveTypeUniqueness(this);
         }
         if (from < 178) await reportProgress();
+        // v179: dives.site_suggestion_dismissed_at (site suggestion dismissal).
+        if (from < 179) {
+          await _assertSiteSuggestionDismissedAtColumn();
+        }
+        if (from < 179) await reportProgress();
+        // v180: dives.excluded_from_stats and dives.excluded_from_gas_stats
+        // (issues #526 and #1272). Column-only rung, no backfill: every
+        // pre-existing row correctly defaults to included.
+        if (from < 180) {
+          await _assertDiveStatsExclusionColumns();
+        }
+        if (from < 180) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9385,6 +9467,10 @@ class AppDatabase extends _$AppDatabase {
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
 
+        // v179 backstop: re-assert dives.site_suggestion_dismissed_at (same
+        // parallel-branch version-collision self-heal).
+        await _assertSiteSuggestionDismissedAtColumn();
+
         // v164 backstop: re-assert media.manual_elapsed_seconds (issue
         // #1090; same parallel-branch version-collision self-heal). The
         // media row mapper reads it on every hydration.
@@ -9422,6 +9508,12 @@ class AppDatabase extends _$AppDatabase {
         // the ladder, and re-running it on every open would resurrect a gear
         // item the user deleted.
         await _assertDiveComputerEquipmentColumn();
+
+        // v180 backstop: re-assert the dives statistics-exclusion columns
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertDiveStatsExclusionColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

@@ -72,10 +72,13 @@ void main() {
       await pumpBulk(tester);
 
       // 4 Logistics + 9 Conditions + 6 Weather + 6 Rebreather + 1 Buddies
-      // (my role, #1220) + 1 Notes gates.
+      // (my role, #1220) + 1 Notes + 2 statistics-exclusion gates (#526,
+      // #1272) = 29.
       // (dive type moved from a scalar gate to the collection lane, #414)
-      expect(find.byType(BulkFieldGate), findsNWidgets(27));
+      expect(find.byType(BulkFieldGate), findsNWidgets(29));
       expect(find.text('Favorite'), findsOneWidget);
+      expect(find.text('Exclude from statistics'), findsOneWidget);
+      expect(find.text('Exclude from gas statistics'), findsOneWidget);
       // Only the 3 owned collections (weights, tanks, sightings) still use a
       // mode selector; the 4 reference collections (tags, diveTypes,
       // equipment, buddies) use the tri-state membership editor.

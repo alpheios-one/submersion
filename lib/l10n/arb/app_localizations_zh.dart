@@ -4675,6 +4675,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_marineLife => '海洋生物';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张照片',
+      one: '1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => '备注';
 
   @override
@@ -6319,6 +6330,44 @@ class AppLocalizationsZh extends AppLocalizations {
   String get siteMatchReview_empty => '没有可匹配的内容。';
 
   @override
+  String get siteSuggestion_titlePhoto => '在照片中找到位置';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => '来自潜水电脑的位置';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '指定 $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return '选择附近潜水点 ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return '为 $name 添加位置';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '已指定 $name';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => '来自照片';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => '来自潜水电脑';
+
+  @override
+  String get siteMatchReview_currentSiteCard => '为此潜水点添加位置';
+
+  @override
+  String get siteMatchReview_createHereButton => '在此创建潜水点';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '已选择 $selected · 待审核 $review · 无匹配 $none';
   }
@@ -6350,8 +6399,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '已关联 $dives 次潜水 · 已添加 $sites 个潜水点';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '已关联 $dives 次潜水 · 已添加 $sites 个潜水点 · 已定位 $located 个潜水点';
   }
 
   @override
@@ -11830,6 +11879,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_title => '气体计算器';
 
   @override
+  String get gasCalculators_desc_mod => '混合气体的最大安全深度';
+
+  @override
+  String get gasCalculators_desc_bestMix => '目标深度的最佳富氧混合气';
+
+  @override
+  String get gasCalculators_desc_consumption => '计划潜水的耗气量';
+
+  @override
+  String get gasCalculators_desc_rockBottom => '两名潜水员上升所需的储备气';
+
+  @override
+  String get gasCalculators_desc_mnd => '混合气体的麻醉深度极限';
+
+  @override
+  String get gasCalculators_desc_blender => '目标混合气的充填流程';
+
+  @override
+  String get gasCalculators_summary_prompt => '选择一个计算器开始';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip => '编辑预期物种';
 
   @override
@@ -12064,6 +12134,161 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => '搜索物种...';
+
+  @override
+  String get marineLife_lookup_button => '在线查找';
+
+  @override
+  String get marineLife_lookup_title => '查找物种';
+
+  @override
+  String get marineLife_lookup_searchHint => '常用名或学名';
+
+  @override
+  String get marineLife_lookup_search => '查找';
+
+  @override
+  String get marineLife_lookup_createWithout => '不查找直接创建';
+
+  @override
+  String get marineLife_lookup_attribution => '物种数据和照片来自 iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => '输入名称，然后点按“查找”。';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return '未找到与“$query”匹配的物种';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => '你似乎处于离线状态。';
+
+  @override
+  String get marineLife_lookup_errorTimeout => '查找超时。';
+
+  @override
+  String get marineLife_lookup_errorServer => 'iNaturalist 返回了错误。请稍后重试。';
+
+  @override
+  String get marineLife_lookup_errorMalformed => '来自 iNaturalist 的意外响应。';
+
+  @override
+  String get marineLife_lookup_retry => '重试';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条观察记录',
+      one: '1 条观察记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank：请选择一个物种';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog => '推荐加入目录';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => '无法打开浏览器';
+
+  @override
+  String get marineLife_suggest_copyLink => '复制链接';
+
+  @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return '照片 ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty => '标记为该物种的照片会显示在这里。';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => '标记照片';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => '添加照片';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => '物种照片';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已添加 $count 张照片',
+      one: '已添加 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '跳过 $count 张',
+      one: '跳过 1 张',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张失败',
+      one: '1 张失败',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => '标记照片';
+
+  @override
+  String get marineLife_tagPicker_empty => '在记录过该物种的潜水中没有未标记的照片。';
+
+  @override
+  String get marineLife_tagPicker_emptyHint => '使用“添加照片”从相册导入图片。';
+
+  @override
+  String get marineLife_tagPicker_selectAll => '全选';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '标记 $count 张照片',
+      one: '标记 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已标记 $count 张照片',
+      one: '已标记 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return '第 $number 次潜水';
+  }
 
   @override
   String get marineLife_speciesPage_title => '物种';
@@ -12410,6 +12635,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => '忽略 GPS 建议';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count 次潜水可根据照片获得潜水点';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => '查看潜水点';
 
   @override
   String get media_gpsBanner_title => 'GPS 已找到在照片';
@@ -13257,6 +13490,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_species => '物种';
 
   @override
   String get media_library_filter_trip => '行程';
@@ -16784,10 +17020,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_conditions_temperature_seriesMin => '最低';
 
   @override
-  String get statistics_conditions_temperature_subtitle => '最低/平均/最高温度';
+  String get statistics_conditions_temperature_subtitle =>
+      '按日历月份统计的最低、平均和最高值，涵盖所有年份';
 
   @override
-  String get statistics_conditions_temperature_title => '每月水温';
+  String get statistics_conditions_temperature_title => '季节性水温';
 
   @override
   String get statistics_conditions_visibility_error => '加载能见度数据失败';
@@ -16823,7 +17060,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_equipment_weightTrend_error => '加载配重趋势失败';
 
   @override
-  String get statistics_equipment_weightTrend_subtitle => '平均配重随时间变化';
+  String get statistics_equipment_weightTrend_subtitle => '每次潜水携带的总配重';
 
   @override
   String get statistics_equipment_weightTrend_title => '配重趋势';
@@ -16897,7 +17134,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_gas_sacTrend_error => '加载消耗趋势失败';
 
   @override
-  String get statistics_gas_sacTrend_subtitle => '5年月均值';
+  String get statistics_gas_sacTrend_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_gas_sacTrend_title => '气体消耗趋势';
@@ -17134,7 +17371,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_progression_bottomTime_error => '加载潜水时间趋势失败';
 
   @override
-  String get statistics_progression_bottomTime_subtitle => '月均潜水时长';
+  String get statistics_progression_bottomTime_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_progression_bottomTime_title => '潜水时间趋势';
@@ -17152,7 +17389,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_progression_depthProgression_error => '加载深度进展失败';
 
   @override
-  String get statistics_progression_depthProgression_subtitle => '5年月度最大深度';
+  String get statistics_progression_depthProgression_subtitle => '范围内的每次潜水';
 
   @override
   String get statistics_progression_depthProgression_title => '最大深度进展';
@@ -22489,11 +22726,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '已检查 $checked 个对象：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
+    return '已检查 $checked 个云端对象（$originals 个原图、$thumbs 个缩略图、$renditions 个压缩版本）：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
   }
 
   @override
@@ -24651,6 +24891,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String get reef_species_addFromLookup => '查找并添加到你的物种';
 
   @override
   String reef_species_showAll(int count) {
@@ -29064,6 +29307,1136 @@ class AppLocalizationsZh extends AppLocalizations {
   String get species_saltwater_crocodile_desc => '现存最大的爬行动物，见于印度洋至太平洋的沿岸和河口水域。';
 
   @override
+  String get species_northern_pike_name => '白斑狗鱼';
+
+  @override
+  String get species_northern_pike_desc => '身体细长、吻部像鸭嘴的伏击型掠食鱼，常一动不动地悬停在湖岸水草间。';
+
+  @override
+  String get species_muskellunge_name => '北美狗鱼';
+
+  @override
+  String get species_muskellunge_desc => '最大的狗鱼，北方清澈湖泊中带条纹或斑点的巨型鱼，难得一见但令人难忘。';
+
+  @override
+  String get species_chain_pickerel_name => '暗色狗鱼';
+
+  @override
+  String get species_chain_pickerel_desc => '北美东部水草茂密池塘中的细长狗鱼，因体侧链状花纹而得名。';
+
+  @override
+  String get species_walleye_name => '玻璃梭鲈';
+
+  @override
+  String get species_walleye_desc => '金橄榄色的鲈科近亲，眼睛大而反光，黄昏时在岩石和沙质湖底上方捕食。';
+
+  @override
+  String get species_sauger_name => '加拿大梭鲈';
+
+  @override
+  String get species_sauger_desc => '大眼梭鲈体型更小、斑纹更多的近亲，偏爱浑浊的河流和水库。';
+
+  @override
+  String get species_yellow_perch_name => '黄金鲈';
+
+  @override
+  String get species_yellow_perch_desc => '成群活动的金黄色鲈鱼，体侧有深色竖纹，在北美的码头和水草丛附近很常见。';
+
+  @override
+  String get species_european_perch_name => '河鲈';
+
+  @override
+  String get species_european_perch_desc =>
+      '带条纹、鳍有硬棘的鲈鱼，下鳍呈红橙色，几乎遍布欧洲所有湖泊和缓流河流。';
+
+  @override
+  String get species_zander_name => '梭鲈';
+
+  @override
+  String get species_zander_desc => '体型大、颜色淡的掠食鱼，眼睛呈玻璃状，口有尖牙，夜间在欧洲浑浊的湖河中巡游。';
+
+  @override
+  String get species_ruffe_name => '密歇根梅花鲈';
+
+  @override
+  String get species_ruffe_desc => '小型斑纹鲈鱼，背鳍连成一片且有硬棘，在欧洲湖泊的软质湖底大量出现。';
+
+  @override
+  String get species_largemouth_bass_name => '大口黑鲈';
+
+  @override
+  String get species_largemouth_bass_desc =>
+      '背部绿色的黑鲈，体侧有深色条纹，嘴巴极大，潜伏在温暖湖泊的倒木和水草边缘。';
+
+  @override
+  String get species_smallmouth_bass_name => '小口黑鲈';
+
+  @override
+  String get species_smallmouth_bass_desc => '古铜色的黑鲈，体侧有淡淡的竖纹，栖息在清凉湖河的岩石和砾石上方。';
+
+  @override
+  String get species_rock_bass_name => '岩钝鲈';
+
+  @override
+  String get species_rock_bass_desc =>
+      '体型粗壮、眼睛发红的太阳鱼，体侧有成排深色斑点，藏身于清澈溪流和湖泊的巨石间。';
+
+  @override
+  String get species_bluegill_name => '蓝鳃太阳鱼';
+
+  @override
+  String get species_bluegill_desc => '圆盘状的太阳鱼，鳃盖有蓝黑色耳片，胸部橙色，在浅沙底成群筑巢。';
+
+  @override
+  String get species_pumpkinseed_name => '太阳鱼';
+
+  @override
+  String get species_pumpkinseed_desc =>
+      '色彩斑斓的太阳鱼，耳片末端红色，面颊有波浪状蓝纹，常见于水草茂密的浅水区。';
+
+  @override
+  String get species_black_crappie_name => '黑莓鲈';
+
+  @override
+  String get species_black_crappie_desc => '银色高身的小型鱼，布满黑色斑点，成群聚集在沉没的树枝和桩柱周围。';
+
+  @override
+  String get species_white_crappie_name => '白莓鲈';
+
+  @override
+  String get species_white_crappie_desc => '颜色较淡的莓鲈，体侧有淡淡的竖带，偏爱浑浊的水库和缓流河流。';
+
+  @override
+  String get species_brown_trout_name => '褐鳟';
+
+  @override
+  String get species_brown_trout_desc => '金棕色的鳟鱼，身上有红色和黑色斑点，栖息在清凉河流和湖泊的水流中。';
+
+  @override
+  String get species_rainbow_trout_name => '虹鳟';
+
+  @override
+  String get species_rainbow_trout_desc =>
+      '银色的鳟鱼，体侧有粉红色带，布满细小黑斑，在全球冷水中既有放流也有野生种群。';
+
+  @override
+  String get species_brook_trout_name => '美洲红点鲑';
+
+  @override
+  String get species_brook_trout_desc =>
+      '背部有蠕虫状花纹的红点鲑，红点外有蓝色光晕，鳍缘白色，栖息于寒冷的源头溪流。';
+
+  @override
+  String get species_lake_trout_name => '突吻红点鲑';
+
+  @override
+  String get species_lake_trout_desc => '大型灰色红点鲑，布满淡色斑点，尾鳍分叉，在北方湖泊深冷水域中巡游。';
+
+  @override
+  String get species_arctic_char_name => '北极红点鲑';
+
+  @override
+  String get species_arctic_char_desc => '分布最北的淡水鱼，体形细长的红点鲑，秋季繁殖期腹部泛出橙红色。';
+
+  @override
+  String get species_atlantic_salmon_name => '大西洋鲑';
+
+  @override
+  String get species_atlantic_salmon_desc =>
+      '银色的溯河洄游鲑鱼，身上有X形黑斑，返回出生河流产卵时会跃过瀑布。';
+
+  @override
+  String get species_chinook_salmon_name => '帝王鲑';
+
+  @override
+  String get species_chinook_salmon_desc => '体型最大的太平洋鲑，背部蓝绿色，牙龈黑色，溯游西部大河产卵。';
+
+  @override
+  String get species_sockeye_salmon_name => '红鲑';
+
+  @override
+  String get species_sockeye_salmon_desc =>
+      '产卵期体色变为鲜红、头部呈绿色的鲑鱼，成群聚集在湖泊补给河流的砾石床上。';
+
+  @override
+  String get species_coho_salmon_name => '银鲑';
+
+  @override
+  String get species_coho_salmon_desc => '银鲑，牙龈白色，斑点仅分布于尾鳍上半部，在小型沿海溪流中产卵。';
+
+  @override
+  String get species_lake_whitefish_name => '鲱形白鲑';
+
+  @override
+  String get species_lake_whitefish_desc => '银色小嘴的白鲑，生活在寒冷的深水湖泊，成大群在湖底觅食。';
+
+  @override
+  String get species_cisco_name => '湖白鲑';
+
+  @override
+  String get species_cisco_desc => '体形细长、似鲱鱼的白鲑，在北方冷水湖的开阔水域成群活动，是湖鳟的猎物。';
+
+  @override
+  String get species_european_grayling_name => '茴鱼';
+
+  @override
+  String get species_european_grayling_desc =>
+      '银灰色的河鱼，背鳍高耸如帆且边缘泛紫，栖息于水流湍急、砾石洁净的河段。';
+
+  @override
+  String get species_common_carp_name => '欧洲鲤';
+
+  @override
+  String get species_common_carp_desc => '体态厚重的古铜色鲤鱼，鳞片大，有两对须，在温暖湖河的软底中翻找食物。';
+
+  @override
+  String get species_grass_carp_name => '草鱼';
+
+  @override
+  String get species_grass_carp_desc => '鱼雷形的亚洲鲤鱼，被引入世界各地以啃食水草，常见于清澈的采石场湖泊。';
+
+  @override
+  String get species_tench_name => '丁鱥';
+
+  @override
+  String get species_tench_desc => '橄榄绿色的鱼，鳞片细小，眼睛红色，鳍圆钝，在静水的淤泥和芦苇间滑行。';
+
+  @override
+  String get species_common_bream_name => '欧鳊';
+
+  @override
+  String get species_common_bream_desc => '体高而侧扁的古铜色鱼，成群头朝下在泥底觅食，广泛分布于欧洲低地。';
+
+  @override
+  String get species_roach_name => '拟鲤';
+
+  @override
+  String get species_roach_desc => '银色的群游鱼，鳍红色，虹膜红色，是许多欧洲湖泊和运河中数量最多的鱼。';
+
+  @override
+  String get species_rudd_name => '红眼鱼';
+
+  @override
+  String get species_rudd_desc => '拟鲤的近亲，体侧金色，鳍鲜红，口上位，在水面下方觅食。';
+
+  @override
+  String get species_chub_name => '宽头欧鲢';
+
+  @override
+  String get species_chub_desc => '体格粗壮的河鱼，头宽，鳞片大且边缘深色，嘴大，常停留在悬垂的树下。';
+
+  @override
+  String get species_barbel_name => '正鲃';
+
+  @override
+  String get species_barbel_desc => '流线型的底栖鱼，有四条须，口下位，紧贴欧洲湍急河流的砾石底。';
+
+  @override
+  String get species_european_eel_name => '欧洲鳗鲡';
+
+  @override
+  String get species_european_eel_desc => '蛇形鱼类，在河流湖泊中生活数十年后洄游至马尾藻海，一生仅产卵一次。';
+
+  @override
+  String get species_american_eel_name => '美洲鳗鲡';
+
+  @override
+  String get species_american_eel_desc => '北美鳗鱼，白天藏身于河流湖泊的岩石下，返回马尾藻海繁殖。';
+
+  @override
+  String get species_burbot_name => '江鳕';
+
+  @override
+  String get species_burbot_desc => '唯一的淡水鳕鱼，体表斑驳、形似鳗鱼，下颌有一根须，白天藏于寒冷深水中。';
+
+  @override
+  String get species_channel_catfish_name => '斑点叉尾鮰';
+
+  @override
+  String get species_channel_catfish_desc =>
+      '灰色的鲶鱼，体表散布深色斑点，尾鳍分叉，有八根须，常见于北美的河流和水库。';
+
+  @override
+  String get species_flathead_catfish_name => '铲鮰';
+
+  @override
+  String get species_flathead_catfish_desc => '体型巨大的褐色斑纹鲶鱼，头部扁平，下颌突出，潜伏在河流深潭中。';
+
+  @override
+  String get species_brown_bullhead_name => '云斑鮰';
+
+  @override
+  String get species_brown_bullhead_desc => '小型粗壮的鲶鱼，须呈深色，尾鳍平直，能耐受泥泞、温暖且缺氧的池塘。';
+
+  @override
+  String get species_wels_catfish_name => '欧鲇';
+
+  @override
+  String get species_wels_catfish_desc => '欧洲最大的淡水鱼，无鳞巨物，头宽而平，长须，潜伏在河流深潭中。';
+
+  @override
+  String get species_white_sturgeon_name => '白鲟';
+
+  @override
+  String get species_white_sturgeon_desc => '北美最大的淡水鱼，披甲的灰色巨物，尾鳍似鲨鱼，在西部大河中巡游。';
+
+  @override
+  String get species_lake_sturgeon_name => '湖鲟';
+
+  @override
+  String get species_lake_sturgeon_desc =>
+      '生长缓慢的披甲鲟鱼，分布于五大湖和密西西比流域，用管状口吸食底部食物。';
+
+  @override
+  String get species_european_sturgeon_name => '欧洲鲟';
+
+  @override
+  String get species_european_sturgeon_desc =>
+      '极度濒危的披甲鲟鱼，原产大西洋沿岸河流，如今在加龙河和易北河进行人工繁育放流。';
+
+  @override
+  String get species_alligator_gar_name => '鳄雀鳝';
+
+  @override
+  String get species_alligator_gar_desc => '史前巨鱼，吻宽而多齿，菱形甲鳞，在南方河流中会浮出水面吞气。';
+
+  @override
+  String get species_longnose_gar_name => '长吻雀鳝';
+
+  @override
+  String get species_longnose_gar_desc => '体形细长的甲鳞鱼，吻如针状，一动不动地悬停在温暖河流的水面下方。';
+
+  @override
+  String get species_bowfin_name => '弓鳍鱼';
+
+  @override
+  String get species_bowfin_desc => '活化石，背鳍长而波状起伏，头部骨质，在水草丛生的回水区守护幼鱼。';
+
+  @override
+  String get species_american_paddlefish_name => '匙吻鲟';
+
+  @override
+  String get species_american_paddlefish_desc => '滤食性巨鱼，桨状吻部占体长的三分之一，在大河中张口游动。';
+
+  @override
+  String get species_sea_lamprey_name => '海七鳃鳗';
+
+  @override
+  String get species_sea_lamprey_desc =>
+      '无颌、形似鳗鱼的寄生鱼，口为环形齿盘状吸盘，在海洋或湖泊觅食后到砾石溪流产卵。';
+
+  @override
+  String get species_freshwater_drum_name => '淡水石首鱼';
+
+  @override
+  String get species_freshwater_drum_desc =>
+      '银色驼背鱼，能发出可闻的咕噜声，用咽齿碾碎贻贝，常见于大河和湖泊。';
+
+  @override
+  String get species_white_sucker_name => '康氏亚口鱼';
+
+  @override
+  String get species_white_sucker_desc => '圆筒形底栖鱼，口肉质且朝下，春季成群溯溪产卵。';
+
+  @override
+  String get species_common_minnow_name => '阿尔泰鱥';
+
+  @override
+  String get species_common_minnow_desc => '微小的条纹群游鱼，栖息于清凉的溪流和湖泊，雄鱼春季变为红绿色。';
+
+  @override
+  String get species_three_spined_stickleback_name => '三刺鱼';
+
+  @override
+  String get species_three_spined_stickleback_desc =>
+      '微小的披甲鱼，背部有三根硬棘，喉部红色的雄鱼会用植物纤维筑巢并守护。';
+
+  @override
+  String get species_alewife_name => '淡水大眼鲱';
+
+  @override
+  String get species_alewife_desc => '银色的鲱鱼，春季溯河洄游，如今在五大湖中形成庞大鱼群。';
+
+  @override
+  String get species_nile_perch_name => '尼罗河鲈';
+
+  @override
+  String get species_nile_perch_desc => '体型庞大的银色掠食鱼，眼周有黑圈，被引入维多利亚湖后称霸开阔水域。';
+
+  @override
+  String get species_nile_tilapia_name => '尼罗口孵非鲫';
+
+  @override
+  String get species_nile_tilapia_desc => '灰色的慈鲷，尾部有竖纹，口孵幼鱼，在全球温暖水域被养殖并野化。';
+
+  @override
+  String get species_african_tigerfish_name => '饰纹狗脂鲤';
+
+  @override
+  String get species_african_tigerfish_desc =>
+      '带条纹的银色掠食鱼，牙齿如匕首般交错，在赞比西河等湍急的非洲河流中捕食。';
+
+  @override
+  String get species_marbled_lungfish_name => '维多利亚肺鱼';
+
+  @override
+  String get species_marbled_lungfish_desc => '鳗形的呼吸空气的鱼，鳍呈丝状，干旱时封在泥茧中存活。';
+
+  @override
+  String get species_electric_catfish_name => '电鲇';
+
+  @override
+  String get species_electric_catfish_desc => '尼罗河和刚果河中的肥硕灰色鲶鱼，能以数百伏特的电击麻痹猎物。';
+
+  @override
+  String get species_zebra_mbuna_name => '斑马岩栖慈鲷';
+
+  @override
+  String get species_zebra_mbuna_desc => '马拉维湖的蓝色条纹岩栖慈鲷，成群密集地在巨石上刮食藻类并守卫领地。';
+
+  @override
+  String get species_malawi_butterfly_peacock_name => '蝴蝶孔雀慈鲷';
+
+  @override
+  String get species_malawi_butterfly_peacock_desc =>
+      '马拉维湖洞穴中的虹彩蓝色孔雀慈鲷，雄鱼的鳍缘发白闪亮。';
+
+  @override
+  String get species_fuelleborn_cichlid_name => '蓝岩栖慈鲷';
+
+  @override
+  String get species_fuelleborn_cichlid_desc =>
+      '马拉维湖的钝吻岩栖慈鲷，肉质突出的吻部用于在浪击带刮食藻类。';
+
+  @override
+  String get species_princess_of_burundi_name => '布隆迪公主慈鲷';
+
+  @override
+  String get species_princess_of_burundi_desc =>
+      '坦噶尼喀湖的优雅慈鲷，鳍呈琴形，以大家庭群体生活并共同照料巢穴。';
+
+  @override
+  String get species_frontosa_name => '六间慈鲷';
+
+  @override
+  String get species_frontosa_desc => '坦噶尼喀湖的深水慈鲷，蓝白条纹醒目，前额隆起，成群在岩石上缓慢游动。';
+
+  @override
+  String get species_tropheus_moorii_name => '蓝岩慈鲷';
+
+  @override
+  String get species_tropheus_moorii_desc =>
+      '坦噶尼喀湖的粗壮岩栖慈鲷，有数十种色型，每种仅限于自己的一段湖岸。';
+
+  @override
+  String get species_arapaima_name => '巨骨舌鱼';
+
+  @override
+  String get species_arapaima_desc => '最大的淡水鱼之一，亚马逊的披甲巨物，尾部有红色斑点，会浮出水面吞气。';
+
+  @override
+  String get species_silver_arowana_name => '双须骨舌鱼';
+
+  @override
+  String get species_silver_arowana_desc => '亚马逊的带状银色鱼，下颌有两根须，会跃出水面从树枝上叼食昆虫。';
+
+  @override
+  String get species_red_bellied_piranha_name => '纳氏臀点脂鲤';
+
+  @override
+  String get species_red_bellied_piranha_desc =>
+      '体高的银色鱼，腹部深红，牙齿锋利，成群在亚马逊回水区活动。';
+
+  @override
+  String get species_black_piranha_name => '菱锯脂鲤';
+
+  @override
+  String get species_black_piranha_desc =>
+      '大型独居的食人鱼，眼睛红色，身体深色呈菱形，潜伏在亚马逊清澈多岩的支流中。';
+
+  @override
+  String get species_red_bellied_pacu_name => '短盖肥脂鲤';
+
+  @override
+  String get species_red_bellied_pacu_desc =>
+      '外形似食人鱼的食果鱼，牙齿扁平善于碾碎，腹部红色，聚集在被淹没的森林树下。';
+
+  @override
+  String get species_tambaqui_name => '黑盖巨脂鲤';
+
+  @override
+  String get species_tambaqui_desc => '亚马逊的巨型深色淡水鲳，在被淹没的森林树冠下嚼食落下的坚果和种子。';
+
+  @override
+  String get species_electric_eel_name => '电鳗';
+
+  @override
+  String get species_electric_eel_desc =>
+      '并非真正的鳗鱼而是裸背电鳗，体长而深色，能呼吸空气，以高达600伏的电击麻痹猎物。';
+
+  @override
+  String get species_redtail_catfish_name => '红尾护头鲿';
+
+  @override
+  String get species_redtail_catfish_desc =>
+      '大型亚马逊鲶鱼，背部深色，腹部白色，尾鳍鲜橙红色，栖息于河流深潭。';
+
+  @override
+  String get species_tiger_shovelnose_catfish_name => '虎皮鸭嘴鲶';
+
+  @override
+  String get species_tiger_shovelnose_catfish_desc =>
+      '流线型的条纹鲶鱼，吻长而扁平，夜间沿南美河流的沙质河道捕食。';
+
+  @override
+  String get species_peacock_bass_name => '眼点丽鱼';
+
+  @override
+  String get species_peacock_bass_desc => '好斗的亚马逊慈鲷，体侧有三条深色竖纹，尾部有眼斑，在沉木旁伏击鱼类。';
+
+  @override
+  String get species_oscar_name => '地图鱼';
+
+  @override
+  String get species_oscar_desc => '粗壮的深色慈鲷，带橙色大理石纹，尾部有眼斑，在亚马逊缓流水域和淹没的岸边巡游。';
+
+  @override
+  String get species_freshwater_angelfish_name => '神仙鱼';
+
+  @override
+  String get species_freshwater_angelfish_desc =>
+      '体高呈圆盘状的亚马逊慈鲷，鳍长而飘逸，体侧有竖纹，在沉没的树根间漂游。';
+
+  @override
+  String get species_discus_name => '七彩神仙鱼';
+
+  @override
+  String get species_discus_desc => '圆形侧扁的慈鲷，体侧有波浪状蓝纹，用自身皮肤分泌的黏液喂养幼鱼。';
+
+  @override
+  String get species_sailfin_pleco_name => '豹纹翼甲鲇';
+
+  @override
+  String get species_sailfin_pleco_desc => '披甲的吸口鲶鱼，背鳍高耸，身披豹纹斑点，刮食木头和岩石上的藻类。';
+
+  @override
+  String get species_cardinal_tetra_name => '阿氏霓虹脂鲤';
+
+  @override
+  String get species_cardinal_tetra_desc =>
+      '微小的脂鲤，霓虹蓝色条纹下是贯穿全身的红带，成群游弋在内格罗河的黑水中。';
+
+  @override
+  String get species_mexican_tetra_name => '墨西哥麗脂鯉';
+
+  @override
+  String get species_mexican_tetra_desc =>
+      '墨西哥河流中的银色脂鲤，其洞穴种群失明且体色苍白，深受天然井潜水者喜爱。';
+
+  @override
+  String get species_mekong_giant_catfish_name => '湄公河巨鲶';
+
+  @override
+  String get species_mekong_giant_catfish_desc =>
+      '湄公河中极度濒危的无齿巨型鲶鱼，灰色无须，曾可长达三米。';
+
+  @override
+  String get species_giant_barb_name => '巨暹罗鲤';
+
+  @override
+  String get species_giant_barb_desc => '世界上最大的鲤科鱼，湄公河的大鳞巨物，头部巨大，如今在河流深潭中已很稀少。';
+
+  @override
+  String get species_asian_arowana_name => '美丽硬仆骨舌鱼';
+
+  @override
+  String get species_asian_arowana_desc => '东南亚黑水河流中的金属红色或金色龙鱼，紧贴水面下方滑行。';
+
+  @override
+  String get species_striped_snakehead_name => '线鳢';
+
+  @override
+  String get species_striped_snakehead_desc =>
+      '鱼雷形的呼吸空气的掠食鱼，头扁平似蛇，在水草茂密的亚洲池塘中守护幼鱼。';
+
+  @override
+  String get species_giant_snakehead_name => '小盾鳢';
+
+  @override
+  String get species_giant_snakehead_desc =>
+      '大型凶猛的鳢鱼，幼时带条纹，成年后体色变深，在东南亚湖泊中保护鲜红色的幼鱼。';
+
+  @override
+  String get species_climbing_perch_name => '攀鲈';
+
+  @override
+  String get species_climbing_perch_desc => '耐受力强的橄榄色鱼，能呼吸空气，并借助带刺的鳃盖在干涸水塘间爬行。';
+
+  @override
+  String get species_golden_mahseer_name => '黄鳍结鱼';
+
+  @override
+  String get species_golden_mahseer_desc =>
+      '喜马拉雅河流中的金鳞鲤科鱼，游泳有力，栖息在急流下方清澈湍急的水潭中。';
+
+  @override
+  String get species_koi_name => '华南鲤';
+
+  @override
+  String get species_koi_desc => '在日本培育的观赏鲤，有白、红、黑、金等花纹，栖息于池塘和温暖清澈的湖泊。';
+
+  @override
+  String get species_goldfish_name => '鲫鱼';
+
+  @override
+  String get species_goldfish_desc => '驯化的亚洲鲫鱼，野化后恢复橄榄古铜色，在温暖湖泊中形成大群。';
+
+  @override
+  String get species_giant_gourami_name => '长丝鲈';
+
+  @override
+  String get species_giant_gourami_desc => '宽大驼背的东南亚鱼类，腹鳍呈丝状，在缓慢多草的水中筑泡巢。';
+
+  @override
+  String get species_clown_knifefish_name => '铠甲弓背鱼';
+
+  @override
+  String get species_clown_knifefish_desc => '银色刀形鱼，长而波动的臀鳍上有眼状斑点，悬停在亚洲河流的沉木下。';
+
+  @override
+  String get species_walking_catfish_name => '胡鲶';
+
+  @override
+  String get species_walking_catfish_desc =>
+      '细长的呼吸空气的鲶鱼，能在池塘间的湿地上蠕动前行，如今在佛罗里达已野化。';
+
+  @override
+  String get species_japanese_eel_name => '鳗鲡';
+
+  @override
+  String get species_japanese_eel_desc => '东亚鳗鱼，在河流湖泊中成长，洄游至西太平洋产卵。';
+
+  @override
+  String get species_ayu_name => '香鱼';
+
+  @override
+  String get species_ayu_desc => '细长的银色日本香鱼，在清澈河流的石头上刮食藻类并守卫觅食领地。';
+
+  @override
+  String get species_baikal_omul_name => '贝加尔白鲑';
+
+  @override
+  String get species_baikal_omul_desc => '仅见于贝加尔湖的银色白鲑，在寒冷的开阔水域成群活动，溯河产卵。';
+
+  @override
+  String get species_baikal_oilfish_name => '贝加尔油鱼';
+
+  @override
+  String get species_baikal_oilfish_desc => '贝加尔湖深处的半透明无鳞鱼，体内油脂丰富几近透明，为卵胎生。';
+
+  @override
+  String get species_murray_cod_name => '墨瑞鳕';
+
+  @override
+  String get species_murray_cod_desc => '澳大利亚最大的淡水鱼，绿色斑纹巨物，腹部白色，栖息于墨累-达令河的沉木旁。';
+
+  @override
+  String get species_golden_perch_name => '疑惑麦觉理鲈';
+
+  @override
+  String get species_golden_perch_desc => '澳大利亚内陆河流的高身金橄榄色鲈鱼，藏身于倒木和岩架旁。';
+
+  @override
+  String get species_australian_bass_name => '澳洲鲈';
+
+  @override
+  String get species_australian_bass_desc => '澳大利亚东部沿海河流的古铜绿色鲈鱼，顺流而下到半咸水河口产卵。';
+
+  @override
+  String get species_barramundi_name => '尖吻鲈';
+
+  @override
+  String get species_barramundi_desc => '澳大利亚北部河流和河口的银色驼背鲈鱼，随年龄由雄性转变为雌性。';
+
+  @override
+  String get species_silver_perch_name => '银锯眶𬶟';
+
+  @override
+  String get species_silver_perch_desc => '墨累-达令河的银灰色鱼，嘴小，尾鳍分叉，曾经成群数量庞大。';
+
+  @override
+  String get species_gulf_saratoga_name => '澳洲硬仆骨舌鱼';
+
+  @override
+  String get species_gulf_saratoga_desc => '古铜色的澳大利亚龙鱼，鳞片带红色斑点，在北部死水潭中口孵鱼卵。';
+
+  @override
+  String get species_sooty_grunter_name => '黑鲈鳉';
+
+  @override
+  String get species_sooty_grunter_desc => '澳大利亚北部河流的深色粗壮鱼类，在岩石和急流周围以藻类和果实为食。';
+
+  @override
+  String get species_eel_tailed_catfish_name => '鳗尾鲶';
+
+  @override
+  String get species_eel_tailed_catfish_desc =>
+      '澳大利亚鲶鱼，尾部渐细似鳗鱼，在清澈河流的浅水区筑砾石巢并守护。';
+
+  @override
+  String get species_spangled_perch_name => '亮片鲈';
+
+  @override
+  String get species_spangled_perch_desc =>
+      '体小、带银色斑点的鱼，遍布澳大利亚内陆，洪水连通的任何水潭都会被它占据。';
+
+  @override
+  String get species_eastern_rainbowfish_name => '东部彩虹鱼';
+
+  @override
+  String get species_eastern_rainbowfish_desc =>
+      '澳大利亚东部溪流中的小型虹彩鱼，雄鱼在阳光下闪现红蓝条纹。';
+
+  @override
+  String get species_signal_crayfish_name => '信号小龙虾';
+
+  @override
+  String get species_signal_crayfish_desc =>
+      '大型褐色螯虾，螯关节处有白斑，是正在欧洲河流中蔓延的北美入侵物种。';
+
+  @override
+  String get species_red_swamp_crayfish_name => '克氏原螯虾';
+
+  @override
+  String get species_red_swamp_crayfish_desc =>
+      '来自路易斯安那沼泽的深红色螯虾，螯上有瘤突，如今在各大洲的温暖湿地中掘穴扩散。';
+
+  @override
+  String get species_noble_crayfish_name => '奥斯塔欧洲螯虾';
+
+  @override
+  String get species_noble_crayfish_desc =>
+      '欧洲本土螯虾，深褐色，螯的下面呈红色，藏身于洁净凉爽溪流湖泊的岸边洞穴中。';
+
+  @override
+  String get species_white_clawed_crayfish_name => '白掌南溪虾';
+
+  @override
+  String get species_white_clawed_crayfish_desc =>
+      '小型橄榄色螯虾，螯下面颜色淡，是西欧洁净石灰岩溪流中受威胁的本土物种。';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_name => '古氏巨螯虾';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_desc =>
+      '世界上最大的淡水无脊椎动物，塔斯马尼亚荫蔽河流中生长缓慢的蓝褐色螯虾。';
+
+  @override
+  String get species_zebra_mussel_name => '多型饰贝';
+
+  @override
+  String get species_zebra_mussel_desc =>
+      '指甲大小的条纹贻贝，成千上万地覆盖岩石、沉船和管道，扩散的同时使水变清。';
+
+  @override
+  String get species_quagga_mussel_name => '布格河饰贝';
+
+  @override
+  String get species_quagga_mussel_desc => '斑马贻贝更圆更淡的近亲，能在斑马贻贝无法生存的软底和深冷水域定居。';
+
+  @override
+  String get species_freshwater_pearl_mussel_name => '珍珠蚌';
+
+  @override
+  String get species_freshwater_pearl_mussel_desc =>
+      '深色长形的贻贝，可在湍急鲑鱼河流的洁净砾石中半埋生活一个多世纪。';
+
+  @override
+  String get species_swan_mussel_name => '无齿蚌';
+
+  @override
+  String get species_swan_mussel_desc => '大型薄壳贻贝，生活在泥底湖泊和运河中，用水管在淤泥上方过滤水体。';
+
+  @override
+  String get species_chinese_pond_mussel_name => '背角华无齿蚌';
+
+  @override
+  String get species_chinese_pond_mussel_desc =>
+      '体型极大的亚洲入侵贻贝，壳呈亮褐色，随养殖鱼类传入并在温暖湖泊中扩散。';
+
+  @override
+  String get species_freshwater_sponge_name => '湖针海绵';
+
+  @override
+  String get species_freshwater_sponge_desc =>
+      '绿色或灰色的分枝状海绵，附着在清澈湖泊的树枝和石头上，颜色来自体内共生的藻类。';
+
+  @override
+  String get species_freshwater_jellyfish_name => '索氏桃花水母';
+
+  @override
+  String get species_freshwater_jellyfish_desc =>
+      '硬币大小的透明水母，夏末在温暖的采石场湖泊和水库中成群出现。';
+
+  @override
+  String get species_great_pond_snail_name => '静水椎实螺';
+
+  @override
+  String get species_great_pond_snail_desc => '大型尖壳螺，在欧洲静水的植物上滑行，浮到水面呼吸空气。';
+
+  @override
+  String get species_great_ramshorn_snail_name => '平角卷螺';
+
+  @override
+  String get species_great_ramshorn_snail_desc =>
+      '扁平盘曲如小羊角的螺，在水草茂密的池塘中刮食叶片和石头上的藻类。';
+
+  @override
+  String get species_channeled_apple_snail_name => '小管福寿螺';
+
+  @override
+  String get species_channeled_apple_snail_desc =>
+      '大型金褐色螺，在水线上方产下亮粉色卵块，在温暖湿地和稻田中为入侵物种。';
+
+  @override
+  String get species_magnificent_bryozoan_name => '大型梳苔虫';
+
+  @override
+  String get species_magnificent_bryozoan_desc =>
+      '足球大小的胶状群体，表面布满微小动物，附着在温暖静水中的树枝和绳索上。';
+
+  @override
+  String get species_chinese_mitten_crab_name => '中华绒螯蟹';
+
+  @override
+  String get species_chinese_mitten_crab_desc =>
+      '掘穴的螃蟹，螯上长有绒毛，在河流中生活数年后顺流而下到河口繁殖。';
+
+  @override
+  String get species_giant_freshwater_prawn_name => '罗氏沼虾';
+
+  @override
+  String get species_giant_freshwater_prawn_desc =>
+      '亚洲和澳大利亚河流中的大型蓝螯虾，老年雄性的螯比身体还长。';
+
+  @override
+  String get species_common_snapping_turtle_name => '拟鳄龟';
+
+  @override
+  String get species_common_snapping_turtle_desc =>
+      '体重壳糙的龟，尾长带锯齿，伏在池塘和缓流河流的泥中，头部露出。';
+
+  @override
+  String get species_alligator_snapping_turtle_name => '大鳄龟';
+
+  @override
+  String get species_alligator_snapping_turtle_desc =>
+      '外形似史前生物的巨龟，背甲有三道脊棱，舌上有蠕虫状诱饵，张口静待于南方河底。';
+
+  @override
+  String get species_painted_turtle_name => '锦龟';
+
+  @override
+  String get species_painted_turtle_desc =>
+      '壳光滑的深色龟，颈部和甲缘有红黄条纹，在北美各地成排趴在倒木上晒太阳。';
+
+  @override
+  String get species_red_eared_slider_name => '红耳龟';
+
+  @override
+  String get species_red_eared_slider_desc =>
+      '带绿色条纹的池龟，每只眼后有一道红纹，作为宠物流行，如今在全球温暖水域野化。';
+
+  @override
+  String get species_northern_map_turtle_name => '地图龟';
+
+  @override
+  String get species_northern_map_turtle_desc =>
+      '橄榄色的龟，甲壳上有地图状黄线，脊棱较低，在清澈河流和大湖的岩石上晒太阳。';
+
+  @override
+  String get species_spiny_softshell_turtle_name => '角鳖';
+
+  @override
+  String get species_spiny_softshell_turtle_desc =>
+      '扁平如薄饼的软壳龟，吻部如呼吸管，埋在浅河的沙中只露出头部。';
+
+  @override
+  String get species_florida_softshell_turtle_name => '佛罗里达鳖';
+
+  @override
+  String get species_florida_softshell_turtle_desc =>
+      '大型深色软壳龟，吻部长而呈管状，常见于佛罗里达的泉水、运河和湖泊。';
+
+  @override
+  String get species_pig_nosed_turtle_name => '猪鼻龟';
+
+  @override
+  String get species_pig_nosed_turtle_desc =>
+      '新几内亚和澳大利亚北部特有的河龟，具有海龟般的鳍足和肉质猪鼻状吻部。';
+
+  @override
+  String get species_mary_river_turtle_name => '巨尾隐龟';
+
+  @override
+  String get species_mary_river_turtle_desc =>
+      '稀有的澳大利亚龟，能通过泄殖腔呼吸，头顶长着绿藻莫西干发型，仅见于昆士兰的一条河流。';
+
+  @override
+  String get species_yellow_spotted_river_turtle_name => '黄头侧颈龟';
+
+  @override
+  String get species_yellow_spotted_river_turtle_desc =>
+      '亚马逊侧颈龟，头部有黄斑，成群在大河的倒木和沙洲上晒太阳。';
+
+  @override
+  String get species_european_pond_turtle_name => '欧洲泽龟';
+
+  @override
+  String get species_european_pond_turtle_desc =>
+      '布满黄色斑点的深色龟，欧洲本土淡水龟，从向阳的岸边滑入水草茂密的池塘。';
+
+  @override
+  String get species_american_alligator_name => '美国短吻鳄';
+
+  @override
+  String get species_american_alligator_desc =>
+      '美国东南部沼泽、泉水和河流中的宽吻披甲爬行动物，漂浮时仅露出眼睛和鼻孔。';
+
+  @override
+  String get species_spectacled_caiman_name => '眼镜凯门鳄';
+
+  @override
+  String get species_spectacled_caiman_desc =>
+      '小型橄榄色凯门鳄，两眼间有骨质脊，在中南美洲的缓流河流和潟湖中数量众多。';
+
+  @override
+  String get species_black_caiman_name => '黑凯门鳄';
+
+  @override
+  String get species_black_caiman_desc =>
+      '亚马逊最大的掠食者，黑色披甲凯门鳄，体长可达五米，夜间在湖泊和淹没森林中捕食。';
+
+  @override
+  String get species_freshwater_crocodile_name => '澳洲淡水鳄';
+
+  @override
+  String get species_freshwater_crocodile_desc =>
+      '吻部细长的澳大利亚鳄鱼，栖息于北部河流和峡谷，性情胆怯，体型远小于湾鳄。';
+
+  @override
+  String get species_northern_water_snake_name => '北部美洲水蛇';
+
+  @override
+  String get species_northern_water_snake_desc =>
+      '身体粗壮、带环纹的褐色蛇，在北美东部溪流上方的岩石和树枝上晒太阳，无毒但易咬人。';
+
+  @override
+  String get species_green_anaconda_name => '森蚺';
+
+  @override
+  String get species_green_anaconda_desc =>
+      '世界上最重的蛇，橄榄色巨蟒，身上有黑斑，潜伏在亚马逊沼泽和缓流河流中。';
+
+  @override
+  String get species_hellbender_name => '美洲大鲵';
+
+  @override
+  String get species_hellbender_desc => '头部扁平、皮肤褶皱的巨型蝾螈，藏身于阿巴拉契亚寒冷清澈河流的大石头下。';
+
+  @override
+  String get species_mudpuppy_name => '斑泥螈';
+
+  @override
+  String get species_mudpuppy_desc => '褐色带斑点的蝾螈，终生保留羽状红鳃，夜间在湖底和河底爬行。';
+
+  @override
+  String get species_axolotl_name => '美西钝口螈';
+
+  @override
+  String get species_axolotl_desc => '面带微笑的有鳃蝾螈，终生不离开水，在墨西哥城附近霍奇米尔科的运河中极度濒危。';
+
+  @override
+  String get species_chinese_giant_salamander_name => '中国大鲵';
+
+  @override
+  String get species_chinese_giant_salamander_desc =>
+      '现存最大的两栖动物，皮肤褶皱的褐色巨物，体长近两米，藏身于凉爽多石的山溪中。';
+
+  @override
+  String get species_smooth_newt_name => '滑螈';
+
+  @override
+  String get species_smooth_newt_desc => '小型橄榄色蝾螈，每年春季回到池塘，雄性长出波状背嵴和带斑点的橙色腹部。';
+
+  @override
+  String get species_great_crested_newt_name => '冠欧螈';
+
+  @override
+  String get species_great_crested_newt_desc =>
+      '大型黑色疣皮蝾螈，腹部呈火橙色，繁殖期雄性长出锯齿状的龙形背嵴。';
+
+  @override
+  String get species_american_bullfrog_name => '美洲牛蛙';
+
+  @override
+  String get species_american_bullfrog_desc =>
+      '体型巨大的绿色蛙，叫声低沉如牛吼，栖息在温暖池塘的睡莲叶间，如今在多个大洲成为入侵物种。';
+
+  @override
+  String get species_common_frog_name => '欧洲林蛙';
+
+  @override
+  String get species_common_frog_desc => '褐色的蛙，眼部有深色面罩纹，春季成群喧闹地聚集在欧洲池塘和沟渠中产卵。';
+
+  @override
+  String get species_north_american_river_otter_name => '北美水獭';
+
+  @override
+  String get species_north_american_river_otter_desc =>
+      '身姿矫健、爱嬉戏的水獭，在北美的河流湖泊中捕食鱼类和螯虾，在岸边留下泥滑道。';
+
+  @override
+  String get species_eurasian_otter_name => '水獭';
+
+  @override
+  String get species_eurasian_otter_desc =>
+      '胆怯的褐色水獭，栖息于欧洲的河流、湖泊和海岸，在数十年衰退后正于整个分布区恢复。';
+
+  @override
+  String get species_giant_otter_name => '巨獭';
+
+  @override
+  String get species_giant_otter_desc =>
+      '体长近两米的水獭，喉部有乳白色斑块，在亚马逊河流和牛轭湖中以喧闹的家族群体生活。';
+
+  @override
+  String get species_north_american_beaver_name => '北美河貍';
+
+  @override
+  String get species_north_american_beaver_desc =>
+      '尾巴扁平的大型啮齿动物，筑坝将溪流变成池塘，在冰下游动，以树枝巢穴为庇护。';
+
+  @override
+  String get species_eurasian_beaver_name => '欧亚河狸';
+
+  @override
+  String get species_eurasian_beaver_desc =>
+      '欧洲最大的啮齿动物，已在全洲重新引入，啃倒河边树木，修筑水坝和巢穴。';
+
+  @override
+  String get species_muskrat_name => '麝鼠';
+
+  @override
+  String get species_muskrat_desc => '鼠大小的褐色啮齿动物，尾巴有鳞且侧扁，在香蒲沼泽中游动，用芦苇筑圆顶巢。';
+
+  @override
+  String get species_platypus_name => '鸭嘴兽';
+
+  @override
+  String get species_platypus_desc => '卵生哺乳动物，长着鸭嘴和蹼足，黎明和黄昏时闭着眼睛在澳大利亚东部溪流中觅食。';
+
+  @override
+  String get species_amazonian_manatee_name => '南美海牛';
+
+  @override
+  String get species_amazonian_manatee_desc =>
+      '最小的海牛，皮肤光滑深色，胸部有白斑，在亚马逊湖河中啃食水生植物。';
+
+  @override
+  String get species_amazon_river_dolphin_name => '亚马逊河豚';
+
+  @override
+  String get species_amazon_river_dolphin_desc =>
+      '长喙的粉红色河豚，颈部灵活，在亚马逊和奥里诺科河淹没森林的树干间穿梭。';
+
+  @override
+  String get species_baikal_seal_name => '贝加尔海豹';
+
+  @override
+  String get species_baikal_seal_desc => '世界上唯一的淡水海豹，体型小巧呈银灰色，在贝加尔湖的冰面和岩岸上休息。';
+
+  @override
+  String get species_capybara_name => '水豚';
+
+  @override
+  String get species_capybara_desc => '最大的啮齿动物，体型如桶的食草动物，成群安静地在南美河流和湿地中涉水游泳。';
+
+  @override
+  String get species_hippopotamus_name => '河马';
+
+  @override
+  String get species_hippopotamus_desc =>
+      '庞大的非洲河流巨兽，白天成群潜伏水中，在水底行走而非游泳；靠近极为危险。';
+
+  @override
+  String get species_white_water_lily_name => '白睡莲';
+
+  @override
+  String get species_white_water_lily_desc => '圆形浮叶和大朵白花，从扎根于欧洲静水淤泥中的粗壮根茎抽出。';
+
+  @override
+  String get species_yellow_pond_lily_name => '欧亚萍蓬草';
+
+  @override
+  String get species_yellow_pond_lily_desc => '心形浮叶和杯状黄花，水下还有潜水者可见的大型半透明沉水叶。';
+
+  @override
+  String get species_american_eelgrass_name => '美洲苦草';
+
+  @override
+  String get species_american_eelgrass_desc =>
+      '带状叶片可长达两米，在清澈河流和泉水的水流中摇曳，是海牛最爱的食物。';
+
+  @override
+  String get species_coontail_name => '金鱼藻';
+
+  @override
+  String get species_coontail_desc => '无根的沉水植物，硬而分叉的叶片轮生如浣熊尾巴，在静水中成团漂浮。';
+
+  @override
+  String get species_eurasian_watermilfoil_name => '穗状狐尾藻';
+
+  @override
+  String get species_eurasian_watermilfoil_desc =>
+      '羽状沉水植物，细裂的叶片轮生，在水面附近形成厚垫，在许多湖泊中为入侵物种。';
+
+  @override
+  String get species_muskgrass_name => '普生轮藻';
+
+  @override
+  String get species_muskgrass_desc => '质脆、有麝香味的绿藻，枝条轮生，常附有石灰结壳，铺满清澈硬水湖泊的湖底。';
+
+  @override
+  String get species_canadian_waterweed_name => '伊乐藻';
+
+  @override
+  String get species_canadian_waterweed_desc =>
+      '茂密的沉水植物，三片深绿色小叶轮生，靠断枝在全球凉爽的湖泊和运河中扩散。';
+
+  @override
+  String get species_curly_leaf_pondweed_name => '菹草';
+
+  @override
+  String get species_curly_leaf_pondweed_desc =>
+      '沉水植物，叶缘波状呈红绿色，形似皱褶的千层面，早春时先于其他水草生长。';
+
+  @override
+  String get species_water_hyacinth_name => '水葫芦';
+
+  @override
+  String get species_water_hyacinth_desc =>
+      '浮水植物，叶片光亮、叶柄膨大充气，开淡紫色穗状花，在全球温暖水道中大量堵塞水面。';
+
+  @override
+  String get species_common_reed_name => '芦苇';
+
+  @override
+  String get species_common_reed_desc =>
+      '高大的芦苇草，顶端有羽状花序，在湖岸形成茂密苇丛，水下茎干为幼鱼和蜻蜓幼虫提供庇护。';
+
+  @override
   String get common_action_done => '完成';
 
   @override
@@ -31855,6 +33228,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_info_title => '媒体信息';
 
   @override
+  String get media_species_actionTooltip => '物种';
+
+  @override
+  String get media_species_sheetTitle => '这张照片中的物种';
+
+  @override
+  String get media_species_sightedOnDive => '本次潜水目击';
+
+  @override
+  String get media_species_otherSpecies => '其他物种...';
+
+  @override
+  String get media_species_noDiveHint => '这张照片未关联到潜水记录。搜索物种以添加标签。';
+
+  @override
+  String get media_species_chipsLabel => '物种标签';
+
+  @override
   String get media_info_fileSection => '文件';
 
   @override
@@ -32163,4 +33554,105 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       '此设备不支持 HealthKit';
+
+  @override
+  String get statistics_trend_aggregation_monthly => '每月平均';
+
+  @override
+  String get statistics_trend_aggregation_perDive => '每次潜水';
+
+  @override
+  String get statistics_trend_aggregation_tooltip => '潜水的分组方式';
+
+  @override
+  String get statistics_trend_aggregation_weekly => '每周平均';
+
+  @override
+  String get statistics_trend_band_semanticLabel => '阴影区间涵盖每组的最低值和最高值';
+
+  @override
+  String get statistics_trend_legend_rate => '总体趋势';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => '滑动平均';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/年';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title => '水温趋势';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle => '范围内的每次潜水';
+
+  @override
+  String get statistics_conditions_tempTrend_empty => '没有可用的温度数据';
+
+  @override
+  String get statistics_conditions_tempTrend_error => '无法加载水温趋势';
+
+  @override
+  String get diveLog_filter_presetLast5Years => '最近 5 年';
+
+  @override
+  String get diveLog_filter_presetLast10Years => '最近 10 年';
+
+  @override
+  String get statistics_trend_tooltip_lowest => '最低';
+
+  @override
+  String get statistics_trend_tooltip_highest => '最高';
+
+  @override
+  String get diveLog_edit_excludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      '将此潜水保留在日志中，但将其排除在所有统计之外，包括潜水次数。';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      '仅将此潜水排除在 SAC、RMV 和气体混合统计之外。当气体数值不具代表性时很有用。';
+
+  @override
+  String get diveLog_badge_excludedFromStats => '已从统计中排除';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => '已从气体统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_filter_excludedOnly => '仅显示已排除的潜水';
+
+  @override
+  String get diveLog_edit_summary_excluded => '已排除';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水已从统计中排除',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => '统计';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => '已排除气体';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
 }

@@ -283,6 +283,7 @@ class SyncData {
   final List<Map<String, dynamic>> diveCustomFields;
   final List<Map<String, dynamic>> diveDataSources;
   final List<Map<String, dynamic>> siteSpecies;
+  final List<Map<String, dynamic>> mediaSpecies;
   final List<Map<String, dynamic>> siteFeatures;
   final List<Map<String, dynamic>> csvPresets;
   final List<Map<String, dynamic>> viewConfigs;
@@ -359,6 +360,7 @@ class SyncData {
     this.diveCustomFields = const [],
     this.diveDataSources = const [],
     this.siteSpecies = const [],
+    this.mediaSpecies = const [],
     this.siteFeatures = const [],
     this.csvPresets = const [],
     this.viewConfigs = const [],
@@ -436,6 +438,7 @@ class SyncData {
     'diveCustomFields': diveCustomFields,
     'diveDataSources': diveDataSources,
     'siteSpecies': siteSpecies,
+    'mediaSpecies': mediaSpecies,
     'siteFeatures': siteFeatures,
     'csvPresets': csvPresets,
     'viewConfigs': viewConfigs,
@@ -516,6 +519,7 @@ class SyncData {
       diveCustomFields: _parseList(json['diveCustomFields']),
       diveDataSources: _parseList(json['diveDataSources']),
       siteSpecies: _parseList(json['siteSpecies']),
+      mediaSpecies: _parseList(json['mediaSpecies']),
       siteFeatures: _parseList(json['siteFeatures']),
       csvPresets: _parseList(json['csvPresets']),
       viewConfigs: _parseList(json['viewConfigs']),
@@ -918,6 +922,7 @@ class SyncDataSerializer {
       full: null,
     ),
     (key: 'siteSpecies', table: _db.siteSpecies, blob: false, full: null),
+    (key: 'mediaSpecies', table: _db.mediaSpecies, blob: false, full: null),
     (key: 'siteFeatures', table: _db.siteFeatures, blob: false, full: null),
     (key: 'csvPresets', table: _db.csvPresets, blob: false, full: null),
     (key: 'viewConfigs', table: _db.viewConfigs, blob: false, full: null),
@@ -1407,6 +1412,10 @@ class SyncDataSerializer {
       siteSpecies: await _safeExport(
         'siteSpecies',
         () => _exportSiteSpecies(hlcSince),
+      ),
+      mediaSpecies: await _safeExport(
+        'mediaSpecies',
+        () => _exportMediaSpecies(hlcSince),
       ),
       siteFeatures: await _safeExport(
         'siteFeatures',
@@ -1902,6 +1911,11 @@ class SyncDataSerializer {
       case 'siteSpecies':
         final row = await (_db.select(
           _db.siteSpecies,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'mediaSpecies':
+        final row = await (_db.select(
+          _db.mediaSpecies,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'siteFeatures':
@@ -2870,6 +2884,13 @@ class SyncDataSerializer {
               SiteSpecy.fromJson(_withTimestampDefaults(data)),
             );
         return;
+      case 'mediaSpecies':
+        await _db
+            .into(_db.mediaSpecies)
+            .insertOnConflictUpdate(
+              MediaSpecy.fromJson(_withTimestampDefaults(data)),
+            );
+        return;
       case 'siteFeatures':
         await _db
             .into(_db.siteFeatures)
@@ -3611,6 +3632,16 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'mediaSpecies':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.mediaSpecies,
+            records
+                .map((r) => MediaSpecy.fromJson(_withTimestampDefaults(r)))
+                .toList(),
+          ),
+        );
+        return;
       case 'siteFeatures':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -3846,6 +3877,8 @@ class SyncDataSerializer {
         return plain(_db.diveDataSources, _db.diveDataSources.id);
       case 'siteSpecies':
         return plain(_db.siteSpecies, _db.siteSpecies.id);
+      case 'mediaSpecies':
+        return plain(_db.mediaSpecies, _db.mediaSpecies.id);
       case 'siteFeatures':
         return plain(_db.siteFeatures, _db.siteFeatures.id);
       case 'csvPresets':
@@ -4075,6 +4108,8 @@ class SyncDataSerializer {
         return _db.diveDataSources;
       case 'siteSpecies':
         return _db.siteSpecies;
+      case 'mediaSpecies':
+        return _db.mediaSpecies;
       case 'siteFeatures':
         return _db.siteFeatures;
       case 'csvPresets':
@@ -4459,6 +4494,11 @@ class SyncDataSerializer {
       case 'siteSpecies':
         await (_db.delete(
           _db.siteSpecies,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'mediaSpecies':
+        await (_db.delete(
+          _db.mediaSpecies,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'siteFeatures':
@@ -5372,12 +5412,57 @@ class SyncDataSerializer {
       final siteIds = modifiedSites.map((s) => s.id).toSet();
       if (siteIds.isEmpty) return [];
 
-      final rows = await (_db.select(
-        _db.siteSpecies,
-      )..where((t) => t.siteId.isIn(siteIds))).get();
-      return rows.map((r) => r.toJson()).toList();
+      return _childRowsOf(
+        siteIds,
+        (chunk) => (_db.select(
+          _db.siteSpecies,
+        )..where((t) => t.siteId.isIn(chunk))).get(),
+      );
     }
     final rows = await _db.select(_db.siteSpecies).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Rows of a clockless child table for [parentIds], fetched in chunks so
+  /// a large changeset (every photo modified since the cursor, say) cannot
+  /// overflow SQLite's bound-variable limit in one `IN (...)`.
+  Future<List<Map<String, dynamic>>> _childRowsOf<R extends DataClass>(
+    Set<String> parentIds,
+    Future<List<R>> Function(List<String> chunk) select,
+  ) async {
+    const idChunk = 900;
+    final ids = parentIds.toList();
+    final out = <Map<String, dynamic>>[];
+    for (var i = 0; i < ids.length; i += idChunk) {
+      final end = i + idChunk < ids.length ? i + idChunk : ids.length;
+      for (final r in await select(ids.sublist(i, end))) {
+        out.add(r.toJson());
+      }
+    }
+    return out;
+  }
+
+  /// `media_species` has no clock of its own, so an incremental export
+  /// ships the tags of every photo whose `media.hlc` advanced; a full export
+  /// ships the table.
+  Future<List<Map<String, dynamic>>> _exportMediaSpecies(
+    String? hlcSince,
+  ) async {
+    if (hlcSince != null) {
+      final modifiedMedia = await (_db.select(
+        _db.media,
+      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final mediaIds = modifiedMedia.map((m) => m.id).toSet();
+      if (mediaIds.isEmpty) return [];
+
+      return _childRowsOf(
+        mediaIds,
+        (chunk) => (_db.select(
+          _db.mediaSpecies,
+        )..where((t) => t.mediaId.isIn(chunk))).get(),
+      );
+    }
+    final rows = await _db.select(_db.mediaSpecies).get();
     return rows.map((r) => r.toJson()).toList();
   }
 

@@ -142,7 +142,9 @@ import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_
 import 'package:submersion/features/gps_log/presentation/pages/gps_track_map_page.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
 import 'package:submersion/features/deco_calculator/presentation/pages/deco_calculator_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculator_detail_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculators_page.dart';
 import 'package:submersion/features/dive_computer/presentation/pages/device_list_page.dart';
 import 'package:submersion/features/dive_computer/presentation/pages/device_detail_page.dart';
@@ -277,6 +279,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'gas-calculators',
                 name: 'gasCalculators',
                 builder: (context, state) => const GasCalculatorsPage(),
+                // The six calculators are children, not tabs. On a narrow
+                // window each is pushed as its own page; in split view they
+                // ride in ?calc= instead and these routes go unused.
+                routes: [
+                  for (final id in kGasCalculatorIds)
+                    GoRoute(
+                      path: id,
+                      builder: (context, state) =>
+                          GasCalculatorDetailPage(toolId: id),
+                    ),
+                ],
               ),
               GoRoute(
                 path: 'weight-calculator',
