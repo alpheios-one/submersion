@@ -2395,6 +2395,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Elementi del set di attrezzatura';
 
   @override
+  String get preDive_item_type_equipment => 'Elemento di attrezzatura';
+
+  @override
   String get preDive_item_valueLabel => 'Etichetta del valore';
 
   @override
@@ -2574,6 +2577,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'Nessuno';
+
+  @override
+  String get preDive_start_noEquipment => 'Nessuno';
 
   @override
   String get preDive_start_begin => 'Inizia';

@@ -2324,6 +2324,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'פריטי סט ציוד';
 
   @override
+  String get preDive_item_type_equipment => 'פריט ציוד';
+
+  @override
   String get preDive_item_valueLabel => 'תווית ערך';
 
   @override
@@ -2502,6 +2505,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'ללא';
+
+  @override
+  String get preDive_start_noEquipment => 'ללא';
 
   @override
   String get preDive_start_begin => 'התחל';

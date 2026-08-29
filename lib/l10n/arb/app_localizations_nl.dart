@@ -2379,6 +2379,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'Items uit uitrustingsset';
 
   @override
+  String get preDive_item_type_equipment => 'Uitrustingsonderdeel';
+
+  @override
   String get preDive_item_valueLabel => 'Waardelabel';
 
   @override
@@ -2556,6 +2559,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'Geen';
+
+  @override
+  String get preDive_start_noEquipment => 'Geen';
 
   @override
   String get preDive_start_begin => 'Beginnen';

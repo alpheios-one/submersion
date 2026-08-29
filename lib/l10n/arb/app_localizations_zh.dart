@@ -2256,6 +2256,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_item_type_equipmentSet => '装备套装事项';
 
   @override
+  String get preDive_item_type_equipment => '装备项目';
+
+  @override
   String get preDive_item_valueLabel => '数值标签';
 
   @override
@@ -2429,6 +2432,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => '无';
+
+  @override
+  String get preDive_start_noEquipment => '无';
 
   @override
   String get preDive_start_begin => '开始';

@@ -2381,6 +2381,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'Felszereléskészlet tételei';
 
   @override
+  String get preDive_item_type_equipment => 'Felszerelési tétel';
+
+  @override
   String get preDive_item_valueLabel => 'Érték címkéje';
 
   @override
@@ -2562,6 +2565,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'Nincs';
+
+  @override
+  String get preDive_start_noEquipment => 'Nincs';
 
   @override
   String get preDive_start_begin => 'Kezdés';

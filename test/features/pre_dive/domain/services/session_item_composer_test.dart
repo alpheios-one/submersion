@@ -111,4 +111,81 @@ void main() {
     expect(out.single.equipmentId, isNull);
     expect(out.single.title, 'T0');
   });
+
+  test('equipment item keeps its own title and links the chosen device', () {
+    final out = SessionItemComposer.compose(
+      templateItems: [tItem(0, type: PreDiveItemType.equipment)],
+      equipmentItems: [gear('g1', 'Primary computer')],
+      equipmentByTemplateItemId: const {'t0': 'g1'},
+      now: now,
+      serviceOverdueNote: 'Service overdue',
+    );
+    expect(out.single.title, 'T0');
+    expect(out.single.itemType, PreDiveItemType.check);
+    expect(out.single.equipmentId, 'g1');
+    expect(out.single.state, PreDiveItemState.pending);
+  });
+
+  test("equipment item falls back to the template item's remembered link", () {
+    final remembered = PreDiveChecklistTemplateItem(
+      id: 't0',
+      templateId: 'tpl',
+      title: 'Computer check',
+      itemType: PreDiveItemType.equipment,
+      equipmentId: 'g1',
+      createdAt: now,
+      updatedAt: now,
+    );
+    final out = SessionItemComposer.compose(
+      templateItems: [remembered],
+      equipmentItems: [gear('g1', 'Primary computer')],
+      now: now,
+      serviceOverdueNote: 'Service overdue',
+    );
+    expect(out.single.equipmentId, 'g1');
+  });
+
+  test('a fresh picker choice overrides the remembered link', () {
+    final remembered = PreDiveChecklistTemplateItem(
+      id: 't0',
+      templateId: 'tpl',
+      title: 'Computer check',
+      itemType: PreDiveItemType.equipment,
+      equipmentId: 'g1',
+      createdAt: now,
+      updatedAt: now,
+    );
+    final out = SessionItemComposer.compose(
+      templateItems: [remembered],
+      equipmentItems: [gear('g1', 'Primary computer'), gear('g2', 'Backup')],
+      equipmentByTemplateItemId: const {'t0': 'g2'},
+      now: now,
+      serviceOverdueNote: 'Service overdue',
+    );
+    expect(out.single.equipmentId, 'g2');
+  });
+
+  test('equipment item without a chosen device degrades unlinked', () {
+    final out = SessionItemComposer.compose(
+      templateItems: [tItem(0, type: PreDiveItemType.equipment)],
+      now: now,
+      serviceOverdueNote: 'Service overdue',
+    );
+    expect(out.single.equipmentId, isNull);
+    expect(out.single.state, PreDiveItemState.pending);
+  });
+
+  test('overdue-service single equipment link starts pre-flagged', () {
+    final out = SessionItemComposer.compose(
+      templateItems: [tItem(0, type: PreDiveItemType.equipment)],
+      equipmentItems: [gear('g1', 'Old computer')],
+      equipmentByTemplateItemId: const {'t0': 'g1'},
+      now: now,
+      serviceOverdueNote: 'Service overdue',
+      overdueEquipmentIds: {'g1'},
+    );
+    expect(out.single.state, PreDiveItemState.flagged);
+    expect(out.single.note, 'Service overdue');
+    expect(out.single.completedAt, isNotNull);
+  });
 }

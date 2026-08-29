@@ -310,7 +310,7 @@ class PreDiveChecklistTemplateItems extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 
-  /// 'check' | 'value' | 'equipmentSet' (PreDiveItemType.name).
+  /// 'check' | 'value' | 'equipmentSet' | 'equipment' (PreDiveItemType.name).
   TextColumn get itemType => text().withDefault(const Constant('check'))();
   TextColumn get valueLabel => text().nullable()();
   TextColumn get valueUnit => text().nullable()();
@@ -321,6 +321,16 @@ class PreDiveChecklistTemplateItems extends Table {
 
   /// Required items must end Done or Flagged (never Skipped).
   BoolColumn get isRequired => boolean().withDefault(const Constant(false))();
+
+  /// Remembered equipment for an 'equipment'-typed item. Chosen at session
+  /// start (not in the template editor, mirroring the equipmentSet flow)
+  /// and persisted here so later sessions pre-fill the same device. Issue
+  /// #814.
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3326,7 +3336,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 180;
+  static const int currentSchemaVersion = 181;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3715,6 +3725,12 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
+    // v181: pre_dive_checklist_template_items.equipment_id, the remembered
+    // single-equipment link for an 'equipment'-typed template item. Chosen
+    // at session start (not in the template editor), mirroring the
+    // equipmentSet flow. Issue #814. Column-only rung, no backfill, so the
+    // beforeOpen backstop is safe to re-run.
+    181,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5564,6 +5580,25 @@ class AppDatabase extends _$AppDatabase {
         'INTEGER NOT NULL DEFAULT 0',
       );
     }
+  }
+
+  /// Idempotent DDL for the v181 pre_dive_checklist_template_items
+  /// equipment_id column (issue #814): the remembered single-equipment link
+  /// for an 'equipment'-typed template item, chosen at session start (not in
+  /// the template editor) and persisted so later sessions pre-fill the same
+  /// device. Self-guards on the table existing. Same dual-call contract
+  /// (onUpgrade + beforeOpen backstop) as the other column-assert helpers.
+  Future<void> _assertTemplateItemEquipmentIdColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_checklist_template_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('equipment_id')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
+      'TEXT REFERENCES equipment(id) ON DELETE SET NULL',
+    );
   }
 
   Future<void> _assertBuddyFavoriteColumn() async {
@@ -9263,6 +9298,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
+        // v181: pre_dive_checklist_template_items.equipment_id (issue #814).
+        // Column-only rung, no backfill: every pre-existing item correctly
+        // defaults to unlinked.
+        if (from < 181) {
+          await _assertTemplateItemEquipmentIdColumn();
+        }
+        if (from < 181) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9514,6 +9556,12 @@ class AppDatabase extends _$AppDatabase {
         // on every open: the helper is column-only with no backfill, so it
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
+
+        // v181 backstop: re-assert pre_dive_checklist_template_items.
+        // equipment_id (same parallel-branch version-collision self-heal).
+        // Safe to re-run on every open: the helper is column-only with no
+        // backfill, so it cannot resurrect or overwrite diver data.
+        await _assertTemplateItemEquipmentIdColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
