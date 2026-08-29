@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../support/fake_app_settings_repository.dart';
@@ -40,6 +41,7 @@ Future<WidgetRef> _pump(
     ProviderScope(
       overrides: [
         settingsProvider.overrideWith((ref) => _settings),
+        tankPresetsProvider.overrideWith((ref) async => const []),
         ...overrides,
       ].cast(),
       child: MaterialApp(

@@ -12215,28 +12215,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_defaults => 'الإعدادات الافتراضية والفوترة';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'أحجام الأسطوانات';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'الاسم';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'لا توجد أحجام أسطوانات محفوظة بعد.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'أدخل اسمًا وحجمًا أكبر من صفر.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'هذا الحجم محفوظ بالفعل.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'لقد وصلت إلى الحد الأقصى لأحجام الأسطوانات المحفوظة.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

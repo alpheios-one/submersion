@@ -5,7 +5,6 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
-import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -74,13 +73,6 @@ final blenderCylinderLitersProvider = StateProvider<double>(
 /// Saved target mixes.
 final blenderTemplatesProvider = StateProvider<List<MixTemplate>>(
   (ref) => BlenderPreferences.seedTemplates,
-);
-
-/// User-managed cylinder sizes that feed the cylinder dropdown, seeded with
-/// the blending-bench sizes from [CylinderTemplate.seedTemplates] the same
-/// way [blenderTemplatesProvider] seeds mix templates.
-final blenderCylinderTemplatesProvider = StateProvider<List<CylinderTemplate>>(
-  (ref) => CylinderTemplate.seedTemplates,
 );
 
 /// Cylinders already finished and put on the bill, oldest first.
@@ -179,8 +171,6 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderFillGas1Provider.notifier).state = stored.fillGas1;
   ref.read(blenderFillGas2Provider.notifier).state = stored.fillGas2;
   ref.read(blenderFillGas3Provider.notifier).state = stored.fillGas3;
-  ref.read(blenderCylinderTemplatesProvider.notifier).state =
-      stored.cylinderTemplates;
   // The input fields hold their own text, seeded once in initState. Without
   // this the cylinder volume and price boxes keep showing defaults over
   // freshly loaded preferences, and the next edit saves those defaults back
@@ -219,7 +209,6 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             fillGas1: ref.read(blenderFillGas1Provider),
             fillGas2: ref.read(blenderFillGas2Provider),
             fillGas3: ref.read(blenderFillGas3Provider),
-            cylinderTemplates: ref.read(blenderCylinderTemplatesProvider),
           ),
         );
   } catch (e, stackTrace) {

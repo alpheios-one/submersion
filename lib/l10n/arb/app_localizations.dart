@@ -21056,42 +21056,6 @@ abstract class AppLocalizations {
   /// **'Default settings and billing'**
   String get gasCalculators_blender_defaults;
 
-  /// No description provided for @gasCalculators_blender_cylinderTemplates.
-  ///
-  /// In en, this message translates to:
-  /// **'Cylinder sizes'**
-  String get gasCalculators_blender_cylinderTemplates;
-
-  /// No description provided for @gasCalculators_blender_cylinderTemplateName.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get gasCalculators_blender_cylinderTemplateName;
-
-  /// No description provided for @gasCalculators_blender_cylinderTemplateNone.
-  ///
-  /// In en, this message translates to:
-  /// **'No saved cylinder sizes yet.'**
-  String get gasCalculators_blender_cylinderTemplateNone;
-
-  /// No description provided for @gasCalculators_blender_cylinderTemplateInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a name and a size greater than zero.'**
-  String get gasCalculators_blender_cylinderTemplateInvalid;
-
-  /// No description provided for @gasCalculators_blender_cylinderTemplateExists.
-  ///
-  /// In en, this message translates to:
-  /// **'This cylinder size is already saved.'**
-  String get gasCalculators_blender_cylinderTemplateExists;
-
-  /// No description provided for @gasCalculators_blender_cylinderTemplateLimit.
-  ///
-  /// In en, this message translates to:
-  /// **'You\'ve reached the saved cylinder size limit.'**
-  String get gasCalculators_blender_cylinderTemplateLimit;
-
   /// No description provided for @gasCalculators_tab_mod.
   ///
   /// In en, this message translates to:

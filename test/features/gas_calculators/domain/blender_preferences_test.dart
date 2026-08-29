@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
-import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 
 void main() {
@@ -53,17 +52,6 @@ void main() {
       expect(prefs.fillGas1, const GasMix(o2: 100));
       expect(prefs.fillGas2, const GasMix(o2: 0, he: 100));
       expect(prefs.fillGas3, const GasMix(o2: 21));
-      expect(prefs.cylinderTemplates, CylinderTemplate.seedTemplates);
-    });
-
-    test('seeds the blending-bench cylinder sizes named in issue #1100', () {
-      final prefs = BlenderPreferences.defaults(cylinderWaterLiters: 12);
-      expect(prefs.cylinderTemplates.map((t) => t.name).toList(), [
-        '2 L',
-        '3 L',
-        'AL80',
-        'Steel 12 L twinset',
-      ]);
     });
   });
 
@@ -84,9 +72,6 @@ void main() {
             fillGas1: const GasMix(o2: 99.5),
             fillGas2: const GasMix(o2: 0, he: 99),
             fillGas3: const GasMix(o2: 20.9),
-            cylinderTemplates: const [
-              CylinderTemplate(name: 'Deco bottle', liters: 3),
-            ],
           );
       final decoded = BlenderPreferences.fromJson(
         jsonDecode(jsonEncode(prefs.toJson())) as Map<String, dynamic>,
@@ -104,33 +89,15 @@ void main() {
       expect(decoded.fillGas1, const GasMix(o2: 99.5));
       expect(decoded.fillGas2, const GasMix(o2: 0, he: 99));
       expect(decoded.fillGas3, const GasMix(o2: 20.9));
-      expect(decoded.cylinderTemplates, prefs.cylinderTemplates);
     });
 
-    test('a malformed mix or cylinder template falls back per field', () {
+    test('a malformed mix falls back per field', () {
       final decoded = BlenderPreferences.fromJson({
         'startPressureBar': 'deep',
         'startMix': {'o2': 'bad'},
-        'cylinderTemplates': [
-          {'name': 'Good', 'liters': 3},
-          {'name': 'Bad', 'liters': -1},
-          'not a map',
-        ],
       });
       expect(decoded.startPressureBar, 0.0);
       expect(decoded.startMix, const GasMix(o2: 21));
-      expect(decoded.cylinderTemplates.map((t) => t.name), ['Good']);
-    });
-
-    test('cylinder templates are capped', () {
-      final many = List.generate(
-        kMaxCylinderTemplates + 10,
-        (i) => CylinderTemplate(name: 'Bottle $i', liters: 3 + i * 0.1),
-      );
-      final capped = BlenderPreferences.defaults(
-        cylinderWaterLiters: 12,
-      ).copyWith(cylinderTemplates: many);
-      expect(capped.cylinderTemplates, hasLength(kMaxCylinderTemplates));
     });
 
     test('an emptied template list survives the round trip', () {

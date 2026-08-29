@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
-import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One entry in the cylinder-size dropdown, reduced to just what the row
-/// needs to show and select. Every entry comes from the diver's own saved
-/// cylinder templates (issue #1335 follow-up): there is no separate,
-/// hard-coded preset list any more, so renaming or deleting a size in
-/// settings is renaming or deleting it here too.
+/// needs to show and select. Every entry comes from the diver's global tank
+/// presets (issue #1335 follow-up): the blender no longer keeps its own
+/// cylinder-size vault, so renaming or deleting a size under Settings ->
+/// Manage -> Tank Presets is renaming or deleting it here too.
 class _CylinderChoice {
   const _CylinderChoice({required this.label, required this.liters});
 
@@ -88,19 +89,13 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    // Opens the settings page scrolled straight to "Default
-                    // settings and billing", where the cylinder-size
-                    // templates this card's dropdown reads are managed
-                    // (issue #1335 follow-up: replaces the second settings
-                    // gear with a link straight to that one setting).
+                    // Opens the global tank presets this card's dropdown
+                    // reads (issue #1335 follow-up: the blender no longer
+                    // keeps its own cylinder-size vault, so this jumps
+                    // straight to Settings -> Manage -> Tank Presets).
                     TextButton.icon(
                       key: const Key('blender-cylinder-sizes-link'),
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (context) =>
-                              const BlenderSettingsPage(scrollToDefaults: true),
-                        ),
-                      ),
+                      onPressed: () => context.push('/tank-presets'),
                       icon: const Icon(Icons.straighten, size: 18),
                       label: Text(
                         context.l10n.gasCalculators_blender_manageCylinderSizes,
@@ -177,16 +172,11 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     AppSettings settings,
     UnitFormatter units,
   ) {
-    // Sourced entirely from Settings -> Default settings and billing
-    // (issue #1335 follow-up): the blending-bench sizes seed that list on
-    // first use, so there is nothing left to hard-code here.
-    final choices = [
-      for (final t in ref.watch(blenderCylinderTemplatesProvider))
-        _CylinderChoice(
-          label: '${t.name} (${units.formatTankVolume(t.liters, null)})',
-          liters: t.liters,
-        ),
-    ];
+    // Sourced from the diver's global tank presets (issue #1335 follow-up):
+    // working pressure and material live on the preset too, but the blender
+    // has no use for either, so only the display name and water volume cross
+    // over.
+    final presetsAsync = ref.watch(tankPresetsProvider);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,36 +205,65 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         const SizedBox(width: 8),
         // A cubic-foot diver does not know their cylinder's water capacity in
         // cubic feet (an AL80 is 0.39), so the presets fill it for them.
-        PopupMenuButton<_CylinderChoice>(
-          key: const Key('blender-cylinder-presets'),
-          tooltip: context.l10n.gasCalculators_blender_cylinderPresets,
-          position: PopupMenuPosition.under,
-          itemBuilder: (context) => [
-            for (final choice in choices)
-              PopupMenuItem<_CylinderChoice>(
-                value: choice,
-                child: Text(choice.label),
-              ),
-          ],
-          onSelected: (choice) {
-            ref.read(blenderCylinderLitersProvider.notifier).state =
-                choice.liters;
-            _cylinder.text = formatRoundedForInput(
-              litersToDisplayVolume(choice.liters, settings),
-              2,
-            );
-            saveBlenderPreferences(ref);
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(context.l10n.gasCalculators_blender_cylinderPresets),
-                const Icon(Icons.arrow_drop_down),
-              ],
+        presetsAsync.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
+          error: (error, stackTrace) => IconButton(
+            icon: const Icon(Icons.error_outline),
+            tooltip: context.l10n.gasCalculators_blender_cylinderPresets,
+            onPressed: null,
+          ),
+          data: (presets) {
+            final choices = [
+              for (final preset in presets)
+                _CylinderChoice(
+                  label:
+                      '${preset.displayName} '
+                      '(${units.formatTankVolume(preset.volumeLiters, null)})',
+                  liters: preset.volumeLiters,
+                ),
+            ];
+            return PopupMenuButton<_CylinderChoice>(
+              key: const Key('blender-cylinder-presets'),
+              tooltip: context.l10n.gasCalculators_blender_cylinderPresets,
+              position: PopupMenuPosition.under,
+              itemBuilder: (context) => [
+                for (final choice in choices)
+                  PopupMenuItem<_CylinderChoice>(
+                    value: choice,
+                    child: Text(choice.label),
+                  ),
+              ],
+              onSelected: (choice) {
+                ref.read(blenderCylinderLitersProvider.notifier).state =
+                    choice.liters;
+                _cylinder.text = formatRoundedForInput(
+                  litersToDisplayVolume(choice.liters, settings),
+                  2,
+                );
+                saveBlenderPreferences(ref);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 12,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(context.l10n.gasCalculators_blender_cylinderPresets),
+                    const Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ],
     );

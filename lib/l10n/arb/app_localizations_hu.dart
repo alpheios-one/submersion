@@ -12396,28 +12396,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Alapértelmezett beállítások és számlázás';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'Palackméretek';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'Név';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'Még nincs mentett palackméret.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'Adj meg egy nevet és egy nullánál nagyobb méretet.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'Ez a palackméret már mentve van.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'Elérted a mentett palackméretek korlátját.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

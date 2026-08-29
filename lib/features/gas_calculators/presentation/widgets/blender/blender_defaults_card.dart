@@ -8,12 +8,10 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/cylinder_template_manager.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Billing defaults: currency, the three fill-gas prices, and the diver's
-/// cylinder-size templates.
+/// Billing defaults: currency and the three fill-gas prices.
 ///
 /// Grouped under "Default settings and billing" behind the settings gear
 /// (issue #1335): none of these change fill to fill the way the cylinder and
@@ -84,10 +82,6 @@ class _BlenderDefaultsCardState extends ConsumerState<BlenderDefaultsCard> {
               if (slot > 0) const SizedBox(height: 12),
               _priceField(context, slot, units),
             ],
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 4),
-            const CylinderTemplateManager(),
           ],
         ),
       ),

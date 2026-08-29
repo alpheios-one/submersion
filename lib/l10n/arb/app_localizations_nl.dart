@@ -12343,28 +12343,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Standaardinstellingen en facturering';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'Flesmaten';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'Naam';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'Nog geen flesmaten opgeslagen.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'Voer een naam en een maat groter dan nul in.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'Deze flesmaat is al opgeslagen.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'Je hebt de limiet van opgeslagen flesmaten bereikt.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

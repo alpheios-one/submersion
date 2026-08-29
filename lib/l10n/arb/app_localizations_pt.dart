@@ -12438,28 +12438,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Definições por defeito e faturação';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'Tamanhos de cilindro';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'Nome';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'Ainda sem tamanhos de cilindro guardados.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'Introduz um nome e um tamanho superior a zero.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'Este tamanho de cilindro já está guardado.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'Atingiste o limite de tamanhos de cilindro guardados.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

@@ -12425,28 +12425,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Standardeinstellungen und Abrechnung';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'Flaschengrössen';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'Name';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'Noch keine Flaschengrössen gespeichert.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'Name und eine Grösse über null eingeben.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'Diese Flaschengrösse ist bereits gespeichert.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'Maximale Anzahl gespeicherter Flaschengrössen erreicht.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

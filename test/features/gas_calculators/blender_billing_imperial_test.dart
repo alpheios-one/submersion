@@ -12,6 +12,7 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
@@ -80,6 +81,7 @@ Future<WidgetRef> _pumpBilling(WidgetTester tester, VolumeUnit unit) async {
             AppSettings(volumeUnit: unit, defaultCurrency: 'USD'),
           ),
         ),
+        tankPresetsProvider.overrideWith((ref) async => const []),
       ],
       child: MaterialApp(
         locale: const Locale('en'),

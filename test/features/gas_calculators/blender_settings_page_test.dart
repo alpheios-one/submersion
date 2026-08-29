@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/test_app.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
@@ -20,6 +24,7 @@ Future<void> _pump(WidgetTester tester) async {
         settingsProvider.overrideWith(
           (ref) => _TestSettingsNotifier(const AppSettings()),
         ),
+        tankPresetsProvider.overrideWith((ref) async => const []),
       ],
       child: const MaterialApp(
         locale: Locale('en'),
@@ -65,33 +70,53 @@ void main() {
     expect(find.byKey(const Key('blender-currency-display')), findsOneWidget);
   });
 
-  testWidgets('the cylinder template manager lives in settings', (
-    tester,
-  ) async {
-    await _pump(tester);
-    await tester.tap(find.byKey(const Key('blender-settings')));
-    await tester.pumpAndSettle();
+  testWidgets(
+    'the cylinder-sizes link navigates to the global tank presets, not settings',
+    (tester) async {
+      late String location;
+      final router = GoRouter(
+        initialLocation: '/gas-calculators',
+        routes: [
+          GoRoute(
+            path: '/gas-calculators',
+            builder: (context, state) =>
+                const Scaffold(body: GasBlenderCalculator()),
+          ),
+          GoRoute(
+            path: '/tank-presets',
+            builder: (context, state) {
+              location = GoRouterState.of(context).uri.toString();
+              return const Scaffold(body: Text('Tank Presets'));
+            },
+          ),
+        ],
+      );
 
-    expect(find.text('Cylinder sizes'), findsOneWidget);
-    // Seeded with the blending-bench sizes named in issue #1100, not empty
-    // (issue #1335 follow-up: this is now the dropdown's only source).
-    expect(find.text('AL80'), findsOneWidget);
-  });
+      await tester.pumpWidget(
+        testAppRouter(
+          locale: const Locale('en'),
+          router: router,
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => _TestSettingsNotifier(const AppSettings()),
+            ),
+            tankPresetsProvider.overrideWith((ref) async => const []),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-  testWidgets('the cylinder-sizes link also opens settings, scrolled down', (
-    tester,
-  ) async {
-    await _pump(tester);
-    // The billing card sits below the fold on the default test surface, so
-    // its link has to be scrolled into view before it can be tapped, same
-    // as a diver would need to scroll down to reach it.
-    await tester.ensureVisible(
-      find.byKey(const Key('blender-cylinder-sizes-link')),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
-    await tester.pumpAndSettle();
+      // The billing card sits below the fold on the default test surface, so
+      // its link has to be scrolled into view before it can be tapped, same
+      // as a diver would need to scroll down to reach it.
+      await tester.ensureVisible(
+        find.byKey(const Key('blender-cylinder-sizes-link')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Default settings and billing'), findsOneWidget);
-  });
+      expect(location, '/tank-presets');
+    },
+  );
 }

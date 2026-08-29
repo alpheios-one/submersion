@@ -1,7 +1,6 @@
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
-import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 
 /// A saved target mix, e.g. 10/70. Pressure is deliberately not part of a
@@ -93,7 +92,6 @@ class BlenderPreferences {
     required this.fillGas1,
     required this.fillGas2,
     required this.fillGas3,
-    required this.cylinderTemplates,
   });
 
   /// Enough to keep a synced blob small. Nobody blends 50 distinct mixes.
@@ -147,15 +145,6 @@ class BlenderPreferences {
   final GasMix fillGas2;
   final GasMix fillGas3;
 
-  /// User-managed cylinder sizes (name + litres) that feed the cylinder
-  /// dropdown. Seeded from [CylinderTemplate.seedTemplates] on first use only,
-  /// the same way [templates] seeds itself -- keyed on the whole blob being
-  /// absent rather than on this list being empty, so deleting every seeded
-  /// entry keeps it deleted.
-  final List<CylinderTemplate> cylinderTemplates;
-
-  static const int maxCylinderTemplates = kMaxCylinderTemplates;
-
   factory BlenderPreferences.defaults({required double cylinderWaterLiters}) =>
       BlenderPreferences(
         templates: seedTemplates,
@@ -173,7 +162,6 @@ class BlenderPreferences {
         fillGas1: const GasMix(o2: 100),
         fillGas2: const GasMix(o2: 0, he: 100),
         fillGas3: const GasMix(o2: 21),
-        cylinderTemplates: CylinderTemplate.seedTemplates,
       );
 
   BlenderPreferences copyWith({
@@ -192,7 +180,6 @@ class BlenderPreferences {
     GasMix? fillGas1,
     GasMix? fillGas2,
     GasMix? fillGas3,
-    List<CylinderTemplate>? cylinderTemplates,
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
@@ -211,9 +198,6 @@ class BlenderPreferences {
     fillGas1: fillGas1 ?? this.fillGas1,
     fillGas2: fillGas2 ?? this.fillGas2,
     fillGas3: fillGas3 ?? this.fillGas3,
-    cylinderTemplates: (cylinderTemplates ?? this.cylinderTemplates)
-        .take(maxCylinderTemplates)
-        .toList(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -232,7 +216,6 @@ class BlenderPreferences {
     'fillGas1': _gasMixToJson(fillGas1),
     'fillGas2': _gasMixToJson(fillGas2),
     'fillGas3': _gasMixToJson(fillGas3),
-    'cylinderTemplates': cylinderTemplates.map((t) => t.toJson()).toList(),
   };
 
   /// Every field falls back independently, so one corrupt entry never costs
@@ -266,15 +249,6 @@ class BlenderPreferences {
 
     final billedTo = json['billedTo'];
 
-    final rawCylinderTemplates = json['cylinderTemplates'];
-    final cylinderTemplates = rawCylinderTemplates is List
-        ? rawCylinderTemplates
-              .map(CylinderTemplate.fromJson)
-              .whereType<CylinderTemplate>()
-              .take(maxCylinderTemplates)
-              .toList()
-        : <CylinderTemplate>[];
-
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
@@ -294,7 +268,6 @@ class BlenderPreferences {
       fillGas2:
           _gasMixFromJson(json['fillGas2']) ?? const GasMix(o2: 0, he: 100),
       fillGas3: _gasMixFromJson(json['fillGas3']) ?? const GasMix(o2: 21),
-      cylinderTemplates: cylinderTemplates,
     );
   }
 }

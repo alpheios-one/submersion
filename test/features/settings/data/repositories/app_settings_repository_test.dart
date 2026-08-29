@@ -5,7 +5,6 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
-import 'package:submersion/features/gas_calculators/domain/blending/cylinder_template.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -56,9 +55,6 @@ void main() {
             fillGas1: const GasMix(o2: 99.5),
             fillGas2: const GasMix(o2: 0, he: 99),
             fillGas3: const GasMix(o2: 20.9),
-            cylinderTemplates: const [
-              CylinderTemplate(name: 'Deco bottle', liters: 3),
-            ],
           );
 
       await repository.setBlenderPreferences(prefs);
@@ -72,7 +68,6 @@ void main() {
       expect(loaded.fillGas1, const GasMix(o2: 99.5));
       expect(loaded.fillGas2, const GasMix(o2: 0, he: 99));
       expect(loaded.fillGas3, const GasMix(o2: 20.9));
-      expect(loaded.cylinderTemplates, prefs.cylinderTemplates);
     });
 
     test('a later write overwrites the earlier one', () async {

@@ -12475,28 +12475,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Réglages par défaut et facturation';
 
   @override
-  String get gasCalculators_blender_cylinderTemplates => 'Tailles de blocs';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateName => 'Nom';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateNone =>
-      'Aucune taille de bloc enregistrée pour l\'instant.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateInvalid =>
-      'Saisissez un nom et une taille supérieure à zéro.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateExists =>
-      'Cette taille de bloc est déjà enregistrée.';
-
-  @override
-  String get gasCalculators_blender_cylinderTemplateLimit =>
-      'Vous avez atteint la limite de tailles de blocs enregistrées.';
-
-  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
