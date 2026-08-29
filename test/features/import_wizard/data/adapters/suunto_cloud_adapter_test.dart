@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:submersion/core/services/suunto_cloud/suunto_cloud_client.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_dive_parser.dart';
 import 'package:submersion/features/dive_computer/data/services/dive_import_service.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
+import 'package:submersion/features/dive_import/domain/services/dive_matcher.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart'
     hide DiveMatchResult;
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
@@ -92,14 +94,39 @@ void main() {
     });
   });
 
+  void stubImportAsNew([String diveId = 'new-dive-id']) {
+    when(
+      mockImportService.importSingleDiveAsNew(
+        any,
+        computerId: anyNamed('computerId'),
+        diverId: anyNamed('diverId'),
+        descriptorVendor: anyNamed('descriptorVendor'),
+        descriptorProduct: anyNamed('descriptorProduct'),
+      ),
+    ).thenAnswer((_) async => diveId);
+  }
+
   group('defaultTagName', () {
-    test('is based on today\'s date', () {
-      final now = DateTime.now();
-      final expectedDate =
-          '${now.year}-'
-          '${now.month.toString().padLeft(2, '0')}-'
-          '${now.day.toString().padLeft(2, '0')}';
-      expect(adapter.defaultTagName, 'Suunto Cloud Import $expectedDate');
+    String isoDate(DateTime d) =>
+        '${d.year}-'
+        '${d.month.toString().padLeft(2, '0')}-'
+        '${d.day.toString().padLeft(2, '0')}';
+
+    test("is based on today's date", () {
+      // defaultTagName reads its own DateTime.now(). Bracketing the call
+      // rather than comparing against a single earlier read keeps this from
+      // failing when the two land on opposite sides of midnight.
+      final before = DateTime.now();
+      final tagName = adapter.defaultTagName;
+      final after = DateTime.now();
+
+      expect(
+        tagName,
+        anyOf(
+          'Suunto Cloud Import ${isoDate(before)}',
+          'Suunto Cloud Import ${isoDate(after)}',
+        ),
+      );
     });
   });
 
@@ -276,6 +303,272 @@ void main() {
       );
 
       expect(result.importedCounts[ImportEntityType.dives], 0);
+    });
+
+    test(
+      'imports a duplicate marked importAsNew even when unselected',
+      () async {
+        adapter.setParsedDives([makeParsedDive()]);
+        final bundle = await adapter.buildBundle();
+        stubImportAsNew();
+
+        final result = await adapter.performImport(bundle, const {}, {
+          ImportEntityType.dives: {0: DuplicateAction.importAsNew},
+        });
+
+        expect(result.importedCounts[ImportEntityType.dives], 1);
+      },
+    );
+
+    test('counts an unselected skip action as skipped', () async {
+      adapter.setParsedDives([makeParsedDive()]);
+      final bundle = await adapter.buildBundle();
+
+      final result = await adapter.performImport(bundle, const {}, {
+        ImportEntityType.dives: {0: DuplicateAction.skip},
+      });
+
+      expect(result.skippedCount, 1);
+    });
+
+    test(
+      'imports oldest first so dive numbering stays chronological',
+      () async {
+        adapter.setParsedDives([
+          makeParsedDive(
+            startTime: DateTime.utc(2026, 3, 20),
+            serialNumber: 'A',
+          ),
+          makeParsedDive(
+            startTime: DateTime.utc(2026, 3, 1),
+            serialNumber: 'B',
+          ),
+        ]);
+        final bundle = await adapter.buildBundle();
+
+        final seen = <DateTime>[];
+        when(
+          mockImportService.importSingleDiveAsNew(
+            any,
+            computerId: anyNamed('computerId'),
+            diverId: anyNamed('diverId'),
+            descriptorVendor: anyNamed('descriptorVendor'),
+            descriptorProduct: anyNamed('descriptorProduct'),
+          ),
+        ).thenAnswer((invocation) async {
+          seen.add(
+            (invocation.positionalArguments.first as DownloadedDive).startTime,
+          );
+          return 'new-dive-id';
+        });
+
+        await adapter.performImport(bundle, {
+          ImportEntityType.dives: {0, 1},
+        }, {});
+
+        expect(seen, [DateTime.utc(2026, 3, 1), DateTime.utc(2026, 3, 20)]);
+      },
+    );
+  });
+
+  group('performImport() consolidate', () {
+    setUp(() {
+      adapter.setParsedDives([makeParsedDive()]);
+    });
+
+    Future<ImportBundle> bundleWithMatch() async {
+      final bundle = await adapter.buildBundle();
+      return ImportBundle(
+        source: bundle.source,
+        groups: {
+          ImportEntityType.dives: EntityGroup(
+            items: bundle.groups[ImportEntityType.dives]!.items,
+            duplicateIndices: const {0},
+            matchResults: {
+              0: const DiveMatchResult(
+                diveId: 'existing-dive',
+                score: 0.9,
+                timeDifferenceMs: 0,
+              ),
+            },
+          ),
+        },
+      );
+    }
+
+    test('consolidates onto the existing dive as a second source', () async {
+      final bundle = await bundleWithMatch();
+      when(
+        mockDiveRepo.getComputerIdForDive('existing-dive'),
+      ).thenAnswer((_) async => 'other-computer');
+      stubImportAsNew();
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.consolidate},
+        },
+      );
+
+      expect(result.consolidatedCount, 1);
+      verify(
+        mockConsolidationService.apply(
+          targetDiveId: 'existing-dive',
+          secondaryDiveIds: ['new-dive-id'],
+        ),
+      ).called(1);
+    });
+
+    test('skips consolidating onto a dive from the same computer', () async {
+      final bundle = await bundleWithMatch();
+      // buildBundle() already created the computer, so read back the id the
+      // fake repository minted for this dive's serial.
+      when(
+        mockDiveRepo.getComputerIdForDive('existing-dive'),
+      ).thenAnswer((_) async => 'computer-SN-1');
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.consolidate},
+        },
+      );
+
+      expect(result.consolidatedCount, 0);
+      expect(result.skippedCount, 1);
+      verifyNever(
+        mockConsolidationService.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      );
+    });
+
+    test('deletes the stranded dive when consolidation fails', () async {
+      final bundle = await bundleWithMatch();
+      when(
+        mockDiveRepo.getComputerIdForDive('existing-dive'),
+      ).thenAnswer((_) async => 'other-computer');
+      stubImportAsNew();
+      when(
+        mockConsolidationService.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      ).thenThrow(StateError('consolidation blew up'));
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.consolidate},
+        },
+      );
+
+      expect(result.consolidatedCount, 0);
+      expect(result.skippedCount, 1);
+      verify(mockDiveRepo.bulkDeleteDives(['new-dive-id'])).called(1);
+    });
+
+    test('does not rethrow when the compensating delete also fails', () async {
+      final bundle = await bundleWithMatch();
+      when(
+        mockDiveRepo.getComputerIdForDive('existing-dive'),
+      ).thenAnswer((_) async => 'other-computer');
+      stubImportAsNew();
+      when(
+        mockConsolidationService.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      ).thenThrow(StateError('consolidation blew up'));
+      when(mockDiveRepo.bulkDeleteDives(any)).thenThrow(StateError('nope'));
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.consolidate},
+        },
+      );
+
+      expect(result.skippedCount, 1);
+    });
+
+    test('replaces the source on an existing dive', () async {
+      final bundle = await bundleWithMatch();
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.replaceSource},
+        },
+      );
+
+      expect(result.updatedCount, 1);
+      verify(
+        mockImportService.resolveConflict(
+          any,
+          ConflictResolution.replaceSource,
+          any,
+          diverId: diverId,
+          descriptorVendor: 'Suunto',
+          descriptorProduct: 'Suunto Ocean',
+        ),
+      ).called(1);
+    });
+  });
+
+  group('adapter metadata', () {
+    test('declares the Suunto cloud source type and duplicate actions', () {
+      expect(adapter.sourceType, ImportSourceType.suuntoCloud);
+      expect(adapter.displayName, 'Suunto Cloud');
+      expect(
+        adapter.duplicateActionsFor(ImportEntityType.dives),
+        adapter.supportedDuplicateActions,
+      );
+      expect(
+        adapter.supportedDuplicateActions,
+        contains(DuplicateAction.consolidate),
+      );
+    });
+
+    test('exposes a sign-in step followed by a fetch step', () {
+      final steps = adapter.acquisitionSteps;
+
+      expect(steps.map((s) => s.label), ['Sign In', 'Fetch']);
+      expect(steps.every((s) => s.autoAdvance), isTrue);
+    });
+
+    test('setClient exposes the authenticated client to the fetch step', () {
+      final client = SuuntoCloudClient();
+      adapter.setClient(client);
+
+      expect(adapter.client, same(client));
+    });
+
+    test('resetState clears the client and the fetched dives', () async {
+      adapter.setClient(SuuntoCloudClient());
+      adapter.setParsedDives([makeParsedDive()]);
+
+      adapter.resetState();
+
+      expect(adapter.client, isNull);
+      final bundle = await adapter.buildBundle();
+      expect(bundle.groups[ImportEntityType.dives]!.items, isEmpty);
     });
   });
 }
