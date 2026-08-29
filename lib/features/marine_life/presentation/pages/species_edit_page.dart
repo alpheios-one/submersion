@@ -240,17 +240,20 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
     setState(() => _isSaving = true);
 
     try {
-      final notifier = ref.read(speciesListNotifierProvider.notifier);
+      // Write through the repository, not through the species list notifier.
+      // That notifier is autoDispose and this page never watches it, so a
+      // `read` of it would be disposed at the end of the frame while the save
+      // was still in flight. The list refreshes off the `species` table tick.
+      final repository = ref.read(speciesRepositoryProvider);
       final commonName = _commonNameController.text.trim();
       final scientificName = _scientificNameController.text.trim();
       final taxonomyClass = _taxonomyClassController.text.trim();
       final description = _descriptionController.text.trim();
 
       if (widget.isEditing) {
-        final repository = ref.read(speciesRepositoryProvider);
         final existing = await repository.getSpeciesById(widget.speciesId!);
         if (existing != null) {
-          await notifier.updateSpecies(
+          await repository.updateSpecies(
             existing.copyWith(
               commonName: commonName,
               scientificName: scientificName.isEmpty ? null : scientificName,
@@ -261,7 +264,7 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
           );
         }
       } else {
-        await notifier.addSpecies(
+        await repository.createSpecies(
           commonName: commonName,
           scientificName: scientificName.isEmpty ? null : scientificName,
           category: _category,
