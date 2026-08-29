@@ -1,0 +1,347 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
+
+/// A fully populated sample: every one of the 28 fields present.
+ProfileSample fullSample(int i) => ProfileSample(
+  timestamp: i * 10,
+  depth: 10.0 + i * 0.5,
+  pressure: 200.0 - i,
+  temperature: 20.0 - i * 0.01,
+  heartRate: 80 + (i % 7),
+  ascentRate: -3.0 + i * 0.1,
+  ceiling: i > 5 ? 3.0 : 0.0,
+  ndl: 1800 - i * 15,
+  setpoint: 1.2,
+  ppO2: 1.19 + i * 0.001,
+  o2Sensor1: 1.18,
+  o2Sensor2: 1.20,
+  o2Sensor3: 1.21,
+  o2Sensor4: 1.17,
+  o2Sensor5: 1.22,
+  o2Sensor6: 1.19,
+  cns: 12.5 + i,
+  tts: 900 + i * 3,
+  rbt: 1500 - i * 2,
+  decoType: i > 5 ? 2 : 0,
+  heartRateSource: i < 4 ? 'diveComputer' : 'appleWatch',
+  heading: (i * 37) % 360 * 1.0,
+  o2SensorMv1: 51 + i,
+  o2SensorMv2: 52 - i,
+  o2SensorMv3: 53,
+  o2SensorMv4: 50,
+  o2SensorMv5: 54,
+  o2SensorMv6: 52,
+);
+
+/// Depth and timestamp only, like a manually entered profile.
+ProfileSample minimalSample(int i) =>
+    ProfileSample(timestamp: i * 30, depth: 5.0 * (i % 4));
+
+void main() {
+  const codec = ProfileSeriesCodec();
+
+  group('round trips', () {
+    test('every field present', () {
+      final samples = [for (var i = 0; i < 12; i++) fullSample(i)];
+      final encoded = codec.encode(samples);
+      expect(encoded.codecVersion, 1);
+      expect(codec.decode(encoded.bytes), samples);
+    });
+
+    test('every optional field null', () {
+      final samples = [for (var i = 0; i < 12; i++) minimalSample(i)];
+      expect(codec.decode(codec.encode(samples).bytes), samples);
+    });
+
+    test('mixed presence within one column', () {
+      final samples = [
+        for (var i = 0; i < 20; i++)
+          ProfileSample(
+            timestamp: i,
+            depth: 1.0 * i,
+            temperature: i.isEven ? 20.0 : null,
+            ndl: i % 3 == 0 ? 600 - i : null,
+            heartRateSource: i % 5 == 0 ? 'garmin' : null,
+          ),
+      ];
+      expect(codec.decode(codec.encode(samples).bytes), samples);
+    });
+
+    test('a single sample', () {
+      final samples = [fullSample(0)];
+      expect(codec.decode(codec.encode(samples).bytes), samples);
+    });
+
+    test('duplicate timestamps survive in insertion order', () {
+      const samples = [
+        ProfileSample(timestamp: 10, depth: 5.0),
+        ProfileSample(timestamp: 10, depth: 5.5),
+        ProfileSample(timestamp: 10, depth: 5.0, temperature: 19.0),
+        ProfileSample(timestamp: 20, depth: 6.0),
+      ];
+      expect(codec.decode(codec.encode(samples).bytes), samples);
+    });
+
+    test('integer fields that decrease encode negative deltas correctly', () {
+      final samples = [
+        for (var i = 0; i < 50; i++)
+          ProfileSample(
+            timestamp: i,
+            depth: 1.0,
+            ndl: 3000 - i * 60,
+            rbt: 2000 - i * 45,
+            heartRate: 100 - i,
+            o2SensorMv1: -5 + i,
+          ),
+      ];
+      expect(codec.decode(codec.encode(samples).bytes), samples);
+    });
+
+    test('float64 fields are bit-exact', () {
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 0.1 + 0.2, temperature: -0.0),
+        ProfileSample(timestamp: 1, depth: double.maxFinite, cns: 1e-300),
+      ];
+      final decoded = codec.decode(codec.encode(samples).bytes);
+      expect(decoded[0].depth, samples[0].depth);
+      expect(decoded[0].temperature!.isNegative, isTrue);
+      expect(decoded[1].depth, double.maxFinite);
+      expect(decoded[1].cns, 1e-300);
+    });
+
+    test('the largest realistic series: 20,000 samples at one second', () {
+      final random = Random(42);
+      var depth = 0.0;
+      final samples = <ProfileSample>[];
+      for (var i = 0; i < 20000; i++) {
+        depth = max(0.0, depth + (random.nextDouble() - 0.5) * 0.3);
+        samples.add(
+          ProfileSample(
+            timestamp: i,
+            depth: depth,
+            temperature: 8.0 + (i ~/ 600) * 0.1,
+            ndl: max(0, 3600 - i ~/ 2),
+            cns: i / 400.0,
+            decoType: i > 15000 ? 2 : 0,
+          ),
+        );
+      }
+      final encoded = codec.encode(samples);
+      expect(codec.decode(encoded.bytes), samples);
+      // 20,000 samples of six fields. Row storage today costs roughly 300
+      // bytes per sample; the packed blob must land far below even the raw
+      // columnar size (8 bytes per float64 field per sample).
+      expect(encoded.bytes.length, lessThan(20000 * 3 * 8));
+    });
+  });
+
+  group('summary', () {
+    test('encode returns the summary of the packed samples', () {
+      final samples = [for (var i = 0; i < 12; i++) fullSample(i)];
+      final encoded = codec.encode(samples);
+      expect(encoded.summary, ProfileSeriesSummary.of(samples));
+      expect(encoded.summary.sampleCount, 12);
+      expect(encoded.summary.hasDecoStop, isTrue);
+      expect(encoded.summary.hasPositiveCeiling, isTrue);
+    });
+  });
+
+  group('caller errors', () {
+    test('an empty series cannot be encoded', () {
+      expect(() => codec.encode(const []), throwsArgumentError);
+    });
+
+    test('timestamps must be non-decreasing', () {
+      const samples = [
+        ProfileSample(timestamp: 10, depth: 1.0),
+        ProfileSample(timestamp: 9, depth: 1.0),
+      ];
+      expect(() => codec.encode(samples), throwsArgumentError);
+    });
+
+    test('an unregistered version cannot be encoded', () {
+      expect(
+        () => codec.encode([fullSample(0)], version: 9),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('malformed input', () {
+    Uint8List validBytes() =>
+        codec.encode([for (var i = 0; i < 8; i++) fullSample(i)]).bytes;
+
+    /// Re-compresses a tampered body so the failure is in the codec, not
+    /// in zlib.
+    Uint8List recompress(List<int> body) =>
+        Uint8List.fromList(ZLibCodec(level: 6).encode(body));
+
+    Uint8List inflate(Uint8List bytes) =>
+        Uint8List.fromList(zlib.decode(bytes));
+
+    test('bytes that are not a zlib stream', () {
+      expect(
+        () => codec.decode(Uint8List.fromList([1, 2, 3, 4, 5])),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('an empty blob', () {
+      expect(
+        () => codec.decode(Uint8List(0)),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('an unknown version byte', () {
+      final body = inflate(validBytes());
+      body[0] = 42;
+      expect(
+        () => codec.decode(recompress(body)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('version'),
+          ),
+        ),
+      );
+    });
+
+    test('a truncated body', () {
+      final body = inflate(validBytes());
+      final truncated = body.sublist(0, body.length ~/ 2);
+      expect(
+        () => codec.decode(recompress(truncated)),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('trailing bytes after the last block', () {
+      final body = inflate(validBytes());
+      final padded = Uint8List.fromList([...body, 0, 0, 0]);
+      expect(
+        () => codec.decode(recompress(padded)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('trailing'),
+          ),
+        ),
+      );
+    });
+
+    test('a blob whose timestamp column is marked absent', () {
+      // Header is version (1 byte) then count varint (8 fits in 1 byte);
+      // byte 2 is the timestamp block's presence mode.
+      final body = inflate(validBytes());
+      expect(body[2], isNot(0));
+      body[2] = 0;
+      expect(
+        () => codec.decode(recompress(body)),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+  });
+
+  group('forward tolerance', () {
+    // A hypothetical older format that never recorded heading.
+    final withoutHeading = [
+      for (final field in ProfileSeriesCodec.fieldTableV1)
+        if (field.name != 'heading') field,
+    ];
+
+    test('a newer decoder reads an older version with missing fields null', () {
+      final legacy = ProfileSeriesCodec(fieldTables: {7: withoutHeading});
+      final modern = ProfileSeriesCodec(
+        fieldTables: {
+          7: withoutHeading,
+          ProfileSeriesCodec.version: ProfileSeriesCodec.fieldTableV1,
+        },
+      );
+      final samples = [for (var i = 0; i < 6; i++) fullSample(i)];
+      final bytes = legacy.encode(samples, version: 7).bytes;
+      final decoded = modern.decode(bytes);
+      expect(decoded, hasLength(6));
+      for (var i = 0; i < 6; i++) {
+        expect(decoded[i].heading, isNull);
+        expect(decoded[i], samples[i].copyWithoutHeading());
+      }
+    });
+
+    test('a decoder that does not know the version refuses it', () {
+      final legacy = ProfileSeriesCodec(fieldTables: {7: withoutHeading});
+      final bytes = legacy.encode([fullSample(0)], version: 7).bytes;
+      expect(
+        () => codec.decode(bytes),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('every field table must carry timestamp and depth', () {
+      final noDepth = [
+        for (final field in ProfileSeriesCodec.fieldTableV1)
+          if (field.name != 'depth') field,
+      ];
+      expect(
+        () => ProfileSeriesCodec(
+          fieldTables: {1: noDepth},
+        ).encode([fullSample(0)]),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('field table', () {
+    test('v1 has 28 entries with unique names', () {
+      final names = ProfileSeriesCodec.fieldTableV1.map((f) => f.name);
+      expect(names, hasLength(28));
+      expect(names.toSet(), hasLength(28));
+    });
+
+    test('v1 begins with timestamp and depth', () {
+      expect(ProfileSeriesCodec.fieldTableV1[0].name, 'timestamp');
+      expect(ProfileSeriesCodec.fieldTableV1[1].name, 'depth');
+    });
+  });
+}
+
+extension on ProfileSample {
+  ProfileSample copyWithoutHeading() => ProfileSample(
+    timestamp: timestamp,
+    depth: depth,
+    pressure: pressure,
+    temperature: temperature,
+    heartRate: heartRate,
+    ascentRate: ascentRate,
+    ceiling: ceiling,
+    ndl: ndl,
+    setpoint: setpoint,
+    ppO2: ppO2,
+    o2Sensor1: o2Sensor1,
+    o2Sensor2: o2Sensor2,
+    o2Sensor3: o2Sensor3,
+    o2Sensor4: o2Sensor4,
+    o2Sensor5: o2Sensor5,
+    o2Sensor6: o2Sensor6,
+    cns: cns,
+    tts: tts,
+    rbt: rbt,
+    decoType: decoType,
+    heartRateSource: heartRateSource,
+    o2SensorMv1: o2SensorMv1,
+    o2SensorMv2: o2SensorMv2,
+    o2SensorMv3: o2SensorMv3,
+    o2SensorMv4: o2SensorMv4,
+    o2SensorMv5: o2SensorMv5,
+    o2SensorMv6: o2SensorMv6,
+  );
+}
