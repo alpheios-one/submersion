@@ -2977,56 +2977,61 @@ class DiveRepository {
       // Depth distribution: 10 m buckets from the surface to 130 m, plus an
       // open-ended bucket for anything deeper (issue #641). A dive lands in
       // a bucket by its max depth, same rule the 0-40 m version used.
+      //
+      // Per-bucket duration is `DiveTimes.effectiveRuntime` (the same
+      // 4-step fallback as `Dive.effectiveRuntime`: runtime, then
+      // exit-entry, then profile span, then bottom_time) rather than the
+      // `SUM(COALESCE(runtime, bottom_time))` SQL shortcut used previously,
+      // which skipped the profile-derived fallback and undercounted dives
+      // that only have a computed runtime. Bucketing therefore happens in
+      // Dart, one row per dive, reusing the `_diveTimesSelect` projection so
+      // no full `Dive`/profile hydration is needed (issue #641 follow-up).
       final depthWhereClause = diverId != null
-          ? 'WHERE max_depth IS NOT NULL AND diver_id = ?'
-          : 'WHERE max_depth IS NOT NULL';
+          ? 'WHERE d.max_depth IS NOT NULL AND d.diver_id = ?'
+          : 'WHERE d.max_depth IS NOT NULL';
       const depthBucketSizeMeters = 10;
       const depthBucketCount = 13; // 0-10m, 10-20m, ..., 120-130m
-      final depthStats = await _db.customSelect('''
-      SELECT
-        MIN(CAST(max_depth / $depthBucketSizeMeters AS INTEGER), $depthBucketCount) as depth_bucket,
-        COUNT(*) as count,
-        SUM(COALESCE(runtime, bottom_time)) as total_time
-      FROM dives
-      $depthWhereClause $fBare
-      GROUP BY depth_bucket
-    ''', variables: vars).get();
+      final depthRows = await _db
+          .customSelect(
+            'SELECT $_diveTimesSelectColumns, d.max_depth AS max_depth '
+            'FROM dives d '
+            '$depthWhereClause $fAliasD',
+            variables: vars,
+            readsFrom: {_db.dives, _db.diveProfiles},
+          )
+          .get();
 
-      final depthRanges = [
+      final bucketCounts = List<int>.filled(depthBucketCount + 1, 0);
+      final bucketDurationSeconds = List<int>.filled(depthBucketCount + 1, 0);
+      for (final row in depthRows) {
+        final maxDepthValue = row.read<double>('max_depth');
+        final bucket = (maxDepthValue / depthBucketSizeMeters).floor().clamp(
+          0,
+          depthBucketCount,
+        );
+        bucketCounts[bucket]++;
+        bucketDurationSeconds[bucket] +=
+            _mapDiveTimesRow(row).effectiveRuntime?.inSeconds ?? 0;
+      }
+
+      final depthDistribution = [
         for (var i = 0; i < depthBucketCount; i++)
           DepthRangeStat(
             label:
                 '${i * depthBucketSizeMeters}-${(i + 1) * depthBucketSizeMeters}m',
             minDepth: i * depthBucketSizeMeters,
             maxDepth: (i + 1) * depthBucketSizeMeters,
-            count: 0,
+            count: bucketCounts[i],
+            totalDurationSeconds: bucketDurationSeconds[i],
           ),
         DepthRangeStat(
           label: '${depthBucketCount * depthBucketSizeMeters}m+',
           minDepth: depthBucketCount * depthBucketSizeMeters,
           maxDepth: depthBucketCount * depthBucketSizeMeters,
-          count: 0,
+          count: bucketCounts[depthBucketCount],
+          totalDurationSeconds: bucketDurationSeconds[depthBucketCount],
           openEnded: true,
         ),
-      ];
-
-      final depthDistribution = [
-        for (var i = 0; i < depthRanges.length; i++)
-          DepthRangeStat(
-            label: depthRanges[i].label,
-            minDepth: depthRanges[i].minDepth,
-            maxDepth: depthRanges[i].maxDepth,
-            openEnded: depthRanges[i].openEnded,
-            count: depthStats
-                .where((row) => row.data['depth_bucket'] == i)
-                .fold<int>(0, (sum, row) => sum + (row.data['count'] as int)),
-            totalDurationSeconds: depthStats
-                .where((row) => row.data['depth_bucket'] == i)
-                .fold<int>(
-                  0,
-                  (sum, row) => sum + (row.data['total_time'] as int? ?? 0),
-                ),
-          ),
       ];
 
       // Top sites
@@ -4824,16 +4829,21 @@ class DiveRepository {
     }
   }
 
-  /// Shared SELECT for the times-only dive projection. The scalar subquery
-  /// carries the profile-derived runtime fallback so
+  /// Shared column list for the times-only dive projection. The scalar
+  /// subquery carries the profile-derived runtime fallback so
   /// [DiveTimes.effectiveRuntime] can mirror [domain.Dive.effectiveRuntime]
-  /// without loading profile rows.
-  static const _diveTimesSelect =
-      'SELECT d.id, d.dive_date_time, d.entry_time, d.exit_time, '
+  /// without loading profile rows. Split out from [_diveTimesSelect] so
+  /// callers that need one extra column (e.g. the depth-distribution stats
+  /// query, which also needs `max_depth`) can extend the SELECT without
+  /// duplicating the subquery.
+  static const _diveTimesSelectColumns =
+      'd.id, d.dive_date_time, d.entry_time, d.exit_time, '
       'd.runtime, d.bottom_time, '
       '(SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id) AS profile_span '
-      'FROM dives d';
+      'WHERE p.dive_id = d.id) AS profile_span';
+
+  static const _diveTimesSelect =
+      'SELECT $_diveTimesSelectColumns FROM dives d';
 
   domain.DiveTimes _mapDiveTimesRow(QueryRow row) {
     final entry = row.readNullable<int>('entry_time');

@@ -4,6 +4,8 @@ import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 
@@ -373,6 +375,39 @@ void main() {
       expect(byLabel['10-20m']!.totalDurationSeconds, 55 * 60);
       expect(byLabel['30-40m']!.totalDurationSeconds, 45 * 60);
       expect(byLabel['0-10m']!.totalDurationSeconds, 0);
+    });
+
+    test('falls back to the profile span when runtime, entry/exit time, and '
+        'bottom_time are all missing (issue #641 follow-up)', () async {
+      // No runtime/entryTime/exitTime/bottomTime: effectiveRuntime can only
+      // resolve via the profile-derived fallback (30 min span).
+      await repository.createDive(
+        domain.Dive(
+          id: 'dive-profile-only',
+          dateTime: DateTime.utc(2026, 3, 28, 10),
+          maxDepth: 22.0,
+          profile: [
+            for (var t = 0; t <= 1800; t += 10)
+              domain.DiveProfilePoint(
+                timestamp: t,
+                depth: t == 0 || t == 1800 ? 0 : 22,
+              ),
+          ],
+        ),
+      );
+      await insertDive(
+        id: 'dive-with-bottom-time',
+        maxDepth: 22.0,
+        bottomTimeSeconds: 10 * 60,
+      );
+
+      final stats = await repository.getStatistics();
+      final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+
+      // dive-profile-only contributes its 30 min profile span; dive-with-
+      // bottom-time contributes its 10 min bottom_time. Same bucket: 40m.
+      expect(byLabel['20-30m']!.totalDurationSeconds, (30 + 10) * 60);
+      expect(byLabel['20-30m']!.count, 2);
     });
   });
 
