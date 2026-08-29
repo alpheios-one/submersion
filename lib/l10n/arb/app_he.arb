@@ -10484,5 +10484,16 @@
   "settings_storageUsage_category_pdfThumbnails": "תמונות ממוזערות של מסמכים",
   "settings_storageUsage_category_backups": "קובצי גיבוי",
   "settings_storageUsage_category_temporary": "קבצים זמניים",
-  "settings_storageUsage_category_exports": "קבצים שיוצאו"
+  "settings_storageUsage_category_exports": "קבצים שיוצאו",
+  "profilePhoto_sheet_title": "תמונת פרופיל",
+  "profilePhoto_source_camera": "צילום תמונה",
+  "profilePhoto_source_library": "בחירה מהספרייה",
+  "profilePhoto_source_file": "בחירת קובץ",
+  "profilePhoto_source_contacts": "בחירה מאנשי הקשר",
+  "profilePhoto_action_remove": "הסרת התמונה",
+  "profilePhoto_crop_title": "התאמת התמונה",
+  "profilePhoto_crop_hint": "גררו כדי להזיז, צבטו כדי לשנות מרחק",
+  "profilePhoto_error_tooLarge": "התמונה הזו גדולה מדי. נסו תמונה קטנה יותר.",
+  "profilePhoto_error_undecodable": "לא ניתן היה לקרוא את הקובץ הזה כתמונה.",
+  "profilePhoto_error_contactNoPhoto": "לאיש הקשר הזה אין תמונה."
 }

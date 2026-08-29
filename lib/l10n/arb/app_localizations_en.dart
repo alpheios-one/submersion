@@ -35393,4 +35393,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Exported files';
+
+  @override
+  String get profilePhoto_sheet_title => 'Profile Photo';
+
+  @override
+  String get profilePhoto_source_camera => 'Take Photo';
+
+  @override
+  String get profilePhoto_source_library => 'Choose from Library';
+
+  @override
+  String get profilePhoto_source_file => 'Choose File';
+
+  @override
+  String get profilePhoto_source_contacts => 'Choose from Contacts';
+
+  @override
+  String get profilePhoto_action_remove => 'Remove Photo';
+
+  @override
+  String get profilePhoto_crop_title => 'Adjust Photo';
+
+  @override
+  String get profilePhoto_crop_hint => 'Drag to reposition, pinch to zoom';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'That image is too large to use. Try a smaller one.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'That file could not be read as an image.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'That contact does not have a photo.';
 }

@@ -10484,5 +10484,16 @@
   "settings_storageUsage_category_pdfThumbnails": "الصور المصغرة للمستندات",
   "settings_storageUsage_category_backups": "ملفات النسخ الاحتياطي",
   "settings_storageUsage_category_temporary": "الملفات المؤقتة",
-  "settings_storageUsage_category_exports": "الملفات المصدرة"
+  "settings_storageUsage_category_exports": "الملفات المصدرة",
+  "profilePhoto_sheet_title": "صورة الملف الشخصي",
+  "profilePhoto_source_camera": "التقاط صورة",
+  "profilePhoto_source_library": "الاختيار من المكتبة",
+  "profilePhoto_source_file": "اختيار ملف",
+  "profilePhoto_source_contacts": "الاختيار من جهات الاتصال",
+  "profilePhoto_action_remove": "إزالة الصورة",
+  "profilePhoto_crop_title": "تعديل الصورة",
+  "profilePhoto_crop_hint": "اسحب لتغيير الموضع، وقرّب بإصبعين للتكبير",
+  "profilePhoto_error_tooLarge": "هذه الصورة كبيرة جدًا. جرّب صورة أصغر.",
+  "profilePhoto_error_undecodable": "تعذّرت قراءة هذا الملف كصورة.",
+  "profilePhoto_error_contactNoPhoto": "جهة الاتصال هذه ليس لها صورة."
 }

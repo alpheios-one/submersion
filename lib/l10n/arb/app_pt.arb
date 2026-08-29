@@ -10484,5 +10484,16 @@
   "settings_storageUsage_category_pdfThumbnails": "Miniaturas de documentos",
   "settings_storageUsage_category_backups": "Ficheiros de cópia de segurança",
   "settings_storageUsage_category_temporary": "Ficheiros temporários",
-  "settings_storageUsage_category_exports": "Ficheiros exportados"
+  "settings_storageUsage_category_exports": "Ficheiros exportados",
+  "profilePhoto_sheet_title": "Foto do perfil",
+  "profilePhoto_source_camera": "Tirar foto",
+  "profilePhoto_source_library": "Escolher da biblioteca",
+  "profilePhoto_source_file": "Escolher ficheiro",
+  "profilePhoto_source_contacts": "Escolher dos contactos",
+  "profilePhoto_action_remove": "Remover foto",
+  "profilePhoto_crop_title": "Ajustar foto",
+  "profilePhoto_crop_hint": "Arraste para mover, aperte para ampliar",
+  "profilePhoto_error_tooLarge": "Essa imagem é demasiado grande. Tente uma mais pequena.",
+  "profilePhoto_error_undecodable": "Não foi possível ler esse ficheiro como imagem.",
+  "profilePhoto_error_contactNoPhoto": "Esse contacto não tem foto."
 }

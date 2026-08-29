@@ -35587,4 +35587,40 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'الملفات المصدرة';
+
+  @override
+  String get profilePhoto_sheet_title => 'صورة الملف الشخصي';
+
+  @override
+  String get profilePhoto_source_camera => 'التقاط صورة';
+
+  @override
+  String get profilePhoto_source_library => 'الاختيار من المكتبة';
+
+  @override
+  String get profilePhoto_source_file => 'اختيار ملف';
+
+  @override
+  String get profilePhoto_source_contacts => 'الاختيار من جهات الاتصال';
+
+  @override
+  String get profilePhoto_action_remove => 'إزالة الصورة';
+
+  @override
+  String get profilePhoto_crop_title => 'تعديل الصورة';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'اسحب لتغيير الموضع، وقرّب بإصبعين للتكبير';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'هذه الصورة كبيرة جدًا. جرّب صورة أصغر.';
+
+  @override
+  String get profilePhoto_error_undecodable => 'تعذّرت قراءة هذا الملف كصورة.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'جهة الاتصال هذه ليس لها صورة.';
 }

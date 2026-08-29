@@ -35230,4 +35230,39 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'קבצים שיוצאו';
+
+  @override
+  String get profilePhoto_sheet_title => 'תמונת פרופיל';
+
+  @override
+  String get profilePhoto_source_camera => 'צילום תמונה';
+
+  @override
+  String get profilePhoto_source_library => 'בחירה מהספרייה';
+
+  @override
+  String get profilePhoto_source_file => 'בחירת קובץ';
+
+  @override
+  String get profilePhoto_source_contacts => 'בחירה מאנשי הקשר';
+
+  @override
+  String get profilePhoto_action_remove => 'הסרת התמונה';
+
+  @override
+  String get profilePhoto_crop_title => 'התאמת התמונה';
+
+  @override
+  String get profilePhoto_crop_hint => 'גררו כדי להזיז, צבטו כדי לשנות מרחק';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'התמונה הזו גדולה מדי. נסו תמונה קטנה יותר.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'לא ניתן היה לקרוא את הקובץ הזה כתמונה.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto => 'לאיש הקשר הזה אין תמונה.';
 }

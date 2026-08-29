@@ -10484,5 +10484,16 @@
   "settings_storageUsage_category_pdfThumbnails": "Dokumentum-bélyegképek",
   "settings_storageUsage_category_backups": "Biztonsági mentési fájlok",
   "settings_storageUsage_category_temporary": "Ideiglenes fájlok",
-  "settings_storageUsage_category_exports": "Exportált fájlok"
+  "settings_storageUsage_category_exports": "Exportált fájlok",
+  "profilePhoto_sheet_title": "Profilkép",
+  "profilePhoto_source_camera": "Fénykép készítése",
+  "profilePhoto_source_library": "Választás a könyvtárból",
+  "profilePhoto_source_file": "Fájl választása",
+  "profilePhoto_source_contacts": "Választás a névjegyekből",
+  "profilePhoto_action_remove": "Fénykép eltávolítása",
+  "profilePhoto_crop_title": "Fénykép igazítása",
+  "profilePhoto_crop_hint": "Húzza az áthelyezéshez, csippentsen a nagyításhoz",
+  "profilePhoto_error_tooLarge": "Ez a kép túl nagy. Próbáljon egy kisebbet.",
+  "profilePhoto_error_undecodable": "Ezt a fájlt nem sikerült képként beolvasni.",
+  "profilePhoto_error_contactNoPhoto": "Ennek a névjegynek nincs fényképe."
 }

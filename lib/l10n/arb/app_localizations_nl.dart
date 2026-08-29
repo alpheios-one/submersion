@@ -35698,4 +35698,41 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_storageUsage_category_exports =>
       'Geëxporteerde bestanden';
+
+  @override
+  String get profilePhoto_sheet_title => 'Profielfoto';
+
+  @override
+  String get profilePhoto_source_camera => 'Foto maken';
+
+  @override
+  String get profilePhoto_source_library => 'Kies uit bibliotheek';
+
+  @override
+  String get profilePhoto_source_file => 'Kies bestand';
+
+  @override
+  String get profilePhoto_source_contacts => 'Kies uit contacten';
+
+  @override
+  String get profilePhoto_action_remove => 'Foto verwijderen';
+
+  @override
+  String get profilePhoto_crop_title => 'Foto bijsnijden';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'Sleep om te verplaatsen, knijp om te zoomen';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'Deze afbeelding is te groot. Probeer een kleinere.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'Dit bestand kon niet als afbeelding worden gelezen.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'Dit contact heeft geen foto.';
 }
