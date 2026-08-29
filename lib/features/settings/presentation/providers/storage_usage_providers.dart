@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'package:path/path.dart' as p;
@@ -71,17 +72,40 @@ final storageCategorySizeProvider = FutureProvider.family<int?, String>((
   return category.measure();
 });
 
-/// Returns null when the backup location cannot be enumerated as a directory.
+/// Chooses the directory to measure for the backups category, or null when
+/// there is no directory to measure.
 ///
 /// An Android SAF location is a content:// tree URI with no Directory behind
 /// it. Reporting it as zero bytes would tell the user their backups had
 /// vanished, so it reports unavailable instead.
+///
+/// Split out from [_resolveBackupsDirectoryPath] because this is the whole of
+/// the decision, and the SAF branch is the reason StorageCategory.measure
+/// returns a nullable int at all. It deserves a test that does not need
+/// SharedPreferences to run.
+///
+/// [defaultPath] is a callback rather than a value on purpose:
+/// `resolveDefaultBackupsDirectory` creates the directory if it is missing, and
+/// measuring storage must not have that side effect on a device whose backups
+/// live somewhere else entirely.
+@visibleForTesting
+Future<String?> backupsPathToMeasure({
+  required String? configuredLocation,
+  required Future<String> Function() defaultPath,
+}) async {
+  if (configuredLocation == null || configuredLocation.isEmpty) {
+    return defaultPath();
+  }
+  if (configuredLocation.startsWith('content://')) return null;
+  return configuredLocation;
+}
+
 Future<String?> _resolveBackupsDirectoryPath() async {
   final prefs = await SharedPreferences.getInstance();
-  final location = BackupPreferences(prefs).getSettings().backupLocation;
-  if (location != null && location.startsWith('content://')) return null;
-  if (location != null && location.isNotEmpty) return location;
-  return BackupService.resolveDefaultBackupsDirectory();
+  return backupsPathToMeasure(
+    configuredLocation: BackupPreferences(prefs).getSettings().backupLocation,
+    defaultPath: BackupService.resolveDefaultBackupsDirectory,
+  );
 }
 
 /// Returns null when the tile store never initialized.

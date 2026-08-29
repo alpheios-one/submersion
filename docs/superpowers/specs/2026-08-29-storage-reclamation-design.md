@@ -163,8 +163,8 @@ reclaimed. Written twice, the two drift the first time a fourteenth cache is
 added.
 
 `StorageCategory` is therefore a plain descriptor, not a task. Slice A ships the
-measurement half plus the clear actions that already exist. Slice C extends the
-same descriptors with a reclaim policy. Nothing speculative is built now.
+measurement half only. Slice C extends the same descriptors with a reclaim
+policy. Nothing speculative is built now.
 
 This is deliberately not the abandoned `StartupMaintenanceRunner`. That was a
 scheduler with a convergence ledger and splash progress UI. This is a list of
@@ -277,16 +277,28 @@ against the project's 800-line ceiling, and it has a single coherent
 responsibility today (where the database file lives) that a disk-usage report
 does not share.
 
-Contents: grouped rows of label and size, a total, a refresh action, and
-trailing clear buttons on the two categories that already have working clear
-paths:
+Contents: grouped rows of label and size, a total, and a refresh action. The
+page is entirely read-only. Nothing on it deletes anything.
 
-- Map tiles: `TileCacheService.clearCache()` via
-  `lib/features/maps/presentation/providers/offline_map_providers.dart:285`
-- Network images: `CachedNetworkImageDiagnostics.clearCache()` via
-  `lib/features/media/presentation/widgets/network_cache_card.dart`
+An earlier draft of this section put trailing clear buttons on the two
+categories that have working clear paths today. That was dropped during
+implementation, for one concrete reason: `clearAllCache()`
+(`lib/features/maps/presentation/providers/offline_map_providers.dart:285`)
+resets the FMTC store **and** deletes every `cached_regions` row, so it is not
+merely a cache clear. The offline maps page guards it with a confirmation
+dialog; putting the same call behind a bare button on a usage page would be a
+safety regression. Rather than ship one clear action with a confirmation and
+one without, the slice ships neither and stays genuinely read-only.
 
-No new deletion path is introduced in this slice.
+Both actions remain reachable from the pages that own them:
+
+- Map tiles: the "Clear cache" action on the offline maps page
+- Network images: `NetworkCacheCard`
+  (`lib/features/media/presentation/widgets/network_cache_card.dart`), mounted
+  on the network sources page
+
+A later slice may add reclaim actions here, with the confirmations each one
+needs. That is a deliberate follow-up, not an oversight.
 
 `_formatBytes` already exists privately at
 `lib/features/settings/presentation/pages/sync_devices_page.dart:342`. It is

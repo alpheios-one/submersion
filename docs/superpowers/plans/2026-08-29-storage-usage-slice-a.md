@@ -1055,7 +1055,6 @@ Insert these into `lib/l10n/arb/app_en.arb`, keeping the file's existing alphabe
 "settings_storageUsage_refresh_tooltip": "Recalculate",
 "settings_storageUsage_unavailable": "Not available",
 "settings_storageUsage_measureFailed": "Could not measure",
-"settings_storageUsage_clear": "Clear",
 "settings_storageUsage_group_appData": "App Data",
 "settings_storageUsage_group_mediaCache": "Media Cache",
 "settings_storageUsage_group_caches": "Caches",
@@ -1080,7 +1079,7 @@ Insert these into `lib/l10n/arb/app_en.arb`, keeping the file's existing alphabe
 
 - [ ] **Step 2: Translate into all ten other locales**
 
-Add the same 29 keys, translated, to each of: `app_ar.arb`, `app_de.arb`, `app_es.arb`, `app_fr.arb`, `app_he.arb`, `app_hu.arb`, `app_it.arb`, `app_nl.arb`, `app_pt.arb`, `app_zh.arb`.
+Add the same 28 keys, translated, to each of: `app_ar.arb`, `app_de.arb`, `app_es.arb`, `app_fr.arb`, `app_he.arb`, `app_hu.arb`, `app_it.arb`, `app_nl.arb`, `app_pt.arb`, `app_zh.arb`.
 
 Translate the values properly for each language. Do not copy the English strings across. Arabic and Hebrew are right-to-left; Flutter handles the direction, so translate the text normally.
 
@@ -1267,9 +1266,10 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Reports how many bytes the app holds on this device, by category.
 ///
-/// Read-only by design. The two trailing clear actions call paths that already
-/// exist and are already reachable from other pages; this slice introduces no
-/// new way to delete anything.
+/// Read-only by design. Nothing on this page deletes anything: the categories
+/// that can be reclaimed today are reclaimed from the pages that already own
+/// that action, and the ones that cannot be reclaimed safely at all are shown
+/// here precisely so the user can decide for themselves.
 class StorageUsagePage extends ConsumerWidget {
   const StorageUsagePage({super.key});
 
