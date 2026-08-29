@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
 import 'package:submersion/features/planner/presentation/chart/plan_chart_geometry.dart';
 import 'package:submersion/features/planner/presentation/chart/plan_chart_paint_utils.dart';
 import 'package:submersion/features/planner/presentation/chart/plan_chart_palette.dart';
@@ -119,18 +120,24 @@ class PlanChartBackdropPainter extends CustomPainter {
     }
   }
 
+  /// A ceiling at or below this depth (in meters) counts as clear to the
+  /// surface. Deliberately tiny: it exists only to absorb the sub-centimeter
+  /// residue that gradient-factor interpolation leaves on the final sample
+  /// of [PlanOutcome.ceilingTrace], not to hide a real obligation. A larger
+  /// value would end each run at a sample that is still meters deep, so the
+  /// band would cut off in mid-water instead of tapering to the surface.
+  static const clearCeilingEpsilon = 0.05;
+
   /// Splits [ceiling] into contiguous runs where the ceiling is actually
-  /// above the surface (> [_clearCeilingEpsilon]), each bookended by the
+  /// above the surface (> [clearCeilingEpsilon]), each bookended by the
   /// adjacent clear-to-surface sample so the shaded band tapers down to 0
   /// instead of cutting off abruptly.
-  static const _clearCeilingEpsilon = 0.05;
-
   List<List<CanvasPoint>> _ceilingRuns(List<CanvasPoint> ceiling) {
     final runs = <List<CanvasPoint>>[];
     List<CanvasPoint>? current;
     for (var i = 0; i < ceiling.length; i++) {
       final point = ceiling[i];
-      if (point.depth > _clearCeilingEpsilon) {
+      if (point.depth > clearCeilingEpsilon) {
         current ??= [if (i > 0) ceiling[i - 1]];
         current.add(point);
       } else if (current != null) {

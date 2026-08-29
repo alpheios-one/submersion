@@ -280,11 +280,12 @@ class _SegmentEditorState extends ConsumerState<SegmentEditor> {
 
     switch (type) {
       case SegmentType.descent:
-        // Keep the existing/inherited start depth rather than forcing 0 -
-        // only the first segment in a plan actually starts at the surface.
-        _startDepthController.text = depth(
-          widget.segment?.startDepth ?? widget.initialStartDepth,
-        );
+        // Leave the start depth alone. The field already holds the right
+        // value: the segment's own start depth when editing, the previous
+        // segment's end depth when adding, or whatever the diver has since
+        // typed. Only the first segment in a plan starts at the surface, so
+        // the old unconditional reset to 0 clobbered every later one, and
+        // re-seeding from the widget would still discard a typed edit.
         // 18 m/min default descent rate
         _rateController.text = depth(18);
         break;

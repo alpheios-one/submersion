@@ -398,13 +398,16 @@ class PlanEngine {
     );
   }
 
+  /// Sampling interval for [PlanOutcome.ceilingTrace], in seconds. Fine
+  /// enough that the chart draws a smooth curve, coarse enough that even
+  /// a long technical plan stays a few hundred samples.
+  static const ceilingSampleSeconds = 30;
+
   /// Replays the dive (user segments, then the computed travel legs and
   /// stops) on a scratch tissue state, sampling the ceiling every
-  /// [_ceilingSampleSeconds] so the chart can draw the real shape of a deco
+  /// [ceilingSampleSeconds] so the chart can draw the real shape of a deco
   /// obligation: it climbs from 0 as tissues load, then eases back to 0 as
   /// each stop clears — never a flat plateau pinned to a stop's own depth.
-  static const _ceilingSampleSeconds = 30;
-
   List<(int, double)> _ceilingTrace(
     DecoModel model,
     domain.DivePlan plan,
@@ -426,9 +429,9 @@ class PlanEngine {
       var elapsed = 0;
       while (elapsed < durationSeconds) {
         final remaining = durationSeconds - elapsed;
-        final step = remaining < _ceilingSampleSeconds
+        final step = remaining < ceilingSampleSeconds
             ? remaining
-            : _ceilingSampleSeconds;
+            : ceilingSampleSeconds;
         final legStart =
             startDepth + (endDepth - startDepth) * (elapsed / durationSeconds);
         final legEnd =

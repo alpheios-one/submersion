@@ -83,6 +83,21 @@ void main() {
   );
 
   testWidgets(
+    'switching to Descent keeps a start depth the diver has already typed',
+    (tester) async {
+      await tester.pumpWidget(harness(initialStartDepth: 12));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, '25');
+      await tester.pumpAndSettle();
+
+      await selectType(tester, 'Descent');
+
+      expect(controllerAt(tester, 0).text, '25');
+    },
+  );
+
+  testWidgets(
     "switching an existing segment to Descent keeps the segment's own start "
     'depth instead of resetting to 0',
     (tester) async {
