@@ -1122,7 +1122,105 @@ class DiveRepository {
   /// data is ever dropped or bucketed under an invented key. When an edited
   /// profile exists, the primary source carries only the edited rows
   /// (isEdited: true).
+  ///
+  /// Series-first: a dive with series rows is grouped from them; a dive with
+  /// none is read from the legacy row table until plan 2e removes it.
   Future<Map<String, domain.SourceProfile>> getProfilesByDataSource(
+    String diveId,
+  ) async {
+    try {
+      final series = await _profileSeries.getSeriesForDive(diveId);
+      if (series.isEmpty) return await _getProfilesByDataSourceLegacy(diveId);
+      return await _profilesBySourceFromSeries(diveId, series);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get profiles by data source for dive: $diveId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return {};
+    }
+  }
+
+  /// Series path of [getProfilesByDataSource]; the same rules as the legacy
+  /// body, applied to whole series instead of rows.
+  Future<Map<String, domain.SourceProfile>> _profilesBySourceFromSeries(
+    String diveId,
+    List<ProfileSeries> series,
+  ) async {
+    final sourceRows = _canonicalDataSourceRows(
+      await (_db.select(_db.diveDataSources)
+            ..where((t) => t.diveId.equals(diveId))
+            ..orderBy([
+              (t) => OrderingTerm.desc(t.isPrimary),
+              (t) => OrderingTerm.asc(t.createdAt),
+            ]))
+          .get(),
+    );
+    if (sourceRows.isEmpty) {
+      // Dives with series but no dive_data_sources row: synthesize the
+      // primary source the way the legacy read does.
+      final primary = [
+        for (final s in series)
+          if (s.isPrimary) s,
+      ];
+      if (primary.isEmpty) return {};
+      final syntheticSourceId = legacyDataSourceId(diveId);
+      return {
+        syntheticSourceId: domain.SourceProfile(
+          sourceId: syntheticSourceId,
+          computerId: primary.first.computerId,
+          isEdited: series.any((s) => !s.isPrimary),
+          points: mergeSeriesPoints(primary),
+        ),
+      };
+    }
+
+    final primary = sourceRows.first;
+    final sourceIdByComputer = <String, String>{
+      for (final s in sourceRows)
+        if (s.computerId != null) s.computerId!: s.id,
+    };
+    final sourceIds = {for (final s in sourceRows) s.id};
+    // The FK is authoritative; a series without one follows the pre-v154
+    // computer convention (issue #1149).
+    bool isPrimaryFamily(ProfileSeries s) => sourceIds.contains(s.sourceId)
+        ? s.sourceId == primary.id
+        : s.computerId == null || s.computerId == primary.computerId;
+    final family = series.where(isPrimaryFamily);
+    final hasEditedProfile =
+        family.any((s) => s.isPrimary) && family.any((s) => !s.isPrimary);
+
+    final grouped = <String, List<ProfileSeries>>{
+      for (final s in sourceRows) s.id: [],
+    };
+    var primaryIsEdited = false;
+    for (final s in series) {
+      final owner = sourceIds.contains(s.sourceId)
+          ? s.sourceId!
+          : s.computerId == null
+          ? primary.id
+          : (sourceIdByComputer[s.computerId!] ?? primary.id);
+      if (hasEditedProfile && isPrimaryFamily(s)) {
+        if (!s.isPrimary) continue;
+        primaryIsEdited = true;
+      }
+      grouped[owner]!.add(s);
+    }
+    return {
+      for (final s in sourceRows)
+        s.id: domain.SourceProfile(
+          sourceId: s.id,
+          computerId: s.computerId,
+          isEdited: s.id == primary.id && primaryIsEdited,
+          points: mergeSeriesPoints(grouped[s.id]!),
+        ),
+    };
+  }
+
+  /// The pre-series read of [getProfilesByDataSource], kept for dives with no
+  /// series rows until plan 2e removes the legacy table.
+  Future<Map<String, domain.SourceProfile>> _getProfilesByDataSourceLegacy(
     String diveId,
   ) async {
     try {
