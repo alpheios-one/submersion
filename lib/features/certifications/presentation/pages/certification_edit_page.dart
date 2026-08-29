@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -199,18 +200,38 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     if (source == null) return null;
 
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        maxWidth: 2000,
-        maxHeight: 2000,
-        imageQuality: 85,
-      );
+      // No maxWidth / maxHeight / imageQuality here: image_picker_macos,
+      // image_picker_windows and image_picker_linux all document those
+      // arguments as silently ignored, so a desktop pick entered the database
+      // at full size and rode into every sync changeset as base64. The cap is
+      // enforced below instead, in Dart, where it holds on every platform.
+      final picked = await _imagePicker.pickImage(source: source);
 
       if (picked == null) return null;
 
-      // Read the file bytes directly
-      final file = File(picked.path);
-      return await file.readAsBytes();
+      final raw = await File(picked.path).readAsBytes();
+      final encoded = await encodeStoredImage(
+        ImageEncodeRequest.fromBytes(
+          bytes: raw,
+          spec: ImageEncodeSpec.certificationCard,
+          declaredName: picked.name,
+        ),
+      );
+      if (encoded.outcome != ImageEncodeOutcome.encoded) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                encoded.outcome == ImageEncodeOutcome.tooLarge
+                    ? context.l10n.profilePhoto_error_tooLarge
+                    : context.l10n.profilePhoto_error_undecodable,
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+      return encoded.bytes;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
