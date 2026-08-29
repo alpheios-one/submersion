@@ -33619,4 +33619,88 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
+
+  @override
+  String get settings_storageUsage_appBar_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_subtitle => '查看此设备上的空间占用';
+
+  @override
+  String get settings_storageUsage_total => '总计';
+
+  @override
+  String get settings_storageUsage_totalPartial => '当前总计';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => '重新计算';
+
+  @override
+  String get settings_storageUsage_unavailable => '不可用';
+
+  @override
+  String get settings_storageUsage_measureFailed => '无法测量';
+
+  @override
+  String get settings_storageUsage_group_appData => '应用数据';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => '媒体缓存';
+
+  @override
+  String get settings_storageUsage_group_caches => '缓存';
+
+  @override
+  String get settings_storageUsage_group_backups => '备份';
+
+  @override
+  String get settings_storageUsage_group_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_group_exports => '导出的文件';
+
+  @override
+  String get settings_storageUsage_category_database => '潜水日志数据库';
+
+  @override
+  String get settings_storageUsage_category_localCache => '本地缓存数据库';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals => '原始照片和视频';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => '缩略图';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions => '视频转码版本';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging => '暂存的传输';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode => '已转码视频';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => '地图瓦片';
+
+  @override
+  String get settings_storageUsage_category_networkImages => '网络图片';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails => '视频缩略图';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails => '文档缩略图';
+
+  @override
+  String get settings_storageUsage_category_backups => '备份文件';
+
+  @override
+  String get settings_storageUsage_category_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_category_exports => '导出的文件';
 }

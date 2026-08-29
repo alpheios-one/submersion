@@ -35382,4 +35382,97 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => 'محتسبة في كل الإحصائيات';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'استخدام التخزين';
+
+  @override
+  String get settings_storageUsage_tile_title => 'استخدام التخزين';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'اطلع على ما يشغل مساحة على هذا الجهاز';
+
+  @override
+  String get settings_storageUsage_total => 'الإجمالي';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'الإجمالي حتى الآن';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'إعادة الحساب';
+
+  @override
+  String get settings_storageUsage_unavailable => 'غير متوفر';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'تعذر القياس';
+
+  @override
+  String get settings_storageUsage_group_appData => 'بيانات التطبيق';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'ذاكرة الوسائط المؤقتة';
+
+  @override
+  String get settings_storageUsage_group_caches => 'الذواكر المؤقتة';
+
+  @override
+  String get settings_storageUsage_group_backups => 'النسخ الاحتياطية';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'الملفات المؤقتة';
+
+  @override
+  String get settings_storageUsage_group_exports => 'الملفات المصدرة';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'قاعدة بيانات سجل الغوص';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'قاعدة بيانات التخزين المؤقت المحلي';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'الصور ومقاطع الفيديو الأصلية';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'الصور المصغرة';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'نسخ الفيديو';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'عمليات النقل المهيأة';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'الفيديو المحول';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'مربعات الخريطة';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'صور الشبكة';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'الصور المصغرة للفيديو';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'الصور المصغرة للمستندات';
+
+  @override
+  String get settings_storageUsage_category_backups => 'ملفات النسخ الاحتياطي';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'الملفات المؤقتة';
+
+  @override
+  String get settings_storageUsage_category_exports => 'الملفات المصدرة';
 }

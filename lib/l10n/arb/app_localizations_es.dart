@@ -35775,4 +35775,98 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Incluida en todas las estadísticas';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Uso de almacenamiento';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Uso de almacenamiento';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Vea qué ocupa espacio en este dispositivo';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total hasta ahora';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalcular';
+
+  @override
+  String get settings_storageUsage_unavailable => 'No disponible';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'No se pudo medir';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Datos de la aplicación';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Caché de medios';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Cachés';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Copias de seguridad';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Archivos temporales';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Archivos exportados';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Base de datos del cuaderno de buceo';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Base de datos de caché local';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Fotos y vídeos originales';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniaturas';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Versiones de vídeo';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Transferencias preparadas';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Vídeo transcodificado';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Teselas de mapa';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Imágenes de red';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Miniaturas de vídeo';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Miniaturas de documentos';
+
+  @override
+  String get settings_storageUsage_category_backups =>
+      'Archivos de copia de seguridad';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Archivos temporales';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Archivos exportados';
 }

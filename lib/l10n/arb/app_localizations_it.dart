@@ -35730,4 +35730,97 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Inclusa in tutte le statistiche';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Utilizzo dello spazio';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Utilizzo dello spazio';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Scopri cosa occupa spazio su questo dispositivo';
+
+  @override
+  String get settings_storageUsage_total => 'Totale';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Totale finora';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Ricalcola';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Non disponibile';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Impossibile misurare';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Dati dell\'app';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Cache multimediale';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Cache';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Backup';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'File temporanei';
+
+  @override
+  String get settings_storageUsage_group_exports => 'File esportati';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Database del diario immersioni';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Database di cache locale';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Foto e video originali';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniature';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Versioni video';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Trasferimenti preparati';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Video transcodificato';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Tessere della mappa';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Immagini di rete';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Miniature video';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Miniature dei documenti';
+
+  @override
+  String get settings_storageUsage_category_backups => 'File di backup';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'File temporanei';
+
+  @override
+  String get settings_storageUsage_category_exports => 'File esportati';
 }
