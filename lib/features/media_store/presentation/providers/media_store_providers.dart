@@ -234,18 +234,41 @@ final mediaTransferEntriesProvider =
 final mediaTransferLabelsProvider = FutureProvider<Map<String, String>>((
   ref,
 ) async {
-  final key = ref.watch(
+  final queued = ref.watch(
     mediaTransferEntriesProvider.select((entries) {
       final rows = entries.value;
-      if (rows == null) return null;
-      return (rows.map((e) => e.mediaId).toSet().toList()..sort()).join('\n');
+      return rows == null ? null : _QueuedMediaIds(rows.map((e) => e.mediaId));
     }),
   );
-  if (key == null || key.isEmpty) return const {};
+  if (queued == null || queued.ids.isEmpty) return const {};
   final repository = ref.watch(mediaRepositoryProvider);
   ref.invalidateSelfWhen(repository.watchMediaChanges());
-  return repository.getDisplayLabels(key.split('\n'));
+  return repository.getDisplayLabels(queued.ids);
 });
+
+/// The set of media ids the transfer queue names, as a value: `select`
+/// compares successive results with `==`, and a List or Set compares by
+/// identity, so a fresh collection per emission would defeat the point.
+class _QueuedMediaIds {
+  _QueuedMediaIds(Iterable<String> ids)
+    : ids = List.unmodifiable(ids.toSet().toList()..sort());
+
+  final List<String> ids;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _QueuedMediaIds || other.ids.length != ids.length) {
+      return false;
+    }
+    for (var i = 0; i < ids.length; i++) {
+      if (ids[i] != other.ids[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hashAll(ids);
+}
 
 /// Whether this device has any media store attached. Deliberately not
 /// mediaStoreRuntimeProvider: that constructs the full runtime and kicks a
