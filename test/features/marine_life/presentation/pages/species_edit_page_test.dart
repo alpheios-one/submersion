@@ -140,6 +140,9 @@ void main() {
       commonName: 'Map Puffer',
       scientificName: 'Arothron mappa',
       category: SpeciesCategory.fish,
+      taxonomyClass: 'Actinopterygii',
+      description: 'Large pale pufferfish.',
+      photoPath: '/photos/map-puffer.jpg',
     );
 
     late _FakeSpeciesRepository repository;
@@ -215,6 +218,28 @@ void main() {
       expect(repository.created, ['Map Puffer']);
       expect(find.textContaining('Error saving species'), findsNothing);
       expect(find.text('species list'), findsOneWidget);
+    });
+
+    testWidgets('clearing the optional fields blanks them on the row', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextFormField);
+      await tester.enterText(fields.at(1), '');
+      await tester.enterText(fields.at(2), '');
+      await tester.enterText(fields.at(3), '');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final saved = repository.updated.single;
+      expect(saved.scientificName, isNull);
+      expect(saved.taxonomyClass, isNull);
+      expect(saved.description, isNull);
+      // Fields the editor does not show survive the write.
+      expect(saved.id, 's1');
+      expect(saved.photoPath, '/photos/map-puffer.jpg');
     });
   });
 }

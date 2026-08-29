@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/domain/entities/species_lookup.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_lookup_sheet.dart';
@@ -253,13 +254,20 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
       if (widget.isEditing) {
         final existing = await repository.getSpeciesById(widget.speciesId!);
         if (existing != null) {
+          // Built by hand rather than with copyWith, which reads a null as
+          // "keep this value" and so could never blank an optional field the
+          // diver had cleared. Everything the form does not show is carried
+          // over from the stored row.
           await repository.updateSpecies(
-            existing.copyWith(
+            Species(
+              id: existing.id,
               commonName: commonName,
               scientificName: scientificName.isEmpty ? null : scientificName,
               category: _category,
               taxonomyClass: taxonomyClass.isEmpty ? null : taxonomyClass,
               description: description.isEmpty ? null : description,
+              photoPath: existing.photoPath,
+              isBuiltIn: existing.isBuiltIn,
             ),
           );
         }
