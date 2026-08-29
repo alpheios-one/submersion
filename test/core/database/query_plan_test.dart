@@ -44,6 +44,25 @@ void main() {
     expect(p, contains('idx_tank_pressure_dive_tank'));
   });
 
+  test(
+    'per-dive series fetch uses idx_dive_profile_series_dive_primary',
+    () async {
+      final p = await plan(
+        db,
+        "SELECT * FROM dive_profile_series WHERE dive_id = 'x' AND is_primary = 1",
+      );
+      expect(p, contains('idx_dive_profile_series_dive_primary'));
+    },
+  );
+
+  test('per-tank series fetch uses idx_tank_pressure_series_dive_tank', () async {
+    final p = await plan(
+      db,
+      "SELECT * FROM tank_pressure_series WHERE dive_id = 'x' AND tank_id = 't'",
+    );
+    expect(p, contains('idx_tank_pressure_series_dive_tank'));
+  });
+
   test('per-dive tanks fetch uses idx_dive_tanks_dive_id', () async {
     final p = await plan(db, "SELECT * FROM dive_tanks WHERE dive_id = 'x'");
     expect(p, contains('idx_dive_tanks_dive_id'));

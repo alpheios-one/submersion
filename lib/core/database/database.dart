@@ -2819,6 +2819,95 @@ class TankPressureProfiles extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// One packed series of profile samples: every sample a
+/// (dive, computer, source, is_primary) group holds, encoded by
+/// `ProfileSeriesCodec` (spec 2026-08-28-profile-sample-storage). Replaces
+/// row-per-sample `dive_profiles`, which stays until plan 2e retires it.
+///
+/// The identity columns mirror `dive_profiles` exactly so every ownership
+/// predicate ports one for one. The summary scalars are the values the SQL
+/// consumers read instead of decoding the blob; they are computed from the
+/// same samples the blob packs, so they can never disagree with it.
+@DataClassName('DiveProfileSeriesRow')
+class DiveProfileSeries extends Table {
+  // coverage:ignore-start
+  TextColumn get id => text()();
+  TextColumn get diveId =>
+      text().references(Dives, #id, onDelete: KeyAction.cascade)();
+  TextColumn get computerId => text().nullable().references(
+    DiveComputers,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get sourceId => text().nullable().references(
+    DiveDataSources,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  BoolColumn get isPrimary => boolean().withDefault(const Constant(true))();
+  IntColumn get sampleCount => integer()();
+
+  /// Seconds from dive start of the first and last sample.
+  IntColumn get startTimestamp => integer()();
+  IntColumn get endTimestamp => integer()();
+
+  /// Metres.
+  RealColumn get maxDepth => real()();
+  RealColumn get firstDepth => real()();
+  RealColumn get lastDepth => real()();
+
+  /// Any sample carries deco_type; any carries deco_type = 2; any carries
+  /// ceiling > 0. The deco classification and deco-signal predicates read
+  /// these instead of scanning samples.
+  BoolColumn get hasDecoType => boolean().withDefault(const Constant(false))();
+  BoolColumn get hasDecoStop => boolean().withDefault(const Constant(false))();
+  BoolColumn get hasPositiveCeiling =>
+      boolean().withDefault(const Constant(false))();
+  IntColumn get codecVersion => integer()();
+
+  /// `ProfileSeriesCodec` output.
+  BlobColumn get samples => blob()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution.
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+  // coverage:ignore-end
+}
+
+/// One packed series of tank pressure readings for a (dive, tank, computer)
+/// group, encoded by `TankPressureSeriesCodec`. Replaces row-per-sample
+/// `tank_pressure_profiles`, which stays until plan 2e retires it.
+@DataClassName('TankPressureSeriesRow')
+class TankPressureSeries extends Table {
+  // coverage:ignore-start
+  TextColumn get id => text()();
+  TextColumn get diveId =>
+      text().references(Dives, #id, onDelete: KeyAction.cascade)();
+  TextColumn get tankId =>
+      text().references(DiveTanks, #id, onDelete: KeyAction.cascade)();
+  TextColumn get computerId => text().nullable().references(
+    DiveComputers,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  IntColumn get sampleCount => integer()();
+  IntColumn get startTimestamp => integer()();
+  IntColumn get endTimestamp => integer()();
+  IntColumn get codecVersion => integer()();
+  BlobColumn get samples => blob()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+  // coverage:ignore-end
+}
+
 /// Tide data recorded with a dive for historical reference.
 ///
 /// Stores the tide conditions at the time of a dive, including:
@@ -3221,6 +3310,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     Trips,
     Dives,
     DiveProfiles,
+    DiveProfileSeries,
     DiveSites,
     DiveTanks,
     Equipment,
@@ -3262,6 +3352,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     Incidents,
     GasSwitches,
     TankPressureProfiles,
+    TankPressureSeries,
     TideRecords,
     // Site-species junction
     SiteSpecies,
@@ -3326,7 +3417,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 180;
+  static const int currentSchemaVersion = 181;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3715,6 +3806,15 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
+    // v181 (packed profile series, spec 2026-08-28-profile-sample-storage):
+    // dive_profile_series and tank_pressure_series, one zlib columnar blob
+    // per (dive, computer, source, is_primary) group and per (dive, tank,
+    // computer) group, packed from the row-per-sample tables by
+    // packLegacyProfileRows with ids derived from the identity tuple so every
+    // device converges (the #1360 lesson). The legacy tables stay until the
+    // consumers move; the same PR retires them in a later plan. 176 remains
+    // skipped; the ladder is non-contiguous by design.
+    181,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4200,6 +4300,65 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE UNIQUE INDEX IF NOT EXISTS idx_trip_day_weather_trip_date '
       'ON trip_day_weather (trip_id, date)',
+    );
+  }
+
+  /// v181: the packed profile series tables.
+  ///
+  /// Raw idempotent DDL so it doubles as the beforeOpen backstop for a
+  /// database stranded at 181 by a parallel branch. The DDL must agree with
+  /// the Drift declarations column for column; the v181 migration test
+  /// compares the two on a fresh database.
+  Future<void> _assertProfileSeriesSchema() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS dive_profile_series (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE,
+        computer_id TEXT REFERENCES dive_computers (id) ON DELETE SET NULL,
+        source_id TEXT REFERENCES dive_data_sources (id) ON DELETE SET NULL,
+        is_primary INTEGER NOT NULL DEFAULT 1 CHECK (is_primary IN (0, 1)),
+        sample_count INTEGER NOT NULL,
+        start_timestamp INTEGER NOT NULL,
+        end_timestamp INTEGER NOT NULL,
+        max_depth REAL NOT NULL,
+        first_depth REAL NOT NULL,
+        last_depth REAL NOT NULL,
+        has_deco_type INTEGER NOT NULL DEFAULT 0
+          CHECK (has_deco_type IN (0, 1)),
+        has_deco_stop INTEGER NOT NULL DEFAULT 0
+          CHECK (has_deco_stop IN (0, 1)),
+        has_positive_ceiling INTEGER NOT NULL DEFAULT 0
+          CHECK (has_positive_ceiling IN (0, 1)),
+        codec_version INTEGER NOT NULL,
+        samples BLOB NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
+      'ON dive_profile_series (dive_id, is_primary)',
+    );
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS tank_pressure_series (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE,
+        tank_id TEXT NOT NULL REFERENCES dive_tanks (id) ON DELETE CASCADE,
+        computer_id TEXT REFERENCES dive_computers (id) ON DELETE SET NULL,
+        sample_count INTEGER NOT NULL,
+        start_timestamp INTEGER NOT NULL,
+        end_timestamp INTEGER NOT NULL,
+        codec_version INTEGER NOT NULL,
+        samples BLOB NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_dive_tank '
+      'ON tank_pressure_series (dive_id, tank_id)',
     );
   }
 
@@ -9263,6 +9422,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
+        // v181: packed profile series tables. Idempotent DDL; the packing
+        // step that fills them from the legacy tables is added by plan 2a
+        // Task 4 and is idempotent too (INSERT OR IGNORE on derived ids).
+        if (from < 181) {
+          await _assertProfileSeriesSchema();
+        }
+        if (from < 181) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9514,6 +9680,11 @@ class AppDatabase extends _$AppDatabase {
         // on every open: the helper is column-only with no backfill, so it
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
+
+        // v181 backstop: re-assert the packed profile series tables (same
+        // parallel-branch version-collision self-heal). Schema only: packing
+        // is not re-run on open.
+        await _assertProfileSeriesSchema();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

@@ -94,6 +94,18 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'ON tank_pressure_profiles(dive_id, tank_id, timestamp)',
   ),
   (
+    name: 'idx_dive_profile_series_dive_primary',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
+        'ON dive_profile_series (dive_id, is_primary)',
+  ),
+  (
+    name: 'idx_tank_pressure_series_dive_tank',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_dive_tank '
+        'ON tank_pressure_series (dive_id, tank_id)',
+  ),
+  (
     name: 'idx_dive_tanks_dive_id',
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_dive_tanks_dive_id '
