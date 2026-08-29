@@ -91,9 +91,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
         final key = _ProfileKey(
           computerId: _resolvedParent(row.data['computer_id'], computerIds),
           sourceId: _resolvedParent(row.data['source_id'], sourceIds),
-          isPrimary: hasPrimary
-              ? _boolOf(row.data['is_primary'], fallback: true)
-              : true,
+          isPrimary: hasPrimary ? _boolOf(row.data['is_primary']) : true,
         );
         groups.putIfAbsent(key, () => []).add(_profileSampleOf(row.data));
       }
@@ -352,11 +350,13 @@ Future<String?> _migrationHlc(DatabaseConnectionUser db, int nowMs) async {
   return Hlc(nowMs, 0, deviceId).toString();
 }
 
-bool _boolOf(Object? value, {required bool fallback}) {
-  if (value == null) return fallback;
+bool _boolOf(Object? value) {
   if (value is bool) return value;
   if (value is num) return value != 0;
-  return fallback;
+  // Every legacy schema declares is_primary NOT NULL DEFAULT 1, so a null
+  // here means the column is not carrying a value at all; a legacy row with
+  // no flag is the dive's live profile, which is what true says.
+  return true;
 }
 
 double? _realOf(Object? value) => (value as num?)?.toDouble();

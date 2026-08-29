@@ -127,32 +127,48 @@ void main() {
       );
     });
 
-    test(
-      'getSeriesForDive orders by start then id and can filter primary',
-      () async {
-        await repo.insertSeries(
-          diveId: 'dive-1',
-          computerId: 'comp-1',
-          isPrimary: false,
-          samples: const [ProfileSample(timestamp: 5, depth: 1.0)],
-          id: 'b',
-          now: now,
-        );
-        await repo.insertSeries(
-          diveId: 'dive-1',
-          samples: samples,
-          id: 'a',
-          now: now,
-        );
-        final all = await repo.getSeriesForDive('dive-1');
-        expect(all.map((s) => s.id), ['a', 'b']);
-        final primary = await repo.getSeriesForDive(
-          'dive-1',
-          primaryOnly: true,
-        );
-        expect(primary.map((s) => s.id), ['a']);
-      },
-    );
+    test('getSeriesForDive orders by start, not by id', () async {
+      // The two keys disagree: 'b' starts first but sorts last by id.
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: false,
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        id: 'b',
+        now: now,
+      );
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: const [
+          ProfileSample(timestamp: 5, depth: 2.0),
+          ProfileSample(timestamp: 30, depth: 6.0),
+        ],
+        id: 'a',
+        now: now,
+      );
+      final all = await repo.getSeriesForDive('dive-1');
+      expect(all.map((s) => s.id), ['b', 'a']);
+      final primary = await repo.getSeriesForDive('dive-1', primaryOnly: true);
+      expect(primary.map((s) => s.id), ['a']);
+    });
+
+    test('getSeriesForDive breaks an equal start on the id', () async {
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: samples,
+        id: 'b',
+        now: now,
+      );
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        samples: samples,
+        id: 'a',
+        now: now,
+      );
+      final all = await repo.getSeriesForDive('dive-1');
+      expect(all.map((s) => s.id), ['a', 'b']);
+    });
 
     test('getSeriesById returns null for an unknown id', () async {
       expect(await repo.getSeriesById('nope'), isNull);
@@ -292,6 +308,7 @@ void main() {
                       t.entityType.equals(ProfileSeriesRepository.entityType),
                 ))
                 .get();
+        expect(tombstones, hasLength(2));
         expect(tombstones.map((t) => t.recordId).toSet(), {
           computerSeries,
           editSeries,

@@ -100,15 +100,25 @@ void main() {
       id: 'b',
       now: now,
     );
+    // Two series on tank-a whose id order disagrees with their start order,
+    // so the assertion below can only pass on the start key.
     await repo.insertSeries(
       diveId: 'dive-1',
       tankId: 'tank-a',
-      samples: samples,
+      samples: const [TankPressureSample(timestamp: 5, pressure: 150.0)],
       id: 'a',
       now: now,
     );
+    await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      computerId: 'comp-1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      id: 'c',
+      now: now,
+    );
     final all = await repo.getSeriesForDive('dive-1');
-    expect(all.map((s) => s.id), ['a', 'b']);
+    expect(all.map((s) => s.id), ['c', 'a', 'b']);
   });
 
   test(
@@ -141,6 +151,7 @@ void main() {
                 ),
               ))
               .get();
+      expect(tombstones, hasLength(2));
       expect(tombstones.map((t) => t.recordId).toSet(), {a, b});
     },
   );
