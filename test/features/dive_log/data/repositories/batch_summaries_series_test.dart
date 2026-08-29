@@ -81,6 +81,29 @@ void main() {
     expect(summaries['dive-1']!.map((p) => p.timestamp), [0, 10]);
   });
 
+  test(
+    'a dive with both series and legacy rows keeps only the series',
+    () async {
+      await series.insertSeries(
+        diveId: 'dive-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 7.0)],
+        now: now,
+      );
+      await db
+          .into(db.diveProfiles)
+          .insert(
+            const DiveProfilesCompanion(
+              id: Value('legacy-1'),
+              diveId: Value('dive-1'),
+              timestamp: Value(0),
+              depth: Value(1.0),
+            ),
+          );
+      final summaries = await dives.getBatchProfileSummaries(['dive-1']);
+      expect(summaries['dive-1']!.map((p) => p.depth), [7.0]);
+    },
+  );
+
   test('an empty id list returns an empty map', () async {
     expect(await dives.getBatchProfileSummaries(const []), isEmpty);
   });

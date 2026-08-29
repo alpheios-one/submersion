@@ -81,6 +81,61 @@ void main() {
     expect(tankA.endPressure, 150.0);
   });
 
+  test('multiple series for one tank interleave by timestamp', () async {
+    await db
+        .into(db.diveComputers)
+        .insert(
+          DiveComputersCompanion.insert(
+            id: 'comp-1',
+            name: 'comp-1',
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      computerId: 'comp-1',
+      samples: const [
+        TankPressureSample(timestamp: 0, pressure: 200.0),
+        TankPressureSample(timestamp: 1800, pressure: 150.0),
+        TankPressureSample(timestamp: 3600, pressure: 100.0),
+      ],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      samples: const [
+        TankPressureSample(timestamp: 900, pressure: 180.0),
+        TankPressureSample(timestamp: 2700, pressure: 120.0),
+      ],
+      now: now,
+    );
+    final byTank = await tanks.getTankPressuresForDive('dive-1');
+    expect(byTank['tank-a']!.map((p) => p.timestamp), [
+      0,
+      900,
+      1800,
+      2700,
+      3600,
+    ]);
+    expect(byTank['tank-a']!.map((p) => p.pressure), [
+      200.0,
+      180.0,
+      150.0,
+      120.0,
+      100.0,
+    ]);
+    final forTank = await tanks.getPressuresForTank('dive-1', 'tank-a');
+    expect(forTank.map((p) => p.timestamp), [0, 900, 1800, 2700, 3600]);
+    expect(forTank.map((p) => p.pressure), [200.0, 180.0, 150.0, 120.0, 100.0]);
+    final dive = await DiveRepository().getDiveById('dive-1');
+    final tankA = dive!.tanks.singleWhere((t) => t.id == 'tank-a');
+    expect(tankA.startPressure, 200.0);
+    expect(tankA.endPressure, 100.0);
+  });
+
   test('a dive with no tank series falls back to the legacy rows', () async {
     await db
         .into(db.tankPressureProfiles)

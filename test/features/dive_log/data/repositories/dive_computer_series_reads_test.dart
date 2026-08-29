@@ -69,6 +69,17 @@ void main() {
     expect(await computers.getPrimaryComputerId('dive-1'), 'comp-1');
   });
 
+  test('a dive whose only series has a null computer id has no computer ids '
+      'and no primary computer', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: now,
+    );
+    expect(await computers.getComputerIdsForDive('dive-1'), isEmpty);
+    expect(await computers.getPrimaryComputerId('dive-1'), isNull);
+  });
+
   test('falls back to legacy rows when the dive has no series', () async {
     await db
         .into(db.diveProfiles)

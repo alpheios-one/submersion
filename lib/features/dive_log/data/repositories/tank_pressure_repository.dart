@@ -7,6 +7,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/services/profile_series_merge.dart';
 
 /// Repository for managing per-tank time-series pressure data
 ///
@@ -30,20 +31,13 @@ class TankPressureRepository {
   ) async {
     final series = await _tankSeries.getSeriesForDive(diveId);
     if (series.isEmpty) return _getTankPressuresForDiveLegacy(diveId);
-    final result = <String, List<TankPressurePoint>>{};
+    final byTank = <String, List<dynamic>>{};
     for (final s in series) {
-      final points = result.putIfAbsent(s.tankId, () => []);
-      for (var i = 0; i < s.samples.length; i++) {
-        final sample = s.samples[i];
-        points.add(
-          TankPressurePoint(
-            id: '${s.id}:$i',
-            tankId: s.tankId,
-            timestamp: sample.timestamp,
-            pressure: sample.pressure,
-          ),
-        );
-      }
+      byTank.putIfAbsent(s.tankId, () => []).add(s);
+    }
+    final result = <String, List<TankPressurePoint>>{};
+    for (final entry in byTank.entries) {
+      result[entry.key] = mergeTankSeriesPoints(entry.value.cast());
     }
     return result;
   }
@@ -76,22 +70,17 @@ class TankPressureRepository {
 
   /// Get pressure data for a specific tank. Series-first: falls back to the
   /// legacy rows when the tank has no series.
+  ///
+  /// This read gates on the TANK's series while [getTankPressuresForDive]
+  /// gates on the dive's; the two can only disagree for a tank the packer
+  /// skipped as an orphan (no `dive_tanks` parent), which nothing renders.
   Future<List<TankPressurePoint>> getPressuresForTank(
     String diveId,
     String tankId,
   ) async {
     final series = await _tankSeries.getSeriesForTank(diveId, tankId);
     if (series.isEmpty) return _getPressuresForTankLegacy(diveId, tankId);
-    return [
-      for (final s in series)
-        for (var i = 0; i < s.samples.length; i++)
-          TankPressurePoint(
-            id: '${s.id}:$i',
-            tankId: s.tankId,
-            timestamp: s.samples[i].timestamp,
-            pressure: s.samples[i].pressure,
-          ),
-    ];
+    return mergeTankSeriesPoints(series);
   }
 
   Future<List<TankPressurePoint>> _getPressuresForTankLegacy(

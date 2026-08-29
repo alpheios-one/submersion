@@ -1,9 +1,10 @@
-import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
-
 /// Row-decoding helpers for [profileSampleOf], split out of
 /// `profile_series_pack.dart` to keep that file under the project's line
 /// limit. Same imports discipline as the rest of `lib/core/database`: no
 /// Flutter, only what a headless isolate can run.
+library;
+
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 /// Reads a legacy `dive_profiles` row by column name. Absent columns (an
 /// older fixture or a partially migrated table) read as null. Returns null

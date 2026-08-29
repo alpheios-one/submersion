@@ -212,11 +212,12 @@ class DiveRepository {
   /// documents, and it fired for writes the analysis never reads.
   ///
   /// Table set = the reads of [getDiveForAnalysis] (dives, dive_profiles,
-  /// dive_tanks, plus dive_data_sources/dive_computers for primary-source
-  /// resolution in [getMergedProfile]), the pipeline's direct queries
-  /// (gas_switches, tank_pressure_profiles), and dive_profile_events --
-  /// which the detail tick never covered at all, leaving
-  /// `diveComputerEventsProvider` blind to writes of its own table.
+  /// dive_profile_series, dive_tanks, plus dive_data_sources/dive_computers
+  /// for primary-source resolution in [getMergedProfile]), the pipeline's
+  /// direct queries (gas_switches, tank_pressure_profiles,
+  /// tank_pressure_series), and dive_profile_events -- which the detail tick
+  /// never covered at all, leaving `diveComputerEventsProvider` blind to
+  /// writes of its own table.
   ///
   /// `dives` also covers FK cascades: SQLite performs a cascade delete of
   /// child rows without Drift seeing a write on the child tables, so the
@@ -859,25 +860,26 @@ class DiveRepository {
   /// only, interleaved by timestamp); a dive with none is read from the
   /// legacy row table until plan 2e removes it.
   Future<List<domain.DiveProfilePoint>> getDiveProfile(String diveId) async {
-    try {
-      final List<ProfileSeries> series = await _profileSeries.getSeriesForDive(
-        diveId,
-      );
-      if (series.isNotEmpty) {
-        return mergeSeriesPoints([
-          for (final s in series)
-            if (s.isPrimary) s,
-        ]);
+    return await PerfTimer.measure('getDiveProfile', () async {
+      try {
+        final List<ProfileSeries> series = await _profileSeries
+            .getSeriesForDive(diveId);
+        if (series.isNotEmpty) {
+          return mergeSeriesPoints([
+            for (final s in series)
+              if (s.isPrimary) s,
+          ]);
+        }
+        return await _getDiveProfileLegacy(diveId);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to get profile for dive: $diveId',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        return [];
       }
-      return await _getDiveProfileLegacy(diveId);
-    } catch (e, stackTrace) {
-      _log.error(
-        'Failed to get profile for dive: $diveId',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      return [];
-    }
+    });
   }
 
   /// The pre-series read of [getDiveProfile], kept for dives with no series
@@ -885,47 +887,45 @@ class DiveRepository {
   Future<List<domain.DiveProfilePoint>> _getDiveProfileLegacy(
     String diveId,
   ) async {
-    return await PerfTimer.measure('getDiveProfile', () async {
-      final profileQuery = _db.select(_db.diveProfiles)
-        ..where((t) => t.diveId.equals(diveId))
-        ..where((t) => t.isPrimary.equals(true))
-        ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-      final profileRows = await profileQuery.get();
+    final profileQuery = _db.select(_db.diveProfiles)
+      ..where((t) => t.diveId.equals(diveId))
+      ..where((t) => t.isPrimary.equals(true))
+      ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
+    final profileRows = await profileQuery.get();
 
-      return profileRows
-          .map(
-            (p) => domain.DiveProfilePoint(
-              timestamp: p.timestamp,
-              depth: p.depth,
-              temperature: p.temperature,
-              heartRate: p.heartRate,
-              heading: p.heading,
-              heartRateSource: p.heartRateSource,
-              setpoint: p.setpoint,
-              ppO2: p.ppO2,
-              o2Sensor1: p.o2Sensor1,
-              o2Sensor2: p.o2Sensor2,
-              o2Sensor3: p.o2Sensor3,
-              o2Sensor4: p.o2Sensor4,
-              o2Sensor5: p.o2Sensor5,
-              o2Sensor6: p.o2Sensor6,
-              o2SensorMv1: p.o2SensorMv1,
-              o2SensorMv2: p.o2SensorMv2,
-              o2SensorMv3: p.o2SensorMv3,
-              o2SensorMv4: p.o2SensorMv4,
-              o2SensorMv5: p.o2SensorMv5,
-              o2SensorMv6: p.o2SensorMv6,
-              cns: p.cns,
-              ndl: p.ndl,
-              ceiling: p.ceiling,
-              ascentRate: p.ascentRate,
-              rbt: p.rbt,
-              decoType: p.decoType,
-              tts: p.tts,
-            ),
-          )
-          .toList();
-    });
+    return profileRows
+        .map(
+          (p) => domain.DiveProfilePoint(
+            timestamp: p.timestamp,
+            depth: p.depth,
+            temperature: p.temperature,
+            heartRate: p.heartRate,
+            heading: p.heading,
+            heartRateSource: p.heartRateSource,
+            setpoint: p.setpoint,
+            ppO2: p.ppO2,
+            o2Sensor1: p.o2Sensor1,
+            o2Sensor2: p.o2Sensor2,
+            o2Sensor3: p.o2Sensor3,
+            o2Sensor4: p.o2Sensor4,
+            o2Sensor5: p.o2Sensor5,
+            o2Sensor6: p.o2Sensor6,
+            o2SensorMv1: p.o2SensorMv1,
+            o2SensorMv2: p.o2SensorMv2,
+            o2SensorMv3: p.o2SensorMv3,
+            o2SensorMv4: p.o2SensorMv4,
+            o2SensorMv5: p.o2SensorMv5,
+            o2SensorMv6: p.o2SensorMv6,
+            cns: p.cns,
+            ndl: p.ndl,
+            ceiling: p.ceiling,
+            ascentRate: p.ascentRate,
+            rbt: p.rbt,
+            decoType: p.decoType,
+            tts: p.tts,
+          ),
+        )
+        .toList();
   }
 
   /// Save an edited profile for a dive.
@@ -3845,13 +3845,15 @@ class DiveRepository {
     final startPressureByTank = <String, double>{};
     final endPressureByTank = <String, double>{};
     if (tankSeries.isNotEmpty) {
+      final byTank = <String, List<dynamic>>{};
       for (final s in tankSeries) {
-        if (s.samples.isEmpty) continue;
-        startPressureByTank.putIfAbsent(
-          s.tankId,
-          () => s.samples.first.pressure,
-        );
-        endPressureByTank[s.tankId] = s.samples.last.pressure;
+        byTank.putIfAbsent(s.tankId, () => []).add(s);
+      }
+      for (final entry in byTank.entries) {
+        final merged = mergeTankSeriesPoints(entry.value.cast());
+        if (merged.isEmpty) continue;
+        startPressureByTank[entry.key] = merged.first.pressure;
+        endPressureByTank[entry.key] = merged.last.pressure;
       }
     } else {
       final tankPressureRows =
@@ -5120,7 +5122,8 @@ class DiveRepository {
     );
     if (series.isEmpty) return null;
     final needsPrimary =
-        series.any((s) => !s.isPrimary) && series.any((s) => s.isPrimary);
+        series.any((s) => s.isPrimary) &&
+        series.any((s) => !s.isPrimary && s.computerId != null);
     var hasSources = true;
     String? primaryComputerId;
     if (needsPrimary) {

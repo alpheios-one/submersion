@@ -154,6 +154,46 @@ void main() {
     },
   );
 
+  test('a demoted null-computer series next to a computer-owned primary is '
+      'kept, as the legacy read keeps it', () async {
+    await source('src-1', 'comp-1', primary: true);
+    await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: 'comp-1',
+      sourceId: 'src-1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      sourceId: 'src-1',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 5, depth: 2.0)],
+      now: now,
+    );
+    final merged = await dives.getMergedProfile('dive-1');
+    expect(merged.map((p) => p.depth), [1.0, 2.0]);
+  });
+
+  test('series present but none primary: getDiveProfile is empty, '
+      'getMergedProfile keeps the demoted series', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 5, depth: 2.0)],
+      now: now,
+    );
+    expect(await dives.getDiveProfile('dive-1'), isEmpty);
+    final merged = await dives.getMergedProfile('dive-1');
+    expect(merged.map((p) => p.depth), [1.0, 2.0]);
+  });
+
   test('a dive with no series falls back to the legacy rows', () async {
     await db
         .into(db.diveProfiles)

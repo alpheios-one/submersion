@@ -55,6 +55,10 @@ typedef ProfilePackReport = ({
 /// persisted in `sync_metadata` so the first sync after the upgrade
 /// publishes the rows. A device that never synced has nothing to publish to
 /// and stays unstamped until a base publish, which exports everything.
+///
+/// A dive whose legacy rows are ALL malformed (null timestamp or depth) gets
+/// no series row and is rescanned on every open; that is a bounded per-open
+/// cost on a damaged database, not a retry bug.
 Future<ProfilePackReport> packLegacyProfileRows(
   DatabaseConnectionUser db, {
   int? nowMs,

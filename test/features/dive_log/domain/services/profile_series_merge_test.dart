@@ -1,8 +1,26 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_series_merge.dart';
+
+TankPressureSeries tankSeries(
+  String id, {
+  String tankId = 'tank-a',
+  String? computerId,
+  required List<TankPressureSample> samples,
+}) => TankPressureSeries(
+  id: id,
+  diveId: 'd1',
+  tankId: tankId,
+  computerId: computerId,
+  summary: TankPressureSeriesSummary.of(samples),
+  samples: samples,
+  codecVersion: 1,
+  createdAt: 0,
+  updatedAt: 0,
+);
 
 ProfileSeries series(
   String id, {
@@ -142,6 +160,55 @@ void main() {
         primaryComputerId: null,
       );
       expect(kept.map((s) => s.id), ['edit']);
+    });
+  });
+
+  group('mergeTankSeriesPoints', () {
+    test('two series interleave by timestamp with synthesized ids', () {
+      final a = tankSeries(
+        'a',
+        computerId: 'comp-1',
+        samples: const [
+          TankPressureSample(timestamp: 0, pressure: 200.0),
+          TankPressureSample(timestamp: 1800, pressure: 150.0),
+        ],
+      );
+      final b = tankSeries(
+        'b',
+        samples: const [TankPressureSample(timestamp: 900, pressure: 180.0)],
+      );
+      final merged = mergeTankSeriesPoints([a, b]);
+      expect(merged.map((p) => p.timestamp), [0, 900, 1800]);
+      expect(merged.map((p) => p.pressure), [200.0, 180.0, 150.0]);
+      expect(merged.map((p) => p.id), ['a:0', 'b:0', 'a:1']);
+    });
+
+    test('ties keep series order, then within-series order', () {
+      final a = tankSeries(
+        'a',
+        samples: const [
+          TankPressureSample(timestamp: 10, pressure: 100.0),
+          TankPressureSample(timestamp: 10, pressure: 90.0),
+        ],
+      );
+      final b = tankSeries(
+        'b',
+        samples: const [TankPressureSample(timestamp: 10, pressure: 80.0)],
+      );
+      expect(mergeTankSeriesPoints([a, b]).map((p) => p.pressure), [
+        100.0,
+        90.0,
+        80.0,
+      ]);
+      expect(mergeTankSeriesPoints([b, a]).map((p) => p.pressure), [
+        80.0,
+        100.0,
+        90.0,
+      ]);
+    });
+
+    test('an empty list merges to an empty list', () {
+      expect(mergeTankSeriesPoints(const []), isEmpty);
     });
   });
 }
