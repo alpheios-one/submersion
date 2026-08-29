@@ -29,11 +29,18 @@ class ProfilePhotoResult {
 ///
 /// [contactPhotoLoader] is supplied by callers that can reach the address
 /// book, which keeps this shared widget free of a flutter_contacts dependency.
+///
+/// [pickImageOverride] is a test seam replacing the platform image picker,
+/// which has no Dart-side entry point a fake can be injected through. Mirrors
+/// [OcrScanPage.pickImageOverride].
 Future<ProfilePhotoResult?> pickProfilePhoto({
   required BuildContext context,
   required bool hasPhoto,
   required bool allowContacts,
   Future<Uint8List?> Function(BuildContext context)? contactPhotoLoader,
+  @visibleForTesting
+  Future<({Uint8List bytes, String name})?> Function(ImageSource source)?
+  pickImageOverride,
 }) async {
   // Offering Contacts without a loader would show a menu item that silently
   // does nothing when tapped, which reads as a broken flow. The two are
@@ -58,13 +65,20 @@ Future<ProfilePhotoResult?> pickProfilePhoto({
     declaredName = 'contact.jpg';
     if (raw == null) return null;
   } else {
-    final picked = await ImagePicker().pickImage(
-      source: source == ProfilePhotoSource.camera
-          ? ImageSource.camera
-          : ImageSource.gallery,
-    );
+    final imageSource = source == ProfilePhotoSource.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+    final ({Uint8List bytes, String name})? picked;
+    if (pickImageOverride != null) {
+      picked = await pickImageOverride(imageSource);
+    } else {
+      final file = await ImagePicker().pickImage(source: imageSource);
+      picked = file == null
+          ? null
+          : (bytes: await File(file.path).readAsBytes(), name: file.name);
+    }
     if (picked == null) return null;
-    raw = await File(picked.path).readAsBytes();
+    raw = picked.bytes;
     declaredName = picked.name;
   }
 

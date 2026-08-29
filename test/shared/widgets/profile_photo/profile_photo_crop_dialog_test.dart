@@ -122,4 +122,74 @@ void main() {
     expect(find.text('Drag to reposition, pinch to zoom'), findsOneWidget);
     expect(find.byType(InteractiveViewer), findsOneWidget);
   });
+
+  testWidgets('the default crop is the centre of a landscape photo', (
+    tester,
+  ) async {
+    // Left third red, middle third green, right third blue. With
+    // `constrained: false` an uninitialised transform anchors the child at the
+    // origin, so the default crop would take the RED left edge. Centring the
+    // initial view makes it GREEN, which also matches what the codec does when
+    // no crop rect is supplied.
+    final source = img.Image(width: 900, height: 300);
+    img.fillRect(
+      source,
+      x1: 0,
+      y1: 0,
+      x2: 299,
+      y2: 299,
+      color: img.ColorRgb8(255, 0, 0),
+    );
+    img.fillRect(
+      source,
+      x1: 300,
+      y1: 0,
+      x2: 599,
+      y2: 299,
+      color: img.ColorRgb8(0, 255, 0),
+    );
+    img.fillRect(
+      source,
+      x1: 600,
+      y1: 0,
+      x2: 899,
+      y2: 299,
+      color: img.ColorRgb8(0, 0, 255),
+    );
+    final bytes = Uint8List.fromList(img.encodeJpg(source, quality: 95));
+
+    Uint8List? result;
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              result = await showProfilePhotoCropDialog(
+                context: context,
+                sourceBytes: bytes,
+                declaredName: 'wide.jpg',
+              );
+            },
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await _settle(tester);
+    await tester.tap(find.text('Save'));
+    await _settle(tester, rounds: 30);
+
+    expect(result, isNotNull);
+    final out = img.decodeImage(result!)!;
+    final centre = out.getPixel(out.width ~/ 2, out.height ~/ 2);
+    expect(
+      centre.g,
+      greaterThan(centre.r),
+      reason: 'the default crop must centre on the photo, not its left edge',
+    );
+    expect(centre.g, greaterThan(centre.b));
+  });
 }

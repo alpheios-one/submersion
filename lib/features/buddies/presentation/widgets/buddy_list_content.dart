@@ -54,12 +54,18 @@ class BuddyListContent extends ConsumerStatefulWidget {
   /// Optional floating action button to display when showAppBar is true.
   final Widget? floatingActionButton;
 
+  /// Test seam: replaces the native contact picker, which is a static entry
+  /// point with no place to inject a fake. Returns the picked contact, or null
+  /// when the user cancels. Mirrors [OcrScanPage.pickImageOverride].
+  final ContactPickerFn? pickContactOverride;
+
   const BuddyListContent({
     super.key,
     this.onItemSelected,
     this.selectedId,
     this.showAppBar = true,
     this.floatingActionButton,
+    @visibleForTesting this.pickContactOverride,
   });
 
   @override
@@ -325,7 +331,9 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
   }
 
   Future<void> _importFromContacts(BuildContext context) async {
-    if (!isContactImportSupported) {
+    // An injected picker implies support: the test host is a desktop, where
+    // the real guard would short-circuit before any of the logic below.
+    if (widget.pickContactOverride == null && !isContactImportSupported) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -342,7 +350,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
       // Only Android needs a permission here. The native picker itself is
       // permissionless on both platforms, and asking it for properties always
       // works on iOS, so the iOS build never shows an address-book prompt.
-      if (!await ensureContactPropertyAccess()) {
+      final override = widget.pickContactOverride;
+      if (override == null && !await ensureContactPropertyAccess()) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -357,14 +366,16 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
 
       // One call: flutter_contacts 2.3.1's picker returns the contact with the
       // requested properties already populated, so there is no follow-up get.
-      final fullContact = await FlutterContacts.native.showPicker(
-        properties: {
-          ContactProperty.name,
-          ContactProperty.email,
-          ContactProperty.phone,
-          ...contactPhotoProperties,
-        },
-      );
+      final fullContact = override != null
+          ? await override()
+          : await FlutterContacts.native.showPicker(
+              properties: {
+                ContactProperty.name,
+                ContactProperty.email,
+                ContactProperty.phone,
+                ...contactPhotoProperties,
+              },
+            );
       if (fullContact == null) return;
 
       final name = fullContact.displayName;

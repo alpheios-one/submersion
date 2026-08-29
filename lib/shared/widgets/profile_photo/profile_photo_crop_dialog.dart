@@ -45,6 +45,7 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
   final TransformationController _controller = TransformationController();
   ui.Image? _decoded;
   bool _busy = false;
+  bool _centered = false;
 
   @override
   void initState() {
@@ -76,6 +77,27 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
     _controller.dispose();
     _decoded?.dispose();
     super.dispose();
+  }
+
+  /// Centres the initial view on the middle of the photo.
+  ///
+  /// With `constrained: false` the child is anchored at the viewer's origin,
+  /// so an identity transform shows the TOP-LEFT of an image that is larger
+  /// than the square viewport. For a landscape photo that means the left edge,
+  /// which forces the user to pan before every save and disagrees with the
+  /// codec, whose no-rect default is the largest CENTRED square.
+  void _centerOnce(Size viewport, Size childSize) {
+    if (_centered) return;
+    _centered = true;
+    final dx = (childSize.width - viewport.width) / 2;
+    final dy = (childSize.height - viewport.height) / 2;
+    if (dx <= 0 && dy <= 0) return;
+    // Deferred: the controller is a ValueNotifier, so assigning during build
+    // would notify the viewer mid-build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _controller.value = Matrix4.identity()..translateByDouble(-dx, -dy, 0, 1);
+    });
   }
 
   Future<void> _save(Size viewport, Size childSize, Size sourceSize) async {
@@ -149,6 +171,7 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
                     decoded.width * coverScale,
                     decoded.height * coverScale,
                   );
+                  _centerOnce(viewport, childSize);
 
                   return Column(
                     children: [

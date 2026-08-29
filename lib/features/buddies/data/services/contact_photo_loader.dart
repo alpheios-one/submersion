@@ -33,14 +33,26 @@ Future<bool> ensureContactPropertyAccess() async {
 /// Returns null when the user cancels, denies permission, or picks a contact
 /// with no photo. The last case is common and is reported as a plain message
 /// rather than an error.
-Future<Uint8List?> loadContactPhoto(BuildContext context) async {
-  if (!await ensureContactPropertyAccess()) return null;
+/// Test seam: replaces the native contact picker, which is a static entry
+/// point with no place to inject a fake. Returns the picked contact, or null
+/// when the user cancels.
+typedef ContactPickerFn = Future<Contact?> Function();
+
+Future<Uint8List?> loadContactPhoto(
+  BuildContext context, {
+  @visibleForTesting ContactPickerFn? pickContactOverride,
+}) async {
+  if (pickContactOverride == null && !await ensureContactPropertyAccess()) {
+    return null;
+  }
 
   final Contact? contact;
   try {
-    contact = await FlutterContacts.native.showPicker(
-      properties: contactPhotoProperties,
-    );
+    contact = pickContactOverride != null
+        ? await pickContactOverride()
+        : await FlutterContacts.native.showPicker(
+            properties: contactPhotoProperties,
+          );
   } on PlatformException {
     // Android without READ_CONTACTS refuses the property fetch. Treated as a
     // cancel rather than an error: the user was not promised a photo.

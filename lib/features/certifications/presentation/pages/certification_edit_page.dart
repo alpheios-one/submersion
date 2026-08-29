@@ -33,6 +33,13 @@ class CertificationEditPage extends ConsumerStatefulWidget {
   final Certification? initialCertification;
   final void Function(Certification result)? onStaged;
 
+  /// Test seam: replaces the platform image picker, which has no Dart-side
+  /// entry point a fake can be injected through. Receives the source and
+  /// returns the raw bytes plus a declared name, or null when the user
+  /// cancels. Mirrors [OcrScanPage.pickImageOverride].
+  final Future<({Uint8List bytes, String name})?> Function(ImageSource source)?
+  pickPhotoOverride;
+
   const CertificationEditPage({
     super.key,
     this.certificationId,
@@ -41,6 +48,7 @@ class CertificationEditPage extends ConsumerStatefulWidget {
     this.onCancel,
     this.initialCertification,
     this.onStaged,
+    @visibleForTesting this.pickPhotoOverride,
   }) : assert(
          onStaged == null || certificationId == null,
          'Staging mode (onStaged) prefills from initialCertification and never '
@@ -205,16 +213,23 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
       // arguments as silently ignored, so a desktop pick entered the database
       // at full size and rode into every sync changeset as base64. The cap is
       // enforced below instead, in Dart, where it holds on every platform.
-      final picked = await _imagePicker.pickImage(source: source);
+      final ({Uint8List bytes, String name})? source_;
+      if (widget.pickPhotoOverride != null) {
+        source_ = await widget.pickPhotoOverride!(source);
+      } else {
+        final picked = await _imagePicker.pickImage(source: source);
+        source_ = picked == null
+            ? null
+            : (bytes: await File(picked.path).readAsBytes(), name: picked.name);
+      }
 
-      if (picked == null) return null;
+      if (source_ == null) return null;
 
-      final raw = await File(picked.path).readAsBytes();
       final encoded = await encodeStoredImage(
         ImageEncodeRequest.fromBytes(
-          bytes: raw,
+          bytes: source_.bytes,
           spec: ImageEncodeSpec.certificationCard,
-          declaredName: picked.name,
+          declaredName: source_.name,
         ),
       );
       if (encoded.outcome != ImageEncodeOutcome.encoded) {
