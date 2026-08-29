@@ -56,6 +56,10 @@ class _FakeSpeciesRepository extends Fake implements SpeciesRepository {
   /// Completed by the test to release the in-flight write.
   Completer<void>? gate;
 
+  /// Drops the row on the next read, standing in for a sync that deleted the
+  /// species from another device while the editor was open.
+  bool deleteOnNextRead = false;
+
   @override
   Stream<void> watchSpeciesChanges() => _changes.stream;
 
@@ -63,8 +67,14 @@ class _FakeSpeciesRepository extends Fake implements SpeciesRepository {
   Future<List<Species>> getAllSpecies() async => List.of(_stored);
 
   @override
-  Future<Species?> getSpeciesById(String id) async =>
-      _stored.where((s) => s.id == id).firstOrNull;
+  Future<Species?> getSpeciesById(String id) async {
+    if (deleteOnNextRead) {
+      _stored.removeWhere((s) => s.id == id);
+      deleteOnNextRead = false;
+      return null;
+    }
+    return _stored.where((s) => s.id == id).firstOrNull;
+  }
 
   @override
   Future<void> updateSpecies(Species species) async {
@@ -241,5 +251,27 @@ void main() {
       expect(saved.id, 's1');
       expect(saved.photoPath, '/photos/map-puffer.jpg');
     });
+
+    testWidgets(
+      'reports a species deleted under the editor instead of a save',
+      (tester) async {
+        await tester.pumpWidget(host());
+        await tester.pumpAndSettle();
+
+        await tester.enterText(
+          find.byType(TextFormField).first,
+          'Map Pufferfish',
+        );
+        repository.deleteOnNextRead = true;
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        expect(repository.updated, isEmpty);
+        expect(find.text('This species no longer exists.'), findsOneWidget);
+        expect(find.textContaining('updated'), findsNothing);
+        // The editor stays put so the diver does not lose what they typed.
+        expect(find.text('species list'), findsNothing);
+      },
+    );
   });
 }

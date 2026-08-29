@@ -12374,6 +12374,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'لم يعد هذا النوع موجودًا.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'حفظ';
 
   @override

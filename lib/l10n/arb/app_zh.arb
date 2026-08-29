@@ -4193,6 +4193,7 @@
   "marineLife_speciesEdit_editTitle": "编辑物种",
   "marineLife_speciesEdit_errorLoading": "加载物种出错：{error}",
   "marineLife_speciesEdit_errorSaving": "保存物种出错：{error}",
+  "marineLife_speciesEdit_notFoundMessage": "该物种已不存在。",
   "marineLife_speciesEdit_saveButton": "保存",
   "marineLife_speciesEdit_scientificNameHint": "例如 Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "学名",

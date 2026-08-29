@@ -3966,6 +3966,7 @@
   "marineLife_speciesEdit_editTitle": "Modifier l'espece",
   "marineLife_speciesEdit_errorLoading": "Erreur lors du chargement de l'espece : {error}",
   "marineLife_speciesEdit_errorSaving": "Erreur lors de l'enregistrement de l'espece : {error}",
+  "marineLife_speciesEdit_notFoundMessage": "Cette espèce n'existe plus.",
   "marineLife_speciesEdit_saveButton": "Enregistrer",
   "marineLife_speciesEdit_scientificNameHint": "ex. Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Nom scientifique",

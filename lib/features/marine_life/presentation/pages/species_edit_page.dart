@@ -253,24 +253,38 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
 
       if (widget.isEditing) {
         final existing = await repository.getSpeciesById(widget.speciesId!);
-        if (existing != null) {
-          // Built by hand rather than with copyWith, which reads a null as
-          // "keep this value" and so could never blank an optional field the
-          // diver had cleared. Everything the form does not show is carried
-          // over from the stored row.
-          await repository.updateSpecies(
-            Species(
-              id: existing.id,
-              commonName: commonName,
-              scientificName: scientificName.isEmpty ? null : scientificName,
-              category: _category,
-              taxonomyClass: taxonomyClass.isEmpty ? null : taxonomyClass,
-              description: description.isEmpty ? null : description,
-              photoPath: existing.photoPath,
-              isBuiltIn: existing.isBuiltIn,
-            ),
-          );
+        if (existing == null) {
+          // The row went away while the editor was open, e.g. a sync applied
+          // a deletion from another device. Say so instead of reporting an
+          // update that never happened.
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  context.l10n.marineLife_speciesEdit_notFoundMessage,
+                ),
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+            );
+          }
+          return;
         }
+        // Built by hand rather than with copyWith, which reads a null as
+        // "keep this value" and so could never blank an optional field the
+        // diver had cleared. Everything the form does not show is carried
+        // over from the stored row.
+        await repository.updateSpecies(
+          Species(
+            id: existing.id,
+            commonName: commonName,
+            scientificName: scientificName.isEmpty ? null : scientificName,
+            category: _category,
+            taxonomyClass: taxonomyClass.isEmpty ? null : taxonomyClass,
+            description: description.isEmpty ? null : description,
+            photoPath: existing.photoPath,
+            isBuiltIn: existing.isBuiltIn,
+          ),
+        );
       } else {
         await repository.createSpecies(
           commonName: commonName,

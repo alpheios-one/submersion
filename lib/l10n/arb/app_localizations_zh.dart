@@ -12002,6 +12002,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage => '该物种已不存在。';
+
+  @override
   String get marineLife_speciesEdit_saveButton => '保存';
 
   @override

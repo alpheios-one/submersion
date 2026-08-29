@@ -12563,6 +12563,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Ez a faj már nem létezik.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Mentes';
 
   @override
