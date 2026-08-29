@@ -88,21 +88,51 @@ class _RecordingRepository extends Fake implements SpeciesRepository {
   }
 }
 
+const _lookupFooter = ValueKey('species_picker_lookup_online');
+
+/// A catalog that answers "sail" locally, so the lookup footer is exercised
+/// on the path the empty state never reaches.
+const _catalog = [
+  Species(
+    id: 'sp_sailfin_blenny',
+    commonName: 'Sailfin Blenny',
+    scientificName: 'Emblemaria pandionis',
+    category: SpeciesCategory.fish,
+    isBuiltIn: true,
+  ),
+  Species(
+    id: 'sp_sailfin_tang',
+    commonName: 'Sailfin Tang',
+    scientificName: 'Zebrasoma veliferum',
+    category: SpeciesCategory.fish,
+    isBuiltIn: true,
+  ),
+];
+
 Future<void> _pump(
   WidgetTester tester, {
   required _RecordingRepository repository,
+  List<Species> catalog = const [],
 }) async {
   tester.view.physicalSize = const Size(900, 1800);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
+  List<Species> matching(String query) => catalog
+      .where(
+        (s) => s.commonName.toLowerCase().contains(query.trim().toLowerCase()),
+      )
+      .toList();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        allSpeciesProvider.overrideWith((ref) async => const []),
+        allSpeciesProvider.overrideWith((ref) async => catalog),
         speciesByCategoryProvider.overrideWith(
-          (ref, category) async => const [],
+          (ref, category) async =>
+              catalog.where((s) => s.category == category).toList(),
         ),
-        speciesSearchProvider.overrideWith((ref, query) async => const []),
+        speciesSearchProvider.overrideWith(
+          (ref, query) async => matching(query),
+        ),
         speciesRepositoryProvider.overrideWithValue(repository),
         speciesLookupServiceProvider.overrideWithValue(_FakeLookup()),
         speciesLookupLocaleProvider.overrideWithValue('en'),
@@ -114,6 +144,51 @@ Future<void> _pump(
           body: SpeciesPickerSheet(
             scrollController: ScrollController(),
             onSpeciesSelected: (_, _, _) {},
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Pumps the sheet into a short fixed box, the way DraggableScrollableSheet
+/// does at its minimum size. Kept wide on purpose: the test font draws every
+/// glyph as wide as the font size, so a narrow surface overflows the title
+/// row for reasons that have nothing to do with the height under test.
+Future<void> _pumpConstrained(
+  WidgetTester tester, {
+  required double height,
+}) async {
+  tester.view.physicalSize = Size(900, height);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        allSpeciesProvider.overrideWith((ref) async => _catalog),
+        speciesByCategoryProvider.overrideWith(
+          (ref, category) async => const [],
+        ),
+        speciesSearchProvider.overrideWith((ref, query) async => const []),
+        speciesRepositoryProvider.overrideWithValue(_RecordingRepository()),
+        speciesLookupServiceProvider.overrideWithValue(_FakeLookup()),
+        speciesLookupLocaleProvider.overrideWithValue('en'),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              height: height,
+              width: 900,
+              child: SpeciesPickerSheet(
+                scrollController: ScrollController(),
+                onSpeciesSelected: (_, _, _) {},
+              ),
+            ),
           ),
         ),
       ),
@@ -182,5 +257,128 @@ void main() {
     expect(repository.nameOnlyCreations, 1);
     expect(repository.created, isEmpty);
     expect(find.byType(AlertDialog), findsOneWidget);
+  });
+
+  testWidgets('the online lookup is offered even when the catalog matches '
+      'the query', (tester) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    // The empty state's "Add ..." button is the pre-existing door and it is
+    // shut here, because the catalog answered the search.
+    await tester.enterText(find.byType(TextField).first, 'sail');
+    await tester.pumpAndSettle();
+    expect(find.text('Sailfin Blenny'), findsOneWidget);
+    expect(find.textContaining('Add "'), findsNothing);
+
+    expect(find.byKey(_lookupFooter), findsOneWidget);
+  });
+
+  testWidgets('the online lookup is offered before anything is typed', (
+    tester,
+  ) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    expect(find.byKey(_lookupFooter), findsOneWidget);
+  });
+
+  testWidgets('the footer carries the current query into the lookup and '
+      'creates the chosen species', (tester) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    await tester.enterText(find.byType(TextField).first, 'whale');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(_lookupFooter));
+    await tester.pumpAndSettle();
+
+    // The sheet opens pre-filled, so the diver does not retype the name.
+    expect(find.text('Look up a species'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).last).controller?.text,
+      'whale',
+    );
+
+    await tester.tap(find.text('Look up'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Whale Shark'));
+    await tester.pumpAndSettle();
+
+    expect(repository.created.single['scientificName'], 'Rhincodon typus');
+    expect(repository.nameOnlyCreations, 0);
+    expect(find.byType(AlertDialog), findsOneWidget);
+  });
+
+  testWidgets('browsing the lookup with an empty query offers no '
+      'create-without escape and creates nothing when dismissed', (
+    tester,
+  ) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    await tester.tap(find.byKey(_lookupFooter));
+    await tester.pumpAndSettle();
+    expect(find.text('Look up a species'), findsOneWidget);
+
+    // With no name to fall back on, "Create without lookup" would mint a
+    // nameless species, so it must not be offered at all.
+    expect(find.text('Create without lookup'), findsNothing);
+
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Look up a species'), findsNothing);
+    expect(repository.created, isEmpty);
+    expect(repository.nameOnlyCreations, 0);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('dismissing the lookup opened from the footer with a query '
+      'creates nothing', (tester) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    await tester.enterText(find.byType(TextField).first, 'whale');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(_lookupFooter));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+
+    expect(repository.created, isEmpty);
+    expect(repository.nameOnlyCreations, 0);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
+  testWidgets('Create without lookup from the footer keeps the name-only '
+      'path', (tester) async {
+    final repository = _RecordingRepository();
+    await _pump(tester, repository: repository, catalog: _catalog);
+
+    await tester.enterText(find.byType(TextField).first, 'whale');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(_lookupFooter));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Create without lookup'));
+    await tester.pumpAndSettle();
+
+    expect(repository.nameOnlyCreations, 1);
+    expect(repository.created, isEmpty);
+    expect(find.byType(AlertDialog), findsOneWidget);
+  });
+
+  testWidgets('the footer survives a short sheet, since it sits below the '
+      'scrolling list rather than inside it', (tester) async {
+    await _pumpConstrained(tester, height: 320);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(_lookupFooter), findsOneWidget);
+    // Off-screen would still be "found", so check it can actually be hit.
+    final box = tester.getRect(find.byKey(_lookupFooter));
+    expect(box.bottom, lessThanOrEqualTo(320));
+    expect(box.height, greaterThan(0));
+    // The list is the part that gives, not the footer.
+    expect(find.byType(ListView), findsWidgets);
   });
 }

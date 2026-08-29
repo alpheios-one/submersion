@@ -137,6 +137,25 @@ class SpeciesLookupResult extends Equatable {
   ];
 }
 
+/// What the lookup sheet was closed with. Dismissal is the absence of an
+/// outcome (a null future), so a caller can tell "the diver backed out" from
+/// "the diver asked to skip the lookup" instead of guessing from a bare null.
+sealed class SpeciesLookupOutcome {
+  const SpeciesLookupOutcome();
+}
+
+/// The diver picked a taxon and it resolved.
+class SpeciesLookupChosen extends SpeciesLookupOutcome {
+  final SpeciesLookupResult result;
+
+  const SpeciesLookupChosen(this.result);
+}
+
+/// The diver asked to create the species from the typed name alone.
+class SpeciesLookupCreateWithout extends SpeciesLookupOutcome {
+  const SpeciesLookupCreateWithout();
+}
+
 enum SpeciesLookupErrorKind { offline, timeout, server, malformed }
 
 /// One message per kind in the sheet; nothing retries silently.
