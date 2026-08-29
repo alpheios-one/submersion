@@ -39265,6 +39265,12 @@ abstract class AppLocalizations {
   /// **'Media store connected'**
   String get settings_mediaStorage_saved;
 
+  /// No description provided for @settings_mediaStorage_error_notReady.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud storage could not be read yet. Wait a moment and try connecting again.'**
+  String get settings_mediaStorage_error_notReady;
+
   /// No description provided for @settings_mediaStorage_action_disconnect.
   ///
   /// In en, this message translates to:
@@ -39348,6 +39354,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed'**
   String get settings_mediaStorage_transfers_state_failed;
+
+  /// No description provided for @settings_mediaStorage_transfers_suspended_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers paused'**
+  String get settings_mediaStorage_transfers_suspended_title;
+
+  /// No description provided for @settings_mediaStorage_transfers_suspended_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.'**
+  String get settings_mediaStorage_transfers_suspended_subtitle;
 
   /// No description provided for @settings_mediaStorage_transfers_queued.
   ///

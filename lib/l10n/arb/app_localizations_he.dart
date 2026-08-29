@@ -23277,6 +23277,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_mediaStorage_saved => 'אחסון המדיה חובר';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'עדיין לא ניתן היה לקרוא את אחסון הענן. המתינו רגע ונסו שוב.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'התנתק';
 
   @override
@@ -23320,6 +23324,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'נכשל';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'ההעברות מושהות';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'המכשיר הזה ואחסון הענן כבר לא מסכימים על המאגר שבשימוש. חיבור מחדש של אחסון המדיה מאמץ את המאגר שנמצא כעת בענן.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

@@ -23874,6 +23874,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Archivio media collegato';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Non è stato ancora possibile leggere l\'archivio cloud. Attendi un momento e riprova.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnetti';
 
   @override
@@ -23920,6 +23924,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Non riuscito';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Trasferimenti in pausa';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Questo dispositivo e l\'archivio cloud non concordano più su quale archivio sia in uso. Riconnettere l\'archivio multimediale adotta quello che il cloud contiene ora.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

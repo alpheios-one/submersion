@@ -23471,6 +23471,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Media store connected';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'The cloud storage could not be read yet. Wait a moment and try connecting again.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnect';
 
   @override
@@ -23516,6 +23520,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Failed';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transfers paused';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

@@ -23689,6 +23689,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Mediaopslag verbonden';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'De cloudopslag kon nog niet worden gelezen. Wacht even en probeer het opnieuw.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Loskoppelen';
 
   @override
@@ -23734,6 +23738,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Mislukt';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Overdrachten gepauzeerd';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Dit apparaat en de cloudopslag zijn het niet meer eens over welke opslag in gebruik is. Opnieuw verbinden neemt de opslag over die de cloud nu bevat.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

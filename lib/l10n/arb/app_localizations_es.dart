@@ -23891,6 +23891,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Almacén de medios conectado';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Aún no se pudo leer el almacenamiento en la nube. Espera un momento e inténtalo de nuevo.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Desconectar';
 
   @override
@@ -23936,6 +23940,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Fallido';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transferencias en pausa';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Este dispositivo y el almacenamiento en la nube ya no coinciden en qué almacén está en uso. Volver a conectar adopta el almacén que la nube tiene ahora.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

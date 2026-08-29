@@ -15484,6 +15484,7 @@
   },
   "settings_mediaStorage_test_success": "Connection successful",
   "settings_mediaStorage_saved": "Media store connected",
+  "settings_mediaStorage_error_notReady": "The cloud storage could not be read yet. Wait a moment and try connecting again.",
   "settings_mediaStorage_action_disconnect": "Disconnect",
   "settings_mediaStorage_disconnect_confirm_title": "Disconnect media store?",
   "settings_mediaStorage_disconnect_confirm_body": "This device stops uploading and fetching media. Nothing in your bucket is deleted.",
@@ -15498,6 +15499,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Removing from cloud",
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
+  "settings_mediaStorage_transfers_suspended_title": "Transfers paused",
+  "settings_mediaStorage_transfers_suspended_subtitle": "This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.",
   "settings_mediaStorage_transfers_queued": "{count} queued",
   "@settings_mediaStorage_transfers_queued": {
     "placeholders": {

@@ -23446,6 +23446,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_mediaStorage_saved => 'تم توصيل مخزن الوسائط';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'تعذّرت قراءة التخزين السحابي حتى الآن. انتظر لحظة ثم أعد المحاولة.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'قطع الاتصال';
 
   @override
@@ -23490,6 +23494,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'فشل';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'تم إيقاف عمليات النقل مؤقتًا';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'لم يعد هذا الجهاز والتخزين السحابي متفقين على المخزن المستخدم. تؤدي إعادة توصيل تخزين الوسائط إلى اعتماد المخزن الموجود في السحابة الآن.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {

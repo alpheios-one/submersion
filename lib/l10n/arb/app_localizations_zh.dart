@@ -22642,6 +22642,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_saved => '媒体存储已连接';
 
   @override
+  String get settings_mediaStorage_error_notReady => '尚无法读取云存储。请稍候片刻后重试。';
+
+  @override
   String get settings_mediaStorage_action_disconnect => '断开连接';
 
   @override
@@ -22683,6 +22686,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => '失败';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title => '传输已暂停';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      '此设备与云存储对正在使用的存储库不再一致。重新连接媒体存储将采用云端当前保存的存储库。';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
