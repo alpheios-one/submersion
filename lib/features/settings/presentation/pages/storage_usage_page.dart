@@ -56,11 +56,15 @@ class StorageUsagePage extends ConsumerWidget {
   }
 }
 
-/// The running total across every category that has resolved so far.
+/// The running total across every category that contributed a number.
 ///
-/// Labelled as partial while any category is still measuring, because a total
-/// that silently grows as rows land would read as a wrong number rather than an
-/// incomplete one.
+/// Labelled as partial whenever any category did not contribute, which covers
+/// three different reasons and deliberately does not distinguish them here: a
+/// category still measuring, one that failed, and one that is structurally
+/// unmeasurable all leave the sum short of the truth. The row itself says
+/// which, so the header only has to avoid claiming a short sum is the total.
+/// Presenting an incomplete figure as final is the failure mode that matters,
+/// because a user acts on the number.
 class _TotalHeader extends ConsumerWidget {
   const _TotalHeader({required this.categories});
 
@@ -70,18 +74,19 @@ class _TotalHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     var total = 0;
-    var pending = false;
+    var incomplete = false;
     for (final category in categories) {
       final size = ref.watch(storageCategorySizeProvider(category.id));
       switch (size) {
         case AsyncData(:final value?):
           total += value;
         case AsyncData():
-          break;
+          // Structurally unmeasurable, so the sum is short by an unknown amount.
+          incomplete = true;
         case AsyncError():
-          break;
+          incomplete = true;
         default:
-          pending = true;
+          incomplete = true;
       }
     }
 
@@ -91,7 +96,7 @@ class _TotalHeader extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            pending
+            incomplete
                 ? context.l10n.settings_storageUsage_totalPartial
                 : context.l10n.settings_storageUsage_total,
             style: theme.textTheme.labelMedium?.copyWith(

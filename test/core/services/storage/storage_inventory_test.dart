@@ -216,6 +216,23 @@ void main() {
     );
   });
 
+  test('temporary excludes sibling temp subtrees it does not own', () async {
+    await writeFile(p.join(temporary.path, 'picked', '0', 'dives.zip'), 800);
+    await writeFile(p.join(temporary.path, 'shared_photo.jpg'), 60);
+    // DefaultCacheManager keeps the network image cache here, and it already
+    // has its own category. Walking the whole temp tree would count it twice.
+    await writeFile(
+      p.join(temporary.path, 'libCachedImageData', 'blob.bin'),
+      500000,
+    );
+    await writeFile(p.join(temporary.path, 'some_plugin', 'scratch'), 4000);
+
+    expect(
+      await categoryFor(build(), StorageCategoryId.temporary).measure(),
+      860,
+    );
+  });
+
   test(
     'exports exclude the database, its sidecars and subdirectories',
     () async {

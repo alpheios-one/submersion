@@ -17,15 +17,25 @@ import 'package:submersion/features/settings/presentation/providers/storage_prov
 
 /// The real inventory, wired to path_provider and the live services.
 final storageInventoryProvider = Provider<StorageInventory>((ref) {
+  // Memoized because the three media cache pools plus the two thumbnail
+  // categories each resolve it, and it is a platform channel round trip that
+  // returns the same immutable path every time for the life of the process.
+  // The MediaCacheStore itself is rebuilt per call on purpose: it captures the
+  // LocalCacheDatabase at construction, and caching one across the session
+  // would hold a stale handle after a database location migration.
+  Future<Directory>? supportDirectory;
+  Future<Directory> resolveSupport() =>
+      supportDirectory ??= getApplicationSupportDirectory();
+
   return StorageInventory(
-    supportDirectory: getApplicationSupportDirectory,
+    supportDirectory: resolveSupport,
     documentsDirectory: getApplicationDocumentsDirectory,
     temporaryDirectory: getTemporaryDirectory,
     databasePath: () =>
         ref.read(databaseLocationServiceProvider).getDatabasePath(),
     backupsDirectoryPath: _resolveBackupsDirectoryPath,
     mediaCacheBytes: (kind) async {
-      final support = await getApplicationSupportDirectory();
+      final support = await resolveSupport();
       final store = MediaCacheStore(
         database: LocalCacheDatabaseService.instance.database,
         root: Directory(p.join(support.path, 'Submersion', 'media_cache')),

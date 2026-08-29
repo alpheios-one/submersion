@@ -41,6 +41,7 @@ class StorageInventory {
 
   static const _appDir = 'Submersion';
   static const _localCacheDb = 'submersion_local.db';
+  static const _pickedDir = 'picked';
 
   /// Order is display order on the usage page.
   List<StorageCategory> get categories => [
@@ -157,9 +158,21 @@ class StorageInventory {
     return measureDirectoryBytes(Directory(path));
   }
 
+  /// The picked/ subtree plus the loose share files at the temp root, never
+  /// the whole temp directory.
+  ///
+  /// A recursive walk of the root would double count: DefaultCacheManager keeps
+  /// the network image cache at `<temp>/libCachedImageData`, which already has
+  /// its own row, so walking the tree would add those bytes twice. It
+  /// would also sweep in temp subtrees belonging to plugins this app does not
+  /// own, which is not something a user can act on.
   Future<int?> _measureTemporary() async {
     final temp = await _temporaryDirectory();
-    return measureDirectoryBytes(temp);
+    final picked = await measureDirectoryBytes(
+      Directory(p.join(temp.path, _pickedDir)),
+    );
+    final loose = await measureLooseFilesBytes(temp, exclude: (_) => false);
+    return picked + loose;
   }
 
   /// Loose files in the Documents root, which is where saveAndShareFile leaves

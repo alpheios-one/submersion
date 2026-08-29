@@ -127,6 +127,52 @@ void main() {
     expect(rowText('2.0 KB'), findsNothing);
   });
 
+  testWidgets('the header stays partial when a category errored', (
+    tester,
+  ) async {
+    useTallSurface(tester);
+    await tester.pumpWidget(
+      harness(
+        sizes: {
+          StorageCategoryId.networkImages: () =>
+              Future<int?>.error(const FileSystemException('denied')),
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Nothing is loading any more, but the sum is still short by whatever the
+    // failed category holds, so calling it the total would be a false claim.
+    expect(find.text('Total so far'), findsOneWidget);
+    expect(find.text('Total'), findsNothing);
+  });
+
+  testWidgets('the header stays partial when a category is unmeasurable', (
+    tester,
+  ) async {
+    useTallSurface(tester);
+    await tester.pumpWidget(
+      harness(
+        sizes: {StorageCategoryId.backups: () => Future<int?>.value(null)},
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Total so far'), findsOneWidget);
+    expect(find.text('Total'), findsNothing);
+  });
+
+  testWidgets('the header reads as final only when every category counted', (
+    tester,
+  ) async {
+    useTallSurface(tester);
+    await tester.pumpWidget(harness(sizes: {}));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Total'), findsOneWidget);
+    expect(find.text('Total so far'), findsNothing);
+  });
+
   testWidgets('an errored category is left out of the total', (tester) async {
     useTallSurface(tester);
     await tester.pumpWidget(
