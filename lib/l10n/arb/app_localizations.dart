@@ -58720,6 +58720,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, one{1 dive excluded from statistics} other{{count} dives excluded from statistics}}'**
   String statistics_excludedDivesFootnote(int count);
+
+  /// Collapsible dive-form group holding the statistics-exclusion toggles
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get diveLog_edit_group_statistics;
+
+  /// Collapsed Statistics group summary when only gas statistics are excluded
+  ///
+  /// In en, this message translates to:
+  /// **'Gas excluded'**
+  String get diveLog_edit_summary_gasExcluded;
+
+  /// Collapsed Statistics group hint when the dive is not excluded
+  ///
+  /// In en, this message translates to:
+  /// **'Counted in every statistic'**
+  String get diveLog_edit_statisticsIncludedHint;
 }
 
 class _AppLocalizationsDelegate

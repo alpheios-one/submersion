@@ -240,12 +240,19 @@ requires an explicit release note.
 
 ## Section 3: UI and localization
 
-**Dive edit form.** Two checkboxes at the end of `_buildTheDiveSection`
-(`dive_edit_page.dart:2025`), under a small "Statistics" label. That section
-holds dive number, date, site, and depth, so a flag about how the dive is
-counted belongs there rather than in Experience (rating, notes, sightings,
-tags). The collapsed section summary picks up an "Excluded" marker when either
-flag is set.
+**Dive edit form.** A collapsible "Statistics" group at the bottom of the
+form (`_buildStatisticsSection`, rendered after the contextual groups and
+before the AddSectionRow), holding the two toggles.
+
+The toggles first shipped as two rows at the end of `_buildTheDiveSection`,
+on the reasoning that the group holding dive number, date, site and depth is
+where a flag about how the dive is counted belongs. In practice they read as
+clutter inside an always-expanded group of core facts, so they moved into
+their own collapsible group instead, matching the other expandable ones. The
+group is collapsed unless the dive is already excluded, and its header carries
+the state: an "Excluded" or "Gas excluded" summary, or the fainter "Counted in
+every statistic" hint. Nothing in the group is a validated field, so it does
+not join the sections `_saveDive` force-expands before `Form.validate()`.
 
 The gas checkbox renders disabled and checked while the master flag is on, so
 the implication is visible rather than surprising.

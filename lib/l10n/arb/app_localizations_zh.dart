@@ -33610,4 +33610,13 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => '统计';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => '已排除气体';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
 }

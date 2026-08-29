@@ -35481,4 +35481,14 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statistieken';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gas uitgesloten';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Meegeteld in alle statistieken';
 }

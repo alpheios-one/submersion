@@ -10425,5 +10425,8 @@
   "diveLog_bulkEdit_fieldExcludeFromGasStats": "Kizárás a gázstatisztikákból",
   "diveLog_filter_excludedOnly": "Csak a statisztikákból kizártak",
   "diveLog_edit_summary_excluded": "Kizárva",
-  "statistics_excludedDivesFootnote": "{count, plural, one{1 merülés kizárva a statisztikákból} other{{count} merülés kizárva a statisztikákból}}"
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 merülés kizárva a statisztikákból} other{{count} merülés kizárva a statisztikákból}}",
+  "diveLog_edit_group_statistics": "Statisztikák",
+  "diveLog_edit_summary_gasExcluded": "Gáz kizárva",
+  "diveLog_edit_statisticsIncludedHint": "Minden statisztikában szerepel"
 }

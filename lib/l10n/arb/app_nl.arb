@@ -10425,5 +10425,8 @@
   "diveLog_bulkEdit_fieldExcludeFromGasStats": "Uitsluiten van gasstatistieken",
   "diveLog_filter_excludedOnly": "Alleen uitgesloten van statistieken",
   "diveLog_edit_summary_excluded": "Uitgesloten",
-  "statistics_excludedDivesFootnote": "{count, plural, one{1 duik uitgesloten van statistieken} other{{count} duiken uitgesloten van statistieken}}"
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 duik uitgesloten van statistieken} other{{count} duiken uitgesloten van statistieken}}",
+  "diveLog_edit_group_statistics": "Statistieken",
+  "diveLog_edit_summary_gasExcluded": "Gas uitgesloten",
+  "diveLog_edit_statisticsIncludedHint": "Meegeteld in alle statistieken"
 }
