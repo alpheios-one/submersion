@@ -56,4 +56,12 @@ void main() {
       expect(field.kind, expectedKind, reason: field.name);
     }
   });
+
+  test('the tank codec covers every tank_pressure_profiles sample column', () {
+    const tankIdentity = {'id', 'dive_id', 'tank_id', 'computer_id'};
+    final tableColumns = {
+      for (final column in db.tankPressureProfiles.$columns) column.$name,
+    };
+    expect(tableColumns.difference(tankIdentity), {'timestamp', 'pressure'});
+  });
 }

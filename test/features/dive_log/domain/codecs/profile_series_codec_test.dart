@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
@@ -239,15 +240,110 @@ void main() {
       );
     });
 
-    test('a blob whose timestamp column is marked absent', () {
-      // Header is version (1 byte) then count varint (8 fits in 1 byte);
-      // byte 2 is the timestamp block's presence mode.
-      final body = inflate(validBytes());
-      expect(body[2], isNot(0));
-      body[2] = 0;
+    test('a body whose timestamp column is absent', () {
+      // [version 9][count 3][timestamp: mode, 3 deltas][depth: mode, 3 floats]
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.5),
+        ProfileSample(timestamp: 10, depth: 2.5),
+        ProfileSample(timestamp: 20, depth: 3.5),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      expect(body[2], kPresenceAll);
+      // Mark the timestamp column absent and drop its three delta bytes.
+      final tampered = Uint8List.fromList([
+        body[0],
+        body[1],
+        kPresenceAbsent,
+        ...body.sublist(6),
+      ]);
+      expect(
+        () => small.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('no timestamp'),
+          ),
+        ),
+      );
+    });
+
+    test('a body whose depth column is absent', () {
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.5),
+        ProfileSample(timestamp: 10, depth: 2.5),
+        ProfileSample(timestamp: 20, depth: 3.5),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      // Depth block starts after version, count, timestamp mode, 3 deltas.
+      const depthMode = 6;
+      expect(body[depthMode], kPresenceAll);
+      final tampered = Uint8List.fromList([
+        ...body.sublist(0, depthMode),
+        kPresenceAbsent,
+      ]);
+      expect(
+        () => small.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('no depth'),
+          ),
+        ),
+      );
+    });
+
+    test('malformed UTF-8 in a string run', () {
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+        ProfileField('heart_rate_source', ProfileFieldKind.runLengthString),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 1, depth: 2.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 2, depth: 3.0, heartRateSource: 'a'),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      const firstStringByte = 1 + 1 + (1 + 3) + (1 + 24) + 1 + 1 + 1 + 1;
+      expect(body[firstStringByte], 0x61);
+      body[firstStringByte] = 0xFF;
+      expect(
+        () => small.decode(recompress(body)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('UTF-8'),
+          ),
+        ),
+      );
+    });
+
+    test('a zero sample count', () {
+      // [version 1][count 0] then 28 absent blocks.
+      final body = Uint8List.fromList([1, 0, ...List.filled(28, 0)]);
       expect(
         () => codec.decode(recompress(body)),
-        throwsA(isA<ProfileSeriesCodecException>()),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('empty'),
+          ),
+        ),
       );
     });
 
@@ -337,6 +433,17 @@ void main() {
         ).encode([fullSample(0)]),
         throwsArgumentError,
       );
+    });
+
+    test('a field table with a duplicate name is refused on both sides', () {
+      final duplicated = [
+        ...ProfileSeriesCodec.fieldTableV1,
+        const ProfileField('depth', ProfileFieldKind.float64),
+      ];
+      final bad = ProfileSeriesCodec(fieldTables: {1: duplicated});
+      expect(() => bad.encode([fullSample(0)]), throwsArgumentError);
+      final bytes = codec.encode([fullSample(0)]).bytes;
+      expect(() => bad.decode(bytes), throwsArgumentError);
     });
   });
 

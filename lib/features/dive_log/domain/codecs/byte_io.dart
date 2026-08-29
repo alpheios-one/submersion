@@ -20,8 +20,6 @@ class ByteWriter {
   final BytesBuilder _builder = BytesBuilder();
   final ByteData _scratch = ByteData(8);
 
-  int get length => _builder.length;
-
   void writeByte(int value) {
     assert(value >= 0 && value <= 0xFF, 'not a byte: $value');
     _builder.addByte(value);
@@ -80,6 +78,9 @@ class ByteReader {
     var shift = 0;
     while (true) {
       final byte = readByte();
+      if (shift == 63 && (byte & 0x7F) != 0) {
+        throw const ProfileSeriesCodecException('varint overflows 63 bits');
+      }
       result |= (byte & 0x7F) << shift;
       if ((byte & 0x80) == 0) return result;
       shift += 7;

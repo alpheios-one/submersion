@@ -110,7 +110,7 @@ class ProfileSeriesCodec {
     if (table == null) {
       throw ArgumentError.value(version, 'version', 'no field table');
     }
-    _requireTimestampAndDepth(table);
+    _validateTable(table);
     final summary = ProfileSeriesSummary.of(samples);
     for (var i = 1; i < samples.length; i++) {
       if (samples[i].timestamp < samples[i - 1].timestamp) {
@@ -159,7 +159,11 @@ class ProfileSeriesCodec {
     if (table == null) {
       throw ProfileSeriesCodecException('unknown codec version $blobVersion');
     }
+    _validateTable(table);
     final count = reader.readVarUint();
+    if (count == 0) {
+      throw const ProfileSeriesCodecException('empty series');
+    }
     // Every sample carries at least a one-byte timestamp delta, so a count
     // the remaining payload cannot hold is corruption, not a large series.
     // Guarding here keeps a bogus count from sizing 28 column lists.
@@ -181,8 +185,17 @@ class ProfileSeriesCodec {
     return _samplesFrom(columns, count);
   }
 
-  static void _requireTimestampAndDepth(List<ProfileField> table) {
-    final names = {for (final field in table) field.name};
+  static void _validateTable(List<ProfileField> table) {
+    final names = <String>{};
+    for (final field in table) {
+      if (!names.add(field.name)) {
+        throw ArgumentError.value(
+          table,
+          'fieldTables',
+          'duplicate field ${field.name}',
+        );
+      }
+    }
     if (!names.contains('timestamp') || !names.contains('depth')) {
       throw ArgumentError.value(
         table,

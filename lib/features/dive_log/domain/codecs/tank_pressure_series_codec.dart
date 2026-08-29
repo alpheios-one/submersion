@@ -129,6 +129,9 @@ class TankPressureSeriesCodec {
       throw ProfileSeriesCodecException('unknown codec version $blobVersion');
     }
     final count = reader.readVarUint();
+    if (count == 0) {
+      throw const ProfileSeriesCodecException('empty series');
+    }
     // Every sample carries at least a one-byte timestamp delta, so a count
     // the remaining payload cannot hold is corruption, not a large series.
     if (count > reader.remaining) {

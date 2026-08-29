@@ -117,9 +117,25 @@ void main() {
       expect(reader.readVarUint, throwsA(isA<ProfileSeriesCodecException>()));
     });
 
-    test('a varint longer than 64 bits throws', () {
+    test('eleven continuation bytes throw', () {
       final reader = ByteReader(Uint8List.fromList(List.filled(11, 0x80)));
       expect(reader.readVarUint, throwsA(isA<ProfileSeriesCodecException>()));
+    });
+
+    test('a ten-byte varint whose payload reaches bit 63 throws', () {
+      // Nine continuation bytes, then a terminating byte carrying bit 63.
+      final reader = ByteReader(
+        Uint8List.fromList([...List.filled(9, 0x80), 0x01]),
+      );
+      expect(reader.readVarUint, throwsA(isA<ProfileSeriesCodecException>()));
+    });
+
+    test('the largest 63-bit varint still decodes', () {
+      // 2^63 - 1: eight bytes of 0xFF then 0x7F.
+      final reader = ByteReader(
+        Uint8List.fromList([...List.filled(8, 0xFF), 0x7F]),
+      );
+      expect(reader.readVarUint(), (1 << 63) - 1);
     });
 
     test('readBytes past the end throws', () {

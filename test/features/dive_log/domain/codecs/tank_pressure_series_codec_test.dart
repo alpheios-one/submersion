@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
@@ -135,6 +136,61 @@ void main() {
       expect(
         () => codec.decode(recompress(tampered)),
         throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('a body whose timestamp column is absent', () {
+      final body = inflate(codec.encode(descending(3)).bytes);
+      expect(body[2], kPresenceAll);
+      final tampered = Uint8List.fromList([
+        body[0],
+        body[1],
+        kPresenceAbsent,
+        ...body.sublist(6),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('no timestamp'),
+          ),
+        ),
+      );
+    });
+
+    test('a body whose pressure column is absent', () {
+      final body = inflate(codec.encode(descending(3)).bytes);
+      const pressureMode = 6;
+      expect(body[pressureMode], kPresenceAll);
+      final tampered = Uint8List.fromList([
+        ...body.sublist(0, pressureMode),
+        kPresenceAbsent,
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('no pressure'),
+          ),
+        ),
+      );
+    });
+
+    test('a zero sample count', () {
+      final body = Uint8List.fromList([1, 0, 0, 0]);
+      expect(
+        () => codec.decode(recompress(body)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('empty'),
+          ),
+        ),
       );
     });
   });
