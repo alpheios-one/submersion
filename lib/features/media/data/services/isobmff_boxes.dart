@@ -52,11 +52,21 @@ List<BoxRange> findBoxesInBytes(Uint8List b, int start, int end, String type) =>
         if (r.type == type) r.range,
     ];
 
-typedef _Header = ({String type, BoxRange range});
+/// A box's four-character type paired with its content range.
+typedef BoxHeader = ({String type, BoxRange range});
+
+/// Every sibling box within [start, end), in file order, whatever its type.
+///
+/// Callers that need a box's POSITION among its siblings need all of them,
+/// not just the ones of one type: HEIC `ipma` property indices are 1-based
+/// into `ipco`'s full child list, so skipping a `hvcC` shifts every later
+/// index onto the wrong property.
+List<BoxHeader> boxesInBytes(Uint8List b, int start, int end) =>
+    _walkBytes(b, start, end).toList();
 
 /// Lazily yields sibling boxes; stops at the first corrupt header so a bad
 /// size never walks past [end] or spins.
-Iterable<_Header> _walk(RandomAccessFile raf, int start, int end) sync* {
+Iterable<BoxHeader> _walk(RandomAccessFile raf, int start, int end) sync* {
   var pos = start;
   while (pos + 8 <= end) {
     raf.setPositionSync(pos);
@@ -81,7 +91,7 @@ Iterable<_Header> _walk(RandomAccessFile raf, int start, int end) sync* {
   }
 }
 
-Iterable<_Header> _walkBytes(Uint8List b, int start, int end) sync* {
+Iterable<BoxHeader> _walkBytes(Uint8List b, int start, int end) sync* {
   var pos = start;
   while (pos + 8 <= end) {
     var size = beU32(b, pos);

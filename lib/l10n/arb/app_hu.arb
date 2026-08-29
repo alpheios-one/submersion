@@ -1749,6 +1749,7 @@
   "diveLog_detail_section_diveProfile": "Merulesi profil",
   "diveLog_detail_section_equipment": "Felszereles",
   "diveLog_detail_section_marineLife": "Tengeri elet",
+  "diveLog_detail_sightingPhotos": "{count, plural, =1{1 fotó} other{{count} fotó}}",
   "diveLog_detail_section_notes": "Jegyzetek",
   "diveLog_detail_section_oxygenToxicity": "Oxigen toxicitas",
   "diveLog_detail_section_sacRateBySegment": "Gázfogyasztás szakaszonként",
@@ -3765,6 +3766,13 @@
   "gasCalculators_tab_rockBottom": "Tartalék minimum",
   "gasCalculators_tankSize": "Palack méret",
   "gasCalculators_title": "Gáz kalkulátorok",
+  "gasCalculators_desc_mod": "Legnagyobb biztonságos mélység egy keverékhez",
+  "gasCalculators_desc_bestMix": "Leggazdagabb keverék a célmélységhez",
+  "gasCalculators_desc_consumption": "Egy tervezett merülés gázfogyasztása",
+  "gasCalculators_desc_rockBottom": "Tartalék két búvár felhozatalához",
+  "gasCalculators_desc_mnd": "Narkózis szerinti mélységhatár egy keverékhez",
+  "gasCalculators_desc_blender": "Töltési eljárás a célkeverékhez",
+  "gasCalculators_summary_prompt": "Válasszon egy számológépet a kezdéshez",
   "gpsLogger_androidNotificationText": "Felszíni útvonal rögzítése folyamatban",
   "gpsLogger_androidNotificationTitle": "Submersion GPS-naplózó",
   "gpsLogger_deleteTrackMessage": "Törli a rögzített GPS-útvonalat. A merülésekhez már hozzárendelt pozíciók megmaradnak.",
@@ -3958,6 +3966,7 @@
   "marineLife_speciesEdit_editTitle": "Faj szerkesztese",
   "marineLife_speciesEdit_errorLoading": "Hiba a faj betoltesekor: {error}",
   "marineLife_speciesEdit_errorSaving": "Hiba a faj mentesekor: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "Ez a faj már nem létezik.",
   "marineLife_speciesEdit_saveButton": "Mentes",
   "marineLife_speciesEdit_scientificNameHint": "pl. Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Tudomanyos nev",
@@ -3987,6 +3996,24 @@
   "marineLife_speciesManage_resetSuccess": "Beepitett fajok visszaallitva az alapertekekre",
   "marineLife_speciesManage_resetToDefaults": "Visszaallitas az alapertekekre",
   "marineLife_speciesManage_searchHint": "Fajok keresese...",
+  "marineLife_lookup_button": "Keresés online",
+  "marineLife_lookup_title": "Faj keresése",
+  "marineLife_lookup_searchHint": "Köznapi vagy tudományos név",
+  "marineLife_lookup_search": "Keresés",
+  "marineLife_lookup_createWithout": "Létrehozás keresés nélkül",
+  "marineLife_lookup_attribution": "Fajadatok és fotók az iNaturalisttól",
+  "marineLife_lookup_idle": "Írj be egy nevet, és koppints a Keresés gombra.",
+  "marineLife_lookup_empty": "Nincs találat erre: \"{query}\"",
+  "marineLife_lookup_errorOffline": "Úgy tűnik, nincs internetkapcsolat.",
+  "marineLife_lookup_errorTimeout": "A keresés túllépte az időkorlátot.",
+  "marineLife_lookup_errorServer": "Az iNaturalist hibát adott vissza. Próbáld újra később.",
+  "marineLife_lookup_errorMalformed": "Váratlan válasz az iNaturalisttól.",
+  "marineLife_lookup_retry": "Újra",
+  "marineLife_lookup_observations": "{count, plural, =1{1 megfigyelés} other{{count} megfigyelés}}",
+  "marineLife_lookup_unresolvableRank": "{rank}: válassz egy fajt",
+  "marineLife_speciesDetail_suggestForCatalog": "Javaslat a katalógusba",
+  "marineLife_suggest_couldNotOpen": "Nem sikerült megnyitni a böngészőt",
+  "marineLife_suggest_copyLink": "Link másolása",
   "marineLife_speciesPhotos_title": "Fotók ({count})",
   "marineLife_speciesPhotos_empty": "Az ezzel a fajjal címkézett fotók itt jelennek meg.",
   "marineLife_speciesPhotos_tagPhotos": "Fotók címkézése",
@@ -4303,6 +4330,7 @@
   "media_library_unlinkSelected": "Leválasztás",
   "media_library_selectedCount": "{count} kiválasztva",
   "media_library_filter_site": "Merülőhely",
+  "media_library_filter_species": "Faj",
   "media_library_filter_trip": "Utazás",
   "media_library_filter_dates": "Dátumok",
   "media_library_filter_missing": "Hiányzó fájlok",
@@ -6729,7 +6757,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} újrapróbálkozásra vár",
   "settings_mediaStorage_verify_action": "Könyvtár ellenőrzése",
   "settings_mediaStorage_verify_running": "Médiatár ellenőrzése...",
-  "settings_mediaStorage_verify_summary": "{checked} objektum ellenőrizve: {removed} árva eltávolítva, {repaired} javítás sorba állítva, {aborted} elavult feltöltés megszakítva",
+  "settings_mediaStorage_verify_summary": "{checked} felhőobjektum ellenőrizve ({originals} eredeti, {thumbs} bélyegkép, {renditions} tömörített változat): {removed} árva eltávolítva, {repaired} javítás sorba állítva, {aborted} elavult feltöltés megszakítva",
   "settings_mediaStorage_backfill_action": "Meglévő könyvtár feltöltése",
   "settings_mediaStorage_backfill_enqueued": "{count} feltöltés sorban",
   "settings_mediaStorage_policy_autoUpload": "Fotók automatikus feltöltése",
@@ -7331,15 +7359,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{Nem lett megfigyelés elvetve} =1{1 megfigyelés elvetve} other{{count} megfigyelés elvetve}}, {failed, plural, =1{1 merülést nem sikerült frissíteni} other{{failed} merülést nem sikerült frissíteni}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "A merüléslista nem olvasható. Semmi sem változott.",
   "safetySettings_analyzeAll_failed": "A merüléseket nem sikerült elemezni.",
   "safetyReview_details": "Részletek",
@@ -7781,6 +7809,7 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "Közelben rögzítve",
   "reef_species_addToExpected": "Hozzáadás a várható fajokhoz",
+  "reef_species_addFromLookup": "Keresés és hozzáadás a fajaidhoz",
   "reef_species_showAll": "Mind a(z) {count} megjelenítése",
   "reef_species_showFewer": "Kevesebb megjelenítése",
   "reef_attribution_title": "Zátony adatforrásai",
@@ -10386,5 +10415,19 @@
   "diveLog_filter_presetLast5Years": "Elmúlt 5 év",
   "diveLog_filter_presetLast10Years": "Elmúlt 10 év",
   "statistics_trend_tooltip_lowest": "Legalacsonyabb",
-  "statistics_trend_tooltip_highest": "Legmagasabb"
+  "statistics_trend_tooltip_highest": "Legmagasabb",
+  "diveLog_edit_excludeFromStats": "Kizárás a statisztikákból",
+  "diveLog_edit_excludeFromStatsHelp": "Tartsd meg ezt a merülést a naplóban, de hagyd ki minden statisztikából, beleértve a merülésszámot is.",
+  "diveLog_edit_excludeFromGasStats": "Kizárás a gázstatisztikákból",
+  "diveLog_edit_excludeFromGasStatsHelp": "Csak a SAC-, RMV- és gázkeverék-statisztikákból hagyd ki ezt a merülést. Hasznos, ha a gázérték nem reprezentatív.",
+  "diveLog_badge_excludedFromStats": "Kizárva a statisztikákból",
+  "diveLog_badge_excludedFromGasStats": "Kizárva a gázstatisztikákból",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Kizárás a statisztikákból",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Kizárás a gázstatisztikákból",
+  "diveLog_filter_excludedOnly": "Csak a statisztikákból kizártak",
+  "diveLog_edit_summary_excluded": "Kizárva",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 merülés kizárva a statisztikákból} other{{count} merülés kizárva a statisztikákból}}",
+  "diveLog_edit_group_statistics": "Statisztikák",
+  "diveLog_edit_summary_gasExcluded": "Gáz kizárva",
+  "diveLog_edit_statisticsIncludedHint": "Minden statisztikában szerepel"
 }

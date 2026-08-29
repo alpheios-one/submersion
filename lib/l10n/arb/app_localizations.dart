@@ -8183,6 +8183,12 @@ abstract class AppLocalizations {
   /// **'Marine Life'**
   String get diveLog_detail_section_marineLife;
 
+  /// No description provided for @diveLog_detail_sightingPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 photo} other{{count} photos}}'**
+  String diveLog_detail_sightingPhotos(int count);
+
   /// No description provided for @diveLog_detail_section_notes.
   ///
   /// In en, this message translates to:
@@ -21056,6 +21062,48 @@ abstract class AppLocalizations {
   /// **'Gas Calculators'**
   String get gasCalculators_title;
 
+  /// No description provided for @gasCalculators_desc_mod.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest safe depth for a mix'**
+  String get gasCalculators_desc_mod;
+
+  /// No description provided for @gasCalculators_desc_bestMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Richest mix for a target depth'**
+  String get gasCalculators_desc_bestMix;
+
+  /// No description provided for @gasCalculators_desc_consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas a planned dive will use'**
+  String get gasCalculators_desc_consumption;
+
+  /// No description provided for @gasCalculators_desc_rockBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Reserve to bring two divers up'**
+  String get gasCalculators_desc_rockBottom;
+
+  /// No description provided for @gasCalculators_desc_mnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Narcosis depth limit for a mix'**
+  String get gasCalculators_desc_mnd;
+
+  /// No description provided for @gasCalculators_desc_blender.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill procedure for a target mix'**
+  String get gasCalculators_desc_blender;
+
+  /// No description provided for @gasCalculators_summary_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a calculator to get started'**
+  String get gasCalculators_summary_prompt;
+
   /// No description provided for @marineLife_siteSection_editExpectedTooltip.
   ///
   /// In en, this message translates to:
@@ -21275,6 +21323,12 @@ abstract class AppLocalizations {
   /// **'Error saving species: {error}'**
   String marineLife_speciesEdit_errorSaving(Object error);
 
+  /// No description provided for @marineLife_speciesEdit_notFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This species no longer exists.'**
+  String get marineLife_speciesEdit_notFoundMessage;
+
   /// No description provided for @marineLife_speciesEdit_saveButton.
   ///
   /// In en, this message translates to:
@@ -21448,6 +21502,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search species...'**
   String get marineLife_speciesManage_searchHint;
+
+  /// No description provided for @marineLife_lookup_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up online'**
+  String get marineLife_lookup_button;
+
+  /// No description provided for @marineLife_lookup_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up a species'**
+  String get marineLife_lookup_title;
+
+  /// No description provided for @marineLife_lookup_searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Common or scientific name'**
+  String get marineLife_lookup_searchHint;
+
+  /// No description provided for @marineLife_lookup_search.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up'**
+  String get marineLife_lookup_search;
+
+  /// No description provided for @marineLife_lookup_createWithout.
+  ///
+  /// In en, this message translates to:
+  /// **'Create without lookup'**
+  String get marineLife_lookup_createWithout;
+
+  /// No description provided for @marineLife_lookup_attribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Species data and photos from iNaturalist'**
+  String get marineLife_lookup_attribution;
+
+  /// No description provided for @marineLife_lookup_idle.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a name and tap Look up.'**
+  String get marineLife_lookup_idle;
+
+  /// No description provided for @marineLife_lookup_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No species found for \"{query}\"'**
+  String marineLife_lookup_empty(String query);
+
+  /// No description provided for @marineLife_lookup_errorOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline.'**
+  String get marineLife_lookup_errorOffline;
+
+  /// No description provided for @marineLife_lookup_errorTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'The lookup timed out.'**
+  String get marineLife_lookup_errorTimeout;
+
+  /// No description provided for @marineLife_lookup_errorServer.
+  ///
+  /// In en, this message translates to:
+  /// **'iNaturalist returned an error. Try again later.'**
+  String get marineLife_lookup_errorServer;
+
+  /// No description provided for @marineLife_lookup_errorMalformed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected response from iNaturalist.'**
+  String get marineLife_lookup_errorMalformed;
+
+  /// No description provided for @marineLife_lookup_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get marineLife_lookup_retry;
+
+  /// No description provided for @marineLife_lookup_observations.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 observation} other{{count} observations}}'**
+  String marineLife_lookup_observations(int count);
+
+  /// No description provided for @marineLife_lookup_unresolvableRank.
+  ///
+  /// In en, this message translates to:
+  /// **'{rank}: choose a species'**
+  String marineLife_lookup_unresolvableRank(String rank);
+
+  /// No description provided for @marineLife_speciesDetail_suggestForCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggest for the catalog'**
+  String get marineLife_speciesDetail_suggestForCatalog;
+
+  /// No description provided for @marineLife_suggest_couldNotOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the browser'**
+  String get marineLife_suggest_couldNotOpen;
+
+  /// No description provided for @marineLife_suggest_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get marineLife_suggest_copyLink;
 
   /// No description provided for @marineLife_speciesPhotos_title.
   ///
@@ -23371,6 +23533,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Site'**
   String get media_library_filter_site;
+
+  /// Library filter chip: pick a species tag
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get media_library_filter_species;
 
   /// Library filter chip: pick a trip
   ///
@@ -39202,9 +39370,12 @@ abstract class AppLocalizations {
   /// No description provided for @settings_mediaStorage_verify_summary.
   ///
   /// In en, this message translates to:
-  /// **'Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads'**
+  /// **'Checked {checked} cloud objects ({originals, plural, =1{1 original} other{{originals} originals}}, {thumbs, plural, =1{1 thumbnail} other{{thumbs} thumbnails}}, {renditions, plural, =1{1 compressed version} other{{renditions} compressed versions}}): removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads'**
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
@@ -43067,6 +43238,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add to expected species'**
   String get reef_species_addToExpected;
+
+  /// No description provided for @reef_species_addFromLookup.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up and add to your species'**
+  String get reef_species_addFromLookup;
 
   /// Expands the capped nearby-species chip list to its full length
   ///
@@ -58483,6 +58660,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Highest'**
   String get statistics_trend_tooltip_highest;
+
+  /// Checkbox: exclude this dive from all statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from statistics'**
+  String get diveLog_edit_excludeFromStats;
+
+  /// Help text under the exclude-from-statistics checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this dive in your logbook, but leave it out of every statistic, including your dive count.'**
+  String get diveLog_edit_excludeFromStatsHelp;
+
+  /// Checkbox: exclude this dive from gas statistics only
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from gas statistics'**
+  String get diveLog_edit_excludeFromGasStats;
+
+  /// Help text under the exclude-from-gas-statistics checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this dive out of SAC, RMV and gas mix statistics only. Useful when the gas reading is not representative.'**
+  String get diveLog_edit_excludeFromGasStatsHelp;
+
+  /// Tooltip on the excluded-from-statistics badge
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from statistics'**
+  String get diveLog_badge_excludedFromStats;
+
+  /// Tooltip on the excluded-from-gas-statistics badge
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from gas statistics'**
+  String get diveLog_badge_excludedFromGasStats;
+
+  /// Bulk edit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from statistics'**
+  String get diveLog_bulkEdit_fieldExcludeFromStats;
+
+  /// Bulk edit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude from gas statistics'**
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats;
+
+  /// Filter axis: show only dives excluded from statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded from statistics only'**
+  String get diveLog_filter_excludedOnly;
+
+  /// Collapsed summary fragment: dive excluded from statistics
+  ///
+  /// In en, this message translates to:
+  /// **'Excluded'**
+  String get diveLog_edit_summary_excluded;
+
+  /// Overview footnote naming how many dives are excluded
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 dive excluded from statistics} other{{count} dives excluded from statistics}}'**
+  String statistics_excludedDivesFootnote(int count);
+
+  /// Collapsible dive-form group holding the statistics-exclusion toggles
+  ///
+  /// In en, this message translates to:
+  /// **'Statistics'**
+  String get diveLog_edit_group_statistics;
+
+  /// Collapsed Statistics group summary when only gas statistics are excluded
+  ///
+  /// In en, this message translates to:
+  /// **'Gas excluded'**
+  String get diveLog_edit_summary_gasExcluded;
+
+  /// Collapsed Statistics group hint when the dive is not excluded
+  ///
+  /// In en, this message translates to:
+  /// **'Counted in every statistic'**
+  String get diveLog_edit_statisticsIncludedHint;
 }
 
 class _AppLocalizationsDelegate

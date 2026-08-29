@@ -4794,6 +4794,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'חיים ימיים';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות',
+      one: 'תמונה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'הערות';
 
   @override
@@ -12125,6 +12136,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_title => 'מחשבוני גז';
 
   @override
+  String get gasCalculators_desc_mod => 'העומק הבטוח המרבי לתערובת';
+
+  @override
+  String get gasCalculators_desc_bestMix => 'התערובת העשירה ביותר לעומק היעד';
+
+  @override
+  String get gasCalculators_desc_consumption => 'כמות הגז שצלילה מתוכננת תצרוך';
+
+  @override
+  String get gasCalculators_desc_rockBottom => 'רזרבה להעלאת שני צוללנים';
+
+  @override
+  String get gasCalculators_desc_mnd => 'גבול עומק הנרקוזה לתערובת';
+
+  @override
+  String get gasCalculators_desc_blender => 'נוהל מילוי לתערובת היעד';
+
+  @override
+  String get gasCalculators_summary_prompt => 'בחר מחשבון כדי להתחיל';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip => 'ערוך מינים צפויים';
 
   @override
@@ -12258,6 +12290,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage => 'מין זה כבר אינו קיים.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'שמירה';
 
   @override
@@ -12363,6 +12398,75 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'חיפוש מינים...';
+
+  @override
+  String get marineLife_lookup_button => 'חיפוש מקוון';
+
+  @override
+  String get marineLife_lookup_title => 'חיפוש מין';
+
+  @override
+  String get marineLife_lookup_searchHint => 'שם עממי או מדעי';
+
+  @override
+  String get marineLife_lookup_search => 'חיפוש';
+
+  @override
+  String get marineLife_lookup_createWithout => 'יצירה ללא חיפוש';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'נתוני מינים ותמונות מ-iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => 'הקלידו שם והקישו על חיפוש.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'לא נמצאו מינים עבור \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'נראה שאין חיבור לאינטרנט.';
+
+  @override
+  String get marineLife_lookup_errorTimeout => 'תם הזמן המוקצב לחיפוש.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'iNaturalist החזיר שגיאה. נסו שוב מאוחר יותר.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'תגובה לא צפויה מ-iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'ניסיון חוזר';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תצפיות',
+      one: 'תצפית אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: בחרו מין';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog => 'הצעה לקטלוג';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => 'לא ניתן לפתוח את הדפדפן';
+
+  @override
+  String get marineLife_suggest_copyLink => 'העתקת קישור';
 
   @override
   String marineLife_speciesPhotos_title(Object count) {
@@ -13682,6 +13786,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'אתר';
+
+  @override
+  String get media_library_filter_species => 'מין';
 
   @override
   String get media_library_filter_trip => 'טיול';
@@ -23229,11 +23336,32 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return 'נבדקו $checked אובייקטים: הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals מקוריים',
+      one: 'מקורי אחד',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs תמונות ממוזערות',
+      one: 'תמונה ממוזערת אחת',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions גרסאות דחוסות',
+      one: 'גרסה דחוסה אחת',
+    );
+    return 'נבדקו $checked אובייקטים בענן ($_temp0, $_temp1, $_temp2): הוסרו $removed יתומים, $repaired תיקונים נוספו לתור, $aborted העלאות ישנות בוטלו';
   }
 
   @override
@@ -25433,6 +25561,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'הוספה למינים צפויים';
+
+  @override
+  String get reef_species_addFromLookup => 'חיפוש והוספה למינים שלכם';
 
   @override
   String reef_species_showAll(int count) {
@@ -34842,4 +34973,59 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'הגבוה ביותר';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'החרג מהסטטיסטיקות';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'השאר את הצלילה ביומן, אך החרג אותה מכל סטטיסטיקה, כולל מספר הצלילות שלך.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'החרג מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'החרג את הצלילה מסטטיסטיקות SAC, RMV ותערובת גז בלבד. שימושי כאשר ערך הגז אינו מייצג.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'מוחרגת מהסטטיסטיקות';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => 'מוחרגת מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => 'החרג מהסטטיסטיקות';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'החרג מסטטיסטיקות הגז';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'רק המוחרגות מהסטטיסטיקות';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'מוחרגת';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות מוחרגות מהסטטיסטיקות',
+      many: '$count צלילות מוחרגות מהסטטיסטיקות',
+      two: 'שתי צלילות מוחרגות מהסטטיסטיקות',
+      one: 'צלילה אחת מוחרגת מהסטטיסטיקות',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'סטטיסטיקות';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'הגז הוחרג';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => 'נכללת בכל הסטטיסטיקות';
 }

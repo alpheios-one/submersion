@@ -21,6 +21,19 @@ final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
   return StatisticsRepository(gasModel: ref.watch(gasModelProvider));
 });
 
+/// How many dives the diver has explicitly excluded from statistics.
+///
+/// Backs the Overview footnote, which exists so the statistics dive count and
+/// the logbook dive count differing is self-explaining rather than a support
+/// ticket six months later. Deliberately unaffected by the Statistics filter:
+/// it describes a persistent property of the logbook, not the current view.
+final excludedDiveCountProvider = FutureProvider<int>((ref) async {
+  final repository = ref.watch(statisticsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  ref.invalidateSelfWhen(repository.watchStatisticsChanges());
+  return repository.countExcludedDives(diverId: currentDiverId);
+});
+
 /// Overview totals scoped by the Statistics filter. Kept separate from
 /// diveStatisticsProvider so the home dashboard and dive-log summary (which
 /// read diveStatisticsProvider) stay unfiltered.

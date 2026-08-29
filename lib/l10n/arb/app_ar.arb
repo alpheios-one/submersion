@@ -1822,6 +1822,7 @@
   "diveLog_detail_section_diveProfile": "ملف الغوصة",
   "diveLog_detail_section_equipment": "المعدات",
   "diveLog_detail_section_marineLife": "الحياة البحرية",
+  "diveLog_detail_sightingPhotos": "{count, plural, =1{صورة واحدة} other{{count} صور}}",
   "diveLog_detail_section_notes": "الملاحظات",
   "diveLog_detail_section_oxygenToxicity": "سمية الأكسجين",
   "diveLog_detail_section_sacRateBySegment": "استهلاك الغاز حسب المقطع",
@@ -3838,6 +3839,13 @@
   "gasCalculators_tab_rockBottom": "الحد الأدنى",
   "gasCalculators_tankSize": "حجم الأسطوانة",
   "gasCalculators_title": "حاسبات الغاز",
+  "gasCalculators_desc_mod": "أقصى عمق آمن للخليط",
+  "gasCalculators_desc_bestMix": "أغنى خليط لعمق مستهدف",
+  "gasCalculators_desc_consumption": "الغاز الذي ستستهلكه غطسة مخططة",
+  "gasCalculators_desc_rockBottom": "احتياطي لصعود غطاسين",
+  "gasCalculators_desc_mnd": "حد عمق التخدير للخليط",
+  "gasCalculators_desc_blender": "إجراء التعبئة لخليط مستهدف",
+  "gasCalculators_summary_prompt": "اختر حاسبة للبدء",
   "gpsLogger_androidNotificationText": "يجري تسجيل مسار السطح",
   "gpsLogger_androidNotificationTitle": "مسجّل GPS في Submersion",
   "gpsLogger_deleteTrackMessage": "سيؤدي هذا إلى إزالة مسار GPS المسجّل. تبقى المواقع المسندة إلى الغطسات محفوظة.",
@@ -4031,6 +4039,7 @@
   "marineLife_speciesEdit_editTitle": "تعديل النوع",
   "marineLife_speciesEdit_errorLoading": "خطأ في تحميل النوع: {error}",
   "marineLife_speciesEdit_errorSaving": "خطأ في حفظ النوع: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "لم يعد هذا النوع موجودًا.",
   "marineLife_speciesEdit_saveButton": "حفظ",
   "marineLife_speciesEdit_scientificNameHint": "مثال: Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "الاسم العلمي",
@@ -4060,6 +4069,24 @@
   "marineLife_speciesManage_resetSuccess": "تمت استعادة الأنواع المدمجة إلى الإعدادات الافتراضية",
   "marineLife_speciesManage_resetToDefaults": "إعادة التعيين إلى الافتراضي",
   "marineLife_speciesManage_searchHint": "البحث في الأنواع...",
+  "marineLife_lookup_button": "البحث عبر الإنترنت",
+  "marineLife_lookup_title": "البحث عن نوع",
+  "marineLife_lookup_searchHint": "الاسم الشائع أو العلمي",
+  "marineLife_lookup_search": "بحث",
+  "marineLife_lookup_createWithout": "إنشاء بدون بحث",
+  "marineLife_lookup_attribution": "بيانات الأنواع والصور من iNaturalist",
+  "marineLife_lookup_idle": "اكتب اسمًا ثم اضغط بحث.",
+  "marineLife_lookup_empty": "لم يُعثر على أنواع لـ \"{query}\"",
+  "marineLife_lookup_errorOffline": "يبدو أنك غير متصل بالإنترنت.",
+  "marineLife_lookup_errorTimeout": "انتهت مهلة البحث.",
+  "marineLife_lookup_errorServer": "أعاد iNaturalist خطأ. حاول مرة أخرى لاحقًا.",
+  "marineLife_lookup_errorMalformed": "استجابة غير متوقعة من iNaturalist.",
+  "marineLife_lookup_retry": "إعادة المحاولة",
+  "marineLife_lookup_observations": "{count, plural, =1{مشاهدة واحدة} other{{count} مشاهدات}}",
+  "marineLife_lookup_unresolvableRank": "{rank}: اختر نوعًا",
+  "marineLife_speciesDetail_suggestForCatalog": "اقتراح للفهرس",
+  "marineLife_suggest_couldNotOpen": "تعذر فتح المتصفح",
+  "marineLife_suggest_copyLink": "نسخ الرابط",
   "marineLife_speciesPhotos_title": "الصور ({count})",
   "marineLife_speciesPhotos_empty": "الصور الموسومة بهذا النوع تظهر هنا.",
   "marineLife_speciesPhotos_tagPhotos": "وسم الصور",
@@ -4376,6 +4403,7 @@
   "media_library_unlinkSelected": "إلغاء الربط",
   "media_library_selectedCount": "تم تحديد {count}",
   "media_library_filter_site": "الموقع",
+  "media_library_filter_species": "النوع",
   "media_library_filter_trip": "الرحلة",
   "media_library_filter_dates": "التواريخ",
   "media_library_filter_missing": "ملفات مفقودة",
@@ -6729,7 +6757,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} في انتظار إعادة المحاولة",
   "settings_mediaStorage_verify_action": "التحقق من المكتبة",
   "settings_mediaStorage_verify_running": "جارٍ التحقق من مكتبة الوسائط...",
-  "settings_mediaStorage_verify_summary": "تم فحص {checked} عنصرًا: أزيل {removed} يتيمًا، وأُدرج {repaired} إصلاحًا في قائمة الانتظار، وأُلغي {aborted} رفعًا قديمًا",
+  "settings_mediaStorage_verify_summary": "تم فحص {checked} عنصرًا سحابيًا ({originals, plural, =1{أصل واحد} other{{originals} أصلية}}، {thumbs, plural, =1{صورة مصغرة واحدة} other{{thumbs} صور مصغرة}}، {renditions, plural, =1{نسخة مضغوطة واحدة} other{{renditions} نسخ مضغوطة}}): أزيل {removed} يتيمًا، وأُدرج {repaired} إصلاحًا في قائمة الانتظار، وأُلغي {aborted} رفعًا قديمًا",
   "settings_mediaStorage_backfill_action": "رفع المكتبة الحالية",
   "settings_mediaStorage_backfill_enqueued": "{count} عمليات رفع في قائمة الانتظار",
   "settings_mediaStorage_policy_autoUpload": "رفع الصور تلقائيا",
@@ -7331,15 +7359,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{لم يتم تجاهل أي ملاحظة} =1{تم تجاهل ملاحظة واحدة} other{تم تجاهل {count} ملاحظات}}، {failed, plural, =1{تعذّر تحديث غطسة واحدة} other{تعذّر تحديث {failed} غطسات}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "تعذّرت قراءة قائمة الغطسات. لم يتم تغيير أي شيء.",
   "safetySettings_analyzeAll_failed": "تعذّر تحليل الغطسات.",
   "safetyReview_details": "التفاصيل",
@@ -7781,6 +7809,7 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "مسجل في الجوار",
   "reef_species_addToExpected": "إضافة إلى الأنواع المتوقعة",
+  "reef_species_addFromLookup": "البحث والإضافة إلى أنواعك",
   "reef_species_showAll": "عرض الكل ({count})",
   "reef_species_showFewer": "عرض أقل",
   "reef_attribution_title": "مصادر بيانات الشعاب",
@@ -10386,5 +10415,19 @@
   "diveLog_filter_presetLast5Years": "آخر 5 سنوات",
   "diveLog_filter_presetLast10Years": "آخر 10 سنوات",
   "statistics_trend_tooltip_lowest": "الأدنى",
-  "statistics_trend_tooltip_highest": "الأعلى"
+  "statistics_trend_tooltip_highest": "الأعلى",
+  "diveLog_edit_excludeFromStats": "استبعاد من الإحصائيات",
+  "diveLog_edit_excludeFromStatsHelp": "احتفظ بهذه الغطسة في سجلك، لكن استبعدها من كل الإحصائيات، بما في ذلك عدد غطساتك.",
+  "diveLog_edit_excludeFromGasStats": "استبعاد من إحصائيات الغاز",
+  "diveLog_edit_excludeFromGasStatsHelp": "استبعد هذه الغطسة من إحصائيات SAC وRMV وخليط الغاز فقط. مفيد عندما تكون قراءة الغاز غير ممثلة.",
+  "diveLog_badge_excludedFromStats": "مستبعدة من الإحصائيات",
+  "diveLog_badge_excludedFromGasStats": "مستبعدة من إحصائيات الغاز",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "استبعاد من الإحصائيات",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "استبعاد من إحصائيات الغاز",
+  "diveLog_filter_excludedOnly": "المستبعدة من الإحصائيات فقط",
+  "diveLog_edit_summary_excluded": "مستبعدة",
+  "statistics_excludedDivesFootnote": "{count, plural, zero{لا غطسات مستبعدة من الإحصائيات} one{غطسة واحدة مستبعدة من الإحصائيات} two{غطستان مستبعدتان من الإحصائيات} few{{count} غطسات مستبعدة من الإحصائيات} many{{count} غطسة مستبعدة من الإحصائيات} other{{count} غطسة مستبعدة من الإحصائيات}}",
+  "diveLog_edit_group_statistics": "الإحصائيات",
+  "diveLog_edit_summary_gasExcluded": "الغاز مستبعد",
+  "diveLog_edit_statisticsIncludedHint": "محتسبة في كل الإحصائيات"
 }

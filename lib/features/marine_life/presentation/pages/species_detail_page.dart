@@ -6,6 +6,10 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/core/utils/app_version.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/domain/services/species_suggestion_url.dart';
+import 'package:submersion/features/marine_life/presentation/helpers/species_suggestion_launcher.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_sightings_section.dart';
 import 'package:submersion/features/media/data/services/species_tagging_service.dart';
@@ -39,6 +43,25 @@ class SpeciesDetailPage extends ConsumerWidget {
             tooltip: context.l10n.marineLife_speciesDetail_editTooltip,
             onPressed: () => context.push('/species/$speciesId/edit'),
           ),
+          // Only a custom species can be suggested: built-ins already are
+          // the catalog.
+          if (speciesAsync.value case final species? when !species.isBuiltIn)
+            PopupMenuButton<String>(
+              key: const ValueKey('species_detail_menu'),
+              onSelected: (value) {
+                if (value == 'suggest') {
+                  _suggestForCatalog(context, ref, species);
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'suggest',
+                  child: Text(
+                    context.l10n.marineLife_speciesDetail_suggestForCatalog,
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
       body: speciesAsync.when(
@@ -400,6 +423,25 @@ class SpeciesDetailPage extends ConsumerWidget {
       case SpeciesCategory.other:
         return Colors.grey;
     }
+  }
+
+  Future<void> _suggestForCatalog(
+    BuildContext context,
+    WidgetRef ref,
+    Species species,
+  ) async {
+    final info = await ref.read(packageInfoProvider.future);
+    if (!context.mounted) return;
+    final uri = buildSpeciesSuggestionUrl(
+      species: species,
+      locale: ref.read(localeProvider),
+      appVersion: formatAppVersion(info),
+    );
+    await launchSpeciesSuggestion(
+      context,
+      uri,
+      launch: ref.read(speciesSuggestionLaunchProvider),
+    );
   }
 
   Future<void> _openTagPicker(BuildContext context) async {

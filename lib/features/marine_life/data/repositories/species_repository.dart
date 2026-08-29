@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
@@ -137,6 +138,24 @@ class SpeciesRepository {
       scientificName: scientificName,
       category: category,
     );
+  }
+
+  /// The species whose scientific name equals [scientificName], ignoring
+  /// case, or null. Lets a lookup select an existing row (built-in or
+  /// custom) instead of creating a twin.
+  Future<domain.Species?> findSpeciesByScientificName(
+    String scientificName,
+  ) async {
+    final needle = scientificName.trim().toLowerCase();
+    if (needle.isEmpty) return null;
+    final row = await _db
+        .customSelect(
+          'SELECT id FROM species WHERE LOWER(scientific_name) = ? LIMIT 1',
+          variables: [Variable.withString(needle)],
+        )
+        .getSingleOrNull();
+    if (row == null) return null;
+    return getSpeciesById(row.data['id'] as String);
   }
 
   /// Add sighting to a dive
@@ -684,7 +703,7 @@ class SpeciesRepository {
       FROM sightings s
       JOIN species sp ON s.species_id = sp.id
       JOIN dives d ON s.dive_id = d.id
-      WHERE d.site_id = ?
+      WHERE d.site_id = ?${DiveStatsScope.and(alias: 'd')}
       GROUP BY sp.id
       ORDER BY sighting_count DESC, sp.common_name ASC
     ''',

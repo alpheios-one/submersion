@@ -4897,6 +4897,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Tengeri elet';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó',
+      one: '1 fotó',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Jegyzetek';
 
   @override
@@ -12385,6 +12396,33 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_title => 'Gáz kalkulátorok';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Legnagyobb biztonságos mélység egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Leggazdagabb keverék a célmélységhez';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Egy tervezett merülés gázfogyasztása';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Tartalék két búvár felhozatalához';
+
+  @override
+  String get gasCalculators_desc_mnd =>
+      'Narkózis szerinti mélységhatár egy keverékhez';
+
+  @override
+  String get gasCalculators_desc_blender => 'Töltési eljárás a célkeverékhez';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Válasszon egy számológépet a kezdéshez';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Vart fajok szerkesztese';
 
@@ -12525,6 +12563,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Ez a faj már nem létezik.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Mentes';
 
   @override
@@ -12631,6 +12673,80 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'Fajok keresese...';
+
+  @override
+  String get marineLife_lookup_button => 'Keresés online';
+
+  @override
+  String get marineLife_lookup_title => 'Faj keresése';
+
+  @override
+  String get marineLife_lookup_searchHint => 'Köznapi vagy tudományos név';
+
+  @override
+  String get marineLife_lookup_search => 'Keresés';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Létrehozás keresés nélkül';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Fajadatok és fotók az iNaturalisttól';
+
+  @override
+  String get marineLife_lookup_idle =>
+      'Írj be egy nevet, és koppints a Keresés gombra.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Nincs találat erre: \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline =>
+      'Úgy tűnik, nincs internetkapcsolat.';
+
+  @override
+  String get marineLife_lookup_errorTimeout =>
+      'A keresés túllépte az időkorlátot.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'Az iNaturalist hibát adott vissza. Próbáld újra később.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Váratlan válasz az iNaturalisttól.';
+
+  @override
+  String get marineLife_lookup_retry => 'Újra';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megfigyelés',
+      one: '1 megfigyelés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: válassz egy fajt';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Javaslat a katalógusba';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Nem sikerült megnyitni a böngészőt';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Link másolása';
 
   @override
   String marineLife_speciesPhotos_title(Object count) {
@@ -13975,6 +14091,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Merülőhely';
+
+  @override
+  String get media_library_filter_species => 'Faj';
 
   @override
   String get media_library_filter_trip => 'Utazás';
@@ -23736,11 +23855,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objektum ellenőrizve: $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
+    return '$checked felhőobjektum ellenőrizve ($originals eredeti, $thumbs bélyegkép, $renditions tömörített változat): $removed árva eltávolítva, $repaired javítás sorba állítva, $aborted elavult feltöltés megszakítva';
   }
 
   @override
@@ -25989,6 +26111,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
+
+  @override
+  String get reef_species_addFromLookup => 'Keresés és hozzáadás a fajaidhoz';
 
   @override
   String reef_species_showAll(int count) {
@@ -35402,4 +35527,60 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Legmagasabb';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Tartsd meg ezt a merülést a naplóban, de hagyd ki minden statisztikából, beleértve a merülésszámot is.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => 'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Csak a SAC-, RMV- és gázkeverék-statisztikákból hagyd ki ezt a merülést. Hasznos, ha a gázérték nem reprezentatív.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Kizárva a statisztikákból';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Kizárva a gázstatisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Kizárás a statisztikákból';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Kizárás a gázstatisztikákból';
+
+  @override
+  String get diveLog_filter_excludedOnly => 'Csak a statisztikákból kizártak';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Kizárva';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés kizárva a statisztikákból',
+      one: '1 merülés kizárva a statisztikákból',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statisztikák';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gáz kizárva';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Minden statisztikában szerepel';
 }

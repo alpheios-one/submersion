@@ -318,6 +318,9 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
       _showSnack(
         l10n.settings_mediaStorage_verify_summary(
           report.objectsChecked,
+          report.originalsChecked,
+          report.thumbsChecked,
+          report.renditionsChecked,
           report.orphansRemoved,
           report.repairsQueued,
           report.sessionsAborted,

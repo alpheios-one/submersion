@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
@@ -1440,6 +1441,8 @@ class DiveRepository {
               weightingFeedbackKg: Value(dive.weightingFeedbackKg),
               // Favorite flag
               isFavorite: Value(dive.isFavorite),
+              excludedFromStats: Value(dive.excludedFromStats),
+              excludedFromGasStats: Value(dive.excludedFromGasStats),
               // CCR/SCR rebreather fields (v1.5)
               diveMode: Value(dive.diveMode.code),
               setpointLow: Value(dive.setpointLow),
@@ -1695,6 +1698,8 @@ class DiveRepository {
           weightingFeedbackKg: Value(dive.weightingFeedbackKg),
           // Favorite flag
           isFavorite: Value(dive.isFavorite),
+          excludedFromStats: Value(dive.excludedFromStats),
+          excludedFromGasStats: Value(dive.excludedFromGasStats),
           // CCR/SCR rebreather fields (v1.5)
           diveMode: Value(dive.diveMode.code),
           setpointLow: Value(dive.setpointLow),
@@ -2054,6 +2059,9 @@ class DiveRepository {
     );
   }
 
+  // stats-scope-exempt: the logbook list itself. It SELECTS the exclusion
+  // columns so the row can render its badge, but must never filter on them:
+  // an excluded dive is still in the logbook and still shown.
   Future<List<DiveSummary>> getDiveSummaries({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2121,7 +2129,8 @@ class DiveRepository {
             'd.id, d.dive_number, d.name AS dive_name, '
             'd.dive_date_time, d.entry_time, '
             'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-            'd.is_favorite, d.dive_type, d.dive_mode, '
+            'd.is_favorite, d.excluded_from_stats, d.excluded_from_gas_stats, '
+            'd.dive_type, d.dive_mode, '
             'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
             's.name AS site_name, s.country AS site_country, '
             's.region AS site_region, s.latitude AS site_latitude, '
@@ -2172,6 +2181,7 @@ class DiveRepository {
   ///
   /// Used to compute previous/next navigation from the detail page. Distinct
   /// from [getPreviousDive], which is the chronological surface-interval query.
+  // stats-scope-exempt: drives detail-page next/prev over the displayed list
   Future<List<String>> getOrderedDiveIds({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2227,6 +2237,12 @@ class DiveRepository {
   /// Get total count of dives matching the given filters.
   ///
   /// Used to display "X dives" in the UI header without loading all data.
+  ///
+  /// Deliberately does NOT apply [DiveStatsScope]: an excluded dive is still
+  /// in the logbook and the list still shows it, so the header still counts
+  /// it. Only descriptive *statistics* honour the exclusion. Do not "fix"
+  /// this; see the design doc and the census test's exemption list.
+  // stats-scope-exempt: logbook list header, not a statistic
   Future<int> getDiveCount({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -2274,6 +2290,7 @@ class DiveRepository {
   ///
   /// Only called while the deco filter is active, which keeps the scan over
   /// `dive_profiles` off the default dive-list load.
+  // stats-scope-exempt: backs a view-filter axis; consumers apply the scope themselves
   Future<Set<String>> getDiveIdsWithDecoSignal({
     required bool wantDeco,
     String? diverId,
@@ -2344,6 +2361,7 @@ class DiveRepository {
 
   /// Translates each active filter field into parameterized SQL.
   /// Junction-table filters (tags, equipment, buddies) use EXISTS subqueries.
+  // stats-scope-exempt: this IS the view filter; the scope is applied alongside it
   void _buildFilterWhereClauses(
     DiveFilterState filter,
     List<String> clauses,
@@ -2387,6 +2405,9 @@ class DiveRepository {
     }
     if (filter.favoritesOnly == true) {
       clauses.add('d.is_favorite = 1');
+    }
+    if (filter.excludedFromStatsOnly == true) {
+      clauses.add('d.excluded_from_stats = 1');
     }
     if (filter.decoOnly != null) {
       clauses.add(
@@ -2634,6 +2655,7 @@ class DiveRepository {
   /// Note: This returns the next number after the highest existing number,
   /// which may not be chronologically correct. Use [getDiveNumberForDate]
   /// for chronologically-based numbering.
+  // stats-scope-exempt: numbering integrity, must see every dive or it reuses a number
   Future<int> getNextDiveNumber({String? diverId}) async {
     try {
       final String sql;
@@ -2688,6 +2710,7 @@ class DiveRepository {
   /// hydrating search whose roughly-ten-queries-per-match N+1 dominated
   /// search cost on large databases (docs/superpowers/specs/2026-07-10-
   /// large-db-performance-findings.md).
+  // stats-scope-exempt: search results are a displayed list, like the logbook
   Future<List<DiveSummary>> searchDiveSummaries(
     String query, {
     String? diverId,
@@ -2768,6 +2791,9 @@ class DiveRepository {
 
   /// Loads [DiveSummary] rows for [ids] (slim SELECT plus batched tags and
   /// dive types), ordered most recent first.
+  // stats-scope-exempt: hydrates rows for an already-chosen id set. It
+  // SELECTS the exclusion columns for the list badge and must not filter on
+  // them; whoever produced the ids decided what belongs.
   Future<List<DiveSummary>> _summariesForIds(
     List<String> ids, {
     Set<String> disabledSafetyRules = const {},
@@ -2784,7 +2810,8 @@ class DiveRepository {
           'd.id, d.dive_number, d.name AS dive_name, '
           'd.dive_date_time, d.entry_time, '
           'd.max_depth, d.bottom_time, d.runtime, d.water_temp, d.rating, '
-          'd.is_favorite, d.dive_type, d.dive_mode, '
+          'd.is_favorite, d.excluded_from_stats, d.excluded_from_gas_stats, '
+          'd.dive_type, d.dive_mode, '
           'COALESCE(d.entry_time, d.dive_date_time) AS sort_timestamp, '
           's.name AS site_name, s.country AS site_country, '
           's.region AS site_region, s.latitude AS site_latitude, '
@@ -2847,6 +2874,8 @@ class DiveRepository {
         waterTemp: row.readNullable<double>('water_temp'),
         rating: row.readNullable<int>('rating'),
         isFavorite: row.read<int>('is_favorite') == 1,
+        excludedFromStats: row.read<int>('excluded_from_stats') == 1,
+        excludedFromGasStats: row.read<int>('excluded_from_gas_stats') == 1,
         diveMode: DiveMode.fromCode(row.read<String>('dive_mode')),
         diveTypeIds: diveTypesByDive[id] ?? [row.read<String>('dive_type')],
         tags: tagsByDive[id] ?? [],
@@ -2884,12 +2913,20 @@ class DiveRepository {
       final df = buildFilteredDiveIdSubquery(filter);
       // params are always non-null so `p!` is safe.
       final filterVars = df.params.map((p) => Variable<Object>(p!)).toList();
-      // Clause fragments per table alias used below.
-      final fBare = df.subquery.isEmpty ? '' : 'AND id IN (${df.subquery})';
-      final fAliasD = df.subquery.isEmpty ? '' : 'AND d.id IN (${df.subquery})';
+      // Clause fragments per table alias used below. The statistics scope is
+      // unconditional; the diver's view filter is appended only when active.
+      final scopeBare = DiveStatsScope.and(alias: 'dives');
+      final scopeAliasD = DiveStatsScope.and(alias: 'd');
+      final fBare = df.subquery.isEmpty
+          ? scopeBare
+          : '$scopeBare AND id IN (${df.subquery})';
+      final fAliasD = df.subquery.isEmpty
+          ? scopeAliasD
+          : '$scopeAliasD AND d.id IN (${df.subquery})';
       // WHERE-prefix helpers so an empty base WHERE still starts correctly.
+      // Always emits a WHERE now, because the scope is never empty.
       final basicWhere = whereClause.isEmpty
-          ? (df.subquery.isEmpty ? '' : 'WHERE id IN (${df.subquery})')
+          ? 'WHERE 1=1 $fBare'
           : '$whereClause $fBare';
       vars.addAll(filterVars);
 
@@ -2982,7 +3019,7 @@ class DiveRepository {
       // Top sites
       final siteWhereClause = diverId != null
           ? 'WHERE d.diver_id = ? $fAliasD'
-          : (df.subquery.isEmpty ? '' : 'WHERE 1=1 $fAliasD');
+          : 'WHERE 1=1 $fAliasD';
       final siteStats = await _db.customSelect('''
       SELECT
         s.id as site_id,
@@ -3053,18 +3090,22 @@ class DiveRepository {
       // Every statement below binds the same `vars` list, so the diver `?` must
       // always precede the filter `?`s -- hence the fixed clause order.
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+      // The statistics scope is unconditional: an excluded dive must never
+      // surface as a personal record. The view filter is appended only when
+      // the diver has active axes.
       final filterClause = df.subquery.isEmpty
-          ? ''
-          : 'AND d.id IN (${df.subquery})';
+          ? DiveStatsScope.and(alias: 'd')
+          : '${DiveStatsScope.and(alias: 'd')} '
+                'AND d.id IN (${df.subquery})';
       // The first/last statements have no WHERE of their own, so their scope
-      // clauses have to open one.
+      // clauses have to open one. The scope predicate binds no placeholders,
+      // so listing it first cannot disturb the fixed `?` order.
       final scopeConditions = [
+        DiveStatsScope.predicate(alias: 'd'),
         if (diverId != null) 'd.diver_id = ?',
         if (df.subquery.isNotEmpty) 'd.id IN (${df.subquery})',
       ];
-      final diverFilterFirst = scopeConditions.isEmpty
-          ? ''
-          : 'WHERE ${scopeConditions.join(' AND ')}';
+      final diverFilterFirst = 'WHERE ${scopeConditions.join(' AND ')}';
 
       // Deepest dive
       final deepestResult = await _db.customSelect('''
@@ -3193,7 +3234,8 @@ class DiveRepository {
     final row = await _db
         .customSelect(
           'SELECT COUNT(*) AS c FROM dives '
-          'WHERE dive_date_time > ? $diverFilter',
+          'WHERE dive_date_time > ? $diverFilter'
+          '${DiveStatsScope.and(alias: 'dives')}',
           variables: [
             Variable<int>(since.millisecondsSinceEpoch),
             if (diverId != null) Variable<String>(diverId),
@@ -3223,6 +3265,7 @@ class DiveRepository {
           "AND CAST(strftime('%Y', dive_date_time / 1000, 'unixepoch') "
           "AS INTEGER) != ? "
           "$diverFilter"
+          "${DiveStatsScope.and(alias: 'dives')} "
           "ORDER BY dive_date_time DESC LIMIT ?",
           variables: [
             Variable<String>(monthDay),
@@ -3279,7 +3322,12 @@ class DiveRepository {
     final vars = diverId != null
         ? [Variable<String>(diverId)]
         : <Variable<Object>>[];
-    final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+    // The statistics scope rides along with the diver filter, which every
+    // statement below already interpolates: an excluded or planned dive must
+    // never win a personal record.
+    final diverFilter = diverId != null
+        ? 'AND d.diver_id = ?${DiveStatsScope.and(alias: 'd')}'
+        : DiveStatsScope.and(alias: 'd');
 
     Future<String?> winner(String where, String orderBy) async {
       final row = await _db
@@ -3587,6 +3635,8 @@ class DiveRepository {
       equipment: equipment,
       weights: const [], // Weights not loaded for list views (use detail view)
       isFavorite: row.isFavorite,
+      excludedFromStats: row.excludedFromStats,
+      excludedFromGasStats: row.excludedFromGasStats,
       tags: tags,
       // CCR/SCR rebreather fields (v1.5)
       diveMode: DiveMode.fromCode(row.diveMode),
@@ -3969,6 +4019,8 @@ class DiveRepository {
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
+      excludedFromStats: row.excludedFromStats,
+      excludedFromGasStats: row.excludedFromGasStats,
       tags: tags,
       // CCR/SCR rebreather fields (v1.5)
       diveMode: DiveMode.fromCode(row.diveMode),
@@ -4635,6 +4687,7 @@ class DiveRepository {
   /// classifier: end time (exit time, else entry/date + runtime) plus a
   /// had-deco flag derived from the recorded profile (any sample with
   /// deco_type = 2 or a positive ceiling).
+  // stats-scope-exempt: flying-after-diving safety, an excluded dive still off-gassed
   Future<List<NoFlyDiveInput>> getNoFlyDiveInputs({
     required DateTime since,
     String? diverId,
@@ -4729,6 +4782,7 @@ class DiveRepository {
   /// [getPreviousDiveTimes]) rather than full hydration: the formula needs
   /// only timestamps and effective runtime, and this method sits on the
   /// residual-decompression lookback hot path (WS2, large-DB performance).
+  // stats-scope-exempt: physiological interval between real dives, not a statistic
   Future<Duration?> getSurfaceInterval(String diveId) async {
     try {
       final current = await getDiveTimes(diveId);
@@ -5147,6 +5201,7 @@ class DiveRepository {
   /// [diverId] - If non-null, only operates on that diver's dives. The
   /// MIN(dive_number) used as the starting point is also scoped, so each
   /// diver preserves their own numbering baseline.
+  // stats-scope-exempt: renumbering integrity, must see every dive
   Future<void> assignMissingDiveNumbers({String? diverId}) async {
     try {
       _log.info(
@@ -6185,6 +6240,7 @@ class DiveRepository {
   /// When [diverId] is provided, the result is restricted to that diver's
   /// dives — callers that have already scoped `existingDives` to a single
   /// diver should pass it here so the key map shares the same scope.
+  // stats-scope-exempt: import dedupe fingerprints, must see every dive or it re-imports
   Future<Map<String, Set<String>>> getSourceKeysByDiveId({
     String? diverId,
   }) async {

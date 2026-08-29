@@ -45,6 +45,8 @@ class FormRow extends StatefulWidget {
     this.decoration,
     this.profileSuggestion,
   }) : _kind = _RowKind.text,
+       enabled = true,
+       helpText = null,
        value = null,
        onTap = null,
        onClear = null,
@@ -62,6 +64,8 @@ class FormRow extends StatefulWidget {
     this.placeholder,
     this.onClear,
   }) : _kind = _RowKind.picker,
+       enabled = true,
+       helpText = null,
        profileSuggestion = null,
        decoration = null,
        controller = null,
@@ -80,6 +84,8 @@ class FormRow extends StatefulWidget {
 
   const FormRow.display({super.key, required this.label, required this.value})
     : _kind = _RowKind.display,
+      enabled = true,
+      helpText = null,
       profileSuggestion = null,
       decoration = null,
       controller = null,
@@ -99,11 +105,16 @@ class FormRow extends StatefulWidget {
       onIntChanged = null,
       child = null;
 
+  /// Set [enabled] to false to render the switch in its current position but
+  /// inert, for a value that is implied by another control rather than freely
+  /// chosen. Prefer this over silently overriding what the user picked.
   const FormRow.toggle({
     super.key,
     required this.label,
     required bool value,
     required ValueChanged<bool> onChanged,
+    this.enabled = true,
+    this.helpText,
   }) : _kind = _RowKind.toggle,
        profileSuggestion = null,
        decoration = null,
@@ -132,6 +143,8 @@ class FormRow extends StatefulWidget {
     required ValueChanged<int> onChanged,
     this.onClear,
   }) : _kind = _RowKind.rating,
+       enabled = true,
+       helpText = null,
        profileSuggestion = null,
        decoration = null,
        inputFormatters = null,
@@ -153,6 +166,8 @@ class FormRow extends StatefulWidget {
 
   const FormRow.custom({super.key, required this.label, required this.child})
     : _kind = _RowKind.custom,
+      enabled = true,
+      helpText = null,
       profileSuggestion = null,
       decoration = null,
       controller = null,
@@ -171,6 +186,13 @@ class FormRow extends StatefulWidget {
       onBoolChanged = null,
       intValue = null,
       onIntChanged = null;
+
+  /// Toggle rows only: false renders the switch inert.
+  final bool enabled;
+
+  /// Optional explanatory line rendered under the row, for a control whose
+  /// label cannot carry the whole meaning on its own.
+  final String? helpText;
 
   final _RowKind _kind;
   final String label;
@@ -267,8 +289,30 @@ class _FormRowState extends State<FormRow> {
         ],
       ),
     );
-    if (onTap == null) return row;
-    return InkWell(onTap: onTap, child: row);
+    final help = widget.helpText;
+    final content = help == null
+        ? row
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              row,
+              Padding(
+                padding: EdgeInsets.only(
+                  left: FormStyle.rowPadding.left,
+                  right: FormStyle.rowPadding.right,
+                  bottom: FormStyle.rowPadding.bottom,
+                ),
+                child: Text(
+                  help,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          );
+    if (onTap == null) return content;
+    return InkWell(onTap: onTap, child: content);
   }
 
   @override
@@ -416,7 +460,7 @@ class _FormRowState extends State<FormRow> {
           context,
           trailing: Switch(
             value: widget.boolValue!,
-            onChanged: widget.onBoolChanged,
+            onChanged: widget.enabled ? widget.onBoolChanged : null,
           ),
         );
 

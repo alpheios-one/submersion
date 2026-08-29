@@ -1749,6 +1749,7 @@
   "diveLog_detail_section_diveProfile": "פרופיל צלילה",
   "diveLog_detail_section_equipment": "ציוד",
   "diveLog_detail_section_marineLife": "חיים ימיים",
+  "diveLog_detail_sightingPhotos": "{count, plural, =1{תמונה אחת} other{{count} תמונות}}",
   "diveLog_detail_section_notes": "הערות",
   "diveLog_detail_section_oxygenToxicity": "רעילות חמצן",
   "diveLog_detail_section_sacRateBySegment": "צריכת גז לפי מקטע",
@@ -3765,6 +3766,13 @@
   "gasCalculators_tab_rockBottom": "Rock Bottom",
   "gasCalculators_tankSize": "גודל מיכל",
   "gasCalculators_title": "מחשבוני גז",
+  "gasCalculators_desc_mod": "העומק הבטוח המרבי לתערובת",
+  "gasCalculators_desc_bestMix": "התערובת העשירה ביותר לעומק היעד",
+  "gasCalculators_desc_consumption": "כמות הגז שצלילה מתוכננת תצרוך",
+  "gasCalculators_desc_rockBottom": "רזרבה להעלאת שני צוללנים",
+  "gasCalculators_desc_mnd": "גבול עומק הנרקוזה לתערובת",
+  "gasCalculators_desc_blender": "נוהל מילוי לתערובת היעד",
+  "gasCalculators_summary_prompt": "בחר מחשבון כדי להתחיל",
   "gpsLogger_androidNotificationText": "מקליט את מסלול פני המים",
   "gpsLogger_androidNotificationTitle": "מקליט ה-GPS של Submersion",
   "gpsLogger_deleteTrackMessage": "פעולה זו תסיר את מסלול ה-GPS שהוקלט. מיקומים שכבר הוצמדו לצלילות יישמרו.",
@@ -3958,6 +3966,7 @@
   "marineLife_speciesEdit_editTitle": "ערוך מין",
   "marineLife_speciesEdit_errorLoading": "שגיאה בטעינת מין: {error}",
   "marineLife_speciesEdit_errorSaving": "שגיאה בשמירת מין: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "מין זה כבר אינו קיים.",
   "marineLife_speciesEdit_saveButton": "שמירה",
   "marineLife_speciesEdit_scientificNameHint": "לדוגמה, Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "שם מדעי",
@@ -3987,6 +3996,24 @@
   "marineLife_speciesManage_resetSuccess": "המינים המובנים שוחזרו לברירת מחדל",
   "marineLife_speciesManage_resetToDefaults": "איפוס לברירת מחדל",
   "marineLife_speciesManage_searchHint": "חיפוש מינים...",
+  "marineLife_lookup_button": "חיפוש מקוון",
+  "marineLife_lookup_title": "חיפוש מין",
+  "marineLife_lookup_searchHint": "שם עממי או מדעי",
+  "marineLife_lookup_search": "חיפוש",
+  "marineLife_lookup_createWithout": "יצירה ללא חיפוש",
+  "marineLife_lookup_attribution": "נתוני מינים ותמונות מ-iNaturalist",
+  "marineLife_lookup_idle": "הקלידו שם והקישו על חיפוש.",
+  "marineLife_lookup_empty": "לא נמצאו מינים עבור \"{query}\"",
+  "marineLife_lookup_errorOffline": "נראה שאין חיבור לאינטרנט.",
+  "marineLife_lookup_errorTimeout": "תם הזמן המוקצב לחיפוש.",
+  "marineLife_lookup_errorServer": "iNaturalist החזיר שגיאה. נסו שוב מאוחר יותר.",
+  "marineLife_lookup_errorMalformed": "תגובה לא צפויה מ-iNaturalist.",
+  "marineLife_lookup_retry": "ניסיון חוזר",
+  "marineLife_lookup_observations": "{count, plural, =1{תצפית אחת} other{{count} תצפיות}}",
+  "marineLife_lookup_unresolvableRank": "{rank}: בחרו מין",
+  "marineLife_speciesDetail_suggestForCatalog": "הצעה לקטלוג",
+  "marineLife_suggest_couldNotOpen": "לא ניתן לפתוח את הדפדפן",
+  "marineLife_suggest_copyLink": "העתקת קישור",
   "marineLife_speciesPhotos_title": "תמונות ({count})",
   "marineLife_speciesPhotos_empty": "תמונות שתויגו במין זה יופיעו כאן.",
   "marineLife_speciesPhotos_tagPhotos": "תיוג תמונות",
@@ -4303,6 +4330,7 @@
   "media_library_unlinkSelected": "בטל קישור",
   "media_library_selectedCount": "{count} נבחרו",
   "media_library_filter_site": "אתר",
+  "media_library_filter_species": "מין",
   "media_library_filter_trip": "טיול",
   "media_library_filter_dates": "תאריכים",
   "media_library_filter_missing": "קבצים חסרים",
@@ -6729,7 +6757,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} ממתינים לניסיון חוזר",
   "settings_mediaStorage_verify_action": "אימות הספרייה",
   "settings_mediaStorage_verify_running": "מאמת את ספריית המדיה...",
-  "settings_mediaStorage_verify_summary": "נבדקו {checked} אובייקטים: הוסרו {removed} יתומים, {repaired} תיקונים נוספו לתור, {aborted} העלאות ישנות בוטלו",
+  "settings_mediaStorage_verify_summary": "נבדקו {checked} אובייקטים בענן ({originals, plural, =1{מקורי אחד} other{{originals} מקוריים}}, {thumbs, plural, =1{תמונה ממוזערת אחת} other{{thumbs} תמונות ממוזערות}}, {renditions, plural, =1{גרסה דחוסה אחת} other{{renditions} גרסאות דחוסות}}): הוסרו {removed} יתומים, {repaired} תיקונים נוספו לתור, {aborted} העלאות ישנות בוטלו",
   "settings_mediaStorage_backfill_action": "העלה ספריה קיימת",
   "settings_mediaStorage_backfill_enqueued": "{count} העלאות בתור",
   "settings_mediaStorage_policy_autoUpload": "העלה תמונות אוטומטית",
@@ -7331,15 +7359,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{לא בוצעה התעלמות מתצפיות} =1{בוצעה התעלמות מתצפית אחת} other{בוצעה התעלמות מ-{count} תצפיות}}, {failed, plural, =1{לא ניתן היה לעדכן צלילה אחת} other{לא ניתן היה לעדכן {failed} צלילות}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "לא ניתן לקרוא את רשימת הצלילות. דבר לא שונה.",
   "safetySettings_analyzeAll_failed": "לא ניתן לנתח את הצלילות.",
   "safetyReview_details": "פרטים",
@@ -7781,6 +7809,7 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "תועד בסביבה",
   "reef_species_addToExpected": "הוספה למינים צפויים",
+  "reef_species_addFromLookup": "חיפוש והוספה למינים שלכם",
   "reef_species_showAll": "הצג הכול ({count})",
   "reef_species_showFewer": "הצג פחות",
   "reef_attribution_title": "מקורות נתוני השונית",
@@ -10386,5 +10415,19 @@
   "diveLog_filter_presetLast5Years": "5 השנים האחרונות",
   "diveLog_filter_presetLast10Years": "10 השנים האחרונות",
   "statistics_trend_tooltip_lowest": "הנמוך ביותר",
-  "statistics_trend_tooltip_highest": "הגבוה ביותר"
+  "statistics_trend_tooltip_highest": "הגבוה ביותר",
+  "diveLog_edit_excludeFromStats": "החרג מהסטטיסטיקות",
+  "diveLog_edit_excludeFromStatsHelp": "השאר את הצלילה ביומן, אך החרג אותה מכל סטטיסטיקה, כולל מספר הצלילות שלך.",
+  "diveLog_edit_excludeFromGasStats": "החרג מסטטיסטיקות הגז",
+  "diveLog_edit_excludeFromGasStatsHelp": "החרג את הצלילה מסטטיסטיקות SAC, RMV ותערובת גז בלבד. שימושי כאשר ערך הגז אינו מייצג.",
+  "diveLog_badge_excludedFromStats": "מוחרגת מהסטטיסטיקות",
+  "diveLog_badge_excludedFromGasStats": "מוחרגת מסטטיסטיקות הגז",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "החרג מהסטטיסטיקות",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "החרג מסטטיסטיקות הגז",
+  "diveLog_filter_excludedOnly": "רק המוחרגות מהסטטיסטיקות",
+  "diveLog_edit_summary_excluded": "מוחרגת",
+  "statistics_excludedDivesFootnote": "{count, plural, one{צלילה אחת מוחרגת מהסטטיסטיקות} two{שתי צלילות מוחרגות מהסטטיסטיקות} many{{count} צלילות מוחרגות מהסטטיסטיקות} other{{count} צלילות מוחרגות מהסטטיסטיקות}}",
+  "diveLog_edit_group_statistics": "סטטיסטיקות",
+  "diveLog_edit_summary_gasExcluded": "הגז הוחרג",
+  "diveLog_edit_statisticsIncludedHint": "נכללת בכל הסטטיסטיקות"
 }

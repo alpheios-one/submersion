@@ -1822,6 +1822,7 @@
   "diveLog_detail_section_diveProfile": "Perfil de inmersión",
   "diveLog_detail_section_equipment": "Equipo",
   "diveLog_detail_section_marineLife": "Vida marina",
+  "diveLog_detail_sightingPhotos": "{count, plural, =1{1 foto} other{{count} fotos}}",
   "diveLog_detail_section_notes": "Notas",
   "diveLog_detail_section_oxygenToxicity": "Toxicidad del oxígeno",
   "diveLog_detail_section_sacRateBySegment": "Consumo de gas por segmento",
@@ -3838,6 +3839,13 @@
   "gasCalculators_tab_rockBottom": "Rock Bottom",
   "gasCalculators_tankSize": "Tamaño de Botella",
   "gasCalculators_title": "Calculadoras de Gas",
+  "gasCalculators_desc_mod": "Profundidad máxima segura para una mezcla",
+  "gasCalculators_desc_bestMix": "Mezcla más rica para una profundidad objetivo",
+  "gasCalculators_desc_consumption": "Gas que consumirá una inmersión planificada",
+  "gasCalculators_desc_rockBottom": "Reserva para ascender dos buceadores",
+  "gasCalculators_desc_mnd": "Profundidad narcótica límite de una mezcla",
+  "gasCalculators_desc_blender": "Procedimiento de llenado para una mezcla objetivo",
+  "gasCalculators_summary_prompt": "Seleccione una calculadora para empezar",
   "gpsLogger_androidNotificationText": "Grabando tu track de superficie",
   "gpsLogger_androidNotificationTitle": "Registrador GPS de Submersion",
   "gpsLogger_deleteTrackMessage": "Elimina el track GPS grabado. Las posiciones ya asignadas a las inmersiones se conservan.",
@@ -4031,6 +4039,7 @@
   "marineLife_speciesEdit_editTitle": "Editar especie",
   "marineLife_speciesEdit_errorLoading": "Error al cargar especie: {error}",
   "marineLife_speciesEdit_errorSaving": "Error al guardar especie: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "Esta especie ya no existe.",
   "marineLife_speciesEdit_saveButton": "Guardar",
   "marineLife_speciesEdit_scientificNameHint": "ej., Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Nombre cientifico",
@@ -4060,6 +4069,24 @@
   "marineLife_speciesManage_resetSuccess": "Especies integradas restauradas a valores predeterminados",
   "marineLife_speciesManage_resetToDefaults": "Restablecer a valores predeterminados",
   "marineLife_speciesManage_searchHint": "Buscar especies...",
+  "marineLife_lookup_button": "Buscar en línea",
+  "marineLife_lookup_title": "Buscar una especie",
+  "marineLife_lookup_searchHint": "Nombre común o científico",
+  "marineLife_lookup_search": "Buscar",
+  "marineLife_lookup_createWithout": "Crear sin buscar",
+  "marineLife_lookup_attribution": "Datos y fotos de especies de iNaturalist",
+  "marineLife_lookup_idle": "Escribe un nombre y toca Buscar.",
+  "marineLife_lookup_empty": "No se encontraron especies para \"{query}\"",
+  "marineLife_lookup_errorOffline": "Parece que no tienes conexión.",
+  "marineLife_lookup_errorTimeout": "La búsqueda tardó demasiado.",
+  "marineLife_lookup_errorServer": "iNaturalist devolvió un error. Inténtalo más tarde.",
+  "marineLife_lookup_errorMalformed": "Respuesta inesperada de iNaturalist.",
+  "marineLife_lookup_retry": "Reintentar",
+  "marineLife_lookup_observations": "{count, plural, =1{1 observación} other{{count} observaciones}}",
+  "marineLife_lookup_unresolvableRank": "{rank}: elige una especie",
+  "marineLife_speciesDetail_suggestForCatalog": "Sugerir para el catálogo",
+  "marineLife_suggest_couldNotOpen": "No se pudo abrir el navegador",
+  "marineLife_suggest_copyLink": "Copiar enlace",
   "marineLife_speciesPhotos_title": "Fotos ({count})",
   "marineLife_speciesPhotos_empty": "Las fotos etiquetadas con esta especie aparecen aquí.",
   "marineLife_speciesPhotos_tagPhotos": "Etiquetar fotos",
@@ -4376,6 +4403,7 @@
   "media_library_unlinkSelected": "Desvincular",
   "media_library_selectedCount": "{count} seleccionados",
   "media_library_filter_site": "Sitio",
+  "media_library_filter_species": "Especie",
   "media_library_filter_trip": "Viaje",
   "media_library_filter_dates": "Fechas",
   "media_library_filter_missing": "Archivos faltantes",
@@ -6729,7 +6757,7 @@
   "settings_mediaStorage_transfers_waitingRetry": "{count} esperando para reintentar",
   "settings_mediaStorage_verify_action": "Verificar biblioteca",
   "settings_mediaStorage_verify_running": "Verificando la biblioteca multimedia...",
-  "settings_mediaStorage_verify_summary": "Se comprobaron {checked} objetos: {removed} huérfanos eliminados, {repaired} reparaciones en cola, {aborted} subidas obsoletas canceladas",
+  "settings_mediaStorage_verify_summary": "Se comprobaron {checked} objetos en la nube ({originals, plural, =1{1 original} other{{originals} originales}}, {thumbs, plural, =1{1 miniatura} other{{thumbs} miniaturas}}, {renditions, plural, =1{1 versión comprimida} other{{renditions} versiones comprimidas}}): {removed} huérfanos eliminados, {repaired} reparaciones en cola, {aborted} subidas obsoletas canceladas",
   "settings_mediaStorage_backfill_action": "Subir biblioteca existente",
   "settings_mediaStorage_backfill_enqueued": "{count} subidas en cola",
   "settings_mediaStorage_policy_autoUpload": "Subir fotos automáticamente",
@@ -7331,15 +7359,15 @@
   },
   "safetySettings_dismissAll_doneWithErrors": "{count, plural, =0{No se descartó ninguna observación} =1{1 observación descartada} other{{count} observaciones descartadas}}, {failed, plural, =1{no se pudo actualizar 1 inmersión} other{no se pudieron actualizar {failed} inmersiones}}",
   "@safetySettings_dismissAll_doneWithErrors": {
-  "placeholders": {
-    "count": {
-      "type": "int"
-    },
-    "failed": {
-      "type": "int"
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
     }
-  }
-},
+  },
   "safetySettings_dismissAll_failed": "No se pudo leer la lista de inmersiones. No se cambió nada.",
   "safetySettings_analyzeAll_failed": "No se pudieron analizar las inmersiones.",
   "safetyReview_details": "Detalles",
@@ -7781,6 +7809,7 @@
   "reef_protection_iucn": "IUCN {category}",
   "reef_species_recordedNearby": "Registrado cerca",
   "reef_species_addToExpected": "Añadir a especies esperadas",
+  "reef_species_addFromLookup": "Buscar y añadir a tus especies",
   "reef_species_showAll": "Mostrar las {count}",
   "reef_species_showFewer": "Mostrar menos",
   "reef_attribution_title": "Fuentes de datos del arrecife",
@@ -10386,5 +10415,19 @@
   "diveLog_filter_presetLast5Years": "Últimos 5 años",
   "diveLog_filter_presetLast10Years": "Últimos 10 años",
   "statistics_trend_tooltip_lowest": "Mínimo",
-  "statistics_trend_tooltip_highest": "Máximo"
+  "statistics_trend_tooltip_highest": "Máximo",
+  "diveLog_edit_excludeFromStats": "Excluir de las estadísticas",
+  "diveLog_edit_excludeFromStatsHelp": "Mantén esta inmersión en tu cuaderno, pero déjala fuera de todas las estadísticas, incluido tu número de inmersiones.",
+  "diveLog_edit_excludeFromGasStats": "Excluir de las estadísticas de gas",
+  "diveLog_edit_excludeFromGasStatsHelp": "Deja esta inmersión fuera solo de las estadísticas de SAC, RMV y mezcla de gas. Útil cuando el valor de gas no es representativo.",
+  "diveLog_badge_excludedFromStats": "Excluida de las estadísticas",
+  "diveLog_badge_excludedFromGasStats": "Excluida de las estadísticas de gas",
+  "diveLog_bulkEdit_fieldExcludeFromStats": "Excluir de las estadísticas",
+  "diveLog_bulkEdit_fieldExcludeFromGasStats": "Excluir de las estadísticas de gas",
+  "diveLog_filter_excludedOnly": "Solo las excluidas de las estadísticas",
+  "diveLog_edit_summary_excluded": "Excluida",
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 inmersión excluida de las estadísticas} other{{count} inmersiones excluidas de las estadísticas}}",
+  "diveLog_edit_group_statistics": "Estadísticas",
+  "diveLog_edit_summary_gasExcluded": "Gas excluido",
+  "diveLog_edit_statisticsIncludedHint": "Incluida en todas las estadísticas"
 }

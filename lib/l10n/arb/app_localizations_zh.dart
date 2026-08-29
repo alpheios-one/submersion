@@ -4675,6 +4675,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_marineLife => '海洋生物';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 张照片',
+      one: '1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => '备注';
 
   @override
@@ -11839,6 +11850,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_title => '气体计算器';
 
   @override
+  String get gasCalculators_desc_mod => '混合气体的最大安全深度';
+
+  @override
+  String get gasCalculators_desc_bestMix => '目标深度的最佳富氧混合气';
+
+  @override
+  String get gasCalculators_desc_consumption => '计划潜水的耗气量';
+
+  @override
+  String get gasCalculators_desc_rockBottom => '两名潜水员上升所需的储备气';
+
+  @override
+  String get gasCalculators_desc_mnd => '混合气体的麻醉深度极限';
+
+  @override
+  String get gasCalculators_desc_blender => '目标混合气的充填流程';
+
+  @override
+  String get gasCalculators_summary_prompt => '选择一个计算器开始';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip => '编辑预期物种';
 
   @override
@@ -11970,6 +12002,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage => '该物种已不存在。';
+
+  @override
   String get marineLife_speciesEdit_saveButton => '保存';
 
   @override
@@ -12073,6 +12108,72 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => '搜索物种...';
+
+  @override
+  String get marineLife_lookup_button => '在线查找';
+
+  @override
+  String get marineLife_lookup_title => '查找物种';
+
+  @override
+  String get marineLife_lookup_searchHint => '常用名或学名';
+
+  @override
+  String get marineLife_lookup_search => '查找';
+
+  @override
+  String get marineLife_lookup_createWithout => '不查找直接创建';
+
+  @override
+  String get marineLife_lookup_attribution => '物种数据和照片来自 iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => '输入名称，然后点按“查找”。';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return '未找到与“$query”匹配的物种';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => '你似乎处于离线状态。';
+
+  @override
+  String get marineLife_lookup_errorTimeout => '查找超时。';
+
+  @override
+  String get marineLife_lookup_errorServer => 'iNaturalist 返回了错误。请稍后重试。';
+
+  @override
+  String get marineLife_lookup_errorMalformed => '来自 iNaturalist 的意外响应。';
+
+  @override
+  String get marineLife_lookup_retry => '重试';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条观察记录',
+      one: '1 条观察记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank：请选择一个物种';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog => '推荐加入目录';
+
+  @override
+  String get marineLife_suggest_couldNotOpen => '无法打开浏览器';
+
+  @override
+  String get marineLife_suggest_copyLink => '复制链接';
 
   @override
   String marineLife_speciesPhotos_title(Object count) {
@@ -13363,6 +13464,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_species => '物种';
 
   @override
   String get media_library_filter_trip => '行程';
@@ -22596,11 +22700,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '已检查 $checked 个对象：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
+    return '已检查 $checked 个云端对象（$originals 个原图、$thumbs 个缩略图、$renditions 个压缩版本）：移除 $removed 个孤立文件，排队 $repaired 个修复，中止 $aborted 个过期上传';
   }
 
   @override
@@ -24751,6 +24858,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String get reef_species_addFromLookup => '查找并添加到你的物种';
 
   @override
   String reef_species_showAll(int count) {
@@ -33461,4 +33571,55 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => '最高';
+
+  @override
+  String get diveLog_edit_excludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      '将此潜水保留在日志中，但将其排除在所有统计之外，包括潜水次数。';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      '仅将此潜水排除在 SAC、RMV 和气体混合统计之外。当气体数值不具代表性时很有用。';
+
+  @override
+  String get diveLog_badge_excludedFromStats => '已从统计中排除';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats => '已从气体统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats => '从统计中排除';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats => '从气体统计中排除';
+
+  @override
+  String get diveLog_filter_excludedOnly => '仅显示已排除的潜水';
+
+  @override
+  String get diveLog_edit_summary_excluded => '已排除';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水已从统计中排除',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => '统计';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => '已排除气体';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
 }

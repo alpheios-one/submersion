@@ -129,6 +129,13 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     conditions.add('is_favorite = 1');
   }
 
+  // Finds the dives the diver excluded. Enforcement of the exclusion is
+  // DiveStatsScope's job and is applied alongside this subquery, never
+  // inside it.
+  if (filter.excludedFromStatsOnly == true) {
+    conditions.add('excluded_from_stats = 1');
+  }
+
   if (filter.decoOnly != null) {
     conditions.add(
       decoSignalCondition(wantDeco: filter.decoOnly!, diveIdRef: 'dives.id'),

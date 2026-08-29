@@ -17,6 +17,14 @@ class DiveFilterState {
   final double? maxDepth;
   final bool? favoritesOnly;
 
+  /// When true, keep only dives the diver excluded from statistics, so
+  /// they can find and review them (#526). Null means this axis is off.
+  ///
+  /// This is a view filter for *finding* excluded dives. It plays no part
+  /// in enforcing the exclusion; that is DiveStatsScope's job and applies
+  /// unconditionally, whether or not this axis is set.
+  final bool? excludedFromStatsOnly;
+
   /// Decompression status, derived from the recorded profile signal: a
   /// deco-stop profile point, a `decoStopStart` event, or a positive ceiling
   /// on a profile carrying no deco-type data at all (mirroring
@@ -78,6 +86,7 @@ class DiveFilterState {
     this.minDepth,
     this.maxDepth,
     this.favoritesOnly,
+    this.excludedFromStatsOnly,
     this.decoOnly,
     this.noBuddyOnly,
     this.tagIds = const [],
@@ -110,6 +119,7 @@ class DiveFilterState {
       minDepth != null ||
       maxDepth != null ||
       favoritesOnly == true ||
+      excludedFromStatsOnly == true ||
       decoOnly != null ||
       noBuddyOnly == true ||
       tagIds.isNotEmpty ||
@@ -137,6 +147,7 @@ class DiveFilterState {
     double? minDepth,
     double? maxDepth,
     bool? favoritesOnly,
+    bool? excludedFromStatsOnly,
     bool? decoOnly,
     bool? noBuddyOnly,
     List<String>? tagIds,
@@ -166,6 +177,7 @@ class DiveFilterState {
     bool clearMinDepth = false,
     bool clearMaxDepth = false,
     bool clearFavoritesOnly = false,
+    bool clearExcludedFromStatsOnly = false,
     bool clearDecoOnly = false,
     bool clearNoBuddyOnly = false,
     bool clearTagIds = false,
@@ -198,6 +210,9 @@ class DiveFilterState {
       favoritesOnly: clearFavoritesOnly
           ? null
           : (favoritesOnly ?? this.favoritesOnly),
+      excludedFromStatsOnly: clearExcludedFromStatsOnly
+          ? null
+          : (excludedFromStatsOnly ?? this.excludedFromStatsOnly),
       decoOnly: clearDecoOnly ? null : (decoOnly ?? this.decoOnly),
       noBuddyOnly: clearNoBuddyOnly ? null : (noBuddyOnly ?? this.noBuddyOnly),
       tagIds: clearTagIds ? const [] : (tagIds ?? this.tagIds),
@@ -296,6 +311,9 @@ class DiveFilterState {
         return false;
       }
       if (favoritesOnly == true && !dive.isFavorite) {
+        return false;
+      }
+      if (excludedFromStatsOnly == true && !dive.excludedFromStats) {
         return false;
       }
       if (noBuddyOnly == true) {

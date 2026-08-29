@@ -103,6 +103,24 @@ For species not in the database:
 7. Add photo (optional)
 8. Save
 
+### Looking a species up online
+
+When you add a species, tap **Look up online** to search iNaturalist by common
+or scientific name. Choosing a result fills the common name (in your language
+where iNaturalist has it), the scientific name, the category and the taxonomy
+class; you can still edit anything before saving. The same lookup is offered
+when you add a species from the dive's marine life picker, and on a dive site's
+"Recorded nearby" list for names the catalog does not know yet.
+
+Lookups happen only when you tap **Look up**; nothing is sent while you type,
+and nothing from iNaturalist is stored except the fields you save.
+
+### Suggesting a species for the catalog
+
+On a custom species, the menu offers **Suggest for the catalog**. It opens a
+prefilled GitHub issue in your browser with the species' details; posting it
+is up to you.
+
 ## Sighting Statistics
 
 ### Marine Life Dashboard
@@ -161,6 +179,10 @@ a species in one place.
   chips you can toggle, plus a search for any other species. Tagging a species
   that is not yet logged on that dive adds the sighting for you.
 - Tagged species appear as chips under the photo; tap one to open the species.
+- The Species page shows each species' newest tagged photo in place of its
+  category icon. On a dive, each sighting row shows how many of the dive's
+  photos carry the species; tap the count to view them. The media library's
+  filter has a **Species** facet, which smart albums keep too.
 
 A species with tagged photos cannot be deleted from the catalog until the
 tags are removed, the same rule as for sightings.

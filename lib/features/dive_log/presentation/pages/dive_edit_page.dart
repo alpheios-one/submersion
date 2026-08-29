@@ -67,6 +67,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
@@ -198,6 +199,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   List<String> _selectedDiveTypeIds = const ['recreational'];
   Visibility _selectedVisibility = Visibility.unknown;
   int _rating = 0;
+  // Statistics exclusion (#526 / #1272). Kept independent: unticking the
+  // master flag must restore the diver's own gas-only choice rather than
+  // having silently overwritten it.
+  bool _excludedFromStats = false;
+  bool _excludedFromGasStats = false;
+  bool _bulkExcludedFromStats = false;
+  bool _bulkExcludedFromGasStats = false;
   DiveSite? _selectedSite;
   Trip? _selectedTrip;
   DiveCenter? _selectedDiveCenter;
@@ -665,6 +673,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               ? _seedDecimal(units.convertDepth(dive.visibilityMeters!), 0)
               : '';
           _rating = dive.rating ?? 0;
+          _excludedFromStats = dive.excludedFromStats;
+          _excludedFromGasStats = dive.excludedFromGasStats;
           _selectedSite = dive.site;
           _selectedTrip = dive.trip;
           _selectedDiveCenter = dive.diveCenter;
@@ -894,6 +904,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 _buildExperienceSection(),
                 if (_showCourseSection) _buildCourseGroupSection(),
                 if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
+                _buildStatisticsSection(),
                 AddSectionRow(
                   entries: [
                     if (!_showCourseSection)
@@ -1057,6 +1068,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   onChanged: (v) => setState(() => _bulkFavorite = v),
                 ),
               ),
+              _gatedRow(
+                BulkField.excludedFromStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromStats,
+                  value: _bulkExcludedFromStats,
+                  onChanged: (v) => setState(() => _bulkExcludedFromStats = v),
+                ),
+              ),
+              _gatedRow(
+                BulkField.excludedFromGasStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromGasStats,
+                  value: _bulkExcludedFromGasStats,
+                  onChanged: (v) =>
+                      setState(() => _bulkExcludedFromGasStats = v),
+                ),
+              ),
             ],
           ),
           _buildBulkConditionsSection(units),
@@ -1109,6 +1137,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       diverRoleId: _diverRoleId,
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
+      excludedFromStats: _bulkExcludedFromStats,
+      excludedFromGasStats: _bulkExcludedFromGasStats,
       waterType: _waterType?.name,
       visibilityMeters: _visibilityMetersInput(units),
       currentDirection: _currentDirection?.name,
@@ -2487,6 +2517,42 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       child: _customFieldsChild(),
     );
   }
+
+  Widget _buildStatisticsSection() {
+    return StatisticsSection(
+      // Collapsed unless this dive is already excluded, so the setting stays
+      // out of the way of the dives that are just dives.
+      expanded: _isExpanded(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      onToggle: () => _toggleSection(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      excludedFromStats: _excludedFromStats,
+      excludedFromGasStats: _excludedFromGasStats,
+      onExcludedFromStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+      onExcludedFromGasStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromGasStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+    );
+  }
+
+  /// The section's default expansion follows the two flags, so clearing the
+  /// last one would otherwise shut the group under the diver's finger. Once
+  /// they have touched a toggle, expansion is theirs to decide.
+  void _pinStatisticsOpen() => _expanded['statistics'] = true;
 
   Widget _buildExperienceSection() {
     return ExperienceSection(
@@ -4879,6 +4945,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             .toList(),
         // Preserve favorite status when editing
         isFavorite: _existingDive?.isFavorite ?? false,
+        excludedFromStats: _excludedFromStats,
+        excludedFromGasStats: _excludedFromGasStats,
         // Preserve dive profile data (time series from dive computer)
         profile: _existingDive?.profile ?? const [],
         // Preserve photo associations

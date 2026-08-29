@@ -4920,6 +4920,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Meeresfauna';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos',
+      one: '1 Foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Notizen';
 
   @override
@@ -12414,6 +12425,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_title => 'Gasrechner';
 
   @override
+  String get gasCalculators_desc_mod => 'Größte sichere Tiefe für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Sauerstoffreichstes Gemisch für eine Zieltiefe';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gasverbrauch eines geplanten Tauchgangs';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Reserve für den Aufstieg zu zweit';
+
+  @override
+  String get gasCalculators_desc_mnd => 'Narkosetiefe-Grenze für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_blender => 'Füllvorgang für ein Zielgemisch';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Wählen Sie einen Rechner aus, um zu beginnen';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Erwartete Arten bearbeiten';
 
@@ -12557,6 +12593,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Diese Art existiert nicht mehr.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Speichern';
 
   @override
@@ -12664,6 +12704,80 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'Arten durchsuchen...';
+
+  @override
+  String get marineLife_lookup_button => 'Online nachschlagen';
+
+  @override
+  String get marineLife_lookup_title => 'Art nachschlagen';
+
+  @override
+  String get marineLife_lookup_searchHint =>
+      'Trivial- oder wissenschaftlicher Name';
+
+  @override
+  String get marineLife_lookup_search => 'Nachschlagen';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Ohne Nachschlagen anlegen';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Artdaten und Fotos von iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle =>
+      'Geben Sie einen Namen ein und tippen Sie auf Nachschlagen.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Keine Art für \"$query\" gefunden';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'Sie scheinen offline zu sein.';
+
+  @override
+  String get marineLife_lookup_errorTimeout =>
+      'Zeitüberschreitung beim Nachschlagen.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'iNaturalist hat einen Fehler gemeldet. Versuchen Sie es später erneut.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Unerwartete Antwort von iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'Erneut versuchen';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Beobachtungen',
+      one: '1 Beobachtung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: wählen Sie eine Art';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Für den Katalog vorschlagen';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Browser konnte nicht geöffnet werden';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Link kopieren';
 
   @override
   String marineLife_speciesPhotos_title(Object count) {
@@ -14013,6 +14127,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Tauchplatz';
+
+  @override
+  String get media_library_filter_species => 'Art';
 
   @override
   String get media_library_filter_trip => 'Reise';
@@ -23771,11 +23888,32 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked Objekte geprüft: $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals Originale',
+      one: '1 Original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs Miniaturansichten',
+      one: '1 Miniaturansicht',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions komprimierte Versionen',
+      one: '1 komprimierte Version',
+    );
+    return '$checked Cloud-Objekte geprüft ($_temp0, $_temp1, $_temp2): $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
   }
 
   @override
@@ -26035,6 +26173,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufügen';
+
+  @override
+  String get reef_species_addFromLookup =>
+      'Nachschlagen und zu Ihren Arten hinzufügen';
 
   @override
   String reef_species_showAll(int count) {
@@ -35468,4 +35610,63 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_trend_tooltip_highest => 'Höchster';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Behalte diesen Tauchgang im Logbuch, lasse ihn aber aus jeder Statistik heraus, einschließlich der Tauchgangszahl.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Lasse diesen Tauchgang nur aus AMV-, RMV- und Gasgemisch-Statistiken heraus. Nützlich, wenn der Gaswert nicht repräsentativ ist.';
+
+  @override
+  String get diveLog_badge_excludedFromStats =>
+      'Von Statistiken ausgeschlossen';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Von Gasstatistiken ausgeschlossen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Nur von Statistiken ausgeschlossene';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Ausgeschlossen';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge von Statistiken ausgeschlossen',
+      one: '1 Tauchgang von Statistiken ausgeschlossen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statistiken';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gas ausgeschlossen';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'In allen Statistiken enthalten';
 }

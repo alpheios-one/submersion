@@ -866,6 +866,23 @@ class UddfFullImportService {
         diveData['isFavorite'] = true;
       }
 
+      // Statistics exclusion. Absent means included, so a document from
+      // another application never arrives pre-excluded.
+      final excludedFromStats = UddfImportParsers.getElementText(
+        afterElement,
+        'excludedfromstats',
+      );
+      if (excludedFromStats?.toLowerCase() == 'true') {
+        diveData['excludedFromStats'] = true;
+      }
+      final excludedFromGasStats = UddfImportParsers.getElementText(
+        afterElement,
+        'excludedfromgasstats',
+      );
+      if (excludedFromGasStats?.toLowerCase() == 'true') {
+        diveData['excludedFromGasStats'] = true;
+      }
+
       // Parse additional weights (app-specific, beyond single weight)
       final weightsElement = afterElement.findElements('weights').firstOrNull;
       if (weightsElement != null) {

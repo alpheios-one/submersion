@@ -730,6 +730,18 @@ class Dives extends Table {
   RealColumn get weightingFeedbackKg => real().nullable()();
   // Favorite flag (v1.1)
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  // Statistics exclusion (schema v180, issues #526 and #1272).
+  // excludedFromStats is the master flag: the dive stays in the logbook but
+  // contributes to no descriptive aggregate, its count included.
+  // excludedFromGasStats drops the dive from SAC/RMV and gas-mix aggregates
+  // only, for an otherwise ordinary dive whose gas number is unrepresentative
+  // (for example purging the tank for an end-of-dive weight check).
+  // The master flag implies the gas flag; the implication is applied in SQL by
+  // DiveStatsScope, not stored on the row.
+  BoolColumn get excludedFromStats =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get excludedFromGasStats =>
+      boolean().withDefault(const Constant(false))();
   // Dive mode for CCR/SCR (v1.5)
   TextColumn get diveMode =>
       text().withDefault(const Constant('oc'))(); // oc, ccr, scr
@@ -3314,7 +3326,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 179;
+  static const int currentSchemaVersion = 180;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3694,6 +3706,15 @@ class AppDatabase extends _$AppDatabase {
     // open, so this sits above it. 162, 167, 169 and 176 are skipped; the
     // ladder is non-contiguous by design.
     179,
+    // v180 (statistics exclusion): dives.excluded_from_stats and
+    // dives.excluded_from_gas_stats, letting a diver keep a dive in the
+    // logbook while removing it from statistics. Issues #526 and #1272.
+    // Renumbered from 178: main landed 178 (dive-type uniqueness) and 179
+    // (site-suggestion dismissal) while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    // Column-only rung with no backfill, so the beforeOpen backstop is
+    // safe to re-run.
+    180,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5521,6 +5542,30 @@ class AppDatabase extends _$AppDatabase {
   /// letting frequently-dived buddies be pinned to the top of the "Add
   /// buddy" picker regardless of sort. Self-guards on the table existing, and
   /// defaults every pre-existing row to not-favorited.
+  /// Idempotent DDL for the v180 dives.excluded_from_stats and
+  /// dives.excluded_from_gas_stats columns (issues #526 and #1272), letting a
+  /// diver keep a dive in the logbook while removing it from statistics.
+  /// Self-guards on the table existing, and defaults every pre-existing row to
+  /// included. Same dual-call contract (onUpgrade + beforeOpen backstop) as
+  /// the other column-assert helpers.
+  Future<void> _assertDiveStatsExclusionColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('excluded_from_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+    if (!names.contains('excluded_from_gas_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_gas_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+  }
+
   Future<void> _assertBuddyFavoriteColumn() async {
     final cols = await customSelect("PRAGMA table_info('buddies')").get();
     if (cols.isEmpty) return;
@@ -9211,6 +9256,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertSiteSuggestionDismissedAtColumn();
         }
         if (from < 179) await reportProgress();
+        // v180: dives.excluded_from_stats and dives.excluded_from_gas_stats
+        // (issues #526 and #1272). Column-only rung, no backfill: every
+        // pre-existing row correctly defaults to included.
+        if (from < 180) {
+          await _assertDiveStatsExclusionColumns();
+        }
+        if (from < 180) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9456,6 +9508,12 @@ class AppDatabase extends _$AppDatabase {
         // the ladder, and re-running it on every open would resurrect a gear
         // item the user deleted.
         await _assertDiveComputerEquipmentColumn();
+
+        // v180 backstop: re-assert the dives statistics-exclusion columns
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertDiveStatsExclusionColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
