@@ -11,6 +11,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -23,10 +24,12 @@ import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_sites/data/mappers/dive_site_row_mapper.dart';
+import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_event_mapper.dart';
+import 'package:submersion/features/dive_log/domain/services/profile_series_merge.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
@@ -100,6 +103,7 @@ class DiveRepository {
   final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final ProfileSeriesRepository _profileSeries = ProfileSeriesRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveRepository);
   final TagRepository _tagRepository = TagRepository();
@@ -166,8 +170,10 @@ class DiveRepository {
         TableUpdateQuery.allOf([
           TableUpdateQuery.onTable(_db.dives),
           TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveProfileSeries),
           TableUpdateQuery.onTable(_db.diveTanks),
           TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.tankPressureSeries),
           TableUpdateQuery.onTable(_db.diveEquipment),
           TableUpdateQuery.onTable(_db.equipment),
           TableUpdateQuery.onTable(_db.gasSwitches),
@@ -217,8 +223,10 @@ class DiveRepository {
         TableUpdateQuery.allOf([
           TableUpdateQuery.onTable(_db.dives),
           TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveProfileSeries),
           TableUpdateQuery.onTable(_db.diveTanks),
           TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.tankPressureSeries),
           TableUpdateQuery.onTable(_db.gasSwitches),
           TableUpdateQuery.onTable(_db.diveDataSources),
           TableUpdateQuery.onTable(_db.diveComputers),
@@ -842,50 +850,23 @@ class DiveRepository {
     }
   }
 
-  /// Get profile data for a single dive (for lazy loading in list views)
+  /// Get profile data for a single dive (for lazy loading in list views).
+  ///
+  /// Series-first: a dive with series rows is read from them (primary series
+  /// only, interleaved by timestamp); a dive with none is read from the
+  /// legacy row table until plan 2e removes it.
   Future<List<domain.DiveProfilePoint>> getDiveProfile(String diveId) async {
     try {
-      return await PerfTimer.measure('getDiveProfile', () async {
-        final profileQuery = _db.select(_db.diveProfiles)
-          ..where((t) => t.diveId.equals(diveId))
-          ..where((t) => t.isPrimary.equals(true))
-          ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-        final profileRows = await profileQuery.get();
-
-        return profileRows
-            .map(
-              (p) => domain.DiveProfilePoint(
-                timestamp: p.timestamp,
-                depth: p.depth,
-                temperature: p.temperature,
-                heartRate: p.heartRate,
-                heading: p.heading,
-                heartRateSource: p.heartRateSource,
-                setpoint: p.setpoint,
-                ppO2: p.ppO2,
-                o2Sensor1: p.o2Sensor1,
-                o2Sensor2: p.o2Sensor2,
-                o2Sensor3: p.o2Sensor3,
-                o2Sensor4: p.o2Sensor4,
-                o2Sensor5: p.o2Sensor5,
-                o2Sensor6: p.o2Sensor6,
-                o2SensorMv1: p.o2SensorMv1,
-                o2SensorMv2: p.o2SensorMv2,
-                o2SensorMv3: p.o2SensorMv3,
-                o2SensorMv4: p.o2SensorMv4,
-                o2SensorMv5: p.o2SensorMv5,
-                o2SensorMv6: p.o2SensorMv6,
-                cns: p.cns,
-                ndl: p.ndl,
-                ceiling: p.ceiling,
-                ascentRate: p.ascentRate,
-                rbt: p.rbt,
-                decoType: p.decoType,
-                tts: p.tts,
-              ),
-            )
-            .toList();
-      });
+      final List<ProfileSeries> series = await _profileSeries.getSeriesForDive(
+        diveId,
+      );
+      if (series.isNotEmpty) {
+        return mergeSeriesPoints([
+          for (final s in series)
+            if (s.isPrimary) s,
+        ]);
+      }
+      return await _getDiveProfileLegacy(diveId);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get profile for dive: $diveId',
@@ -894,6 +875,54 @@ class DiveRepository {
       );
       return [];
     }
+  }
+
+  /// The pre-series read of [getDiveProfile], kept for dives with no series
+  /// rows until plan 2e removes the legacy table.
+  Future<List<domain.DiveProfilePoint>> _getDiveProfileLegacy(
+    String diveId,
+  ) async {
+    return await PerfTimer.measure('getDiveProfile', () async {
+      final profileQuery = _db.select(_db.diveProfiles)
+        ..where((t) => t.diveId.equals(diveId))
+        ..where((t) => t.isPrimary.equals(true))
+        ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
+      final profileRows = await profileQuery.get();
+
+      return profileRows
+          .map(
+            (p) => domain.DiveProfilePoint(
+              timestamp: p.timestamp,
+              depth: p.depth,
+              temperature: p.temperature,
+              heartRate: p.heartRate,
+              heading: p.heading,
+              heartRateSource: p.heartRateSource,
+              setpoint: p.setpoint,
+              ppO2: p.ppO2,
+              o2Sensor1: p.o2Sensor1,
+              o2Sensor2: p.o2Sensor2,
+              o2Sensor3: p.o2Sensor3,
+              o2Sensor4: p.o2Sensor4,
+              o2Sensor5: p.o2Sensor5,
+              o2Sensor6: p.o2Sensor6,
+              o2SensorMv1: p.o2SensorMv1,
+              o2SensorMv2: p.o2SensorMv2,
+              o2SensorMv3: p.o2SensorMv3,
+              o2SensorMv4: p.o2SensorMv4,
+              o2SensorMv5: p.o2SensorMv5,
+              o2SensorMv6: p.o2SensorMv6,
+              cns: p.cns,
+              ndl: p.ndl,
+              ceiling: p.ceiling,
+              ascentRate: p.ascentRate,
+              rbt: p.rbt,
+              decoType: p.decoType,
+              tts: p.tts,
+            ),
+          )
+          .toList();
+    });
   }
 
   /// Save an edited profile for a dive.
@@ -3694,17 +3723,18 @@ class DiveRepository {
       tankPressuresByTankId.putIfAbsent(p.tankId, () => []).add(p);
     }
 
-    // Get profile for this dive. Every source is kept; only the originals a
-    // saved profile edit superseded are dropped (see
-    // [_dropSupersededOriginals]). [getMergedProfile] mirrors this query and
-    // the two must stay in step.
+    // Get profile for this dive. Series-first: a dive with series rows uses
+    // [_mergedSeriesPoints]; a dive with none falls back to the legacy
+    // table, where every source is kept except the originals a saved
+    // profile edit superseded (see [_dropSupersededOriginals]).
+    // [getMergedProfile] mirrors this query and the two must stay in step.
+    final seriesProfile = await _mergedSeriesPoints(row.id);
     final profileQuery = _db.select(_db.diveProfiles)
       ..where((t) => t.diveId.equals(row.id))
       ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-    final profileRows = await _dropSupersededOriginals(
-      row.id,
-      await profileQuery.get(),
-    );
+    final profileRows = seriesProfile != null
+        ? const <DiveProfile>[]
+        : await _dropSupersededOriginals(row.id, await profileQuery.get());
 
     // Get equipment for this dive
     final equipmentQuery = _db.select(_db.diveEquipment).join([
@@ -4013,9 +4043,9 @@ class DiveRepository {
           computerId: t.computerId,
         );
       }).toList(),
-      profile: _dropDuplicateSamples(
-        profileRows,
-      ).map(_profilePointFromRow).toList(),
+      profile:
+          seriesProfile ??
+          _dropDuplicateSamples(profileRows).map(_profilePointFromRow).toList(),
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
@@ -4927,6 +4957,15 @@ class DiveRepository {
   /// semantics must be made in both places together rather than diverging
   /// here.
   Future<List<domain.DiveProfilePoint>> getMergedProfile(String diveId) async {
+    return await _mergedSeriesPoints(diveId) ??
+        await _getMergedProfileLegacy(diveId);
+  }
+
+  /// The pre-series read of [getMergedProfile], kept for dives with no
+  /// series rows until plan 2e removes the legacy table.
+  Future<List<domain.DiveProfilePoint>> _getMergedProfileLegacy(
+    String diveId,
+  ) async {
     final rows = await _dropSupersededOriginals(
       diveId,
       await (_db.select(_db.diveProfiles)
@@ -4935,6 +4974,39 @@ class DiveRepository {
           .get(),
     );
     return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
+  }
+
+  /// The merged profile from series rows, or null when [diveId] has none.
+  ///
+  /// Shared by [getMergedProfile] and [_mapRowToDive] so `getDiveById`,
+  /// [getMergedProfile], and [getDiveForAnalysis] return the same list by
+  /// construction (the parity test locks this in). Every source is kept,
+  /// except the demoted originals a saved edit superseded
+  /// ([dropSupersededSeries], the series twin of
+  /// [_dropSupersededOriginals]).
+  Future<List<domain.DiveProfilePoint>?> _mergedSeriesPoints(
+    String diveId,
+  ) async {
+    final List<ProfileSeries> series = await _profileSeries.getSeriesForDive(
+      diveId,
+    );
+    if (series.isEmpty) return null;
+    final needsPrimary =
+        series.any((s) => !s.isPrimary) && series.any((s) => s.isPrimary);
+    var hasSources = true;
+    String? primaryComputerId;
+    if (needsPrimary) {
+      final primary = await _primarySourceComputer(diveId);
+      hasSources = primary.hasSources;
+      primaryComputerId = primary.computerId;
+    }
+    return mergeSeriesPoints(
+      dropSupersededSeries(
+        series,
+        hasSources: hasSources,
+        primaryComputerId: primaryComputerId,
+      ),
+    );
   }
 
   /// Drops the originals that a saved profile edit superseded.
