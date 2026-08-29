@@ -23,6 +23,7 @@
 - **Format must be run as** `dart format .` before committing; CI runs `dart format --set-exit-if-changed .`.
 - **Never pipe `flutter test` through `grep`.** The pipeline returns grep's exit status, so a failing suite reads as success.
 - **ARB parity:** `test/l10n/arb_parity_test.dart` requires all 10 non-English locales to define exactly the English key set. Any string change lands in all 11 files in the same commit.
+- **Generated files split two ways.** `*.g.dart` is gitignored (`.gitignore:9`), so Drift and mockito output is never committed and a fresh worktree must run `build_runner` before anything compiles. But `lib/l10n/arb/app_localizations*.dart` comes from `flutter gen-l10n`, does not match that pattern, and IS tracked, so l10n regeneration must be committed.
 - **Immutability:** never mutate objects or arrays; all domain entities have `copyWith`.
 - **Commit only what the task names.** Never `git add -A` or `git add -u` in this repo: sibling worktrees share the checkout and a broad add can commit another session's work or restage a stale submodule.
 
@@ -238,6 +239,8 @@ dart run build_runner build --delete-conflicting-outputs
 ```
 Expected: succeeds. `lib/core/database/database.g.dart` now has `photo` on the divers and buddies table and data classes.
 
+Do NOT try to commit `database.g.dart`. `.gitignore:9` is a blanket `*.g.dart`, so every Drift and mockito output is untracked and each worktree regenerates its own. `git add` on it fails with "paths are ignored".
+
 - [ ] **Step 11: Run the test to verify it passes**
 
 Run: `flutter test test/core/database/migration_v181_profile_photo_test.dart`
@@ -248,7 +251,7 @@ Expected: PASS, all five tests.
 ```bash
 dart format .
 flutter analyze --fatal-infos
-git add lib/core/database/database.dart lib/core/database/database.g.dart test/core/database/migration_v181_profile_photo_test.dart
+git add lib/core/database/database.dart test/core/database/migration_v181_profile_photo_test.dart
 git commit -m "feat(db): add profile photo blob columns to divers and buddies (v181)"
 ```
 
