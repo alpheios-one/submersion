@@ -176,10 +176,7 @@ void main() {
     final inventory = build();
 
     expect(
-      await categoryFor(
-        inventory,
-        StorageCategoryId.videoThumbnails,
-      ).measure(),
+      await categoryFor(inventory, StorageCategoryId.videoThumbnails).measure(),
       12,
     );
     expect(
