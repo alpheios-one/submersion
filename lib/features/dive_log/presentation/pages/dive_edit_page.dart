@@ -67,6 +67,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
@@ -903,6 +904,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 _buildExperienceSection(),
                 if (_showCourseSection) _buildCourseGroupSection(),
                 if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
+                _buildStatisticsSection(),
                 AddSectionRow(
                   entries: [
                     if (!_showCourseSection)
@@ -2050,16 +2052,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Widget _buildTheDiveSection(UnitFormatter units) {
     final hasProfile = _existingDive?.profile.isNotEmpty == true;
     return TheDiveSection(
-      excludedFromStats: _excludedFromStats,
-      excludedFromGasStats: _excludedFromGasStats,
-      onExcludedFromStatsChanged: (v) {
-        _markDirty();
-        setState(() => _excludedFromStats = v);
-      },
-      onExcludedFromGasStatsChanged: (v) {
-        _markDirty();
-        setState(() => _excludedFromGasStats = v);
-      },
       depthSymbol: units.depthSymbol,
       nameController: _nameController,
       maxDepthController: _maxDepthController,
@@ -2525,6 +2517,42 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       child: _customFieldsChild(),
     );
   }
+
+  Widget _buildStatisticsSection() {
+    return StatisticsSection(
+      // Collapsed unless this dive is already excluded, so the setting stays
+      // out of the way of the dives that are just dives.
+      expanded: _isExpanded(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      onToggle: () => _toggleSection(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      excludedFromStats: _excludedFromStats,
+      excludedFromGasStats: _excludedFromGasStats,
+      onExcludedFromStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+      onExcludedFromGasStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromGasStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+    );
+  }
+
+  /// The section's default expansion follows the two flags, so clearing the
+  /// last one would otherwise shut the group under the diver's finger. Once
+  /// they have touched a toggle, expansion is theirs to decide.
+  void _pinStatisticsOpen() => _expanded['statistics'] = true;
 
   Widget _buildExperienceSection() {
     return ExperienceSection(

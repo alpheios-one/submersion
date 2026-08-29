@@ -35462,4 +35462,14 @@ class AppLocalizationsHu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statisztikák';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gáz kizárva';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Minden statisztikában szerepel';
 }

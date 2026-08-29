@@ -38,10 +38,6 @@ class TheDiveSection extends StatelessWidget {
     this.surfaceIntervalRow,
     this.siteExtras,
     this.profileChild,
-    this.excludedFromStats = false,
-    this.excludedFromGasStats = false,
-    this.onExcludedFromStatsChanged,
-    this.onExcludedFromGasStatsChanged,
   });
 
   final String depthSymbol;
@@ -73,13 +69,6 @@ class TheDiveSection extends StatelessWidget {
   /// Existing profile block (points count, outlier chip, edit/draw
   /// buttons), stripped of its Card wrapper.
   final Widget? profileChild;
-
-  /// Statistics exclusion (#526 / #1272). The gas toggle renders inert while
-  /// [excludedFromStats] is on, because the master flag already implies it.
-  final bool excludedFromStats;
-  final bool excludedFromGasStats;
-  final ValueChanged<bool>? onExcludedFromStatsChanged;
-  final ValueChanged<bool>? onExcludedFromGasStatsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -156,26 +145,6 @@ class TheDiveSection extends StatelessWidget {
         ),
         ?siteExtras,
         ?profileChild,
-        if (onExcludedFromStatsChanged != null)
-          FormRow.toggle(
-            key: const Key('dive-edit-exclude-from-stats'),
-            label: l10n.diveLog_edit_excludeFromStats,
-            value: excludedFromStats,
-            onChanged: onExcludedFromStatsChanged!,
-            // The label alone does not say the dive count is affected, which
-            // is the part that surprises people later.
-            helpText: l10n.diveLog_edit_excludeFromStatsHelp,
-          ),
-        if (onExcludedFromGasStatsChanged != null)
-          FormRow.toggle(
-            key: const Key('dive-edit-exclude-from-gas-stats'),
-            label: l10n.diveLog_edit_excludeFromGasStats,
-            // Show the effective state: the master flag implies this one.
-            value: excludedFromStats || excludedFromGasStats,
-            onChanged: onExcludedFromGasStatsChanged!,
-            enabled: !excludedFromStats,
-            helpText: l10n.diveLog_edit_excludeFromGasStatsHelp,
-          ),
       ],
     );
   }

@@ -21598,5 +21598,17 @@
         "type": "int"
       }
     }
+  },
+  "diveLog_edit_group_statistics": "Statistics",
+  "@diveLog_edit_group_statistics": {
+    "description": "Collapsible dive-form group holding the statistics-exclusion toggles"
+  },
+  "diveLog_edit_summary_gasExcluded": "Gas excluded",
+  "@diveLog_edit_summary_gasExcluded": {
+    "description": "Collapsed Statistics group summary when only gas statistics are excluded"
+  },
+  "diveLog_edit_statisticsIncludedHint": "Counted in every statistic",
+  "@diveLog_edit_statisticsIncludedHint": {
+    "description": "Collapsed Statistics group hint when the dive is not excluded"
   }
 }

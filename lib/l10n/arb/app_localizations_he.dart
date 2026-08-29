@@ -34902,4 +34902,13 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => 'סטטיסטיקות';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'הגז הוחרג';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => 'נכללת בכל הסטטיסטיקות';
 }

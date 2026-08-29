@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
-/// The Dive section renders the two statistics-exclusion toggles. The one that
-/// matters is the gas toggle's behaviour while the master flag is on: it must
-/// read as checked and be inert, so the implication is visible rather than
-/// silently overriding what the diver picked.
+/// The Statistics section is the collapsible group at the bottom of the dive
+/// form that owns the two exclusion toggles. Two things matter: the collapsed
+/// header has to say whether this dive is excluded (otherwise the exclusion is
+/// invisible), and the gas toggle has to read as checked and inert while the
+/// master flag is on, so the implication is visible rather than silently
+/// overriding what the diver picked.
 void main() {
   Widget host({
     required bool excludedFromStats,
     required bool excludedFromGasStats,
+    bool expanded = true,
+    VoidCallback? onToggle,
     ValueChanged<bool>? onStats,
     ValueChanged<bool>? onGas,
   }) {
@@ -20,20 +24,9 @@ void main() {
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: SingleChildScrollView(
-          child: TheDiveSection(
-            depthSymbol: 'm',
-            nameController: TextEditingController(),
-            maxDepthController: TextEditingController(),
-            avgDepthController: TextEditingController(),
-            bottomTimeController: TextEditingController(),
-            runtimeController: TextEditingController(),
-            diveNumberController: TextEditingController(),
-            entryText: '',
-            onEditEntry: () {},
-            exitText: null,
-            onEditExit: () {},
-            siteName: null,
-            onPickSite: () {},
+          child: StatisticsSection(
+            expanded: expanded,
+            onToggle: onToggle ?? () {},
             excludedFromStats: excludedFromStats,
             excludedFromGasStats: excludedFromGasStats,
             onExcludedFromStatsChanged: onStats ?? (_) {},
@@ -168,5 +161,73 @@ void main() {
           'the locale needs; German and Hungarian run materially longer',
     );
     expect(help.overflow, anyOf(isNull, TextOverflow.clip));
+  });
+
+  group('collapsed', () {
+    testWidgets('hides the toggles but keeps the header tappable', (
+      tester,
+    ) async {
+      var toggled = 0;
+      await tester.pumpWidget(
+        host(
+          excludedFromStats: false,
+          excludedFromGasStats: false,
+          expanded: false,
+          onToggle: () => toggled++,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('dive-edit-exclude-from-stats')),
+        findsNothing,
+        reason: 'a collapsed FormSection does not mount its children',
+      );
+      await tester.tap(find.text('Statistics'));
+      await tester.pumpAndSettle();
+      expect(toggled, 1);
+    });
+
+    testWidgets('says the dive is counted when nothing is excluded', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        host(
+          excludedFromStats: false,
+          excludedFromGasStats: false,
+          expanded: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Counted in every statistic'), findsOneWidget);
+    });
+
+    testWidgets('names the exclusion so it is not hidden by collapsing', (
+      tester,
+    ) async {
+      // Without this the only trace of an excluded dive would be behind a
+      // closed section, which is how a diver loses track of why a count is
+      // off months later.
+      await tester.pumpWidget(
+        host(
+          excludedFromStats: true,
+          excludedFromGasStats: false,
+          expanded: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Excluded'), findsOneWidget);
+
+      await tester.pumpWidget(
+        host(
+          excludedFromStats: false,
+          excludedFromGasStats: true,
+          expanded: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Gas excluded'), findsOneWidget);
+    });
   });
 }

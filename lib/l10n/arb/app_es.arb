@@ -10399,5 +10399,8 @@
   "diveLog_bulkEdit_fieldExcludeFromGasStats": "Excluir de las estadísticas de gas",
   "diveLog_filter_excludedOnly": "Solo las excluidas de las estadísticas",
   "diveLog_edit_summary_excluded": "Excluida",
-  "statistics_excludedDivesFootnote": "{count, plural, one{1 inmersión excluida de las estadísticas} other{{count} inmersiones excluidas de las estadísticas}}"
+  "statistics_excludedDivesFootnote": "{count, plural, one{1 inmersión excluida de las estadísticas} other{{count} inmersiones excluidas de las estadísticas}}",
+  "diveLog_edit_group_statistics": "Estadísticas",
+  "diveLog_edit_summary_gasExcluded": "Gas excluido",
+  "diveLog_edit_statisticsIncludedHint": "Incluida en todas las estadísticas"
 }

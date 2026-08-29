@@ -35610,4 +35610,14 @@ class AppLocalizationsPt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Estatísticas';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gás excluído';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Incluído em todas as estatísticas';
 }

@@ -35258,4 +35258,13 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get diveLog_edit_group_statistics => 'الإحصائيات';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'الغاز مستبعد';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint => 'محتسبة في كل الإحصائيات';
 }
