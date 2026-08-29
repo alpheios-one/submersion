@@ -23947,6 +23947,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Stockage des médias connecté';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Le stockage cloud n\'a pas encore pu être lu. Patientez un instant, puis réessayez.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Déconnecter';
 
   @override

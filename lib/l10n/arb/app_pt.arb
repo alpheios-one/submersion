@@ -6738,6 +6738,7 @@
   "settings_mediaStorage_status_connected": "Conectado a {hint}",
   "settings_mediaStorage_test_success": "Conexão bem-sucedida",
   "settings_mediaStorage_saved": "Armazenamento de mídia conectado",
+  "settings_mediaStorage_error_notReady": "Ainda não foi possível ler o armazenamento na nuvem. Aguarde um momento e tente novamente.",
   "settings_mediaStorage_action_disconnect": "Desconectar",
   "settings_mediaStorage_disconnect_confirm_title": "Desconectar o armazenamento de mídia?",
   "settings_mediaStorage_disconnect_confirm_body": "Este dispositivo deixa de enviar e buscar mídia. Nada é excluído do seu bucket.",

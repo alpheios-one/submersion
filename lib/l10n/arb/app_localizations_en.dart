@@ -23463,6 +23463,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Media store connected';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'The cloud storage could not be read yet. Wait a moment and try connecting again.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnect';
 
   @override

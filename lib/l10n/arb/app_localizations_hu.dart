@@ -23786,6 +23786,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Médiatár csatlakoztatva';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'A felhőtárolót még nem sikerült beolvasni. Várj egy pillanatot, majd próbáld újra.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Leválasztás';
 
   @override

@@ -6738,6 +6738,7 @@
   "settings_mediaStorage_status_connected": "מחובר אל {hint}",
   "settings_mediaStorage_test_success": "החיבור הצליח",
   "settings_mediaStorage_saved": "אחסון המדיה חובר",
+  "settings_mediaStorage_error_notReady": "עדיין לא ניתן היה לקרוא את אחסון הענן. המתינו רגע ונסו שוב.",
   "settings_mediaStorage_action_disconnect": "התנתק",
   "settings_mediaStorage_disconnect_confirm_title": "לנתק את אחסון המדיה?",
   "settings_mediaStorage_disconnect_confirm_body": "מכשיר זה יפסיק להעלות ולהוריד מדיה. שום דבר לא יימחק מהדלי שלך.",

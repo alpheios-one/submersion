@@ -6738,6 +6738,7 @@
   "settings_mediaStorage_status_connected": "Connecté à {hint}",
   "settings_mediaStorage_test_success": "Connexion réussie",
   "settings_mediaStorage_saved": "Stockage des médias connecté",
+  "settings_mediaStorage_error_notReady": "Le stockage cloud n'a pas encore pu être lu. Patientez un instant, puis réessayez.",
   "settings_mediaStorage_action_disconnect": "Déconnecter",
   "settings_mediaStorage_disconnect_confirm_title": "Déconnecter le stockage des médias ?",
   "settings_mediaStorage_disconnect_confirm_body": "Cet appareil cesse d'envoyer et de récupérer des médias. Rien n'est supprimé de votre bucket.",

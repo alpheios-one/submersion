@@ -22636,6 +22636,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_saved => '媒体存储已连接';
 
   @override
+  String get settings_mediaStorage_error_notReady => '尚无法读取云存储。请稍候片刻后重试。';
+
+  @override
   String get settings_mediaStorage_action_disconnect => '断开连接';
 
   @override

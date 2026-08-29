@@ -23681,6 +23681,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Mediaopslag verbonden';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'De cloudopslag kon nog niet worden gelezen. Wacht even en probeer het opnieuw.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Loskoppelen';
 
   @override

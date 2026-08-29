@@ -142,11 +142,20 @@ class MediaStoreWorker {
     // stopped the drain, an exception out of the pipeline - leaves work
     // behind on purpose, and must not arm the immediate wakeup below.
     var drainedToEmpty = false;
+    // Whether the preflight stopped this drain, for ANY reason. Separate from
+    // the user-visible [isSuspended], which speaks only for a determinate
+    // refusal: a preflight that could not answer (offline) still leaves due
+    // rows behind with nothing to pick them up, so scheduling has to know
+    // about it even though the UI must not.
+    var preflightBlocked = false;
     try {
       while (true) {
         // Re-checked per entry, not once per drain: a store wipe or user
         // disconnect mid-drain must suspend the rest of the queue.
-        if (!await _preflightPasses()) return;
+        if (!await _preflightPasses()) {
+          preflightBlocked = true;
+          return;
+        }
         final entry = await _queue.nextPending(DateTime.now());
         if (entry == null) {
           drainedToEmpty = true;
@@ -180,7 +189,10 @@ class MediaStoreWorker {
       }
     } finally {
       _running = false;
-      await _armWakeup(drainedToEmpty: drainedToEmpty, suspended: _suspended);
+      await _armWakeup(
+        drainedToEmpty: drainedToEmpty,
+        preflightBlocked: preflightBlocked,
+      );
     }
   }
 
@@ -284,14 +296,13 @@ class MediaStoreWorker {
   /// [drainedToEmpty] says the drain looked and found nothing due. That is
   /// what makes the already-due branch below safe; see it for why.
   ///
-  /// [suspended] says the preflight stopped the drain. Its due rows are
-  /// still due, so the immediate branch must not take them (it would spin
+  /// [preflightBlocked] says the preflight stopped the drain. Its due rows
+  /// are still due, so the immediate branch must not take them (it would spin
   /// against a check that keeps failing); they get the
-  /// [defaultPreflightRetryWindow] instead, and only while there is
-  /// anything left to retry for.
+  /// [defaultPreflightRetryWindow] instead.
   Future<void> _armWakeup({
     required bool drainedToEmpty,
-    required bool suspended,
+    required bool preflightBlocked,
   }) async {
     _wakeup?.cancel();
     _wakeup = null;
@@ -305,14 +316,15 @@ class MediaStoreWorker {
       // One clock reading for both the query and the delay, so the timer
       // cannot be handed a negative duration by the query's own latency.
       final now = DateTime.now();
-      if (suspended) {
-        // Always arm, even with an empty queue. A suspension is cleared only
-        // from inside a passing preflight, so a drain that armed nothing
-        // here could never clear one in this process: the loop checks the
-        // preflight before asking what is due, so the final iteration of an
-        // emptying drain can record a suspension with nothing left to carry
-        // a timer, and the notice would then stand forever over a queue with
-        // nothing in it.
+      if (preflightBlocked) {
+        // Always arm, even with an empty queue. A blocked preflight is
+        // re-run only by a drain, and a suspension is cleared only by one
+        // that passes, so a drain that armed nothing here could never
+        // recover in this process. Both halves need it: an offline blip
+        // would otherwise strand every due row until an unrelated trigger,
+        // and the final iteration of an emptying drain can record a
+        // suspension with nothing left to carry a timer, leaving the notice
+        // standing forever over a queue with nothing in it.
         //
         // Never later than a row's own backoff. That timer is the one this
         // branch replaces, and a row deferred for thirty seconds must not

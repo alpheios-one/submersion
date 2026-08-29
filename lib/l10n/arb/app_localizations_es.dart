@@ -23883,6 +23883,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Almacén de medios conectado';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Aún no se pudo leer el almacenamiento en la nube. Espera un momento e inténtalo de nuevo.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Desconectar';
 
   @override

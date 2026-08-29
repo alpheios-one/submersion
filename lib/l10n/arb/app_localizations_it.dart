@@ -23866,6 +23866,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Archivio media collegato';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Non è stato ancora possibile leggere l\'archivio cloud. Attendi un momento e riprova.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnetti';
 
   @override

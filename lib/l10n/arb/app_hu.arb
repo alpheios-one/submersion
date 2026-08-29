@@ -6738,6 +6738,7 @@
   "settings_mediaStorage_status_connected": "Csatlakoztatva: {hint}",
   "settings_mediaStorage_test_success": "Sikeres kapcsolat",
   "settings_mediaStorage_saved": "Médiatár csatlakoztatva",
+  "settings_mediaStorage_error_notReady": "A felhőtárolót még nem sikerült beolvasni. Várj egy pillanatot, majd próbáld újra.",
   "settings_mediaStorage_action_disconnect": "Leválasztás",
   "settings_mediaStorage_disconnect_confirm_title": "Leválasztja a médiatárat?",
   "settings_mediaStorage_disconnect_confirm_body": "Az eszköz nem tölt fel és nem tölt le több médiát. A bucketből semmi sem törlődik.",

@@ -23866,6 +23866,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Armazenamento de mídia conectado';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Ainda não foi possível ler o armazenamento na nuvem. Aguarde um momento e tente novamente.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Desconectar';
 
   @override

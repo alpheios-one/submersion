@@ -23817,6 +23817,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Medienspeicher verbunden';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Der Cloud-Speicher konnte noch nicht gelesen werden. Warte einen Moment und versuche es erneut.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Trennen';
 
   @override

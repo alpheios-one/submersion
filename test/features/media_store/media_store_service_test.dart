@@ -436,4 +436,77 @@ void main() {
       reason: 'the marker the other device wrote must survive untouched',
     );
   });
+
+  // Connecting is a foreground action the user is watching, and on iCloud the
+  // container's copy of store.json may still be coming down when they tap
+  // Connect. Refusing on the first attempt would fail a connect that succeeds
+  // seconds later.
+  test('a store that cannot serve the marker yet is retried, then '
+      'connects', () async {
+    final fake = InMemoryMediaObjectStore();
+    var attempts = 0;
+    final svc = MediaStoreService(
+      credentials: credentials,
+      attachState: attachState,
+      storesRepository: storesRepository,
+      accountsRepository: accountsRepository,
+      accountCredentials: accountCredentials,
+      markerRetryBackoff: const [Duration.zero, Duration.zero],
+      icloudStoreFactory: () async {
+        attempts++;
+        if (attempts == 1) {
+          fake.failNextWith = const MediaStoreException(
+            'still downloading from iCloud: smv1/store.json',
+            kind: MediaStoreErrorKind.transient,
+          );
+        }
+        return fake;
+      },
+    );
+
+    final result = await svc.connectICloud();
+
+    expect(result.storeId, isNotEmpty);
+    expect(await attachState.attachedStoreId(), result.storeId);
+  });
+
+  test('a store that keeps refusing the marker gives up rather than '
+      'connecting', () async {
+    final svc = MediaStoreService(
+      credentials: credentials,
+      attachState: attachState,
+      storesRepository: storesRepository,
+      accountsRepository: accountsRepository,
+      accountCredentials: accountCredentials,
+      markerRetryBackoff: const [Duration.zero],
+      icloudStoreFactory: () async => _AlwaysTransientStore(),
+    );
+
+    await expectLater(
+      svc.connectICloud(),
+      throwsA(
+        isA<MediaStoreException>().having(
+          (e) => e.kind,
+          'kind',
+          MediaStoreErrorKind.transient,
+        ),
+      ),
+    );
+    expect(await attachState.attachedStoreId(), isNull);
+  });
+}
+
+/// Never serves the marker, however often it is asked.
+class _AlwaysTransientStore extends InMemoryMediaObjectStore {
+  @override
+  Future<void> getFile(
+    String key,
+    File destination, {
+    TransferProgressCallback? onProgress,
+  }) async {
+    throw const MediaStoreException(
+      'still downloading from iCloud: smv1/store.json',
+      kind: MediaStoreErrorKind.transient,
+    );
+  }
 }

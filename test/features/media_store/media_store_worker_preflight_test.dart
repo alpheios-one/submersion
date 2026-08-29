@@ -271,4 +271,36 @@ void main() {
     expect(pipeline.processed, isEmpty);
     expect(worker.isSuspended, isFalse);
   });
+
+  // Scheduling and the UI signal are separate concerns. A preflight that
+  // could not answer must not accuse the store, but it still leaves due rows
+  // with nothing to pick them up: earliestPendingWakeup ignores due rows, so
+  // without this the offline case reproduced the stall this PR exists to fix.
+  test('a drain blocked by a thrown preflight still arms a retry', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    var offline = true;
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async {
+        if (offline) {
+          throw const MediaStoreException(
+            'Could not reach S3 endpoint',
+            kind: MediaStoreErrorKind.transient,
+          );
+        }
+        return true;
+      },
+      preflightRetryWindow: const Duration(milliseconds: 20),
+    );
+    addTearDown(worker.dispose);
+
+    await worker.drain();
+
+    expect(worker.isSuspended, isFalse, reason: 'the store is not at fault');
+    expect(worker.wakeupDelayForTesting, const Duration(milliseconds: 20));
+
+    offline = false;
+    await waitUntil(() async => pipeline.processed.contains('m1'));
+  });
 }

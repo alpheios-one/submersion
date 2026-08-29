@@ -6738,6 +6738,7 @@
   "settings_mediaStorage_status_connected": "متصل بـ {hint}",
   "settings_mediaStorage_test_success": "نجح الاتصال",
   "settings_mediaStorage_saved": "تم توصيل مخزن الوسائط",
+  "settings_mediaStorage_error_notReady": "تعذّرت قراءة التخزين السحابي حتى الآن. انتظر لحظة ثم أعد المحاولة.",
   "settings_mediaStorage_action_disconnect": "قطع الاتصال",
   "settings_mediaStorage_disconnect_confirm_title": "قطع اتصال مخزن الوسائط؟",
   "settings_mediaStorage_disconnect_confirm_body": "يتوقف هذا الجهاز عن رفع الوسائط وجلبها. لن يُحذف أي شيء من الحاوية الخاصة بك.",

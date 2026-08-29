@@ -39253,6 +39253,12 @@ abstract class AppLocalizations {
   /// **'Media store connected'**
   String get settings_mediaStorage_saved;
 
+  /// No description provided for @settings_mediaStorage_error_notReady.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud storage could not be read yet. Wait a moment and try connecting again.'**
+  String get settings_mediaStorage_error_notReady;
+
   /// No description provided for @settings_mediaStorage_action_disconnect.
   ///
   /// In en, this message translates to:

@@ -23438,6 +23438,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_mediaStorage_saved => 'تم توصيل مخزن الوسائط';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'تعذّرت قراءة التخزين السحابي حتى الآن. انتظر لحظة ثم أعد المحاولة.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'قطع الاتصال';
 
   @override
