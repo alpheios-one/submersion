@@ -35032,4 +35032,96 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => 'נכללת בכל הסטטיסטיקות';
+
+  @override
+  String get suuntoCloud_signIn_title => 'התחברות ל-Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'התחבר עם חשבון app.suunto.com שלך כדי לייבא את הצלילות שלך ישירות. הסיסמה שלך לעולם אינה נשמרת, רק ההפעלה שנוצרת ממנה.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'דוא\"ל';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'נדרש דוא\"ל';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'סיסמה';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'נדרשת סיסמה';
+
+  @override
+  String get suuntoCloud_signIn_button => 'התחברות';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'מתחבר…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'מחובר כ-$email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'מציג רשימת צלילות…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'מוריד צלילה $current מתוך $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'לא ניתן להוריד את הצלילות';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'נסה שוב';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמצאו $count צלילות',
+      one: 'נמצאה צלילה אחת',
+      zero: 'לא נמצאו צלילות',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לא ניתן היה להמיר $count צלילות והן דולגו.',
+      one: 'לא ניתן היה להמיר צלילה אחת והיא דולגה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'מיון';
+
+  @override
+  String get importWizard_review_sortByDate => 'תאריך';
+
+  @override
+  String get importWizard_review_sortByDepth => 'עומק';
+
+  @override
+  String get importWizard_review_sortByDuration => 'זמן';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'ייבוא צלילות מאפליקציית Suunto או מחשבון app.suunto.com';
+
+  @override
+  String get transfer_section_cloudTitle => 'ענן';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'ייבוא מהענן';
 }

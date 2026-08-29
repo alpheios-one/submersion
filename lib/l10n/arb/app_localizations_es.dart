@@ -35783,4 +35783,99 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Incluida en todas las estadísticas';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Iniciar sesión en Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Inicia sesión con tu cuenta de app.suunto.com para importar tus inmersiones directamente. Tu contraseña nunca se almacena; solo se guarda la sesión resultante.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'Correo electrónico';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired =>
+      'El correo electrónico es obligatorio';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Contraseña';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired =>
+      'La contraseña es obligatoria';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Iniciar sesión';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Iniciando sesión…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Sesión iniciada como $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Listando inmersiones…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Obteniendo inmersión $current de $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'No se pudieron obtener las inmersiones';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Reintentar';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Se encontraron $count inmersiones',
+      one: 'Se encontró 1 inmersión',
+      zero: 'No se encontraron inmersiones',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'No se pudieron convertir $count inmersiones y se omitieron.',
+      one: 'No se pudo convertir 1 inmersión y se omitió.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Ordenar';
+
+  @override
+  String get importWizard_review_sortByDate => 'Fecha';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Profundidad';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Tiempo';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Importa inmersiones desde tu aplicacion Suunto o tu cuenta de app.suunto.com';
+
+  @override
+  String get transfer_section_cloudTitle => 'Nube';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Importar desde la nube';
 }
