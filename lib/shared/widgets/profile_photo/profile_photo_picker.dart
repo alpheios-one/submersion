@@ -35,10 +35,13 @@ Future<ProfilePhotoResult?> pickProfilePhoto({
   required bool allowContacts,
   Future<Uint8List?> Function(BuildContext context)? contactPhotoLoader,
 }) async {
+  // Offering Contacts without a loader would show a menu item that silently
+  // does nothing when tapped, which reads as a broken flow. The two are
+  // therefore gated together rather than independently.
   final source = await showProfilePhotoSourceSheet(
     context: context,
     hasPhoto: hasPhoto,
-    allowContacts: allowContacts,
+    allowContacts: allowContacts && contactPhotoLoader != null,
   );
   if (source == null || !context.mounted) return null;
 
@@ -50,7 +53,8 @@ Future<ProfilePhotoResult?> pickProfilePhoto({
   String? declaredName;
 
   if (source == ProfilePhotoSource.contacts) {
-    raw = await contactPhotoLoader?.call(context);
+    // Unreachable without a loader, since the option is gated above.
+    raw = await contactPhotoLoader!(context);
     declaredName = 'contact.jpg';
     if (raw == null) return null;
   } else {

@@ -53,8 +53,17 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
   }
 
   Future<void> _decode() async {
+    // The codec holds native decode resources separate from the frame's
+    // image, so it needs disposing even on the happy path or repeated opens
+    // of this dialog leak. Same try/finally shape as
+    // terrain_imagery_service.dart.
+    final ui.FrameInfo frame;
     final codec = await ui.instantiateImageCodec(widget.sourceBytes);
-    final frame = await codec.getNextFrame();
+    try {
+      frame = await codec.getNextFrame();
+    } finally {
+      codec.dispose();
+    }
     if (!mounted) {
       frame.image.dispose();
       return;

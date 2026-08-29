@@ -88,4 +88,11 @@ void main() {
 
     expect(chosen, ProfilePhotoSource.remove);
   });
+
+  testWidgets('a source sheet with contacts allowed still lists the other '
+      'options', (tester) async {
+    await _open(tester, hasPhoto: true, allowContacts: true);
+    expect(find.text('Choose from Contacts'), findsOneWidget);
+    expect(find.text('Remove Photo'), findsOneWidget);
+  });
 }
