@@ -52,7 +52,7 @@ class _SuuntoCloudSignInStepState extends ConsumerState<SuuntoCloudSignInStep> {
   }
 
   Future<void> _tryCachedSession() async {
-    final cached = await SuuntoSessionStore().load();
+    final cached = await ref.read(suuntoSessionStoreProvider).load();
     if (!mounted) return;
 
     if (cached == null) {
@@ -63,7 +63,8 @@ class _SuuntoCloudSignInStepState extends ConsumerState<SuuntoCloudSignInStep> {
       return;
     }
 
-    final client = SuuntoCloudClient()..sessionKey = cached.sessionKey;
+    final client = ref.read(suuntoCloudClientFactoryProvider)()
+      ..sessionKey = cached.sessionKey;
     bool valid;
     try {
       valid = await client.verifySession();
@@ -107,13 +108,15 @@ class _SuuntoCloudSignInStepState extends ConsumerState<SuuntoCloudSignInStep> {
 
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final client = SuuntoCloudClient();
+    final client = ref.read(suuntoCloudClientFactoryProvider)();
 
     try {
       await client.login(email, password);
-      await SuuntoSessionStore().save(
-        SuuntoSessionData(email: email, sessionKey: client.sessionKey!),
-      );
+      await ref
+          .read(suuntoSessionStoreProvider)
+          .save(
+            SuuntoSessionData(email: email, sessionKey: client.sessionKey!),
+          );
       if (!mounted) return;
       _markSignedIn(client, email);
     } on SuuntoApiException catch (e) {
@@ -289,9 +292,17 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchDives());
   }
 
-  void _finishWithNoDives() {
+  /// Clears any dives a previous attempt loaded, WITHOUT flipping
+  /// [suuntoCloudDivesFetchedProvider].
+  ///
+  /// That provider is this step's `canAdvance`, and the step is declared
+  /// `autoAdvance: true`, so setting it on a failure would carry the wizard
+  /// straight past the error message into a review page listing no dives --
+  /// the diver would see an empty import and no reason for it. Leaving it
+  /// false keeps the error on screen with a Try Again button; Back and the
+  /// wizard's close button both stay available, so this is not a dead end.
+  void _discardDives() {
     widget.onDivesFetched(const []);
-    ref.read(suuntoCloudDivesFetchedProvider.notifier).state = true;
   }
 
   Future<void> _fetchDives() async {
@@ -301,7 +312,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
         _isFetching = false;
         _error = context.l10n.suuntoCloud_fetch_failedTitle;
       });
-      _finishWithNoDives();
+      _discardDives();
       return;
     }
 
@@ -357,14 +368,14 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
         _isFetching = false;
         _error = e.displayMessage;
       });
-      _finishWithNoDives();
+      _discardDives();
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isFetching = false;
         _error = '$e';
       });
-      _finishWithNoDives();
+      _discardDives();
     }
   }
 
@@ -414,13 +425,24 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
                 l10n.suuntoCloud_fetch_failedTitle,
                 style: theme.textTheme.titleLarge,
               ),
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              // The no-client branch has no detail beyond the headline; it
+              // sets _error to the headline itself, so guard against
+              // printing the same sentence twice.
+              if (_error != l10n.suuntoCloud_fetch_failedTitle) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _error!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
+              ],
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: _fetchDives,
+                icon: const Icon(Icons.refresh),
+                label: Text(l10n.suuntoCloud_fetch_retry),
               ),
             ],
           ),

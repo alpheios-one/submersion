@@ -6,6 +6,7 @@ import 'package:submersion/core/domain/models/incoming_dive_data.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_cloud_client.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_dive_parser.dart';
+import 'package:submersion/core/services/suunto_cloud/suunto_session_store.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/dive_computer/data/services/dive_import_service.dart';
@@ -28,6 +29,20 @@ import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 
 /// Signals that the sign-in step can advance (a usable session was obtained).
 final suuntoCloudSignedInProvider = StateProvider<bool>((ref) => false);
+
+/// The keychain-backed session cache the sign-in step reads and writes.
+/// Injected rather than constructed inline so a widget test can supply an
+/// in-memory store instead of hitting the platform keychain.
+final suuntoSessionStoreProvider = Provider<SuuntoSessionStore>(
+  (ref) => SuuntoSessionStore(),
+);
+
+/// Builds the client the sign-in step authenticates with. Injected for the
+/// same reason as [suuntoSessionStoreProvider]: overriding it keeps a test
+/// from ever reaching api.sports-tracker.com.
+final suuntoCloudClientFactoryProvider = Provider<SuuntoCloudClient Function()>(
+  (ref) => SuuntoCloudClient.new,
+);
 
 /// Signals that the fetch step can advance (dives have been downloaded and
 /// converted).
