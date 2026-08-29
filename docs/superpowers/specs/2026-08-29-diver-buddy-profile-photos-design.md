@@ -149,31 +149,61 @@ the field. `Buddy.copyWith` is the plain `??` style, where `photo: null` falls
 through to `this.photo` and is a silent no-op. Wiring the two identically would
 make "Remove photo" work for a diver and silently fail for a buddy.
 
-`Buddy.copyWith` therefore gains `bool clearPhoto = false`, mirroring
-`Certification.copyWith`'s existing `clearFront` flag
-(`certification.dart:140`). Copying the neighbouring solution avoids converting
-`Buddy` to the sentinel pattern, which would touch every existing caller.
+`Buddy` therefore gains a separate `Buddy clearPhoto()` method, mirroring
+`Certification.clearPhotos({bool clearFront, bool clearBack})`
+(`certification.dart:125-146`), which rebuilds through the constructor rather
+than routing a flag through `copyWith`. That is this codebase's established
+idiom for clearing a photo blob. Copying it avoids converting `Buddy` to the
+sentinel pattern, which would touch every existing caller.
+
+Note that `buddy_edit_page.dart` constructs a `Buddy(...)` directly rather than
+going through `copyWith`, so the primary user-facing "Remove photo" path does
+not depend on this method. It exists so that no future caller reaching for
+`copyWith(photo: null)` gets a silent no-op.
 
 ### Repositories
 
-`photo: row.photo` in `_mapRowToBuddy` (`buddy_repository.dart:1100`) and the
-diver mapper (`diver_repository.dart:660`), and `photo: Value(x.photo)` in the
-create and update companions on both. `buddy_merge_repository.dart` carries
-`photoPath` at lines 115, 446, and 594 and needs the same treatment, as does
-`buddy_merge_form_controller.dart:81`, so a merge picks a winning photo the way
-it picks other fields. Existing `markRecordPending` calls already stamp the HLC.
+Every site that reads a row into a `Buddy`/`Diver` or writes a companion must
+carry `photo`, or it silently fails to persist on that path. The complete list,
+against the worktree base:
+
+`buddy_repository.dart`
+- `_mapRowToBuddy` `:1100`
+- inline row-to-`Buddy` construction feeding `_withPrimaryCerts`, `:140-162`
+- `createBuddy` companion `:165-206`
+- `updateBuddy` companion `:277-312`
+- two further `BuddiesCompanion` writes at `:887` and `:918`
+
+`diver_repository.dart`
+- `_mapRowToDiver` `:660`
+- `createDiver` companion `:128-194`
+- `updateDiver` companion `:196-239`
+- (`:551` writes only `isDefault` and `updatedAt`; it needs no change)
+
+`buddy_merge_repository.dart` carries `photoPath` at `:115`, `:446`, and `:594`
+and needs the same treatment, as does `buddy_merge_form_controller.dart:81`, so
+a merge picks a winning photo the way it picks other fields.
+
+Existing `markRecordPending` calls already stamp the HLC, so no new sync
+bookkeeping is needed in the repositories.
 
 ### Sync
 
-Five edits per entity, following the `certifications` pattern:
+Six edits per entity, following the `certifications` pattern. Line numbers are
+against the worktree base (`origin/main` at v179):
 
-| Site | Change |
-| --- | --- |
-| `_baseTables` (`:650`, `:714`) | `blob: false` becomes `blob: true` |
-| `_exportDivers` (`:4495`), `_exportBuddies` (`:4763`) | `r.toJson(serializer: _syncBlobSerializer)` |
-| `fetchRecord` (`:1546`, `:1641`) | same serializer |
-| `upsertRecord` (`:2430`, `:2535`) | `fromJson(data, serializer: _syncBlobSerializer)` |
-| batch upsert (`:2930`, `:3094`) | same serializer |
+| Site | divers | buddies | Change |
+| --- | --- | --- | --- |
+| `_baseTables` | `:653` | `:718` | `blob: false` becomes `blob: true` |
+| delta exporter | `_exportDivers` `:4535` | `_exportBuddies` `:4803` | `r.toJson(serializer: _syncBlobSerializer)` |
+| `fetchRecord` | `:1555` | `:1650` | `row?.toJson(serializer: _syncBlobSerializer)` |
+| `fetchRecords` (batch) | `:1971` | `:2026` | same serializer in the map comprehension |
+| `upsertRecord` | `:2444` | `:2549` | `fromJson(data, serializer: _syncBlobSerializer)` |
+| `upsertRecords` (batch) | `:2951` | `:3115` | same serializer |
+
+Note this is six sites, not five. The batch `fetchRecords` path
+(`sync_data_serializer.dart:1951`) is easy to miss because it sits between the
+single-record fetch and the upserts, and it has its own switch.
 
 Missing any one of these fails silently: the blob still round-trips correctly,
 just as a JSON byte array at roughly 3x the size. `sync_blob_base64_test.dart`
