@@ -157,6 +157,14 @@ typedef struct {
     double temperature;        // celsius (NAN if unavailable)
     double pressure;           // bar (NAN if unavailable)
     unsigned int tank;         // tank index (UINT32_MAX if unavailable)
+    // Per-tank pressure at this sample, indexed by libdivecomputer's tank
+    // index; NAN where that tank reported nothing. Issue #1223: a dive logged
+    // with two AI transmitters fires DC_SAMPLE_PRESSURE twice per sample, and
+    // the single `pressure`/`tank` pair above kept only the last one, so every
+    // tank but the highest-numbered lost its curve. `pressure`/`tank` still
+    // carry that last reading, for the single-pressure profile column; this
+    // array is the complete record.
+    double tank_pressure[LIBDC_MAX_TANKS];
     unsigned int gasmix;       // active gas mix index (UINT32_MAX if unavailable)
     // New fields for full sample capture
     unsigned int heartbeat;    // bpm (UINT32_MAX if unavailable)
@@ -166,7 +174,7 @@ typedef struct {
     double o2_sensor[6];       // per-cell ppO2 in bar (NAN if that cell absent)
     unsigned int o2_sensor_mv[6]; // per-cell raw output in mV (UINT32_MAX if absent)
     double cns;                // percentage 0-100 (NAN if unavailable)
-    unsigned int rbt;          // remaining bottom time in seconds (UINT32_MAX if unavailable)
+    unsigned int rbt;          // remaining bottom time in MINUTES as libdc reports it (UINT32_MAX if unavailable); Dart converts to seconds
     // Decompression status at this sample
     unsigned int deco_type;    // 0=NDL, 1=safetystop, 2=decostop, 3=deepstop (UINT32_MAX if unavailable)
     unsigned int deco_time;    // seconds (NDL seconds or stop time remaining)

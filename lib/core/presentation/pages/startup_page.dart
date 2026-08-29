@@ -37,6 +37,7 @@ import 'package:submersion/core/services/security/database_security_sidecar.dart
 import 'package:submersion/core/services/security/locked_database_escape.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
+import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/backup/data/services/backup_target.dart';
@@ -46,6 +47,7 @@ import 'package:submersion/features/backup/domain/entities/backup_type.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
@@ -671,13 +673,16 @@ class _StartupWrapperState extends State<StartupWrapper>
 
     await timeStartupStep('speciesSeed', () async {
       final speciesRepository = SpeciesRepository();
-      await speciesRepository.seedBuiltInSpecies();
+      await speciesRepository.seedBuiltInSpecies(
+        versionStore: PrefsBuiltInSpeciesSeedVersionStore(
+          await SharedPreferences.getInstance(),
+        ),
+      );
     });
 
-    // One-time orphaned-media backlog sweep (orphan-prevention spec 4.3).
-    // Fire-and-forget: it must not delay first frame, runs against the
-    // now-open databases, and self-guards with a persisted flag that is
-    // only set on success (a failed run retries next launch).
+    // Unlinked-media sweep, every launch. Fire-and-forget: it must not delay
+    // first frame and runs against the now-open databases. Empty on a
+    // healthy library; catches anything a not-yet-upgraded peer syncs in.
     final mediaRepository = MediaRepository();
     final sweep = MediaOrphanBacklogSweep(
       mediaRepository: mediaRepository,
@@ -685,7 +690,6 @@ class _StartupWrapperState extends State<StartupWrapper>
         mediaRepository: mediaRepository,
         queue: () => MediaTransferQueueRepository(),
       ),
-      prefs: SharedPreferences.getInstance,
     );
     // An async closure rather than `.catchError` on the Future<int>: it
     // hands `unawaited` a genuine Future<void> instead of a swept-row count
@@ -696,7 +700,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     // Exception, and a failed sweep must never take down startup.
     unawaited(() async {
       try {
-        await sweep.runIfNeeded();
+        await sweep.run();
       } catch (e, stackTrace) {
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
@@ -732,7 +736,7 @@ class _StartupWrapperState extends State<StartupWrapper>
       appVersion = '0.0.0.0';
     } else {
       final info = await PackageInfo.fromPlatform();
-      appVersion = '${info.version}.${info.buildNumber}';
+      appVersion = formatAppVersion(info);
       service = PreMigrationBackupService(
         livePathProvider: () async => dbPath,
         // Resolve LAZILY, inside the provider. Resolution arms any

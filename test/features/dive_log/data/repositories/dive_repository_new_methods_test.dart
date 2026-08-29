@@ -56,6 +56,7 @@ void main() {
     int? gradientFactorHigh,
     String? importId,
     int? diveDateTime,
+    String? buddy,
   }) async {
     final diveId = id ?? 'dive-${DateTime.now().microsecondsSinceEpoch}';
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -82,11 +83,40 @@ void main() {
             gradientFactorLow: Value(gradientFactorLow),
             gradientFactorHigh: Value(gradientFactorHigh),
             importId: Value(importId),
+            buddy: Value(buddy),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
         );
     return diveId;
+  }
+
+  Future<void> insertBuddy({required String id, required String name}) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.buddies)
+        .insert(
+          BuddiesCompanion(
+            id: Value(id),
+            name: Value(name),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+  }
+
+  Future<void> linkBuddy(String diveId, String buddyId) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.diveBuddies)
+        .insert(
+          DiveBuddiesCompanion(
+            id: Value('$diveId-$buddyId'),
+            diveId: Value(diveId),
+            buddyId: Value(buddyId),
+            createdAt: Value(now),
+          ),
+        );
   }
 
   DiveDataSourcesCompanion buildReading({
@@ -1422,6 +1452,41 @@ void main() {
         diveNumber: 2,
         computerId: 'dc-2',
       );
+
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(),
+      );
+
+      expect(summaries.length, equals(2));
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // noBuddyOnly filter in getDiveSummaries
+  // ---------------------------------------------------------------------------
+
+  group('noBuddyOnly filter', () {
+    test('excludes dives with a legacy buddy or a linked buddy', () async {
+      await insertTestDive(id: 'dive-legacy-buddy', buddy: 'Alice Diver');
+      await insertBuddy(id: 'b1', name: 'Bob Buddy');
+      await insertTestDive(id: 'dive-linked-buddy');
+      await linkBuddy('dive-linked-buddy', 'b1');
+      await insertTestDive(id: 'dive-no-buddy');
+      await insertTestDive(id: 'dive-empty-buddy', buddy: '');
+
+      final summaries = await repository.getDiveSummaries(
+        filter: const DiveFilterState(noBuddyOnly: true),
+      );
+
+      expect(summaries.map((s) => s.id).toSet(), {
+        'dive-no-buddy',
+        'dive-empty-buddy',
+      });
+    });
+
+    test('returns all dives when noBuddyOnly is not set', () async {
+      await insertTestDive(id: 'dive-a', buddy: 'Alice Diver');
+      await insertTestDive(id: 'dive-b');
 
       final summaries = await repository.getDiveSummaries(
         filter: const DiveFilterState(),

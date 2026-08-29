@@ -158,6 +158,51 @@ final mediaVerifyRunnerProvider =
       };
     });
 
+/// Resumes an outstanding transfer queue at app launch and on app resume
+/// (issue #1270).
+///
+/// Every other drain trigger is downstream of [mediaStoreRuntimeProvider]
+/// already existing: the runtime is what kicks the first drain, subscribes to
+/// connectivity changes, and lets the worker arm its retry wakeup. Nothing in
+/// the launch path ever built it, and the display surfaces cannot stand in for
+/// one - the media grid only reaches the store for a row that is already
+/// backed up (`MediaItemView`'s storeConfirmed gate), which on a device that
+/// has never finished an upload is never true. So a queue that stopped for any
+/// reason - the app quit mid-import, a moment offline, a policy hold - had no
+/// way back, and the reporter's 196 rows survived every restart untouched.
+///
+/// Two cheap guards run before anything expensive, because building the
+/// runtime opens the keychain and reads the store marker out of the bucket:
+/// [mediaStoreAttachedProvider] is one SharedPreferences read (and is
+/// documented never to error, which is exactly why it exists), and
+/// [MediaTransferQueueRepository.nextPending] is one indexed local read that
+/// means precisely "there is work a drain could take right now". A queue
+/// holding only deferred rows is left to the worker's own wakeup timer.
+///
+/// Contains its own failures rather than propagating them: both call sites are
+/// fire-and-forget, so an escaping throw would land in the zone handler with
+/// nothing to catch it - the shape of #942.
+// no-tick: the value is a CLOSURE, not a query result. Every read happens
+// inside it at call time via ref.read, so there is no cached row to go stale.
+final mediaTransferResumeProvider = Provider<Future<void> Function()>((ref) {
+  return () async {
+    try {
+      if (!await ref.read(mediaStoreAttachedProvider.future)) return;
+      final queue = ref.read(mediaTransferQueueRepositoryProvider);
+      if (await queue.nextPending(DateTime.now()) == null) return;
+      // Building the runtime is the kick: see the unawaited drain at the end
+      // of mediaStoreRuntimeProvider.
+      await ref.read(mediaStoreRuntimeProvider.future);
+    } on Object catch (e, stackTrace) {
+      LoggerService.forClass(MediaStoreWorker).warning(
+        'Could not resume media transfers',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  };
+});
+
 final mediaBackfillServiceProvider = Provider<MediaBackfillService>(
   (ref) => MediaBackfillService(
     mediaRepository: ref.watch(mediaRepositoryProvider),
@@ -216,21 +261,6 @@ void invalidateMediaStoreAttachment(WidgetRef ref) {
   ref.invalidate(mediaStoreAttachedProvider);
 }
 
-/// Per-tile badge status. Transient transfer state outranks persistent
-/// backup state: failed > transferring > queued > notBackedUp > none.
-///
-/// A failed, transferring, or pending queue row maps straight through. A
-/// done or absent row is a settled item, and settles to notBackedUp only
-/// when a store is attached, the source is uploadable, and the item has no
-/// upload stamps.
-///
-/// The settled check re-reads the row rather than trusting [item]: the
-/// tile's snapshot comes from mediaForDiveProvider, a FutureProvider that
-/// an upload's stamp write does not invalidate, so the snapshot goes stale
-/// the moment an upload completes. Re-reading is race-free because the
-/// pipeline calls stampRemoteUploaded before markDone, so the emission
-/// reporting done always follows the stamp write.
-///
 final mediaStoresRepositoryProvider = Provider<MediaStoresRepository>(
   (ref) => MediaStoresRepository(),
 );

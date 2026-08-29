@@ -16,25 +16,15 @@ import 'package:submersion/features/data_quality/presentation/providers/data_qua
 import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_card.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_message.dart';
+import 'package:submersion/features/data_quality/presentation/widgets/quality_unit_formatters.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/combine_dives_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/run_dive_consolidation.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-QualityUnitFormatters buildQualityUnitFormatters(WidgetRef ref) {
-  final units = UnitFormatter(ref.watch(settingsProvider));
-  return QualityUnitFormatters(
-    depth: (m) => units.formatDepth(m),
-    pressure: (bar) => units.formatPressure(bar),
-    temperature: (c) => units.formatTemperature(c),
-    // Surface air consumption is a volume rate; honor the volume unit
-    // preference (L/min vs cuft/min) rather than the pressure-based SAC mode.
-    sac: (lpm) =>
-        '${units.convertVolume(lpm).toStringAsFixed(1)} ${units.volumeSymbol}/min',
-    date: (d) => units.formatDate(d),
-  );
-}
+QualityUnitFormatters buildQualityUnitFormatters(WidgetRef ref) =>
+    qualityUnitFormattersFor(UnitFormatter(ref.watch(settingsProvider)));
 
 typedef _DiveGroup = ({String diveId, List<QualityFinding> findings});
 

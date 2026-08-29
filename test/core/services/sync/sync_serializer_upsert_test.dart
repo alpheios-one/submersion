@@ -152,6 +152,7 @@ void main() {
         (type: 'diveCustomFields', table: db.diveCustomFields.actualTableName),
         (type: 'diveDataSources', table: db.diveDataSources.actualTableName),
         (type: 'siteSpecies', table: db.siteSpecies.actualTableName),
+        (type: 'mediaSpecies', table: db.mediaSpecies.actualTableName),
         (type: 'csvPresets', table: db.csvPresets.actualTableName),
         (type: 'viewConfigs', table: db.viewConfigs.actualTableName),
         (type: 'fieldPresets', table: db.fieldPresets.actualTableName),

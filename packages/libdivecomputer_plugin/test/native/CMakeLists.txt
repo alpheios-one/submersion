@@ -185,6 +185,27 @@ if(WIN32)
     target_link_libraries(test_shearwater_o2_millivolt PRIVATE SetupAPI.lib ws2_32.lib)
 endif()
 
+# Regression test for issue #1223: a sample carrying two transmitter pressures
+# must keep both. Goes through the wrapper, since the loss was in its per-sample
+# accumulator rather than in libdivecomputer.
+add_executable(test_multi_transmitter_pressure
+    test_multi_transmitter_pressure.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${WRAPPER_DIR}/libdc_download.c
+    ${LIBDC_ALL_SOURCES}
+)
+target_include_directories(test_multi_transmitter_pressure PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${PLATFORM_CONFIG_DIR}
+)
+target_compile_definitions(test_multi_transmitter_pressure PRIVATE HAVE_CONFIG_H)
+if(WIN32)
+    target_compile_definitions(test_multi_transmitter_pressure PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_link_libraries(test_multi_transmitter_pressure PRIVATE SetupAPI.lib ws2_32.lib)
+endif()
+
 enable_testing()
 add_test(NAME test_dive_converter COMMAND test_dive_converter)
 add_test(NAME test_serial_callbacks COMMAND test_serial_callbacks)
@@ -194,6 +215,9 @@ add_test(NAME test_hw_ostc3_read COMMAND test_hw_ostc3_read)
 add_test(NAME test_shearwater_petrel_foreach COMMAND test_shearwater_petrel_foreach)
 add_test(NAME test_shearwater_common_download COMMAND test_shearwater_common_download)
 add_test(NAME test_parse_raw_dive COMMAND test_parse_raw_dive
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+add_test(NAME test_multi_transmitter_pressure COMMAND test_multi_transmitter_pressure
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_test(NAME test_shearwater_o2_millivolt COMMAND test_shearwater_o2_millivolt

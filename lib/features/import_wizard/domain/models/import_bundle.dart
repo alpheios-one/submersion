@@ -55,6 +55,9 @@ enum ImportEntityType {
 
   /// Courses.
   courses,
+
+  /// Photos referenced by an imported logbook.
+  media,
 }
 
 /// Metadata about the source of an [ImportBundle].
