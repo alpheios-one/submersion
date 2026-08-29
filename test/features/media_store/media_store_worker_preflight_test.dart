@@ -38,6 +38,21 @@ class _RecordingPipeline extends MediaUploadPipeline {
   }
 }
 
+/// Polls [condition] until true or [within] elapses; the retry wakeup fires
+/// on a real timer, so a fixed sleep would either flake under load or pad
+/// every run.
+Future<bool> _waitFor(
+  bool Function() condition, {
+  Duration within = const Duration(seconds: 5),
+}) async {
+  final deadline = DateTime.now().add(within);
+  while (DateTime.now().isBefore(deadline)) {
+    if (condition()) return true;
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+  return condition();
+}
+
 void main() {
   late MediaRepository mediaRepository;
   late LocalCacheDatabase cacheDb;
@@ -154,4 +169,81 @@ void main() {
       expect(pipeline.processed, ['m1']);
     },
   );
+
+  // Issue #1356: a failed preflight left every due row untouched and armed
+  // no wakeup (earliestPendingWakeup ignores due rows), so the queue sat at
+  // "Waiting" until an external trigger re-ran the same failing check.
+  test('a suspended drain arms a retry so the queue recovers without an '
+      'external kick', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    var verified = false;
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => verified,
+      preflightRetryWindow: const Duration(milliseconds: 20),
+    );
+    addTearDown(worker.dispose);
+
+    await worker.drain();
+    expect(pipeline.processed, isEmpty);
+    expect(worker.wakeupDelayForTesting, const Duration(milliseconds: 20));
+
+    verified = true;
+    expect(await _waitFor(() => pipeline.processed.contains('m1')), isTrue);
+  });
+
+  test('a suspended drain with nothing queued arms no retry', () async {
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => false,
+    );
+    addTearDown(worker.dispose);
+
+    await worker.drain();
+    expect(worker.wakeupDelayForTesting, isNull);
+  });
+
+  test('the suspension is observable and clears once the preflight '
+      'passes', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    var verified = false;
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => verified,
+    );
+    addTearDown(worker.dispose);
+    final seen = <bool>[];
+    final sub = worker.suspensionChanges.listen(seen.add);
+    addTearDown(sub.cancel);
+
+    expect(worker.isSuspended, isFalse);
+    await worker.drain();
+    expect(worker.isSuspended, isTrue);
+
+    verified = true;
+    await worker.drain();
+    expect(worker.isSuspended, isFalse);
+    expect(pipeline.processed, ['m1']);
+    await Future<void>.delayed(Duration.zero);
+    expect(seen, [true, false]);
+  });
+
+  test('a preflight that throws reads as suspended too', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => throw const MediaStoreException(
+        'get smv1/store.json failed',
+        kind: MediaStoreErrorKind.transient,
+      ),
+    );
+    addTearDown(worker.dispose);
+
+    await worker.drain();
+    expect(worker.isSuspended, isTrue);
+  });
 }

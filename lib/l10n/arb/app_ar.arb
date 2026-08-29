@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "جارٍ الإزالة من السحابة",
   "settings_mediaStorage_transfers_state_done": "تم",
   "settings_mediaStorage_transfers_state_failed": "فشل",
+  "settings_mediaStorage_transfers_suspended_title": "تم إيقاف عمليات النقل مؤقتًا",
+  "settings_mediaStorage_transfers_suspended_subtitle": "تعذّر التحقق من التخزين السحابي. يواصل Submersion المحاولة؛ إذا استمرت المشكلة، افصل تخزين الوسائط ثم أعد توصيله.",
   "settings_mediaStorage_transfers_queued": "{count} في قائمة الانتظار",
   "settings_mediaStorage_transfers_waitingRetry": "{count} في انتظار إعادة المحاولة",
   "settings_mediaStorage_verify_action": "التحقق من المكتبة",

@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/pages/transfers_page.dart';
@@ -49,12 +51,22 @@ void main() {
 
   tearDown(() => db.close());
 
-  Widget app(List<MediaTransferQueueEntry> entries) => ProviderScope(
+  Widget app(
+    List<MediaTransferQueueEntry> entries, {
+    Map<String, MediaItem> media = const {},
+    bool suspended = false,
+  }) => ProviderScope(
     overrides: [
       mediaTransferQueueRepositoryProvider.overrideWithValue(repo),
       localAssetCacheRepositoryProvider.overrideWithValue(assetCache),
       mediaTransferEntriesProvider.overrideWith((ref) => Stream.value(entries)),
       mediaStoreRuntimeProvider.overrideWith((ref) async => null),
+      // The rows name their media; without this the lookup would reach for
+      // an uninitialised database.
+      mediaByIdProvider.overrideWith((ref, id) async => media[id]),
+      mediaTransfersSuspendedProvider.overrideWith(
+        (ref) => Stream.value(suspended),
+      ),
     ],
     child: const MaterialApp(
       // Pinned: these tests find widgets by their English strings.
@@ -456,5 +468,64 @@ void main() {
     await pumpRoute(tester);
 
     expect(builds, 1);
+  });
+
+  // Issue #1356: the reporter's queue read as a column of bare UUIDs. The row
+  // carries only the media id; the file name lives on the media row.
+  testWidgets('rows name the media file rather than its id', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+    final photo = MediaItem(
+      id: 'm-a',
+      originalFilename: 'IMG_0042.HEIC',
+      mediaType: MediaType.photo,
+      takenAt: DateTime(2026, 8, 1),
+      createdAt: DateTime(2026, 8, 1),
+      updatedAt: DateTime(2026, 8, 1),
+    );
+
+    await tester.pumpWidget(app(snapshot, media: {'m-a': photo}));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('IMG_0042.HEIC'), findsOneWidget);
+    expect(find.text('m-a'), findsNothing);
+  });
+
+  testWidgets('a row whose media is unknown falls back to the id', (
+    tester,
+  ) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('m-a'), findsOneWidget);
+  });
+
+  testWidgets('a suspended queue shows the paused notice above the list', (
+    tester,
+  ) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot, suspended: true));
+    // Two frames: the list, then the suspension stream's first value.
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Transfers paused'), findsOneWidget);
+    expect(find.text('Waiting'), findsOneWidget);
   });
 }

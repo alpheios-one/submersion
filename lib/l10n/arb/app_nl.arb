@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Verwijderen uit de cloud",
   "settings_mediaStorage_transfers_state_done": "Klaar",
   "settings_mediaStorage_transfers_state_failed": "Mislukt",
+  "settings_mediaStorage_transfers_suspended_title": "Overdrachten gepauzeerd",
+  "settings_mediaStorage_transfers_suspended_subtitle": "De cloudopslag kon niet worden geverifieerd. Submersion blijft het proberen; als dit aanhoudt, koppel de mediaopslag los en verbind opnieuw.",
   "settings_mediaStorage_transfers_queued": "{count} in wachtrij",
   "settings_mediaStorage_transfers_waitingRetry": "{count} wachten op nieuwe poging",
   "settings_mediaStorage_verify_action": "Bibliotheek verifiëren",

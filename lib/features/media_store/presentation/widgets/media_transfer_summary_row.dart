@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
+import 'package:submersion/features/media_store/presentation/widgets/media_transfers_suspended_notice.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Outstanding transfer work on the Media Storage page.
@@ -30,6 +31,7 @@ class MediaTransferSummaryRow extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const MediaTransfersSuspendedNotice(contentPadding: EdgeInsets.zero),
         if (summary.transferring > 0)
           Padding(
             key: const Key('media-transfer-progress'),

@@ -95,10 +95,17 @@ class ICloudMediaObjectStore implements MediaObjectStore {
     TransferProgressCallback? onProgress,
   }) async {
     final path = await _pathFor(key);
+    // A false answer means iCloud KNOWS the file: the placeholder is on disk,
+    // startDownloadingUbiquitousItem succeeded, and the native poll ran out
+    // waiting for the bytes. A key the container has never held does not get
+    // here (the native side answers true for a non-ubiquitous path and the
+    // exists() check below reports it absent). Reporting the slow download
+    // as notFound made StoreMarkerStore.ensure mint a fresh store id over a
+    // marker another device had already written (issue #1356).
     if (!await _platform.ensureDownloaded(path)) {
       throw MediaStoreException(
-        'not found: $key',
-        kind: MediaStoreErrorKind.notFound,
+        'still downloading from iCloud: $key',
+        kind: MediaStoreErrorKind.transient,
       );
     }
     final file = File(path);

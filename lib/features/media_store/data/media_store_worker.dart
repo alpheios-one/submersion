@@ -23,13 +23,15 @@ class MediaStoreWorker {
     Future<WorkerGate> Function(MediaTransferQueueEntry entry)? gate,
     Duration entryBudget = defaultEntryBudget,
     Duration preflightBudget = defaultPreflightBudget,
+    Duration preflightRetryWindow = defaultPreflightRetryWindow,
   }) : _queue = queue,
        _pipeline = pipeline,
        _deleteProcessor = deleteProcessor,
        _preflight = preflight,
        _gate = gate,
        _entryBudget = entryBudget,
-       _preflightBudget = preflightBudget;
+       _preflightBudget = preflightBudget,
+       _preflightRetryWindow = preflightRetryWindow;
 
   final MediaTransferQueueRepository _queue;
   final MediaUploadPipeline _pipeline;
@@ -66,12 +68,28 @@ class MediaStoreWorker {
   /// stall here wedges the drain without a single row being touched.
   static const Duration defaultPreflightBudget = Duration(seconds: 30);
 
+  /// How long a drain the preflight suspended waits before trying again.
+  ///
+  /// A suspended drain leaves its due rows untouched, which is right for the
+  /// rows (no attempt burned, no backoff written) but left the queue with
+  /// nothing to wake it: [MediaTransferQueueRepository.earliestPendingWakeup]
+  /// deliberately skips rows that are already due. Every retry then hung on
+  /// an external trigger re-running the same check, and on desktop, where
+  /// the app sits in one process for days, the rows read "Waiting" for as
+  /// long (issue #1356). The preflight is one small GET, so a periodic retry
+  /// costs almost nothing, and it is what lets a marker that was merely slow
+  /// to download from iCloud clear on its own.
+  static const Duration defaultPreflightRetryWindow = Duration(minutes: 10);
+
   final Duration _entryBudget;
   final Duration _preflightBudget;
+  final Duration _preflightRetryWindow;
 
   final _log = LoggerService.forClass(MediaStoreWorker);
   bool _running = false;
   bool _disposed = false;
+  bool _suspended = false;
+  final _suspensionChanges = StreamController<bool>.broadcast();
   Future<void>? _activeDrain;
   Timer? _wakeup;
   Duration? _wakeupDelay;
@@ -86,6 +104,21 @@ class MediaStoreWorker {
   /// [enqueueAndKick] fires the drain in the background, so callers (and tests)
   /// that need to observe completion await this instead of racing it.
   Future<void>? get activeDrain => _activeDrain;
+
+  /// Whether the most recent preflight suspended the drain. The queue's rows
+  /// carry no trace of a suspension (they are left exactly as they were), so
+  /// without this the only record was a log line and the settings page could
+  /// not tell "paused" from "queued" (issue #1356).
+  bool get isSuspended => _suspended;
+
+  /// Emits on every change of [isSuspended].
+  Stream<bool> get suspensionChanges => _suspensionChanges.stream;
+
+  void _setSuspended(bool value) {
+    if (_suspended == value) return;
+    _suspended = value;
+    if (!_suspensionChanges.isClosed) _suspensionChanges.add(value);
+  }
 
   Future<void> drain() async {
     if (_disposed || _running) return;
@@ -133,7 +166,7 @@ class MediaStoreWorker {
       }
     } finally {
       _running = false;
-      await _armWakeup(drainedToEmpty: drainedToEmpty);
+      await _armWakeup(drainedToEmpty: drainedToEmpty, suspended: _suspended);
     }
   }
 
@@ -197,7 +230,10 @@ class MediaStoreWorker {
     final preflight = _preflight;
     if (preflight == null) return true;
     try {
-      if (await preflight().timeout(_preflightBudget)) return true;
+      if (await preflight().timeout(_preflightBudget)) {
+        _setSuspended(false);
+        return true;
+      }
       _log.warning('Media store preflight failed; drain suspended');
     } on Object catch (e, stackTrace) {
       _log.warning(
@@ -206,6 +242,7 @@ class MediaStoreWorker {
         stackTrace: stackTrace,
       );
     }
+    _setSuspended(true);
     return false;
   }
 
@@ -224,7 +261,16 @@ class MediaStoreWorker {
   ///
   /// [drainedToEmpty] says the drain looked and found nothing due. That is
   /// what makes the already-due branch below safe; see it for why.
-  Future<void> _armWakeup({required bool drainedToEmpty}) async {
+  ///
+  /// [suspended] says the preflight stopped the drain. Its due rows are
+  /// still due, so the immediate branch must not take them (it would spin
+  /// against a check that keeps failing); they get the
+  /// [defaultPreflightRetryWindow] instead, and only while there is
+  /// anything left to retry for.
+  Future<void> _armWakeup({
+    required bool drainedToEmpty,
+    required bool suspended,
+  }) async {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
@@ -237,6 +283,15 @@ class MediaStoreWorker {
       // One clock reading for both the query and the delay, so the timer
       // cannot be handed a negative duration by the query's own latency.
       final now = DateTime.now();
+      if (suspended) {
+        final anythingPending =
+            await _queue.nextPending(now) != null ||
+            await _queue.earliestPendingWakeup(now) != null;
+        if (!anythingPending) return;
+        _wakeupDelay = _preflightRetryWindow;
+        _wakeup = Timer(_preflightRetryWindow, () => unawaited(drain()));
+        return;
+      }
       // The drain asked "what is due?" against its own clock reading, and
       // earliestPendingWakeup asks "what is not due yet?" against this one.
       // Those are complements only if no time passed in between, so a row
@@ -246,8 +301,9 @@ class MediaStoreWorker {
       // straight back to a fresh drain.
       //
       // Only when the drain reached an empty queue. A drain that declined to
-      // run (offline, failed preflight) left its due row behind deliberately,
-      // and re-kicking that would spin against a drain that keeps declining.
+      // run (offline, or the preflight case handled above) left its due row
+      // behind deliberately, and re-kicking that would spin against a drain
+      // that keeps declining.
       // A drain that emptied the queue cannot: every loop exit consumes its
       // entry, so the next drain either takes this row or is itself a decline.
       if (drainedToEmpty && await _queue.nextPending(now) != null) {
@@ -280,6 +336,7 @@ class MediaStoreWorker {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
+    _suspensionChanges.close();
   }
 
   Future<void> enqueueAndKick(String mediaId) async {

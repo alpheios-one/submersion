@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Eliminando de la nube",
   "settings_mediaStorage_transfers_state_done": "Completado",
   "settings_mediaStorage_transfers_state_failed": "Fallido",
+  "settings_mediaStorage_transfers_suspended_title": "Transferencias en pausa",
+  "settings_mediaStorage_transfers_suspended_subtitle": "No se pudo verificar el almacenamiento en la nube. Submersion sigue reintentando; si persiste, desconecta y vuelve a conectar el almacenamiento de medios.",
   "settings_mediaStorage_transfers_queued": "{count} en cola",
   "settings_mediaStorage_transfers_waitingRetry": "{count} esperando para reintentar",
   "settings_mediaStorage_verify_action": "Verificar biblioteca",

@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Wird aus der Cloud entfernt",
   "settings_mediaStorage_transfers_state_done": "Fertig",
   "settings_mediaStorage_transfers_state_failed": "Fehlgeschlagen",
+  "settings_mediaStorage_transfers_suspended_title": "Übertragungen angehalten",
+  "settings_mediaStorage_transfers_suspended_subtitle": "Der Cloud-Speicher konnte nicht überprüft werden. Submersion versucht es weiter; falls das anhält, den Medienspeicher trennen und neu verbinden.",
   "settings_mediaStorage_transfers_queued": "{count} in Warteschlange",
   "settings_mediaStorage_transfers_waitingRetry": "{count} warten auf Wiederholung",
   "settings_mediaStorage_verify_action": "Bibliothek überprüfen",

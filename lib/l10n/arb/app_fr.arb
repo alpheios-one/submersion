@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Suppression du cloud",
   "settings_mediaStorage_transfers_state_done": "Terminé",
   "settings_mediaStorage_transfers_state_failed": "Échec",
+  "settings_mediaStorage_transfers_suspended_title": "Transferts en pause",
+  "settings_mediaStorage_transfers_suspended_subtitle": "Le stockage cloud n'a pas pu être vérifié. Submersion réessaie régulièrement ; si le problème persiste, déconnectez puis reconnectez le stockage des médias.",
   "settings_mediaStorage_transfers_queued": "{count} en file",
   "settings_mediaStorage_transfers_waitingRetry": "{count} en attente de nouvelle tentative",
   "settings_mediaStorage_verify_action": "Vérifier la bibliothèque",

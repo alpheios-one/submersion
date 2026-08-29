@@ -15,7 +15,6 @@ import 'package:submersion/core/services/media_store/media_store_credentials_sto
 import 'package:submersion/core/services/media_store/media_store_policies.dart';
 import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
 import 'package:submersion/core/services/media_store/network_status_service.dart';
-import 'package:submersion/core/services/media_store/store_marker.dart';
 import 'package:submersion/features/media/data/resolvers/media_store_resolver.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -24,6 +23,7 @@ import 'package:submersion/features/media_store/data/media_backfill_service.dart
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
 import 'package:submersion/features/media_store/data/media_delete_processor.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_store_preflight.dart';
 import 'package:submersion/features/media_store/data/media_store_service.dart';
 import 'package:submersion/features/media_store/data/media_store_worker.dart';
 import 'package:submersion/features/media_store/data/media_stores_repository.dart';
@@ -291,6 +291,7 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       final attachState = ref.watch(mediaStoreAttachStateProvider);
       final attachedId = await attachState.attachedStoreId();
       if (attachedId == null) return null;
+      final providerType = await attachState.attachedProviderType();
 
       // Account-first: attachments made through the Connected Accounts
       // layer resolve their store via the account's adapter. Legacy
@@ -307,13 +308,12 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
           ref.watch(accountProviderRegistryProvider),
         );
       } else {
-        final providerType =
-            await attachState.attachedProviderType() ?? CloudProviderType.s3;
-        final s3Config = providerType == CloudProviderType.s3
+        final legacyType = providerType ?? CloudProviderType.s3;
+        final s3Config = legacyType == CloudProviderType.s3
             ? await ref.watch(mediaStoreCredentialsStoreProvider).load()
             : null;
         builtStore = await buildMediaObjectStore(
-          providerType,
+          legacyType,
           s3Config: s3Config,
         );
       }
@@ -344,20 +344,27 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         store: store,
         mediaRepository: mediaRepository,
       );
+      // Read now, not inside the adopter: the adopter runs from a drain
+      // that can outlive this provider's ref.
+      final service = ref.read(mediaStoreServiceProvider);
+      final preflight = MediaStorePreflight(
+        attachState: attachState,
+        store: store,
+        attachedStoreId: attachedId,
+        // Suspend all transfers when this device detached or when the bucket
+        // no longer carries the store this device attached to (wiped or
+        // repointed; spec section 13). iCloud alone adopts a foreign marker:
+        // its container is fixed per Apple ID, so the only way to find one
+        // there is the two-device race in issue #1356.
+        adoptMarker: providerType == CloudProviderType.icloud
+            ? (marker) => service.adoptICloudStore(marker.storeId)
+            : null,
+      );
       final worker = MediaStoreWorker(
         queue: MediaTransferQueueRepository(),
         pipeline: pipeline,
         deleteProcessor: deleteProcessor,
-        preflight: () async {
-          // Suspend all transfers when this device detached (attach state
-          // re-read, not captured: disconnect can land while a drain is
-          // running) or when the bucket no longer carries the store this
-          // device attached to (wiped or repointed; spec section 13).
-          final currentId = await attachState.attachedStoreId();
-          if (currentId == null || currentId != attachedId) return false;
-          final marker = await StoreMarkerStore(store: store).read();
-          return marker != null && marker.storeId == currentId;
-        },
+        preflight: preflight.call,
         gate: (entry) async {
           // Network policies (design spec section 9): offline halts the
           // drain; cellular defers anything the policy disallows.
@@ -450,6 +457,22 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         worker: worker,
       );
     });
+
+/// Whether the worker's last preflight suspended the transfer queue (issue
+/// #1356). False without a runtime, and it follows the live worker from then
+/// on: the queue rows carry no trace of a suspension, so this is the only
+/// way the settings pages can tell "paused" from "queued".
+// no-tick: mirrors an in-memory worker flag, not a query result.
+final mediaTransfersSuspendedProvider = StreamProvider<bool>((ref) async* {
+  final runtime = await ref.watch(mediaStoreRuntimeProvider.future);
+  final worker = runtime?.worker;
+  if (worker == null) {
+    yield false;
+    return;
+  }
+  yield worker.isSuspended;
+  yield* worker.suspensionChanges;
+});
 
 /// The store-fallback resolver for display surfaces, or null when no store
 /// runtime exists yet. Synchronous accessor over the async runtime.

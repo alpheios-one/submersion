@@ -23315,6 +23315,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'נכשל';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'ההעברות מושהות';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'לא ניתן היה לאמת את אחסון הענן. Submersion ממשיך לנסות; אם הבעיה נמשכת, נתקו את אחסון המדיה וחברו אותו מחדש.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count בתור';
   }

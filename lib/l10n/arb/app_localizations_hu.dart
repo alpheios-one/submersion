@@ -23833,6 +23833,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Sikertelen';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Átvitelek szüneteltetve';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'A felhőtárolót nem sikerült ellenőrizni. A Submersion tovább próbálkozik; ha ez tartósan fennáll, válassza le, majd csatlakoztassa újra a médiatárolót.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count sorban áll';
   }

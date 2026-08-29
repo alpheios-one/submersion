@@ -23484,6 +23484,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'فشل';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'تم إيقاف عمليات النقل مؤقتًا';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'تعذّر التحقق من التخزين السحابي. يواصل Submersion المحاولة؛ إذا استمرت المشكلة، افصل تخزين الوسائط ثم أعد توصيله.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count في قائمة الانتظار';
   }

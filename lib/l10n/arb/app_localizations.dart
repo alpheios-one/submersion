@@ -39337,6 +39337,18 @@ abstract class AppLocalizations {
   /// **'Failed'**
   String get settings_mediaStorage_transfers_state_failed;
 
+  /// No description provided for @settings_mediaStorage_transfers_suspended_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers paused'**
+  String get settings_mediaStorage_transfers_suspended_title;
+
+  /// No description provided for @settings_mediaStorage_transfers_suspended_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud store could not be verified. Submersion keeps retrying; if this persists, disconnect and reconnect media storage.'**
+  String get settings_mediaStorage_transfers_suspended_subtitle;
+
   /// No description provided for @settings_mediaStorage_transfers_queued.
   ///
   /// In en, this message translates to:

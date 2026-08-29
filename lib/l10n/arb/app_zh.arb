@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "正在从云端移除",
   "settings_mediaStorage_transfers_state_done": "已完成",
   "settings_mediaStorage_transfers_state_failed": "失败",
+  "settings_mediaStorage_transfers_suspended_title": "传输已暂停",
+  "settings_mediaStorage_transfers_suspended_subtitle": "无法验证云存储。Submersion 会持续重试；如果问题持续存在，请断开并重新连接媒体存储。",
   "settings_mediaStorage_transfers_queued": "{count} 个排队中",
   "settings_mediaStorage_transfers_waitingRetry": "{count} 个等待重试",
   "settings_mediaStorage_verify_action": "验证媒体库",

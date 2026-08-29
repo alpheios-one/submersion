@@ -203,9 +203,12 @@ void main() {
   );
 
   // The constraint the immediate wakeup must not break: a drain that declined
-  // to run leaves its due row behind on purpose, and arming a timer for it
-  // would spin that timer against a drain that keeps declining.
-  test('a preflight-suspended drain arms no wakeup for a due row', () async {
+  // to run leaves its due row behind on purpose, and an immediate timer for
+  // it would spin against a drain that keeps declining. A suspended drain
+  // gets the preflight retry window instead (issue #1356): far enough out
+  // not to spin, and the only thing that lets the queue recover on its own.
+  test('a preflight-suspended drain arms the retry window, not an immediate '
+      'wakeup', () async {
     final suspended = MediaStoreWorker(
       queue: queue,
       pipeline: pipeline,
@@ -216,9 +219,16 @@ void main() {
 
     await suspended.drain();
 
-    expect(suspended.wakeupDelayForTesting, isNull);
+    expect(
+      suspended.wakeupDelayForTesting,
+      MediaStoreWorker.defaultPreflightRetryWindow,
+    );
     await Future<void>.delayed(const Duration(milliseconds: 150));
-    expect(pipeline.processed, isEmpty, reason: 'no timer should have fired');
+    expect(
+      pipeline.processed,
+      isEmpty,
+      reason: 'no immediate timer should have fired',
+    );
   });
 
   test('a gate-stopped drain arms no wakeup for a due row', () async {

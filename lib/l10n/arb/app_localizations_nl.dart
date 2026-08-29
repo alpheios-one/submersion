@@ -23728,6 +23728,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Mislukt';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Overdrachten gepauzeerd';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'De cloudopslag kon niet worden geverifieerd. Submersion blijft het proberen; als dit aanhoudt, koppel de mediaopslag los en verbind opnieuw.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count in wachtrij';
   }

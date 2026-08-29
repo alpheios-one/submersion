@@ -31,6 +31,17 @@ class _PhantomDownloadPlatform extends DirectoryICloudMediaPlatform {
   Future<bool> ensureDownloaded(String path) async => true;
 }
 
+/// Reports a file iCloud knows about but could not materialize in time. The
+/// native downloadIfNeeded answers false only on that path: the placeholder
+/// exists, startDownloadingUbiquitousItem succeeded, and the 12 s poll ran out.
+/// A file the container has never held short-circuits to true instead.
+class _UndownloadablePlatform extends DirectoryICloudMediaPlatform {
+  _UndownloadablePlatform(super.root);
+
+  @override
+  Future<bool> ensureDownloaded(String path) async => false;
+}
+
 void main() {
   // The NativeICloudMediaPlatform tests invoke a real MethodChannel, which
   // needs the services binding available (it then fails with a
@@ -207,6 +218,43 @@ void main() {
     expect(
       await build().reapStaleUploadSessions(olderThan: DateTime.utc(2026)),
       0,
+    );
+  });
+
+  // Issue #1356: the second device to connect read the first device's
+  // store.json before iCloud had finished downloading it. Reporting that as
+  // notFound made StoreMarkerStore.ensure mint a fresh store id and overwrite
+  // the marker, splitting the store's identity between the two devices.
+  test('getFile on a placeholder that would not download in time is '
+      'transient, not notFound', () async {
+    final store = ICloudMediaObjectStore(
+      platform: _UndownloadablePlatform(container),
+    );
+    File('${container.path}/submersion-media/smv1/store.json')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('{"storeId":"a","formatVersion":1}');
+    await expectLater(
+      store.getFile('smv1/store.json', File('${tmp.path}/o')),
+      throwsA(
+        isA<MediaStoreException>().having(
+          (e) => e.kind,
+          'kind',
+          MediaStoreErrorKind.transient,
+        ),
+      ),
+    );
+  });
+
+  test('getFile on a key the container has never held is notFound', () async {
+    await expectLater(
+      build().getFile('smv1/objects/aa/never.bin', File('${tmp.path}/o')),
+      throwsA(
+        isA<MediaStoreException>().having(
+          (e) => e.kind,
+          'kind',
+          MediaStoreErrorKind.notFound,
+        ),
+      ),
     );
   });
 }

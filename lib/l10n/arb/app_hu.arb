@@ -6752,6 +6752,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Eltávolítás a felhőből",
   "settings_mediaStorage_transfers_state_done": "Kész",
   "settings_mediaStorage_transfers_state_failed": "Sikertelen",
+  "settings_mediaStorage_transfers_suspended_title": "Átvitelek szüneteltetve",
+  "settings_mediaStorage_transfers_suspended_subtitle": "A felhőtárolót nem sikerült ellenőrizni. A Submersion tovább próbálkozik; ha ez tartósan fennáll, válassza le, majd csatlakoztassa újra a médiatárolót.",
   "settings_mediaStorage_transfers_queued": "{count} sorban áll",
   "settings_mediaStorage_transfers_waitingRetry": "{count} újrapróbálkozásra vár",
   "settings_mediaStorage_verify_action": "Könyvtár ellenőrzése",

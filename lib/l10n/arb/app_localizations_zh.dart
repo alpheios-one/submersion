@@ -22679,6 +22679,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => '失败';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title => '传输已暂停';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      '无法验证云存储。Submersion 会持续重试；如果问题持续存在，请断开并重新连接媒体存储。';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count 个排队中';
   }

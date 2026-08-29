@@ -23914,6 +23914,14 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Non riuscito';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Trasferimenti in pausa';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Impossibile verificare l\'archivio cloud. Submersion continua a riprovare; se il problema persiste, disconnetti e ricollega l\'archivio multimediale.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count in coda';
   }

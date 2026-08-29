@@ -15493,6 +15493,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Removing from cloud",
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
+  "settings_mediaStorage_transfers_suspended_title": "Transfers paused",
+  "settings_mediaStorage_transfers_suspended_subtitle": "The cloud store could not be verified. Submersion keeps retrying; if this persists, disconnect and reconnect media storage.",
   "settings_mediaStorage_transfers_queued": "{count} queued",
   "@settings_mediaStorage_transfers_queued": {
     "placeholders": {
