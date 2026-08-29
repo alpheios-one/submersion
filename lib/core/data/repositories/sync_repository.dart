@@ -18,7 +18,10 @@ enum CloudProviderType { icloud, googledrive, s3, dropbox }
 
 /// Repository for managing sync metadata and tracking
 class SyncRepository {
-  AppDatabase get _db => DatabaseService.instance.database;
+  SyncRepository({AppDatabase? database}) : _database = database;
+
+  final AppDatabase? _database;
+  AppDatabase get _db => _database ?? DatabaseService.instance.database;
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(SyncRepository);
 

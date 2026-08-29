@@ -17,15 +17,19 @@ import 'package:submersion/features/dive_log/domain/services/profile_sample_dedu
 /// Zero-arg like `TankPressureRepository`: the database is the
 /// `DatabaseService` singleton, so `setUpTestDatabase()` composes with it.
 class ProfileSeriesRepository {
-  ProfileSeriesRepository({SyncRepository? syncRepository})
-    : _syncRepository = syncRepository ?? SyncRepository();
+  ProfileSeriesRepository({
+    SyncRepository? syncRepository,
+    AppDatabase? database,
+  }) : _syncRepository = syncRepository ?? SyncRepository(database: database),
+       _database = database;
 
   /// The sync entity type; also the `hlcTargets` key.
   static const String entityType = 'diveProfileSeries';
 
   static const ProfileSeriesCodec _codec = ProfileSeriesCodec();
 
-  AppDatabase get _db => DatabaseService.instance.database;
+  final AppDatabase? _database;
+  AppDatabase get _db => _database ?? DatabaseService.instance.database;
   final SyncRepository _syncRepository;
   final _uuid = const Uuid();
 
@@ -42,7 +46,9 @@ class ProfileSeriesRepository {
     String? id,
     int? now,
   }) async {
-    final encoded = _codec.encode(dedupeExactSamples(samples));
+    final encoded = _codec.encode(
+      dedupeExactSamples(_sortedByTimestamp(samples)),
+    );
     final summary = encoded.summary;
     final rowId = id ?? _uuid.v4();
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
@@ -73,6 +79,19 @@ class ProfileSeriesRepository {
     await _markPending(rowId, nowMs);
     SyncEventBus.notifyLocalChange();
     return rowId;
+  }
+
+  /// Timestamp order, ties in input order. Every writer hands over whatever
+  /// order it has; the codec and every reader assume ascending timestamps.
+  static List<ProfileSample> _sortedByTimestamp(List<ProfileSample> samples) {
+    final indexed = [
+      for (var i = 0; i < samples.length; i++) (samples[i].timestamp, i),
+    ];
+    indexed.sort((a, b) {
+      final byTime = a.$1.compareTo(b.$1);
+      return byTime != 0 ? byTime : a.$2.compareTo(b.$2);
+    });
+    return [for (final e in indexed) samples[e.$2]];
   }
 
   /// Every series of [diveId], decoded, oldest start first and then by id
@@ -136,6 +155,42 @@ class ProfileSeriesRepository {
             _db.diveProfileSeries.isPrimary.equals(true),
       );
     return ((await query.getSingle()).read(count) ?? 0) > 0;
+  }
+
+  /// Whether [diveId] has any series row, primary or not. The writers use it
+  /// where the legacy code counted `dive_profiles` rows.
+  Future<bool> hasAnySeries(String diveId) async {
+    final count =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([_db.diveProfileSeries.id.count()])
+              ..where(_db.diveProfileSeries.diveId.equals(diveId)))
+            .map((row) => row.read(_db.diveProfileSeries.id.count()))
+            .getSingle();
+    return (count ?? 0) > 0;
+  }
+
+  /// Whether the source identified by [sourceId] / [computerId] owns at least
+  /// one series of [diveId]: the FK first, then the legacy null-source
+  /// computer rule (the same predicate every ownership write uses).
+  Future<bool> ownsAny(
+    String diveId, {
+    required String? sourceId,
+    required String? computerId,
+  }) async {
+    final count =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([_db.diveProfileSeries.id.count()])
+              ..where(
+                _db.diveProfileSeries.diveId.equals(diveId) &
+                    _ownedBy(
+                      _db.diveProfileSeries,
+                      sourceId: sourceId,
+                      computerId: computerId,
+                    ),
+              ))
+            .map((row) => row.read(_db.diveProfileSeries.id.count()))
+            .getSingle();
+    return (count ?? 0) > 0;
   }
 
   /// Clears `is_primary` on the primary series of [diveId]. Returns how many
@@ -227,6 +282,35 @@ class ProfileSeriesRepository {
   Future<int> promoteAll(String diveId, {int? now}) =>
       _setPrimary((t) => t.diveId.equals(diveId), value: true, now: now);
 
+  /// Stamps [sourceId] on every series of [diveId] that has no source yet
+  /// (the first `dive_data_sources` row of a dive adopts the unattributed
+  /// profile, issue #1149). Returns the number of series stamped.
+  Future<int> adoptUnattributed(
+    String diveId,
+    String sourceId, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(
+      (t) => t.diveId.equals(diveId) & t.sourceId.isNull(),
+    );
+    if (ids.isEmpty) return 0;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.diveProfileSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        DiveProfileSeriesCompanion(
+          sourceId: Value(sourceId),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
+    return ids.length;
+  }
+
   /// Re-inserts [row] verbatim, `created_at`, `updated_at` and `hlc`
   /// included: consolidation undo puts back the row it captured rather than
   /// re-encoding it, and a re-encode could differ byte for byte. When
@@ -314,6 +398,38 @@ class ProfileSeriesRepository {
         t.isPrimary.equals(true) &
         t.computerId.isNull(),
   );
+
+  /// Deletes the series [computerId] contributed to [diveId]; a null
+  /// [computerId] matches the null-computer (manual or file) series only.
+  /// One tombstone per series. Returns the deleted ids.
+  Future<List<String>> deleteByComputer(String diveId, String? computerId) =>
+      _delete(
+        (t) =>
+            t.diveId.equals(diveId) &
+            (computerId == null
+                ? t.computerId.isNull()
+                : t.computerId.equals(computerId)),
+      );
+
+  /// Deletes exactly [ids], one tombstone each. Empty input is a no-op.
+  Future<List<String>> deleteByIds(List<String> ids) =>
+      ids.isEmpty ? Future.value(const []) : _delete((t) => t.id.isIn(ids));
+
+  /// Raw rows of every series of [diveIds], undecoded, for snapshots that
+  /// restore them verbatim through [restoreSeriesRow].
+  Future<List<DiveProfileSeriesRow>> getRowsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const [];
+    return (_db.select(_db.diveProfileSeries)
+          ..where((t) => t.diveId.isIn(diveIds))
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.diveId),
+            (t) => OrderingTerm.asc(t.startTimestamp),
+            (t) => OrderingTerm.asc(t.id),
+          ]))
+        .get();
+  }
 
   Expression<bool> _ownedBy(
     $DiveProfileSeriesTable t, {

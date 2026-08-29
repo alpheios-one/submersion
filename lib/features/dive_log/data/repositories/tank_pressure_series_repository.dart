@@ -14,14 +14,18 @@ import 'package:submersion/features/dive_log/domain/services/profile_sample_dedu
 /// `ProfileSeriesRepository` for the conventions; this is its two-field
 /// sibling keyed by (dive, tank, computer).
 class TankPressureSeriesRepository {
-  TankPressureSeriesRepository({SyncRepository? syncRepository})
-    : _syncRepository = syncRepository ?? SyncRepository();
+  TankPressureSeriesRepository({
+    SyncRepository? syncRepository,
+    AppDatabase? database,
+  }) : _syncRepository = syncRepository ?? SyncRepository(database: database),
+       _database = database;
 
   static const String entityType = 'tankPressureSeries';
 
   static const TankPressureSeriesCodec _codec = TankPressureSeriesCodec();
 
-  AppDatabase get _db => DatabaseService.instance.database;
+  final AppDatabase? _database;
+  AppDatabase get _db => _database ?? DatabaseService.instance.database;
   final SyncRepository _syncRepository;
   final _uuid = const Uuid();
 
@@ -35,7 +39,9 @@ class TankPressureSeriesRepository {
     String? id,
     int? now,
   }) async {
-    final encoded = _codec.encode(dedupeExactPressureSamples(samples));
+    final encoded = _codec.encode(
+      dedupeExactPressureSamples(_sortedByTimestamp(samples)),
+    );
     final rowId = id ?? _uuid.v4();
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
     await _db
@@ -62,6 +68,21 @@ class TankPressureSeriesRepository {
     );
     SyncEventBus.notifyLocalChange();
     return rowId;
+  }
+
+  /// Timestamp order, ties in input order. Every writer hands over whatever
+  /// order it has; the codec and every reader assume ascending timestamps.
+  static List<TankPressureSample> _sortedByTimestamp(
+    List<TankPressureSample> samples,
+  ) {
+    final indexed = [
+      for (var i = 0; i < samples.length; i++) (samples[i].timestamp, i),
+    ];
+    indexed.sort((a, b) {
+      final byTime = a.$1.compareTo(b.$1);
+      return byTime != 0 ? byTime : a.$2.compareTo(b.$2);
+    });
+    return [for (final e in indexed) samples[e.$2]];
   }
 
   /// Every series of [diveId], by tank then start then id.
@@ -104,6 +125,90 @@ class TankPressureSeriesRepository {
     return (row.read(_db.tankPressureSeries.id.count()) ?? 0) > 0;
   }
 
+  /// Raw rows of every series of [diveIds], undecoded, for snapshots that
+  /// restore them verbatim through [restoreSeriesRow].
+  Future<List<TankPressureSeriesRow>> getRowsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const [];
+    return (_db.select(_db.tankPressureSeries)
+          ..where((t) => t.diveId.isIn(diveIds))
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.diveId),
+            (t) => OrderingTerm.asc(t.tankId),
+            (t) => OrderingTerm.asc(t.startTimestamp),
+            (t) => OrderingTerm.asc(t.id),
+          ]))
+        .get();
+  }
+
+  /// Points every series of [fromTankId] on [diveId] at [toTankId] (the
+  /// wrong-cylinder repair). Returns the number of series moved.
+  Future<int> reassignTank(
+    String diveId,
+    String fromTankId,
+    String toTankId, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(
+      (t) => t.diveId.equals(diveId) & t.tankId.equals(fromTankId),
+    );
+    if (ids.isEmpty) return 0;
+    await _retarget(ids, toTankId, nowMs);
+    return ids.length;
+  }
+
+  /// Exchanges the tank ids of the two series sets (the swapped-cylinders
+  /// repair). Both sets are read before either is written.
+  Future<void> swapTanks(
+    String diveId,
+    String tankIdA,
+    String tankIdB, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final aIds = await _ids(
+      (t) => t.diveId.equals(diveId) & t.tankId.equals(tankIdA),
+    );
+    final bIds = await _ids(
+      (t) => t.diveId.equals(diveId) & t.tankId.equals(tankIdB),
+    );
+    await _db.transaction(() async {
+      if (aIds.isNotEmpty) await _retarget(aIds, tankIdB, nowMs);
+      if (bIds.isNotEmpty) await _retarget(bIds, tankIdA, nowMs);
+    });
+  }
+
+  /// Stamps [computerId] on the null-computer series of [diveId]
+  /// (consolidation gives the target's unattributed pressures to its primary
+  /// computer). Returns the number of series stamped.
+  Future<int> stampComputerWhereNull(
+    String diveId,
+    String computerId, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(
+      (t) => t.diveId.equals(diveId) & t.computerId.isNull(),
+    );
+    if (ids.isEmpty) return 0;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.tankPressureSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        TankPressureSeriesCompanion(
+          computerId: Value(computerId),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
+    return ids.length;
+  }
+
   Future<List<String>> deleteForDive(String diveId) =>
       _delete((t) => t.diveId.equals(diveId));
 
@@ -122,6 +227,10 @@ class TankPressureSeriesRepository {
             ? t.computerId.isNull()
             : t.computerId.equals(computerId)),
   );
+
+  /// Deletes exactly [ids], one tombstone each. Empty input is a no-op.
+  Future<List<String>> deleteByIds(List<String> ids) =>
+      ids.isEmpty ? Future.value(const []) : _delete((t) => t.id.isIn(ids));
 
   /// Re-inserts [row] verbatim, `created_at`, `updated_at` and `hlc`
   /// included: consolidation undo puts back the row it captured rather than
@@ -178,6 +287,40 @@ class TankPressureSeriesRepository {
     SyncEventBus.notifyLocalChange();
     return ids;
   }
+
+  Future<void> _retarget(List<String> ids, String tankId, int nowMs) async {
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.tankPressureSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        TankPressureSeriesCompanion(
+          tankId: Value(tankId),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
+  }
+
+  Future<List<String>> _ids(
+    Expression<bool> Function($TankPressureSeriesTable t) where,
+  ) async {
+    final rows =
+        await (_db.selectOnly(_db.tankPressureSeries)
+              ..addColumns([_db.tankPressureSeries.id])
+              ..where(where(_db.tankPressureSeries)))
+            .get();
+    return [for (final r in rows) r.read(_db.tankPressureSeries.id)!];
+  }
+
+  Future<void> _markPending(String id, int nowMs) =>
+      _syncRepository.markRecordPending(
+        entityType: entityType,
+        recordId: id,
+        localUpdatedAt: nowMs,
+      );
 
   domain.TankPressureSeries _decode(TankPressureSeriesRow row) {
     return domain.TankPressureSeries(

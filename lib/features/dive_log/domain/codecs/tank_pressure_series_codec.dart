@@ -17,6 +17,11 @@ class TankPressureSample extends Equatable {
   /// Bar.
   final double pressure;
 
+  /// The same reading [seconds] later (negative moves it earlier). Merge and
+  /// consolidation re-base a segment's samples onto the combined timeline.
+  TankPressureSample shiftedBy(int seconds) =>
+      TankPressureSample(timestamp: timestamp + seconds, pressure: pressure);
+
   @override
   List<Object?> get props => [timestamp, pressure];
 }
