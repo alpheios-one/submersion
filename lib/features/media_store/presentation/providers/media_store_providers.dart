@@ -231,6 +231,11 @@ final mediaTransferEntriesProvider =
 /// A lookup per visible row was the first shape; it hydrated a full
 /// MediaItem (imageData BLOB included) into a non-autoDispose family per
 /// row and re-ran for every visible row on every media write.
+// no-tick: a file name does not change while its upload sits in the queue,
+// and the media table ticks on every stamp the upload pipeline writes - about
+// three a second through a drain - each of which would re-run the whole label
+// query. autoDispose re-resolves the labels the next time the page is built,
+// which is the only moment a stale name could be seen.
 final mediaTransferLabelsProvider =
     FutureProvider.autoDispose<Map<String, String>>((ref) async {
       final queued = ref.watch(
@@ -242,9 +247,7 @@ final mediaTransferLabelsProvider =
         }),
       );
       if (queued == null || queued.ids.isEmpty) return const {};
-      final repository = ref.watch(mediaRepositoryProvider);
-      ref.invalidateSelfWhen(repository.watchMediaChanges());
-      return repository.getDisplayLabels(queued.ids);
+      return ref.watch(mediaRepositoryProvider).getDisplayLabels(queued.ids);
     });
 
 /// The set of media ids the transfer queue names, as a value: `select`

@@ -109,4 +109,22 @@ void main() {
     expect(labels(), isEmpty);
     expect(media.calls, 0);
   });
+
+  // The pipeline stamps the media row of every completed upload, so a
+  // subscription to the media table re-ran this query about three times a
+  // second through a drain, over every id the queue had ever named.
+  test('a write to the media table does not re-run the query', () async {
+    final a = await insertMedia('a.jpg');
+    final sub = container.listen(mediaTransferLabelsProvider, (_, _) {});
+    addTearDown(sub.close);
+    await queue.enqueueUpload(mediaId: a);
+    await waitUntil(() async => labels()?[a] == 'a.jpg');
+    expect(media.calls, 1);
+
+    await insertMedia('c.jpg');
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+
+    expect(media.calls, 1);
+    expect(labels(), {a: 'a.jpg'});
+  });
 }
