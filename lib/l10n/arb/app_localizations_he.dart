@@ -12059,11 +12059,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_currencyFollowsUnits =>
-      'Follows Settings > Units > Default currency';
+      'בהתאם להגדרות > יחידות > מטבע ברירת מחדל';
 
   @override
-  String get gasCalculators_blender_manageCylinderSizes =>
-      'Manage cylinder sizes';
+  String get gasCalculators_blender_manageCylinderSizes => 'ניהול גדלי בלונים';
 
   @override
   String get gasCalculators_blender_costTotal => 'סה\"כ';
@@ -24948,11 +24947,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'נעילת אפליקציה והצפנת מסד הנתונים';
 
   @override
-  String get settings_section_trimixMixer_title => 'Trimix Mixer';
+  String get settings_section_trimixMixer_title => 'מערבל טרימיקס';
 
   @override
   String get settings_section_trimixMixer_subtitle =>
-      'Fill gases, conditions & billing defaults';
+      'גזי מילוי, תנאים וברירות מחדל לחיוב';
 
   @override
   String get settings_security_appLock => 'נעילת אפליקציה';

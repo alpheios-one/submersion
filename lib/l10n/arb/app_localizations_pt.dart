@@ -12361,11 +12361,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_currencyFollowsUnits =>
-      'Follows Settings > Units > Default currency';
+      'Segue Configuracoes > Unidades > Moeda padrão';
 
   @override
   String get gasCalculators_blender_manageCylinderSizes =>
-      'Manage cylinder sizes';
+      'Gerenciar tamanhos de cilindro';
 
   @override
   String get gasCalculators_blender_costTotal => 'Total';
@@ -25578,11 +25578,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Bloqueio do app e criptografia do banco de dados';
 
   @override
-  String get settings_section_trimixMixer_title => 'Trimix Mixer';
+  String get settings_section_trimixMixer_title => 'Misturador de trimix';
 
   @override
   String get settings_section_trimixMixer_subtitle =>
-      'Fill gases, conditions & billing defaults';
+      'Gases de enchimento, condições e definições padrão de faturação';
 
   @override
   String get settings_security_appLock => 'Bloqueio do app';

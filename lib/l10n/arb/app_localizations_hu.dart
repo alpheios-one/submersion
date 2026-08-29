@@ -12319,11 +12319,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_currencyFollowsUnits =>
-      'Follows Settings > Units > Default currency';
+      'Követi: Beallitasok > Mertekegysegek > Alapértelmezett pénznem';
 
   @override
   String get gasCalculators_blender_manageCylinderSizes =>
-      'Manage cylinder sizes';
+      'Palackméretek kezelése';
 
   @override
   String get gasCalculators_blender_costTotal => 'Összesen';
@@ -25476,11 +25476,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Alkalmazászár és adatbázis-titkosítás';
 
   @override
-  String get settings_section_trimixMixer_title => 'Trimix Mixer';
+  String get settings_section_trimixMixer_title => 'Trimix keverő';
 
   @override
   String get settings_section_trimixMixer_subtitle =>
-      'Fill gases, conditions & billing defaults';
+      'Töltőgázok, keverési körülmények és alapértelmezett számlázási beállítások';
 
   @override
   String get settings_security_appLock => 'Alkalmazászár';
