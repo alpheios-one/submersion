@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -127,14 +128,13 @@ class DiverProfileHubPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 24),
           child: Column(
             children: [
-              CircleAvatar(
+              ProfileAvatar(
+                photo: diver.photo,
+                initials: diver.initials,
                 radius: 40,
                 backgroundColor: theme.colorScheme.primaryContainer,
                 foregroundColor: theme.colorScheme.onPrimaryContainer,
-                child: Text(
-                  diver.initials,
-                  style: theme.textTheme.headlineMedium,
-                ),
+                textStyle: theme.textTheme.headlineMedium,
               ),
               const SizedBox(height: 12),
               Text(
