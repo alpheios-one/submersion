@@ -90,11 +90,7 @@ void main() {
     await queue.markTransferring(entryA);
     await waitUntil(
       () async =>
-          container
-              .read(mediaTransferEntriesProvider)
-              .value
-              ?.single
-              .state ==
+          container.read(mediaTransferEntriesProvider).value?.single.state ==
           'transferring',
     );
     expect(media.calls, 1);
