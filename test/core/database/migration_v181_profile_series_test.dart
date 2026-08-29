@@ -216,4 +216,104 @@ void main() {
       expect(AppDatabase.minimumCompatibleSchemaVersion, 170);
     });
   });
+
+  group('packing on upgrade', () {
+    void seed(dynamic rawDb) {
+      rawDb.execute("INSERT INTO dives (id) VALUES ('d1')");
+      rawDb.execute("INSERT INTO dive_computers (id) VALUES ('c1')");
+      rawDb.execute(
+        "INSERT INTO dive_data_sources (id, dive_id, computer_id, "
+        "imported_at, created_at) VALUES ('s1', 'd1', 'c1', 0, 0)",
+      );
+      rawDb.execute("INSERT INTO dive_tanks (id, dive_id) VALUES ('t1', 'd1')");
+      rawDb.execute(
+        "INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, "
+        "is_primary, timestamp, depth) VALUES "
+        "('p1', 'd1', 'c1', 's1', 1, 0, 0.0), "
+        "('p2', 'd1', 'c1', 's1', 1, 10, 15.0), "
+        "('p3', 'd1', 'c1', 's1', 1, 10, 15.0)",
+      );
+      rawDb.execute(
+        "INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, "
+        "pressure, computer_id) VALUES ('q1', 'd1', 't1', 0, 200.0, 'c1')",
+      );
+    }
+
+    test('upgrading from 180 packs the legacy rows', () async {
+      final db = AppDatabase(dbAt180(seed: seed));
+      addTearDown(db.close);
+      await db.customSelect('SELECT 1').get();
+
+      final series = await db
+          .customSelect('SELECT * FROM dive_profile_series')
+          .get();
+      expect(series, hasLength(1));
+      expect(series.single.read<int>('sample_count'), 2);
+      expect(series.single.read<double>('max_depth'), 15.0);
+      final tanks = await db
+          .customSelect('SELECT * FROM tank_pressure_series')
+          .get();
+      expect(tanks, hasLength(1));
+      expect(tanks.single.read<String>('tank_id'), 't1');
+      // Legacy rows are untouched in this plan.
+      final legacy = await db
+          .customSelect('SELECT COUNT(*) AS n FROM dive_profiles')
+          .getSingle();
+      expect(legacy.read<int>('n'), 3);
+    });
+
+    test(
+      'two devices upgrading the same rows converge on the same ids',
+      () async {
+        Future<List<String>> idsAfterUpgrade() async {
+          final db = AppDatabase(dbAt180(seed: seed));
+          addTearDown(db.close);
+          await db.customSelect('SELECT 1').get();
+          final a = await db
+              .customSelect('SELECT id FROM dive_profile_series ORDER BY id')
+              .get();
+          final b = await db
+              .customSelect('SELECT id FROM tank_pressure_series ORDER BY id')
+              .get();
+          return [
+            for (final r in [...a, ...b]) r.read<String>('id'),
+          ];
+        }
+
+        expect(await idsAfterUpgrade(), await idsAfterUpgrade());
+      },
+    );
+
+    test('a database already at 181 is not packed again on open', () async {
+      // Two executors over one handle (see the schema group): the first
+      // open runs the ladder and packs; a legacy row written afterwards must
+      // survive the second open unpacked, because the backstop is schema
+      // only.
+      final raw = sqlite3.sqlite3.openInMemory();
+      addTearDown(raw.close);
+      legacyDdlAt180(raw);
+      seed(raw);
+
+      final first = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      await first.customSelect('SELECT 1').get();
+      await first.close();
+
+      raw.execute(
+        "INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, "
+        "is_primary, timestamp, depth) VALUES ('p9', 'd1', NULL, NULL, 1, 0, 1.0)",
+      );
+
+      final second = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      addTearDown(second.close);
+      await second.customSelect('SELECT 1').get();
+      final series = await second
+          .customSelect('SELECT COUNT(*) AS n FROM dive_profile_series')
+          .getSingle();
+      expect(series.read<int>('n'), 1);
+    });
+  });
 }

@@ -7,6 +7,7 @@ import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 import 'package:submersion/core/database/dive_type_uniqueness.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
 
@@ -9422,11 +9423,14 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
-        // v181: packed profile series tables. Idempotent DDL; the packing
-        // step that fills them from the legacy tables is added by plan 2a
-        // Task 4 and is idempotent too (INSERT OR IGNORE on derived ids).
+        // v181: packed profile series tables, then pack every legacy
+        // row-per-sample row into them. Both steps are idempotent (IF NOT
+        // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
+        // tuple), so a retry after a failed ladder, or a collision re-run,
+        // is safe. The legacy tables stay until plan 2e retires them.
         if (from < 181) {
           await _assertProfileSeriesSchema();
+          await packLegacyProfileRows(this);
         }
         if (from < 181) await reportProgress();
       },
