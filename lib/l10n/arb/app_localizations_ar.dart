@@ -12374,6 +12374,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'لم يعد هذا النوع موجودًا.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'حفظ';
 
   @override
@@ -17387,6 +17391,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signatures_error_enterSignerName => 'الرجاء إدخال اسم الموقع';
 
   @override
+  String get signatures_error_saveFailed =>
+      'تعذر حفظ التوقيع. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get signatures_field_instructorName => 'اسم المدرب';
 
   @override
@@ -19397,13 +19405,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV، UDDF، سجل PDF';
 
   @override
-  String get transfer_section_exportTitle => 'تصدير';
+  String get transfer_section_exportTitle => 'تصدير ملف';
 
   @override
   String get transfer_section_importSubtitle => 'ملفات CSV، UDDF';
 
   @override
-  String get transfer_section_importTitle => 'استيراد';
+  String get transfer_section_importTitle => 'استيراد ملف';
 
   @override
   String get transfer_summary_description => 'استيراد وتصدير بيانات الغوص';
@@ -35382,6 +35390,98 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => 'محتسبة في كل الإحصائيات';
+
+  @override
+  String get suuntoCloud_signIn_title => 'تسجيل الدخول إلى Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'سجّل الدخول بحساب app.suunto.com لاستيراد غوصاتك مباشرة. لا يتم تخزين كلمة المرور مطلقًا، بل يتم تخزين الجلسة الناتجة فقط.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'البريد الإلكتروني مطلوب';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'كلمة المرور';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'كلمة المرور مطلوبة';
+
+  @override
+  String get suuntoCloud_signIn_button => 'تسجيل الدخول';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'جارٍ تسجيل الدخول…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'تم تسجيل الدخول باسم $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'جارٍ سرد الغوصات…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'جلب الغوصة $current من $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'تعذّر جلب الغوصات';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count غوصة',
+      one: 'تم العثور على غوصة واحدة',
+      zero: 'لم يتم العثور على غوصات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'ترتيب';
+
+  @override
+  String get importWizard_review_sortByDate => 'التاريخ';
+
+  @override
+  String get importWizard_review_sortByDepth => 'العمق';
+
+  @override
+  String get importWizard_review_sortByDuration => 'الوقت';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'استيراد الغوصات من تطبيق Suunto أو حساب app.suunto.com';
+
+  @override
+  String get transfer_section_cloudTitle => 'السحابة';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'الاستيراد من السحابة';
 
   @override
   String get settings_storageUsage_appBar_title => 'استخدام التخزين';

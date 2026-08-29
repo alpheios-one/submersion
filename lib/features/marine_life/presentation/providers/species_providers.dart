@@ -189,6 +189,12 @@ class SpeciesListNotifier extends StateNotifier<AsyncValue<List<Species>>> {
     // Reload when the `species` table changes (e.g. a sync writes rows
     // directly), not just on local mutations. _loadSpecies() updates in place
     // without a loading flash, so it doubles as the silent reload.
+    //
+    // The same tick refreshes allSpeciesProvider, speciesByCategoryProvider
+    // and speciesSearchProvider through their own invalidateSelfWhen, so the
+    // mutations below invalidate nothing by hand. A manual invalidate here
+    // would touch this Ref after an await, which throws once this autoDispose
+    // provider has been disposed mid-write.
     final tableChangeSub = _repository.watchSpeciesChanges().listen(
       (_) => _loadSpecies(),
     );
@@ -219,20 +225,17 @@ class SpeciesListNotifier extends StateNotifier<AsyncValue<List<Species>>> {
       description: description,
     );
     await _loadSpecies();
-    _invalidateRelatedProviders();
     return species;
   }
 
   Future<void> updateSpecies(Species species) async {
     await _repository.updateSpecies(species);
     await _loadSpecies();
-    _invalidateRelatedProviders();
   }
 
   Future<void> deleteSpecies(String id) async {
     await _repository.deleteSpecies(id);
     await _loadSpecies();
-    _invalidateRelatedProviders();
   }
 
   Future<bool> isSpeciesInUse(String id) async {
@@ -242,13 +245,6 @@ class SpeciesListNotifier extends StateNotifier<AsyncValue<List<Species>>> {
   Future<void> resetBuiltInSpecies() async {
     await _repository.resetBuiltInSpecies();
     await _loadSpecies();
-    _invalidateRelatedProviders();
-  }
-
-  void _invalidateRelatedProviders() {
-    _ref.invalidate(allSpeciesProvider);
-    _ref.invalidate(speciesByCategoryProvider);
-    _ref.invalidate(speciesSearchProvider);
   }
 }
 

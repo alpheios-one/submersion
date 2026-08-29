@@ -12593,6 +12593,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Diese Art existiert nicht mehr.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Speichern';
 
   @override
@@ -17681,6 +17685,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte geben Sie den Namen des Unterzeichners ein';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Die Unterschrift konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.';
+
+  @override
   String get signatures_field_instructorName => 'Tauchlehrername';
 
   @override
@@ -19716,13 +19724,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF-Logbuch';
 
   @override
-  String get transfer_section_exportTitle => 'Exportieren';
+  String get transfer_section_exportTitle => 'Dateiexport';
 
   @override
   String get transfer_section_importSubtitle => 'CSV-, UDDF-Dateien';
 
   @override
-  String get transfer_section_importTitle => 'Importieren';
+  String get transfer_section_importTitle => 'Dateiimport';
 
   @override
   String get transfer_summary_description =>
@@ -35665,6 +35673,101 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'In allen Statistiken enthalten';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Bei Suunto anmelden';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Melde dich mit deinem app.suunto.com-Konto an, um deine Tauchgänge direkt zu importieren. Dein Passwort wird nie gespeichert, nur die daraus entstehende Sitzung.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-Mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Passwort';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Passwort ist erforderlich';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Anmelden';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Anmeldung läuft…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Angemeldet als $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Tauchgänge werden aufgelistet…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Tauchgang $current von $total wird geladen…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'Tauchgänge konnten nicht geladen werden';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Wiederholen';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+      zero: 'Keine Tauchgänge gefunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.',
+      one:
+          '1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sortieren';
+
+  @override
+  String get importWizard_review_sortByDate => 'Datum';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Tiefe';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Zeit';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Aus der Cloud importieren';
 
   @override
   String get settings_storageUsage_appBar_title => 'Speichernutzung';

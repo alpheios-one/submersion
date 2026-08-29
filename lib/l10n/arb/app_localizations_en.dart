@@ -12396,6 +12396,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'This species no longer exists.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Save';
 
   @override
@@ -17407,6 +17411,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signatures_error_enterSignerName => 'Please enter the signer name';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Could not save the signature. Please try again.';
+
+  @override
   String get signatures_field_instructorName => 'Instructor Name';
 
   @override
@@ -19419,13 +19427,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF logbook';
 
   @override
-  String get transfer_section_exportTitle => 'Export';
+  String get transfer_section_exportTitle => 'File Export';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF files';
 
   @override
-  String get transfer_section_importTitle => 'Import';
+  String get transfer_section_importTitle => 'File Import';
 
   @override
   String get transfer_summary_description => 'Import and export dive data';
@@ -35189,6 +35197,98 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Counted in every statistic';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'Email';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Password';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Sign In';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Listing dives…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Fetching dive $current of $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Try Again';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count dives',
+      one: 'Found 1 dive',
+      zero: 'No dives found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives could not be converted and were skipped.',
+      one: '1 dive could not be converted and was skipped.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sort';
+
+  @override
+  String get importWizard_review_sortByDate => 'Date';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Depth';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Time';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Import dives from your Suunto app / app.suunto.com account';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Import from cloud';
 
   @override
   String get settings_storageUsage_appBar_title => 'Storage Usage';

@@ -2615,12 +2615,22 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// Opens the previously-used-tag picker (#1171) over [selected], so tagging
   /// stays consistent without having to recall earlier spellings. Reports the
   /// merged list (existing plus newly picked) through [onPicked].
+  ///
+  /// [host] is the context the sheet is pushed from, so it decides which
+  /// navigator owns the picker. It defaults to the page, which is right when
+  /// Browse sits on the form itself. A caller whose Browse action lives inside
+  /// a dialog must pass that dialog's context instead: `showDialog` defaults
+  /// to the root navigator while `showModalBottomSheet` defaults to the
+  /// nearest one, which under the app's `ShellRoute` is the shell navigator
+  /// sitting *below* the dialog. Pushed from the page, the picker would open
+  /// behind the dialog with the dialog's barrier eating every tap (#1366).
   void _showTagPickerFor({
     required List<Tag> selected,
     required ValueChanged<List<Tag>> onPicked,
+    BuildContext? host,
   }) {
     showModalBottomSheet<void>(
-      context: context,
+      context: host ?? context,
       isScrollControlled: true,
       builder: (sheetContext) => DraggableScrollableSheet(
         initialChildSize: 0.7,
@@ -3557,7 +3567,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
           actions: [
             TextButton(
+              // `ctx` is inside the dialog route, so the picker lands on the
+              // same (root) navigator and opens above the dialog (#1366).
               onPressed: () => _showTagPickerFor(
+                host: ctx,
                 selected: picked,
                 onPicked: (tags) => setSt(() => picked = tags),
               ),

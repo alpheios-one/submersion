@@ -21323,6 +21323,12 @@ abstract class AppLocalizations {
   /// **'Error saving species: {error}'**
   String marineLife_speciesEdit_errorSaving(Object error);
 
+  /// No description provided for @marineLife_speciesEdit_notFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This species no longer exists.'**
+  String get marineLife_speciesEdit_notFoundMessage;
+
   /// No description provided for @marineLife_speciesEdit_saveButton.
   ///
   /// In en, this message translates to:
@@ -29351,6 +29357,12 @@ abstract class AppLocalizations {
   /// **'Please enter the signer name'**
   String get signatures_error_enterSignerName;
 
+  /// Error shown when saving a signature failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the signature. Please try again.'**
+  String get signatures_error_saveFailed;
+
   /// Label for the instructor name text field
   ///
   /// In en, this message translates to:
@@ -32583,7 +32595,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_exportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export'**
+  /// **'File Export'**
   String get transfer_section_exportTitle;
 
   /// No description provided for @transfer_section_importSubtitle.
@@ -32595,7 +32607,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_importTitle.
   ///
   /// In en, this message translates to:
-  /// **'Import'**
+  /// **'File Import'**
   String get transfer_section_importTitle;
 
   /// No description provided for @transfer_summary_description.
@@ -58738,6 +58750,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Counted in every statistic'**
   String get diveLog_edit_statisticsIncludedHint;
+
+  /// No description provided for @suuntoCloud_signIn_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Suunto'**
+  String get suuntoCloud_signIn_title;
+
+  /// No description provided for @suuntoCloud_signIn_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  String get suuntoCloud_signIn_description;
+
+  /// No description provided for @suuntoCloud_signIn_emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get suuntoCloud_signIn_emailLabel;
+
+  /// No description provided for @suuntoCloud_signIn_emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get suuntoCloud_signIn_emailRequired;
+
+  /// No description provided for @suuntoCloud_signIn_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get suuntoCloud_signIn_passwordLabel;
+
+  /// No description provided for @suuntoCloud_signIn_passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get suuntoCloud_signIn_passwordRequired;
+
+  /// No description provided for @suuntoCloud_signIn_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get suuntoCloud_signIn_button;
+
+  /// No description provided for @suuntoCloud_signIn_signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get suuntoCloud_signIn_signingIn;
+
+  /// Success state on the Suunto sign-in step, once a session is established.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String suuntoCloud_signIn_signedInAs(String email);
+
+  /// No description provided for @suuntoCloud_fetch_listing.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing dives…'**
+  String get suuntoCloud_fetch_listing;
+
+  /// Progress line while downloading each dive from the Suunto cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dive {current} of {total}…'**
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total);
+
+  /// No description provided for @suuntoCloud_fetch_failedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch dives'**
+  String get suuntoCloud_fetch_failedTitle;
+
+  /// No description provided for @suuntoCloud_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get suuntoCloud_fetch_retry;
+
+  /// Result headline after fetching dives from the Suunto cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
+  String suuntoCloud_fetch_foundDives(int count);
+
+  /// Shown when one or more fetched Suunto dives could not be converted and were skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
+  String suuntoCloud_fetch_someFailed(int count);
+
+  /// No description provided for @importWizard_review_sortTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get importWizard_review_sortTooltip;
+
+  /// No description provided for @importWizard_review_sortByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get importWizard_review_sortByDate;
+
+  /// No description provided for @importWizard_review_sortByDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get importWizard_review_sortByDepth;
+
+  /// No description provided for @importWizard_review_sortByDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get importWizard_review_sortByDuration;
+
+  /// No description provided for @transfer_importCloud_suuntoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suunto'**
+  String get transfer_importCloud_suuntoTitle;
+
+  /// No description provided for @transfer_importCloud_suuntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import dives from your Suunto app / app.suunto.com account'**
+  String get transfer_importCloud_suuntoSubtitle;
+
+  /// No description provided for @transfer_section_cloudTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud'**
+  String get transfer_section_cloudTitle;
+
+  /// No description provided for @transfer_section_cloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from cloud'**
+  String get transfer_section_cloudSubtitle;
 
   /// No description provided for @settings_storageUsage_appBar_title.
   ///
