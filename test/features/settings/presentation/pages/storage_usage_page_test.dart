@@ -31,6 +31,8 @@ void main() {
         ),
       ],
       child: const MaterialApp(
+        // Pinned: the assertions match English strings.
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: StorageUsagePage(),

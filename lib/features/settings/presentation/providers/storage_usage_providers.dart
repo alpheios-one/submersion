@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +13,6 @@ import 'package:submersion/core/services/storage/storage_inventory.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
-import 'package:submersion/features/media/data/services/cached_network_image_diagnostics.dart';
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart';
 
@@ -43,7 +44,9 @@ final storageInventoryProvider = Provider<StorageInventory>((ref) {
       return store.totalBytes(kind);
     },
     mapTileKibibytes: _resolveMapTileKibibytes,
-    networkImageBytes: () => CachedNetworkImageDiagnostics().cacheSize(),
+    networkImageDirectory: () async => Directory(
+      p.join((await getTemporaryDirectory()).path, DefaultCacheManager.key),
+    ),
   );
 });
 

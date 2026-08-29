@@ -35,7 +35,7 @@ void main() {
   StorageInventory build({
     Future<int> Function(MediaCacheKind)? mediaCacheBytes,
     Future<double?> Function()? mapTileKibibytes,
-    Future<int> Function()? networkImageBytes,
+    Future<Directory> Function()? networkImageDirectory,
     Future<String?> Function()? backupsDirectoryPath,
     Future<String> Function()? databasePath,
   }) {
@@ -48,7 +48,9 @@ void main() {
       backupsDirectoryPath: backupsDirectoryPath ?? () async => null,
       mediaCacheBytes: mediaCacheBytes ?? (_) async => 0,
       mapTileKibibytes: mapTileKibibytes ?? () async => null,
-      networkImageBytes: networkImageBytes ?? () async => 0,
+      networkImageDirectory:
+          networkImageDirectory ??
+          () async => Directory(p.join(temporary.path, 'libCachedImageData')),
     );
   }
 
@@ -87,6 +89,44 @@ void main() {
     expect(
       await categoryFor(build(), StorageCategoryId.localCache).measure(),
       321,
+    );
+  });
+
+  test('the local cache category counts its WAL sidecars too', () async {
+    final base = p.join(support.path, 'Submersion', 'submersion_local.db');
+    await writeFile(base, 321);
+    await writeFile('$base-wal', 60);
+    await writeFile('$base-shm', 19);
+
+    expect(
+      await categoryFor(build(), StorageCategoryId.localCache).measure(),
+      400,
+    );
+  });
+
+  test('network images walk the cache manager directory', () async {
+    await writeFile(
+      p.join(temporary.path, 'libCachedImageData', 'blob.bin'),
+      4096,
+    );
+
+    expect(
+      await categoryFor(build(), StorageCategoryId.networkImages).measure(),
+      4096,
+    );
+  });
+
+  test('an unreadable network image cache surfaces rather than reading 0', () {
+    // CachedNetworkImageDiagnostics.cacheSize() returns 0 on any failure, which
+    // would let the page present a failed measurement as a real, final zero.
+    final inventory = build(
+      networkImageDirectory: () async =>
+          throw const FileSystemException('denied'),
+    );
+
+    expect(
+      categoryFor(inventory, StorageCategoryId.networkImages).measure(),
+      throwsA(isA<FileSystemException>()),
     );
   });
 
@@ -151,6 +191,17 @@ void main() {
     expect(
       await categoryFor(inventory, StorageCategoryId.mapTiles).measure(),
       4096,
+    );
+  });
+
+  test('map tiles floor the conversion rather than rounding up', () async {
+    // 4.6 KiB is 4710.4 bytes. Flooring keeps the figure from exceeding the
+    // truth, which is the direction every other category reports in.
+    final inventory = build(mapTileKibibytes: () async => 4.6);
+
+    expect(
+      await categoryFor(inventory, StorageCategoryId.mapTiles).measure(),
+      4710,
     );
   });
 

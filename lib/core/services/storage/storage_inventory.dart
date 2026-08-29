@@ -20,7 +20,7 @@ class StorageInventory {
     required Future<String?> Function() backupsDirectoryPath,
     required Future<int> Function(MediaCacheKind kind) mediaCacheBytes,
     required Future<double?> Function() mapTileKibibytes,
-    required Future<int> Function() networkImageBytes,
+    required Future<Directory> Function() networkImageDirectory,
   }) : _supportDirectory = supportDirectory,
        _documentsDirectory = documentsDirectory,
        _temporaryDirectory = temporaryDirectory,
@@ -28,7 +28,7 @@ class StorageInventory {
        _backupsDirectoryPath = backupsDirectoryPath,
        _mediaCacheBytes = mediaCacheBytes,
        _mapTileKibibytes = mapTileKibibytes,
-       _networkImageBytes = networkImageBytes;
+       _networkImageDirectory = networkImageDirectory;
 
   final Future<Directory> Function() _supportDirectory;
   final Future<Directory> Function() _documentsDirectory;
@@ -37,7 +37,7 @@ class StorageInventory {
   final Future<String?> Function() _backupsDirectoryPath;
   final Future<int> Function(MediaCacheKind kind) _mediaCacheBytes;
   final Future<double?> Function() _mapTileKibibytes;
-  final Future<int> Function() _networkImageBytes;
+  final Future<Directory> Function() _networkImageDirectory;
 
   static const _appDir = 'Submersion';
   static const _localCacheDb = 'submersion_local.db';
@@ -92,7 +92,7 @@ class StorageInventory {
     StorageCategory(
       id: StorageCategoryId.networkImages,
       group: StorageGroup.caches,
-      measure: _networkImageBytes,
+      measure: _measureNetworkImages,
     ),
     StorageCategory(
       id: StorageCategoryId.videoThumbnails,
@@ -130,10 +130,17 @@ class StorageInventory {
     ]);
   }
 
+  /// Includes the WAL sidecars for the same reason the main database does:
+  /// drift opens this file in WAL mode and the app holds it open for the whole
+  /// session, so `-wal` and `-shm` are present exactly when a user is looking
+  /// at this page. Counting only the base file would under-report it.
   Future<int?> _measureLocalCache() async {
     final support = await _supportDirectory();
+    final path = p.join(support.path, _appDir, _localCacheDb);
     return measureFileGroupBytes([
-      File(p.join(support.path, _appDir, _localCacheDb)),
+      File(path),
+      File('$path-wal'),
+      File('$path-shm'),
     ]);
   }
 
@@ -146,10 +153,15 @@ class StorageInventory {
 
   /// FMTC reports kibibytes as a double. Converting here rather than at the
   /// call site keeps every category's contract in bytes.
+  ///
+  /// Floored, not rounded. The difference is at most half a byte and the source
+  /// is only KiB-granular anyway, so this is about direction rather than
+  /// accuracy: every other category reports a figure that cannot exceed the
+  /// truth, and this one should not be the exception.
   Future<int?> _measureMapTiles() async {
     final kibibytes = await _mapTileKibibytes();
     if (kibibytes == null) return null;
-    return (kibibytes * 1024).round();
+    return (kibibytes * 1024).floor();
   }
 
   Future<int?> _measureBackups() async {
@@ -157,6 +169,17 @@ class StorageInventory {
     if (path == null) return null;
     return measureDirectoryBytes(Directory(path));
   }
+
+  /// Walked here rather than delegated to CachedNetworkImageDiagnostics.
+  ///
+  /// That class's `cacheSize()` catches everything and returns 0, which is the
+  /// right call for the card it was written for but wrong here: a permission
+  /// failure would arrive as a successful "0 B" and let the header claim a
+  /// final total over a measurement that never happened. `measureDirectoryBytes`
+  /// keeps the distinction, returning 0 only when the directory genuinely is
+  /// not there and throwing when it cannot be read.
+  Future<int?> _measureNetworkImages() async =>
+      measureDirectoryBytes(await _networkImageDirectory());
 
   /// The picked/ subtree plus the loose share files at the temp root, never
   /// the whole temp directory.
