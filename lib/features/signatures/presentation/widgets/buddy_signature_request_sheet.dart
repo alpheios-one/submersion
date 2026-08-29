@@ -166,7 +166,10 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
   /// Laid-out size of the drawing surface, recorded by the [LayoutBuilder]
   /// that wraps it. The canvas stretches to the sheet width, so it is only
   /// known after layout -- and the strokes mean nothing without it.
-  Size _canvasSize = const Size(0, _canvasHeight);
+  ///
+  /// The placeholder is never read: a stroke requires a laid-out canvas, so
+  /// the builder has always run by the time a save can happen.
+  Size _canvasSize = Size.zero;
 
   void _clear() {
     setState(() {
@@ -197,15 +200,7 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
         // Signature canvas
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Recorded, not applied: the strokes are in this box's
-              // coordinates, so the PNG has to be rendered at this exact
-              // size or the right-hand side of the signature is cropped.
-              _canvasSize = Size(constraints.maxWidth, _canvasHeight);
-              return _buildCanvas(context, colorScheme);
-            },
-          ),
+          child: _buildCanvas(context, colorScheme),
         ),
 
         const SizedBox(height: 8),
@@ -265,35 +260,49 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(11),
-        child: Semantics(
-          label: context.l10n.signatures_drawSignatureSemantics,
-          child: GestureDetector(
-            onPanStart: (details) {
-              setState(() {
-                _currentStroke = [details.localPosition];
-              });
-            },
-            onPanUpdate: (details) {
-              setState(() {
-                _currentStroke.add(details.localPosition);
-              });
-            },
-            onPanEnd: (details) {
-              setState(() {
-                if (_currentStroke.isNotEmpty) {
-                  _strokes.add(List.from(_currentStroke));
-                }
-                _currentStroke = [];
-              });
-            },
-            child: CustomPaint(
-              painter: _SignaturePainter(
-                strokes: _strokes,
-                currentStroke: _currentStroke,
-              ),
-              size: Size.infinite,
-            ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Recorded, not applied, and measured HERE rather than around
+            // the Container: the border insets this surface by 1px a side,
+            // and `details.localPosition` is relative to it. Measuring the
+            // outer box would report a canvas 2px larger than the space the
+            // strokes actually live in.
+            _canvasSize = constraints.biggest;
+            return _buildGestureSurface(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGestureSurface(BuildContext context) {
+    return Semantics(
+      label: context.l10n.signatures_drawSignatureSemantics,
+      child: GestureDetector(
+        onPanStart: (details) {
+          setState(() {
+            _currentStroke = [details.localPosition];
+          });
+        },
+        onPanUpdate: (details) {
+          setState(() {
+            _currentStroke.add(details.localPosition);
+          });
+        },
+        onPanEnd: (details) {
+          setState(() {
+            if (_currentStroke.isNotEmpty) {
+              _strokes.add(List.from(_currentStroke));
+            }
+            _currentStroke = [];
+          });
+        },
+        child: CustomPaint(
+          painter: _SignaturePainter(
+            strokes: _strokes,
+            currentStroke: _currentStroke,
           ),
+          size: Size.infinite,
         ),
       ),
     );

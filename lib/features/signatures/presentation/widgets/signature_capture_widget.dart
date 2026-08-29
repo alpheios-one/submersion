@@ -56,7 +56,10 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
   /// Laid-out size of the drawing surface, recorded by the [LayoutBuilder]
   /// that wraps it. The canvas stretches to the available width, so it is
   /// only known after layout -- and the strokes mean nothing without it.
-  late Size _canvasSize = Size(0, widget.canvasHeight);
+  ///
+  /// The placeholder is never read: a stroke requires a laid-out canvas, so
+  /// the builder has always run by the time a save can happen.
+  Size _canvasSize = Size.zero;
 
   @override
   void initState() {
@@ -139,15 +142,7 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
         // Signature canvas
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Recorded, not applied: the strokes are in this box's
-              // coordinates, so the PNG has to be rendered at this exact
-              // size or the right-hand side of the signature is cropped.
-              _canvasSize = Size(constraints.maxWidth, widget.canvasHeight);
-              return _buildCanvas(context, canvasBackground, colorScheme);
-            },
-          ),
+          child: _buildCanvas(context, canvasBackground, colorScheme),
         ),
 
         const SizedBox(height: 8),
@@ -214,37 +209,51 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(11),
-        child: Semantics(
-          label: context.l10n.signatures_drawSignatureSemantics,
-          child: GestureDetector(
-            onPanStart: (details) {
-              setState(() {
-                _currentStroke = [details.localPosition];
-              });
-            },
-            onPanUpdate: (details) {
-              setState(() {
-                _currentStroke.add(details.localPosition);
-              });
-            },
-            onPanEnd: (details) {
-              setState(() {
-                if (_currentStroke.isNotEmpty) {
-                  _strokes.add(List.from(_currentStroke));
-                }
-                _currentStroke = [];
-              });
-            },
-            child: CustomPaint(
-              painter: _SignaturePainter(
-                strokes: _strokes,
-                currentStroke: _currentStroke,
-                strokeColor: widget.strokeColor,
-                strokeWidth: widget.strokeWidth,
-              ),
-              size: Size.infinite,
-            ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Recorded, not applied, and measured HERE rather than around
+            // the Container: the border insets this surface by 1px a side,
+            // and `details.localPosition` is relative to it. Measuring the
+            // outer box would report a canvas 2px larger than the space the
+            // strokes actually live in.
+            _canvasSize = constraints.biggest;
+            return _buildGestureSurface(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGestureSurface(BuildContext context) {
+    return Semantics(
+      label: context.l10n.signatures_drawSignatureSemantics,
+      child: GestureDetector(
+        onPanStart: (details) {
+          setState(() {
+            _currentStroke = [details.localPosition];
+          });
+        },
+        onPanUpdate: (details) {
+          setState(() {
+            _currentStroke.add(details.localPosition);
+          });
+        },
+        onPanEnd: (details) {
+          setState(() {
+            if (_currentStroke.isNotEmpty) {
+              _strokes.add(List.from(_currentStroke));
+            }
+            _currentStroke = [];
+          });
+        },
+        child: CustomPaint(
+          painter: _SignaturePainter(
+            strokes: _strokes,
+            currentStroke: _currentStroke,
+            strokeColor: widget.strokeColor,
+            strokeWidth: widget.strokeWidth,
           ),
+          size: Size.infinite,
         ),
       ),
     );

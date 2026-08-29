@@ -3,9 +3,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
+import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
 import 'package:submersion/features/signatures/domain/entities/signature.dart';
 import 'package:submersion/features/signatures/presentation/providers/signature_providers.dart';
 import 'package:submersion/features/signatures/presentation/widgets/buddy_signatures_section.dart';
@@ -74,6 +77,87 @@ void main() {
     expect(find.byType(Image), findsNothing);
   });
 
+  /// Drives Request -> Ready to Sign -> draw -> Done with [saveResult] as the
+  /// notifier's answer. The notifier is faked so the flow never reaches
+  /// `strokesToPng`, which would hang here; what is under test is how the
+  /// section reacts to the answer, not the encode.
+  Future<void> signWithResult(
+    WidgetTester tester,
+    Signature? saveResult,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        // Pinned: the assertions match English strings.
+        locale: const Locale('en'),
+        overrides: [
+          buddiesForDiveProvider.overrideWith(
+            (ref, id) async => [
+              BuddyWithRole(buddy: buddy, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          buddySignaturesForDiveProvider.overrideWith((ref, id) async => []),
+          buddySignatureSaveNotifierProvider.overrideWith(
+            (ref) => _FakeSaveNotifier(ref, saveResult),
+          ),
+        ],
+        child: const BuddySignaturesSection(diveId: diveId),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Request'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ready to Sign'));
+    await tester.pumpAndSettle();
+
+    final origin = tester.getCenter(find.bySemanticsLabel('Draw signature'));
+    final gesture = await tester.startGesture(origin - const Offset(60, 20));
+    await tester.pump();
+    for (var i = 0; i < 8; i++) {
+      await gesture.moveBy(const Offset(15, 5));
+      await tester.pump();
+    }
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('a failed save tells the diver instead of failing silently', (
+    tester,
+  ) async {
+    // The #1358 symptom exactly: the save threw, the notifier swallowed it
+    // into an AsyncValue nothing watches, and the diver saw an unchanged
+    // Request button with no explanation.
+    await signWithResult(tester, null);
+
+    expect(
+      find.text('Could not save the signature. Please try again.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a successful save says nothing', (tester) async {
+    await signWithResult(
+      tester,
+      Signature(
+        id: 'sig-1',
+        diveId: diveId,
+        imageData: pngBytes,
+        signerId: buddyId,
+        signerName: buddy.name,
+        signedAt: DateTime.utc(2026, 1, 2),
+        type: SignatureType.buddy,
+      ),
+    );
+
+    expect(
+      find.text('Could not save the signature. Please try again.'),
+      findsNothing,
+    );
+  });
+
   testWidgets('shows the signature instead of Request once signed', (
     tester,
   ) async {
@@ -98,4 +182,27 @@ void main() {
     // signerId rather than merely rendered somewhere on the card.
     expect(find.text('1/1'), findsOneWidget);
   });
+}
+
+/// Answers [_result] without touching the encoder or the database, so the
+/// section's reaction to a save can be tested on its own.
+class _FakeSaveNotifier extends BuddySignatureSaveNotifier {
+  _FakeSaveNotifier(Ref ref, this._result)
+    : super(SignatureStorageService(), ref);
+
+  final Signature? _result;
+
+  @override
+  Future<Signature?> saveFromStrokes({
+    required String diveId,
+    required String buddyId,
+    required String buddyName,
+    required String role,
+    required List<List<Offset>> strokes,
+    required double width,
+    required double height,
+    Color strokeColor = const Color(0xFF000000),
+    double strokeWidth = 3.0,
+    Color? backgroundColor,
+  }) async => _result;
 }
