@@ -226,6 +226,13 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
+                      // These presets, and the two date buttons below, hand
+                      // DiveFilterState LOCAL DateTimes. That is deliberate:
+                      // the filter reads them as CALENDAR DATES and normalizes
+                      // to the wall-clock-as-UTC frame the dive rows use, so
+                      // there is nothing to gain by building them with
+                      // DateTime.utc here (issue #1368). Only year/month/day
+                      // are ever read.
                       Wrap(
                         spacing: 8,
                         children: [

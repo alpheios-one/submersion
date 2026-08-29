@@ -2367,14 +2367,19 @@ class DiveRepository {
     List<String> clauses,
     List<Variable<Object>> args,
   ) {
-    if (filter.startDate != null) {
+    // Bounds come pre-normalized to the wall-clock-as-UTC frame the column
+    // stores, so a locally-built filter date lands on the right day boundary
+    // whatever the device's UTC offset is (issue #1368). Half-open, matching
+    // buildFilteredDiveIdSubquery and DiveFilterState.apply.
+    final startBoundMs = filter.startDateBoundMs;
+    if (startBoundMs != null) {
       clauses.add('d.dive_date_time >= ?');
-      args.add(Variable(filter.startDate!.millisecondsSinceEpoch));
+      args.add(Variable(startBoundMs));
     }
-    if (filter.endDate != null) {
-      final endOfDay = filter.endDate!.add(const Duration(days: 1));
+    final endBoundMs = filter.endDateBoundMs;
+    if (endBoundMs != null) {
       clauses.add('d.dive_date_time < ?');
-      args.add(Variable(endOfDay.millisecondsSinceEpoch));
+      args.add(Variable(endBoundMs));
     }
     if (filter.diveTypeId != null) {
       clauses.add(
