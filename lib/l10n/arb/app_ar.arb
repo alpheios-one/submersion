@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{غطسة واحدة} other{{count} غطسة}}",
   "buddies_label_level": "المستوى",
   "buddies_label_notSpecified": "غير محدد",
-  "buddies_label_photoComingSoon": "دعم الصور قادم في الإصدار 2.0",
   "buddies_message_added": "تمت إضافة الرفيق بنجاح",
   "buddies_message_contactImportUnavailable": "استيراد جهات الاتصال غير متوفر على هذا النظام",
   "buddies_message_contactLoadFailed": "فشل تحميل جهات الاتصال",

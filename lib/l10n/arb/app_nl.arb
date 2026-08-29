@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 duik} other{{count} duiken}}",
   "buddies_label_level": "Niveau",
   "buddies_label_notSpecified": "Niet opgegeven",
-  "buddies_label_photoComingSoon": "Foto ondersteuning komt in v2.0",
   "buddies_message_added": "Buddy succesvol toegevoegd",
   "buddies_message_contactImportUnavailable": "Contacten importeren is niet beschikbaar op dit platform",
   "buddies_message_contactLoadFailed": "Contacten laden mislukt",

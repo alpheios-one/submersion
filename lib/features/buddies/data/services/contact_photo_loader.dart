@@ -1,0 +1,58 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Photo properties worth asking the address book for.
+///
+/// Full resolution first, thumbnail as a fallback: a contact thumbnail is
+/// typically only 96x96 or 150x150, well under the 512 the codec stores, so it
+/// is a last resort rather than a preference.
+const contactPhotoProperties = {
+  ContactProperty.photoFullRes,
+  ContactProperty.photoThumbnail,
+};
+
+/// Ensures contacts read permission, but only where the platform needs it.
+///
+/// `FlutterContacts.native.showPicker` is permissionless on both platforms.
+/// Asking it for properties always works on iOS, and on Android throws a
+/// PlatformException without READ_CONTACTS. So Android asks and iOS does not,
+/// which keeps the iOS build free of an address-book prompt it does not need.
+Future<bool> ensureContactPropertyAccess() async {
+  if (!Platform.isAndroid) return true;
+  if (await FlutterContacts.permissions.has(PermissionType.read)) return true;
+  await FlutterContacts.permissions.request(PermissionType.read);
+  return FlutterContacts.permissions.has(PermissionType.read);
+}
+
+/// Opens the native contact picker and returns the chosen contact's photo.
+///
+/// Returns null when the user cancels, denies permission, or picks a contact
+/// with no photo. The last case is common and is reported as a plain message
+/// rather than an error.
+Future<Uint8List?> loadContactPhoto(BuildContext context) async {
+  if (!await ensureContactPropertyAccess()) return null;
+
+  final Contact? contact;
+  try {
+    contact = await FlutterContacts.native.showPicker(
+      properties: contactPhotoProperties,
+    );
+  } on PlatformException {
+    // Android without READ_CONTACTS refuses the property fetch. Treated as a
+    // cancel rather than an error: the user was not promised a photo.
+    return null;
+  }
+
+  final bytes = contact?.photo?.fullSize ?? contact?.photo?.thumbnail;
+
+  if (contact != null && bytes == null && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.profilePhoto_error_contactNoPhoto)),
+    );
+  }
+  return bytes;
+}

@@ -693,7 +693,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 次潜水} other{{count} 次潜水}}",
   "buddies_label_level": "等级",
   "buddies_label_notSpecified": "未指定",
-  "buddies_label_photoComingSoon": "照片功能将在 v2.0 推出",
   "buddies_list_bulkDelete_cancel": "取消",
   "buddies_list_bulkDelete_confirm": "删除",
   "buddies_list_bulkDelete_content": "确定要删除 {count} {count, plural, =1{位潜伴} other{位潜伴}}吗？此操作无法撤消。",

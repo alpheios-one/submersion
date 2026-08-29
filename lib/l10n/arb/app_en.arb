@@ -844,7 +844,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 dive} other{{count} dives}}",
   "buddies_label_level": "Level",
   "buddies_label_notSpecified": "Not specified",
-  "buddies_label_photoComingSoon": "Photo support coming in v2.0",
   "buddies_message_added": "Buddy added successfully",
   "buddies_message_contactImportUnavailable": "Contact import is not available on this platform",
   "buddies_message_contactLoadFailed": "Failed to load contacts",

@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 merülés} other{{count} merülés}}",
   "buddies_label_level": "Szint",
   "buddies_label_notSpecified": "Nincs megadva",
-  "buddies_label_photoComingSoon": "Fotó támogatás a v2.0-ban",
   "buddies_message_added": "Búvártárs sikeresen hozzáadva",
   "buddies_message_contactImportUnavailable": "Névjegy importálás nem elérhető ezen a platformon",
   "buddies_message_contactLoadFailed": "Névjegyek betöltése sikertelen",

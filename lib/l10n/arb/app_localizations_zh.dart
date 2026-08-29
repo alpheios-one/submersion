@@ -1217,9 +1217,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_label_notSpecified => '未指定';
 
   @override
-  String get buddies_label_photoComingSoon => '照片功能将在 v2.0 推出';
-
-  @override
   String get buddies_message_added => '潜伴添加成功';
 
   @override

@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 Tauchgang} other{{count} Tauchgänge}}",
   "buddies_label_level": "Stufe",
   "buddies_label_notSpecified": "Nicht angegeben",
-  "buddies_label_photoComingSoon": "Fotounterstützung kommt in v2.0",
   "buddies_message_added": "Tauchpartner erfolgreich hinzugefügt",
   "buddies_message_contactImportUnavailable": "Kontaktimport ist auf dieser Plattform nicht verfügbar",
   "buddies_message_contactLoadFailed": "Kontakte konnten nicht geladen werden",

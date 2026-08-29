@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 plongée} other{{count} plongées}}",
   "buddies_label_level": "Niveau",
   "buddies_label_notSpecified": "Non spécifié",
-  "buddies_label_photoComingSoon": "Support photo disponible dans la v2.0",
   "buddies_message_added": "Binôme ajouté avec succès",
   "buddies_message_contactImportUnavailable": "L'import de contacts n'est pas disponible sur cette plateforme",
   "buddies_message_contactLoadFailed": "Échec du chargement des contacts",

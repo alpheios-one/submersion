@@ -1288,9 +1288,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get buddies_label_notSpecified => 'Niet opgegeven';
 
   @override
-  String get buddies_label_photoComingSoon => 'Foto ondersteuning komt in v2.0';
-
-  @override
   String get buddies_message_added => 'Buddy succesvol toegevoegd';
 
   @override

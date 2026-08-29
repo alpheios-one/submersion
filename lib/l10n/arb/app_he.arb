@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{צלילה אחת} other{{count} צלילות}}",
   "buddies_label_level": "רמה",
   "buddies_label_notSpecified": "לא צוין",
-  "buddies_label_photoComingSoon": "תמיכה בתמונה תגיע ב-v2.0",
   "buddies_message_added": "חבר צוללים נוסף בהצלחה",
   "buddies_message_contactImportUnavailable": "ייבוא אנשי קשר אינו זמין בפלטפורמה זו",
   "buddies_message_contactLoadFailed": "נכשל בטעינת אנשי קשר",

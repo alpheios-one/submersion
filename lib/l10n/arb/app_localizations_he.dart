@@ -1267,9 +1267,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get buddies_label_notSpecified => 'לא צוין';
 
   @override
-  String get buddies_label_photoComingSoon => 'תמיכה בתמונה תגיע ב-v2.0';
-
-  @override
   String get buddies_message_added => 'חבר צוללים נוסף בהצלחה';
 
   @override

@@ -1282,9 +1282,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get buddies_label_notSpecified => 'غير محدد';
 
   @override
-  String get buddies_label_photoComingSoon => 'دعم الصور قادم في الإصدار 2.0';
-
-  @override
   String get buddies_message_added => 'تمت إضافة الرفيق بنجاح';
 
   @override

@@ -1304,10 +1304,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get buddies_label_notSpecified => 'Non spécifié';
 
   @override
-  String get buddies_label_photoComingSoon =>
-      'Support photo disponible dans la v2.0';
-
-  @override
   String get buddies_message_added => 'Binôme ajouté avec succès';
 
   @override

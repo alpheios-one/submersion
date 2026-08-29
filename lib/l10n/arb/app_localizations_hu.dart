@@ -1292,9 +1292,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get buddies_label_notSpecified => 'Nincs megadva';
 
   @override
-  String get buddies_label_photoComingSoon => 'Fotó támogatás a v2.0-ban';
-
-  @override
   String get buddies_message_added => 'Búvártárs sikeresen hozzáadva';
 
   @override
