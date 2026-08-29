@@ -197,6 +197,58 @@ Future<void> _pumpConstrained(
   await tester.pumpAndSettle();
 }
 
+/// Pumps the sheet bottom-anchored under a home-indicator-sized inset, the
+/// way both hosts present it: showModalBottomSheet without useSafeArea.
+Future<void> _pumpWithBottomInset(
+  WidgetTester tester, {
+  required double inset,
+}) async {
+  tester.view.physicalSize = const Size(900, 800);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        allSpeciesProvider.overrideWith((ref) async => _catalog),
+        speciesByCategoryProvider.overrideWith(
+          (ref, category) async => const [],
+        ),
+        speciesSearchProvider.overrideWith((ref, query) async => const []),
+        speciesRepositoryProvider.overrideWithValue(_RecordingRepository()),
+        speciesLookupServiceProvider.overrideWithValue(_FakeLookup()),
+        speciesLookupLocaleProvider.overrideWithValue('en'),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          // The override sits inside the body so it is the sheet's nearest
+          // MediaQuery, whatever the Scaffold did with the real padding.
+          body: Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(padding: EdgeInsets.only(bottom: inset)),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  height: 560,
+                  width: 900,
+                  child: SpeciesPickerSheet(
+                    scrollController: ScrollController(),
+                    onSpeciesSelected: (_, _, _) {},
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 Future<void> _typeAndAdd(WidgetTester tester) async {
   await tester.enterText(find.byType(TextField).first, 'whale');
   await tester.pumpAndSettle();
@@ -380,5 +432,17 @@ void main() {
     expect(box.height, greaterThan(0));
     // The list is the part that gives, not the footer.
     expect(find.byType(ListView), findsWidgets);
+  });
+
+  testWidgets('the footer clears the bottom inset, since neither host passes '
+      'useSafeArea', (tester) async {
+    const inset = 34.0;
+    await _pumpWithBottomInset(tester, inset: inset);
+
+    final footer = tester.getRect(find.byKey(_lookupFooter));
+    // The sheet is bottom-anchored, so its own bottom edge is the screen
+    // edge; the button has to stop short of the home indicator.
+    expect(footer.bottom, lessThanOrEqualTo(800 - inset));
+    expect(footer.height, greaterThan(0));
   });
 }

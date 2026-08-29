@@ -216,13 +216,19 @@ class _SpeciesPickerSheetState extends ConsumerState<SpeciesPickerSheet> {
         // no way to reach the online lookup at all. This footer is the door
         // that is always open.
         const Divider(height: 1),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: TextButton.icon(
-            key: const ValueKey('species_picker_lookup_online'),
-            icon: const Icon(Icons.travel_explore),
-            label: Text(context.l10n.marineLife_lookup_button),
-            onPressed: _lookUpOnline,
+        // Neither host passes useSafeArea, and the sheet is bottom-anchored,
+        // so without this the button sits under the home indicator. The list
+        // above could be scrolled clear of it; a fixed footer cannot.
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextButton.icon(
+              key: const ValueKey('species_picker_lookup_online'),
+              icon: const Icon(Icons.travel_explore),
+              label: Text(context.l10n.marineLife_lookup_button),
+              onPressed: _lookUpOnline,
+            ),
           ),
         ),
       ],
