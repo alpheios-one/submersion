@@ -621,10 +621,12 @@ class MultiTrendLineChart extends StatelessWidget {
     ];
     final colors = seriesColors ?? defaultColors;
 
-    final allValues = dataSeries.expand((s) => s.map((d) => d.value)).toList();
-    final minY = allValues.reduce((a, b) => a < b ? a : b);
-    final maxY = allValues.reduce((a, b) => a > b ? a : b);
-    final padding = (maxY - minY) * 0.1;
+    // Every series shares one axis, and that axis drives the bounds, the grid
+    // lines and the labels together, so the numbers sit on the lines instead
+    // of on fl_chart's own separate sequence (issues #219, #1354).
+    final axis = ChartAxis.forTrend(
+      dataSeries.expand((s) => s.map((d) => d.value)),
+    );
 
     final longestSeries = dataSeries.reduce(
       (a, b) => a.length > b.length ? a : b,
@@ -640,8 +642,8 @@ class MultiTrendLineChart extends StatelessWidget {
             height: height - 30,
             child: LineChart(
               LineChartData(
-                minY: minY - padding,
-                maxY: maxY + padding,
+                minY: axis.min,
+                maxY: axis.max,
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipItems: (touchedSpots) {
@@ -689,7 +691,11 @@ class MultiTrendLineChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 40,
+                      // Matches the sibling trend chart: a unit-formatted
+                      // temperature such as 85.5 F wrapped onto two lines in
+                      // the narrower gutter this chart used to reserve.
+                      reservedSize: 50,
+                      interval: axis.interval,
                       getTitlesWidget: (value, meta) {
                         return Text(
                           valueFormatter?.call(value) ??
@@ -715,6 +721,7 @@ class MultiTrendLineChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
+                  horizontalInterval: axis.interval,
                   getDrawingHorizontalLine: (value) => FlLine(
                     color: Theme.of(context).colorScheme.outlineVariant,
                     strokeWidth: 1,
