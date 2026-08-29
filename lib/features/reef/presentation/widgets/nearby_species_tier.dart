@@ -235,11 +235,15 @@ class _NearbySpeciesTierState extends ConsumerState<NearbySpeciesTier> {
       result = null;
     }
     if (!mounted) return;
-    result ??= await showSpeciesLookupSheet(
-      context,
-      initialQuery: scientificName,
-    );
-    if (result == null || !mounted) return;
+    if (result == null) {
+      final outcome = await showSpeciesLookupSheet(
+        context,
+        initialQuery: scientificName,
+      );
+      if (outcome is! SpeciesLookupChosen) return;
+      result = outcome.result;
+    }
+    if (!mounted) return;
 
     final repository = ref.read(speciesRepositoryProvider);
     final species =

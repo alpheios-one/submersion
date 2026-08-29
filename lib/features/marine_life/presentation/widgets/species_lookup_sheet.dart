@@ -6,13 +6,18 @@ import 'package:submersion/features/marine_life/presentation/providers/species_l
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Opens the lookup sheet. Resolves to the chosen species' fields, or null
-/// when the diver dismisses it or asks to create the species without a
-/// lookup (callers keep their offline path for that).
-Future<SpeciesLookupResult?> showSpeciesLookupSheet(
+/// Opens the lookup sheet. Resolves to a [SpeciesLookupChosen] when the
+/// diver picked a taxon, a [SpeciesLookupCreateWithout] when they asked to
+/// skip the lookup, and null when they dismissed the sheet.
+///
+/// Set [allowCreateWithout] to false when the caller has no name to fall
+/// back on, so the sheet does not offer to create a species out of an empty
+/// string.
+Future<SpeciesLookupOutcome?> showSpeciesLookupSheet(
   BuildContext context, {
   String initialQuery = '',
-}) => showModalBottomSheet<SpeciesLookupResult>(
+  bool allowCreateWithout = true,
+}) => showModalBottomSheet<SpeciesLookupOutcome>(
   context: context,
   isScrollControlled: true,
   useSafeArea: true,
@@ -23,6 +28,7 @@ Future<SpeciesLookupResult?> showSpeciesLookupSheet(
     expand: false,
     builder: (_, controller) => SpeciesLookupSheet(
       initialQuery: initialQuery,
+      allowCreateWithout: allowCreateWithout,
       scrollController: controller,
     ),
   ),
@@ -33,11 +39,13 @@ Future<SpeciesLookupResult?> showSpeciesLookupSheet(
 /// offline boat is a single clear message rather than a stream of errors.
 class SpeciesLookupSheet extends ConsumerStatefulWidget {
   final String initialQuery;
+  final bool allowCreateWithout;
   final ScrollController? scrollController;
 
   const SpeciesLookupSheet({
     super.key,
     required this.initialQuery,
+    this.allowCreateWithout = true,
     this.scrollController,
   });
 
@@ -95,7 +103,7 @@ class _SpeciesLookupSheetState extends ConsumerState<SpeciesLookupSheet> {
       final result = await ref
           .read(speciesLookupServiceProvider)
           .resolve(hit.taxonId, locale: ref.read(speciesLookupLocaleProvider));
-      if (mounted) Navigator.of(context).pop(result);
+      if (mounted) Navigator.of(context).pop(SpeciesLookupChosen(result));
     } on SpeciesLookupException catch (e) {
       if (mounted) {
         setState(() {
@@ -144,12 +152,15 @@ class _SpeciesLookupSheetState extends ConsumerState<SpeciesLookupSheet> {
         const SizedBox(height: 16),
         ..._body(l10n, theme),
         const SizedBox(height: 16),
-        OutlinedButton(
-          key: const ValueKey('lookup_create_without'),
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.marineLife_lookup_createWithout),
-        ),
-        const SizedBox(height: 8),
+        if (widget.allowCreateWithout) ...[
+          OutlinedButton(
+            key: const ValueKey('lookup_create_without'),
+            onPressed: () =>
+                Navigator.of(context).pop(const SpeciesLookupCreateWithout()),
+            child: Text(l10n.marineLife_lookup_createWithout),
+          ),
+          const SizedBox(height: 8),
+        ],
         Text(
           l10n.marineLife_lookup_attribution,
           textAlign: TextAlign.center,
