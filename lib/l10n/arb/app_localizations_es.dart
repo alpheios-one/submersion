@@ -17714,6 +17714,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Por favor ingresa el nombre del firmante';
 
   @override
+  String get signatures_error_saveFailed =>
+      'No se pudo guardar la firma. Inténtalo de nuevo.';
+
+  @override
   String get signatures_field_instructorName => 'Nombre del Instructor';
 
   @override

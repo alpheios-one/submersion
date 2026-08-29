@@ -5189,6 +5189,7 @@
   "signatures_drawSignatureSemantics": "Dessiner la signature",
   "signatures_error_drawSignature": "Veuillez dessiner une signature",
   "signatures_error_enterSignerName": "Veuillez entrer le nom du signataire",
+  "signatures_error_saveFailed": "Impossible d'enregistrer la signature. Veuillez réessayer.",
   "signatures_field_instructorName": "Nom de l'instructeur",
   "signatures_field_instructorNameHint": "Entrer le nom de l'instructeur",
   "signatures_handoff_title": "Passez votre appareil à",

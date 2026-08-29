@@ -5262,6 +5262,7 @@
   "signatures_drawSignatureSemantics": "رسم التوقيع",
   "signatures_error_drawSignature": "الرجاء رسم توقيع",
   "signatures_error_enterSignerName": "الرجاء إدخال اسم الموقع",
+  "signatures_error_saveFailed": "تعذر حفظ التوقيع. يرجى المحاولة مرة أخرى.",
   "signatures_field_instructorName": "اسم المدرب",
   "signatures_field_instructorNameHint": "أدخل اسم المدرب",
   "signatures_handoff_title": "ناول جهازك إلى",

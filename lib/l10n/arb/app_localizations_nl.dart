@@ -17569,6 +17569,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer de naam van de ondertekenaar in';
 
   @override
+  String get signatures_error_saveFailed =>
+      'De handtekening kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
   String get signatures_field_instructorName => 'Naam instructeur';
 
   @override

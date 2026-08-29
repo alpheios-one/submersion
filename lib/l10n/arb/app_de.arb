@@ -5262,6 +5262,7 @@
   "signatures_drawSignatureSemantics": "Signatur zeichnen",
   "signatures_error_drawSignature": "Bitte zeichnen Sie eine Signatur",
   "signatures_error_enterSignerName": "Bitte geben Sie den Namen des Unterzeichners ein",
+  "signatures_error_saveFailed": "Die Unterschrift konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
   "signatures_field_instructorName": "Tauchlehrername",
   "signatures_field_instructorNameHint": "Tauchlehrernamen eingeben",
   "signatures_handoff_title": "Geben Sie Ihr Gerät an",

@@ -527,10 +527,17 @@ class MediaRepository {
   /// Whether any attachable media exists (signatures excluded). Cheap
   /// EXISTS probe for setup/status surfaces.
   Future<bool> hasAnyMedia() async {
+    // Excludes every signature spelling, not just the instructor one, so a
+    // logbook whose only media rows are buddy signatures still reports empty.
+    final placeholders = List.filled(
+      kSignatureFileTypes.length,
+      '?',
+    ).join(', ');
     final row = await _db
         .customSelect(
-          "SELECT EXISTS(SELECT 1 FROM media "
-          "WHERE file_type != 'instructor_signature') AS present",
+          'SELECT EXISTS(SELECT 1 FROM media '
+          'WHERE file_type NOT IN ($placeholders)) AS present',
+          variables: kSignatureFileTypes.map(Variable.withString).toList(),
         )
         .getSingle();
     return row.read<int>('present') == 1;

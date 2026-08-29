@@ -17715,6 +17715,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get signatures_error_enterSignerName => 'Digite o nome do signatário';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Não foi possível salvar a assinatura. Tente novamente.';
+
+  @override
   String get signatures_field_instructorName => 'Nome do Instrutor';
 
   @override

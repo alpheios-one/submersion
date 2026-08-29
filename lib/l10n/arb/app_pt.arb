@@ -5262,6 +5262,7 @@
   "signatures_drawSignatureSemantics": "Desenhar assinatura",
   "signatures_error_drawSignature": "Desenhe uma assinatura",
   "signatures_error_enterSignerName": "Digite o nome do signatário",
+  "signatures_error_saveFailed": "Não foi possível salvar a assinatura. Tente novamente.",
   "signatures_field_instructorName": "Nome do Instrutor",
   "signatures_field_instructorNameHint": "Digite o nome do instrutor",
   "signatures_handoff_title": "Entregue seu dispositivo para",
