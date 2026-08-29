@@ -1,0 +1,177 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+
+import 'package:submersion/core/services/storage/directory_size.dart';
+import 'package:submersion/core/services/storage/storage_category.dart';
+import 'package:submersion/features/media_store/data/media_cache_store.dart';
+
+/// Builds the list of places this app accumulates bytes on disk.
+///
+/// Every external dependency arrives as a closure rather than being looked up
+/// internally, so the whole inventory is testable without path_provider, a real
+/// database, or an initialized FMTC store.
+class StorageInventory {
+  StorageInventory({
+    required Future<Directory> Function() supportDirectory,
+    required Future<Directory> Function() documentsDirectory,
+    required Future<Directory> Function() temporaryDirectory,
+    required Future<String> Function() databasePath,
+    required Future<String?> Function() backupsDirectoryPath,
+    required Future<int> Function(MediaCacheKind kind) mediaCacheBytes,
+    required Future<double?> Function() mapTileKibibytes,
+    required Future<int> Function() networkImageBytes,
+  }) : _supportDirectory = supportDirectory,
+       _documentsDirectory = documentsDirectory,
+       _temporaryDirectory = temporaryDirectory,
+       _databasePath = databasePath,
+       _backupsDirectoryPath = backupsDirectoryPath,
+       _mediaCacheBytes = mediaCacheBytes,
+       _mapTileKibibytes = mapTileKibibytes,
+       _networkImageBytes = networkImageBytes;
+
+  final Future<Directory> Function() _supportDirectory;
+  final Future<Directory> Function() _documentsDirectory;
+  final Future<Directory> Function() _temporaryDirectory;
+  final Future<String> Function() _databasePath;
+  final Future<String?> Function() _backupsDirectoryPath;
+  final Future<int> Function(MediaCacheKind kind) _mediaCacheBytes;
+  final Future<double?> Function() _mapTileKibibytes;
+  final Future<int> Function() _networkImageBytes;
+
+  static const _appDir = 'Submersion';
+  static const _localCacheDb = 'submersion_local.db';
+
+  /// Order is display order on the usage page.
+  List<StorageCategory> get categories => [
+    StorageCategory(
+      id: StorageCategoryId.database,
+      group: StorageGroup.appData,
+      measure: _measureDatabase,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.localCache,
+      group: StorageGroup.appData,
+      measure: _measureLocalCache,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.mediaCacheOriginals,
+      group: StorageGroup.mediaCache,
+      measure: () => _mediaCacheBytes(MediaCacheKind.original),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.mediaCacheThumbs,
+      group: StorageGroup.mediaCache,
+      measure: () => _mediaCacheBytes(MediaCacheKind.thumb),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.mediaCacheRenditions,
+      group: StorageGroup.mediaCache,
+      measure: () => _mediaCacheBytes(MediaCacheKind.rendition),
+    ),
+    // Staging and transcode are walked rather than read from the index: the
+    // LRU caps in MediaCacheStore are enforced only over rows in
+    // media_cache_entries, and neither subdirectory is indexed. Their bytes are
+    // invisible to the 3.25 GiB budget, which is precisely why they get rows.
+    StorageCategory(
+      id: StorageCategoryId.mediaCacheStaging,
+      group: StorageGroup.mediaCache,
+      measure: () => _measureSupportSubdirectory(['media_cache', 'staging']),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.mediaCacheTranscode,
+      group: StorageGroup.mediaCache,
+      measure: () => _measureSupportSubdirectory(['media_cache', 'transcode']),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.mapTiles,
+      group: StorageGroup.caches,
+      measure: _measureMapTiles,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.networkImages,
+      group: StorageGroup.caches,
+      measure: _networkImageBytes,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.videoThumbnails,
+      group: StorageGroup.caches,
+      measure: () => _measureSupportSubdirectory(['video_thumbnails']),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.pdfThumbnails,
+      group: StorageGroup.caches,
+      measure: () => _measureSupportSubdirectory(['pdf_thumbnails']),
+    ),
+    StorageCategory(
+      id: StorageCategoryId.backups,
+      group: StorageGroup.backups,
+      measure: _measureBackups,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.temporary,
+      group: StorageGroup.temporary,
+      measure: _measureTemporary,
+    ),
+    StorageCategory(
+      id: StorageCategoryId.exports,
+      group: StorageGroup.exports,
+      measure: _measureExports,
+    ),
+  ];
+
+  Future<int?> _measureDatabase() async {
+    final path = await _databasePath();
+    return measureFileGroupBytes([
+      File(path),
+      File('$path-wal'),
+      File('$path-shm'),
+    ]);
+  }
+
+  Future<int?> _measureLocalCache() async {
+    final support = await _supportDirectory();
+    return measureFileGroupBytes([
+      File(p.join(support.path, _appDir, _localCacheDb)),
+    ]);
+  }
+
+  Future<int?> _measureSupportSubdirectory(List<String> segments) async {
+    final support = await _supportDirectory();
+    return measureDirectoryBytes(
+      Directory(p.joinAll([support.path, _appDir, ...segments])),
+    );
+  }
+
+  /// FMTC reports kibibytes as a double. Converting here rather than at the
+  /// call site keeps every category's contract in bytes.
+  Future<int?> _measureMapTiles() async {
+    final kibibytes = await _mapTileKibibytes();
+    if (kibibytes == null) return null;
+    return (kibibytes * 1024).round();
+  }
+
+  Future<int?> _measureBackups() async {
+    final path = await _backupsDirectoryPath();
+    if (path == null) return null;
+    return measureDirectoryBytes(Directory(path));
+  }
+
+  Future<int?> _measureTemporary() async {
+    final temp = await _temporaryDirectory();
+    return measureDirectoryBytes(temp);
+  }
+
+  /// Loose files in the Documents root, which is where saveAndShareFile leaves
+  /// every export permanently. The database may or may not live here depending
+  /// on the configured location, so it is excluded by name either way, as are
+  /// its sidecars and every subdirectory.
+  Future<int?> _measureExports() async {
+    final documents = await _documentsDirectory();
+    final dbName = p.basename(await _databasePath());
+    return measureLooseFilesBytes(
+      documents,
+      exclude: (name) => name.startsWith(dbName),
+    );
+  }
+}
