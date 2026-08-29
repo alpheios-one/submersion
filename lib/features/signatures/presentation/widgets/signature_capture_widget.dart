@@ -73,6 +73,11 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
     super.dispose();
   }
 
+  /// Whether anything drawable has been captured. Mirrors what the painter
+  /// and the PNG encoder accept, so an enabled button always means there is
+  /// a signature to save.
+  bool get _hasDrawing => _strokes.isNotEmpty || _currentStroke.length >= 2;
+
   void _clear() {
     setState(() {
       _strokes.clear();
@@ -167,9 +172,7 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
             children: [
               // Clear button
               OutlinedButton.icon(
-                onPressed: _strokes.isEmpty && _currentStroke.isEmpty
-                    ? null
-                    : _clear,
+                onPressed: !_hasDrawing ? null : _clear,
                 icon: const Icon(Icons.clear),
                 label: Text(context.l10n.signatures_action_clear),
               ),
@@ -182,9 +185,7 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
               const SizedBox(width: 8),
               // Save button
               FilledButton.icon(
-                onPressed: _strokes.isEmpty && _currentStroke.isEmpty
-                    ? null
-                    : _handleSave,
+                onPressed: !_hasDrawing ? null : _handleSave,
                 icon: const Icon(Icons.check),
                 label: Text(context.l10n.signatures_action_saveSignature),
               ),
@@ -240,7 +241,11 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
         },
         onPanEnd: (details) {
           setState(() {
-            if (_currentStroke.isNotEmpty) {
+            // Only strokes with a segment to draw. A plain tap wins the
+            // gesture arena uncontested and lands here with a single point,
+            // which the painter and the PNG encoder both skip -- so storing
+            // it would light up Save and store a blank signature.
+            if (_currentStroke.length >= 2) {
               _strokes.add(List.from(_currentStroke));
             }
             _currentStroke = [];

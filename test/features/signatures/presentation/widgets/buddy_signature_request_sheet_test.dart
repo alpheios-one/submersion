@@ -180,4 +180,22 @@ void main() {
     expect(canvas(), findsNothing);
     expect(savedStrokes, isNull);
   });
+
+  // A plain tap wins the gesture arena uncontested and reaches onPanEnd with
+  // a single point. The painter and the encoder both skip such a stroke, so
+  // storing it would enable Done and save a blank signature.
+  testWidgets('a tap on the canvas is not a signature', (tester) async {
+    await openSheet(tester);
+    await tester.tap(find.text('Ready to Sign'));
+    await tester.pumpAndSettle();
+
+    await tester.tapAt(tester.getCenter(canvas()));
+    await tester.pumpAndSettle();
+
+    final doneButton = tester.widget<FilledButton>(
+      find.ancestor(of: find.text('Done'), matching: find.byType(FilledButton)),
+    );
+    expect(doneButton.onPressed, isNull);
+    expect(savedStrokes, isNull);
+  });
 }

@@ -147,4 +147,22 @@ void main() {
     expect(canvas(), findsNothing);
     expect(savedStrokes, isNull);
   });
+
+  // A plain tap wins the gesture arena uncontested and reaches onPanEnd with
+  // a single point, which neither the painter nor the encoder draws.
+  testWidgets('a tap on the canvas is not a signature', (tester) async {
+    await openSheet(tester, initialSignerName: 'Dive Instructor');
+
+    await tester.tapAt(tester.getCenter(canvas()));
+    await tester.pumpAndSettle();
+
+    final saveButton = tester.widget<FilledButton>(
+      find.ancestor(
+        of: find.text('Save Signature'),
+        matching: find.byType(FilledButton),
+      ),
+    );
+    expect(saveButton.onPressed, isNull);
+    expect(savedStrokes, isNull);
+  });
 }

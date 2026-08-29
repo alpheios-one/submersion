@@ -358,10 +358,27 @@ class SignatureStorageService {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
 
+    // The output is a whole number of pixels, rounded up, because the size
+    // comes from layout constraints and is routinely fractional on a scaled
+    // display: a stroke may sit at x = 607.8 on a 607.5-wide canvas, and
+    // truncating would drop that last column and crop the signature again,
+    // in miniature.
+    //
+    // Everything painted below is measured against these dimensions rather
+    // than the fractional request, so the background reaches the edge of the
+    // image it is filling. Filling only to 607.5 of a 608px-wide bitmap
+    // leaves a transparent strip down the right of an otherwise opaque
+    // signature.
+    final pixelWidth = width.ceil();
+    final pixelHeight = height.ceil();
+
     // Draw background if specified
     if (backgroundColor != null) {
       final bgPaint = Paint()..color = backgroundColor;
-      canvas.drawRect(Rect.fromLTWH(0, 0, width, height), bgPaint);
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, pixelWidth.toDouble(), pixelHeight.toDouble()),
+        bgPaint,
+      );
     }
 
     // Draw strokes
@@ -385,15 +402,8 @@ class SignatureStorageService {
       canvas.drawPath(path, paint);
     }
 
-    // Convert to image.
-    //
-    // Rounded up, not truncated: the size comes from layout constraints and
-    // is routinely fractional on a scaled display, and a stroke may sit at
-    // x = 607.8 on a 607.5-wide canvas. `toInt()` would drop that last
-    // column and crop the signature again, in miniature. Rounding up costs
-    // at most one transparent pixel.
     final picture = recorder.endRecording();
-    final image = await picture.toImage(width.ceil(), height.ceil());
+    final image = await picture.toImage(pixelWidth, pixelHeight);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
 
     return byteData!.buffer.asUint8List();

@@ -1,9 +1,12 @@
+import 'dart:ui' show ImageByteFormat, instantiateImageCodec;
+
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
 import 'package:submersion/features/signatures/presentation/providers/signature_providers.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -162,4 +165,39 @@ void main() {
     expect(image.width, 608);
     expect(image.height, 200);
   });
+
+  // An opaque background has to reach the edge of the image it is filling.
+  // Filling only to the fractional request left the last column and row
+  // transparent on a rounded-up bitmap, so an instructor signature (which
+  // asks for a white background) came out with a transparent strip.
+  test(
+    'an opaque background fills the rounded-up bitmap to its edge',
+    () async {
+      final bytes = await SignatureStorageService.strokesToPng(
+        strokes: const <List<Offset>>[
+          [Offset(10, 100), Offset(400, 100)],
+        ],
+        width: 607.5,
+        height: 199.25,
+        strokeColor: const Color(0xFF000000),
+        strokeWidth: 3,
+        backgroundColor: const Color(0xFFFFFFFF),
+      );
+
+      final codec = await instantiateImageCodec(bytes);
+      final frame = await codec.getNextFrame();
+      final image = frame.image;
+      expect(image.width, 608);
+      expect(image.height, 200);
+
+      final data = await image.toByteData(format: ImageByteFormat.rawRgba);
+      int alphaAt(int x, int y) =>
+          data!.getUint8((y * image.width + x) * 4 + 3);
+
+      // The bottom-right pixel is the one the fractional fill used to miss.
+      expect(alphaAt(image.width - 1, image.height - 1), 255);
+      expect(alphaAt(image.width - 1, 0), 255);
+      expect(alphaAt(0, image.height - 1), 255);
+    },
+  );
 }

@@ -171,6 +171,11 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
   /// the builder has always run by the time a save can happen.
   Size _canvasSize = Size.zero;
 
+  /// Whether anything drawable has been captured. Mirrors what the painter
+  /// and the PNG encoder accept, so an enabled button always means there is
+  /// a signature to save.
+  bool get _hasDrawing => _strokes.isNotEmpty || _currentStroke.length >= 2;
+
   void _clear() {
     setState(() {
       _strokes.clear();
@@ -224,9 +229,7 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
           child: Row(
             children: [
               OutlinedButton.icon(
-                onPressed: _strokes.isEmpty && _currentStroke.isEmpty
-                    ? null
-                    : _clear,
+                onPressed: !_hasDrawing ? null : _clear,
                 icon: const Icon(Icons.clear),
                 label: Text(context.l10n.signatures_action_clear),
               ),
@@ -237,9 +240,7 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
               ),
               const SizedBox(width: 8),
               FilledButton.icon(
-                onPressed: _strokes.isEmpty && _currentStroke.isEmpty
-                    ? null
-                    : _handleSave,
+                onPressed: !_hasDrawing ? null : _handleSave,
                 icon: const Icon(Icons.check),
                 label: Text(context.l10n.signatures_action_done),
               ),
@@ -291,7 +292,11 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
         },
         onPanEnd: (details) {
           setState(() {
-            if (_currentStroke.isNotEmpty) {
+            // Only strokes with a segment to draw. A plain tap wins the
+            // gesture arena uncontested and lands here with a single point,
+            // which the painter and the PNG encoder both skip -- so storing
+            // it would light up Done and save a blank signature.
+            if (_currentStroke.length >= 2) {
               _strokes.add(List.from(_currentStroke));
             }
             _currentStroke = [];
