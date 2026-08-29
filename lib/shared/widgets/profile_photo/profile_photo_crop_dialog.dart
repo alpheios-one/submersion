@@ -1,0 +1,202 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/profile_photo/profile_photo_crop_geometry.dart';
+
+/// Shows the pan and zoom crop surface and returns the encoded 512x512 JPEG,
+/// or null if the user cancelled.
+///
+/// A full-screen dialog rather than a bottom sheet: a crop wants maximum area,
+/// and `showModalBottomSheet(isScrollControlled: true)` removes the height
+/// ceiling entirely, which puts a drag handle inside Android's notification
+/// shade zone (issue #1188). Popping happens from inside this builder's own
+/// context, which addresses the root navigator that `showDialog` already
+/// defaults to, so this is not the pattern that blanked master-detail in
+/// PR #1312.
+Future<Uint8List?> showProfilePhotoCropDialog({
+  required BuildContext context,
+  required Uint8List sourceBytes,
+  String? declaredName,
+}) {
+  return showDialog<Uint8List?>(
+    context: context,
+    builder: (dialogContext) => _ProfilePhotoCropDialog(
+      sourceBytes: sourceBytes,
+      declaredName: declaredName,
+    ),
+  );
+}
+
+class _ProfilePhotoCropDialog extends StatefulWidget {
+  const _ProfilePhotoCropDialog({required this.sourceBytes, this.declaredName});
+
+  final Uint8List sourceBytes;
+  final String? declaredName;
+
+  @override
+  State<_ProfilePhotoCropDialog> createState() =>
+      _ProfilePhotoCropDialogState();
+}
+
+class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
+  final TransformationController _controller = TransformationController();
+  ui.Image? _decoded;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _decode();
+  }
+
+  Future<void> _decode() async {
+    final codec = await ui.instantiateImageCodec(widget.sourceBytes);
+    final frame = await codec.getNextFrame();
+    if (!mounted) {
+      frame.image.dispose();
+      return;
+    }
+    setState(() => _decoded = frame.image);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _decoded?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save(Size viewport, Size childSize, Size sourceSize) async {
+    setState(() => _busy = true);
+    final rect = cropRectInSourcePixels(
+      transform: _controller.value,
+      viewport: viewport,
+      childSize: childSize,
+      sourceSize: sourceSize,
+    );
+    final result = await encodeStoredImage(
+      ImageEncodeRequest.fromBytes(
+        bytes: widget.sourceBytes,
+        spec: ImageEncodeSpec.avatar,
+        cropRect: rect,
+        declaredName: widget.declaredName,
+      ),
+    );
+    if (!mounted) return;
+    if (result.outcome != ImageEncodeOutcome.encoded) {
+      setState(() => _busy = false);
+      final l10n = context.l10n;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            result.outcome == ImageEncodeOutcome.tooLarge
+                ? l10n.profilePhoto_error_tooLarge
+                : l10n.profilePhoto_error_undecodable,
+          ),
+        ),
+      );
+      return;
+    }
+    Navigator.of(context).pop(result.bytes);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final decoded = _decoded;
+
+    return Dialog.fullscreen(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.profilePhoto_crop_title),
+          leading: TextButton(
+            onPressed: _busy ? null : () => Navigator.of(context).pop(),
+            child: Text(l10n.common_action_cancel),
+          ),
+          leadingWidth: 96,
+        ),
+        body: decoded == null
+            ? const Center(child: CircularProgressIndicator())
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  final side = constraints.maxWidth < constraints.maxHeight
+                      ? constraints.maxWidth
+                      : constraints.maxHeight;
+                  final viewport = Size(side, side);
+                  final sourceSize = Size(
+                    decoded.width.toDouble(),
+                    decoded.height.toDouble(),
+                  );
+                  // Lay the child out at cover scale so the square viewport is
+                  // always fully covered. minScale 1.0 then makes a gap
+                  // unrepresentable rather than something to validate against.
+                  final coverScale = decoded.width < decoded.height
+                      ? side / decoded.width
+                      : side / decoded.height;
+                  final childSize = Size(
+                    decoded.width * coverScale,
+                    decoded.height * coverScale,
+                  );
+
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: SizedBox(
+                            width: side,
+                            height: side,
+                            child: ClipOval(
+                              child: InteractiveViewer(
+                                transformationController: _controller,
+                                minScale: 1,
+                                maxScale: 5,
+                                constrained: false,
+                                child: SizedBox(
+                                  width: childSize.width,
+                                  height: childSize.height,
+                                  child: Image.memory(
+                                    widget.sourceBytes,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          l10n.profilePhoto_crop_hint,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        child: FilledButton(
+                          onPressed: _busy
+                              ? null
+                              : () => _save(viewport, childSize, sourceSize),
+                          child: _busy
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(l10n.common_action_save),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+      ),
+    );
+  }
+}

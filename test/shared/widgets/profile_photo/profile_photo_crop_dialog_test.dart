@@ -1,0 +1,125 @@
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:submersion/shared/widgets/profile_photo/profile_photo_crop_dialog.dart';
+
+import '../../../helpers/test_app.dart';
+
+Uint8List _jpeg(int width, int height) {
+  final image = img.Image(width: width, height: height);
+  img.fill(image, color: img.ColorRgb8(120, 60, 30));
+  return Uint8List.fromList(img.encodeJpg(image, quality: 90));
+}
+
+/// Alternates real async progress with frame pumps.
+///
+/// The dialog does two things fakeAsync cannot drive: `instantiateImageCodec`
+/// decodes on the engine, and `encodeStoredImage` spawns a real isolate
+/// through `compute`. Both need `runAsync` to make progress. Pumping is still
+/// manual rather than `pumpAndSettle`, because the dialog shows a
+/// CircularProgressIndicator during each of those phases and an animating
+/// spinner never settles.
+Future<void> _settle(WidgetTester tester, {int rounds = 15}) async {
+  for (var i = 0; i < rounds; i++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump();
+  }
+}
+
+void main() {
+  testWidgets('cancel returns null', (tester) async {
+    Uint8List? result;
+    var completed = false;
+
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              result = await showProfilePhotoCropDialog(
+                context: context,
+                sourceBytes: _jpeg(800, 600),
+                declaredName: 'pick.jpg',
+              );
+              completed = true;
+            },
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await _settle(tester);
+
+    expect(find.text('Adjust Photo'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await _settle(tester);
+
+    expect(completed, isTrue);
+    expect(result, isNull);
+  });
+
+  testWidgets('save returns encoded square bytes', (tester) async {
+    Uint8List? result;
+
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              result = await showProfilePhotoCropDialog(
+                context: context,
+                sourceBytes: _jpeg(800, 600),
+                declaredName: 'pick.jpg',
+              );
+            },
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await _settle(tester);
+
+    await tester.tap(find.text('Save'));
+    await _settle(tester, rounds: 30);
+
+    expect(result, isNotNull);
+    final out = img.decodeImage(result!)!;
+    expect(out.width, out.height, reason: 'the stored photo must be square');
+    expect(out.width, lessThanOrEqualTo(512));
+  });
+
+  testWidgets('the dialog shows the repositioning hint', (tester) async {
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () => showProfilePhotoCropDialog(
+              context: context,
+              sourceBytes: _jpeg(400, 400),
+              declaredName: 'pick.jpg',
+            ),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await _settle(tester);
+
+    expect(find.text('Drag to reposition, pinch to zoom'), findsOneWidget);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+  });
+}
