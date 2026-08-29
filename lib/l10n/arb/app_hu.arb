@@ -5188,6 +5188,7 @@
   "signatures_drawSignatureSemantics": "Aláírás rajzolása",
   "signatures_error_drawSignature": "Rajzolj egy aláírást",
   "signatures_error_enterSignerName": "Add meg az aláíró nevét",
+  "signatures_error_saveFailed": "Az aláírást nem sikerült menteni. Próbáld újra.",
   "signatures_field_instructorName": "Oktató neve",
   "signatures_field_instructorNameHint": "Add meg az oktató nevét",
   "signatures_handoff_title": "Add át az eszközt",

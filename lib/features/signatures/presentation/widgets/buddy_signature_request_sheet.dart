@@ -9,7 +9,11 @@ import 'package:submersion/features/dive_roles/presentation/dive_role_display.da
 /// Shows a message to hand device to buddy, then displays signature canvas
 class BuddySignatureRequestSheet extends StatefulWidget {
   final BuddyWithRole buddyWithRole;
-  final void Function(List<List<Offset>> strokes)? onSave;
+
+  /// Receives the strokes together with the size of the canvas they were
+  /// drawn on. The strokes are in canvas-local coordinates, so rendering
+  /// them at any other size crops the signature.
+  final void Function(List<List<Offset>> strokes, Size canvasSize)? onSave;
 
   const BuddySignatureRequestSheet({
     super.key,
@@ -121,8 +125,8 @@ class _BuddySignatureRequestSheetState
               // Signature capture
               _BuddySignatureCapture(
                 buddyName: buddy.name,
-                onSave: (strokes) {
-                  widget.onSave?.call(strokes);
+                onSave: (strokes, canvasSize) {
+                  widget.onSave?.call(strokes, canvasSize);
                   Navigator.of(context).pop();
                 },
                 onCancel: () => Navigator.of(context).pop(),
@@ -140,7 +144,7 @@ class _BuddySignatureRequestSheetState
 /// Customized signature capture for buddy signatures (no name field needed)
 class _BuddySignatureCapture extends StatefulWidget {
   final String buddyName;
-  final void Function(List<List<Offset>> strokes)? onSave;
+  final void Function(List<List<Offset>> strokes, Size canvasSize)? onSave;
   final VoidCallback? onCancel;
 
   const _BuddySignatureCapture({
@@ -154,8 +158,15 @@ class _BuddySignatureCapture extends StatefulWidget {
 }
 
 class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
+  static const double _canvasHeight = 200;
+
   final List<List<Offset>> _strokes = [];
   List<Offset> _currentStroke = [];
+
+  /// Laid-out size of the drawing surface, recorded by the [LayoutBuilder]
+  /// that wraps it. The canvas stretches to the sheet width, so it is only
+  /// known after layout -- and the strokes mean nothing without it.
+  Size _canvasSize = const Size(0, _canvasHeight);
 
   void _clear() {
     setState(() {
@@ -172,7 +183,7 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
       return;
     }
 
-    widget.onSave?.call(_strokes);
+    widget.onSave?.call(_strokes, _canvasSize);
   }
 
   @override
@@ -186,48 +197,14 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
         // Signature canvas
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            height: 200,
-            decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.5),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
-              child: Semantics(
-                label: context.l10n.signatures_drawSignatureSemantics,
-                child: GestureDetector(
-                  onPanStart: (details) {
-                    setState(() {
-                      _currentStroke = [details.localPosition];
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    setState(() {
-                      _currentStroke.add(details.localPosition);
-                    });
-                  },
-                  onPanEnd: (details) {
-                    setState(() {
-                      if (_currentStroke.isNotEmpty) {
-                        _strokes.add(List.from(_currentStroke));
-                      }
-                      _currentStroke = [];
-                    });
-                  },
-                  child: CustomPaint(
-                    painter: _SignaturePainter(
-                      strokes: _strokes,
-                      currentStroke: _currentStroke,
-                    ),
-                    size: Size.infinite,
-                  ),
-                ),
-              ),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Recorded, not applied: the strokes are in this box's
+              // coordinates, so the PNG has to be rendered at this exact
+              // size or the right-hand side of the signature is cropped.
+              _canvasSize = Size(constraints.maxWidth, _canvasHeight);
+              return _buildCanvas(context, colorScheme);
+            },
           ),
         ),
 
@@ -275,6 +252,50 @@ class _BuddySignatureCaptureState extends State<_BuddySignatureCapture> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCanvas(BuildContext context, ColorScheme colorScheme) {
+    return Container(
+      height: _canvasHeight,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: Semantics(
+          label: context.l10n.signatures_drawSignatureSemantics,
+          child: GestureDetector(
+            onPanStart: (details) {
+              setState(() {
+                _currentStroke = [details.localPosition];
+              });
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                _currentStroke.add(details.localPosition);
+              });
+            },
+            onPanEnd: (details) {
+              setState(() {
+                if (_currentStroke.isNotEmpty) {
+                  _strokes.add(List.from(_currentStroke));
+                }
+                _currentStroke = [];
+              });
+            },
+            child: CustomPaint(
+              painter: _SignaturePainter(
+                strokes: _strokes,
+                currentStroke: _currentStroke,
+              ),
+              size: Size.infinite,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -328,7 +349,7 @@ class _SignaturePainter extends CustomPainter {
 Future<void> showBuddySignatureRequestSheet({
   required BuildContext context,
   required BuddyWithRole buddyWithRole,
-  required void Function(List<List<Offset>> strokes) onSave,
+  required void Function(List<List<Offset>> strokes, Size canvasSize) onSave,
 }) {
   return showModalBottomSheet(
     context: context,

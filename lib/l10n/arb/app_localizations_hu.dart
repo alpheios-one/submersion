@@ -17647,6 +17647,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get signatures_error_enterSignerName => 'Add meg az aláíró nevét';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Az aláírást nem sikerült menteni. Próbáld újra.';
+
+  @override
   String get signatures_field_instructorName => 'Oktató neve';
 
   @override

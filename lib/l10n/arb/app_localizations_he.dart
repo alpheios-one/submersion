@@ -17260,6 +17260,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get signatures_error_enterSignerName => 'נא להזין שם החותם';
 
   @override
+  String get signatures_error_saveFailed =>
+      'לא ניתן היה לשמור את החתימה. נסו שוב.';
+
+  @override
   String get signatures_field_instructorName => 'שם המדריך';
 
   @override

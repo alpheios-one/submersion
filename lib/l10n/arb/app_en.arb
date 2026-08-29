@@ -10506,6 +10506,7 @@
   "signatures_drawSignatureSemantics": "Draw signature",
   "signatures_error_drawSignature": "Please draw a signature",
   "signatures_error_enterSignerName": "Please enter the signer name",
+  "signatures_error_saveFailed": "Could not save the signature. Please try again.",
   "signatures_field_instructorName": "Instructor Name",
   "signatures_field_instructorNameHint": "Enter instructor name",
   "signatures_handoff_title": "Hand your device to",
@@ -10586,6 +10587,9 @@
   },
   "@signatures_error_enterSignerName": {
     "description": "Error shown when trying to save without entering a signer name"
+  },
+  "@signatures_error_saveFailed": {
+    "description": "Error shown when saving a signature failed"
   },
   "@signatures_field_instructorName": {
     "description": "Label for the instructor name text field"

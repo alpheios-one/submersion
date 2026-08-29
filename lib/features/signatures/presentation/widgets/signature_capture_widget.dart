@@ -11,7 +11,12 @@ class SignatureCaptureWidget extends StatefulWidget {
   final String? initialSignerName;
 
   /// Callback when signature is saved
-  final void Function(List<List<Offset>> strokes, String signerName)? onSave;
+  final void Function(
+    List<List<Offset>> strokes,
+    String signerName,
+    Size canvasSize,
+  )?
+  onSave;
 
   /// Callback when cancelled
   final VoidCallback? onCancel;
@@ -48,6 +53,11 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
   List<Offset> _currentStroke = [];
   late final TextEditingController _nameController;
 
+  /// Laid-out size of the drawing surface, recorded by the [LayoutBuilder]
+  /// that wraps it. The canvas stretches to the available width, so it is
+  /// only known after layout -- and the strokes mean nothing without it.
+  late Size _canvasSize = Size(0, widget.canvasHeight);
+
   @override
   void initState() {
     super.initState();
@@ -83,7 +93,7 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
       return;
     }
 
-    widget.onSave?.call(_strokes, name);
+    widget.onSave?.call(_strokes, name, _canvasSize);
   }
 
   @override
@@ -129,50 +139,14 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
         // Signature canvas
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Container(
-            height: widget.canvasHeight,
-            decoration: BoxDecoration(
-              color: canvasBackground,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.5),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
-              child: Semantics(
-                label: context.l10n.signatures_drawSignatureSemantics,
-                child: GestureDetector(
-                  onPanStart: (details) {
-                    setState(() {
-                      _currentStroke = [details.localPosition];
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    setState(() {
-                      _currentStroke.add(details.localPosition);
-                    });
-                  },
-                  onPanEnd: (details) {
-                    setState(() {
-                      if (_currentStroke.isNotEmpty) {
-                        _strokes.add(List.from(_currentStroke));
-                      }
-                      _currentStroke = [];
-                    });
-                  },
-                  child: CustomPaint(
-                    painter: _SignaturePainter(
-                      strokes: _strokes,
-                      currentStroke: _currentStroke,
-                      strokeColor: widget.strokeColor,
-                      strokeWidth: widget.strokeWidth,
-                    ),
-                    size: Size.infinite,
-                  ),
-                ),
-              ),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Recorded, not applied: the strokes are in this box's
+              // coordinates, so the PNG has to be rendered at this exact
+              // size or the right-hand side of the signature is cropped.
+              _canvasSize = Size(constraints.maxWidth, widget.canvasHeight);
+              return _buildCanvas(context, canvasBackground, colorScheme);
+            },
           ),
         ),
 
@@ -223,6 +197,56 @@ class _SignatureCaptureWidgetState extends State<SignatureCaptureWidget> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCanvas(
+    BuildContext context,
+    Color canvasBackground,
+    ColorScheme colorScheme,
+  ) {
+    return Container(
+      height: widget.canvasHeight,
+      decoration: BoxDecoration(
+        color: canvasBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.5)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: Semantics(
+          label: context.l10n.signatures_drawSignatureSemantics,
+          child: GestureDetector(
+            onPanStart: (details) {
+              setState(() {
+                _currentStroke = [details.localPosition];
+              });
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                _currentStroke.add(details.localPosition);
+              });
+            },
+            onPanEnd: (details) {
+              setState(() {
+                if (_currentStroke.isNotEmpty) {
+                  _strokes.add(List.from(_currentStroke));
+                }
+                _currentStroke = [];
+              });
+            },
+            child: CustomPaint(
+              painter: _SignaturePainter(
+                strokes: _strokes,
+                currentStroke: _currentStroke,
+                strokeColor: widget.strokeColor,
+                strokeWidth: widget.strokeWidth,
+              ),
+              size: Size.infinite,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -284,7 +308,12 @@ class _SignaturePainter extends CustomPainter {
 /// Full-screen signature capture sheet
 class SignatureCaptureSheet extends StatelessWidget {
   final String? initialSignerName;
-  final void Function(List<List<Offset>> strokes, String signerName)? onSave;
+  final void Function(
+    List<List<Offset>> strokes,
+    String signerName,
+    Size canvasSize,
+  )?
+  onSave;
 
   const SignatureCaptureSheet({super.key, this.initialSignerName, this.onSave});
 
@@ -331,8 +360,8 @@ class SignatureCaptureSheet extends StatelessWidget {
             // Signature capture widget
             SignatureCaptureWidget(
               initialSignerName: initialSignerName,
-              onSave: (strokes, name) {
-                onSave?.call(strokes, name);
+              onSave: (strokes, name, canvasSize) {
+                onSave?.call(strokes, name, canvasSize);
                 Navigator.of(context).pop();
               },
               onCancel: () => Navigator.of(context).pop(),
@@ -350,7 +379,12 @@ class SignatureCaptureSheet extends StatelessWidget {
 Future<void> showSignatureCaptureSheet({
   required BuildContext context,
   String? initialSignerName,
-  required void Function(List<List<Offset>> strokes, String signerName) onSave,
+  required void Function(
+    List<List<Offset>> strokes,
+    String signerName,
+    Size canvasSize,
+  )
+  onSave,
 }) {
   return showModalBottomSheet(
     context: context,

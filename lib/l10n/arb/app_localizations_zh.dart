@@ -16811,6 +16811,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signatures_error_enterSignerName => '请输入签名者姓名';
 
   @override
+  String get signatures_error_saveFailed => '无法保存签名。请重试。';
+
+  @override
   String get signatures_field_instructorName => '教练名称';
 
   @override

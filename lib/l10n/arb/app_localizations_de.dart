@@ -17681,6 +17681,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte geben Sie den Namen des Unterzeichners ein';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Die Unterschrift konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.';
+
+  @override
   String get signatures_field_instructorName => 'Tauchlehrername';
 
   @override

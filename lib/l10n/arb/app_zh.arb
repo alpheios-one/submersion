@@ -5448,6 +5448,7 @@
   "signatures_drawSignatureSemantics": "绘制签名",
   "signatures_error_drawSignature": "请绘制签名",
   "signatures_error_enterSignerName": "请输入签名者姓名",
+  "signatures_error_saveFailed": "无法保存签名。请重试。",
   "signatures_field_instructorName": "教练名称",
   "signatures_field_instructorNameHint": "输入教练姓名",
   "signatures_handoff_title": "请将设备交给",

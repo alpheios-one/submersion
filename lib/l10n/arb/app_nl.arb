@@ -5261,6 +5261,7 @@
   "signatures_drawSignatureSemantics": "Teken handtekening",
   "signatures_error_drawSignature": "Teken een handtekening",
   "signatures_error_enterSignerName": "Voer de naam van de ondertekenaar in",
+  "signatures_error_saveFailed": "De handtekening kon niet worden opgeslagen. Probeer het opnieuw.",
   "signatures_field_instructorName": "Naam instructeur",
   "signatures_field_instructorNameHint": "Voer naam instructeur in",
   "signatures_handoff_title": "Geef je apparaat aan",

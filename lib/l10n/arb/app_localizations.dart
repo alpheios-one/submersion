@@ -29351,6 +29351,12 @@ abstract class AppLocalizations {
   /// **'Please enter the signer name'**
   String get signatures_error_enterSignerName;
 
+  /// Error shown when saving a signature failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the signature. Please try again.'**
+  String get signatures_error_saveFailed;
+
   /// Label for the instructor name text field
   ///
   /// In en, this message translates to:

@@ -21,6 +21,22 @@ class SignatureStorageService {
   static const String _signatureFileType = 'instructor_signature';
   static const String _buddySignatureFileType = 'buddy_signature';
 
+  /// `media.file_path` is NOT NULL, but a signature has no file behind it:
+  /// the strokes live in the row's `image_data` BLOB. The empty string is the
+  /// schema's existing "no file" sentinel -- the v72 `source_type` backfill
+  /// tests `file_path != ''` before classifying a row as a local file, and
+  /// `SignatureResolver` only falls back to the path when it is non-empty.
+  ///
+  /// Omitting it entirely is what broke signature capture (issue #1358):
+  /// Drift rejects the companion in `validateIntegrity` before any SQL runs,
+  /// so every save threw and no signature ever reached the database.
+  static const String _signatureFilePath = '';
+
+  /// Signature rows resolve through `SignatureResolver`, never through the
+  /// gallery or local-file resolvers, so they carry the matching source type
+  /// rather than the column's `platformGallery` default.
+  static const String _signatureSourceType = 'signature';
+
   /// Save a signature image and create media record
   ///
   /// [diveId] - The dive this signature belongs to
@@ -47,7 +63,10 @@ class SignatureStorageService {
               id: Value(id),
               diveId: Value(diveId),
               imageData: Value(imageBytes),
+              filePath: const Value(_signatureFilePath),
               fileType: const Value(_signatureFileType),
+              sourceType: const Value(_signatureSourceType),
+              signatureType: const Value('instructor'),
               takenAt: Value(now.millisecondsSinceEpoch),
               signerId: Value(signerId),
               signerName: Value(signerName),
@@ -72,6 +91,7 @@ class SignatureStorageService {
         signerId: signerId,
         signerName: signerName,
         signedAt: now,
+        type: SignatureType.instructor,
       );
     } catch (e, stackTrace) {
       _log.error(
@@ -209,7 +229,9 @@ class SignatureStorageService {
               id: Value(id),
               diveId: Value(diveId),
               imageData: Value(imageBytes),
+              filePath: const Value(_signatureFilePath),
               fileType: const Value(_buddySignatureFileType),
+              sourceType: const Value(_signatureSourceType),
               takenAt: Value(now.millisecondsSinceEpoch),
               signerId: Value(buddyId),
               signerName: Value(buddyName),

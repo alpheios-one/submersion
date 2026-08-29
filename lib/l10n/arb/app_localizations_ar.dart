@@ -17387,6 +17387,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signatures_error_enterSignerName => 'الرجاء إدخال اسم الموقع';
 
   @override
+  String get signatures_error_saveFailed =>
+      'تعذر حفظ التوقيع. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get signatures_field_instructorName => 'اسم المدرب';
 
   @override

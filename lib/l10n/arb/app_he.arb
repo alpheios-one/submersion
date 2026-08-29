@@ -5261,6 +5261,7 @@
   "signatures_drawSignatureSemantics": "שרטט חתימה",
   "signatures_error_drawSignature": "נא לשרטט חתימה",
   "signatures_error_enterSignerName": "נא להזין שם החותם",
+  "signatures_error_saveFailed": "לא ניתן היה לשמור את החתימה. נסו שוב.",
   "signatures_field_instructorName": "שם המדריך",
   "signatures_field_instructorNameHint": "הזן שם מדריך",
   "signatures_handoff_title": "העבר את המכשיר ל",

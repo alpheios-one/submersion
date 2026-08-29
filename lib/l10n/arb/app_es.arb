@@ -5261,6 +5261,7 @@
   "signatures_drawSignatureSemantics": "Dibujar firma",
   "signatures_error_drawSignature": "Por favor dibuja una firma",
   "signatures_error_enterSignerName": "Por favor ingresa el nombre del firmante",
+  "signatures_error_saveFailed": "No se pudo guardar la firma. Inténtalo de nuevo.",
   "signatures_field_instructorName": "Nombre del Instructor",
   "signatures_field_instructorNameHint": "Ingresa el nombre del instructor",
   "signatures_handoff_title": "Entrega tu dispositivo a",
