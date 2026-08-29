@@ -72,9 +72,9 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // A Wrap rather than a Row: the heading and the action together
+            // A Wrap rather than a Row: the heading and the link together
             // are a few pixels too wide for the narrowest phone, and dropping
-            // the button to its own line reads better than truncating it.
+            // the link to its own line reads better than truncating it.
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -82,35 +82,17 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 BlenderSectionTitle(
                   context.l10n.gasCalculators_blender_billing,
                 ),
-                // Wrap, not Row: the link plus "Save fill" together are also
-                // a few pixels too wide for the narrowest phone, so this
-                // group wraps onto its own second line the same way the
-                // title and this group already wrap against each other.
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    // Opens the global tank presets this card's dropdown
-                    // reads (issue #1335 follow-up: the blender no longer
-                    // keeps its own cylinder-size vault, so this jumps
-                    // straight to Settings -> Manage -> Tank Presets).
-                    TextButton.icon(
-                      key: const Key('blender-cylinder-sizes-link'),
-                      onPressed: () => context.push('/tank-presets'),
-                      icon: const Icon(Icons.straighten, size: 18),
-                      label: Text(
-                        context.l10n.gasCalculators_blender_manageCylinderSizes,
-                      ),
-                    ),
-                    if (billing.lines.isNotEmpty)
-                      TextButton.icon(
-                        key: const Key('blender-save-fill'),
-                        onPressed: () => _saveFill(context, billing, currency),
-                        icon: const Icon(Icons.playlist_add, size: 18),
-                        label: Text(
-                          context.l10n.gasCalculators_blender_saveFill,
-                        ),
-                      ),
-                  ],
+                // Opens the global tank presets this card's dropdown
+                // reads (issue #1335 follow-up: the blender no longer
+                // keeps its own cylinder-size vault, so this jumps
+                // straight to Settings -> Manage -> Tank Presets).
+                TextButton.icon(
+                  key: const Key('blender-cylinder-sizes-link'),
+                  onPressed: () => context.push('/tank-presets'),
+                  icon: const Icon(Icons.straighten, size: 18),
+                  label: Text(
+                    context.l10n.gasCalculators_blender_manageCylinderSizes,
+                  ),
                 ),
               ],
             ),
@@ -126,6 +108,16 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 context.l10n.gasCalculators_blender_costBasis,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  key: const Key('blender-save-fill'),
+                  onPressed: () => _saveFill(context, billing, currency),
+                  icon: const Icon(Icons.playlist_add, size: 18),
+                  label: Text(context.l10n.gasCalculators_blender_saveFill),
                 ),
               ),
             ],
