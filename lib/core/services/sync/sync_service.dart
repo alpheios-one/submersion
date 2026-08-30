@@ -1562,10 +1562,15 @@ class SyncService {
   /// must never escape: it would roll back the whole payload while leaving
   /// the changeset reader's cursor advanced, and the next sync would neither
   /// replay nor retry the payload, wedging the peer permanently. The legacy
-  /// rows this call packs are already applied and durable by the time it
-  /// runs, so nothing is lost by deferring the pack; the `beforeOpen`
-  /// backstop in `database.dart` re-attempts it on every open, which is the
-  /// retry.
+  /// rows this call packs are already applied and durable in
+  /// `legacy_sample_staging.dart`'s TEMP tables by the time it runs, and
+  /// [SyncDataSerializer.packLegacySamples] leaves them staged on a throw
+  /// (it only empties the staging tables after a successful pack), so
+  /// nothing is lost by deferring: the next apply in this session (another
+  /// changeset, base file, or adopt) packs the same staged rows. A TEMP
+  /// table does not survive an app restart, though, so that retry window
+  /// closes at the next open; recovery past that point is the origin peer
+  /// republishing its base or changeset, which stages the rows again.
   Future<void> _packLegacySamplesIfPresent(bool anyLegacyRowsApplied) async {
     if (!anyLegacyRowsApplied) return;
     try {
@@ -1577,8 +1582,8 @@ class SyncService {
       );
     } catch (e, st) {
       _log.warning(
-        'Packing legacy sample rows from a peer failed; the next open packs '
-        'them',
+        'Packing legacy sample rows from a peer failed; the rows stay '
+        'staged and the next sync apply in this session retries them',
         error: e,
         stackTrace: st,
       );

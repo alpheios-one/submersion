@@ -18,7 +18,7 @@ String _sqlType(ProfileFieldKind kind) => switch (kind) {
 };
 
 /// The legacy `dive_profiles` columns: identity plus every codec field.
-final List<String> kLegacyProfileColumns = [
+final List<String> _legacyProfileColumns = [
   'id',
   'dive_id',
   'computer_id',
@@ -27,7 +27,7 @@ final List<String> kLegacyProfileColumns = [
   for (final f in kProfileFieldTableV1) f.name,
 ];
 
-const List<String> kLegacyTankColumns = [
+const List<String> _legacyTankColumns = [
   'id',
   'dive_id',
   'tank_id',
@@ -60,12 +60,12 @@ String legacyColumnFor(String wireKey) =>
 Future<int> stageLegacyProfileRows(
   DatabaseConnectionUser db,
   List<Map<String, dynamic>> jsonRows,
-) => _stage(db, kLegacyProfileStagingTable, kLegacyProfileColumns, jsonRows);
+) => _stage(db, kLegacyProfileStagingTable, _legacyProfileColumns, jsonRows);
 
 Future<int> stageLegacyTankRows(
   DatabaseConnectionUser db,
   List<Map<String, dynamic>> jsonRows,
-) => _stage(db, kLegacyTankStagingTable, kLegacyTankColumns, jsonRows);
+) => _stage(db, kLegacyTankStagingTable, _legacyTankColumns, jsonRows);
 
 Future<int> _stage(
   DatabaseConnectionUser db,
@@ -97,18 +97,26 @@ Future<int> _stage(
 /// Packs whatever is staged into series (dives that already have a series
 /// are left alone, exactly as the migration packer does) and empties both
 /// staging tables.
+///
+/// The staging tables are emptied only after a successful pack. The TEMP
+/// table is the only copy of a peer's row once staged (the real
+/// `dive_profiles` / `tank_pressure_profiles` tables are gone), so if
+/// [packLegacyProfileRows] throws, the rows are left staged rather than
+/// discarded: the next apply in this session (another changeset, base file,
+/// or adopt) calls this again and retries the same staged rows. A TEMP
+/// table does not survive past this connection, so an app restart loses
+/// whatever is still staged; recovery then is the origin peer republishing
+/// its base or changeset, which stages the rows again.
 Future<ProfilePackReport> packStagedLegacyRows(
   DatabaseConnectionUser db,
 ) async {
   await ensureLegacyStagingTables(db);
-  try {
-    return await packLegacyProfileRows(
-      db,
-      profileTable: kLegacyProfileStagingTable,
-      tankTable: kLegacyTankStagingTable,
-    );
-  } finally {
-    await db.customStatement('DELETE FROM $kLegacyProfileStagingTable');
-    await db.customStatement('DELETE FROM $kLegacyTankStagingTable');
-  }
+  final report = await packLegacyProfileRows(
+    db,
+    profileTable: kLegacyProfileStagingTable,
+    tankTable: kLegacyTankStagingTable,
+  );
+  await db.customStatement('DELETE FROM $kLegacyProfileStagingTable');
+  await db.customStatement('DELETE FROM $kLegacyTankStagingTable');
+  return report;
 }

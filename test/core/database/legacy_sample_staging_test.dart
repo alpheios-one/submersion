@@ -205,4 +205,88 @@ void main() {
     await ensureLegacyStagingTables(db);
     expect(await packStagedLegacyRows(db), isA<ProfilePackReport>());
   });
+
+  test(
+    'a pack failure leaves the staged rows in place for the next apply',
+    () async {
+      await ensureLegacyStagingTables(db);
+      await stageLegacyProfileRows(db, [
+        {
+          'id': 'p1',
+          'diveId': 'dive-1',
+          'isPrimary': true,
+          'timestamp': 0,
+          'depth': 0.0,
+        },
+        {
+          'id': 'p2',
+          'diveId': 'dive-1',
+          'isPrimary': true,
+          'timestamp': 30,
+          'depth': 12.0,
+        },
+      ]);
+
+      // The malformed-dive_profile_series trick from backstop_resilience_test
+      // and legacy_sample_entities_inbound_test: a series table missing the
+      // summary/samples columns makes every packer INSERT fail.
+      await db.customStatement('DROP TABLE dive_profile_series');
+      await db.customStatement('''
+          CREATE TABLE dive_profile_series (
+            id TEXT NOT NULL PRIMARY KEY,
+            dive_id TEXT NOT NULL,
+            computer_id TEXT,
+            source_id TEXT,
+            is_primary INTEGER NOT NULL DEFAULT 1
+          )
+        ''');
+
+      await expectLater(packStagedLegacyRows(db), throwsA(anything));
+
+      final staged = await db
+          .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')
+          .getSingle();
+      expect(
+        staged.data['n'],
+        2,
+        reason: 'a failed pack must not discard the only copy of the rows',
+      );
+
+      // Repair the table (mirrors a real migration/backstop self-heal) and
+      // confirm the next call packs the still-staged rows and empties them.
+      await db.customStatement('DROP TABLE dive_profile_series');
+      await db.customStatement('''
+          CREATE TABLE dive_profile_series (
+            id TEXT NOT NULL PRIMARY KEY,
+            dive_id TEXT NOT NULL,
+            computer_id TEXT,
+            source_id TEXT,
+            is_primary INTEGER NOT NULL DEFAULT 1,
+            sample_count INTEGER NOT NULL,
+            start_timestamp INTEGER NOT NULL,
+            end_timestamp INTEGER NOT NULL,
+            max_depth REAL NOT NULL,
+            first_depth REAL NOT NULL,
+            last_depth REAL NOT NULL,
+            has_deco_type INTEGER NOT NULL DEFAULT 0,
+            has_deco_stop INTEGER NOT NULL DEFAULT 0,
+            has_positive_ceiling INTEGER NOT NULL DEFAULT 0,
+            codec_version INTEGER NOT NULL,
+            samples BLOB NOT NULL,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            hlc TEXT
+          )
+        ''');
+
+      final report = await packStagedLegacyRows(db);
+      expect(report.profileSeries, 1);
+      final series = await ProfileSeriesRepository().getSeriesForDive('dive-1');
+      expect(series.single.samples.map((s) => s.depth), [0.0, 12.0]);
+      final after = await db
+          .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')
+          .getSingle();
+      expect(after.data['n'], 0);
+    },
+  );
 }
