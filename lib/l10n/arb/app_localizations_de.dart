@@ -7228,6 +7228,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fehler beim Laden der Tauchgangstypen';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Fehler beim Laden der Ausrüstung';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Fehler beim Laden der Reisen';
 
   @override
@@ -7253,6 +7257,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Dauerbereich (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Ausrüstung';
 
   @override
   String get diveLog_search_label_trip => 'Reise';

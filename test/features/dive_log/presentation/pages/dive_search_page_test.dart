@@ -1,6 +1,9 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_search_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -231,5 +234,82 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(DatePickerDialog), findsNothing);
     });
+
+    testWidgets(
+      'selecting an equipment chip applies the equipmentIds filter (#1407)',
+      (tester) async {
+        final db = DatabaseService.instance.database;
+        final now = DateTime(2026, 6, 1).millisecondsSinceEpoch;
+        await db
+            .into(db.equipment)
+            .insert(
+              EquipmentCompanion(
+                id: const Value('eq1'),
+                name: const Value('Backplate BCD'),
+                type: const Value('bcd'),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+              ),
+            );
+
+        final overrides = await getBaseOverrides();
+        late WidgetRef capturedRef;
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...overrides,
+              diveRepositoryProvider.overrideWithValue(repository),
+              diveListNotifierProvider.overrideWith((ref) {
+                return DiveListNotifier(repository, ref);
+              }),
+            ].cast(),
+            child: MaterialApp(
+              // Pinned: this test drives the page by English label.
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Consumer(
+                  builder: (context, ref, _) {
+                    capturedRef = ref;
+                    return const DiveSearchPage();
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Gas & Equipment starts collapsed, so the equipment chips are not in
+        // the tree until the section is expanded.
+        await tester.tap(find.text('Gas & Equipment'));
+        await tester.pumpAndSettle();
+
+        final chip = find.widgetWithText(FilterChip, 'Backplate BCD');
+        expect(chip, findsOneWidget);
+        await tester.ensureVisible(chip);
+        await tester.pumpAndSettle();
+        await tester.tap(chip);
+        await tester.pumpAndSettle();
+
+        // Applying navigates via go_router, which is not wired up in this
+        // test's MaterialApp; the provider write above happens first, so
+        // swallow the resulting navigation error the same way the existing
+        // "tapping search applies bottomTime filter" test above does.
+        final errors = <FlutterErrorDetails>[];
+        FlutterError.onError = (d) => errors.add(d);
+        await tester.ensureVisible(find.text('Search'));
+        await tester.tap(find.text('Search'));
+        await tester.pump();
+        FlutterError.onError = FlutterError.presentError;
+
+        expect(
+          capturedRef.read(diveFilterProvider).equipmentIds,
+          contains('eq1'),
+        );
+      },
+    );
   });
 }

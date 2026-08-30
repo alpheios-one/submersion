@@ -7233,6 +7233,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Erro ao carregar tipos de mergulho';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Erro ao carregar equipamento';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Erro ao carregar viagens';
 
   @override
@@ -7258,6 +7262,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Faixa de Duracao (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Equipamento';
 
   @override
   String get diveLog_search_label_trip => 'Viagem';

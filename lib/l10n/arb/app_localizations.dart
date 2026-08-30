@@ -12065,6 +12065,12 @@ abstract class AppLocalizations {
   /// **'Error loading dive types'**
   String get diveLog_search_errorLoadingDiveTypes;
 
+  /// No description provided for @diveLog_search_errorLoadingEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading equipment'**
+  String get diveLog_search_errorLoadingEquipment;
+
   /// No description provided for @diveLog_search_errorLoadingTrips.
   ///
   /// In en, this message translates to:
@@ -12118,6 +12124,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duration Range (min)'**
   String get diveLog_search_label_durationRange;
+
+  /// No description provided for @diveLog_search_label_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get diveLog_search_label_equipment;
 
   /// No description provided for @diveLog_search_label_trip.
   ///
