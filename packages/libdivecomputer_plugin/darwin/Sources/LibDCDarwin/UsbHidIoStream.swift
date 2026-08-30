@@ -45,6 +45,18 @@ final class UsbHidIoStream {
     /// `close` waits on it before freeing the report buffer, which IOKit is
     /// still writing into until the device is unscheduled.
     private let readLoopFinished = DispatchSemaphore(value: 0)
+    /// Set by `stopReadLoop`, read by the read thread between run loop passes.
+    ///
+    /// CFRunLoopStop alone is not enough to end the loop, because it only
+    /// records the request when the loop is already running: it sets
+    /// `_stopped` on `rl->_currentMode` and does nothing when there is no
+    /// current mode. A stop that lands between the thread signalling readiness
+    /// and entering CFRunLoopRun would be dropped, and the loop would then run
+    /// for the lifetime of the process, leaking the thread and the report
+    /// buffer. A flag the thread re-reads each pass cannot be missed whichever
+    /// order the two threads happen to run in.
+    private let stopLock = NSLock()
+    private var readLoopStopRequested = false
 
     deinit {
         close()
@@ -105,6 +117,10 @@ final class UsbHidIoStream {
         guard let ref = device, let reports = reportBuffer else { return }
         let length = reportBufferLength
 
+        stopLock.lock()
+        readLoopStopRequested = false
+        stopLock.unlock()
+
         let thread = Thread { [weak self] in
             guard let self else { return }
             let loop: CFRunLoop = CFRunLoopGetCurrent()
@@ -144,7 +160,14 @@ final class UsbHidIoStream {
             RunLoop.current.add(NSMachPort(), forMode: .default)
 
             self.readLoopReady.signal()
-            CFRunLoopRun()
+
+            // Bounded passes rather than one open-ended CFRunLoopRun, so the
+            // stop flag is re-read regularly. CFRunLoopStop still makes the
+            // exit immediate in the ordinary case; this only removes the
+            // dependency on the stop arriving while the loop is running.
+            while !self.isReadLoopStopRequested {
+                CFRunLoopRunInMode(CFRunLoopMode.defaultMode, 0.25, false)
+            }
 
             // Unregistering before unscheduling means IOKit is finished with
             // the report buffer by the time close() frees it.
@@ -163,12 +186,26 @@ final class UsbHidIoStream {
         _ = readLoopReady.wait(timeout: .now() + .seconds(5))
     }
 
+    private var isReadLoopStopRequested: Bool {
+        stopLock.lock()
+        defer { stopLock.unlock() }
+        return readLoopStopRequested
+    }
+
     private func stopReadLoop() {
+        // Raised before the run loop is touched, so a stop that arrives before
+        // the loop starts is still seen on its first pass.
+        stopLock.lock()
+        readLoopStopRequested = true
+        stopLock.unlock()
+
         guard let loop = readRunLoop else {
             readThread = nil
             return
         }
         readRunLoop = nil
+        // CFRunLoopStop wakes the loop itself when one is running, so no
+        // separate CFRunLoopWakeUp is needed here.
         CFRunLoopStop(loop)
         // Bounded so a wedged run loop cannot hang the download thread. Losing
         // the race leaks the report buffer, which is the safe way to lose it:

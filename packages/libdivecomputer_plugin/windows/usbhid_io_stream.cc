@@ -196,13 +196,24 @@ int UsbHidIoStream::PerformRead(void* data, size_t size, size_t* actual) {
 //
 // The buffer's first byte is the HID report id, which is exactly what Windows
 // wants at the front of a WriteFile, so unlike the macOS backend nothing is
-// stripped here. A report shorter than the device's report length is padded:
-// Windows rejects a write that is not exactly OutputReportByteLength bytes.
+// stripped here.
+//
+// Windows wants exactly OutputReportByteLength bytes. A shorter report is
+// padded, as hidapi's Windows backend does. A longer one cannot be padded down
+// and the driver would reject it, so it is refused here rather than handed to
+// WriteFile: the write fails either way, and INVALIDARGS says the caller asked
+// for something impossible while an I/O error would suggest the cable. hidapi
+// passes the oversized buffer through instead; no driver sends one, so the
+// difference is only in which failure a future one would see.
 int UsbHidIoStream::PerformWrite(const void* data, size_t size,
                                  size_t* actual) {
     if (actual != nullptr) *actual = 0;
     if (handle_ == INVALID_HANDLE_VALUE) return LIBDC_STATUS_IO;
     if (size == 0) return LIBDC_STATUS_SUCCESS;
+
+    if (size > output_report_length_) {
+        return LIBDC_STATUS_INVALIDARGS;
+    }
 
     const unsigned char* source = static_cast<const unsigned char*>(data);
     const unsigned char* buffer = source;
