@@ -1534,16 +1534,9 @@ class SyncService {
       recordsFailed += result.recordsFailed;
     }
 
-    if (data.diveProfiles.isNotEmpty || data.tankPressureProfiles.isNotEmpty) {
-      // v182 receive-side tolerance: an older peer's row-per-sample arrays
-      // become series for dives that have none yet.
-      final packed = await _serializer.packLegacySamples();
-      _log.info(
-        'Packed legacy sample rows from a peer: '
-        '${packed.profileSeries} profile series, '
-        '${packed.tankSeries} tank series',
-      );
-    }
+    await _packLegacySamplesIfPresent(
+      data.diveProfiles.isNotEmpty || data.tankPressureProfiles.isNotEmpty,
+    );
 
     // Integrity backstop: applying a remote deletion of a parent can leave a
     // local row pointing at it via a non-cascading FK, which would fail the
@@ -1556,6 +1549,21 @@ class SyncService {
       recordsApplied: recordsApplied,
       conflictsFound: conflictsFound,
       recordsFailed: recordsFailed,
+    );
+  }
+
+  /// v182 receive-side tolerance: after a merge (changeset OR base file) has
+  /// applied any inbound-only legacy row-per-sample rows, pack them into
+  /// series for whichever dives don't already have one. A no-op (and no log)
+  /// when [anyLegacyRowsApplied] is false, which is the common case once
+  /// every peer has upgraded.
+  Future<void> _packLegacySamplesIfPresent(bool anyLegacyRowsApplied) async {
+    if (!anyLegacyRowsApplied) return;
+    final packed = await _serializer.packLegacySamples();
+    _log.info(
+      'Packed legacy sample rows from a peer: '
+      '${packed.profileSeries} profile series, '
+      '${packed.tankSeries} tank series',
     );
   }
 
@@ -1621,7 +1629,7 @@ class SyncService {
     final parentUpdatedAt = <String, Map<String, int>>{};
     final contradictedByEntity = <String, Set<String>>{};
     final pass2Tables = <String>{
-      for (final table in entityHasUpdatedAt.keys)
+      for (final table in _baseApplyEntityFlags.keys)
         if (parentTypes.contains(table) || deletionIds.containsKey(table))
           table,
     };
@@ -1633,7 +1641,8 @@ class SyncService {
         final rec = r.row;
         final id = _recordIdForEntity(table, rec);
         if (id == null) continue;
-        if (parentTypes.contains(table) && entityHasUpdatedAt[table] == true) {
+        if (parentTypes.contains(table) &&
+            _baseApplyEntityFlags[table] == true) {
           final u = _extractUpdatedAtMillis(rec);
           if (u != null) (parentUpdatedAt[table] ??= {})[id] = u;
         }
@@ -1679,6 +1688,10 @@ class SyncService {
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
+      // v182 receive-side tolerance: true once a legacy diveProfiles /
+      // tankPressureProfiles row has streamed through, so the packer only
+      // runs when this base actually carried some.
+      var sawLegacySamples = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1686,7 +1699,7 @@ class SyncService {
         final r = await _mergeEntity(
           entityType: table,
           records: batch,
-          hasUpdatedAt: entityHasUpdatedAt[table] ?? false,
+          hasUpdatedAt: _baseApplyEntityFlags[table] ?? false,
           lastSyncMs: lastSyncMs,
           pendingRecordIds: pendingByEntity[table] ?? const <String>{},
           allTombstones: tombstonesByEntity,
@@ -1699,7 +1712,7 @@ class SyncService {
         batch = <Map<String, dynamic>>[];
       }
 
-      client.startDataRows(entityHasUpdatedAt.keys.toSet());
+      client.startDataRows(_baseApplyEntityFlags.keys.toSet());
       List<({String table, Map<String, dynamic> row})>? p3batch;
       while ((p3batch = await client.nextDataBatch()) != null) {
         for (final r in p3batch!) {
@@ -1707,11 +1720,16 @@ class SyncService {
             await flush();
             currentTable = r.table;
           }
+          if (inboundOnlyLegacyEntities.containsKey(r.table)) {
+            sawLegacySamples = true;
+          }
           batch.add(r.row);
           if (batch.length >= batchSize) await flush();
         }
       }
       await flush();
+
+      await _packLegacySamplesIfPresent(sawLegacySamples);
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -1776,13 +1794,14 @@ class SyncService {
       file.openRead(),
       wantRows: (section, table) =>
           section == 'data' &&
-          entityHasUpdatedAt.containsKey(table) &&
+          _baseApplyEntityFlags.containsKey(table) &&
           (parentTypes.contains(table) || deletionIds.containsKey(table)),
       onRow: (section, table, rowBytes) async {
         final rec = jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>;
         final id = _recordIdForEntity(table, rec);
         if (id == null) return;
-        if (parentTypes.contains(table) && entityHasUpdatedAt[table] == true) {
+        if (parentTypes.contains(table) &&
+            _baseApplyEntityFlags[table] == true) {
           final u = _extractUpdatedAtMillis(rec);
           if (u != null) (parentUpdatedAt[table] ??= {})[id] = u;
         }
@@ -1834,6 +1853,10 @@ class SyncService {
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
+      // v182 receive-side tolerance: true once a legacy diveProfiles /
+      // tankPressureProfiles row has streamed through, so the packer only
+      // runs when this base actually carried some.
+      var sawLegacySamples = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1841,7 +1864,7 @@ class SyncService {
         final r = await _mergeEntity(
           entityType: table,
           records: batch,
-          hasUpdatedAt: entityHasUpdatedAt[table] ?? false,
+          hasUpdatedAt: _baseApplyEntityFlags[table] ?? false,
           lastSyncMs: lastSyncMs,
           pendingRecordIds: pendingByEntity[table] ?? const <String>{},
           allTombstones: tombstonesByEntity,
@@ -1857,17 +1880,22 @@ class SyncService {
       await BaseJsonStreamReader().parse(
         file.openRead(),
         wantRows: (section, table) =>
-            section == 'data' && entityHasUpdatedAt.containsKey(table),
+            section == 'data' && _baseApplyEntityFlags.containsKey(table),
         onRow: (section, table, rowBytes) async {
           if (table != currentTable) {
             await flush();
             currentTable = table;
+          }
+          if (inboundOnlyLegacyEntities.containsKey(table)) {
+            sawLegacySamples = true;
           }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
         },
       );
       await flush();
+
+      await _packLegacySamplesIfPresent(sawLegacySamples);
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -1983,9 +2011,10 @@ class SyncService {
 
   /// Per-entity "has an updatedAt column" flag, mirroring the `mergeOrder`
   /// records in [_applyRemotePayloadInner]. The streaming base apply
-  /// ([_applyRemoteBaseFile]) uses it for (a) conflict-detection behavior in
-  /// [_mergeEntity] and (b) the set of entity tables it applies (a table absent
-  /// from these keys is silently skipped on base import).
+  /// ([_applyRemoteBaseFile]) uses it (via [_baseApplyEntityFlags], which
+  /// also folds in [inboundOnlyLegacyEntities]) for (a) conflict-detection
+  /// behavior in [_mergeEntity] and (b) the set of entity tables it applies
+  /// (a table absent from that union is silently skipped on base import).
   ///
   /// MUST list every [SyncData] entity: a structural test
   /// (`entityHasUpdatedAt covers exactly the SyncData entities`) asserts the
@@ -2071,6 +2100,33 @@ class SyncService {
     'mediaSubscriptions': true,
     'diveProfileSeries': true,
     'tankPressureSeries': true,
+  };
+
+  /// v182 receive-side tolerance: legacy row-per-sample entities an older
+  /// peer still sends. Parsed and applied when such a peer's data arrives,
+  /// whether as a changeset (via `mergeOrder` in [_applyRemotePayloadInner])
+  /// or as a base file (unioned into the table set the base-file apply path
+  /// reads off the wire, see [_baseApplyEntityFlags]), then packed into
+  /// series by [SyncDataSerializer.packLegacySamples]. Deliberately absent
+  /// from [entityHasUpdatedAt] and from [SyncData.toJson]: never exported,
+  /// and kept out of the structural test that pins `entityHasUpdatedAt` to
+  /// the `SyncData` entity set. Removed together with the legacy tables in
+  /// plan 2e.
+  @visibleForTesting
+  static const Map<String, bool> inboundOnlyLegacyEntities = {
+    'diveProfiles': false,
+    'tankPressureProfiles': false,
+  };
+
+  /// Table set the base-file apply path (`_applyRemoteBaseFile*`) reads off
+  /// the wire: every merge-applied entity ([entityHasUpdatedAt]) plus the
+  /// inbound-only legacy entities ([inboundOnlyLegacyEntities]). A table
+  /// absent from this union is silently skipped on base import (mirrors
+  /// [entityHasUpdatedAt]'s own doc comment); kept separate from
+  /// [entityHasUpdatedAt] itself so that map's structural test is unaffected.
+  static Map<String, bool> get _baseApplyEntityFlags => {
+    ...entityHasUpdatedAt,
+    ...inboundOnlyLegacyEntities,
   };
 
   /// Every synced child -> parent FK whose parent can be deleted (and thus

@@ -11,6 +11,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/sync/changeset_log/base_chunker.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
@@ -84,28 +85,24 @@ void main() {
       cloudProvider: cloud,
     );
 
-    /// Publishes [dataJson] -- the raw `data` section a peer still on
-    /// row-per-sample tables would send, legacy `diveProfiles` /
-    /// `tankPressureProfiles` keys included -- as [peerId]'s single
-    /// changeset (seq 1, no base) and pulls it through the real merge path.
-    ///
-    /// A base publish will not exercise the behavior under test: the
-    /// streaming base-file apply (SyncService._applyRemoteBaseFile*) only
-    /// reads tables named in `entityHasUpdatedAt`, and this task removes
-    /// `diveProfiles`/`tankPressureProfiles` from that map (a table absent
-    /// from it is silently skipped on base import -- see that map's doc
-    /// comment). A changeset is instead applied in-memory through
-    /// `mergeOrder`, which still lists both entities; this is exactly the
-    /// path an already-known peer's incremental publish takes, so it is
-    /// the one that must (and does) still apply and get packed.
-    Future<void> pullPeerPayload(
+    /// Builds the payload JSON both helpers below publish: [dataJson] is the
+    /// raw `data` section a peer still on row-per-sample tables would send,
+    /// legacy `diveProfiles` / `tankPressureProfiles` keys included.
+    /// `SyncPayload.toJson` (and so `ChangesetCodec.encodeChangeset` /
+    /// `encodeBaseParts`, which route through it) calls `data.toJson` under
+    /// the hood, which drops those keys (inbound only) before the bytes are
+    /// ever built -- so both helpers assemble the wire bytes from raw JSON
+    /// instead of going through a `SyncPayload` object.
+    Map<String, dynamic> buildPayloadJson(
       Map<String, dynamic> dataJson,
-      String peerId,
-    ) async {
+      String peerId, {
+      int? seq,
+      int? baseSeq,
+    }) {
       final checksum = sha256
           .convert(utf8.encode(jsonEncode(dataJson)))
           .toString();
-      final payloadJson = <String, dynamic>{
+      return <String, dynamic>{
         'version': syncFormatVersion,
         'exportedAt': 9000,
         'deviceId': peerId,
@@ -115,11 +112,22 @@ void main() {
         'deletions': <String, dynamic>{},
         'uploadNonce': null,
         'epochId': null,
-        'seq': 1,
-        'baseSeq': null,
+        'seq': seq,
+        'baseSeq': baseSeq,
         'sinceHlc': null,
         'toHlc': null,
       };
+    }
+
+    /// Publishes [dataJson] as [peerId]'s single CHANGESET (seq 1, no base)
+    /// and pulls it through the real merge path: the shape an
+    /// already-known peer's small incremental update takes
+    /// (`_applyRemotePayloadInner`, applied via `mergeOrder`).
+    Future<void> pullPeerPayload(
+      Map<String, dynamic> dataJson,
+      String peerId,
+    ) async {
+      final payloadJson = buildPayloadJson(dataJson, peerId, seq: 1);
       final bytes = Uint8List.fromList(utf8.encode(jsonEncode(payloadJson)));
       final folder = await cloud.getOrCreateSyncFolder();
       await cloud.uploadFile(
@@ -130,6 +138,45 @@ void main() {
       final manifest = SyncManifest(
         deviceId: peerId,
         provider: cloud.providerId,
+        headSeq: 1,
+        updatedAt: DateTime.now().millisecondsSinceEpoch,
+      );
+      await cloud.uploadFile(
+        manifest.toBytes(),
+        ChangesetLogLayout.manifestName(peerId),
+        folderId: folder,
+      );
+      final result = await buildService().performSync();
+      expect(result.status, isNot(SyncResultStatus.error));
+    }
+
+    /// Publishes [dataJson] as [peerId]'s BASE (baseSeq 1, one part, headSeq
+    /// 1) and pulls it through the real merge path: the "first contact"
+    /// shape for a peer this device has never synced with before (cold
+    /// start), applied via the streaming base-file path
+    /// (`_applyRemoteBaseFile*`), which reads `_baseApplyEntityFlags` --
+    /// `entityHasUpdatedAt` unioned with `inboundOnlyLegacyEntities` -- to
+    /// decide which tables to read off the wire.
+    Future<void> pullPeerBasePayload(
+      Map<String, dynamic> dataJson,
+      String peerId,
+    ) async {
+      final payloadJson = buildPayloadJson(dataJson, peerId, baseSeq: 1);
+      final bytes = Uint8List.fromList(utf8.encode(jsonEncode(payloadJson)));
+      final folder = await cloud.getOrCreateSyncFolder();
+      await cloud.uploadFile(
+        bytes,
+        ChangesetLogLayout.basePartName(peerId, 1, 0),
+        folderId: folder,
+      );
+      final manifest = SyncManifest(
+        deviceId: peerId,
+        provider: cloud.providerId,
+        baseSeq: 1,
+        basePartCount: 1,
+        baseBytes: bytes.length,
+        baseChecksum: BaseChunker.checksum(bytes),
+        basePartChecksums: [BaseChunker.checksum(bytes)],
         headSeq: 1,
         updatedAt: DateTime.now().millisecondsSinceEpoch,
       );
@@ -191,6 +238,55 @@ void main() {
         );
       },
     );
+
+    test("a legacy peer's first-contact BASE snapshot lands its sample rows "
+        'as series', () async {
+      await DiveRepository().createDive(_dive('template-base', const []));
+      final diveRow =
+          Map<String, dynamic>.from(
+              (await SyncDataSerializer().fetchRecord(
+                'dives',
+                'template-base',
+              ))!,
+            )
+            ..['id'] = 'd-base-old'
+            ..['hlc'] = const Hlc(9000, 0, 'peer-181-base').toString();
+      final profiles = [
+        {
+          'id': 'p1-base',
+          'diveId': 'd-base-old',
+          'timestamp': 0,
+          'depth': 3.0,
+          'isPrimary': true,
+        },
+        {
+          'id': 'p2-base',
+          'diveId': 'd-base-old',
+          'timestamp': 60,
+          'depth': 15.0,
+          'isPrimary': true,
+        },
+      ];
+      final data = SyncData(dives: [diveRow], diveProfiles: profiles);
+      final dataJson = {...data.toJson(), 'diveProfiles': profiles};
+
+      await pullPeerBasePayload(dataJson, 'peer-181-base');
+
+      final series = await ProfileSeriesRepository().getSeriesForDive(
+        'd-base-old',
+      );
+      expect(series, hasLength(1));
+      expect(series.single.samples.map((s) => s.depth), [3.0, 15.0]);
+      expect(
+        series.single.id,
+        profileSeriesMigratedId(
+          diveId: 'd-base-old',
+          computerId: null,
+          sourceId: null,
+          isPrimary: true,
+        ),
+      );
+    });
 
     test(
       'legacy rows for a dive that already has series are ignored',
