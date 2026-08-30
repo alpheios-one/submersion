@@ -2,34 +2,42 @@ import 'dart:io';
 
 import 'package:sqlite3/sqlite3.dart';
 
+const String _usage =
+    'Usage: dart run tools/synth_fixture.dart <source.db> <out.db> '
+    '[--replicas N]';
+
 /// Replicates every dive of a plaintext Submersion database N times under
 /// fresh ids so a small development library becomes a large benchmark
 /// fixture. Usage:
 ///
 ///     dart run tools/synth_fixture.dart <source.db> <out.db> --replicas 25
 ///
-/// Never points at a live database: it copies the source file first. Child
-/// rows are found by column name: every table with a `dive_id` column is
-/// replicated; `id` (when text) gets a `-r<k>` suffix, `dive_id`, `tank_id`
-/// and `source_id` are remapped to the replica's ids, `computer_id`,
+/// Never points at a live database: it copies the source file first, and
+/// refuses to run when the source and the output resolve to the same file.
+/// Child rows are found by column name: every table with a `dive_id` column
+/// is replicated; `id` (when text) gets a `-r<k>` suffix, `dive_id`,
+/// `tank_id`, `source_id` and `related_dive_id` (the quality_findings
+/// cross-reference) are remapped to the replica's ids, `computer_id`,
 /// `site_id` and every other column are copied as they are. Media rows are
 /// skipped (blob stores are not part of the profile benchmark).
 void main(List<String> args) {
   if (args.length < 2) {
-    stderr.writeln(
-      'Usage: dart run tools/synth_fixture.dart <source.db> <out.db> '
-      '[--replicas N]',
-    );
+    stderr.writeln(_usage);
     exit(64);
   }
   final source = args[0];
   final out = args[1];
-  final replicas = args.contains('--replicas')
-      ? int.parse(args[args.indexOf('--replicas') + 1])
-      : 25;
+  final replicas = _replicaCount(args);
   if (!File(source).existsSync()) {
     stderr.writeln('No such file: $source');
     exit(66);
+  }
+  // The copy below would truncate the source before a single row was read,
+  // and the replication that follows would then rewrite the only copy of the
+  // library it was pointed at.
+  if (File(source).absolute.path == File(out).absolute.path) {
+    stderr.writeln('Refusing to write the fixture over its own source: $out');
+    exit(2);
   }
   File(source).copySync(out);
   final db = sqlite3.open(out);
@@ -99,11 +107,7 @@ void _replicate(
       final values = <Object?>[];
       for (final name in cols) {
         final v = row[name];
-        if (v is String &&
-            (name == 'id' ||
-                name == 'dive_id' ||
-                name == 'tank_id' ||
-                name == 'source_id')) {
+        if (v is String && _remappedColumns.contains(name)) {
           values.add('$v$suffix');
         } else {
           values.add(v);
@@ -114,4 +118,39 @@ void _replicate(
   } finally {
     insert.close();
   }
+}
+
+/// Columns whose text value names a row this tool replicates, so a replica's
+/// copy has to point at the replica. `related_dive_id` (quality_findings)
+/// belongs here for the same reason `dive_id` does: left alone, every
+/// replica's finding would cross-reference the original dive.
+const Set<String> _remappedColumns = {
+  'id',
+  'dive_id',
+  'tank_id',
+  'source_id',
+  'related_dive_id',
+};
+
+/// The `--replicas N` operand, defaulting to 25. A missing, unparseable, or
+/// non-positive operand prints the usage and exits 2 rather than throwing a
+/// FormatException or silently replicating nothing.
+int _replicaCount(List<String> args) {
+  final flag = args.indexOf('--replicas');
+  if (flag < 0) return 25;
+  if (flag + 1 >= args.length) {
+    stderr.writeln('--replicas needs a count');
+    stderr.writeln(_usage);
+    exit(2);
+  }
+  final value = int.tryParse(args[flag + 1]);
+  if (value == null || value < 1) {
+    stderr.writeln(
+      '--replicas must be a positive integer, got '
+      '"${args[flag + 1]}"',
+    );
+    stderr.writeln(_usage);
+    exit(2);
+  }
+  return value;
 }

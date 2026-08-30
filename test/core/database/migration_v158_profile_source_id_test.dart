@@ -146,8 +146,8 @@ void main() {
 
     // Null computer_id (p-null) and a computer_id matching no source
     // (p-unmatched, comp-99 is never registered) both resolve to a null
-    // computer at pack time and land on the primary source -- the
-    // convention getProfilesByDataSource has always implemented.
+    // computer at pack time and land on the primary source: the convention
+    // getProfilesByDataSource has always implemented.
     // Reproducing it here is what keeps the upgrade from moving anyone's
     // samples between sources; it also merges them into one series, since
     // they now share both key components.

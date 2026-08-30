@@ -2138,10 +2138,11 @@ class StatisticsRepository {
   /// Get average ascent/descent rates in m/min, or null when the filtered
   /// dives hold no vertical movement to average.
   ///
-  /// Rates are derived from the stored depth samples rather than read from
-  /// `dive_profiles.ascent_rate`: no download or import path ever populates
-  /// that column (libdivecomputer reports no ascent-rate sample type), so it is
-  /// null for every row and averaging it always yielded an empty section.
+  /// Rates are derived from the stored depth samples rather than read from a
+  /// stored rate column. The retired `dive_profiles.ascent_rate` was never
+  /// populated by any download or import path (libdivecomputer reports no
+  /// ascent-rate sample type), so it was null for every row and averaging it
+  /// always yielded an empty section.
   ///
   /// The aggregation runs in Dart, on a worker isolate, over decoded primary
   /// series (see [ascentDescentRates] and [ascentDescentRatesFromBlobs]),

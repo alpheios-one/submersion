@@ -57,23 +57,59 @@ Future<void> ensureLegacyStagingTables(DatabaseConnectionUser db) async {
 String legacyColumnFor(String wireKey) =>
     wireKey.replaceAllMapped(RegExp('[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');
 
+/// Columns whose value the staging DDL supplies when the wire row omits the
+/// key. Only `is_primary` has a DDL default; binding null for it would fail
+/// its NOT NULL constraint, which is what the old per-row column list
+/// avoided by leaving the column out of the statement altogether.
+const Map<String, Object?> _legacyProfileDefaults = {'is_primary': 1};
+
+/// Rows per multi-row INSERT. SQLite's default SQLITE_MAX_VARIABLE_NUMBER is
+/// 32,766. The wider of the two staging tables is the profile one, five
+/// identity columns plus every codec field, so 200 rows binds well under
+/// 7,000 values; [_maxStagedVariables] keeps that true if the field table
+/// grows.
+const int _maxStagedRowsPerStatement = 200;
+const int _maxStagedVariables = 30000;
+
 Future<int> stageLegacyProfileRows(
   DatabaseConnectionUser db,
   List<Map<String, dynamic>> jsonRows,
-) => _stage(db, kLegacyProfileStagingTable, _legacyProfileColumns, jsonRows);
+) => _stage(
+  db,
+  kLegacyProfileStagingTable,
+  _legacyProfileColumns,
+  jsonRows,
+  defaults: _legacyProfileDefaults,
+);
 
 Future<int> stageLegacyTankRows(
   DatabaseConnectionUser db,
   List<Map<String, dynamic>> jsonRows,
 ) => _stage(db, kLegacyTankStagingTable, _legacyTankColumns, jsonRows);
 
+/// Stages [jsonRows] into [table], returning how many rows were written.
+///
+/// Every row binds the SAME full [columns] list, so one statement shape
+/// serves a whole chunk rather than a fresh SQL string per row. A key the
+/// wire row omits binds its [defaults] entry, or null. Values are always
+/// bound, never interpolated; only the identifiers come from the fixed
+/// column and table constants above.
+///
+/// Chunked at [_maxStagedRowsPerStatement] rows per statement. A throw part
+/// way through therefore leaves the earlier chunks staged, which is harmless:
+/// the staging tables are TEMP and the pack that reads them is idempotent,
+/// so the retry restages the same ids over the same rows
+/// (`INSERT OR REPLACE`) and packs once.
+///
+/// [jsonRows] is only read; the caller's list and maps are never mutated.
 Future<int> _stage(
   DatabaseConnectionUser db,
   String table,
   List<String> columns,
-  List<Map<String, dynamic>> jsonRows,
-) async {
-  var staged = 0;
+  List<Map<String, dynamic>> jsonRows, {
+  Map<String, Object?> defaults = const {},
+}) async {
+  final staged = <List<Object?>>[];
   for (final row in jsonRows) {
     final values = <String, Object?>{};
     for (final entry in row.entries) {
@@ -83,15 +119,35 @@ Future<int> _stage(
       values[column] = v is bool ? (v ? 1 : 0) : v;
     }
     if (values['id'] == null || values['dive_id'] == null) continue;
-    final names = values.keys.toList();
-    await db.customStatement(
-      'INSERT OR REPLACE INTO $table (${names.join(', ')}) '
-      'VALUES (${List.filled(names.length, '?').join(', ')})',
-      [for (final n in names) values[n]],
-    );
-    staged++;
+    staged.add([
+      for (final column in columns) values[column] ?? defaults[column],
+    ]);
   }
-  return staged;
+  if (staged.isEmpty) return 0;
+
+  final perStatement = _rowsPerStatement(columns.length);
+  final tuple = '(${List.filled(columns.length, '?').join(', ')})';
+  final prefix =
+      'INSERT OR REPLACE INTO $table (${columns.join(', ')}) VALUES ';
+  for (var start = 0; start < staged.length; start += perStatement) {
+    final end = start + perStatement < staged.length
+        ? start + perStatement
+        : staged.length;
+    final chunk = staged.sublist(start, end);
+    await db.customStatement(
+      prefix + List.filled(chunk.length, tuple).join(', '),
+      [for (final row in chunk) ...row],
+    );
+  }
+  return staged.length;
+}
+
+int _rowsPerStatement(int columnCount) {
+  final byVariables = _maxStagedVariables ~/ columnCount;
+  if (byVariables < 1) return 1;
+  return byVariables < _maxStagedRowsPerStatement
+      ? byVariables
+      : _maxStagedRowsPerStatement;
 }
 
 /// Packs whatever is staged into series (dives that already have a series

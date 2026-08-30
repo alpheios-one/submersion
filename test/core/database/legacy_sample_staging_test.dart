@@ -199,6 +199,75 @@ void main() {
     );
   });
 
+  test(
+    'a 450-row stage crosses the chunk boundaries and keeps every row',
+    () async {
+      await ensureLegacyStagingTables(db);
+      // 450 rows is three statements at the 200-row chunk size, so both
+      // boundaries are exercised. Every third row omits `temperature`, an
+      // optional codec column, which must stage as null rather than shifting
+      // the bound values of the rest of the chunk.
+      final rows = [
+        for (var i = 0; i < 450; i++)
+          <String, dynamic>{
+            'id': 'p$i',
+            'diveId': 'dive-1',
+            'isPrimary': true,
+            'timestamp': i,
+            'depth': i / 10.0,
+            if (i % 3 != 0) 'temperature': 20.0 - i / 100.0,
+          },
+      ];
+      expect(await stageLegacyProfileRows(db, rows), 450);
+
+      final count = await db
+          .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')
+          .getSingle();
+      expect(count.data['n'], 450);
+      final nullTemps = await db
+          .customSelect(
+            'SELECT COUNT(*) AS n FROM dive_profiles_inbound '
+            'WHERE temperature IS NULL',
+          )
+          .getSingle();
+      expect(nullTemps.data['n'], 150);
+      // A row from the last, short chunk still carries its own values.
+      final last = await db
+          .customSelect(
+            'SELECT depth, temperature, is_primary FROM dive_profiles_inbound '
+            'WHERE id = ?',
+            variables: [const Variable<String>('p449')],
+          )
+          .getSingle();
+      expect(last.data['depth'], 44.9);
+      expect(last.data['temperature'], closeTo(15.51, 0.0001));
+      expect(last.data['is_primary'], 1);
+
+      final report = await packStagedLegacyRows(db);
+      expect(report.profileSeries, 1);
+      final series = await ProfileSeriesRepository().getSeriesForDive('dive-1');
+      expect(series.single.samples, hasLength(450));
+    },
+  );
+
+  test('a wire row with no is_primary key takes the column default', () async {
+    await ensureLegacyStagingTables(db);
+    expect(
+      await stageLegacyProfileRows(db, [
+        {'id': 'p1', 'diveId': 'dive-1', 'timestamp': 0, 'depth': 0.0},
+      ]),
+      1,
+    );
+    final row = await db
+        .customSelect(
+          'SELECT is_primary, ndl FROM dive_profiles_inbound WHERE id = ?',
+          variables: [const Variable<String>('p1')],
+        )
+        .getSingle();
+    expect(row.data['is_primary'], 1);
+    expect(row.data['ndl'], isNull);
+  });
+
   test('ensureLegacyStagingTables is idempotent and survives a missing legacy '
       'table', () async {
     await ensureLegacyStagingTables(db);

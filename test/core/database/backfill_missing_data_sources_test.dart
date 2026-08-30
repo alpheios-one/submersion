@@ -151,6 +151,48 @@ void main() {
     expect(rows.map((r) => r.data['id']), ['real-src']);
   });
 
+  test('a dive_profile_series missing the columns the heal reads opens '
+      'without throwing', () async {
+    // A parallel branch's differently-shaped series table (or a hand-built
+    // fixture): beforeOpen's IF NOT EXISTS DDL leaves it alone, so the
+    // helper's table check alone would let the EXISTS predicate name a
+    // column that is not there and abort the open.
+    final db = AppDatabase(
+      NativeDatabase.memory(
+        setup: (rawDb) {
+          rawDb.execute(
+            'PRAGMA user_version = ${AppDatabase.currentSchemaVersion}',
+          );
+          rawDb.execute('CREATE TABLE dives (id TEXT NOT NULL PRIMARY KEY)');
+          rawDb.execute('''
+            CREATE TABLE dive_profile_series (
+              id TEXT NOT NULL PRIMARY KEY,
+              dive_id TEXT NOT NULL,
+              computer_id TEXT
+            )
+          ''');
+          rawDb.execute('''
+            CREATE TABLE dive_data_sources (
+              id TEXT NOT NULL PRIMARY KEY,
+              dive_id TEXT NOT NULL,
+              is_primary INTEGER NOT NULL DEFAULT 0,
+              imported_at INTEGER NOT NULL,
+              created_at INTEGER NOT NULL
+            )
+          ''');
+          rawDb.execute("INSERT INTO dives (id) VALUES ('orphan')");
+        },
+      ),
+    );
+    addTearDown(() => db.close());
+
+    await expectLater(db.customSelect('SELECT 1').get(), completes);
+    final rows = await db
+        .customSelect('SELECT id FROM dive_data_sources')
+        .get();
+    expect(rows, isEmpty);
+  });
+
   test('does not heal a dive whose only series is non-primary', () async {
     final db = AppDatabase(
       seeded((rawDb) {

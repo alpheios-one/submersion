@@ -17,14 +17,25 @@ typedef ProfilePackReport = ({
   /// Legacy rows without a timestamp or depth (pressure, tank id for tanks),
   /// stepped over.
   int skippedRows,
+
+  /// Dives whose legacy (or staged) rows were discarded because the dive
+  /// already had a series row, counted once per dive per legacy table.
+  ///
+  /// Expected and harmless on the migration path: a retried ladder, or the
+  /// beforeOpen backstop after the rung already packed, sees every dive this
+  /// way. On the receive-side staging path it is the count that says an
+  /// older peer's row-per-sample copy of a dive lost to the series this
+  /// device already holds, which is the intended precedence but worth being
+  /// able to see in the sync log.
+  int skippedAlreadyPacked,
 });
 
 /// Packs every legacy `dive_profiles` and `tank_pressure_profiles` row into
 /// the series tables (v182, spec 2026-08-28-profile-sample-storage).
 ///
-/// Raw SQL throughout, never the legacy Drift classes: plan 2e removes those
-/// classes and drops the tables, and this function must keep compiling and
-/// keep no-oping on a database that has already lost them.
+/// Raw SQL throughout, never the legacy Drift classes: plan 2e removed those
+/// classes and dropped the tables, and this function has to keep compiling
+/// and keep no-oping on a database that has already lost them.
 ///
 /// Memory is bounded by one dive's rows, never the table. Each identity group
 /// becomes one row whose id is derived from the tuple
@@ -85,29 +96,35 @@ Future<ProfilePackReport> packLegacyProfileRows(
     'timestamp',
     'pressure',
   });
-  final unpackedProfileDives = canPackProfiles
-      ? await _unpackedDiveIds(
+  final profileScan = canPackProfiles
+      ? await _scanLegacyDives(
           db,
           legacyTable: profileTable,
           seriesTable: 'dive_profile_series',
         )
-      : const <String>[];
-  final unpackedTankDives = canPackTanks
-      ? await _unpackedDiveIds(
+      : _emptyScan;
+  final tankScan = canPackTanks
+      ? await _scanLegacyDives(
           db,
           legacyTable: tankTable,
           seriesTable: 'tank_pressure_series',
         )
-      : const <String>[];
+      : _emptyScan;
+  final unpackedProfileDives = profileScan.unpacked;
+  final unpackedTankDives = tankScan.unpacked;
+  final alreadyPacked = profileScan.alreadyPacked + tankScan.alreadyPacked;
   if (unpackedProfileDives.isEmpty && unpackedTankDives.isEmpty) {
     // The common case on every open once a database is packed: nothing to
-    // do, so nothing else is loaded.
+    // do, so nothing else is loaded. The already-packed count still rides
+    // out, because this is the branch a late legacy row for a packed dive
+    // takes.
     return (
       profileSeries: 0,
       tankSeries: 0,
       droppedSamples: 0,
       skippedOrphans: 0,
       skippedRows: 0,
+      skippedAlreadyPacked: alreadyPacked,
     );
   }
   final hlc = await _migrationHlc(db, now);
@@ -294,6 +311,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
     droppedSamples: dropped,
     skippedOrphans: skipped,
     skippedRows: skippedRows,
+    skippedAlreadyPacked: alreadyPacked,
   );
 }
 
@@ -345,25 +363,45 @@ Future<bool> _tableExists(DatabaseConnectionUser db, String table) async {
   return rows.isNotEmpty;
 }
 
-/// Dives that still have legacy rows and no series rows yet. Cheap once a
-/// database is packed (an indexed NOT EXISTS per legacy dive), which is what
-/// lets the beforeOpen backstop call the packer on every open. Empty when
-/// the series table is absent: `_assertProfileSeriesSchema` waits for that
-/// table's foreign-key parents, so there is nothing to pack into yet.
-Future<List<String>> _unpackedDiveIds(
+/// Every dive with legacy rows, split into the ones still to pack and a
+/// count of the ones a series row already covers.
+typedef _LegacyDiveScan = ({List<String> unpacked, int alreadyPacked});
+
+const _LegacyDiveScan _emptyScan = (unpacked: <String>[], alreadyPacked: 0);
+
+/// One pass over [legacyTable]'s distinct dive ids, marking each with
+/// whether [seriesTable] already holds a row for it. Cheap once a database
+/// is packed (an indexed EXISTS per legacy dive), which is what lets the
+/// beforeOpen backstop call the packer on every open. Empty when the series
+/// table is absent: `_assertProfileSeriesSchema` waits for that table's
+/// foreign-key parents, so there is nothing to pack into yet.
+///
+/// The already-packed side is what feeds
+/// [ProfilePackReport.skippedAlreadyPacked], and it comes from this same
+/// scan rather than a second COUNT so the per-open cost does not change.
+Future<_LegacyDiveScan> _scanLegacyDives(
   DatabaseConnectionUser db, {
   required String legacyTable,
   required String seriesTable,
 }) async {
-  if (!await _tableExists(db, seriesTable)) return const [];
+  if (!await _tableExists(db, seriesTable)) return _emptyScan;
   final rows = await db
       .customSelect(
-        'SELECT DISTINCT p.dive_id AS dive_id FROM $legacyTable p '
-        'WHERE NOT EXISTS (SELECT 1 FROM $seriesTable s '
-        'WHERE s.dive_id = p.dive_id) ORDER BY p.dive_id',
+        'SELECT DISTINCT p.dive_id AS dive_id, EXISTS ('
+        'SELECT 1 FROM $seriesTable s WHERE s.dive_id = p.dive_id'
+        ') AS packed FROM $legacyTable p ORDER BY p.dive_id',
       )
       .get();
-  return [for (final row in rows) row.read<String>('dive_id')];
+  final unpacked = <String>[];
+  var alreadyPacked = 0;
+  for (final row in rows) {
+    if (row.read<int>('packed') != 0) {
+      alreadyPacked++;
+    } else {
+      unpacked.add(row.read<String>('dive_id'));
+    }
+  }
+  return (unpacked: unpacked, alreadyPacked: alreadyPacked);
 }
 
 /// Every id in [table], or an empty set when the table is absent. Loaded

@@ -342,11 +342,131 @@ void main() {
     );
   });
 
+  test('a missing dive_data_sources keeps dive_profiles: nothing packed its '
+      'samples', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    legacyIndexes(raw);
+    seedParents(raw);
+    seedProfiles(raw);
+    seedPressures(raw);
+    // _assertProfileSeriesSchema waits for every foreign-key parent, so with
+    // dive_data_sources gone dive_profile_series is never created, the packer
+    // finds no table to pack into and returns normally having packed nothing.
+    // The drop has to wait with it or the samples go with the table.
+    raw.execute('DROP TABLE dive_data_sources');
+
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await db.customSelect('SELECT 1').get();
+
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      raw.select(
+        "SELECT name FROM sqlite_master WHERE type = 'table' "
+        "AND name = 'dive_profile_series'",
+      ),
+      isEmpty,
+    );
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 11);
+    // dive_tanks is still there, so the tank half packed and its legacy table
+    // is free to go: the two tables are gated independently.
+    expect(
+      scalar(raw, 'SELECT SUM(sample_count) AS n FROM tank_pressure_series'),
+      3,
+    );
+    expect(
+      raw.select(
+        "SELECT name FROM sqlite_master WHERE name = 'tank_pressure_profiles'",
+      ),
+      isEmpty,
+    );
+  });
+
+  test('a missing dive_tanks keeps tank_pressure_profiles: the mirror of the '
+      'profile case', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    legacyIndexes(raw);
+    seedParents(raw);
+    seedProfiles(raw);
+    seedPressures(raw);
+    raw.execute('DROP TABLE dive_tanks');
+
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await db.customSelect('SELECT 1').get();
+
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      raw.select(
+        "SELECT name FROM sqlite_master WHERE type = 'table' "
+        "AND name = 'tank_pressure_series'",
+      ),
+      isEmpty,
+    );
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM tank_pressure_profiles'), 4);
+    expect(
+      scalar(raw, 'SELECT SUM(sample_count) AS n FROM dive_profile_series'),
+      10,
+    );
+    expect(
+      raw.select("SELECT name FROM sqlite_master WHERE name = 'dive_profiles'"),
+      isEmpty,
+    );
+  });
+
+  test(
+    'the backstop keeps a legacy table whose series table is absent',
+    () async {
+      final raw = sqlite3.sqlite3.openInMemory();
+      addTearDown(raw.close);
+      // Already at 183, so no rung runs: beforeOpen is the only code that
+      // touches this database, and its drop needs the same per-table gate.
+      legacyDdlAt180(raw, userVersion: 183);
+      legacyIndexes(raw);
+      seedParents(raw);
+      seedProfiles(raw);
+      seedPressures(raw);
+      raw.execute('DROP TABLE dive_tanks');
+
+      final db = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      addTearDown(db.close);
+      await db.customSelect('SELECT 1').get();
+
+      expect(
+        scalar(raw, 'SELECT COUNT(*) AS n FROM tank_pressure_profiles'),
+        4,
+      );
+      expect(
+        scalar(raw, 'SELECT SUM(sample_count) AS n FROM dive_profile_series'),
+        10,
+      );
+      expect(
+        raw.select(
+          "SELECT name FROM sqlite_master WHERE name = 'dive_profiles'",
+        ),
+        isEmpty,
+      );
+    },
+  );
+
   test('v183 is present in the migration ladder', () {
     expect(AppDatabase.currentSchemaVersion, 183);
     expect(AppDatabase.migrationVersions, contains(183));
-    // The wire compatibility floor stays where v182 put it: v183 removes no
-    // synced column or entity that v182 had not already replaced.
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 182);
+    // The wire compatibility floor lands on 183, not on the 182 rung that
+    // replaced the two synced entities: no released build was ever stamped
+    // 182, and only a reader that has run v183 has lost the legacy
+    // deletion_log guard, so 183 is the oldest schema that can safely apply
+    // this build's payloads.
+    expect(AppDatabase.minimumCompatibleSchemaVersion, 183);
   });
 }

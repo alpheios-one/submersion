@@ -604,9 +604,9 @@ void main() {
       );
 
       // Single-sample tank pressure series, the writer's twin of the legacy
-      // TankPressureProfilesCompanion inserts this replaces: computerId
-      // left null, matching what the legacy rows carried before the fold
-      // under test stamps them.
+      // row-per-sample tank pressure inserts it replaced: computerId left
+      // null, matching what the legacy rows carried before the fold under
+      // test stamps them.
       await TankPressureSeriesRepository().insertSeries(
         id: 'tp-t1',
         diveId: targetId,

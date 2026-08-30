@@ -299,6 +299,42 @@ void main() {
     expect(row.readNullable<String>('hlc'), isNull);
   });
 
+  test(
+    'skippedAlreadyPacked counts a late legacy row for a packed dive',
+    () async {
+      final open = await openLegacy();
+      seedParents(open.raw);
+      seedProfiles(open.raw);
+      seedPressures(open.raw);
+
+      // First pass packs everything.
+      final first = await packLegacyProfileRows(open.db, nowMs: 1700000000000);
+      expect(first.profileSeries, 4);
+      expect(first.skippedAlreadyPacked, 0);
+
+      // A row that arrives after the dive already has its series: an older
+      // peer republishing, or a retried ladder. It must not be packed, and the
+      // report has to say so rather than looking like an empty no-op.
+      open.raw.execute(
+        'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
+        'is_primary, timestamp, depth) VALUES '
+        "('p-late', 'd1', NULL, NULL, 1, 40, 3.0)",
+      );
+      final second = await packLegacyProfileRows(open.db, nowMs: 1700000000001);
+      expect(second.profileSeries, 0);
+      // d1 and d2 both carry legacy profile rows and both already have series,
+      // and d1's pressure rows are packed too.
+      expect(second.skippedAlreadyPacked, 3);
+      expect(
+        (await rows(
+          open.db,
+          'SELECT SUM(sample_count) AS n FROM dive_profile_series',
+        )).single['n'],
+        10,
+      );
+    },
+  );
+
   test('no-ops when the legacy tables are absent', () async {
     final db = AppDatabase(
       NativeDatabase.memory(

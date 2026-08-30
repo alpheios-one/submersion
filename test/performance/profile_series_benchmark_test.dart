@@ -36,10 +36,10 @@ void main() {
       addTearDown(() {
         if (work.existsSync()) work.deleteSync(recursive: true);
       });
-      final legacyCopy = File('${work.path}/legacy.db')
-        ..writeAsBytesSync(File(fixture).readAsBytesSync());
-      final migratedCopy = File('${work.path}/migrated.db')
-        ..writeAsBytesSync(File(fixture).readAsBytesSync());
+      // copySync streams, so a multi-hundred-megabyte fixture never has to
+      // fit in the test isolate's heap twice over.
+      final legacyCopy = File(fixture).copySync('${work.path}/legacy.db');
+      final migratedCopy = File(fixture).copySync('${work.path}/migrated.db');
       final results = <String, ({Duration legacy, Duration series})>{};
 
       // Legacy shapes, raw SQL, pre-migration copy. The per-dive metric
@@ -203,18 +203,11 @@ void main() {
 
       // The two migration assertions come first, so a timing miss below can
       // never hide a migration/drop regression.
-      //
-      // green after Task 2: the drop (schema 183) has not landed yet, so the
-      // migrated copy's ladder still stops at 182 and the legacy tables are
-      // still present, keeping the file large.
       expect(
         sizeAfter,
         lessThan(sizeBefore ~/ 2),
         reason: 'the drop plus VACUUM must return most of the file',
       );
-      // green after Task 2: schema 183 (the drop) does not exist on this
-      // commit, so the migrated copy's final stored version stops at 182
-      // instead of AppDatabase.currentSchemaVersion.
       expect(
         DatabaseService.getStoredSchemaVersion(migratedCopy.path),
         AppDatabase.currentSchemaVersion,
@@ -226,7 +219,10 @@ void main() {
           lessThanOrEqualTo((e.value.legacy.inMicroseconds * 1.25).round()),
           reason:
               '${e.key}: series ${e.value.series} vs legacy '
-              '${e.value.legacy} (25% tolerance for timer noise)',
+              '${e.value.legacy}. The 25% tolerance covers timer noise, the '
+              'page-cache state each copy happens to be read under, and the '
+              'sync sqlite3 legacy path measured against the async drift '
+              'stack the series path goes through',
         );
       }
     },

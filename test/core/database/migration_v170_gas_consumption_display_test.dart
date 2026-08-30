@@ -78,7 +78,7 @@ void main() {
     // Renaming a synced column and changing its value set are both breaking
     // under the #1089 rules, so peers below 170 were held until they
     // updated. A later rung is free to raise the floor further (plan 2d's
-    // packed profile series did, to 182), so this only pins the floor v170
+    // packed profile series did, to 183), so this only pins the floor v170
     // itself established, not whatever a later migration adds on top.
     expect(
       AppDatabase.minimumCompatibleSchemaVersion,

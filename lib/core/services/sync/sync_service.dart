@@ -1578,7 +1578,8 @@ class SyncService {
       _log.info(
         'Packed legacy sample rows from a peer: '
         '${packed.profileSeries} profile series, '
-        '${packed.tankSeries} tank series',
+        '${packed.tankSeries} tank series, '
+        '${packed.skippedAlreadyPacked} dives already packed here',
       );
     } catch (e, st) {
       _log.warning(
@@ -1960,8 +1961,8 @@ class SyncService {
           // protected from a stale remote tombstone even on append-only child
           // tables that have a createdAt.
           // Clockless child tables with neither updatedAt nor createdAt
-          // (dive_profiles, dive_tanks, tank_pressure_profiles, sightings) have
-          // no age signal: the uuid-keyed ones regenerate with fresh ids on
+          // (dive_tanks and sightings, and the retired dive_profiles /
+          // tank_pressure_profiles before them) have no age signal: the uuid-keyed ones regenerate with fresh ids on
           // re-import, so a stale tombstone won't match a current row. The
           // composite-natural-key junctions (dive_equipment, equipment_set_items)
           // WOULD match a re-inserted row, but the contradicted-key skip above
@@ -2521,6 +2522,14 @@ class SyncService {
     // Drift's batch is all-or-nothing, so a failure fails every row it would
     // have applied -- move those from applied to failed, mirroring the per-row
     // catch above.
+    //
+    // The two inbound-only legacy sample entities are the exception to the
+    // all-or-nothing part: their upsert goes to the TEMP staging tables of
+    // legacy_sample_staging.dart, which insert in chunks, so a throw can
+    // leave earlier chunks staged. Counting the whole batch failed is still
+    // right, and the partial stage is harmless: the staging is TEMP, the
+    // pack that reads it is idempotent, and a retry restages the same ids
+    // over the same rows.
     if (toUpsert.isNotEmpty) {
       try {
         await _serializer.upsertRecords(entityType, toUpsert);

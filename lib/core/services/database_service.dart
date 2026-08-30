@@ -331,6 +331,13 @@ class DatabaseService {
         // background executor opens the file. Non-fatal: a busy lock or an
         // out-of-space temp store leaves a correct database that is merely
         // larger than it needs to be.
+        //
+        // One shot, by design. It runs only on the open that crossed 183, so
+        // a database whose rung skipped the drop and lost the tables later
+        // through the beforeOpen backstop never reaches this, and neither
+        // does one whose VACUUM was killed part way. Both are correct, just
+        // still carrying the free pages; the next real VACUUM is whatever
+        // maintenance the user runs.
         try {
           await migrator.customStatement('VACUUM');
         } catch (e, stackTrace) {

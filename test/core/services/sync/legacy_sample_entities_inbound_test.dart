@@ -126,7 +126,7 @@ void main() {
     /// and pulls it through the real merge path: the shape an
     /// already-known peer's small incremental update takes
     /// (`_applyRemotePayloadInner`, applied via `mergeOrder`). Returns the
-    /// sync result so a caller can inspect `recordsSynced` -- the staging
+    /// sync result so a caller can inspect `recordsSynced`. The staging
     /// table is emptied by the packer regardless of outcome, so it is no
     /// longer possible to confirm a legacy row applied by querying a table
     /// for it afterwards.

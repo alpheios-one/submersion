@@ -3350,13 +3350,24 @@ class AppDatabase extends _$AppDatabase {
   /// still arrive here; _renamedWireKeys plus the value map in
   /// _applyDiverSettingDefaults carry the receiving-side tolerance.
   ///
-  /// Raised 170 -> 182 by the packed profile series: v182 replaces the synced
+  /// Raised 170 -> 183 by the packed profile series: v182 replaces the synced
   /// entities diveProfiles and tankPressureProfiles with diveProfileSeries and
   /// tankPressureSeries, which the first rule above classifies as breaking.
-  /// Peers below 182 are held until they update. Their payloads still arrive
+  /// Peers below 183 are held until they update. Their payloads still arrive
   /// here; SyncData keeps the two legacy keys inbound-only and
   /// SyncDataSerializer.packLegacySamples packs them into series on apply.
-  static const int minimumCompatibleSchemaVersion = 182;
+  ///
+  /// 183 rather than 182, even though 182 is the rung that made the change:
+  /// no released build was ever stamped 182. Shipped devices are at 180, the
+  /// 181 rung is still an open PR, and 182 and 183 land in the same release,
+  /// so nothing in the fleet is held by 183 that 182 did not already hold.
+  /// What the extra step buys is the v183 rung itself: it drops the legacy
+  /// tables and purges the `deletion_log` rows for diveProfiles and
+  /// tankPressureProfiles, and those tombstones were also the guard that kept
+  /// a peer's stale legacy rows from being resurrected on apply. A reader
+  /// that has run v183 no longer has that guard, so it must not be one of the
+  /// readers a 182 writer expects to apply its legacy payloads.
+  static const int minimumCompatibleSchemaVersion = 183;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -4281,34 +4292,88 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// v183: drops the row-per-sample profile tables and purges the sync
-  /// bookkeeping that named them.
+  /// v183: drops the row-per-sample profile table.
   ///
-  /// Called only from the v183 rung, and only after the pack above has run,
-  /// so every sample already lives in `dive_profile_series` /
-  /// `tank_pressure_series`. Every statement is idempotent, so a ladder that
-  /// failed later and retried from the top runs this again harmlessly.
+  /// Called from the v183 rung and from the `beforeOpen` backstop, and in
+  /// both places only once the pack has returned normally AND
+  /// `dive_profile_series` exists. Both conditions are load-bearing. A pack
+  /// that threw packed nothing, and a pack that ran with no series table to
+  /// pack into ALSO packed nothing: `_assertProfileSeriesSchema` skips a
+  /// series table whose foreign-key parents are absent, and the packer's
+  /// unpacked-dive scan then reports no work rather than failing. Dropping
+  /// on either would destroy the only copy of those samples.
+  ///
+  /// Idempotent (`IF EXISTS` throughout), so a ladder that failed later and
+  /// retried from the top runs this again harmlessly.
   ///
   /// Split from [_purgeLegacySampleBookkeeping] because the two have
   /// different preconditions: the bookkeeping purge is always correct, while
-  /// dropping the tables is only safe once the samples in them are packed.
-  /// Also called from the `beforeOpen` backstop, which is how a database
-  /// whose v183 pack failed once still loses the tables on the first later
-  /// open whose pack succeeds.
-  Future<void> _dropLegacySampleTables() async {
+  /// dropping the table is only safe once the samples in it are packed.
+  /// Split from [_dropLegacyTankTable] because the two legacy tables have
+  /// different parents, so one can be packable on a database where the other
+  /// is not.
+  Future<void> _dropLegacyProfileTable() async {
     await customStatement('DROP INDEX IF EXISTS idx_dive_profiles_dive_id');
-    await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
     await customStatement('DROP TABLE IF EXISTS dive_profiles');
+  }
+
+  /// v183: drops the row-per-sample tank pressure table. The mirror of
+  /// [_dropLegacyProfileTable], gated on `tank_pressure_series` existing
+  /// (that table waits for `dive_tanks`, which `dive_profile_series` does
+  /// not need).
+  Future<void> _dropLegacyTankTable() async {
+    await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
     await customStatement('DROP TABLE IF EXISTS tank_pressure_profiles');
+  }
+
+  /// True when [table] exists in this database right now.
+  Future<bool> _tableExists(String table) async {
+    final rows = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+      variables: [Variable<String>(table)],
+    ).get();
+    return rows.isNotEmpty;
+  }
+
+  /// Drops whichever legacy sample table the pack has provably emptied into
+  /// its series table. Never both unconditionally: on a database missing one
+  /// side's foreign-key parents only one series table exists, and the other
+  /// legacy table is still the only copy of its samples.
+  Future<void> _dropPackedLegacySampleTables() async {
+    if (await _tableExists('dive_profile_series')) {
+      await _dropLegacyProfileTable();
+    }
+    if (await _tableExists('tank_pressure_series')) {
+      await _dropLegacyTankTable();
+    }
   }
 
   /// v183: deletes the sync bookkeeping of the retired sample entities.
   ///
   /// The `sync_records` rows are this device's pending outbound work for
-  /// entity types this build no longer exports, and the `deletion_log` rows
-  /// are tombstones for records no peer can hold any more (the compatibility
-  /// floor is 182, so every peer we sync with has the series tables). Left
-  /// behind they would be published forever and never acknowledged.
+  /// entity types this build no longer exports. Left behind they would be
+  /// published forever and never acknowledged.
+  ///
+  /// The `deletion_log` rows did double duty, and the second job is the one
+  /// worth naming: outbound they are tombstones peers apply, and INBOUND they
+  /// were the resurrection guard for these two entity types, the rows
+  /// SyncService's merge consults to keep a peer's copy of a sample this
+  /// device deleted from coming back. Purging them retires that guard, which
+  /// is safe because there is nothing left for it to guard. A `diveProfiles`
+  /// or `tankPressureProfiles` row from an older peer no longer reaches a
+  /// live table at all: those entity types are inbound-only
+  /// (SyncService.inboundOnlyLegacyEntities), their rows land in the TEMP
+  /// staging tables of `legacy_sample_staging.dart`, and the packer builds a
+  /// series only for a dive that has none, so a stale legacy row cannot
+  /// overwrite or revive a series this device holds. Deleting samples in this
+  /// build tombstones `diveProfileSeries` / `tankPressureSeries` instead, and
+  /// those tombstones are untouched here.
+  ///
+  /// The compatibility floor (183) is NOT what makes this safe. That gate is
+  /// one-directional: it stops readers below 183 from applying our payloads,
+  /// not older peers' payloads from reaching us. The staging shim above is
+  /// what handles those, and it is what has to be retired before the floor
+  /// argument would ever apply.
   ///
   /// UNCONDITIONAL in the rung: this is bookkeeping about rows nothing
   /// exports any more, so it is correct whether or not the pack that guards
@@ -4951,6 +5016,22 @@ class AppDatabase extends _$AppDatabase {
       'imported_at',
       'created_at',
     })) {
+      return;
+    }
+    // The same column guard on the OTHER side of the statement. A
+    // dive_profile_series a parallel branch shaped differently, or a fixture
+    // that stands one up by hand, survives beforeOpen's IF NOT EXISTS DDL
+    // untouched, so its presence says nothing about its shape. These are the
+    // two columns the EXISTS predicate below reads; the rest of the series
+    // row (source_id, computer_id, the summary scalars, the blob) this
+    // helper never names.
+    final seriesCols = await customSelect(
+      "PRAGMA table_info('dive_profile_series')",
+    ).get();
+    final seriesColNames = seriesCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!seriesColNames.containsAll(const {'dive_id', 'is_primary'})) {
       return;
     }
     await customStatement('''
@@ -9489,15 +9570,22 @@ class AppDatabase extends _$AppDatabase {
         //  - The bookkeeping purge is UNCONDITIONAL. Those rows describe
         //    entities nothing exports any more, so deleting them is correct
         //    whether or not the pack succeeded.
-        //  - The table drop is CONDITIONAL on that pack succeeding. A series
-        //    table a parallel branch shaped differently makes every packer
-        //    INSERT fail; dropping anyway would destroy the only copy of
-        //    those samples, and letting the exception out would leave a
-        //    database that cannot open at all
-        //    (backstop_resilience_test.dart pins that). Skipping the drop
-        //    leaves a correct database that merely still carries the old
-        //    tables, and the beforeOpen backstop below drops them on the
-        //    first later open whose pack succeeds.
+        //  - The table drop is CONDITIONAL, per table, on that pack having
+        //    actually moved the samples. A series table a parallel branch
+        //    shaped differently makes every packer INSERT fail; dropping
+        //    anyway would destroy the only copy of those samples, and
+        //    letting the exception out would leave a database that cannot
+        //    open at all (backstop_resilience_test.dart pins that). A pack
+        //    that returned normally is not enough on its own either: when a
+        //    series table's foreign-key parents are absent
+        //    (`dive_data_sources` for profiles, `dive_tanks` for pressures)
+        //    `_assertProfileSeriesSchema` creates no series table, the
+        //    packer finds nothing to pack into and returns having packed
+        //    nothing, so `_dropPackedLegacySampleTables` requires the
+        //    matching series table as well. Skipping a drop leaves a correct
+        //    database that merely still carries the old table, and the
+        //    beforeOpen backstop below drops it on the first later open
+        //    whose pack succeeds.
         if (from < 183) {
           var packed = true;
           try {
@@ -9515,7 +9603,7 @@ class AppDatabase extends _$AppDatabase {
           }
           await _purgeLegacySampleBookkeeping();
           if (packed) {
-            await _dropLegacySampleTables();
+            await _dropPackedLegacySampleTables();
           }
         }
         if (from < 183) await reportProgress();
@@ -9795,11 +9883,29 @@ class AppDatabase extends _$AppDatabase {
           // later open's pack succeeds the samples are all in the series and
           // the tables can go. Gated on the stored version so a database
           // still below 183 (a migration fixture, or one caught mid-ladder)
-          // keeps its tables until its own rung has run.
-          if (await _legacySampleTablesPresent() &&
-              await _storedSchemaVersion() >= 183) {
-            await _dropLegacySampleTables();
-            await _purgeLegacySampleBookkeeping();
+          // keeps its tables until its own rung has run, and gated per table
+          // on the matching series table existing, for the same reason the
+          // rung is: a series table whose foreign-key parents are absent is
+          // never created, and the pack over it moves nothing.
+          //
+          // Nested try so the log names the step that threw. A drop or purge
+          // failure here is its own event, and it must not be reported as a
+          // packing failure; a pack failure, by contrast, has to keep the
+          // drop from running at all, which is why this sits INSIDE the
+          // pack's try rather than beside it.
+          try {
+            if (await _legacySampleTablesPresent() &&
+                await _storedSchemaVersion() >= 183) {
+              await _dropPackedLegacySampleTables();
+              await _purgeLegacySampleBookkeeping();
+            }
+          } catch (e, stackTrace) {
+            developer.log(
+              'Backstop drop of the legacy sample tables failed; continuing',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
           }
         } catch (e, stackTrace) {
           developer.log(

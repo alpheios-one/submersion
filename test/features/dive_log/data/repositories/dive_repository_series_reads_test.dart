@@ -223,6 +223,39 @@ void main() {
     expect(dive!.waterTemp, 18.5);
   });
 
+  test('a sentinel sample temperature is stepped over for the coldest '
+      'plausible one', () async {
+    // -128 C is what a transmitter or a computer with no thermistor reports.
+    // The derived water temperature has always applied the same plausibility
+    // band as the import paths (-2 C to 40 C, uddf_import_service) rather
+    // than believing it.
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0, temperature: -128.0),
+        ProfileSample(timestamp: 10, depth: 5.0, temperature: 12.5),
+        ProfileSample(timestamp: 20, depth: 3.0, temperature: 19.0),
+      ],
+      now: now,
+    );
+    final dive = await dives.getDiveById('dive-1');
+    expect(dive!.waterTemp, 12.5);
+  });
+
+  test('a series whose sample temperatures are all out of band derives no '
+      'water temperature', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0, temperature: -128.0),
+        ProfileSample(timestamp: 10, depth: 5.0, temperature: 99.0),
+      ],
+      now: now,
+    );
+    final dive = await dives.getDiveById('dive-1');
+    expect(dive!.waterTemp, isNull);
+  });
+
   test(
     'an explicit water_temp is kept even with colder sample temperatures',
     () async {

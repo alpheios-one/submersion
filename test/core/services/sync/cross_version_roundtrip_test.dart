@@ -355,8 +355,8 @@ void main() {
       expect(result.status, isNot(SyncResultStatus.error));
     }
 
-    test('the floor is 182', () {
-      expect(AppDatabase.minimumCompatibleSchemaVersion, 182);
+    test('the floor is 183', () {
+      expect(AppDatabase.minimumCompatibleSchemaVersion, 183);
     });
 
     test('an old peer that still sends dive_profiles rows produces a series '

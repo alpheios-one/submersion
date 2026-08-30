@@ -220,13 +220,13 @@ class DiveMergeService {
       //     dropped row's bytes can never be re-parsed by a later
       //     libdivecomputer.
       // The duplicate is a display-side concern only, and is canonicalized on
-      // read by _canonicalDataSourceRows (#1005). The underlying gap that
-      // comment described, the old row-per-sample dive_profiles table
-      // attributing samples by computerId alone, so computerId got treated
-      // as a per-dive unique source key the schema never guaranteed, is what
-      // a profile series row's sourceId now closes (#1149); each carried row
-      // keeps its own id here and the copied samples point at it, so the
-      // strands stay separable without a lossy write.
+      // read by _canonicalDataSourceRows (#1005). The gap that comment
+      // described came from the old row-per-sample dive_profiles table, which
+      // attributed samples by computerId alone; computerId was then treated
+      // as a per-dive unique source key the schema never guaranteed. A profile
+      // series row's sourceId closes that gap (#1149): each carried row keeps
+      // its own id here and the copied samples point at it, so the strands
+      // stay separable without a lossy write.
       for (final row in snapshot.dataSourceRows) {
         await _db
             .into(_db.diveDataSources)

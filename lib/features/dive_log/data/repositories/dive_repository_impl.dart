@@ -214,7 +214,7 @@ class DiveRepository {
   /// dive_profile_series, dive_tanks, plus dive_data_sources/dive_computers
   /// for primary-source resolution in [getMergedProfile]), the pipeline's
   /// direct queries (gas_switches, tank_pressure_series), and
-  /// dive_profile_events -- which the detail tick never covered at all,
+  /// dive_profile_events, which the detail tick never covered at all,
   /// leaving `diveComputerEventsProvider` blind to writes of its own table.
   ///
   /// `dives` also covers FK cascades: SQLite performs a cascade delete of
@@ -3521,11 +3521,27 @@ class DiveRepository {
   /// `water_temp` column is unset. Some imports populate per-sample
   /// temperature but miss the dive-level field. Returns null when [points]
   /// carries no usable temperature.
+  /// The coldest plausible sample temperature, in Celsius, or null when a
+  /// series carries none.
+  ///
+  /// The band is the one every other temperature path applies (the v36
+  /// water_temp backfill in database.dart, and the four UDDF import checks):
+  /// a computer with no thermistor, or a transmitter standing in for one,
+  /// reports a sentinel such as -128, and taking the raw minimum would put
+  /// that on the dive. `isFinite` covers the decoder's own NaN/infinity.
+  static const double _minPlausibleWaterTempC = -2;
+  static const double _maxPlausibleWaterTempC = 40;
+
   static double? _minProfileTemp(List<domain.DiveProfilePoint> points) {
     double? min;
     for (final point in points) {
       final temp = point.temperature;
-      if (temp == null || !temp.isFinite) continue;
+      if (temp == null ||
+          !temp.isFinite ||
+          temp < _minPlausibleWaterTempC ||
+          temp > _maxPlausibleWaterTempC) {
+        continue;
+      }
       if (min == null || temp < min) min = temp;
     }
     return min;
