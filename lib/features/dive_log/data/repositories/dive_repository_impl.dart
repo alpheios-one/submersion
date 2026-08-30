@@ -1633,7 +1633,7 @@ class DiveRepository {
       }
 
       // Delete tanks that are no longer present
-      // This will cascade to both tank_pressure_profiles and gas_switches for removed tanks
+      // This will cascade to both tank_pressure_series and gas_switches for removed tanks
       final tanksToDelete = existingTankIds.difference(updatedTankIds);
       for (final tankId in tanksToDelete) {
         await (_db.delete(
@@ -5725,7 +5725,7 @@ class DiveRepository {
   }
 
   /// Replace each dive's tank list with [tanks] (fresh ids, sequential order).
-  /// No notify/txn. Cascades to delete tank_pressure_profiles/gas_switches.
+  /// No notify/txn. Cascades to delete tank_pressure_series/gas_switches.
   Future<void> bulkReplaceTanks(
     List<String> diveIds,
     List<domain.DiveTank> tanks,

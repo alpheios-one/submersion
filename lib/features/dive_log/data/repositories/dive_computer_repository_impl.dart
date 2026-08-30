@@ -733,7 +733,7 @@ class DiveComputerRepository {
   /// The dive_data_sources row on [diveId] that describes [computerId], or
   /// null when the dive has no source row for that computer yet.
   ///
-  /// Used to stamp `dive_profiles.sourceId` at insert time (issue #1149).
+  /// Used to stamp the series row's `sourceId` at insert time (issue #1149).
   /// Primary first so a dive that somehow carries two rows for one computer
   /// resolves to the one the rest of the app treats as canonical.
   Future<String?> _dataSourceIdFor(String diveId, String computerId) async {

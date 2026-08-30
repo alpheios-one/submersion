@@ -192,9 +192,9 @@ class DiveMergeService {
       final mergedSourceIds = <String, String>{
         for (final row in snapshot.dataSourceRows) row.id: _uuid.v4(),
       };
-      // Inserted here rather than at their step-10 slot: dive_profiles.
-      // sourceId is a real FK and foreign_keys is ON, so the parent rows must
-      // land before the samples that reference them.
+      // Inserted here rather than at their step-10 slot: a profile series
+      // row's sourceId is a real FK and foreign_keys is ON, so the parent
+      // rows must land before the samples that reference them.
       //
       // Carried as provenance; NEVER primary (a merged profile is
       // user-authored -- reparse must not rewrite it).
@@ -221,11 +221,12 @@ class DiveMergeService {
       //     libdivecomputer.
       // The duplicate is a display-side concern only, and is canonicalized on
       // read by _canonicalDataSourceRows (#1005). The underlying gap that
-      // comment described -- dive_profiles attributing samples by computerId
-      // alone, so computerId gets treated as a per-dive unique source key the
-      // schema never guaranteed -- is what dive_profiles.sourceId now closes
-      // (#1149); each carried row keeps its own id here and the copied samples
-      // point at it, so the strands stay separable without a lossy write.
+      // comment described, the old row-per-sample dive_profiles table
+      // attributing samples by computerId alone, so computerId got treated
+      // as a per-dive unique source key the schema never guaranteed, is what
+      // a profile series row's sourceId now closes (#1149); each carried row
+      // keeps its own id here and the copied samples point at it, so the
+      // strands stay separable without a lossy write.
       for (final row in snapshot.dataSourceRows) {
         await _db
             .into(_db.diveDataSources)
@@ -307,8 +308,9 @@ class DiveMergeService {
         if (host != null) {
           host.samples.addAll(surface);
         } else {
-          // No profile on either side: the legacy rows carried a null
-          // computer, a null source and is_primary true.
+          // No profile on either side: mirrors what a dive_profiles row
+          // carried when unattributed, a null computer, a null source and
+          // is_primary true; today's series row keeps the same convention.
           drafts.add(
             _SeriesDraft(
               diveId: gap.afterDiveId,
