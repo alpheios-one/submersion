@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
+import 'package:submersion/features/equipment/domain/entities/overdue_service_entry.dart';
+import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/domain/services/checklist_session_engine.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -22,6 +25,7 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
     PreDiveItemState state, {
     double? valueNumber,
     String? note,
+    List<OverdueServiceEntry>? overdueServices,
   }) {
     return ref
         .read(preDiveSessionRepositoryProvider)
@@ -31,7 +35,51 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
           state: state,
           valueNumber: valueNumber,
           note: note,
+          // A transition to pending always clears the frozen snapshot
+          // server-side regardless of what is passed, so pass through the
+          // item's existing value here -- it only matters for a call that
+          // leaves the item resolved (a note/value edit that keeps the
+          // current state), where it must survive untouched.
+          overdueServices: overdueServices ?? item.overdueServices,
         );
+  }
+
+  /// Resolves [item] to [state], freezing its live overdue-service list at
+  /// this exact moment -- the informative red warning becomes a snapshot the
+  /// instant the diver makes a decision, rather than staying tied to
+  /// whatever the equipment's service clocks say later.
+  Future<void> _resolve(
+    WidgetRef ref,
+    PreDiveSessionItem item,
+    PreDiveItemState state, {
+    double? valueNumber,
+    String? note,
+  }) async {
+    final overdueServices = await _overdueEntriesFor(ref, item);
+    await _setState(
+      ref,
+      item,
+      state,
+      valueNumber: valueNumber,
+      note: note,
+      overdueServices: overdueServices,
+    );
+  }
+
+  Future<List<OverdueServiceEntry>> _overdueEntriesFor(
+    WidgetRef ref,
+    PreDiveSessionItem item,
+  ) async {
+    final equipmentId = item.equipmentId;
+    if (equipmentId == null) return const [];
+    final statuses = await ref.read(
+      serviceClockStatusesProvider(equipmentId).future,
+    );
+    return [
+      for (final status in statuses)
+        if (status.severity == ServiceClockSeverity.overdue)
+          OverdueServiceEntry.fromStatus(status),
+    ];
   }
 
   Future<void> _editValue(
@@ -44,7 +92,7 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
       builder: (context) => _ValueEntryDialog(item: item),
     );
     if (result == null) return;
-    await _setState(
+    await _resolve(
       ref,
       item,
       PreDiveItemState.done,
@@ -63,7 +111,8 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
       builder: (context) => _NoteDialog(item: item),
     );
     if (note == null) return;
-    // Preserve the current state; only the note changes.
+    // Preserve the current state; only the note changes. _setState keeps
+    // item.overdueServices untouched since no fresh snapshot is passed.
     await _setState(ref, item, item.state, note: note);
   }
 
@@ -78,7 +127,7 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
     );
     // Flagging without a note is allowed; dialog cancel aborts.
     if (note == null) return;
-    await _setState(ref, item, PreDiveItemState.flagged, note: note);
+    await _resolve(ref, item, PreDiveItemState.flagged, note: note);
   }
 
   Future<void> _complete(
@@ -257,9 +306,9 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
                       session: session,
                       sortedItems: items,
                       item: item,
-                      onDone: () => _setState(ref, item, PreDiveItemState.done),
+                      onDone: () => _resolve(ref, item, PreDiveItemState.done),
                       onSkip: () =>
-                          _setState(ref, item, PreDiveItemState.skipped),
+                          _resolve(ref, item, PreDiveItemState.skipped),
                       onFlag: () => _flag(context, ref, item),
                       onEditValue: () => _editValue(context, ref, item),
                       onAddNote: () => _addNote(context, ref, item),

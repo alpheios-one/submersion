@@ -6,7 +6,6 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
-import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_checklist_template.dart';
@@ -76,9 +75,6 @@ class _StartSessionSheetState extends ConsumerState<_StartSessionSheet> {
   Future<void> _begin() async {
     final template = _template;
     if (template == null || _starting) return;
-    // Capture the localized note before any await, so the composer never
-    // touches BuildContext across an async gap.
-    final serviceOverdueNote = context.l10n.preDive_runner_serviceOverdue;
     setState(() => _starting = true);
     try {
       final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
@@ -96,25 +92,14 @@ class _StartSessionSheetState extends ConsumerState<_StartSessionSheet> {
         gear = all.where((g) => chosenSet.equipmentIds.contains(g.id)).toList();
       }
       // Union of set-expanded gear and single-item links, deduplicated by id
-      // so a device chosen both ways is not counted twice in the overdue
-      // lookup below.
+      // so a device chosen both ways is not passed twice to the composer.
       final allGear = {
         for (final g in gear) g.id: g,
         for (final g in chosenSingles.values) g.id: g,
       }.values.toList();
-      // Overdue gear is flagged from the service-clock ledger, evaluated only
-      // for the gear actually in play (proportional, not the whole locker)
-      // and in parallel so total latency is the slowest item, not the sum.
-      final statusesPerGear = await Future.wait(
-        allGear.map((g) => ref.read(serviceClockStatusesProvider(g.id).future)),
-      );
-      final overdueEquipmentIds = {
-        for (var i = 0; i < allGear.length; i++)
-          if (statusesPerGear[i].any(
-            (s) => s.severity == ServiceClockSeverity.overdue,
-          ))
-            allGear[i].id,
-      };
+      // Overdue service is a purely informative, live-computed warning shown
+      // in the runner (SessionItemTile), not a decision baked into the
+      // session at start time -- so no service-clock lookup happens here.
       final items = SessionItemComposer.compose(
         templateItems: _templateItems,
         equipmentSet: chosenSet,
@@ -123,8 +108,6 @@ class _StartSessionSheetState extends ConsumerState<_StartSessionSheet> {
           for (final entry in chosenSingles.entries) entry.key: entry.value.id,
         },
         now: DateTime.now(),
-        serviceOverdueNote: serviceOverdueNote,
-        overdueEquipmentIds: overdueEquipmentIds,
       );
       final session = await ref
           .read(preDiveSessionRepositoryProvider)

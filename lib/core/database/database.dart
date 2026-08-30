@@ -425,6 +425,12 @@ class PreDiveSessionItems extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+
+  /// JSON-encoded list of overdue-service entries, frozen the moment the
+  /// diver last moved this item away from pending. Null while pending (the
+  /// runner computes the live overdue list from equipmentId instead) and
+  /// cleared back to null on reset. Issue #814 phase 2.
+  TextColumn get overdueServices => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3338,7 +3344,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 181;
+  static const int currentSchemaVersion = 182;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3733,6 +3739,12 @@ class AppDatabase extends _$AppDatabase {
     // equipmentSet flow. Issue #814. Column-only rung, no backfill, so the
     // beforeOpen backstop is safe to re-run.
     181,
+    // v182: pre_dive_session_items.overdue_services, the frozen snapshot of
+    // overdue-service entries for a resolved checklist item (issue #814
+    // phase 2). Column-only rung, no backfill: every pre-existing row
+    // correctly reads back as null (no frozen snapshot), which the UI
+    // already treats as "nothing known" for a resolved legacy row.
+    182,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5605,6 +5617,24 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
       'TEXT',
+    );
+  }
+
+  /// Idempotent DDL for the v182 pre_dive_session_items.overdue_services
+  /// column (issue #814 phase 2): the frozen snapshot of overdue-service
+  /// entries for a resolved checklist item, written by the repository the
+  /// moment an item leaves pending and cleared on reset. Self-guards on the
+  /// table existing. Same dual-call contract (onUpgrade + beforeOpen
+  /// backstop) as the other column-assert helpers.
+  Future<void> _assertSessionItemOverdueServicesColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_session_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('overdue_services')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_session_items ADD COLUMN overdue_services TEXT',
     );
   }
 
@@ -9312,6 +9342,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertTemplateItemEquipmentIdColumn();
         }
         if (from < 181) await reportProgress();
+        // v182: pre_dive_session_items.overdue_services (issue #814 phase 2).
+        // Column-only rung, no backfill: every pre-existing resolved item
+        // correctly reads back as "nothing known" until it is next resolved.
+        if (from < 182) {
+          await _assertSessionItemOverdueServicesColumn();
+        }
+        if (from < 182) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9569,6 +9606,12 @@ class AppDatabase extends _$AppDatabase {
         // Safe to re-run on every open: the helper is column-only with no
         // backfill, so it cannot resurrect or overwrite diver data.
         await _assertTemplateItemEquipmentIdColumn();
+
+        // v182 backstop: re-assert pre_dive_session_items.overdue_services
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertSessionItemOverdueServicesColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
