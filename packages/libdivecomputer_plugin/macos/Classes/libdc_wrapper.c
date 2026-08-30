@@ -6,6 +6,7 @@
 #include <libdivecomputer/version.h>
 #include <libdivecomputer/descriptor.h>
 #include <libdivecomputer/iterator.h>
+#include <libdivecomputer/usbhid.h>
 
 #ifdef _WIN32
 #define strcasecmp _stricmp
@@ -382,6 +383,77 @@ int libdc_descriptor_lookup_model(unsigned int transport, unsigned int model,
 
     dc_iterator_free(iter);
     return found;
+}
+
+// ============================================================
+// USB HID Discovery Helpers
+// ============================================================
+
+// Finds the descriptor for an exact vendor/product/model triple.
+// Returns NULL when nothing matches; the caller owns what it gets back and
+// must dc_descriptor_free() it.
+//
+// Vendor and product are compared exactly, unlike the BLE name matcher above:
+// these strings did not come off the air, they came from a descriptor this
+// same table produced, so a spelling difference means a different device.
+static dc_descriptor_t *find_descriptor_exact(const char *vendor,
+                                              const char *product,
+                                              unsigned int model) {
+    if (vendor == NULL || product == NULL) {
+        return NULL;
+    }
+
+    dc_iterator_t *iter = NULL;
+    if (dc_descriptor_iterator(&iter) != DC_STATUS_SUCCESS || iter == NULL) {
+        return NULL;
+    }
+
+    dc_descriptor_t *desc = NULL;
+    dc_descriptor_t *found = NULL;
+    while (dc_iterator_next(iter, &desc) == DC_STATUS_SUCCESS) {
+        const char *desc_vendor = dc_descriptor_get_vendor(desc);
+        const char *desc_product = dc_descriptor_get_product(desc);
+        if (desc_vendor != NULL && desc_product != NULL &&
+            strcmp(desc_vendor, vendor) == 0 &&
+            strcmp(desc_product, product) == 0 &&
+            dc_descriptor_get_model(desc) == model) {
+            found = desc;
+            break;
+        }
+        dc_descriptor_free(desc);
+    }
+
+    dc_iterator_free(iter);
+    return found;
+}
+
+unsigned int libdc_descriptor_transports(const char *vendor, const char *product,
+                                         unsigned int model) {
+    dc_descriptor_t *desc = find_descriptor_exact(vendor, product, model);
+    if (desc == NULL) {
+        return 0;
+    }
+    unsigned int transports = dc_descriptor_get_transports(desc);
+    dc_descriptor_free(desc);
+    return transports;
+}
+
+int libdc_usbhid_match(const char *vendor, const char *product,
+                       unsigned int model,
+                       unsigned short vid, unsigned short pid) {
+    dc_descriptor_t *desc = find_descriptor_exact(vendor, product, model);
+    if (desc == NULL) {
+        return 0;
+    }
+
+    int matched = 0;
+    if (dc_descriptor_get_transports(desc) & DC_TRANSPORT_USBHID) {
+        dc_usbhid_desc_t usbhid = { vid, pid };
+        matched = dc_descriptor_filter(desc, DC_TRANSPORT_USBHID, &usbhid) != 0;
+    }
+
+    dc_descriptor_free(desc);
+    return matched;
 }
 
 void libdc_parsed_dive_free(libdc_parsed_dive_t *dive) {
