@@ -73,7 +73,7 @@ std::string UsbHidIoStream::Open(const UsbHidDevice& device) {
 void UsbHidIoStream::Close() {
     if (handle_ != INVALID_HANDLE_VALUE) {
         if (read_pending_) {
-            CancelIo(handle_);
+            CancelIoEx(handle_, &read_overlapped_);
             // The overlapped structure and its buffer live in this object, so
             // the wait is not optional: returning while the driver may still
             // write into them would corrupt whatever reuses the memory.
@@ -151,7 +151,7 @@ int UsbHidIoStream::PerformRead(void* data, size_t size, size_t* actual) {
                       static_cast<DWORD>(read_buffer_.size()), &read_now,
                       &read_overlapped_)) {
             if (GetLastError() != ERROR_IO_PENDING) {
-                CancelIo(handle_);
+                CancelIoEx(handle_, &read_overlapped_);
                 return LIBDC_STATUS_IO;
             }
         }
@@ -231,7 +231,13 @@ int UsbHidIoStream::PerformWrite(const void* data, size_t size,
                                            ? INFINITE
                                            : static_cast<DWORD>(timeout_ms_)) !=
                    WAIT_OBJECT_0) {
-            CancelIo(handle_);
+            // CancelIoEx, not CancelIo: CancelIo cancels every operation the
+            // calling thread has outstanding on this handle, and reads and
+            // writes both come from libdivecomputer's one download thread. A
+            // write timeout would take the read that PerformRead deliberately
+            // leaves pending with it, and the next read would then fail with
+            // ERROR_OPERATION_ABORTED and end the download for no reason.
+            CancelIoEx(handle_, &overlapped);
             GetOverlappedResult(handle_, &overlapped, &written, TRUE);
             status = LIBDC_STATUS_TIMEOUT;
         } else if (!GetOverlappedResult(handle_, &overlapped, &written, FALSE)) {

@@ -110,6 +110,20 @@ final class UsbHidIoStream {
             let loop: CFRunLoop = CFRunLoopGetCurrent()
             self.readRunLoop = loop
 
+            // The callback's separate reportID argument is deliberately
+            // ignored, and the report buffer passed through untouched.
+            //
+            // That matters for the Suunto EON Steel, which uses a numbered
+            // report: suunto_eonsteel.c:156 rejects any reply whose first byte
+            // is not 0x3f, so the id byte has to survive. IOKit puts it at the
+            // front of the report buffer for a numbered device, and omits it
+            // for an unnumbered one, which is exactly the shape hidraw
+            // delivers on Linux and what libdivecomputer's drivers assume.
+            //
+            // hidapi's macOS backend does the same thing, discarding report_id
+            // and copying the buffer verbatim, and Subsurface downloads an EON
+            // Steel over USB on macOS through it. Reading the id byte out of
+            // the argument and prepending it here would double it.
             IOHIDDeviceRegisterInputReportCallback(
                 ref, reports, length,
                 { context, result, _, _, _, report, reportLength in
