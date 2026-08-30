@@ -12,6 +12,13 @@ import 'package:submersion/features/statistics/presentation/pages/statistics_ove
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+/// Every MaterialApp here pins `locale: Locale('en')`. flutter_test forwards
+/// the HOST machine's locale list rather than a fixed en_US, and the app ships
+/// 11 locales, so an unpinned MaterialApp renders a translated UI on a
+/// non-English machine and every English assertion in this file misses. CI
+/// runners are en_US, so the failure would only ever show up on a
+/// contributor's machine.
+
 /// Minimal mock SettingsNotifier using noSuchMethod to avoid re-implementing
 /// the full interface (~60 methods). Matches the pattern used in
 /// localization_test.dart and other test files.
@@ -75,6 +82,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -139,6 +147,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -192,6 +201,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -265,6 +275,7 @@ void main() {
           child: MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             routerConfig: router,
           ),
         ),
@@ -319,6 +330,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -359,6 +371,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -420,6 +433,7 @@ void main() {
           child: MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             routerConfig: router,
           ),
         ),
@@ -488,6 +502,7 @@ void main() {
           child: MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
             routerConfig: router,
           ),
         ),
@@ -544,6 +559,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -632,6 +648,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -697,6 +714,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),
@@ -737,6 +755,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
             home: StatisticsOverviewPage(embedded: true),
           ),
         ),

@@ -409,6 +409,49 @@ void main() {
       expect(byLabel['20-30m']!.totalDurationSeconds, (30 + 10) * 60);
       expect(byLabel['20-30m']!.count, 2);
     });
+
+    test('falls back to exit - entry when there is no runtime, ahead of the '
+        'profile span and bottom_time (issue #641 follow-up)', () async {
+      await repository.createDive(
+        domain.Dive(
+          id: 'dive-entry-exit',
+          dateTime: DateTime.utc(2026, 3, 29, 10),
+          maxDepth: 45.0,
+          entryTime: DateTime.utc(2026, 3, 29, 10),
+          exitTime: DateTime.utc(2026, 3, 29, 10, 50),
+          bottomTime: const Duration(minutes: 20),
+          profile: [
+            for (var t = 0; t <= 600; t += 10)
+              domain.DiveProfilePoint(
+                timestamp: t,
+                depth: t == 0 || t == 600 ? 0 : 45,
+              ),
+          ],
+        ),
+      );
+
+      final stats = await repository.getStatistics();
+      final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+
+      // 50 min from the timestamps, not the 10 min profile span and not the
+      // 20 min bottom_time: both sit later in the chain.
+      expect(byLabel['40-50m']!.totalDurationSeconds, 50 * 60);
+    });
+
+    test(
+      'reports zero time for a bucket whose dives carry no duration at all',
+      () async {
+        await insertDive(id: 'dive-untimed', maxDepth: 18.0);
+
+        final stats = await repository.getStatistics();
+        final byLabel = {for (final d in stats.depthDistribution) d.label: d};
+
+        // SUM over an all-NULL column is NULL; the bucket still reports its
+        // dive, with no time behind it.
+        expect(byLabel['10-20m']!.count, 1);
+        expect(byLabel['10-20m']!.totalDurationSeconds, 0);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

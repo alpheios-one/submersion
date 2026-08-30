@@ -11,6 +11,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -2976,26 +2977,35 @@ class DiveRepository {
 
       // Depth distribution: 10 m buckets from the surface to 130 m, plus an
       // open-ended bucket for anything deeper (issue #641). A dive lands in
-      // a bucket by its max depth, same rule the 0-40 m version used.
+      // a bucket by its max depth, the same rule the old 0-40 m version used.
       //
-      // Per-bucket duration is `DiveTimes.effectiveRuntime` (the same
-      // 4-step fallback as `Dive.effectiveRuntime`: runtime, then
-      // exit-entry, then profile span, then bottom_time) rather than the
-      // `SUM(COALESCE(runtime, bottom_time))` SQL shortcut used previously,
-      // which skipped the profile-derived fallback and undercounted dives
-      // that only have a computed runtime. Bucketing therefore happens in
-      // Dart, one row per dive, reusing the `_diveTimesSelect` projection so
-      // no full `Dive`/profile hydration is needed (issue #641 follow-up).
+      // Per-bucket duration resolves the full `Dive.effectiveRuntime` chain
+      // in SQL (see `effectiveRuntimeSecondsSql`) rather than the
+      // `COALESCE(runtime, bottom_time)` shortcut this query used before,
+      // which skipped the profile-derived step and reported a dive that only
+      // has a profile as zero minutes. Bucketing stays in SQL so the whole
+      // distribution comes back as at most 14 rows, not one row per dive.
+      const depthBucketSizeMeters = 10;
+      const depthBucketCount = 13; // 0-10m, 10-20m, ..., 120-130m
       final depthWhereClause = diverId != null
           ? 'WHERE d.max_depth IS NOT NULL AND d.diver_id = ?'
           : 'WHERE d.max_depth IS NOT NULL';
-      const depthBucketSizeMeters = 10;
-      const depthBucketCount = 13; // 0-10m, 10-20m, ..., 120-130m
+      // The inner CAST forces real division whatever affinity the column
+      // value carries; the outer one truncates toward zero. Truncation is
+      // not floor for a negative, so the MAX/MIN pair clamps both ends: a
+      // stray negative depth lands in the first bucket, and anything at or
+      // past 130 m lands in the open-ended last one.
+      const depthBucketExpression =
+          'MIN(MAX(CAST(CAST(d.max_depth AS REAL) / $depthBucketSizeMeters '
+          'AS INTEGER), 0), $depthBucketCount)';
       final depthRows = await _db
           .customSelect(
-            'SELECT $_diveTimesSelectColumns, d.max_depth AS max_depth '
+            'SELECT $depthBucketExpression AS bucket, '
+            'COUNT(*) AS count, '
+            'SUM(${effectiveRuntimeSecondsSql('d')}) AS total_time '
             'FROM dives d '
-            '$depthWhereClause $fAliasD',
+            '$depthWhereClause $fAliasD '
+            'GROUP BY bucket',
             variables: vars,
             readsFrom: {_db.dives, _db.diveProfiles},
           )
@@ -3004,14 +3014,12 @@ class DiveRepository {
       final bucketCounts = List<int>.filled(depthBucketCount + 1, 0);
       final bucketDurationSeconds = List<int>.filled(depthBucketCount + 1, 0);
       for (final row in depthRows) {
-        final maxDepthValue = row.read<double>('max_depth');
-        final bucket = (maxDepthValue / depthBucketSizeMeters).floor().clamp(
-          0,
-          depthBucketCount,
-        );
-        bucketCounts[bucket]++;
-        bucketDurationSeconds[bucket] +=
-            _mapDiveTimesRow(row).effectiveRuntime?.inSeconds ?? 0;
+        final bucket = row.read<int>('bucket');
+        bucketCounts[bucket] = row.read<int>('count');
+        // NULL when every dive in the bucket is missing all four duration
+        // sources, which reads as zero minutes logged at that depth.
+        bucketDurationSeconds[bucket] =
+            row.readNullable<int>('total_time') ?? 0;
       }
 
       final depthDistribution = [
@@ -4829,21 +4837,21 @@ class DiveRepository {
     }
   }
 
-  /// Shared column list for the times-only dive projection. The scalar
-  /// subquery carries the profile-derived runtime fallback so
+  /// Shared SELECT for the times-only dive projection. The scalar subquery
+  /// carries the profile-derived runtime fallback so
   /// [DiveTimes.effectiveRuntime] can mirror [domain.Dive.effectiveRuntime]
-  /// without loading profile rows. Split out from [_diveTimesSelect] so
-  /// callers that need one extra column (e.g. the depth-distribution stats
-  /// query, which also needs `max_depth`) can extend the SELECT without
-  /// duplicating the subquery.
-  static const _diveTimesSelectColumns =
-      'd.id, d.dive_date_time, d.entry_time, d.exit_time, '
+  /// without loading profile rows.
+  ///
+  /// Every caller here reads a single dive or a short range, so the subquery
+  /// runs a bounded number of times. Aggregates that scan the whole dive
+  /// table use [effectiveRuntimeSecondsSql] instead, which resolves the same
+  /// chain but short-circuits past the profile scan.
+  static const _diveTimesSelect =
+      'SELECT d.id, d.dive_date_time, d.entry_time, d.exit_time, '
       'd.runtime, d.bottom_time, '
       '(SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id) AS profile_span';
-
-  static const _diveTimesSelect =
-      'SELECT $_diveTimesSelectColumns FROM dives d';
+      'WHERE p.dive_id = d.id) AS profile_span '
+      'FROM dives d';
 
   domain.DiveTimes _mapDiveTimesRow(QueryRow row) {
     final entry = row.readNullable<int>('entry_time');
