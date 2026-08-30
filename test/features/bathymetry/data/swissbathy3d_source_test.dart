@@ -95,7 +95,10 @@ void main() {
           return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
         });
 
-        final grid = await source.fetch(zurichseePoint, spanMeters: 1000);
+        // A span well under a tile width keeps this to the single tile
+        // under zurichseePoint; multi-tile stitching has its own tests
+        // below.
+        final grid = await source.fetch(zurichseePoint, spanMeters: 100);
         expect(grid.sourceId, 'swissbathy3d');
         expect(grid.rows, 4);
         expect(itemCalls, 1);
@@ -103,7 +106,7 @@ void main() {
 
         // Second fetch of a coordinate in the same tile must hit neither
         // the STAC API nor the download endpoint again (tile-level cache).
-        final again = await source.fetch(zurichseePoint, spanMeters: 1000);
+        final again = await source.fetch(zurichseePoint, spanMeters: 100);
         expect(again.sourceId, 'swissbathy3d');
         expect(itemCalls, 1);
         expect(downloadCalls, 1);
@@ -120,13 +123,13 @@ void main() {
         });
 
         await expectLater(
-          source.fetch(zurichseePoint, spanMeters: 1000),
+          source.fetch(zurichseePoint, spanMeters: 100),
           throwsA(isA<BathymetryFetchException>()),
         );
         expect(itemCalls, 1);
 
         await expectLater(
-          source.fetch(zurichseePoint, spanMeters: 1000),
+          source.fetch(zurichseePoint, spanMeters: 100),
           throwsA(isA<BathymetryFetchException>()),
         );
         // The negative answer was cached by tile key: no second STAC call.
@@ -144,5 +147,128 @@ void main() {
         );
       },
     );
+
+    test(
+      'stitches all tiles the requested spanMeters bounding box touches',
+      () async {
+        // Straddles the LV95 easting=2685000 tile boundary while a wide
+        // northing margin keeps it inside a single northing tile (1245), so
+        // spanMeters=200 needs exactly two adjacent tiles east-west.
+        const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+
+        const tileAGrid = '''
+ncols 2
+nrows 2
+xllcorner 2684000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+        const tileBGrid = '''
+ncols 2
+nrows 2
+xllcorner 2685000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+410.0 410.0
+410.0 -9999
+''';
+
+        var itemCalls = 0;
+        var downloadCalls = 0;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            itemCalls++;
+            final href = itemCalls == 1
+                ? 'https://example.org/tile_a.zip'
+                : 'https://example.org/tile_b.zip';
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'assets': {
+                      'grid': {'href': href},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          downloadCalls++;
+          final body = req.url.path.endsWith('tile_a.zip')
+              ? tileAGrid
+              : tileBGrid;
+          return http.Response.bytes(_zipOf('tile.asc', body), 200);
+        });
+
+        final grid = await source.fetch(boundaryPoint, spanMeters: 200);
+
+        expect(itemCalls, 2);
+        expect(downloadCalls, 2);
+        expect(grid.rows, 2);
+        expect(grid.cols, 4);
+
+        // West tile (Z=400 -> depth 6.1) occupies the western columns, east
+        // tile (Z=410 -> depth -3.9) the eastern ones: stitched side by
+        // side, not overwritten or overlapping.
+        expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+        expect(grid.depthAt(1, 0), closeTo(406.1 - 400.0, 1e-6));
+        expect(grid.depthAt(0, 2), closeTo(406.1 - 410.0, 1e-6));
+        expect(grid.depthAt(1, 3), closeTo(406.1 - 410.0, 1e-6));
+        // The east tile's nodata sentinel survives stitching as a gap.
+        expect(grid.depthAt(0, 3), isNull);
+      },
+    );
+
+    test('a missing tile inside the span is a gap, not a crash, when at least '
+        'one neighboring tile has data', () async {
+      // Same boundary point/span as above, but the east tile has no STAC
+      // item at all (empty feature list) — a genuine coverage gap.
+      const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      const tileAGrid = '''
+ncols 2
+nrows 2
+xllcorner 2684000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          if (itemCalls == 1) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_a.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response(jsonEncode({'features': []}), 200);
+        }
+        return http.Response.bytes(_zipOf('tile.asc', tileAGrid), 200);
+      });
+
+      final grid = await source.fetch(boundaryPoint, spanMeters: 200);
+
+      expect(itemCalls, 2);
+      expect(grid.rows, 2);
+      expect(grid.cols, 2);
+      expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+    });
   });
 }

@@ -70,17 +70,48 @@ class SwissBathy3dSource implements BathymetrySource {
     }
 
     final lv95 = Lv95Transform.fromWgs84(center.latitude, center.longitude);
-    final tileE = (lv95.easting / tileSizeMeters).floor();
-    final tileN = (lv95.northing / tileSizeMeters).floor();
+    final half = spanMeters / 2;
+    final tileEMin = ((lv95.easting - half) / tileSizeMeters).floor();
+    final tileEMax = ((lv95.easting + half) / tileSizeMeters).floor();
+    final tileNMin = ((lv95.northing - half) / tileSizeMeters).floor();
+    final tileNMax = ((lv95.northing + half) / tileSizeMeters).floor();
+
+    // Sequential, not parallel: each tile is cache-checked before any
+    // network call, and most requests hit the cache after the first visit
+    // to an area — no benefit in racing STAC lookups for a cold cache.
+    final tiles = <BathymetryGrid>[];
+    for (var tileN = tileNMin; tileN <= tileNMax; tileN++) {
+      for (var tileE = tileEMin; tileE <= tileEMax; tileE++) {
+        final tile = await _fetchTile(tileE, tileN, lake);
+        if (tile != null) tiles.add(tile);
+      }
+    }
+
+    if (tiles.isEmpty) {
+      throw BathymetryFetchException(
+        'no swissBATHY3D tiles for tile range '
+        'E[$tileEMin..$tileEMax] N[$tileNMin..$tileNMax]',
+      );
+    }
+    return tiles.length == 1 ? tiles.single : _stitchTiles(tiles);
+  }
+
+  /// Fetches, parses and caches the single 1-km tile at ([tileE], [tileN]),
+  /// or returns null when swissBATHY3D genuinely has no tile there (e.g. a
+  /// shoreline cell outside the "complete tiles only" coverage) — a gap to
+  /// stitch around, not an error. Transient failures (network, unparseable
+  /// STAC response) still throw and are never cached, so the caller falls
+  /// through to the next resolver tier and retries on the next visit.
+  Future<BathymetryGrid?> _fetchTile(
+    int tileE,
+    int tileN,
+    SwissLakeLevel lake,
+  ) async {
     final tileKey = '${tileE}_$tileN';
 
     final cached = await _tileCache.read(tileKey);
     if (cached != null) return cached;
-    if (await _tileCache.hasCachedAnswer(tileKey)) {
-      throw BathymetryFetchException(
-        'no swissBATHY3D tile for $tileKey (cached negative)',
-      );
-    }
+    if (await _tileCache.hasCachedAnswer(tileKey)) return null;
 
     final SwissBathyAsset? asset;
     final Uint8List zipBytes;
@@ -88,11 +119,9 @@ class SwissBathy3dSource implements BathymetrySource {
       asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
       if (asset == null) {
         await _tileCache.writeEmpty(tileKey);
-        throw BathymetryFetchException('no swissBATHY3D tile for $tileKey');
+        return null;
       }
       zipBytes = await _stac.downloadBytes(asset.href);
-    } on BathymetryFetchException {
-      rethrow;
     } on SwissStacException catch (e) {
       // Transient: network error, HTTP failure, unparseable STAC response.
       // Must not be cached — the next visit should retry.
@@ -104,9 +133,7 @@ class SwissBathy3dSource implements BathymetrySource {
       // Deterministic for this tile: caching it avoids re-downloading the
       // same zip on every future visit to the same coordinate.
       await _tileCache.writeEmpty(tileKey);
-      throw BathymetryFetchException(
-        'swissBATHY3D asset for $tileKey had no ESRI ASCII grid file',
-      );
+      return null;
     }
 
     final BathymetryGrid grid;
@@ -122,6 +149,69 @@ class SwissBathy3dSource implements BathymetrySource {
     }
     await _tileCache.writeOk(tileKey, grid);
     return grid;
+  }
+
+  /// Merges same-resolution tile grids into one rectangular [BathymetryGrid]
+  /// spanning all of them. Each tile's cells are placed by rounding its
+  /// origin's offset from the merged origin to the nearest cell — robust to
+  /// the sub-cell drift between tiles' independently-reprojected LV95
+  /// origins (see [parseSwissLv95Grid]) — rather than assuming tiles are
+  /// pixel-perfectly aligned. Gaps (no tile, or nodata cells) stay null.
+  static BathymetryGrid _stitchTiles(List<BathymetryGrid> tiles) {
+    final reference = tiles.first;
+    final cellSizeLat = reference.cellSizeLatDeg;
+    final cellSizeLon = reference.cellSizeLonDeg;
+
+    var minLat = double.infinity;
+    var maxLat = -double.infinity;
+    var minLon = double.infinity;
+    var maxLon = -double.infinity;
+    for (final tile in tiles) {
+      final tileMinLat = tile.originLat - cellSizeLat / 2;
+      final tileMaxLat = tile.originLat + cellSizeLat * (tile.rows - 0.5);
+      final tileMinLon = tile.originLon - cellSizeLon / 2;
+      final tileMaxLon = tile.originLon + cellSizeLon * (tile.cols - 0.5);
+      if (tileMinLat < minLat) minLat = tileMinLat;
+      if (tileMaxLat > maxLat) maxLat = tileMaxLat;
+      if (tileMinLon < minLon) minLon = tileMinLon;
+      if (tileMaxLon > maxLon) maxLon = tileMaxLon;
+    }
+
+    final rows = ((maxLat - minLat) / cellSizeLat).round();
+    final cols = ((maxLon - minLon) / cellSizeLon).round();
+    final originLat = minLat + cellSizeLat / 2;
+    final originLon = minLon + cellSizeLon / 2;
+
+    final merged = List<double?>.filled(rows * cols, null);
+    var fetchedAt = reference.fetchedAt;
+    for (final tile in tiles) {
+      if (tile.fetchedAt.isBefore(fetchedAt)) fetchedAt = tile.fetchedAt;
+      final rowOffset = ((tile.originLat - originLat) / cellSizeLat).round();
+      final colOffset = ((tile.originLon - originLon) / cellSizeLon).round();
+      for (var r = 0; r < tile.rows; r++) {
+        final mergedRow = rowOffset + r;
+        if (mergedRow < 0 || mergedRow >= rows) continue;
+        for (var c = 0; c < tile.cols; c++) {
+          final mergedCol = colOffset + c;
+          if (mergedCol < 0 || mergedCol >= cols) continue;
+          final depth = tile.depthAt(r, c);
+          if (depth != null) merged[mergedRow * cols + mergedCol] = depth;
+        }
+      }
+    }
+
+    return BathymetryGrid(
+      originLat: originLat,
+      originLon: originLon,
+      cellSizeLatDeg: cellSizeLat,
+      cellSizeLonDeg: cellSizeLon,
+      rows: rows,
+      cols: cols,
+      depthsMeters: merged,
+      sourceId: reference.sourceId,
+      resolutionMeters: reference.resolutionMeters,
+      fetchedAt: fetchedAt,
+    );
   }
 
   /// Tries each candidate collection ID in turn, falling through to the
