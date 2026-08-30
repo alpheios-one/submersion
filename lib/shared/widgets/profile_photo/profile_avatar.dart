@@ -53,7 +53,10 @@ class ProfileAvatar extends StatelessWidget {
     // of bitmap for an avatar drawn at 40 logical pixels; a list of 200
     // buddies would hold roughly 200 MB.
     final devicePixelRatio = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
-    final target = (radius * 2 * devicePixelRatio).round().clamp(1, 512);
+    // `target` is an int, not a num: Dart special-cases clamp so the result is
+    // int when the receiver and both bounds are int, which .round() and the
+    // literals satisfy. No toInt() is needed to satisfy ResizeImage's int?.
+    final int target = (radius * 2 * devicePixelRatio).round().clamp(1, 512);
 
     final avatar = CircleAvatar(
       radius: ringColor == null ? radius : radius - 2,
