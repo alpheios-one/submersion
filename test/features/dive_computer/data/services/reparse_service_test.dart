@@ -2,16 +2,31 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_computer/data/services/reparse_service.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
 void main() {
   late AppDatabase db;
   late ReparseService service;
+  late ProfileSeriesRepository profileSeries;
+  late TankPressureSeriesRepository tankSeries;
 
   setUp(() {
     db = AppDatabase(NativeDatabase.memory());
     service = ReparseService(db: db);
+    profileSeries = ProfileSeriesRepository(
+      database: db,
+      syncRepository: SyncRepository(database: db),
+    );
+    tankSeries = TankPressureSeriesRepository(
+      database: db,
+      syncRepository: SyncRepository(database: db),
+    );
   });
 
   tearDown(() => db.close());
@@ -141,6 +156,49 @@ void main() {
             isPrimary: Value(isPrimary),
           ),
         );
+  }
+
+  /// Series twin of [insertProfile]: one single-sample series per call,
+  /// through the profile series repository.
+  Future<String> insertProfileSeries({
+    required String id,
+    required String diveId,
+    String? computerId,
+    String? sourceId,
+    required int timestamp,
+    required double depth,
+    bool isPrimary = true,
+  }) {
+    return profileSeries.insertSeries(
+      id: id,
+      diveId: diveId,
+      computerId: computerId,
+      sourceId: sourceId,
+      isPrimary: isPrimary,
+      samples: [ProfileSample(timestamp: timestamp, depth: depth)],
+      now: 1000,
+    );
+  }
+
+  /// Series twin of the inline `tankPressureProfiles` seeds below: one
+  /// single-sample series per call, through the tank pressure series
+  /// repository.
+  Future<String> insertTankPressureSeries({
+    required String id,
+    required String diveId,
+    required String tankId,
+    String? computerId,
+    required int timestamp,
+    required double pressure,
+  }) {
+    return tankSeries.insertSeries(
+      id: id,
+      diveId: diveId,
+      tankId: tankId,
+      computerId: computerId,
+      samples: [TankPressureSample(timestamp: timestamp, pressure: pressure)],
+      now: 1000,
+    );
   }
 
   pigeon.ParsedDive makeParsedDive({
@@ -349,10 +407,8 @@ void main() {
         libdivecomputerVersion: '0.8.0',
       );
 
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals('dive-1'))).get();
-      expect(profiles.single.rbt, 25 * 60);
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series.single.samples.single.rbt, 25 * 60);
     });
 
     test(
@@ -971,8 +1027,8 @@ void main() {
           computerId: 'comp-1',
           isPrimary: true,
         );
-        // Insert initial profiles that will be replaced
-        await insertProfile(
+        // Insert an initial series that will be replaced
+        await insertProfileSeries(
           id: 'prof-old-1',
           diveId: 'dive-1',
           computerId: 'comp-1',
@@ -1000,9 +1056,7 @@ void main() {
         // Snapshot after first run
         final diveAfter1 = await getDive('dive-1');
         final srcAfter1 = await getSource('src-1');
-        final profilesAfter1 = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals('dive-1'))).get();
+        final seriesAfter1 = await profileSeries.getSeriesForDive('dive-1');
 
         // Second run
         await service.applyParsedUpdate(
@@ -1018,12 +1072,14 @@ void main() {
         // Snapshot after second run
         final diveAfter2 = await getDive('dive-1');
         final srcAfter2 = await getSource('src-1');
-        final profilesAfter2 = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals('dive-1'))).get();
+        final seriesAfter2 = await profileSeries.getSeriesForDive('dive-1');
 
-        // Assert: same number of profiles
-        expect(profilesAfter2.length, profilesAfter1.length);
+        // Assert: same number of series, holding the same number of samples
+        expect(seriesAfter2.length, seriesAfter1.length);
+        expect(
+          seriesAfter2.single.samples.length,
+          seriesAfter1.single.samples.length,
+        );
 
         // Assert: dive fields match
         expect(diveAfter2.maxDepth, diveAfter1.maxDepth);
@@ -1097,27 +1153,31 @@ void main() {
         libdivecomputerVersion: null,
       );
 
-      // Assert: 3 new profiles from comp-1, plus 1 untouched from comp-2
-      final profiles =
+      // Assert: comp-1's legacy rows are gone, replaced by one series; comp-2
+      // (untouched, still legacy-only) survives.
+      final legacyProfiles =
           await (db.select(db.diveProfiles)
                 ..where((t) => t.diveId.equals('dive-1'))
                 ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
               .get();
+      expect(legacyProfiles.every((p) => p.computerId != 'comp-1'), isTrue);
 
-      final comp1Profiles = profiles
-          .where((p) => p.computerId == 'comp-1')
-          .toList();
-      final comp2Profiles = profiles
+      final comp2Profiles = legacyProfiles
           .where((p) => p.computerId == 'comp-2')
           .toList();
-
-      expect(comp1Profiles.length, 3);
-      expect(comp1Profiles[0].depth, 0.0);
-      expect(comp1Profiles[1].depth, 5.0);
-      expect(comp1Profiles[2].depth, 12.0);
-
       expect(comp2Profiles.length, 1);
       expect(comp2Profiles[0].id, 'prof-other');
+
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series, hasLength(1));
+      expect(series.single.computerId, 'comp-1');
+      expect(series.single.sourceId, 'src-1');
+      expect(series.single.isPrimary, isTrue);
+      expect(series.single.samples.map((s) => s.depth).toList(), [
+        0.0,
+        5.0,
+        12.0,
+      ]);
     });
 
     test('re-parsing a consolidated source re-bases its profile onto the '
@@ -1140,7 +1200,7 @@ void main() {
         isPrimary: false,
         timeOffsetSeconds: 60,
       );
-      await insertProfile(
+      await insertProfileSeries(
         id: 'prof-secondary',
         diveId: 'dive-1',
         computerId: 'comp-secondary',
@@ -1167,16 +1227,20 @@ void main() {
         libdivecomputerVersion: null,
       );
 
-      final profiles =
-          await (db.select(db.diveProfiles)
-                ..where((t) => t.computerId.equals('comp-secondary'))
-                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-              .get();
+      expect(
+        await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.computerId.equals('comp-secondary'))).get(),
+        isEmpty,
+      );
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series, hasLength(1));
+      expect(series.single.computerId, 'comp-secondary');
 
       // Without the offset these land at 0/30/60 and the secondary strand
       // sits a minute to the left of the primary's on every comparison view.
-      expect(profiles.map((p) => p.timestamp), [60, 90, 120]);
-      expect(profiles.map((p) => p.depth), [0.0, 5.0, 12.0]);
+      expect(series.single.samples.map((s) => s.timestamp), [60, 90, 120]);
+      expect(series.single.samples.map((s) => s.depth), [0.0, 5.0, 12.0]);
     });
 
     test('re-parsing leaves the recorded offset intact, so a second '
@@ -1218,10 +1282,9 @@ void main() {
       }
 
       expect((await getSource('src-secondary')).timeOffsetSeconds, 60);
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.computerId.equals('comp-secondary'))).get();
-      expect(profiles.map((p) => p.timestamp), [60]);
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series, hasLength(1));
+      expect(series.single.samples.map((s) => s.timestamp), [60]);
     });
 
     test('a source with no recorded offset re-parses on the raw time base '
@@ -1252,12 +1315,9 @@ void main() {
         libdivecomputerVersion: null,
       );
 
-      final profiles =
-          await (db.select(db.diveProfiles)
-                ..where((t) => t.diveId.equals('dive-1'))
-                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-              .get();
-      expect(profiles.map((p) => p.timestamp), [0, 30]);
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series, hasLength(1));
+      expect(series.single.samples.map((s) => s.timestamp), [0, 30]);
     });
 
     test('an offset-bearing source that is a dive\'s only row is refused '
@@ -1637,17 +1697,13 @@ void main() {
               tankRole: Value('backGas'),
             ),
           );
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'stale-pp',
-              diveId: 'dive-1',
-              tankId: 'tank-0',
-              timestamp: 0,
-              pressure: 999.0,
-            ),
-          );
+      await insertTankPressureSeries(
+        id: 'stale-pp',
+        diveId: 'dive-1',
+        tankId: 'tank-0',
+        timestamp: 0,
+        pressure: 999.0,
+      );
 
       // Air-integrated tank: summary pressure is null, pressure lives in the
       // sample stream.
@@ -1687,19 +1743,23 @@ void main() {
       );
 
       // Pressure profiles replaced with the parsed samples (stale row gone).
-      final profiles =
-          await (db.select(db.tankPressureProfiles)
-                ..where((t) => t.diveId.equals('dive-1'))
-                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-              .get();
-      expect(profiles.length, 3);
-      expect(profiles.first.pressure, 220.0);
-      expect(profiles.last.pressure, 90.0);
-      expect(profiles.every((p) => p.tankId == 'tank-0'), isTrue);
       expect(
-        profiles.every((p) => p.computerId == 'comp-1'),
-        isTrue,
-        reason: 'pressure profiles are stamped with the source computerId',
+        await (db.select(
+          db.tankPressureProfiles,
+        )..where((t) => t.diveId.equals('dive-1'))).get(),
+        isEmpty,
+      );
+      final pressureSeries = await tankSeries.getSeriesForDive('dive-1');
+      expect(pressureSeries, hasLength(1));
+      final samples = pressureSeries.single.samples;
+      expect(samples.length, 3);
+      expect(samples.first.pressure, 220.0);
+      expect(samples.last.pressure, 90.0);
+      expect(pressureSeries.single.tankId, 'tank-0');
+      expect(
+        pressureSeries.single.computerId,
+        'comp-1',
+        reason: 'pressure series are stamped with the source computerId',
       );
 
       // Tank start/end pressure backfilled from first/last sample.
@@ -1780,13 +1840,16 @@ void main() {
               .get();
       expect(tanks, hasLength(2));
 
+      expect(
+        await (db.select(
+          db.tankPressureProfiles,
+        )..where((t) => t.diveId.equals('dive-1'))).get(),
+        isEmpty,
+      );
+
       Future<List<double>> pressuresFor(String tankId) async {
-        final rows =
-            await (db.select(db.tankPressureProfiles)
-                  ..where((t) => t.tankId.equals(tankId))
-                  ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-                .get();
-        return [for (final r in rows) r.pressure];
+        final series = await tankSeries.getSeriesForTank('dive-1', tankId);
+        return [for (final s in series) ...s.samples.map((p) => p.pressure)];
       }
 
       expect(await pressuresFor(tanks[0].id), [
@@ -3142,15 +3205,15 @@ void main() {
         isPrimary: true,
       );
 
-      // Pre-existing profile with null computerId
-      await insertProfile(
+      // Pre-existing series with null computerId
+      await insertProfileSeries(
         id: 'prof-old-1',
         diveId: 'dive-1',
         computerId: null,
         timestamp: 0,
         depth: 0.0,
       );
-      await insertProfile(
+      await insertProfileSeries(
         id: 'prof-old-2',
         diveId: 'dive-1',
         computerId: null,
@@ -3176,21 +3239,21 @@ void main() {
         libdivecomputerVersion: null,
       );
 
-      // Old profiles should be replaced by the 3 new samples
-      final profiles =
-          await (db.select(db.diveProfiles)
-                ..where((t) => t.diveId.equals('dive-1'))
-                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-              .get();
-
-      expect(profiles.length, 3);
-      expect(profiles[0].depth, 0.0);
-      expect(profiles[1].depth, 8.0);
-      expect(profiles[2].depth, 20.0);
-      // All should have null computerId
-      for (final p in profiles) {
-        expect(p.computerId, isNull);
-      }
+      // Old profiles should be replaced by the 3 new samples, in a series.
+      expect(
+        await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals('dive-1'))).get(),
+        isEmpty,
+      );
+      final series = await profileSeries.getSeriesForDive('dive-1');
+      expect(series, hasLength(1));
+      expect(series.single.computerId, isNull);
+      expect(series.single.samples.map((s) => s.depth).toList(), [
+        0.0,
+        8.0,
+        20.0,
+      ]);
     });
   });
 
@@ -3319,11 +3382,19 @@ void main() {
       expect(tanks, hasLength(1));
       expect(tanks.single.computerId, isNull);
 
-      final pressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals('dive-1'))).get();
-      expect(pressures, isNotEmpty);
-      expect(pressures.every((p) => p.computerId == null), isTrue);
+      expect(
+        await (db.select(
+          db.tankPressureProfiles,
+        )..where((t) => t.diveId.equals('dive-1'))).get(),
+        isEmpty,
+      );
+      final pressureSeries = await tankSeries.getSeriesForDive('dive-1');
+      expect(pressureSeries, isNotEmpty);
+      expect(pressureSeries.every((s) => s.computerId == null), isTrue);
+      expect(pressureSeries.expand((s) => s.samples).map((s) => s.pressure), [
+        200.0,
+        100.0,
+      ]);
 
       final events = await (db.select(
         db.diveProfileEvents,
@@ -3681,7 +3752,7 @@ void main() {
           computerId: 'comp-2',
           isPrimary: false,
         );
-        await insertProfile(
+        await insertProfileSeries(
           id: 'stale-secondary',
           diveId: 'dive-1',
           computerId: 'comp-2',
@@ -3705,13 +3776,17 @@ void main() {
           libdivecomputerVersion: null,
         );
 
-        final secondary =
-            await (db.select(db.diveProfiles)
-                  ..where((t) => t.computerId.equals('comp-2'))
-                  ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
-                .get();
-        expect(secondary.map((p) => p.timestamp), [0, 60]);
-        expect(secondary.any((p) => p.isPrimary), isFalse);
+        expect(
+          await (db.select(
+            db.diveProfiles,
+          )..where((t) => t.computerId.equals('comp-2'))).get(),
+          isEmpty,
+        );
+        final series = await profileSeries.getSeriesForDive('dive-1');
+        expect(series, hasLength(1));
+        expect(series.single.computerId, 'comp-2');
+        expect(series.single.samples.map((s) => s.timestamp), [0, 60]);
+        expect(series.single.isPrimary, isFalse);
       },
     );
 
@@ -3737,7 +3812,7 @@ void main() {
             rawData: Value(Uint8List.fromList([1, 2, 3])),
           ),
         );
-        await insertProfile(
+        await insertProfileSeries(
           id: 'stale',
           diveId: 'dive-1',
           timestamp: 999,
@@ -3759,12 +3834,15 @@ void main() {
           libdivecomputerVersion: null,
         );
 
-        final profiles =
-            await (db.select(db.diveProfiles)
-                  ..where((t) => t.diveId.equals('dive-1'))
-                  ..orderBy([(t) => OrderingTerm(expression: t.timestamp)]))
-                .get();
-        expect(profiles.map((p) => p.timestamp), [0, 60]);
+        expect(
+          await (db.select(
+            db.diveProfiles,
+          )..where((t) => t.diveId.equals('dive-1'))).get(),
+          isEmpty,
+        );
+        final series = await profileSeries.getSeriesForDive('dive-1');
+        expect(series, hasLength(1));
+        expect(series.single.samples.map((s) => s.timestamp), [0, 60]);
       },
     );
 
