@@ -11,6 +11,9 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
 /// Sync data format version for compatibility checking
 const int syncFormatVersion = 2;
@@ -288,6 +291,8 @@ class SyncData {
   final List<Map<String, dynamic>> csvPresets;
   final List<Map<String, dynamic>> viewConfigs;
   final List<Map<String, dynamic>> fieldPresets;
+  final List<Map<String, dynamic>> diveProfileSeries;
+  final List<Map<String, dynamic>> tankPressureSeries;
 
   const SyncData({
     this.divers = const [],
@@ -365,6 +370,8 @@ class SyncData {
     this.csvPresets = const [],
     this.viewConfigs = const [],
     this.fieldPresets = const [],
+    this.diveProfileSeries = const [],
+    this.tankPressureSeries = const [],
   });
 
   Map<String, dynamic> toJson() => {
@@ -443,6 +450,8 @@ class SyncData {
     'csvPresets': csvPresets,
     'viewConfigs': viewConfigs,
     'fieldPresets': fieldPresets,
+    'diveProfileSeries': diveProfileSeries,
+    'tankPressureSeries': tankPressureSeries,
   };
 
   factory SyncData.fromJson(Map<String, dynamic> json) {
@@ -524,6 +533,8 @@ class SyncData {
       csvPresets: _parseList(json['csvPresets']),
       viewConfigs: _parseList(json['viewConfigs']),
       fieldPresets: _parseList(json['fieldPresets']),
+      diveProfileSeries: _parseList(json['diveProfileSeries']),
+      tankPressureSeries: _parseList(json['tankPressureSeries']),
     );
   }
 
@@ -931,6 +942,18 @@ class SyncDataSerializer {
       table: null,
       blob: false,
       full: () => _exportFieldPresets(null),
+    ),
+    (
+      key: 'diveProfileSeries',
+      table: _db.diveProfileSeries,
+      blob: true,
+      full: null,
+    ),
+    (
+      key: 'tankPressureSeries',
+      table: _db.tankPressureSeries,
+      blob: true,
+      full: null,
     ),
   ];
 
@@ -1432,6 +1455,14 @@ class SyncDataSerializer {
       fieldPresets: await _safeExport(
         'fieldPresets',
         () => _exportFieldPresets(hlcSince),
+      ),
+      diveProfileSeries: await _safeExport(
+        'diveProfileSeries',
+        () => _exportDiveProfileSeries(hlcSince),
+      ),
+      tankPressureSeries: await _safeExport(
+        'tankPressureSeries',
+        () => _exportTankPressureSeries(hlcSince),
       ),
     );
   }
@@ -1938,6 +1969,16 @@ class SyncDataSerializer {
           _db.fieldPresets,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'diveProfileSeries':
+        final row = await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson(serializer: _syncBlobSerializer);
+      case 'tankPressureSeries':
+        final row = await (_db.select(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson(serializer: _syncBlobSerializer);
     }
     return null;
   }
@@ -2923,6 +2964,61 @@ class SyncDataSerializer {
               FieldPreset.fromJson(_withTimestampDefaults(data)),
             );
         return;
+      case 'diveProfileSeries':
+        final row = DiveProfileSeriesRow.fromJson(
+          data,
+          serializer: _syncBlobSerializer,
+        );
+        if (!_profileSeriesBlobIsSound(row)) return;
+        await _db.into(_db.diveProfileSeries).insertOnConflictUpdate(row);
+        return;
+      case 'tankPressureSeries':
+        final row = TankPressureSeriesRow.fromJson(
+          data,
+          serializer: _syncBlobSerializer,
+        );
+        if (!_tankSeriesBlobIsSound(row)) return;
+        await _db.into(_db.tankPressureSeries).insertOnConflictUpdate(row);
+        return;
+    }
+  }
+
+  /// A peer's packed samples are decoded once before they are written so a
+  /// corrupt or truncated blob never reaches the readers. Returns false (and
+  /// logs) when the blob does not decode or its sample count disagrees with
+  /// the header the row carries.
+  bool _profileSeriesBlobIsSound(DiveProfileSeriesRow row) {
+    try {
+      final decoded = const ProfileSeriesCodec().decode(row.samples);
+      if (decoded.length != row.sampleCount) {
+        _log.warning(
+          'Skipping diveProfileSeries ${row.id}: header says '
+          '${row.sampleCount} samples, blob holds ${decoded.length}',
+        );
+        return false;
+      }
+      return true;
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping diveProfileSeries ${row.id}: $e');
+      return false;
+    }
+  }
+
+  /// The tank twin of [_profileSeriesBlobIsSound].
+  bool _tankSeriesBlobIsSound(TankPressureSeriesRow row) {
+    try {
+      final decoded = const TankPressureSeriesCodec().decode(row.samples);
+      if (decoded.length != row.sampleCount) {
+        _log.warning(
+          'Skipping tankPressureSeries ${row.id}: header says '
+          '${row.sampleCount} samples, blob holds ${decoded.length}',
+        );
+        return false;
+      }
+      return true;
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping tankPressureSeries ${row.id}: $e');
+      return false;
     }
   }
 
@@ -3690,6 +3786,26 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'diveProfileSeries':
+        final rows = [
+          for (final r in records)
+            DiveProfileSeriesRow.fromJson(r, serializer: _syncBlobSerializer),
+        ].where(_profileSeriesBlobIsSound).toList();
+        if (rows.isEmpty) return;
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(_db.diveProfileSeries, rows),
+        );
+        return;
+      case 'tankPressureSeries':
+        final rows = [
+          for (final r in records)
+            TankPressureSeriesRow.fromJson(r, serializer: _syncBlobSerializer),
+        ].where(_tankSeriesBlobIsSound).toList();
+        if (rows.isEmpty) return;
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(_db.tankPressureSeries, rows),
+        );
+        return;
       default:
         throw ArgumentError('upsertRecords: unknown entityType $entityType');
     }
@@ -3905,6 +4021,10 @@ class SyncDataSerializer {
         return plain(_db.media, _db.media.id);
       case 'mediaSmartAlbums':
         return plain(_db.mediaSmartAlbums, _db.mediaSmartAlbums.id);
+      case 'diveProfileSeries':
+        return plain(_db.diveProfileSeries, _db.diveProfileSeries.id);
+      case 'tankPressureSeries':
+        return plain(_db.tankPressureSeries, _db.tankPressureSeries.id);
       default:
         // Fail loud: a synced entity without a case here would silently
         // enumerate zero local ids, so streaming adopt would never delete its
@@ -4136,6 +4256,10 @@ class SyncDataSerializer {
         return _db.media;
       case 'mediaSmartAlbums':
         return _db.mediaSmartAlbums;
+      case 'diveProfileSeries':
+        return _db.diveProfileSeries;
+      case 'tankPressureSeries':
+        return _db.tankPressureSeries;
       default:
         throw ArgumentError.value(
           entityType,
@@ -4519,6 +4643,16 @@ class SyncDataSerializer {
       case 'fieldPresets':
         await (_db.delete(
           _db.fieldPresets,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'diveProfileSeries':
+        await (_db.delete(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'tankPressureSeries':
+        await (_db.delete(
+          _db.tankPressureSeries,
         )..where((t) => t.id.equals(recordId))).go();
         return;
     }
@@ -5124,6 +5258,29 @@ class SyncDataSerializer {
     final rows = await query.get();
     // gps_tracks carries the points BLOB; encode it as base64, not a byte
     // array (same as media/certifications).
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportDiveProfileSeries(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.diveProfileSeries);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    // The packed samples BLOB rides as base64, like gps_tracks.points.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportTankPressureSeries(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.tankPressureSeries);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
     return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 

@@ -1396,6 +1396,16 @@ class SyncService {
             records: data.diveDataSources,
             hasUpdatedAt: false,
           ),
+          (
+            type: 'diveProfileSeries',
+            records: data.diveProfileSeries,
+            hasUpdatedAt: true,
+          ),
+          (
+            type: 'tankPressureSeries',
+            records: data.tankPressureSeries,
+            hasUpdatedAt: true,
+          ),
           (type: 'siteSpecies', records: data.siteSpecies, hasUpdatedAt: false),
           (
             type: 'mediaSpecies',
@@ -2050,6 +2060,8 @@ class SyncService {
     'mediaStores': false,
     'connectedAccounts': true,
     'mediaSubscriptions': true,
+    'diveProfileSeries': true,
+    'tankPressureSeries': true,
   };
 
   /// Every synced child -> parent FK whose parent can be deleted (and thus
@@ -2133,6 +2145,16 @@ class SyncService {
     'tideRecords': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveDataSources': [
       (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'computerId', parent: 'diveComputers', nullable: true),
+    ],
+    'diveProfileSeries': [
+      (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'computerId', parent: 'diveComputers', nullable: true),
+      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
+    ],
+    'tankPressureSeries': [
+      (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'tankId', parent: 'diveTanks', nullable: false),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
     ],
     'sightings': [

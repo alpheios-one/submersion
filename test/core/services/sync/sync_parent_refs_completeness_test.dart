@@ -91,6 +91,8 @@ void main() {
     'pre_dive_checklist_template_items': 'preDiveChecklistTemplateItems',
     'pre_dive_sessions': 'preDiveSessions',
     'pre_dive_session_items': 'preDiveSessionItems',
+    'dive_profile_series': 'diveProfileSeries',
+    'tank_pressure_series': 'tankPressureSeries',
   };
 
   // Parent table -> entityType for parents a user can delete (and thus
