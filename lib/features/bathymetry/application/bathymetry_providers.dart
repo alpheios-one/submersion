@@ -9,6 +9,9 @@ import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/emodnet_source.dart';
 import 'package:submersion/features/bathymetry/data/sources/etopo_erddap_source.dart';
 import 'package:submersion/features/bathymetry/data/sources/gmrt_source.dart';
+import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
+import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
+import 'package:submersion/features/bathymetry/data/swiss_lake_depth_service.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
@@ -29,10 +32,32 @@ final bathymetryRepositoryProvider = Provider<BathymetryRepository?>((ref) {
     return BathymetryRepository(
       db: db,
       resolver: BathymetryResolver(
-        // Tier order: regional survey data first, then global GMRT, then
-        // the coarse public-domain fallback.
-        sources: [EmodnetSource(), GmrtSource(), EtopoErddapSource()],
+        // Tier order: swissBATHY3D first (lake-only, ~0.5-2 m, beats every
+        // other tier where it applies), then regional survey data, then
+        // global GMRT, then the coarse public-domain fallback.
+        sources: [
+          SwissBathy3dSource(tileCache: SwissBathyTileCacheRepository(db)),
+          EmodnetSource(),
+          GmrtSource(),
+          EtopoErddapSource(),
+        ],
       ),
+    );
+  } on StateError {
+    return null;
+  }
+});
+
+/// Depth queries for Swiss dive sites via swissBATHY3D directly (Part 1 of
+/// the Bathymetrie-Daten Schweiz task) — bypasses the resolver's tiered
+/// best-source-wins mosaic since this is a single-coordinate lookup, not a
+/// terrain grid for rendering. Null when the local cache database is not
+/// initialized, matching [bathymetryRepositoryProvider].
+final swissLakeDepthServiceProvider = Provider<SwissLakeDepthService?>((ref) {
+  try {
+    final db = LocalCacheDatabaseService.instance.database;
+    return SwissLakeDepthService(
+      SwissBathy3dSource(tileCache: SwissBathyTileCacheRepository(db)),
     );
   } on StateError {
     return null;

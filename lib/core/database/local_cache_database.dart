@@ -82,6 +82,26 @@ class BathymetryCache extends Table {
   Set<Column> get primaryKey => {cacheKey};
 }
 
+/// Cached swissBATHY3D tiles, keyed by the LV95 1-km tile index (e.g.
+/// "2600_1200"). Never synced, never backed up: re-derivable from the
+/// public OGD/STAC source. This sits BELOW [BathymetryCache] in the cache
+/// stack — one physical swissBATHY3D tile can be reused by several
+/// [BathymetryCache] quantized cells, so caching at tile granularity is what
+/// actually guarantees "every tile is downloaded only once" (the task's OGD
+/// fair-use requirement), independent of the coarser 0.02 degree cache grid.
+/// status semantics: 'ok' = usable grid in gridJson; 'empty' = the STAC
+/// lookup for this tile definitively found no covering asset. Transient
+/// failures (network error, STAC error) write NO row.
+class SwissBathyTileCache extends Table {
+  TextColumn get tileKey => text()();
+  TextColumn get status => text()();
+  TextColumn get gridJson => text().nullable()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {tileKey};
+}
+
 /// Cached third-party reef data, keyed by quantized coordinate. Never synced
 /// and never backed up: any device can re-derive this from a site's
 /// coordinates, so a restored database re-fetches rather than carrying
@@ -217,6 +237,7 @@ class DecoClassificationCache extends Table {
     MediaTransferQueue,
     MediaCacheEntries,
     BathymetryCache,
+    SwissBathyTileCache,
     ReefDataCache,
     NoaaTideStations,
     GpsTrackGeometryCache,
@@ -229,7 +250,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -316,6 +337,10 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 13) {
         await m.createTable(decoClassificationCache);
       }
+      // v14: swissBATHY3D tile cache (Bathymetrie-Daten Schweiz, part 1).
+      if (from < 14) {
+        await m.createTable(swissBathyTileCache);
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -395,6 +420,15 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           inputs_hash TEXT NOT NULL,
           computed_at INTEGER NOT NULL,
           PRIMARY KEY (dive_id)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS swiss_bathy_tile_cache (
+          tile_key TEXT NOT NULL,
+          status TEXT NOT NULL,
+          grid_json TEXT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (tile_key)
         )
       ''');
     },
