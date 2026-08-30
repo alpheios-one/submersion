@@ -2118,12 +2118,14 @@ class SyncService {
     'tankPressureProfiles': false,
   };
 
-  /// Table set the base-file apply path (`_applyRemoteBaseFile*`) reads off
-  /// the wire: every merge-applied entity ([entityHasUpdatedAt]) plus the
-  /// inbound-only legacy entities ([inboundOnlyLegacyEntities]). A table
-  /// absent from this union is silently skipped on base import (mirrors
-  /// [entityHasUpdatedAt]'s own doc comment); kept separate from
-  /// [entityHasUpdatedAt] itself so that map's structural test is unaffected.
+  /// Table set the base-file apply path (`_applyRemoteBaseFile*`) and the
+  /// replace-adopt streaming path (`_adoptApplyStreaming`) read off the wire
+  /// (and, for adopt, clear before re-inserting): every merge-applied entity
+  /// ([entityHasUpdatedAt]) plus the inbound-only legacy entities
+  /// ([inboundOnlyLegacyEntities]). A table absent from this union is
+  /// silently skipped on base import (mirrors [entityHasUpdatedAt]'s own doc
+  /// comment); kept separate from [entityHasUpdatedAt] itself so that map's
+  /// structural test is unaffected.
   static Map<String, bool> get _baseApplyEntityFlags => {
     ...entityHasUpdatedAt,
     ...inboundOnlyLegacyEntities,
@@ -3455,8 +3457,12 @@ class SyncService {
     // Replace semantics: clear every synced table, then insert the cloud union
     // (latest export wins). Equivalent to the old upsert-then-delete-not-in-
     // cloud, but needs no in-RAM id set to diff against, so adopt memory stays
-    // bounded regardless of library size (#358 adopt OOM).
-    for (final entity in entityHasUpdatedAt.keys) {
+    // bounded regardless of library size (#358 adopt OOM). The legacy sample
+    // entities are still synced tables from a not-yet-upgraded peer's point of
+    // view (v182 receive-side tolerance), so they are cleared and
+    // re-inserted the same union of tables covers -- the series tables
+    // ([entityHasUpdatedAt] already lists them) get no special treatment.
+    for (final entity in _baseApplyEntityFlags.keys) {
       await _serializer.deleteAllRecords(entity);
     }
 
@@ -3483,20 +3489,39 @@ class SyncService {
       for (final c in changesets) (at: c.exportedAt, file: null, changeset: c),
     ]..sort((a, b) => a.at.compareTo(b.at));
 
+    // v182 receive-side tolerance: true once a legacy diveProfiles /
+    // tankPressureProfiles row has been applied from any unit, so the
+    // packer only runs when the adopted library actually carried some.
+    var sawLegacySamples = false;
+
     for (final unit in units) {
       final changeset = unit.changeset;
       if (changeset != null) {
-        for (final entry in changeset.data.toJson().entries) {
-          if (!entityHasUpdatedAt.containsKey(entry.key)) continue;
-          await applyBatch(
-            entry.key,
-            (entry.value as List).cast<Map<String, dynamic>>(),
-          );
+        // changeset.data.toJson() omits diveProfiles/tankPressureProfiles
+        // (inbound only, never re-exported through toJson), so they are
+        // folded back in from the typed fields fromJson already parsed them
+        // into, matching the raw wire shape a not-yet-upgraded peer sends.
+        final changesetData = {
+          ...changeset.data.toJson(),
+          'diveProfiles': changeset.data.diveProfiles,
+          'tankPressureProfiles': changeset.data.tankPressureProfiles,
+        };
+        for (final entry in changesetData.entries) {
+          if (!_baseApplyEntityFlags.containsKey(entry.key)) continue;
+          final records = (entry.value as List).cast<Map<String, dynamic>>();
+          if (records.isNotEmpty &&
+              inboundOnlyLegacyEntities.containsKey(entry.key)) {
+            sawLegacySamples = true;
+          }
+          await applyBatch(entry.key, records);
         }
         continue;
       }
 
-      // Base file: stream `data` rows, batching 500 per table.
+      // Base file: stream `data` rows, batching 500 per table. Read directly
+      // off disk, so a not-yet-upgraded peer's raw diveProfiles /
+      // tankPressureProfiles rows are present here regardless of what this
+      // build's own SyncData.toJson would emit.
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
@@ -3510,11 +3535,14 @@ class SyncService {
       await BaseJsonStreamReader().parse(
         File(unit.file!).openRead(),
         wantRows: (section, table) =>
-            section == 'data' && entityHasUpdatedAt.containsKey(table),
+            section == 'data' && _baseApplyEntityFlags.containsKey(table),
         onRow: (section, table, rowBytes) async {
           if (table != currentTable) {
             await flush();
             currentTable = table;
+          }
+          if (inboundOnlyLegacyEntities.containsKey(table)) {
+            sawLegacySamples = true;
           }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
@@ -3522,6 +3550,8 @@ class SyncService {
       );
       await flush();
     }
+
+    await _packLegacySamplesIfPresent(sawLegacySamples);
 
     await _serializer.repairDanglingForeignKeys();
   }

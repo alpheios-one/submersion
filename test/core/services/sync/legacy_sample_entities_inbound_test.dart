@@ -5,6 +5,7 @@
 // arrays, and those must keep applying so its data is not silently dropped.
 // A post-merge hook packs whatever legacy rows land locally into series.
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
@@ -35,6 +36,8 @@ const _twoPoints = [
 ];
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('export: legacy sample entities never leave this device', () {
     setUp(() async {
       await setUpTestDatabase();
@@ -317,6 +320,101 @@ void main() {
         expect(
           after.samples.map((s) => s.depth),
           before.samples.map((s) => s.depth),
+        );
+      },
+    );
+  });
+
+  group('adopt: a replace-adopt from a legacy peer', () {
+    setUp(() async {
+      await setUpTestDatabase();
+    });
+
+    tearDown(() => tearDownTestDatabase());
+
+    SyncService buildService() => SyncService(
+      syncRepository: SyncRepository(),
+      serializer: SyncDataSerializer(),
+    );
+
+    test(
+      "adopting a legacy peer's base lands its sample rows as series",
+      () async {
+        await DiveRepository().createDive(_dive('template-adopt', const []));
+        final diveRow =
+            Map<String, dynamic>.from(
+                (await SyncDataSerializer().fetchRecord(
+                  'dives',
+                  'template-adopt',
+                ))!,
+              )
+              ..['id'] = 'd-adopt-old'
+              ..['hlc'] = const Hlc(9000, 0, 'peer-181-adopt').toString();
+        final profiles = [
+          {
+            'id': 'p1-adopt',
+            'diveId': 'd-adopt-old',
+            'timestamp': 0,
+            'depth': 6.0,
+            'isPrimary': true,
+          },
+          {
+            'id': 'p2-adopt',
+            'diveId': 'd-adopt-old',
+            'timestamp': 60,
+            'depth': 20.0,
+            'isPrimary': true,
+          },
+        ];
+        final data = SyncData(dives: [diveRow], diveProfiles: profiles);
+        // SyncPayload.toJson (and so SyncDataSerializer.serializePayload,
+        // which the other adopt tests use to write a base file) routes
+        // through data.toJson, which drops diveProfiles (inbound only), so
+        // the payload bytes are built by hand instead, exactly as the
+        // changeset/base peer-sync tests above do.
+        final dataJson = {...data.toJson(), 'diveProfiles': profiles};
+        final payloadJson = <String, dynamic>{
+          'version': syncFormatVersion,
+          'exportedAt': 9000,
+          'deviceId': 'peer-181-adopt',
+          'lastSyncTimestamp': null,
+          'checksum': sha256
+              .convert(utf8.encode(jsonEncode(dataJson)))
+              .toString(),
+          'data': dataJson,
+          'deletions': <String, dynamic>{},
+          'uploadNonce': null,
+          'epochId': null,
+          'seq': null,
+          'baseSeq': null,
+          'sinceHlc': null,
+          'toHlc': null,
+        };
+
+        final tmpDir = await Directory.systemTemp.createTemp('adopt_legacy');
+        final tmp = File('${tmpDir.path}/base.json');
+        await tmp.writeAsBytes(utf8.encode(jsonEncode(payloadJson)));
+        // debugAdoptStreaming drives the same production path
+        // (_adoptApplyStreaming) sync_adopt_streaming_parity_test.dart and
+        // sync_adopt_builtin_dive_types_test.dart use: no confirmation
+        // callback or mode flag, just base file paths plus their
+        // exportedAt and any in-memory changesets layered on top.
+        await buildService().debugAdoptStreaming([tmp.path], [9000], const []);
+        await tmpDir.delete(recursive: true);
+
+        final series = await ProfileSeriesRepository().getSeriesForDive(
+          'd-adopt-old',
+        );
+        expect(series, hasLength(1));
+        expect(series.single.samples.map((s) => s.depth), [6.0, 20.0]);
+        expect(
+          series.single.id,
+          profileSeriesMigratedId(
+            diveId: 'd-adopt-old',
+            computerId: null,
+            sourceId: null,
+            isPrimary: true,
+          ),
         );
       },
     );
