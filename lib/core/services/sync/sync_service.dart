@@ -2176,11 +2176,6 @@ class SyncService {
       (field: 'relatedDiveId', parent: 'dives', nullable: true),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
     ],
-    'diveProfiles': [
-      (field: 'diveId', parent: 'dives', nullable: false),
-      (field: 'computerId', parent: 'diveComputers', nullable: true),
-      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
-    ],
     // v175 gear twins: a peer's live computer whose gear item we deleted
     // locally would otherwise dangle this FK and abort the whole sync at
     // COMMIT. Nullable, so the computer survives with the reference cleared.
@@ -2223,10 +2218,6 @@ class SyncService {
     'diveSafetyFindings': [(field: 'diveId', parent: 'dives', nullable: false)],
     'gasSwitches': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveCustomFields': [(field: 'diveId', parent: 'dives', nullable: false)],
-    'tankPressureProfiles': [
-      (field: 'diveId', parent: 'dives', nullable: false),
-      (field: 'computerId', parent: 'diveComputers', nullable: true),
-    ],
     'tideRecords': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveDataSources': [
       (field: 'diveId', parent: 'dives', nullable: false),
@@ -3476,11 +3467,14 @@ class SyncService {
     // (latest export wins). Equivalent to the old upsert-then-delete-not-in-
     // cloud, but needs no in-RAM id set to diff against, so adopt memory stays
     // bounded regardless of library size (#358 adopt OOM). The legacy sample
-    // entities are still synced tables from a not-yet-upgraded peer's point of
-    // view (v182 receive-side tolerance), so the same union of tables clears
-    // and re-inserts them; the series tables, which [entityHasUpdatedAt]
-    // already lists, get no special treatment.
+    // entities are still applied from a not-yet-upgraded peer's point of view
+    // (v182 receive-side tolerance) below, but there is no local table to
+    // clear for them any more (v183 dropped `dive_profiles` /
+    // `tank_pressure_profiles`; an inbound row now stages in a per-connection
+    // TEMP table instead), so the clear loop skips them; the series tables,
+    // which [entityHasUpdatedAt] already lists, get no special treatment.
     for (final entity in _baseApplyEntityFlags.keys) {
+      if (inboundOnlyLegacyEntities.containsKey(entity)) continue;
       await _serializer.deleteAllRecords(entity);
     }
 

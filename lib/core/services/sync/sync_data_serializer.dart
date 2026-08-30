@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/legacy_sample_staging.dart';
 import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -1462,11 +1463,12 @@ class SyncDataSerializer {
     );
   }
 
-  /// Packs legacy row-per-sample rows that an older peer's changeset left in
-  /// `dive_profiles` / `tank_pressure_profiles` into series rows. Dives that
+  /// Packs legacy row-per-sample rows that an older peer's changeset staged
+  /// (the real `dive_profiles` / `tank_pressure_profiles` tables are gone as
+  /// of v183; see `legacy_sample_staging.dart`) into series rows. Dives that
   /// already have a series are left alone: the peer is held below the floor
   /// and will migrate its own rows when it upgrades.
-  Future<ProfilePackReport> packLegacySamples() => packLegacyProfileRows(_db);
+  Future<ProfilePackReport> packLegacySamples() => packStagedLegacyRows(_db);
 
   /// Convert payload to JSON string
   String serializePayload(SyncPayload payload) {
@@ -2507,9 +2509,11 @@ class SyncDataSerializer {
             .insertOnConflictUpdate(Dive.fromJson(data).toCompanion(false));
         return;
       case 'diveProfiles':
-        // Until Task 3 lands, an inbound legacy sample row is dropped
-        // here: the row-per-sample tables are gone and the packer that
-        // turns these payloads into series rows is Task 3's.
+        // The row-per-sample tables are gone (v183): an older peer's row
+        // stages in a TEMP table instead and is packed into a series after
+        // the merge (SyncService._packLegacySamplesIfPresent).
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyProfileRows(_db, [data]);
         return;
       case 'diveTanks':
         await _db
@@ -2838,9 +2842,10 @@ class SyncDataSerializer {
             );
         return;
       case 'tankPressureProfiles':
-        // Until Task 3 lands, an inbound legacy sample row is dropped
-        // here: the row-per-sample tables are gone and the packer that
-        // turns these payloads into series rows is Task 3's.
+        // See the 'diveProfiles' case above: stages into a TEMP table and
+        // packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyTankRows(_db, [data]);
         return;
       case 'tideRecords':
         await _db
@@ -3099,9 +3104,10 @@ class SyncDataSerializer {
         );
         return;
       case 'diveProfiles':
-        // Until Task 3 lands, an inbound legacy sample row is dropped
-        // here: the row-per-sample tables are gone and the packer that
-        // turns these payloads into series rows is Task 3's.
+        // See upsertRecord's 'diveProfiles' case: stages into a TEMP table
+        // and packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyProfileRows(_db, records);
         return;
       case 'diveTanks':
         await _db.batch(
@@ -3618,9 +3624,10 @@ class SyncDataSerializer {
         );
         return;
       case 'tankPressureProfiles':
-        // Until Task 3 lands, an inbound legacy sample row is dropped
-        // here: the row-per-sample tables are gone and the packer that
-        // turns these payloads into series rows is Task 3's.
+        // See upsertRecord's 'tankPressureProfiles' case: stages into a TEMP
+        // table and packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyTankRows(_db, records);
         return;
       case 'tideRecords':
         await _db.batch(
@@ -4304,6 +4311,11 @@ class SyncDataSerializer {
     }
   }
 
+  // No case for 'diveProfiles' / 'tankPressureProfiles': they are inbound
+  // only (SyncService.inboundOnlyLegacyEntities), so no peer ever tombstones
+  // one, and there is no local row-per-sample table left to delete from
+  // (v183). A legacy tombstone falls through this switch with no default and
+  // is a silent no-op.
   Future<void> deleteRecord(String entityType, String recordId) async {
     switch (entityType) {
       case 'divers':

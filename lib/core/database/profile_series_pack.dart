@@ -56,21 +56,29 @@ typedef ProfilePackReport = ({
 /// publishes the rows. A device that never synced has nothing to publish to
 /// and stays unstamped until a base publish, which exports everything.
 ///
+/// [profileTable] / [tankTable] default to the legacy table names the v182
+/// migration and the beforeOpen backstop read. `legacy_sample_staging.dart`
+/// passes its own TEMP staging table names instead, so this same function
+/// packs an older peer's inbound row-per-sample rows once the real
+/// `dive_profiles` / `tank_pressure_profiles` tables are gone (v183).
+///
 /// A dive whose legacy rows are ALL malformed (null timestamp or depth) gets
 /// no series row and is rescanned on every open; that is a bounded per-open
 /// cost on a damaged database, not a retry bug.
 Future<ProfilePackReport> packLegacyProfileRows(
   DatabaseConnectionUser db, {
   int? nowMs,
+  String profileTable = 'dive_profiles',
+  String tankTable = 'tank_pressure_profiles',
 }) async {
   final now = nowMs ?? DateTime.now().millisecondsSinceEpoch;
-  final profileColumns = await _columnNames(db, 'dive_profiles');
+  final profileColumns = await _columnNames(db, profileTable);
   final canPackProfiles = profileColumns.containsAll(const {
     'dive_id',
     'timestamp',
     'depth',
   });
-  final tankColumns = await _columnNames(db, 'tank_pressure_profiles');
+  final tankColumns = await _columnNames(db, tankTable);
   final canPackTanks = tankColumns.containsAll(const {
     'dive_id',
     'tank_id',
@@ -80,14 +88,14 @@ Future<ProfilePackReport> packLegacyProfileRows(
   final unpackedProfileDives = canPackProfiles
       ? await _unpackedDiveIds(
           db,
-          legacyTable: 'dive_profiles',
+          legacyTable: profileTable,
           seriesTable: 'dive_profile_series',
         )
       : const <String>[];
   final unpackedTankDives = canPackTanks
       ? await _unpackedDiveIds(
           db,
-          legacyTable: 'tank_pressure_profiles',
+          legacyTable: tankTable,
           seriesTable: 'tank_pressure_series',
         )
       : const <String>[];
@@ -123,7 +131,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
       // the null-computer group) out of timestamp order.
       final rows = await db
           .customSelect(
-            'SELECT * FROM dive_profiles WHERE dive_id = ? '
+            'SELECT * FROM $profileTable WHERE dive_id = ? '
             'ORDER BY timestamp, rowid',
             variables: [Variable<String>(diveId)],
           )
@@ -207,7 +215,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
     for (final diveId in unpackedTankDives) {
       final rows = await db
           .customSelect(
-            'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
+            'SELECT * FROM $tankTable WHERE dive_id = ? '
             'ORDER BY timestamp, rowid',
             variables: [Variable<String>(diveId)],
           )

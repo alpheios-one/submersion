@@ -125,8 +125,12 @@ void main() {
     /// Publishes [dataJson] as [peerId]'s single CHANGESET (seq 1, no base)
     /// and pulls it through the real merge path: the shape an
     /// already-known peer's small incremental update takes
-    /// (`_applyRemotePayloadInner`, applied via `mergeOrder`).
-    Future<void> pullPeerPayload(
+    /// (`_applyRemotePayloadInner`, applied via `mergeOrder`). Returns the
+    /// sync result so a caller can inspect `recordsSynced` -- the staging
+    /// table is emptied by the packer regardless of outcome, so it is no
+    /// longer possible to confirm a legacy row applied by querying a table
+    /// for it afterwards.
+    Future<SyncResult> pullPeerPayload(
       Map<String, dynamic> dataJson,
       String peerId,
     ) async {
@@ -151,6 +155,7 @@ void main() {
       );
       final result = await buildService().performSync();
       expect(result.status, isNot(SyncResultStatus.error));
+      return result;
     }
 
     /// Publishes [dataJson] as [peerId]'s BASE (baseSeq 1, one part, headSeq
@@ -311,19 +316,16 @@ void main() {
         final data = SyncData(diveProfiles: profiles);
         final dataJson = {...data.toJson(), 'diveProfiles': profiles};
 
-        await pullPeerPayload(dataJson, 'peer-181b');
+        final result = await pullPeerPayload(dataJson, 'peer-181b');
 
         // The merge itself must have succeeded (legacy rows still apply
-        // through the kept upsertRecords case): this is the packer's
-        // dive-already-has-a-series gate skipping the pack, not a failed
-        // merge that never wrote the row at all.
-        final landed = await DatabaseService.instance.database
-            .customSelect(
-              'SELECT 1 FROM dive_profiles WHERE id = ?',
-              variables: [Variable.withString('p-stale')],
-            )
-            .get();
-        expect(landed, hasLength(1));
+        // through the kept upsertRecords case, which stages them): this is
+        // the packer's dive-already-has-a-series gate skipping the pack, not
+        // a failed merge that never staged the row at all. The staging table
+        // is emptied by the packer either way, so `recordsSynced` (counted
+        // when the row is staged, before packing runs) is the only way left
+        // to see that the row was actually applied.
+        expect(result.recordsSynced, greaterThanOrEqualTo(1));
 
         final after = (await ProfileSeriesRepository().getSeriesForDive(
           'd1',
