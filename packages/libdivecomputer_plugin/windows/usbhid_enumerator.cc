@@ -8,7 +8,7 @@ extern "C" {
 }
 
 #include <cstdio>
-#include <memory>
+#include <string>
 #include <vector>
 
 #pragma comment(lib, "SetupAPI.lib")
@@ -33,7 +33,11 @@ std::string NarrowString(const wchar_t* wide) {
 
 std::string FormatIds(unsigned short vendor_id, unsigned short product_id) {
     char buffer[32] = {};
-    snprintf(buffer, sizeof(buffer), "0x%04X:0x%04X", vendor_id, product_id);
+    // Widened explicitly: %X takes an unsigned int, and the build treats the
+    // format-mismatch warning as an error.
+    snprintf(buffer, sizeof(buffer), "0x%04X:0x%04X",
+             static_cast<unsigned int>(vendor_id),
+             static_cast<unsigned int>(product_id));
     return buffer;
 }
 
@@ -98,7 +102,8 @@ std::vector<UsbHidDevice> EnumerateMatchingUsbHidDevices(
         }
 
         wchar_t product[256] = {};
-        HidD_GetProductString(handle, product, sizeof(product));
+        HidD_GetProductString(handle, product,
+                              static_cast<ULONG>(sizeof(product)));
         CloseHandle(handle);
 
         considered++;
