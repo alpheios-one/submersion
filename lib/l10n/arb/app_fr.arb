@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "Faites glisser pour déplacer, pincez pour zoomer",
   "profilePhoto_error_tooLarge": "Cette image est trop volumineuse. Essayez-en une plus petite.",
   "profilePhoto_error_undecodable": "Ce fichier n'a pas pu être lu comme une image.",
-  "profilePhoto_error_contactNoPhoto": "Ce contact n'a pas de photo."
+  "profilePhoto_error_contactNoPhoto": "Ce contact n'a pas de photo.",
+  "profilePhoto_error_contactPermission": "L'autorisation d'accès aux contacts est requise pour choisir une photo."
 }

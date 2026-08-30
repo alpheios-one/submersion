@@ -119,14 +119,29 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
       childSize: childSize,
       sourceSize: sourceSize,
     );
-    final result = await encodeStoredImage(
-      ImageEncodeRequest.fromBytes(
-        bytes: widget.sourceBytes,
-        spec: ImageEncodeSpec.avatar,
-        cropRect: rect,
-        declaredName: widget.declaredName,
-      ),
-    );
+    // compute() spawns a real isolate, which can fail to start, and the codec
+    // reports expected problems as an outcome but can still throw on the
+    // unexpected. Either would otherwise strand the dialog at _busy true with
+    // the Save button permanently disabled. This mirrors the guard on the
+    // open-time decode.
+    final ImageEncodeResult result;
+    try {
+      result = await encodeStoredImage(
+        ImageEncodeRequest.fromBytes(
+          bytes: widget.sourceBytes,
+          spec: ImageEncodeSpec.avatar,
+          cropRect: rect,
+          declaredName: widget.declaredName,
+        ),
+      );
+    } on Object {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.profilePhoto_error_undecodable)),
+      );
+      return;
+    }
     if (!mounted) return;
     if (result.outcome != ImageEncodeOutcome.encoded) {
       setState(() => _busy = false);

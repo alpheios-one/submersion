@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "Sleep om te verplaatsen, knijp om te zoomen",
   "profilePhoto_error_tooLarge": "Deze afbeelding is te groot. Probeer een kleinere.",
   "profilePhoto_error_undecodable": "Dit bestand kon niet als afbeelding worden gelezen.",
-  "profilePhoto_error_contactNoPhoto": "Dit contact heeft geen foto."
+  "profilePhoto_error_contactNoPhoto": "Dit contact heeft geen foto.",
+  "profilePhoto_error_contactPermission": "Toegang tot contacten is vereist om een foto te kiezen."
 }

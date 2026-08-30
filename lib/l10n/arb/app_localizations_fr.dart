@@ -36070,4 +36070,8 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get profilePhoto_error_contactNoPhoto =>
       'Ce contact n\'a pas de photo.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'L\'autorisation d\'accès aux contacts est requise pour choisir une photo.';
 }

@@ -35986,4 +35986,8 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get profilePhoto_error_contactNoPhoto => 'Esse contacto não tem foto.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'É necessária permissão de contactos para escolher uma foto.';
 }

@@ -35822,4 +35822,8 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get profilePhoto_error_contactNoPhoto =>
       'Ennek a névjegynek nincs fényképe.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'A fénykép kiválasztásához névjegy-hozzáférési engedély szükséges.';
 }

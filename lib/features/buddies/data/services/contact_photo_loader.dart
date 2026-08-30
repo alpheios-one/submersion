@@ -52,7 +52,10 @@ Future<Uint8List?> loadContactPhoto(
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(context.l10n.buddies_message_contactPermissionRequired),
+          // Photo-specific wording: this path is reached from "Choose from
+          // Contacts" in the profile photo sheet, where the buddy-import
+          // string ("...to import buddies") describes the wrong action.
+          content: Text(context.l10n.profilePhoto_error_contactPermission),
         ),
       );
     }

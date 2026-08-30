@@ -35620,4 +35620,8 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profilePhoto_error_contactNoPhoto =>
       'جهة الاتصال هذه ليس لها صورة.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة.';
 }

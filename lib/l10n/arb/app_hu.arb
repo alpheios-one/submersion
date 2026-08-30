@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "Húzza az áthelyezéshez, csippentsen a nagyításhoz",
   "profilePhoto_error_tooLarge": "Ez a kép túl nagy. Próbáljon egy kisebbet.",
   "profilePhoto_error_undecodable": "Ezt a fájlt nem sikerült képként beolvasni.",
-  "profilePhoto_error_contactNoPhoto": "Ennek a névjegynek nincs fényképe."
+  "profilePhoto_error_contactNoPhoto": "Ennek a névjegynek nincs fényképe.",
+  "profilePhoto_error_contactPermission": "A fénykép kiválasztásához névjegy-hozzáférési engedély szükséges."
 }

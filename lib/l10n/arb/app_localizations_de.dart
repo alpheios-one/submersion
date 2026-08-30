@@ -35907,4 +35907,8 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get profilePhoto_error_contactNoPhoto =>
       'Dieser Kontakt hat kein Foto.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'Für die Auswahl eines Fotos wird die Kontaktberechtigung benötigt.';
 }

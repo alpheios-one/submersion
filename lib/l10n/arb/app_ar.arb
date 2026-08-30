@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "اسحب لتغيير الموضع، وقرّب بإصبعين للتكبير",
   "profilePhoto_error_tooLarge": "هذه الصورة كبيرة جدًا. جرّب صورة أصغر.",
   "profilePhoto_error_undecodable": "تعذّرت قراءة هذا الملف كصورة.",
-  "profilePhoto_error_contactNoPhoto": "جهة الاتصال هذه ليس لها صورة."
+  "profilePhoto_error_contactNoPhoto": "جهة الاتصال هذه ليس لها صورة.",
+  "profilePhoto_error_contactPermission": "يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة."
 }

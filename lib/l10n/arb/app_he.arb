@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "גררו כדי להזיז, צבטו כדי לשנות מרחק",
   "profilePhoto_error_tooLarge": "התמונה הזו גדולה מדי. נסו תמונה קטנה יותר.",
   "profilePhoto_error_undecodable": "לא ניתן היה לקרוא את הקובץ הזה כתמונה.",
-  "profilePhoto_error_contactNoPhoto": "לאיש הקשר הזה אין תמונה."
+  "profilePhoto_error_contactNoPhoto": "לאיש הקשר הזה אין תמונה.",
+  "profilePhoto_error_contactPermission": "נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה."
 }

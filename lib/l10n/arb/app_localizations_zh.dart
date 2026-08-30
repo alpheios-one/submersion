@@ -33841,4 +33841,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profilePhoto_error_contactNoPhoto => '该联系人没有照片。';
+
+  @override
+  String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
 }

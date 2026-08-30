@@ -59134,6 +59134,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That contact does not have a photo.'**
   String get profilePhoto_error_contactNoPhoto;
+
+  /// No description provided for @profilePhoto_error_contactPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts permission is required to choose a photo.'**
+  String get profilePhoto_error_contactPermission;
 }
 
 class _AppLocalizationsDelegate

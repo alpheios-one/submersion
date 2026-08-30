@@ -143,9 +143,17 @@ void main() {
 
     expect(result, isNull);
     expect(pickerCalls, 0, reason: 'the picker must not open without access');
+    // Photo-specific wording: this path is reached from "Choose from
+    // Contacts" in the photo sheet, where the buddy-import string would
+    // describe the wrong action.
     expect(
-      find.text('Contact permission is required to import buddies'),
+      find.text('Contacts permission is required to choose a photo.'),
       findsOneWidget,
+    );
+    expect(
+      find.textContaining('import buddies'),
+      findsNothing,
+      reason: 'the buddy-import wording must not leak into the photo flow',
     );
   });
 }

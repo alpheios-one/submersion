@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "Zum Verschieben ziehen, zum Zoomen zwei Finger",
   "profilePhoto_error_tooLarge": "Dieses Bild ist zu groß. Bitte ein kleineres wählen.",
   "profilePhoto_error_undecodable": "Diese Datei konnte nicht als Bild gelesen werden.",
-  "profilePhoto_error_contactNoPhoto": "Dieser Kontakt hat kein Foto."
+  "profilePhoto_error_contactNoPhoto": "Dieser Kontakt hat kein Foto.",
+  "profilePhoto_error_contactPermission": "Für die Auswahl eines Fotos wird die Kontaktberechtigung benötigt."
 }

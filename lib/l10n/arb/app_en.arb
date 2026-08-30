@@ -21770,5 +21770,6 @@
   "profilePhoto_crop_hint": "Drag to reposition, pinch to zoom",
   "profilePhoto_error_tooLarge": "That image is too large to use. Try a smaller one.",
   "profilePhoto_error_undecodable": "That file could not be read as an image.",
-  "profilePhoto_error_contactNoPhoto": "That contact does not have a photo."
+  "profilePhoto_error_contactNoPhoto": "That contact does not have a photo.",
+  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo."
 }

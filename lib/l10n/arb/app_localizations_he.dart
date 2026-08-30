@@ -35262,4 +35262,8 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get profilePhoto_error_contactNoPhoto => 'לאיש הקשר הזה אין תמונה.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה.';
 }

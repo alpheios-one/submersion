@@ -10494,5 +10494,6 @@
   "profilePhoto_crop_hint": "拖动以调整位置，双指缩放",
   "profilePhoto_error_tooLarge": "该图片太大，请尝试较小的图片。",
   "profilePhoto_error_undecodable": "无法将该文件读取为图片。",
-  "profilePhoto_error_contactNoPhoto": "该联系人没有照片。"
+  "profilePhoto_error_contactNoPhoto": "该联系人没有照片。",
+  "profilePhoto_error_contactPermission": "选择照片需要通讯录访问权限。"
 }
