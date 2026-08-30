@@ -23137,45 +23137,46 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_transmitters_title => 'Transmitters';
+  String get diveComputer_transmitters_title => 'أجهزة الإرسال';
 
   @override
   String get diveComputer_transmitters_emptyState =>
-      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+      'لم يتم تعيين أي قنوات بعد. عيّن قناة لأسطوانة لتطبيق الحجم ونوع الغاز والدور تلقائيًا مع كل تنزيل.';
 
   @override
-  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+  String get diveComputer_transmitters_addTitle => 'إضافة تعيين قناة';
 
   @override
-  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+  String get diveComputer_transmitters_editTitle => 'تعديل تعيين قناة';
 
   @override
-  String get diveComputer_transmitters_channelLabel => 'Channel index';
+  String get diveComputer_transmitters_channelLabel => 'رقم القناة';
 
   @override
   String diveComputer_transmitters_channelTitle(int channel) {
-    return 'Channel $channel';
+    return 'القناة $channel';
   }
 
   @override
-  String get diveComputer_transmitters_labelField => 'Label (optional)';
+  String get diveComputer_transmitters_labelField => 'التسمية (اختياري)';
 
   @override
-  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+  String get diveComputer_transmitters_presetLabel =>
+      'إعداد الأسطوانة (اختياري)';
 
   @override
-  String get diveComputer_transmitters_presetNone => 'None';
+  String get diveComputer_transmitters_presetNone => 'بلا';
 
   @override
   String get diveComputer_transmitters_duplicateChannelError =>
-      'This channel already has a mapping.';
+      'هذه القناة لديها تعيين بالفعل.';
 
   @override
-  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+  String get diveComputer_transmitters_deleteTitle => 'إزالة التعيين؟';
 
   @override
   String diveComputer_transmitters_deleteMessage(int channel) {
-    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+    return 'إزالة تعيين القناة $channel؟ ستستخدم التنزيلات المستقبلية على هذه القناة إعداد الأسطوانة الافتراضي مرة أخرى.';
   }
 
   @override

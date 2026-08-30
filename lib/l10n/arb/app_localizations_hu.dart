@@ -23480,45 +23480,49 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_transmitters_title => 'Transmitters';
+  String get diveComputer_transmitters_title => 'Adók';
 
   @override
   String get diveComputer_transmitters_emptyState =>
-      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+      'Még nincs csatorna hozzárendelve. Rendelj egy csatornát egy palackhoz, hogy a méret, a gáz és a szerep automatikusan érvényesüljön minden letöltéskor.';
 
   @override
-  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+  String get diveComputer_transmitters_addTitle =>
+      'Csatornahozzárendelés hozzáadása';
 
   @override
-  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+  String get diveComputer_transmitters_editTitle =>
+      'Csatornahozzárendelés szerkesztése';
 
   @override
-  String get diveComputer_transmitters_channelLabel => 'Channel index';
+  String get diveComputer_transmitters_channelLabel => 'Csatornaindex';
 
   @override
   String diveComputer_transmitters_channelTitle(int channel) {
-    return 'Channel $channel';
+    return '$channel. csatorna';
   }
 
   @override
-  String get diveComputer_transmitters_labelField => 'Label (optional)';
+  String get diveComputer_transmitters_labelField => 'Címke (nem kötelező)';
 
   @override
-  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+  String get diveComputer_transmitters_presetLabel =>
+      'Palacksablon (nem kötelező)';
 
   @override
-  String get diveComputer_transmitters_presetNone => 'None';
+  String get diveComputer_transmitters_presetNone => 'Nincs';
 
   @override
   String get diveComputer_transmitters_duplicateChannelError =>
-      'This channel already has a mapping.';
+      'Ehhez a csatornához már tartozik hozzárendelés.';
 
   @override
-  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+  String get diveComputer_transmitters_deleteTitle =>
+      'Hozzárendelés eltávolítása?';
 
   @override
   String diveComputer_transmitters_deleteMessage(int channel) {
-    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+    return 'Eltávolítod a(z) $channel. csatorna hozzárendelését? A jövőbeli letöltések ezen a csatornán ismét az alapértelmezett palacksablont használják.';
   }
 
   @override

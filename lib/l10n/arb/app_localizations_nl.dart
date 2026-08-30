@@ -23375,45 +23375,46 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_transmitters_title => 'Transmitters';
+  String get diveComputer_transmitters_title => 'Zenders';
 
   @override
   String get diveComputer_transmitters_emptyState =>
-      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+      'Nog geen kanalen gekoppeld. Koppel een kanaal aan een fles om grootte, gassoort en rol automatisch toe te passen bij elke download.';
 
   @override
-  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+  String get diveComputer_transmitters_addTitle => 'Kanaalkoppeling toevoegen';
 
   @override
-  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+  String get diveComputer_transmitters_editTitle => 'Kanaalkoppeling bewerken';
 
   @override
-  String get diveComputer_transmitters_channelLabel => 'Channel index';
+  String get diveComputer_transmitters_channelLabel => 'Kanaalindex';
 
   @override
   String diveComputer_transmitters_channelTitle(int channel) {
-    return 'Channel $channel';
+    return 'Kanaal $channel';
   }
 
   @override
-  String get diveComputer_transmitters_labelField => 'Label (optional)';
+  String get diveComputer_transmitters_labelField => 'Label (optioneel)';
 
   @override
-  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+  String get diveComputer_transmitters_presetLabel =>
+      'Flesinstelling (optioneel)';
 
   @override
-  String get diveComputer_transmitters_presetNone => 'None';
+  String get diveComputer_transmitters_presetNone => 'Geen';
 
   @override
   String get diveComputer_transmitters_duplicateChannelError =>
-      'This channel already has a mapping.';
+      'Dit kanaal heeft al een koppeling.';
 
   @override
-  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+  String get diveComputer_transmitters_deleteTitle => 'Koppeling verwijderen?';
 
   @override
   String diveComputer_transmitters_deleteMessage(int channel) {
-    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+    return 'Koppeling voor kanaal $channel verwijderen? Toekomstige downloads op dit kanaal gebruiken dan weer de standaard flesinstelling.';
   }
 
   @override

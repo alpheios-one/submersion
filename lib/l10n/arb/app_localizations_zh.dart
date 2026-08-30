@@ -22345,45 +22345,44 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_transmitters_title => 'Transmitters';
+  String get diveComputer_transmitters_title => '发射器';
 
   @override
   String get diveComputer_transmitters_emptyState =>
-      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+      '尚未映射任何通道。将通道映射到气瓶,以便每次下载时自动应用尺寸、气体和角色。';
 
   @override
-  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+  String get diveComputer_transmitters_addTitle => '添加通道映射';
 
   @override
-  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+  String get diveComputer_transmitters_editTitle => '编辑通道映射';
 
   @override
-  String get diveComputer_transmitters_channelLabel => 'Channel index';
+  String get diveComputer_transmitters_channelLabel => '通道索引';
 
   @override
   String diveComputer_transmitters_channelTitle(int channel) {
-    return 'Channel $channel';
+    return '通道 $channel';
   }
 
   @override
-  String get diveComputer_transmitters_labelField => 'Label (optional)';
+  String get diveComputer_transmitters_labelField => '标签(可选)';
 
   @override
-  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+  String get diveComputer_transmitters_presetLabel => '气瓶预设(可选)';
 
   @override
-  String get diveComputer_transmitters_presetNone => 'None';
+  String get diveComputer_transmitters_presetNone => '无';
 
   @override
-  String get diveComputer_transmitters_duplicateChannelError =>
-      'This channel already has a mapping.';
+  String get diveComputer_transmitters_duplicateChannelError => '此通道已存在映射。';
 
   @override
-  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+  String get diveComputer_transmitters_deleteTitle => '移除映射?';
 
   @override
   String diveComputer_transmitters_deleteMessage(int channel) {
-    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+    return '移除通道 $channel 的映射?此通道上的后续下载将恢复使用默认气瓶预设。';
   }
 
   @override

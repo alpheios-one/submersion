@@ -23558,45 +23558,46 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get diveComputer_transmitters_title => 'Transmitters';
+  String get diveComputer_transmitters_title => 'Trasmettitori';
 
   @override
   String get diveComputer_transmitters_emptyState =>
-      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+      'Nessun canale ancora mappato. Mappa un canale a una bombola per applicare automaticamente dimensione, gas e ruolo a ogni download.';
 
   @override
-  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+  String get diveComputer_transmitters_addTitle => 'Aggiungi mappatura canale';
 
   @override
-  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+  String get diveComputer_transmitters_editTitle => 'Modifica mappatura canale';
 
   @override
-  String get diveComputer_transmitters_channelLabel => 'Channel index';
+  String get diveComputer_transmitters_channelLabel => 'Indice canale';
 
   @override
   String diveComputer_transmitters_channelTitle(int channel) {
-    return 'Channel $channel';
+    return 'Canale $channel';
   }
 
   @override
-  String get diveComputer_transmitters_labelField => 'Label (optional)';
+  String get diveComputer_transmitters_labelField => 'Etichetta (facoltativa)';
 
   @override
-  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+  String get diveComputer_transmitters_presetLabel =>
+      'Preset bombola (facoltativo)';
 
   @override
-  String get diveComputer_transmitters_presetNone => 'None';
+  String get diveComputer_transmitters_presetNone => 'Nessuno';
 
   @override
   String get diveComputer_transmitters_duplicateChannelError =>
-      'This channel already has a mapping.';
+      'Questo canale ha già una mappatura.';
 
   @override
-  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+  String get diveComputer_transmitters_deleteTitle => 'Rimuovere la mappatura?';
 
   @override
   String diveComputer_transmitters_deleteMessage(int channel) {
-    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+    return 'Rimuovere la mappatura per il canale $channel? I prossimi download su questo canale useranno di nuovo il preset bombola predefinito.';
   }
 
   @override
