@@ -116,37 +116,9 @@ void main() {
     );
   }
 
-  /// Insert a profile point, using [sourceTag] to distinguish computers
-  /// (stored in the id to make retrieval predictable, computerId left null).
-  Future<String> insertTestProfile({
-    required String diveId,
-    String? sourceTag,
-    String? sourceId,
-    bool isPrimary = true,
-    int timestamp = 0,
-    double depth = 5.0,
-  }) async {
-    final tag = sourceTag ?? 'default';
-    final id = 'profile-$tag-$timestamp-${diveId.hashCode}';
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            // computerId left null to avoid FK constraints
-            sourceId: Value(sourceId),
-            isPrimary: Value(isPrimary),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-          ),
-        );
-    return id;
-  }
-
-  /// The series twin of [insertTestProfile]: one single-sample series per
-  /// call, for tests exercising a writer that now reads and writes series
-  /// rows instead of legacy `dive_profiles` rows.
+  /// Insert one single-sample profile series, using [sourceTag] to
+  /// distinguish computers (stored in the id to make retrieval predictable,
+  /// computerId left null).
   Future<String> insertTestSeries({
     required String diveId,
     String? sourceTag,
@@ -302,7 +274,7 @@ void main() {
 
       // Source A's own samples, demoted the way a profile edit leaves the
       // superseded originals: null computerId, isPrimary false, owned by A.
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'a-original',
         sourceId: 'source-a',
@@ -311,7 +283,7 @@ void main() {
         depth: 5.0,
       );
       // Source B's samples: identical shape apart from the owning source.
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'b1',
         sourceId: 'source-b',
@@ -324,12 +296,12 @@ void main() {
         repository,
       ).split(diveId: diveId, sourceId: 'source-b');
 
-      final remaining = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
+      final remaining = await ProfileSeriesRepository().getSeriesForDive(
+        diveId,
+      );
 
       expect(
-        remaining.map((r) => r.sourceId),
+        remaining.map((s) => s.sourceId),
         contains('source-a'),
         reason:
             "source A's samples belong to the dive being split FROM and must "
@@ -365,14 +337,14 @@ void main() {
       );
 
       // Profiles for each computer (isPrimary distinguishes them).
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'prim',
         isPrimary: true,
         timestamp: 0,
         depth: 5.0,
       );
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'sec',
         isPrimary: false,
@@ -460,14 +432,14 @@ void main() {
         ),
       );
 
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'prim',
         isPrimary: true,
         timestamp: 0,
         depth: 5.0,
       );
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'sec',
         isPrimary: false,
