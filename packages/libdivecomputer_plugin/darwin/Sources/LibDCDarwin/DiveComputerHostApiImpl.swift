@@ -503,10 +503,6 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
     /// knowledge, so the vendor and product ids are put to `libdc_usbhid_match`
     /// rather than compared against a table kept here.
     private func usbHidCandidates(for device: DiscoveredDevice) -> [DownloadCandidate] {
-        let transports = libdc_descriptor_transports(
-            device.vendor, device.product, UInt32(device.model))
-        guard transports & UInt32(LIBDC_TRANSPORT_USBHID) != 0 else { return [] }
-
         let found = UsbHidDeviceEnumerator.enumerateMatching(
             log: { message in
                 NativeLogger.i("DiveComputerHost", category: "HID", message)
@@ -519,14 +515,17 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         return found.map { DownloadCandidate.usbHid($0) }
     }
 
-    /// Serial-transport download with auto-probe, mirroring the Linux/Windows
+    /// USB and serial download with auto-probe, mirroring the Linux/Windows
     /// backends.
     ///
-    /// Candidates are the USB serial ports the operating system published,
-    /// followed by any dive-computer USB cable it left unclaimed (issue #732:
-    /// the Aeris/Oceanic cable is an FTDI chip with a custom product ID that
-    /// Apple's driver does not match, so it never becomes a /dev/cu.* node).
-    /// Serial ports come first, so a cable that already works keeps working.
+    /// Candidates, in the order they are tried:
+    ///
+    /// 1. USB HID devices the selected model claims (issue #1271: the Scubapro
+    ///    G2 family and the Suunto EON Steel family speak HID, not serial).
+    /// 2. The USB serial ports the operating system published.
+    /// 3. Any dive-computer USB cable it left unclaimed (issue #732: the
+    ///    Aeris/Oceanic cable is an FTDI chip with a custom product ID that
+    ///    Apple's driver does not match, so it never becomes a /dev/cu.* node).
     ///
     /// A single candidate is opened and run directly so the real failure is
     /// reported. Multiple candidates are each tried with a full download,
@@ -535,36 +534,42 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         device: DiscoveredDevice, session: OpaquePointer,
         downloadCallbacks: libdc_download_callbacks_t, fingerprint: [UInt8]?
     ) {
-        // USB HID computers first. A HID-only model (the Scubapro G2 family,
-        // the Suunto EON Steel family) has no serial port to find, and probing
-        // unrelated ports before it would write dive-computer handshake bytes
-        // at hardware that is not the target (issue #1271).
-        var candidates = usbHidCandidates(for: device)
-        let hidCapable = !candidates.isEmpty
-            || libdc_descriptor_transports(
-                device.vendor, device.product, UInt32(device.model))
-                & UInt32(LIBDC_TRANSPORT_USBHID) != 0
+        let transports = libdc_descriptor_transports(
+            device.vendor, device.product, UInt32(device.model))
+        let hidCapable = transports & UInt32(LIBDC_TRANSPORT_USBHID) != 0
+        // Hardware whose only wired transport is HID. Probing serial ports for
+        // it would write dive-computer handshake bytes at unrelated hardware
+        // and could only ever fail, so the list stops at the HID candidates.
+        let hidOnly = hidCapable
+            && transports
+                & UInt32(LIBDC_TRANSPORT_SERIAL | LIBDC_TRANSPORT_USB) == 0
 
-        let available = SerialPortEnumerator.enumerateUsbSerialPaths()
-        candidates += SerialPortEnumerator.candidatePorts(
-            address: device.address, available: available)
-            .map { DownloadCandidate.serialPort($0) }
+        var candidates = hidCapable ? usbHidCandidates(for: device) : []
 
-        // Cables the operating system never published as a serial port. Tried
-        // after the serial ports so nothing that works today changes: a real
-        // /dev node is always the better path when one exists. An explicit
-        // /dev address means the user picked a specific port, so raw USB is
-        // not second-guessed into the list.
-        if !device.address.hasPrefix("/dev/") {
-            // The log closure is how the enumerator reports what it saw; it
-            // takes one rather than calling NativeLogger itself so the file
-            // stays compilable outside the CocoaPods build. Every USB device is
-            // reported, matched or not, so a user's debug log distinguishes a
-            // cable that is not enumerating from one the allowlist rejected.
-            let found = UsbFtdiDeviceEnumerator.enumerateDiveCables { message in
-                NativeLogger.i("DiveComputerHost", category: "USB", message)
+        if !hidOnly {
+            let available = SerialPortEnumerator.enumerateUsbSerialPaths()
+            candidates += SerialPortEnumerator.candidatePorts(
+                address: device.address, available: available)
+                .map { DownloadCandidate.serialPort($0) }
+
+            // Cables the operating system never published as a serial port.
+            // Tried after the serial ports so nothing that works today
+            // changes: a real /dev node is always the better path when one
+            // exists. An explicit /dev address means the user picked a
+            // specific port, so raw USB is not second-guessed into the list.
+            if !device.address.hasPrefix("/dev/") {
+                // The log closure is how the enumerator reports what it saw; it
+                // takes one rather than calling NativeLogger itself so the file
+                // stays compilable outside the CocoaPods build. Every USB device
+                // is reported, matched or not, so a user's debug log
+                // distinguishes a cable that is not enumerating from one the
+                // allowlist rejected.
+                let found = UsbFtdiDeviceEnumerator.enumerateDiveCables { message in
+                    NativeLogger.i("DiveComputerHost", category: "USB", message)
+                }
+                candidates.append(
+                    contentsOf: found.map { DownloadCandidate.ftdiUsb($0) })
             }
-            candidates.append(contentsOf: found.map { DownloadCandidate.ftdiUsb($0) })
         }
 
         if candidates.isEmpty {

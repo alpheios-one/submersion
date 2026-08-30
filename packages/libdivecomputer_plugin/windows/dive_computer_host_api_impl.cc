@@ -323,6 +323,13 @@ void DiveComputerHostApiImpl::PerformDownload(
             static_cast<unsigned int>(device.model()));
         const bool hid_capable =
             (descriptor_transports & LIBDC_TRANSPORT_USBHID) != 0;
+        // Hardware whose only wired transport is HID. Probing serial ports for
+        // it would write dive-computer handshake bytes at unrelated hardware
+        // and could only ever fail, so the list stops at the HID candidates.
+        const bool hid_only =
+            hid_capable &&
+            (descriptor_transports &
+             (LIBDC_TRANSPORT_SERIAL | LIBDC_TRANSPORT_USB)) == 0;
         if (hid_capable) {
             auto hid_devices = EnumerateMatchingUsbHidDevices(
                 [&device](unsigned short vendor_id, unsigned short product_id) {
@@ -344,22 +351,24 @@ void DiveComputerHostApiImpl::PerformDownload(
         }
 
         // Build list of candidate serial ports.
-        std::vector<std::string> ports_to_try;
-        std::string address = device.address();
-        bool is_com_port = (address.size() >= 4 &&
-            _strnicmp(address.c_str(), "COM", 3) == 0 &&
-            address[3] >= '0' && address[3] <= '9');
+        if (!hid_only) {
+            std::vector<std::string> ports_to_try;
+            std::string address = device.address();
+            bool is_com_port = (address.size() >= 4 &&
+                _strnicmp(address.c_str(), "COM", 3) == 0 &&
+                address[3] >= '0' && address[3] <= '9');
 
-        if (is_com_port) {
-            ports_to_try.push_back(address);
-        } else {
-            ports_to_try = EnumerateAvailableSerialPorts();
-        }
-        for (const auto& port : ports_to_try) {
-            DownloadCandidate candidate;
-            candidate.port = port;
-            candidate.label = port;
-            candidates.push_back(std::move(candidate));
+            if (is_com_port) {
+                ports_to_try.push_back(address);
+            } else {
+                ports_to_try = EnumerateAvailableSerialPorts();
+            }
+            for (const auto& port : ports_to_try) {
+                DownloadCandidate candidate;
+                candidate.port = port;
+                candidate.label = port;
+                candidates.push_back(std::move(candidate));
+            }
         }
 
         // Try each candidate with a full download attempt. Simply opening one

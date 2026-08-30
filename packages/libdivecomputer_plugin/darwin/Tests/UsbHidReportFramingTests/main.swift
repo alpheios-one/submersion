@@ -47,18 +47,25 @@ func testZeroReportIdIsStripped() {
     print("PASS: testZeroReportIdIsStripped")
 }
 
-// A numbered report keeps its id byte in the payload. No dive computer in the
-// descriptor table uses one today, but getting this backwards would corrupt
-// the first byte of every packet on hardware that does, and the asymmetry is
-// surprising enough to be worth pinning.
+// A numbered report keeps its id byte in the payload, because Apple requires
+// the id to lead the report data for numbered reports.
+//
+// This is the Suunto EON Steel family, not a hypothetical: suunto_eonsteel.c
+// builds a 64-byte packet whose first byte is the report type 0x3f
+// (suunto_eonsteel.c:242), writes the whole buffer, and checks buf[0] == 0x3f
+// on the way back (suunto_eonsteel.c:156). Stripping that byte would fail
+// every packet in both directions.
 func testNumberedReportKeepsItsIdByte() {
-    let buffer: [UInt8] = [0x03, 0xaa, 0xbb, 0xcc]
+    var buffer = [UInt8](repeating: 0, count: 64)
+    buffer[0] = 0x3f  // report type, EON Steel
+    buffer[1] = 12    // payload length
+    buffer[63] = 0xcc
 
     guard let report = UsbHidReportFraming.outgoingReport(from: buffer) else {
-        preconditionFailure("a 4-byte buffer must produce a report")
+        preconditionFailure("a 64-byte buffer must produce a report")
     }
-    expect(report.reportId == 0x03, "report id must be the first byte")
-    expect(report.payload.count == 4, "a numbered report keeps its id byte")
+    expect(report.reportId == 0x3f, "report id must be the first byte")
+    expect(report.payload.count == 64, "a numbered report keeps its id byte")
     expect(report.payload == buffer, "a numbered report is sent verbatim")
     print("PASS: testNumberedReportKeepsItsIdByte")
 }

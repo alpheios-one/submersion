@@ -1,7 +1,10 @@
 #include "usbhid_io_stream.h"
 
+// hidsdi.h declares HidD_*, hidpi.h declares HidP_GetCaps and HIDP_CAPS. The
+// Windows SDK does not pull the second in through the first, so both are named.
 extern "C" {
 #include <hidsdi.h>
+#include <hidpi.h>
 }
 
 #include <algorithm>
