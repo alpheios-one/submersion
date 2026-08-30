@@ -368,6 +368,13 @@ class DiveComputerRepository {
         await _backfillProvenanceSnapshots(_mapRowToComputer(row));
       }
 
+      // Clear the series first: their FK is ON DELETE SET NULL, so the
+      // legacy dive_profiles clear below (and the dive_computers delete that
+      // follows it) would null series.computer_id via the cascade without
+      // restamping hlc, and peers would never learn of the change.
+      await _profileSeries.clearComputer(id);
+      await _tankSeries.clearComputer(id);
+
       // Clear FK references that would block the delete. dives.computer_id
       // has no ON DELETE action, so leaving it set fails the delete with
       // SqliteException(787) on any computer that a dive references (#823).
@@ -533,6 +540,7 @@ class DiveComputerRepository {
         "AND s.source_format = 'dive_computer') = 1",
         [computerId, ...matchedDiveIds],
       );
+      await _profileSeries.relinkComputer(computerId, matchedDiveIds);
 
       _log.info(
         'Relinked ${sourceIds.length} data source(s) from previous '
@@ -1009,7 +1017,7 @@ class DiveComputerRepository {
           '''
         SELECT DISTINCT d.id, d.dive_date_time
         FROM dives d
-        INNER JOIN dive_profiles dp ON d.id = dp.dive_id
+        INNER JOIN dive_profile_series dp ON d.id = dp.dive_id
         WHERE dp.computer_id = ?
         ORDER BY d.dive_date_time DESC
         ${limit != null ? 'LIMIT $limit' : ''}

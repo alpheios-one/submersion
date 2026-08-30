@@ -7,6 +7,8 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/settings/data/repositories/diver_settings_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart'
     as domain;
@@ -377,6 +379,11 @@ class DiverRepository {
           'AND dive_id NOT IN (SELECT id FROM dives WHERE diver_id = ?)',
           [id, id],
         );
+        await ProfileSeriesRepository().clearComputersOfDiverForForeignDives(
+          id,
+        );
+        await TankPressureSeriesRepository()
+            .clearComputersOfDiverForForeignDives(id);
         await _db.customStatement(
           'UPDATE dive_data_sources SET computer_id = NULL '
           'WHERE computer_id IN '

@@ -4,6 +4,8 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
     as domain;
 
@@ -11,11 +13,13 @@ import '../../../../helpers/test_database.dart';
 
 void main() {
   late DiveComputerRepository repository;
+  late ProfileSeriesRepository profileSeries;
   late AppDatabase db;
 
   setUp(() async {
     db = await setUpTestDatabase();
     repository = DiveComputerRepository();
+    profileSeries = ProfileSeriesRepository();
   });
 
   tearDown(() async {
@@ -400,6 +404,15 @@ void main() {
         timestamp: 0,
         depth: 10.0,
       );
+      final seriesId = await profileSeries.insertSeries(
+        diveId: diveId,
+        computerId: computerId,
+        samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+        now: 1000,
+      );
+      final beforeHlc = (await profileSeries.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == seriesId).hlc;
 
       await repository.deleteComputer(computerId);
 
@@ -409,6 +422,14 @@ void main() {
       )..where((t) => t.diveId.equals(diveId))).get();
       expect(profiles, hasLength(1));
       expect(profiles.first.computerId, isNull);
+
+      // Series should still exist but with null computerId and a restamped
+      // hlc.
+      final seriesRow = (await profileSeries.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == seriesId);
+      expect(seriesRow.computerId, isNull);
+      expect(seriesRow.hlc, isNot(beforeHlc));
 
       // Computer should be deleted.
       final computers = await (db.select(
@@ -568,6 +589,12 @@ void main() {
           sourceFormat: 'dive_computer',
         );
         await insertProfile(diveId: diveId, computerId: oldId);
+        final seriesId = await profileSeries.insertSeries(
+          diveId: diveId,
+          computerId: oldId,
+          samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+          now: 1000,
+        );
         await repository.deleteComputer(oldId);
 
         final created = await repository.createComputer(newComputer());
@@ -584,6 +611,10 @@ void main() {
           db.diveProfiles,
         )..where((t) => t.diveId.equals(diveId))).get();
         expect(profiles.single.computerId, equals(created.id));
+        final series = (await profileSeries.getRowsForDives([
+          diveId,
+        ])).firstWhere((r) => r.id == seriesId);
+        expect(series.computerId, equals(created.id));
       },
     );
 
@@ -678,6 +709,12 @@ void main() {
           sourceFormat: 'dive_computer',
         );
         await insertProfile(diveId: diveId, computerId: oldId);
+        final seriesId = await profileSeries.insertSeries(
+          diveId: diveId,
+          computerId: oldId,
+          samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+          now: 1000,
+        );
         await repository.deleteComputer(oldId);
 
         final created = await repository.createComputer(newComputer());
@@ -698,6 +735,10 @@ void main() {
           db.diveProfiles,
         )..where((t) => t.diveId.equals(diveId))).get();
         expect(profiles.single.computerId, isNull);
+        final series = (await profileSeries.getRowsForDives([
+          diveId,
+        ])).firstWhere((r) => r.id == seriesId);
+        expect(series.computerId, isNull);
       },
     );
   });

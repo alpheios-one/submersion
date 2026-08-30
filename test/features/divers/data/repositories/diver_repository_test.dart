@@ -1,17 +1,21 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 
 import '../../../../helpers/test_database.dart';
 
 void main() {
   late DiverRepository repository;
+  late ProfileSeriesRepository profileSeries;
   late AppDatabase db;
 
   setUp(() async {
     db = await setUpTestDatabase();
     repository = DiverRepository();
+    profileSeries = ProfileSeriesRepository();
   });
 
   tearDown(() async {
@@ -332,6 +336,12 @@ void main() {
         diveId: 'dive-b',
         computerId: 'comp-a',
       );
+      final seriesId = await profileSeries.insertSeries(
+        diveId: 'dive-b',
+        computerId: 'comp-a',
+        samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+        now: 1000,
+      );
 
       await repository.deleteDiver('diver-a');
 
@@ -339,6 +349,11 @@ void main() {
       expect(profiles, hasLength(1));
       expect(profiles.first.id, equals('profile-b'));
       expect(profiles.first.computerId, isNull);
+
+      final series = (await profileSeries.getRowsForDives([
+        'dive-b',
+      ])).firstWhere((r) => r.id == seriesId);
+      expect(series.computerId, isNull);
     });
 
     test(

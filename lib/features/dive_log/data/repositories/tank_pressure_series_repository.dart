@@ -233,6 +233,57 @@ class TankPressureSeriesRepository {
   Future<List<String>> deleteByIds(List<String> ids) =>
       ids.isEmpty ? Future.value(const []) : _delete((t) => t.id.isIn(ids));
 
+  /// Nulls `computer_id` on every series of [computerId] and restamps each
+  /// (the FK's ON DELETE SET NULL would change the rows without an hlc bump,
+  /// so peers would never learn). Returns the number of series touched.
+  Future<int> clearComputer(String computerId, {int? now}) =>
+      _setComputer(null, (t) => t.computerId.equals(computerId), now: now);
+
+  /// Diver reassignment: a computer that now belongs to [diverId] must not
+  /// stay attributed on dives the diver does not own.
+  Future<int> clearComputersOfDiverForForeignDives(
+    String diverId, {
+    int? now,
+  }) => _setComputer(
+    null,
+    (t) =>
+        t.computerId.isInQuery(
+          _db.selectOnly(_db.diveComputers)
+            ..addColumns([_db.diveComputers.id])
+            ..where(_db.diveComputers.diverId.equals(diverId)),
+        ) &
+        t.diveId.isNotInQuery(
+          _db.selectOnly(_db.dives)
+            ..addColumns([_db.dives.id])
+            ..where(_db.dives.diverId.equals(diverId)),
+        ),
+    now: now,
+  );
+
+  Future<int> _setComputer(
+    String? computerId,
+    Expression<bool> Function($TankPressureSeriesTable t) where, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(where);
+    if (ids.isEmpty) return 0;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.tankPressureSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        TankPressureSeriesCompanion(
+          computerId: Value(computerId),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
+    return ids.length;
+  }
+
   /// Re-inserts [row] verbatim, `created_at`, `updated_at` and `hlc`
   /// included: consolidation undo puts back the row it captured rather than
   /// re-encoding it. When [markPending] the row is queued for sync, which

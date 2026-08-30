@@ -431,6 +431,83 @@ class ProfileSeriesRepository {
   Future<List<String>> deleteByIds(List<String> ids) =>
       ids.isEmpty ? Future.value(const []) : _delete((t) => t.id.isIn(ids));
 
+  /// Nulls `computer_id` on every series of [computerId] and restamps each
+  /// (the FK's ON DELETE SET NULL would change the rows without an hlc bump,
+  /// so peers would never learn). Returns the number of series touched.
+  Future<int> clearComputer(String computerId, {int? now}) =>
+      _setComputer(null, (t) => t.computerId.equals(computerId), now: now);
+
+  /// Diver reassignment: a computer that now belongs to [diverId] must not
+  /// stay attributed on dives the diver does not own.
+  Future<int> clearComputersOfDiverForForeignDives(
+    String diverId, {
+    int? now,
+  }) => _setComputer(
+    null,
+    (t) =>
+        t.computerId.isInQuery(
+          _db.selectOnly(_db.diveComputers)
+            ..addColumns([_db.diveComputers.id])
+            ..where(_db.diveComputers.diverId.equals(diverId)),
+        ) &
+        t.diveId.isNotInQuery(
+          _db.selectOnly(_db.dives)
+            ..addColumns([_db.dives.id])
+            ..where(_db.dives.diverId.equals(diverId)),
+        ),
+    now: now,
+  );
+
+  /// A recreated computer takes back the null-computer series of [diveIds]
+  /// whose only computer source is the one being relinked (the legacy
+  /// `dive_profiles` relink, series twin).
+  Future<int> relinkComputer(
+    String computerId,
+    List<String> diveIds, {
+    int? now,
+  }) {
+    if (diveIds.isEmpty) return Future.value(0);
+    return _setComputer(
+      computerId,
+      (t) =>
+          t.computerId.isNull() &
+          t.diveId.isIn(diveIds) &
+          t.diveId.isInQuery(
+            _db.selectOnly(_db.diveDataSources)
+              ..addColumns([_db.diveDataSources.diveId])
+              ..where(_db.diveDataSources.sourceFormat.equals('dive_computer'))
+              ..groupBy([
+                _db.diveDataSources.diveId,
+              ], having: _db.diveDataSources.id.count().equals(1)),
+          ),
+      now: now,
+    );
+  }
+
+  Future<int> _setComputer(
+    String? computerId,
+    Expression<bool> Function($DiveProfileSeriesTable t) where, {
+    int? now,
+  }) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids(where);
+    if (ids.isEmpty) return 0;
+    await _db.transaction(() async {
+      await (_db.update(
+        _db.diveProfileSeries,
+      )..where((t) => t.id.isIn(ids))).write(
+        DiveProfileSeriesCompanion(
+          computerId: Value(computerId),
+          updatedAt: Value(nowMs),
+        ),
+      );
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
+    });
+    return ids.length;
+  }
+
   /// Raw rows of every series of [diveIds], undecoded, for snapshots that
   /// restore them verbatim through [restoreSeriesRow].
   Future<List<DiveProfileSeriesRow>> getRowsForDives(
