@@ -10,6 +10,7 @@ import 'package:submersion/features/checklists/presentation/pages/checklist_temp
 import 'package:submersion/features/dive_log/presentation/pages/dive_search_page.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
+import 'package:submersion/features/marine_life/presentation/pages/species_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
@@ -1132,6 +1133,62 @@ void main() {
       final manage = _findRouteByName(species.routes, 'speciesManage');
       expect(manage, isNotNull);
       expect(manage!.path, 'manage');
+    });
+
+    test('the species route lives inside the nav shell', () {
+      final shells = router.configuration.routes.whereType<ShellRoute>();
+      expect(shells, isNotEmpty);
+      expect(
+        shells.any(
+          (shell) => _findRouteByName(shell.routes, 'species') != null,
+        ),
+        isTrue,
+        reason:
+            'Species is a nav destination, so its page must render inside '
+            'MainScaffold rather than replacing the rail and bottom bar.',
+      );
+    });
+
+    testWidgets('the species route has no transition', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(router.configuration.routes, 'species');
+      expect(route, isNotNull);
+      expect(route!.pageBuilder, isNotNull);
+
+      final page = route.pageBuilder!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/species'),
+          matchedLocation: '/species',
+          fullPath: '/species',
+          pathParameters: const {},
+          pageKey: const ValueKey('/species'),
+        ),
+      );
+
+      expect(
+        page,
+        isA<NoTransitionPage<dynamic>>(),
+        reason:
+            '/species is a nav destination reached with go, so switching to '
+            'it must not animate the way a pushed page does.',
+      );
+      expect((page as NoTransitionPage).child, isA<SpeciesPage>());
     });
   });
 }
