@@ -121,8 +121,10 @@ class StatisticsRepository {
         TableUpdateQuery.allOf([
           TableUpdateQuery.onTable(_db.dives),
           TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveProfileSeries),
           TableUpdateQuery.onTable(_db.diveTanks),
           TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.tankPressureSeries),
           TableUpdateQuery.onTable(_db.diveEquipment),
           TableUpdateQuery.onTable(_db.equipment),
           TableUpdateQuery.onTable(_db.diveWeights),
@@ -2410,13 +2412,14 @@ class StatisticsRepository {
         signals AS (
           SELECT
             s.dive_id AS dive_id,
-            MAX(CASE WHEN p.id IS NOT NULL THEN 1 ELSE 0 END) AS has_profile,
-            MAX(CASE WHEN p.deco_type IS NOT NULL THEN 1 ELSE 0 END)
+            MAX(CASE WHEN ps.id IS NOT NULL THEN 1 ELSE 0 END) AS has_profile,
+            MAX(CASE WHEN ps.has_deco_type = 1 THEN 1 ELSE 0 END)
               AS has_deco_type,
-            MAX(CASE WHEN p.deco_type = 2 THEN 1 ELSE 0 END) AS deco_stop,
-            MAX(CASE WHEN p.ceiling > 0 THEN 1 ELSE 0 END) AS positive_ceiling
+            MAX(CASE WHEN ps.has_deco_stop = 1 THEN 1 ELSE 0 END) AS deco_stop,
+            MAX(CASE WHEN ps.has_positive_ceiling = 1 THEN 1 ELSE 0 END)
+              AS positive_ceiling
           FROM scoped s
-          LEFT JOIN dive_profiles p ON p.dive_id = s.dive_id
+          LEFT JOIN dive_profile_series ps ON ps.dive_id = s.dive_id
           GROUP BY s.dive_id
         ),
         stop_events AS (

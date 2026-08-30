@@ -2247,7 +2247,13 @@ class DiveRepository {
             .customSelect(
               sql,
               variables: [...safetyCountArgs, ...args],
-              readsFrom: {_db.dives, _db.diveSites, _db.diveSafetyFindings},
+              readsFrom: {
+                _db.dives,
+                _db.diveSites,
+                _db.diveSafetyFindings,
+                _db.diveProfileSeries,
+                _db.diveProfileEvents,
+              },
             )
             .get();
 
@@ -2312,7 +2318,12 @@ class DiveRepository {
             .customSelect(
               sql,
               variables: args,
-              readsFrom: {_db.dives, _db.diveSites},
+              readsFrom: {
+                _db.dives,
+                _db.diveSites,
+                _db.diveProfileSeries,
+                _db.diveProfileEvents,
+              },
             )
             .get();
 
@@ -2361,7 +2372,11 @@ class DiveRepository {
             .customSelect(
               'SELECT COUNT(*) AS count FROM dives d $whereClause',
               variables: args,
-              readsFrom: {_db.dives},
+              readsFrom: {
+                _db.dives,
+                _db.diveProfileSeries,
+                _db.diveProfileEvents,
+              },
             )
             .getSingle();
         return result.read<int>('count');
@@ -2383,7 +2398,7 @@ class DiveRepository {
   /// classify dives exactly as the paginated SQL list does.
   ///
   /// Only called while the deco filter is active, which keeps the scan over
-  /// `dive_profiles` off the default dive-list load.
+  /// `dive_profile_series` off the default dive-list load.
   // stats-scope-exempt: backs a view-filter axis; consumers apply the scope themselves
   Future<Set<String>> getDiveIdsWithDecoSignal({
     required bool wantDeco,
@@ -2406,7 +2421,11 @@ class DiveRepository {
               'SELECT d.id AS id FROM dives d '
               'WHERE ${whereClauses.join(' AND ')}',
               variables: args,
-              readsFrom: {_db.dives, _db.diveProfiles, _db.diveProfileEvents},
+              readsFrom: {
+                _db.dives,
+                _db.diveProfileSeries,
+                _db.diveProfileEvents,
+              },
             )
             .get();
         return rows.map((r) => r.read<String>('id')).toSet();
@@ -4784,8 +4803,8 @@ class DiveRepository {
 
   /// Lightweight trailing-window query for the flying-after-diving
   /// classifier: end time (exit time, else entry/date + runtime) plus a
-  /// had-deco flag derived from the recorded profile (any sample with
-  /// deco_type = 2 or a positive ceiling).
+  /// had-deco flag derived from the recorded profile series (a recorded
+  /// deco stop or a positive ceiling on any series of the dive).
   // stats-scope-exempt: flying-after-diving safety, an excluded dive still off-gassed
   Future<List<NoFlyDiveInput>> getNoFlyDiveInputs({
     required DateTime since,
@@ -4799,8 +4818,9 @@ class DiveRepository {
             'COALESCE(d.exit_time, '
             'COALESCE(d.entry_time, d.dive_date_time) '
             '+ COALESCE(d.runtime, 0) * 1000) AS end_ms, '
-            'EXISTS(SELECT 1 FROM dive_profiles p WHERE p.dive_id = d.id '
-            'AND (p.deco_type = 2 OR p.ceiling > 0)) AS had_deco '
+            'EXISTS(SELECT 1 FROM dive_profile_series s WHERE s.dive_id = d.id '
+            'AND (s.has_deco_stop = 1 OR s.has_positive_ceiling = 1)) '
+            'AS had_deco '
             'FROM dives d '
             'WHERE COALESCE(d.exit_time, '
             'COALESCE(d.entry_time, d.dive_date_time) '
@@ -4810,7 +4830,7 @@ class DiveRepository {
               Variable(since.millisecondsSinceEpoch),
               if (diverId != null) Variable(diverId),
             ],
-            readsFrom: {_db.dives, _db.diveProfiles},
+            readsFrom: {_db.dives, _db.diveProfileSeries},
           )
           .get();
       return [
