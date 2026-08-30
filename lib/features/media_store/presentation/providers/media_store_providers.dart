@@ -109,6 +109,37 @@ final FutureProvider<void> mediaTransferQueueReclaimProvider =
       await ref.read(mediaTransferQueueRepositoryProvider).requeueStale();
     });
 
+/// The on-disk root of the media cache: originals, thumbs, renditions, plus
+/// the staging and transcode scratch directories.
+Future<Directory> mediaCacheRoot() async {
+  final support = await getApplicationSupportDirectory();
+  return Directory(p.join(support.path, 'Submersion', 'media_cache'));
+}
+
+/// Brings the media cache back inside its LRU caps once per process.
+///
+/// [MediaCacheStore.evictIfNeeded] is public but was only ever called from
+/// inside `put()`, so eviction needed a write to happen. A store that went
+/// over cap and then went idle stayed over cap indefinitely, waiting on a
+/// download that might never come. Running the same pass on the way up means
+/// a library that has stopped fetching still settles back under budget.
+///
+/// Cached like [mediaTransferQueueReclaimProvider] so a runtime rebuild does
+/// not repeat it. Unlike that one it is deliberately NOT awaited by the
+/// runtime: reclaim must precede any drain for correctness, whereas eviction
+/// is housekeeping and must never delay one.
+// no-tick: recomputing is the bug, not the fix. The cached result is what
+// keeps this to one pass per process.
+final FutureProvider<void> mediaCacheEvictionProvider = FutureProvider<void>((
+  ref,
+) async {
+  final cache = MediaCacheStore(
+    database: LocalCacheDatabaseService.instance.database,
+    root: await mediaCacheRoot(),
+  );
+  await cache.evictIfNeeded();
+});
+
 /// Deletion entry point for UI flows: enqueue-before-delete per the
 /// orphan-prevention spec (5.2). The queue and runtime are read lazily
 /// (never watched) so consumer widget tests without a media store runtime
@@ -372,10 +403,9 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       final store = builtStore;
       if (store == null) return null;
 
-      final supportDir = await getApplicationSupportDirectory();
       final cache = MediaCacheStore(
         database: LocalCacheDatabaseService.instance.database,
-        root: Directory(p.join(supportDir.path, 'Submersion', 'media_cache')),
+        root: await mediaCacheRoot(),
       );
       final resolver = MediaStoreResolver(store: store, cache: cache);
 
@@ -438,6 +468,11 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       // cannot reclaim a row a still-running worker from the previous runtime
       // owns; the cache makes it run only once.
       await ref.read(mediaTransferQueueReclaimProvider.future);
+
+      // Fire-and-forget: housekeeping must not delay the drain below. Its
+      // own errors are contained by the provider, and the next launch simply
+      // runs it again.
+      unawaited(ref.read(mediaCacheEvictionProvider.future));
 
       final connectivitySub = network.changes.listen((kind) {
         if (kind != NetworkKind.offline) unawaited(worker.drain());
