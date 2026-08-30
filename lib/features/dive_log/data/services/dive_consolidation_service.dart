@@ -6,6 +6,8 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_consolidation_builder.dart';
 
@@ -38,6 +40,8 @@ class DiveConsolidationService {
   final _uuid = const Uuid();
   final _builder = const DiveConsolidationBuilder();
   final _sync = SyncRepository();
+  final _profileSeries = ProfileSeriesRepository();
+  final _tankSeries = TankPressureSeriesRepository();
 
   AppDatabase get _db => DatabaseService.instance.database;
 
@@ -85,14 +89,11 @@ class DiveConsolidationService {
               (t) => t.diveId.equals(targetDiveId) & t.computerId.isNull(),
             ))
             .write(DiveTanksCompanion(computerId: Value(targetRow.computerId)));
-        await (_db.update(_db.tankPressureProfiles)..where(
-              (t) => t.diveId.equals(targetDiveId) & t.computerId.isNull(),
-            ))
-            .write(
-              TankPressureProfilesCompanion(
-                computerId: Value(targetRow.computerId),
-              ),
-            );
+        await _tankSeries.stampComputerWhereNull(
+          targetDiveId,
+          targetRow.computerId!,
+          now: now,
+        );
         await (_db.update(_db.diveProfileEvents)..where(
               (t) => t.diveId.equals(targetDiveId) & t.computerId.isNull(),
             ))
@@ -285,52 +286,36 @@ class DiveConsolidationService {
           }
         }
 
-        // Profiles: copy every column, re-based, attributed, never primary.
-        await _db.batch((batch) {
-          for (final row in snapshot.profileRows.where(
-            (r) => r.diveId == secondary.id,
-          )) {
-            batch.insert(
-              _db.diveProfiles,
-              row
-                  .toCompanion(false)
-                  .copyWith(
-                    id: Value(_uuid.v4()),
-                    diveId: Value(targetDiveId),
-                    timestamp: Value(row.timestamp + offset),
-                    computerId: Value(row.computerId ?? secRow.computerId),
-                    // Re-point at the target's copy of the owning source
-                    // (issue #1149). Without this the copied samples would
-                    // reference a source row on the now-deleted secondary,
-                    // and two file-imported sources -- both null computerId
-                    // -- would be indistinguishable on the merged dive.
-                    sourceId: Value(
-                      sourceIdMap[row.sourceId] ?? sourceIdMap[null],
-                    ),
-                    isPrimary: const Value(false),
-                  ),
-            );
-          }
-          // Tank pressures: re-based, remapped, attributed.
-          for (final row in snapshot.tankPressureRows.where(
-            (r) => r.diveId == secondary.id,
-          )) {
-            final mappedTank = tankIdMap[row.tankId];
-            if (mappedTank == null) continue;
-            batch.insert(
-              _db.tankPressureProfiles,
-              row
-                  .toCompanion(false)
-                  .copyWith(
-                    id: Value(_uuid.v4()),
-                    diveId: Value(targetDiveId),
-                    tankId: Value(mappedTank),
-                    timestamp: Value(row.timestamp + offset),
-                    computerId: Value(secRow.computerId),
-                  ),
-            );
-          }
-        });
+        // Profiles: copy every series, re-based, attributed, never primary.
+        // Re-points at the target's copy of the owning source (issue
+        // #1149): without this the copied samples would reference a source
+        // row on the now-deleted secondary, and two file-imported sources
+        // -- both null computerId -- would be indistinguishable on the
+        // merged dive. Read before the delete below removes the secondary
+        // dive (and, with it, ownership of these rows).
+        for (final s in await _profileSeries.getSeriesForDive(secondary.id)) {
+          if (s.samples.isEmpty) continue;
+          await _profileSeries.insertSeries(
+            diveId: targetDiveId,
+            computerId: s.computerId ?? secRow.computerId,
+            sourceId: sourceIdMap[s.sourceId] ?? sourceIdMap[null],
+            isPrimary: false,
+            samples: [for (final p in s.samples) p.shiftedBy(offset)],
+            now: now,
+          );
+        }
+        // Tank pressures: re-based, remapped, attributed.
+        for (final s in await _tankSeries.getSeriesForDive(secondary.id)) {
+          final mappedTank = tankIdMap[s.tankId];
+          if (mappedTank == null || s.samples.isEmpty) continue;
+          await _tankSeries.insertSeries(
+            diveId: targetDiveId,
+            tankId: mappedTank,
+            computerId: secRow.computerId,
+            samples: [for (final p in s.samples) p.shiftedBy(offset)],
+            now: now,
+          );
+        }
 
         // Existing profile events, re-based, tank text-refs remapped, PLUS
         // computerId attribution (DiveMergeService.apply step 5 has no
@@ -668,6 +653,8 @@ class DiveConsolidationService {
         'tankPressureProfiles': {
           for (final r in snapshot.tankPressureRows) r.id,
         },
+        'diveProfileSeries': {for (final r in snapshot.profileSeriesRows) r.id},
+        'tankPressureSeries': {for (final r in snapshot.tankSeriesRows) r.id},
         'diveDataSources': {for (final r in snapshot.dataSourceRows) r.id},
         'diveTags': {for (final r in snapshot.tagRows) r.id},
         'diveBuddies': {for (final r in snapshot.buddyRows) r.id},
@@ -710,6 +697,13 @@ class DiveConsolidationService {
             _db.tankPressureProfiles,
           )..where((t) => t.diveId.equals(mergedId))).get())
             r.id,
+        ],
+        'diveProfileSeries': [
+          for (final r in await _profileSeries.getRowsForDives([mergedId]))
+            r.id,
+        ],
+        'tankPressureSeries': [
+          for (final r in await _tankSeries.getRowsForDives([mergedId])) r.id,
         ],
         'diveDataSources': [
           for (final r in await (_db.select(
@@ -788,6 +782,18 @@ class DiveConsolidationService {
         batch.deleteWhere(_db.gasSwitches, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(
           _db.tankPressureProfiles,
+          (t) => t.diveId.equals(mergedId),
+        );
+        // Raw deletes on purpose: the tombstone loop above already logged
+        // the difference between the current (post-consolidation) rows and
+        // the snapshot, and restoreSeriesRow below removes the tombstone of
+        // any row it puts back.
+        batch.deleteWhere(
+          _db.diveProfileSeries,
+          (t) => t.diveId.equals(mergedId),
+        );
+        batch.deleteWhere(
+          _db.tankPressureSeries,
           (t) => t.diveId.equals(mergedId),
         );
         batch.deleteWhere(
@@ -873,6 +879,15 @@ class DiveConsolidationService {
           );
         }
       });
+      // Series restored after the batch above: dataSourceRows and diveTanks
+      // (inserted earlier) are the series' FK parents and must be back
+      // first.
+      for (final r in snapshot.profileSeriesRows) {
+        await _profileSeries.restoreSeriesRow(r, now: now);
+      }
+      for (final r in snapshot.tankSeriesRows) {
+        await _tankSeries.restoreSeriesRow(r, now: now);
+      }
       for (final r in snapshot.weightRows) {
         await _db
             .into(_db.diveWeights)

@@ -74,32 +74,10 @@ void main() {
   }
 
   var rowCounter = 0;
-  Future<String> insertProfileRow(
-    String diveId,
-    String? computerId, {
-    required bool isPrimary,
-    int timestamp = 0,
-    double depth = 10.0,
-  }) async {
-    final id = 'prof-${rowCounter++}';
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            computerId: Value(computerId),
-            isPrimary: Value(isPrimary),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-          ),
-        );
-    return id;
-  }
 
-  /// The series twin of [insertProfileRow]: one single-sample series per
-  /// call, for tests exercising the split writer, which now reads and
-  /// writes series rows instead of legacy `dive_profiles` rows.
+  /// One single-sample series per call, for tests exercising the split
+  /// writer, which now reads and writes series rows instead of legacy
+  /// `dive_profiles` rows.
   Future<String> insertProfileSeriesRow(
     String diveId,
     String? computerId, {
@@ -383,9 +361,19 @@ void main() {
     () async {
       await insertDive('dive-1', computerId: 'dc-a');
       await insertDive('dive-2', computerId: 'dc-b');
-      await insertProfileRow('dive-1', null, isPrimary: true, depth: 21.7);
-      await insertProfileRow('dive-2', null, isPrimary: true, depth: 18.3);
-      await insertProfileRow(
+      await insertProfileSeriesRow(
+        'dive-1',
+        null,
+        isPrimary: true,
+        depth: 21.7,
+      );
+      await insertProfileSeriesRow(
+        'dive-2',
+        null,
+        isPrimary: true,
+        depth: 18.3,
+      );
+      await insertProfileSeriesRow(
         'dive-2',
         null,
         isPrimary: true,
@@ -409,12 +397,12 @@ void main() {
         sourceId: secondarySource.id,
       );
 
-      final newProfiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(newDiveId))).get();
+      final newProfiles = await profileSeries.getSeriesForDive(newDiveId);
       expect(newProfiles.length, 2);
       expect(
-        newProfiles.map((p) => p.depth).reduce((a, b) => a > b ? a : b),
+        newProfiles
+            .map((s) => s.samples.single.depth)
+            .reduce((a, b) => a > b ? a : b),
         18.3,
       );
       final newDive = await (db.select(

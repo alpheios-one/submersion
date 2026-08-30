@@ -3,9 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/data/services/dive_split_service.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 
@@ -601,39 +603,31 @@ void main() {
         const DivesCompanion(computerId: Value('comp-s')),
       );
 
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'tp-t1',
-              diveId: targetId,
-              tankId: 'tank-t1',
-              timestamp: 60,
-              pressure: 190,
-            ),
-          );
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'tp-s1',
-              diveId: secondaryId,
-              tankId: 'tank-s1',
-              timestamp: 60,
-              pressure: 195,
-            ),
-          );
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'tp-s2',
-              diveId: secondaryId,
-              tankId: 'tank-s2',
-              timestamp: 60,
-              pressure: 195,
-            ),
-          );
+      // Single-sample tank pressure series, the writer's twin of the legacy
+      // TankPressureProfilesCompanion inserts this replaces: computerId
+      // left null, matching what the legacy rows carried before the fold
+      // under test stamps them.
+      await TankPressureSeriesRepository().insertSeries(
+        id: 'tp-t1',
+        diveId: targetId,
+        tankId: 'tank-t1',
+        samples: const [TankPressureSample(timestamp: 60, pressure: 190)],
+        now: 1000,
+      );
+      await TankPressureSeriesRepository().insertSeries(
+        id: 'tp-s1',
+        diveId: secondaryId,
+        tankId: 'tank-s1',
+        samples: const [TankPressureSample(timestamp: 60, pressure: 195)],
+        now: 1000,
+      );
+      await TankPressureSeriesRepository().insertSeries(
+        id: 'tp-s2',
+        diveId: secondaryId,
+        tankId: 'tank-s2',
+        samples: const [TankPressureSample(timestamp: 60, pressure: 195)],
+        now: 1000,
+      );
 
       await db
           .into(db.diveProfileEvents)
@@ -655,13 +649,16 @@ void main() {
     }
 
     /// Asserts referential dive-locality: no tank_pressure_profiles,
-    /// dive_profile_events, or gas_switches row on [diveId] references a
-    /// dive_tanks row that lives on a different dive.
+    /// tank_pressure_series, dive_profile_events, or gas_switches row on
+    /// [diveId] references a dive_tanks row that lives on a different dive.
     Future<void> assertNoCrossDiveTankRefs(String diveId) async {
       final tankIds = (await (db.select(
         db.diveTanks,
       )..where((t) => t.diveId.equals(diveId))).get()).map((t) => t.id).toSet();
 
+      // Legacy table: the consolidation/split writers under test never
+      // touch it, so it stays empty; kept alongside the series check below
+      // rather than removed.
       final pressures = await (db.select(
         db.tankPressureProfiles,
       )..where((t) => t.diveId.equals(diveId))).get();
@@ -671,6 +668,18 @@ void main() {
           contains(p.tankId),
           reason:
               'tank_pressure_profiles row ${p.id} on dive $diveId '
+              'references tank ${p.tankId}, which is not on this dive',
+        );
+      }
+
+      final pressureSeries = await TankPressureSeriesRepository()
+          .getSeriesForDive(diveId);
+      for (final p in pressureSeries) {
+        expect(
+          tankIds,
+          contains(p.tankId),
+          reason:
+              'tank_pressure_series row ${p.id} on dive $diveId '
               'references tank ${p.tankId}, which is not on this dive',
         );
       }
@@ -757,10 +766,9 @@ void main() {
       final sharedTank = originalTanks.firstWhere((t) => t.id == 'tank-t1');
       expect(sharedTank.computerId, equals('comp-t'));
 
-      // -- Tank pressure profiles ---------------------------------------
-      final newDivePressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals(newDiveId))).get();
+      // -- Tank pressure series ------------------------------------------
+      final newDivePressures = await TankPressureSeriesRepository()
+          .getSeriesForDive(newDiveId);
       expect(newDivePressures, hasLength(2));
       expect(newDivePressures.every((p) => p.computerId == 'comp-s'), isTrue);
       // One curve points at the clone (it lived on the shared tank), the
@@ -772,9 +780,8 @@ void main() {
 
       // The original dive keeps only its own computer's pressure curve on
       // the shared tank.
-      final originalPressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals('dive-t'))).get();
+      final originalPressures = await TankPressureSeriesRepository()
+          .getSeriesForDive('dive-t');
       expect(originalPressures, hasLength(1));
       expect(originalPressures.single.tankId, equals('tank-t1'));
       expect(originalPressures.single.computerId, equals('comp-t'));
@@ -856,13 +863,12 @@ void main() {
       expect(clone.startPressure, equals(200.0));
       expect(clone.endPressure, equals(100.0));
 
-      // -- Tank pressure profiles ---------------------------------------
-      // comp-s's pressure rows stay on the original dive; the one that
+      // -- Tank pressure series ------------------------------------------
+      // comp-s's pressure series stay on the original dive; the one that
       // lived on the shared tank still points at tank-t1, which is
       // still on that dive.
-      final originalPressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals('dive-t'))).get();
+      final originalPressures = await TankPressureSeriesRepository()
+          .getSeriesForDive('dive-t');
       expect(originalPressures, hasLength(2));
       expect(originalPressures.every((p) => p.computerId == 'comp-s'), isTrue);
       final stayedOnShared = originalPressures.firstWhere(
@@ -870,11 +876,10 @@ void main() {
       );
       expect(stayedOnShared.computerId, equals('comp-s'));
 
-      // comp-t's own pressure row moves to the new dive, re-pointed at
+      // comp-t's own pressure series moves to the new dive, re-pointed at
       // the clone rather than the shared tank it used to live on.
-      final newDivePressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals(newDiveId))).get();
+      final newDivePressures = await TankPressureSeriesRepository()
+          .getSeriesForDive(newDiveId);
       expect(newDivePressures, hasLength(1));
       expect(newDivePressures.single.computerId, equals('comp-t'));
       expect(newDivePressures.single.tankId, equals(clone.id));
