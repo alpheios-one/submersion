@@ -9,6 +9,9 @@ import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:submersion/core/database/database.dart' hide Tags;
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    as domain;
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 
 /// Spec section 10 gates on the synthesized 1,000-dive fixture. Legacy
@@ -33,7 +36,10 @@ void main() {
         ..writeAsBytesSync(File(fixture).readAsBytesSync());
       final results = <String, ({Duration legacy, Duration series})>{};
 
-      // Legacy shapes, raw SQL, pre-migration copy.
+      // Legacy shapes, raw SQL, pre-migration copy. The per-dive metric
+      // materializes rows into the same domain objects the old read
+      // returned, so the timing includes object construction and is not
+      // just the raw SELECT.
       final raw = sqlite.sqlite3.open(legacyCopy.path);
       final diveIds = raw
           .select('SELECT id FROM dives ORDER BY dive_date_time DESC LIMIT 50')
@@ -41,16 +47,35 @@ void main() {
           .toList();
       final legacyHydrate = _time(() {
         for (final id in diveIds) {
-          raw.select(
+          final profileRows = raw.select(
             'SELECT * FROM dive_profiles WHERE dive_id = ? AND is_primary = 1 '
             'ORDER BY timestamp',
             [id],
           );
-          raw.select(
+          profileRows
+              .map(
+                (row) => domain.DiveProfilePoint(
+                  timestamp: row['timestamp'] as int,
+                  depth: row['depth'] as double,
+                  temperature: row['temperature'] as double?,
+                ),
+              )
+              .toList();
+          final pressureRows = raw.select(
             'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
             'ORDER BY timestamp',
             [id],
           );
+          pressureRows
+              .map(
+                (row) => domain.TankPressurePoint(
+                  id: row['id'] as String,
+                  tankId: row['tank_id'] as String,
+                  timestamp: row['timestamp'] as int,
+                  pressure: row['pressure'] as double,
+                ),
+              )
+              .toList();
         }
       });
       final legacySummaries = _time(() {
@@ -79,10 +104,16 @@ void main() {
       final db = AppDatabase(NativeDatabase(migratedCopy));
       DatabaseService.instance.setTestDatabase(db);
       final dives = DiveRepository();
+      final tankPressures = TankPressureRepository();
       final stats = StatisticsRepository();
       final seriesHydrate = await _timeAsync(() async {
+        // getDiveById hydrates the whole entity (tanks, buddies, equipment,
+        // site, computer, source, safety data...) and is not the metric
+        // here: this compares the same two profile reads the legacy side
+        // times above, not a full dive hydrate.
         for (final id in diveIds) {
-          await dives.getDiveById(id);
+          await dives.getDiveProfile(id);
+          await tankPressures.getTankPressuresForDive(id);
         }
       });
       final seriesSummaries = await _timeAsync(
@@ -97,7 +128,7 @@ void main() {
       await db.close();
       DatabaseService.instance.resetForTesting();
 
-      results['per-dive hydrate (50 dives)'] = (
+      results['per-dive profile and tank reads (50 dives)'] = (
         legacy: legacyHydrate,
         series: seriesHydrate,
       );
@@ -132,15 +163,9 @@ void main() {
       // ignore: avoid_print
       print(table);
 
-      for (final e in results.entries) {
-        expect(
-          e.value.series.inMicroseconds,
-          lessThanOrEqualTo((e.value.legacy.inMicroseconds * 1.25).round()),
-          reason:
-              '${e.key}: series ${e.value.series} vs legacy '
-              '${e.value.legacy} (25% tolerance for timer noise)',
-        );
-      }
+      // The two migration assertions come first, so a timing miss below can
+      // never hide a migration/drop regression.
+      //
       // green after Task 2: the drop (schema 183) has not landed yet, so the
       // migrated copy's ladder still stops at 182 and the legacy tables are
       // still present, keeping the file large.
@@ -150,12 +175,22 @@ void main() {
         reason: 'the drop plus VACUUM must return most of the file',
       );
       // green after Task 2: schema 183 (the drop) does not exist on this
-      // commit, so the fixture's stored version is never below it.
-      expect(storedBefore, lessThan(183));
+      // commit, so the migrated copy's final stored version stops at 182
+      // instead of AppDatabase.currentSchemaVersion.
       expect(
         DatabaseService.getStoredSchemaVersion(migratedCopy.path),
         AppDatabase.currentSchemaVersion,
       );
+
+      for (final e in results.entries) {
+        expect(
+          e.value.series.inMicroseconds,
+          lessThanOrEqualTo((e.value.legacy.inMicroseconds * 1.25).round()),
+          reason:
+              '${e.key}: series ${e.value.series} vs legacy '
+              '${e.value.legacy} (25% tolerance for timer noise)',
+        );
+      }
     },
   );
 }

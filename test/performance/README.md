@@ -89,3 +89,4 @@ once with `dart run tools/synth_fixture.dart <source.db> <out.db> --replicas
 run the gate with `SUBMERSION_BENCH_FIXTURE=<out.db> flutter test
 --run-skipped --tags performance test/performance/profile_series_benchmark_test.dart`.
 The test skips with a message when `SUBMERSION_BENCH_FIXTURE` is unset.
+The per-dive row measures the two profile reads (dive profile samples and tank pressure samples), not a full dive entity hydrate.
