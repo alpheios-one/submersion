@@ -4,7 +4,10 @@ import 'package:submersion/core/database/database.dart';
 
 /// Minimal pre-v181 shape: dive_computers and dive_tanks without the
 /// transmitters table or the source/sensor_ref columns, stamped at v180 so
-/// the upgrade to 181 runs.
+/// the upgrade to 181 runs. equipment and tank_presets are included (empty)
+/// because transmitters references both -- _assertTransmittersSchema
+/// correctly no-ops without them, same as every other stripped-fixture
+/// migration test in this file.
 NativeDatabase _dbAt180() {
   return NativeDatabase.memory(
     setup: (rawDb) {
@@ -15,6 +18,16 @@ NativeDatabase _dbAt180() {
         )
       ''');
       rawDb.execute("INSERT INTO dive_computers (id) VALUES ('dc-1')");
+      rawDb.execute('''
+        CREATE TABLE equipment (
+          id TEXT NOT NULL PRIMARY KEY
+        )
+      ''');
+      rawDb.execute('''
+        CREATE TABLE tank_presets (
+          id TEXT NOT NULL PRIMARY KEY
+        )
+      ''');
       rawDb.execute('''
         CREATE TABLE dive_tanks (
           id TEXT NOT NULL PRIMARY KEY,

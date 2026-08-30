@@ -5635,7 +5635,21 @@ class AppDatabase extends _$AppDatabase {
 
   /// v181: the transmitter (air-integration channel) registry table (issue
   /// #1365). Idempotent for onUpgrade + beforeOpen backstop use.
+  ///
+  /// Guarded on dive_computers, equipment and tank_presets all existing:
+  /// transmitters references all three, so with foreign_keys=ON the create
+  /// cannot even prepare when one is absent. Minimal migration-test fixtures
+  /// upgrade an old schema without the full table set and legitimately lack
+  /// them -- skipping creation there is correct, since nothing can reference
+  /// the (also absent) transmitters table either. Real databases always have
+  /// all three, so they always get it. Mirrors the guarded pre-dive-template
+  /// seed above.
   Future<void> _assertTransmittersSchema() async {
+    final requiredTables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_computers', 'equipment', 'tank_presets')",
+    ).get();
+    if (requiredTables.length < 3) return;
     await createMigrator().createTable(transmitters);
   }
 
@@ -5665,6 +5679,10 @@ class AppDatabase extends _$AppDatabase {
   /// though the guard would also make it idempotent -- onUpgrade only, not a
   /// beforeOpen backstop, to keep the ladder's one-time passes in one place.
   Future<void> _backfillDiveTankSourceForImportedRows() async {
+    final cols = await customSelect("PRAGMA table_info('dive_tanks')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('source') || !names.contains('computer_id')) return;
     await customStatement(
       "UPDATE dive_tanks SET source = 'dc_import' "
       'WHERE source IS NULL AND computer_id IS NOT NULL',

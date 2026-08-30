@@ -106,6 +106,7 @@ class SyncRepository {
     'emergencyChambers': (table: 'emergency_chambers', pk: 'id'),
     'incidents': (table: 'incidents', pk: 'id'),
     'mediaSmartAlbums': (table: 'media_smart_albums', pk: 'id'),
+    'transmitters': (table: 'transmitters', pk: 'id'),
   };
 
   // ============================================================================
