@@ -695,13 +695,10 @@ class DiveComputerRepository {
   Future<List<String>> getComputerIdsForDive(String diveId) async {
     try {
       final series = await _profileSeries.getSeriesForDive(diveId);
-      if (series.isNotEmpty) {
-        return {
-          for (final s in series)
-            if (s.computerId != null) s.computerId!,
-        }.toList();
-      }
-      return const <String>[];
+      return {
+        for (final s in series)
+          if (s.computerId != null) s.computerId!,
+      }.toList();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get computer ids for dive: $diveId',
@@ -759,11 +756,8 @@ class DiveComputerRepository {
   Future<String?> getPrimaryComputerId(String diveId) async {
     try {
       final series = await _profileSeries.getSeriesForDive(diveId);
-      if (series.isNotEmpty) {
-        for (final s in series) {
-          if (s.isPrimary && s.computerId != null) return s.computerId;
-        }
-        return null;
+      for (final s in series) {
+        if (s.isPrimary && s.computerId != null) return s.computerId;
       }
       return null;
     } catch (e, stackTrace) {
@@ -996,8 +990,8 @@ class DiveComputerRepository {
   ///
   /// Used by the replaceSource path so that a subsequent [importProfile] call
   /// inserts fresh data instead of short-circuiting. Also clears per-dive
-  /// derived tables (events, gas switches, tank pressure profiles) that lack
-  /// a computer_id column and would otherwise accumulate stale rows.
+  /// derived rows (events, gas switches, tank pressure series) that lack a
+  /// computer_id column and would otherwise accumulate stale rows.
   Future<void> clearSourceAndProfiles({
     required String diveId,
     required String computerId,
@@ -1865,8 +1859,8 @@ class DiveComputerRepository {
     );
   }
 
-  /// Maps a parsed profile point to the codec's sample type. The legacy row
-  /// left `pressure` null; per-sample pressure lives in the tank series.
+  /// Maps a parsed profile point to the codec's sample type. Per-sample
+  /// pressure is not carried here; it lives in the tank series.
   static codec.ProfileSample _sampleFromPointData(ProfilePointData p) =>
       codec.ProfileSample(
         timestamp: p.timestamp,

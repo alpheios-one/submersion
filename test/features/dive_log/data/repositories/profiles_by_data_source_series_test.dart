@@ -7,8 +7,8 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 import '../../../../helpers/test_database.dart';
 
-/// Series path of getProfilesByDataSource; mirrors the cases the legacy
-/// profiles_by_data_source_test pins.
+/// getProfilesByDataSource built from richer, multi-sample series; mirrors
+/// the per-sample-series cases profiles_by_data_source_test pins.
 void main() {
   late AppDatabase db;
   late DiveRepository dives;
@@ -150,7 +150,20 @@ void main() {
     expect(only.points.single.depth, 1.0);
   });
 
-  test('no series and no legacy rows gives an empty map', () async {
+  test('no series and no data sources gives an empty map', () async {
     expect(await dives.getProfilesByDataSource('dive-1'), isEmpty);
   });
+
+  test(
+    'sources exist but carry no series: one empty entry per source',
+    () async {
+      await source('src-1', 'comp-1', primary: true);
+      await source('src-2', 'comp-2');
+      final bySource = await dives.getProfilesByDataSource('dive-1');
+      expect(bySource.keys.toSet(), {'src-1', 'src-2'});
+      expect(bySource['src-1']!.points, isEmpty);
+      expect(bySource['src-2']!.points, isEmpty);
+      expect(bySource['src-1']!.isEdited, isFalse);
+    },
+  );
 }

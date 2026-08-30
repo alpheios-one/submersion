@@ -7,9 +7,9 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 import '../../../../helpers/test_database.dart';
 
-/// The series-first read paths. Fixtures are written through the series
-/// repository; the legacy-row fixtures in the neighbouring test files keep
-/// covering the fallback branch until plan 2e removes it.
+/// The series-only read paths. Every profile read comes from
+/// `dive_profile_series` rows; a dive with none reads back empty, with no
+/// row-table fallback.
 void main() {
   late AppDatabase db;
   late DiveRepository dives;
@@ -194,11 +194,60 @@ void main() {
     expect(merged.map((p) => p.depth), [1.0, 2.0]);
   });
 
-  test('a dive with no series reads as an empty profile', () async {
+  test('a dive with no series reads as an empty profile, and a tank with no '
+      'series has null start/end pressure', () async {
+    await db
+        .into(db.diveTanks)
+        .insert(DiveTanksCompanion.insert(id: 'tank-a', diveId: 'dive-1'));
     expect(await dives.getDiveProfile('dive-1'), isEmpty);
     expect(await dives.getMergedProfile('dive-1'), isEmpty);
-    expect((await dives.getDiveById('dive-1'))!.profile, isEmpty);
+    final dive = await dives.getDiveById('dive-1');
+    expect(dive!.profile, isEmpty);
+    final tankA = dive.tanks.single;
+    expect(tankA.startPressure, isNull);
+    expect(tankA.endPressure, isNull);
   });
+
+  test('a dive with no water_temp derives it from the minimum finite sample '
+      'temperature in the primary series', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0, temperature: 24.0),
+        ProfileSample(timestamp: 10, depth: 5.0, temperature: 18.5),
+        ProfileSample(timestamp: 20, depth: 3.0, temperature: 20.0),
+      ],
+      now: now,
+    );
+    final dive = await dives.getDiveById('dive-1');
+    expect(dive!.waterTemp, 18.5);
+  });
+
+  test(
+    'an explicit water_temp is kept even with colder sample temperatures',
+    () async {
+      await db
+          .into(db.dives)
+          .insert(
+            const DivesCompanion(
+              id: Value('dive-2'),
+              diveDateTime: Value(now),
+              waterTemp: Value(22.0),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
+      await series.insertSeries(
+        diveId: 'dive-2',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 1.0, temperature: 12.0),
+        ],
+        now: now,
+      );
+      final dive = await dives.getDiveById('dive-2');
+      expect(dive!.waterTemp, 22.0);
+    },
+  );
 
   test('the series is what every profile read returns', () async {
     await series.insertSeries(

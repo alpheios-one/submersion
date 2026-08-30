@@ -128,8 +128,8 @@ class DiveRepository {
   /// provider listening for a change -- the list, stats, dashboard, sites,
   /// trips, buddies, and (most expensively) the per-dive detail providers that
   /// re-run the Buhlmann analysis in [profileAnalysisProvider]. That is 20-30s
-  /// of UI stutter and, while `dive_profiles` rows are mid-rewrite, transiently
-  /// blanks the deco/tissue/O2 cards. Debouncing collapses a write burst into a
+  /// of UI stutter and, while `dive_profile_series` rows are mid-rewrite,
+  /// transiently blanks the deco/tissue/O2 cards. Debouncing collapses a write burst into a
   /// single tick that fires only once writes go quiet, so listeners refresh once
   /// on the SETTLED DB state instead of once per intermediate commit.
   static const changeTickDebounce = Duration(milliseconds: 300);
@@ -852,21 +852,17 @@ class DiveRepository {
 
   /// Get profile data for a single dive (for lazy loading in list views).
   ///
-  /// Series-first: a dive with series rows is read from them (primary series
-  /// only, interleaved by timestamp); a dive with none is read from the
-  /// legacy row table until plan 2e removes it.
+  /// Reads the dive's primary series only, interleaved by timestamp; a dive
+  /// with no series returns an empty list.
   Future<List<domain.DiveProfilePoint>> getDiveProfile(String diveId) async {
     return await PerfTimer.measure('getDiveProfile', () async {
       try {
         final List<ProfileSeries> series = await _profileSeries
             .getSeriesForDive(diveId);
-        if (series.isNotEmpty) {
-          return mergeSeriesPoints([
-            for (final s in series)
-              if (s.isPrimary) s,
-          ]);
-        }
-        return const <domain.DiveProfilePoint>[];
+        return mergeSeriesPoints([
+          for (final s in series)
+            if (s.isPrimary) s,
+        ]);
       } catch (e, stackTrace) {
         _log.error(
           'Failed to get profile for dive: $diveId',
@@ -1012,15 +1008,82 @@ class DiveRepository {
   /// profile exists, the primary source carries only the edited rows
   /// (isEdited: true).
   ///
-  /// Series-first: a dive with series rows is grouped from them; a dive with
-  /// none is read from the legacy row table until plan 2e removes it.
+  /// A dive with no dive_data_sources row and no primary series returns an
+  /// empty map; one with sources but no series returns one entry per source,
+  /// each with an empty points list.
   Future<Map<String, domain.SourceProfile>> getProfilesByDataSource(
     String diveId,
   ) async {
     try {
       final series = await _profileSeries.getSeriesForDive(diveId);
-      if (series.isEmpty) return const <String, domain.SourceProfile>{};
-      return await _profilesBySourceFromSeries(diveId, series);
+      final sourceRows = _canonicalDataSourceRows(
+        await (_db.select(_db.diveDataSources)
+              ..where((t) => t.diveId.equals(diveId))
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.isPrimary),
+                (t) => OrderingTerm.asc(t.createdAt),
+              ]))
+            .get(),
+      );
+      if (sourceRows.isEmpty) {
+        // Dives with series but no dive_data_sources row (older imports
+        // predate that table): synthesize the primary source.
+        final primary = [
+          for (final s in series)
+            if (s.isPrimary) s,
+        ];
+        if (primary.isEmpty) return {};
+        final syntheticSourceId = legacyDataSourceId(diveId);
+        return {
+          syntheticSourceId: domain.SourceProfile(
+            sourceId: syntheticSourceId,
+            computerId: primary.first.computerId,
+            isEdited: series.any((s) => !s.isPrimary),
+            points: mergeSeriesPoints(primary),
+          ),
+        };
+      }
+
+      final primary = sourceRows.first;
+      final sourceIdByComputer = <String, String>{
+        for (final s in sourceRows)
+          if (s.computerId != null) s.computerId!: s.id,
+      };
+      final sourceIds = {for (final s in sourceRows) s.id};
+      // The FK is authoritative; a series without one follows the pre-v154
+      // computer convention (issue #1149).
+      bool isPrimaryFamily(ProfileSeries s) => sourceIds.contains(s.sourceId)
+          ? s.sourceId == primary.id
+          : s.computerId == null || s.computerId == primary.computerId;
+      final family = series.where(isPrimaryFamily);
+      final hasEditedProfile =
+          family.any((s) => s.isPrimary) && family.any((s) => !s.isPrimary);
+
+      final grouped = <String, List<ProfileSeries>>{
+        for (final s in sourceRows) s.id: [],
+      };
+      var primaryIsEdited = false;
+      for (final s in series) {
+        final owner = sourceIds.contains(s.sourceId)
+            ? s.sourceId!
+            : s.computerId == null
+            ? primary.id
+            : (sourceIdByComputer[s.computerId!] ?? primary.id);
+        if (hasEditedProfile && isPrimaryFamily(s)) {
+          if (!s.isPrimary) continue;
+          primaryIsEdited = true;
+        }
+        grouped[owner]!.add(s);
+      }
+      return {
+        for (final s in sourceRows)
+          s.id: domain.SourceProfile(
+            sourceId: s.id,
+            computerId: s.computerId,
+            isEdited: s.id == primary.id && primaryIsEdited,
+            points: mergeSeriesPoints(grouped[s.id]!),
+          ),
+      };
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get profiles by data source for dive: $diveId',
@@ -1029,82 +1092,6 @@ class DiveRepository {
       );
       return {};
     }
-  }
-
-  /// Series path of [getProfilesByDataSource]; the same rules as the legacy
-  /// body, applied to whole series instead of rows.
-  Future<Map<String, domain.SourceProfile>> _profilesBySourceFromSeries(
-    String diveId,
-    List<ProfileSeries> series,
-  ) async {
-    final sourceRows = _canonicalDataSourceRows(
-      await (_db.select(_db.diveDataSources)
-            ..where((t) => t.diveId.equals(diveId))
-            ..orderBy([
-              (t) => OrderingTerm.desc(t.isPrimary),
-              (t) => OrderingTerm.asc(t.createdAt),
-            ]))
-          .get(),
-    );
-    if (sourceRows.isEmpty) {
-      // Dives with series but no dive_data_sources row: synthesize the
-      // primary source the way the legacy read does.
-      final primary = [
-        for (final s in series)
-          if (s.isPrimary) s,
-      ];
-      if (primary.isEmpty) return {};
-      final syntheticSourceId = legacyDataSourceId(diveId);
-      return {
-        syntheticSourceId: domain.SourceProfile(
-          sourceId: syntheticSourceId,
-          computerId: primary.first.computerId,
-          isEdited: series.any((s) => !s.isPrimary),
-          points: mergeSeriesPoints(primary),
-        ),
-      };
-    }
-
-    final primary = sourceRows.first;
-    final sourceIdByComputer = <String, String>{
-      for (final s in sourceRows)
-        if (s.computerId != null) s.computerId!: s.id,
-    };
-    final sourceIds = {for (final s in sourceRows) s.id};
-    // The FK is authoritative; a series without one follows the pre-v154
-    // computer convention (issue #1149).
-    bool isPrimaryFamily(ProfileSeries s) => sourceIds.contains(s.sourceId)
-        ? s.sourceId == primary.id
-        : s.computerId == null || s.computerId == primary.computerId;
-    final family = series.where(isPrimaryFamily);
-    final hasEditedProfile =
-        family.any((s) => s.isPrimary) && family.any((s) => !s.isPrimary);
-
-    final grouped = <String, List<ProfileSeries>>{
-      for (final s in sourceRows) s.id: [],
-    };
-    var primaryIsEdited = false;
-    for (final s in series) {
-      final owner = sourceIds.contains(s.sourceId)
-          ? s.sourceId!
-          : s.computerId == null
-          ? primary.id
-          : (sourceIdByComputer[s.computerId!] ?? primary.id);
-      if (hasEditedProfile && isPrimaryFamily(s)) {
-        if (!s.isPrimary) continue;
-        primaryIsEdited = true;
-      }
-      grouped[owner]!.add(s);
-    }
-    return {
-      for (final s in sourceRows)
-        s.id: domain.SourceProfile(
-          sourceId: s.id,
-          computerId: s.computerId,
-          isEdited: s.id == primary.id && primaryIsEdited,
-          points: mergeSeriesPoints(grouped[s.id]!),
-        ),
-    };
   }
 
   /// Restore the original profile as primary.
@@ -3530,6 +3517,20 @@ class DiveRepository {
     );
   }
 
+  /// Minimum finite sample temperature across [points], for a dive whose
+  /// `water_temp` column is unset. Some imports populate per-sample
+  /// temperature but miss the dive-level field. Returns null when [points]
+  /// carries no usable temperature.
+  static double? _minProfileTemp(List<domain.DiveProfilePoint> points) {
+    double? min;
+    for (final point in points) {
+      final temp = point.temperature;
+      if (temp == null || !temp.isFinite) continue;
+      if (min == null || temp < min) min = temp;
+    }
+    return min;
+  }
+
   /// Legacy method that loads all related data for a single dive (used for detail views)
   Future<domain.Dive> _mapRowToDive(Dive row) async {
     // Get tanks for this dive
@@ -3685,7 +3686,9 @@ class DiveRepository {
     final diveTypesByDive = await _diveTypesForDives([row.id]);
     final diveTypeIds = diveTypesByDive[row.id] ?? [row.diveType];
 
-    final effectiveWaterTemp = row.waterTemp;
+    // Derive waterTemp from the profile if not set on the dive row. Some
+    // imports populate per-sample temperature but miss the dive-level field.
+    final effectiveWaterTemp = row.waterTemp ?? _minProfileTemp(seriesProfile);
 
     return domain.Dive(
       id: row.id,
@@ -3849,7 +3852,7 @@ class DiveRepository {
           computerId: t.computerId,
         );
       }).toList(),
-      profile: seriesProfile ?? const <domain.DiveProfilePoint>[],
+      profile: seriesProfile,
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
@@ -4762,24 +4765,23 @@ class DiveRepository {
   /// semantics must be made in both places together rather than diverging
   /// here.
   Future<List<domain.DiveProfilePoint>> getMergedProfile(String diveId) async {
-    return await _mergedSeriesPoints(diveId) ??
-        const <domain.DiveProfilePoint>[];
+    return _mergedSeriesPoints(diveId);
   }
 
-  /// The merged profile from series rows, or null when [diveId] has none.
+  /// The merged profile from series rows; an empty list when [diveId] has
+  /// none.
   ///
   /// Shared by [getMergedProfile] and [_mapRowToDive] so `getDiveById`,
   /// [getMergedProfile], and [getDiveForAnalysis] return the same list by
   /// construction (the parity test locks this in). Every source is kept,
   /// except the demoted originals a saved edit superseded
   /// ([dropSupersededSeries]).
-  Future<List<domain.DiveProfilePoint>?> _mergedSeriesPoints(
+  Future<List<domain.DiveProfilePoint>> _mergedSeriesPoints(
     String diveId,
   ) async {
     final List<ProfileSeries> series = await _profileSeries.getSeriesForDive(
       diveId,
     );
-    if (series.isEmpty) return null;
     final needsPrimary =
         series.any((s) => s.isPrimary) &&
         series.any((s) => !s.isPrimary && s.computerId != null);
