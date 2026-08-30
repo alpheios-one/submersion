@@ -11,6 +11,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -2974,52 +2975,72 @@ class DiveRepository {
           )
           .toList();
 
-      // Depth distribution
+      // Depth distribution: 10 m buckets from the surface to 130 m, plus an
+      // open-ended bucket for anything deeper (issue #641). A dive lands in
+      // a bucket by its max depth, the same rule the old 0-40 m version used.
+      //
+      // Per-bucket duration resolves the full `Dive.effectiveRuntime` chain
+      // in SQL (see `effectiveRuntimeSecondsSql`) rather than the
+      // `COALESCE(runtime, bottom_time)` shortcut this query used before,
+      // which skipped the profile-derived step and reported a dive that only
+      // has a profile as zero minutes. Bucketing stays in SQL so the whole
+      // distribution comes back as at most 14 rows, not one row per dive.
+      const depthBucketSizeMeters = 10;
+      const depthBucketCount = 13; // 0-10m, 10-20m, ..., 120-130m
       final depthWhereClause = diverId != null
-          ? 'WHERE max_depth IS NOT NULL AND diver_id = ?'
-          : 'WHERE max_depth IS NOT NULL';
-      final depthStats = await _db.customSelect('''
-      SELECT
-        CASE
-          WHEN max_depth < 10 THEN '0-10m'
-          WHEN max_depth < 20 THEN '10-20m'
-          WHEN max_depth < 30 THEN '20-30m'
-          WHEN max_depth < 40 THEN '30-40m'
-          ELSE '40m+'
-        END as depth_range,
-        COUNT(*) as count
-      FROM dives
-      $depthWhereClause $fBare
-      GROUP BY depth_range
-      ORDER BY
-        CASE depth_range
-          WHEN '0-10m' THEN 1
-          WHEN '10-20m' THEN 2
-          WHEN '20-30m' THEN 3
-          WHEN '30-40m' THEN 4
-          ELSE 5
-        END
-    ''', variables: vars).get();
+          ? 'WHERE d.max_depth IS NOT NULL AND d.diver_id = ?'
+          : 'WHERE d.max_depth IS NOT NULL';
+      // The inner CAST forces real division whatever affinity the column
+      // value carries; the outer one truncates toward zero. Truncation is
+      // not floor for a negative, so the MAX/MIN pair clamps both ends: a
+      // stray negative depth lands in the first bucket, and anything at or
+      // past 130 m lands in the open-ended last one.
+      const depthBucketExpression =
+          'MIN(MAX(CAST(CAST(d.max_depth AS REAL) / $depthBucketSizeMeters '
+          'AS INTEGER), 0), $depthBucketCount)';
+      final depthRows = await _db
+          .customSelect(
+            'SELECT $depthBucketExpression AS bucket, '
+            'COUNT(*) AS count, '
+            'SUM(${effectiveRuntimeSecondsSql('d')}) AS total_time '
+            'FROM dives d '
+            '$depthWhereClause $fAliasD '
+            'GROUP BY bucket',
+            variables: vars,
+            readsFrom: {_db.dives, _db.diveProfiles},
+          )
+          .get();
 
-      final depthRanges = [
-        DepthRangeStat(label: '0-10m', minDepth: 0, maxDepth: 10, count: 0),
-        DepthRangeStat(label: '10-20m', minDepth: 10, maxDepth: 20, count: 0),
-        DepthRangeStat(label: '20-30m', minDepth: 20, maxDepth: 30, count: 0),
-        DepthRangeStat(label: '30-40m', minDepth: 30, maxDepth: 40, count: 0),
-        DepthRangeStat(label: '40m+', minDepth: 40, maxDepth: 100, count: 0),
+      final bucketCounts = List<int>.filled(depthBucketCount + 1, 0);
+      final bucketDurationSeconds = List<int>.filled(depthBucketCount + 1, 0);
+      for (final row in depthRows) {
+        final bucket = row.read<int>('bucket');
+        bucketCounts[bucket] = row.read<int>('count');
+        // NULL when every dive in the bucket is missing all four duration
+        // sources, which reads as zero minutes logged at that depth.
+        bucketDurationSeconds[bucket] =
+            row.readNullable<int>('total_time') ?? 0;
+      }
+
+      final depthDistribution = [
+        for (var i = 0; i < depthBucketCount; i++)
+          DepthRangeStat(
+            label:
+                '${i * depthBucketSizeMeters}-${(i + 1) * depthBucketSizeMeters}m',
+            minDepth: i * depthBucketSizeMeters,
+            maxDepth: (i + 1) * depthBucketSizeMeters,
+            count: bucketCounts[i],
+            totalDurationSeconds: bucketDurationSeconds[i],
+          ),
+        DepthRangeStat(
+          label: '${depthBucketCount * depthBucketSizeMeters}m+',
+          minDepth: depthBucketCount * depthBucketSizeMeters,
+          maxDepth: depthBucketCount * depthBucketSizeMeters,
+          count: bucketCounts[depthBucketCount],
+          totalDurationSeconds: bucketDurationSeconds[depthBucketCount],
+          openEnded: true,
+        ),
       ];
-
-      final depthDistribution = depthRanges.map((range) {
-        final found = depthStats.where(
-          (row) => row.data['depth_range'] == range.label,
-        );
-        return DepthRangeStat(
-          label: range.label,
-          minDepth: range.minDepth,
-          maxDepth: range.maxDepth,
-          count: found.isNotEmpty ? found.first.data['count'] as int : 0,
-        );
-      }).toList();
 
       // Top sites
       final siteWhereClause = diverId != null
@@ -3287,18 +3308,12 @@ class DiveRepository {
   /// SQL expression mirroring [domain.Dive.effectiveRuntime]'s resolution
   /// order in seconds: runtime, exit - entry (when positive), profile span,
   /// bottom time.
-  static const _effectiveRuntimeSql =
-      'COALESCE(d.runtime, '
-      'CASE WHEN d.exit_time IS NOT NULL AND d.entry_time IS NOT NULL '
-      'AND d.exit_time > d.entry_time '
-      // CAST truncates toward zero to match Dart's Duration.inSeconds.
-      'THEN CAST((d.exit_time - d.entry_time) / 1000 AS INTEGER) END, '
-      // NULLIF drops a zero-span profile (single point or same-timestamp
-      // samples) to NULL so COALESCE falls through to bottom_time, matching
-      // calculateRuntimeFromProfile()'s `totalSeconds > 0 ? ... : null`.
-      'NULLIF((SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id), 0), '
-      'd.bottom_time)';
+  ///
+  /// Delegates to the shared fragment rather than spelling the chain out a
+  /// second time. This constant and the statistics aggregates have to agree
+  /// on what a dive's duration is, and two hand-written copies of a four-step
+  /// COALESCE are how they stop agreeing.
+  static final _effectiveRuntimeSql = effectiveRuntimeSecondsSql('d');
 
   /// Deterministic tie-break for the personal-record winners, matching the
   /// most-recent-first order [getAllDives] used before WS4: the old in-memory
@@ -4820,6 +4835,11 @@ class DiveRepository {
   /// carries the profile-derived runtime fallback so
   /// [DiveTimes.effectiveRuntime] can mirror [domain.Dive.effectiveRuntime]
   /// without loading profile rows.
+  ///
+  /// Every caller here reads a single dive or a short range, so the subquery
+  /// runs a bounded number of times. Aggregates that scan the whole dive
+  /// table use [effectiveRuntimeSecondsSql] instead, which resolves the same
+  /// chain but short-circuits past the profile scan.
   static const _diveTimesSelect =
       'SELECT d.id, d.dive_date_time, d.entry_time, d.exit_time, '
       'd.runtime, d.bottom_time, '
@@ -6929,11 +6949,22 @@ class DepthRangeStat {
   final int maxDepth;
   final int count;
 
+  /// Whether this is the deepest, open-ended bucket (e.g. "130m+"), which
+  /// has no real upper bound unlike every other bucket.
+  final bool openEnded;
+
+  /// Summed dive duration (seconds) across dives whose max depth landed in
+  /// this bucket (issue #641), mirroring
+  /// [DistributionSegment.totalDurationSeconds].
+  final int totalDurationSeconds;
+
   DepthRangeStat({
     required this.label,
     required this.minDepth,
     required this.maxDepth,
     required this.count,
+    this.openEnded = false,
+    this.totalDurationSeconds = 0,
   });
 }
 
