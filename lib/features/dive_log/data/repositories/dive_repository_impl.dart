@@ -3308,18 +3308,12 @@ class DiveRepository {
   /// SQL expression mirroring [domain.Dive.effectiveRuntime]'s resolution
   /// order in seconds: runtime, exit - entry (when positive), profile span,
   /// bottom time.
-  static const _effectiveRuntimeSql =
-      'COALESCE(d.runtime, '
-      'CASE WHEN d.exit_time IS NOT NULL AND d.entry_time IS NOT NULL '
-      'AND d.exit_time > d.entry_time '
-      // CAST truncates toward zero to match Dart's Duration.inSeconds.
-      'THEN CAST((d.exit_time - d.entry_time) / 1000 AS INTEGER) END, '
-      // NULLIF drops a zero-span profile (single point or same-timestamp
-      // samples) to NULL so COALESCE falls through to bottom_time, matching
-      // calculateRuntimeFromProfile()'s `totalSeconds > 0 ? ... : null`.
-      'NULLIF((SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id), 0), '
-      'd.bottom_time)';
+  ///
+  /// Delegates to the shared fragment rather than spelling the chain out a
+  /// second time. This constant and the statistics aggregates have to agree
+  /// on what a dive's duration is, and two hand-written copies of a four-step
+  /// COALESCE are how they stop agreeing.
+  static final _effectiveRuntimeSql = effectiveRuntimeSecondsSql('d');
 
   /// Deterministic tie-break for the personal-record winners, matching the
   /// most-recent-first order [getAllDives] used before WS4: the old in-memory

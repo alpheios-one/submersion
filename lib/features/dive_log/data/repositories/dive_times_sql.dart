@@ -23,12 +23,16 @@ const _millisecondsPerSecond = 1000;
 ///
 /// Mirrors the guard `Dive.effectiveRuntime` applies before trusting the
 /// computed value: a zero or negative span means the timestamps are unusable,
-/// not that the dive lasted no time.
+/// not that the dive lasted no time. The CAST truncates toward zero to match
+/// Dart's `Duration.inSeconds`; both operands are `IntColumn`s, so SQLite's
+/// `/` is already integer division and the CAST states that rather than
+/// changing it.
 String timestampRuntimeSecondsSql(String alias) =>
     'CASE WHEN $alias.entry_time IS NOT NULL '
     'AND $alias.exit_time IS NOT NULL '
     'AND $alias.exit_time > $alias.entry_time '
-    'THEN ($alias.exit_time - $alias.entry_time) / $_millisecondsPerSecond '
+    'THEN CAST(($alias.exit_time - $alias.entry_time) '
+    '/ $_millisecondsPerSecond AS INTEGER) '
     'END';
 
 /// The span of the dive's profile samples in seconds, or NULL when it has no
