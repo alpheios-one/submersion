@@ -326,11 +326,13 @@ class PreDiveChecklistTemplateItems extends Table {
   /// start (not in the template editor, mirroring the equipmentSet flow)
   /// and persisted here so later sessions pre-fill the same device. Issue
   /// #814.
-  TextColumn get equipmentId => text().nullable().references(
-    Equipment,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
+  ///
+  /// Deliberately not a SQL-level FK: template items are (re-)seeded
+  /// independently of the equipment table in isolated schema fixtures (and
+  /// at every app start for builtin templates), so a REFERENCES clause would
+  /// require the equipment table to exist wherever this table does.
+  /// Referential integrity is enforced at the application layer instead.
+  TextColumn get equipmentId => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -5588,6 +5590,11 @@ class AppDatabase extends _$AppDatabase {
   /// the template editor) and persisted so later sessions pre-fill the same
   /// device. Self-guards on the table existing. Same dual-call contract
   /// (onUpgrade + beforeOpen backstop) as the other column-assert helpers.
+  ///
+  /// No SQL-level REFERENCES clause: template items are (re-)seeded
+  /// independently of the equipment table (isolated schema fixtures, builtin
+  /// template reseeding on every app start), so referential integrity is
+  /// enforced at the application layer instead of via SQLite FK.
   Future<void> _assertTemplateItemEquipmentIdColumn() async {
     final cols = await customSelect(
       "PRAGMA table_info('pre_dive_checklist_template_items')",
@@ -5597,7 +5604,7 @@ class AppDatabase extends _$AppDatabase {
     if (names.contains('equipment_id')) return;
     await customStatement(
       'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
-      'TEXT REFERENCES equipment(id) ON DELETE SET NULL',
+      'TEXT',
     );
   }
 
