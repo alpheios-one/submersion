@@ -2592,6 +2592,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get common_action_cancel => 'Annuleren';
 
   @override
+  String get common_action_clearRating => 'Beoordeling wissen';
+
+  @override
   String get common_action_close => 'Sluiten';
 
   @override
@@ -17569,6 +17572,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer de naam van de ondertekenaar in';
 
   @override
+  String get signatures_error_saveFailed =>
+      'De handtekening kon niet worden opgeslagen. Probeer het opnieuw.';
+
+  @override
   String get signatures_field_instructorName => 'Naam instructeur';
 
   @override
@@ -19599,13 +19606,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF-logboek';
 
   @override
-  String get transfer_section_exportTitle => 'Exporteren';
+  String get transfer_section_exportTitle => 'Bestandsexport';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF-bestanden';
 
   @override
-  String get transfer_section_importTitle => 'Importeren';
+  String get transfer_section_importTitle => 'Bestandsimport';
 
   @override
   String get transfer_summary_description =>
@@ -23685,6 +23692,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Mediaopslag verbonden';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'De cloudopslag kon nog niet worden gelezen. Wacht even en probeer het opnieuw.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Loskoppelen';
 
   @override
@@ -23730,6 +23741,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Mislukt';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Overdrachten gepauzeerd';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Dit apparaat en de cloudopslag zijn het niet meer eens over welke opslag in gebruik is. Opnieuw verbinden neemt de opslag over die de cloud nu bevat.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -35495,4 +35514,191 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Meegeteld in alle statistieken';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Aanmelden bij Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Meld je aan met je app.suunto.com-account om je duiken rechtstreeks te importeren. Je wachtwoord wordt nooit opgeslagen, alleen de resulterende sessie.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'E-mail is verplicht';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Wachtwoord';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Wachtwoord is verplicht';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Aanmelden';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Bezig met aanmelden…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Aangemeld als $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Duiken worden opgehaald…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Duik $current van $total downloaden…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'Kan duiken niet ophalen';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Opnieuw proberen';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken gevonden',
+      one: '1 duik gevonden',
+      zero: 'Geen duiken gevonden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count duiken konden niet worden geconverteerd en zijn overgeslagen.',
+      one: '1 duik kon niet worden geconverteerd en is overgeslagen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sorteren';
+
+  @override
+  String get importWizard_review_sortByDate => 'Datum';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Diepte';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Tijd';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Duiken importeren uit je Suunto-app of app.suunto.com-account';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Importeren uit de cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Opslaggebruik';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Opslaggebruik';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Bekijk wat ruimte inneemt op dit apparaat';
+
+  @override
+  String get settings_storageUsage_total => 'Totaal';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Totaal tot nu toe';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Opnieuw berekenen';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Niet beschikbaar';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Meten niet gelukt';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App-gegevens';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Mediacache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Back-ups';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Tijdelijke bestanden';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Geëxporteerde bestanden';
+
+  @override
+  String get settings_storageUsage_category_database => 'Duiklogboekdatabase';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Lokale cachedatabase';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Originele foto\'s en video\'s';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniaturen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Videoversies';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Voorbereide overdrachten';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Getranscodeerde video';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Kaarttegels';
+
+  @override
+  String get settings_storageUsage_category_networkImages =>
+      'Netwerkafbeeldingen';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Videominiaturen';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Documentminiaturen';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Back-upbestanden';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Tijdelijke bestanden';
+
+  @override
+  String get settings_storageUsage_category_exports =>
+      'Geëxporteerde bestanden';
 }

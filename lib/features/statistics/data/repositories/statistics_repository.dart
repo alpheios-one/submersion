@@ -10,6 +10,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
@@ -60,10 +61,19 @@ class DistributionSegment {
   final int count;
   final double percentage;
 
+  /// Summed dive duration (seconds) behind this segment.
+  ///
+  /// Only populated by distributions where a per-segment total makes sense
+  /// (e.g. dive type); null for distributions like time-of-day where a
+  /// summed duration would double count against other segments' overlapping
+  /// dives or simply isn't meaningful.
+  final int? totalDurationSeconds;
+
   DistributionSegment({
     required this.label,
     required this.count,
     required this.percentage,
+    this.totalDurationSeconds,
   });
 }
 
@@ -734,6 +744,12 @@ class StatisticsRepository {
   /// presentation layer resolves it through the built-in translation table
   /// (see `diveTypeDistributionLabel`). Capitalizing the slug here is what
   /// left this chart English under every locale.
+  ///
+  /// A dive carrying several types counts once under each of them, so the
+  /// per-type totals deliberately sum to more than the diver's career total.
+  /// Each dive's contribution is its `Dive.effectiveRuntime`, resolved in SQL
+  /// by [effectiveRuntimeSecondsSql] so a dive whose duration only exists in
+  /// its profile is not reported as zero.
   Future<List<DistributionSegment>> getDiveTypeDistribution({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -746,7 +762,8 @@ class StatisticsRepository {
       final results = await _db.customSelect('''
         SELECT
           ddt.dive_type_id AS dive_type,
-          COUNT(*) AS count
+          COUNT(*) AS count,
+          SUM(${effectiveRuntimeSecondsSql('d')}) AS total_time
         FROM dive_dive_types ddt
         JOIN dives d ON d.id = ddt.dive_id
         WHERE 1=1 $diverFilter ${df.clause}
@@ -767,6 +784,9 @@ class StatisticsRepository {
           label: label,
           count: count,
           percentage: count / total * 100,
+          // NULL when no dive of this type carries a duration in any
+          // form, which reads as no time logged.
+          totalDurationSeconds: row.readNullable<int>('total_time') ?? 0,
         );
       }).toList();
     } catch (e, stackTrace) {

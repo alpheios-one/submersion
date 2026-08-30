@@ -1615,6 +1615,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Buddy checks, CCR build lists, gear packing",
   "common_action_back": "Back",
   "common_action_cancel": "Cancel",
+  "common_action_clearRating": "Clear rating",
   "common_action_close": "Close",
   "common_action_continue": "Continue",
   "common_action_delete": "Delete",
@@ -1631,6 +1632,9 @@
   },
   "@common_action_cancel": {
     "description": "Generic cancel action"
+  },
+  "@common_action_clearRating": {
+    "description": "Tooltip on the icon that removes a star rating from a form row, returning it to no rating"
   },
   "@common_action_close": {
     "description": "Generic close action used for dialogs, menus, etc."
@@ -10507,6 +10511,7 @@
   "signatures_drawSignatureSemantics": "Draw signature",
   "signatures_error_drawSignature": "Please draw a signature",
   "signatures_error_enterSignerName": "Please enter the signer name",
+  "signatures_error_saveFailed": "Could not save the signature. Please try again.",
   "signatures_field_instructorName": "Instructor Name",
   "signatures_field_instructorNameHint": "Enter instructor name",
   "signatures_handoff_title": "Hand your device to",
@@ -10587,6 +10592,9 @@
   },
   "@signatures_error_enterSignerName": {
     "description": "Error shown when trying to save without entering a signer name"
+  },
+  "@signatures_error_saveFailed": {
+    "description": "Error shown when saving a signature failed"
   },
   "@signatures_field_instructorName": {
     "description": "Label for the instructor name text field"
@@ -11900,9 +11908,9 @@
   "transfer_section_computersSubtitle": "Download from device",
   "transfer_section_computersTitle": "Dive Computers",
   "transfer_section_exportSubtitle": "CSV, UDDF, PDF logbook",
-  "transfer_section_exportTitle": "Export",
+  "transfer_section_exportTitle": "File Export",
   "transfer_section_importSubtitle": "CSV, UDDF files",
-  "transfer_section_importTitle": "Import",
+  "transfer_section_importTitle": "File Import",
   "transfer_summary_description": "Import and export dive data",
   "transfer_summary_selectSection": "Select a section from the list",
   "transfer_summary_title": "Transfer",
@@ -15480,6 +15488,7 @@
   },
   "settings_mediaStorage_test_success": "Connection successful",
   "settings_mediaStorage_saved": "Media store connected",
+  "settings_mediaStorage_error_notReady": "The cloud storage could not be read yet. Wait a moment and try connecting again.",
   "settings_mediaStorage_action_disconnect": "Disconnect",
   "settings_mediaStorage_disconnect_confirm_title": "Disconnect media store?",
   "settings_mediaStorage_disconnect_confirm_body": "This device stops uploading and fetching media. Nothing in your bucket is deleted.",
@@ -15494,6 +15503,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Removing from cloud",
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
+  "settings_mediaStorage_transfers_suspended_title": "Transfers paused",
+  "settings_mediaStorage_transfers_suspended_subtitle": "This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.",
   "settings_mediaStorage_transfers_queued": "{count} queued",
   "@settings_mediaStorage_transfers_queued": {
     "placeholders": {
@@ -21667,5 +21678,91 @@
   "diveLog_edit_statisticsIncludedHint": "Counted in every statistic",
   "@diveLog_edit_statisticsIncludedHint": {
     "description": "Collapsed Statistics group hint when the dive is not excluded"
-  }
+  },
+  "suuntoCloud_signIn_title": "Sign in to Suunto",
+  "suuntoCloud_signIn_description": "Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.",
+  "suuntoCloud_signIn_emailLabel": "Email",
+  "suuntoCloud_signIn_emailRequired": "Email is required",
+  "suuntoCloud_signIn_passwordLabel": "Password",
+  "suuntoCloud_signIn_passwordRequired": "Password is required",
+  "suuntoCloud_signIn_button": "Sign In",
+  "suuntoCloud_signIn_signingIn": "Signing in…",
+  "suuntoCloud_signIn_signedInAs": "Signed in as {email}",
+  "suuntoCloud_fetch_listing": "Listing dives…",
+  "suuntoCloud_fetch_fetchingDiveOf": "Fetching dive {current} of {total}…",
+  "suuntoCloud_fetch_failedTitle": "Could not fetch dives",
+  "suuntoCloud_fetch_retry": "Try Again",
+  "suuntoCloud_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
+  "suuntoCloud_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
+  "@suuntoCloud_signIn_signedInAs": {
+    "description": "Success state on the Suunto sign-in step, once a session is established.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_fetchingDiveOf": {
+    "description": "Progress line while downloading each dive from the Suunto cloud.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_foundDives": {
+    "description": "Result headline after fetching dives from the Suunto cloud.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_someFailed": {
+    "description": "Shown when one or more fetched Suunto dives could not be converted and were skipped.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_review_sortTooltip": "Sort",
+  "importWizard_review_sortByDate": "Date",
+  "importWizard_review_sortByDepth": "Depth",
+  "importWizard_review_sortByDuration": "Time",
+  "transfer_importCloud_suuntoTitle": "Suunto",
+  "transfer_importCloud_suuntoSubtitle": "Import dives from your Suunto app / app.suunto.com account",
+  "transfer_section_cloudTitle": "Cloud",
+  "transfer_section_cloudSubtitle": "Import from cloud",
+  "settings_storageUsage_appBar_title": "Storage Usage",
+  "settings_storageUsage_tile_title": "Storage Usage",
+  "settings_storageUsage_tile_subtitle": "See what is using space on this device",
+  "settings_storageUsage_total": "Total",
+  "settings_storageUsage_totalPartial": "Total so far",
+  "settings_storageUsage_refresh_tooltip": "Recalculate",
+  "settings_storageUsage_unavailable": "Not available",
+  "settings_storageUsage_measureFailed": "Could not measure",
+  "settings_storageUsage_group_appData": "App Data",
+  "settings_storageUsage_group_mediaCache": "Media Cache",
+  "settings_storageUsage_group_caches": "Caches",
+  "settings_storageUsage_group_backups": "Backups",
+  "settings_storageUsage_group_temporary": "Temporary Files",
+  "settings_storageUsage_group_exports": "Exported Files",
+  "settings_storageUsage_category_database": "Dive log database",
+  "settings_storageUsage_category_localCache": "Local cache database",
+  "settings_storageUsage_category_mediaCacheOriginals": "Original photos and videos",
+  "settings_storageUsage_category_mediaCacheThumbs": "Thumbnails",
+  "settings_storageUsage_category_mediaCacheRenditions": "Video renditions",
+  "settings_storageUsage_category_mediaCacheStaging": "Staged transfers",
+  "settings_storageUsage_category_mediaCacheTranscode": "Transcoded video",
+  "settings_storageUsage_category_mapTiles": "Map tiles",
+  "settings_storageUsage_category_networkImages": "Network images",
+  "settings_storageUsage_category_videoThumbnails": "Video thumbnails",
+  "settings_storageUsage_category_pdfThumbnails": "Document thumbnails",
+  "settings_storageUsage_category_backups": "Backup files",
+  "settings_storageUsage_category_temporary": "Temporary files",
+  "settings_storageUsage_category_exports": "Exported files"
 }
