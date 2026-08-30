@@ -39,6 +39,18 @@ void main() {
     String diveId, {
     void Function(String)? onSaved,
   }) async {
+    // The finders below match English literals. flutter_test forwards the
+    // host machine's locale list rather than a fixed en_US, so an unpinned
+    // MaterialApp renders a translated UI for a developer whose primary
+    // locale is one of the eleven this app supports, and every finder misses.
+    // Forcing a non-English host locale here means the pin on MaterialApp
+    // below is load-bearing everywhere, instead of only on those machines:
+    // remove it and this test fails on any runner, CI included.
+    tester.platformDispatcher.localesTestValue = const [
+      Locale('fr'),
+      Locale('en'),
+    ];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
     tester.view.physicalSize = const Size(950, 8000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
@@ -54,6 +66,10 @@ void main() {
           customTankPresetsProvider.overrideWith((ref) async => []),
         ],
         child: MaterialApp(
+          // Pinned: flutter_test forwards the host machine's locale list, so
+          // an unpinned MaterialApp resolves to a translated UI on a
+          // non-English dev machine and every English finder below misses.
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(

@@ -4967,11 +4967,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Preserve legacy buddy/divemaster text fields
         buddy: _existingDive?.buddy,
         diveMaster: _existingDive?.diveMaster,
-        // Fields this form has no widget for. updateDive writes every column
-        // from the entity it is handed, so anything not carried through here
-        // is reset to the entity default on every save (issue #1392). The
-        // census test in dive_edit_save_field_census_test.dart fails when a
-        // new field is added to the writer without being carried here.
+        // Fields this form has no widget for. Every column updateDive does
+        // write, it writes unconditionally, with no merge against the stored
+        // row, so anything not carried through here is reset to the entity
+        // default on every save (issue #1392). Columns it deliberately omits
+        // (computerId, the entry/exit location pair) are not at risk and are
+        // not listed. The census test in dive_edit_save_field_census_test.dart
+        // fails when a new field is added to the writer without a carry here.
         isPlanned: _existingDive?.isPlanned ?? false,
         diveComputerModel: _existingDive?.diveComputerModel,
         diveComputerSerial: _existingDive?.diveComputerSerial,
