@@ -2592,6 +2592,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get common_action_cancel => 'Annuleren';
 
   @override
+  String get common_action_clearRating => 'Beoordeling wissen';
+
+  @override
   String get common_action_close => 'Sluiten';
 
   @override

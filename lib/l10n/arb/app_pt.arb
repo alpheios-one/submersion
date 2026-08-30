@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Verificações de dupla, listas de montagem de CCR, preparação de equipamento",
   "common_action_back": "Voltar",
   "common_action_cancel": "Cancelar",
+  "common_action_clearRating": "Limpar avaliação",
   "common_action_close": "Fechar",
   "common_action_delete": "Excluir",
   "common_action_edit": "Editar",

@@ -50,6 +50,7 @@ class FormRow extends StatefulWidget {
        value = null,
        onTap = null,
        onClear = null,
+       clearTooltip = null,
        boolValue = null,
        onBoolChanged = null,
        intValue = null,
@@ -63,6 +64,7 @@ class FormRow extends StatefulWidget {
     required this.onTap,
     this.placeholder,
     this.onClear,
+    this.clearTooltip,
   }) : _kind = _RowKind.picker,
        enabled = true,
        helpText = null,
@@ -91,6 +93,7 @@ class FormRow extends StatefulWidget {
       controller = null,
       inputFormatters = null,
       onClear = null,
+      clearTooltip = null,
       placeholder = null,
       suffixText = null,
       keyboardType = null,
@@ -120,6 +123,7 @@ class FormRow extends StatefulWidget {
        decoration = null,
        inputFormatters = null,
        onClear = null,
+       clearTooltip = null,
        boolValue = value,
        onBoolChanged = onChanged,
        controller = null,
@@ -142,6 +146,7 @@ class FormRow extends StatefulWidget {
     required int value,
     required ValueChanged<int> onChanged,
     this.onClear,
+    this.clearTooltip,
   }) : _kind = _RowKind.rating,
        enabled = true,
        helpText = null,
@@ -173,6 +178,7 @@ class FormRow extends StatefulWidget {
       controller = null,
       inputFormatters = null,
       onClear = null,
+      clearTooltip = null,
       value = null,
       placeholder = null,
       suffixText = null,
@@ -209,6 +215,12 @@ class FormRow extends StatefulWidget {
   final InputDecoration? decoration;
   final VoidCallback? onTap;
   final VoidCallback? onClear;
+
+  /// Names the clear affordance for pointer and screen-reader users. Passed
+  /// in already localized: this widget sits below the l10n layer, and
+  /// reaching for it here would throw in every consumer test that pumps a
+  /// bare MaterialApp.
+  final String? clearTooltip;
   final bool? boolValue;
   final ValueChanged<bool>? onBoolChanged;
   final int? intValue;
@@ -422,18 +434,7 @@ class _FormRowState extends State<FormRow> {
               ),
               if (widget.onClear != null && !empty) ...[
                 const SizedBox(width: 4),
-                InkWell(
-                  onTap: widget.onClear,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
-                    child: Icon(
-                      Icons.clear,
-                      size: 16,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
+                _clearAffordance(context, widget.onClear!),
               ],
               Icon(
                 Icons.chevron_right,
@@ -465,15 +466,25 @@ class _FormRowState extends State<FormRow> {
         );
 
       case _RowKind.rating:
+        final rating = widget.intValue!;
+        // Zero stars is a real answer, not the absence of one, so the row keeps
+        // two ways back to it: re-tapping the star that already holds the
+        // rating (what divers reach for first), and the explicit clear icon.
+        // Both go through the same callback, so a caller whose onClear does
+        // extra bookkeeping cannot have it skipped by the gesture it did not
+        // anticipate.
+        final clear = widget.onClear ?? () => widget.onIntChanged!(0);
         return _shell(
           context,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               ...List.generate(5, (i) {
-                final filled = i < widget.intValue!;
+                final stars = i + 1;
+                final filled = i < rating;
                 return InkWell(
-                  onTap: () => widget.onIntChanged!(i + 1),
+                  onTap: () =>
+                      stars == rating ? clear() : widget.onIntChanged!(stars),
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.all(2),
@@ -487,20 +498,9 @@ class _FormRowState extends State<FormRow> {
                   ),
                 );
               }),
-              if (widget.onClear != null && widget.intValue! > 0) ...[
+              if (rating > 0) ...[
                 const SizedBox(width: 4),
-                InkWell(
-                  onTap: widget.onClear,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding: const EdgeInsets.all(2),
-                    child: Icon(
-                      Icons.clear,
-                      size: 16,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
+                _clearAffordance(context, clear),
               ],
             ],
           ),
@@ -509,5 +509,26 @@ class _FormRowState extends State<FormRow> {
       case _RowKind.custom:
         return _shell(context, trailing: widget.child!);
     }
+  }
+
+  /// The bare X shared by the picker and rating rows. Wrapped in a [Tooltip]
+  /// only when the caller named it, so rows that never supplied a label keep
+  /// rendering exactly as before.
+  Widget _clearAffordance(BuildContext context, VoidCallback onTap) {
+    final button = InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(FormStyle.clearTapTarget / 2),
+      child: SizedBox(
+        width: FormStyle.clearTapTarget,
+        height: FormStyle.clearTapTarget,
+        child: Icon(
+          Icons.clear,
+          size: 16,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+    final tooltip = widget.clearTooltip;
+    return tooltip == null ? button : Tooltip(message: tooltip, child: button);
   }
 }

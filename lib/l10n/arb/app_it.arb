@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Buddy check, liste di montaggio CCR, preparazione attrezzatura",
   "common_action_back": "Indietro",
   "common_action_cancel": "Annulla",
+  "common_action_clearRating": "Cancella valutazione",
   "common_action_close": "Chiudi",
   "common_action_delete": "Elimina",
   "common_action_edit": "Modifica",
