@@ -192,4 +192,43 @@ void main() {
     );
     expect(centre.g, greaterThan(centre.b));
   });
+
+  testWidgets('undecodable bytes report the reason instead of hanging', (
+    tester,
+  ) async {
+    // instantiateImageCodec throws on bytes it cannot read. Unhandled, the
+    // exception escapes into the zone and the dialog sits on its spinner with
+    // no explanation. A picked file is not guaranteed to be a valid image: it
+    // may be corrupt, or a contact photo in a format the engine cannot decode.
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () => showProfilePhotoCropDialog(
+              context: context,
+              sourceBytes: Uint8List.fromList([0, 1, 2, 3, 4, 5]),
+              declaredName: 'broken.jpg',
+            ),
+            child: const Text('open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('open'));
+    await _settle(tester);
+
+    expect(
+      find.text('That file could not be read as an image.'),
+      findsOneWidget,
+    );
+    expect(
+      find.byType(CircularProgressIndicator),
+      findsNothing,
+      reason: 'the dialog must not sit on a spinner forever',
+    );
+    // Cancel remains the way out.
+    expect(find.text('Cancel'), findsOneWidget);
+  });
 }

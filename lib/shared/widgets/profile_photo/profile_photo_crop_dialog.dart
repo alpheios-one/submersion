@@ -46,6 +46,7 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
   ui.Image? _decoded;
   bool _busy = false;
   bool _centered = false;
+  bool _decodeFailed = false;
 
   @override
   void initState() {
@@ -54,16 +55,26 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
   }
 
   Future<void> _decode() async {
-    // The codec holds native decode resources separate from the frame's
-    // image, so it needs disposing even on the happy path or repeated opens
-    // of this dialog leak. Same try/finally shape as
-    // terrain_imagery_service.dart.
+    // instantiateImageCodec THROWS on bytes it cannot read, and a picked file
+    // is not guaranteed to be a valid image: a corrupt file, or a contact
+    // photo in a format the engine does not decode. Unhandled, the exception
+    // escapes into the zone and leaves this dialog on its spinner forever
+    // with no way out but Cancel.
     final ui.FrameInfo frame;
-    final codec = await ui.instantiateImageCodec(widget.sourceBytes);
     try {
-      frame = await codec.getNextFrame();
-    } finally {
-      codec.dispose();
+      // The codec holds native decode resources separate from the frame's
+      // image, so it needs disposing even on the happy path or repeated opens
+      // of this dialog leak. Same try/finally shape as
+      // terrain_imagery_service.dart.
+      final codec = await ui.instantiateImageCodec(widget.sourceBytes);
+      try {
+        frame = await codec.getNextFrame();
+      } finally {
+        codec.dispose();
+      }
+    } on Object {
+      if (mounted) setState(() => _decodeFailed = true);
+      return;
     }
     if (!mounted) {
       frame.image.dispose();
@@ -149,7 +160,21 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
           ),
           leadingWidth: 96,
         ),
-        body: decoded == null
+        body: _decodeFailed
+            // Reported in place rather than through a snackbar: this Scaffold's
+            // messenger dies with the dialog, and the user needs the reason to
+            // stay on screen next to the only way out.
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    l10n.profilePhoto_error_undecodable,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              )
+            : decoded == null
             ? const Center(child: CircularProgressIndicator())
             : LayoutBuilder(
                 builder: (context, constraints) {
