@@ -33,7 +33,17 @@ import 'package:submersion/shared/widgets/wizard/wizard_step_indicator.dart';
 ///
 /// Accepts an [ImportSourceAdapter] and orchestrates the full import flow:
 /// acquisition steps (source-specific), review, import progress, and summary.
-class UnifiedImportWizard extends StatelessWidget {
+///
+/// The adapter is a per-session object: it accumulates acquisition state
+/// (a dive computer download, a picked file) that the later steps consume.
+/// The wizard therefore pins the adapter it is first built with and keeps
+/// using it even if an ancestor rebuilds this widget with a different
+/// instance. Route builders create their adapter in `build`, so a provider
+/// re-emitting mid-session (the dive computer download route watches the
+/// computer record, which the download itself writes on completion) would
+/// otherwise swap in a fresh, empty adapter between the download and the
+/// Review step.
+class UnifiedImportWizard extends StatefulWidget {
   const UnifiedImportWizard({
     super.key,
     required this.adapter,
@@ -41,6 +51,8 @@ class UnifiedImportWizard extends StatelessWidget {
     this.notifierFactoryOverride,
   });
 
+  /// The adapter this widget was built with. The session adapter is the one
+  /// the wizard was FIRST built with; see the class doc.
   final ImportSourceAdapter adapter;
 
   /// Optional starting page for widget tests that need to exercise behavior
@@ -58,20 +70,30 @@ class UnifiedImportWizard extends StatelessWidget {
   final ImportWizardNotifier Function(Ref ref)? notifierFactoryOverride;
 
   @override
+  State<UnifiedImportWizard> createState() => _UnifiedImportWizardState();
+}
+
+class _UnifiedImportWizardState extends State<UnifiedImportWizard> {
+  /// The session adapter, captured once. Deliberately not refreshed in
+  /// didUpdateWidget: a replacement instance carries none of the state the
+  /// acquisition steps already committed to this one.
+  late final ImportSourceAdapter _adapter = widget.adapter;
+
+  @override
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
         importWizardNotifierProvider.overrideWith(
-          notifierFactoryOverride ??
+          widget.notifierFactoryOverride ??
               (ref) => ImportWizardNotifier(
-                adapter,
+                _adapter,
                 tagRepository: ref.read(tagRepositoryProvider),
               ),
         ),
       ],
       child: _UnifiedImportWizardBody(
-        adapter: adapter,
-        initialPageOverride: initialPageOverride,
+        adapter: _adapter,
+        initialPageOverride: widget.initialPageOverride,
       ),
     );
   }
@@ -97,6 +119,13 @@ class _UnifiedImportWizardBodyState
   int _currentPage = 0;
   bool _navigatingForward = true;
   bool _resetComplete = false;
+
+  /// True while [_onNext] is building the bundle or animating to the next
+  /// page. An acquisition step's auto-advance re-arms on every rebuild while
+  /// its page is still current, and [_currentPage] only moves once the page
+  /// animation completes, so a rebuild in that window would otherwise run
+  /// the whole advance (bundle build included) a second time.
+  bool _advancing = false;
 
   List<WizardStepDef> get _acquisitionSteps => widget.adapter.acquisitionSteps;
   int get _reviewIndex => _acquisitionSteps.length;
@@ -182,6 +211,16 @@ class _UnifiedImportWizardBodyState
   }
 
   Future<void> _onNext() async {
+    if (_advancing) return;
+    _advancing = true;
+    try {
+      await _advance();
+    } finally {
+      _advancing = false;
+    }
+  }
+
+  Future<void> _advance() async {
     _navigatingForward = true;
     if (_currentPage < _reviewIndex) {
       // Let the current step commit any pending state before we leave it.
