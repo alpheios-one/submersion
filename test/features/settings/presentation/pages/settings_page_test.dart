@@ -1136,6 +1136,28 @@ void main() {
 
       expect(find.textContaining('(Beta)'), findsOneWidget);
     });
+
+    testWidgets(
+      'bathymetry credit lists swissBATHY3D alongside GMRT, EMODnet and ETOPO',
+      (tester) async {
+        await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 6));
+
+        await tester.scrollUntilVisible(
+          find.textContaining('swissBATHY3D'),
+          100,
+        );
+        final creditFinder = find.textContaining('swissBATHY3D');
+        expect(creditFinder, findsOneWidget);
+        final creditText = tester.widget<Text>(creditFinder).data!;
+        expect(creditText, contains('GMRT'));
+        expect(creditText, contains('EMODnet'));
+        expect(creditText, contains('ETOPO'));
+        expect(creditText, contains('swissBATHY3D'));
+        expect(creditText, contains('swisstopo'));
+      },
+    );
   });
 
   group('AppearanceSectionContent navigation', () {
