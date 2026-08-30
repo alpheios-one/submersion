@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -20,7 +18,12 @@ Future<ProfilePhotoSource?> showProfilePhotoSourceSheet({
   required bool hasPhoto,
   required bool allowContacts,
 }) {
-  final isMobile = !kIsWeb && (Platform.isIOS || Platform.isAndroid);
+  // defaultTargetPlatform rather than dart:io's Platform: web-safe, and
+  // overridable in tests so the camera option can actually be exercised.
+  final isMobile =
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.android);
 
   return showModalBottomSheet<ProfilePhotoSource>(
     context: context,

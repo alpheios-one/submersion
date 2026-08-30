@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/shared/widgets/profile_photo/profile_photo_source_sheet.dart';
@@ -116,5 +117,36 @@ void main() {
           'removing the inner SafeArea would put Remove Photo under the '
           'gesture bar on a phone with no home button',
     );
+  });
+
+  testWidgets('a mobile target offers the camera and a photo library', (
+    tester,
+  ) async {
+    // Previously unreachable: the branch is gated on the host platform, and
+    // the suite runs on desktop. Switching from dart:io's Platform to
+    // defaultTargetPlatform makes it overridable, so the mobile wording can
+    // finally be exercised.
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await _open(tester, hasPhoto: false, allowContacts: false);
+
+    expect(find.text('Take Photo'), findsOneWidget);
+    expect(find.text('Choose from Library'), findsOneWidget);
+    expect(find.text('Choose File'), findsNothing);
+
+    // Reset inside the body: the binding asserts foundation debug vars are
+    // unset when the test returns, which runs before any tear-down.
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('a desktop target offers a file chooser and no camera', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+    await _open(tester, hasPhoto: false, allowContacts: false);
+
+    expect(find.text('Take Photo'), findsNothing);
+    expect(find.text('Choose File'), findsOneWidget);
+
+    debugDefaultTargetPlatformOverride = null;
   });
 }

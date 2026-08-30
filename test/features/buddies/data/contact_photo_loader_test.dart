@@ -1,6 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,6 +29,10 @@ Future<Uint8List?> _run(
           onPressed: () async {
             result = await loadContactPhoto(
               context,
+              // Granted explicitly: these cases exercise photo selection, and
+              // flutter_test reports defaultTargetPlatform as android, so the
+              // real guard would reach the flutter_contacts platform channel.
+              ensureAccessOverride: () async => true,
               pickContactOverride: picker,
             );
           },
@@ -91,12 +93,19 @@ void main() {
     expect(find.text('That contact does not have a photo.'), findsNothing);
   });
 
-  test('property access needs no permission off Android', () {
+  testWidgets('property access needs no permission off Android', (
+    tester,
+  ) async {
     // The native picker is permissionless on both platforms, and asking it for
     // properties always works on iOS. Only Android needs READ_CONTACTS, which
     // is why the iOS build shows no address-book prompt for a contact photo.
-    if (Platform.isAndroid) return;
-    expectLater(ensureContactPropertyAccess(), completion(isTrue));
+    //
+    // The platform is pinned rather than read from the host: the
+    // implementation uses defaultTargetPlatform, which flutter_test reports as
+    // android on every machine.
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await expectLater(ensureContactPropertyAccess(), completion(isTrue));
+    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('a denied permission explains itself rather than doing nothing', (

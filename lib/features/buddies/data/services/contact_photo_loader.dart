@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -22,7 +21,9 @@ const contactPhotoProperties = {
 /// PlatformException without READ_CONTACTS. So Android asks and iOS does not,
 /// which keeps the iOS build free of an address-book prompt it does not need.
 Future<bool> ensureContactPropertyAccess() async {
-  if (!Platform.isAndroid) return true;
+  // defaultTargetPlatform rather than dart:io's Platform. kIsWeb is checked
+  // first because a mobile browser reports iOS or android here.
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return true;
   if (await FlutterContacts.permissions.has(PermissionType.read)) return true;
   await FlutterContacts.permissions.request(PermissionType.read);
   return FlutterContacts.permissions.has(PermissionType.read);
