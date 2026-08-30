@@ -3457,7 +3457,14 @@ class AppDatabase extends _$AppDatabase {
   /// breaking. Peers below 170 are held until they update. Their payloads
   /// still arrive here; _renamedWireKeys plus the value map in
   /// _applyDiverSettingDefaults carry the receiving-side tolerance.
-  static const int minimumCompatibleSchemaVersion = 170;
+  ///
+  /// Raised 170 -> 182 by the packed profile series: v182 replaces the synced
+  /// entities diveProfiles and tankPressureProfiles with diveProfileSeries and
+  /// tankPressureSeries, which the first rule above classifies as breaking.
+  /// Peers below 182 are held until they update. Their payloads still arrive
+  /// here; SyncData keeps the two legacy keys inbound-only and
+  /// SyncDataSerializer.packLegacySamples packs them into series on apply.
+  static const int minimumCompatibleSchemaVersion = 182;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
