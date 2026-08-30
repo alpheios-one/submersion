@@ -101,19 +101,29 @@ object GattDiagnostics {
      * Message for a service discovery the stack refused, naming the radio
      * the computer was reached on.
      *
-     * A dual-mode computer earns an extra clause: Android connects such a
-     * device over Bluetooth Classic unless the caller demands
-     * TRANSPORT_LE, and a GATT server that only exists on the LE radio is
-     * then invisible. That is the failure behind #957, and naming it in the
-     * log is what makes a future report of it self-diagnosing.
+     * A dual-mode computer earns an extra clause naming the trap behind
+     * #957: under TRANSPORT_AUTO Android connects such a radio over
+     * Bluetooth Classic, where a GATT server that exists only on the LE
+     * radio is invisible.
+     *
+     * Phrased as a lead to check rather than a verdict. This build already
+     * demands TRANSPORT_LE, so on a current log the transport is not the
+     * explanation, and a dual-mode radio fails discovery for the same
+     * ordinary reasons any other radio does: an unstable link, an ATT
+     * error, a computer that dropped out of upload mode. Pointing the
+     * reader at the connect line keeps the addendum useful without
+     * pre-deciding the diagnosis for them.
      */
     fun describeDiscoveryFailure(status: Int, deviceType: Int): String {
         val base = "Service discovery failed: status=$status " +
             "(${describeGattStatus(status)}); the computer's radio is " +
             describeDeviceType(deviceType)
         if (deviceType != DEVICE_TYPE_DUAL) return base
-        return "$base. A dual-mode computer answers GATT only on its LE " +
-            "radio, so this discovery must run over the LE transport"
+        return "$base. Dual-mode is a known trap: under TRANSPORT_AUTO " +
+            "Android connects such a radio over Bluetooth Classic, where " +
+            "an LE-only GATT server is invisible. Check the transport on " +
+            "the connect line above before assuming that is the cause " +
+            "here; an unstable link or an ATT error fails discovery too"
     }
 
     /**

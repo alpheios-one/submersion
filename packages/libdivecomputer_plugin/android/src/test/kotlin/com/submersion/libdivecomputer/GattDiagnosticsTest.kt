@@ -89,10 +89,27 @@ class GattDiagnosticsTest {
             GattDiagnostics.DEVICE_TYPE_DUAL
         )
 
-        // The dual-mode radio is the whole diagnosis of #957: Android
-        // connects such a device over Bluetooth Classic unless the LE
-        // transport is demanded, and GATT discovery then finds nothing.
+        // The dual-mode radio is the whole diagnosis of #957: under
+        // TRANSPORT_AUTO Android connects such a device over Bluetooth
+        // Classic, and GATT discovery then finds nothing.
         assertTrue(message.contains("Classic"))
+        assertTrue(message.contains("TRANSPORT_AUTO"))
+    }
+
+    @Test
+    fun theDualModeAddendumIsALeadRatherThanAVerdict() {
+        val message = GattDiagnostics.describeDiscoveryFailure(
+            GattDiagnostics.GATT_ERROR,
+            GattDiagnostics.DEVICE_TYPE_DUAL
+        )
+
+        // Since this build demands TRANSPORT_LE, the transport is not the
+        // explanation on a current log, and a dual-mode radio fails
+        // discovery for the same ordinary reasons any other radio does.
+        // The line must send the reader to the connect line rather than
+        // deciding the diagnosis for them.
+        assertTrue(message.contains("connect line"))
+        assertTrue(message.contains("before assuming"))
     }
 
     @Test
