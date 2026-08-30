@@ -329,14 +329,8 @@ void main() {
           dive: _makeDive([_makeTank(startPressure: null, endPressure: null)]),
           tankPressures: const {
             'tank-1': [
+              TankPressurePoint(tankId: 'tank-1', timestamp: 0, pressure: 200),
               TankPressurePoint(
-                id: 'tp-1',
-                tankId: 'tank-1',
-                timestamp: 0,
-                pressure: 200,
-              ),
-              TankPressurePoint(
-                id: 'tp-2',
                 tankId: 'tank-1',
                 timestamp: 2700,
                 pressure: 60,

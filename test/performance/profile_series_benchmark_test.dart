@@ -86,7 +86,6 @@ void main() {
             pressureRows
                 .map(
                   (row) => domain.TankPressurePoint(
-                    id: row['id'] as String,
                     tankId: row['tank_id'] as String,
                     timestamp: row['timestamp'] as int,
                     pressure: row['pressure'] as double,

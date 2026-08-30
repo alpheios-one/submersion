@@ -61,8 +61,7 @@ List<DiveProfilePoint> mergeSeriesPointsCollapsingDuplicates(
 /// Interleaves every sample of [series] by timestamp into one tank pressure
 /// list. Ties keep series order, then within-series order, so the result is
 /// deterministic for the `(start_timestamp, id)` order the repositories
-/// return. Point ids are synthesized as `'<seriesId>:<index>'` until plan 2e
-/// removes [TankPressurePoint.id].
+/// return.
 List<TankPressurePoint> mergeTankSeriesPoints(List<TankPressureSeries> series) {
   if (series.isEmpty) return const [];
   final entries = <(int, int, TankPressurePoint)>[];
@@ -74,7 +73,6 @@ List<TankPressurePoint> mergeTankSeriesPoints(List<TankPressureSeries> series) {
         sample.timestamp,
         order++,
         TankPressurePoint(
-          id: '${s.id}:$i',
           tankId: s.tankId,
           timestamp: sample.timestamp,
           pressure: sample.pressure,

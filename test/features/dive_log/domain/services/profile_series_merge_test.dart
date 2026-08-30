@@ -256,7 +256,7 @@ void main() {
   });
 
   group('mergeTankSeriesPoints', () {
-    test('two series interleave by timestamp with synthesized ids', () {
+    test('two series interleave by timestamp', () {
       final a = tankSeries(
         'a',
         computerId: 'comp-1',
@@ -272,7 +272,6 @@ void main() {
       final merged = mergeTankSeriesPoints([a, b]);
       expect(merged.map((p) => p.timestamp), [0, 900, 1800]);
       expect(merged.map((p) => p.pressure), [200.0, 180.0, 150.0]);
-      expect(merged.map((p) => p.id), ['a:0', 'b:0', 'a:1']);
     });
 
     test('ties keep series order, then within-series order', () {

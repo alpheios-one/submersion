@@ -99,13 +99,8 @@ void main() {
     // is real and still plots.
     const real = <String, List<TankPressurePoint>>{
       't1': [
-        TankPressurePoint(id: 'p1', tankId: 't1', timestamp: 0, pressure: 200),
-        TankPressurePoint(
-          id: 'p2',
-          tankId: 't1',
-          timestamp: 1800,
-          pressure: 60,
-        ),
+        TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+        TankPressurePoint(tankId: 't1', timestamp: 1800, pressure: 60),
       ],
     };
     final dive = Dive(

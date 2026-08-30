@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 
-/// One tank pressure reading as `tank_pressure_profiles` stores it, minus
-/// the identity columns (`id`, `dive_id`, `tank_id`, `computer_id`) that
-/// live on the series row.
+/// One tank pressure reading as the v181 `tank_pressure_profiles` table
+/// stored it (the codec's column order), minus the identity columns (`id`,
+/// `dive_id`, `tank_id`, `computer_id`) that live on the series row.
 class TankPressureSample extends Equatable {
   const TankPressureSample({required this.timestamp, required this.pressure});
 

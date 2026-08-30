@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-/// One profile sample exactly as the `dive_profiles` table stores it, minus
-/// the identity columns (`id`, `dive_id`, `computer_id`, `source_id`,
-/// `is_primary`) that live on the series row.
+/// One profile sample exactly as the v181 `dive_profiles` table stored it
+/// (the codec's column order), minus the identity columns (`id`, `dive_id`,
+/// `computer_id`, `source_id`, `is_primary`) that live on the series row.
 ///
 /// This is the codec's input and output type. It differs from the domain
 /// `DiveProfilePoint` in one field: the legacy per-sample [pressure]

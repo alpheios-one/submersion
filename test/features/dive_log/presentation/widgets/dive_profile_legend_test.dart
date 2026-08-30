@@ -84,7 +84,6 @@ void main() {
               tankPressures: {
                 'tank-1': [
                   TankPressurePoint(
-                    id: 'e0',
                     tankId: 'tank-1',
                     timestamp: 0,
                     pressure: 200,
@@ -353,7 +352,6 @@ void main() {
               tankPressures: {
                 'tank-1': [
                   TankPressurePoint(
-                    id: 'tp-1',
                     tankId: 'tank-1',
                     timestamp: 10,
                     pressure: 210,
@@ -361,7 +359,6 @@ void main() {
                 ],
                 'tank-2': [
                   TankPressurePoint(
-                    id: 'tp-2',
                     tankId: 'tank-2',
                     timestamp: 700,
                     pressure: 150,
@@ -717,7 +714,6 @@ void main() {
               tankPressures: {
                 'tank-1': [
                   TankPressurePoint(
-                    id: 'tp-1',
                     tankId: 'tank-1',
                     timestamp: 0,
                     pressure: 200,
@@ -881,20 +877,10 @@ void main() {
           tanks: _testTanks,
           tankPressures: {
             'tank-1': [
-              TankPressurePoint(
-                id: 'tp-1',
-                tankId: 'tank-1',
-                timestamp: 0,
-                pressure: 200,
-              ),
+              TankPressurePoint(tankId: 'tank-1', timestamp: 0, pressure: 200),
             ],
             'tank-2': [
-              TankPressurePoint(
-                id: 'tp-2',
-                tankId: 'tank-2',
-                timestamp: 0,
-                pressure: 200,
-              ),
+              TankPressurePoint(tankId: 'tank-2', timestamp: 0, pressure: 200),
             ],
           },
         ),
