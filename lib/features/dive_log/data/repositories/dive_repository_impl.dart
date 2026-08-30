@@ -3145,7 +3145,8 @@ class DiveRepository {
       // samples) to NULL so COALESCE falls through to bottom_time, matching
       // calculateRuntimeFromProfile()'s `totalSeconds > 0 ? ... : null`. The
       // span is over every series of the dive, primary and demoted alike,
-      // matching the legacy `dive_profiles` span (no is_primary filter).
+      // which is the span the retired row-per-sample read produced (it had
+      // no is_primary filter either).
       'NULLIF((SELECT MAX(s.end_timestamp) - MIN(s.start_timestamp) '
       'FROM dive_profile_series s WHERE s.dive_id = d.id), 0), '
       'd.bottom_time)';
@@ -3203,7 +3204,7 @@ class DiveRepository {
       'd.max_depth DESC, $_recencyTieBreak',
     );
     // Longest evaluates the effective-runtime expression (a correlated
-    // dive_profiles subquery) once in a derived table and filters/orders on
+    // dive_profile_series subquery) once in a derived table and orders on
     // the alias, rather than paying for the subquery twice (WHERE + ORDER BY)
     // -- this is the dashboard hot path the PR is optimizing.
     final longestRow = await _db

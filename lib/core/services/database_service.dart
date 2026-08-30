@@ -237,7 +237,9 @@ class DatabaseService {
   ///
   /// A single synchronous `PRAGMA user_version` read (via
   /// [getStoredSchemaVersion]) drives BOTH the newer-than-app guard and
-  /// the migration-pending decision, so the file is opened synchronously
+  /// the migration-pending decision, and is handed on to
+  /// [_runUpgradeLadder] for its one-time VACUUM rather than re-read there,
+  /// so the file is opened synchronously
   /// on the UI isolate at most once per open — the rest is executor work.
   Future<AppDatabase> _openDatabase(
     String dbPath, {
@@ -287,7 +289,7 @@ class DatabaseService {
       // mean onMigrationProgress can restart at step 1, so a progress bar may
       // visibly rewind. A rewinding bar beats a bricked launch.
       await retryWhileDatabaseBusy(
-        () => _runUpgradeLadder(file, keyHex, onMigrationProgress),
+        () => _runUpgradeLadder(file, keyHex, stored, onMigrationProgress),
       );
       lastOpenMode = DatabaseOpenMode.migrationThenBackground;
     } else {
@@ -309,11 +311,9 @@ class DatabaseService {
   Future<void> _runUpgradeLadder(
     File file,
     String? keyHex,
+    int? storedBefore,
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
   ) async {
-    // Read before the ladder: the one-time VACUUM below keys off the version
-    // the file had on disk, not the version the ladder leaves behind.
-    final storedBefore = getStoredSchemaVersion(file.path, keyHex: keyHex);
     final migrator = AppDatabase(
       NativeDatabase(file, setup: _connectionSetup(keyHex)),
       onMigrationProgress: onMigrationProgress,
@@ -321,6 +321,9 @@ class DatabaseService {
     try {
       // Force the upgrade ladder to completion before switching executors.
       await migrator.customSelect('SELECT 1').get();
+      // [storedBefore] is the version the file had ON DISK before the
+      // ladder ran, read by the caller: keying off the migrator's own
+      // version here would always read 183 and never VACUUM.
       if (storedBefore != null && storedBefore < 183) {
         // v183 dropped the row-per-sample tables, which on an older file are
         // most of its pages. VACUUM here: outside any migration transaction,

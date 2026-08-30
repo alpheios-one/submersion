@@ -2507,7 +2507,9 @@ class SyncDataSerializer {
             .insertOnConflictUpdate(Dive.fromJson(data).toCompanion(false));
         return;
       case 'diveProfiles':
-        // Task 3 stages these rows
+        // Until Task 3 lands, an inbound legacy sample row is dropped
+        // here: the row-per-sample tables are gone and the packer that
+        // turns these payloads into series rows is Task 3's.
         return;
       case 'diveTanks':
         await _db
@@ -2836,7 +2838,9 @@ class SyncDataSerializer {
             );
         return;
       case 'tankPressureProfiles':
-        // Task 3 stages these rows
+        // Until Task 3 lands, an inbound legacy sample row is dropped
+        // here: the row-per-sample tables are gone and the packer that
+        // turns these payloads into series rows is Task 3's.
         return;
       case 'tideRecords':
         await _db
@@ -3095,7 +3099,9 @@ class SyncDataSerializer {
         );
         return;
       case 'diveProfiles':
-        // Task 3 stages these rows
+        // Until Task 3 lands, an inbound legacy sample row is dropped
+        // here: the row-per-sample tables are gone and the packer that
+        // turns these payloads into series rows is Task 3's.
         return;
       case 'diveTanks':
         await _db.batch(
@@ -3612,7 +3618,9 @@ class SyncDataSerializer {
         );
         return;
       case 'tankPressureProfiles':
-        // Task 3 stages these rows
+        // Until Task 3 lands, an inbound legacy sample row is dropped
+        // here: the row-per-sample tables are gone and the packer that
+        // turns these payloads into series rows is Task 3's.
         return;
       case 'tideRecords':
         await _db.batch(

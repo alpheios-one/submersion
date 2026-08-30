@@ -8,7 +8,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 ///
 /// is_primary/imported_at/created_at on dive_data_sources are not part of
 /// what the packer reads, but the unconditional beforeOpen self-heal
-/// `_backfillMissingDataSources` runs once dives, dive_profiles, and
+/// `_backfillMissingDataSources` runs once dives, dive_profile_series, and
 /// dive_data_sources all exist and inserts rows naming those columns. It
 /// never touches dive_profiles.source_id.
 void legacyDdlAt180(sqlite3.Database rawDb, {int userVersion = 180}) {

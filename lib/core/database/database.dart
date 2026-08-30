@@ -2716,11 +2716,11 @@ class GasSwitches extends Table {
 
 /// One packed series of profile samples: every sample a
 /// (dive, computer, source, is_primary) group holds, encoded by
-/// `ProfileSeriesCodec` (spec 2026-08-28-profile-sample-storage). Replaces
-/// row-per-sample `dive_profiles`, which stays until plan 2e retires it.
+/// `ProfileSeriesCodec` (spec 2026-08-28-profile-sample-storage). Replaced
+/// row-per-sample `dive_profiles`, which v183 dropped.
 ///
-/// The identity columns mirror `dive_profiles` exactly so every ownership
-/// predicate ports one for one. The summary scalars are the values the SQL
+/// The identity columns mirror the ones `dive_profiles` carried, so every
+/// ownership predicate ported one for one. The summary scalars are the values the SQL
 /// consumers read instead of decoding the blob; they are computed from the
 /// same samples the blob packs, so they can never disagree with it.
 @DataClassName('DiveProfileSeriesRow')
@@ -2774,8 +2774,8 @@ class DiveProfileSeries extends Table {
 }
 
 /// One packed series of tank pressure readings for a (dive, tank, computer)
-/// group, encoded by `TankPressureSeriesCodec`. Replaces row-per-sample
-/// `tank_pressure_profiles`, which stays until plan 2e retires it.
+/// group, encoded by `TankPressureSeriesCodec`. Replaced row-per-sample
+/// `tank_pressure_profiles`, which v183 dropped.
 ///
 /// Not the domain entity of the same name
 /// (lib/features/dive_log/domain/entities/profile_series.dart); consumers
@@ -4289,20 +4289,36 @@ class AppDatabase extends _$AppDatabase {
   /// `tank_pressure_series`. Every statement is idempotent, so a ladder that
   /// failed later and retried from the top runs this again harmlessly.
   ///
-  /// The `sync_records` rows are this device's pending outbound work for
-  /// entity types this build no longer exports, and the `deletion_log` rows
-  /// are tombstones for records no peer can hold any more (the compatibility
-  /// floor is 182, so every peer we sync with has the series tables). Left
-  /// behind they would be published forever and never acknowledged.
+  /// Split from [_purgeLegacySampleBookkeeping] because the two have
+  /// different preconditions: the bookkeeping purge is always correct, while
+  /// dropping the tables is only safe once the samples in them are packed.
+  /// Also called from the `beforeOpen` backstop, which is how a database
+  /// whose v183 pack failed once still loses the tables on the first later
+  /// open whose pack succeeds.
   Future<void> _dropLegacySampleTables() async {
     await customStatement('DROP INDEX IF EXISTS idx_dive_profiles_dive_id');
     await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
     await customStatement('DROP TABLE IF EXISTS dive_profiles');
     await customStatement('DROP TABLE IF EXISTS tank_pressure_profiles');
-    // Guarded per table like every other migration helper: a minimal
-    // old-schema fixture (and a database that reached this rung through a
-    // guarded path) can lack the sync bookkeeping entirely, and a DELETE
-    // naming a missing table aborts the whole ladder.
+  }
+
+  /// v183: deletes the sync bookkeeping of the retired sample entities.
+  ///
+  /// The `sync_records` rows are this device's pending outbound work for
+  /// entity types this build no longer exports, and the `deletion_log` rows
+  /// are tombstones for records no peer can hold any more (the compatibility
+  /// floor is 182, so every peer we sync with has the series tables). Left
+  /// behind they would be published forever and never acknowledged.
+  ///
+  /// UNCONDITIONAL in the rung: this is bookkeeping about rows nothing
+  /// exports any more, so it is correct whether or not the pack that guards
+  /// the table drop succeeded.
+  ///
+  /// Guarded per table like every other migration helper: a minimal
+  /// old-schema fixture (and a database that reached this rung through a
+  /// guarded path) can lack the sync bookkeeping entirely, and a DELETE
+  /// naming a missing table aborts the whole ladder.
+  Future<void> _purgeLegacySampleBookkeeping() async {
     for (final table in const ['sync_records', 'deletion_log']) {
       final exists = await customSelect(
         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
@@ -4314,6 +4330,21 @@ class AppDatabase extends _$AppDatabase {
         "'tankPressureProfiles')",
       );
     }
+  }
+
+  /// The `user_version` this database carries on disk right now.
+  Future<int> _storedSchemaVersion() async {
+    final row = await customSelect('PRAGMA user_version').getSingle();
+    return (row.data.values.first as int?) ?? 0;
+  }
+
+  /// True when either retired row-per-sample table is still present.
+  Future<bool> _legacySampleTablesPresent() async {
+    final rows = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_profiles', 'tank_pressure_profiles')",
+    ).get();
+    return rows.isNotEmpty;
   }
 
   Future<void> _assertTankPressureSeriesTable() async {
@@ -4866,10 +4897,16 @@ class AppDatabase extends _$AppDatabase {
 
   /// Data self-heal: synthesize a primary [DiveDataSources] row for any dive
   /// that has profile samples but no data-source row. Older file imports (and
-  /// any import path predating dive_data_sources) wrote dive_profiles without
-  /// the metadata row, which stranded the grouped-by-source view that the 3D
+  /// any import path predating dive_data_sources) wrote samples without the
+  /// metadata row, which stranded the grouped-by-source view that the 3D
   /// scene, spatial map, and computer-compare all read -- they spun forever on
   /// a null scene. The 2D chart survived because it reads dive.profile directly.
+  ///
+  /// Reads `dive_profile_series`, not the retired row-per-sample
+  /// `dive_profiles`: v183 dropped that table, so the pre-183 guard and
+  /// predicate would have made this helper a permanent no-op. The rung packs
+  /// before it drops, so a dive that had primary legacy rows has a primary
+  /// series row and is still healed.
   ///
   /// Runs on every open; a cheap no-op once healed (the NOT EXISTS guard leaves
   /// nothing to insert). Local-only by design: the id is deterministic
@@ -4886,10 +4923,34 @@ class AppDatabase extends _$AppDatabase {
     // exist yet.
     final tables = await customSelect(
       "SELECT name FROM sqlite_master WHERE type='table' "
-      "AND name IN ('dives', 'dive_profiles', 'dive_data_sources')",
+      "AND name IN ('dives', 'dive_profile_series', 'dive_data_sources')",
     ).get();
     final present = tables.map((r) => r.read<String>('name')).toSet();
-    if (!present.containsAll({'dives', 'dive_profiles', 'dive_data_sources'})) {
+    if (!present.containsAll({
+      'dives',
+      'dive_profile_series',
+      'dive_data_sources',
+    })) {
+      return;
+    }
+    // Column guard as well as table guard. A minimal fixture (and a database
+    // caught mid-upgrade) can carry a dive_data_sources that predates these
+    // columns, and beforeOpen's own _assertProfileSeriesSchema will have
+    // created dive_profile_series for it, so the table check alone is not
+    // enough: the INSERT below would abort the open.
+    final sourceCols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final sourceColNames = sourceCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!sourceColNames.containsAll(const {
+      'id',
+      'dive_id',
+      'is_primary',
+      'imported_at',
+      'created_at',
+    })) {
       return;
     }
     await customStatement('''
@@ -4901,8 +4962,8 @@ class AppDatabase extends _$AppDatabase {
         SELECT CAST(strftime('%s','now') AS INTEGER) AS now_s
       ) n
       WHERE EXISTS (
-        SELECT 1 FROM dive_profiles p
-        WHERE p.dive_id = d.id AND p.is_primary = 1
+        SELECT 1 FROM dive_profile_series s
+        WHERE s.dive_id = d.id AND s.is_primary = 1
       )
       AND NOT EXISTS (
         SELECT 1 FROM dive_data_sources s WHERE s.dive_id = d.id
@@ -9424,13 +9485,19 @@ class AppDatabase extends _$AppDatabase {
         // rows would already be dropped. Packing here is a no-op once
         // packed (one indexed NOT EXISTS per legacy dive).
         //
-        // The drop is CONDITIONAL on that pack succeeding. A series table a
-        // parallel branch shaped differently makes every packer INSERT fail;
-        // dropping anyway would destroy the only copy of those samples, and
-        // letting the exception out would leave a database that cannot open
-        // at all (backstop_resilience_test.dart pins that). Skipping the
-        // drop leaves a correct database that merely still carries the old
-        // tables, and the beforeOpen backstop keeps retrying the pack.
+        // Two steps with different preconditions:
+        //  - The bookkeeping purge is UNCONDITIONAL. Those rows describe
+        //    entities nothing exports any more, so deleting them is correct
+        //    whether or not the pack succeeded.
+        //  - The table drop is CONDITIONAL on that pack succeeding. A series
+        //    table a parallel branch shaped differently makes every packer
+        //    INSERT fail; dropping anyway would destroy the only copy of
+        //    those samples, and letting the exception out would leave a
+        //    database that cannot open at all
+        //    (backstop_resilience_test.dart pins that). Skipping the drop
+        //    leaves a correct database that merely still carries the old
+        //    tables, and the beforeOpen backstop below drops them on the
+        //    first later open whose pack succeeds.
         if (from < 183) {
           var packed = true;
           try {
@@ -9446,6 +9513,7 @@ class AppDatabase extends _$AppDatabase {
               stackTrace: stackTrace,
             );
           }
+          await _purgeLegacySampleBookkeeping();
           if (packed) {
             await _dropLegacySampleTables();
           }
@@ -9721,6 +9789,18 @@ class AppDatabase extends _$AppDatabase {
         // second isolate must not turn into a database that cannot open.
         try {
           await packLegacyProfileRows(this);
+          // v183 convergence: the rung skips its table drop when its own
+          // pack threw, and a rung never runs twice, so without this the
+          // legacy tables would survive forever on that database. Once a
+          // later open's pack succeeds the samples are all in the series and
+          // the tables can go. Gated on the stored version so a database
+          // still below 183 (a migration fixture, or one caught mid-ladder)
+          // keeps its tables until its own rung has run.
+          if (await _legacySampleTablesPresent() &&
+              await _storedSchemaVersion() >= 183) {
+            await _dropLegacySampleTables();
+            await _purgeLegacySampleBookkeeping();
+          }
         } catch (e, stackTrace) {
           developer.log(
             'Backstop pack of legacy profile rows failed; continuing',
@@ -9897,8 +9977,9 @@ class AppDatabase extends _$AppDatabase {
         // Without it, the 3D/spatial/compare views spin forever on those dives.
         // Idempotent and local-only (deterministic ids, no HLC bump). Runs
         // AFTER ensurePerformanceIndexes so its per-dive EXISTS/NOT EXISTS
-        // subqueries hit idx_dive_profiles_dive_id / idx_dive_data_sources_dive_id
-        // instead of full-scanning million-row tables on a fresh/restored DB.
+        // subqueries hit idx_dive_profile_series_dive_primary /
+        // idx_dive_data_sources_dive_id instead of full-scanning on a
+        // fresh/restored DB.
         await _backfillMissingDataSources();
 
         // Data self-heal (issue #1064): adopt dives.computer_id from the

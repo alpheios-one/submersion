@@ -65,6 +65,21 @@ void legacyIndexes(sqlite3.Database rawDb) {
   );
 }
 
+/// A `dive_profile_series` without its `samples` column: the backstop's
+/// IF NOT EXISTS DDL leaves it alone and every packer INSERT fails. Same
+/// trick as backstop_resilience_test.dart.
+void malformedSeriesTable(sqlite3.Database rawDb) {
+  rawDb.execute('''
+    CREATE TABLE dive_profile_series (
+      id TEXT NOT NULL PRIMARY KEY,
+      dive_id TEXT NOT NULL,
+      computer_id TEXT,
+      source_id TEXT,
+      is_primary INTEGER NOT NULL DEFAULT 1
+    )
+  ''');
+}
+
 List<Object?> columnOf(sqlite3.Database rawDb, String sql, String column) {
   return rawDb.select(sql).map((r) => r[column]).toList();
 }
@@ -230,6 +245,102 @@ void main() {
       expect(scalar(raw, 'PRAGMA user_version'), 183);
     },
   );
+
+  test('a pack that throws keeps the legacy tables but still purges the '
+      'bookkeeping', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    legacyIndexes(raw);
+    seedParents(raw);
+    seedProfiles(raw);
+    seedPressures(raw);
+    syncBookkeepingDdl(raw);
+    seedSyncBookkeeping(raw);
+    // A dive_profile_series a parallel branch shaped differently: the
+    // IF NOT EXISTS DDL leaves it alone and every packer INSERT fails.
+    malformedSeriesTable(raw);
+
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await expectLater(db.customSelect('SELECT 1').get(), completes);
+
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    // The samples are still only in the legacy tables, so the drop is skipped
+    // rather than destroying them.
+    expect(
+      columnOf(
+        raw,
+        "SELECT name FROM sqlite_master WHERE name IN ('dive_profiles', "
+            "'tank_pressure_profiles') ORDER BY name",
+        'name',
+      ),
+      ['dive_profiles', 'tank_pressure_profiles'],
+    );
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 11);
+    // The bookkeeping purge does not depend on the pack: those rows describe
+    // entities this build no longer exports either way.
+    expect(
+      columnOf(raw, 'SELECT entity_type FROM sync_records', 'entity_type'),
+      ['dives'],
+    );
+    expect(
+      columnOf(raw, 'SELECT entity_type FROM deletion_log', 'entity_type'),
+      ['dives'],
+    );
+  });
+
+  test('the backstop drops the legacy tables on the first later open whose '
+      'pack succeeds', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    legacyIndexes(raw);
+    seedParents(raw);
+    seedProfiles(raw);
+    seedPressures(raw);
+    syncBookkeepingDdl(raw);
+    seedSyncBookkeeping(raw);
+    malformedSeriesTable(raw);
+
+    // First open: the rung's pack throws, so the tables survive at 183.
+    final first = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    await first.customSelect('SELECT 1').get();
+    await first.close();
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 11);
+
+    // The malformed series table is repaired (dropped, so the backstop's
+    // IF NOT EXISTS DDL recreates it correctly). The rung never runs again,
+    // so only the backstop can finish the job.
+    raw.execute('DROP TABLE dive_profile_series');
+
+    final second = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(second.close);
+    await second.customSelect('SELECT 1').get();
+
+    expect(
+      scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'),
+      greaterThan(0),
+    );
+    expect(
+      scalar(raw, 'SELECT SUM(sample_count) AS n FROM dive_profile_series'),
+      10,
+    );
+    expect(
+      raw.select(
+        "SELECT name FROM sqlite_master WHERE name IN ('dive_profiles', "
+        "'tank_pressure_profiles')",
+      ),
+      isEmpty,
+    );
+  });
 
   test('v183 is present in the migration ladder', () {
     expect(AppDatabase.currentSchemaVersion, 183);

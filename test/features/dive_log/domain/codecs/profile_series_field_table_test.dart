@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
@@ -53,52 +54,24 @@ void main() {
     );
   });
 
-  test('every sample field is representable by the codec', () {
-    // The whole ProfileSample surface, minus the identity the series row
-    // carries: if a sample field ever gains a member with no field-table
-    // entry, it would be silently dropped on encode.
-    const sampleFields = {
-      'timestamp',
-      'depth',
-      'pressure',
-      'temperature',
-      'heart_rate',
-      'ascent_rate',
-      'ceiling',
-      'ndl',
-      'setpoint',
-      'pp_o2',
-      'o2_sensor1',
-      'o2_sensor2',
-      'o2_sensor3',
-      'o2_sensor4',
-      'o2_sensor5',
-      'o2_sensor6',
-      'cns',
-      'tts',
-      'rbt',
-      'deco_type',
-      'heart_rate_source',
-      'heading',
-      'o2_sensor_mv1',
-      'o2_sensor_mv2',
-      'o2_sensor_mv3',
-      'o2_sensor_mv4',
-      'o2_sensor_mv5',
-      'o2_sensor_mv6',
-    };
-    expect({
-      for (final f in ProfileSeriesCodec.fieldTableV1) f.name,
-    }, sampleFields);
+  test('the field table covers every ProfileSample field', () {
+    // Anchored on the live type, not a second copy of the list above: a
+    // sample field added without a matching field-table entry would be
+    // silently dropped on encode, and this is what says so.
+    expect(
+      kProfileFieldTableV1.length,
+      const ProfileSample(timestamp: 0, depth: 0.0).props.length,
+    );
   });
 
-  test('the tank codec packs exactly timestamp and pressure', () {
+  test('the tank codec covers every TankPressureSample field', () {
     const sample = TankPressureSample(timestamp: 30, pressure: 180.0);
-    expect(sample.timestamp, 30);
-    expect(sample.pressure, 180.0);
+    // The tank codec has no field table: it writes the two columns inline.
+    // Anchor that count on the live type the same way, so a third field
+    // cannot be added without this failing.
+    expect(sample.props, hasLength(2));
     const codec = TankPressureSeriesCodec();
     final decoded = codec.decode(codec.encode(const [sample]).bytes);
-    expect(decoded.single.timestamp, 30);
-    expect(decoded.single.pressure, 180.0);
+    expect(decoded.single.props, sample.props);
   });
 }
