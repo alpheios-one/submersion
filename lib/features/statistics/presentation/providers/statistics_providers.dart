@@ -432,7 +432,7 @@ final bestSitesForMarineLifeProvider = FutureProvider<List<RankingItem>>((
 
 /// Per-species statistics (sightings, depth range, sites, first/last seen).
 ///
-/// Deliberately UNFILTERED: its only consumer is the Marine Life
+/// Deliberately UNFILTERED: its only consumer is the Species
 /// species-detail page (route `/species/:id`), which is not a Statistics-tab
 /// surface and has no filter UI. Watching [statisticsFilterProvider] here
 /// would silently scope each species' detail stats to whatever filter is
