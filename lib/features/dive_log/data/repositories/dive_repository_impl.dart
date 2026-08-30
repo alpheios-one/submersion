@@ -3403,9 +3403,11 @@ class DiveRepository {
       'THEN CAST((d.exit_time - d.entry_time) / 1000 AS INTEGER) END, '
       // NULLIF drops a zero-span profile (single point or same-timestamp
       // samples) to NULL so COALESCE falls through to bottom_time, matching
-      // calculateRuntimeFromProfile()'s `totalSeconds > 0 ? ... : null`.
-      'NULLIF((SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id), 0), '
+      // calculateRuntimeFromProfile()'s `totalSeconds > 0 ? ... : null`. The
+      // span is over every series of the dive, primary and demoted alike,
+      // matching the legacy `dive_profiles` span (no is_primary filter).
+      'NULLIF((SELECT MAX(s.end_timestamp) - MIN(s.start_timestamp) '
+      'FROM dive_profile_series s WHERE s.dive_id = d.id), 0), '
       'd.bottom_time)';
 
   /// Deterministic tie-break for the personal-record winners, matching the
@@ -3448,7 +3450,7 @@ class DiveRepository {
             'SELECT d.id FROM dives d WHERE $where $diverFilter '
             'ORDER BY $orderBy LIMIT 1',
             variables: vars,
-            readsFrom: {_db.dives, _db.diveProfiles},
+            readsFrom: {_db.dives, _db.diveProfileSeries},
           )
           .getSingleOrNull();
       return row?.read<String>('id');
@@ -3472,7 +3474,7 @@ class DiveRepository {
           'd.dive_number AS dn FROM dives d WHERE 1 = 1 $diverFilter'
           ') WHERE er > 0 ORDER BY er DESC, recency DESC, dn DESC LIMIT 1',
           variables: vars,
-          readsFrom: {_db.dives, _db.diveProfiles},
+          readsFrom: {_db.dives, _db.diveProfileSeries},
         )
         .getSingleOrNull();
     final longestId = longestRow?.read<String>('id');
@@ -4937,8 +4939,8 @@ class DiveRepository {
   static const _diveTimesSelect =
       'SELECT d.id, d.dive_date_time, d.entry_time, d.exit_time, '
       'd.runtime, d.bottom_time, '
-      '(SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-      'WHERE p.dive_id = d.id) AS profile_span '
+      '(SELECT MAX(s.end_timestamp) - MIN(s.start_timestamp) '
+      'FROM dive_profile_series s WHERE s.dive_id = d.id) AS profile_span '
       'FROM dives d';
 
   domain.DiveTimes _mapDiveTimesRow(QueryRow row) {
@@ -4972,7 +4974,7 @@ class DiveRepository {
         .customSelect(
           '$_diveTimesSelect WHERE d.id = ?',
           variables: [Variable<String>(diveId)],
-          readsFrom: {_db.dives, _db.diveProfiles},
+          readsFrom: {_db.dives, _db.diveProfileSeries},
         )
         .get();
     if (rows.isEmpty) return null;
@@ -4998,7 +5000,7 @@ class DiveRepository {
             Variable<int>(cutoff),
             Variable<int>(cutoff),
           ],
-          readsFrom: {_db.dives, _db.diveProfiles},
+          readsFrom: {_db.dives, _db.diveProfileSeries},
         )
         .get();
     if (rows.isEmpty) return null;
@@ -5027,7 +5029,7 @@ class DiveRepository {
           'ORDER BY COALESCE(d.entry_time, d.dive_date_time) DESC, '
           'd.dive_number DESC',
           variables: args,
-          readsFrom: {_db.dives, _db.diveProfiles},
+          readsFrom: {_db.dives, _db.diveProfileSeries},
         )
         .get();
     return rows.map(_mapDiveTimesRow).toList();

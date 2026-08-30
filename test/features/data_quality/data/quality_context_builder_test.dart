@@ -3,6 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/data_quality/data/services/quality_context_builder.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 
@@ -11,11 +15,15 @@ import '../../../helpers/test_database.dart';
 void main() {
   late AppDatabase db;
   late DiveRepository diveRepo;
+  late ProfileSeriesRepository profileSeries;
+  late TankPressureSeriesRepository tankSeries;
   late QualityContextBuilder builder;
 
   setUp(() async {
     db = await setUpTestDatabase();
     diveRepo = DiveRepository();
+    profileSeries = ProfileSeriesRepository();
+    tankSeries = TankPressureSeriesRepository();
     builder = QualityContextBuilder();
   });
   tearDown(tearDownTestDatabase);
@@ -50,17 +58,12 @@ void main() {
         const domain.DiveProfilePoint(timestamp: 0, depth: 0.0),
       ],
     );
-    // Directly insert a non-finite depth row: the builder must drop it.
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion.insert(
-            id: 'p-bad',
-            diveId: 'd1',
-            timestamp: 20,
-            depth: double.infinity,
-          ),
-        );
+    // A second primary series carrying a non-finite depth sample: the
+    // builder must drop it.
+    await profileSeries.insertSeries(
+      diveId: 'd1',
+      samples: const [ProfileSample(timestamp: 20, depth: double.infinity)],
+    );
     final ctx = (await builder.buildAll(['d1'])).single;
     expect(ctx.primarySamples.map((s) => s.t), [0, 10]); // sorted, bad dropped
     expect(ctx.dive.id, 'd1');
@@ -70,7 +73,7 @@ void main() {
     'builds tank pressures (dropping non-finite) and gas switches',
     () async {
       final entry = DateTime.utc(2026, 7, 1, 10);
-      // tank_pressure_profiles.tankId and gas_switches.tankId both FK to
+      // tank_pressure_series.tankId and gas_switches.tankId both FK to
       // dive_tanks, so the referenced tanks must exist first.
       await diveRepo.createDive(
         domain.Dive(
@@ -91,29 +94,19 @@ void main() {
           ],
         ),
       );
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'tp1',
-              diveId: 'dP',
-              tankId: 'tankA',
-              timestamp: 0,
-              pressure: 200.0,
-            ),
-          );
+      await tankSeries.insertSeries(
+        diveId: 'dP',
+        tankId: 'tankA',
+        samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      );
       // Non-finite pressure must be dropped by the sanitizing loop.
-      await db
-          .into(db.tankPressureProfiles)
-          .insert(
-            TankPressureProfilesCompanion.insert(
-              id: 'tp2',
-              diveId: 'dP',
-              tankId: 'tankA',
-              timestamp: 10,
-              pressure: double.infinity,
-            ),
-          );
+      await tankSeries.insertSeries(
+        diveId: 'dP',
+        tankId: 'tankA',
+        samples: const [
+          TankPressureSample(timestamp: 10, pressure: double.infinity),
+        ],
+      );
       await db
           .into(db.gasSwitches)
           .insert(
