@@ -297,6 +297,92 @@ void main() {
     },
   );
 
+  test('fetchRecords batches diveProfileSeries and tankPressureSeries, '
+      'keyed by id with samples as base64', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await seedBareDive(dbA, 'd2');
+    final profileId1 = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: 1000,
+    );
+    final profileId2 = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd2',
+      samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+      now: 1000,
+    );
+    await dbA
+        .into(dbA.diveTanks)
+        .insert(DiveTanksCompanion.insert(id: 'tank1', diveId: 'd1'));
+    final tankId = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd1',
+      tankId: 'tank1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+
+    final profileRows = await SyncDataSerializer().fetchRecords(
+      'diveProfileSeries',
+      [profileId1, profileId2],
+    );
+    expect(profileRows.keys.toSet(), {profileId1, profileId2});
+    expect(profileRows[profileId1]!['samples'], isA<String>());
+    expect(profileRows[profileId2]!['samples'], isA<String>());
+
+    final tankRows = await SyncDataSerializer().fetchRecords(
+      'tankPressureSeries',
+      [tankId],
+    );
+    expect(tankRows.keys.toSet(), {tankId});
+    expect(tankRows[tankId]!['samples'], isA<String>());
+  });
+
+  test('a batch with one corrupt blob writes only the sound rows', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await seedBareDive(dbA, 'd2');
+    final goodId = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: 1000,
+    );
+    final good = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      goodId,
+    );
+    final corruptId = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd2',
+      samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+      now: 1000,
+    );
+    final corruptSource = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      corruptId,
+    );
+    final corrupt = {
+      ...corruptSource!,
+      'samples': base64Encode(const [1, 2, 3]),
+    };
+    await ProfileSeriesRepository().deleteForDive('d1');
+    await ProfileSeriesRepository().deleteForDive('d2');
+
+    await SyncDataSerializer().upsertRecords('diveProfileSeries', [
+      good!,
+      corrupt,
+    ]);
+
+    final remaining = await ProfileSeriesRepository().getRowsForDives([
+      'd1',
+      'd2',
+    ]);
+    expect(remaining.map((r) => r.id), [goodId]);
+  });
+
   test('fetchRecord carries tank pressure samples as base64 and '
       'upsertRecord round-trips it', () async {
     dbA = await setUpTestDatabase();

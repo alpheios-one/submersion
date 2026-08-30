@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -219,6 +220,11 @@ class SyncData {
   final List<Map<String, dynamic>> divers;
   final List<Map<String, dynamic>> diverSettings;
   final List<Map<String, dynamic>> dives;
+
+  /// Inbound only since v182: older peers still send row-per-sample arrays;
+  /// they apply into the legacy tables and are packed into series by
+  /// [SyncDataSerializer.packLegacySamples]. Never exported, absent from
+  /// [toJson].
   final List<Map<String, dynamic>> diveProfiles;
   final List<Map<String, dynamic>> diveTanks;
   final List<Map<String, dynamic>> diveEquipment;
@@ -272,6 +278,11 @@ class SyncData {
   final List<Map<String, dynamic>> diveRoles;
   final List<Map<String, dynamic>> tankPresets;
   final List<Map<String, dynamic>> diveComputers;
+
+  /// Inbound only since v182: older peers still send row-per-sample arrays;
+  /// they apply into the legacy tables and are packed into series by
+  /// [SyncDataSerializer.packLegacySamples]. Never exported, absent from
+  /// [toJson].
   final List<Map<String, dynamic>> tankPressureProfiles;
   final List<Map<String, dynamic>> tideRecords;
   final List<Map<String, dynamic>> settings;
@@ -378,7 +389,6 @@ class SyncData {
     'divers': divers,
     'diverSettings': diverSettings,
     'dives': dives,
-    'diveProfiles': diveProfiles,
     'diveTanks': diveTanks,
     'diveEquipment': diveEquipment,
     'diveWeights': diveWeights,
@@ -431,7 +441,6 @@ class SyncData {
     'diveRoles': diveRoles,
     'tankPresets': tankPresets,
     'diveComputers': diveComputers,
-    'tankPressureProfiles': tankPressureProfiles,
     'tideRecords': tideRecords,
     'settings': settings,
     'species': species,
@@ -665,7 +674,6 @@ class SyncDataSerializer {
     (key: 'divers', table: _db.divers, blob: false, full: null),
     (key: 'diverSettings', table: _db.diverSettings, blob: false, full: null),
     (key: 'dives', table: _db.dives, blob: false, full: null),
-    (key: 'diveProfiles', table: _db.diveProfiles, blob: false, full: null),
     (key: 'diveTanks', table: _db.diveTanks, blob: false, full: null),
     (
       key: 'diveEquipment',
@@ -872,12 +880,6 @@ class SyncDataSerializer {
     ),
     (key: 'tankPresets', table: _db.tankPresets, blob: false, full: null),
     (key: 'diveComputers', table: _db.diveComputers, blob: false, full: null),
-    (
-      key: 'tankPressureProfiles',
-      table: _db.tankPressureProfiles,
-      blob: false,
-      full: null,
-    ),
     (key: 'tideRecords', table: _db.tideRecords, blob: false, full: null),
     (
       key: 'settings',
@@ -1192,10 +1194,6 @@ class SyncDataSerializer {
         () => _exportDiverSettings(hlcSince),
       ),
       dives: await _safeExport('dives', () => _exportDives(hlcSince)),
-      diveProfiles: await _safeExport(
-        'diveProfiles',
-        () => _exportDiveProfiles(hlcSince),
-      ),
       diveTanks: await _safeExport(
         'diveTanks',
         () => _exportDiveTanks(hlcSince),
@@ -1386,10 +1384,6 @@ class SyncDataSerializer {
         'diveComputers',
         () => _exportDiveComputers(hlcSince),
       ),
-      tankPressureProfiles: await _safeExport(
-        'tankPressureProfiles',
-        () => _exportTankPressureProfiles(hlcSince),
-      ),
       tideRecords: await _safeExport(
         'tideRecords',
         () => _exportTideRecords(hlcSince),
@@ -1466,6 +1460,12 @@ class SyncDataSerializer {
       ),
     );
   }
+
+  /// Packs legacy row-per-sample rows that an older peer's changeset left in
+  /// `dive_profiles` / `tank_pressure_profiles` into series rows. Dives that
+  /// already have a series are left alone: the peer is held below the floor
+  /// and will migrate its own rows when it upgrades.
+  Future<ProfilePackReport> packLegacySamples() => packLegacyProfileRows(_db);
 
   /// Convert payload to JSON string
   String serializePayload(SyncPayload payload) {
@@ -2243,6 +2243,20 @@ class SyncDataSerializer {
           _db.settings,
         )..where((t) => t.key.isIn(idList))).get();
         return {for (final r in rows) r.key: r.toJson()};
+      case 'diveProfileSeries':
+        final rows = await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
+      case 'tankPressureSeries':
+        final rows = await (_db.select(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       default:
         // Clockless / composite-key entities are never fetched by the merge;
         // fall back to per-id reads so the method is total and correct.
@@ -4698,26 +4712,6 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson()).toList();
   }
 
-  Future<List<Map<String, dynamic>>> _exportDiveProfiles(
-    String? hlcSince,
-  ) async {
-    // Profile points don't have updatedAt, export all for modified dives
-    if (hlcSince != null) {
-      final modifiedDives = await (_db.select(
-        _db.dives,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
-      final diveIds = modifiedDives.map((d) => d.id).toSet();
-      if (diveIds.isEmpty) return [];
-
-      final rows = await (_db.select(
-        _db.diveProfiles,
-      )..where((t) => t.diveId.isIn(diveIds))).get();
-      return rows.map((r) => r.toJson()).toList();
-    }
-    final rows = await _db.select(_db.diveProfiles).get();
-    return rows.map((r) => r.toJson()).toList();
-  }
-
   Future<List<Map<String, dynamic>>> _exportDiveTanks(String? hlcSince) async {
     // Similar to profiles, export for modified dives
     if (hlcSince != null) {
@@ -5419,25 +5413,6 @@ class SyncDataSerializer {
     final copy = Map<String, dynamic>.from(data);
     copy.remove('bluetoothAddress');
     return copy;
-  }
-
-  Future<List<Map<String, dynamic>>> _exportTankPressureProfiles(
-    String? hlcSince,
-  ) async {
-    if (hlcSince != null) {
-      final modifiedDives = await (_db.select(
-        _db.dives,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
-      final diveIds = modifiedDives.map((d) => d.id).toSet();
-      if (diveIds.isEmpty) return [];
-
-      final rows = await (_db.select(
-        _db.tankPressureProfiles,
-      )..where((t) => t.diveId.isIn(diveIds))).get();
-      return rows.map((r) => r.toJson()).toList();
-    }
-    final rows = await _db.select(_db.tankPressureProfiles).get();
-    return rows.map((r) => r.toJson()).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportTideRecords(

@@ -1534,6 +1534,17 @@ class SyncService {
       recordsFailed += result.recordsFailed;
     }
 
+    if (data.diveProfiles.isNotEmpty || data.tankPressureProfiles.isNotEmpty) {
+      // v182 receive-side tolerance: an older peer's row-per-sample arrays
+      // become series for dives that have none yet.
+      final packed = await _serializer.packLegacySamples();
+      _log.info(
+        'Packed legacy sample rows from a peer: '
+        '${packed.profileSeries} profile series, '
+        '${packed.tankSeries} tank series',
+      );
+    }
+
     // Integrity backstop: applying a remote deletion of a parent can leave a
     // local row pointing at it via a non-cascading FK, which would fail the
     // deferred-FK COMMIT and abort the whole sync. Clear or delete any such
@@ -2032,7 +2043,6 @@ class SyncService {
     'diveTags': false,
     'diveDiveTypes': false,
     'diveBuddies': false,
-    'diveProfiles': false,
     'diveProfileEvents': false,
     'diveSafetyReviews': false,
     'diveSafetyFindings': false,
@@ -2047,7 +2057,6 @@ class SyncService {
     'csvPresets': true,
     'viewConfigs': true,
     'fieldPresets': false,
-    'tankPressureProfiles': false,
     'tideRecords': false,
     'sightings': false,
     'certifications': true,
