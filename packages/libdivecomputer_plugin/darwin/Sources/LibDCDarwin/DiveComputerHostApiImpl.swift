@@ -12,11 +12,13 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
     private var downloadSession: OpaquePointer?  // libdc_download_session_t*
     private var activeBleStream: BleIoStream?
     private var serialScanner: SerialScanner?
-    // Holds the open byte pipe for the duration of a serial-transport download.
-    // Typed as AnyObject because it is either a SerialIoStream or, for a cable
-    // the operating system never exposed as a serial port, an FtdiUsbIoStream
-    // (issue #732). Nothing calls methods on it: its only job is to keep the
-    // stream alive, because the callback table's userdata pointer is unretained.
+    // Holds the open byte pipe for the duration of a USB or serial download.
+    // Typed as AnyObject because it is a SerialIoStream, or an FtdiUsbIoStream
+    // for a cable the operating system never exposed as a serial port (issue
+    // #732), or a UsbHidIoStream for a computer that speaks HID rather than a
+    // serial protocol (issue #1271). Nothing calls methods on it: its only job
+    // is to keep the stream alive, because the callback table's userdata
+    // pointer is unretained.
     private var activeSerialStream: AnyObject?
 
     /// Why the most recent candidate could not be opened, for the error the
@@ -74,12 +76,20 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         if bitmask & UInt32(LIBDC_TRANSPORT_BLE) != 0 {
             transports.append(.ble)
         }
-        // USBHID is deliberately NOT surfaced as USB: no platform build
-        // implements a USB HID transport (HAVE_HIDAPI is off), so
-        // advertising it sent HID-only devices (Suunto EON Steel family)
-        // into the serial path's "No USB serial ports found" dead end
-        // (#143). BLE is the working path for those devices.
-        if bitmask & UInt32(LIBDC_TRANSPORT_USB) != 0 {
+        // USB HID is reported as USB, which is the cable the user is holding;
+        // the app has no separate HID transfer mode and does not want one.
+        //
+        // It was suppressed until issue #1271, because advertising a transport
+        // with nothing behind it sent HID-only devices (the Suunto EON Steel
+        // family) into the serial path's "No USB serial ports found" dead end
+        // (#143). UsbHidIoStream is that missing transport, so the bit can be
+        // told the truth again. macOS only: iOS shares this file and has no
+        // USB host role, so a HID device is never reachable there.
+        var usb = bitmask & UInt32(LIBDC_TRANSPORT_USB) != 0
+        #if os(macOS)
+        usb = usb || bitmask & UInt32(LIBDC_TRANSPORT_USBHID) != 0
+        #endif
+        if usb {
             transports.append(.usb)
         }
         if bitmask & UInt32(LIBDC_TRANSPORT_SERIAL) != 0 {
@@ -400,12 +410,14 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
     private enum DownloadCandidate {
         case serialPort(String)
         case ftdiUsb(UsbFtdiDevice)
+        case usbHid(UsbHidDevice)
 
         /// Label for logs and the probe report shown to the user.
         var label: String {
             switch self {
             case .serialPort(let path): return path
             case .ftdiUsb(let device): return "\(device.displayName) (USB)"
+            case .usbHid(let device): return "\(device.displayName) (USB HID)"
             }
         }
 
@@ -419,6 +431,19 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             switch self {
             case .serialPort: return "SER"
             case .ftdiUsb: return "USB"
+            case .usbHid: return "HID"
+            }
+        }
+
+        /// The libdivecomputer transport this candidate speaks.
+        ///
+        /// Per-candidate rather than per-download because the drivers branch on
+        /// it. An FTDI cable is a serial line whatever bus it hangs off, so it
+        /// shares SERIAL with a /dev node.
+        var transportValue: UInt32 {
+            switch self {
+            case .serialPort, .ftdiUsb: return UInt32(LIBDC_TRANSPORT_SERIAL)
+            case .usbHid: return UInt32(LIBDC_TRANSPORT_USBHID)
             }
         }
     }
@@ -456,7 +481,42 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
                 return nil
             }
             return (stream, stream.makeCallbacks(), stream.close)
+        case .usbHid(let device):
+            let stream = UsbHidIoStream()
+            if let reason = stream.open(device: device) {
+                NativeLogger.e(
+                    "DiveComputerHost", category: candidate.logCategory,
+                    "Failed to open \(device.displayName): \(reason)")
+                lastCandidateFailure = reason
+                return nil
+            }
+            NativeLogger.i(
+                "DiveComputerHost", category: candidate.logCategory,
+                "Opened USB HID device: \(device.displayName)")
+            return (stream, stream.makeCallbacks(), stream.close)
         }
+    }
+
+    /// USB HID devices belonging to the selected model, most-specific first.
+    ///
+    /// Which HID device belongs to which computer is libdivecomputer's
+    /// knowledge, so the vendor and product ids are put to `libdc_usbhid_match`
+    /// rather than compared against a table kept here.
+    private func usbHidCandidates(for device: DiscoveredDevice) -> [DownloadCandidate] {
+        let transports = libdc_descriptor_transports(
+            device.vendor, device.product, UInt32(device.model))
+        guard transports & UInt32(LIBDC_TRANSPORT_USBHID) != 0 else { return [] }
+
+        let found = UsbHidDeviceEnumerator.enumerateMatching(
+            log: { message in
+                NativeLogger.i("DiveComputerHost", category: "HID", message)
+            },
+            isMatch: { vendorId, productId in
+                libdc_usbhid_match(
+                    device.vendor, device.product, UInt32(device.model),
+                    vendorId, productId) != 0
+            })
+        return found.map { DownloadCandidate.usbHid($0) }
     }
 
     /// Serial-transport download with auto-probe, mirroring the Linux/Windows
@@ -475,9 +535,18 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         device: DiscoveredDevice, session: OpaquePointer,
         downloadCallbacks: libdc_download_callbacks_t, fingerprint: [UInt8]?
     ) {
-        let transportValue = UInt32(LIBDC_TRANSPORT_SERIAL)
+        // USB HID computers first. A HID-only model (the Scubapro G2 family,
+        // the Suunto EON Steel family) has no serial port to find, and probing
+        // unrelated ports before it would write dive-computer handshake bytes
+        // at hardware that is not the target (issue #1271).
+        var candidates = usbHidCandidates(for: device)
+        let hidCapable = !candidates.isEmpty
+            || libdc_descriptor_transports(
+                device.vendor, device.product, UInt32(device.model))
+                & UInt32(LIBDC_TRANSPORT_USBHID) != 0
+
         let available = SerialPortEnumerator.enumerateUsbSerialPaths()
-        var candidates = SerialPortEnumerator.candidatePorts(
+        candidates += SerialPortEnumerator.candidatePorts(
             address: device.address, available: available)
             .map { DownloadCandidate.serialPort($0) }
 
@@ -499,9 +568,18 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         }
 
         if candidates.isEmpty {
-            reportError(
-                code: "no_serial_ports",
-                message: "No USB serial ports found. Is the dive computer connected and powered on?")
+            // A HID-only model has no serial port to go looking for, so the
+            // serial wording would send the user hunting for the wrong thing.
+            if hidCapable {
+                reportError(
+                    code: "no_usb_device",
+                    message: "No \(device.product) found over USB. "
+                        + "Is it connected to this computer and powered on?")
+            } else {
+                reportError(
+                    code: "no_serial_ports",
+                    message: "No USB serial ports found. Is the dive computer connected and powered on?")
+            }
             return
         }
 
@@ -517,7 +595,8 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             }
             self.activeSerialStream = opened.stream
             let result = runOnce(
-                session: session, device: device, transportValue: transportValue,
+                session: session, device: device,
+                transportValue: candidate.transportValue,
                 ioCallbacks: opened.callbacks, fingerprint: fingerprint,
                 downloadCallbacks: downloadCallbacks)
             opened.close()
@@ -552,7 +631,8 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
                 "Probing \(candidate.label)")
             self.activeSerialStream = opened.stream
             let result = runOnce(
-                session: session, device: device, transportValue: transportValue,
+                session: session, device: device,
+                transportValue: candidate.transportValue,
                 ioCallbacks: opened.callbacks, fingerprint: fingerprint,
                 downloadCallbacks: downloadCallbacks)
             lastResult = result

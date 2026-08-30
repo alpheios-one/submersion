@@ -99,3 +99,13 @@ swiftc -framework IOKit -o "$BUILD_DIR/usb_ftdi_device_enumerator_tests" \
     Tests/UsbFtdiDeviceEnumeratorTests/main.swift
 
 "$BUILD_DIR/usb_ftdi_device_enumerator_tests"
+
+# USB HID report framing (issue #1271). libdivecomputer puts the HID report id
+# in the first byte of the write buffer; IOHIDDeviceSetReport takes it as a
+# separate argument. Vectors come from libdivecomputer's own usbhid.c and from
+# hidapi's macOS backend, not from our implementation.
+swiftc -o "$BUILD_DIR/usb_hid_report_framing_tests" \
+    Sources/LibDCDarwin/UsbHidReportFraming.swift \
+    Tests/UsbHidReportFramingTests/main.swift
+
+"$BUILD_DIR/usb_hid_report_framing_tests"
