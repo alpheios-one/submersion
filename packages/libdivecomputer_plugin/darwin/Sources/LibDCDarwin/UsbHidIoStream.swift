@@ -268,8 +268,17 @@ final class UsbHidIoStream {
         actual.pointee = 0
         guard let ref = device else { return Int32(LIBDC_STATUS_IO) }
 
+        // Nothing to send is a success, not an error. libdivecomputer's own
+        // USB HID write short-circuits it that way (`usbhid.c:750-752`), and so
+        // do the Windows and Linux backends here, so failing it would make
+        // macOS the only one of the four that aborts a download over it.
+        if size == 0 { return Int32(LIBDC_STATUS_SUCCESS) }
+
         let bytes = Array(UnsafeRawBufferPointer(start: data, count: size))
         guard let report = UsbHidReportFraming.outgoingReport(from: bytes) else {
+            // Unreachable while size > 0, since a non-empty buffer always has a
+            // report id. Kept so a future caller cannot reach IOKit with a
+            // buffer this has not framed.
             return Int32(LIBDC_STATUS_INVALIDARGS)
         }
 
