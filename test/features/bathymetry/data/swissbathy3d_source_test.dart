@@ -8,9 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
@@ -271,4 +273,65 @@ nodata_value -9999
       expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
     });
   });
+
+  group('SwissBathy3dSource in the resolver chain', () {
+    // Regression test for a bug observed after the swissBATHY3D integration:
+    // a land coordinate outside every known lake stopped loading a 3D model
+    // at all. Root cause turned out to be the multi-tile stitching bug (a
+    // separate fix) rather than the fallback logic itself, but nothing
+    // previously exercised the full resolver + real source combination for
+    // this case — this locks that path in.
+    test('a land coordinate outside every known lake falls through to the '
+        'next resolver tier and still yields a result', () async {
+      var httpCalls = 0;
+      final swissSource = buildSource((_) async {
+        httpCalls++;
+        return http.Response('', 404);
+      });
+      final fallback = _FakeFallbackSource();
+
+      final resolution = await BathymetryResolver(
+        sources: [swissSource, fallback],
+      ).resolve(alpsPoint);
+
+      // covers() already excludes it; the tier makes no network call.
+      expect(httpCalls, 0);
+      expect(fallback.fetchCount, 1);
+      expect(resolution.grid?.sourceId, 'fallback');
+      expect(resolution.definitive, isTrue);
+    });
+  });
+}
+
+class _FakeFallbackSource implements BathymetrySource {
+  int fetchCount = 0;
+
+  @override
+  String get id => 'fallback';
+
+  @override
+  bool get global => true;
+
+  @override
+  bool covers(GeoPoint center) => true;
+
+  @override
+  Future<BathymetryGrid> fetch(
+    GeoPoint center, {
+    required double spanMeters,
+  }) async {
+    fetchCount++;
+    return BathymetryGrid(
+      originLat: center.latitude,
+      originLon: center.longitude,
+      cellSizeLatDeg: 0.004,
+      cellSizeLonDeg: 0.004,
+      rows: 1,
+      cols: 10,
+      depthsMeters: [for (var i = 0; i < 10; i++) 50.0],
+      sourceId: 'fallback',
+      resolutionMeters: 100,
+      fetchedAt: DateTime.utc(2026, 7, 28),
+    );
+  }
 }
