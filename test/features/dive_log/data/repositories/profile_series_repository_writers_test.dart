@@ -79,6 +79,26 @@ void main() {
     },
   );
 
+  test(
+    'hasSeriesForComputer is true only for the computer that contributed',
+    () async {
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: 1000,
+      );
+      // A null-computer series never satisfies a specific computer's guard.
+      await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+        now: 1000,
+      );
+      expect(await repo.hasSeriesForComputer('dive-1', 'comp-1'), isTrue);
+      expect(await repo.hasSeriesForComputer('dive-1', 'comp-2'), isFalse);
+    },
+  );
+
   test('hasAnySeries is false before and true after an insert', () async {
     expect(await repo.hasAnySeries('dive-1'), isFalse);
     await repo.insertSeries(

@@ -29,8 +29,9 @@ class TankPressureSeriesRepository {
   final SyncRepository _syncRepository;
   final _uuid = const Uuid();
 
-  /// Inserts one series and marks it pending. [samples] must be non-empty
-  /// and timestamp-ordered; exact duplicates are dropped. Returns the id.
+  /// Inserts one series and marks it pending. [samples] must be non-empty;
+  /// any order, the repository sorts by timestamp (stable) and drops exact
+  /// duplicates. Returns the id.
   Future<String> insertSeries({
     required String diveId,
     required String tankId,
@@ -266,12 +267,7 @@ class TankPressureSeriesRepository {
   Future<List<String>> _delete(
     Expression<bool> Function($TankPressureSeriesTable t) where,
   ) async {
-    final query = _db.selectOnly(_db.tankPressureSeries)
-      ..addColumns([_db.tankPressureSeries.id])
-      ..where(where(_db.tankPressureSeries));
-    final ids = [
-      for (final row in await query.get()) row.read(_db.tankPressureSeries.id)!,
-    ];
+    final ids = await _ids(where);
     if (ids.isEmpty) return ids;
     // The tombstones and the delete are one logical write. A failure between
     // them would leave tombstones for rows that are still live here, and the

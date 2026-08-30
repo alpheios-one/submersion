@@ -415,9 +415,9 @@ class DiveMergeService {
         );
       }
 
-      // 7. Tank pressure series, re-based + remapped onto the merged tanks
-      //    (parent-dive sync pattern: no per-row pending, same as
-      //    createDive's profile series).
+      // 7. Tank pressure series, re-based + remapped onto the merged tanks.
+      //    Each series insert is marked pending and stamped with an hlc by
+      //    the repository, same as createDive's profile series.
       for (final id in diveIds) {
         for (final s in await _tankSeries.getSeriesForDive(id)) {
           final newTankId = result.tankIdMap[s.tankId];

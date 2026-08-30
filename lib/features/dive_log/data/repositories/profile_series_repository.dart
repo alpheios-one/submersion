@@ -35,8 +35,9 @@ class ProfileSeriesRepository {
 
   /// Inserts one series and marks it pending so it gets an HLC.
   ///
-  /// [samples] must be non-empty and timestamp-ordered; exact duplicates are
-  /// dropped. Throws [ArgumentError] on an empty list. Returns the row id.
+  /// [samples] must be non-empty; any order, the repository sorts by
+  /// timestamp (stable) and drops exact duplicates. Throws [ArgumentError]
+  /// on an empty list. Returns the row id.
   Future<String> insertSeries({
     required String diveId,
     String? computerId,
@@ -164,6 +165,21 @@ class ProfileSeriesRepository {
         await (_db.selectOnly(_db.diveProfileSeries)
               ..addColumns([_db.diveProfileSeries.id.count()])
               ..where(_db.diveProfileSeries.diveId.equals(diveId)))
+            .map((row) => row.read(_db.diveProfileSeries.id.count()))
+            .getSingle();
+    return (count ?? 0) > 0;
+  }
+
+  /// Whether [computerId] already contributed a series to [diveId]; the
+  /// re-download guard.
+  Future<bool> hasSeriesForComputer(String diveId, String computerId) async {
+    final count =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([_db.diveProfileSeries.id.count()])
+              ..where(
+                _db.diveProfileSeries.diveId.equals(diveId) &
+                    _db.diveProfileSeries.computerId.equals(computerId),
+              ))
             .map((row) => row.read(_db.diveProfileSeries.id.count()))
             .getSingle();
     return (count ?? 0) > 0;

@@ -5070,7 +5070,7 @@ class DiveRepository {
       hasSources = primary.hasSources;
       primaryComputerId = primary.computerId;
     }
-    return mergeSeriesPoints(
+    return mergeSeriesPointsCollapsingDuplicates(
       dropSupersededSeries(
         series,
         hasSources: hasSources,
@@ -6692,7 +6692,7 @@ class DiveRepository {
   /// Swaps which computer is primary for a dive.
   ///
   /// Updates both [DiveDataSources] `isPrimary` flags and the parent [Dives]
-  /// record.  Also swaps `isPrimary` on the associated [DiveProfiles] rows.
+  /// record. Also swaps `isPrimary` on the associated profile series.
   Future<void> setPrimaryDataSource({
     required String diveId,
     required String computerReadingId,
@@ -6737,19 +6737,17 @@ class DiveRepository {
           ),
         );
 
-        // Swap isPrimary on dive_profiles.
+        // Swap isPrimary on the profile series.
         //
         // Resolve what to promote BEFORE demoting anything (issue #1149).
-        // The old order -- demote every row for the dive, then promote --
-        // stranded the dive with zero `is_primary = 1` rows whenever the
-        // promote matched nothing, which happened for every file-imported
-        // source (null computerId on both the source row and its profile
-        // rows) and for any metadata-only source that owns no samples. The
-        // dive kept rendering, because getDiveById and getMergedProfile do
-        // not filter on the flag, while getDiveProfile, getAscentDescentRates
-        // and the data-quality prefilters silently skipped it.
-        // Flip the profile flags only when the new primary owns samples;
-        // otherwise the current primary profile stays on display (#1149).
+        // The old order (demote every series for the dive, then promote)
+        // stranded the dive with zero primary series whenever the promote
+        // matched nothing, which happened for every file-imported source
+        // (null computerId on both the source row and its series) and for
+        // any metadata-only source that owns no samples. The dive kept
+        // rendering, because getDiveById and getMergedProfile do not filter
+        // on the flag, while getDiveProfile, getAscentDescentRates and the
+        // data-quality prefilters silently skipped it.
         if (await _profileSeries.ownsAny(
           diveId,
           sourceId: newPrimary.id,

@@ -27,6 +27,37 @@ List<DiveProfilePoint> mergeSeriesPoints(List<ProfileSeries> series) {
   return [for (final entry in entries) entry.$3.toPoint()];
 }
 
+/// [mergeSeriesPoints] with the legacy `_dropDuplicateSamples` rule applied:
+/// a legacy row carried its identity columns, so whole-row equality only ever
+/// collapsed duplicates INSIDE one identity group `(computerId, sourceId,
+/// isPrimary)`. Two devices that each download the same computer mint
+/// different series ids and sync unions them; this is the read that keeps
+/// those from rendering every sample twice. Identical samples from two
+/// different computers are both kept, as the legacy read kept them.
+List<DiveProfilePoint> mergeSeriesPointsCollapsingDuplicates(
+  List<ProfileSeries> series,
+) {
+  if (series.isEmpty) return const [];
+  final entries =
+      <(int timestamp, int order, ProfileSeries owner, ProfileSample sample)>[];
+  var order = 0;
+  for (final s in series) {
+    for (final sample in s.samples) {
+      entries.add((sample.timestamp, order++, s, sample));
+    }
+  }
+  entries.sort((a, b) {
+    final byTime = a.$1.compareTo(b.$1);
+    return byTime != 0 ? byTime : a.$2.compareTo(b.$2);
+  });
+  final seen = <(String?, String?, bool, ProfileSample)>{};
+  return [
+    for (final e in entries)
+      if (seen.add((e.$3.computerId, e.$3.sourceId, e.$3.isPrimary, e.$4)))
+        e.$4.toPoint(),
+  ];
+}
+
 /// Interleaves every sample of [series] by timestamp into one tank pressure
 /// list. Ties keep series order, then within-series order, so the result is
 /// deterministic for the `(start_timestamp, id)` order the repositories

@@ -163,6 +163,98 @@ void main() {
     });
   });
 
+  group('mergeSeriesPointsCollapsingDuplicates', () {
+    test('two series sharing an identity with identical samples collapse', () {
+      final a = series(
+        'a',
+        computerId: 'c1',
+        sourceId: 's1',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 10, depth: 1.0),
+          ProfileSample(timestamp: 20, depth: 2.0),
+        ],
+      );
+      final b = series(
+        'b',
+        computerId: 'c1',
+        sourceId: 's1',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 10, depth: 1.0),
+          ProfileSample(timestamp: 20, depth: 2.0),
+        ],
+      );
+      final merged = mergeSeriesPointsCollapsingDuplicates([a, b]);
+      expect(merged, hasLength(3));
+      expect(merged.map((p) => p.timestamp), [0, 10, 20]);
+    });
+
+    test('identical samples from two different computers are both kept', () {
+      final a = series(
+        'a',
+        computerId: 'c1',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 10, depth: 1.0),
+          ProfileSample(timestamp: 20, depth: 2.0),
+        ],
+      );
+      final b = series(
+        'b',
+        computerId: 'c2',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 10, depth: 1.0),
+          ProfileSample(timestamp: 20, depth: 2.0),
+        ],
+      );
+      expect(mergeSeriesPointsCollapsingDuplicates([a, b]), hasLength(6));
+    });
+
+    test('same identity, partially overlapping timestamps merge and collapse '
+        'only the shared ones', () {
+      final a = series(
+        'a',
+        computerId: 'c1',
+        sourceId: 's1',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 10, depth: 1.0),
+        ],
+      );
+      final b = series(
+        'b',
+        computerId: 'c1',
+        sourceId: 's1',
+        samples: const [
+          ProfileSample(timestamp: 10, depth: 1.0),
+          ProfileSample(timestamp: 20, depth: 2.0),
+        ],
+      );
+      expect(
+        mergeSeriesPointsCollapsingDuplicates([a, b]).map((p) => p.timestamp),
+        [0, 10, 20],
+      );
+    });
+
+    test('a single series with an internal duplicate does not crash and '
+        'collapses to one point', () {
+      final a = series(
+        'a',
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 0.0),
+          ProfileSample(timestamp: 0, depth: 0.0),
+        ],
+      );
+      expect(mergeSeriesPointsCollapsingDuplicates([a]), hasLength(1));
+    });
+
+    test('an empty list merges to an empty list', () {
+      expect(mergeSeriesPointsCollapsingDuplicates(const []), isEmpty);
+    });
+  });
+
   group('mergeTankSeriesPoints', () {
     test('two series interleave by timestamp with synthesized ids', () {
       final a = tankSeries(

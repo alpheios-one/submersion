@@ -1284,9 +1284,8 @@ class DiveComputerRepository {
         isPrimary = true; // First profile is always primary
       }
 
-      // Check if this computer already has a series for this dive
-      final existing = await _profileSeries.getSeriesForDive(diveId);
-      if (existing.any((s) => s.computerId == computerId)) {
+      // The re-download guard: this computer already contributed a series.
+      if (await _profileSeries.hasSeriesForComputer(diveId, computerId)) {
         _log.info('Profile from this computer already exists for dive $diveId');
         return diveId;
       }
@@ -1378,7 +1377,8 @@ class DiveComputerRepository {
         }
       }
 
-      // Insert per-tank pressure time-series data (batch insert, no individual sync)
+      // Insert per-tank pressure time-series data: one series insert per
+      // tank, each marked pending and stamped with an hlc by the repository.
       if (tankIdsByIndex.isNotEmpty) {
         // Group pressure readings by tank index. A sample can carry a reading
         // per air-integrated transmitter (issue #1223), so this walks
@@ -1393,8 +1393,8 @@ class DiveComputerRepository {
             ),
         ]);
 
-        // Batch insert pressure data for each tank
-        // No individual sync records - parent dive sync covers child data
+        // Insert one series per tank; each series is marked pending and
+        // stamped with an hlc by the repository.
         final insertEntries = pressuresByTank.entries
             .where((entry) => tankIdsByIndex.containsKey(entry.key))
             .toList();
