@@ -1,11 +1,12 @@
 import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart'
+    show TankPressureSample;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_series_merge.dart';
 
@@ -18,7 +19,6 @@ class TankPressureRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final TankPressureSeriesRepository _tankSeries =
       TankPressureSeriesRepository();
-  final _uuid = const Uuid();
 
   /// Get all tank pressure data for a dive, grouped by tank ID
   ///
@@ -116,23 +116,21 @@ class TankPressureRepository {
   ) async {
     if (pressuresByTank.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
-    await _db.batch((batch) {
-      for (final entry in pressuresByTank.entries) {
-        final tankId = entry.key;
-        for (final point in entry.value) {
-          batch.insert(
-            _db.tankPressureProfiles,
-            TankPressureProfilesCompanion.insert(
-              id: _uuid.v4(),
-              diveId: diveId,
-              tankId: tankId,
+    for (final entry in pressuresByTank.entries) {
+      if (entry.value.isEmpty) continue;
+      await _tankSeries.insertSeries(
+        diveId: diveId,
+        tankId: entry.key,
+        samples: [
+          for (final point in entry.value)
+            TankPressureSample(
               timestamp: point.timestamp,
               pressure: point.pressure,
             ),
-          );
-        }
-      }
-    });
+        ],
+        now: now,
+      );
+    }
     // Only mark parent dive as pending - child data syncs with it
     await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
       DivesCompanion(updatedAt: Value(now)),
@@ -147,18 +145,10 @@ class TankPressureRepository {
 
   /// Delete all tank pressure data for a dive
   Future<void> deleteTankPressuresForDive(String diveId) async {
-    final existing = await (_db.select(
-      _db.tankPressureProfiles,
-    )..where((t) => t.diveId.equals(diveId))).get();
     await (_db.delete(
       _db.tankPressureProfiles,
     )..where((t) => t.diveId.equals(diveId))).go();
-    for (final row in existing) {
-      await _syncRepository.logDeletion(
-        entityType: 'tankPressureProfiles',
-        recordId: row.id,
-      );
-    }
+    await _tankSeries.deleteForDive(diveId);
     final now = DateTime.now().millisecondsSinceEpoch;
     await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
       DivesCompanion(updatedAt: Value(now)),
@@ -192,9 +182,7 @@ class TankPressureRepository {
     required String toTankId,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    await (_db.update(_db.tankPressureProfiles)
-          ..where((t) => t.diveId.equals(diveId) & t.tankId.equals(fromTankId)))
-        .write(TankPressureProfilesCompanion(tankId: Value(toTankId)));
+    await _tankSeries.reassignTank(diveId, fromTankId, toTankId, now: now);
     await _touchDive(diveId, now);
   }
 
@@ -205,35 +193,7 @@ class TankPressureRepository {
     required String tankIdB,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final aIds = [
-      for (final r
-          in await (_db.select(_db.tankPressureProfiles)..where(
-                (t) => t.diveId.equals(diveId) & t.tankId.equals(tankIdA),
-              ))
-              .get())
-        r.id,
-    ];
-    final bIds = [
-      for (final r
-          in await (_db.select(_db.tankPressureProfiles)..where(
-                (t) => t.diveId.equals(diveId) & t.tankId.equals(tankIdB),
-              ))
-              .get())
-        r.id,
-    ];
-    // Snapshot the row ids first so the two writes can't feed into each other.
-    // Guard empty lists: skip the write when a tank has no pressure series
-    // rather than issuing an update whose id filter matches no rows.
-    if (aIds.isNotEmpty) {
-      await (_db.update(_db.tankPressureProfiles)
-            ..where((t) => t.id.isIn(aIds)))
-          .write(TankPressureProfilesCompanion(tankId: Value(tankIdB)));
-    }
-    if (bIds.isNotEmpty) {
-      await (_db.update(_db.tankPressureProfiles)
-            ..where((t) => t.id.isIn(bIds)))
-          .write(TankPressureProfilesCompanion(tankId: Value(tankIdA)));
-    }
+    await _tankSeries.swapTanks(diveId, tankIdA, tankIdB, now: now);
     await _touchDive(diveId, now);
   }
 
