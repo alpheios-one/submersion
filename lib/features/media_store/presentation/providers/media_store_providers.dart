@@ -503,10 +503,19 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       // owns; the cache makes it run only once.
       await ref.read(mediaTransferQueueReclaimProvider.future);
 
-      // Fire-and-forget: housekeeping must not delay the drain below. Its
-      // own errors are contained by the provider, and the next launch simply
-      // runs it again.
-      unawaited(ref.read(mediaCacheEvictionProvider.future));
+      // Fire-and-forget: housekeeping must not delay the drain below.
+      //
+      // catchError is load-bearing, not decoration. A FutureProvider records
+      // the failure in its own AsyncError state, but the future handed back by
+      // .future still completes with that error, so an unawaited one surfaces
+      // as an unhandled async exception. Same shape as the tile sweep in
+      // startup_page.dart. Nothing surfaces this to the user and the retry is
+      // a whole launch away, so the log is the only diagnostic there will be.
+      unawaited(
+        ref.read(mediaCacheEvictionProvider.future).catchError((Object e) {
+          debugPrint('Media cache eviction failed (will retry): $e');
+        }),
+      );
 
       final connectivitySub = network.changes.listen((kind) {
         if (kind != NetworkKind.offline) unawaited(worker.drain());
