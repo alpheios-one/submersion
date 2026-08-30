@@ -25,6 +25,12 @@ std::string NarrowString(const wchar_t* wide) {
     int needed = WideCharToMultiByte(CP_UTF8, 0, wide, -1, nullptr, 0, nullptr,
                                      nullptr);
     if (needed <= 1) return {};
+
+    // `needed` counts the terminator, because cchWideChar is -1, so the string
+    // holds one character fewer and the conversion writes one byte more. That
+    // last byte lands on the terminator slot, not past the buffer: C++17 gives
+    // data() the range [0, size()], and writing charT() to data()[size()] is
+    // exactly what the standard permits there.
     std::string narrow(static_cast<size_t>(needed) - 1, '\0');
     WideCharToMultiByte(CP_UTF8, 0, wide, -1, narrow.data(), needed, nullptr,
                         nullptr);

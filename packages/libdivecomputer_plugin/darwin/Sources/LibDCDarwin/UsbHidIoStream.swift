@@ -248,8 +248,8 @@ final class UsbHidIoStream {
             actual.pointee = 0
             return Int32(LIBDC_STATUS_IO)
         }
-        let deadline = DispatchTime.now() + .milliseconds(Int(timeoutMs))
-        let count = buffer.read(into: dest, maxBytes: size, deadline: deadline)
+        let count = buffer.read(
+            into: dest, maxBytes: size, deadline: Self.deadline(for: timeoutMs))
         actual.pointee = count ?? 0
         return Int32(LIBDC_STATUS_SUCCESS)
     }
@@ -288,9 +288,24 @@ final class UsbHidIoStream {
     }
 
     private func performPoll(_ timeout: Int32) -> Int32 {
-        let deadline = DispatchTime.now() + .milliseconds(Int(max(timeout, 0)))
-        return buffer.poll(deadline: deadline)
+        return buffer.poll(deadline: Self.deadline(for: timeout))
             ? Int32(LIBDC_STATUS_SUCCESS) : Int32(LIBDC_STATUS_TIMEOUT)
+    }
+
+    /// Turns a libdivecomputer timeout into an absolute deadline.
+    ///
+    /// Negative means block indefinitely, zero means do not block at all, and
+    /// positive bounds the wait. That is libdivecomputer's own contract, set by
+    /// `dc_serial_poll` (serial_posix.c:677-686), which passes a null timeval
+    /// to select for a negative timeout and a zeroed one for zero.
+    ///
+    /// Worth a named helper rather than the arithmetic inline: adding a
+    /// negative interval to `now()` yields a deadline already in the past, so
+    /// the infinite case silently becomes the most impatient one. The Windows
+    /// backend spells this out with INFINITE and the Linux backend gets it from
+    /// poll(2), so macOS was the only one of the three that had it wrong.
+    private static func deadline(for timeoutMs: Int32) -> DispatchTime {
+        timeoutMs < 0 ? .distantFuture : .now() + .milliseconds(Int(timeoutMs))
     }
     #else
     // iOS has no USB host role. The type stays declared so the shared host API
