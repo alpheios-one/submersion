@@ -654,10 +654,13 @@ class BleIoStream(
     // because they won't respond to pairing requests without an active
     // GATT connection.
     fun connectAndDiscover(): Boolean {
+        // One flag drives both the overload and the line that reports it, so
+        // the log can never claim a transport the connect did not use.
+        val leTransport = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
         NativeLogger.d(TAG, "BLE",
             "connectGatt: ${device.address} radio=" +
                 GattDiagnostics.describeDeviceType(deviceType()) +
-                " transport=LE")
+                " transport=" + GattDiagnostics.describeTransport(leTransport))
         // Demand the LE transport rather than letting the stack choose.
         //
         // TRANSPORT_AUTO resolves to Bluetooth Classic for a dual-mode
@@ -672,7 +675,7 @@ class BleIoStream(
         // Safe for every other computer: this stream is only ever reached
         // from a BLE scan, so the peripheral is LE-capable by construction,
         // and TRANSPORT_AUTO already resolves to LE for an LE-only radio.
-        gatt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        gatt = if (leTransport) {
             device.connectGatt(
                 context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
             )

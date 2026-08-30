@@ -55,6 +55,17 @@ object GattDiagnostics {
         else -> "unrecognized device type ($type)"
     }
 
+    /**
+     * Names the transport a connect actually ran on.
+     *
+     * Written from the same flag that picks the connectGatt overload so the
+     * two cannot drift: a line that claimed LE while the call fell back to
+     * TRANSPORT_AUTO would misreport the one fact this instrumentation
+     * exists to establish.
+     */
+    fun describeTransport(leRequested: Boolean): String =
+        if (leRequested) "LE" else "AUTO (LE cannot be demanded below API 23)"
+
     /** Human-readable reason for a BluetoothGattCallback status code. */
     fun describeGattStatus(status: Int): String = when (status) {
         GATT_SUCCESS ->

@@ -106,6 +106,18 @@ class GattDiagnosticsTest {
     }
 
     @Test
+    fun theTransportLabelFollowsWhatTheConnectActuallyRequested() {
+        assertEquals("LE", GattDiagnostics.describeTransport(true))
+
+        // A log that claims LE on a connect that ran under TRANSPORT_AUTO
+        // would misreport the one fact this instrumentation exists to
+        // establish, so the fallback must never read as LE.
+        val fallback = GattDiagnostics.describeTransport(false)
+        assertFalse(fallback == "LE")
+        assertTrue(fallback.contains("AUTO"))
+    }
+
+    @Test
     fun emptyDiscoveryIsDistinguishedFromAnUnusableOne() {
         val empty = GattDiagnostics.describeNoUsableService(emptyList())
 
