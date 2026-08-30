@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
+import 'package:submersion/features/media/data/repositories/media_species_repository.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -171,6 +172,44 @@ void main() {
   tearDown(tearDownTestDatabase);
 
   group('MediaLibraryRepository.getPage', () {
+    test('the species filter keeps only photos tagged with it', () async {
+      await db
+          .into(db.species)
+          .insert(
+            const SpeciesCompanion(
+              id: Value('sp1'),
+              commonName: Value('Blue Grouper'),
+              category: Value('fish'),
+              isBuiltIn: Value(false),
+            ),
+          );
+      final tags = MediaSpeciesRepository();
+      await tags.addTag(mediaId: 'p2', speciesId: 'sp1');
+      await tags.addTag(mediaId: 'unlinked-1', speciesId: 'sp1');
+
+      final tagged = await repo.getPage(
+        diverId: 'd1',
+        filter: const MediaLibraryFilter(speciesId: 'sp1'),
+      );
+      expect(tagged.entries.map((e) => e.item.id).toSet(), {
+        'p2',
+        'unlinked-1',
+      });
+
+      // Combines with the other facets by AND.
+      final taggedAtSite = await repo.getPage(
+        diverId: 'd1',
+        filter: const MediaLibraryFilter(speciesId: 'sp1', siteId: 'site-1'),
+      );
+      expect(taggedAtSite.entries.map((e) => e.item.id).toList(), ['p2']);
+
+      final untagged = await repo.getPage(
+        diverId: 'd1',
+        filter: const MediaLibraryFilter(speciesId: 'sp-none'),
+      );
+      expect(untagged.entries, isEmpty);
+    });
+
     test('excludes signatures and other divers, includes unlinked', () async {
       final page = await repo.getPage(diverId: 'd1');
       final ids = page.entries.map((e) => e.item.id).toList();

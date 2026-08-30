@@ -73,11 +73,14 @@ class _FakeLocalFileResolver implements MediaSourceResolver {
   /// gallery resolver's pre-compressed poster bytes for videos).
   MediaSourceData? thumbnailData;
 
+  /// Models the real resolvers' origin-device check.
+  bool canResolve = true;
+
   @override
   MediaSourceType get sourceType => MediaSourceType.localFile;
 
   @override
-  bool canResolveOnThisDevice(domain.MediaItem item) => true;
+  bool canResolveOnThisDevice(domain.MediaItem item) => canResolve;
 
   @override
   Future<MediaSourceData> resolve(domain.MediaItem item) async => data;
@@ -276,6 +279,37 @@ void main() {
     expect(row.errorMessage, contains('unavailable'));
     expect(fakeStore.objects, isEmpty);
     expect((await mediaRepository.getMediaById(id))!.remoteUploadedAt, isNull);
+  });
+
+  test('a row another device owns completes as ineligible instead of '
+      'failing', () async {
+    // The phone holds a row the desktop imported: the path is the
+    // desktop's, and the resolver says so. Nothing on this device can
+    // upload it, so the queue entry must finish quietly rather than sit
+    // in Transfers as "source unavailable" forever.
+    await enqueueLocalFileItem(bytes: [1], name: 'desktop.jpg');
+    resolver.data = const UnavailableData(
+      kind: UnavailableKind.fromOtherDevice,
+    );
+
+    final entry = (await queue.nextPending(DateTime.now()))!;
+    expect(await pipeline.process(entry), UploadOutcome.skippedIneligible);
+
+    final row = (await queue.allForTesting()).single;
+    expect(row.state, 'done');
+    expect(row.errorMessage, isNull);
+    expect(fakeStore.objects, isEmpty);
+  });
+
+  test('a resolver that declines the device skips the row before reading '
+      'anything', () async {
+    await enqueueLocalFileItem(bytes: [1], name: 'desktop.jpg');
+    resolver.canResolve = false;
+
+    final entry = (await queue.nextPending(DateTime.now()))!;
+    expect(await pipeline.process(entry), UploadOutcome.skippedIneligible);
+    expect((await queue.allForTesting()).single.state, 'done');
+    expect(fakeStore.objects, isEmpty);
   });
 
   test('thumb object uploads alongside the original and stamps '

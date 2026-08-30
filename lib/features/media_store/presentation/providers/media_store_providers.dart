@@ -15,7 +15,6 @@ import 'package:submersion/core/services/media_store/media_store_credentials_sto
 import 'package:submersion/core/services/media_store/media_store_policies.dart';
 import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
 import 'package:submersion/core/services/media_store/network_status_service.dart';
-import 'package:submersion/core/services/media_store/store_marker.dart';
 import 'package:submersion/features/media/data/resolvers/media_store_resolver.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -24,6 +23,7 @@ import 'package:submersion/features/media_store/data/media_backfill_service.dart
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
 import 'package:submersion/features/media_store/data/media_delete_processor.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_store_preflight.dart';
 import 'package:submersion/features/media_store/data/media_store_service.dart';
 import 'package:submersion/features/media_store/data/media_store_worker.dart';
 import 'package:submersion/features/media_store/data/media_stores_repository.dart';
@@ -222,6 +222,58 @@ final mediaTransferEntriesProvider =
       (ref) => ref.watch(mediaTransferQueueRepositoryProvider).watchEntries(),
     );
 
+/// Display labels (file name, else caption) for every media row the transfer
+/// queue names, in one lean query.
+///
+/// Keyed on the SET of media ids, not the rows: progress ticks and state
+/// changes re-emit the rows many times per transfer without changing which
+/// media the queue names, and none of those should touch the media table.
+/// A lookup per visible row was the first shape; it hydrated a full
+/// MediaItem (imageData BLOB included) into a non-autoDispose family per
+/// row and re-ran for every visible row on every media write.
+// no-tick: a file name does not change while its upload sits in the queue,
+// and the media table ticks on every stamp the upload pipeline writes - about
+// three a second through a drain - each of which would re-run the whole label
+// query. autoDispose re-resolves the labels the next time the page is built,
+// which is the only moment a stale name could be seen.
+final mediaTransferLabelsProvider =
+    FutureProvider.autoDispose<Map<String, String>>((ref) async {
+      final queued = ref.watch(
+        mediaTransferEntriesProvider.select((entries) {
+          final rows = entries.value;
+          return rows == null
+              ? null
+              : _QueuedMediaIds(rows.map((e) => e.mediaId));
+        }),
+      );
+      if (queued == null || queued.ids.isEmpty) return const {};
+      return ref.watch(mediaRepositoryProvider).getDisplayLabels(queued.ids);
+    });
+
+/// The set of media ids the transfer queue names, as a value: `select`
+/// compares successive results with `==`, and a List or Set compares by
+/// identity, so a fresh collection per emission would defeat the point.
+class _QueuedMediaIds {
+  _QueuedMediaIds(Iterable<String> ids)
+    : ids = List.unmodifiable(ids.toSet().toList()..sort());
+
+  final List<String> ids;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _QueuedMediaIds || other.ids.length != ids.length) {
+      return false;
+    }
+    for (var i = 0; i < ids.length; i++) {
+      if (ids[i] != other.ids[i]) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hashAll(ids);
+}
+
 /// Whether this device has any media store attached. Deliberately not
 /// mediaStoreRuntimeProvider: that constructs the full runtime and kicks a
 /// queue drain, which must not happen merely because a media grid scrolled
@@ -291,6 +343,7 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       final attachState = ref.watch(mediaStoreAttachStateProvider);
       final attachedId = await attachState.attachedStoreId();
       if (attachedId == null) return null;
+      final providerType = await attachState.attachedProviderType();
 
       // Account-first: attachments made through the Connected Accounts
       // layer resolve their store via the account's adapter. Legacy
@@ -307,13 +360,12 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
           ref.watch(accountProviderRegistryProvider),
         );
       } else {
-        final providerType =
-            await attachState.attachedProviderType() ?? CloudProviderType.s3;
-        final s3Config = providerType == CloudProviderType.s3
+        final legacyType = providerType ?? CloudProviderType.s3;
+        final s3Config = legacyType == CloudProviderType.s3
             ? await ref.watch(mediaStoreCredentialsStoreProvider).load()
             : null;
         builtStore = await buildMediaObjectStore(
-          providerType,
+          legacyType,
           s3Config: s3Config,
         );
       }
@@ -344,20 +396,19 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         store: store,
         mediaRepository: mediaRepository,
       );
+      // Suspend all transfers when this device detached or when the store no
+      // longer carries the marker this device attached to (wiped or
+      // repointed; spec section 13).
+      final preflight = MediaStorePreflight(
+        attachState: attachState,
+        store: store,
+        attachedStoreId: attachedId,
+      );
       final worker = MediaStoreWorker(
         queue: MediaTransferQueueRepository(),
         pipeline: pipeline,
         deleteProcessor: deleteProcessor,
-        preflight: () async {
-          // Suspend all transfers when this device detached (attach state
-          // re-read, not captured: disconnect can land while a drain is
-          // running) or when the bucket no longer carries the store this
-          // device attached to (wiped or repointed; spec section 13).
-          final currentId = await attachState.attachedStoreId();
-          if (currentId == null || currentId != attachedId) return false;
-          final marker = await StoreMarkerStore(store: store).read();
-          return marker != null && marker.storeId == currentId;
-        },
+        preflight: preflight.call,
         gate: (entry) async {
           // Network policies (design spec section 9): offline halts the
           // drain; cellular defers anything the policy disallows.
@@ -450,6 +501,23 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         worker: worker,
       );
     });
+
+/// Whether the worker's last preflight suspended the transfer queue (issue
+/// #1356). False without a runtime, and it follows the live worker from then
+/// on: the queue rows carry no trace of a suspension, so this is the only
+/// way the settings pages can tell "paused" from "queued".
+// no-tick: mirrors an in-memory worker flag, not a query result.
+final mediaTransfersSuspendedProvider = StreamProvider<bool>((ref) async* {
+  final runtime = await ref.watch(mediaStoreRuntimeProvider.future);
+  final worker = runtime?.worker;
+  if (worker == null) {
+    yield false;
+    return;
+  }
+  // suspensionChanges opens with the current value, so there is no window
+  // between sampling it and subscribing.
+  yield* worker.suspensionChanges;
+});
 
 /// The store-fallback resolver for display surfaces, or null when no store
 /// runtime exists yet. Synchronous accessor over the async runtime.

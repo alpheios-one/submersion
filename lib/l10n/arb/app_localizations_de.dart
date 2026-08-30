@@ -2617,6 +2617,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_action_cancel => 'Abbrechen';
 
   @override
+  String get common_action_clearRating => 'Bewertung löschen';
+
+  @override
   String get common_action_close => 'Schließen';
 
   @override
@@ -4920,6 +4923,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Meeresfauna';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos',
+      one: '1 Foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Notizen';
 
   @override
@@ -5985,6 +5999,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -6656,6 +6673,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get siteMatchReview_empty => 'Nichts zuzuordnen.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Standort in Fotos gefunden';
+
+  @override
+  String get siteSuggestion_titleDiveComputer => 'Standort vom Tauchcomputer';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return '$name zuweisen';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Nahegelegenen Tauchplatz wählen ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Standort zu $name hinzufügen';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name zugewiesen';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'aus Foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'vom Tauchcomputer';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Standort zu diesem Tauchplatz hinzufügen';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Tauchplatz hier erstellen';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected ausgewählt · $review zu prüfen · $none ohne Treffer';
   }
@@ -6688,8 +6744,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives Tauchgänge verknüpft · $sites Tauchplätze hinzugefügt';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives Tauchgänge verknüpft · $sites Tauchplätze hinzugefügt · $located Tauchplätze verortet';
   }
 
   @override
@@ -7584,6 +7640,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Messwert';
@@ -10285,6 +10344,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_profileMetric_tts_short => 'TTS';
 
   @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
+
+  @override
   String get enum_scrType_cmf => 'Konstanter Massenstrom';
 
   @override
@@ -12363,6 +12428,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_title => 'Gasrechner';
 
   @override
+  String get gasCalculators_desc_mod => 'Größte sichere Tiefe für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Sauerstoffreichstes Gemisch für eine Zieltiefe';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gasverbrauch eines geplanten Tauchgangs';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Reserve für den Aufstieg zu zweit';
+
+  @override
+  String get gasCalculators_desc_mnd => 'Narkosetiefe-Grenze für ein Gemisch';
+
+  @override
+  String get gasCalculators_desc_blender => 'Füllvorgang für ein Zielgemisch';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Wählen Sie einen Rechner aus, um zu beginnen';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Erwartete Arten bearbeiten';
 
@@ -12506,6 +12596,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Diese Art existiert nicht mehr.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Speichern';
 
   @override
@@ -12613,6 +12707,172 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'Arten durchsuchen...';
+
+  @override
+  String get marineLife_lookup_button => 'Online nachschlagen';
+
+  @override
+  String get marineLife_lookup_title => 'Art nachschlagen';
+
+  @override
+  String get marineLife_lookup_searchHint =>
+      'Trivial- oder wissenschaftlicher Name';
+
+  @override
+  String get marineLife_lookup_search => 'Nachschlagen';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Ohne Nachschlagen anlegen';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Artdaten und Fotos von iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle =>
+      'Geben Sie einen Namen ein und tippen Sie auf Nachschlagen.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Keine Art für \"$query\" gefunden';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'Sie scheinen offline zu sein.';
+
+  @override
+  String get marineLife_lookup_errorTimeout =>
+      'Zeitüberschreitung beim Nachschlagen.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'iNaturalist hat einen Fehler gemeldet. Versuchen Sie es später erneut.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Unerwartete Antwort von iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'Erneut versuchen';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Beobachtungen',
+      one: '1 Beobachtung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: wählen Sie eine Art';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Für den Katalog vorschlagen';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Browser konnte nicht geöffnet werden';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Link kopieren';
+
+  @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotos ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'Fotos, die mit dieser Art markiert sind, erscheinen hier.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Fotos markieren';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Fotos hinzufügen';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Artenfoto';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos hinzugefügt',
+      one: '1 Foto hinzugefügt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count übersprungen',
+      one: '1 übersprungen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fehlgeschlagen',
+      one: '1 fehlgeschlagen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Fotos markieren';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Keine unmarkierten Fotos bei Tauchgängen, bei denen Sie diese Art protokolliert haben.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Verwenden Sie Fotos hinzufügen, um Bilder aus Ihren Aufnahmen zu importieren.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Alle auswählen';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos markieren',
+      one: '1 Foto markieren',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Fotos markiert',
+      one: '1 Foto markiert',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Tauchgang $number';
+  }
 
   @override
   String get marineLife_speciesPage_title => 'Arten';
@@ -12970,6 +13230,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'GPS-Vorschlag schließen';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count Tauchgänge könnten aus ihren Fotos einen Tauchplatz erhalten';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Tauchplätze prüfen';
 
   @override
   String get media_gpsBanner_title => 'GPS in Fotos gefunden';
@@ -13862,6 +14130,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Tauchplatz';
+
+  @override
+  String get media_library_filter_species => 'Art';
 
   @override
   String get media_library_filter_trip => 'Reise';
@@ -15191,6 +15462,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Zeit zur Oberfläche)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Verbleibende Gaszeit)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (O2-Toxizität)';
@@ -17414,6 +17688,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte geben Sie den Namen des Unterzeichners ein';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Die Unterschrift konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.';
+
+  @override
   String get signatures_field_instructorName => 'Tauchlehrername';
 
   @override
@@ -17601,11 +17879,11 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Min/Durchschn./Max Temperaturen';
+      'Min, Mittel und Max nach Kalendermonat, über alle Jahre';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Wassertemperatur nach Monat';
+      'Saisonale Wassertemperatur';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17650,7 +17928,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Durchschnittliches Gewicht im Zeitverlauf';
+      'Gesamtes Blei pro Tauchgang';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Gewichtstrend';
@@ -17734,8 +18012,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Verbrauchstrend konnte nicht geladen werden';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'Monatlicher Durchschnitt über 5 Jahre';
+  String get statistics_gas_sacTrend_subtitle => 'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_gas_sacTrend_title => 'Gasverbrauchstrend';
@@ -17991,7 +18268,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Durchschnittliche Dauer nach Monat';
+      'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_progression_bottomTime_title => 'Grundzeit-Trend';
@@ -18014,7 +18291,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Monatliche Maximaltiefe über 5 Jahre';
+      'Jeder Tauchgang im Zeitraum';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -19450,13 +19727,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF-Logbuch';
 
   @override
-  String get transfer_section_exportTitle => 'Exportieren';
+  String get transfer_section_exportTitle => 'Dateiexport';
 
   @override
   String get transfer_section_importSubtitle => 'CSV-, UDDF-Dateien';
 
   @override
-  String get transfer_section_importTitle => 'Importieren';
+  String get transfer_section_importTitle => 'Dateiimport';
 
   @override
   String get transfer_summary_description =>
@@ -23551,6 +23828,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Medienspeicher verbunden';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Der Cloud-Speicher konnte noch nicht gelesen werden. Warte einen Moment und versuche es erneut.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Trennen';
 
   @override
@@ -23599,6 +23880,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Fehlgeschlagen';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Übertragungen angehalten';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Dieses Gerät und der Cloud-Speicher sind sich nicht mehr einig, welcher Speicher verwendet wird. Beim erneuten Verbinden wird der Speicher übernommen, den die Cloud jetzt enthält.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count in Warteschlange';
   }
@@ -23618,11 +23907,32 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked Objekte geprüft: $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals Originale',
+      one: '1 Original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs Miniaturansichten',
+      one: '1 Miniaturansicht',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions komprimierte Versionen',
+      one: '1 komprimierte Version',
+    );
+    return '$checked Cloud-Objekte geprüft ($_temp0, $_temp1, $_temp2): $removed verwaiste entfernt, $repaired Reparaturen eingereiht, $aborted veraltete Uploads abgebrochen';
   }
 
   @override
@@ -25882,6 +26192,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufügen';
+
+  @override
+  String get reef_species_addFromLookup =>
+      'Nachschlagen und zu Ihren Arten hinzufügen';
 
   @override
   String reef_species_showAll(int count) {
@@ -30653,6 +30967,1232 @@ class AppLocalizationsDe extends AppLocalizations {
       'Größtes lebendes Reptil, in Küsten- und Ästuargewässern des Indopazifiks.';
 
   @override
+  String get species_northern_pike_name => 'Hecht';
+
+  @override
+  String get species_northern_pike_desc =>
+      'Langgestreckter Lauerjäger mit entenschnabelartigem Maul, der reglos zwischen Wasserpflanzen am Seeufer steht.';
+
+  @override
+  String get species_muskellunge_name => 'Muskellunge';
+
+  @override
+  String get species_muskellunge_desc =>
+      'Der größte Hecht, ein gestreifter oder gefleckter Riese klarer nördlicher Seen, selten gesehen und unvergesslich.';
+
+  @override
+  String get species_chain_pickerel_name => 'Kettenhecht';
+
+  @override
+  String get species_chain_pickerel_desc =>
+      'Schlanker Hecht verkrauteter Teiche im Osten Nordamerikas, benannt nach dem kettenartigen Muster seiner Flanken.';
+
+  @override
+  String get species_walleye_name => 'Amerikanischer Zander';
+
+  @override
+  String get species_walleye_desc =>
+      'Goldoliv gefärbter Barschverwandter mit großen reflektierenden Augen, jagt in der Dämmerung über Fels- und Sandgrund.';
+
+  @override
+  String get species_sauger_name => 'Kanadische Zander';
+
+  @override
+  String get species_sauger_desc =>
+      'Kleinerer, fleckigerer Vetter des Glasaugenbarschs, der trübe Flüsse und Stauseen bevorzugt.';
+
+  @override
+  String get species_yellow_perch_name => 'Amerikanischer Flussbarsch';
+
+  @override
+  String get species_yellow_perch_desc =>
+      'Schwarmbildender goldgelber Barsch mit dunklen Querbinden, häufig an Stegen und Krautbetten in ganz Nordamerika.';
+
+  @override
+  String get species_european_perch_name => 'Flussbarsch';
+
+  @override
+  String get species_european_perch_desc =>
+      'Gestreifter Barsch mit stacheliger Rückenflosse und rot-orangen Bauchflossen, in fast jedem See und langsamen Fluss Europas.';
+
+  @override
+  String get species_zander_name => 'Zander';
+
+  @override
+  String get species_zander_desc =>
+      'Großer, blasser Raubfisch mit glasigen Augen und Fangzähnen, der nachts trübe europäische Seen und Flüsse durchstreift.';
+
+  @override
+  String get species_ruffe_name => 'Kaulbarsch';
+
+  @override
+  String get species_ruffe_desc =>
+      'Kleiner, marmorierter Barsch mit durchgehender stacheliger Rückenflosse, häufig auf weichen Böden europäischer Seen.';
+
+  @override
+  String get species_largemouth_bass_name => 'Forellenbarsch';
+
+  @override
+  String get species_largemouth_bass_desc =>
+      'Grünrückiger Barsch mit dunklem Seitenstreifen und riesigem Maul, lauert an Baumstämmen und Krautkanten warmer Seen.';
+
+  @override
+  String get species_smallmouth_bass_name => 'Großer Schwarzbarsch';
+
+  @override
+  String get species_smallmouth_bass_desc =>
+      'Bronzefarbener Barsch mit schwachen Querbinden, steht über Fels und Kies in klaren, kühlen Seen und Flüssen.';
+
+  @override
+  String get species_rock_bass_name => 'Steinbarsch';
+
+  @override
+  String get species_rock_bass_desc =>
+      'Gedrungener rotäugiger Sonnenbarsch mit Reihen dunkler Flecken, versteckt sich zwischen Felsblöcken klarer Bäche und Seen.';
+
+  @override
+  String get species_bluegill_name => 'Blauer Sonnenbarsch';
+
+  @override
+  String get species_bluegill_desc =>
+      'Scheibenförmiger Sonnenbarsch mit blauschwarzem Kiemenlappen und oranger Brust, nistet in Kolonien auf flachen Sandböden.';
+
+  @override
+  String get species_pumpkinseed_name => 'Gemeiner Sonnenbarsch';
+
+  @override
+  String get species_pumpkinseed_desc =>
+      'Bunt gesprenkelter Sonnenbarsch mit rot gesäumtem Kiemenlappen und welligen blauen Wangenlinien, häufig im krautigen Flachwasser.';
+
+  @override
+  String get species_black_crappie_name => 'Schwarzflecken-Sonnenbarsch';
+
+  @override
+  String get species_black_crappie_desc =>
+      'Silbriger, hochrückiger Sonnenbarsch mit schwarzen Sprenkeln, schwärmt um versunkenes Geäst und Pfähle.';
+
+  @override
+  String get species_white_crappie_name => 'Ringel-Sonnenbarsch';
+
+  @override
+  String get species_white_crappie_desc =>
+      'Blasserer Crappie mit schwachen Querbändern, bevorzugt trübe Stauseen und langsame Flüsse.';
+
+  @override
+  String get species_brown_trout_name => 'Forelle';
+
+  @override
+  String get species_brown_trout_desc =>
+      'Goldbraune Forelle mit roten und schwarzen Punkten, steht in der Strömung kühler, klarer Flüsse und Seen.';
+
+  @override
+  String get species_rainbow_trout_name => 'Regenbogenforelle';
+
+  @override
+  String get species_rainbow_trout_desc =>
+      'Silbrige Forelle mit rosafarbenem Seitenband und feiner schwarzer Sprenkelung, besetzt und wild in kalten Gewässern weltweit.';
+
+  @override
+  String get species_brook_trout_name => 'Bachsaibling';
+
+  @override
+  String get species_brook_trout_desc =>
+      'Saibling mit wurmartiger Rückenzeichnung, roten Punkten in blauen Höfen und weiß gesäumten Flossen, in kalten Quellbächen.';
+
+  @override
+  String get species_lake_trout_name => 'Amerikanischer Seesaibling';
+
+  @override
+  String get species_lake_trout_desc =>
+      'Großer grauer Saibling mit hellen Flecken und gegabelter Schwanzflosse, zieht durch das tiefe kalte Wasser nördlicher Seen.';
+
+  @override
+  String get species_arctic_char_name => 'Wandersaibling';
+
+  @override
+  String get species_arctic_char_desc =>
+      'Nördlichster Süßwasserfisch, ein schlanker Saibling, dessen Bauch sich zur Herbstlaichzeit orangerot färbt.';
+
+  @override
+  String get species_atlantic_salmon_name => 'Atlantischer Lachs';
+
+  @override
+  String get species_atlantic_salmon_desc =>
+      'Silberner Wanderlachs mit schwarzen X-förmigen Punkten, überspringt Wasserfälle auf dem Rückweg in seine Geburtsflüsse.';
+
+  @override
+  String get species_chinook_salmon_name => 'Königslachs';
+
+  @override
+  String get species_chinook_salmon_desc =>
+      'Der größte Pazifiklachs, blaugrüner Rücken und schwarzes Zahnfleisch, steigt zum Laichen in große westliche Flüsse auf.';
+
+  @override
+  String get species_sockeye_salmon_name => 'Rotlachs';
+
+  @override
+  String get species_sockeye_salmon_desc =>
+      'Lachs, der zur Laichzeit leuchtend rot mit grünem Kopf wird und die Kiesbetten seengespeister Flüsse füllt.';
+
+  @override
+  String get species_coho_salmon_name => 'Silberlachs';
+
+  @override
+  String get species_coho_salmon_desc =>
+      'Silberlachs mit weißem Zahnfleisch und Punkten nur auf der oberen Schwanzhälfte, laicht in kleinen Küstenbächen.';
+
+  @override
+  String get species_lake_whitefish_name => 'Nordamerikanische Renke';
+
+  @override
+  String get species_lake_whitefish_desc =>
+      'Silbrige, kleinmäulige Renke tiefer kalter Seen, frisst in großen Schwärmen am Grund.';
+
+  @override
+  String get species_cisco_name => 'Cisco-Renke';
+
+  @override
+  String get species_cisco_desc =>
+      'Schlanke, heringsähnliche Renke, die im Freiwasser kalter nördlicher Seen schwärmt, Beute des Seesaiblings.';
+
+  @override
+  String get species_european_grayling_name => 'Europäische Äsche';
+
+  @override
+  String get species_european_grayling_desc =>
+      'Silbergrauer Flussfisch mit hoher, segelartiger, purpurn gesäumter Rückenflosse, steht in schnellen sauberen Kiesläufen.';
+
+  @override
+  String get species_common_carp_name => 'Karpfen';
+
+  @override
+  String get species_common_carp_desc =>
+      'Schwerer bronzefarbener Karpfen mit großen Schuppen und zwei Barteln, wühlt in weichen Böden warmer Seen und Flüsse.';
+
+  @override
+  String get species_grass_carp_name => 'Graskarpfen';
+
+  @override
+  String get species_grass_carp_desc =>
+      'Torpedoförmiger asiatischer Karpfen, weltweit zur Beweidung von Wasserpflanzen eingeführt, oft in klaren Baggerseen zu sehen.';
+
+  @override
+  String get species_tench_name => 'Schleie';
+
+  @override
+  String get species_tench_desc =>
+      'Olivgrüner Fisch mit winzigen Schuppen, roten Augen und abgerundeten Flossen, gleitet durch Schlamm und Schilf stiller Gewässer.';
+
+  @override
+  String get species_common_bream_name => 'Brachse';
+
+  @override
+  String get species_common_bream_desc =>
+      'Hochrückiger, seitlich abgeflachter Bronzefisch, der kopfüber in schlammigen Schwärmen frisst, häufig im europäischen Flachland.';
+
+  @override
+  String get species_roach_name => 'Rotauge';
+
+  @override
+  String get species_roach_desc =>
+      'Silberner Schwarmfisch mit roten Flossen und roter Iris, der häufigste Fisch in vielen europäischen Seen und Kanälen.';
+
+  @override
+  String get species_rudd_name => 'Rotfeder';
+
+  @override
+  String get species_rudd_desc =>
+      'Goldflankiger Verwandter des Rotauges mit leuchtend roten Flossen und oberständigem Maul, frisst knapp unter der Oberfläche.';
+
+  @override
+  String get species_chub_name => 'Döbel';
+
+  @override
+  String get species_chub_desc =>
+      'Gedrungener Flussfisch mit breitem Kopf, großen dunkel gerandeten Schuppen und großem Maul, steht unter überhängenden Bäumen.';
+
+  @override
+  String get species_barbel_name => 'Barbe';
+
+  @override
+  String get species_barbel_desc =>
+      'Stromlinienförmiger Grundfisch mit vier Barteln und unterständigem Maul, hält sich am Kies schneller europäischer Flüsse.';
+
+  @override
+  String get species_european_eel_name => 'Europäischer Aal';
+
+  @override
+  String get species_european_eel_desc =>
+      'Schlangenförmiger Fisch, der Jahrzehnte in Flüssen und Seen lebt, bevor er zum einmaligen Laichen in die Sargassosee zieht.';
+
+  @override
+  String get species_american_eel_name => 'Amerikanischer Aal';
+
+  @override
+  String get species_american_eel_desc =>
+      'Nordamerikanischer Aal, der sich tagsüber in Flüssen und Seen unter Steinen versteckt und zum Laichen in die Sargassosee zurückkehrt.';
+
+  @override
+  String get species_burbot_name => 'Quappe';
+
+  @override
+  String get species_burbot_desc =>
+      'Der einzige Süßwasserdorsch, ein marmorierter aalähnlicher Fisch mit einer Kinnbartel, versteckt sich tagsüber im kalten Tiefenwasser.';
+
+  @override
+  String get species_channel_catfish_name => 'Getüpfelter Gabelwels';
+
+  @override
+  String get species_channel_catfish_desc =>
+      'Grauer Wels mit verstreuten dunklen Flecken, gegabelter Schwanzflosse und acht Barteln, häufig in Flüssen und Stauseen Nordamerikas.';
+
+  @override
+  String get species_flathead_catfish_name => 'Flachkopfwels';
+
+  @override
+  String get species_flathead_catfish_desc =>
+      'Riesiger, braun marmorierter Wels mit abgeflachtem Kopf und vorstehendem Unterkiefer, liegt in tiefen Flusskolken.';
+
+  @override
+  String get species_brown_bullhead_name => 'Zwergwels';
+
+  @override
+  String get species_brown_bullhead_desc =>
+      'Kleiner, gedrungener Zwergwels mit dunklen Barteln und gerader Schwanzflosse, verträgt schlammige, warme und sauerstoffarme Teiche.';
+
+  @override
+  String get species_wels_catfish_name => 'Europäischer Wels';
+
+  @override
+  String get species_wels_catfish_desc =>
+      'Europas größter Süßwasserfisch, ein schuppenloser Riese mit breitem flachem Kopf und langen Barteln, liegt in tiefen Flusskolken.';
+
+  @override
+  String get species_white_sturgeon_name => 'Weißer Stör';
+
+  @override
+  String get species_white_sturgeon_desc =>
+      'Nordamerikas größter Süßwasserfisch, ein gepanzerter grauer Riese mit haiähnlicher Schwanzflosse in großen westlichen Flüssen.';
+
+  @override
+  String get species_lake_sturgeon_name => 'Seestör';
+
+  @override
+  String get species_lake_sturgeon_desc =>
+      'Langsam wachsender gepanzerter Stör der Großen Seen und des Mississippi-Beckens, saugt mit seinem Rüsselmaul den Grund ab.';
+
+  @override
+  String get species_european_sturgeon_name => 'Europäischer Stör';
+
+  @override
+  String get species_european_sturgeon_desc =>
+      'Vom Aussterben bedrohter gepanzerter Stör atlantischer Flüsse, heute in Garonne und Elbe nachgezüchtet und ausgesetzt.';
+
+  @override
+  String get species_alligator_gar_name => 'Alligatorhecht';
+
+  @override
+  String get species_alligator_gar_desc =>
+      'Urzeitlicher Riese mit breiter, zahnbewehrter Schnauze und rautenförmigen Panzerschuppen, taucht in südlichen Flüssen zum Luftschnappen auf.';
+
+  @override
+  String get species_longnose_gar_name => 'Gemeiner Knochenhecht';
+
+  @override
+  String get species_longnose_gar_desc =>
+      'Schlanker gepanzerter Fisch mit nadelartiger Schnauze, steht reglos knapp unter der Oberfläche warmer Flüsse.';
+
+  @override
+  String get species_bowfin_name => 'Kahlhecht';
+
+  @override
+  String get species_bowfin_desc =>
+      'Lebendes Fossil mit langer wellenförmiger Rückenflosse und knöchernem Kopf, bewacht seine Brut in verkrauteten Altwassern.';
+
+  @override
+  String get species_american_paddlefish_name => 'Löffelstör';
+
+  @override
+  String get species_american_paddlefish_desc =>
+      'Filtrierender Riese mit paddelförmiger Schnauze von einem Drittel seiner Länge, schwimmt mit offenem Maul durch große Flüsse.';
+
+  @override
+  String get species_sea_lamprey_name => 'Meerneunauge';
+
+  @override
+  String get species_sea_lamprey_desc =>
+      'Kieferloser aalähnlicher Parasit mit zahnbewehrtem Saugmaul, laicht in Kiesbächen nach dem Fressen im Meer oder in Seen.';
+
+  @override
+  String get species_freshwater_drum_name => 'Süßwassertrommler';
+
+  @override
+  String get species_freshwater_drum_desc =>
+      'Silbriger Buckelfisch, der hörbar grunzt und Muscheln mit Schlundzähnen knackt, häufig in großen Flüssen und Seen.';
+
+  @override
+  String get species_white_sucker_name => 'Weißer Sauger';
+
+  @override
+  String get species_white_sucker_desc =>
+      'Zylindrischer Grundfisch mit fleischigem, nach unten gerichtetem Maul, zieht im Frühjahr in Laichscharen die Bäche hinauf.';
+
+  @override
+  String get species_common_minnow_name => 'Elritze';
+
+  @override
+  String get species_common_minnow_desc =>
+      'Winziger gestreifter Schwarmfisch klarer kühler Bäche und Seen, die Männchen färben sich im Frühjahr rot und grün.';
+
+  @override
+  String get species_three_spined_stickleback_name =>
+      'Dreistachliger Stichling';
+
+  @override
+  String get species_three_spined_stickleback_desc =>
+      'Winziger gepanzerter Fisch mit drei Rückenstacheln, dessen rotkehlige Männchen Nester aus Pflanzenfasern bauen und bewachen.';
+
+  @override
+  String get species_alewife_name => 'Maifisch';
+
+  @override
+  String get species_alewife_desc =>
+      'Silberner Hering, der im Frühjahr die Flüsse hinaufzieht und heute die Großen Seen in riesigen Schwärmen füllt.';
+
+  @override
+  String get species_nile_perch_name => 'Nilbarsch';
+
+  @override
+  String get species_nile_perch_desc =>
+      'Massiger silberner Raubfisch mit schwarz umrandetem Auge, in den Victoriasee eingeführt, wo er das Freiwasser beherrscht.';
+
+  @override
+  String get species_nile_tilapia_name => 'Nil-Tilapie';
+
+  @override
+  String get species_nile_tilapia_desc =>
+      'Grauer Buntbarsch mit senkrechten Schwanzstreifen, der seine Jungen im Maul ausbrütet, weltweit in warmen Gewässern gezüchtet und verwildert.';
+
+  @override
+  String get species_african_tigerfish_name => 'Tigersalmler';
+
+  @override
+  String get species_african_tigerfish_desc =>
+      'Gestreifter silberner Raubfisch mit ineinandergreifenden Dolchzähnen, jagt in schnellen afrikanischen Flüssen wie dem Sambesi.';
+
+  @override
+  String get species_marbled_lungfish_name => 'Äthiopischer Lungenfisch';
+
+  @override
+  String get species_marbled_lungfish_desc =>
+      'Aalförmiger luftatmender Fisch mit fadenförmigen Flossen, der Dürren in einem Schlammkokon eingeschlossen übersteht.';
+
+  @override
+  String get species_electric_catfish_name => 'Zitterwels';
+
+  @override
+  String get species_electric_catfish_desc =>
+      'Plumper grauer Wels aus Nil und Kongo, der Beute mit Stromstößen von mehreren hundert Volt betäubt.';
+
+  @override
+  String get species_zebra_mbuna_name => 'Zebra-Mbuna';
+
+  @override
+  String get species_zebra_mbuna_desc =>
+      'Blau gebänderter Felsenbuntbarsch des Malawisees, weidet in dichten territorialen Scharen Algen von Felsblöcken.';
+
+  @override
+  String get species_malawi_butterfly_peacock_name => 'Feenbuntbarsch';
+
+  @override
+  String get species_malawi_butterfly_peacock_desc =>
+      'Schillernd blauer Pfauenbuntbarsch aus den Höhlen des Malawisees, die Männchen leuchten mit weiß gesäumten Flossen.';
+
+  @override
+  String get species_fuelleborn_cichlid_name => 'Schabemundbuntbarsch';
+
+  @override
+  String get species_fuelleborn_cichlid_desc =>
+      'Stumpfnasiger Mbuna aus dem Malawisee mit fleischiger, überhängender Schnauze zum Abschaben von Algen in der Brandungszone.';
+
+  @override
+  String get species_princess_of_burundi_name => 'Prinzessin von Burundi';
+
+  @override
+  String get species_princess_of_burundi_desc =>
+      'Eleganter Tanganjikasee-Buntbarsch mit leierförmigen Flossen, lebt in Großfamilien, die sich die Brutpflege teilen.';
+
+  @override
+  String get species_frontosa_name => 'Tanganjika-Beulenkopf';
+
+  @override
+  String get species_frontosa_desc =>
+      'Tiefwasser-Buntbarsch des Tanganjikasees mit kräftigen blauweißen Bändern und Stirnbuckel, zieht langsam in Gruppen über Felsen.';
+
+  @override
+  String get species_tropheus_moorii_name => 'Brabantbuntbarsch';
+
+  @override
+  String get species_tropheus_moorii_desc =>
+      'Gedrungener Felsenbuntbarsch des Tanganjikasees in Dutzenden Farbformen, jede auf ihren eigenen Uferabschnitt beschränkt.';
+
+  @override
+  String get species_arapaima_name => 'Piracurù';
+
+  @override
+  String get species_arapaima_desc =>
+      'Einer der größten Süßwasserfische, ein gepanzerter Amazonasriese mit rot gesprenkeltem Schwanz, der zum Luftholen auftaucht.';
+
+  @override
+  String get species_silver_arowana_name => 'Arowana';
+
+  @override
+  String get species_silver_arowana_desc =>
+      'Bandförmiger silberner Amazonasfisch mit zwei Kinnbarteln, der aus dem Wasser springt, um Insekten von Zweigen zu schnappen.';
+
+  @override
+  String get species_red_bellied_piranha_name => 'Diamant-Piranha';
+
+  @override
+  String get species_red_bellied_piranha_desc =>
+      'Hochrückiger silberner Fisch mit karmesinrotem Bauch und messerscharfen Zähnen, zieht in Schwärmen durch Amazonas-Altwasser.';
+
+  @override
+  String get species_black_piranha_name => 'Roter Piranha';
+
+  @override
+  String get species_black_piranha_desc =>
+      'Große einzelgängerische Piranha mit roten Augen und dunklem rautenförmigem Körper, lauert in klaren felsigen Amazonas-Nebenflüssen.';
+
+  @override
+  String get species_red_bellied_pacu_name => 'Gamitana-Scheibensalmler';
+
+  @override
+  String get species_red_bellied_pacu_desc =>
+      'Piranhaähnlicher Früchtefresser mit flachen Mahlzähnen und rotem Bauch, sammelt sich unter überfluteten Waldbäumen.';
+
+  @override
+  String get species_tambaqui_name => 'Schwarzer Pacu';
+
+  @override
+  String get species_tambaqui_desc =>
+      'Riesiger dunkler Pacu des Amazonas, der unter dem Blätterdach überfluteter Wälder herabgefallene Nüsse und Samen knackt.';
+
+  @override
+  String get species_electric_eel_name => 'Zitteraal';
+
+  @override
+  String get species_electric_eel_desc =>
+      'Kein Aal, sondern ein Messerfisch, ein langer dunkler Luftatmer, der Beute mit bis zu 600 Volt betäubt.';
+
+  @override
+  String get species_redtail_catfish_name => 'Rotflossen-Antennenwels';
+
+  @override
+  String get species_redtail_catfish_desc =>
+      'Großer Amazonaswels mit dunklem Rücken, weißem Bauch und leuchtend orangerotem Schwanz, ruht in tiefen Flusskolken.';
+
+  @override
+  String get species_tiger_shovelnose_catfish_name => 'Tigerspatelwels';
+
+  @override
+  String get species_tiger_shovelnose_catfish_desc =>
+      'Schlanker gestreifter Wels mit langer abgeflachter Schnauze, jagt nachts entlang sandiger südamerikanischer Flussrinnen.';
+
+  @override
+  String get species_peacock_bass_name => 'Grüner Augenfleck-Kammbarsch';
+
+  @override
+  String get species_peacock_bass_desc =>
+      'Aggressiver Amazonas-Buntbarsch mit drei dunklen Querbinden und Augenfleck am Schwanz, lauert Fischen an versunkenem Holz auf.';
+
+  @override
+  String get species_oscar_name => 'Pfauenaugenbuntbarsch';
+
+  @override
+  String get species_oscar_desc =>
+      'Kräftiger dunkler Buntbarsch mit oranger Marmorierung und Augenfleck am Schwanz, durchstreift langsame Amazonasgewässer und überflutete Ufer.';
+
+  @override
+  String get species_freshwater_angelfish_name => 'Skalar';
+
+  @override
+  String get species_freshwater_angelfish_desc =>
+      'Hoher, scheibenförmiger Amazonas-Buntbarsch mit langen Flossen und senkrechten Streifen, treibt zwischen versunkenen Wurzeln.';
+
+  @override
+  String get species_discus_name => 'Diskusfisch';
+
+  @override
+  String get species_discus_desc =>
+      'Runder, seitlich abgeflachter Buntbarsch mit welligen blauen Linien, der seine Brut mit Hautschleim füttert.';
+
+  @override
+  String get species_sailfin_pleco_name => 'Segelflossen-Harnischwels';
+
+  @override
+  String get species_sailfin_pleco_desc =>
+      'Gepanzerter Saugwels mit hoher Rückenflosse und Leopardenflecken, raspelt Algen von Holz und Fels.';
+
+  @override
+  String get species_cardinal_tetra_name => 'Roter Neon';
+
+  @override
+  String get species_cardinal_tetra_desc =>
+      'Winziger Salmler mit neonblauem Streifen über einem durchgehenden roten Band, schwärmt im dunklen Wasser des Rio Negro.';
+
+  @override
+  String get species_mexican_tetra_name => 'Mexikanischer Streifensalmler';
+
+  @override
+  String get species_mexican_tetra_desc =>
+      'Silberner Salmler mexikanischer Flüsse, dessen Höhlenpopulationen blind und blass sind, ein Liebling der Cenote-Taucher.';
+
+  @override
+  String get species_mekong_giant_catfish_name => 'Mekongwels';
+
+  @override
+  String get species_mekong_giant_catfish_desc =>
+      'Vom Aussterben bedrohter zahnloser Riese des Mekong, grau und ohne Barteln, einst bis zu drei Meter lang.';
+
+  @override
+  String get species_giant_barb_name => 'Riesenbarbe';
+
+  @override
+  String get species_giant_barb_desc =>
+      'Der größte Karpfen der Welt, ein großschuppiger Mekong-Riese mit gewaltigem Kopf, heute selten in tiefen Flusskolken.';
+
+  @override
+  String get species_asian_arowana_name => 'Asiatischer Gabelbart';
+
+  @override
+  String get species_asian_arowana_desc =>
+      'Metallisch roter oder goldener Drachenfisch südostasiatischer Schwarzwasserflüsse, gleitet knapp unter der Oberfläche.';
+
+  @override
+  String get species_striped_snakehead_name => 'Quergestreifter Schlangenkopf';
+
+  @override
+  String get species_striped_snakehead_desc =>
+      'Torpedoförmiger luftatmender Raubfisch mit flachem schlangenartigem Kopf, bewacht seine Brut in verkrauteten asiatischen Teichen.';
+
+  @override
+  String get species_giant_snakehead_name => 'Riesenschlangenkopf';
+
+  @override
+  String get species_giant_snakehead_desc =>
+      'Großer, aggressiver Schlangenkopffisch, gestreift als Jungfisch und dunkel als Erwachsener, verteidigt seine leuchtend roten Jungen in südostasiatischen Seen.';
+
+  @override
+  String get species_climbing_perch_name => 'Kletterfisch';
+
+  @override
+  String get species_climbing_perch_desc =>
+      'Robuster olivfarbener Fisch, der Luft atmet und auf seinen stacheligen Kiemendeckeln über Land zwischen austrocknenden Tümpeln kriecht.';
+
+  @override
+  String get species_golden_mahseer_name => 'Riesen barbe';
+
+  @override
+  String get species_golden_mahseer_desc =>
+      'Goldschuppiger Karpfen der Himalaya-Flüsse, ein kraftvoller Schwimmer, der in schnellen klaren Kolken unterhalb von Stromschnellen steht.';
+
+  @override
+  String get species_koi_name => 'Koi-Karpfen';
+
+  @override
+  String get species_koi_desc =>
+      'Zierkarpfen, in Japan in weißen, roten, schwarzen und goldenen Mustern gezüchtet, zu Hause in Teichen und warmen klaren Seen.';
+
+  @override
+  String get species_goldfish_name => 'Goldfisch';
+
+  @override
+  String get species_goldfish_desc =>
+      'Domestizierter asiatischer Karpfen, der in freier Wildbahn olivbronze wird und in warmen Seen große verwilderte Schwärme bildet.';
+
+  @override
+  String get species_giant_gourami_name => 'Speisegurami';
+
+  @override
+  String get species_giant_gourami_desc =>
+      'Breiter, buckliger südostasiatischer Fisch mit fadenförmigen Bauchflossen, der in langsamem krautigem Wasser Schaumnester baut.';
+
+  @override
+  String get species_clown_knifefish_name => 'Tausenddollarfisch';
+
+  @override
+  String get species_clown_knifefish_desc =>
+      'Silberner klingenförmiger Fisch mit Augenflecken entlang einer langen wellenden Afterflosse, schwebt unter Totholz asiatischer Flüsse.';
+
+  @override
+  String get species_walking_catfish_name => 'Wanderwels';
+
+  @override
+  String get species_walking_catfish_desc =>
+      'Schlanker luftatmender Wels, der sich zwischen Teichen über feuchten Boden schlängelt, heute in Florida verwildert.';
+
+  @override
+  String get species_japanese_eel_name => 'Japanischer Aal';
+
+  @override
+  String get species_japanese_eel_desc =>
+      'Ostasiatischer Aal, der in Flüssen und Seen heranwächst und zum Laichen in den westlichen Pazifik zieht.';
+
+  @override
+  String get species_ayu_name => 'Ayu';
+
+  @override
+  String get species_ayu_desc =>
+      'Schlanker silberner japanischer Ayu, der in klaren Flüssen Algen von Steinen weidet und ein Fressrevier verteidigt.';
+
+  @override
+  String get species_baikal_omul_name => 'Baikal-Omul';
+
+  @override
+  String get species_baikal_omul_desc =>
+      'Silberne Renke, die nur im Baikalsee vorkommt, schwärmt im kalten Freiwasser und zieht zum Laichen die Flüsse hinauf.';
+
+  @override
+  String get species_baikal_oilfish_name => 'Baikalgroppe';
+
+  @override
+  String get species_baikal_oilfish_desc =>
+      'Durchscheinender, schuppenloser Fisch aus den Tiefen des Baikalsees, so ölreich, dass er fast durchsichtig ist, und lebendgebärend.';
+
+  @override
+  String get species_murray_cod_name => 'Murray-Dorsch';
+
+  @override
+  String get species_murray_cod_desc =>
+      'Australiens größter Süßwasserfisch, ein grün marmorierter Riese mit weißem Bauch, steht neben Totholz im Murray-Darling.';
+
+  @override
+  String get species_golden_perch_name => 'Goldbarsch';
+
+  @override
+  String get species_golden_perch_desc =>
+      'Hochrückiger goldoliv gefärbter Barsch australischer Binnenflüsse, sucht Schutz an umgestürzten Bäumen und Felsvorsprüngen.';
+
+  @override
+  String get species_australian_bass_name => 'Australischer Barsch';
+
+  @override
+  String get species_australian_bass_desc =>
+      'Bronzegrüner Barsch der Küstenflüsse Ostaustraliens, der zum Laichen flussabwärts in brackige Ästuare zieht.';
+
+  @override
+  String get species_barramundi_name => 'Barramundi';
+
+  @override
+  String get species_barramundi_desc =>
+      'Silberner, buckliger Barsch der Flüsse und Ästuare Nordaustraliens, der mit dem Alter das Geschlecht von männlich zu weiblich wechselt.';
+
+  @override
+  String get species_silver_perch_name => 'Silberbarsch';
+
+  @override
+  String get species_silver_perch_desc =>
+      'Silbergrauer Grunzbarsch des Murray-Darling mit kleinem Maul und gegabelter Schwanzflosse, früher in riesigen Schwärmen.';
+
+  @override
+  String get species_gulf_saratoga_name => 'Nördlicher Saratoga';
+
+  @override
+  String get species_gulf_saratoga_desc =>
+      'Bronzefarbener australischer Arowana mit rot gesprenkelten Schuppen, der seine Eier in nördlichen Billabongs im Maul ausbrütet.';
+
+  @override
+  String get species_sooty_grunter_name => 'Rußgrunzer';
+
+  @override
+  String get species_sooty_grunter_desc =>
+      'Dunkler, gedrungener Grunzbarsch nordaustralischer Flüsse, weidet Algen und Früchte um Felsen und Stromschnellen.';
+
+  @override
+  String get species_eel_tailed_catfish_name => 'Aalschwanzwels';
+
+  @override
+  String get species_eel_tailed_catfish_desc =>
+      'Australischer Wels mit spitz zulaufendem aalartigem Schwanz, der im klaren Flachwasser ein Kiesnest baut und bewacht.';
+
+  @override
+  String get species_spangled_perch_name => 'Flitterbarsch';
+
+  @override
+  String get species_spangled_perch_desc =>
+      'Kleiner, silbern gesprenkelter Grunzbarsch im gesamten australischen Binnenland, besiedelt jedes Wasserloch, das eine Flut verbindet.';
+
+  @override
+  String get species_eastern_rainbowfish_name => 'Östlicher Regenbogenfisch';
+
+  @override
+  String get species_eastern_rainbowfish_desc =>
+      'Kleiner schillernder Fisch ostaustralischer Bäche, die Männchen blitzen in der Sonne mit roten und blauen Streifen.';
+
+  @override
+  String get species_signal_crayfish_name => 'Signalkrebs';
+
+  @override
+  String get species_signal_crayfish_desc =>
+      'Großer brauner Flusskrebs mit weißem Fleck am Scherengelenk, eine invasive nordamerikanische Art, die sich in europäischen Flüssen ausbreitet.';
+
+  @override
+  String get species_red_swamp_crayfish_name =>
+      'Roter Amerikanischer Sumpfkrebs';
+
+  @override
+  String get species_red_swamp_crayfish_desc =>
+      'Dunkelroter Flusskrebs mit höckerigen Scheren aus den Sümpfen Louisianas, gräbt sich heute in warme Feuchtgebiete auf allen Kontinenten ein.';
+
+  @override
+  String get species_noble_crayfish_name => 'Edelkrebs';
+
+  @override
+  String get species_noble_crayfish_desc =>
+      'Europas heimischer Edelkrebs, dunkelbraun mit rot unterseitigen Scheren, versteckt sich in Uferhöhlen sauberer kühler Bäche und Seen.';
+
+  @override
+  String get species_white_clawed_crayfish_name => 'Dohlenkrebs';
+
+  @override
+  String get species_white_clawed_crayfish_desc =>
+      'Kleiner olivfarbener Flusskrebs mit hellen Scherenunterseiten, ein bedrohter Bewohner sauberer Kalksteinbäche Westeuropas.';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_name =>
+      'Tasmanischer Riesenflusskrebs';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_desc =>
+      'Das größte Süßwasser-Wirbellose der Welt, ein langsam wachsender blaubrauner Flusskrebs beschatteter tasmanischer Flüsse.';
+
+  @override
+  String get species_zebra_mussel_name => 'Wandermuschel';
+
+  @override
+  String get species_zebra_mussel_desc =>
+      'Daumennagelgroße gestreifte Muschel, die Felsen, Wracks und Rohre zu Tausenden überzieht und das Wasser klärt, während sie sich ausbreitet.';
+
+  @override
+  String get species_quagga_mussel_name => 'Quagga-Muschel';
+
+  @override
+  String get species_quagga_mussel_desc =>
+      'Rundere, blassere Verwandte der Zebramuschel, die weiche Böden und tiefes kaltes Wasser besiedelt, wo die Zebramuschel nicht kann.';
+
+  @override
+  String get species_freshwater_pearl_mussel_name => 'Flussperlmuschel';
+
+  @override
+  String get species_freshwater_pearl_mussel_desc =>
+      'Dunkle, längliche Muschel, die über ein Jahrhundert halb eingegraben im sauberen Kies schneller Lachsflüsse leben kann.';
+
+  @override
+  String get species_swan_mussel_name => 'Große Teichmuschel';
+
+  @override
+  String get species_swan_mussel_desc =>
+      'Große dünnschalige Muschel schlammiger Seen und Kanäle, filtert mit ihren Siphonen knapp über dem Schlick das Wasser.';
+
+  @override
+  String get species_chinese_pond_mussel_name => 'Chinesische Teichmuschel';
+
+  @override
+  String get species_chinese_pond_mussel_desc =>
+      'Sehr große invasive asiatische Muschel mit glänzend brauner Schale, mit Zuchtfischen eingeschleppt und in warmen Seen verbreitet.';
+
+  @override
+  String get species_freshwater_sponge_name => 'Geweihschwamm';
+
+  @override
+  String get species_freshwater_sponge_desc =>
+      'Grüner oder grauer verzweigter Schwamm, der Äste und Steine in klaren Seen überzieht, gefärbt von Algen, die in ihm leben.';
+
+  @override
+  String get species_freshwater_jellyfish_name => 'Süßwasserqualle';
+
+  @override
+  String get species_freshwater_jellyfish_desc =>
+      'Münzgroße durchsichtige Qualle, die im Spätsommer in Schwärmen in warmen Baggerseen und Stauseen auftaucht.';
+
+  @override
+  String get species_great_pond_snail_name => 'Spitzschlammschnecke';
+
+  @override
+  String get species_great_pond_snail_desc =>
+      'Große Schnecke mit spitzem Gehäuse, gleitet über Pflanzen und glasklare Flächen stiller europäischer Gewässer und atmet Luft an der Oberfläche.';
+
+  @override
+  String get species_great_ramshorn_snail_name => 'Posthornschnecke';
+
+  @override
+  String get species_great_ramshorn_snail_desc =>
+      'Flache, spiralig gewundene Schnecke wie ein winziges Widderhorn, weidet Algen von Blättern und Steinen in verkrauteten Teichen.';
+
+  @override
+  String get species_channeled_apple_snail_name => 'Gefurchte Apfelschnecke';
+
+  @override
+  String get species_channeled_apple_snail_desc =>
+      'Große goldbraune Schnecke, die leuchtend rosa Eigelege über der Wasserlinie ablegt, invasiv in warmen Feuchtgebieten und Reisfeldern.';
+
+  @override
+  String get species_magnificent_bryozoan_name => 'Prächtiges Moostierchen';
+
+  @override
+  String get species_magnificent_bryozoan_desc =>
+      'Gallertartige Kolonie von Fußballgröße, besetzt mit winzigen Tieren, haftet an Ästen und Seilen in warmem stillem Wasser.';
+
+  @override
+  String get species_chinese_mitten_crab_name => 'Chinesische Wollhandkrabbe';
+
+  @override
+  String get species_chinese_mitten_crab_desc =>
+      'Grabende Krabbe mit behaarten Scheren, die Jahre in Flüssen verbringt, bevor sie flussabwärts zum Laichen in Ästuare wandert.';
+
+  @override
+  String get species_giant_freshwater_prawn_name => 'Riesensüßwassergarnele';
+
+  @override
+  String get species_giant_freshwater_prawn_desc =>
+      'Große Garnele mit blauen Scheren aus asiatischen und australischen Flüssen, deren alte Männchen Scheren länger als der Körper haben.';
+
+  @override
+  String get species_common_snapping_turtle_name => 'Schnappschildkröte';
+
+  @override
+  String get species_common_snapping_turtle_desc =>
+      'Schwere Schildkröte mit rauem Panzer und langem gezacktem Schwanz, liegt mit herausgestrecktem Kopf im Schlamm von Teichen und langsamen Flüssen.';
+
+  @override
+  String get species_alligator_snapping_turtle_name => 'Geierschildkröte';
+
+  @override
+  String get species_alligator_snapping_turtle_desc =>
+      'Urzeitlich wirkender Riese mit drei gezackten Kielen und wurmartigem Zungenköder, wartet mit offenem Maul auf südlichen Flussgründen.';
+
+  @override
+  String get species_painted_turtle_name => 'Zierschildkröte';
+
+  @override
+  String get species_painted_turtle_desc =>
+      'Glatte dunkle Schildkröte mit roten und gelben Streifen an Hals und Panzerrand, sonnt sich in Reihen auf Baumstämmen in ganz Nordamerika.';
+
+  @override
+  String get species_red_eared_slider_name => 'Rotwangen-Schmuckschildkröte';
+
+  @override
+  String get species_red_eared_slider_desc =>
+      'Grün gestreifte Wasserschildkröte mit rotem Streifen hinter jedem Auge, die Heimtierschildkröte, heute weltweit in warmen Gewässern verwildert.';
+
+  @override
+  String get species_northern_map_turtle_name => 'Landkarten-Höckerschildkröte';
+
+  @override
+  String get species_northern_map_turtle_desc =>
+      'Olivfarbene Schildkröte mit landkartenartigen gelben Linien auf dem Panzer und niedrigem Kiel, sonnt sich auf Felsen an klaren Flüssen und großen Seen.';
+
+  @override
+  String get species_spiny_softshell_turtle_name => 'Dornrand-Weichschildkröte';
+
+  @override
+  String get species_spiny_softshell_turtle_desc =>
+      'Flache, lederartige Pfannkuchenschildkröte mit Schnorchelschnauze, im Sand flacher Flüsse eingegraben, nur der Kopf schaut heraus.';
+
+  @override
+  String get species_florida_softshell_turtle_name =>
+      'Florida-Weichschildkröte';
+
+  @override
+  String get species_florida_softshell_turtle_desc =>
+      'Große dunkle Weichschildkröte mit langer röhrenförmiger Schnauze, häufig in Floridas Quellen, Kanälen und Seen.';
+
+  @override
+  String get species_pig_nosed_turtle_name => 'Neuguinea-Weichschildkröte';
+
+  @override
+  String get species_pig_nosed_turtle_desc =>
+      'Einzigartige Flussschildkröte Neuguineas und Nordaustraliens mit Meeresschildkrötenflossen und fleischiger schweineartiger Schnauze.';
+
+  @override
+  String get species_mary_river_turtle_name => 'Mary-River-Schildkröte';
+
+  @override
+  String get species_mary_river_turtle_desc =>
+      'Seltene australische Schildkröte, die über ihre Kloake atmet und einen grünen Algen-Irokesenschnitt trägt, nur in einem einzigen Fluss in Queensland.';
+
+  @override
+  String get species_yellow_spotted_river_turtle_name =>
+      'Terekay-Schienenschildkröte';
+
+  @override
+  String get species_yellow_spotted_river_turtle_desc =>
+      'Amazonas-Halswender-Schildkröte mit gelben Kopfflecken, sonnt sich in Gruppen auf Baumstämmen und Sandbänken großer Flüsse.';
+
+  @override
+  String get species_european_pond_turtle_name =>
+      'Europäische Sumpfschildkröte';
+
+  @override
+  String get species_european_pond_turtle_desc =>
+      'Dunkle, gelb gepunktete Schildkröte, Europas heimische Sumpfschildkröte, gleitet von sonnigen Ufern in verkrautete Teiche.';
+
+  @override
+  String get species_american_alligator_name => 'Mississippi-Alligator';
+
+  @override
+  String get species_american_alligator_desc =>
+      'Breitschnauziges gepanzertes Reptil der Sümpfe, Quellen und Flüsse im Südosten der USA, treibt mit nur Augen und Nasenlöchern über Wasser.';
+
+  @override
+  String get species_spectacled_caiman_name => 'Krokodilkaiman';
+
+  @override
+  String get species_spectacled_caiman_desc =>
+      'Kleiner olivfarbener Kaiman mit knöchernem Grat zwischen den Augen, häufig in langsamen Flüssen und Lagunen Mittel- und Südamerikas.';
+
+  @override
+  String get species_black_caiman_name => 'Schwarzer Kaiman';
+
+  @override
+  String get species_black_caiman_desc =>
+      'Der größte Räuber des Amazonas, ein schwarzer gepanzerter Kaiman von bis zu fünf Metern, jagt nachts in Seen und überflutetem Wald.';
+
+  @override
+  String get species_freshwater_crocodile_name => 'Australien-Krokodil';
+
+  @override
+  String get species_freshwater_crocodile_desc =>
+      'Schmalschnauziges australisches Krokodil der nördlichen Flüsse und Schluchten, scheu und weit kleiner als das Leistenkrokodil.';
+
+  @override
+  String get species_northern_water_snake_name => 'Siegelring-Schwimmnatter';
+
+  @override
+  String get species_northern_water_snake_desc =>
+      'Dickleibige, gebänderte braune Schlange, sonnt sich auf Felsen und Ästen über Bächen im Osten Nordamerikas, harmlos, aber bissig.';
+
+  @override
+  String get species_green_anaconda_name => 'Große Anakonda';
+
+  @override
+  String get species_green_anaconda_desc =>
+      'Die schwerste Schlange der Erde, ein olivfarbener Riese mit schwarzen Flecken, liegt untergetaucht in Sümpfen und langsamen Flüssen des Amazonas.';
+
+  @override
+  String get species_hellbender_name => 'Schlammteufel';
+
+  @override
+  String get species_hellbender_desc =>
+      'Riesiger flachköpfiger Salamander mit faltiger Haut, versteckt sich unter großen Steinen in kalten klaren Flüssen der Appalachen.';
+
+  @override
+  String get species_mudpuppy_name => 'Gefleckter Furchenmolch';
+
+  @override
+  String get species_mudpuppy_desc =>
+      'Brauner gefleckter Salamander, der seine gefiederten roten Kiemen lebenslang behält und nachts über See- und Flussgründe kriecht.';
+
+  @override
+  String get species_axolotl_name => 'Axolotl';
+
+  @override
+  String get species_axolotl_desc =>
+      'Lächelnder Kiemensalamander, der das Wasser nie verlässt, vom Aussterben bedroht in den Kanälen von Xochimilco bei Mexiko-Stadt.';
+
+  @override
+  String get species_chinese_giant_salamander_name =>
+      'Chinesischer Riesensalamander';
+
+  @override
+  String get species_chinese_giant_salamander_desc =>
+      'Die größte lebende Amphibie, ein faltiger brauner Riese von fast zwei Metern, versteckt sich in kühlen felsigen Gebirgsbächen.';
+
+  @override
+  String get species_smooth_newt_name => 'Teichmolch';
+
+  @override
+  String get species_smooth_newt_desc =>
+      'Kleiner olivfarbener Molch, der jedes Frühjahr in die Teiche zurückkehrt, die Männchen bilden einen gewellten Kamm und einen gefleckten orangen Bauch.';
+
+  @override
+  String get species_great_crested_newt_name => 'Nördlicher Kammmolch';
+
+  @override
+  String get species_great_crested_newt_desc =>
+      'Großer schwarzer warziger Molch mit feuerorangem Bauch, die Männchen tragen zur Paarungszeit einen gezackten drachenartigen Kamm.';
+
+  @override
+  String get species_american_bullfrog_name => 'Amerikanischer Ochsenfrosch';
+
+  @override
+  String get species_american_bullfrog_desc =>
+      'Riesiger grüner Frosch mit tiefem Brüllen, sitzt zwischen Seerosenblättern warmer Teiche und ist heute auf mehreren Kontinenten invasiv.';
+
+  @override
+  String get species_common_frog_name => 'Grasfrosch';
+
+  @override
+  String get species_common_frog_desc =>
+      'Brauner Frosch mit dunkler Augenmaske, versammelt sich im Frühjahr in lauten Scharen zum Laichen in europäischen Teichen und Gräben.';
+
+  @override
+  String get species_north_american_river_otter_name =>
+      'Nordamerikanischer Fischotter';
+
+  @override
+  String get species_north_american_river_otter_desc =>
+      'Schlanker verspielter Otter, der in Flüssen und Seen Nordamerikas Fische und Krebse jagt und Schlammrutschen an den Ufern hinterlässt.';
+
+  @override
+  String get species_eurasian_otter_name => 'Fischotter';
+
+  @override
+  String get species_eurasian_otter_desc =>
+      'Scheuer brauner Fischotter europäischer Flüsse, Seen und Küsten, erholt sich nach Jahrzehnten des Rückgangs in seinem gesamten Verbreitungsgebiet.';
+
+  @override
+  String get species_giant_otter_name => 'Riesenotter';
+
+  @override
+  String get species_giant_otter_desc =>
+      'Fast zwei Meter langer Otter mit cremefarbenem Kehlfleck, lebt in lauten Familiengruppen an Amazonasflüssen und Altwasserseen.';
+
+  @override
+  String get species_north_american_beaver_name => 'Kanadischer Biber';
+
+  @override
+  String get species_north_american_beaver_desc =>
+      'Großes Nagetier mit flachem Schwanz, das Bäche zu Teichen aufstaut und unter dem Eis schwimmt, mit einer Burg aus Ästen als Unterschlupf.';
+
+  @override
+  String get species_eurasian_beaver_name => 'Europäischer Biber';
+
+  @override
+  String get species_eurasian_beaver_desc =>
+      'Europas größtes Nagetier, auf dem ganzen Kontinent wieder angesiedelt, fällt Uferbäume und baut Dämme und Burgen.';
+
+  @override
+  String get species_muskrat_name => 'Bisamratte';
+
+  @override
+  String get species_muskrat_desc =>
+      'Rattengroßes braunes Nagetier mit schuppigem, seitlich abgeflachtem Schwanz, schwimmt durch Rohrkolbensümpfe und baut kuppelförmige Schilfburgen.';
+
+  @override
+  String get species_platypus_name => 'Schnabeltier';
+
+  @override
+  String get species_platypus_desc =>
+      'Eierlegendes Säugetier mit Entenschnabel und Schwimmfüßen, sucht mit geschlossenen Augen in der Dämmerung an ostaustralischen Bächen nach Nahrung.';
+
+  @override
+  String get species_amazonian_manatee_name => 'Amazonasseekuh';
+
+  @override
+  String get species_amazonian_manatee_desc =>
+      'Die kleinste Seekuh, ein glatter dunkler Pflanzenfresser mit weißem Brustfleck, weidet Wasserpflanzen in Seen und Flüssen des Amazonas.';
+
+  @override
+  String get species_amazon_river_dolphin_name => 'Amazonasdelfin';
+
+  @override
+  String get species_amazon_river_dolphin_desc =>
+      'Rosafarbener Delfin mit langer Schnauze und beweglichem Hals, schlängelt sich in Amazonas und Orinoco zwischen Stämmen überfluteter Wälder.';
+
+  @override
+  String get species_baikal_seal_name => 'Baikalrobbe';
+
+  @override
+  String get species_baikal_seal_desc =>
+      'Die einzige Süßwasserrobbe der Welt, eine kleine silbergraue Robbe, die sich auf dem Eis und den Felsufern des Baikalsees ausruht.';
+
+  @override
+  String get species_capybara_name => 'Wasserschwein';
+
+  @override
+  String get species_capybara_desc =>
+      'Das größte Nagetier, ein tonnenförmiger Pflanzenfresser, der in ruhigen Herden in südamerikanischen Flüssen und Feuchtgebieten watet und schwimmt.';
+
+  @override
+  String get species_hippopotamus_name => 'Flusspferd';
+
+  @override
+  String get species_hippopotamus_desc =>
+      'Massiger afrikanischer Flussriese, der den Tag in Gruppen untergetaucht verbringt und über den Grund läuft statt zu schwimmen; gefährlich in der Nähe.';
+
+  @override
+  String get species_white_water_lily_name => 'Weiße Seerose';
+
+  @override
+  String get species_white_water_lily_desc =>
+      'Schwimmende runde Blätter und große weiße Blüten, die aus dicken, im Schlamm stiller europäischer Gewässer verwurzelten Rhizomen aufsteigen.';
+
+  @override
+  String get species_yellow_pond_lily_name => 'Gelbe Teichrose';
+
+  @override
+  String get species_yellow_pond_lily_desc =>
+      'Herzförmige Schwimmblätter und becherförmige gelbe Blüten, mit großen durchscheinenden Unterwasserblättern, die Taucher von unten sehen.';
+
+  @override
+  String get species_american_eelgrass_name => 'Amerikanische Wasserschraube';
+
+  @override
+  String get species_american_eelgrass_desc =>
+      'Bandförmige, bis zu zwei Meter lange Blätter, die in der Strömung klarer Flüsse und Quellen wiegen, ein Lieblingsfutter der Seekühe.';
+
+  @override
+  String get species_coontail_name => 'Raues Hornblatt';
+
+  @override
+  String get species_coontail_desc =>
+      'Wurzellose Unterwasserpflanze mit Quirlen steifer gegabelter Blätter wie ein Waschbärschwanz, treibt in dichten Massen in stillem Wasser.';
+
+  @override
+  String get species_eurasian_watermilfoil_name => 'Ähriges Tausendblatt';
+
+  @override
+  String get species_eurasian_watermilfoil_desc =>
+      'Federartige Unterwasserpflanze mit Quirlen fein geteilter Blätter, die dichte Matten nahe der Oberfläche bildet, in vielen Seen invasiv.';
+
+  @override
+  String get species_muskgrass_name => 'Gemeine Armleuchteralge';
+
+  @override
+  String get species_muskgrass_desc =>
+      'Brüchige, moschusartig riechende Grünalge mit quirligen Ästen, oft mit Kalk überkrustet, bedeckt den Grund klarer kalkreicher Seen.';
+
+  @override
+  String get species_canadian_waterweed_name => 'Kanadische Wasserpest';
+
+  @override
+  String get species_canadian_waterweed_desc =>
+      'Dichte Unterwasserpflanze mit Quirlen aus drei kleinen dunkelgrünen Blättern, verbreitet sich durch Bruchstücke in kühlen Seen und Kanälen weltweit.';
+
+  @override
+  String get species_curly_leaf_pondweed_name => 'Krauses Laichkraut';
+
+  @override
+  String get species_curly_leaf_pondweed_desc =>
+      'Unterwasserpflanze mit wellig gerandeten rötlich-grünen Blättern wie gekräuselte Lasagne, wächst im zeitigen Frühjahr vor anderen Wasserpflanzen.';
+
+  @override
+  String get species_water_hyacinth_name => 'Dickstielige Wasserhyazinthe';
+
+  @override
+  String get species_water_hyacinth_desc =>
+      'Schwimmpflanze mit glänzenden Blättern an luftgefüllten Stielen und Ähren lavendelfarbener Blüten, verstopft warme Wasserwege weltweit.';
+
+  @override
+  String get species_common_reed_name => 'Schilfrohr';
+
+  @override
+  String get species_common_reed_desc =>
+      'Hohes Gras mit federartigen Rispen, das dichte Bestände an Seeufern bildet; seine untergetauchten Halme beherbergen Brut und Libellenlarven.';
+
+  @override
   String get common_action_done => 'Fertig';
 
   @override
@@ -31498,6 +33038,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'TTS-Quelle';
+
+  @override
+  String get settings_decompression_gtrSource => 'GTR-Quelle';
+
+  @override
+  String get settings_decompression_gtrReserve => 'GTR-Reservedruck';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Flaschendruck, auf den die verbleibende Gaszeit herunterzählt. Die berechnete GTR geht von einem direkten Aufstieg mit 10 m/min ohne Stopps aus.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
@@ -33683,6 +35233,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_info_title => 'Medieninfo';
 
   @override
+  String get media_species_actionTooltip => 'Arten';
+
+  @override
+  String get media_species_sheetTitle => 'Arten auf diesem Foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Bei diesem Tauchgang gesichtet';
+
+  @override
+  String get media_species_otherSpecies => 'Andere Arten...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Dieses Foto ist keinem Tauchgang zugeordnet. Suchen Sie eine Art, um es zu markieren.';
+
+  @override
+  String get media_species_chipsLabel => 'Artenmarkierungen';
+
+  @override
   String get media_info_fileSection => 'Datei';
 
   @override
@@ -34002,4 +35571,309 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'HealthKit ist auf diesem Gerät nicht verfügbar';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Monatlicher Durchschnitt';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Jeder Tauchgang';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Wie Tauchgänge gruppiert werden';
+
+  @override
+  String get statistics_trend_aggregation_weekly =>
+      'Wöchentlicher Durchschnitt';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'Der schattierte Bereich umfasst den niedrigsten und höchsten Wert jeder Gruppe';
+
+  @override
+  String get statistics_trend_legend_rate => 'Gesamttrend';
+
+  @override
+  String get statistics_trend_legend_rollingAverage =>
+      'Gleitender Durchschnitt';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/Jahr';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Wassertemperatur-Verlauf';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Jeder Tauchgang im Zeitraum';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Keine Temperaturdaten verfügbar';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Temperaturverlauf konnte nicht geladen werden';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Letzte 5 Jahre';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Letzte 10 Jahre';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Niedrigster';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Höchster';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Behalte diesen Tauchgang im Logbuch, lasse ihn aber aus jeder Statistik heraus, einschließlich der Tauchgangszahl.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Lasse diesen Tauchgang nur aus AMV-, RMV- und Gasgemisch-Statistiken heraus. Nützlich, wenn der Gaswert nicht repräsentativ ist.';
+
+  @override
+  String get diveLog_badge_excludedFromStats =>
+      'Von Statistiken ausgeschlossen';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Von Gasstatistiken ausgeschlossen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Von Statistiken ausschließen';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Von Gasstatistiken ausschließen';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Nur von Statistiken ausgeschlossene';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Ausgeschlossen';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge von Statistiken ausgeschlossen',
+      one: '1 Tauchgang von Statistiken ausgeschlossen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Statistiken';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gas ausgeschlossen';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'In allen Statistiken enthalten';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Bei Suunto anmelden';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Melde dich mit deinem app.suunto.com-Konto an, um deine Tauchgänge direkt zu importieren. Dein Passwort wird nie gespeichert, nur die daraus entstehende Sitzung.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-Mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Passwort';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Passwort ist erforderlich';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Anmelden';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Anmeldung läuft…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Angemeldet als $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Tauchgänge werden aufgelistet…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Tauchgang $current von $total wird geladen…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'Tauchgänge konnten nicht geladen werden';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Wiederholen';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+      zero: 'Keine Tauchgänge gefunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.',
+      one:
+          '1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sortieren';
+
+  @override
+  String get importWizard_review_sortByDate => 'Datum';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Tiefe';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Zeit';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Aus der Cloud importieren';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Speichernutzung';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Speichernutzung';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Sehen Sie, was auf diesem Gerät Speicherplatz belegt';
+
+  @override
+  String get settings_storageUsage_total => 'Gesamt';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Bisher gesamt';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Neu berechnen';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Nicht verfügbar';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Messung nicht möglich';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App-Daten';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Medien-Cache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Sicherungen';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Temporäre Dateien';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exportierte Dateien';
+
+  @override
+  String get settings_storageUsage_category_database => 'Tauchbuch-Datenbank';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Lokale Cache-Datenbank';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Original-Fotos und -Videos';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs =>
+      'Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Video-Versionen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Bereitgestellte Übertragungen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Transkodierte Videos';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Kartenkacheln';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Netzwerkbilder';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Video-Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Dokument-Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Sicherungsdateien';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Temporäre Dateien';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exportierte Dateien';
 }

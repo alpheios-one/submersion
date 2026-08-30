@@ -33,6 +33,7 @@ import 'package:submersion/features/equipment/domain/entities/equipment_set.dart
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/equipment/domain/services/equipment_set_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/geofence_suggestion_banner.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
@@ -66,6 +67,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
@@ -88,9 +90,6 @@ import 'package:submersion/features/weather/presentation/providers/weather_provi
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/courses/presentation/widgets/course_picker.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/widgets/photo_gps_suggestion_banner.dart';
-import 'package:submersion/features/media/presentation/widgets/quick_site_from_gps_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_multi_select_field.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/add_section_row.dart';
@@ -200,6 +199,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   List<String> _selectedDiveTypeIds = const ['recreational'];
   Visibility _selectedVisibility = Visibility.unknown;
   int _rating = 0;
+  // Statistics exclusion (#526 / #1272). Kept independent: unticking the
+  // master flag must restore the diver's own gas-only choice rather than
+  // having silently overwritten it.
+  bool _excludedFromStats = false;
+  bool _excludedFromGasStats = false;
+  bool _bulkExcludedFromStats = false;
+  bool _bulkExcludedFromGasStats = false;
   DiveSite? _selectedSite;
   Trip? _selectedTrip;
   DiveCenter? _selectedDiveCenter;
@@ -294,7 +300,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   bool _isCapturingLocation = false;
 
   // GPS suggestion from photos
-  bool _gpsSuggestionDismissed = false;
 
   /// Smart-collapse expansion state, keyed by group. Defaults are computed
   /// at the call sites (new dive vs editing); user toggles override them
@@ -668,6 +673,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               ? _seedDecimal(units.convertDepth(dive.visibilityMeters!), 0)
               : '';
           _rating = dive.rating ?? 0;
+          _excludedFromStats = dive.excludedFromStats;
+          _excludedFromGasStats = dive.excludedFromGasStats;
           _selectedSite = dive.site;
           _selectedTrip = dive.trip;
           _selectedDiveCenter = dive.diveCenter;
@@ -897,6 +904,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 _buildExperienceSection(),
                 if (_showCourseSection) _buildCourseGroupSection(),
                 if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
+                _buildStatisticsSection(),
                 AddSectionRow(
                   entries: [
                     if (!_showCourseSection)
@@ -1050,6 +1058,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: l10n.diveLog_edit_section_rating,
                   value: _rating,
                   onChanged: (v) => setState(() => _rating = v),
+                  clearTooltip: l10n.common_action_clearRating,
                 ),
               ),
               _gatedRow(
@@ -1058,6 +1067,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: context.l10n.diveLog_bulkEdit_fieldFavorite,
                   value: _bulkFavorite,
                   onChanged: (v) => setState(() => _bulkFavorite = v),
+                ),
+              ),
+              _gatedRow(
+                BulkField.excludedFromStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromStats,
+                  value: _bulkExcludedFromStats,
+                  onChanged: (v) => setState(() => _bulkExcludedFromStats = v),
+                ),
+              ),
+              _gatedRow(
+                BulkField.excludedFromGasStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromGasStats,
+                  value: _bulkExcludedFromGasStats,
+                  onChanged: (v) =>
+                      setState(() => _bulkExcludedFromGasStats = v),
                 ),
               ),
             ],
@@ -1112,6 +1138,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       diverRoleId: _diverRoleId,
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
+      excludedFromStats: _bulkExcludedFromStats,
+      excludedFromGasStats: _bulkExcludedFromGasStats,
       waterType: _waterType?.name,
       visibilityMeters: _visibilityMetersInput(units),
       currentDirection: _currentDirection?.name,
@@ -2188,14 +2216,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
       );
     }
-    if (widget.diveId != null && !_gpsSuggestionDismissed) {
+    if (widget.diveId != null) {
       children.add(
-        PhotoGpsSuggestionBanner(
+        SiteSuggestionCard(
           diveId: widget.diveId!,
           currentSite: _selectedSite,
-          onCreateSite: () => _createSiteFromPhotoGps(),
-          onUpdateSite: (gps) => _updateSiteWithPhotoGps(gps),
-          onDismiss: () => setState(() => _gpsSuggestionDismissed = true),
+          onSiteChanged: (site) => setState(() => _assignSite(site)),
         ),
       );
     }
@@ -2207,81 +2233,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         children: children,
       ),
     );
-  }
-
-  Future<void> _createSiteFromPhotoGps() async {
-    final gps = await ref.read(divePhotoGpsProvider(widget.diveId!).future);
-    if (gps == null || !mounted) return;
-
-    final newSite = await QuickSiteFromGpsDialog.show(
-      context,
-      latitude: gps.latitude,
-      longitude: gps.longitude,
-    );
-
-    if (newSite != null && mounted) {
-      // Create the site via the notifier
-      final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-      final createdSite = await siteNotifier.addSite(newSite);
-
-      setState(() {
-        _assignSite(createdSite);
-        _gpsSuggestionDismissed = true;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.l10n.diveLog_edit_createdSite(createdSite.name),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
-    if (_selectedSite == null) return;
-
-    var updatedSite = _selectedSite!.copyWith(location: gps);
-    // A site gaining coordinates should also gain its altitude, so later dives
-    // there resolve locally without a lookup.
-    double? lookedUpAltitude;
-    if (updatedSite.altitude == null) {
-      lookedUpAltitude = await ref
-          .read(elevationServiceProvider)
-          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
-      if (!mounted) return;
-      if (lookedUpAltitude != null) {
-        updatedSite = updatedSite.copyWith(altitude: lookedUpAltitude);
-      }
-    }
-
-    // Patch only the coordinate columns: _selectedSite may be a partially
-    // hydrated entity, and a whole-entity update would wipe the rest
-    // (issue #1187).
-    final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-    await siteNotifier.updateSiteCoordinates(
-      updatedSite.id,
-      gps,
-      altitude: lookedUpAltitude,
-    );
-
-    setState(() {
-      _selectedSite = updatedSite;
-      _gpsSuggestionDismissed = true;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.diveLog_edit_addedGps(updatedSite.name)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
   /// Assigns [site] to the dive and snaps the water type and the entry/exit
@@ -2568,6 +2519,42 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  Widget _buildStatisticsSection() {
+    return StatisticsSection(
+      // Collapsed unless this dive is already excluded, so the setting stays
+      // out of the way of the dives that are just dives.
+      expanded: _isExpanded(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      onToggle: () => _toggleSection(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      excludedFromStats: _excludedFromStats,
+      excludedFromGasStats: _excludedFromGasStats,
+      onExcludedFromStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+      onExcludedFromGasStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromGasStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+    );
+  }
+
+  /// The section's default expansion follows the two flags, so clearing the
+  /// last one would otherwise shut the group under the diver's finger. Once
+  /// they have touched a toggle, expansion is theirs to decide.
+  void _pinStatisticsOpen() => _expanded['statistics'] = true;
+
   Widget _buildExperienceSection() {
     return ExperienceSection(
       expanded: _isExpanded('experience', defaultValue: false),
@@ -2629,12 +2616,22 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// Opens the previously-used-tag picker (#1171) over [selected], so tagging
   /// stays consistent without having to recall earlier spellings. Reports the
   /// merged list (existing plus newly picked) through [onPicked].
+  ///
+  /// [host] is the context the sheet is pushed from, so it decides which
+  /// navigator owns the picker. It defaults to the page, which is right when
+  /// Browse sits on the form itself. A caller whose Browse action lives inside
+  /// a dialog must pass that dialog's context instead: `showDialog` defaults
+  /// to the root navigator while `showModalBottomSheet` defaults to the
+  /// nearest one, which under the app's `ShellRoute` is the shell navigator
+  /// sitting *below* the dialog. Pushed from the page, the picker would open
+  /// behind the dialog with the dialog's barrier eating every tap (#1366).
   void _showTagPickerFor({
     required List<Tag> selected,
     required ValueChanged<List<Tag>> onPicked,
+    BuildContext? host,
   }) {
     showModalBottomSheet<void>(
-      context: context,
+      context: host ?? context,
       isScrollControlled: true,
       builder: (sheetContext) => DraggableScrollableSheet(
         initialChildSize: 0.7,
@@ -3571,7 +3568,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
           actions: [
             TextButton(
+              // `ctx` is inside the dialog route, so the picker lands on the
+              // same (root) navigator and opens above the dialog (#1366).
               onPressed: () => _showTagPickerFor(
+                host: ctx,
                 selected: picked,
                 onPicked: (tags) => setSt(() => picked = tags),
               ),
@@ -4959,6 +4959,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             .toList(),
         // Preserve favorite status when editing
         isFavorite: _existingDive?.isFavorite ?? false,
+        excludedFromStats: _excludedFromStats,
+        excludedFromGasStats: _excludedFromGasStats,
         // Preserve dive profile data (time series from dive computer)
         profile: _existingDive?.profile ?? const [],
         // Preserve photo associations
@@ -4966,6 +4968,24 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Preserve legacy buddy/divemaster text fields
         buddy: _existingDive?.buddy,
         diveMaster: _existingDive?.diveMaster,
+        // Fields this form has no widget for. Every column updateDive does
+        // write, it writes unconditionally, with no merge against the stored
+        // row, so anything not carried through here is reset to the entity
+        // default on every save (issue #1392). Columns it deliberately omits
+        // (computerId, the entry/exit location pair) are not at risk and are
+        // not listed. The census test in dive_edit_save_field_census_test.dart
+        // fails when a new field is added to the writer without a carry here.
+        isPlanned: _existingDive?.isPlanned ?? false,
+        diveComputerModel: _existingDive?.diveComputerModel,
+        diveComputerSerial: _existingDive?.diveComputerSerial,
+        diveComputerFirmware: _existingDive?.diveComputerFirmware,
+        decoAlgorithm: _existingDive?.decoAlgorithm,
+        decoConservatism: _existingDive?.decoConservatism,
+        gradientFactorLow: _existingDive?.gradientFactorLow,
+        gradientFactorHigh: _existingDive?.gradientFactorHigh,
+        weatherCode: _existingDive?.weatherCode,
+        importId: _existingDive?.importId,
+        surfaceInterval: _existingDive?.surfaceInterval,
         diverRoleId: _diverRoleId,
         // CCR/SCR rebreather settings
         diveMode: _diveMode,

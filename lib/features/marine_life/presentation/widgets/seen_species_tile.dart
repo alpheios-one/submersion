@@ -6,16 +6,27 @@ import 'package:submersion/features/marine_life/domain/entities/seen_species.dar
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// One row of the Species page: a category avatar, the localized name, the
-/// scientific name, and the sighting aggregates.
+/// One row of the Species page: the newest tagged photo (or the category
+/// avatar when there is none), the localized name, the scientific name, and
+/// the sighting aggregates.
 class SeenSpeciesTile extends ConsumerWidget {
   final SeenSpecies entry;
+
+  /// The species' newest tagged photo, shown in place of the avatar.
+  final MediaItem? cover;
   final VoidCallback? onTap;
 
-  const SeenSpeciesTile({super.key, required this.entry, this.onTap});
+  const SeenSpeciesTile({
+    super.key,
+    required this.entry,
+    this.cover,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,17 +41,30 @@ class SeenSpeciesTile extends ConsumerWidget {
       l10n.marineLife_speciesPage_lastSeen(units.formatDate(entry.lastSeen)),
     ].join(' · ');
 
+    final cover = this.cover;
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: colorForSpeciesCategory(
-          species.category,
-          Theme.of(context).brightness,
-        ),
-        child: Icon(
-          iconForSpeciesCategory(species.category),
-          color: Colors.white,
-        ),
-      ),
+      leading: cover == null
+          ? CircleAvatar(
+              backgroundColor: colorForSpeciesCategory(
+                species.category,
+                Theme.of(context).brightness,
+              ),
+              child: Icon(
+                iconForSpeciesCategory(species.category),
+                color: Colors.white,
+              ),
+            )
+          : ClipOval(
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: MediaItemView(
+                  item: cover,
+                  thumbnail: true,
+                  targetSize: const Size(80, 80),
+                ),
+              ),
+            ),
       title: Text(species.localizedCommonName(l10n)),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
