@@ -23526,6 +23526,26 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return 'Észlelt, még nem hozzárendelt csatornák: $channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption => 'Kézi megadás…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper =>
+      'Válasszon egy nemrégi letöltésben látott csatornát';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel =>
+      'Választás az észlelt csatornák közül';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      'Még nem észleltünk csatornát. Töltsön le előbb egy merülést erről a számítógépről, vagy adja meg az indexet kézzel.';
+
+  @override
   String get diveLog_detail_menu_reparseRawData => 'Nyers adatok újraelemzése';
 
   @override

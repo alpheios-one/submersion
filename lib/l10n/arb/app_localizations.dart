@@ -38875,6 +38875,36 @@ abstract class AppLocalizations {
   /// **'Remove the mapping for channel {channel}? Future downloads on this channel fall back to the default tank preset.'**
   String diveComputer_transmitters_deleteMessage(int channel);
 
+  /// Non-blocking hint listing channel indices seen in downloads from this computer that have no registry entry yet
+  ///
+  /// In en, this message translates to:
+  /// **'Detected channels not yet mapped: {channels}'**
+  String diveComputer_transmitters_unassignedHint(String channels);
+
+  /// Option in the detected-channel picker to switch to typing the channel index by hand
+  ///
+  /// In en, this message translates to:
+  /// **'Enter manually…'**
+  String get diveComputer_transmitters_channelManualOption;
+
+  /// Helper text under the channel picker dropdown in the add-mapping dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a channel seen in a recent download'**
+  String get diveComputer_transmitters_channelPickerHelper;
+
+  /// Button label to switch from manual channel entry back to the detected-channel picker
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from detected channels'**
+  String get diveComputer_transmitters_useDetectedChannel;
+
+  /// Helper text shown under the manual channel field when no channels have been seen in a download yet
+  ///
+  /// In en, this message translates to:
+  /// **'No channels detected yet. Download a dive from this computer first, or enter the index manually.'**
+  String get diveComputer_transmitters_noChannelsDetected;
+
   /// Menu item to re-parse raw dive data
   ///
   /// In en, this message translates to:

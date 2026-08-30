@@ -23,6 +23,9 @@ class TransmittersSection extends ConsumerWidget {
     final entriesAsync = ref.watch(
       transmittersForComputerProvider(diveComputerId),
     );
+    final unassignedAsync = ref.watch(
+      unassignedChannelIndexesForComputerProvider(diveComputerId),
+    );
     final theme = Theme.of(context);
     final l10n = context.l10n;
 
@@ -52,12 +55,21 @@ class TransmittersSection extends ConsumerWidget {
                   ),
                 ),
                 FilledButton.tonalIcon(
-                  onPressed: () => _showEntryDialog(context, ref, null),
+                  onPressed: () => _showEntryDialog(
+                    context,
+                    ref,
+                    null,
+                    unassignedAsync.valueOrNull ?? const [],
+                  ),
                   icon: const Icon(Icons.add, size: 18),
                   label: Text(l10n.common_action_add),
                 ),
               ],
             ),
+            if ((unassignedAsync.valueOrNull ?? const []).isNotEmpty) ...[
+              const SizedBox(height: 4),
+              _UnassignedChannelsHint(channels: unassignedAsync.valueOrNull!),
+            ],
             const Divider(),
             entriesAsync.when(
               data: (entries) {
@@ -80,7 +92,8 @@ class TransmittersSection extends ConsumerWidget {
                     for (final entry in entries)
                       _TransmitterTile(
                         entry: entry,
-                        onTap: () => _showEntryDialog(context, ref, entry),
+                        onTap: () =>
+                            _showEntryDialog(context, ref, entry, const []),
                         onDelete: () => _confirmDelete(context, ref, entry),
                       ),
                   ],
@@ -106,12 +119,14 @@ class TransmittersSection extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     TransmitterEntity? existing,
+    List<int> unassignedChannels,
   ) {
     showDialog<void>(
       context: context,
       builder: (context) => _TransmitterDialog(
         diveComputerId: diveComputerId,
         existing: existing,
+        unassignedChannels: unassignedChannels,
       ),
     );
   }
@@ -150,6 +165,44 @@ class TransmittersSection extends ConsumerWidget {
           .read(transmitterListNotifierProvider(diveComputerId).notifier)
           .delete(entry.id);
     }
+  }
+}
+
+/// Non-blocking hint (issue #1365 import step 3) listing channel indices
+/// seen in downloads from this computer that have no registry entry yet, so
+/// the diver knows what to map without having to guess an index.
+class _UnassignedChannelsHint extends StatelessWidget {
+  final List<int> channels;
+
+  const _UnassignedChannelsHint({required this.channels});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+    final channelList = channels
+        .map((c) => l10n.diveComputer_transmitters_channelTitle(c))
+        .join(', ');
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          Icons.info_outline,
+          size: 16,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            l10n.diveComputer_transmitters_unassignedHint(channelList),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -207,7 +260,17 @@ class _TransmitterDialog extends ConsumerStatefulWidget {
   final String diveComputerId;
   final TransmitterEntity? existing;
 
-  const _TransmitterDialog({required this.diveComputerId, this.existing});
+  /// Channel indices seen in downloads from this computer that have no
+  /// registry entry yet. When non-empty and adding a new entry, the channel
+  /// field defaults to a picker over these instead of a free-text index
+  /// (issue #1365 follow-up).
+  final List<int> unassignedChannels;
+
+  const _TransmitterDialog({
+    required this.diveComputerId,
+    this.existing,
+    this.unassignedChannels = const [],
+  });
 
   @override
   ConsumerState<_TransmitterDialog> createState() => _TransmitterDialogState();
@@ -221,6 +284,14 @@ class _TransmitterDialogState extends ConsumerState<_TransmitterDialog> {
   String? _tankPresetId;
   String? _errorText;
 
+  /// True once the diver picks from [_TransmitterDialog.unassignedChannels]
+  /// or has to fall back to typing the index (editing, or nothing detected
+  /// yet). False shows the detected-channel dropdown instead.
+  late bool _manualChannelEntry;
+
+  bool get _isEdit => widget.existing != null;
+  bool get _hasDetectedChannels => widget.unassignedChannels.isNotEmpty;
+
   @override
   void initState() {
     super.initState();
@@ -233,6 +304,10 @@ class _TransmitterDialogState extends ConsumerState<_TransmitterDialog> {
         .where((r) => r.name == existing?.tankRole)
         .firstOrNull;
     _tankPresetId = existing?.tankPresetId;
+    _manualChannelEntry = _isEdit || !_hasDetectedChannels;
+    if (!_manualChannelEntry) {
+      _channelController.text = '${widget.unassignedChannels.first}';
+    }
   }
 
   @override
@@ -260,22 +335,7 @@ class _TransmitterDialogState extends ConsumerState<_TransmitterDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
-                controller: _channelController,
-                keyboardType: TextInputType.number,
-                enabled: !isEdit,
-                decoration: InputDecoration(
-                  labelText: l10n.diveComputer_transmitters_channelLabel,
-                  errorText: _errorText,
-                ),
-                validator: (value) {
-                  final parsed = int.tryParse(value ?? '');
-                  if (parsed == null || parsed < 0) {
-                    return l10n.tankPresets_edit_required;
-                  }
-                  return null;
-                },
-              ),
+              _buildChannelField(context, isEdit),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _labelController,
@@ -334,6 +394,92 @@ class _TransmitterDialogState extends ConsumerState<_TransmitterDialog> {
         FilledButton(
           onPressed: () => _save(context),
           child: Text(l10n.common_action_save),
+        ),
+      ],
+    );
+  }
+
+  /// The channel-index field: a dropdown over channels actually seen in
+  /// downloads when there are any and a new entry is being added, otherwise
+  /// the free-text fallback (issue #1365 follow-up). Either widget keeps
+  /// [_channelController] in sync so [_save] never has to branch on mode.
+  Widget _buildChannelField(BuildContext context, bool isEdit) {
+    final l10n = context.l10n;
+
+    if (isEdit || _manualChannelEntry) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            controller: _channelController,
+            keyboardType: TextInputType.number,
+            enabled: !isEdit,
+            decoration: InputDecoration(
+              labelText: l10n.diveComputer_transmitters_channelLabel,
+              errorText: _errorText,
+              helperText: !isEdit && !_hasDetectedChannels
+                  ? l10n.diveComputer_transmitters_noChannelsDetected
+                  : null,
+              helperMaxLines: 3,
+            ),
+            validator: (value) {
+              final parsed = int.tryParse(value ?? '');
+              if (parsed == null || parsed < 0) {
+                return l10n.tankPresets_edit_required;
+              }
+              return null;
+            },
+          ),
+          if (!isEdit && _hasDetectedChannels)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () => setState(() {
+                  _manualChannelEntry = false;
+                  _channelController.text =
+                      '${widget.unassignedChannels.first}';
+                }),
+                child: Text(l10n.diveComputer_transmitters_useDetectedChannel),
+              ),
+            ),
+        ],
+      );
+    }
+
+    final selected = int.tryParse(_channelController.text);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownButtonFormField<int>(
+          initialValue: widget.unassignedChannels.contains(selected)
+              ? selected
+              : widget.unassignedChannels.first,
+          decoration: InputDecoration(
+            labelText: l10n.diveComputer_transmitters_channelLabel,
+            errorText: _errorText,
+            helperText: l10n.diveComputer_transmitters_channelPickerHelper,
+            helperMaxLines: 2,
+          ),
+          items: [
+            for (final channel in widget.unassignedChannels)
+              DropdownMenuItem<int>(
+                value: channel,
+                child: Text(
+                  l10n.diveComputer_transmitters_channelTitle(channel),
+                ),
+              ),
+          ],
+          onChanged: (value) => setState(() {
+            if (value != null) _channelController.text = '$value';
+            _errorText = null;
+          }),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () => setState(() => _manualChannelEntry = true),
+            child: Text(l10n.diveComputer_transmitters_channelManualOption),
+          ),
         ),
       ],
     );

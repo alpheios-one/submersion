@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_computer/data/repositories/transmitter_repository.dart';
@@ -118,6 +119,77 @@ void main() {
       await db.close();
 
       await expectLater(repository.getForComputer('dc-1'), throwsA(anything));
+    });
+
+    group('getUsedChannelIndexes', () {
+      Future<void> insertDiveTank({
+        required String diveId,
+        required int tankOrder,
+        String? source,
+      }) async {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        await db
+            .into(db.dives)
+            .insert(
+              DivesCompanion.insert(
+                id: diveId,
+                diveDateTime: now,
+                createdAt: now,
+                updatedAt: now,
+              ),
+              mode: InsertMode.insertOrIgnore,
+            );
+        await db
+            .into(db.diveTanks)
+            .insert(
+              DiveTanksCompanion.insert(
+                id: '$diveId-tank-$tankOrder',
+                diveId: diveId,
+                computerId: const Value('dc-1'),
+                tankOrder: Value(tankOrder),
+                source: Value(source),
+              ),
+            );
+      }
+
+      test('returns distinct dc_import channels, ascending', () async {
+        await insertDiveTank(
+          diveId: 'dive-1',
+          tankOrder: 1,
+          source: 'dc_import',
+        );
+        await insertDiveTank(
+          diveId: 'dive-2',
+          tankOrder: 0,
+          source: 'dc_import',
+        );
+        // Same channel seen again on a second dive must not duplicate.
+        await insertDiveTank(
+          diveId: 'dive-3',
+          tankOrder: 1,
+          source: 'dc_import',
+        );
+
+        final channels = await repository.getUsedChannelIndexes('dc-1');
+        expect(channels, [0, 1]);
+      });
+
+      test('excludes manual and file-import rows', () async {
+        await insertDiveTank(diveId: 'dive-1', tankOrder: 0, source: 'manual');
+        await insertDiveTank(
+          diveId: 'dive-2',
+          tankOrder: 1,
+          source: 'file_import',
+        );
+
+        final channels = await repository.getUsedChannelIndexes('dc-1');
+        expect(channels, isEmpty);
+      });
+
+      test('returns empty for a computer with no downloads', () async {
+        final channels = await repository.getUsedChannelIndexes('dc-1');
+        expect(channels, isEmpty);
+      });
     });
   });
 }

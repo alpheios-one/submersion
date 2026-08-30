@@ -23418,6 +23418,27 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return 'Gedetecteerde kanalen nog niet toegewezen: $channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption =>
+      'Handmatig invoeren…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper =>
+      'Kies een kanaal dat is gezien bij een recente download';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel =>
+      'Kiezen uit gedetecteerde kanalen';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      'Nog geen kanalen gedetecteerd. Download eerst een duik van deze computer, of voer de index handmatig in.';
+
+  @override
   String get diveLog_detail_menu_reparseRawData =>
       'Ruwe data opnieuw verwerken';
 

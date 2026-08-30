@@ -23013,6 +23013,26 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return 'ערוצים שזוהו וטרם שויכו: $channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption => 'הזנה ידנית…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper =>
+      'בחר ערוץ שזוהה בהורדה אחרונה';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel =>
+      'בחירה מתוך הערוצים שזוהו';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      'טרם זוהו ערוצים. הורד תחילה צלילה ממחשב זה, או הזן את האינדקס באופן ידני.';
+
+  @override
   String get diveLog_detail_menu_reparseRawData => 'נתח מחדש נתונים גולמיים';
 
   @override

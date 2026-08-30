@@ -15172,6 +15172,32 @@
       }
     }
   },
+  "diveComputer_transmitters_unassignedHint": "Detected channels not yet mapped: {channels}",
+  "@diveComputer_transmitters_unassignedHint": {
+    "description": "Non-blocking hint listing channel indices seen in downloads from this computer that have no registry entry yet",
+    "placeholders": {
+      "channels": {
+        "type": "String",
+        "example": "Channel 0, Channel 1"
+      }
+    }
+  },
+  "diveComputer_transmitters_channelManualOption": "Enter manually…",
+  "@diveComputer_transmitters_channelManualOption": {
+    "description": "Option in the detected-channel picker to switch to typing the channel index by hand"
+  },
+  "diveComputer_transmitters_channelPickerHelper": "Choose a channel seen in a recent download",
+  "@diveComputer_transmitters_channelPickerHelper": {
+    "description": "Helper text under the channel picker dropdown in the add-mapping dialog"
+  },
+  "diveComputer_transmitters_useDetectedChannel": "Choose from detected channels",
+  "@diveComputer_transmitters_useDetectedChannel": {
+    "description": "Button label to switch from manual channel entry back to the detected-channel picker"
+  },
+  "diveComputer_transmitters_noChannelsDetected": "No channels detected yet. Download a dive from this computer first, or enter the index manually.",
+  "@diveComputer_transmitters_noChannelsDetected": {
+    "description": "Helper text shown under the manual channel field when no channels have been seen in a download yet"
+  },
   "diveLog_detail_menu_reparseRawData": "Re-parse raw data",
   "@diveLog_detail_menu_reparseRawData": {
     "description": "Menu item to re-parse raw dive data"

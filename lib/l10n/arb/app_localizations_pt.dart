@@ -23604,6 +23604,27 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return 'Canais detetados ainda não mapeados: $channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption =>
+      'Inserir manualmente…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper =>
+      'Escolha um canal visto num download recente';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel =>
+      'Escolher entre os canais detetados';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      'Ainda não foi detetado nenhum canal. Descarregue primeiro um mergulho deste computador, ou introduza o índice manualmente.';
+
+  @override
   String get diveLog_detail_menu_reparseRawData => 'Reanalisar dados brutos';
 
   @override

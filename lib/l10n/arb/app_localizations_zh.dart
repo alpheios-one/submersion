@@ -22386,6 +22386,24 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return '检测到尚未映射的通道:$channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption => '手动输入…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper => '选择最近一次下载中检测到的通道';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel => '从检测到的通道中选择';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      '尚未检测到任何通道。请先从此设备下载一次潜水记录,或手动输入索引。';
+
+  @override
   String get diveLog_detail_menu_reparseRawData => '重新解析原始数据';
 
   @override

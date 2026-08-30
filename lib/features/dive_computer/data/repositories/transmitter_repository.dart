@@ -22,6 +22,11 @@ class TransmitterRepository {
   Stream<void> watchTransmittersChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.transmitters));
 
+  /// Emits whenever `dive_tanks` changes, so the "channels seen in
+  /// downloads" list refreshes after a new import.
+  Stream<void> watchDiveTanksChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.diveTanks));
+
   /// All registry entries for [diveComputerId], ordered by channel index.
   Future<List<TransmitterEntity>> getForComputer(String diveComputerId) async {
     try {
@@ -34,6 +39,34 @@ class TransmitterRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get transmitters for computer: $diveComputerId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Distinct channel indices actually seen in downloads from
+  /// [diveComputerId] (`dive_tanks.tankOrder` on `source = 'dc_import'` rows
+  /// -- the importer always stamps it from the parsed channel index, whether
+  /// or not a registry entry matched it). Lets the "add mapping" dialog offer
+  /// a pick list of real channels instead of a free-text index (issue
+  /// #1365 follow-up).
+  Future<List<int>> getUsedChannelIndexes(String diveComputerId) async {
+    try {
+      final rows =
+          await (_db.selectOnly(_db.diveTanks, distinct: true)
+                ..addColumns([_db.diveTanks.tankOrder])
+                ..where(
+                  _db.diveTanks.computerId.equals(diveComputerId) &
+                      _db.diveTanks.source.equals('dc_import'),
+                )
+                ..orderBy([OrderingTerm.asc(_db.diveTanks.tankOrder)]))
+              .get();
+      return rows.map((r) => r.read(_db.diveTanks.tankOrder)!).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get used channel indexes for computer: $diveComputerId',
         error: e,
         stackTrace: stackTrace,
       );

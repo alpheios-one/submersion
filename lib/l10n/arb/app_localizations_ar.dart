@@ -23180,6 +23180,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String diveComputer_transmitters_unassignedHint(String channels) {
+    return 'القنوات المكتشفة التي لم يتم تعيينها بعد: $channels';
+  }
+
+  @override
+  String get diveComputer_transmitters_channelManualOption => 'إدخال يدوي…';
+
+  @override
+  String get diveComputer_transmitters_channelPickerHelper =>
+      'اختر قناة ظهرت في تنزيل حديث';
+
+  @override
+  String get diveComputer_transmitters_useDetectedChannel =>
+      'الاختيار من القنوات المكتشفة';
+
+  @override
+  String get diveComputer_transmitters_noChannelsDetected =>
+      'لم يتم اكتشاف أي قناة بعد. قم بتنزيل غطسة من هذا الجهاز أولاً، أو أدخل الفهرس يدويًا.';
+
+  @override
   String get diveLog_detail_menu_reparseRawData =>
       'إعادة تحليل البيانات الأولية';
 

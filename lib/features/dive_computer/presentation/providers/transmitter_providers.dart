@@ -19,6 +19,31 @@ final transmittersForComputerProvider =
       return repository.getForComputer(diveComputerId);
     });
 
+/// Channel indices actually seen in downloads from a dive computer, ordered
+/// ascending. Refreshes automatically whenever `dive_tanks` changes (i.e.
+/// after every import).
+final usedChannelIndexesForComputerProvider =
+    FutureProvider.family<List<int>, String>((ref, diveComputerId) async {
+      final repository = ref.watch(transmitterRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchDiveTanksChanges());
+      return repository.getUsedChannelIndexes(diveComputerId);
+    });
+
+/// Channels seen in downloads that have no registry entry yet -- the
+/// non-blocking "these channels aren't mapped" hint from issue #1365's
+/// import step 3. Ordered ascending.
+final unassignedChannelIndexesForComputerProvider =
+    FutureProvider.family<List<int>, String>((ref, diveComputerId) async {
+      final used = await ref.watch(
+        usedChannelIndexesForComputerProvider(diveComputerId).future,
+      );
+      final mapped = await ref.watch(
+        transmittersForComputerProvider(diveComputerId).future,
+      );
+      final mappedChannels = mapped.map((e) => e.channelIndex).toSet();
+      return used.where((c) => !mappedChannels.contains(c)).toList();
+    });
+
 /// Mutations (create/update/delete) for a dive computer's transmitter
 /// registry. List reads live on [transmittersForComputerProvider]; this
 /// notifier just wraps the repository and lets a screen await the result of
