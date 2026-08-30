@@ -2599,6 +2599,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_action_cancel => 'Megse';
 
   @override
+  String get common_action_clearRating => 'Értékelés törlése';
+
+  @override
   String get common_action_close => 'Bezaras';
 
   @override

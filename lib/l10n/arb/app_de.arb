@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Buddy-Checks, CCR-Aufbaulisten, Ausrüstungspacken",
   "common_action_back": "Zurück",
   "common_action_cancel": "Abbrechen",
+  "common_action_clearRating": "Bewertung löschen",
   "common_action_close": "Schließen",
   "common_action_delete": "Löschen",
   "common_action_edit": "Bearbeiten",
