@@ -6,9 +6,14 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
+    as series;
 import 'package:submersion/features/dive_log/domain/services/dive_merge_builder.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
 
@@ -32,6 +37,8 @@ class DiveMergeService {
   final _builder = const DiveMergeBuilder();
   final _sync = SyncRepository();
   final _tagRepository = TagRepository();
+  final _profileSeries = ProfileSeriesRepository();
+  final _tankSeries = TankPressureSeriesRepository();
 
   AppDatabase get _db => DatabaseService.instance.database;
 
@@ -57,34 +64,32 @@ class DiveMergeService {
     return null;
   }
 
-  /// A representative profile row for source dive [diveId], used to attribute
-  /// synthesized gap samples to the correct source (#449 review F1). Prefers
-  /// the primary profile (the one that renders) so the gap fill joins it --
-  /// e.g. a user-edited profile is primary with a null computerId while the
-  /// original download lingers as a non-primary row (see
-  /// DiveRepository.saveEditedProfile). Falls back to any computerId-bearing
-  /// row, then to any row of the segment.
-  DiveProfile? _adjacentProfileRow(List<DiveProfile> rows, String diveId) {
-    final segment = rows.where((r) => r.diveId == diveId).toList();
+  /// The draft that hosts a gap's surface samples: the segment's primary
+  /// series, else one with a computer, else its first series.
+  _SeriesDraft? _adjacentDraft(List<_SeriesDraft> drafts, String diveId) {
+    final segment = drafts.where((d) => d.diveId == diveId).toList();
     if (segment.isEmpty) return null;
-    for (final row in segment) {
-      if (row.isPrimary) return row;
+    for (final d in segment) {
+      if (d.isPrimary) return d;
     }
-    for (final row in segment) {
-      if (row.computerId != null) return row;
+    for (final d in segment) {
+      if (d.computerId != null) return d;
     }
     return segment.first;
   }
 
-  /// The native sample cadence around [gap]: the median inter-sample delta
-  /// of the previous segment's profile (falling back to the next segment's,
-  /// then to 60s when neither has samples). Synthesized surface samples use
-  /// this so they are indistinguishable from the computer's own rhythm.
-  int _nativeSampleIntervalSeconds(List<DiveProfile> rows, MergeGap gap) {
+  /// Median inter-sample delta of the previous segment (then the next, then
+  /// 60 s), over every series of that segment.
+  int _nativeSampleIntervalSecondsOf(
+    List<series.ProfileSeries> originals,
+    MergeGap gap,
+  ) {
     for (final diveId in [gap.afterDiveId, gap.beforeDiveId]) {
-      final timestamps =
-          rows.where((r) => r.diveId == diveId).map((r) => r.timestamp).toList()
-            ..sort();
+      final timestamps = [
+        for (final s in originals)
+          if (s.diveId == diveId)
+            for (final p in s.samples) p.timestamp,
+      ]..sort();
       final deltas = <int>[
         for (var i = 1; i < timestamps.length; i++)
           if (timestamps[i] - timestamps[i - 1] > 0)
@@ -249,72 +254,86 @@ class DiveMergeService {
         return mergedSourceIds[owner.id];
       }
 
-      // 2. Profile rows copied directly (preserves computerId/isPrimary/
-      //    temperature/sensor columns), re-based onto the merged timeline.
-      await _db.batch((batch) {
-        for (final row in snapshot.profileRows) {
-          final offset = result.segmentOffsetsSeconds[row.diveId] ?? 0;
-          batch.insert(
-            _db.diveProfiles,
-            row
-                .toCompanion(false)
-                .copyWith(
-                  id: Value(_uuid.v4()),
-                  diveId: Value(mergedId),
-                  timestamp: Value(row.timestamp + offset),
-                  sourceId: Value(mergedSourceIdFor(row.diveId, row.sourceId)),
-                ),
+      // 2. Profile series re-based onto the merged timeline (preserves
+      //    computerId/isPrimary/samples), one draft per original series.
+      //    Read live, before anything is deleted (step 13 removes the
+      //    sources).
+      final seriesByDive = await _profileSeries.getSeriesForDives(diveIds);
+      final originals = [
+        for (final id in diveIds)
+          ...(seriesByDive[id] ?? const <series.ProfileSeries>[]),
+      ];
+      final drafts = <_SeriesDraft>[
+        for (final s in originals)
+          _SeriesDraft(
+            diveId: s.diveId,
+            computerId: s.computerId,
+            sourceId: s.sourceId,
+            isPrimary: s.isPrimary,
+            samples: [
+              for (final p in s.samples)
+                p.shiftedBy(result.segmentOffsetsSeconds[s.diveId] ?? 0),
+            ],
+          ),
+      ];
+      // 3. Synthesized 0-depth samples across each gap (skip tiny gaps), at
+      //    the source profile's native cadence and hugging both boundaries:
+      //    a 2-point fill leaves a sample hole that the chart's curve
+      //    smoothing draws as a swooping line with an overshoot loop (#449
+      //    manual test). Appended to the adjacent segment's hosting draft so
+      //    getProfilesBySource (dive_repository_impl.dart) doesn't see a
+      //    bogus extra 'original' source next to the real computer's rows.
+      for (final gap in result.gaps) {
+        if (gap.endSeconds - gap.startSeconds < 2) continue;
+        final host =
+            _adjacentDraft(drafts, gap.afterDiveId) ??
+            _adjacentDraft(drafts, gap.beforeDiveId);
+        final interval = _nativeSampleIntervalSecondsOf(originals, gap);
+        // Cap the fill so a very long surface interval (hours/days) at a
+        // dense cadence can't generate tens of thousands of rows in one
+        // transaction; a few hundred flat points render identically.
+        final minStep = ((gap.endSeconds - gap.startSeconds) / 300).ceil();
+        final step = interval > minStep ? interval : minStep;
+        final timestamps = <int>[
+          for (var ts = gap.startSeconds + 1; ts < gap.endSeconds; ts += step)
+            ts,
+        ];
+        if (timestamps.last != gap.endSeconds - 1) {
+          timestamps.add(gap.endSeconds - 1);
+        }
+        final surface = [
+          for (final ts in timestamps) ProfileSample(timestamp: ts, depth: 0),
+        ];
+        if (host != null) {
+          host.samples.addAll(surface);
+        } else {
+          // No profile on either side: the legacy rows carried a null
+          // computer, a null source and is_primary true.
+          drafts.add(
+            _SeriesDraft(
+              diveId: gap.afterDiveId,
+              computerId: null,
+              sourceId: null,
+              isPrimary: true,
+              samples: surface,
+              synthetic: true,
+            ),
           );
         }
-        // 3. Synthesized 0-depth samples across each gap (skip tiny gaps),
-        //    at the source profile's native cadence and hugging both
-        //    boundaries: a 2-point fill leaves a sample hole that the
-        //    chart's curve smoothing draws as a swooping line with an
-        //    overshoot loop (#449 manual test). Stamped with the adjacent
-        //    segment's computerId/isPrimary so getProfilesBySource
-        //    (dive_repository_impl.dart) doesn't see a bogus extra
-        //    'original' source next to the real computer's rows.
-        for (final gap in result.gaps) {
-          if (gap.endSeconds - gap.startSeconds < 2) continue;
-          final adjacent =
-              _adjacentProfileRow(snapshot.profileRows, gap.afterDiveId) ??
-              _adjacentProfileRow(snapshot.profileRows, gap.beforeDiveId);
-          final interval = _nativeSampleIntervalSeconds(
-            snapshot.profileRows,
-            gap,
-          );
-          // Cap the fill so a very long surface interval (hours/days) at a
-          // dense cadence can't generate tens of thousands of rows in one
-          // transaction; a few hundred flat points render identically.
-          final minStep = ((gap.endSeconds - gap.startSeconds) / 300).ceil();
-          final step = interval > minStep ? interval : minStep;
-          final timestamps = <int>[
-            for (var ts = gap.startSeconds + 1; ts < gap.endSeconds; ts += step)
-              ts,
-          ];
-          if (timestamps.last != gap.endSeconds - 1) {
-            timestamps.add(gap.endSeconds - 1);
-          }
-          for (final ts in timestamps) {
-            batch.insert(
-              _db.diveProfiles,
-              DiveProfilesCompanion.insert(
-                id: _uuid.v4(),
-                diveId: mergedId,
-                timestamp: ts,
-                depth: 0,
-                computerId: Value(adjacent?.computerId),
-                sourceId: Value(
-                  adjacent == null
-                      ? null
-                      : mergedSourceIdFor(adjacent.diveId, adjacent.sourceId),
-                ),
-                isPrimary: Value(adjacent?.isPrimary ?? true),
-              ),
-            );
-          }
-        }
-      });
+      }
+      for (final d in drafts) {
+        if (d.samples.isEmpty) continue;
+        await _profileSeries.insertSeries(
+          diveId: mergedId,
+          computerId: d.computerId,
+          sourceId: d.synthetic
+              ? null
+              : mergedSourceIdFor(d.diveId, d.sourceId),
+          isPrimary: d.isPrimary,
+          samples: d.samples,
+          now: now,
+        );
+      }
 
       // 4. Surface events at each gap boundary (skip tiny gaps -- same
       //    threshold as step 3's synthesized samples).
@@ -396,26 +415,23 @@ class DiveMergeService {
         );
       }
 
-      // 7. Tank pressure series, re-based + remapped (parent-dive sync
-      //    pattern: no per-row pending, same as createDive's profile rows).
-      await _db.batch((batch) {
-        for (final row in snapshot.tankPressureRows) {
-          final newTankId = result.tankIdMap[row.tankId];
-          if (newTankId == null) continue;
-          final offset = result.segmentOffsetsSeconds[row.diveId] ?? 0;
-          batch.insert(
-            _db.tankPressureProfiles,
-            row
-                .toCompanion(false)
-                .copyWith(
-                  id: Value(_uuid.v4()),
-                  diveId: Value(mergedId),
-                  tankId: Value(newTankId),
-                  timestamp: Value(row.timestamp + offset),
-                ),
+      // 7. Tank pressure series, re-based + remapped onto the merged tanks
+      //    (parent-dive sync pattern: no per-row pending, same as
+      //    createDive's profile series).
+      for (final id in diveIds) {
+        for (final s in await _tankSeries.getSeriesForDive(id)) {
+          final newTankId = result.tankIdMap[s.tankId];
+          if (newTankId == null || s.samples.isEmpty) continue;
+          final offset = result.segmentOffsetsSeconds[s.diveId] ?? 0;
+          await _tankSeries.insertSeries(
+            diveId: mergedId,
+            tankId: newTankId,
+            computerId: s.computerId,
+            samples: [for (final p in s.samples) p.shiftedBy(offset)],
+            now: now,
           );
         }
-      });
+      }
 
       // 8. Buddies: union by buddyId, chronological (sortedSources order).
       final seenBuddies = <String>{};
@@ -519,6 +535,12 @@ class DiveMergeService {
       // leaving orphaned merge-output rows for the verbatim re-inserts below
       // to collide with.
       final mergedId = snapshot.mergedDiveId;
+      // Series are tombstoned through the repository (row-level sync), not
+      // the raw batch below: a cascade delete from deleteDive further down
+      // would remove them without logging a deletion, and the merge's
+      // series would never leave the other peers.
+      await _profileSeries.deleteForDive(mergedId);
+      await _tankSeries.deleteForDive(mergedId);
       await _db.batch((batch) {
         batch.deleteWhere(_db.diveProfiles, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTanks, (t) => t.diveId.equals(mergedId));
@@ -628,6 +650,15 @@ class DiveMergeService {
           );
         }
       });
+      // Series restored after the batch above: dataSourceRows and diveTanks
+      // (inserted earlier) are the series' FK parents and must be back
+      // first.
+      for (final r in snapshot.profileSeriesRows) {
+        await _profileSeries.restoreSeriesRow(r, now: now);
+      }
+      for (final r in snapshot.tankSeriesRows) {
+        await _tankSeries.restoreSeriesRow(r, now: now);
+      }
       for (final r in snapshot.weightRows) {
         await _db
             .into(_db.diveWeights)
@@ -726,4 +757,30 @@ class DiveMergeService {
 
     SyncEventBus.notifyLocalChange();
   }
+}
+
+/// One profile series being assembled for the merged dive: an original
+/// series re-based onto the merged timeline, plus any gap-fill samples
+/// appended onto its chosen host (see [DiveMergeService._adjacentDraft]).
+/// [samples] is growable and mutated only by [DiveMergeService.apply]
+/// before the single insert. [synthetic] marks a gap-fill draft created
+/// because neither adjacent segment had a series to host it: it carries no
+/// real source, so [DiveMergeService.apply] gives it a null sourceId rather
+/// than resolving one through `mergedSourceIdFor`.
+class _SeriesDraft {
+  _SeriesDraft({
+    required this.diveId,
+    required this.computerId,
+    required this.sourceId,
+    required this.isPrimary,
+    required this.samples,
+    this.synthetic = false,
+  });
+
+  final String diveId;
+  final String? computerId;
+  final String? sourceId;
+  final bool isPrimary;
+  final bool synthetic;
+  final List<ProfileSample> samples;
 }

@@ -1,4 +1,7 @@
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 
 /// Plain-data capture of every row touched by a dive merge (#449), taken
 /// before mutation so a merge can later be undone.
@@ -25,6 +28,8 @@ class DiveMergeSnapshot {
     required this.dataSourceRows,
     required this.tideRows,
     required this.mediaDiveIds,
+    this.profileSeriesRows = const [],
+    this.tankSeriesRows = const [],
   });
 
   /// The id assigned to the new merged dive.
@@ -49,6 +54,12 @@ class DiveMergeSnapshot {
   /// Media id -> original dive id, so an undo can point media back at its
   /// source dive.
   final Map<String, String> mediaDiveIds;
+
+  /// Raw packed profile / tank pressure series rows of [diveIds], undecoded,
+  /// for an undo to restore verbatim. Empty on a database still carrying only
+  /// legacy row-per-sample data; plan 2e removes the legacy fields above.
+  final List<DiveProfileSeriesRow> profileSeriesRows;
+  final List<TankPressureSeriesRow> tankSeriesRows;
 
   /// Reads (does not mutate) every row belonging to [diveIds] so a merge
   /// can later be applied and, if needed, undone.
@@ -109,6 +120,14 @@ class DiveMergeSnapshot {
         db.tideRecords,
       )..where((t) => t.diveId.isIn(diveIds))).get(),
       mediaDiveIds: {for (final m in mediaRows) m.id: m.diveId!},
+      profileSeriesRows: await ProfileSeriesRepository(
+        database: db,
+        syncRepository: SyncRepository(database: db),
+      ).getRowsForDives(diveIds),
+      tankSeriesRows: await TankPressureSeriesRepository(
+        database: db,
+        syncRepository: SyncRepository(database: db),
+      ).getRowsForDives(diveIds),
     );
   }
 }
