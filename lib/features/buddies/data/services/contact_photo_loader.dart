@@ -41,8 +41,20 @@ typedef ContactPickerFn = Future<Contact?> Function();
 Future<Uint8List?> loadContactPhoto(
   BuildContext context, {
   @visibleForTesting ContactPickerFn? pickContactOverride,
+  @visibleForTesting Future<bool> Function()? ensureAccessOverride,
 }) async {
-  if (pickContactOverride == null && !await ensureContactPropertyAccess()) {
+  final ensureAccess = ensureAccessOverride ?? ensureContactPropertyAccess;
+  if (!await ensureAccess()) {
+    // Silence here reads as a broken menu action: the user tapped "Choose
+    // from Contacts" and nothing happened. The buddy import flow already
+    // explains itself with this same string, so say the same thing.
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.buddies_message_contactPermissionRequired),
+        ),
+      );
+    }
     return null;
   }
 

@@ -98,4 +98,45 @@ void main() {
     if (Platform.isAndroid) return;
     expectLater(ensureContactPropertyAccess(), completion(isTrue));
   });
+
+  testWidgets('a denied permission explains itself rather than doing nothing', (
+    tester,
+  ) async {
+    // Only Android can deny here, so the branch is unreachable on the test
+    // host without a seam. Silence would read as a broken menu action: the
+    // user taps "Choose from Contacts" and nothing happens.
+    Uint8List? result;
+    var pickerCalls = 0;
+
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        child: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              result = await loadContactPhoto(
+                context,
+                ensureAccessOverride: () async => false,
+                pickContactOverride: () async {
+                  pickerCalls++;
+                  return null;
+                },
+              );
+            },
+            child: const Text('load'),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('load'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(result, isNull);
+    expect(pickerCalls, 0, reason: 'the picker must not open without access');
+    expect(
+      find.text('Contact permission is required to import buddies'),
+      findsOneWidget,
+    );
+  });
 }

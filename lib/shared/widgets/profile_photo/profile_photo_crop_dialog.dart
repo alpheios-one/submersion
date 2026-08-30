@@ -186,11 +186,16 @@ class _ProfilePhotoCropDialogState extends State<_ProfilePhotoCropDialog> {
                                 minScale: 1,
                                 maxScale: 5,
                                 constrained: false,
+                                // Renders the ui.Image already decoded for
+                                // its dimensions. Image.memory would decode
+                                // the same JPEG a second time, doubling both
+                                // the work and the resident bitmap for a large
+                                // source photo.
                                 child: SizedBox(
                                   width: childSize.width,
                                   height: childSize.height,
-                                  child: Image.memory(
-                                    widget.sourceBytes,
+                                  child: RawImage(
+                                    image: decoded,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
