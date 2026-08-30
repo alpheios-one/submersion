@@ -34,6 +34,7 @@
   * [State Management](developer/state-management.md)
   * [Navigation](developer/navigation.md)
   * [Testing](developer/testing.md)
+  * [Local Test Performance](developer/local-test-performance.md)
   * [Building](developer/building.md)
   * [Release Process](developer/release-process.md)
 

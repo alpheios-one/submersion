@@ -2612,6 +2612,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_action_cancel => 'Cancelar';
 
   @override
+  String get common_action_clearRating => 'Limpar avaliação';
+
+  @override
   String get common_action_close => 'Fechar';
 
   @override
@@ -4917,6 +4920,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_section_marineLife => 'Vida Marinha';
 
   @override
+  String diveLog_detail_sightingPhotos(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos',
+      one: '1 foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_section_notes => 'Anotacoes';
 
   @override
@@ -5993,6 +6007,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_legend_label_tts => 'TTS';
 
   @override
+  String get diveLog_legend_label_gtr => 'GTR';
+
+  @override
   String get diveLog_legend_source_dc => 'DC';
 
   @override
@@ -6659,6 +6676,46 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteMatchReview_empty => 'Nada para associar.';
 
   @override
+  String get siteSuggestion_titlePhoto => 'Localização encontrada nas fotos';
+
+  @override
+  String get siteSuggestion_titleDiveComputer =>
+      'Localização do computador de mergulho';
+
+  @override
+  String siteSuggestion_assignButton(Object name) {
+    return 'Atribuir $name';
+  }
+
+  @override
+  String siteSuggestion_chooseNearbyButton(int count) {
+    return 'Escolher ponto próximo ($count)';
+  }
+
+  @override
+  String siteSuggestion_addLocationButton(Object name) {
+    return 'Adicionar localização a $name';
+  }
+
+  @override
+  String siteSuggestion_assignedSnack(Object name) {
+    return '$name atribuído';
+  }
+
+  @override
+  String get siteMatchReview_sourcePhoto => 'da foto';
+
+  @override
+  String get siteMatchReview_sourceDiveComputer => 'do computador de mergulho';
+
+  @override
+  String get siteMatchReview_currentSiteCard =>
+      'Adicionar localização a este ponto';
+
+  @override
+  String get siteMatchReview_createHereButton => 'Criar ponto aqui';
+
+  @override
   String siteMatchReview_summary(int selected, int review, int none) {
     return '$selected selecionados · $review para revisar · $none sem correspondência';
   }
@@ -6690,8 +6747,8 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String siteMatchReview_appliedSnack(int dives, int sites) {
-    return '$dives mergulhos associados · $sites pontos adicionados';
+  String siteMatchReview_appliedSnack(int dives, int sites, int located) {
+    return '$dives mergulhos associados · $sites pontos adicionados · $located pontos localizados';
   }
 
   @override
@@ -7590,6 +7647,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_tooltip_tts => 'TTS';
+
+  @override
+  String get diveLog_tooltip_gtr => 'GTR';
 
   @override
   String get diveLog_sources_row_metric => 'Medida';
@@ -10284,6 +10344,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_profileMetric_tts_short => 'TTS';
 
   @override
+  String get enum_profileMetric_gtr => 'GTR';
+
+  @override
+  String get enum_profileMetric_gtr_short => 'GTR';
+
+  @override
   String get enum_scrType_cmf => 'Fluxo de Massa Constante';
 
   @override
@@ -12375,6 +12441,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_title => 'Calculadoras de Gás';
 
   @override
+  String get gasCalculators_desc_mod =>
+      'Profundidade máxima segura para uma mistura';
+
+  @override
+  String get gasCalculators_desc_bestMix =>
+      'Mistura mais rica para uma profundidade alvo';
+
+  @override
+  String get gasCalculators_desc_consumption =>
+      'Gás que um mergulho planejado vai consumir';
+
+  @override
+  String get gasCalculators_desc_rockBottom =>
+      'Reserva para subir dois mergulhadores';
+
+  @override
+  String get gasCalculators_desc_mnd =>
+      'Profundidade narcótica limite de uma mistura';
+
+  @override
+  String get gasCalculators_desc_blender =>
+      'Procedimento de enchimento para uma mistura alvo';
+
+  @override
+  String get gasCalculators_summary_prompt =>
+      'Selecione uma calculadora para começar';
+
+  @override
   String get marineLife_siteSection_editExpectedTooltip =>
       'Editar especies esperadas';
 
@@ -12519,6 +12613,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Esta espécie já não existe.';
+
+  @override
   String get marineLife_speciesEdit_saveButton => 'Salvar';
 
   @override
@@ -12626,6 +12724,169 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_speciesManage_searchHint => 'Buscar especies...';
+
+  @override
+  String get marineLife_lookup_button => 'Pesquisar online';
+
+  @override
+  String get marineLife_lookup_title => 'Pesquisar uma espécie';
+
+  @override
+  String get marineLife_lookup_searchHint => 'Nome comum ou científico';
+
+  @override
+  String get marineLife_lookup_search => 'Pesquisar';
+
+  @override
+  String get marineLife_lookup_createWithout => 'Criar sem pesquisar';
+
+  @override
+  String get marineLife_lookup_attribution =>
+      'Dados e fotos de espécies do iNaturalist';
+
+  @override
+  String get marineLife_lookup_idle => 'Digite um nome e toque em Pesquisar.';
+
+  @override
+  String marineLife_lookup_empty(String query) {
+    return 'Nenhuma espécie encontrada para \"$query\"';
+  }
+
+  @override
+  String get marineLife_lookup_errorOffline => 'Você parece estar offline.';
+
+  @override
+  String get marineLife_lookup_errorTimeout => 'A pesquisa expirou.';
+
+  @override
+  String get marineLife_lookup_errorServer =>
+      'O iNaturalist retornou um erro. Tente novamente mais tarde.';
+
+  @override
+  String get marineLife_lookup_errorMalformed =>
+      'Resposta inesperada do iNaturalist.';
+
+  @override
+  String get marineLife_lookup_retry => 'Tentar novamente';
+
+  @override
+  String marineLife_lookup_observations(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observações',
+      one: '1 observação',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_lookup_unresolvableRank(String rank) {
+    return '$rank: escolha uma espécie';
+  }
+
+  @override
+  String get marineLife_speciesDetail_suggestForCatalog =>
+      'Sugerir para o catálogo';
+
+  @override
+  String get marineLife_suggest_couldNotOpen =>
+      'Não foi possível abrir o navegador';
+
+  @override
+  String get marineLife_suggest_copyLink => 'Copiar link';
+
+  @override
+  String marineLife_speciesPhotos_title(Object count) {
+    return 'Fotos ($count)';
+  }
+
+  @override
+  String get marineLife_speciesPhotos_empty =>
+      'As fotos marcadas com esta espécie aparecem aqui.';
+
+  @override
+  String get marineLife_speciesPhotos_tagPhotos => 'Marcar fotos';
+
+  @override
+  String get marineLife_speciesPhotos_addPhotos => 'Adicionar fotos';
+
+  @override
+  String get marineLife_speciesPhotos_thumbnailLabel => 'Foto da espécie';
+
+  @override
+  String marineLife_speciesPhotos_importAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos adicionadas',
+      one: '1 foto adicionada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ignoradas',
+      one: '1 ignorada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_speciesPhotos_importFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count com falha',
+      one: '1 com falha',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_tagPicker_title => 'Marcar fotos';
+
+  @override
+  String get marineLife_tagPicker_empty =>
+      'Nenhuma foto sem marcação nos mergulhos em que você registrou esta espécie.';
+
+  @override
+  String get marineLife_tagPicker_emptyHint =>
+      'Use Adicionar fotos para importar imagens do seu rolo da câmera.';
+
+  @override
+  String get marineLife_tagPicker_selectAll => 'Selecionar tudo';
+
+  @override
+  String marineLife_tagPicker_confirm(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Marcar $count fotos',
+      one: 'Marcar 1 foto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_tagged(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos marcadas',
+      one: '1 foto marcada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String marineLife_tagPicker_diveLabel(Object number) {
+    return 'Mergulho $number';
+  }
 
   @override
   String get marineLife_speciesPage_title => 'Espécies';
@@ -12980,6 +13241,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_gpsBanner_dismissTooltip => 'Dispensar sugestao de GPS';
+
+  @override
+  String mediaImport_offerSiteReview(int count) {
+    return '$count mergulhos podem obter um ponto a partir das fotos';
+  }
+
+  @override
+  String get mediaImport_reviewSitesAction => 'Rever pontos';
 
   @override
   String get media_gpsBanner_title => 'GPS encontrado nas fotos';
@@ -13876,6 +14145,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_library_filter_site => 'Ponto';
+
+  @override
+  String get media_library_filter_species => 'Espécie';
 
   @override
   String get media_library_filter_trip => 'Viagem';
@@ -15212,6 +15484,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_metric_tts => 'TTS (Tempo ate a Superficie)';
+
+  @override
+  String get settings_appearance_metric_gtr => 'GTR (Tempo de gás restante)';
 
   @override
   String get settings_appearance_metric_cns => 'CNS% (Toxicidade de O2)';
@@ -17443,6 +17718,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get signatures_error_enterSignerName => 'Digite o nome do signatário';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Não foi possível salvar a assinatura. Tente novamente.';
+
+  @override
   String get signatures_field_instructorName => 'Nome do Instrutor';
 
   @override
@@ -17637,11 +17916,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_conditions_temperature_subtitle =>
-      'Temperaturas min/media/max';
+      'Mín, média e máx por mês do calendário, em todos os anos';
 
   @override
   String get statistics_conditions_temperature_title =>
-      'Temperatura da Agua por Mes';
+      'Temperatura da água por estação';
 
   @override
   String get statistics_conditions_visibility_error =>
@@ -17687,7 +17966,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_equipment_weightTrend_subtitle =>
-      'Peso medio ao longo do tempo';
+      'Chumbo total por mergulho';
 
   @override
   String get statistics_equipment_weightTrend_title => 'Tendencia de Peso';
@@ -17770,8 +18049,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Falha ao carregar tendencia de consumo';
 
   @override
-  String get statistics_gas_sacTrend_subtitle =>
-      'Media mensal ao longo de 5 anos';
+  String get statistics_gas_sacTrend_subtitle => 'Cada mergulho no período';
 
   @override
   String get statistics_gas_sacTrend_title => 'Tendência do consumo de gás';
@@ -18031,7 +18309,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_bottomTime_subtitle =>
-      'Duracao media por mes';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_bottomTime_title =>
@@ -18055,7 +18333,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get statistics_progression_depthProgression_subtitle =>
-      'Profundidade maxima mensal ao longo de 5 anos';
+      'Cada mergulho no período';
 
   @override
   String get statistics_progression_depthProgression_title =>
@@ -19497,13 +19775,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, logbook PDF';
 
   @override
-  String get transfer_section_exportTitle => 'Exportar';
+  String get transfer_section_exportTitle => 'Exportar arquivo';
 
   @override
   String get transfer_section_importSubtitle => 'Arquivos CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'Importar';
+  String get transfer_section_importTitle => 'Importar arquivo';
 
   @override
   String get transfer_summary_description =>
@@ -23599,6 +23877,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Armazenamento de mídia conectado';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Ainda não foi possível ler o armazenamento na nuvem. Aguarde um momento e tente novamente.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Desconectar';
 
   @override
@@ -23646,6 +23928,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Falhou';
 
   @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transferências pausadas';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Este dispositivo e o armazenamento na nuvem não concordam mais sobre qual repositório está em uso. Reconectar o armazenamento de mídia adota o que a nuvem contém agora.';
+
+  @override
   String settings_mediaStorage_transfers_queued(int count) {
     return '$count na fila';
   }
@@ -23665,11 +23955,32 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String settings_mediaStorage_verify_summary(
     int checked,
+    int originals,
+    int thumbs,
+    int renditions,
     int removed,
     int repaired,
     int aborted,
   ) {
-    return '$checked objetos verificados: $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
+    String _temp0 = intl.Intl.pluralLogic(
+      originals,
+      locale: localeName,
+      other: '$originals originais',
+      one: '1 original',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      thumbs,
+      locale: localeName,
+      other: '$thumbs miniaturas',
+      one: '1 miniatura',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      renditions,
+      locale: localeName,
+      other: '$renditions versões comprimidas',
+      one: '1 versão comprimida',
+    );
+    return '$checked objetos na nuvem verificados ($_temp0, $_temp1, $_temp2): $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
   }
 
   @override
@@ -25921,6 +26232,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reef_species_addToExpected => 'Adicionar às espécies esperadas';
+
+  @override
+  String get reef_species_addFromLookup =>
+      'Pesquisar e adicionar às suas espécies';
 
   @override
   String reef_species_showAll(int count) {
@@ -30725,6 +31040,1233 @@ class AppLocalizationsPt extends AppLocalizations {
       'O maior réptil vivo, presente em águas costeiras e estuarinas do Indo-Pacífico.';
 
   @override
+  String get species_northern_pike_name => 'Lúcio';
+
+  @override
+  String get species_northern_pike_desc =>
+      'Predador alongado de focinho em bico de pato, imóvel à espreita entre as plantas das margens dos lagos.';
+
+  @override
+  String get species_muskellunge_name => 'Muskellunge';
+
+  @override
+  String get species_muskellunge_desc =>
+      'O maior dos lúcios, um gigante listrado ou pintado dos lagos límpidos do norte, raro de ver e inesquecível.';
+
+  @override
+  String get species_chain_pickerel_name => 'Lúcio-corrente';
+
+  @override
+  String get species_chain_pickerel_desc =>
+      'Lúcio esguio dos lagos com vegetação do leste da América do Norte, nomeado pelo padrão em cadeia dos flancos.';
+
+  @override
+  String get species_walleye_name => 'Sander-dourado';
+
+  @override
+  String get species_walleye_desc =>
+      'Parente da perca de tom oliva dourado com grandes olhos refletores, caça ao anoitecer sobre fundos rochosos e arenosos.';
+
+  @override
+  String get species_sauger_name => 'Sander-canadense';
+
+  @override
+  String get species_sauger_desc =>
+      'Primo menor e mais manchado do walleye, prefere rios turvos e represas.';
+
+  @override
+  String get species_yellow_perch_name => 'Perca-americana';
+
+  @override
+  String get species_yellow_perch_desc =>
+      'Perca dourada de cardume com barras verticais escuras, comum junto a cais e leitos de plantas na América do Norte.';
+
+  @override
+  String get species_european_perch_name => 'Perca';
+
+  @override
+  String get species_european_perch_desc =>
+      'Perca listrada de barbatanas espinhosas e barbatanas inferiores vermelho alaranjadas, presente em quase todos os lagos e rios lentos da Europa.';
+
+  @override
+  String get species_zander_name => 'Lúcioperca';
+
+  @override
+  String get species_zander_desc =>
+      'Grande predador pálido de olhos vítreos e mandíbulas com presas, patrulha lagos e rios turvos da Europa à noite.';
+
+  @override
+  String get species_ruffe_name => 'Perca-porco-espinho';
+
+  @override
+  String get species_ruffe_desc =>
+      'Pequena perca mosqueada com barbatana dorsal espinhosa contínua, abundante em fundos moles de lagos europeus.';
+
+  @override
+  String get species_largemouth_bass_name => 'Achigã';
+
+  @override
+  String get species_largemouth_bass_desc =>
+      'Achigã de dorso verde, faixa lateral escura e boca enorme, à espreita junto a troncos e bordas de vegetação em lagos quentes.';
+
+  @override
+  String get species_smallmouth_bass_name => 'Achigã-boca-pequena';
+
+  @override
+  String get species_smallmouth_bass_desc =>
+      'Achigã bronzeado com barras verticais ténues, mantém-se sobre rocha e cascalho em lagos e rios claros e frescos.';
+
+  @override
+  String get species_rock_bass_name => 'Achigã-da-rocha';
+
+  @override
+  String get species_rock_bass_desc =>
+      'Peixe-sol atarracado de olhos vermelhos com fileiras de pontos escuros, abriga-se entre pedregulhos em riachos e lagos claros.';
+
+  @override
+  String get species_bluegill_name => 'Guelra-azul';
+
+  @override
+  String get species_bluegill_desc =>
+      'Peixe-sol discoide com opérculo azul-escuro e peito laranja, nidifica em colónias em fundos arenosos rasos.';
+
+  @override
+  String get species_pumpkinseed_name => 'Perca-sol';
+
+  @override
+  String get species_pumpkinseed_desc =>
+      'Peixe-sol vivamente salpicado com opérculo de ponta vermelha e linhas azuis onduladas nas bochechas, comum em águas rasas com vegetação.';
+
+  @override
+  String get species_black_crappie_name => 'Achigã-nebuloso';
+
+  @override
+  String get species_black_crappie_desc =>
+      'Peixe prateado de corpo alto salpicado de preto, em cardumes junto a ramos submersos e estacas.';
+
+  @override
+  String get species_white_crappie_name => 'Achigã-preteado';
+
+  @override
+  String get species_white_crappie_desc =>
+      'Crappie mais pálido com faixas verticais ténues, prefere represas turvas e rios lentos.';
+
+  @override
+  String get species_brown_trout_name => 'Truta';
+
+  @override
+  String get species_brown_trout_desc =>
+      'Truta castanho dourada com pintas vermelhas e pretas, mantém-se na corrente de rios e lagos frescos e claros.';
+
+  @override
+  String get species_rainbow_trout_name => 'Truta-arco-íris';
+
+  @override
+  String get species_rainbow_trout_desc =>
+      'Truta prateada com faixa lateral rosada e fino salpicado preto, repovoada e selvagem em águas frias de todo o mundo.';
+
+  @override
+  String get species_brook_trout_name => 'Truta das fontes';
+
+  @override
+  String get species_brook_trout_desc =>
+      'Truta-das-fontes com marcas vermiformes no dorso, pintas vermelhas com halos azuis e barbatanas orladas de branco, em riachos frios de cabeceira.';
+
+  @override
+  String get species_lake_trout_name => 'Salvelino-lacustre';
+
+  @override
+  String get species_lake_trout_desc =>
+      'Grande truta-de-lago cinzenta coberta de manchas claras e cauda bifurcada, percorre as águas frias e profundas dos lagos do norte.';
+
+  @override
+  String get species_arctic_char_name => 'Salvelino-árctico';
+
+  @override
+  String get species_arctic_char_desc =>
+      'O peixe de água doce mais setentrional, uma truta esguia cujo ventre se tinge de vermelho alaranjado nas cores de desova outonais.';
+
+  @override
+  String get species_atlantic_salmon_name => 'Salmão-do-Atlântico';
+
+  @override
+  String get species_atlantic_salmon_desc =>
+      'Salmão prateado migrador com pintas pretas em forma de X, salta quedas de água ao regressar aos rios natais para desovar.';
+
+  @override
+  String get species_chinook_salmon_name => 'Salmão-real';
+
+  @override
+  String get species_chinook_salmon_desc =>
+      'O maior salmão do Pacífico, de dorso azul-esverdeado e gengivas pretas, sobe os grandes rios ocidentais para desovar.';
+
+  @override
+  String get species_sockeye_salmon_name => 'Salmão-vermelho';
+
+  @override
+  String get species_sockeye_salmon_desc =>
+      'Salmão que fica vermelho vivo com cabeça verde na desova, enchendo os leitos de cascalho de rios alimentados por lagos.';
+
+  @override
+  String get species_coho_salmon_name => 'Salmão-prateado';
+
+  @override
+  String get species_coho_salmon_desc =>
+      'Salmão prateado de gengivas brancas e pintas apenas na parte superior da cauda, desova em pequenos riachos costeiros.';
+
+  @override
+  String get species_lake_whitefish_name => 'Peixe-branco-de-lago';
+
+  @override
+  String get species_lake_whitefish_desc =>
+      'Peixe-branco prateado de boca pequena dos lagos frios e profundos, alimenta-se no fundo em grandes cardumes.';
+
+  @override
+  String get species_cisco_name => 'Cisco';
+
+  @override
+  String get species_cisco_desc =>
+      'Peixe-branco esguio semelhante a um arenque que forma cardumes em águas abertas de lagos frios do norte, presa da truta-de-lago.';
+
+  @override
+  String get species_european_grayling_name => 'Peixe-sombra';
+
+  @override
+  String get species_european_grayling_desc =>
+      'Peixe de rio cinzento prateado com barbatana dorsal alta em forma de vela orlada de púrpura, mantém-se em correntes rápidas sobre cascalho limpo.';
+
+  @override
+  String get species_common_carp_name => 'Carpa';
+
+  @override
+  String get species_common_carp_desc =>
+      'Carpa robusta cor de bronze com escamas grandes e dois barbilhos, revolve os fundos moles de lagos e rios quentes.';
+
+  @override
+  String get species_grass_carp_name => 'Carpa-capim';
+
+  @override
+  String get species_grass_carp_desc =>
+      'Carpa asiática fusiforme introduzida em todo o mundo para consumir plantas aquáticas, frequente em lagos de pedreira límpidos.';
+
+  @override
+  String get species_tench_name => 'Tenca';
+
+  @override
+  String get species_tench_desc =>
+      'Peixe verde-oliva de escamas minúsculas, olhos vermelhos e barbatanas arredondadas, desliza pela lama e pelos caniços de águas paradas.';
+
+  @override
+  String get species_common_bream_name => 'Brema';
+
+  @override
+  String get species_common_bream_desc =>
+      'Peixe bronzeado de corpo alto e comprimido que se alimenta de cabeça para baixo em cardumes sobre fundos lodosos, comum nas planícies europeias.';
+
+  @override
+  String get species_roach_name => 'Gardon';
+
+  @override
+  String get species_roach_desc =>
+      'Peixe prateado de cardume com barbatanas vermelhas e íris vermelha, o mais abundante em muitos lagos e canais europeus.';
+
+  @override
+  String get species_rudd_name => 'Olho-vermelho';
+
+  @override
+  String get species_rudd_desc =>
+      'Parente da ruivaca de flancos dourados com barbatanas vermelho vivo e boca virada para cima, alimenta-se logo abaixo da superfície.';
+
+  @override
+  String get species_chub_name => 'Chub';
+
+  @override
+  String get species_chub_desc =>
+      'Peixe de rio robusto de cabeça larga, escamas grandes de bordo escuro e boca grande, mantém-se sob árvores debruçadas sobre a água.';
+
+  @override
+  String get species_barbel_name => 'Barbo';
+
+  @override
+  String get species_barbel_desc =>
+      'Peixe de fundo hidrodinâmico com quatro barbilhos e boca ventral, colado ao cascalho dos rios rápidos europeus.';
+
+  @override
+  String get species_european_eel_name => 'Enguia-comum';
+
+  @override
+  String get species_european_eel_desc =>
+      'Peixe serpentiforme que passa décadas em rios e lagos antes de migrar para o Mar dos Sargaços para desovar uma única vez.';
+
+  @override
+  String get species_american_eel_name => 'Enguia-americana';
+
+  @override
+  String get species_american_eel_desc =>
+      'Enguia norte-americana que de dia se esconde sob as rochas em rios e lagos e regressa ao Mar dos Sargaços para se reproduzir.';
+
+  @override
+  String get species_burbot_name => 'Lota-de-água-doce';
+
+  @override
+  String get species_burbot_desc =>
+      'O único bacalhau de água doce, peixe mosqueado semelhante a uma enguia com um único barbilho no queixo, escondido de dia em águas frias e profundas.';
+
+  @override
+  String get species_channel_catfish_name => 'Bagre-de-canal';
+
+  @override
+  String get species_channel_catfish_desc =>
+      'Bagre cinzento com pintas escuras dispersas, cauda bifurcada e oito barbilhos, comum em rios e represas da América do Norte.';
+
+  @override
+  String get species_flathead_catfish_name => 'Bagre-cabeça-chata';
+
+  @override
+  String get species_flathead_catfish_desc =>
+      'Enorme bagre castanho mosqueado de cabeça achatada e maxilar inferior saliente, repousa em poços profundos dos rios.';
+
+  @override
+  String get species_brown_bullhead_name => 'Bagre-touro-castanho';
+
+  @override
+  String get species_brown_bullhead_desc =>
+      'Pequeno bagre atarracado de barbilhos escuros e cauda reta, tolera lagoas lodosas, quentes e pobres em oxigénio.';
+
+  @override
+  String get species_wels_catfish_name => 'Peixe-gato-europeu';
+
+  @override
+  String get species_wels_catfish_desc =>
+      'O maior peixe de água doce da Europa, um gigante sem escamas de cabeça larga e achatada e longos bigodes, repousa em poços fundos dos rios.';
+
+  @override
+  String get species_white_sturgeon_name => 'Esturjão-branco';
+
+  @override
+  String get species_white_sturgeon_desc =>
+      'O maior peixe de água doce da América do Norte, um gigante cinzento couraçado com cauda de tubarão que percorre os grandes rios ocidentais.';
+
+  @override
+  String get species_lake_sturgeon_name => 'Esturjão-de-lago';
+
+  @override
+  String get species_lake_sturgeon_desc =>
+      'Esturjão couraçado de crescimento lento dos Grandes Lagos e da bacia do Mississípi, aspira o fundo com a boca tubular.';
+
+  @override
+  String get species_european_sturgeon_name => 'Esturjão';
+
+  @override
+  String get species_european_sturgeon_desc =>
+      'Esturjão couraçado criticamente ameaçado dos rios atlânticos, hoje criado e libertado no Garona e no Elba.';
+
+  @override
+  String get species_alligator_gar_name => 'Peixe-jacaré';
+
+  @override
+  String get species_alligator_gar_desc =>
+      'Gigante pré-histórico de focinho largo e dentado com escamas couraçadas em losango, sobe para engolir ar em rios do sul.';
+
+  @override
+  String get species_longnose_gar_name => 'Gar-agulha';
+
+  @override
+  String get species_longnose_gar_desc =>
+      'Peixe couraçado esguio de focinho em agulha, suspenso imóvel logo abaixo da superfície de rios quentes.';
+
+  @override
+  String get species_bowfin_name => 'Alcaraz';
+
+  @override
+  String get species_bowfin_desc =>
+      'Fóssil vivo com longa barbatana dorsal ondulante e cabeça óssea, guarda os alevins em remansos com vegetação.';
+
+  @override
+  String get species_american_paddlefish_name => 'Peixe-espátula-americano';
+
+  @override
+  String get species_american_paddlefish_desc =>
+      'Gigante filtrador com focinho em forma de remo que ocupa um terço do comprimento, nada de boca aberta pelos grandes rios.';
+
+  @override
+  String get species_sea_lamprey_name => 'Lampreia-marinha';
+
+  @override
+  String get species_sea_lamprey_desc =>
+      'Parasita sem mandíbulas semelhante a uma enguia com boca em ventosa rodeada de dentes, desova em riachos de cascalho após se alimentar no mar ou em lagos.';
+
+  @override
+  String get species_freshwater_drum_name =>
+      'Corvina-de-água-doce-norte-americana';
+
+  @override
+  String get species_freshwater_drum_desc =>
+      'Peixe prateado de dorso corcunda que grunhe audivelmente e tritura mexilhões com dentes faríngeos, comum em grandes rios e lagos.';
+
+  @override
+  String get species_white_sucker_name => 'Sugador-branco';
+
+  @override
+  String get species_white_sucker_desc =>
+      'Peixe de fundo cilíndrico de boca carnuda virada para baixo, sobe os riachos na primavera em multidões de desova.';
+
+  @override
+  String get species_common_minnow_name => 'Vairão';
+
+  @override
+  String get species_common_minnow_desc =>
+      'Minúsculo peixe listrado de cardume de riachos e lagos claros e frescos, os machos ficam vermelhos e verdes na primavera.';
+
+  @override
+  String get species_three_spined_stickleback_name => 'Esganagata';
+
+  @override
+  String get species_three_spined_stickleback_desc =>
+      'Minúsculo peixe couraçado com três espinhos dorsais cujos machos de garganta vermelha constroem e guardam ninhos de fibras vegetais.';
+
+  @override
+  String get species_alewife_name => 'Alosa-cinzenta';
+
+  @override
+  String get species_alewife_desc =>
+      'Arenque prateado que sobe os rios na primavera e hoje enche os Grandes Lagos em cardumes imensos.';
+
+  @override
+  String get species_nile_perch_name => 'Perca-do-Nilo';
+
+  @override
+  String get species_nile_perch_desc =>
+      'Enorme predador prateado de olho orlado de preto, introduzido no lago Vitória onde domina as águas abertas.';
+
+  @override
+  String get species_nile_tilapia_name => 'Tilápia-do-Nilo';
+
+  @override
+  String get species_nile_tilapia_desc =>
+      'Ciclídeo cinzento com barras verticais na cauda que incuba as crias na boca, criado e asselvajado em águas quentes de todo o mundo.';
+
+  @override
+  String get species_african_tigerfish_name => 'Peixe-tigre-africano';
+
+  @override
+  String get species_african_tigerfish_desc =>
+      'Predador prateado listrado com dentes em punhal entrelaçados, caça em rios africanos rápidos como o Zambeze.';
+
+  @override
+  String get species_marbled_lungfish_name => 'Peixe-pulmonado-marmorado';
+
+  @override
+  String get species_marbled_lungfish_desc =>
+      'Peixe anguiliforme que respira ar com barbatanas filiformes e sobrevive às secas fechado num casulo de lama.';
+
+  @override
+  String get species_electric_catfish_name => 'Bagre-elétrico';
+
+  @override
+  String get species_electric_catfish_desc =>
+      'Bagre cinzento rechonchudo do Nilo e do Congo que atordoa as presas com descargas de várias centenas de volts.';
+
+  @override
+  String get species_zebra_mbuna_name => 'Mbuna-zebra';
+
+  @override
+  String get species_zebra_mbuna_desc =>
+      'Ciclídeo de rocha com barras azuis do lago Malawi, raspa algas dos pedregulhos em densas multidões territoriais.';
+
+  @override
+  String get species_malawi_butterfly_peacock_name =>
+      'Ciclídeo pavão borboleta';
+
+  @override
+  String get species_malawi_butterfly_peacock_desc =>
+      'Ciclídeo pavão azul iridescente das grutas do lago Malawi, os machos brilham com barbatanas orladas de branco.';
+
+  @override
+  String get species_fuelleborn_cichlid_name => 'Mbuna-azul';
+
+  @override
+  String get species_fuelleborn_cichlid_desc =>
+      'Mbuna do lago Malawi de focinho rombo e carnudo saliente para raspar algas na zona de rebentação.';
+
+  @override
+  String get species_princess_of_burundi_name => 'Princesa do Burundi';
+
+  @override
+  String get species_princess_of_burundi_desc =>
+      'Elegante ciclídeo do lago Tanganica com barbatanas em lira, vive em famílias alargadas que partilham os cuidados do ninho.';
+
+  @override
+  String get species_frontosa_name => 'Ciclídeo-cabeçudo';
+
+  @override
+  String get species_frontosa_desc =>
+      'Ciclídeo de águas profundas do Tanganica com faixas azul-branco marcadas e testa corcunda, move-se devagar em grupos sobre as rochas.';
+
+  @override
+  String get species_tropheus_moorii_name => 'Tropheus moorii';
+
+  @override
+  String get species_tropheus_moorii_desc =>
+      'Ciclídeo de rocha atarracado do Tanganica em dezenas de formas de cor, cada uma confinada ao seu próprio troço de margem.';
+
+  @override
+  String get species_arapaima_name => 'Pirarucu';
+
+  @override
+  String get species_arapaima_desc =>
+      'Um dos maiores peixes de água doce, um gigante couraçado do Amazonas de cauda salpicada de vermelho que sobe para engolir ar.';
+
+  @override
+  String get species_silver_arowana_name => 'Aruanã';
+
+  @override
+  String get species_silver_arowana_desc =>
+      'Peixe prateado em forma de fita do Amazonas com dois barbilhos no queixo que salta fora de água para apanhar insetos nos ramos.';
+
+  @override
+  String get species_red_bellied_piranha_name => 'Piranha caju';
+
+  @override
+  String get species_red_bellied_piranha_desc =>
+      'Peixe prateado de corpo alto, ventre carmesim e dentes afiados, desloca-se em cardumes pelos remansos do Amazonas.';
+
+  @override
+  String get species_black_piranha_name => 'Piranha preta';
+
+  @override
+  String get species_black_piranha_desc =>
+      'Grande piranha solitária de olhos vermelhos e corpo escuro em losango, à espreita em afluentes claros e rochosos do Amazonas.';
+
+  @override
+  String get species_red_bellied_pacu_name => 'Pacu';
+
+  @override
+  String get species_red_bellied_pacu_desc =>
+      'Frugívoro semelhante a uma piranha com dentes achatados trituradores e ventre vermelho, reúne-se sob as árvores da floresta inundada.';
+
+  @override
+  String get species_tambaqui_name => 'Tambaqui';
+
+  @override
+  String get species_tambaqui_desc =>
+      'Enorme pacu escuro do Amazonas que tritura nozes e sementes caídas sob a copa da floresta inundada.';
+
+  @override
+  String get species_electric_eel_name => 'Poraquê';
+
+  @override
+  String get species_electric_eel_desc =>
+      'Não é uma enguia mas um peixe-faca, um longo respirador de ar escuro que atordoa as presas com descargas de até 600 volts.';
+
+  @override
+  String get species_redtail_catfish_name => 'Cajaro';
+
+  @override
+  String get species_redtail_catfish_desc =>
+      'Grande bagre do Amazonas de dorso escuro, ventre branco e cauda vermelho alaranjada viva, repousa em poços fundos dos rios.';
+
+  @override
+  String get species_tiger_shovelnose_catfish_name => 'Cachara';
+
+  @override
+  String get species_tiger_shovelnose_catfish_desc =>
+      'Bagre listrado e esguio de focinho longo e achatado, caça à noite ao longo dos canais arenosos dos rios sul-americanos.';
+
+  @override
+  String get species_peacock_bass_name => 'Tucunaré';
+
+  @override
+  String get species_peacock_bass_desc =>
+      'Ciclídeo agressivo do Amazonas com três barras escuras e um ocelo na cauda, embosca peixes junto a troncos submersos.';
+
+  @override
+  String get species_oscar_name => 'Acará-grande';
+
+  @override
+  String get species_oscar_desc =>
+      'Ciclídeo robusto e escuro com marmoreado laranja e um ocelo na cauda, patrulha águas lentas do Amazonas e margens inundadas.';
+
+  @override
+  String get species_freshwater_angelfish_name => 'Acará-bandeira';
+
+  @override
+  String get species_freshwater_angelfish_desc =>
+      'Ciclídeo amazónico alto e discoide com barbatanas alongadas e riscas verticais, flutua entre raízes submersas.';
+
+  @override
+  String get species_discus_name => 'Acará disco';
+
+  @override
+  String get species_discus_desc =>
+      'Ciclídeo redondo e comprimido com linhas azuis onduladas que alimenta as crias com o muco da própria pele.';
+
+  @override
+  String get species_sailfin_pleco_name => 'Cascudo-pintado-amazônico';
+
+  @override
+  String get species_sailfin_pleco_desc =>
+      'Bagre couraçado de boca em ventosa com barbatana dorsal alta e manchas de leopardo, raspa algas da madeira e da rocha.';
+
+  @override
+  String get species_cardinal_tetra_name => 'Tetra cardinal';
+
+  @override
+  String get species_cardinal_tetra_desc =>
+      'Minúsculo tetra com uma risca azul néon sobre uma faixa vermelha a todo o comprimento, forma cardumes nas águas escuras do Rio Negro.';
+
+  @override
+  String get species_mexican_tetra_name => 'Lambari-cego';
+
+  @override
+  String get species_mexican_tetra_desc =>
+      'Tetra prateado dos rios mexicanos cujas populações de gruta são cegas e pálidas, um favorito dos mergulhadores de cenotes.';
+
+  @override
+  String get species_mekong_giant_catfish_name => 'Bagre-gigante-do-Mekong';
+
+  @override
+  String get species_mekong_giant_catfish_desc =>
+      'Gigante desdentado do Mekong criticamente ameaçado, cinzento e sem barbilhos, que outrora atingia três metros.';
+
+  @override
+  String get species_giant_barb_name => 'Barbo-gigante';
+
+  @override
+  String get species_giant_barb_desc =>
+      'A maior carpa do mundo, um gigante do Mekong de escamas grandes e cabeça enorme, hoje raro em poços fundos do rio.';
+
+  @override
+  String get species_asian_arowana_name => 'Aruanã-dourado';
+
+  @override
+  String get species_asian_arowana_desc =>
+      'Peixe-dragão vermelho ou dourado metálico dos rios de águas negras do Sudeste Asiático, desliza logo abaixo da superfície.';
+
+  @override
+  String get species_striped_snakehead_name => 'Cabeça-de-cobra-asiático';
+
+  @override
+  String get species_striped_snakehead_desc =>
+      'Predador fusiforme que respira ar com cabeça achatada de serpente, guarda as crias em lagoas asiáticas com vegetação.';
+
+  @override
+  String get species_giant_snakehead_name => 'Cabeça-de-cobra-gigante';
+
+  @override
+  String get species_giant_snakehead_desc =>
+      'Grande e feroz cabeça-de-cobra, listrado em jovem e escuro em adulto, defende as crias vermelho vivo em lagos do Sudeste Asiático.';
+
+  @override
+  String get species_climbing_perch_name => 'Perca-trepadora';
+
+  @override
+  String get species_climbing_perch_desc =>
+      'Peixe oliva resistente que respira ar e rasteja por terra sobre os opérculos espinhosos entre charcos que secam.';
+
+  @override
+  String get species_golden_mahseer_name => 'Barbeso';
+
+  @override
+  String get species_golden_mahseer_desc =>
+      'Carpa de escamas douradas dos rios dos Himalaias, nadadora poderosa que se mantém em poços claros e rápidos abaixo das corredeiras.';
+
+  @override
+  String get species_koi_name => 'Koi';
+
+  @override
+  String get species_koi_desc =>
+      'Carpa ornamental criada no Japão em padrões brancos, vermelhos, pretos e dourados, à vontade em tanques e lagos quentes e claros.';
+
+  @override
+  String get species_goldfish_name => 'Peixinho-vermelho';
+
+  @override
+  String get species_goldfish_desc =>
+      'Carpa asiática domesticada que reverte para oliva bronze na natureza, formando grandes cardumes asselvajados em lagos quentes.';
+
+  @override
+  String get species_giant_gourami_name => 'Gourami-gigante';
+
+  @override
+  String get species_giant_gourami_desc =>
+      'Peixe largo e corcunda do Sudeste Asiático com barbatanas pélvicas filiformes que constrói ninhos de bolhas em água lenta com vegetação.';
+
+  @override
+  String get species_clown_knifefish_name => 'Peixe-faca-palhaço';
+
+  @override
+  String get species_clown_knifefish_desc =>
+      'Peixe prateado em forma de lâmina com ocelos ao longo de uma longa barbatana anal ondulante, paira sob troncos de rios asiáticos.';
+
+  @override
+  String get species_walking_catfish_name => 'Peixe-gato-andador';
+
+  @override
+  String get species_walking_catfish_desc =>
+      'Bagre esguio que respira ar e serpenteia sobre solo húmido entre lagoas, hoje asselvajado na Florida.';
+
+  @override
+  String get species_japanese_eel_name => 'Enguia-japonesa';
+
+  @override
+  String get species_japanese_eel_desc =>
+      'Enguia da Ásia Oriental que cresce em rios e lagos e migra para o Pacífico ocidental para desovar.';
+
+  @override
+  String get species_ayu_name => 'Ayu';
+
+  @override
+  String get species_ayu_desc =>
+      'Esguio peixe prateado japonês que raspa algas das pedras em rios claros e defende um território de alimentação.';
+
+  @override
+  String get species_baikal_omul_name => 'Omul-do-Baikal';
+
+  @override
+  String get species_baikal_omul_desc =>
+      'Peixe-branco prateado exclusivo do lago Baikal, forma cardumes nas águas frias abertas e sobe os rios para desovar.';
+
+  @override
+  String get species_baikal_oilfish_name => 'Golomianka';
+
+  @override
+  String get species_baikal_oilfish_desc =>
+      'Peixe translúcido sem escamas das profundezas do Baikal, tão rico em óleo que é quase transparente, e vivíparo.';
+
+  @override
+  String get species_murray_cod_name => 'Bacalhau-do-Murray';
+
+  @override
+  String get species_murray_cod_desc =>
+      'O maior peixe de água doce da Austrália, um gigante verde mosqueado de ventre branco, mantém-se junto a troncos no Murray-Darling.';
+
+  @override
+  String get species_golden_perch_name => 'Perca-dourada';
+
+  @override
+  String get species_golden_perch_desc =>
+      'Perca de corpo alto de tom oliva dourado dos rios interiores da Austrália, abriga-se junto a árvores caídas e saliências rochosas.';
+
+  @override
+  String get species_australian_bass_name => 'Perca-australiana';
+
+  @override
+  String get species_australian_bass_desc =>
+      'Perca verde bronze dos rios costeiros do leste da Austrália que migra rio abaixo para desovar em estuários salobros.';
+
+  @override
+  String get species_barramundi_name => 'Barramunda';
+
+  @override
+  String get species_barramundi_desc =>
+      'Perca prateada de dorso corcunda dos rios e estuários do norte da Austrália, que muda de macho para fêmea com a idade.';
+
+  @override
+  String get species_silver_perch_name => 'Perca-prateada';
+
+  @override
+  String get species_silver_perch_desc =>
+      'Peixe cinzento prateado do Murray-Darling de boca pequena e cauda bifurcada, outrora em cardumes enormes.';
+
+  @override
+  String get species_gulf_saratoga_name => 'aruanã-pérola';
+
+  @override
+  String get species_gulf_saratoga_desc =>
+      'Arowana australiana bronzeada de escamas salpicadas de vermelho que incuba os ovos na boca nos billabongs do norte.';
+
+  @override
+  String get species_sooty_grunter_name => 'Roncador-preto';
+
+  @override
+  String get species_sooty_grunter_desc =>
+      'Peixe escuro e atarracado dos rios do norte da Austrália, alimenta-se de algas e frutos junto a rochas e corredeiras.';
+
+  @override
+  String get species_eel_tailed_catfish_name => 'Bagre-enguia-kenaru';
+
+  @override
+  String get species_eel_tailed_catfish_desc =>
+      'Bagre australiano de cauda afilada semelhante à de uma enguia que constrói e guarda um ninho de cascalho em águas rasas e claras.';
+
+  @override
+  String get species_spangled_perch_name => 'Perca-lantejoula';
+
+  @override
+  String get species_spangled_perch_desc =>
+      'Pequeno peixe salpicado de prata presente em todo o interior da Austrália, coloniza qualquer poça que uma cheia ligue.';
+
+  @override
+  String get species_eastern_rainbowfish_name => 'Pelangia-do-deserto';
+
+  @override
+  String get species_eastern_rainbowfish_desc =>
+      'Pequeno peixe iridescente dos ribeiros do leste da Austrália, os machos exibem ao sol riscas vermelhas e azuis.';
+
+  @override
+  String get species_signal_crayfish_name => 'Lagostim-Sinal';
+
+  @override
+  String get species_signal_crayfish_desc =>
+      'Lagostim castanho e grande com uma mancha branca na articulação da pinça, espécie invasora norte-americana em expansão pelos rios europeus.';
+
+  @override
+  String get species_red_swamp_crayfish_name =>
+      'Lagostim-vermelho-do-Louisiana';
+
+  @override
+  String get species_red_swamp_crayfish_desc =>
+      'Lagostim vermelho-escuro de pinças rugosas dos pântanos do Luisiana, hoje escava em zonas húmidas quentes de todos os continentes.';
+
+  @override
+  String get species_noble_crayfish_name => 'Lagostim-europeu';
+
+  @override
+  String get species_noble_crayfish_desc =>
+      'Lagostim nativo da Europa, castanho-escuro com pinças vermelhas por baixo, esconde-se em tocas nas margens de riachos e lagos limpos e frescos.';
+
+  @override
+  String get species_white_clawed_crayfish_name => 'Lagostim-de-patas-brancas';
+
+  @override
+  String get species_white_clawed_crayfish_desc =>
+      'Pequeno lagostim oliva com pinças pálidas por baixo, espécie ameaçada de riachos calcários limpos da Europa ocidental.';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_name =>
+      'Lagostim-gigante-da-Tasmânia';
+
+  @override
+  String get species_tasmanian_giant_freshwater_crayfish_desc =>
+      'O maior invertebrado de água doce do mundo, um lagostim azul-acastanhado de crescimento lento dos rios sombreados da Tasmânia.';
+
+  @override
+  String get species_zebra_mussel_name => 'Mexilhão-zebra';
+
+  @override
+  String get species_zebra_mussel_desc =>
+      'Mexilhão listrado do tamanho de uma unha que reveste rochas, naufrágios e tubagens aos milhares, clarificando a água à medida que se espalha.';
+
+  @override
+  String get species_quagga_mussel_name => 'Mexilhão-quagga';
+
+  @override
+  String get species_quagga_mussel_desc =>
+      'Parente mais arredondado e pálido do mexilhão-zebra que coloniza fundos moles e águas frias e profundas onde aquele não consegue.';
+
+  @override
+  String get species_freshwater_pearl_mussel_name => 'Peroleiro-de-rio';
+
+  @override
+  String get species_freshwater_pearl_mussel_desc =>
+      'Mexilhão escuro e alongado que pode viver mais de um século meio enterrado no cascalho limpo de rios rápidos de salmão.';
+
+  @override
+  String get species_swan_mussel_name => 'Ameijão-grande';
+
+  @override
+  String get species_swan_mussel_desc =>
+      'Grande mexilhão de concha fina de lagos e canais lodosos, filtra a água com os sifões logo acima do lodo.';
+
+  @override
+  String get species_chinese_pond_mussel_name => 'Mexilhão-chinês';
+
+  @override
+  String get species_chinese_pond_mussel_desc =>
+      'Mexilhão asiático invasor muito grande de concha castanha brilhante, chegado com peixes de aquicultura e espalhado por lagos quentes.';
+
+  @override
+  String get species_freshwater_sponge_name => 'Esponja-de-água-doce';
+
+  @override
+  String get species_freshwater_sponge_desc =>
+      'Esponja ramificada verde ou cinzenta que reveste ramos e pedras em lagos claros, colorida pelas algas que vivem no seu interior.';
+
+  @override
+  String get species_freshwater_jellyfish_name => 'Água-viva-de-água-doce';
+
+  @override
+  String get species_freshwater_jellyfish_desc =>
+      'Medusa transparente do tamanho de uma moeda que surge em enxames em lagos de pedreira quentes e represas no fim do verão.';
+
+  @override
+  String get species_great_pond_snail_name => 'caramujo-dos-Pauis';
+
+  @override
+  String get species_great_pond_snail_desc =>
+      'Grande caracol de concha pontiaguda que desliza sobre plantas em águas paradas europeias e respira ar à superfície.';
+
+  @override
+  String get species_great_ramshorn_snail_name => 'Planórbia-Maior';
+
+  @override
+  String get species_great_ramshorn_snail_desc =>
+      'Caracol achatado e enrolado como um minúsculo corno de carneiro, raspa algas de folhas e pedras em lagoas com vegetação.';
+
+  @override
+  String get species_channeled_apple_snail_name => 'Aruá';
+
+  @override
+  String get species_channeled_apple_snail_desc =>
+      'Grande caracol castanho-dourado que deposita cachos de ovos rosa vivo acima da linha de água, invasor em zonas húmidas quentes e arrozais.';
+
+  @override
+  String get species_magnificent_bryozoan_name => 'Briozoário-magnífico';
+
+  @override
+  String get species_magnificent_bryozoan_desc =>
+      'Colónia gelatinosa do tamanho de uma bola, cravejada de minúsculos animais, agarrada a ramos e cordas em água quente e parada.';
+
+  @override
+  String get species_chinese_mitten_crab_name => 'Caranguejo-de-Shanghai';
+
+  @override
+  String get species_chinese_mitten_crab_desc =>
+      'Caranguejo escavador de pinças peludas que passa anos nos rios antes de descer para se reproduzir nos estuários.';
+
+  @override
+  String get species_giant_freshwater_prawn_name =>
+      'Camarão-gigante-da-Malásia';
+
+  @override
+  String get species_giant_freshwater_prawn_desc =>
+      'Grande camarão de pinças azuis dos rios da Ásia e da Austrália, com pinças mais compridas do que o corpo nos machos velhos.';
+
+  @override
+  String get species_common_snapping_turtle_name => 'Tartaruga-mordedora';
+
+  @override
+  String get species_common_snapping_turtle_desc =>
+      'Tartaruga pesada de carapaça rugosa e longa cauda serrilhada, repousa na lama de lagoas e rios lentos com a cabeça de fora.';
+
+  @override
+  String get species_alligator_snapping_turtle_name => 'Tartaruga-aligátor';
+
+  @override
+  String get species_alligator_snapping_turtle_desc =>
+      'Gigante de aspeto pré-histórico com três quilhas cristadas e um isco lingual em forma de verme, espera de boca aberta no fundo dos rios do sul.';
+
+  @override
+  String get species_painted_turtle_name => 'Tartaruga-pintada';
+
+  @override
+  String get species_painted_turtle_desc =>
+      'Tartaruga lisa e escura com riscas vermelhas e amarelas no pescoço e na orla da carapaça, apanha sol em fila sobre troncos por toda a América do Norte.';
+
+  @override
+  String get species_red_eared_slider_name => 'Tartaruga-de-orelhas-vermelhas';
+
+  @override
+  String get species_red_eared_slider_desc =>
+      'Tartaruga de lagoa de riscas verdes com uma faixa vermelha atrás de cada olho, a tartaruga de estimação hoje asselvajada em águas quentes de todo o mundo.';
+
+  @override
+  String get species_northern_map_turtle_name => 'Tartaruga-geográfica';
+
+  @override
+  String get species_northern_map_turtle_desc =>
+      'Tartaruga oliva com linhas amarelas em forma de mapa na carapaça e uma quilha baixa, apanha sol nas rochas de rios claros e grandes lagos.';
+
+  @override
+  String get species_spiny_softshell_turtle_name =>
+      'Tartaruga-de-casco-mole-espinhosa';
+
+  @override
+  String get species_spiny_softshell_turtle_desc =>
+      'Tartaruga achatada e coriácea como uma panqueca com focinho de snorkel, enterrada na areia de rios rasos com apenas a cabeça de fora.';
+
+  @override
+  String get species_florida_softshell_turtle_name =>
+      'Tartaruga-de-casco-mole-americana';
+
+  @override
+  String get species_florida_softshell_turtle_desc =>
+      'Grande tartaruga de carapaça mole e escura com longo focinho tubular, comum nas nascentes, canais e lagos da Florida.';
+
+  @override
+  String get species_pig_nosed_turtle_name => 'Tartaruga-nariz-de-porco';
+
+  @override
+  String get species_pig_nosed_turtle_desc =>
+      'Tartaruga de rio única da Nova Guiné e do norte da Austrália com barbatanas de tartaruga marinha e focinho carnudo de porco.';
+
+  @override
+  String get species_mary_river_turtle_name => 'Tartaruga-do-rio-Mary';
+
+  @override
+  String get species_mary_river_turtle_desc =>
+      'Rara tartaruga australiana que respira pela cloaca e ostenta uma crista de algas verdes, encontrada num único rio de Queensland.';
+
+  @override
+  String get species_yellow_spotted_river_turtle_name => 'Tracajá';
+
+  @override
+  String get species_yellow_spotted_river_turtle_desc =>
+      'Tartaruga de pescoço lateral do Amazonas com manchas amarelas na cabeça, apanha sol em grupos sobre troncos e bancos de areia de grandes rios.';
+
+  @override
+  String get species_european_pond_turtle_name => 'Cágado-de-carapaça-estriada';
+
+  @override
+  String get species_european_pond_turtle_desc =>
+      'Tartaruga escura salpicada de pontos amarelos, a tartaruga de água doce nativa da Europa, escorrega das margens soalheiras para lagoas com vegetação.';
+
+  @override
+  String get species_american_alligator_name => 'Aligátor-americano';
+
+  @override
+  String get species_american_alligator_desc =>
+      'Réptil couraçado de focinho largo dos pântanos, nascentes e rios do sudeste dos EUA, flutua mostrando apenas os olhos e as narinas.';
+
+  @override
+  String get species_spectacled_caiman_name => 'Jacaretinga';
+
+  @override
+  String get species_spectacled_caiman_desc =>
+      'Pequeno jacaré oliva com uma crista óssea entre os olhos, abundante em rios lentos e lagoas da América Central e do Sul.';
+
+  @override
+  String get species_black_caiman_name => 'Jacaré-açu';
+
+  @override
+  String get species_black_caiman_desc =>
+      'O maior predador do Amazonas, um jacaré negro couraçado de até cinco metros, caça à noite em lagos e floresta inundada.';
+
+  @override
+  String get species_freshwater_crocodile_name =>
+      'Crocodilo-de-água-doce-australiano';
+
+  @override
+  String get species_freshwater_crocodile_desc =>
+      'Crocodilo australiano de focinho estreito dos rios e desfiladeiros do norte, tímido e muito menor do que o crocodilo-de-água-salgada.';
+
+  @override
+  String get species_northern_water_snake_name => 'Cobra-d\'água-do-norte';
+
+  @override
+  String get species_northern_water_snake_desc =>
+      'Serpente castanha robusta com bandas que apanha sol em rochas e ramos sobre riachos do leste da América do Norte, inofensiva mas pronta a morder.';
+
+  @override
+  String get species_green_anaconda_name => 'Sucuri';
+
+  @override
+  String get species_green_anaconda_desc =>
+      'A serpente mais pesada do mundo, um gigante oliva com manchas pretas, jaz submersa em pântanos e rios lentos do Amazonas.';
+
+  @override
+  String get species_hellbender_name => 'Salamandra-gigante-americana';
+
+  @override
+  String get species_hellbender_desc =>
+      'Salamandra gigante de cabeça achatada com pregas de pele enrugada, esconde-se sob grandes rochas em rios frios e claros dos Apalaches.';
+
+  @override
+  String get species_mudpuppy_name => 'Mudpuppy';
+
+  @override
+  String get species_mudpuppy_desc =>
+      'Salamandra castanha manchada que mantém as brânquias vermelhas plumosas toda a vida, rasteja à noite pelos fundos de lagos e rios.';
+
+  @override
+  String get species_axolotl_name => 'Axolote';
+
+  @override
+  String get species_axolotl_desc =>
+      'Salamandra com brânquias e ar sorridente que nunca sai da água, criticamente ameaçada nos canais de Xochimilco perto da Cidade do México.';
+
+  @override
+  String get species_chinese_giant_salamander_name =>
+      'Salamandra-gigante-da-China';
+
+  @override
+  String get species_chinese_giant_salamander_desc =>
+      'O maior anfíbio vivo, um gigante castanho enrugado com quase dois metros, escondido em riachos de montanha frescos e rochosos.';
+
+  @override
+  String get species_smooth_newt_name => 'Tritão-comum';
+
+  @override
+  String get species_smooth_newt_desc =>
+      'Pequeno tritão oliva que regressa às charcas a cada primavera, os machos desenvolvem uma crista ondulada e um ventre laranja manchado.';
+
+  @override
+  String get species_great_crested_newt_name => 'Tritão-de-crista';
+
+  @override
+  String get species_great_crested_newt_desc =>
+      'Grande tritão preto verrugoso de ventre laranja vivo, os machos reprodutores ostentam uma crista dentada de dragão.';
+
+  @override
+  String get species_american_bullfrog_name => 'Rã-touro';
+
+  @override
+  String get species_american_bullfrog_desc =>
+      'Enorme rã verde de coaxar grave, pousada entre nenúfares em lagoas quentes e hoje invasora em vários continentes.';
+
+  @override
+  String get species_common_frog_name => 'Rã-europeia';
+
+  @override
+  String get species_common_frog_desc =>
+      'Rã castanha com máscara ocular escura que se reúne em ruidosas multidões primaveris para desovar em lagoas e valas da Europa.';
+
+  @override
+  String get species_north_american_river_otter_name => 'Lontra-canadense';
+
+  @override
+  String get species_north_american_river_otter_desc =>
+      'Lontra esguia e brincalhona que caça peixes e lagostins em rios e lagos da América do Norte, deixando escorregas de lama nas margens.';
+
+  @override
+  String get species_eurasian_otter_name => 'Lontra-europeia';
+
+  @override
+  String get species_eurasian_otter_desc =>
+      'Lontra castanha esquiva de rios, lagos e costas da Europa, em recuperação em toda a sua área após décadas de declínio.';
+
+  @override
+  String get species_giant_otter_name => 'Ariranha';
+
+  @override
+  String get species_giant_otter_desc =>
+      'Lontra de quase dois metros com uma mancha creme na garganta, vive em ruidosos grupos familiares nos rios e lagos de meandro do Amazonas.';
+
+  @override
+  String get species_north_american_beaver_name => 'Castor-americano';
+
+  @override
+  String get species_north_american_beaver_desc =>
+      'Grande roedor de cauda achatada que represa riachos em lagoas e nada sob o gelo, com uma toca de ramos como abrigo.';
+
+  @override
+  String get species_eurasian_beaver_name => 'Castor-europeu';
+
+  @override
+  String get species_eurasian_beaver_desc =>
+      'O maior roedor da Europa, reintroduzido por todo o continente, derruba árvores ribeirinhas e constrói barragens e tocas.';
+
+  @override
+  String get species_muskrat_name => 'Rato-almiscarado';
+
+  @override
+  String get species_muskrat_desc =>
+      'Roedor castanho do tamanho de um rato com cauda escamosa achatada, nada por pântanos de tabuas e constrói tocas abobadadas de caniço.';
+
+  @override
+  String get species_platypus_name => 'Ornitorrinco';
+
+  @override
+  String get species_platypus_desc =>
+      'Mamífero ovíparo com bico de pato e patas palmadas, procura alimento de olhos fechados ao longo dos ribeiros do leste da Austrália ao amanhecer e ao anoitecer.';
+
+  @override
+  String get species_amazonian_manatee_name => 'Peixe-boi-da-amazônia';
+
+  @override
+  String get species_amazonian_manatee_desc =>
+      'O mais pequeno dos peixes-boi, um herbívoro liso e escuro com uma mancha branca no peito, pasta plantas aquáticas em lagos e rios do Amazonas.';
+
+  @override
+  String get species_amazon_river_dolphin_name => 'Boto-cor-de-rosa';
+
+  @override
+  String get species_amazon_river_dolphin_desc =>
+      'Golfinho cor-de-rosa de bico longo e pescoço flexível, serpenteia entre os troncos da floresta inundada no Amazonas e no Orinoco.';
+
+  @override
+  String get species_baikal_seal_name => 'Foca-do-Baikal';
+
+  @override
+  String get species_baikal_seal_desc =>
+      'A única foca de água doce do mundo, uma pequena foca cinzento-prateada que descansa no gelo e nas margens rochosas do lago Baikal.';
+
+  @override
+  String get species_capybara_name => 'Capivara';
+
+  @override
+  String get species_capybara_desc =>
+      'O maior roedor, um herbívoro em forma de barril que vadeia e nada em rios e zonas húmidas sul-americanas em manadas tranquilas.';
+
+  @override
+  String get species_hippopotamus_name => 'Hipopótamo';
+
+  @override
+  String get species_hippopotamus_desc =>
+      'Enorme gigante dos rios africanos que passa o dia submerso em grupos e caminha no fundo em vez de nadar; perigoso de abordar.';
+
+  @override
+  String get species_white_water_lily_name => 'Nenúfar-branco';
+
+  @override
+  String get species_white_water_lily_desc =>
+      'Folhas redondas flutuantes e grandes flores brancas que emergem de rizomas espessos enraizados na lama de águas paradas europeias.';
+
+  @override
+  String get species_yellow_pond_lily_name => 'Golfão-amarelo';
+
+  @override
+  String get species_yellow_pond_lily_desc =>
+      'Folhas flutuantes em forma de coração e flores amarelas em taça, com grandes folhas submersas translúcidas visíveis aos mergulhadores.';
+
+  @override
+  String get species_american_eelgrass_name => 'Valisnéria-americana';
+
+  @override
+  String get species_american_eelgrass_desc =>
+      'Folhas em fita com até dois metros que ondulam na corrente de rios e nascentes claros, favoritas dos peixes-boi.';
+
+  @override
+  String get species_coontail_name => 'erva-do-peixe-dourado';
+
+  @override
+  String get species_coontail_desc =>
+      'Planta submersa sem raízes com verticilos de folhas rígidas e bifurcadas como a cauda de um guaxinim, flutua em massas densas em água parada.';
+
+  @override
+  String get species_eurasian_watermilfoil_name => 'Milefólio-de-espiga';
+
+  @override
+  String get species_eurasian_watermilfoil_desc =>
+      'Planta submersa plumosa com verticilos de folhas finamente divididas que forma densos tapetes perto da superfície, invasora em muitos lagos.';
+
+  @override
+  String get species_muskgrass_name => 'Chara';
+
+  @override
+  String get species_muskgrass_desc =>
+      'Alga verde quebradiça de cheiro almiscarado com ramos verticilados, muitas vezes incrustada de cal, que atapeta o fundo de lagos claros de água dura.';
+
+  @override
+  String get species_canadian_waterweed_name => 'Elódea';
+
+  @override
+  String get species_canadian_waterweed_desc =>
+      'Planta submersa densa com verticilos de três pequenas folhas verde-escuras, propaga-se por fragmentos em lagos e canais frescos de todo o mundo.';
+
+  @override
+  String get species_curly_leaf_pondweed_name => 'Colher-de-folha-crespa';
+
+  @override
+  String get species_curly_leaf_pondweed_desc =>
+      'Planta submersa com folhas verde-avermelhadas de bordos ondulados como lasanha enrugada, cresce no início da primavera antes das outras plantas.';
+
+  @override
+  String get species_water_hyacinth_name => 'Jacinto-d\'água';
+
+  @override
+  String get species_water_hyacinth_desc =>
+      'Planta flutuante de folhas brilhantes sobre pecíolos cheios de ar e espigas de flores lilás, que sufoca cursos de água quentes em todo o mundo.';
+
+  @override
+  String get species_common_reed_name => 'Caniço';
+
+  @override
+  String get species_common_reed_desc =>
+      'Gramínea alta de panículas plumosas que forma densos caniçais nas margens dos lagos; os seus caules submersos abrigam alevins e larvas de libélula.';
+
+  @override
   String get common_action_done => 'Concluído';
 
   @override
@@ -31579,6 +33121,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_decompression_ttsSource => 'Fonte do TTS';
+
+  @override
+  String get settings_decompression_gtrSource => 'Fonte do GTR';
+
+  @override
+  String get settings_decompression_gtrReserve => 'Pressão de reserva do GTR';
+
+  @override
+  String get settings_decompression_gtrReserve_subtitle =>
+      'Pressão do cilindro até à qual o tempo de gás restante faz a contagem decrescente. O GTR calculado assume uma subida direta a 10 m/min sem paragens.';
 
   @override
   String settings_fixDiveTimes_applied(int count, String hours, int hoursAbs) {
@@ -33764,6 +35316,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_info_title => 'Informações da mídia';
 
   @override
+  String get media_species_actionTooltip => 'Espécies';
+
+  @override
+  String get media_species_sheetTitle => 'Espécies nesta foto';
+
+  @override
+  String get media_species_sightedOnDive => 'Avistadas neste mergulho';
+
+  @override
+  String get media_species_otherSpecies => 'Outras espécies...';
+
+  @override
+  String get media_species_noDiveHint =>
+      'Esta foto não está vinculada a um mergulho. Pesquise uma espécie para marcá-la.';
+
+  @override
+  String get media_species_chipsLabel => 'Marcações de espécies';
+
+  @override
   String get media_info_fileSection => 'Arquivo';
 
   @override
@@ -34082,4 +35653,308 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_dataSources_appleHealth_permissionUnsupported =>
       'O HealthKit não está disponível neste dispositivo';
+
+  @override
+  String get statistics_trend_aggregation_monthly => 'Média mensal';
+
+  @override
+  String get statistics_trend_aggregation_perDive => 'Cada mergulho';
+
+  @override
+  String get statistics_trend_aggregation_tooltip =>
+      'Como os mergulhos são agrupados';
+
+  @override
+  String get statistics_trend_aggregation_weekly => 'Média semanal';
+
+  @override
+  String get statistics_trend_band_semanticLabel =>
+      'A faixa sombreada abrange o valor mais baixo e mais alto de cada grupo';
+
+  @override
+  String get statistics_trend_legend_rate => 'Tendência geral';
+
+  @override
+  String get statistics_trend_legend_rollingAverage => 'Média móvel';
+
+  @override
+  String statistics_trend_rate_perYear(String value) {
+    return '$value/ano';
+  }
+
+  @override
+  String get statistics_conditions_tempTrend_title =>
+      'Evolução da temperatura da água';
+
+  @override
+  String get statistics_conditions_tempTrend_subtitle =>
+      'Cada mergulho no período';
+
+  @override
+  String get statistics_conditions_tempTrend_empty =>
+      'Sem dados de temperatura disponíveis';
+
+  @override
+  String get statistics_conditions_tempTrend_error =>
+      'Falha ao carregar a evolução da temperatura';
+
+  @override
+  String get diveLog_filter_presetLast5Years => 'Últimos 5 anos';
+
+  @override
+  String get diveLog_filter_presetLast10Years => 'Últimos 10 anos';
+
+  @override
+  String get statistics_trend_tooltip_lowest => 'Mínimo';
+
+  @override
+  String get statistics_trend_tooltip_highest => 'Máximo';
+
+  @override
+  String get diveLog_edit_excludeFromStats => 'Excluir das estatísticas';
+
+  @override
+  String get diveLog_edit_excludeFromStatsHelp =>
+      'Mantenha este mergulho no seu registo, mas deixe-o fora de todas as estatísticas, incluindo a sua contagem de mergulhos.';
+
+  @override
+  String get diveLog_edit_excludeFromGasStats =>
+      'Excluir das estatísticas de gás';
+
+  @override
+  String get diveLog_edit_excludeFromGasStatsHelp =>
+      'Deixe este mergulho fora apenas das estatísticas de SAC, RMV e mistura de gás. Útil quando o valor de gás não é representativo.';
+
+  @override
+  String get diveLog_badge_excludedFromStats => 'Excluído das estatísticas';
+
+  @override
+  String get diveLog_badge_excludedFromGasStats =>
+      'Excluído das estatísticas de gás';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromStats =>
+      'Excluir das estatísticas';
+
+  @override
+  String get diveLog_bulkEdit_fieldExcludeFromGasStats =>
+      'Excluir das estatísticas de gás';
+
+  @override
+  String get diveLog_filter_excludedOnly =>
+      'Apenas os excluídos das estatísticas';
+
+  @override
+  String get diveLog_edit_summary_excluded => 'Excluído';
+
+  @override
+  String statistics_excludedDivesFootnote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos excluídos das estatísticas',
+      one: '1 mergulho excluído das estatísticas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_edit_group_statistics => 'Estatísticas';
+
+  @override
+  String get diveLog_edit_summary_gasExcluded => 'Gás excluído';
+
+  @override
+  String get diveLog_edit_statisticsIncludedHint =>
+      'Incluído em todas as estatísticas';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Entrar na Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Entre com a sua conta app.suunto.com para importar os seus mergulhos diretamente. A sua palavra-passe nunca é guardada, apenas a sessão resultante.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'O e-mail é obrigatório';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Palavra-passe';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired =>
+      'A palavra-passe é obrigatória';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Entrar';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'A entrar…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Sessão iniciada como $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'A listar mergulhos…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'A obter o mergulho $current de $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'Não foi possível obter os mergulhos';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Tentar novamente';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos encontrados',
+      one: '1 mergulho encontrado',
+      zero: 'Nenhum mergulho encontrado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos não puderam ser convertidos e foram ignorados.',
+      one: '1 mergulho não pôde ser convertido e foi ignorado.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Ordenar';
+
+  @override
+  String get importWizard_review_sortByDate => 'Data';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Profundidade';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Tempo';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Importar mergulhos da sua aplicacao Suunto ou da conta app.suunto.com';
+
+  @override
+  String get transfer_section_cloudTitle => 'Nuvem';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Importar da nuvem';
+
+  @override
+  String get settings_storageUsage_appBar_title =>
+      'Utilização de armazenamento';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Utilização de armazenamento';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Veja o que está a ocupar espaço neste dispositivo';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total até agora';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalcular';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Não disponível';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Não foi possível medir';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Dados da aplicação';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Cache de multimédia';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Cópias de segurança';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Ficheiros temporários';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Ficheiros exportados';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Base de dados do registo de mergulhos';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Base de dados de cache local';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Fotos e vídeos originais';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniaturas';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Versões de vídeo';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Transferências preparadas';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Vídeo transcodificado';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Mosaicos de mapa';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Imagens de rede';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Miniaturas de vídeo';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Miniaturas de documentos';
+
+  @override
+  String get settings_storageUsage_category_backups =>
+      'Ficheiros de cópia de segurança';
+
+  @override
+  String get settings_storageUsage_category_temporary =>
+      'Ficheiros temporários';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Ficheiros exportados';
 }

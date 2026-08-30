@@ -47,6 +47,7 @@ import 'package:submersion/features/backup/domain/entities/backup_type.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
@@ -672,7 +673,11 @@ class _StartupWrapperState extends State<StartupWrapper>
 
     await timeStartupStep('speciesSeed', () async {
       final speciesRepository = SpeciesRepository();
-      await speciesRepository.seedBuiltInSpecies();
+      await speciesRepository.seedBuiltInSpecies(
+        versionStore: PrefsBuiltInSpeciesSeedVersionStore(
+          await SharedPreferences.getInstance(),
+        ),
+      );
     });
 
     // Unlinked-media sweep, every launch. Fire-and-forget: it must not delay

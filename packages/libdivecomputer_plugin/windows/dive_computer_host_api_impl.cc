@@ -1,6 +1,7 @@
 #include "dive_computer_host_api_impl.h"
 
 #include "dive_converter.h"
+#include "native_logger.h"
 #include "serial_scanner.h"
 
 #include <climits>
@@ -16,12 +17,17 @@ namespace libdivecomputer_plugin {
 DiveComputerHostApiImpl::DiveComputerHostApiImpl(
     flutter::BinaryMessenger* messenger)
     : flutter_api_(
-          std::make_unique<DiveComputerFlutterApi>(messenger)) {}
+          std::make_unique<DiveComputerFlutterApi>(messenger)) {
+    NativeLogger::SetFlutterApi(flutter_api_.get());
+}
 
 DiveComputerHostApiImpl::~DiveComputerHostApiImpl() {
     if (download_thread_.joinable()) {
         download_thread_.join();
     }
+    // After the download thread is joined, so nothing can be mid-log, and
+    // before flutter_api_ is destroyed with this object.
+    NativeLogger::SetFlutterApi(nullptr);
 }
 
 void DiveComputerHostApiImpl::GetDeviceDescriptors(

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/marine_life/domain/entities/seen_species.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart'
@@ -39,7 +40,7 @@ class SeenSpeciesRepository {
       FROM species sp
       JOIN sightings s ON s.species_id = sp.id
       JOIN dives d ON d.id = s.dive_id
-      WHERE 1=1 $diverClause
+      WHERE 1=1 $diverClause${DiveStatsScope.and(alias: 'd')}
       GROUP BY sp.id
     ''',
           variables: [if (diverId != null) Variable.withString(diverId)],
@@ -67,7 +68,7 @@ class SeenSpeciesRepository {
       FROM sightings s
       JOIN dives d ON d.id = s.dive_id
       LEFT JOIN dive_sites ds ON ds.id = d.site_id
-      WHERE s.species_id = ? $diverClause
+      WHERE s.species_id = ? $diverClause${DiveStatsScope.and(alias: 'd')}
       ORDER BY d.dive_date_time DESC, s.id ASC
     ''',
           variables: [

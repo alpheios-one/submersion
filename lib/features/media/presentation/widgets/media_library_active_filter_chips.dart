@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/helpers/media_source_labels.dart';
@@ -46,6 +48,7 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
 
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
+    final species = ref.watch(allSpeciesProvider).value ?? const [];
 
     Widget chip(String label, VoidCallback onClear) {
       return InputChip(
@@ -86,6 +89,19 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
           l10n.media_library_filter_trip;
       chips.add(
         chip(name, () => _update(ref, (f) => f.copyWith(tripId: null))),
+      );
+    }
+
+    final speciesId = filter.speciesId;
+    if (speciesId != null) {
+      final name =
+          species
+              .where((s) => s.id == speciesId)
+              .firstOrNull
+              ?.localizedCommonName(l10n) ??
+          l10n.media_library_filter_species;
+      chips.add(
+        chip(name, () => _update(ref, (f) => f.copyWith(speciesId: null))),
       );
     }
 
