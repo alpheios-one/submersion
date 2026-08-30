@@ -1633,6 +1633,9 @@
   "@common_action_cancel": {
     "description": "Generic cancel action"
   },
+  "@common_action_clearRating": {
+    "description": "Tooltip on the icon that removes a star rating from a form row, returning it to no rating"
+  },
   "@common_action_close": {
     "description": "Generic close action used for dialogs, menus, etc."
   },

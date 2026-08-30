@@ -4421,7 +4421,7 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get common_action_cancel;
 
-  /// No description provided for @common_action_clearRating.
+  /// Tooltip on the icon that removes a star rating from a form row, returning it to no rating
   ///
   /// In en, this message translates to:
   /// **'Clear rating'**
