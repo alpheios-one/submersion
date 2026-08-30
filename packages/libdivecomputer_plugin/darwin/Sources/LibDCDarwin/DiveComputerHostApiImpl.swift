@@ -71,34 +71,21 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         }
     }
 
+    /// The rules live in `DescriptorTransportMapping`, which has no Flutter
+    /// dependency and is unit-tested standalone. This is only the translation
+    /// into the Pigeon enum: the USB tab is a static catalog driven by this
+    /// mapping, so a bit dropped here makes a supported computer unselectable
+    /// with no error to explain it, and that deserves a test (issue #1271).
     private static func mapTransports(_ bitmask: UInt32) -> [TransportType] {
-        var transports: [TransportType] = []
-        if bitmask & UInt32(LIBDC_TRANSPORT_BLE) != 0 {
-            transports.append(.ble)
+        let transports = DescriptorTransportMapping.Transport(rawValue: bitmask)
+        return DescriptorTransportMapping.modes(for: transports).map { mode in
+            switch mode {
+            case .ble: return .ble
+            case .usb: return .usb
+            case .serial: return .serial
+            case .infrared: return .infrared
+            }
         }
-        // USB HID is reported as USB, which is the cable the user is holding;
-        // the app has no separate HID transfer mode and does not want one.
-        //
-        // It was suppressed until issue #1271, because advertising a transport
-        // with nothing behind it sent HID-only devices (the Suunto EON Steel
-        // family) into the serial path's "No USB serial ports found" dead end
-        // (#143). UsbHidIoStream is that missing transport, so the bit can be
-        // told the truth again. macOS only: iOS shares this file and has no
-        // USB host role, so a HID device is never reachable there.
-        var usb = bitmask & UInt32(LIBDC_TRANSPORT_USB) != 0
-        #if os(macOS)
-        usb = usb || bitmask & UInt32(LIBDC_TRANSPORT_USBHID) != 0
-        #endif
-        if usb {
-            transports.append(.usb)
-        }
-        if bitmask & UInt32(LIBDC_TRANSPORT_SERIAL) != 0 {
-            transports.append(.serial)
-        }
-        if bitmask & UInt32(LIBDC_TRANSPORT_IRDA) != 0 {
-            transports.append(.infrared)
-        }
-        return transports
     }
 
     // MARK: - Discovery
@@ -497,11 +484,13 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         }
     }
 
-    /// USB HID devices belonging to the selected model, most-specific first.
+    /// The attached USB HID devices that the selected model claims.
     ///
     /// Which HID device belongs to which computer is libdivecomputer's
     /// knowledge, so the vendor and product ids are put to `libdc_usbhid_match`
-    /// rather than compared against a table kept here.
+    /// rather than compared against a table kept here. Callers check the
+    /// descriptor's USB HID bit first, so this walks the HID bus only for a
+    /// model that could plausibly be on it.
     private func usbHidCandidates(for device: DiscoveredDevice) -> [DownloadCandidate] {
         let found = UsbHidDeviceEnumerator.enumerateMatching(
             log: { message in

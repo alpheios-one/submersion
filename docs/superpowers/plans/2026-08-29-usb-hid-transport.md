@@ -52,11 +52,13 @@ Create under `packages/libdivecomputer_plugin/darwin/Sources/LibDCDarwin/`:
 | File | Responsibility |
 | --- | --- |
 | `UsbHidReportFraming.swift` | Pure report-id framing and buffer sizing. No I/O. |
+| `DescriptorTransportMapping.swift` | Pure bitmask-to-transfer-mode mapping. Extracted from the host API because it is where the bug lived and it had no test at any layer. |
 | `UsbHidDeviceEnumerator.swift` | IOHIDManager enumeration of HID devices with their VID/PID. |
 | `UsbHidIoStream.swift` | Glue: owns the IOHIDDevice, queues input reports, produces `libdc_io_callbacks_t`. |
 
 Create under `packages/libdivecomputer_plugin/darwin/Tests/`:
-`UsbHidReportFramingTests/main.swift`.
+`UsbHidReportFramingTests/main.swift`,
+`DescriptorTransportMappingTests/main.swift`.
 
 Create under `packages/libdivecomputer_plugin/windows/`:
 `usbhid_io_stream.{h,cc}`, `usbhid_enumerator.{h,cc}`.
@@ -91,7 +93,7 @@ it into plugin code.
 - `unsigned int libdc_descriptor_transports(const char *vendor, const char *product, unsigned int model)`
 - `int libdc_usbhid_match(const char *vendor, const char *product, unsigned int model, unsigned short vid, unsigned short pid)`
 
-- [ ] **Step 1: Write the failing test.** Assert the Uwatec pairs
+- [x] **Step 1: Write the failing test.** Assert the Uwatec pairs
   (`0x2e6c:0x3201` G2 and G2 TEK, `0x2e6c:0x3211` G2 Console, `0x2e6c:0x4201`
   G2 HUD, `0xc251:0x2006` Aladin Square) and the Suunto pairs (`0x1493:0x0030`,
   `0x0033`, `0x0035`, `0x0036`) match their own descriptors; that a G2 TEK
@@ -100,9 +102,9 @@ it into plugin code.
   `libdc_descriptor_transports("Scubapro", "G2 TEK", 0x31)` has the USBHID bit
   and not the SERIAL bit. Vectors come from `descriptor.c`, not from the new
   code.
-- [ ] **Step 2: Implement** over `dc_descriptor_iterator` plus
+- [x] **Step 2: Implement** over `dc_descriptor_iterator` plus
   `dc_descriptor_filter(descriptor, DC_TRANSPORT_USBHID, &desc)`.
-- [ ] **Step 3: Verify** via `test/native/` CMake build.
+- [x] **Step 3: Verify** via `test/native/` CMake build.
 
 ## Task 2: Per-candidate transport on darwin
 
@@ -111,10 +113,10 @@ Refactor only. The probe currently runs every candidate with
 
 **Files:** `darwin/Sources/LibDCDarwin/DiveComputerHostApiImpl.swift`
 
-- [ ] Give `DownloadCandidate` a `transportValue: UInt32` (`SERIAL` for both
+- [x] Give `DownloadCandidate` a `transportValue: UInt32` (`SERIAL` for both
   existing cases) and use it in both the single-candidate and multi-candidate
   paths instead of the function-level constant.
-- [ ] Verify no behaviour change: `flutter build macos --debug`.
+- [x] Verify no behaviour change: `flutter build macos --debug`.
 
 ## Task 3: HID report framing (pure, tested)
 
@@ -127,12 +129,12 @@ Refactor only. The probe currently runs every candidate with
 `outgoingReport(from: [UInt8]) -> (reportId: UInt8, payload: [UInt8])?` and
 `reportSize(deviceMaximum: Int?, fallback: Int) -> Int`.
 
-- [ ] **Step 1: Failing test.** A 33-byte buffer whose first byte is zero
+- [x] **Step 1: Failing test.** A 33-byte buffer whose first byte is zero
   yields report id 0 and a 32-byte payload; a non-zero first byte yields that
   id and keeps all remaining bytes; an empty buffer yields nil. Vectors from
   `usbhid.c:745-790`.
-- [ ] **Step 2: Implement.**
-- [ ] **Step 3:** `packages/libdivecomputer_plugin/darwin/run_native_tests.sh`.
+- [x] **Step 2: Implement.**
+- [x] **Step 3:** `packages/libdivecomputer_plugin/darwin/run_native_tests.sh`.
 
 ## Task 4: macOS HID enumeration and byte pipe
 
@@ -141,27 +143,27 @@ Refactor only. The probe currently runs every candidate with
   `darwin/Sources/LibDCDarwin/UsbHidIoStream.swift`
 - Symlink both into `macos/Classes/` and `ios/Classes/`
 
-- [ ] `UsbHidDevice` value type (vid, pid, product name, `IOHIDDevice`) and an
+- [x] `UsbHidDevice` value type (vid, pid, product name, `IOHIDDevice`) and an
   `enumerate(log:)` that reports every HID device it sees, matched or not, so a
   user's debug log distinguishes "not enumerating" from "rejected".
-- [ ] `UsbHidIoStream`: open with `IOHIDDeviceOpen`, register an input report
+- [x] `UsbHidIoStream`: open with `IOHIDDeviceOpen`, register an input report
   callback on a dedicated run loop, queue reports, `IOHIDDeviceSetReport` for
   write, and `makeCallbacks()` returning `libdc_io_callbacks_t`.
-- [ ] Guard the whole file body with `#if os(macOS)` so the iOS build compiles
+- [x] Guard the whole file body with `#if os(macOS)` so the iOS build compiles
   it to nothing.
 
 ## Task 5: Wire HID into the macOS download
 
 **Files:** `darwin/Sources/LibDCDarwin/DiveComputerHostApiImpl.swift`
 
-- [ ] Add `case usbHid(UsbHidDevice)` to `DownloadCandidate` with transport
+- [x] Add `case usbHid(UsbHidDevice)` to `DownloadCandidate` with transport
   `LIBDC_TRANSPORT_USBHID` and log category `"HID"`.
-- [ ] In `performSerialDownload`, when
+- [x] In `performSerialDownload`, when
   `libdc_descriptor_transports(...) & LIBDC_TRANSPORT_USBHID`, enumerate HID
   devices, keep those `libdc_usbhid_match` accepts, and prepend them.
-- [ ] Replace the bare "No USB serial ports found" when the model is HID-capable
+- [x] Replace the bare "No USB serial ports found" when the model is HID-capable
   and nothing matched.
-- [ ] Surface USBHID as `.usb` in `mapTransports`, `#if os(macOS)` only, and
+- [x] Surface USBHID as `.usb` in `mapTransports`, `#if os(macOS)` only, and
   rewrite the #143 comment to say what is now true.
 
 ## Task 6: Windows HID
@@ -169,40 +171,59 @@ Refactor only. The probe currently runs every candidate with
 **Files:** `windows/usbhid_io_stream.{h,cc}`, `windows/usbhid_enumerator.{h,cc}`,
 `windows/dive_computer_host_api_impl.cc`, `windows/CMakeLists.txt`
 
-- [ ] Enumerate with `SetupDiGetClassDevs(GUID_DEVINTERFACE_HID)` +
+- [x] Enumerate with `SetupDiGetClassDevs(GUID_DEVINTERFACE_HID)` +
   `HidD_GetAttributes` + `HidD_GetProductString`; buffer sizes from
   `HidP_GetCaps`.
-- [ ] Overlapped `ReadFile` with `WaitForSingleObject` for the timeout, and
+- [x] Overlapped `ReadFile` with `WaitForSingleObject` for the timeout, and
   `WriteFile` for output reports.
-- [ ] Same candidate ordering and mapping changes as Task 5.
-- [ ] Link `hid.lib` (SetupAPI.lib is already linked).
+- [x] Same candidate ordering and mapping changes as Task 5.
+- [x] Link `hid.lib` (SetupAPI.lib is already linked).
 
 ## Task 7: Linux HID
 
 **Files:** `linux/usbhid_io_stream.{h,c}`, `linux/usbhid_enumerator.{h,c}`,
 `linux/dive_computer_host_api_impl.cc`, `linux/CMakeLists.txt`
 
-- [ ] Enumerate `/dev/hidraw*`, VID/PID from `HIDIOCGRAWINFO`, name from
+- [x] Enumerate `/dev/hidraw*`, VID/PID from `HIDIOCGRAWINFO`, name from
   `HIDIOCGRAWNAME`. No libudev, no libusb.
-- [ ] `poll()` + `read()` for the timeout contract, `write()` for output
+- [x] `poll()` + `read()` for the timeout contract, `write()` for output
   reports.
-- [ ] Same candidate ordering and mapping changes as Task 5. Note the Linux
+- [x] Same candidate ordering and mapping changes as Task 5. Note the Linux
   backend currently forces USB to SERIAL at
   `linux/dive_computer_host_api_impl.cc:372`; that becomes per-candidate.
 
 ## Task 8: Dart coverage and l10n
 
-- [ ] Test that `usbDeviceModelsProvider` keeps a descriptor whose only
+- [x] Test that `usbDeviceModelsProvider` keeps a descriptor whose only
   transport is `usb` (the shape a HID device now arrives in).
-- [ ] Any new user-facing string goes through `lib/l10n/arb/` for every locale.
+- [x] Any new user-facing string goes through `lib/l10n/arb/` for every locale.
+
+## Findings during implementation
+
+- **The two HID families frame reports differently, and both directions
+  matter.** The Uwatec family writes report id 0 (`uwatec_smart.c:287`), which
+  is stripped before it goes on the wire. The Suunto EON Steel family writes
+  report type `0x3f` (`suunto_eonsteel.c:242`) and rejects any reply whose
+  first byte is not `0x3f` (`:156`), so its id byte must stay. Treating "strip
+  the first byte" as unconditional would have worked for the G2 and failed
+  every EON Steel packet. Both cases are pinned by tests.
+- **A HID-only model must not fall through to the serial probe.** It has no
+  serial port to find, and probing writes dive-computer handshake bytes at
+  whatever else is plugged in. The candidate list stops at HID when the
+  descriptor declares no serial or bulk-USB transport.
+- **No Pigeon change was needed.** Surfacing USB HID as the existing `usb`
+  transport and dispatching from the descriptor inside the download path also
+  keeps a saved computer working: `dive_computers.connection_type` stores the
+  string `"usb"` either way, so a G2 registered today comes back as a plain USB
+  device tomorrow. A new enum value would only have handled a fresh selection.
 
 ## Task 9: Verification
 
-- [ ] `packages/libdivecomputer_plugin/darwin/run_native_tests.sh`
-- [ ] `test/native/` CMake suite
-- [ ] `flutter analyze` clean, `dart format .` clean
-- [ ] Full `flutter test` run
-- [ ] `flutter build macos --debug` and a smoke run of the USB tab, confirming
+- [x] `packages/libdivecomputer_plugin/darwin/run_native_tests.sh`
+- [x] `test/native/` CMake suite
+- [x] `flutter analyze` clean, `dart format .` clean
+- [x] Full `flutter test` run
+- [x] `flutter build macos --debug` and a smoke run of the USB tab, confirming
   Scubapro and Suunto models are listed
-- [ ] CI must build Windows and Linux green
-- [ ] Reply on issue #1271 offering a build to test
+- [x] CI must build Windows and Linux green
+- [x] Reply on issue #1271 offering a build to test
