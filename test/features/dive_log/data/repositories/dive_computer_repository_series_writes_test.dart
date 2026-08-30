@@ -87,6 +87,17 @@ void main() {
   );
 
   test(
+    'a second import of the same dive and computer does not insert a second series',
+    () async {
+      final first = await importDive();
+      final second = await importDive();
+      expect(second, first);
+      expect(await series.getSeriesForDive(first), hasLength(1));
+      expect(await tankSeries.getSeriesForDive(first), hasLength(1));
+    },
+  );
+
+  test(
     'setPrimaryProfile flips the flags by computer and writes no tombstone',
     () async {
       final diveId = await importDive();

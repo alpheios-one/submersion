@@ -1284,19 +1284,9 @@ class DiveComputerRepository {
         isPrimary = true; // First profile is always primary
       }
 
-      // Check if this computer already has a profile for this dive
-      final existingProfiles = await _db
-          .customSelect(
-            '''
-        SELECT COUNT(*) as count
-        FROM dive_profiles
-        WHERE dive_id = ? AND computer_id = ?
-      ''',
-            variables: [Variable(diveId), Variable(computerId)],
-          )
-          .getSingle();
-
-      if ((existingProfiles.data['count'] as int) > 0) {
+      // Check if this computer already has a series for this dive
+      final existing = await _profileSeries.getSeriesForDive(diveId);
+      if (existing.any((s) => s.computerId == computerId)) {
         _log.info('Profile from this computer already exists for dive $diveId');
         return diveId;
       }
