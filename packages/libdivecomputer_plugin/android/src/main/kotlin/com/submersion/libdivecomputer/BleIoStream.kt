@@ -235,12 +235,24 @@ class BleIoStream(
 
         override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
             NativeLogger.d(TAG, "BLE", "onMtuChanged: mtu=$mtu status=$status")
-            // MTU negotiation complete; now discover services.
-            gatt.discoverServices()
+            // MTU negotiation complete; now discover services. A refused
+            // request never produces onServicesDiscovered, so waking the
+            // caller here is what stops it from sitting out the whole
+            // 15-second connect timeout for a failure already known.
+            if (!gatt.discoverServices()) {
+                NativeLogger.e(TAG, "BLE",
+                    "discoverServices() was refused by the Bluetooth stack")
+                connectSemaphore.release()
+            }
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             if (status != BluetoothGatt.GATT_SUCCESS) {
+                // Silent before #957: the only trace a Petrel 2 owner could
+                // send was "writeChar=null", which is a symptom of both this
+                // branch and the no-usable-service one below.
+                NativeLogger.e(TAG, "BLE",
+                    GattDiagnostics.describeDiscoveryFailure(status, deviceType()))
                 connectSemaphore.release()
                 return
             }
@@ -358,6 +370,14 @@ class BleIoStream(
                 } else {
                     subscribeToNotifications(gatt, bestNotify, SetupStep.DATA_NOTIFY)
                 }
+            } else {
+                // Discovery worked but nothing here can carry a serial
+                // session. Name what the computer did expose: those UUIDs
+                // are what a new descriptor would have to be written from,
+                // and an empty list means the connection was never usable.
+                NativeLogger.e(TAG, "BLE", GattDiagnostics.describeNoUsableService(
+                    gatt.services.map { it.uuid.toString() }
+                ))
             }
 
             // If a setup operation was started, wait for its completion
@@ -618,6 +638,12 @@ class BleIoStream(
         }
     }
 
+    // Which radios the stack believes this computer has. Reported alongside
+    // every connect and every discovery failure because a dual-mode radio
+    // changes what a failure means (issue #957); the stack answers UNKNOWN
+    // for a device it has not seen advertise, which is itself worth seeing.
+    private fun deviceType(): Int = device.type
+
     // Connect to the BLE device and discover services.
     // Blocks until ready or timeout. Returns true on success.
     //
@@ -628,7 +654,34 @@ class BleIoStream(
     // because they won't respond to pairing requests without an active
     // GATT connection.
     fun connectAndDiscover(): Boolean {
-        gatt = device.connectGatt(context, false, gattCallback)
+        // One flag drives both the overload and the line that reports it, so
+        // the log can never claim a transport the connect did not use.
+        val leTransport = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        NativeLogger.d(TAG, "BLE",
+            "connectGatt: ${device.address} radio=" +
+                GattDiagnostics.describeDeviceType(deviceType()) +
+                " transport=" + GattDiagnostics.describeTransport(leTransport))
+        // Demand the LE transport rather than letting the stack choose.
+        //
+        // TRANSPORT_AUTO resolves to Bluetooth Classic for a dual-mode
+        // device, and a computer whose GATT server lives only on the LE
+        // radio then connects, negotiates an MTU, and answers service
+        // discovery with nothing -- the exact shape of the Shearwater
+        // Petrel 2 failure in issue #957, whose Panasonic module is
+        // dual-mode (libdivecomputer lists that model as both
+        // DC_TRANSPORT_BLUETOOTH and DC_TRANSPORT_BLE, unlike the LE-only
+        // Petrel 3 / Perdix 2 / Teric that download fine).
+        //
+        // Safe for every other computer: this stream is only ever reached
+        // from a BLE scan, so the peripheral is LE-capable by construction,
+        // and TRANSPORT_AUTO already resolves to LE for an LE-only radio.
+        gatt = if (leTransport) {
+            device.connectGatt(
+                context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
+            )
+        } else {
+            device.connectGatt(context, false, gattCallback)
+        }
         if (!connectSemaphore.tryAcquire(15, TimeUnit.SECONDS)) {
             NativeLogger.e(TAG, "BLE", "connectAndDiscover: semaphore timeout")
             return false

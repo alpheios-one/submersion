@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Vérifications entre binômes, listes de montage CCR, préparation du matériel",
   "common_action_back": "Retour",
   "common_action_cancel": "Annuler",
+  "common_action_clearRating": "Effacer la note",
   "common_action_close": "Fermer",
   "common_action_delete": "Supprimer",
   "common_action_edit": "Modifier",

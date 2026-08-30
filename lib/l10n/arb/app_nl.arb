@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Buddychecks, CCR-opbouwlijsten, uitrusting inpakken",
   "common_action_back": "Terug",
   "common_action_cancel": "Annuleren",
+  "common_action_clearRating": "Beoordeling wissen",
   "common_action_close": "Sluiten",
   "common_action_delete": "Verwijderen",
   "common_action_edit": "Bewerken",

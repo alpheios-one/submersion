@@ -2463,6 +2463,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_action_cancel => '取消';
 
   @override
+  String get common_action_clearRating => '清除评分';
+
+  @override
   String get common_action_close => '关闭';
 
   @override

@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Társellenőrzések, CCR összeszerelési listák, felszereléscsomagolás",
   "common_action_back": "Vissza",
   "common_action_cancel": "Megse",
+  "common_action_clearRating": "Értékelés törlése",
   "common_action_close": "Bezaras",
   "common_action_delete": "Torles",
   "common_action_edit": "Szerkesztes",
