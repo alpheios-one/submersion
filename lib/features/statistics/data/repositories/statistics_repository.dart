@@ -1381,11 +1381,15 @@ class StatisticsRepository {
         averageDurationSeconds: result.read<double?>(
           'average_duration_seconds',
         ),
+        // `dive_date_time` is persisted as a wall clock flagged UTC, the same
+        // convention `DiveRepositoryImpl` hydrates with. Reading it back as a
+        // local `DateTime` would shift the displayed first/last dive date by
+        // the device's UTC offset.
         firstDiveAt: firstDiveMs != null
-            ? DateTime.fromMillisecondsSinceEpoch(firstDiveMs)
+            ? DateTime.fromMillisecondsSinceEpoch(firstDiveMs, isUtc: true)
             : null,
         lastDiveAt: lastDiveMs != null
-            ? DateTime.fromMillisecondsSinceEpoch(lastDiveMs)
+            ? DateTime.fromMillisecondsSinceEpoch(lastDiveMs, isUtc: true)
             : null,
       );
     } catch (e, stackTrace) {

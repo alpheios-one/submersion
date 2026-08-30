@@ -106,7 +106,7 @@ void main() {
 
     test('aggregates a single dive', () async {
       final siteId = await insertSite();
-      final diveDate = DateTime(2026, 3, 10);
+      final diveDate = DateTime.utc(2026, 3, 10);
       await insertDive(
         siteId: siteId,
         diveDateTime: diveDate,
@@ -130,9 +130,9 @@ void main() {
       'aggregates depth range, duration, and date range across multiple dives',
       () async {
         final siteId = await insertSite();
-        final earliest = DateTime(2025, 1, 5);
-        final middle = DateTime(2025, 6, 15);
-        final latest = DateTime(2026, 2, 20);
+        final earliest = DateTime.utc(2025, 1, 5);
+        final middle = DateTime.utc(2025, 6, 15);
+        final latest = DateTime.utc(2026, 2, 20);
 
         await insertDive(
           id: 'dive-1',
@@ -175,14 +175,14 @@ void main() {
         await insertDive(
           id: 'dive-with-depth',
           siteId: siteId,
-          diveDateTime: DateTime(2026, 1, 1),
+          diveDateTime: DateTime.utc(2026, 1, 1),
           maxDepth: 15,
           runtime: 1800,
         );
         await insertDive(
           id: 'dive-no-depth',
           siteId: siteId,
-          diveDateTime: DateTime(2026, 1, 2),
+          diveDateTime: DateTime.utc(2026, 1, 2),
           runtime: 1800,
         );
 
@@ -202,14 +202,14 @@ void main() {
         await insertDive(
           id: 'dive-with-duration',
           siteId: siteId,
-          diveDateTime: DateTime(2026, 1, 1),
+          diveDateTime: DateTime.utc(2026, 1, 1),
           maxDepth: 15,
           runtime: 1800,
         );
         await insertDive(
           id: 'dive-no-duration',
           siteId: siteId,
-          diveDateTime: DateTime(2026, 1, 2),
+          diveDateTime: DateTime.utc(2026, 1, 2),
           maxDepth: 16,
         );
 
@@ -225,7 +225,7 @@ void main() {
       final siteId = await insertSite();
       await insertDive(
         siteId: siteId,
-        diveDateTime: DateTime(2026, 1, 1),
+        diveDateTime: DateTime.utc(2026, 1, 1),
         bottomTime: 2100,
       );
 
@@ -245,7 +245,7 @@ void main() {
           id: 'dive-diver-a',
           siteId: siteId,
           diverId: diverA,
-          diveDateTime: DateTime(2026, 1, 1),
+          diveDateTime: DateTime.utc(2026, 1, 1),
           maxDepth: 10,
           runtime: 1200,
         );
@@ -253,7 +253,7 @@ void main() {
           id: 'dive-diver-b',
           siteId: siteId,
           diverId: diverB,
-          diveDateTime: DateTime(2026, 1, 2),
+          diveDateTime: DateTime.utc(2026, 1, 2),
           maxDepth: 40,
           runtime: 3600,
         );
@@ -274,13 +274,13 @@ void main() {
       final otherSiteId = await insertSite(id: 'site-b');
       await insertDive(
         siteId: siteId,
-        diveDateTime: DateTime(2026, 1, 1),
+        diveDateTime: DateTime.utc(2026, 1, 1),
         maxDepth: 10,
         runtime: 1200,
       );
       await insertDive(
         siteId: otherSiteId,
-        diveDateTime: DateTime(2026, 1, 2),
+        diveDateTime: DateTime.utc(2026, 1, 2),
         maxDepth: 40,
         runtime: 3600,
       );

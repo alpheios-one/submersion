@@ -1170,6 +1170,7 @@ void main() {
             ).overrideWith((_) async => SiteDiveStatistics.empty),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SiteDetailPage(siteId: statsSite.id, embedded: true),
@@ -1206,6 +1207,7 @@ void main() {
             ).overrideWith((_) async => stats),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SiteDetailPage(siteId: statsSite.id, embedded: true),
@@ -1253,6 +1255,7 @@ void main() {
               ).overrideWith((_) async => stats),
             ],
             child: MaterialApp(
+              locale: const Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: SiteDetailPage(siteId: statsSite.id, embedded: true),
@@ -1291,6 +1294,7 @@ void main() {
             ),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SiteDetailPage(siteId: statsSite.id, embedded: true),
