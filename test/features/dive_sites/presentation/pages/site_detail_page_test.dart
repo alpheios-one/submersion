@@ -1275,9 +1275,8 @@ void main() {
       },
     );
 
-    testWidgets('shows a progress indicator while stats are loading', (
-      tester,
-    ) async {
+    testWidgets('renders nothing while the aggregate is in flight, so a site '
+        'with no dives never flashes a phantom card', (tester) async {
       _setMobileTestSurfaceSize(tester);
       final overrides = await getBaseOverrides();
       await tester.pumpWidget(
@@ -1303,14 +1302,17 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.scrollUntilVisible(
-        find.byType(LinearProgressIndicator),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      expect(find.byType(LinearProgressIndicator), findsOneWidget);
-      // Let the pending timer resolve before the test tears down.
+
+      // The section occupies no space at all until the aggregate resolves.
+      // Asserting on the card's own icon rather than on a progress indicator
+      // keeps this independent of the other sections on the page.
+      expect(find.byIcon(Icons.query_stats), findsNothing);
+      expect(find.text('Dive Statistics'), findsNothing);
+
+      // Let the pending timer resolve before the test tears down. The stats
+      // are empty, so the section stays hidden once it settles too.
       await tester.pump(const Duration(seconds: 11));
+      expect(find.byIcon(Icons.query_stats), findsNothing);
     });
   });
 }

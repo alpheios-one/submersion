@@ -1228,20 +1228,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           ),
         );
       },
-      loading: () => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.query_stats, size: 20, color: colorScheme.primary),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: SizedBox(height: 20, child: LinearProgressIndicator()),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // Nothing while the aggregate is in flight. Unlike the dive count card
+      // above, which always resolves to a card, this section resolves to
+      // SizedBox.shrink() for a site with no dives, so a skeleton here would
+      // be a phantom card that appears and then vanishes, jumping the content
+      // below it. The query is a single indexed aggregate over one site, so
+      // the wait it would cover is imperceptible.
+      loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
     );
   }
