@@ -101,6 +101,11 @@ class DefaultVisibleMetricsPage extends ConsumerWidget {
             onChanged: notifier.setDefaultShowTts,
           ),
           SwitchListTile(
+            title: Text(context.l10n.settings_appearance_metric_gtr),
+            value: settings.defaultShowGtr,
+            onChanged: notifier.setDefaultShowGtr,
+          ),
+          SwitchListTile(
             title: Text(context.l10n.settings_appearance_metric_cns),
             value: settings.defaultShowCns,
             onChanged: notifier.setDefaultShowCns,

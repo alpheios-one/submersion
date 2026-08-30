@@ -40,6 +40,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_compute
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_sighting_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
 import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_nav_buttons.dart';
@@ -48,7 +49,8 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
-import 'package:submersion/features/marine_life/presentation/species_display.dart';
+import 'package:submersion/features/media/presentation/pages/dive_species_photo_viewer_page.dart';
+import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -68,6 +70,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/safety_review_
 import 'package:submersion/features/safety/domain/services/altitude_flag.dart';
 import 'package:submersion/features/safety/presentation/widgets/linked_incidents_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/surface_gps_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/data_sources_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_detail_row.dart';
@@ -97,9 +100,7 @@ import 'package:submersion/features/dive_sites/presentation/pages/site_detail_pa
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
-import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
-import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/media/presentation/helpers/photo_import_helper.dart';
@@ -1024,191 +1025,202 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .watch(preDiveSessionForDiveProvider(dive.id))
         .value;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Dive number badge
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '#${dive.diveNumber ?? '-'}',
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
-                  ),
-                ),
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
             ),
           ),
-          const SizedBox(width: 12),
-          // Site name and location
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dive.effectiveName ??
-                      dive.site?.name ??
-                      context.l10n.diveLog_listPage_unknownSite,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (dive.effectiveName != null && dive.site != null)
-                  Text(
-                    dive.site!.name,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+          child: Row(
+            children: [
+              // Dive number badge
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '#${dive.diveNumber ?? '-'}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                if (dive.site?.locationString.isNotEmpty == true)
-                  Text(
-                    dive.site!.locationString,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
-          ),
-          DiveNavButtons(diveId: dive.id, onNavigate: _navigateToDive),
-          // Favorite toggle
-          IconButton(
-            icon: Icon(
-              dive.isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: dive.isFavorite ? Colors.red : null,
-              size: 20,
-            ),
-            visualDensity: VisualDensity.compact,
-            tooltip: dive.isFavorite
-                ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
-                : context.l10n.diveLog_detail_tooltip_addToFavorites,
-            onPressed: () {
-              ref
-                  .read(paginatedDiveListProvider.notifier)
-                  .toggleFavorite(diveId);
-            },
-          ),
-          // Edit button - use query params in master-detail layout
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20),
-            visualDensity: VisualDensity.compact,
-            tooltip: context.l10n.diveLog_detail_tooltip_edit,
-            onPressed: () {
-              final state = GoRouterState.of(context);
-              final currentPath = state.uri.path;
-              context.go('$currentPath?selected=$diveId&mode=edit');
-            },
-          ),
-          // More options
-          PopupMenuButton<String>(
-            key: _headerMenuKey,
-            icon: const Icon(Icons.more_vert, size: 20),
-            padding: EdgeInsets.zero,
-            onSelected: (value) {
-              switch (value) {
-                case 'export':
-                  _showExportOptions(
-                    context,
-                    ref,
-                    dive,
-                    shareAnchorFrom(_headerMenuKey.currentContext),
-                  );
-                  break;
-                case 'reparse':
-                  _reparseDive(context, ref, dive);
-                  break;
-                case 'logNearMiss':
-                  context.push('/incidents/new?diveId=$diveId');
-                  break;
-                case 'linkPreDive':
-                  _linkPreDiveChecklist(context, dive);
-                  break;
-                case 'unlinkPreDive':
-                  _unlinkPreDiveChecklist(context, linkedPreDive!);
-                  break;
-                case 'delete':
-                  _showDeleteConfirmation(context, ref);
-                  break;
-                case 'open':
-                  // Open in full-page mode. push (not go) so there's a back
-                  // button and the pushed page skips the master-detail
-                  // redirect above instead of bouncing straight back into
-                  // the pane it was opened from.
-                  context.push('/dives/$diveId');
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'open',
-                child: ListTile(
-                  leading: const Icon(Icons.open_in_new),
-                  title: Text(context.l10n.diveLog_detail_menu_openFullPage),
-                  contentPadding: EdgeInsets.zero,
                 ),
               ),
-              PopupMenuItem(
-                value: 'export',
-                child: ListTile(
-                  leading: const Icon(Icons.download),
-                  title: Text(context.l10n.diveLog_detail_menu_export),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              PopupMenuItem(
-                value: 'logNearMiss',
-                child: ListTile(
-                  leading: const Icon(Icons.flag_outlined),
-                  title: Text(context.l10n.diveLog_detail_menu_logNearMiss),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              _preDiveLinkMenuItem(context, linkedPreDive),
-              if (hasRawData)
-                PopupMenuItem(
-                  value: 'reparse',
-                  child: ListTile(
-                    leading: const Icon(Icons.refresh),
-                    title: Text(
-                      context.l10n.diveLog_detail_menu_reparseRawData,
+              const SizedBox(width: 12),
+              // Site name and location
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      dive.effectiveName ??
+                          dive.site?.name ??
+                          context.l10n.diveLog_listPage_unknownSite,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                    if (dive.effectiveName != null && dive.site != null)
+                      Text(
+                        dive.site!.name,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (dive.site?.locationString.isNotEmpty == true)
+                      Text(
+                        dive.site!.locationString,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  title: Text(
-                    context.l10n.diveLog_detail_menu_delete,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                  contentPadding: EdgeInsets.zero,
+              ),
+              DiveNavButtons(diveId: dive.id, onNavigate: _navigateToDive),
+              // Favorite toggle
+              IconButton(
+                icon: Icon(
+                  dive.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: dive.isFavorite ? Colors.red : null,
+                  size: 20,
                 ),
+                visualDensity: VisualDensity.compact,
+                tooltip: dive.isFavorite
+                    ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
+                    : context.l10n.diveLog_detail_tooltip_addToFavorites,
+                onPressed: () {
+                  ref
+                      .read(paginatedDiveListProvider.notifier)
+                      .toggleFavorite(diveId);
+                },
+              ),
+              // Edit button - use query params in master-detail layout
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20),
+                visualDensity: VisualDensity.compact,
+                tooltip: context.l10n.diveLog_detail_tooltip_edit,
+                onPressed: () {
+                  final state = GoRouterState.of(context);
+                  final currentPath = state.uri.path;
+                  context.go('$currentPath?selected=$diveId&mode=edit');
+                },
+              ),
+              // More options
+              PopupMenuButton<String>(
+                key: _headerMenuKey,
+                icon: const Icon(Icons.more_vert, size: 20),
+                padding: EdgeInsets.zero,
+                onSelected: (value) {
+                  switch (value) {
+                    case 'export':
+                      _showExportOptions(
+                        context,
+                        ref,
+                        dive,
+                        shareAnchorFrom(_headerMenuKey.currentContext),
+                      );
+                      break;
+                    case 'reparse':
+                      _reparseDive(context, ref, dive);
+                      break;
+                    case 'logNearMiss':
+                      context.push('/incidents/new?diveId=$diveId');
+                      break;
+                    case 'linkPreDive':
+                      _linkPreDiveChecklist(context, dive);
+                      break;
+                    case 'unlinkPreDive':
+                      _unlinkPreDiveChecklist(context, linkedPreDive!);
+                      break;
+                    case 'delete':
+                      _showDeleteConfirmation(context, ref);
+                      break;
+                    case 'open':
+                      // Open in full-page mode. push (not go) so there's a back
+                      // button and the pushed page skips the master-detail
+                      // redirect above instead of bouncing straight back into
+                      // the pane it was opened from.
+                      context.push('/dives/$diveId');
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'open',
+                    child: ListTile(
+                      leading: const Icon(Icons.open_in_new),
+                      title: Text(
+                        context.l10n.diveLog_detail_menu_openFullPage,
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'export',
+                    child: ListTile(
+                      leading: const Icon(Icons.download),
+                      title: Text(context.l10n.diveLog_detail_menu_export),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'logNearMiss',
+                    child: ListTile(
+                      leading: const Icon(Icons.flag_outlined),
+                      title: Text(context.l10n.diveLog_detail_menu_logNearMiss),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  _preDiveLinkMenuItem(context, linkedPreDive),
+                  if (hasRawData)
+                    PopupMenuItem(
+                      value: 'reparse',
+                      child: ListTile(
+                        leading: const Icon(Icons.refresh),
+                        title: Text(
+                          context.l10n.diveLog_detail_menu_reparseRawData,
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: const Icon(Icons.delete, color: Colors.red),
+                      title: Text(
+                        context.l10n.diveLog_detail_menu_delete,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
+        ),
+      ],
     );
   }
 
@@ -1404,6 +1416,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               );
             },
           ),
+          SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -2007,6 +2020,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         surfaceGfCurve: analysis?.surfaceGfCurve,
                         meanDepthCurve: analysis?.meanDepthCurve,
                         ttsCurve: analysis?.ttsCurve,
+                        gtrCurve: analysis?.gtrCurve,
                         cnsCurve: analysis?.cnsCurve,
                         otuCurve: analysis?.otuCurve,
                         tankVolume: dive.tanks
@@ -4769,6 +4783,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   Widget _buildSightingsSection(BuildContext context, WidgetRef ref) {
     final sightingsAsync = ref.watch(diveSightingsProvider(diveId));
+    // Loads beside the sightings: a row shows its chip once the count is in.
+    final photoCounts =
+        ref.watch(diveSpeciesPhotoCountsProvider(diveId)).value ??
+        const <String, int>{};
 
     return sightingsAsync.when(
       data: (sightings) {
@@ -4807,9 +4825,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                       ],
                     ),
                     const Divider(),
-                    ...sightings.map(
-                      (sighting) => _buildSightingTile(context, sighting),
-                    ),
+                    for (final sighting in sightings)
+                      DiveSightingRow(
+                        sighting: sighting,
+                        photoCount: photoCounts[sighting.speciesId] ?? 0,
+                        onOpen: () =>
+                            context.push('/species/${sighting.speciesId}'),
+                        onOpenPhotos: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => DiveSpeciesPhotoViewerPage(
+                              diveId: diveId,
+                              speciesId: sighting.speciesId,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -4820,111 +4851,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
     );
-  }
-
-  Widget _buildSightingTile(BuildContext context, Sighting sighting) {
-    return Semantics(
-      button: true,
-      label: context.l10n.diveLog_detail_semantics_viewSpecies(
-        localizedSpeciesName(
-          context.l10n,
-          sighting.speciesId,
-          sighting.speciesName,
-        ),
-      ),
-      child: InkWell(
-        onTap: () => context.push('/species/${sighting.speciesId}'),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: _getCategoryColor(sighting.speciesCategory),
-                child: Icon(
-                  iconForSpeciesCategory(
-                    sighting.speciesCategory ?? SpeciesCategory.other,
-                  ),
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      localizedSpeciesName(
-                        context.l10n,
-                        sighting.speciesId,
-                        sighting.speciesName,
-                      ),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    if (sighting.notes.isNotEmpty)
-                      Text(
-                        sighting.notes,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-              if (sighting.count > 1)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'x${sighting.count}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getCategoryColor(SpeciesCategory? category) {
-    switch (category) {
-      case SpeciesCategory.fish:
-        return Colors.blue;
-      case SpeciesCategory.shark:
-        return Colors.grey.shade700;
-      case SpeciesCategory.ray:
-        return Colors.indigo;
-      case SpeciesCategory.mammal:
-        return Colors.brown;
-      case SpeciesCategory.turtle:
-        return Colors.green.shade700;
-      case SpeciesCategory.invertebrate:
-        return Colors.purple;
-      case SpeciesCategory.coral:
-        return Colors.pink;
-      case SpeciesCategory.plant:
-        return Colors.green;
-      case SpeciesCategory.other:
-      case null:
-        return Colors.grey;
-    }
   }
 
   Widget _buildMediaSection(BuildContext context, WidgetRef ref, Dive dive) {
@@ -5331,26 +5257,36 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       instructorId = courseAsync.value!.instructorId;
     }
 
+    // Captured before the sheet closes: the save outlives it, and reporting
+    // a failure needs a messenger that is still in the tree.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+
     showSignatureCaptureSheet(
       context: context,
       initialSignerName: instructorName,
-      onSave: (strokes, signerName) async {
-        // Get the canvas dimensions from the capture widget
-        // Using a reasonable default for signature capture
-        const width = 400.0;
-        const height = 200.0;
-
-        await ref
+      onSave: (strokes, signerName, canvasSize) async {
+        // The strokes are in the capture canvas's own coordinates, so the
+        // PNG is rendered at that exact size. A hardcoded size cropped
+        // every signature drawn on a canvas wider than it (issue #1358).
+        final signature = await ref
             .read(signatureSaveNotifierProvider.notifier)
             .saveFromStrokes(
               diveId: dive.id,
               strokes: strokes,
-              width: width,
-              height: height,
+              width: canvasSize.width,
+              height: canvasSize.height,
               signerName: signerName,
               signerId: instructorId,
               backgroundColor: Colors.white,
             );
+        // A null result means the save threw. Nothing watches the notifier's
+        // AsyncValue, so without this the failure is entirely silent.
+        if (signature == null) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.signatures_error_saveFailed)),
+          );
+        }
       },
     );
   }

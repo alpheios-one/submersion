@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
@@ -41,6 +44,7 @@ class _MediaLibraryFilterSheetState
   MediaType? _mediaType;
   String? _siteId;
   String? _tripId;
+  String? _speciesId;
   DateTime? _fromDate;
   DateTime? _toDate;
   bool _missingOnly = false;
@@ -52,6 +56,7 @@ class _MediaLibraryFilterSheetState
     _mediaType = filter.mediaType;
     _siteId = filter.siteId;
     _tripId = filter.tripId;
+    _speciesId = filter.speciesId;
     _fromDate = filter.fromDate;
     _toDate = filter.toDate;
     _missingOnly = filter.health == MediaHealthFilter.missing;
@@ -62,6 +67,7 @@ class _MediaLibraryFilterSheetState
       _mediaType = null;
       _siteId = null;
       _tripId = null;
+      _speciesId = null;
       _fromDate = null;
       _toDate = null;
       _missingOnly = false;
@@ -78,6 +84,7 @@ class _MediaLibraryFilterSheetState
       mediaType: _mediaType,
       siteId: _siteId,
       tripId: _tripId,
+      speciesId: _speciesId,
       fromDate: _fromDate,
       toDate: _toDate,
       health: _missingOnly ? MediaHealthFilter.missing : null,
@@ -166,6 +173,7 @@ class _MediaLibraryFilterSheetState
                     _mediaType = album.filter.mediaType;
                     _siteId = album.filter.siteId;
                     _tripId = album.filter.tripId;
+                    _speciesId = album.filter.speciesId;
                     _fromDate = album.filter.fromDate;
                     _toDate = album.filter.toDate;
                     _missingOnly =
@@ -199,6 +207,10 @@ class _MediaLibraryFilterSheetState
     final colorScheme = Theme.of(context).colorScheme;
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
+    final speciesOptions = [
+      for (final s in ref.watch(allSpeciesProvider).value ?? const <Species>[])
+        (s.id, s.localizedCommonName(l10n)),
+    ]..sort((a, b) => a.$2.toLowerCase().compareTo(b.$2.toLowerCase()));
     final albums = ref.watch(mediaSmartAlbumsProvider).value ?? const [];
     final missingCount = ref.watch(missingCountProvider).value ?? 0;
 
@@ -208,6 +220,9 @@ class _MediaLibraryFilterSheetState
     final tripName = _tripId == null
         ? null
         : trips.where((t) => t.id == _tripId).firstOrNull?.name;
+    final speciesName = _speciesId == null
+        ? null
+        : speciesOptions.where((s) => s.$1 == _speciesId).firstOrNull?.$2;
     // "Any", not "All": these read as "Site: Any", and reusing the type
     // chip's "All" both reads wrong and puts four identical labels in one
     // sheet.
@@ -319,6 +334,17 @@ class _MediaLibraryFilterSheetState
                         onTap: () => _pickFromList(
                           options: [for (final t in trips) (t.id, t.name)],
                           onPicked: (id) => setState(() => _tripId = id),
+                          anyLabel: anyLabel,
+                        ),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(l10n.media_library_filter_species),
+                        subtitle: Text(speciesName ?? anyLabel),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _pickFromList(
+                          options: speciesOptions,
+                          onPicked: (id) => setState(() => _speciesId = id),
                           anyLabel: anyLabel,
                         ),
                       ),
