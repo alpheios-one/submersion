@@ -35136,4 +35136,98 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_section_cloudSubtitle => 'ייבוא מהענן';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'שימוש באחסון';
+
+  @override
+  String get settings_storageUsage_tile_title => 'שימוש באחסון';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'ראה מה תופס מקום במכשיר הזה';
+
+  @override
+  String get settings_storageUsage_total => 'סך הכול';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'סך הכול עד כה';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'חישוב מחדש';
+
+  @override
+  String get settings_storageUsage_unavailable => 'לא זמין';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'לא ניתן למדוד';
+
+  @override
+  String get settings_storageUsage_group_appData => 'נתוני האפליקציה';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'מטמון מדיה';
+
+  @override
+  String get settings_storageUsage_group_caches => 'מטמונים';
+
+  @override
+  String get settings_storageUsage_group_backups => 'גיבויים';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'קבצים זמניים';
+
+  @override
+  String get settings_storageUsage_group_exports => 'קבצים שיוצאו';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'מסד נתונים של יומן הצלילה';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'מסד נתונים של מטמון מקומי';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'תמונות וסרטונים מקוריים';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs =>
+      'תמונות ממוזערות';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'גרסאות וידאו';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'העברות מוכנות';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'וידאו מקודד';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'אריחי מפה';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'תמונות רשת';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'תמונות ממוזערות של וידאו';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'תמונות ממוזערות של מסמכים';
+
+  @override
+  String get settings_storageUsage_category_backups => 'קובצי גיבוי';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'קבצים זמניים';
+
+  @override
+  String get settings_storageUsage_category_exports => 'קבצים שיוצאו';
 }
