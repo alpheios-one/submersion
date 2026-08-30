@@ -187,6 +187,46 @@ void main() {
   });
 
   test(
+    'a tank pressure series deleted on A is tombstoned and removed on B',
+    () async {
+      dbB = await setUpTestDatabase();
+      dbA = await setUpTestDatabase();
+      switchTo(dbA);
+      await seedFkPrereqs(dbA);
+      await seedBareDive(dbA, 'd1');
+      await dbA
+          .into(dbA.diveTanks)
+          .insert(DiveTanksCompanion.insert(id: 'tank1', diveId: 'd1'));
+      await TankPressureSeriesRepository().insertSeries(
+        diveId: 'd1',
+        tankId: 'tank1',
+        samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+        now: 1000,
+      );
+      expect((await buildService().performSync()).isSuccess, isTrue);
+
+      switchTo(dbB!);
+      await seedFkPrereqs(dbB!);
+      expect((await buildService().performSync()).isSuccess, isTrue);
+      expect(
+        await TankPressureSeriesRepository().getSeriesForDive('d1'),
+        isNotEmpty,
+      );
+
+      switchTo(dbA);
+      await TankPressureSeriesRepository().deleteForDive('d1');
+      expect((await buildService().performSync()).isSuccess, isTrue);
+
+      switchTo(dbB!);
+      expect((await buildService().performSync()).isSuccess, isTrue);
+      expect(
+        await TankPressureSeriesRepository().getSeriesForDive('d1'),
+        isEmpty,
+      );
+    },
+  );
+
+  test(
     'fetchRecord carries samples as base64 and upsertRecord round-trips it',
     () async {
       dbA = await setUpTestDatabase();
@@ -259,6 +299,82 @@ void main() {
       expect(await ProfileSeriesRepository().getSeriesForDive('d1'), isEmpty);
     },
   );
+
+  test('a peer blob whose hasDecoStop disagrees with the decoded samples is '
+      'skipped', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    final id = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: 1000,
+    );
+    final json = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      id,
+    );
+    await ProfileSeriesRepository().deleteForDive('d1');
+    // No sample in the encoded blob carries a decoType, so the decoded
+    // summary's hasDecoStop is false; flipping the header must be caught
+    // even though the sample count still matches.
+    final tampered = {...json!, 'hasDecoStop': true};
+    await SyncDataSerializer().upsertRecord('diveProfileSeries', tampered);
+    expect(await ProfileSeriesRepository().getSeriesForDive('d1'), isEmpty);
+  });
+
+  test('a peer blob whose maxDepth disagrees with the decoded samples is '
+      'skipped', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    final id = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: 1000,
+    );
+    final json = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      id,
+    );
+    await ProfileSeriesRepository().deleteForDive('d1');
+    final tampered = {...json!, 'maxDepth': 2.0};
+    await SyncDataSerializer().upsertRecord('diveProfileSeries', tampered);
+    expect(await ProfileSeriesRepository().getSeriesForDive('d1'), isEmpty);
+  });
+
+  test('a tank peer blob whose endTimestamp disagrees with the decoded samples '
+      'is skipped', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await dbA
+        .into(dbA.diveTanks)
+        .insert(DiveTanksCompanion.insert(id: 'tank1', diveId: 'd1'));
+    final id = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd1',
+      tankId: 'tank1',
+      samples: const [
+        TankPressureSample(timestamp: 0, pressure: 200.0),
+        TankPressureSample(timestamp: 60, pressure: 180.0),
+      ],
+      now: 1000,
+    );
+    final json = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      id,
+    );
+    await TankPressureSeriesRepository().deleteForDive('d1');
+    final tampered = {...json!, 'endTimestamp': 61};
+    await SyncDataSerializer().upsertRecord('tankPressureSeries', tampered);
+    expect(
+      await TankPressureSeriesRepository().getSeriesForDive('d1'),
+      isEmpty,
+    );
+  });
 
   test(
     'a tank pressure series pushed by A arrives on B byte for byte',
@@ -346,6 +462,7 @@ void main() {
     await seedFkPrereqs(dbA);
     await seedBareDive(dbA, 'd1');
     await seedBareDive(dbA, 'd2');
+    await seedBareDive(dbA, 'd3');
     final goodId = await ProfileSeriesRepository().insertSeries(
       diveId: 'd1',
       samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
@@ -368,17 +485,34 @@ void main() {
       ...corruptSource!,
       'samples': base64Encode(const [1, 2, 3]),
     };
+    final malformedId = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd3',
+      samples: const [ProfileSample(timestamp: 0, depth: 3.0)],
+      now: 1000,
+    );
+    final malformedSource = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      malformedId,
+    );
+    // Not valid base64 at all, unlike `corrupt` above (which is valid
+    // base64 that decodes to bytes the codec rejects): this throws inside
+    // DiveProfileSeriesRow.fromJson itself, before soundness is ever
+    // checked, which is what the per-record try must also survive.
+    final malformed = {...malformedSource!, 'samples': 'not base64!'};
     await ProfileSeriesRepository().deleteForDive('d1');
     await ProfileSeriesRepository().deleteForDive('d2');
+    await ProfileSeriesRepository().deleteForDive('d3');
 
     await SyncDataSerializer().upsertRecords('diveProfileSeries', [
       good!,
       corrupt,
+      malformed,
     ]);
 
     final remaining = await ProfileSeriesRepository().getRowsForDives([
       'd1',
       'd2',
+      'd3',
     ]);
     expect(remaining.map((r) => r.id), [goodId]);
   });

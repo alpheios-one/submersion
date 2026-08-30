@@ -193,6 +193,14 @@ Future<ProfilePackReport> packLegacyProfileRows(
       }
     }
   }
+  if (profileSeries > 0) {
+    // Raw SQL bypasses Drift's own change tracking, so a stream built on
+    // `tableUpdates(TableUpdateQuery.onTable(db.diveProfileSeries))` would
+    // otherwise never fire for a table this function just populated.
+    db.notifyUpdates({
+      const TableUpdate('dive_profile_series', kind: UpdateKind.insert),
+    });
+  }
 
   if (canPackTanks) {
     const codec = TankPressureSeriesCodec();
@@ -265,6 +273,11 @@ Future<ProfilePackReport> packLegacyProfileRows(
         tankSeries += inserted;
       }
     }
+  }
+  if (tankSeries > 0) {
+    db.notifyUpdates({
+      const TableUpdate('tank_pressure_series', kind: UpdateKind.insert),
+    });
   }
 
   return (

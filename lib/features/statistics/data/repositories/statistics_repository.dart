@@ -103,7 +103,7 @@ class StatisticsRepository {
   ///
   /// Broader than [DiveRepository.watchDivesChanges] because the aggregate SQL
   /// joins well beyond the `dives` table: `dive_tanks` and
-  /// `tank_pressure_profiles` carry all of the SAC math, `sightings`/`species`
+  /// `tank_pressure_series` carry all of the SAC math, `sightings`/`species`
   /// the marine-life stats, `dive_sites`/`dive_centers`/`trips` the geographic
   /// stats. Subscribing only to the dives tick would leave every SAC chart
   /// stale after a sync applied a tank-pressure-only changeset, which never

@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
@@ -158,6 +159,23 @@ void main() {
       const TankPressureSample(timestamp: 60, pressure: 190.0),
     ]);
     expect(tanks[1]['computer_id'], isNull);
+  });
+
+  test('packing notifies subscribers of the series tables it wrote', () async {
+    final db = await seededLegacy();
+    final profileUpdates = db.tableUpdates(
+      TableUpdateQuery.onTable(db.diveProfileSeries),
+    );
+    final tankUpdates = db.tableUpdates(
+      TableUpdateQuery.onTable(db.tankPressureSeries),
+    );
+
+    final profileEvent = expectLater(profileUpdates, emits(anything));
+    final tankEvent = expectLater(tankUpdates, emits(anything));
+    await packLegacyProfileRows(db, nowMs: 1);
+
+    await profileEvent;
+    await tankEvent;
   });
 
   test('re-running the packer inserts nothing new', () async {

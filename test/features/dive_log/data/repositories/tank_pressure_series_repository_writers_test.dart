@@ -128,6 +128,47 @@ void main() {
     expect(rows.firstWhere((r) => r.id == owned).updatedAt, 1000);
   });
 
+  test('getRowsForDives chunks past the SQL variable ceiling', () async {
+    const count = 2000;
+    final diveIds = [for (var i = 0; i < count; i++) 'chunk-dive-$i'];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.batch(
+      (b) => b.insertAll(db.dives, [
+        for (final id in diveIds)
+          DivesCompanion.insert(
+            id: id,
+            diveDateTime: now,
+            createdAt: now,
+            updatedAt: now,
+          ),
+      ]),
+    );
+    await db.batch(
+      (b) => b.insertAll(db.diveTanks, [
+        DiveTanksCompanion.insert(
+          id: 'chunk-tank-first',
+          diveId: diveIds.first,
+        ),
+        DiveTanksCompanion.insert(id: 'chunk-tank-last', diveId: diveIds.last),
+      ]),
+    );
+    final first = await repo.insertSeries(
+      diveId: diveIds.first,
+      tankId: 'chunk-tank-first',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+    final last = await repo.insertSeries(
+      diveId: diveIds.last,
+      tankId: 'chunk-tank-last',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 190.0)],
+      now: 1000,
+    );
+
+    final rows = await repo.getRowsForDives(diveIds);
+    expect(rows.map((r) => r.id), [first, last]);
+  });
+
   test('deleteByIds and getRowsForDives', () async {
     final a = await repo.insertSeries(
       diveId: 'dive-1',

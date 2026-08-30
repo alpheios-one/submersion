@@ -1557,14 +1557,32 @@ class SyncService {
   /// series for whichever dives don't already have one. A no-op (and no log)
   /// when [anyLegacyRowsApplied] is false, which is the common case once
   /// every peer has upgraded.
+  ///
+  /// Runs inside the caller's deferred-FK merge transaction, so a throw here
+  /// must never escape: it would roll back the whole payload while leaving
+  /// the changeset reader's cursor advanced, and the next sync would neither
+  /// replay nor retry the payload, wedging the peer permanently. The legacy
+  /// rows this call packs are already applied and durable by the time it
+  /// runs, so nothing is lost by deferring the pack; the `beforeOpen`
+  /// backstop in `database.dart` re-attempts it on every open, which is the
+  /// retry.
   Future<void> _packLegacySamplesIfPresent(bool anyLegacyRowsApplied) async {
     if (!anyLegacyRowsApplied) return;
-    final packed = await _serializer.packLegacySamples();
-    _log.info(
-      'Packed legacy sample rows from a peer: '
-      '${packed.profileSeries} profile series, '
-      '${packed.tankSeries} tank series',
-    );
+    try {
+      final packed = await _serializer.packLegacySamples();
+      _log.info(
+        'Packed legacy sample rows from a peer: '
+        '${packed.profileSeries} profile series, '
+        '${packed.tankSeries} tank series',
+      );
+    } catch (e, st) {
+      _log.warning(
+        'Packing legacy sample rows from a peer failed; the next open packs '
+        'them',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 
   /// Apply a base that was streamed to a local temp [filePath], in bounded
@@ -3459,9 +3477,9 @@ class SyncService {
     // cloud, but needs no in-RAM id set to diff against, so adopt memory stays
     // bounded regardless of library size (#358 adopt OOM). The legacy sample
     // entities are still synced tables from a not-yet-upgraded peer's point of
-    // view (v182 receive-side tolerance), so they are cleared and
-    // re-inserted the same union of tables covers -- the series tables
-    // ([entityHasUpdatedAt] already lists them) get no special treatment.
+    // view (v182 receive-side tolerance), so the same union of tables clears
+    // and re-inserts them; the series tables, which [entityHasUpdatedAt]
+    // already lists, get no special treatment.
     for (final entity in _baseApplyEntityFlags.keys) {
       await _serializer.deleteAllRecords(entity);
     }

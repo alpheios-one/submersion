@@ -224,6 +224,40 @@ void main() {
     expect(rows.single.samples, isNotEmpty);
   });
 
+  test('getRowsForDives and getSeriesForDives chunk past the SQL variable '
+      'ceiling', () async {
+    const count = 2000;
+    final diveIds = [for (var i = 0; i < count; i++) 'chunk-dive-$i'];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.batch(
+      (b) => b.insertAll(db.dives, [
+        for (final id in diveIds)
+          DivesCompanion.insert(
+            id: id,
+            diveDateTime: now,
+            createdAt: now,
+            updatedAt: now,
+          ),
+      ]),
+    );
+    final first = await repo.insertSeries(
+      diveId: diveIds.first,
+      samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+      now: 1000,
+    );
+    final last = await repo.insertSeries(
+      diveId: diveIds.last,
+      samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+      now: 1000,
+    );
+
+    final rows = await repo.getRowsForDives(diveIds);
+    expect(rows.map((r) => r.id), [first, last]);
+
+    final byDive = await repo.getSeriesForDives(diveIds);
+    expect(byDive.keys.toSet(), {diveIds.first, diveIds.last});
+  });
+
   test(
     'a repository bound to a private database never touches the global one',
     () async {

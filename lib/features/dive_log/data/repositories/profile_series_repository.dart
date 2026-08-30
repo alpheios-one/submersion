@@ -117,20 +117,14 @@ class ProfileSeriesRepository {
   /// Every series of every dive in [diveIds], grouped by dive, each list in
   /// the same order [getSeriesForDive] uses. Dives without series are absent
   /// from the map, which is how a caller tells "not yet migrated" apart
-  /// from "no samples". One statement for the whole batch.
+  /// from "no samples". [diveIds] is queried in chunks (see [_chunks]), then
+  /// the concatenated rows are sorted before grouping so the result is the
+  /// same as one unchunked query would have produced.
   Future<Map<String, List<ProfileSeries>>> getSeriesForDives(
     List<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return const {};
-    final rows =
-        await (_db.select(_db.diveProfileSeries)
-              ..where((t) => t.diveId.isIn(diveIds))
-              ..orderBy([
-                (t) => OrderingTerm.asc(t.diveId),
-                (t) => OrderingTerm.asc(t.startTimestamp),
-                (t) => OrderingTerm.asc(t.id),
-              ]))
-            .get();
+    final rows = await _rowsForDives(diveIds);
     final byDive = <String, List<ProfileSeries>>{};
     for (final row in rows) {
       byDive.putIfAbsent(row.diveId, () => []).add(_decode(row));
@@ -514,14 +508,52 @@ class ProfileSeriesRepository {
     List<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return const [];
-    return (_db.select(_db.diveProfileSeries)
-          ..where((t) => t.diveId.isIn(diveIds))
-          ..orderBy([
-            (t) => OrderingTerm.asc(t.diveId),
-            (t) => OrderingTerm.asc(t.startTimestamp),
-            (t) => OrderingTerm.asc(t.id),
-          ]))
-        .get();
+    return _rowsForDives(diveIds);
+  }
+
+  /// [diveIds] queried in chunks of at most [_chunkSize], concatenated and
+  /// sorted by `(diveId, startTimestamp, id)`, which is the order a single
+  /// unchunked query with that `ORDER BY` would have returned.
+  ///
+  /// Binding one SQL variable per dive id means an unchunked `IN (...)`
+  /// clause over a whole library's filtered dive ids can exceed the
+  /// engine's bound-variable ceiling. `DecoClassificationCacheRepository`
+  /// measured that ceiling against the bundled engine at 32766 (SQLite's
+  /// 3.32+ default): an unchunked query survives 2500 ids and only throws
+  /// "too many SQL variables" past that. The chunk size stays at 900 for
+  /// consistency with that repository and `SpeciesRepository` rather than
+  /// for necessity.
+  Future<List<DiveProfileSeriesRow>> _rowsForDives(List<String> diveIds) async {
+    final rows = <DiveProfileSeriesRow>[];
+    for (final chunk in _chunks(diveIds)) {
+      rows.addAll(
+        await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.diveId.isIn(chunk))).get(),
+      );
+    }
+    rows.sort(_byDiveStartId);
+    return rows;
+  }
+
+  static const int _chunkSize =
+      900; // safely under SQLite's bound-variable limit
+
+  static Iterable<List<String>> _chunks(List<String> ids) sync* {
+    for (var start = 0; start < ids.length; start += _chunkSize) {
+      final end = start + _chunkSize < ids.length
+          ? start + _chunkSize
+          : ids.length;
+      yield ids.sublist(start, end);
+    }
+  }
+
+  static int _byDiveStartId(DiveProfileSeriesRow a, DiveProfileSeriesRow b) {
+    final byDive = a.diveId.compareTo(b.diveId);
+    if (byDive != 0) return byDive;
+    final byStart = a.startTimestamp.compareTo(b.startTimestamp);
+    if (byStart != 0) return byStart;
+    return a.id.compareTo(b.id);
   }
 
   Expression<bool> _ownedBy(

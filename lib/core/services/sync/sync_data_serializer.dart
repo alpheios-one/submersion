@@ -14,6 +14,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
 /// Sync data format version for compatibility checking
@@ -2999,15 +3000,31 @@ class SyncDataSerializer {
 
   /// A peer's packed samples are decoded once before they are written so a
   /// corrupt or truncated blob never reaches the readers. Returns false (and
-  /// logs) when the blob does not decode or its sample count disagrees with
-  /// the header the row carries.
+  /// logs) when the blob does not decode or when the summary computed from
+  /// the decoded samples disagrees with any scalar the row carries.
+  ///
+  /// The scalars are recomputed rather than only compared by count because
+  /// seven SQL consumers read them directly without ever decoding the blob
+  /// (deco classification, runtime fallback, quality neighbours and more):
+  /// a row whose header was tampered with, or corrupted independently of
+  /// the blob, would otherwise write scalars that disagree with the samples
+  /// they claim to summarize.
   bool _profileSeriesBlobIsSound(DiveProfileSeriesRow row) {
     try {
       final decoded = const ProfileSeriesCodec().decode(row.samples);
-      if (decoded.length != row.sampleCount) {
+      final summary = ProfileSeriesSummary.of(decoded);
+      if (summary.sampleCount != row.sampleCount ||
+          summary.startTimestamp != row.startTimestamp ||
+          summary.endTimestamp != row.endTimestamp ||
+          summary.maxDepth != row.maxDepth ||
+          summary.firstDepth != row.firstDepth ||
+          summary.lastDepth != row.lastDepth ||
+          summary.hasDecoType != row.hasDecoType ||
+          summary.hasDecoStop != row.hasDecoStop ||
+          summary.hasPositiveCeiling != row.hasPositiveCeiling) {
         _log.warning(
-          'Skipping diveProfileSeries ${row.id}: header says '
-          '${row.sampleCount} samples, blob holds ${decoded.length}',
+          'Skipping diveProfileSeries ${row.id}: the header scalars do not '
+          'match the summary the blob decodes to',
         );
         return false;
       }
@@ -3022,10 +3039,13 @@ class SyncDataSerializer {
   bool _tankSeriesBlobIsSound(TankPressureSeriesRow row) {
     try {
       final decoded = const TankPressureSeriesCodec().decode(row.samples);
-      if (decoded.length != row.sampleCount) {
+      final summary = TankPressureSeriesSummary.of(decoded);
+      if (summary.sampleCount != row.sampleCount ||
+          summary.startTimestamp != row.startTimestamp ||
+          summary.endTimestamp != row.endTimestamp) {
         _log.warning(
-          'Skipping tankPressureSeries ${row.id}: header says '
-          '${row.sampleCount} samples, blob holds ${decoded.length}',
+          'Skipping tankPressureSeries ${row.id}: the header scalars do not '
+          'match the summary the blob decodes to',
         );
         return false;
       }
@@ -3801,20 +3821,45 @@ class SyncDataSerializer {
         );
         return;
       case 'diveProfileSeries':
-        final rows = [
-          for (final r in records)
-            DiveProfileSeriesRow.fromJson(r, serializer: _syncBlobSerializer),
-        ].where(_profileSeriesBlobIsSound).toList();
+        // Each record is parsed inside its own try: a truncated base64
+        // `samples` string throws FormatException, a missing key throws
+        // TypeError, and either one, eagerly parsed before the soundness
+        // filter, used to fail the whole batch instead of just that record.
+        // `on Object` is deliberate here: [r] is untrusted wire data from a
+        // peer, so any parse failure it can provoke must be caught, not
+        // just the two shapes seen so far.
+        final rows = <DiveProfileSeriesRow>[];
+        for (final r in records) {
+          try {
+            final row = DiveProfileSeriesRow.fromJson(
+              r,
+              serializer: _syncBlobSerializer,
+            );
+            if (_profileSeriesBlobIsSound(row)) rows.add(row);
+          } on Object catch (e) {
+            _log.warning('Skipping a malformed diveProfileSeries record: $e');
+          }
+        }
         if (rows.isEmpty) return;
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(_db.diveProfileSeries, rows),
         );
         return;
       case 'tankPressureSeries':
-        final rows = [
-          for (final r in records)
-            TankPressureSeriesRow.fromJson(r, serializer: _syncBlobSerializer),
-        ].where(_tankSeriesBlobIsSound).toList();
+        // See the diveProfileSeries case above: same per-record try, same
+        // reason.
+        final rows = <TankPressureSeriesRow>[];
+        for (final r in records) {
+          try {
+            final row = TankPressureSeriesRow.fromJson(
+              r,
+              serializer: _syncBlobSerializer,
+            );
+            if (_tankSeriesBlobIsSound(row)) rows.add(row);
+          } on Object catch (e) {
+            _log.warning('Skipping a malformed tankPressureSeries record: $e');
+          }
+        }
         if (rows.isEmpty) return;
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(_db.tankPressureSeries, rows),

@@ -128,19 +128,52 @@ class TankPressureSeriesRepository {
 
   /// Raw rows of every series of [diveIds], undecoded, for snapshots that
   /// restore them verbatim through [restoreSeriesRow].
+  ///
+  /// [diveIds] is queried in chunks of at most [_chunkSize], concatenated
+  /// and sorted by `(diveId, tankId, startTimestamp, id)`, which is the
+  /// order a single unchunked query with that `ORDER BY` would have
+  /// returned. See `ProfileSeriesRepository._rowsForDives` for why: binding
+  /// one SQL variable per dive id can exceed the engine's bound-variable
+  /// ceiling on a whole library's filtered dive ids.
   Future<List<TankPressureSeriesRow>> getRowsForDives(
     List<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return const [];
-    return (_db.select(_db.tankPressureSeries)
-          ..where((t) => t.diveId.isIn(diveIds))
-          ..orderBy([
-            (t) => OrderingTerm.asc(t.diveId),
-            (t) => OrderingTerm.asc(t.tankId),
-            (t) => OrderingTerm.asc(t.startTimestamp),
-            (t) => OrderingTerm.asc(t.id),
-          ]))
-        .get();
+    final rows = <TankPressureSeriesRow>[];
+    for (final chunk in _chunks(diveIds)) {
+      rows.addAll(
+        await (_db.select(
+          _db.tankPressureSeries,
+        )..where((t) => t.diveId.isIn(chunk))).get(),
+      );
+    }
+    rows.sort(_byDiveTankStartId);
+    return rows;
+  }
+
+  static const int _chunkSize =
+      900; // safely under SQLite's bound-variable limit
+
+  static Iterable<List<String>> _chunks(List<String> ids) sync* {
+    for (var start = 0; start < ids.length; start += _chunkSize) {
+      final end = start + _chunkSize < ids.length
+          ? start + _chunkSize
+          : ids.length;
+      yield ids.sublist(start, end);
+    }
+  }
+
+  static int _byDiveTankStartId(
+    TankPressureSeriesRow a,
+    TankPressureSeriesRow b,
+  ) {
+    final byDive = a.diveId.compareTo(b.diveId);
+    if (byDive != 0) return byDive;
+    final byTank = a.tankId.compareTo(b.tankId);
+    if (byTank != 0) return byTank;
+    final byStart = a.startTimestamp.compareTo(b.startTimestamp);
+    if (byStart != 0) return byStart;
+    return a.id.compareTo(b.id);
   }
 
   /// Points every series of [fromTankId] on [diveId] at [toTankId] (the

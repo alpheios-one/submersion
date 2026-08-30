@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
@@ -150,4 +152,28 @@ void main() {
     expect(ascentDescentRatesFromBlobs(blobs), ascentDescentRates(byStream));
     expect(timeAtDepthRangesFromBlobs(blobs), timeAtDepthRanges(byStream));
   });
+
+  test(
+    'one corrupt blob is skipped rather than blanking the whole aggregate',
+    () {
+      const codec = ProfileSeriesCodec();
+      final descent = ramp(step: 10, count: 13, perStep: 1.0);
+      final blobs = [
+        SeriesBlob(
+          diveId: 'd1',
+          computerId: 'c1',
+          samples: codec.encode(descent).bytes,
+        ),
+        SeriesBlob(
+          diveId: 'd2',
+          computerId: 'c1',
+          samples: Uint8List.fromList([1, 2, 3]),
+        ),
+      ];
+
+      final r = ascentDescentRatesFromBlobs(blobs);
+
+      expect(r, ascentDescentRates({('d1', 'c1'): descent}));
+    },
+  );
 }

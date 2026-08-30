@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 
 /// Smoothing interval used by [ascentDescentRates], in seconds.
 ///
@@ -59,11 +60,20 @@ class SeriesBlob {
   final Uint8List samples;
 }
 
+/// One corrupt local blob (a decode failure the writer never should have let
+/// through, but storage can still bit-rot) is skipped rather than failing
+/// the whole aggregate: every other blob's samples still contribute, so one
+/// bad row blanks only its own stream instead of every chart on the dive.
 Map<StreamKey, List<ProfileSample>> _decodeStreams(List<SeriesBlob> blobs) {
   const codec = ProfileSeriesCodec();
   final streams = <StreamKey, List<ProfileSample>>{};
   for (final b in blobs) {
-    final decoded = codec.decode(b.samples);
+    final List<ProfileSample> decoded;
+    try {
+      decoded = codec.decode(b.samples);
+    } on ProfileSeriesCodecException {
+      continue;
+    }
     streams.update(
       (b.diveId, b.computerId),
       (existing) => _mergedByTimestamp(existing, decoded),
@@ -75,6 +85,12 @@ Map<StreamKey, List<ProfileSample>> _decodeStreams(List<SeriesBlob> blobs) {
 
 /// Stable interleave of two timestamp-ordered lists (two series of one
 /// stream, in stored order for a timestamp tie).
+///
+/// "Stored order" here is `ProfileSeriesRepository.getRowsForDives`'s
+/// `(diveId, startTimestamp, id)` ordering: [a] and [b] arrive from that
+/// query already sorted, so a tie always breaks on series id rather than on
+/// insertion order or scan order, which is what makes the merged result the
+/// same on every device regardless of which one produced it.
 List<ProfileSample> _mergedByTimestamp(
   List<ProfileSample> a,
   List<ProfileSample> b,

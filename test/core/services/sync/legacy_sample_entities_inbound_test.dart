@@ -335,6 +335,61 @@ void main() {
         );
       },
     );
+
+    test('a packer failure during the merge does not fail the sync or lose '
+        'the applied dive row', () async {
+      // The pack runs inside the deferred-FK merge transaction with no
+      // try around it in the old code, so a throw here rolled back the
+      // whole payload while the changeset reader's cursor stayed put: the
+      // next sync would replay and throw the same way forever. Simulating
+      // the failure the same way backstop_resilience_test.dart does for
+      // the beforeOpen backstop (a series table shaped so the packer's
+      // INSERT cannot bind every column) exercises the sync-time guard
+      // instead.
+      await DiveRepository().createDive(_dive('template-pack-fail', const []));
+      final diveRow =
+          Map<String, dynamic>.from(
+              (await SyncDataSerializer().fetchRecord(
+                'dives',
+                'template-pack-fail',
+              ))!,
+            )
+            ..['id'] = 'd-pack-fail'
+            ..['hlc'] = const Hlc(9000, 0, 'peer-pack-fail').toString();
+      final profiles = [
+        {
+          'id': 'p-pack-fail',
+          'diveId': 'd-pack-fail',
+          'timestamp': 0,
+          'depth': 4.0,
+          'isPrimary': true,
+        },
+      ];
+      final data = SyncData(dives: [diveRow], diveProfiles: profiles);
+      final dataJson = {...data.toJson(), 'diveProfiles': profiles};
+
+      final db = DatabaseService.instance.database;
+      await db.customStatement('DROP TABLE dive_profile_series');
+      await db.customStatement('''
+          CREATE TABLE dive_profile_series (
+            id TEXT NOT NULL PRIMARY KEY,
+            dive_id TEXT NOT NULL,
+            computer_id TEXT,
+            source_id TEXT,
+            is_primary INTEGER NOT NULL DEFAULT 1
+          )
+        ''');
+
+      await pullPeerPayload(dataJson, 'peer-pack-fail');
+
+      final landed = await db
+          .customSelect(
+            'SELECT 1 FROM dives WHERE id = ?',
+            variables: [Variable.withString('d-pack-fail')],
+          )
+          .get();
+      expect(landed, hasLength(1));
+    });
   });
 
   group('adopt: a replace-adopt from a legacy peer', () {
