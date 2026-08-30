@@ -113,4 +113,23 @@ void main() {
 
     expect(input.first.volumeLiters, isNull);
   });
+
+  test('carries provenance fields through untouched', () {
+    // The transmitter registry resolver (issue #1365) runs before this
+    // function and stamps source/sensorRef/equipmentId; they must survive
+    // the default-preset fill.
+    const tank = TankData(
+      index: 0,
+      o2Percent: 21.0,
+      source: 'dc_import',
+      sensorRef: 'channel:0',
+      equipmentId: 'equip-1',
+    );
+
+    final result = applyDefaultPresetToTanks([tank], al80);
+
+    expect(result.first.source, 'dc_import');
+    expect(result.first.sensorRef, 'channel:0');
+    expect(result.first.equipmentId, 'equip-1');
+  });
 }

@@ -23511,6 +23511,48 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_transmitters_title => 'Transmitter';
+
+  @override
+  String get diveComputer_transmitters_emptyState =>
+      'Noch keine Kanäle zugeordnet. Ordne einen Kanal einer Flasche zu, um Grösse, Gasart und Rolle bei jedem Download automatisch zu übernehmen.';
+
+  @override
+  String get diveComputer_transmitters_addTitle => 'Kanalzuordnung hinzufügen';
+
+  @override
+  String get diveComputer_transmitters_editTitle => 'Kanalzuordnung bearbeiten';
+
+  @override
+  String get diveComputer_transmitters_channelLabel => 'Kanalindex';
+
+  @override
+  String diveComputer_transmitters_channelTitle(int channel) {
+    return 'Kanal $channel';
+  }
+
+  @override
+  String get diveComputer_transmitters_labelField => 'Bezeichnung (optional)';
+
+  @override
+  String get diveComputer_transmitters_presetLabel => 'Tankpreset (optional)';
+
+  @override
+  String get diveComputer_transmitters_presetNone => 'Keins';
+
+  @override
+  String get diveComputer_transmitters_duplicateChannelError =>
+      'Für diesen Kanal existiert bereits eine Zuordnung.';
+
+  @override
+  String get diveComputer_transmitters_deleteTitle => 'Zuordnung entfernen?';
+
+  @override
+  String diveComputer_transmitters_deleteMessage(int channel) {
+    return 'Zuordnung für Kanal $channel entfernen? Künftige Downloads auf diesem Kanal verwenden dann wieder das Standard-Tankpreset.';
+  }
+
+  @override
   String get diveLog_detail_menu_reparseRawData => 'Rohdaten neu auswerten';
 
   @override

@@ -11,10 +11,12 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_computer/data/services/dive_import_service.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_dive_mapper.dart';
+import 'package:submersion/features/dive_computer/data/services/transmitter_registry_resolver.dart';
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/domain/services/first_sync_cutoff.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
+import 'package:submersion/features/dive_computer/presentation/providers/transmitter_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -38,6 +40,10 @@ final diveImportServiceProvider = Provider<DiveImportService>((ref) {
     // Read at import time, not provider build time, so a toggle flipped in
     // Settings applies to the very next download (issue #386).
     defaultTankPresetForImports: () => loadDefaultTankPresetForDownloads(ref),
+    // Same per-call rationale: a registry edit should apply to the very next
+    // download (issue #1365).
+    transmitterRegistryForImports: (computerId) =>
+        loadTransmitterRegistryForDownloads(ref, computerId),
   );
 });
 
@@ -52,6 +58,36 @@ Future<TankPresetEntity?> loadDefaultTankPresetForDownloads(Ref ref) async {
     repository: ref.read(tankPresetRepositoryProvider),
   );
   return resolver.resolve(settings.defaultTankPreset);
+}
+
+/// The transmitter registry snapshot for [diveComputerId] (issue #1365):
+/// registry entries keyed by channel index, plus any tank presets they
+/// reference, pre-resolved so the pure resolver never touches the database.
+@visibleForTesting
+Future<TransmitterRegistrySnapshot> loadTransmitterRegistryForDownloads(
+  Ref ref,
+  String diveComputerId,
+) async {
+  final entries = await ref
+      .read(transmitterRepositoryProvider)
+      .getForComputer(diveComputerId);
+  if (entries.isEmpty) return TransmitterRegistrySnapshot.empty;
+
+  final presetRepository = ref.read(tankPresetRepositoryProvider);
+  final presetIds = entries
+      .map((e) => e.tankPresetId)
+      .whereType<String>()
+      .toSet();
+  final presetsById = <String, TankPresetEntity>{};
+  for (final id in presetIds) {
+    final preset = await presetRepository.getPresetById(id);
+    if (preset != null) presetsById[id] = preset;
+  }
+
+  return TransmitterRegistrySnapshot(
+    byChannel: {for (final e in entries) e.channelIndex: e},
+    presetsById: presetsById,
+  );
 }
 
 /// Stream provider for download events from the service.

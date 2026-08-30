@@ -1006,8 +1006,67 @@ class DiveTanks extends Table {
     onDelete: KeyAction.setNull,
   )();
 
+  /// Provenance of this row (transmitter registry, issue #1365): manual |
+  /// dc_import | file_import. Nullable because rows written before v181
+  /// never recorded this.
+  TextColumn get source => text().nullable()();
+
+  /// Stable channel-index-based reference (e.g. "channel:2") stamped by the
+  /// download importer when a [Transmitters] registry entry produced this
+  /// row, so re-imports of the same dive stay idempotent. Null for manual
+  /// and file-import rows, which carry no transmitter identity.
+  TextColumn get sensorRef => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
+}
+
+/// Deterministic mapping from a dive computer's air-integration channel
+/// index to a cylinder role/template (issue #1365). Applied only during
+/// dive-computer download import, so it can assign size, gas mix and role
+/// (bottom/deco/stage/oxygen/diluent) without falling back to the
+/// orphan-to-tank heuristic or the global default tank preset.
+///
+/// libdivecomputer does not expose a transmitter serial number through the
+/// portable API -- dc_tank_t and the sample stream only carry a channel
+/// index -- so (diveComputerId, channelIndex) stands in for physical
+/// transmitter identity, since that pairing is persistent on the device.
+/// [transmitterSerial] is reserved for a future extension that reads paired
+/// serials out of the Shearwater log opening block.
+class Transmitters extends Table {
+  TextColumn get id => text()();
+  TextColumn get diveComputerId =>
+      text().references(DiveComputers, #id, onDelete: KeyAction.cascade)();
+  IntColumn get channelIndex => integer()();
+  TextColumn get label => text().nullable()();
+  TextColumn get transmitterSerial => text().nullable()();
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  // backGas, stage, deco, bailout, oxygen, diluent, etc. -- same vocabulary
+  // as DiveTanks.tankRole.
+  TextColumn get tankRole => text().nullable()();
+  TextColumn get tankPresetId => text().nullable().references(
+    TankPresets,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {diveComputerId, channelIndex},
+  ];
 }
 
 /// Equipment catalog
@@ -3317,6 +3376,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     ServiceSchedules,
     CylinderConfigs,
     CylinderConfigItems,
+    // Transmitter (air-integration channel) registry (issue #1365)
+    Transmitters,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -3326,7 +3387,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 180;
+  static const int currentSchemaVersion = 181;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3715,6 +3776,12 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
+    // v181 (transmitter registry): the transmitters table plus
+    // dive_tanks.source/sensor_ref, mapping a dive computer's
+    // air-integration channel index to a cylinder role/template on import.
+    // Issue #1365. Table creation and the columns are backstop-safe; the
+    // dive_tanks.source backfill for pre-existing rows is onUpgrade-only.
+    181,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5564,6 +5631,48 @@ class AppDatabase extends _$AppDatabase {
         'INTEGER NOT NULL DEFAULT 0',
       );
     }
+  }
+
+  /// v181: the transmitter (air-integration channel) registry table (issue
+  /// #1365). Idempotent for onUpgrade + beforeOpen backstop use.
+  Future<void> _assertTransmittersSchema() async {
+    await createMigrator().createTable(transmitters);
+  }
+
+  /// v181: dive_tanks.source and dive_tanks.sensor_ref columns (issue
+  /// #1365), letting the download importer record where a cylinder row came
+  /// from and, for registry-assigned rows, which channel produced it. Column
+  /// only, no backfill -- see [_backfillDiveTankSourceForImportedRows] for
+  /// the one-time data pass, which must not be re-run from beforeOpen.
+  Future<void> _assertDiveTankTransmitterColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_tanks')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('source')) {
+      await customStatement('ALTER TABLE dive_tanks ADD COLUMN source TEXT');
+    }
+    if (!names.contains('sensor_ref')) {
+      await customStatement(
+        'ALTER TABLE dive_tanks ADD COLUMN sensor_ref TEXT',
+      );
+    }
+  }
+
+  /// v181 one-time backfill: label pre-existing dive_tanks rows with a
+  /// [source] so older, un-tagged rows read as provenance-known rather than
+  /// silently falling into a future "unknown" bucket. Only ever fills rows
+  /// where source IS NULL, so it is safe to reason about as one-time even
+  /// though the guard would also make it idempotent -- onUpgrade only, not a
+  /// beforeOpen backstop, to keep the ladder's one-time passes in one place.
+  Future<void> _backfillDiveTankSourceForImportedRows() async {
+    await customStatement(
+      "UPDATE dive_tanks SET source = 'dc_import' "
+      'WHERE source IS NULL AND computer_id IS NOT NULL',
+    );
+    await customStatement(
+      "UPDATE dive_tanks SET source = 'manual' "
+      'WHERE source IS NULL AND computer_id IS NULL',
+    );
   }
 
   Future<void> _assertBuddyFavoriteColumn() async {
@@ -9263,6 +9372,15 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
+        // v181: transmitter (air-integration channel) registry table plus
+        // dive_tanks.source/sensor_ref (issue #1365). The column-only assert
+        // must run before the backfill, which reads dive_tanks.source.
+        if (from < 181) {
+          await _assertTransmittersSchema();
+          await _assertDiveTankTransmitterColumns();
+          await _backfillDiveTankSourceForImportedRows();
+        }
+        if (from < 181) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9514,6 +9632,14 @@ class AppDatabase extends _$AppDatabase {
         // on every open: the helper is column-only with no backfill, so it
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
+
+        // v181 backstop: re-assert the transmitter registry table and
+        // dive_tanks.source/sensor_ref columns (parallel-branch
+        // version-collision self-heal). The one-time source backfill is NOT
+        // here (onUpgrade only) -- it is safe to re-run, but the ladder
+        // keeps one-time passes out of the backstop by convention.
+        await _assertTransmittersSchema();
+        await _assertDiveTankTransmitterColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

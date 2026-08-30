@@ -1420,6 +1420,7 @@ class DiveComputerRepository {
                 id: Value(tankId),
                 diveId: Value(diveId),
                 computerId: Value(computerId),
+                equipmentId: Value.absentIfNull(tank.equipmentId),
                 volume: Value(tank.volumeLiters),
                 workingPressure: Value.absentIfNull(tank.workingPressure),
                 tankMaterial: Value.absentIfNull(tank.material),
@@ -1430,6 +1431,8 @@ class DiveComputerRepository {
                 hePercent: Value(tank.hePercent),
                 tankOrder: Value(tank.index),
                 tankRole: Value(tank.role ?? 'backGas'),
+                source: Value.absentIfNull(tank.source),
+                sensorRef: Value.absentIfNull(tank.sensorRef),
               ),
             );
             _log.info(
@@ -2246,6 +2249,19 @@ class TankData {
   /// Inferred cylinder role (a [TankRole] name), or null for the default.
   final String? role;
 
+  /// Provenance of this row (transmitter registry, issue #1365): manual |
+  /// dc_import | file_import. Set by the importer, not the parser.
+  final String? source;
+
+  /// Stable channel-index-based reference (e.g. "channel:2"), stamped when a
+  /// transmitter registry entry produced this tank, so re-imports of the
+  /// same dive stay idempotent. Null when no registry entry matched.
+  final String? sensorRef;
+
+  /// Equipment catalog row linked by a matching transmitter registry entry,
+  /// when one exists.
+  final String? equipmentId;
+
   const TankData({
     required this.index,
     required this.o2Percent,
@@ -2257,6 +2273,9 @@ class TankData {
     this.material,
     this.presetName,
     this.role,
+    this.source,
+    this.sensorRef,
+    this.equipmentId,
   });
 }
 

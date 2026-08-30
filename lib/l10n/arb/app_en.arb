@@ -15112,6 +15112,66 @@
       }
     }
   },
+  "diveComputer_transmitters_title": "Transmitters",
+  "@diveComputer_transmitters_title": {
+    "description": "Section title for the transmitter channel registry on the device detail page"
+  },
+  "diveComputer_transmitters_emptyState": "No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.",
+  "@diveComputer_transmitters_emptyState": {
+    "description": "Empty state for the transmitter registry section"
+  },
+  "diveComputer_transmitters_addTitle": "Add Channel Mapping",
+  "@diveComputer_transmitters_addTitle": {
+    "description": "Dialog title when adding a transmitter registry entry"
+  },
+  "diveComputer_transmitters_editTitle": "Edit Channel Mapping",
+  "@diveComputer_transmitters_editTitle": {
+    "description": "Dialog title when editing a transmitter registry entry"
+  },
+  "diveComputer_transmitters_channelLabel": "Channel index",
+  "@diveComputer_transmitters_channelLabel": {
+    "description": "Field label for the transmitter channel index"
+  },
+  "diveComputer_transmitters_channelTitle": "Channel {channel}",
+  "@diveComputer_transmitters_channelTitle": {
+    "description": "Row title showing the channel index of a registry entry",
+    "placeholders": {
+      "channel": {
+        "type": "int",
+        "example": "0"
+      }
+    }
+  },
+  "diveComputer_transmitters_labelField": "Label (optional)",
+  "@diveComputer_transmitters_labelField": {
+    "description": "Field label for the optional free-text transmitter label"
+  },
+  "diveComputer_transmitters_presetLabel": "Tank preset (optional)",
+  "@diveComputer_transmitters_presetLabel": {
+    "description": "Field label for the tank preset picker in the transmitter dialog"
+  },
+  "diveComputer_transmitters_presetNone": "None",
+  "@diveComputer_transmitters_presetNone": {
+    "description": "Option to leave the tank preset unassigned"
+  },
+  "diveComputer_transmitters_duplicateChannelError": "This channel already has a mapping.",
+  "@diveComputer_transmitters_duplicateChannelError": {
+    "description": "Validation error when saving a duplicate channel index"
+  },
+  "diveComputer_transmitters_deleteTitle": "Remove mapping?",
+  "@diveComputer_transmitters_deleteTitle": {
+    "description": "Confirmation dialog title for removing a transmitter registry entry"
+  },
+  "diveComputer_transmitters_deleteMessage": "Remove the mapping for channel {channel}? Future downloads on this channel fall back to the default tank preset.",
+  "@diveComputer_transmitters_deleteMessage": {
+    "description": "Confirmation dialog body for removing a transmitter registry entry",
+    "placeholders": {
+      "channel": {
+        "type": "int",
+        "example": "0"
+      }
+    }
+  },
   "diveLog_detail_menu_reparseRawData": "Re-parse raw data",
   "@diveLog_detail_menu_reparseRawData": {
     "description": "Menu item to re-parse raw dive data"

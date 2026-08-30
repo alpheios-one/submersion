@@ -38803,6 +38803,78 @@ abstract class AppLocalizations {
   /// **'{count} dives with raw data ({without} without)'**
   String diveComputer_detail_reparseRawDataCountWithout(int count, int without);
 
+  /// Section title for the transmitter channel registry on the device detail page
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitters'**
+  String get diveComputer_transmitters_title;
+
+  /// Empty state for the transmitter registry section
+  ///
+  /// In en, this message translates to:
+  /// **'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.'**
+  String get diveComputer_transmitters_emptyState;
+
+  /// Dialog title when adding a transmitter registry entry
+  ///
+  /// In en, this message translates to:
+  /// **'Add Channel Mapping'**
+  String get diveComputer_transmitters_addTitle;
+
+  /// Dialog title when editing a transmitter registry entry
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Channel Mapping'**
+  String get diveComputer_transmitters_editTitle;
+
+  /// Field label for the transmitter channel index
+  ///
+  /// In en, this message translates to:
+  /// **'Channel index'**
+  String get diveComputer_transmitters_channelLabel;
+
+  /// Row title showing the channel index of a registry entry
+  ///
+  /// In en, this message translates to:
+  /// **'Channel {channel}'**
+  String diveComputer_transmitters_channelTitle(int channel);
+
+  /// Field label for the optional free-text transmitter label
+  ///
+  /// In en, this message translates to:
+  /// **'Label (optional)'**
+  String get diveComputer_transmitters_labelField;
+
+  /// Field label for the tank preset picker in the transmitter dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Tank preset (optional)'**
+  String get diveComputer_transmitters_presetLabel;
+
+  /// Option to leave the tank preset unassigned
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get diveComputer_transmitters_presetNone;
+
+  /// Validation error when saving a duplicate channel index
+  ///
+  /// In en, this message translates to:
+  /// **'This channel already has a mapping.'**
+  String get diveComputer_transmitters_duplicateChannelError;
+
+  /// Confirmation dialog title for removing a transmitter registry entry
+  ///
+  /// In en, this message translates to:
+  /// **'Remove mapping?'**
+  String get diveComputer_transmitters_deleteTitle;
+
+  /// Confirmation dialog body for removing a transmitter registry entry
+  ///
+  /// In en, this message translates to:
+  /// **'Remove the mapping for channel {channel}? Future downloads on this channel fall back to the default tank preset.'**
+  String diveComputer_transmitters_deleteMessage(int channel);
+
   /// Menu item to re-parse raw dive data
   ///
   /// In en, this message translates to:

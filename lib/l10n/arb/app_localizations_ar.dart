@@ -23137,6 +23137,48 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_transmitters_title => 'Transmitters';
+
+  @override
+  String get diveComputer_transmitters_emptyState =>
+      'No channels mapped yet. Map a channel to a cylinder to apply size, gas and role automatically on every download.';
+
+  @override
+  String get diveComputer_transmitters_addTitle => 'Add Channel Mapping';
+
+  @override
+  String get diveComputer_transmitters_editTitle => 'Edit Channel Mapping';
+
+  @override
+  String get diveComputer_transmitters_channelLabel => 'Channel index';
+
+  @override
+  String diveComputer_transmitters_channelTitle(int channel) {
+    return 'Channel $channel';
+  }
+
+  @override
+  String get diveComputer_transmitters_labelField => 'Label (optional)';
+
+  @override
+  String get diveComputer_transmitters_presetLabel => 'Tank preset (optional)';
+
+  @override
+  String get diveComputer_transmitters_presetNone => 'None';
+
+  @override
+  String get diveComputer_transmitters_duplicateChannelError =>
+      'This channel already has a mapping.';
+
+  @override
+  String get diveComputer_transmitters_deleteTitle => 'Remove mapping?';
+
+  @override
+  String diveComputer_transmitters_deleteMessage(int channel) {
+    return 'Remove the mapping for channel $channel? Future downloads on this channel fall back to the default tank preset.';
+  }
+
+  @override
   String get diveLog_detail_menu_reparseRawData =>
       'إعادة تحليل البيانات الأولية';
 
