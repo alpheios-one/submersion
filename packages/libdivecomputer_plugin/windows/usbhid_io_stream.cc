@@ -237,27 +237,42 @@ int UsbHidIoStream::PerformWrite(const void* data, size_t size,
                    &overlapped)) {
         if (GetLastError() != ERROR_IO_PENDING) {
             status = LIBDC_STATUS_IO;
-        } else if (WaitForSingleObject(write_event,
-                                       timeout_ms_ < 0
-                                           ? INFINITE
-                                           : static_cast<DWORD>(timeout_ms_)) !=
-                   WAIT_OBJECT_0) {
-            // CancelIoEx, not CancelIo: CancelIo cancels every operation the
-            // calling thread has outstanding on this handle, and reads and
-            // writes both come from libdivecomputer's one download thread. A
-            // write timeout would take the read that PerformRead deliberately
-            // leaves pending with it, and the next read would then fail with
-            // ERROR_OPERATION_ABORTED and end the download for no reason.
-            CancelIoEx(handle_, &overlapped);
-            GetOverlappedResult(handle_, &overlapped, &written, TRUE);
-            status = LIBDC_STATUS_TIMEOUT;
-        } else if (!GetOverlappedResult(handle_, &overlapped, &written, FALSE)) {
-            status = LIBDC_STATUS_IO;
+        } else {
+            const DWORD wait = WaitForSingleObject(
+                write_event,
+                timeout_ms_ < 0 ? INFINITE : static_cast<DWORD>(timeout_ms_));
+
+            // Classified the same way PerformRead classifies its wait. Folding
+            // everything that is not WAIT_OBJECT_0 into a timeout would report
+            // WAIT_FAILED, which means the wait itself broke, as though the
+            // dive computer had simply been slow.
+            if (wait != WAIT_OBJECT_0) {
+                // CancelIoEx, not CancelIo: CancelIo cancels every operation
+                // the calling thread has outstanding on this handle, and reads
+                // and writes both come from libdivecomputer's one download
+                // thread. Cancelling broadly would take the read that
+                // PerformRead deliberately leaves pending, and the next read
+                // would then fail with ERROR_OPERATION_ABORTED for no reason.
+                CancelIoEx(handle_, &overlapped);
+                GetOverlappedResult(handle_, &overlapped, &written, TRUE);
+                status = wait == WAIT_TIMEOUT ? LIBDC_STATUS_TIMEOUT
+                                              : LIBDC_STATUS_IO;
+            } else if (!GetOverlappedResult(handle_, &overlapped, &written,
+                                            FALSE)) {
+                status = LIBDC_STATUS_IO;
+            }
         }
     }
     CloseHandle(write_event);
 
     if (status != LIBDC_STATUS_SUCCESS) return status;
+
+    // A HID report reaches the device whole or not at all, so a short write is
+    // a failure rather than a partial success. Reporting it upward as success
+    // would leave the device holding half a command and desynchronise every
+    // exchange after it.
+    if (written != static_cast<DWORD>(length)) return LIBDC_STATUS_IO;
+
     // The caller counts the bytes it handed over, not the padding, exactly as
     // libdivecomputer's own write does (usbhid.c:776-778).
     if (actual != nullptr) *actual = size;

@@ -42,9 +42,12 @@ static gboolean read_uevent(const gchar* node, unsigned short* vendor_id,
     g_auto(GStrv) lines = g_strsplit(contents, "\n", -1);
     for (int i = 0; lines[i] != NULL; i++) {
         if (g_str_has_prefix(lines[i], "HID_ID=")) {
-            unsigned int bus = 0, vendor = 0, product = 0;
-            if (sscanf(lines[i] + strlen("HID_ID="), "%x:%x:%x", &bus, &vendor,
-                       &product) == 3) {
+            // The bus id leads HID_ID and nothing here wants it, so %*x
+            // parses and discards it. That makes sscanf report two
+            // assignments rather than three.
+            unsigned int vendor = 0, product = 0;
+            if (sscanf(lines[i] + strlen("HID_ID="), "%*x:%x:%x", &vendor,
+                       &product) == 2) {
                 *vendor_id = (unsigned short)(vendor & 0xFFFF);
                 *product_id = (unsigned short)(product & 0xFFFF);
                 found_ids = TRUE;
