@@ -3361,12 +3361,12 @@ class AppDatabase extends _$AppDatabase {
   /// no released build was ever stamped 182. Shipped devices are at 180, the
   /// 181 rung is still an open PR, and 182 and 183 land in the same release,
   /// so nothing in the fleet is held by 183 that 182 did not already hold.
-  /// What the extra step buys is the v183 rung itself: it drops the legacy
-  /// tables and purges the `deletion_log` rows for diveProfiles and
-  /// tankPressureProfiles, and those tombstones were also the guard that kept
-  /// a peer's stale legacy rows from being resurrected on apply. A reader
-  /// that has run v183 no longer has that guard, so it must not be one of the
-  /// readers a 182 writer expects to apply its legacy payloads.
+  /// The extra step records that v183, not v182, is the rung that drops the
+  /// legacy tables and purges their `deletion_log` rows. The floor is stamped
+  /// on this device's own payloads and only holds readers below it; the gate
+  /// is one-directional and does nothing to inbound payloads from an older
+  /// peer. See [_purgeLegacySampleBookkeeping] for why those inbound legacy
+  /// rows stay safe without the purged tombstones.
   static const int minimumCompatibleSchemaVersion = 183;
 
   /// Every schema version that has a migration block in onUpgrade.
