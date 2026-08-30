@@ -160,4 +160,47 @@ void main() {
           'crop selects the wrong region',
     );
   });
+
+  test('PNG bytes decode when no name is declared', () {
+    // Contact photos arrive with no filename and are not guaranteed to be
+    // JPEG, so they are encoded with declaredName null and the format probed.
+    final image = img.Image(width: 300, height: 200);
+    img.fill(image, color: img.ColorRgb8(20, 90, 160));
+    final png = Uint8List.fromList(img.encodePng(image));
+
+    final result = runImageEncodeRequest(
+      ImageEncodeRequest.fromBytes(bytes: png, spec: ImageEncodeSpec.avatar),
+    );
+
+    expect(result.outcome, ImageEncodeOutcome.encoded);
+    final out = _decode(result.bytes!);
+    expect(out.width, out.height, reason: 'avatars are square');
+  });
+
+  test('a wrong declared extension is why contact photos declare none', () {
+    // decodeNamedImage picks the decoder purely by extension and does NOT
+    // fall back when that decoder fails, so calling PNG bytes '.jpg' hands
+    // them to the JPEG decoder. This pins the hazard the contacts paths avoid.
+    final image = img.Image(width: 120, height: 120);
+    img.fill(image, color: img.ColorRgb8(20, 90, 160));
+    final png = Uint8List.fromList(img.encodePng(image));
+
+    final mislabelled = runImageEncodeRequest(
+      ImageEncodeRequest.fromBytes(
+        bytes: png,
+        spec: ImageEncodeSpec.avatar,
+        declaredName: 'contact.jpg',
+      ),
+    );
+    final probed = runImageEncodeRequest(
+      ImageEncodeRequest.fromBytes(bytes: png, spec: ImageEncodeSpec.avatar),
+    );
+
+    expect(probed.outcome, ImageEncodeOutcome.encoded);
+    expect(
+      mislabelled.outcome,
+      isNot(ImageEncodeOutcome.encoded),
+      reason: 'a wrong extension must not be trusted over the actual bytes',
+    );
+  });
 }

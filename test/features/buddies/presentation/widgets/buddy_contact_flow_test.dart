@@ -26,6 +26,12 @@ class _StubBuddyListNotifier extends StateNotifier<AsyncValue<List<Buddy>>>
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
+Uint8List _png() {
+  final image = img.Image(width: 200, height: 200);
+  img.fill(image, color: img.ColorRgb8(200, 30, 30));
+  return Uint8List.fromList(img.encodePng(image));
+}
+
 Uint8List _jpeg() {
   final image = img.Image(width: 200, height: 200);
   img.fill(image, color: img.ColorRgb8(10, 120, 200));
@@ -158,5 +164,19 @@ void main() {
 
     expect(extra, isNull);
     expect(find.text('new buddy form'), findsNothing);
+  });
+
+  testWidgets('a PNG contact photo survives the import', (tester) async {
+    // The address book gives no filename and does not guarantee JPEG. When
+    // this path claimed '.jpg', decodeNamedImage handed PNG bytes to the JPEG
+    // decoder and a perfectly valid photo was dropped as undecodable.
+    final extra = await _runImport(tester, () async => _contact(photo: _png()));
+
+    expect(extra, isNotNull);
+    expect(
+      extra!['photo'],
+      isA<Uint8List>(),
+      reason: 'a PNG contact photo must not be discarded as undecodable',
+    );
   });
 }

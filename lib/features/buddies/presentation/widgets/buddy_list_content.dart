@@ -393,11 +393,14 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           fullContact.photo?.fullSize ?? fullContact.photo?.thumbnail;
       Uint8List? photo;
       if (rawPhoto != null) {
+        // No declaredName: the address book gives no filename and a contact
+        // photo is not guaranteed to be JPEG. decodeNamedImage picks the
+        // decoder purely by extension with no fallback, so claiming '.jpg'
+        // over PNG bytes would report a valid photo as undecodable.
         final encoded = await encodeStoredImage(
           ImageEncodeRequest.fromBytes(
             bytes: rawPhoto,
             spec: ImageEncodeSpec.avatar,
-            declaredName: 'contact.jpg',
           ),
         );
         if (encoded.outcome == ImageEncodeOutcome.encoded) {

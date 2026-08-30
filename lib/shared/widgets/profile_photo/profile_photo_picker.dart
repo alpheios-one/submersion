@@ -61,7 +61,12 @@ Future<ProfilePhotoResult?> pickProfilePhoto({
   if (source == ProfilePhotoSource.contacts) {
     // Unreachable without a loader, since the option is gated above.
     raw = await contactPhotoLoader!(context);
-    declaredName = 'contact.jpg';
+    // No declaredName: the address book gives no filename and a contact photo
+    // is not guaranteed to be JPEG. decodeNamedImage picks the decoder purely
+    // by extension with no fallback, so claiming '.jpg' over PNG bytes would
+    // hand them to the JPEG decoder and report a valid photo as undecodable.
+    // Null makes the codec probe the actual bytes.
+    declaredName = null;
     if (raw == null) return null;
   } else {
     final imageSource = source == ProfilePhotoSource.camera
