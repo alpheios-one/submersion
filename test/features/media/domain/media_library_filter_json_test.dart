@@ -10,6 +10,7 @@ void main() {
       siteId: 's1',
       tripId: 't1',
       diveId: 'd1',
+      speciesId: 'sp1',
       fromDate: DateTime(2026, 6, 1),
       toDate: DateTime(2026, 6, 30),
       sourceType: MediaSourceType.localFile,
@@ -106,6 +107,7 @@ void main() {
         siteId: 's1',
         tripId: 't1',
         diveId: 'd1',
+        speciesId: 'sp1',
         mediaType: MediaType.video,
         sourceType: MediaSourceType.mediaStore,
         health: MediaHealthFilter.missing,
@@ -162,6 +164,25 @@ void main() {
       expect(const MediaLibraryFilter(), MediaLibraryFilter.none);
       expect(MediaLibraryFilter.none.isEmpty, isTrue);
       expect(const MediaLibraryFilter(siteId: 's1').isEmpty, isFalse);
+      expect(const MediaLibraryFilter(speciesId: 'sp1').isEmpty, isFalse);
+    });
+
+    test('a species facet alone distinguishes two filters', () {
+      const base = MediaLibraryFilter(siteId: 's1');
+      expect(
+        base == const MediaLibraryFilter(siteId: 's1', speciesId: 'sp1'),
+        isFalse,
+      );
+      expect(
+        const MediaLibraryFilter(speciesId: 'sp1').copyWith(speciesId: null),
+        MediaLibraryFilter.none,
+      );
+    });
+
+    test('an album saved before the species facet decodes without it', () {
+      final restored = MediaLibraryFilter.fromJson({'siteId': 's1'});
+      expect(restored.speciesId, isNull);
+      expect(restored.siteId, 's1');
     });
 
     test('a round trip through JSON preserves equality', () {

@@ -7,6 +7,7 @@ import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
 import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_sample_units.dart';
 
 /// Service responsible for applying re-parsed dive computer data back to the
 /// database while respecting the computer-authored vs user-authored field
@@ -560,7 +561,7 @@ class ReparseService {
             ceiling: Value(
               s.decoType != null && s.decoType != 0 ? s.decoDepth : null,
             ),
-            rbt: Value(s.rbt),
+            rbt: Value(libdcRbtToSeconds(s.rbt)),
             decoType: Value(s.decoType),
             tts: Value(s.tts),
             o2Sensor1: Value(s.o2Sensor1),

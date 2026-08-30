@@ -36,7 +36,7 @@ List<PhotoChartMarker> photoMarkersFromMedia(
     // Photos AND videos get markers — underwater libraries are often mostly
     // short clips, and enrichment gives both the same (time, depth) position.
     // Only signatures are categorically not dive-moment media.
-    if (item.mediaType == MediaType.instructorSignature) continue;
+    if (item.isSignature) continue;
     final enrichment = item.enrichment;
     if (enrichment == null) continue;
     if (enrichment.matchConfidence == MatchConfidence.noProfile) continue;
