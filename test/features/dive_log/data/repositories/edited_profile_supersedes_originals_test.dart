@@ -2,6 +2,8 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -60,6 +62,22 @@ void main() {
           ),
         );
   }
+
+  /// The series twin of [insertProfileRow]: one single-sample series per
+  /// call, for tests exercising a writer that now reads and writes series
+  /// rows instead of legacy `dive_profiles` rows.
+  Future<void> insertSeriesRow({
+    required int timestamp,
+    required double depth,
+    required String? computerId,
+    required bool isPrimary,
+  }) => ProfileSeriesRepository().insertSeries(
+    diveId: 'dive-1',
+    computerId: computerId,
+    isPrimary: isPrimary,
+    samples: [ProfileSample(timestamp: timestamp, depth: depth)],
+    now: now,
+  );
 
   Future<void> insertComputer(String id) => db
       .into(db.diveComputers)
@@ -213,7 +231,7 @@ void main() {
         );
 
         for (final (ts, depth) in [(0, 0.0), (4, 20.0), (8, 0.0)]) {
-          await insertProfileRow(
+          await insertSeriesRow(
             timestamp: ts,
             depth: depth,
             computerId: 'dc-a',
@@ -222,7 +240,7 @@ void main() {
         }
         // Secondary computers are always stored demoted.
         for (final (ts, depth) in [(0, 0.1), (4, 20.5), (8, 0.2)]) {
-          await insertProfileRow(
+          await insertSeriesRow(
             timestamp: ts,
             depth: depth,
             computerId: 'dc-b',

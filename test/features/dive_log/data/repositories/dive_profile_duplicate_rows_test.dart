@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 
@@ -100,21 +102,16 @@ void main() {
         ],
       ),
     );
-    final rows = await (db.select(
-      db.diveProfiles,
-    )..where((t) => t.diveId.equals('meta'))).get();
-    for (final row in rows) {
-      await db
-          .into(db.diveProfiles)
-          .insert(
-            row
-                .toCompanion(false)
-                .copyWith(
-                  id: Value('${row.id}-hr'),
-                  heartRate: const Value(72),
-                ),
-          );
-    }
+    // A second, unattributed series sharing every (timestamp, depth) pair
+    // with the first but carrying its own heart rate.
+    await ProfileSeriesRepository().insertSeries(
+      diveId: 'meta',
+      samples: [
+        for (var t = 0; t <= 100; t += 10)
+          ProfileSample(timestamp: t, depth: t / 10.0, heartRate: 72),
+      ],
+      now: 1000,
+    );
 
     expect(await repository.getMergedProfile('meta'), hasLength(22));
   });
@@ -132,21 +129,16 @@ void main() {
         ],
       ),
     );
-    final rows = await (db.select(
-      db.diveProfiles,
-    )..where((t) => t.diveId.equals('twosrc'))).get();
-    for (final row in rows) {
-      await db
-          .into(db.diveProfiles)
-          .insert(
-            row
-                .toCompanion(false)
-                .copyWith(
-                  id: Value('${row.id}-b'),
-                  depth: Value(row.depth + 0.4),
-                ),
-          );
-    }
+    // A second, unattributed series recording a different depth at every
+    // shared timestamp.
+    await ProfileSeriesRepository().insertSeries(
+      diveId: 'twosrc',
+      samples: [
+        for (var t = 0; t <= 100; t += 10)
+          ProfileSample(timestamp: t, depth: t / 10.0 + 0.4),
+      ],
+      now: 1000,
+    );
 
     expect(await repository.getMergedProfile('twosrc'), hasLength(22));
   });

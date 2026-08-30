@@ -13,6 +13,7 @@ import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample_point.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -953,53 +954,21 @@ class DiveRepository {
                   ..limit(1))
                 .getSingleOrNull();
 
-        // Demote all existing profiles to non-primary
-        await (_db.update(_db.diveProfiles)
-              ..where((t) => t.diveId.equals(diveId)))
-            .write(const DiveProfilesCompanion(isPrimary: Value(false)));
-
-        // Insert edited profile points (computerId left null to avoid FK violation)
-        await _db.batch((batch) {
-          for (final point in editedPoints) {
-            batch.insert(
-              _db.diveProfiles,
-              DiveProfilesCompanion(
-                id: Value(_uuid.v4()),
-                diveId: Value(diveId),
-                sourceId: Value(primarySource?.id),
-                isPrimary: const Value(true),
-                timestamp: Value(point.timestamp),
-                depth: Value(point.depth),
-                pressure: const Value(null),
-                temperature: Value(point.temperature),
-                heartRate: Value(point.heartRate),
-                heading: Value(point.heading),
-                heartRateSource: Value(point.heartRateSource),
-                setpoint: Value(point.setpoint),
-                ppO2: Value(point.ppO2),
-                o2Sensor1: Value(point.o2Sensor1),
-                o2Sensor2: Value(point.o2Sensor2),
-                o2Sensor3: Value(point.o2Sensor3),
-                o2Sensor4: Value(point.o2Sensor4),
-                o2Sensor5: Value(point.o2Sensor5),
-                o2Sensor6: Value(point.o2Sensor6),
-                o2SensorMv1: Value(point.o2SensorMv1),
-                o2SensorMv2: Value(point.o2SensorMv2),
-                o2SensorMv3: Value(point.o2SensorMv3),
-                o2SensorMv4: Value(point.o2SensorMv4),
-                o2SensorMv5: Value(point.o2SensorMv5),
-                o2SensorMv6: Value(point.o2SensorMv6),
-                cns: Value(point.cns),
-                ndl: Value(point.ndl),
-                ceiling: Value(point.ceiling),
-                ascentRate: Value(point.ascentRate),
-                rbt: Value(point.rbt),
-                decoType: Value(point.decoType),
-                tts: Value(point.tts),
-              ),
-            );
-          }
-        });
+        // Demote every series, then the edit becomes the one primary series
+        // of the dive: no computer (a manual correction), owned by the source
+        // that was primary at the time (issue #1149).
+        await _profileSeries.demoteAll(diveId, now: now);
+        if (editedPoints.isNotEmpty) {
+          await _profileSeries.insertSeries(
+            diveId: diveId,
+            sourceId: primarySource?.id,
+            isPrimary: true,
+            samples: [
+              for (final point in editedPoints) profileSampleFromPoint(point),
+            ],
+            now: now,
+          );
+        }
 
         // Recalculate dive stats from edited profile
         if (editedPoints.isNotEmpty) {
@@ -1382,6 +1351,7 @@ class DiveRepository {
               ..where((t) => t.isPrimary.equals(true))
               ..where((t) => t.computerId.isNull()))
             .go();
+        await _profileSeries.deleteEditedSeries(diveId);
 
         // Find the primary computer from dive_data_sources
         final primaryReading =
@@ -1394,16 +1364,13 @@ class DiveRepository {
         final primaryComputerId = primaryReading?.computerId;
 
         if (primaryComputerId != null) {
-          // Multi-computer dive: only restore the previously-primary computer
-          await (_db.update(_db.diveProfiles)
-                ..where((t) => t.diveId.equals(diveId))
-                ..where((t) => t.computerId.equals(primaryComputerId)))
-              .write(const DiveProfilesCompanion(isPrimary: Value(true)));
+          // Multi-computer dive: only the previously-primary computer's
+          // series come back.
+          await _profileSeries.promoteByComputer(diveId, primaryComputerId);
         } else {
-          // Single-computer dive (or no computer reading): restore all rows
-          await (_db.update(_db.diveProfiles)
-                ..where((t) => t.diveId.equals(diveId)))
-              .write(const DiveProfilesCompanion(isPrimary: Value(true)));
+          // Single-computer dive (or no computer reading): everything left is
+          // the live profile.
+          await _profileSeries.promoteAll(diveId);
         }
       });
 
@@ -1696,46 +1663,6 @@ class DiveRepository {
           );
         }
 
-        // Insert profile points - no individual sync records needed,
-        // the parent dive sync record covers all child data
-        for (final point in dive.profile) {
-          batch.insert(
-            _db.diveProfiles,
-            DiveProfilesCompanion(
-              id: Value(_uuid.v4()),
-              diveId: Value(id),
-              timestamp: Value(point.timestamp),
-              depth: Value(point.depth),
-              pressure: const Value(null),
-              temperature: Value(point.temperature),
-              heartRate: Value(point.heartRate),
-              heading: Value(point.heading),
-              heartRateSource: Value(point.heartRateSource),
-              setpoint: Value(point.setpoint),
-              ppO2: Value(point.ppO2),
-              o2Sensor1: Value(point.o2Sensor1),
-              o2Sensor2: Value(point.o2Sensor2),
-              o2Sensor3: Value(point.o2Sensor3),
-              o2Sensor4: Value(point.o2Sensor4),
-              o2Sensor5: Value(point.o2Sensor5),
-              o2Sensor6: Value(point.o2Sensor6),
-              o2SensorMv1: Value(point.o2SensorMv1),
-              o2SensorMv2: Value(point.o2SensorMv2),
-              o2SensorMv3: Value(point.o2SensorMv3),
-              o2SensorMv4: Value(point.o2SensorMv4),
-              o2SensorMv5: Value(point.o2SensorMv5),
-              o2SensorMv6: Value(point.o2SensorMv6),
-              cns: Value(point.cns),
-              ndl: Value(point.ndl),
-              ceiling: Value(point.ceiling),
-              ascentRate: Value(point.ascentRate),
-              rbt: Value(point.rbt),
-              decoType: Value(point.decoType),
-              tts: Value(point.tts),
-            ),
-          );
-        }
-
         // Insert equipment associations
         for (final item in dive.equipment) {
           batch.insert(
@@ -1747,6 +1674,18 @@ class DiveRepository {
           );
         }
       });
+
+      // Profile samples: one packed primary series with no computer and no
+      // source, the same identity the legacy rows carried for a manual dive.
+      if (dive.profile.isNotEmpty) {
+        await _profileSeries.insertSeries(
+          diveId: id,
+          samples: [
+            for (final point in dive.profile) profileSampleFromPoint(point),
+          ],
+          now: now,
+        );
+      }
 
       // Insert tag associations
       if (dive.tags.isNotEmpty) {
@@ -6654,9 +6593,7 @@ class DiveRepository {
             .get();
     if (sources.length != 1) return;
 
-    await (_db.update(_db.diveProfiles)
-          ..where((t) => t.diveId.equals(diveId) & t.sourceId.isNull()))
-        .write(DiveProfilesCompanion(sourceId: Value(reading.id.value)));
+    await _profileSeries.adoptUnattributed(diveId, reading.id.value);
   }
 
   /// Delete a computer reading snapshot by its ID.
@@ -6811,11 +6748,20 @@ class DiveRepository {
         // dive kept rendering, because getDiveById and getMergedProfile do
         // not filter on the flag, while getDiveProfile, getAscentDescentRates
         // and the data-quality prefilters silently skipped it.
-        if (await _sourceOwnsProfiles(diveId, newPrimary)) {
-          await (_db.update(_db.diveProfiles)
-                ..where((t) => t.diveId.equals(diveId)))
-              .write(const DiveProfilesCompanion(isPrimary: Value(false)));
-          await _promoteProfilesOwnedBySource(diveId, newPrimary);
+        // Flip the profile flags only when the new primary owns samples;
+        // otherwise the current primary profile stays on display (#1149).
+        if (await _profileSeries.ownsAny(
+          diveId,
+          sourceId: newPrimary.id,
+          computerId: newPrimary.computerId,
+        )) {
+          await _profileSeries.demoteAll(diveId, now: now);
+          await _profileSeries.promoteWinnerOwnedBy(
+            diveId,
+            sourceId: newPrimary.id,
+            computerId: newPrimary.computerId,
+            now: now,
+          );
         }
       });
       SyncEventBus.notifyLocalChange();
@@ -6827,101 +6773,6 @@ class DiveRepository {
       );
       rethrow;
     }
-  }
-
-  /// Matches the [DiveProfiles] rows on a dive that [source] owns.
-  ///
-  /// Ownership prefers the v154 `sourceId` FK and falls back to the pre-v154
-  /// convention for rows that carry none -- rows written before the migration
-  /// backfilled them, and rows synced from a peer still on an older schema.
-  /// That convention, which [getProfilesByDataSource] also implements, is:
-  /// a row belongs to [source] when their `computerId`s match, and a
-  /// null-`computerId` row belongs to whichever source is primary.
-  ///
-  /// `computer_id IS ?` rather than `=` is load-bearing. `=` never matches
-  /// NULL, which is exactly how issue #1149 began: the old promote could not
-  /// address a file-imported source's rows at all. `IS` compares null-safely,
-  /// so one predicate covers both a real computer id and the null every file
-  /// import and manual entry carries.
-  ///
-  /// `source.isPrimary` is deliberately not consulted: callers load the row
-  /// before swapping the source flags, so it still reads false for the very
-  /// source being promoted. The convention is applied prospectively -- this
-  /// source is about to be primary, so the dive's unattributed
-  /// null-computerId rows are the ones it will own.
-  static const String _ownedBySourceSql =
-      '(p.source_id = ?2 OR (p.source_id IS NULL AND p.computer_id IS ?3))';
-
-  List<Variable<Object>> _ownershipVars(
-    String diveId,
-    DiveDataSourcesData source,
-  ) => [
-    Variable<String>(diveId),
-    Variable<String>(source.id),
-    Variable<String>(source.computerId),
-  ];
-
-  /// Whether [source] owns any of the dive's profile rows.
-  ///
-  /// Read before the demote so a source that owns nothing leaves the existing
-  /// primary set alone rather than stranding the dive (issue #1149).
-  Future<bool> _sourceOwnsProfiles(
-    String diveId,
-    DiveDataSourcesData source,
-  ) async {
-    final row = await _db
-        .customSelect(
-          'SELECT EXISTS(SELECT 1 FROM dive_profiles p '
-          'WHERE p.dive_id = ?1 AND $_ownedBySourceSql) AS owns',
-          variables: _ownershipVars(diveId, source),
-          readsFrom: {_db.diveProfiles},
-        )
-        .getSingle();
-    return row.read<int>('owns') == 1;
-  }
-
-  /// Promotes the rows [source] owns, one per timestamp.
-  ///
-  /// Expressed as a predicate rather than a list of ids on purpose. Binding
-  /// one variable per sample capped the method at SQLite's bound-variable
-  /// limit -- 999 on builds before 3.32, 32766 after -- so a long enough dive
-  /// failed with "too many SQL variables". The limit varies by platform build
-  /// (system SQLite on Android, the bundled SQLCipher elsewhere), so this
-  /// binds a fixed three variables at any dive length instead of chunking to
-  /// whichever ceiling the current build happens to have.
-  ///
-  /// The ranking is what keeps an edited profile from rendering twice.
-  /// [saveEditedProfile] does not replace the rows it supersedes: it demotes
-  /// them and inserts a second, null-computerId generation alongside. Both
-  /// generations belong to the same source and share timestamps, so promoting
-  /// the whole owned set would resurrect the originals next to the edit. Only
-  /// the winner at each timestamp is promoted: the null-computerId row first,
-  /// which is the same "the edit is the live one" rule
-  /// [restoreOriginalProfile] encodes, then the greatest id. Both halves are
-  /// deterministic and derived from synced values, so every device resolves
-  /// the same winner and the flag does not ping-pong through sync.
-  ///
-  /// ROW_NUMBER, not a correlated subquery matching on timestamp. There is no
-  /// index on dive_profiles(timestamp) -- only dive_id -- so a correlated form
-  /// rescans the dive once per row, which measured 45 seconds on a
-  /// 32767-sample dive. The window function sorts the dive's rows once
-  /// instead. The same pattern already appears in the dedupe migrations in
-  /// database.dart.
-  Future<void> _promoteProfilesOwnedBySource(
-    String diveId,
-    DiveDataSourcesData source,
-  ) async {
-    await _db.customStatement(
-      'UPDATE dive_profiles SET is_primary = 1 WHERE id IN ('
-      'SELECT id FROM ('
-      'SELECT p.id AS id, ROW_NUMBER() OVER ('
-      'PARTITION BY p.timestamp '
-      'ORDER BY (p.computer_id IS NULL) DESC, p.id DESC) AS rn '
-      'FROM dive_profiles p '
-      'WHERE p.dive_id = ?1 AND $_ownedBySourceSql'
-      ') WHERE rn = 1)',
-      _ownershipVars(diveId, source).map((v) => v.value).toList(),
-    );
   }
 
   /// Resolves a `{ computerId -> friendly name }` map for the given source
