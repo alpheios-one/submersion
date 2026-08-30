@@ -104,6 +104,8 @@ class _CountingAdapter implements ImportSourceAdapter {
 
 Widget _buildWizard(ImportSourceAdapter adapter) {
   return MaterialApp(
+    // Pinned: the assertions read the English "Dives (n)" tab label.
+    locale: const Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: UnifiedImportWizard(adapter: adapter),
