@@ -6,9 +6,9 @@
 // A post-merge hook packs whatever legacy rows land locally into series.
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -312,6 +312,18 @@ void main() {
         final dataJson = {...data.toJson(), 'diveProfiles': profiles};
 
         await pullPeerPayload(dataJson, 'peer-181b');
+
+        // The merge itself must have succeeded (legacy rows still apply
+        // through the kept upsertRecords case): this is the packer's
+        // dive-already-has-a-series gate skipping the pack, not a failed
+        // merge that never wrote the row at all.
+        final landed = await DatabaseService.instance.database
+            .customSelect(
+              'SELECT 1 FROM dive_profiles WHERE id = ?',
+              variables: [Variable.withString('p-stale')],
+            )
+            .get();
+        expect(landed, hasLength(1));
 
         final after = (await ProfileSeriesRepository().getSeriesForDive(
           'd1',

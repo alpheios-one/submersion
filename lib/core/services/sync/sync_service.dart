@@ -2126,10 +2126,10 @@ class SyncService {
   /// silently skipped on base import (mirrors [entityHasUpdatedAt]'s own doc
   /// comment); kept separate from [entityHasUpdatedAt] itself so that map's
   /// structural test is unaffected.
-  static Map<String, bool> get _baseApplyEntityFlags => {
+  static final Map<String, bool> _baseApplyEntityFlags = Map.unmodifiable({
     ...entityHasUpdatedAt,
     ...inboundOnlyLegacyEntities,
-  };
+  });
 
   /// Every synced child -> parent FK whose parent can be deleted (and thus
   /// tombstoned in the deletion log). Used by [_mergeEntity] to keep a peer's
