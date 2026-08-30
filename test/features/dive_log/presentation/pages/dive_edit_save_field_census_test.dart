@@ -30,6 +30,29 @@ void main() {
         'legacy single weight type; retired together with weightAmount',
   };
 
+  /// The named arguments of the constructor call [literal] belongs to, and
+  /// only those.
+  ///
+  /// A bare `^\s+(\w+):` also matches the arguments of nested constructors
+  /// (`scrubber: ScrubberInfo(type: ..., ratedMinutes: ...)`), which would let
+  /// a future `Dive` field whose name collides with a nested argument pass as
+  /// "named" and slip past this guard. `dart format` puts every top-level
+  /// argument at one indent and indents nested ones strictly further, so the
+  /// shallowest indent is the literal's own argument level. A nested argument
+  /// written on one line is excluded too, because `^` only matches the first
+  /// `name:` on each line.
+  Set<String> topLevelNamedArgs(String literal) {
+    final rows = RegExp(r'^( +)(\w+):', multiLine: true).allMatches(literal);
+    if (rows.isEmpty) return {};
+    final topLevel = rows
+        .map((m) => m.group(1)!.length)
+        .reduce((a, b) => a < b ? a : b);
+    return rows
+        .where((m) => m.group(1)!.length == topLevel)
+        .map((m) => m.group(2)!)
+        .toSet();
+  }
+
   String between(String source, String start, String end, String what) {
     final from = source.indexOf(start);
     expect(from, greaterThanOrEqualTo(0), reason: 'could not find $what');
@@ -75,10 +98,7 @@ void main() {
       '\n      );',
       'the Dive literal in _saveDive',
     );
-    final named = RegExp(
-      r'^\s+(\w+):',
-      multiLine: true,
-    ).allMatches(literal).map((m) => m.group(1)!).toSet();
+    final named = topLevelNamedArgs(literal);
 
     // Guard the parsers themselves: a moved marker must not pass vacuously.
     expect(ctorParams.length, greaterThan(60));
@@ -113,5 +133,35 @@ void main() {
             'updateDive writes; remove it',
       );
     }
+  });
+
+  test('the named-argument parser ignores nested constructor arguments', () {
+    // A field name deliberately shared between the outer literal and a nested
+    // constructor: the collision the census would otherwise be blind to.
+    const literal = '''
+final dive = Dive(
+        id: widget.diveId ?? '',
+        notes: _notesController.text,
+        scrubber: _scrubberType != null
+            ? ScrubberInfo(
+                type: _scrubberType!,
+                ratedMinutes: _scrubberDurationMinutes,
+                notes: 'nested, not a Dive argument',
+              )
+            : null,
+        weights: const [DiveWeight(amountKg: 4, weightType: WeightType.belt)],
+''';
+
+    final named = topLevelNamedArgs(literal);
+
+    expect(named, containsAll(<String>['id', 'notes', 'scrubber', 'weights']));
+    expect(
+      named,
+      isNot(anyElement(isIn(<String>['type', 'ratedMinutes', 'amountKg']))),
+      reason:
+          'arguments of a nested constructor must not count as named by the '
+          'Dive literal, or a Dive field sharing one of their names would '
+          'slip past the census',
+    );
   });
 }
