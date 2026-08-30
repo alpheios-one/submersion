@@ -2538,6 +2538,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get common_action_cancel => 'ביטול';
 
   @override
+  String get common_action_clearRating => 'נקה דירוג';
+
+  @override
   String get common_action_close => 'סגירה';
 
   @override

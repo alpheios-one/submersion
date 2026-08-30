@@ -2612,6 +2612,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get common_action_cancel => 'Cancelar';
 
   @override
+  String get common_action_clearRating => 'Limpar avaliação';
+
+  @override
   String get common_action_close => 'Fechar';
 
   @override

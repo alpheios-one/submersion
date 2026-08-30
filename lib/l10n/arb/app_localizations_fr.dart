@@ -2617,6 +2617,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get common_action_cancel => 'Annuler';
 
   @override
+  String get common_action_clearRating => 'Effacer la note';
+
+  @override
   String get common_action_close => 'Fermer';
 
   @override

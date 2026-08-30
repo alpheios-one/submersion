@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "בדיקות באדי, רשימות הרכבת CCR, אריזת ציוד",
   "common_action_back": "חזרה",
   "common_action_cancel": "ביטול",
+  "common_action_clearRating": "נקה דירוג",
   "common_action_close": "סגירה",
   "common_action_delete": "מחיקה",
   "common_action_edit": "עריכה",

@@ -2610,6 +2610,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get common_action_cancel => 'Annulla';
 
   @override
+  String get common_action_clearRating => 'Cancella valutazione';
+
+  @override
   String get common_action_close => 'Chiudi';
 
   @override

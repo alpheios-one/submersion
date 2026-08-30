@@ -1008,6 +1008,7 @@
   "settings_manage_preDiveChecklists_subtitle": "فحوصات رفيق الغوص، قوائم تجهيز CCR، توضيب المعدات",
   "common_action_back": "رجوع",
   "common_action_cancel": "إلغاء",
+  "common_action_clearRating": "مسح التقييم",
   "common_action_close": "إغلاق",
   "common_action_delete": "حذف",
   "common_action_edit": "تعديل",

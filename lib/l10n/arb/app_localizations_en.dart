@@ -2560,6 +2560,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_action_cancel => 'Cancel';
 
   @override
+  String get common_action_clearRating => 'Clear rating';
+
+  @override
   String get common_action_close => 'Close';
 
   @override

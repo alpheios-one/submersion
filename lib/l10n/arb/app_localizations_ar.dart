@@ -2559,6 +2559,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_cancel => 'إلغاء';
 
   @override
+  String get common_action_clearRating => 'مسح التقييم';
+
+  @override
   String get common_action_close => 'إغلاق';
 
   @override

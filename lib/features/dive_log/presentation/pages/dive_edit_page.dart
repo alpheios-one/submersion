@@ -1058,6 +1058,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: l10n.diveLog_edit_section_rating,
                   value: _rating,
                   onChanged: (v) => setState(() => _rating = v),
+                  clearTooltip: l10n.common_action_clearRating,
                 ),
               ),
               _gatedRow(

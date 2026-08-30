@@ -2617,6 +2617,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_action_cancel => 'Abbrechen';
 
   @override
+  String get common_action_clearRating => 'Bewertung löschen';
+
+  @override
   String get common_action_close => 'Schließen';
 
   @override

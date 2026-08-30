@@ -333,5 +333,114 @@ void main() {
       expect(value, 0);
       expect(find.byIcon(Icons.clear), findsNothing);
     });
+
+    testWidgets('rating row clears through onChanged without an onClear', (
+      tester,
+    ) async {
+      var value = 3;
+      await tester.pumpWidget(
+        _wrap(
+          StatefulBuilder(
+            builder: (context, setState) => FormRow.rating(
+              label: 'Rating',
+              value: value,
+              onChanged: (v) => setState(() => value = v),
+            ),
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.clear), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      expect(value, 0);
+      expect(find.byIcon(Icons.clear), findsNothing);
+      expect(find.byIcon(Icons.star), findsNothing);
+      expect(find.byIcon(Icons.star_border), findsNWidgets(5));
+    });
+
+    testWidgets('rating row hides the clear affordance at zero', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(FormRow.rating(label: 'Rating', value: 0, onChanged: (_) {})),
+      );
+      expect(find.byIcon(Icons.clear), findsNothing);
+    });
+
+    testWidgets('tapping the star that holds the current rating clears it', (
+      tester,
+    ) async {
+      int? rated;
+      await tester.pumpWidget(
+        _wrap(
+          FormRow.rating(
+            label: 'Rating',
+            value: 3,
+            onChanged: (v) => rated = v,
+          ),
+        ),
+      );
+      // The third star is the last filled one, so it carries the current value.
+      await tester.tap(find.byIcon(Icons.star).at(2));
+      expect(rated, 0);
+    });
+
+    testWidgets('tapping below the current rating lowers it instead of '
+        'clearing', (tester) async {
+      int? rated;
+      await tester.pumpWidget(
+        _wrap(
+          FormRow.rating(
+            label: 'Rating',
+            value: 3,
+            onChanged: (v) => rated = v,
+          ),
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.star).first);
+      expect(rated, 1);
+    });
+
+    testWidgets('re-tapping the current rating routes through onClear', (
+      tester,
+    ) async {
+      // A caller that passes onClear has bookkeeping of its own to do, so the
+      // gesture it did not anticipate must not bypass it.
+      var cleared = 0;
+      final reported = <int>[];
+      await tester.pumpWidget(
+        _wrap(
+          FormRow.rating(
+            label: 'Rating',
+            value: 3,
+            onChanged: reported.add,
+            onClear: () => cleared++,
+          ),
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.star).at(2));
+      expect(cleared, 1);
+      expect(reported, isEmpty);
+    });
+
+    testWidgets('clear affordance carries the caller tooltip', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          FormRow.rating(
+            label: 'Rating',
+            value: 2,
+            onChanged: (_) {},
+            clearTooltip: 'Clear rating',
+          ),
+        ),
+      );
+      expect(
+        find.byTooltip('Clear rating'),
+        findsOneWidget,
+        reason:
+            'the X is a bare icon, so it needs a name for pointer and '
+            'screen-reader users alike',
+      );
+    });
   });
 }

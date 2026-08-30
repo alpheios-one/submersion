@@ -1102,6 +1102,7 @@
   "settings_manage_preDiveChecklists_subtitle": "潜伴检查、CCR 组装清单、装备打包",
   "common_action_back": "返回",
   "common_action_cancel": "取消",
+  "common_action_clearRating": "清除评分",
   "common_action_close": "关闭",
   "common_action_delete": "删除",
   "common_action_edit": "编辑",
