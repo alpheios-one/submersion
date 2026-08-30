@@ -7,6 +7,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:submersion/core/database/database.dart' hide Tags;
+import 'package:submersion/core/database/database_connection_setup.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
@@ -17,8 +18,10 @@ import 'package:submersion/features/statistics/data/repositories/statistics_repo
 /// Spec section 10 gates on the synthesized 1,000-dive fixture. Legacy
 /// numbers come from the legacy SQL shapes run raw against the
 /// pre-migration copy; series numbers from the app's own methods on the
-/// migrated copy. Set SUBMERSION_BENCH_FIXTURE to the fixture path
-/// (see test/performance/README.md); the test skips without it.
+/// migrated copy, opened with the app's own connection setup
+/// ([applyMainDatabaseSetup]: busy timeout and WAL) rather than a bare
+/// connection. Set SUBMERSION_BENCH_FIXTURE to the fixture path (see
+/// test/performance/README.md); the test skips without it.
 void main() {
   final fixture = Platform.environment['SUBMERSION_BENCH_FIXTURE'];
 
@@ -30,6 +33,9 @@ void main() {
         return;
       }
       final work = Directory.systemTemp.createTempSync('series-bench');
+      addTearDown(() {
+        if (work.existsSync()) work.deleteSync(recursive: true);
+      });
       final legacyCopy = File('${work.path}/legacy.db')
         ..writeAsBytesSync(File(fixture).readAsBytesSync());
       final migratedCopy = File('${work.path}/migrated.db')
@@ -39,94 +45,127 @@ void main() {
       // Legacy shapes, raw SQL, pre-migration copy. The per-dive metric
       // materializes rows into the same domain objects the old read
       // returned, so the timing includes object construction and is not
-      // just the raw SELECT.
+      // just the raw SELECT. Wrapped in try/finally so a failure partway
+      // through still closes the handle before the tear-down above tries
+      // to delete the directory it lives in.
+      late final List<String> diveIds;
+      late final Duration legacyHydrate;
+      late final Duration legacySummaries;
+      late final Duration legacyAscent;
+      late final Duration legacyBuckets;
+      late final int sizeBefore;
       final raw = sqlite.sqlite3.open(legacyCopy.path);
-      final diveIds = raw
-          .select('SELECT id FROM dives ORDER BY dive_date_time DESC LIMIT 50')
-          .map((r) => r['id'] as String)
-          .toList();
-      final legacyHydrate = _time(() {
-        for (final id in diveIds) {
-          final profileRows = raw.select(
-            'SELECT * FROM dive_profiles WHERE dive_id = ? AND is_primary = 1 '
-            'ORDER BY timestamp',
-            [id],
-          );
-          profileRows
-              .map(
-                (row) => domain.DiveProfilePoint(
-                  timestamp: row['timestamp'] as int,
-                  depth: row['depth'] as double,
-                  temperature: row['temperature'] as double?,
-                ),
-              )
-              .toList();
-          final pressureRows = raw.select(
-            'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
-            'ORDER BY timestamp',
-            [id],
-          );
-          pressureRows
-              .map(
-                (row) => domain.TankPressurePoint(
-                  id: row['id'] as String,
-                  tankId: row['tank_id'] as String,
-                  timestamp: row['timestamp'] as int,
-                  pressure: row['pressure'] as double,
-                ),
-              )
-              .toList();
-        }
-      });
-      final legacySummaries = _time(() {
-        raw.select(_legacyBatchSummarySql(diveIds.length), diveIds);
-      });
-      final legacyAscent = _time(() => raw.select(_legacyAscentDescentSql));
-      final legacyBuckets = _time(() => raw.select(_legacyTimeAtDepthSql));
-      final sizeBefore = legacyCopy.lengthSync();
-      raw.close();
+      try {
+        diveIds = raw
+            .select(
+              'SELECT id FROM dives ORDER BY dive_date_time DESC LIMIT 50',
+            )
+            .map((r) => r['id'] as String)
+            .toList();
+        legacyHydrate = _time(() {
+          for (final id in diveIds) {
+            final profileRows = raw.select(
+              'SELECT * FROM dive_profiles WHERE dive_id = ? AND is_primary = 1 '
+              'ORDER BY timestamp',
+              [id],
+            );
+            profileRows
+                .map(
+                  (row) => domain.DiveProfilePoint(
+                    timestamp: row['timestamp'] as int,
+                    depth: row['depth'] as double,
+                    temperature: row['temperature'] as double?,
+                  ),
+                )
+                .toList();
+            final pressureRows = raw.select(
+              'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
+              'ORDER BY timestamp',
+              [id],
+            );
+            pressureRows
+                .map(
+                  (row) => domain.TankPressurePoint(
+                    id: row['id'] as String,
+                    tankId: row['tank_id'] as String,
+                    timestamp: row['timestamp'] as int,
+                    pressure: row['pressure'] as double,
+                  ),
+                )
+                .toList();
+          }
+        });
+        legacySummaries = _time(() {
+          raw.select(_legacyBatchSummarySql(diveIds.length), diveIds);
+        });
+        legacyAscent = _time(() => raw.select(_legacyAscentDescentSql));
+        legacyBuckets = _time(() => raw.select(_legacyTimeAtDepthSql));
+        sizeBefore = legacyCopy.lengthSync();
+      } finally {
+        raw.close();
+      }
 
-      // Migration (the ladder from the fixture's version to 183) plus VACUUM.
+      // Migration (the ladder from the fixture's version to 183) plus
+      // VACUUM. Opened with the app's own connection setup, matching how
+      // the real database connects. Wrapped in try/finally so a failure
+      // during migration or VACUUM still closes the connection.
       final storedBefore = DatabaseService.getStoredSchemaVersion(
         migratedCopy.path,
       )!;
-      final migration = Stopwatch()..start();
-      final migrator = AppDatabase(NativeDatabase(migratedCopy));
-      await migrator.customSelect('SELECT 1').get();
-      migration.stop();
-      final vacuum = Stopwatch()..start();
-      await migrator.customStatement('VACUUM');
-      vacuum.stop();
-      await migrator.close();
+      late final Duration migrationElapsed;
+      late final Duration vacuumElapsed;
+      final migrator = AppDatabase(
+        NativeDatabase(migratedCopy, setup: applyMainDatabaseSetup),
+      );
+      try {
+        final migration = Stopwatch()..start();
+        await migrator.customSelect('SELECT 1').get();
+        migration.stop();
+        migrationElapsed = migration.elapsed;
+        final vacuum = Stopwatch()..start();
+        await migrator.customStatement('VACUUM');
+        vacuum.stop();
+        vacuumElapsed = vacuum.elapsed;
+      } finally {
+        await migrator.close();
+      }
       final sizeAfter = migratedCopy.lengthSync();
 
-      // Series path through the app, migrated copy.
-      final db = AppDatabase(NativeDatabase(migratedCopy));
-      DatabaseService.instance.setTestDatabase(db);
-      final dives = DiveRepository();
-      final tankPressures = TankPressureRepository();
-      final stats = StatisticsRepository();
-      final seriesHydrate = await _timeAsync(() async {
-        // getDiveById hydrates the whole entity (tanks, buddies, equipment,
-        // site, computer, source, safety data...) and is not the metric
-        // here: this compares the same two profile reads the legacy side
-        // times above, not a full dive hydrate.
-        for (final id in diveIds) {
-          await dives.getDiveProfile(id);
-          await tankPressures.getTankPressuresForDive(id);
-        }
-      });
-      final seriesSummaries = await _timeAsync(
-        () => dives.getBatchProfileSummaries(diveIds, maxSamples: 200),
+      // Series path through the app, migrated copy, also opened with the
+      // app's connection setup. Wrapped in try/finally so a failing
+      // assertion further down still closes the connection and resets the
+      // test seam before the tear-down deletes the directory.
+      late final Duration seriesHydrate;
+      late final Duration seriesSummaries;
+      late final Duration seriesAscent;
+      late final Duration seriesBuckets;
+      final db = AppDatabase(
+        NativeDatabase(migratedCopy, setup: applyMainDatabaseSetup),
       );
-      final seriesAscent = await _timeAsync(
-        () => stats.getAscentDescentRates(),
-      );
-      final seriesBuckets = await _timeAsync(
-        () => stats.getTimeAtDepthRanges(),
-      );
-      await db.close();
-      DatabaseService.instance.resetForTesting();
+      try {
+        DatabaseService.instance.setTestDatabase(db);
+        final dives = DiveRepository();
+        final tankPressures = TankPressureRepository();
+        final stats = StatisticsRepository();
+        seriesHydrate = await _timeAsync(() async {
+          // getDiveById hydrates the whole entity (tanks, buddies,
+          // equipment, site, computer, source, safety data...) and is not
+          // the metric here: this compares the same two profile reads the
+          // legacy side times above, not a full dive hydrate.
+          for (final id in diveIds) {
+            await dives.getDiveProfile(id);
+            await tankPressures.getTankPressuresForDive(id);
+          }
+        });
+        seriesSummaries = await _timeAsync(
+          () => dives.getBatchProfileSummaries(diveIds, maxSamples: 200),
+        );
+        seriesAscent = await _timeAsync(() => stats.getAscentDescentRates());
+        seriesBuckets = await _timeAsync(() => stats.getTimeAtDepthRanges());
+      } finally {
+        await db.close();
+        DatabaseService.instance.resetForTesting();
+      }
 
       results['per-dive profile and tank reads (50 dives)'] = (
         legacy: legacyHydrate,
@@ -154,9 +193,9 @@ void main() {
       table
         ..writeln(
           '| migration $storedBefore -> ${AppDatabase.currentSchemaVersion} '
-          '| | ${migration.elapsed.inMilliseconds} ms |',
+          '| | ${migrationElapsed.inMilliseconds} ms |',
         )
-        ..writeln('| VACUUM | | ${vacuum.elapsed.inMilliseconds} ms |')
+        ..writeln('| VACUUM | | ${vacuumElapsed.inMilliseconds} ms |')
         ..writeln(
           '| file size | ${sizeBefore ~/ 1024} KB | ${sizeAfter ~/ 1024} KB |',
         );

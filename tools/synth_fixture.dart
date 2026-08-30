@@ -79,10 +79,10 @@ void _replicate(
   List<String> diveIds,
 ) {
   final cols = db
-      .select('SELECT name, pk FROM pragma_table_info(?)', [table])
-      .map((c) => (name: c['name'] as String, pk: (c['pk'] as int) > 0))
+      .select('SELECT name FROM pragma_table_info(?)', [table])
+      .map((c) => c['name'] as String)
       .toList();
-  final names = cols.map((c) => c.name).toList();
+  final names = cols;
   final where = table == 'dives'
       ? 'WHERE id IN (${List.filled(diveIds.length, '?').join(',')})'
       : 'WHERE dive_id IN (${List.filled(diveIds.length, '?').join(',')})';
@@ -97,13 +97,13 @@ void _replicate(
   try {
     for (final row in rows) {
       final values = <Object?>[];
-      for (final c in cols) {
-        final v = row[c.name];
+      for (final name in cols) {
+        final v = row[name];
         if (v is String &&
-            (c.name == 'id' ||
-                c.name == 'dive_id' ||
-                c.name == 'tank_id' ||
-                c.name == 'source_id')) {
+            (name == 'id' ||
+                name == 'dive_id' ||
+                name == 'tank_id' ||
+                name == 'source_id')) {
           values.add('$v$suffix');
         } else {
           values.add(v);
