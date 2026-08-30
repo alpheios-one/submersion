@@ -254,6 +254,38 @@ void main() {
     },
   );
 
+  test('millivolts survive the sync export/import round trip', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    final id = await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      samples: const [
+        ProfileSample(
+          timestamp: 0,
+          depth: 1.0,
+          o2SensorMv1: 550,
+          o2SensorMv2: 560,
+          o2SensorMv3: 570,
+        ),
+      ],
+      now: 1000,
+    );
+    final json = await SyncDataSerializer().fetchRecord(
+      'diveProfileSeries',
+      id,
+    );
+    await ProfileSeriesRepository().deleteForDive('d1');
+    await SyncDataSerializer().upsertRecord('diveProfileSeries', json!);
+    final restored = (await ProfileSeriesRepository().getSeriesForDive(
+      'd1',
+    )).single.samples.single;
+    expect(restored.o2SensorMv1, 550);
+    expect(restored.o2SensorMv2, 560);
+    expect(restored.o2SensorMv3, 570);
+  });
+
   test('a corrupt peer blob is skipped, never written', () async {
     dbA = await setUpTestDatabase();
     switchTo(dbA);

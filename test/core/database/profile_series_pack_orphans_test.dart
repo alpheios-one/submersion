@@ -15,8 +15,11 @@ void main() {
   const codec = ProfileSeriesCodec();
 
   /// A database at v182 whose legacy tables are empty at open. Rows are
-  /// seeded through the raw handle afterwards, because the beforeOpen
-  /// backstop packs every unpacked dive.
+  /// seeded through the raw handle afterwards, both because the beforeOpen
+  /// backstop packs every unpacked dive and because the same open runs the
+  /// v183 rung, which drops the two (still empty) legacy tables once it
+  /// finds nothing left to pack; this recreates them on the open connection
+  /// so seeding afterwards has a table to write into.
   Future<({AppDatabase db, sqlite3.Database raw})> openLegacy() async {
     final raw = sqlite3.sqlite3.openInMemory();
     addTearDown(raw.close);
@@ -26,6 +29,7 @@ void main() {
     );
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
+    createLegacyProfileTables(raw);
     return (db: db, raw: raw);
   }
 
@@ -106,10 +110,9 @@ void main() {
   group('legacy tables without identity columns', () {
     /// Rebuilds `dive_profiles` with [columns] only, on an already open
     /// database. A real database restored from a very old backup reaches the
-    /// packer in this shape. The rebuild happens after beforeOpen and the
-    /// open executor is reused, because the unconditional
-    /// `_backfillMissingDataSources` self-heal names dive_profiles.is_primary
-    /// and would fail on the reduced table.
+    /// packer in this shape. The rebuild happens after [openLegacy] has
+    /// already recreated the (full) legacy table and reuses its open
+    /// executor, so this only has to narrow the column set before seeding.
     Future<({AppDatabase db, sqlite3.Database raw})> rebuiltProfiles(
       String columns,
     ) async {

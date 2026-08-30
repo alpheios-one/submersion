@@ -21,13 +21,16 @@ void main() {
   const codec = ProfileSeriesCodec();
   const tankCodec = TankPressureSeriesCodec();
 
-  /// A database already at v182 (no ladder runs) whose legacy tables are
-  /// empty at open, plus the raw handle that seeds them afterwards.
+  /// A database already at v182 whose legacy tables are empty at open, plus
+  /// the raw handle that recreates and seeds them afterwards.
   ///
-  /// Seeding after the open is load bearing: the beforeOpen backstop packs
-  /// every unpacked dive, so rows seeded before the open would already be
-  /// packed and each test's explicit [packLegacyProfileRows] call would have
-  /// nothing left to report.
+  /// Seeding after the open is load bearing for two reasons: the beforeOpen
+  /// backstop packs every unpacked dive, so rows seeded before the open
+  /// would already be packed and each test's explicit [packLegacyProfileRows]
+  /// call would have nothing left to report; and the same open runs the v183
+  /// rung, which drops the two (still empty) legacy tables once it finds
+  /// nothing left to pack, so this recreates them on the open connection
+  /// rather than relying on the ladder to keep them around.
   Future<({AppDatabase db, sqlite3.Database raw})> openLegacy() async {
     final raw = sqlite3.sqlite3.openInMemory();
     addTearDown(raw.close);
@@ -37,6 +40,7 @@ void main() {
     );
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
+    createLegacyProfileTables(raw);
     return (db: db, raw: raw);
   }
 
@@ -312,14 +316,12 @@ void main() {
   });
 
   test('skippedRows counts legacy rows without a timestamp or depth', () async {
-    final raw = sqlite3.sqlite3.openInMemory();
-    addTearDown(raw.close);
-    legacyDdlAt180(raw, userVersion: 182);
-    seedParents(raw);
+    final open = await openLegacy();
+    seedParents(open.raw);
     // Loosen the columns the fixture declares NOT NULL by rebuilding the
-    // table without those constraints.
-    raw.execute('DROP TABLE dive_profiles');
-    raw.execute('''
+    // table (already recreated by openLegacy) without those constraints.
+    open.raw.execute('DROP TABLE dive_profiles');
+    open.raw.execute('''
       CREATE TABLE dive_profiles (
         id TEXT NOT NULL PRIMARY KEY,
         dive_id TEXT NOT NULL,
@@ -330,18 +332,11 @@ void main() {
         depth REAL
       )
     ''');
-    raw.execute(
+    open.raw.execute(
       "INSERT INTO dive_profiles (id, dive_id, timestamp, depth) VALUES "
       "('p1', 'd1', 0, 1.0), ('p2', 'd1', NULL, 2.0), ('p3', 'd1', 10, 3.0)",
     );
-    final db = AppDatabase(
-      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-    );
-    addTearDown(db.close);
-    // The backstop already packed on open; measure a fresh pack instead.
-    await db.customSelect('SELECT 1').get();
-    await db.customStatement('DELETE FROM dive_profile_series');
-    final report = await packLegacyProfileRows(db, nowMs: 1);
+    final report = await packLegacyProfileRows(open.db, nowMs: 1);
     expect(report.profileSeries, 1);
     expect(report.skippedRows, 1);
   });

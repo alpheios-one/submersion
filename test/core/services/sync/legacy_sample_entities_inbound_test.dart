@@ -8,7 +8,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -244,6 +244,47 @@ void main() {
             isPrimary: true,
           ),
         );
+      },
+    );
+
+    test(
+      'a payload written before v151 restores with null millivolts',
+      () async {
+        // v151 is when the O2 cell millivolt columns (o2SensorMv1..6)
+        // joined the wire format; a peer on an older build never sends
+        // those keys at all, not even as explicit nulls.
+        await DiveRepository().createDive(_dive('template-mv', const []));
+        final diveRow =
+            Map<String, dynamic>.from(
+                (await SyncDataSerializer().fetchRecord(
+                  'dives',
+                  'template-mv',
+                ))!,
+              )
+              ..['id'] = 'd-mv-old'
+              ..['hlc'] = const Hlc(9000, 0, 'peer-pre-v151').toString();
+        final profiles = [
+          {
+            'id': 'p-mv',
+            'diveId': 'd-mv-old',
+            'timestamp': 0,
+            'depth': 8.0,
+            'isPrimary': true,
+          },
+        ];
+        final data = SyncData(dives: [diveRow], diveProfiles: profiles);
+        final dataJson = {...data.toJson(), 'diveProfiles': profiles};
+
+        await pullPeerPayload(dataJson, 'peer-pre-v151');
+
+        final series = await ProfileSeriesRepository().getSeriesForDive(
+          'd-mv-old',
+        );
+        expect(series, hasLength(1));
+        final sample = series.single.samples.single;
+        expect(sample.depth, 8.0);
+        expect(sample.o2SensorMv1, isNull);
+        expect(sample.o2SensorMv6, isNull);
       },
     );
 

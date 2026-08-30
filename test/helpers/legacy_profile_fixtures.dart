@@ -29,6 +29,17 @@ void legacyDdlAt180(sqlite3.Database rawDb, {int userVersion = 180}) {
     'CREATE TABLE dive_tanks (id TEXT NOT NULL PRIMARY KEY, '
     'dive_id TEXT NOT NULL)',
   );
+  createLegacyProfileTables(rawDb);
+}
+
+/// The two row-per-sample legacy tables on their own, matching the shape
+/// [legacyDdlAt180] creates. Split out for tests that pack a hand-built
+/// legacy row set against a connection whose [AppDatabase] has already
+/// opened and (as of v183) dropped these two tables for good: seeding them
+/// before that open would let the ladder's own pack-and-drop empty them out
+/// from under the test, so those tests open first and call this afterwards,
+/// leaving the FK parents [legacyDdlAt180] already created untouched.
+void createLegacyProfileTables(sqlite3.Database rawDb) {
   rawDb.execute('''
     CREATE TABLE dive_profiles (
       id TEXT NOT NULL PRIMARY KEY,
