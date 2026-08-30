@@ -194,33 +194,13 @@ void main() {
     expect(merged.map((p) => p.depth), [1.0, 2.0]);
   });
 
-  test('a dive with no series falls back to the legacy rows', () async {
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          const DiveProfilesCompanion(
-            id: Value('legacy-1'),
-            diveId: Value('dive-1'),
-            timestamp: Value(5),
-            depth: Value(3.0),
-          ),
-        );
-    expect((await dives.getDiveProfile('dive-1')).single.depth, 3.0);
-    expect((await dives.getMergedProfile('dive-1')).single.depth, 3.0);
-    expect((await dives.getDiveById('dive-1'))!.profile.single.depth, 3.0);
+  test('a dive with no series reads as an empty profile', () async {
+    expect(await dives.getDiveProfile('dive-1'), isEmpty);
+    expect(await dives.getMergedProfile('dive-1'), isEmpty);
+    expect((await dives.getDiveById('dive-1'))!.profile, isEmpty);
   });
 
-  test('series rows win over legacy rows when both exist', () async {
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          const DiveProfilesCompanion(
-            id: Value('legacy-1'),
-            diveId: Value('dive-1'),
-            timestamp: Value(5),
-            depth: Value(3.0),
-          ),
-        );
+  test('the series is what every profile read returns', () async {
     await series.insertSeries(
       diveId: 'dive-1',
       samples: const [ProfileSample(timestamp: 0, depth: 9.0)],

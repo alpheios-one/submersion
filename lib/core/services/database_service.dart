@@ -311,6 +311,9 @@ class DatabaseService {
     String? keyHex,
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
   ) async {
+    // Read before the ladder: the one-time VACUUM below keys off the version
+    // the file had on disk, not the version the ladder leaves behind.
+    final storedBefore = getStoredSchemaVersion(file.path, keyHex: keyHex);
     final migrator = AppDatabase(
       NativeDatabase(file, setup: _connectionSetup(keyHex)),
       onMigrationProgress: onMigrationProgress,
@@ -318,6 +321,24 @@ class DatabaseService {
     try {
       // Force the upgrade ladder to completion before switching executors.
       await migrator.customSelect('SELECT 1').get();
+      if (storedBefore != null && storedBefore < 183) {
+        // v183 dropped the row-per-sample tables, which on an older file are
+        // most of its pages. VACUUM here: outside any migration transaction,
+        // on the one exclusive main-isolate connection, and before the
+        // background executor opens the file. Non-fatal: a busy lock or an
+        // out-of-space temp store leaves a correct database that is merely
+        // larger than it needs to be.
+        try {
+          await migrator.customStatement('VACUUM');
+        } catch (e, stackTrace) {
+          _log.warning(
+            'Post-migration VACUUM skipped; the database is correct but has '
+            'not reclaimed the dropped sample pages',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }
     } catch (_) {
       // Best-effort close so we don't leak the connection (or its locks, which
       // would defeat the retry), then let the original error surface.

@@ -218,7 +218,6 @@ void main() {
       expect(gapSamples.map((p) => p.timestamp), [1801, 2701, 3599]);
       // b's first sample re-based to 3600.
       expect(allSamples.where((p) => p.timestamp == 3600), isNotEmpty);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
 
       // Surface events at the gap boundaries.
       final events = await (db.select(
@@ -253,7 +252,6 @@ void main() {
         60,
         3660,
       });
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
 
       // Buddies and sightings carried; same-species sightings merged.
       final buddies = await (db.select(
@@ -332,7 +330,6 @@ void main() {
         );
         // 3 samples per source + the densified gap samples.
         expect(sampleCount, greaterThan(6));
-        expect(await db.select(db.diveProfiles).get(), isEmpty);
       },
     );
 
@@ -431,7 +428,6 @@ void main() {
       final mergedSeries = await profileSeries.getSeriesForDive(mergedId);
       // 3 samples per source, no synthesized gap samples.
       expect(mergedSeries.fold<int>(0, (sum, s) => sum + s.samples.length), 6);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
 
       final events = await (db.select(
         db.diveProfileEvents,
@@ -545,7 +541,6 @@ void main() {
       // only restore if the parent tanks were re-inserted first.
       final pressures = await tankSeries.getRowsForDives(['a', 'b']);
       expect(pressures.map((p) => p.id).toSet(), {'tp-a', 'tp-b'});
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
     });
   });
 

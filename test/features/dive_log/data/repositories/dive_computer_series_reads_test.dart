@@ -80,23 +80,7 @@ void main() {
     expect(await computers.getPrimaryComputerId('dive-1'), isNull);
   });
 
-  test('falls back to legacy rows when the dive has no series', () async {
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          const DiveProfilesCompanion(
-            id: Value('legacy-1'),
-            diveId: Value('dive-1'),
-            computerId: Value('comp-2'),
-            timestamp: Value(0),
-            depth: Value(1.0),
-          ),
-        );
-    expect(await computers.getComputerIdsForDive('dive-1'), ['comp-2']);
-    expect(await computers.getPrimaryComputerId('dive-1'), 'comp-2');
-  });
-
-  test('no series and no legacy rows', () async {
+  test('a dive with no series has no computers', () async {
     expect(await computers.getComputerIdsForDive('dive-1'), isEmpty);
     expect(await computers.getPrimaryComputerId('dive-1'), isNull);
   });

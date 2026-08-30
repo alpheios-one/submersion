@@ -100,10 +100,11 @@ void main() {
             'idx_tank_pressure_series_dive_tank',
           ]),
         );
-        // The legacy tables survive this plan untouched.
+        // The v183 rung in the same ladder run drops the legacy tables once
+        // the pack above has moved every sample into the series.
         expect(
-          tables,
-          containsAll(['dive_profiles', 'tank_pressure_profiles']),
+          tables.intersection({'dive_profiles', 'tank_pressure_profiles'}),
+          isEmpty,
         );
       },
     );
@@ -156,12 +157,11 @@ void main() {
         final version = await second
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(version.data.values.first, 182);
+        expect(version.data.values.first, 183);
       },
     );
 
     test('v182 is present in the migration ladder', () {
-      expect(AppDatabase.currentSchemaVersion, 182);
       expect(AppDatabase.migrationVersions, contains(182));
       expect(AppDatabase.minimumCompatibleSchemaVersion, 182);
     });
@@ -205,11 +205,14 @@ void main() {
           .get();
       expect(tanks, hasLength(1));
       expect(tanks.single.read<String>('tank_id'), 't1');
-      // Legacy rows are untouched in this plan.
+      // The v183 rung drops the legacy tables after the pack.
       final legacy = await db
-          .customSelect('SELECT COUNT(*) AS n FROM dive_profiles')
+          .customSelect(
+            "SELECT COUNT(*) AS n FROM sqlite_master "
+            "WHERE name = 'dive_profiles'",
+          )
           .getSingle();
-      expect(legacy.read<int>('n'), 3);
+      expect(legacy.read<int>('n'), 0);
     });
 
     test(
@@ -234,42 +237,11 @@ void main() {
       },
     );
 
-    test(
-      'the backstop packs a dive whose legacy rows arrived after the rung',
-      () async {
-        // Two executors over one handle: the first open runs the ladder and
-        // packs d1; a legacy row for a second dive written afterwards must be
-        // packed by the backstop on the next open, because a device that took
-        // a parallel branch's rung number never runs this rung at all.
-        final raw = sqlite3.sqlite3.openInMemory();
-        addTearDown(raw.close);
-        legacyDdlAt180(raw);
-        seed(raw);
-
-        final first = AppDatabase(
-          NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-        );
-        await first.customSelect('SELECT 1').get();
-        await first.close();
-
-        raw.execute("INSERT INTO dives (id) VALUES ('d2')");
-        raw.execute(
-          "INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, "
-          "is_primary, timestamp, depth) VALUES ('p9', 'd2', NULL, NULL, 1, 0, 1.0)",
-        );
-
-        final second = AppDatabase(
-          NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-        );
-        addTearDown(second.close);
-        await second.customSelect('SELECT 1').get();
-        final series = await second
-            .customSelect(
-              'SELECT dive_id FROM dive_profile_series ORDER BY dive_id',
-            )
-            .get();
-        expect(series.map((r) => r.read<String>('dive_id')), ['d1', 'd2']);
-      },
-    );
+    // The backstop's late-pack case moved to
+    // migration_v183_drop_legacy_tables_test.dart: v183 drops the legacy
+    // tables inside the same ladder run, so no legacy row can arrive after
+    // the rung any more. What the backstop still guarantees (a device that
+    // reached 182 on a parallel branch packs before the drop) is covered
+    // there.
   });
 }

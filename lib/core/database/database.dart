@@ -845,89 +845,6 @@ class Dives extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-/// Time-series dive profile data points
-class DiveProfiles extends Table {
-  TextColumn get id => text()();
-  TextColumn get diveId =>
-      text().references(Dives, #id, onDelete: KeyAction.cascade)();
-  TextColumn get computerId =>
-      text().nullable().references(DiveComputers, #id)();
-
-  /// Owning [DiveDataSources] row (issue #1149).
-  ///
-  /// [computerId] cannot identify the owner on its own: file imports and
-  /// manual entries leave it null on both the source row and the profile
-  /// rows, so two file-imported sources on one dive are indistinguishable.
-  /// This FK names the owner outright, which is what `setPrimaryDataSource`
-  /// promotes on.
-  ///
-  /// Nullable, and consumers must tolerate null: rows written before v158,
-  /// and rows synced from a peer running an older schema, carry none. The
-  /// fallback is the legacy convention (match on [computerId]; null belongs
-  /// to the primary source). `onDelete: setNull` because samples must
-  /// outlive their metadata row -- dropping a source must never destroy the
-  /// profile it describes.
-  TextColumn get sourceId => text().nullable().references(
-    DiveDataSources,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
-  BoolColumn get isPrimary => boolean().withDefault(
-    const Constant(true),
-  )(); // Primary profile for stats
-  IntColumn get timestamp => integer()(); // seconds from dive start
-  RealColumn get depth => real()();
-  // Deprecated: use tank_pressure_profiles table. Column retained for schema compat.
-  RealColumn get pressure => real().nullable()();
-  RealColumn get temperature => real().nullable()();
-  IntColumn get heartRate => integer().nullable()();
-  // Compass heading in degrees (0-359) from DC_SAMPLE_BEARING; null when the
-  // computer does not report bearing samples.
-  RealColumn get heading => real().nullable()();
-  // Computed decompression data (optional, can be calculated on-the-fly)
-  RealColumn get ascentRate => real().nullable()(); // m/min
-  RealColumn get ceiling => real().nullable()(); // deco ceiling in meters
-  IntColumn get ndl => integer().nullable()(); // no-deco limit in seconds
-
-  // CCR/SCR rebreather data (v1.5)
-  RealColumn get setpoint =>
-      real().nullable()(); // Current setpoint at sample (bar)
-  RealColumn get ppO2 => real().nullable()(); // Measured/calculated ppO2 (bar)
-
-  // Individual CCR O2 cell readings (bar). Subsurface exports up to 6
-  // (sensor1..sensor6); rebreathers run 3 (e.g. JJ-CCR) to 5 (e.g. rEvo).
-  // Stored raw exactly as the source reports them; null when absent.
-  RealColumn get o2Sensor1 => real().nullable()();
-  RealColumn get o2Sensor2 => real().nullable()();
-  RealColumn get o2Sensor3 => real().nullable()();
-  RealColumn get o2Sensor4 => real().nullable()();
-  RealColumn get o2Sensor5 => real().nullable()();
-  RealColumn get o2Sensor6 => real().nullable()();
-  // Raw O2 cell output in millivolts (issue #810). Reported even when the
-  // matching o2SensorN is null because the logged calibration was untrusted.
-  IntColumn get o2SensorMv1 => integer().nullable()();
-  IntColumn get o2SensorMv2 => integer().nullable()();
-  IntColumn get o2SensorMv3 => integer().nullable()();
-  IntColumn get o2SensorMv4 => integer().nullable()();
-  IntColumn get o2SensorMv5 => integer().nullable()();
-  IntColumn get o2SensorMv6 => integer().nullable()();
-
-  // Per-sample decompression data (v1.5)
-  RealColumn get cns => real().nullable()(); // CNS percentage 0-100
-  IntColumn get tts => integer().nullable()(); // Time to surface in seconds
-  IntColumn get rbt =>
-      integer().nullable()(); // Remaining bottom time in seconds
-  IntColumn get decoType =>
-      integer().nullable()(); // 0=NDL, 1=safety, 2=deco, 3=deep
-
-  // Wearable integration (v2.0) - tracks source of heart rate data
-  TextColumn get heartRateSource =>
-      text().nullable()(); // 'diveComputer', 'appleWatch', 'garmin', 'manual'
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
 /// Dive sites/locations
 class DiveSites extends Table {
   TextColumn get id => text()();
@@ -2797,29 +2714,6 @@ class GasSwitches extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-/// Per-tank time-series pressure data for multi-tank dives
-/// Enables visualization of pressure curves for each tank (AI transmitters)
-class TankPressureProfiles extends Table {
-  TextColumn get id => text()();
-  TextColumn get diveId =>
-      text().references(Dives, #id, onDelete: KeyAction.cascade)();
-  TextColumn get tankId =>
-      text().references(DiveTanks, #id, onDelete: KeyAction.cascade)();
-  IntColumn get timestamp => integer()(); // seconds from dive start
-  RealColumn get pressure => real()(); // bar
-  // Which computer contributed this pressure sample (null = primary source /
-  // manual). Same null-means-primary semantics as dive_profiles.computerId;
-  // deletes set null.
-  TextColumn get computerId => text().nullable().references(
-    DiveComputers,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
 /// One packed series of profile samples: every sample a
 /// (dive, computer, source, is_primary) group holds, encoded by
 /// `ProfileSeriesCodec` (spec 2026-08-28-profile-sample-storage). Replaces
@@ -3314,7 +3208,6 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     DiverSettings,
     Trips,
     Dives,
-    DiveProfiles,
     DiveProfileSeries,
     DiveSites,
     DiveTanks,
@@ -3356,7 +3249,6 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     EmergencyChambers,
     Incidents,
     GasSwitches,
-    TankPressureProfiles,
     TankPressureSeries,
     TideRecords,
     // Site-species junction
@@ -3422,7 +3314,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 182;
+  static const int currentSchemaVersion = 183;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3829,6 +3721,14 @@ class AppDatabase extends _$AppDatabase {
     // PR #1390 (profile photos) holds 181; 181 is absent from this ladder
     // until that PR merges into main and main merges here.
     182,
+    // v183 (packed profile series, plan 2e): drop the row-per-sample
+    // dive_profiles and tank_pressure_profiles tables and purge the sync
+    // bookkeeping that named them. Every reader moved to the series tables
+    // in plans 2b to 2d, so the rows have no consumer left. The rung packs
+    // once more before it drops, because a device that reached 182 through
+    // a parallel branch's rung never ran ours and the beforeOpen backstop
+    // only runs AFTER onUpgrade: by then the rows would be gone.
+    183,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4379,6 +4279,41 @@ class AppDatabase extends _$AppDatabase {
       'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
       'ON dive_profile_series (dive_id, is_primary)',
     );
+  }
+
+  /// v183: drops the row-per-sample profile tables and purges the sync
+  /// bookkeeping that named them.
+  ///
+  /// Called only from the v183 rung, and only after the pack above has run,
+  /// so every sample already lives in `dive_profile_series` /
+  /// `tank_pressure_series`. Every statement is idempotent, so a ladder that
+  /// failed later and retried from the top runs this again harmlessly.
+  ///
+  /// The `sync_records` rows are this device's pending outbound work for
+  /// entity types this build no longer exports, and the `deletion_log` rows
+  /// are tombstones for records no peer can hold any more (the compatibility
+  /// floor is 182, so every peer we sync with has the series tables). Left
+  /// behind they would be published forever and never acknowledged.
+  Future<void> _dropLegacySampleTables() async {
+    await customStatement('DROP INDEX IF EXISTS idx_dive_profiles_dive_id');
+    await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
+    await customStatement('DROP TABLE IF EXISTS dive_profiles');
+    await customStatement('DROP TABLE IF EXISTS tank_pressure_profiles');
+    // Guarded per table like every other migration helper: a minimal
+    // old-schema fixture (and a database that reached this rung through a
+    // guarded path) can lack the sync bookkeeping entirely, and a DELETE
+    // naming a missing table aborts the whole ladder.
+    for (final table in const ['sync_records', 'deletion_log']) {
+      final exists = await customSelect(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable<String>(table)],
+      ).get();
+      if (exists.isEmpty) continue;
+      await customStatement(
+        "DELETE FROM $table WHERE entity_type IN ('diveProfiles', "
+        "'tankPressureProfiles')",
+      );
+    }
   }
 
   Future<void> _assertTankPressureSeriesTable() async {
@@ -9468,12 +9403,54 @@ class AppDatabase extends _$AppDatabase {
         // row-per-sample row into them. Both steps are idempotent (IF NOT
         // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
         // tuple), so a retry after a failed ladder, or a collision re-run,
-        // is safe. The legacy tables stay until plan 2e retires them.
+        // is safe. v183 below drops the legacy tables.
         if (from < 182) {
           await _assertProfileSeriesSchema();
           await packLegacyProfileRows(this);
         }
         if (from < 182) await reportProgress();
+        // v183: the legacy row-per-sample tables are gone. Their sync
+        // bookkeeping goes with them: pending records and tombstones for
+        // entity types no peer exports. Idempotent (IF NOT EXISTS DDL,
+        // INSERT OR IGNORE, IF EXISTS, DELETE), so a retried ladder is safe.
+        // The pages come back at the one VACUUM in
+        // DatabaseService._runUpgradeLadder.
+        //
+        // The pack repeats here rather than relying on the v182 rung above.
+        // A device that reached 182 through a PARALLEL BRANCH's rung of the
+        // same number never ran ours, so `from < 182` is false for it and
+        // nothing has packed its rows; the beforeOpen backstop cannot save
+        // it either, because drift runs beforeOpen AFTER onUpgrade and the
+        // rows would already be dropped. Packing here is a no-op once
+        // packed (one indexed NOT EXISTS per legacy dive).
+        //
+        // The drop is CONDITIONAL on that pack succeeding. A series table a
+        // parallel branch shaped differently makes every packer INSERT fail;
+        // dropping anyway would destroy the only copy of those samples, and
+        // letting the exception out would leave a database that cannot open
+        // at all (backstop_resilience_test.dart pins that). Skipping the
+        // drop leaves a correct database that merely still carries the old
+        // tables, and the beforeOpen backstop keeps retrying the pack.
+        if (from < 183) {
+          var packed = true;
+          try {
+            await _assertProfileSeriesSchema();
+            await packLegacyProfileRows(this);
+          } catch (e, stackTrace) {
+            packed = false;
+            developer.log(
+              'v183: packing legacy profile rows failed; keeping the legacy '
+              'tables so no samples are lost',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
+          if (packed) {
+            await _dropLegacySampleTables();
+          }
+        }
+        if (from < 183) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9729,11 +9706,14 @@ class AppDatabase extends _$AppDatabase {
         // v182 backstop: re-assert the packed profile series tables, then
         // pack any dive that still has legacy rows and no series row. A
         // schema-version collision with a parallel branch skips the rung on
-        // devices that took the other branch's number first; without this
-        // self-heal those devices would carry empty series tables and lose
-        // every sample once the legacy tables are dropped. Cheap once packed
-        // (an indexed NOT EXISTS per legacy dive) and a no-op after the
-        // legacy tables are gone.
+        // devices that took the other branch's number first, so this is the
+        // self-heal for series tables a device would otherwise never build.
+        // Cheap once packed (an indexed NOT EXISTS per legacy dive). v183
+        // drops the legacy tables, and the packer no-ops once they are gone
+        // (a missing table reports no columns, so neither side is packable),
+        // which is what makes this safe to keep running afterwards. Note the
+        // v183 rung packs for itself: beforeOpen runs after onUpgrade, so on
+        // the upgrading open this call comes too late to feed the drop.
         await _assertProfileSeriesSchema();
         // Best effort: the ladder's own call is where a packing failure is
         // visible and retried. Here a malformed legacy table, a series table

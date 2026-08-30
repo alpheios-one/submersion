@@ -87,28 +87,7 @@ void main() {
     return id;
   }
 
-  /// Insert a dive profile point.
-  Future<void> insertProfile({
-    required String id,
-    required String diveId,
-    String? computerId,
-    int timestamp = 0,
-    double depth = 10.0,
-  }) async {
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            computerId: Value(computerId),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-          ),
-        );
-  }
-
-  /// Series twin of [insertProfile]: one single-sample profile series.
+  /// One single-sample profile series.
   Future<void> insertProfileSeries({
     required String id,
     required String diveId,
@@ -146,28 +125,7 @@ void main() {
         );
   }
 
-  /// Insert a tank pressure profile point.
-  Future<void> insertTankPressure({
-    required String id,
-    required String diveId,
-    required String tankId,
-    int timestamp = 0,
-    double pressure = 200.0,
-  }) async {
-    await db
-        .into(db.tankPressureProfiles)
-        .insert(
-          TankPressureProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            tankId: Value(tankId),
-            timestamp: Value(timestamp),
-            pressure: Value(pressure),
-          ),
-        );
-  }
-
-  /// Series twin of [insertTankPressure]: one single-sample tank series.
+  /// One single-sample tank pressure series.
   Future<void> insertTankPressureSeries({
     required String id,
     required String diveId,
@@ -217,18 +175,10 @@ void main() {
       'DELETE FROM dive_profile_events WHERE dive_id = ?',
       [diveId],
     );
-    await db.customStatement(
-      'DELETE FROM tank_pressure_profiles WHERE dive_id = ?',
-      [diveId],
-    );
     await TankPressureSeriesRepository(database: db).deleteForDive(diveId);
     await db.customStatement('DELETE FROM gas_switches WHERE dive_id = ?', [
       diveId,
     ]);
-    await db.customStatement(
-      'DELETE FROM dive_profiles WHERE dive_id = ? AND computer_id = ?',
-      [diveId, computerId],
-    );
     await ProfileSeriesRepository(
       database: db,
     ).deleteByComputer(diveId, computerId);
@@ -243,26 +193,17 @@ void main() {
   // --------------------------------------------------------------------------
 
   group('clearSourceAndProfiles', () {
-    test('deletes profile events, tank pressure profiles, gas switches, '
-        'profiles, and data source for the dive+computer pair', () async {
+    test('deletes profile events, tank pressure series, gas switches, '
+        'profile series, and data source for the dive+computer pair', () async {
       await insertDive('dive-1');
       await insertComputer('comp-1');
       final tankId = await insertTank(id: 'tank-1', diveId: 'dive-1');
 
-      // Populate all 5 tables
-      await insertProfile(id: 'p-1', diveId: 'dive-1', computerId: 'comp-1');
-      await insertProfile(
-        id: 'p-2',
-        diveId: 'dive-1',
-        computerId: 'comp-1',
-        timestamp: 10,
-      );
+      // Populate every table clearSourceAndProfiles touches
       await insertSource(id: 'src-1', diveId: 'dive-1', computerId: 'comp-1');
       await insertProfileEvent(id: 'ev-1', diveId: 'dive-1');
-      await insertTankPressure(id: 'tp-1', diveId: 'dive-1', tankId: tankId);
       await insertGasSwitch(id: 'gs-1', diveId: 'dive-1', tankId: tankId);
 
-      // Series twins of the legacy profile and tank pressure rows above.
       await insertProfileSeries(
         id: 'ps-1',
         diveId: 'dive-1',
@@ -281,10 +222,8 @@ void main() {
       );
 
       // Verify everything was inserted
-      expect(await db.select(db.diveProfiles).get(), hasLength(2));
       expect(await db.select(db.diveDataSources).get(), hasLength(1));
       expect(await db.select(db.diveProfileEvents).get(), hasLength(1));
-      expect(await db.select(db.tankPressureProfiles).get(), hasLength(1));
       expect(await db.select(db.gasSwitches).get(), hasLength(1));
       expect(
         await ProfileSeriesRepository(database: db).getSeriesForDive('dive-1'),
@@ -299,11 +238,9 @@ void main() {
 
       await clearSourceAndProfiles(diveId: 'dive-1', computerId: 'comp-1');
 
-      // All 5 tables should be empty for this dive+computer
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
+      // Every table should be empty for this dive+computer
       expect(await db.select(db.diveDataSources).get(), isEmpty);
       expect(await db.select(db.diveProfileEvents).get(), isEmpty);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
       expect(await db.select(db.gasSwitches).get(), isEmpty);
       // The series twins are cleared too.
       expect(
@@ -326,10 +263,8 @@ void main() {
       final tank2 = await insertTank(id: 'tank-2', diveId: 'dive-2');
 
       // Data for dive-1 (will be cleared)
-      await insertProfile(id: 'p-1', diveId: 'dive-1', computerId: 'comp-1');
       await insertSource(id: 'src-1', diveId: 'dive-1', computerId: 'comp-1');
       await insertProfileEvent(id: 'ev-1', diveId: 'dive-1');
-      await insertTankPressure(id: 'tp-1', diveId: 'dive-1', tankId: tank1);
       await insertGasSwitch(id: 'gs-1', diveId: 'dive-1', tankId: tank1);
       await insertProfileSeries(
         id: 'ps-1',
@@ -343,10 +278,8 @@ void main() {
       );
 
       // Data for dive-2 (must survive)
-      await insertProfile(id: 'p-2', diveId: 'dive-2', computerId: 'comp-1');
       await insertSource(id: 'src-2', diveId: 'dive-2', computerId: 'comp-1');
       await insertProfileEvent(id: 'ev-2', diveId: 'dive-2');
-      await insertTankPressure(id: 'tp-2', diveId: 'dive-2', tankId: tank2);
       await insertGasSwitch(id: 'gs-2', diveId: 'dive-2', tankId: tank2);
       await insertProfileSeries(
         id: 'ps-2',
@@ -362,10 +295,6 @@ void main() {
       await clearSourceAndProfiles(diveId: 'dive-1', computerId: 'comp-1');
 
       // dive-2 data is fully preserved
-      final profiles = await db.select(db.diveProfiles).get();
-      expect(profiles, hasLength(1));
-      expect(profiles.first.diveId, 'dive-2');
-
       final sources = await db.select(db.diveDataSources).get();
       expect(sources, hasLength(1));
       expect(sources.first.diveId, 'dive-2');
@@ -373,10 +302,6 @@ void main() {
       final events = await db.select(db.diveProfileEvents).get();
       expect(events, hasLength(1));
       expect(events.first.diveId, 'dive-2');
-
-      final pressures = await db.select(db.tankPressureProfiles).get();
-      expect(pressures, hasLength(1));
-      expect(pressures.first.diveId, 'dive-2');
 
       final switches = await db.select(db.gasSwitches).get();
       expect(switches, hasLength(1));
@@ -413,34 +338,10 @@ void main() {
       final tankId = await insertTank(id: 'tank-1', diveId: 'dive-1');
 
       // Profiles from comp-1 (will be cleared)
-      await insertProfile(
-        id: 'p-1a',
-        diveId: 'dive-1',
-        computerId: 'comp-1',
-        timestamp: 0,
-      );
-      await insertProfile(
-        id: 'p-1b',
-        diveId: 'dive-1',
-        computerId: 'comp-1',
-        timestamp: 10,
-      );
 
       // Profiles from comp-2 (must survive)
-      await insertProfile(
-        id: 'p-2a',
-        diveId: 'dive-1',
-        computerId: 'comp-2',
-        timestamp: 0,
-      );
-      await insertProfile(
-        id: 'p-2b',
-        diveId: 'dive-1',
-        computerId: 'comp-2',
-        timestamp: 10,
-      );
 
-      // Series twins of the comp-1 (cleared) and comp-2 (survives) profiles.
+      // comp-1's series (cleared) and comp-2's (survives).
       await insertProfileSeries(
         id: 'ps-1a',
         diveId: 'dive-1',
@@ -480,7 +381,6 @@ void main() {
       // will be removed regardless of which computer is being cleared. The
       // tank series twin is cleared the same way.
       await insertProfileEvent(id: 'ev-1', diveId: 'dive-1');
-      await insertTankPressure(id: 'tp-1', diveId: 'dive-1', tankId: tankId);
       await insertGasSwitch(id: 'gs-1', diveId: 'dive-1', tankId: tankId);
       await insertTankPressureSeries(
         id: 'tps-1',
@@ -490,11 +390,6 @@ void main() {
 
       await clearSourceAndProfiles(diveId: 'dive-1', computerId: 'comp-1');
 
-      // comp-2 profiles survive (filtered by computer_id)
-      final profiles = await db.select(db.diveProfiles).get();
-      expect(profiles, hasLength(2));
-      expect(profiles.every((p) => p.computerId == 'comp-2'), isTrue);
-
       // comp-2 data source survives (filtered by computer_id)
       final sources = await db.select(db.diveDataSources).get();
       expect(sources, hasLength(1));
@@ -502,7 +397,6 @@ void main() {
 
       // Per-dive derived tables are cleared entirely (by dive_id)
       expect(await db.select(db.diveProfileEvents).get(), isEmpty);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
       expect(await db.select(db.gasSwitches).get(), isEmpty);
 
       // comp-2 profile series survive; the tank series (dive-wide) is gone.

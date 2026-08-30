@@ -656,22 +656,6 @@ void main() {
         db.diveTanks,
       )..where((t) => t.diveId.equals(diveId))).get()).map((t) => t.id).toSet();
 
-      // Legacy table: the consolidation/split writers under test never
-      // touch it, so it stays empty; kept alongside the series check below
-      // rather than removed.
-      final pressures = await (db.select(
-        db.tankPressureProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      for (final p in pressures) {
-        expect(
-          tankIds,
-          contains(p.tankId),
-          reason:
-              'tank_pressure_profiles row ${p.id} on dive $diveId '
-              'references tank ${p.tankId}, which is not on this dive',
-        );
-      }
-
       final pressureSeries = await TankPressureSeriesRepository()
           .getSeriesForDive(diveId);
       for (final p in pressureSeries) {

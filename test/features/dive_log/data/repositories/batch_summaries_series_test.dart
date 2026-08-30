@@ -33,36 +33,28 @@ void main() {
 
   tearDown(tearDownTestDatabase);
 
-  test('series-backed and legacy-backed dives are both summarised', () async {
-    await series.insertSeries(
-      diveId: 'dive-1',
-      samples: [
-        for (var i = 0; i < 300; i++)
-          ProfileSample(timestamp: i, depth: i.toDouble()),
-      ],
-      now: now,
-    );
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          const DiveProfilesCompanion(
-            id: Value('legacy-1'),
-            diveId: Value('dive-2'),
-            timestamp: Value(7),
-            depth: Value(3.0),
-          ),
-        );
-    final summaries = await dives.getBatchProfileSummaries([
-      'dive-1',
-      'dive-2',
-      'dive-3',
-    ], maxSamples: 120);
-    expect(summaries.keys.toSet(), {'dive-1', 'dive-2'});
-    expect(summaries['dive-1'], hasLength(120));
-    expect(summaries['dive-1']!.first.timestamp, 0);
-    expect(summaries['dive-1']!.last.timestamp, 299);
-    expect(summaries['dive-2']!.single.depth, 3.0);
-  });
+  test(
+    'a series-backed dive is summarised, a dive without one is absent',
+    () async {
+      await series.insertSeries(
+        diveId: 'dive-1',
+        samples: [
+          for (var i = 0; i < 300; i++)
+            ProfileSample(timestamp: i, depth: i.toDouble()),
+        ],
+        now: now,
+      );
+      final summaries = await dives.getBatchProfileSummaries([
+        'dive-1',
+        'dive-2',
+        'dive-3',
+      ], maxSamples: 120);
+      expect(summaries.keys.toSet(), {'dive-1'});
+      expect(summaries['dive-1'], hasLength(120));
+      expect(summaries['dive-1']!.first.timestamp, 0);
+      expect(summaries['dive-1']!.last.timestamp, 299);
+    },
+  );
 
   test('every series of a dive contributes, primary or not', () async {
     await series.insertSeries(
@@ -81,28 +73,15 @@ void main() {
     expect(summaries['dive-1']!.map((p) => p.timestamp), [0, 10]);
   });
 
-  test(
-    'a dive with both series and legacy rows keeps only the series',
-    () async {
-      await series.insertSeries(
-        diveId: 'dive-1',
-        samples: const [ProfileSample(timestamp: 0, depth: 7.0)],
-        now: now,
-      );
-      await db
-          .into(db.diveProfiles)
-          .insert(
-            const DiveProfilesCompanion(
-              id: Value('legacy-1'),
-              diveId: Value('dive-1'),
-              timestamp: Value(0),
-              depth: Value(1.0),
-            ),
-          );
-      final summaries = await dives.getBatchProfileSummaries(['dive-1']);
-      expect(summaries['dive-1']!.map((p) => p.depth), [7.0]);
-    },
-  );
+  test('a dive summary comes from its series', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [ProfileSample(timestamp: 0, depth: 7.0)],
+      now: now,
+    );
+    final summaries = await dives.getBatchProfileSummaries(['dive-1']);
+    expect(summaries['dive-1']!.map((p) => p.depth), [7.0]);
+  });
 
   test('an empty id list returns an empty map', () async {
     expect(await dives.getBatchProfileSummaries(const []), isEmpty);

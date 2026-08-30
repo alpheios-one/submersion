@@ -77,12 +77,10 @@ void main() {
       expect(rows.single.computerId, 'comp-1');
       expect(rows.single.sourceId, isNotNull);
       expect(rows.single.samples.map((s) => s.timestamp), [0, 30]);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
       final tanks = await tankSeries.getSeriesForDive(diveId);
       expect(tanks, hasLength(1));
       expect(tanks.single.computerId, 'comp-1');
       expect(tanks.single.samples.map((s) => s.pressure), [200.0, 190.0]);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
     },
   );
 
@@ -135,8 +133,6 @@ void main() {
       expect(await tankSeries.getSeriesForDive(diveId), isEmpty);
       final tombstones = await db.select(db.deletionLog).get();
       expect(tombstones.map((t) => t.recordId).toSet(), {imported, tank});
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
     },
   );
 }

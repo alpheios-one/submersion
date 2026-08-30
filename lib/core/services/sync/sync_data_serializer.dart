@@ -1599,11 +1599,6 @@ class SyncDataSerializer {
           _db.dives,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
-      case 'diveProfiles':
-        final row = await (_db.select(
-          _db.diveProfiles,
-        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
       case 'diveTanks':
         final row = await (_db.select(
           _db.diveTanks,
@@ -1875,11 +1870,6 @@ class SyncDataSerializer {
           _db.diveComputers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row == null ? null : _withoutDeviceLocalFields(row.toJson());
-      case 'tankPressureProfiles':
-        final row = await (_db.select(
-          _db.tankPressureProfiles,
-        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
       case 'tideRecords':
         final row = await (_db.select(
           _db.tideRecords,
@@ -2517,9 +2507,7 @@ class SyncDataSerializer {
             .insertOnConflictUpdate(Dive.fromJson(data).toCompanion(false));
         return;
       case 'diveProfiles':
-        await _db
-            .into(_db.diveProfiles)
-            .insertOnConflictUpdate(DiveProfile.fromJson(data));
+        // Task 3 stages these rows
         return;
       case 'diveTanks':
         await _db
@@ -2848,9 +2836,7 @@ class SyncDataSerializer {
             );
         return;
       case 'tankPressureProfiles':
-        await _db
-            .into(_db.tankPressureProfiles)
-            .insertOnConflictUpdate(TankPressureProfile.fromJson(data));
+        // Task 3 stages these rows
         return;
       case 'tideRecords':
         await _db
@@ -3109,12 +3095,7 @@ class SyncDataSerializer {
         );
         return;
       case 'diveProfiles':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.diveProfiles,
-            records.map((r) => DiveProfile.fromJson(r)).toList(),
-          ),
-        );
+        // Task 3 stages these rows
         return;
       case 'diveTanks':
         await _db.batch(
@@ -3631,12 +3612,7 @@ class SyncDataSerializer {
         );
         return;
       case 'tankPressureProfiles':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.tankPressureProfiles,
-            records.map((r) => TankPressureProfile.fromJson(r)).toList(),
-          ),
-        );
+        // Task 3 stages these rows
         return;
       case 'tideRecords':
         await _db.batch(
@@ -4032,8 +4008,6 @@ class SyncDataSerializer {
         return plain(_db.diveDiveTypes, _db.diveDiveTypes.id);
       case 'diveBuddies':
         return plain(_db.diveBuddies, _db.diveBuddies.id);
-      case 'diveProfiles':
-        return plain(_db.diveProfiles, _db.diveProfiles.id);
       case 'diveProfileEvents':
         return plain(_db.diveProfileEvents, _db.diveProfileEvents.id);
       case 'diveSafetyReviews':
@@ -4062,8 +4036,6 @@ class SyncDataSerializer {
         return plain(_db.viewConfigs, _db.viewConfigs.id);
       case 'fieldPresets':
         return plain(_db.fieldPresets, _db.fieldPresets.id);
-      case 'tankPressureProfiles':
-        return plain(_db.tankPressureProfiles, _db.tankPressureProfiles.id);
       case 'tideRecords':
         return plain(_db.tideRecords, _db.tideRecords.id);
       case 'sightings':
@@ -4267,8 +4239,6 @@ class SyncDataSerializer {
         return _db.diveDiveTypes;
       case 'diveBuddies':
         return _db.diveBuddies;
-      case 'diveProfiles':
-        return _db.diveProfiles;
       case 'diveProfileEvents':
         return _db.diveProfileEvents;
       case 'diveSafetyReviews':
@@ -4297,8 +4267,6 @@ class SyncDataSerializer {
         return _db.viewConfigs;
       case 'fieldPresets':
         return _db.fieldPresets;
-      case 'tankPressureProfiles':
-        return _db.tankPressureProfiles;
       case 'tideRecords':
         return _db.tideRecords;
       case 'sightings':
@@ -4342,11 +4310,6 @@ class SyncDataSerializer {
         return;
       case 'dives':
         await (_db.delete(_db.dives)..where((t) => t.id.equals(recordId))).go();
-        return;
-      case 'diveProfiles':
-        await (_db.delete(
-          _db.diveProfiles,
-        )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'diveTanks':
         await (_db.delete(
@@ -4607,11 +4570,6 @@ class SyncDataSerializer {
       case 'diveComputers':
         await (_db.delete(
           _db.diveComputers,
-        )..where((t) => t.id.equals(recordId))).go();
-        return;
-      case 'tankPressureProfiles':
-        await (_db.delete(
-          _db.tankPressureProfiles,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'tideRecords':

@@ -194,7 +194,6 @@ void main() {
         (5, 0.0),
         (35, 12.0),
       ]);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
       final tombstones = await db.select(db.deletionLog).get();
       expect(tombstones.map((t) => (t.entityType, t.recordId)).toList(), [
         ('diveProfileSeries', stale),
@@ -254,7 +253,6 @@ void main() {
       expect(rows.single.tankId, 'tank-0');
       expect(rows.single.computerId, 'comp-1');
       expect(rows.single.samples.map((s) => s.pressure), [200.0, 150.0]);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
       final tombstones = await db.select(db.deletionLog).get();
       expect(
         tombstones.map((t) => (t.entityType, t.recordId)),

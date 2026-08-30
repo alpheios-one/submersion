@@ -27,23 +27,6 @@ void main() {
 
   tearDown(() => db.close());
 
-  test('per-dive profile fetch uses idx_dive_profiles_dive_id', () async {
-    final p = await plan(
-      db,
-      "SELECT * FROM dive_profiles WHERE dive_id = 'x' ORDER BY timestamp",
-    );
-    expect(p, contains('idx_dive_profiles_dive_id'));
-  });
-
-  test('per-dive pressure fetch uses idx_tank_pressure_dive_tank', () async {
-    final p = await plan(
-      db,
-      "SELECT * FROM tank_pressure_profiles WHERE dive_id = 'x' "
-      'ORDER BY timestamp',
-    );
-    expect(p, contains('idx_tank_pressure_dive_tank'));
-  });
-
   test(
     'per-dive series fetch uses idx_dive_profile_series_dive_primary',
     () async {

@@ -208,8 +208,6 @@ void main() {
       ),
       isFalse,
     );
-    expect(await db.select(db.diveProfiles).get(), isEmpty);
-    expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
   });
 
   test(

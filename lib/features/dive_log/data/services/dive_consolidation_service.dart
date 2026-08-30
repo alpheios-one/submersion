@@ -646,13 +646,9 @@ class DiveConsolidationService {
       // that ARE in the snapshot are re-inserted verbatim below and need no
       // tombstone -- their upsert on the peer carries the restored state.
       final snapshotIds = <String, Set<String>>{
-        'diveProfiles': {for (final r in snapshot.profileRows) r.id},
         'diveTanks': {for (final r in snapshot.tankRows) r.id},
         'diveProfileEvents': {for (final r in snapshot.eventRows) r.id},
         'gasSwitches': {for (final r in snapshot.gasSwitchRows) r.id},
-        'tankPressureProfiles': {
-          for (final r in snapshot.tankPressureRows) r.id,
-        },
         'diveProfileSeries': {for (final r in snapshot.profileSeriesRows) r.id},
         'tankPressureSeries': {for (final r in snapshot.tankSeriesRows) r.id},
         'diveDataSources': {for (final r in snapshot.dataSourceRows) r.id},
@@ -668,12 +664,6 @@ class DiveConsolidationService {
         'diveCustomFields': {for (final r in snapshot.customFieldRows) r.id},
       };
       final currentChildIds = <String, List<String>>{
-        'diveProfiles': [
-          for (final r in await (_db.select(
-            _db.diveProfiles,
-          )..where((t) => t.diveId.equals(mergedId))).get())
-            r.id,
-        ],
         'diveTanks': [
           for (final r in await (_db.select(
             _db.diveTanks,
@@ -689,12 +679,6 @@ class DiveConsolidationService {
         'gasSwitches': [
           for (final r in await (_db.select(
             _db.gasSwitches,
-          )..where((t) => t.diveId.equals(mergedId))).get())
-            r.id,
-        ],
-        'tankPressureProfiles': [
-          for (final r in await (_db.select(
-            _db.tankPressureProfiles,
           )..where((t) => t.diveId.equals(mergedId))).get())
             r.id,
         ],
@@ -763,7 +747,6 @@ class DiveConsolidationService {
       }
 
       await _db.batch((batch) {
-        batch.deleteWhere(_db.diveProfiles, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTanks, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveWeights, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(
@@ -780,10 +763,6 @@ class DiveConsolidationService {
           (t) => t.diveId.equals(mergedId),
         );
         batch.deleteWhere(_db.gasSwitches, (t) => t.diveId.equals(mergedId));
-        batch.deleteWhere(
-          _db.tankPressureProfiles,
-          (t) => t.diveId.equals(mergedId),
-        );
         // Raw deletes on purpose: the tombstone loop above already logged
         // the difference between the current (post-consolidation) rows and
         // the snapshot, and restoreSeriesRow below removes the tombstone of
@@ -843,20 +822,6 @@ class DiveConsolidationService {
       // Child rows verbatim (original ids never collide with consolidation
       // output: consolidated children all had fresh ids).
       await _db.batch((batch) {
-        for (final r in snapshot.profileRows) {
-          batch.insert(
-            _db.diveProfiles,
-            r.toCompanion(false),
-            mode: InsertMode.insertOrReplace,
-          );
-        }
-        for (final r in snapshot.tankPressureRows) {
-          batch.insert(
-            _db.tankPressureProfiles,
-            r.toCompanion(false),
-            mode: InsertMode.insertOrReplace,
-          );
-        }
         for (final r in snapshot.dataSourceRows) {
           batch.insert(
             _db.diveDataSources,

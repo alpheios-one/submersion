@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:uuid/uuid.dart';
 
 /// Seeds the database with realistic test data for App Store screenshots.
@@ -497,6 +499,7 @@ class ScreenshotTestDataSeeder {
 
     // Create profile points every 10 seconds
     final numPoints = duration ~/ 10;
+    final samples = <ProfileSample>[];
 
     for (var i = 0; i < numPoints; i++) {
       final timestamp = i * 10;
@@ -539,21 +542,21 @@ class ScreenshotTestDataSeeder {
       final pressure = (200 - depthAdjustedConsumption + breathingVariation)
           .clamp(40.0, 210.0);
 
-      await db
-          .into(db.diveProfiles)
-          .insert(
-            DiveProfilesCompanion.insert(
-              id: _uuid.v4(),
-              diveId: diveId,
-              timestamp: timestamp,
-              depth: depth,
-              temperature: Value(
-                temp - (depth * 0.1),
-              ), // Temp decreases with depth
-              pressure: Value(pressure), // Realistic gas consumption
-            ),
-          );
+      samples.add(
+        ProfileSample(
+          timestamp: timestamp,
+          depth: depth,
+          // Temp decreases with depth
+          temperature: temp - (depth * 0.1),
+          pressure: pressure, // Realistic gas consumption
+        ),
+      );
     }
+
+    if (samples.isEmpty) return;
+    await ProfileSeriesRepository(
+      database: db,
+    ).insertSeries(diveId: diveId, samples: samples);
   }
 
   String _generateDiveNotes(String diveType, String siteName) {

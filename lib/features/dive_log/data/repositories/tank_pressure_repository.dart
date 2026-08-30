@@ -23,14 +23,13 @@ class TankPressureRepository {
   /// Get all tank pressure data for a dive, grouped by tank ID
   ///
   /// Returns a map where keys are tank IDs and values are lists of
-  /// pressure points sorted by timestamp. Series-first: a dive with tank
-  /// pressure series uses those; a dive with none falls back to the legacy
-  /// `tank_pressure_profiles` rows.
+  /// pressure points sorted by timestamp. The series tables are the only
+  /// store: v183 dropped `tank_pressure_profiles`.
   Future<Map<String, List<TankPressurePoint>>> getTankPressuresForDive(
     String diveId,
   ) async {
     final series = await _tankSeries.getSeriesForDive(diveId);
-    if (series.isEmpty) return _getTankPressuresForDiveLegacy(diveId);
+    if (series.isEmpty) return const <String, List<TankPressurePoint>>{};
     final byTank = <String, List<dynamic>>{};
     for (final s in series) {
       byTank.putIfAbsent(s.tankId, () => []).add(s);
@@ -42,34 +41,7 @@ class TankPressureRepository {
     return result;
   }
 
-  Future<Map<String, List<TankPressurePoint>>> _getTankPressuresForDiveLegacy(
-    String diveId,
-  ) async {
-    final rows =
-        await (_db.select(_db.tankPressureProfiles)
-              ..where((t) => t.diveId.equals(diveId))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
-
-    final result = <String, List<TankPressurePoint>>{};
-    for (final row in rows) {
-      result
-          .putIfAbsent(row.tankId, () => [])
-          .add(
-            TankPressurePoint(
-              id: row.id,
-              tankId: row.tankId,
-              timestamp: row.timestamp,
-              pressure: row.pressure,
-            ),
-          );
-    }
-
-    return result;
-  }
-
-  /// Get pressure data for a specific tank. Series-first: falls back to the
-  /// legacy rows when the tank has no series.
+  /// Get pressure data for a specific tank.
   ///
   /// This read gates on the TANK's series while [getTankPressuresForDive]
   /// gates on the dive's; the two can only disagree for a tank the packer
@@ -79,30 +51,8 @@ class TankPressureRepository {
     String tankId,
   ) async {
     final series = await _tankSeries.getSeriesForTank(diveId, tankId);
-    if (series.isEmpty) return _getPressuresForTankLegacy(diveId, tankId);
+    if (series.isEmpty) return const <TankPressurePoint>[];
     return mergeTankSeriesPoints(series);
-  }
-
-  Future<List<TankPressurePoint>> _getPressuresForTankLegacy(
-    String diveId,
-    String tankId,
-  ) async {
-    final rows =
-        await (_db.select(_db.tankPressureProfiles)
-              ..where((t) => t.diveId.equals(diveId) & t.tankId.equals(tankId))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
-
-    return rows
-        .map(
-          (row) => TankPressurePoint(
-            id: row.id,
-            tankId: row.tankId,
-            timestamp: row.timestamp,
-            pressure: row.pressure,
-          ),
-        )
-        .toList();
   }
 
   /// Bulk insert tank pressure data for a dive
@@ -146,9 +96,6 @@ class TankPressureRepository {
 
   /// Delete all tank pressure data for a dive
   Future<void> deleteTankPressuresForDive(String diveId) async {
-    await (_db.delete(
-      _db.tankPressureProfiles,
-    )..where((t) => t.diveId.equals(diveId))).go();
     await _tankSeries.deleteForDive(diveId);
     final now = DateTime.now().millisecondsSinceEpoch;
     await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
@@ -211,18 +158,6 @@ class TankPressureRepository {
   }
 
   /// Check if a dive has any per-tank pressure data
-  Future<bool> hasTankPressures(String diveId) async =>
-      await _tankSeries.hasSeriesForDive(diveId) ||
-      await _hasTankPressuresLegacy(diveId);
-
-  Future<bool> _hasTankPressuresLegacy(String diveId) async {
-    final count =
-        await (_db.selectOnly(_db.tankPressureProfiles)
-              ..addColumns([_db.tankPressureProfiles.id.count()])
-              ..where(_db.tankPressureProfiles.diveId.equals(diveId)))
-            .map((row) => row.read(_db.tankPressureProfiles.id.count()))
-            .getSingle();
-
-    return (count ?? 0) > 0;
-  }
+  Future<bool> hasTankPressures(String diveId) =>
+      _tankSeries.hasSeriesForDive(diveId);
 }

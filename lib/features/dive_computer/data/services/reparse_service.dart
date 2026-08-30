@@ -160,9 +160,6 @@ class ReparseService {
         await (db.delete(
           db.gasSwitches,
         )..where((t) => t.diveId.equals(diveId))).go();
-        await (db.delete(
-          db.tankPressureProfiles,
-        )..where((t) => t.diveId.equals(diveId))).go();
         await _tankSeries.deleteForDive(diveId);
 
         // Re-insert events from parsed data
@@ -552,16 +549,6 @@ class ReparseService {
     required int timeOffset,
   }) async {
     // Delete existing profiles for this (diveId, computerId)
-    if (computerId != null) {
-      await (db.delete(db.diveProfiles)..where(
-            (t) => t.diveId.equals(diveId) & t.computerId.equals(computerId),
-          ))
-          .go();
-    } else {
-      await (db.delete(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId) & t.computerId.isNull())).go();
-    }
     await _profileSeries.deleteByComputer(diveId, computerId);
 
     // Re-insert from parsed samples

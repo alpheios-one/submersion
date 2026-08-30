@@ -371,14 +371,6 @@ class DiverRepository {
           'AND (diver_id IS NULL OR diver_id != ?)',
           [id, id],
         );
-        await _db.customStatement(
-          'UPDATE dive_profiles SET computer_id = NULL '
-          'WHERE computer_id IN '
-          '(SELECT id FROM dive_computers WHERE diver_id = ?) '
-          // stats-scope-exempt: reassignment cascade, not a statistic.
-          'AND dive_id NOT IN (SELECT id FROM dives WHERE diver_id = ?)',
-          [id, id],
-        );
         await ProfileSeriesRepository().clearComputersOfDiverForForeignDives(
           id,
         );

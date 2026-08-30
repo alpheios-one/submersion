@@ -136,33 +136,7 @@ void main() {
     expect(tankA.endPressure, 100.0);
   });
 
-  test('a dive with no tank series falls back to the legacy rows', () async {
-    await db
-        .into(db.tankPressureProfiles)
-        .insert(
-          TankPressureProfilesCompanion.insert(
-            id: 'legacy-1',
-            diveId: 'dive-1',
-            tankId: 'tank-a',
-            timestamp: 0,
-            pressure: 180.0,
-          ),
-        );
-    expect(
-      (await tanks.getTankPressuresForDive(
-        'dive-1',
-      ))['tank-a']!.single.pressure,
-      180.0,
-    );
-    expect(await tanks.hasTankPressures('dive-1'), isTrue);
-    final dive = await DiveRepository().getDiveById('dive-1');
-    expect(
-      dive!.tanks.singleWhere((t) => t.id == 'tank-a').startPressure,
-      180.0,
-    );
-  });
-
-  test('no series and no legacy rows', () async {
+  test('a dive with no tank series has no pressures', () async {
     expect(await tanks.getTankPressuresForDive('dive-1'), isEmpty);
     expect(await tanks.hasTankPressures('dive-1'), isFalse);
   });

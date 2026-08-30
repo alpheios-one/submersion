@@ -13,7 +13,6 @@ class DiveMergeSnapshot {
   const DiveMergeSnapshot({
     required this.mergedDiveId,
     required this.diveRows,
-    required this.profileRows,
     required this.tankRows,
     required this.weightRows,
     required this.customFieldRows,
@@ -24,7 +23,6 @@ class DiveMergeSnapshot {
     required this.sightingRows,
     required this.eventRows,
     required this.gasSwitchRows,
-    required this.tankPressureRows,
     required this.dataSourceRows,
     required this.tideRows,
     required this.mediaDiveIds,
@@ -36,7 +34,6 @@ class DiveMergeSnapshot {
   final String mergedDiveId;
 
   final List<Dive> diveRows;
-  final List<DiveProfile> profileRows;
   final List<DiveTank> tankRows;
   final List<DiveWeight> weightRows;
   final List<DiveCustomField> customFieldRows;
@@ -47,7 +44,6 @@ class DiveMergeSnapshot {
   final List<Sighting> sightingRows;
   final List<DiveProfileEvent> eventRows;
   final List<GasSwitche> gasSwitchRows;
-  final List<TankPressureProfile> tankPressureRows;
   final List<DiveDataSourcesData> dataSourceRows;
   final List<TideRecord> tideRows;
 
@@ -56,8 +52,8 @@ class DiveMergeSnapshot {
   final Map<String, String> mediaDiveIds;
 
   /// Raw packed profile / tank pressure series rows of [diveIds], undecoded,
-  /// for an undo to restore verbatim. Empty on a database still carrying only
-  /// legacy row-per-sample data; plan 2e removes the legacy fields above.
+  /// for an undo to restore verbatim. The only sample capture there is: v183
+  /// dropped the row-per-sample tables this class used to snapshot too.
   final List<DiveProfileSeriesRow> profileSeriesRows;
   final List<TankPressureSeriesRow> tankSeriesRows;
 
@@ -77,9 +73,6 @@ class DiveMergeSnapshot {
       diveRows: await (db.select(
         db.dives,
       )..where((t) => t.id.isIn(diveIds))).get(),
-      profileRows: await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.isIn(diveIds))).get(),
       tankRows: await (db.select(
         db.diveTanks,
       )..where((t) => t.diveId.isIn(diveIds))).get(),
@@ -109,9 +102,6 @@ class DiveMergeSnapshot {
       )..where((t) => t.diveId.isIn(diveIds))).get(),
       gasSwitchRows: await (db.select(
         db.gasSwitches,
-      )..where((t) => t.diveId.isIn(diveIds))).get(),
-      tankPressureRows: await (db.select(
-        db.tankPressureProfiles,
       )..where((t) => t.diveId.isIn(diveIds))).get(),
       dataSourceRows: await (db.select(
         db.diveDataSources,

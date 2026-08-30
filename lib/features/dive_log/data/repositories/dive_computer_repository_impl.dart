@@ -353,7 +353,7 @@ class DiveComputerRepository {
   /// snapshot (model + serial) of the device that produced it, backfilled
   /// here when missing, so the provenance record survives the delete and
   /// [_relinkOrphanedRows] can restore the links if the same hardware is
-  /// added again. FK references in `dives`, `dive_profiles`, and
+  /// added again. FK references in `dives`, `dive_profile_series`, and
   /// `dive_data_sources` are then nulled out so the delete is not blocked by
   /// foreign key constraints; the dive/profile/data-source rows themselves
   /// are preserved.
@@ -369,9 +369,9 @@ class DiveComputerRepository {
       }
 
       // Clear the series first: their FK is ON DELETE SET NULL, so the
-      // legacy dive_profiles clear below (and the dive_computers delete that
-      // follows it) would null series.computer_id via the cascade without
-      // restamping hlc, and peers would never learn of the change.
+      // dive_computers delete that follows would null series.computer_id via
+      // the cascade without restamping hlc, and peers would never learn of
+      // the change.
       await _profileSeries.clearComputer(id);
       await _tankSeries.clearComputer(id);
 
@@ -380,10 +380,6 @@ class DiveComputerRepository {
       // SqliteException(787) on any computer that a dive references (#823).
       await _db.customStatement(
         'UPDATE dives SET computer_id = NULL WHERE computer_id = ?',
-        [id],
-      );
-      await _db.customStatement(
-        'UPDATE dive_profiles SET computer_id = NULL WHERE computer_id = ?',
         [id],
       );
       await _db.customStatement(
@@ -531,15 +527,6 @@ class DiveComputerRepository {
           .map((r) => r.read<String>('dive_id'))
           .toSet()
           .toList();
-      final matchedPh = List.filled(matchedDiveIds.length, '?').join(', ');
-      await _db.customStatement(
-        'UPDATE dive_profiles SET computer_id = ? '
-        'WHERE computer_id IS NULL AND dive_id IN ($matchedPh) '
-        'AND (SELECT COUNT(*) FROM dive_data_sources s '
-        'WHERE s.dive_id = dive_profiles.dive_id '
-        "AND s.source_format = 'dive_computer') = 1",
-        [computerId, ...matchedDiveIds],
-      );
       await _profileSeries.relinkComputer(computerId, matchedDiveIds);
 
       _log.info(
@@ -714,7 +701,7 @@ class DiveComputerRepository {
             if (s.computerId != null) s.computerId!,
         }.toList();
       }
-      return await _getComputerIdsForDiveLegacy(diveId);
+      return const <String>[];
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get computer ids for dive: $diveId',
@@ -723,24 +710,6 @@ class DiveComputerRepository {
       );
       rethrow;
     }
-  }
-
-  Future<List<String>> _getComputerIdsForDiveLegacy(String diveId) async {
-    final result = await _db
-        .customSelect(
-          '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND computer_id IS NOT NULL
-      ''',
-          variables: [Variable(diveId)],
-        )
-        .get();
-
-    return result
-        .map((row) => row.data['computer_id'] as String?)
-        .whereType<String>()
-        .toList();
   }
 
   /// Get computers with profiles for a given dive
@@ -796,7 +765,7 @@ class DiveComputerRepository {
         }
         return null;
       }
-      return await _getPrimaryComputerIdLegacy(diveId);
+      return null;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get primary computer for dive: $diveId',
@@ -805,22 +774,6 @@ class DiveComputerRepository {
       );
       return null;
     }
-  }
-
-  Future<String?> _getPrimaryComputerIdLegacy(String diveId) async {
-    final result = await _db
-        .customSelect(
-          '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND is_primary = 1 AND computer_id IS NOT NULL
-        LIMIT 1
-      ''',
-          variables: [Variable(diveId)],
-        )
-        .getSingleOrNull();
-
-    return result?.data['computer_id'] as String?;
   }
 
   /// Set the primary profile for a dive (by computer ID)
@@ -1055,19 +1008,11 @@ class DiveComputerRepository {
       'DELETE FROM dive_profile_events WHERE dive_id = ?',
       [diveId],
     );
-    await _db.customStatement(
-      'DELETE FROM tank_pressure_profiles WHERE dive_id = ?',
-      [diveId],
-    );
     await _tankSeries.deleteForDive(diveId);
     await _db.customStatement('DELETE FROM gas_switches WHERE dive_id = ?', [
       diveId,
     ]);
     // Delete profile points for this computer+dive
-    await _db.customStatement(
-      'DELETE FROM dive_profiles WHERE dive_id = ? AND computer_id = ?',
-      [diveId, computerId],
-    );
     await _profileSeries.deleteByComputer(diveId, computerId);
     // Delete the data source row for this computer+dive
     await _db.customStatement(

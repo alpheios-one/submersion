@@ -75,7 +75,6 @@ void main() {
       expect(rows.single.computerId, isNull);
       expect(rows.single.sourceId, isNull);
       expect(rows.single.samples.map((s) => s.timestamp), [0, 10]);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
     },
   );
 
@@ -120,7 +119,6 @@ void main() {
         db.dives,
       )..where((t) => t.id.equals('dive-1'))).getSingle();
       expect(row.maxDepth, 9.0);
-      expect(await db.select(db.diveProfiles).get(), isEmpty);
     },
   );
 

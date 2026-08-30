@@ -184,7 +184,6 @@ void main() {
     expect(gap.last.timestamp, offsetB - 1);
     expectAscending(first.samples.map((s) => s.timestamp));
     expect(first.sourceId, isNotNull);
-    expect(await db.select(db.diveProfiles).get(), isEmpty);
   });
 
   test('apply moves tank pressure series onto the merged tanks with the '
@@ -207,7 +206,6 @@ void main() {
       ..sort();
     expect(timestamps.first, 60);
     expect(timestamps.last, greaterThan(660));
-    expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
   });
 
   test(

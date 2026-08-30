@@ -77,13 +77,6 @@ class DiveSplitService {
     final allPressureSeries = await _tankSeries.getSeriesForDive(diveId);
     bool ownedByComputer(String? computerId) =>
         source.computerId != null && computerId == source.computerId;
-    // The legacy row rule as a Drift expression, for the legacy delete at
-    // step 8: a migrated database still holds `dive_profiles` rows next to
-    // their series twins until plan 2e drops the table.
-    Expression<bool> ownedBySource(GeneratedColumn<String> computerId) =>
-        source.computerId == null
-        ? computerId.isNull()
-        : computerId.equals(source.computerId!);
     // The legacy row rule, applied to whole series: not owned by another
     // source by FK, then the computer convention for the source's primacy.
     bool profileBelongsToSource(series.ProfileSeries s) {
@@ -345,30 +338,6 @@ class DiveSplitService {
       // never move, and only unreferenced tanks were moved.
       await _tankSeries.deleteByIds([for (final s in movingPressures) s.id]);
       await _profileSeries.deleteByIds([for (final s in movingProfiles) s.id]);
-      // Legacy rows of the same identities (a migrated database still holds
-      // them until plan 2e drops the tables); without this delete the 2b
-      // fallback would redisplay the samples that just moved.
-      await (_db.delete(_db.diveProfiles)..where((t) {
-            final notOwnedByAnotherSource =
-                t.sourceId.isNull() | t.sourceId.equals(source.id);
-            final byLegacyRule = source.computerId == null
-                ? t.computerId.isNull() & t.isPrimary.equals(false)
-                : source.isPrimary
-                ? ownedBySource(t.computerId) | t.computerId.isNull()
-                : ownedBySource(t.computerId);
-            return t.diveId.equals(diveId) &
-                notOwnedByAnotherSource &
-                byLegacyRule;
-          }))
-          .go();
-      if (source.computerId != null) {
-        await (_db.delete(_db.tankPressureProfiles)..where(
-              (t) =>
-                  t.diveId.equals(diveId) &
-                  t.computerId.equals(source.computerId!),
-            ))
-            .go();
-      }
       for (final row in eventRows) {
         await _sync.logDeletion(
           entityType: 'diveProfileEvents',

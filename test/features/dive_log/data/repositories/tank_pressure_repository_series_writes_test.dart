@@ -52,7 +52,6 @@ void main() {
       expect(rows.single.tankId, 'tank-a');
       expect(rows.single.computerId, isNull);
       expect(rows.single.samples.map((s) => s.pressure), [200.0, 180.0]);
-      expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
       final dive = await (db.select(
         db.dives,
       )..where((t) => t.id.equals('dive-1'))).getSingle();

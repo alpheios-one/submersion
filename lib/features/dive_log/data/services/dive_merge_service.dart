@@ -542,7 +542,6 @@ class DiveMergeService {
       await _profileSeries.deleteForDive(mergedId);
       await _tankSeries.deleteForDive(mergedId);
       await _db.batch((batch) {
-        batch.deleteWhere(_db.diveProfiles, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveTanks, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(_db.diveWeights, (t) => t.diveId.equals(mergedId));
         batch.deleteWhere(
@@ -559,10 +558,6 @@ class DiveMergeService {
           (t) => t.diveId.equals(mergedId),
         );
         batch.deleteWhere(_db.gasSwitches, (t) => t.diveId.equals(mergedId));
-        batch.deleteWhere(
-          _db.tankPressureProfiles,
-          (t) => t.diveId.equals(mergedId),
-        );
         batch.deleteWhere(
           _db.diveDataSources,
           (t) => t.diveId.equals(mergedId),
@@ -596,7 +591,7 @@ class DiveMergeService {
         );
       }
 
-      // Tanks BEFORE the batch below: tankPressureProfiles.tankId (and
+      // Tanks BEFORE the batch below: tank_pressure_series.tankId (and
       // gasSwitches.tankId further down) are FKs into diveTanks, and FK
       // enforcement is immediate under `PRAGMA foreign_keys = ON`, so the
       // parent tank rows must exist before any row that references them.
@@ -614,20 +609,6 @@ class DiveMergeService {
       // Child rows verbatim (original ids never collide with merge output:
       // merged children all had fresh ids).
       await _db.batch((batch) {
-        for (final r in snapshot.profileRows) {
-          batch.insert(
-            _db.diveProfiles,
-            r.toCompanion(false),
-            mode: InsertMode.insertOrReplace,
-          );
-        }
-        for (final r in snapshot.tankPressureRows) {
-          batch.insert(
-            _db.tankPressureProfiles,
-            r.toCompanion(false),
-            mode: InsertMode.insertOrReplace,
-          );
-        }
         for (final r in snapshot.dataSourceRows) {
           batch.insert(
             _db.diveDataSources,

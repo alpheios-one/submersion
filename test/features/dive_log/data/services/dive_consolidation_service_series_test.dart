@@ -181,7 +181,6 @@ void main() {
         0;
     expect(copied.map((s) => s.samples.single.timestamp).toSet(), {offset});
     expect(await profileSeries.getSeriesForDive('s'), isEmpty);
-    expect(await db.select(db.diveProfiles).get(), isEmpty);
   });
 
   test('apply stamps the target computer on the target null-computer tank '
@@ -199,7 +198,6 @@ void main() {
       't',
     ])).firstWhere((r) => r.id == id);
     expect(row.computerId, 'comp-t');
-    expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
   });
 
   test('undo tombstones the copied series, keeps the originals and restores '

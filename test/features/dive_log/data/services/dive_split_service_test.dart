@@ -94,57 +94,6 @@ void main() {
     );
   }
 
-  /// Inserts a legacy `dive_profiles` row directly. The v182 packer never
-  /// deletes legacy rows, so a migrated database carries one of these next
-  /// to its series twin for the same identity; the split's legacy delete
-  /// tests seed both to prove the 2b fallback cannot resurface a moved
-  /// identity's samples.
-  Future<String> insertProfileRow(
-    String diveId,
-    String? computerId, {
-    required bool isPrimary,
-    int timestamp = 0,
-    double depth = 10.0,
-  }) async {
-    final id = 'legacy-profile-${rowCounter++}';
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion.insert(
-            id: id,
-            diveId: diveId,
-            computerId: Value(computerId),
-            isPrimary: Value(isPrimary),
-            timestamp: timestamp,
-            depth: depth,
-          ),
-        );
-    return id;
-  }
-
-  /// Legacy twin of [insertTankPressureSeriesRow]: a `tank_pressure_profiles`
-  /// row for the same tank and computer.
-  Future<String> insertTankPressureRow(
-    String diveId,
-    String tankId,
-    String? computerId,
-  ) async {
-    final id = 'legacy-pressure-${rowCounter++}';
-    await db
-        .into(db.tankPressureProfiles)
-        .insert(
-          TankPressureProfilesCompanion.insert(
-            id: id,
-            diveId: diveId,
-            tankId: tankId,
-            timestamp: 0,
-            pressure: 200.0,
-            computerId: Value(computerId),
-          ),
-        );
-    return id;
-  }
-
   Future<String> insertTank(String diveId, String? computerId) async {
     final id = 'tank-${rowCounter++}';
     await db
@@ -725,14 +674,10 @@ void main() {
     expect(newDive.diveDateTime, bronzeEntry.millisecondsSinceEpoch);
   });
 
-  test('split deletes the legacy rows of the moved identities so the fallback '
-      'cannot resurface them', () async {
+  test('split moves every series of the source onto the new dive', () async {
     await insertDive('dive-1', computerId: 'dc-a');
     await insertSource('src-a', 'dive-1', 'dc-a', isPrimary: true);
     await insertSource('src-b', 'dive-1', 'dc-b', isPrimary: false);
-    // A legacy row and its series twin, same identity: a migrated
-    // database holds both until plan 2e drops the legacy tables.
-    await insertProfileRow('dive-1', 'dc-a', isPrimary: true, depth: 21.7);
     await insertProfileSeriesRow(
       'dive-1',
       'dc-a',
@@ -740,22 +685,12 @@ void main() {
       depth: 21.7,
     );
     final tankA = await insertTank('dive-1', 'dc-a');
-    await insertTankPressureRow('dive-1', tankA, 'dc-a');
     await insertTankPressureSeriesRow('dive-1', tankA, 'dc-a');
 
     final newDiveId = await service.split(diveId: 'dive-1', sourceId: 'src-a');
 
-    // Every series moved, so getDiveProfile falls back to the legacy
-    // table; the fallback must not find the moved identity's row there.
+    // Every series moved, so the source dive has no samples left.
     expect(await repository.getDiveProfile('dive-1'), isEmpty);
-    final legacyProfiles = await (db.select(
-      db.diveProfiles,
-    )..where((t) => t.diveId.equals('dive-1'))).get();
-    expect(legacyProfiles, isEmpty);
-    final legacyPressures = await (db.select(
-      db.tankPressureProfiles,
-    )..where((t) => t.diveId.equals('dive-1'))).get();
-    expect(legacyPressures, isEmpty);
 
     final newProfiles = await profileSeries.getSeriesForDive(newDiveId);
     expect(newProfiles.single.samples.single.depth, 21.7);

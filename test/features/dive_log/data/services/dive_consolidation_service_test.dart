@@ -408,14 +408,7 @@ void main() {
         );
         expect(outcome.targetDiveId, 't');
 
-        // Target has both computers' profile series; the writer no longer
-        // touches the legacy table at all.
-        expect(
-          await (db.select(
-            db.diveProfiles,
-          )..where((t) => t.diveId.equals('t'))).get(),
-          isEmpty,
-        );
+        // Target has both computers' profile series.
         final series = await profileSeries.getSeriesForDive('t');
         final allSamples = [for (final s in series) ...s.samples];
         expect(allSamples, hasLength(6)); // 3 target + 3 secondary
@@ -444,13 +437,7 @@ void main() {
         expect(secondaryEvents.every((e) => e.computerId == 'comp-s'), isTrue);
 
         // Secondary's tank pressure series shifted by +60 and carry the
-        // secondary's computerId; the legacy table stays empty.
-        expect(
-          await (db.select(
-            db.tankPressureProfiles,
-          )..where((t) => t.diveId.equals('t'))).get(),
-          isEmpty,
-        );
+        // secondary's computerId.
         final pressureSeries = await tankSeries.getSeriesForDive('t');
         final secondaryPressureSeries = pressureSeries.where(
           (p) => p.computerId == 'comp-s',
@@ -502,8 +489,7 @@ void main() {
         expect(newTank.tankOrder, 2); // continues after target's 0, 1.
 
         // The dedupable tank's pressure series lands on tank-t1's id with
-        // the secondary's computerId; the legacy table stays empty.
-        expect(await db.select(db.tankPressureProfiles).get(), isEmpty);
+        // the secondary's computerId.
         final tankT1Series = await tankSeries.getSeriesForTank('t', 'tank-t1');
         expect(tankT1Series, hasLength(2)); // original + folded-in
         final foldedIn = tankT1Series.firstWhere((s) => s.id != 'tp-t1');

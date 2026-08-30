@@ -123,10 +123,8 @@ class StatisticsRepository {
       .tableUpdates(
         TableUpdateQuery.allOf([
           TableUpdateQuery.onTable(_db.dives),
-          TableUpdateQuery.onTable(_db.diveProfiles),
           TableUpdateQuery.onTable(_db.diveProfileSeries),
           TableUpdateQuery.onTable(_db.diveTanks),
-          TableUpdateQuery.onTable(_db.tankPressureProfiles),
           TableUpdateQuery.onTable(_db.tankPressureSeries),
           TableUpdateQuery.onTable(_db.diveEquipment),
           TableUpdateQuery.onTable(_db.equipment),

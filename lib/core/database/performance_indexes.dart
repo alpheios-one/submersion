@@ -82,18 +82,6 @@ const List<PerformanceIndex> kPerformanceIndexes = [
   ),
   // -- per-dive child tables (the million-row scans) ---------------------
   (
-    name: 'idx_dive_profiles_dive_id',
-    ddl:
-        'CREATE INDEX IF NOT EXISTS idx_dive_profiles_dive_id '
-        'ON dive_profiles(dive_id)',
-  ),
-  (
-    name: 'idx_tank_pressure_dive_tank',
-    ddl:
-        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_dive_tank '
-        'ON tank_pressure_profiles(dive_id, tank_id, timestamp)',
-  ),
-  (
     name: 'idx_dive_profile_series_dive_primary',
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
