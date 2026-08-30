@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -259,10 +260,10 @@ class _SuuntoCloudSignInStepState extends ConsumerState<SuuntoCloudSignInStep> {
 
 /// Fetch step for the Suunto cloud import wizard.
 ///
-/// Lists every dive-activity workout, then downloads and converts each one
-/// in turn. A single dive's fetch/normalize/parse failure is skipped rather
-/// than aborting the whole fetch, matching how a single corrupt file is
-/// handled elsewhere in the import pipeline.
+/// Lists dive-activity workouts a page at a time, downloading and converting
+/// each one in turn. A single dive's fetch/normalize/parse failure is
+/// skipped rather than aborting the whole fetch, matching how a single
+/// corrupt file is handled elsewhere in the import pipeline.
 class SuuntoCloudFetchStep extends ConsumerStatefulWidget {
   const SuuntoCloudFetchStep({
     super.key,
@@ -280,32 +281,43 @@ class SuuntoCloudFetchStep extends ConsumerStatefulWidget {
 
 class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
   bool _isFetching = true;
+  bool _isLoadingMore = false;
   bool _hasFetched = false;
-  int _diveCount = 0;
+  bool _hasMorePages = true;
   int _failedCount = 0;
   String? _error;
+  String? _loadMoreError;
   String? _progressText;
+
+  final List<SuuntoParsedDive> _parsedDives = [];
+  StreamIterator<List<SuuntoWorkoutSummary>>? _pageIterator;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchDives());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchFirstPage());
+  }
+
+  @override
+  void dispose() {
+    _pageIterator?.cancel();
+    super.dispose();
   }
 
   /// Clears any dives a previous attempt loaded, WITHOUT flipping
   /// [suuntoCloudDivesFetchedProvider].
   ///
-  /// That provider is this step's `canAdvance`, and the step is declared
-  /// `autoAdvance: true`, so setting it on a failure would carry the wizard
-  /// straight past the error message into a review page listing no dives --
-  /// the diver would see an empty import and no reason for it. Leaving it
-  /// false keeps the error on screen with a Try Again button; Back and the
-  /// wizard's close button both stay available, so this is not a dead end.
+  /// That provider is this step's `canAdvance`. Only the very first page's
+  /// failure reaches this: once any page has succeeded, [_loadMore] reports
+  /// its own errors separately rather than discarding already-usable dives.
+  /// Leaving the provider false here keeps the error on screen with a Try
+  /// Again button; Back and the wizard's close button both stay available,
+  /// so this is not a dead end.
   void _discardDives() {
     widget.onDivesFetched(const []);
   }
 
-  Future<void> _fetchDives() async {
+  Future<void> _fetchFirstPage() async {
     final client = widget.client;
     if (client == null) {
       setState(() {
@@ -319,47 +331,29 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
     setState(() {
       _isFetching = true;
       _error = null;
+      _parsedDives.clear();
+      _failedCount = 0;
+      _hasMorePages = true;
       _progressText = context.l10n.suuntoCloud_fetch_listing;
     });
 
+    _pageIterator = StreamIterator(client.listDivesPaged());
+
     try {
-      final summaries = await client.listDives();
+      final hasPage = await _pageIterator!.moveNext();
       if (!mounted) return;
 
-      final parsedDives = <SuuntoParsedDive>[];
-      var failedCount = 0;
-
-      for (var i = 0; i < summaries.length; i++) {
+      if (hasPage) {
+        await _downloadPage(client, _pageIterator!.current);
         if (!mounted) return;
-        setState(() {
-          _progressText = context.l10n.suuntoCloud_fetch_fetchingDiveOf(
-            i + 1,
-            summaries.length,
-          );
-        });
-
-        try {
-          final bytes = await client.fetchSmlJson(summaries[i].key);
-          final json = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
-          final export = SuuntoSmlNormalizer.parse(json);
-          final parsed = SuuntoDiveParser.parse(
-            header: export.header,
-            samples: export.samples,
-          );
-          parsedDives.add(parsed);
-        } catch (_) {
-          failedCount++;
-        }
+      } else {
+        _hasMorePages = false;
       }
 
-      if (!mounted) return;
-
-      widget.onDivesFetched(parsedDives);
+      widget.onDivesFetched(List.unmodifiable(_parsedDives));
       setState(() {
         _isFetching = false;
         _hasFetched = true;
-        _diveCount = parsedDives.length;
-        _failedCount = failedCount;
       });
       ref.read(suuntoCloudDivesFetchedProvider.notifier).state = true;
     } on SuuntoApiException catch (e) {
@@ -376,6 +370,83 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
         _error = '$e';
       });
       _discardDives();
+    }
+  }
+
+  /// Fetches and downloads the next page of dives, on top of what an earlier
+  /// call to [_fetchFirstPage] or [_loadMore] already made available.
+  ///
+  /// Reached only once the diver has already been shown at least one usable
+  /// page, so a failure here must not wipe out those results the way a
+  /// first-page failure does -- it's reported next to the Load More button
+  /// instead, leaving everything fetched so far intact.
+  Future<void> _loadMore() async {
+    final client = widget.client;
+    final iterator = _pageIterator;
+    if (client == null || iterator == null || _isLoadingMore) return;
+
+    setState(() {
+      _isLoadingMore = true;
+      _loadMoreError = null;
+    });
+
+    try {
+      final hasPage = await iterator.moveNext();
+      if (!mounted) return;
+
+      if (hasPage) {
+        await _downloadPage(client, iterator.current);
+        if (!mounted) return;
+      } else {
+        _hasMorePages = false;
+      }
+
+      widget.onDivesFetched(List.unmodifiable(_parsedDives));
+      setState(() => _isLoadingMore = false);
+    } on SuuntoApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingMore = false;
+        _loadMoreError = e.displayMessage;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoadingMore = false;
+        _loadMoreError = '$e';
+      });
+    }
+  }
+
+  /// Downloads and converts every dive in [page], appending successes to
+  /// [_parsedDives]. A single dive's fetch/normalize/parse failure is
+  /// skipped rather than aborting the page, matching how a single corrupt
+  /// file is handled elsewhere in the import pipeline.
+  Future<void> _downloadPage(
+    SuuntoCloudClient client,
+    List<SuuntoWorkoutSummary> page,
+  ) async {
+    for (var i = 0; i < page.length; i++) {
+      if (!mounted) return;
+      setState(() {
+        _progressText = context.l10n.suuntoCloud_fetch_fetchingDiveOf(
+          i + 1,
+          page.length,
+        );
+      });
+
+      try {
+        final bytes = await client.fetchSmlJson(page[i].key);
+        final json = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+        final export = SuuntoSmlNormalizer.parse(json);
+        final parsed = SuuntoDiveParser.parse(
+          header: export.header,
+          samples: export.samples,
+        );
+        _parsedDives.add(parsed);
+      } catch (_) {
+        _failedCount++;
+      }
     }
   }
 
@@ -440,7 +511,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
               ],
               const SizedBox(height: 24),
               FilledButton.icon(
-                onPressed: _fetchDives,
+                onPressed: _fetchFirstPage,
                 icon: const Icon(Icons.refresh),
                 label: Text(l10n.suuntoCloud_fetch_retry),
               ),
@@ -466,7 +537,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
               ),
               const SizedBox(height: 16),
               Text(
-                l10n.suuntoCloud_fetch_foundDives(_diveCount),
+                l10n.suuntoCloud_fetch_foundDives(_parsedDives.length),
                 style: theme.textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
@@ -479,6 +550,35 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
                   ),
                   textAlign: TextAlign.center,
                 ),
+              ],
+              if (_hasMorePages) ...[
+                const SizedBox(height: 24),
+                if (_isLoadingMore) ...[
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    _progressText ?? l10n.suuntoCloud_fetch_listing,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ] else
+                  OutlinedButton.icon(
+                    onPressed: _loadMore,
+                    icon: const Icon(Icons.expand_more),
+                    label: Text(l10n.suuntoCloud_fetch_loadMore),
+                  ),
+                if (_loadMoreError != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _loadMoreError!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ],
             ],
           ),

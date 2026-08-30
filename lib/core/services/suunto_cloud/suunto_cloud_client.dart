@@ -124,12 +124,21 @@ class SuuntoCloudClient {
     }
   }
 
-  /// Chronological (oldest first) list of dive-activity workouts only
-  /// (scuba diving / freediving), paginating through the API as needed.
-  Future<List<SuuntoWorkoutSummary>> listDives({int sinceMs = 0}) async {
-    const pageSize = 100;
+  /// Streams pages of dive-activity workouts (scuba diving / freediving),
+  /// newest first.
+  ///
+  /// The Suunto/Sports-Tracker `workouts` listing is itself paginated
+  /// oldest-to-newest by offset, so this walks the offset forward and yields
+  /// each page as it arrives -- rather than buffering the diver's entire
+  /// history before returning anything -- letting a caller start acting on
+  /// the newest dives while older pages are still being fetched. Each page
+  /// is additionally sorted newest first on its own as a defensive measure,
+  /// in case the server ever returns a page out of order.
+  Stream<List<SuuntoWorkoutSummary>> listDivesPaged({
+    int sinceMs = 0,
+    int pageSize = 15,
+  }) async* {
     var offset = 0;
-    final dives = <SuuntoWorkoutSummary>[];
 
     while (true) {
       final items = await _listWorkouts(
@@ -139,19 +148,36 @@ class SuuntoCloudClient {
       );
       if (items.isEmpty) break;
 
+      final summaries = <SuuntoWorkoutSummary>[];
       for (final item in items) {
         final activityId = (item['activityId'] as num?)?.toInt() ?? -1;
         if (activityId == _activityScubaDiving ||
             activityId == _activityFreeDiving) {
-          dives.add(_toWorkoutSummary(item, activityId));
+          summaries.add(_toWorkoutSummary(item, activityId));
         }
       }
+      summaries.sort((a, b) => b.startTime.compareTo(a.startTime));
+      yield summaries;
 
       if (items.length < pageSize) break;
       offset += pageSize;
     }
+  }
 
-    dives.sort((a, b) => a.startTime.compareTo(b.startTime));
+  /// Every dive-activity workout, newest first. A convenience wrapper over
+  /// [listDivesPaged] for callers that don't need progressive access to
+  /// pages as they arrive from the network.
+  Future<List<SuuntoWorkoutSummary>> listDives({
+    int sinceMs = 0,
+    int pageSize = 15,
+  }) async {
+    final dives = <SuuntoWorkoutSummary>[];
+    await for (final page in listDivesPaged(
+      sinceMs: sinceMs,
+      pageSize: pageSize,
+    )) {
+      dives.addAll(page);
+    }
     return dives;
   }
 

@@ -98,7 +98,7 @@ void main() {
 
   group('listDives', () {
     test(
-      'filters to scuba/freediving activities and sorts by start time',
+      'filters to scuba/freediving activities and sorts newest first',
       () async {
         final client = SuuntoCloudClient(
           httpClient: MockClient((request) async {
@@ -117,9 +117,9 @@ void main() {
 
         final dives = await client.listDives();
 
-        expect(dives.map((d) => d.key).toList(), ['earlier', 'later']);
-        expect(dives[0].activityId, 79);
-        expect(dives[1].activityId, 78);
+        expect(dives.map((d) => d.key).toList(), ['later', 'earlier']);
+        expect(dives[0].activityId, 78);
+        expect(dives[1].activityId, 79);
       },
     );
 
@@ -141,7 +141,7 @@ void main() {
         }),
       );
 
-      final dives = await client.listDives();
+      final dives = await client.listDives(pageSize: 100);
 
       expect(offsetsSeen, [0, 100]);
       expect(dives, hasLength(101));
@@ -202,6 +202,68 @@ void main() {
         ),
       );
     });
+  });
+
+  group('listDivesPaged', () {
+    test('yields one page per API round trip', () async {
+      final client = SuuntoCloudClient(
+        httpClient: MockClient((request) async {
+          final offset = int.parse(request.url.queryParameters['offset']!);
+          final items = offset == 0
+              ? List.generate(
+                  100,
+                  (i) => {'key': 'dive-$i', 'activityId': 78, 'startTime': i},
+                )
+              : [
+                  {'key': 'dive-100', 'activityId': 78, 'startTime': 100},
+                ];
+          return http.Response(jsonEncode({'payload': items}), 200);
+        }),
+      );
+
+      final pages = await client.listDivesPaged().toList();
+
+      expect(pages, hasLength(2));
+      expect(pages[0], hasLength(100));
+      expect(pages[1], hasLength(1));
+    });
+
+    test(
+      'lets a caller act on the newest page before older pages arrive',
+      () async {
+        final client = SuuntoCloudClient(
+          httpClient: MockClient((request) async {
+            final offset = int.parse(request.url.queryParameters['offset']!);
+            // Suunto's workout listing is served oldest-to-newest by offset,
+            // so the fake server places the newest workout on the first
+            // page (offset 0) the same way the real API would sort within a
+            // page.
+            final items = offset == 0
+                ? [
+                    {'key': 'newest', 'activityId': 78, 'startTime': 999999},
+                    for (var i = 0; i < 99; i++)
+                      {'key': 'dive-$i', 'activityId': 78, 'startTime': i},
+                  ]
+                : [
+                    {'key': 'dive-99', 'activityId': 78, 'startTime': 99},
+                  ];
+            return http.Response(jsonEncode({'payload': items}), 200);
+          }),
+        );
+
+        final seenAfterFirstPage = <String>[];
+        await for (final page in client.listDivesPaged()) {
+          if (seenAfterFirstPage.isEmpty) {
+            seenAfterFirstPage.addAll(page.map((d) => d.key));
+          }
+        }
+
+        // The newest workout is server-ordered first, so it must be visible
+        // after only the first page has arrived, not just once every page
+        // has been fetched.
+        expect(seenAfterFirstPage, contains('newest'));
+      },
+    );
   });
 
   group('fetchSmlJson', () {
