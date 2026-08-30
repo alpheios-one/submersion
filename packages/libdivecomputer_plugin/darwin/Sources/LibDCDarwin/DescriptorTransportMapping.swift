@@ -11,8 +11,12 @@ import Foundation
 enum DescriptorTransportMapping {
     /// libdivecomputer transport bits, mirroring dc_transport_t. Declared here
     /// rather than taken from libdc_wrapper.h so this file compiles standalone,
-    /// outside the CocoaPods build. `pinnedAgainstWrapperConstants` asserts
-    /// they still agree.
+    /// outside the CocoaPods build.
+    ///
+    /// Two tests keep that third copy of the numbers honest, one per link in
+    /// the chain: `DescriptorTransportMappingTests` pins these values, and
+    /// `test_usbhid_descriptor_match.c` pins the `LIBDC_TRANSPORT_*` constants
+    /// they mirror against libdivecomputer's own `dc_transport_t`.
     struct Transport: OptionSet {
         let rawValue: UInt32
         static let serial = Transport(rawValue: 1 << 0)

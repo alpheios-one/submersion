@@ -90,8 +90,16 @@ func testNoTransportsYieldsNoModes() {
 }
 
 // The bit values are redeclared in DescriptorTransportMapping so the file
-// compiles standalone. If dc_transport_t ever renumbered, every test above
-// would keep passing while the real mapping silently read the wrong bits.
+// compiles standalone, which makes them a third copy of numbers that originate
+// in libdivecomputer's dc_transport_t. Every test above would keep passing if
+// one copy drifted, while the real mapping silently read the wrong bits.
+//
+// This pins only the Swift copy against the documented values. It cannot see
+// dc_transport_t itself, because the standalone build compiles this file with
+// swiftc alone and no libdivecomputer headers. The other half of the chain,
+// LIBDC_TRANSPORT_* against the real enum, is pinned in
+// packages/libdivecomputer_plugin/test/native/test_usbhid_descriptor_match.c,
+// where both headers are in scope.
 func testBitValuesMatchLibdivecomputer() {
     expect(Transport.serial.rawValue == 1 << 0, "DC_TRANSPORT_SERIAL")
     expect(Transport.usb.rawValue == 1 << 1, "DC_TRANSPORT_USB")
