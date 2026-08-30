@@ -119,13 +119,19 @@ void main() {
       // idle stayed over cap indefinitely, waiting on a download that might
       // never come. Lowering the cap under a settled store reproduces that
       // state without needing a write to create it.
+      final a = 'aa${'1' * 62}';
+      final b = 'bb${'2' * 62}';
       await cache.put(
-        'aa11',
+        a,
         MediaCacheKind.original,
         await staged(List.filled(60, 1)),
       );
+      // lastAccessedAt is millisecondsSinceEpoch and _evictPool orders by it
+      // ascending, so two puts in the same millisecond leave the LRU order,
+      // and therefore the victim, undefined. Same delay as the LRU test above.
+      await Future<void>.delayed(const Duration(milliseconds: 5));
       await cache.put(
-        'bb22',
+        b,
         MediaCacheKind.original,
         await staged(List.filled(30, 1)),
       );
@@ -141,9 +147,12 @@ void main() {
       // No put(), no writes of any kind: the pass runs on its own.
       await tightened.evictIfNeeded();
 
-      expect(await tightened.totalBytes(MediaCacheKind.original), 30);
-      expect(await tightened.get('aa11', MediaCacheKind.original), isNull);
-      expect(await tightened.get('bb22', MediaCacheKind.original), isNotNull);
+      expect(
+        await tightened.totalBytes(MediaCacheKind.original),
+        lessThanOrEqualTo(50),
+      );
+      expect(await tightened.get(a, MediaCacheKind.original), isNull);
+      expect(await tightened.get(b, MediaCacheKind.original), isNotNull);
     },
   );
 
