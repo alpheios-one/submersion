@@ -2560,6 +2560,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_action_cancel => 'Cancel';
 
   @override
+  String get common_action_clearRating => 'Clear rating';
+
+  @override
   String get common_action_close => 'Close';
 
   @override
@@ -19427,13 +19430,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF logbook';
 
   @override
-  String get transfer_section_exportTitle => 'Export';
+  String get transfer_section_exportTitle => 'File Export';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF files';
 
   @override
-  String get transfer_section_importTitle => 'Import';
+  String get transfer_section_importTitle => 'File Import';
 
   @override
   String get transfer_summary_description => 'Import and export dive data';
@@ -23471,6 +23474,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Media store connected';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'The cloud storage could not be read yet. Wait a moment and try connecting again.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnect';
 
   @override
@@ -23516,6 +23523,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Failed';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transfers paused';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -35197,4 +35212,188 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Counted in every statistic';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'Email';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Password';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Sign In';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Listing dives…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Fetching dive $current of $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Try Again';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count dives',
+      one: 'Found 1 dive',
+      zero: 'No dives found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives could not be converted and were skipped.',
+      one: '1 dive could not be converted and was skipped.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sort';
+
+  @override
+  String get importWizard_review_sortByDate => 'Date';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Depth';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Time';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Import dives from your Suunto app / app.suunto.com account';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Import from cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'See what is using space on this device';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total so far';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalculate';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Not available';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Could not measure';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App Data';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Media Cache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Backups';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Temporary Files';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exported Files';
+
+  @override
+  String get settings_storageUsage_category_database => 'Dive log database';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Local cache database';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Original photos and videos';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Thumbnails';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Video renditions';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Staged transfers';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Transcoded video';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Map tiles';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Network images';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Video thumbnails';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Document thumbnails';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Backup files';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Temporary files';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exported files';
 }

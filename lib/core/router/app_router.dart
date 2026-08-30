@@ -113,6 +113,7 @@ import 'package:submersion/features/settings/presentation/pages/language_setting
 import 'package:submersion/features/settings/presentation/pages/nav_customization_page.dart';
 import 'package:submersion/features/settings/presentation/pages/theme_gallery_page.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/storage_usage_page.dart';
 import 'package:submersion/features/settings/presentation/pages/diver_profile_hub_page.dart';
 import 'package:submersion/features/settings/presentation/pages/personal_info_edit_page.dart';
 import 'package:submersion/features/settings/presentation/pages/emergency_contacts_edit_page.dart';
@@ -151,6 +152,7 @@ import 'package:submersion/features/dive_computer/presentation/providers/downloa
     show diveImportServiceProvider;
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
@@ -889,6 +891,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) =>
                     const _UniversalImportWizardRoute(),
               ),
+              GoRoute(
+                path: 'import-cloud/suunto',
+                name: 'importFromCloudSuunto',
+                builder: (context, state) =>
+                    const _SuuntoCloudImportWizardRoute(),
+              ),
             ],
           ),
 
@@ -982,6 +990,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'storage',
                 name: 'storageSettings',
                 builder: (context, state) => const StorageSettingsPage(),
+              ),
+              GoRoute(
+                path: 'storage-usage',
+                name: 'storageUsage',
+                builder: (context, state) => const StorageUsagePage(),
               ),
               GoRoute(
                 path: 'data-quality',
@@ -1608,6 +1621,33 @@ class _UniversalImportWizardRoute extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return UnifiedImportWizard(adapter: UniversalAdapter(ref: ref));
+  }
+}
+
+/// Wrapper that creates a [SuuntoCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Suunto cloud (app.suunto.com)
+/// account.
+class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
+  const _SuuntoCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: SuuntoCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
   }
 }
 

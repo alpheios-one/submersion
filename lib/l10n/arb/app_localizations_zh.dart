@@ -2463,6 +2463,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_action_cancel => '取消';
 
   @override
+  String get common_action_clearRating => '清除评分';
+
+  @override
   String get common_action_close => '关闭';
 
   @override
@@ -18727,13 +18730,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV、UDDF、PDF 日志本';
 
   @override
-  String get transfer_section_exportTitle => '导出';
+  String get transfer_section_exportTitle => '文件导出';
 
   @override
   String get transfer_section_importSubtitle => 'CSV、UDDF 文件';
 
   @override
-  String get transfer_section_importTitle => '导入';
+  String get transfer_section_importTitle => '文件导入';
 
   @override
   String get transfer_summary_description => '导入和导出潜水数据';
@@ -22642,6 +22645,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_saved => '媒体存储已连接';
 
   @override
+  String get settings_mediaStorage_error_notReady => '尚无法读取云存储。请稍候片刻后重试。';
+
+  @override
   String get settings_mediaStorage_action_disconnect => '断开连接';
 
   @override
@@ -22683,6 +22689,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => '失败';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title => '传输已暂停';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      '此设备与云存储对正在使用的存储库不再一致。重新连接媒体存储将采用云端当前保存的存储库。';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -33625,4 +33638,180 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
+
+  @override
+  String get suuntoCloud_signIn_title => '登录 Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      '使用您的 app.suunto.com 账户登录，即可直接导入潜水记录。您的密码不会被保存，仅缓存由此生成的会话。';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => '电子邮件';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => '请输入电子邮件';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => '密码';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => '请输入密码';
+
+  @override
+  String get suuntoCloud_signIn_button => '登录';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => '正在登录…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return '已登录为 $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => '正在列出潜水记录…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return '正在获取第 $current 次潜水，共 $total 次…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => '无法获取潜水记录';
+
+  @override
+  String get suuntoCloud_fetch_retry => '重试';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '找到 $count 次潜水',
+      one: '找到 1 次潜水',
+      zero: '未找到潜水记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水无法转换，已跳过。',
+      one: '有 1 次潜水无法转换，已跳过。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => '排序';
+
+  @override
+  String get importWizard_review_sortByDate => '日期';
+
+  @override
+  String get importWizard_review_sortByDepth => '深度';
+
+  @override
+  String get importWizard_review_sortByDuration => '时间';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      '从您的 Suunto 应用或 app.suunto.com 账户导入潜水记录';
+
+  @override
+  String get transfer_section_cloudTitle => '云端';
+
+  @override
+  String get transfer_section_cloudSubtitle => '从云端导入';
+
+  @override
+  String get settings_storageUsage_appBar_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_subtitle => '查看此设备上的空间占用';
+
+  @override
+  String get settings_storageUsage_total => '总计';
+
+  @override
+  String get settings_storageUsage_totalPartial => '当前总计';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => '重新计算';
+
+  @override
+  String get settings_storageUsage_unavailable => '不可用';
+
+  @override
+  String get settings_storageUsage_measureFailed => '无法测量';
+
+  @override
+  String get settings_storageUsage_group_appData => '应用数据';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => '媒体缓存';
+
+  @override
+  String get settings_storageUsage_group_caches => '缓存';
+
+  @override
+  String get settings_storageUsage_group_backups => '备份';
+
+  @override
+  String get settings_storageUsage_group_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_group_exports => '导出的文件';
+
+  @override
+  String get settings_storageUsage_category_database => '潜水日志数据库';
+
+  @override
+  String get settings_storageUsage_category_localCache => '本地缓存数据库';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals => '原始照片和视频';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => '缩略图';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions => '视频转码版本';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging => '暂存的传输';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode => '已转码视频';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => '地图瓦片';
+
+  @override
+  String get settings_storageUsage_category_networkImages => '网络图片';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails => '视频缩略图';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails => '文档缩略图';
+
+  @override
+  String get settings_storageUsage_category_backups => '备份文件';
+
+  @override
+  String get settings_storageUsage_category_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_category_exports => '导出的文件';
 }

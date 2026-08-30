@@ -2599,6 +2599,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_action_cancel => 'Megse';
 
   @override
+  String get common_action_clearRating => 'Értékelés törlése';
+
+  @override
   String get common_action_close => 'Bezaras';
 
   @override
@@ -19705,13 +19708,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF naplokonyv';
 
   @override
-  String get transfer_section_exportTitle => 'Exportalas';
+  String get transfer_section_exportTitle => 'Fájlexportálás';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF fajlok';
 
   @override
-  String get transfer_section_importTitle => 'Importalas';
+  String get transfer_section_importTitle => 'Fájlimportálás';
 
   @override
   String get transfer_summary_description =>
@@ -23794,6 +23797,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Médiatár csatlakoztatva';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'A felhőtárolót még nem sikerült beolvasni. Várj egy pillanatot, majd próbáld újra.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Leválasztás';
 
   @override
@@ -23839,6 +23846,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Sikertelen';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Átvitelek szüneteltetve';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Ez az eszköz és a felhőtároló már nem egyezik abban, melyik tárolót használják. A médiatároló újracsatlakoztatása a felhőben most található tárolót veszi át.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -35587,4 +35602,193 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Minden statisztikában szerepel';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Bejelentkezés a Suunto fiókba';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Jelentkezz be az app.suunto.com fiókoddal, hogy közvetlenül importáld a merüléseidet. A jelszavadat soha nem tároljuk, csak a létrejövő munkamenetet.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired =>
+      'Az e-mail cím megadása kötelező';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Jelszó';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired =>
+      'A jelszó megadása kötelező';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Bejelentkezés';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Bejelentkezés…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Bejelentkezve mint $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Merülések listázása…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return '$total merülésből a(z) $current letöltése…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'Nem sikerült letölteni a merüléseket';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Újra';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés található',
+      one: '1 merülés található',
+      zero: 'Nem található merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülést nem sikerült konvertálni, ezért kimaradtak.',
+      one: '1 merülést nem sikerült konvertálni, ezért kimaradt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Rendezés';
+
+  @override
+  String get importWizard_review_sortByDate => 'Dátum';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Mélység';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Idő';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Merulesek importalasa a Suunto alkalmazasbol vagy az app.suunto.com fiokbol';
+
+  @override
+  String get transfer_section_cloudTitle => 'Felho';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Importalas felhobol';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Tárhelyhasználat';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Tárhelyhasználat';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Nézze meg, mi foglal helyet ezen az eszközön';
+
+  @override
+  String get settings_storageUsage_total => 'Összesen';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Eddig összesen';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Újraszámítás';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Nem érhető el';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Nem sikerült megmérni';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Alkalmazásadatok';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Médiagyorsítótár';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Gyorsítótárak';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Biztonsági mentések';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Ideiglenes fájlok';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exportált fájlok';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Merülésnapló-adatbázis';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Helyi gyorsítótár-adatbázis';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Eredeti fényképek és videók';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Videóváltozatok';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Előkészített átvitelek';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Átkódolt videó';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Térképcsempék';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Hálózati képek';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Videó-bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Dokumentum-bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_backups =>
+      'Biztonsági mentési fájlok';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Ideiglenes fájlok';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exportált fájlok';
 }
