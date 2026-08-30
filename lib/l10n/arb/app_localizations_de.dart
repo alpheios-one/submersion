@@ -2617,6 +2617,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_action_cancel => 'Abbrechen';
 
   @override
+  String get common_action_clearRating => 'Bewertung löschen';
+
+  @override
   String get common_action_close => 'Schließen';
 
   @override
@@ -35780,4 +35783,97 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transfer_section_cloudSubtitle => 'Aus der Cloud importieren';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Speichernutzung';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Speichernutzung';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Sehen Sie, was auf diesem Gerät Speicherplatz belegt';
+
+  @override
+  String get settings_storageUsage_total => 'Gesamt';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Bisher gesamt';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Neu berechnen';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Nicht verfügbar';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Messung nicht möglich';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App-Daten';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Medien-Cache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Sicherungen';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Temporäre Dateien';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exportierte Dateien';
+
+  @override
+  String get settings_storageUsage_category_database => 'Tauchbuch-Datenbank';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Lokale Cache-Datenbank';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Original-Fotos und -Videos';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs =>
+      'Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Video-Versionen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Bereitgestellte Übertragungen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Transkodierte Videos';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Kartenkacheln';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Netzwerkbilder';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Video-Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Dokument-Miniaturansichten';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Sicherungsdateien';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Temporäre Dateien';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exportierte Dateien';
 }

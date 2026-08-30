@@ -4421,6 +4421,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get common_action_cancel;
 
+  /// Tooltip on the icon that removes a star rating from a form row, returning it to no rating
+  ///
+  /// In en, this message translates to:
+  /// **'Clear rating'**
+  String get common_action_clearRating;
+
   /// Generic close action used for dialogs, menus, etc.
   ///
   /// In en, this message translates to:
@@ -58906,6 +58912,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import from cloud'**
   String get transfer_section_cloudSubtitle;
+
+  /// No description provided for @settings_storageUsage_appBar_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Usage'**
+  String get settings_storageUsage_appBar_title;
+
+  /// No description provided for @settings_storageUsage_tile_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Usage'**
+  String get settings_storageUsage_tile_title;
+
+  /// No description provided for @settings_storageUsage_tile_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See what is using space on this device'**
+  String get settings_storageUsage_tile_subtitle;
+
+  /// No description provided for @settings_storageUsage_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get settings_storageUsage_total;
+
+  /// No description provided for @settings_storageUsage_totalPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Total so far'**
+  String get settings_storageUsage_totalPartial;
+
+  /// No description provided for @settings_storageUsage_refresh_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate'**
+  String get settings_storageUsage_refresh_tooltip;
+
+  /// No description provided for @settings_storageUsage_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get settings_storageUsage_unavailable;
+
+  /// No description provided for @settings_storageUsage_measureFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not measure'**
+  String get settings_storageUsage_measureFailed;
+
+  /// No description provided for @settings_storageUsage_group_appData.
+  ///
+  /// In en, this message translates to:
+  /// **'App Data'**
+  String get settings_storageUsage_group_appData;
+
+  /// No description provided for @settings_storageUsage_group_mediaCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Media Cache'**
+  String get settings_storageUsage_group_mediaCache;
+
+  /// No description provided for @settings_storageUsage_group_caches.
+  ///
+  /// In en, this message translates to:
+  /// **'Caches'**
+  String get settings_storageUsage_group_caches;
+
+  /// No description provided for @settings_storageUsage_group_backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get settings_storageUsage_group_backups;
+
+  /// No description provided for @settings_storageUsage_group_temporary.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Files'**
+  String get settings_storageUsage_group_temporary;
+
+  /// No description provided for @settings_storageUsage_group_exports.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported Files'**
+  String get settings_storageUsage_group_exports;
+
+  /// No description provided for @settings_storageUsage_category_database.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive log database'**
+  String get settings_storageUsage_category_database;
+
+  /// No description provided for @settings_storageUsage_category_localCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache database'**
+  String get settings_storageUsage_category_localCache;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheOriginals.
+  ///
+  /// In en, this message translates to:
+  /// **'Original photos and videos'**
+  String get settings_storageUsage_category_mediaCacheOriginals;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheThumbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnails'**
+  String get settings_storageUsage_category_mediaCacheThumbs;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheRenditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Video renditions'**
+  String get settings_storageUsage_category_mediaCacheRenditions;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheStaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Staged transfers'**
+  String get settings_storageUsage_category_mediaCacheStaging;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheTranscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcoded video'**
+  String get settings_storageUsage_category_mediaCacheTranscode;
+
+  /// No description provided for @settings_storageUsage_category_mapTiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Map tiles'**
+  String get settings_storageUsage_category_mapTiles;
+
+  /// No description provided for @settings_storageUsage_category_networkImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Network images'**
+  String get settings_storageUsage_category_networkImages;
+
+  /// No description provided for @settings_storageUsage_category_videoThumbnails.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnails'**
+  String get settings_storageUsage_category_videoThumbnails;
+
+  /// No description provided for @settings_storageUsage_category_pdfThumbnails.
+  ///
+  /// In en, this message translates to:
+  /// **'Document thumbnails'**
+  String get settings_storageUsage_category_pdfThumbnails;
+
+  /// No description provided for @settings_storageUsage_category_backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup files'**
+  String get settings_storageUsage_category_backups;
+
+  /// No description provided for @settings_storageUsage_category_temporary.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary files'**
+  String get settings_storageUsage_category_temporary;
+
+  /// No description provided for @settings_storageUsage_category_exports.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported files'**
+  String get settings_storageUsage_category_exports;
 }
 
 class _AppLocalizationsDelegate

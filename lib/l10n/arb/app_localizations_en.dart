@@ -2560,6 +2560,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_action_cancel => 'Cancel';
 
   @override
+  String get common_action_clearRating => 'Clear rating';
+
+  @override
   String get common_action_close => 'Close';
 
   @override
@@ -35301,4 +35304,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transfer_section_cloudSubtitle => 'Import from cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'See what is using space on this device';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total so far';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalculate';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Not available';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Could not measure';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App Data';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Media Cache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Backups';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Temporary Files';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exported Files';
+
+  @override
+  String get settings_storageUsage_category_database => 'Dive log database';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Local cache database';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Original photos and videos';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Thumbnails';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Video renditions';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Staged transfers';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Transcoded video';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Map tiles';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Network images';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Video thumbnails';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Document thumbnails';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Backup files';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Temporary files';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exported files';
 }
