@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
+import 'package:submersion/shared/widgets/forms/form_style.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
   home: Scaffold(body: Material(child: child)),
+);
+
+/// Same host, but shrink-wrapped so the row reports its own height rather
+/// than filling the body.
+Widget _wrapIntrinsic(Widget child) => MaterialApp(
+  home: Scaffold(
+    body: Material(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [child]),
+    ),
+  ),
 );
 
 void main() {
@@ -421,6 +432,35 @@ void main() {
       await tester.tap(find.byIcon(Icons.star).at(2));
       expect(cleared, 1);
       expect(reported, isEmpty);
+    });
+
+    testWidgets('clear affordance is as tappable as the row band allows', (
+      tester,
+    ) async {
+      // The X is a 16px glyph, so its tap target has to be stated rather than
+      // inherited from the icon. 26 is the star buttons' own height: filling
+      // that band costs the row nothing, while Material's 48 would push every
+      // row carrying a clear icon from 48 to 66.
+      await tester.pumpWidget(
+        _wrapIntrinsic(
+          FormRow.rating(label: 'Rating', value: 3, onChanged: (_) {}),
+        ),
+      );
+      final target = tester.getSize(
+        find
+            .ancestor(
+              of: find.byIcon(Icons.clear),
+              matching: find.byType(InkWell),
+            )
+            .first,
+      );
+      expect(target.width, FormStyle.clearTapTarget);
+      expect(target.height, FormStyle.clearTapTarget);
+      expect(
+        tester.getSize(find.byType(FormRow)).height,
+        48,
+        reason: 'a bigger target must not make the row taller',
+      );
     });
 
     testWidgets('clear affordance carries the caller tooltip', (tester) async {

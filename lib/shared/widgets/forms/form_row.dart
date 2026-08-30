@@ -517,9 +517,10 @@ class _FormRowState extends State<FormRow> {
   Widget _clearAffordance(BuildContext context, VoidCallback onTap) {
     final button = InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.all(2),
+      borderRadius: BorderRadius.circular(FormStyle.clearTapTarget / 2),
+      child: SizedBox(
+        width: FormStyle.clearTapTarget,
+        height: FormStyle.clearTapTarget,
         child: Icon(
           Icons.clear,
           size: 16,
