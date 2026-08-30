@@ -95,4 +95,26 @@ void main() {
     expect(find.text('Choose from Contacts'), findsOneWidget);
     expect(find.text('Remove Photo'), findsOneWidget);
   });
+
+  testWidgets('the sheet keeps its own bottom SafeArea', (tester) async {
+    // showModalBottomSheet's useSafeArea wraps in SafeArea(bottom: false), so
+    // it deliberately does NOT guard the bottom edge; the sheet "extends all
+    // the way to the bottom of the screen, including any system intrusions".
+    // The inner SafeArea is what keeps the last row clear of the home
+    // indicator, and nesting does not double-pad because the outer one has
+    // already removed the top/left/right padding from the subtree.
+    await _open(tester, hasPhoto: true, allowContacts: false);
+
+    final sheetSafeAreas = find.descendant(
+      of: find.byType(BottomSheet),
+      matching: find.byType(SafeArea),
+    );
+    expect(
+      sheetSafeAreas,
+      findsWidgets,
+      reason:
+          'removing the inner SafeArea would put Remove Photo under the '
+          'gesture bar on a phone with no home button',
+    );
+  });
 }

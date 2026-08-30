@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -73,9 +72,12 @@ Future<ProfilePhotoResult?> pickProfilePhoto({
       picked = await pickImageOverride(imageSource);
     } else {
       final file = await ImagePicker().pickImage(source: imageSource);
+      // Read through the XFile handle, not File(file.path). A picked file is
+      // a HANDLE: on Android SAF the path can be unusable, and image_picker
+      // makes no promise it addresses a real filesystem entry.
       picked = file == null
           ? null
-          : (bytes: await File(file.path).readAsBytes(), name: file.name);
+          : (bytes: await file.readAsBytes(), name: file.name);
     }
     if (picked == null) return null;
     raw = picked.bytes;

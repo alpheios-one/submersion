@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -218,9 +217,12 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
         source_ = await widget.pickPhotoOverride!(source);
       } else {
         final picked = await _imagePicker.pickImage(source: source);
+        // Read through the XFile handle, not File(picked.path). A picked file
+        // is a HANDLE: on Android SAF the path can be unusable, and
+        // image_picker makes no promise it addresses a real filesystem entry.
         source_ = picked == null
             ? null
-            : (bytes: await File(picked.path).readAsBytes(), name: picked.name);
+            : (bytes: await picked.readAsBytes(), name: picked.name);
       }
 
       if (source_ == null) return null;
