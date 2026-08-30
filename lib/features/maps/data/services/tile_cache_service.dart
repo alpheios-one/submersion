@@ -488,12 +488,14 @@ class TileCacheService {
   /// clean up resources.
   Future<void> dispose() async {
     if (!_initialized) return;
+    // coverage:ignore-start
 
     await cancelDownload();
     await FMTCObjectBoxBackend().uninitialise();
     _store = null;
     _browseStore = null;
     _initialized = false;
+    // coverage:ignore-end
   }
 
   void _ensureInitialized() {

@@ -62,6 +62,29 @@ void main() {
       expect(browse, hasLength(2));
     });
 
+    test('the store name getters match the routing maps', () {
+      // Cheap, but the offline getter keeping its historical value is what
+      // stops an upgrade from stranding every downloaded region.
+      expect(TileCacheService.instance.storeName, 'submersion_tiles');
+      expect(
+        TileCacheService.instance.browseStoreName,
+        'submersion_tiles_browse',
+      );
+      expect(
+        TileCacheService.browseStoreStrategies().keys,
+        containsAll([
+          TileCacheService.instance.storeName,
+          TileCacheService.instance.browseStoreName,
+        ]),
+      );
+    });
+
+    test('an uninitialized service refuses to hand out a store', () {
+      // _ensureInitialized now checks both stores, so a half-initialized
+      // service cannot leak a null browse store into a tile provider.
+      expect(() => TileCacheService.instance.store, throwsStateError);
+    });
+
     test('the browse cap and age are bounded', () {
       expect(TileCacheService.browseStoreMaxTiles, greaterThan(0));
       expect(TileCacheService.browseTileMaxAge, const Duration(days: 30));
