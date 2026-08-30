@@ -101,7 +101,16 @@ class MediaUploadPipeline {
     var latestResumeJson = entry.resumeStateJson;
     String? resumableUploadKey;
     try {
-      staged = await _materialize(item);
+      final source = await _registry.resolverFor(item.sourceType).resolve(item);
+      if (source is UnavailableData &&
+          source.kind == UnavailableKind.fromOtherDevice) {
+        // The device that imported this file is the one that uploads it.
+        // Nothing here can ever read the bytes, so the entry finishes now
+        // rather than parking in Transfers as a failure that retries daily.
+        await _queue.markDone(entry.id);
+        return UploadOutcome.skippedIneligible;
+      }
+      staged = await _stage(source);
       if (staged == null) {
         // Resolution failure is rate-limited on a 24h/3d/7d clock of its own,
         // so retrying on the queue's minute-scale ladder would consume the
@@ -351,10 +360,9 @@ class MediaUploadPipeline {
     return resolver.canResolveOnThisDevice(item);
   }
 
-  /// Resolves the item's bytes to a private temp file the pipeline owns.
-  Future<File?> _materialize(MediaItem item) async {
-    final resolver = _registry.resolverFor(item.sourceType);
-    final data = await resolver.resolve(item);
+  /// Copies resolved bytes to a private temp file the pipeline owns, or null
+  /// when there are none to copy.
+  Future<File?> _stage(MediaSourceData data) async {
     switch (data) {
       case FileData(file: final f):
         final staged = await _cache.stagingFile();

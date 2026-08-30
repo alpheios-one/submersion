@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/repositories/manifest_subscription_repository.dart';
@@ -103,6 +104,10 @@ final localFileResolverProvider = Provider<LocalFileResolver>(
     platform: ref.watch(localMediaPlatformProvider),
     exifExtractor: ref.watch(exifExtractorProvider),
     videoThumbnails: ref.watch(videoThumbnailServiceProvider),
+    // Fetched lazily, only when a read fails on a row that names an origin,
+    // and memoized by the resolver; the provider itself never touches the
+    // database.
+    localDeviceId: () => SyncRepository().getDeviceId(),
   ),
 );
 

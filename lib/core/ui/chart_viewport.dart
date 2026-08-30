@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
-/// Immutable description of the dive profile chart's visible window, expressed
+/// Immutable description of a chart's visible window, expressed
 /// as normalized fractions [0,1] of the total data range. Resolution- and
 /// data-independent, so the anchor math is unit-testable with plain numbers.
 ///
@@ -9,20 +9,16 @@ import 'package:flutter/widgets.dart';
 /// (`offsetY == 0` is the surface). The window spans `1/zoom` of each axis, so
 /// both offsets are valid in `[0, 1 - 1/zoom]`.
 @immutable
-class ProfileChartViewport {
+class ChartViewport {
   final double zoom; // >= 1.0
   final double offsetX;
   final double offsetY;
 
-  const ProfileChartViewport({
-    this.zoom = 1,
-    this.offsetX = 0,
-    this.offsetY = 0,
-  });
+  const ChartViewport({this.zoom = 1, this.offsetX = 0, this.offsetY = 0});
 
   static const double minZoom = 1.0;
   static const double maxZoom = 10.0;
-  static const ProfileChartViewport reset = ProfileChartViewport();
+  static const ChartViewport reset = ChartViewport();
 
   bool get isZoomed => zoom > 1.0;
   double get visibleWidth => 1.0 / zoom;
@@ -31,13 +27,13 @@ class ProfileChartViewport {
   /// Zoom by [factor] (>1 = in, <1 = out) keeping the data point under the
   /// focal point fixed. [focalX]/[focalY] are fractions (0..1) of the visible
   /// plot area under the cursor/pinch (0 = left/top edge).
-  ProfileChartViewport zoomedAt(double focalX, double focalY, double factor) {
+  ChartViewport zoomedAt(double focalX, double focalY, double factor) {
     final newZoom = (zoom * factor).clamp(minZoom, maxZoom);
     if (newZoom == zoom) return this;
     final anchorX =
         offsetX + focalX / zoom; // data fraction under focus, before
     final anchorY = offsetY + focalY / zoom;
-    return ProfileChartViewport(
+    return ChartViewport(
       zoom: newZoom,
       offsetX: anchorX - focalX / newZoom, // keep it under focus, after
       offsetY: anchorY - focalY / newZoom,
@@ -45,15 +41,15 @@ class ProfileChartViewport {
   }
 
   /// Pan by a normalized delta (fractions of the total range).
-  ProfileChartViewport pannedBy(double dx, double dy) => ProfileChartViewport(
+  ChartViewport pannedBy(double dx, double dy) => ChartViewport(
     zoom: zoom,
     offsetX: offsetX + dx,
     offsetY: offsetY + dy,
   )._clamped();
 
-  ProfileChartViewport _clamped() {
+  ChartViewport _clamped() {
     final maxOff = 1.0 - 1.0 / zoom;
-    return ProfileChartViewport(
+    return ChartViewport(
       zoom: zoom,
       offsetX: offsetX.clamp(0.0, maxOff),
       offsetY: offsetY.clamp(0.0, maxOff),
@@ -81,7 +77,7 @@ class ProfileChartViewport {
   );
 }
 
-/// What a drag/scale event should do on the profile chart.
+/// What a drag/scale event should do on an interactive chart.
 enum ChartDragIntent { pan, scrub, zoomPan, none }
 
 /// Decides the meaning of an in-progress gesture from the active pointer kind,

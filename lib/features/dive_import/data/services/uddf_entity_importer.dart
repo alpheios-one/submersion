@@ -1576,6 +1576,9 @@ class UddfEntityImporter {
           _parseEnum(diveData['diveMode'], DiveMode.values) ?? DiveMode.oc;
       final isPlanned = diveData['isPlanned'] as bool? ?? false;
       final isFavorite = diveData['isFavorite'] as bool? ?? false;
+      final excludedFromStats = diveData['excludedFromStats'] as bool? ?? false;
+      final excludedFromGasStats =
+          diveData['excludedFromGasStats'] as bool? ?? false;
 
       // Build diluent gas mix (if present)
       final diluentO2 = diveData['diluentO2'] as double?;
@@ -1660,6 +1663,8 @@ class UddfEntityImporter {
         diveMode: diveMode,
         isPlanned: isPlanned,
         isFavorite: isFavorite,
+        excludedFromStats: excludedFromStats,
+        excludedFromGasStats: excludedFromGasStats,
         courseId: linkedCourseId,
         setpointLow: asDoubleOrNull(diveData['setpointLow']),
         setpointHigh: asDoubleOrNull(diveData['setpointHigh']),

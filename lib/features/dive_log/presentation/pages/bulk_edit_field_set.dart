@@ -11,6 +11,8 @@ enum BulkField {
   course,
   rating,
   isFavorite,
+  excludedFromStats,
+  excludedFromGasStats,
   waterType,
   visibility,
   currentDirection,
@@ -67,6 +69,8 @@ class BulkScalarInputs {
     this.courseId,
     this.rating,
     this.isFavorite,
+    this.excludedFromStats,
+    this.excludedFromGasStats,
     this.waterType,
     this.visibilityMeters,
     this.currentDirection,
@@ -105,6 +109,11 @@ class BulkScalarInputs {
   final String? courseId;
   final int? rating;
   final bool? isFavorite;
+
+  /// Statistics exclusion (#526 / #1272). Null means the diver never
+  /// touched the gate, so the field is left alone on every selected dive.
+  final bool? excludedFromStats;
+  final bool? excludedFromGasStats;
   final String? waterType;
 
   /// Measured visibility in meters. Replaces the pre-v144 bucket string:
@@ -157,6 +166,12 @@ DivesCompanion buildScalarCompanion(
       BulkField.trip => c.copyWith(tripId: Value(i.tripId)),
       BulkField.course => c.copyWith(courseId: Value(i.courseId)),
       BulkField.rating => c.copyWith(rating: Value(i.rating)),
+      BulkField.excludedFromStats => c.copyWith(
+        excludedFromStats: Value(i.excludedFromStats ?? false),
+      ),
+      BulkField.excludedFromGasStats => c.copyWith(
+        excludedFromGasStats: Value(i.excludedFromGasStats ?? false),
+      ),
       BulkField.isFavorite => c.copyWith(
         isFavorite: Value(i.isFavorite ?? false),
       ),

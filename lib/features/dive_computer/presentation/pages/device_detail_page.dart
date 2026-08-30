@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_computer/presentation/utils/last_downlo
 import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/features/dive_computer/presentation/providers/reparse_providers.dart';
+import 'package:submersion/features/dive_computer/presentation/widgets/transmitters_section.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -105,6 +106,8 @@ class DeviceDetailPage extends ConsumerWidget {
             _buildStatsCard(context, computer, colorScheme),
             const SizedBox(height: 16),
             _buildActionsCard(context, ref, computer, colorScheme),
+            const SizedBox(height: 16),
+            TransmittersSection(diveComputerId: computer.id),
             if (computer.notes.isNotEmpty) ...[
               const SizedBox(height: 16),
               _buildNotesCard(context, computer, colorScheme),

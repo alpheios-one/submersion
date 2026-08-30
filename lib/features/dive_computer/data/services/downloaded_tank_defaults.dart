@@ -43,6 +43,9 @@ List<TankData> applyDefaultPresetToTanks(
       material: tank.material ?? preset.material.name,
       presetName: tank.presetName ?? preset.name,
       role: tank.role,
+      source: tank.source,
+      sensorRef: tank.sensorRef,
+      equipmentId: tank.equipmentId,
     );
   }).toList();
 }

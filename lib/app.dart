@@ -20,6 +20,7 @@ import 'package:submersion/features/auto_update/presentation/providers/update_me
 import 'package:submersion/features/backup/presentation/pages/restore_complete_page.dart';
 import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
 import 'package:submersion/features/backup/presentation/widgets/restore_barrier.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_origin_republish_provider.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -110,6 +111,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _maybeSyncOnLaunch();
       _resumeMediaTransfers();
+      _republishOwnedMedia();
       _fileShareHandler.initialize();
     });
   }
@@ -174,6 +176,15 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
   /// callback later still.
   void _resumeMediaTransfers() {
     unawaited(ref.read(mediaTransferResumeProvider)());
+  }
+
+  /// One-time repair of media rows whose cloud stamps a peer dropped before
+  /// the origin-device fix. Launch only: it is flagged after its first
+  /// success, and the provider checks the flag before building anything.
+  /// Same database timing argument as [_resumeMediaTransfers], and the
+  /// provider contains its own failures, so it is safe to leave unawaited.
+  void _republishOwnedMedia() {
+    unawaited(ref.read(mediaOriginRepublishProvider)());
   }
 
   Future<void> _maybeSyncOnLaunch() async {

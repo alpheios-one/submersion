@@ -59,6 +59,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
   late double? _minDepth;
   late double? _maxDepth;
   late bool _favoritesOnly;
+  late bool _excludedFromStatsOnly;
   late List<String> _selectedTagIds;
   late List<int> _selectedWeekdays;
 
@@ -92,6 +93,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
     _minDepth = filter.minDepth;
     _maxDepth = filter.maxDepth;
     _favoritesOnly = filter.favoritesOnly ?? false;
+    _excludedFromStatsOnly = filter.excludedFromStatsOnly ?? false;
     _selectedTagIds = List.from(filter.tagIds);
     _selectedWeekdays = List.from(filter.weekdays);
     // Depth bounds live in meters; the fields show and accept the diver's
@@ -224,6 +226,13 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
+                      // These presets, and the two date buttons below, hand
+                      // DiveFilterState LOCAL DateTimes. That is deliberate:
+                      // the filter reads them as CALENDAR DATES and normalizes
+                      // to the wall-clock-as-UTC frame the dive rows use, so
+                      // there is nothing to gain by building them with
+                      // DateTime.utc here (issue #1368). Only year/month/day
+                      // are ever read.
                       Wrap(
                         spacing: 8,
                         children: [
@@ -279,6 +288,44 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               setState(() {
                                 _startDate = DateTime(now.year - 1, 1, 1);
                                 _endDate = DateTime(now.year - 1, 12, 31);
+                              });
+                            },
+                          ),
+                          _datePresetChip(
+                            context,
+                            context.l10n.diveLog_filter_presetLast5Years,
+                            () {
+                              final now = DateTime.now();
+                              setState(() {
+                                _startDate = DateTime(
+                                  now.year - 5,
+                                  now.month,
+                                  now.day,
+                                );
+                                _endDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
+                              });
+                            },
+                          ),
+                          _datePresetChip(
+                            context,
+                            context.l10n.diveLog_filter_presetLast10Years,
+                            () {
+                              final now = DateTime.now();
+                              setState(() {
+                                _startDate = DateTime(
+                                  now.year - 10,
+                                  now.month,
+                                  now.day,
+                                );
+                                _endDate = DateTime(
+                                  now.year,
+                                  now.month,
+                                  now.day,
+                                );
                               });
                             },
                           ),
@@ -578,6 +625,18 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                         value: _favoritesOnly,
                         onChanged: (value) {
                           setState(() => _favoritesOnly = value);
+                        },
+                      ),
+
+                      // Statistics exclusion, so the diver can find the dives
+                      // they took out of their statistics (#526).
+                      SwitchListTile(
+                        key: const Key('filter-excluded-from-stats-only'),
+                        title: Text(context.l10n.diveLog_filter_excludedOnly),
+                        secondary: const Icon(Icons.bar_chart_outlined),
+                        value: _excludedFromStatsOnly,
+                        onChanged: (value) {
+                          setState(() => _excludedFromStatsOnly = value);
                         },
                       ),
                       const SizedBox(height: 24),
@@ -1161,6 +1220,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
       minDepth: _minDepth,
       maxDepth: _maxDepth,
       favoritesOnly: _favoritesOnly ? true : null,
+      excludedFromStatsOnly: _excludedFromStatsOnly ? true : null,
       tagIds: _selectedTagIds,
       weekdays: _selectedWeekdays,
       // v1.5 filters

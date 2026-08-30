@@ -8,6 +8,7 @@ import 'package:submersion/features/marine_life/presentation/utils/species_categ
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_category_chips.dart';
+import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -40,10 +41,15 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
   /// render without a checkbox instead of failing at delete time.
   Map<String, int> _sightingCounts = const {};
 
+  /// Photo tags, prefetched for the same reason as the sighting counts.
+  Map<String, int> _tagCounts = const {};
+
   /// A species is selectable only if it is custom and unreferenced -- exactly
   /// the two conditions SpeciesRepository.deleteSpecies enforces.
   bool _isSelectable(Species s) =>
-      !s.isBuiltIn && (_sightingCounts[s.id] ?? 0) == 0;
+      !s.isBuiltIn &&
+      (_sightingCounts[s.id] ?? 0) == 0 &&
+      (_tagCounts[s.id] ?? 0) == 0;
 
   @override
   void dispose() {
@@ -56,6 +62,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     final speciesAsync = ref.watch(speciesListNotifierProvider);
     _sightingCounts =
         ref.watch(speciesSightingCountsProvider).value ?? const {};
+    _tagCounts = ref.watch(speciesTagCountsProvider).value ?? const {};
 
     final selectableIds = _visibleSpecies(
       speciesAsync.value ?? const [],
@@ -355,6 +362,7 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
 
     if (!mounted) return;
     ref.invalidate(speciesSightingCountsProvider);
+    ref.invalidate(speciesTagCountsProvider);
     messenger.showSnackBar(
       SnackBar(
         content: Text(

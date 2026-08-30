@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/data/services/dive_parser.dart';
 import 'package:submersion/features/dive_computer/data/services/downloaded_tank_defaults.dart';
+import 'package:submersion/features/dive_computer/data/services/transmitter_registry_resolver.dart';
 import 'package:submersion/features/gps_log/data/services/gps_track_match_service.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 
@@ -236,6 +237,13 @@ class ImportResult {
 /// null when the diver has not opted in (or the preset no longer exists).
 typedef DefaultTankPresetLoader = Future<TankPresetEntity?> Function();
 
+/// Supplies the transmitter registry snapshot for a dive computer (issue
+/// #1365), pre-resolved (registry entries plus any tank presets they
+/// reference) so [applyTransmitterRegistryToTanks] never has to touch the
+/// database.
+typedef TransmitterRegistryLoader =
+    Future<TransmitterRegistrySnapshot> Function(String diveComputerId);
+
 /// Service for importing downloaded dives into the app's database.
 class DiveImportService {
   final DiveComputerRepository _repository;
@@ -243,6 +251,7 @@ class DiveImportService {
   final DiveParser _parser;
   final GpsTrackMatchService? _gpsTrackMatchService;
   final DefaultTankPresetLoader? _defaultTankPresetForImports;
+  final TransmitterRegistryLoader? _transmitterRegistryForImports;
 
   DiveImportService({
     required DiveComputerRepository repository,
@@ -250,11 +259,13 @@ class DiveImportService {
     DiveParser? parser,
     GpsTrackMatchService? gpsTrackMatchService,
     DefaultTankPresetLoader? defaultTankPresetForImports,
+    TransmitterRegistryLoader? transmitterRegistryForImports,
   }) : _repository = repository,
        _diveRepository = diveRepository,
        _parser = parser ?? const DiveParser(),
        _gpsTrackMatchService = gpsTrackMatchService,
-       _defaultTankPresetForImports = defaultTankPresetForImports;
+       _defaultTankPresetForImports = defaultTankPresetForImports,
+       _transmitterRegistryForImports = transmitterRegistryForImports;
 
   /// The preset to fill downloaded cylinders with.
   ///
@@ -267,6 +278,18 @@ class DiveImportService {
     final loader = _defaultTankPresetForImports;
     if (loader == null) return null;
     return loader();
+  }
+
+  /// The transmitter registry for [computerId], applied to new-dive imports
+  /// ahead of the default-tank-preset fallback (issue #1365). Same
+  /// per-call-not-cached rationale as [_loadDefaultTankPreset]: a registry
+  /// edit should apply to the very next import.
+  Future<TransmitterRegistrySnapshot> _loadTransmitterRegistry(
+    String computerId,
+  ) async {
+    final loader = _transmitterRegistryForImports;
+    if (loader == null) return TransmitterRegistrySnapshot.empty;
+    return loader(computerId);
   }
 
   /// Import a list of downloaded dives.
@@ -313,6 +336,7 @@ class DiveImportService {
         : null;
 
     final defaultTankPreset = await _loadDefaultTankPreset();
+    final transmitterRegistry = await _loadTransmitterRegistry(computer.id);
 
     for (final dive in sortedDives) {
       try {
@@ -368,6 +392,7 @@ class DiveImportService {
                 diverId,
                 forceNew: true,
                 defaultTankPreset: defaultTankPreset,
+                transmitterRegistry: transmitterRegistry,
                 descriptorVendor: descriptorVendor,
                 descriptorProduct: descriptorProduct,
                 descriptorModel: descriptorModel,
@@ -398,6 +423,7 @@ class DiveImportService {
               diverId,
               forceNew: true,
               defaultTankPreset: defaultTankPreset,
+              transmitterRegistry: transmitterRegistry,
               descriptorVendor: descriptorVendor,
               descriptorProduct: descriptorProduct,
               descriptorModel: descriptorModel,
@@ -414,6 +440,7 @@ class DiveImportService {
             computer.id,
             diverId,
             defaultTankPreset: defaultTankPreset,
+            transmitterRegistry: transmitterRegistry,
             descriptorVendor: descriptorVendor,
             descriptorProduct: descriptorProduct,
             descriptorModel: descriptorModel,
@@ -527,14 +554,19 @@ class DiveImportService {
 
   /// Import a downloaded dive as a new dive.
   ///
-  /// [defaultTankPreset], when given, fills the cylinder size the computer
-  /// did not report so volumetric SAC is reachable on the new dive.
+  /// [transmitterRegistry], when it has entries for this computer, assigns
+  /// size, gas and role per channel ahead of anything else (issue #1365).
+  /// [defaultTankPreset], when given, fills the cylinder size of any
+  /// remaining channel the computer did not report and the registry did not
+  /// cover, so volumetric SAC is reachable on the new dive.
   Future<String> _importNewDive(
     DownloadedDive dive,
     String computerId,
     String? diverId, {
     bool forceNew = false,
     TankPresetEntity? defaultTankPreset,
+    TransmitterRegistrySnapshot transmitterRegistry =
+        TransmitterRegistrySnapshot.empty,
     String? descriptorVendor,
     String? descriptorProduct,
     int? descriptorModel,
@@ -552,12 +584,17 @@ class DiveImportService {
     // Parse profile data
     final profilePoints = _parser.parseProfile(dive);
 
-    // Convert tanks to TankData, filling the cylinder size from the default
-    // preset when the diver opted in (computers report pressure, not size).
+    // Convert tanks to TankData: the transmitter registry assigns
+    // channel-matched cylinders first, then the default preset (if the
+    // diver opted in) fills the size of anything still missing one.
     final parsedTanks = _parser.parseTanks(dive);
+    final registryTanks = applyTransmitterRegistryToTanks(
+      parsedTanks,
+      transmitterRegistry,
+    );
     final tanks = defaultTankPreset == null
-        ? parsedTanks
-        : applyDefaultPresetToTanks(parsedTanks, defaultTankPreset);
+        ? registryTanks
+        : applyDefaultPresetToTanks(registryTanks, defaultTankPreset);
 
     // Convert events to EventData
     final events = _convertEvents(dive.events);
@@ -619,6 +656,7 @@ class DiveImportService {
       diverId,
       forceNew: true,
       defaultTankPreset: await _loadDefaultTankPreset(),
+      transmitterRegistry: await _loadTransmitterRegistry(computerId),
       descriptorVendor: descriptorVendor,
       descriptorProduct: descriptorProduct,
       descriptorModel: descriptorModel,
@@ -720,6 +758,7 @@ class DiveImportService {
           computerId,
           diverId,
           defaultTankPreset: await _loadDefaultTankPreset(),
+          transmitterRegistry: await _loadTransmitterRegistry(computerId),
           descriptorVendor: descriptorVendor,
           descriptorProduct: descriptorProduct,
           descriptorModel: descriptorModel,
