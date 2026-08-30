@@ -78,10 +78,9 @@ void main() {
 
     expect(await originalsBytes(), lessThanOrEqualTo(2 * oneGiB));
     // Oldest lastAccessedAt goes first.
-    final remaining =
-        (await db.select(db.mediaCacheEntries).get())
-            .map((r) => r.contentHash)
-            .toList();
+    final remaining = (await db.select(db.mediaCacheEntries).get())
+        .map((r) => r.contentHash)
+        .toList();
     expect(remaining, isNot(contains('aa${'1' * 62}')));
   });
 
