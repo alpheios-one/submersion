@@ -1415,6 +1415,14 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "אירעה שגיאה",
   "diveComputer_download_noSerialPortsFound": "לא נמצאו חיבורי USB טוריים. האם מחשב הצלילה מחובר ופועל?",
+  "diveComputer_download_noUsbDeviceFound": "לא נמצא {model} דרך USB. האם הוא מחובר למחשב הזה ומופעל?",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "התאמת ה-Bluetooth של מחשב הצלילה הזה אינה עדכנית. שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך, ולאחר מכן התאם אותו מחדש מתפריט ה-Bluetooth של מחשב הצלילה.",
   "diveComputer_download_discoveryStalled": "ההתחברות למחשב הצלילה הצליחה, אך הוא הפסיק להגיב לפני תחילת ההורדה. בדרך כלל המשמעות היא שהתאמת ה-Bluetooth אינה עדכנית: שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך ונסה שוב.",
   "diveComputer_download_serialConnectFailedWithDetails": "לא ניתן להתחבר למחשב הצלילה.\n\nפרטי אבחון (שתפו עם המפתחים):\n{details}",

@@ -21344,6 +21344,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen USB-seriële poorten gevonden. Is de duikcomputer aangesloten en ingeschakeld?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Geen $model gevonden via USB. Is hij aangesloten op deze computer en ingeschakeld?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'De Bluetooth-koppeling van deze duikcomputer is verouderd. Vergeet de duikcomputer in de Bluetooth-instellingen van je apparaat en koppel hem daarna opnieuw via het Bluetooth-menu van de duikcomputer.';
 

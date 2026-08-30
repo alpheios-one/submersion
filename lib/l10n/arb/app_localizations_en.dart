@@ -21147,6 +21147,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No USB serial ports found. Is the dive computer connected and powered on?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'No $model found over USB. Is it connected to this computer and powered on?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'This dive computer\'s Bluetooth pairing is out of date. Forget the dive computer in your device\'s Bluetooth settings, then pair it again from the dive computer\'s Bluetooth menu.';
 

@@ -103,19 +103,23 @@ static int usbhid_write(void* userdata, const void* data, size_t size,
     if (size == 0) return LIBDC_STATUS_SUCCESS;
 
     const unsigned char* buffer = (const unsigned char*)data;
-    size_t written = 0;
-    while (written < size) {
-        const ssize_t sent = write(stream->fd, buffer + written, size - written);
-        if (sent < 0) {
-            if (errno == EINTR) continue;
-            return LIBDC_STATUS_IO;
-        }
-        if (sent == 0) break;
-        written += (size_t)sent;
-    }
+    ssize_t sent = 0;
+    do {
+        sent = write(stream->fd, buffer, size);
+    } while (sent < 0 && errno == EINTR);
 
-    if (actual != NULL) *actual = written;
-    return written == size ? LIBDC_STATUS_SUCCESS : LIBDC_STATUS_IO;
+    if (sent < 0) return LIBDC_STATUS_IO;
+
+    // One write(2) per report, and a short one is a failure rather than
+    // something to resume. A hidraw write is a whole report: continuing from
+    // the middle would send the tail as a second, malformed report, and the
+    // device would answer the wrong question. libdivecomputer's own hidapi
+    // path is a single hid_write for the same reason, and the Windows backend
+    // here rejects a short write rather than retrying it.
+    if ((size_t)sent != size) return LIBDC_STATUS_IO;
+
+    if (actual != NULL) *actual = (size_t)sent;
+    return LIBDC_STATUS_SUCCESS;
 }
 
 static int usbhid_poll(void* userdata, int timeout) {

@@ -1415,6 +1415,14 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Hiba tortent",
   "diveComputer_download_noSerialPortsFound": "Nem található USB soros port. A búvárszámítógép csatlakoztatva van és be van kapcsolva?",
+  "diveComputer_download_noUsbDeviceFound": "Nem található {model} USB-n. Csatlakoztatva van ehhez a számítógéphez és be van kapcsolva?",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "Ennek a merülőkomputernek a Bluetooth-párosítása elavult. Felejtesd el a merülőkomputert az eszközöd Bluetooth-beállításaiban, majd párosítsd újra a merülőkomputer Bluetooth menüjéből.",
   "diveComputer_download_discoveryStalled": "A merülőkomputer csatlakozott, de a letöltés megkezdése előtt nem válaszolt tovább. Ez általában azt jelenti, hogy a Bluetooth-párosítás elavult: felejtesd el a merülőkomputert az eszközöd Bluetooth-beállításaiban, majd próbáld újra.",
   "diveComputer_download_serialConnectFailedWithDetails": "Nem sikerült csatlakozni a búvárszámítógéphez.\n\nDiagnosztikai részletek (ossza meg a fejlesztőkkel):\n{details}",

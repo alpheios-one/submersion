@@ -21515,6 +21515,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna porta seriale USB trovata. Il computer subacqueo è collegato e acceso?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Nessun $model rilevato via USB. È collegato a questo computer e acceso?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'L\'associazione Bluetooth di questo computer subacqueo non è più valida. Dimentica il computer subacqueo nelle impostazioni Bluetooth del tuo dispositivo, quindi associalo di nuovo dal menu Bluetooth del computer subacqueo.';
 

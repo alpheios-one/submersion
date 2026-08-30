@@ -21515,6 +21515,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhuma porta serial USB encontrada. O computador de mergulho está conectado e ligado?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Nenhum $model encontrado por USB. Está ligado a este computador e ligado?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'O emparelhamento Bluetooth deste computador de mergulho está desatualizado. Esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e emparelhe-o novamente a partir do menu Bluetooth do computador de mergulho.';
 

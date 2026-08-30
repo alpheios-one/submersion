@@ -20393,6 +20393,11 @@ class AppLocalizationsZh extends AppLocalizations {
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return '未通过 USB 找到 $model。它是否已连接到这台电脑并已开机？';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       '此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。';
 
