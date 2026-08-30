@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -109,12 +110,44 @@ final FutureProvider<void> mediaTransferQueueReclaimProvider =
       await ref.read(mediaTransferQueueRepositoryProvider).requeueStale();
     });
 
+Future<Directory>? _mediaCacheRootFuture;
+
 /// The on-disk root of the media cache: originals, thumbs, renditions, plus
 /// the staging and transcode scratch directories.
+///
+/// Memoized for the process. Five call sites resolve this (the runtime, the
+/// eviction pass, and the three media cache rows on the storage usage page)
+/// and each one costs a platform channel round trip that returns the same
+/// immutable path every time. Caching the Directory is safe in a way that
+/// caching a MediaCacheStore is not: the store captures the LocalCacheDatabase
+/// at construction and would go stale after a database location migration,
+/// whereas the support directory does not move while the process lives.
+///
+/// A failed lookup is deliberately not cached, so the next caller retries
+/// rather than inheriting a permanent failure from one bad moment at boot.
 Future<Directory> mediaCacheRoot() async {
+  final cached = _mediaCacheRootFuture;
+  if (cached != null) return cached;
+
+  final pending = _resolveMediaCacheRoot();
+  _mediaCacheRootFuture = pending;
+  try {
+    return await pending;
+  } catch (_) {
+    _mediaCacheRootFuture = null;
+    rethrow;
+  }
+}
+
+Future<Directory> _resolveMediaCacheRoot() async {
   final support = await getApplicationSupportDirectory();
   return Directory(p.join(support.path, 'Submersion', 'media_cache'));
 }
+
+/// Drops the memoized [mediaCacheRoot], so a test that overrides the
+/// path_provider platform channel is not served another test's directory.
+@visibleForTesting
+void resetMediaCacheRootForTesting() => _mediaCacheRootFuture = null;
 
 /// Brings the media cache back inside its LRU caps once per process.
 ///

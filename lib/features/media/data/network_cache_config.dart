@@ -36,8 +36,8 @@ const int kMemoryCacheCapObjects = 200;
 /// Memory only. The disk cache is governed by `flutter_cache_manager`'s own
 /// defaults; see the file header. Idempotent; safe to call multiple times.
 //
-// Configures global Flutter image cache; exercised at app boot by
-// `MediaSourcesApp.bootstrap()` in Phase 3c.
+// Configures the global Flutter image cache. Called once at app boot from
+// `_bootstrap()` in `lib/main.dart`.
 // coverage:ignore-start
 void applyMediaCacheCaps() {
   final cache = PaintingBinding.instance.imageCache;
