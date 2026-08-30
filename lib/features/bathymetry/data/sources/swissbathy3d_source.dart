@@ -82,8 +82,19 @@ class SwissBathy3dSource implements BathymetrySource {
     final tiles = <BathymetryGrid>[];
     for (var tileN = tileNMin; tileN <= tileNMax; tileN++) {
       for (var tileE = tileEMin; tileE <= tileEMax; tileE++) {
-        final tile = await _fetchTile(tileE, tileN, lake);
-        if (tile != null) tiles.add(tile);
+        try {
+          final tile = await _fetchTile(tileE, tileN, lake);
+          if (tile != null) tiles.add(tile);
+        } on BathymetryFetchException {
+          // One tile's transient failure (network timeout, a bad STAC
+          // response) must not sink the whole stitched fetch when
+          // neighboring tiles — possibly including the one under the dive
+          // site itself — already succeeded. Treat it as a gap instead;
+          // never cached (see _fetchTile), so the next visit retries just
+          // this tile. A span can cover dozens of 1-km tiles, so this
+          // isolation matters far more here than it did for the
+          // single-tile fetch this replaced.
+        }
       }
     }
 

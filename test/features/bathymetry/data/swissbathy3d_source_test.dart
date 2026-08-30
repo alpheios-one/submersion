@@ -226,6 +226,80 @@ nodata_value -9999
       },
     );
 
+    test('a transient failure on one tile does not sink neighboring tiles that '
+        'already succeeded', () async {
+      // Same boundary point/span as the stitching test above: exactly two
+      // tiles. Tile A's STAC items lookup succeeds; tile B's returns a
+      // server error, simulating the kind of one-off network hiccup that
+      // becomes likely once a single site view can span dozens of tiles.
+      const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      const tileAGrid = '''
+ncols 2
+nrows 2
+xllcorner 2684000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          if (itemCalls == 1) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_a.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response('server error', 500);
+        }
+        return http.Response.bytes(_zipOf('tile.asc', tileAGrid), 200);
+      });
+
+      // Must not throw despite the second tile's 500: tile A's data is
+      // still returned instead of the whole fetch failing.
+      final grid = await source.fetch(boundaryPoint, spanMeters: 200);
+
+      expect(itemCalls, 2);
+      expect(grid.rows, 2);
+      expect(grid.cols, 2);
+      expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+
+      // The failed tile was never cached as a definitive answer, so a
+      // later retry (e.g. once the network recovers) queries it again
+      // rather than being permanently stuck as "no data".
+      final again = await source.fetch(boundaryPoint, spanMeters: 200);
+      expect(itemCalls, 3);
+      expect(again.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+    });
+
+    test('throws when every tile in the span fails transiently, so the '
+        'resolver falls through instead of caching a false negative', () async {
+      const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        itemCalls++;
+        return http.Response('server error', 500);
+      });
+
+      await expectLater(
+        source.fetch(boundaryPoint, spanMeters: 200),
+        throwsA(isA<BathymetryFetchException>()),
+      );
+      expect(itemCalls, 2);
+    });
+
     test('a missing tile inside the span is a gap, not a crash, when at least '
         'one neighboring tile has data', () async {
       // Same boundary point/span as above, but the east tile has no STAC
