@@ -151,6 +151,8 @@ add_library(${PLUGIN_NAME} SHARED
     ble_io_stream.cc
     serial_scanner.cc
     serial_io_stream.cc
+    usbhid_enumerator.cc
+    usbhid_io_stream.cc
     dive_computer_api.g.cc
     ${WRAPPER_DIR}/libdc_wrapper.c
     ${WRAPPER_DIR}/libdc_download.c
@@ -181,7 +183,10 @@ target_include_directories(${PLUGIN_NAME} PRIVATE
     ${WRAPPER_DIR}
 )
 
+# hid.lib is the Win32 HID API (HidD_*, HidP_*) behind the USB HID transport
+# for the Scubapro G2 and Suunto EON Steel families (issue #1271). It ships in
+# the Windows SDK, so it needs no package.
 target_link_libraries(${PLUGIN_NAME} PRIVATE
     flutter flutter_wrapper_plugin divecomputer
-    WindowsApp.lib SetupAPI.lib
+    WindowsApp.lib SetupAPI.lib hid.lib
 )
