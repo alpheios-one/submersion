@@ -51,7 +51,7 @@ enum DiveDetailSectionId {
       buddies => 'Buddies',
       signatures => 'Signatures',
       equipment => 'Equipment',
-      sightings => 'Marine Life Sightings',
+      sightings => 'Species Sightings',
       media => 'Media',
       tags => 'Tags',
       notes => 'Notes',

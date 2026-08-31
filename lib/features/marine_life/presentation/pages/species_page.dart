@@ -16,7 +16,8 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The species the diver has seen across every dive, searchable and sortable.
 ///
-/// Reached at `/species` from the Statistics > Marine Life tab. Housekeeping
+/// Reached at `/species` from the nav and from the Statistics > Species
+/// tab. Housekeeping
 /// (edit, delete, reset the catalog) stays on the manager at
 /// `/species/manage`, behind the app-bar action. Query, category and sort are
 /// per-visit state, so they live here rather than in a provider.

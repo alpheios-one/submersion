@@ -1217,9 +1217,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_label_notSpecified => '未指定';
 
   @override
-  String get buddies_label_photoComingSoon => '照片功能将在 v2.0 推出';
-
-  @override
   String get buddies_message_added => '潜伴添加成功';
 
   @override
@@ -4675,7 +4672,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_equipment => '装备';
 
   @override
-  String get diveLog_detail_section_marineLife => '海洋生物';
+  String get diveLog_detail_section_marineLife => '物种';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -4988,7 +4985,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => '未选择装备';
 
   @override
-  String get diveLog_edit_noMarineLife => '未记录海洋生物';
+  String get diveLog_edit_noMarineLife => '未记录物种';
 
   @override
   String get diveLog_edit_notSpecified => '未指定';
@@ -5122,7 +5119,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_section_exitTime => '出水时间';
 
   @override
-  String get diveLog_edit_section_marineLife => '海洋生物';
+  String get diveLog_edit_section_marineLife => '物种';
 
   @override
   String get diveLog_edit_section_notes => '备注';
@@ -5996,7 +5993,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_invite_diveInfo => '添加深度范围、难度或评分';
 
   @override
-  String get diveSites_edit_invite_lifeNotes => '添加海洋生物、笔记或共享';
+  String get diveSites_edit_invite_lifeNotes => '添加物种、笔记或共享';
 
   @override
   String get diveSites_edit_invite_location => '添加 GPS 位置或海拔';
@@ -6868,6 +6865,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => '加载潜水类型出错';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => '加载装备出错';
+
+  @override
   String get diveLog_search_errorLoadingTrips => '加载旅行出错';
 
   @override
@@ -6893,6 +6893,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => '时长范围（分钟）';
+
+  @override
+  String get diveLog_search_label_equipment => '装备';
 
   @override
   String get diveLog_search_label_trip => '旅行';
@@ -7018,7 +7021,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => '搜索物种...';
 
   @override
-  String get diveLog_speciesPicker_title => '添加海洋生物';
+  String get diveLog_speciesPicker_title => '添加物种';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => '清除搜索';
@@ -7786,6 +7789,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => '难度等级';
 
   @override
+  String get diveSites_detail_section_diveStatistics => '潜水统计';
+
+  @override
   String get diveSites_detail_section_divesAtSite => '此潜水点的潜水记录';
 
   @override
@@ -7799,6 +7805,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => '评分';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => '平均时长';
+
+  @override
+  String get diveSites_detail_stats_firstDive => '首次潜水';
+
+  @override
+  String get diveSites_detail_stats_lastDive => '最近潜水';
+
+  @override
+  String get diveSites_detail_stats_longestDive => '最长潜水';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => '最深潜水';
+
+  @override
+  String get diveSites_detail_stats_minDepth => '最浅潜水';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => '不可用';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8148,7 +8175,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => '难度等级';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => '预期海洋生物';
+  String get diveSites_edit_section_expectedMarineLife => '预期物种';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS 坐标';
@@ -11889,7 +11916,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_noExpected => '未添加预期物种';
 
   @override
-  String get marineLife_siteSection_noSpotted => '尚无海洋生物目击记录';
+  String get marineLife_siteSection_noSpotted => '尚无物种目击记录';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -11903,7 +11930,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => '发现此处';
 
   @override
-  String get marineLife_siteSection_title => '海洋生物';
+  String get marineLife_siteSection_title => '物种';
 
   @override
   String get marineLife_speciesDetail_backTooltip => '返回';
@@ -12336,7 +12363,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesPage_emptyTitle => '还没有物种';
 
   @override
-  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的海洋生物目击会显示在这里。';
+  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的物种目击会显示在这里。';
 
   @override
   String get marineLife_speciesPage_noMatch => '没有符合搜索条件的物种';
@@ -13563,6 +13590,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_sites => '潜水点';
 
   @override
+  String get nav_species => '物种';
+
+  @override
   String get nav_statistics => '统计';
 
   @override
@@ -14578,7 +14608,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_equipment_description => '潜水中使用的装备';
 
   @override
-  String get diveDetailSection_sightings_name => '海洋生物目击';
+  String get diveDetailSection_sightings_name => '物种目击';
 
   @override
   String get diveDetailSection_sightings_description => '观察到的物种、目击详情';
@@ -16000,7 +16030,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_species => '物种';
 
   @override
-  String get settings_manage_species_subtitle => '管理海洋生物物种目录';
+  String get settings_manage_species_subtitle => '管理物种目录';
 
   @override
   String get settings_manage_tags => '标签';
@@ -16899,7 +16929,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => '物种目击';
 
   @override
-  String get statistics_category_marineLife_title => '海洋生物';
+  String get statistics_category_marineLife_title => '物种';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17216,7 +17246,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', 已选择';
 
   @override
-  String get statistics_marineLife_appBar_title => '海洋生物';
+  String get statistics_marineLife_appBar_title => '物种';
 
   @override
   String get statistics_marineLife_bestSites_empty => '无潜水点数据';
@@ -17237,7 +17267,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title => '海洋生物最佳潜水点';
+  String get statistics_marineLife_bestSites_title => '最佳潜水点';
 
   @override
   String get statistics_marineLife_mostCommon_empty => '无目击数据';
@@ -20394,6 +20424,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
+
+  @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return '未通过 USB 找到 $model。它是否已连接到这台电脑并已开机？';
+  }
 
   @override
   String get diveComputer_download_stalePairing =>
@@ -33814,4 +33849,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => '导出的文件';
+
+  @override
+  String get profilePhoto_sheet_title => '个人资料照片';
+
+  @override
+  String get profilePhoto_source_camera => '拍照';
+
+  @override
+  String get profilePhoto_source_library => '从图库中选择';
+
+  @override
+  String get profilePhoto_source_file => '选择文件';
+
+  @override
+  String get profilePhoto_source_contacts => '从通讯录中选择';
+
+  @override
+  String get profilePhoto_action_remove => '移除照片';
+
+  @override
+  String get profilePhoto_crop_title => '调整照片';
+
+  @override
+  String get profilePhoto_crop_hint => '拖动以调整位置，双指缩放';
+
+  @override
+  String get profilePhoto_error_tooLarge => '该图片太大，请尝试较小的图片。';
+
+  @override
+  String get profilePhoto_error_undecodable => '无法将该文件读取为图片。';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto => '该联系人没有照片。';
+
+  @override
+  String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
 }

@@ -2227,12 +2227,6 @@ abstract class AppLocalizations {
   /// **'Not specified'**
   String get buddies_label_notSpecified;
 
-  /// No description provided for @buddies_label_photoComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo support coming in v2.0'**
-  String get buddies_label_photoComingSoon;
-
   /// No description provided for @buddies_message_added.
   ///
   /// In en, this message translates to:
@@ -8186,7 +8180,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_detail_section_marineLife;
 
   /// No description provided for @diveLog_detail_sightingPhotos.
@@ -8756,7 +8750,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_noMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'No marine life logged'**
+  /// **'No species logged'**
   String get diveLog_edit_noMarineLife;
 
   /// No description provided for @diveLog_edit_notSpecified.
@@ -8972,7 +8966,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_edit_section_marineLife;
 
   /// No description provided for @diveLog_edit_section_notes.
@@ -10484,7 +10478,7 @@ abstract class AppLocalizations {
   /// Empty-state invitation for the Life & notes group
   ///
   /// In en, this message translates to:
-  /// **'Add marine life, notes or sharing'**
+  /// **'Add species, notes or sharing'**
   String get diveSites_edit_invite_lifeNotes;
 
   /// Empty-state invitation for the Location group
@@ -12065,6 +12059,12 @@ abstract class AppLocalizations {
   /// **'Error loading dive types'**
   String get diveLog_search_errorLoadingDiveTypes;
 
+  /// No description provided for @diveLog_search_errorLoadingEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading equipment'**
+  String get diveLog_search_errorLoadingEquipment;
+
   /// No description provided for @diveLog_search_errorLoadingTrips.
   ///
   /// In en, this message translates to:
@@ -12118,6 +12118,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duration Range (min)'**
   String get diveLog_search_label_durationRange;
+
+  /// No description provided for @diveLog_search_label_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get diveLog_search_label_equipment;
 
   /// No description provided for @diveLog_search_label_trip.
   ///
@@ -12344,7 +12350,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_speciesPicker_title.
   ///
   /// In en, this message translates to:
-  /// **'Add Marine Life'**
+  /// **'Add Species'**
   String get diveLog_speciesPicker_title;
 
   /// No description provided for @diveLog_speciesPicker_tooltip_clearSearch.
@@ -13734,6 +13740,12 @@ abstract class AppLocalizations {
   /// **'Difficulty Level'**
   String get diveSites_detail_section_difficultyLevel;
 
+  /// No description provided for @diveSites_detail_section_diveStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Statistics'**
+  String get diveSites_detail_section_diveStatistics;
+
   /// No description provided for @diveSites_detail_section_divesAtSite.
   ///
   /// In en, this message translates to:
@@ -13763,6 +13775,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rating'**
   String get diveSites_detail_section_rating;
+
+  /// No description provided for @diveSites_detail_stats_avgDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Duration'**
+  String get diveSites_detail_stats_avgDuration;
+
+  /// No description provided for @diveSites_detail_stats_firstDive.
+  ///
+  /// In en, this message translates to:
+  /// **'First Dive'**
+  String get diveSites_detail_stats_firstDive;
+
+  /// No description provided for @diveSites_detail_stats_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get diveSites_detail_stats_lastDive;
+
+  /// No description provided for @diveSites_detail_stats_longestDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Dive'**
+  String get diveSites_detail_stats_longestDive;
+
+  /// No description provided for @diveSites_detail_stats_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest Dive'**
+  String get diveSites_detail_stats_maxDepth;
+
+  /// No description provided for @diveSites_detail_stats_minDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Shallowest Dive'**
+  String get diveSites_detail_stats_minDepth;
+
+  /// No description provided for @diveSites_detail_stats_notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get diveSites_detail_stats_notAvailable;
 
   /// No description provided for @diveSites_detail_semantics_copyToClipboard.
   ///
@@ -14366,7 +14420,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_edit_section_expectedMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'Expected Marine Life'**
+  /// **'Expected Species'**
   String get diveSites_edit_section_expectedMarineLife;
 
   /// No description provided for @diveSites_edit_section_gpsCoordinates.
@@ -21143,7 +21197,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_noSpotted.
   ///
   /// In en, this message translates to:
-  /// **'No marine life spotted yet'**
+  /// **'No species spotted yet'**
   String get marineLife_siteSection_noSpotted;
 
   /// No description provided for @marineLife_siteSection_spottedCountSemantics.
@@ -21164,7 +21218,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get marineLife_siteSection_title;
 
   /// No description provided for @marineLife_speciesDetail_backTooltip.
@@ -21794,7 +21848,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_speciesPage_emptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Marine life sightings added to a dive will show up here.'**
+  /// **'Species sightings added to a dive will show up here.'**
   String get marineLife_speciesPage_emptyHint;
 
   /// No description provided for @marineLife_speciesPage_noMatch.
@@ -23720,6 +23774,12 @@ abstract class AppLocalizations {
   /// **'Sites'**
   String get nav_sites;
 
+  /// Navigation label for the species section
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get nav_species;
+
   /// Navigation label for statistics section
   ///
   /// In en, this message translates to:
@@ -25451,7 +25511,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_sightings_name.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life Sightings'**
+  /// **'Species Sightings'**
   String get diveDetailSection_sightings_name;
 
   /// No description provided for @diveDetailSection_sightings_description.
@@ -27868,7 +27928,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_manage_species_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Manage marine life species catalog'**
+  /// **'Manage the species catalog'**
   String get settings_manage_species_subtitle;
 
   /// No description provided for @settings_manage_tags.
@@ -29510,7 +29570,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_category_marineLife_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_category_marineLife_title;
 
   /// Title for the Overview entry in the Statistics category list
@@ -30077,7 +30137,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_appBar_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_marineLife_appBar_title;
 
   /// No description provided for @statistics_marineLife_bestSites_empty.
@@ -30111,7 +30171,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_bestSites_title.
   ///
   /// In en, this message translates to:
-  /// **'Best Sites for Marine Life'**
+  /// **'Best Sites'**
   String get statistics_marineLife_bestSites_title;
 
   /// No description provided for @statistics_marineLife_mostCommon_empty.
@@ -35484,6 +35544,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No USB serial ports found. Is the dive computer connected and powered on?'**
   String get diveComputer_download_noSerialPortsFound;
+
+  /// No description provided for @diveComputer_download_noUsbDeviceFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No {model} found over USB. Is it connected to this computer and powered on?'**
+  String diveComputer_download_noUsbDeviceFound(Object model);
 
   /// No description provided for @diveComputer_download_stalePairing.
   ///
@@ -59080,6 +59146,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exported files'**
   String get settings_storageUsage_category_exports;
+
+  /// No description provided for @profilePhoto_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo'**
+  String get profilePhoto_sheet_title;
+
+  /// No description provided for @profilePhoto_source_camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get profilePhoto_source_camera;
+
+  /// No description provided for @profilePhoto_source_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Library'**
+  String get profilePhoto_source_library;
+
+  /// No description provided for @profilePhoto_source_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose File'**
+  String get profilePhoto_source_file;
+
+  /// No description provided for @profilePhoto_source_contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Contacts'**
+  String get profilePhoto_source_contacts;
+
+  /// No description provided for @profilePhoto_action_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get profilePhoto_action_remove;
+
+  /// No description provided for @profilePhoto_crop_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Photo'**
+  String get profilePhoto_crop_title;
+
+  /// No description provided for @profilePhoto_crop_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reposition, pinch to zoom'**
+  String get profilePhoto_crop_hint;
+
+  /// No description provided for @profilePhoto_error_tooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That image is too large to use. Try a smaller one.'**
+  String get profilePhoto_error_tooLarge;
+
+  /// No description provided for @profilePhoto_error_undecodable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read as an image.'**
+  String get profilePhoto_error_undecodable;
+
+  /// No description provided for @profilePhoto_error_contactNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'That contact does not have a photo.'**
+  String get profilePhoto_error_contactNoPhoto;
+
+  /// No description provided for @profilePhoto_error_contactPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts permission is required to choose a photo.'**
+  String get profilePhoto_error_contactPermission;
 }
 
 class _AppLocalizationsDelegate

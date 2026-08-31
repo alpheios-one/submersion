@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:submersion/core/providers/provider.dart';
+import 'package:flutter/foundation.dart';
+
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/providers/account_providers.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -108,6 +110,69 @@ final FutureProvider<void> mediaTransferQueueReclaimProvider =
     FutureProvider<void>((ref) async {
       await ref.read(mediaTransferQueueRepositoryProvider).requeueStale();
     });
+
+Future<Directory>? _mediaCacheRootFuture;
+
+/// The on-disk root of the media cache: originals, thumbs, renditions, plus
+/// the staging and transcode scratch directories.
+///
+/// Memoized for the process. Five call sites resolve this (the runtime, the
+/// eviction pass, and the three media cache rows on the storage usage page)
+/// and each one costs a platform channel round trip that returns the same
+/// immutable path every time. Caching the Directory is safe in a way that
+/// caching a MediaCacheStore is not: the store captures the LocalCacheDatabase
+/// at construction and would go stale after a database location migration,
+/// whereas the support directory does not move while the process lives.
+///
+/// A failed lookup is deliberately not cached, so the next caller retries
+/// rather than inheriting a permanent failure from one bad moment at boot.
+Future<Directory> mediaCacheRoot() async {
+  final cached = _mediaCacheRootFuture;
+  if (cached != null) return cached;
+
+  final pending = _resolveMediaCacheRoot();
+  _mediaCacheRootFuture = pending;
+  try {
+    return await pending;
+  } catch (_) {
+    _mediaCacheRootFuture = null;
+    rethrow;
+  }
+}
+
+Future<Directory> _resolveMediaCacheRoot() async {
+  final support = await getApplicationSupportDirectory();
+  return Directory(p.join(support.path, 'Submersion', 'media_cache'));
+}
+
+/// Drops the memoized [mediaCacheRoot], so a test that overrides the
+/// path_provider platform channel is not served another test's directory.
+@visibleForTesting
+void resetMediaCacheRootForTesting() => _mediaCacheRootFuture = null;
+
+/// Brings the media cache back inside its LRU caps once per process.
+///
+/// [MediaCacheStore.evictIfNeeded] is public but was only ever called from
+/// inside `put()`, so eviction needed a write to happen. A store that went
+/// over cap and then went idle stayed over cap indefinitely, waiting on a
+/// download that might never come. Running the same pass on the way up means
+/// a library that has stopped fetching still settles back under budget.
+///
+/// Cached like [mediaTransferQueueReclaimProvider] so a runtime rebuild does
+/// not repeat it. Unlike that one it is deliberately NOT awaited by the
+/// runtime: reclaim must precede any drain for correctness, whereas eviction
+/// is housekeeping and must never delay one.
+// no-tick: recomputing is the bug, not the fix. The cached result is what
+// keeps this to one pass per process.
+final FutureProvider<void> mediaCacheEvictionProvider = FutureProvider<void>((
+  ref,
+) async {
+  final cache = MediaCacheStore(
+    database: LocalCacheDatabaseService.instance.database,
+    root: await mediaCacheRoot(),
+  );
+  await cache.evictIfNeeded();
+});
 
 /// Deletion entry point for UI flows: enqueue-before-delete per the
 /// orphan-prevention spec (5.2). The queue and runtime are read lazily
@@ -372,10 +437,9 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       final store = builtStore;
       if (store == null) return null;
 
-      final supportDir = await getApplicationSupportDirectory();
       final cache = MediaCacheStore(
         database: LocalCacheDatabaseService.instance.database,
-        root: Directory(p.join(supportDir.path, 'Submersion', 'media_cache')),
+        root: await mediaCacheRoot(),
       );
       final resolver = MediaStoreResolver(store: store, cache: cache);
 
@@ -438,6 +502,20 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
       // cannot reclaim a row a still-running worker from the previous runtime
       // owns; the cache makes it run only once.
       await ref.read(mediaTransferQueueReclaimProvider.future);
+
+      // Fire-and-forget: housekeeping must not delay the drain below.
+      //
+      // catchError is load-bearing, not decoration. A FutureProvider records
+      // the failure in its own AsyncError state, but the future handed back by
+      // .future still completes with that error, so an unawaited one surfaces
+      // as an unhandled async exception. Same shape as the tile sweep in
+      // startup_page.dart. Nothing surfaces this to the user and the retry is
+      // a whole launch away, so the log is the only diagnostic there will be.
+      unawaited(
+        ref.read(mediaCacheEvictionProvider.future).catchError((Object e) {
+          debugPrint('Media cache eviction failed (will retry): $e');
+        }),
+      );
 
       final connectivitySub = network.changes.listen((kind) {
         if (kind != NetworkKind.offline) unawaited(worker.drain());

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
@@ -611,6 +613,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     initialName: extra?['name'] as String?,
                     initialEmail: extra?['email'] as String?,
                     initialPhone: extra?['phone'] as String?,
+                    initialPhoto: extra?['photo'] as Uint8List?,
                   );
                 },
               ),
@@ -1368,7 +1371,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/species',
             name: 'species',
-            builder: (context, state) => const SpeciesPage(),
+            // A nav destination: the rail and bottom bar reach it with `go`,
+            // so it cross-fades like its siblings instead of animating in.
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SpeciesPage(),
+            ),
             routes: [
               GoRoute(
                 path: 'manage',

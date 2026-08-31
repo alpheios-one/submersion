@@ -679,6 +679,19 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     if (state.errorCode == 'no_serial_ports') {
       return l10n.diveComputer_download_noSerialPortsFound;
     }
+    // A USB HID computer (the Scubapro G2 family, the Suunto EON Steel family)
+    // has no serial port to go looking for, so the serial wording above would
+    // send the diver hunting for the wrong thing (issue #1271). The native
+    // message names the model too, but only in English, so the name is taken
+    // from the device here and the sentence around it is localized.
+    if (state.errorCode == 'no_usb_device') {
+      final model =
+          widget.device?.recognizedModel?.fullName ??
+          widget.device?.displayName;
+      if (model != null) {
+        return l10n.diveComputer_download_noUsbDeviceFound(model);
+      }
+    }
     // Apple platforms expose no API for deleting a pairing record, so a stale
     // one can only be cleared by the diver in Bluetooth settings. Say so
     // instead of showing the generic connect failure (issue #865).

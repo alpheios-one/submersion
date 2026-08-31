@@ -1282,9 +1282,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get buddies_label_notSpecified => 'غير محدد';
 
   @override
-  String get buddies_label_photoComingSoon => 'دعم الصور قادم في الإصدار 2.0';
-
-  @override
   String get buddies_message_added => 'تمت إضافة الرفيق بنجاح';
 
   @override
@@ -4822,7 +4819,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'المعدات';
 
   @override
-  String get diveLog_detail_section_marineLife => 'الحياة البحرية';
+  String get diveLog_detail_section_marineLife => 'الأنواع';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5145,7 +5142,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'لم يتم اختيار معدات';
 
   @override
-  String get diveLog_edit_noMarineLife => 'لم يتم تسجيل حياة بحرية';
+  String get diveLog_edit_noMarineLife => 'لم يتم تسجيل أنواع';
 
   @override
   String get diveLog_edit_notSpecified => 'غير محدد';
@@ -5282,7 +5279,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'وقت الخروج';
 
   @override
-  String get diveLog_edit_section_marineLife => 'الحياة البحرية';
+  String get diveLog_edit_section_marineLife => 'الأنواع';
 
   @override
   String get diveLog_edit_section_notes => 'الملاحظات';
@@ -6184,7 +6181,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'إضافة الحياة البحرية أو الملاحظات أو المشاركة';
+      'إضافة الأنواع أو الملاحظات أو المشاركة';
 
   @override
   String get diveSites_edit_invite_location => 'إضافة إحداثيات GPS أو الارتفاع';
@@ -7082,6 +7079,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'خطأ في تحميل أنواع الغوص';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'خطأ في تحميل المعدات';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'خطأ في تحميل الرحلات';
 
   @override
@@ -7107,6 +7107,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'نطاق المدة (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'المعدات';
 
   @override
   String get diveLog_search_label_trip => 'رحلة';
@@ -7234,7 +7237,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'البحث عن الأنواع...';
 
   @override
-  String get diveLog_speciesPicker_title => 'إضافة حياة بحرية';
+  String get diveLog_speciesPicker_title => 'إضافة أنواع';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'مسح البحث';
@@ -8016,6 +8019,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'مستوى الصعوبة';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'إحصائيات الغوص';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'الغوصات في هذا الموقع';
 
   @override
@@ -8029,6 +8035,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'التقييم';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'متوسط المدة';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'أول غطسة';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'آخر غطسة';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'أطول غطسة';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'أعمق غطسة';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'أقل غطسة عمقًا';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'غير متوفر';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8397,8 +8424,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'مستوى الصعوبة';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'الحياة البحرية المتوقعة';
+  String get diveSites_edit_section_expectedMarineLife => 'الأنواع المتوقعة';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'إحداثيات GPS';
@@ -12259,7 +12285,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get marineLife_siteSection_noExpected => 'لم تتم إضافة أنواع متوقعة';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'لم يتم رصد حياة بحرية بعد';
+  String get marineLife_siteSection_noSpotted => 'لم يتم رصد أنواع بعد';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12273,7 +12299,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'تم رصدها هنا';
 
   @override
-  String get marineLife_siteSection_title => 'الحياة البحرية';
+  String get marineLife_siteSection_title => 'الأنواع';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'رجوع';
@@ -12720,7 +12746,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'مشاهدات الحياة البحرية المضافة إلى غوصة ستظهر هنا.';
+      'مشاهدات الأنواع المضافة إلى غوصة ستظهر هنا.';
 
   @override
   String get marineLife_speciesPage_noMatch => 'لا توجد أنواع تطابق بحثك';
@@ -13980,6 +14006,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_sites => 'المواقع';
 
   @override
+  String get nav_species => 'الأنواع';
+
+  @override
   String get nav_statistics => 'الإحصائيات';
 
   @override
@@ -15055,7 +15084,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'المعدات المستخدمة في الغوصة';
 
   @override
-  String get diveDetailSection_sightings_name => 'مشاهدات الحياة البحرية';
+  String get diveDetailSection_sightings_name => 'مشاهدات الأنواع';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16538,8 +16567,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_manage_species => 'الأنواع';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'إدارة كتالوج أنواع الحياة البحرية';
+  String get settings_manage_species_subtitle => 'إدارة كتالوج الأنواع';
 
   @override
   String get settings_manage_tags => 'الوسوم';
@@ -17478,7 +17506,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'رصد الأنواع';
 
   @override
-  String get statistics_category_marineLife_title => 'الحياة البحرية';
+  String get statistics_category_marineLife_title => 'الأنواع';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17815,7 +17843,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => '، محدد';
 
   @override
-  String get statistics_marineLife_appBar_title => 'الحياة البحرية';
+  String get statistics_marineLife_appBar_title => 'الأنواع';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'لا توجد بيانات مواقع';
@@ -17838,8 +17866,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'أفضل المواقع للحياة البحرية';
+  String get statistics_marineLife_bestSites_title => 'أفضل المواقع';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'لا توجد بيانات رصد';
@@ -21123,6 +21150,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'لم يتم العثور على منافذ USB تسلسلية. هل حاسوب الغوص متصل وقيد التشغيل؟';
+
+  @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'لم يتم العثور على $model عبر USB. هل هو متصل بهذا الكمبيوتر وقيد التشغيل؟';
+  }
 
   @override
   String get diveComputer_download_stalePairing =>
@@ -35590,4 +35622,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'الملفات المصدرة';
+
+  @override
+  String get profilePhoto_sheet_title => 'صورة الملف الشخصي';
+
+  @override
+  String get profilePhoto_source_camera => 'التقاط صورة';
+
+  @override
+  String get profilePhoto_source_library => 'الاختيار من المكتبة';
+
+  @override
+  String get profilePhoto_source_file => 'اختيار ملف';
+
+  @override
+  String get profilePhoto_source_contacts => 'الاختيار من جهات الاتصال';
+
+  @override
+  String get profilePhoto_action_remove => 'إزالة الصورة';
+
+  @override
+  String get profilePhoto_crop_title => 'تعديل الصورة';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'اسحب لتغيير الموضع، وقرّب بإصبعين للتكبير';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'هذه الصورة كبيرة جدًا. جرّب صورة أصغر.';
+
+  @override
+  String get profilePhoto_error_undecodable => 'تعذّرت قراءة هذا الملف كصورة.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'جهة الاتصال هذه ليس لها صورة.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة.';
 }

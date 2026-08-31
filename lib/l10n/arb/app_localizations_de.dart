@@ -1295,9 +1295,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get buddies_label_notSpecified => 'Nicht angegeben';
 
   @override
-  String get buddies_label_photoComingSoon => 'Fotounterstützung kommt in v2.0';
-
-  @override
   String get buddies_message_added => 'Tauchpartner erfolgreich hinzugefügt';
 
   @override
@@ -4920,7 +4917,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Ausrüstung';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Meeresfauna';
+  String get diveLog_detail_section_marineLife => 'Arten';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5250,7 +5247,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'Keine Ausrüstung ausgewählt';
 
   @override
-  String get diveLog_edit_noMarineLife => 'Keine Meeresfauna erfasst';
+  String get diveLog_edit_noMarineLife => 'Keine Arten erfasst';
 
   @override
   String get diveLog_edit_notSpecified => 'Nicht angegeben';
@@ -5391,7 +5388,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Ausstiegszeit';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Meeresfauna';
+  String get diveLog_edit_section_marineLife => 'Arten';
 
   @override
   String get diveLog_edit_section_notes => 'Notizen';
@@ -6311,7 +6308,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'Meeresleben, Notizen oder Freigabe hinzufügen';
+      'Arten, Notizen oder Freigabe hinzufügen';
 
   @override
   String get diveSites_edit_invite_location =>
@@ -7228,6 +7225,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fehler beim Laden der Tauchgangstypen';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Fehler beim Laden der Ausrüstung';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Fehler beim Laden der Reisen';
 
   @override
@@ -7253,6 +7254,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Dauerbereich (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Ausrüstung';
 
   @override
   String get diveLog_search_label_trip => 'Reise';
@@ -7380,7 +7384,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Arten suchen...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Meeresbewohner hinzufügen';
+  String get diveLog_speciesPicker_title => 'Arten hinzufügen';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Suche löschen';
@@ -8165,6 +8169,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Schwierigkeitsgrad';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Tauchstatistik';
+
+  @override
   String get diveSites_detail_section_divesAtSite =>
       'Tauchgänge an diesem Platz';
 
@@ -8179,6 +8186,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Bewertung';
+
+  @override
+  String get diveSites_detail_stats_avgDuration =>
+      'Durchschnittliche Tauchzeit';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'Erster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Letzter Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Längster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Tiefster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Flachster Tauchgang';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Nicht verfügbar';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8554,8 +8583,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Schwierigkeitsgrad';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'Erwartete Meeresbewohner';
+  String get diveSites_edit_section_expectedMarineLife => 'Erwartete Arten';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS-Koordinaten';
@@ -12472,8 +12500,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine erwarteten Arten hinzugefügt';
 
   @override
-  String get marineLife_siteSection_noSpotted =>
-      'Noch keine Meeresbewohner gesichtet';
+  String get marineLife_siteSection_noSpotted => 'Noch keine Arten gesichtet';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12487,7 +12514,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Hier gesichtet';
 
   @override
-  String get marineLife_siteSection_title => 'Meeresbewohner';
+  String get marineLife_siteSection_title => 'Arten';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Zurück';
@@ -12944,7 +12971,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Meereslebewesen, die zu einem Tauchgang hinzugefügt wurden, erscheinen hier.';
+      'Arten, die zu einem Tauchgang hinzugefügt wurden, erscheinen hier.';
 
   @override
   String get marineLife_speciesPage_noMatch =>
@@ -14226,6 +14253,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nav_sites => 'Tauchplätze';
 
   @override
+  String get nav_species => 'Arten';
+
+  @override
   String get nav_statistics => 'Statistiken';
 
   @override
@@ -15306,7 +15336,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Beim Tauchgang verwendete Ausrüstung';
 
   @override
-  String get diveDetailSection_sightings_name => 'Meereslebewesen-Sichtungen';
+  String get diveDetailSection_sightings_name => 'Artensichtungen';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16820,8 +16850,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_manage_species => 'Arten';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'Meeresbewohner-Artenkatalog verwalten';
+  String get settings_manage_species_subtitle => 'Artenkatalog verwalten';
 
   @override
   String get settings_manage_tags => 'Tags';
@@ -17772,7 +17801,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'Artensichtungen';
 
   @override
-  String get statistics_category_marineLife_title => 'Meeresbewohner';
+  String get statistics_category_marineLife_title => 'Arten';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -18117,7 +18146,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', ausgewählt';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Meeresbewohner';
+  String get statistics_marineLife_appBar_title => 'Arten';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'Keine Platzdaten';
@@ -18140,8 +18169,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Beste Plätze für Meeresbewohner';
+  String get statistics_marineLife_bestSites_title => 'Beste Plätze';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'Keine Sichtungsdaten';
@@ -21477,6 +21505,11 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'Keine USB-Seriellports gefunden. Ist der Tauchcomputer angeschlossen und eingeschaltet?';
+
+  @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Kein $model über USB gefunden. Ist er mit diesem Computer verbunden und eingeschaltet?';
+  }
 
   @override
   String get diveComputer_download_stalePairing =>
@@ -35876,4 +35909,45 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Exportierte Dateien';
+
+  @override
+  String get profilePhoto_sheet_title => 'Profilfoto';
+
+  @override
+  String get profilePhoto_source_camera => 'Foto aufnehmen';
+
+  @override
+  String get profilePhoto_source_library => 'Aus Mediathek wählen';
+
+  @override
+  String get profilePhoto_source_file => 'Datei wählen';
+
+  @override
+  String get profilePhoto_source_contacts => 'Aus Kontakten wählen';
+
+  @override
+  String get profilePhoto_action_remove => 'Foto entfernen';
+
+  @override
+  String get profilePhoto_crop_title => 'Foto anpassen';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'Zum Verschieben ziehen, zum Zoomen zwei Finger';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'Dieses Bild ist zu groß. Bitte ein kleineres wählen.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'Diese Datei konnte nicht als Bild gelesen werden.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'Dieser Kontakt hat kein Foto.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'Für die Auswahl eines Fotos wird die Kontaktberechtigung benötigt.';
 }
