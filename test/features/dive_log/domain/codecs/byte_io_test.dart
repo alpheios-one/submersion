@@ -215,4 +215,59 @@ void main() {
       expect(writer.takeBytes(), [kPresenceAbsent]);
     });
   });
+
+  group('reader bounds against overflow', () {
+    test('a length near 2^63 is refused, not passed to sublistView', () {
+      // _ensure adding _offset to count would wrap negative here, and the
+      // guard would fall through to a RangeError from Uint8List.sublistView
+      // instead of the exception decode() documents.
+      final reader = ByteReader(Uint8List.fromList([1, 2, 3, 4]))..readByte();
+      expect(
+        () => reader.readBytes(maxVarInt * 2 + 1),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('a length one past the end is still refused', () {
+      final reader = ByteReader(Uint8List.fromList([1, 2, 3, 4]))..readByte();
+      expect(
+        () => reader.readBytes(4),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+      expect(reader.readBytes(3), [2, 3, 4]);
+    });
+  });
+
+  group('writer range', () {
+    // The reader refuses a varint whose payload reaches bit 63. The writer
+    // has to refuse the same values, or a release build (where asserts are
+    // stripped) would emit one truncated byte and call it an encoding.
+    test('writeVarUint refuses a negative value', () {
+      expect(() => ByteWriter().writeVarUint(-1), throwsArgumentError);
+    });
+
+    test('writeVarInt round-trips the extremes of the zigzag range', () {
+      for (final value in [(1 << 62) - 1, -(1 << 62)]) {
+        final writer = ByteWriter()..writeVarInt(value);
+        expect(ByteReader(writer.takeBytes()).readVarInt(), value);
+      }
+    });
+
+    test('writeByte refuses values outside a byte', () {
+      // addByte keeps the low eight bits, so without the check a release
+      // build writes 44 for 300 and the blob claims a version it is not.
+      for (final value in [-1, 256, 300]) {
+        expect(() => ByteWriter().writeByte(value), throwsArgumentError);
+      }
+      expect((ByteWriter()..writeByte(255)).takeBytes(), [255]);
+    });
+
+    test('writeVarInt refuses values whose zigzag overflows', () {
+      // (value << 1) runs into the sign bit here, so the zigzag mapping
+      // would silently produce a negative varuint.
+      for (final value in [1 << 62, -(1 << 62) - 1, 1 << 63]) {
+        expect(() => ByteWriter().writeVarInt(value), throwsArgumentError);
+      }
+    });
+  });
 }

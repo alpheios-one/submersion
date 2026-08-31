@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:submersion/features/dive_log/domain/codecs/bounded_inflate.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
@@ -48,9 +49,17 @@ class ProfileSeriesCodec {
 
   /// Encodes a non-empty, timestamp-ordered series.
   ///
-  /// Throws [ArgumentError] on an empty list, on decreasing timestamps, on
-  /// an unregistered [version], or on a field table without `timestamp` and
-  /// `depth`. These are caller bugs, not data faults.
+  /// Throws [ArgumentError] on an empty list, on more than
+  /// [kMaxSeriesSampleCount] samples, on decreasing timestamps, on an
+  /// unregistered [version], or on a field table without `timestamp` and
+  /// `depth`.
+  ///
+  /// Most of those are caller bugs, but not all: a deltaInt field whose
+  /// difference from the previous sample leaves the zigzag varint range
+  /// (`minVarInt` .. `maxVarInt`) also throws [ArgumentError], and that is
+  /// data. A caller packing rows it did not produce, the part 2 migration
+  /// among them, has to handle the throw per series rather than treat it as
+  /// a bug that cannot happen.
   EncodedProfileSeries encode(
     List<ProfileSample> samples, {
     int version = ProfileSeriesCodec.version,
@@ -60,6 +69,16 @@ class ProfileSeriesCodec {
       throw ArgumentError.value(version, 'version', 'no field table');
     }
     _validateTable(table);
+    // Refuse to write what decode would refuse to read. Part 2 drops the
+    // source rows once a series is packed, so a blob over the cap would be
+    // unrecoverable while its summary scalars kept the dive looking whole.
+    if (samples.length > kMaxSeriesSampleCount) {
+      throw ArgumentError.value(
+        samples.length,
+        'samples',
+        'more than the maximum $kMaxSeriesSampleCount samples',
+      );
+    }
     final summary = ProfileSeriesSummary.of(samples);
     for (var i = 1; i < samples.length; i++) {
       if (samples[i].timestamp < samples[i - 1].timestamp) {
@@ -90,15 +109,11 @@ class ProfileSeriesCodec {
   /// Decodes a blob written by [encode] under any registered version.
   ///
   /// Throws [ProfileSeriesCodecException] on anything malformed: not a zlib
-  /// stream, an unknown version, a truncated block, trailing bytes, or a
-  /// sample without timestamp or depth.
+  /// stream, a body or sample count over the codec limits, an unknown
+  /// version, a truncated block, trailing bytes, or a sample without
+  /// timestamp or depth.
   List<ProfileSample> decode(Uint8List bytes) {
-    final Uint8List body;
-    try {
-      body = Uint8List.fromList(_zlib.decode(bytes));
-    } catch (e) {
-      throw ProfileSeriesCodecException('not a zlib stream: $e');
-    }
+    final body = inflateBounded(bytes);
     if (body.isEmpty) {
       throw const ProfileSeriesCodecException('empty body');
     }
@@ -113,9 +128,17 @@ class ProfileSeriesCodec {
     if (count == 0) {
       throw const ProfileSeriesCodecException('empty series');
     }
+    // The count sizes one list per field, so it needs a hard cap of its
+    // own: the payload guard below bounds it only by the body, and a body
+    // at the inflate cap admits a count near 67 million, which for 28
+    // columns is about 15 GB of references before any value is read.
+    if (count > kMaxSeriesSampleCount) {
+      throw ProfileSeriesCodecException(
+        'sample count $count exceeds the maximum $kMaxSeriesSampleCount',
+      );
+    }
     // Every sample carries at least a one-byte timestamp delta, so a count
     // the remaining payload cannot hold is corruption, not a large series.
-    // Guarding here keeps a bogus count from sizing 28 column lists.
     if (count > reader.remaining) {
       throw ProfileSeriesCodecException(
         'sample count $count exceeds the ${reader.remaining} remaining '
@@ -152,7 +175,25 @@ class ProfileSeriesCodec {
         'every field table must carry timestamp and depth',
       );
     }
+    // A field's kind is frozen with its name: the column readers and
+    // _samplesFrom both cast on it, and cast() is lazy, so a mismatch would
+    // otherwise escape as a TypeError from inside a presence loop or from a
+    // ProfileSample argument, far from the table that caused it.
+    for (final field in table) {
+      final frozen = _frozenKinds[field.name];
+      if (frozen != null && frozen != field.kind) {
+        throw ArgumentError.value(
+          table,
+          'fieldTables',
+          '${field.name} is ${frozen.name} in v1, not ${field.kind.name}',
+        );
+      }
+    }
   }
+
+  static final Map<String, ProfileFieldKind> _frozenKinds = {
+    for (final field in kProfileFieldTableV1) field.name: field.kind,
+  };
 
   static Object? _fieldOf(ProfileSample s, String name) => switch (name) {
     'timestamp' => s.timestamp,
@@ -253,10 +294,25 @@ class ProfileSeriesCodec {
     }
     if (presentCount == 0) return List<String?>.filled(count, null);
     final runCount = reader.readVarUint();
+    if (runCount > presentCount) {
+      throw ProfileSeriesCodecException(
+        '$runCount string runs for $presentCount present values',
+      );
+    }
     final values = <String>[];
     for (var run = 0; run < runCount; run++) {
       final length = reader.readVarUint();
-      if (values.length + length > presentCount) {
+      // The encoder never emits an empty run, and accepting one would make
+      // the format non-canonical: padding runs would decode to the same
+      // samples from different bytes, so any hash of the blob would
+      // disagree with the decoder about identity.
+      if (length == 0) {
+        throw ProfileSeriesCodecException('string run $run is empty');
+      }
+      // Subtract rather than add: `values.length + length` overflows into a
+      // negative for a length near 2^63, which one varint can declare, and
+      // the append loop below would then run unbounded.
+      if (length > presentCount - values.length) {
         throw ProfileSeriesCodecException(
           'string run $run of length $length overruns the $presentCount '
           'present values',

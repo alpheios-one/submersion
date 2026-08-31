@@ -12,6 +12,12 @@ const int kPresenceAll = 1;
 /// (LSB-first within each byte) precedes the present values.
 const int kPresenceBitmap = 2;
 
+/// The most negative value [ByteWriter.writeVarInt] can zigzag-map.
+const int minVarInt = -(1 << 62);
+
+/// The most positive value [ByteWriter.writeVarInt] can zigzag-map.
+const int maxVarInt = (1 << 62) - 1;
+
 /// Append-only little-endian byte sink for the series codecs.
 class ByteWriter {
   // copy: true (the default) matters: writeFloat64 hands the builder a view
@@ -20,15 +26,27 @@ class ByteWriter {
   final BytesBuilder _builder = BytesBuilder();
   final ByteData _scratch = ByteData(8);
 
+  /// Throws [ArgumentError] outside 0 .. 255. Like [writeVarUint], this is
+  /// not an assert: `addByte` keeps the low eight bits, so a release build
+  /// would silently write 44 for 300 and the blob would decode under the
+  /// wrong version.
   void writeByte(int value) {
-    assert(value >= 0 && value <= 0xFF, 'not a byte: $value');
+    if (value < 0 || value > 0xFF) {
+      throw ArgumentError.value(value, 'value', 'not a byte');
+    }
     _builder.addByte(value);
   }
 
   /// Unsigned LEB128 varint: seven bits per byte, high bit set on all but
   /// the last byte.
+  ///
+  /// Throws [ArgumentError] on a negative value. The check is not an assert
+  /// because a release build would otherwise emit one truncated byte for it
+  /// and produce a blob no reader can make sense of.
   void writeVarUint(int value) {
-    assert(value >= 0, 'varuint cannot encode $value');
+    if (value < 0) {
+      throw ArgumentError.value(value, 'value', 'varuint cannot encode');
+    }
     var remaining = value;
     while (remaining >= 0x80) {
       _builder.addByte((remaining & 0x7F) | 0x80);
@@ -39,7 +57,18 @@ class ByteWriter {
 
   /// Zigzag-mapped signed varint, so small negatives stay small: 0, -1, 1,
   /// -2, 2 map to 0, 1, 2, 3, 4.
-  void writeVarInt(int value) => writeVarUint((value << 1) ^ (value >> 63));
+  ///
+  /// Dart's int is 64-bit two's complement, so `value << 1` wraps into the
+  /// sign bit outside [minVarInt] .. [maxVarInt] and the mapping would hand
+  /// [writeVarUint] a negative. Throws [ArgumentError] rather than encode a
+  /// value the reader, which refuses a payload reaching bit 63, could not
+  /// read back.
+  void writeVarInt(int value) {
+    if (value < minVarInt || value > maxVarInt) {
+      throw ArgumentError.value(value, 'value', 'varint out of zigzag range');
+    }
+    writeVarUint((value << 1) ^ (value >> 63));
+  }
 
   /// IEEE-754 binary64, little-endian, bit-exact.
   void writeFloat64(double value) {
@@ -110,7 +139,10 @@ class ByteReader {
   }
 
   void _ensure(int count) {
-    if (count < 0 || _offset + count > _bytes.length) {
+    // Subtract rather than add: `_offset + count` overflows into a negative
+    // for a count near 2^63, which a crafted length varint can reach, and
+    // the guard would pass it straight to a RangeError.
+    if (count < 0 || count > _bytes.length - _offset) {
       throw ProfileSeriesCodecException(
         'unexpected end of data: needed $count byte(s) at offset $_offset '
         'of ${_bytes.length}',

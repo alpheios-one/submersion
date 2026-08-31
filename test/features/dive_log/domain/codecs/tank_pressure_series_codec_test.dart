@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/codecs/bounded_inflate.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
@@ -85,6 +86,15 @@ void main() {
     });
   });
 
+  group('encode limits', () {
+    test('refuses more samples than decode would accept', () {
+      expect(
+        () => codec.encode(descending(kMaxSeriesSampleCount + 1)),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('malformed input', () {
     Uint8List validBytes() => codec.encode(descending(8)).bytes;
     Uint8List recompress(List<int> body) =>
@@ -126,7 +136,31 @@ void main() {
 
     test('a sample count larger than the payload', () {
       final body = inflate(validBytes());
+      // Replace the one-byte count (8) with a three-byte varint for 200,000:
+      // under the hard cap, so this exercises the payload-size guard.
+      expect(body[1], 8, reason: 'the count must still be one byte here');
+      const overPayload = [0xC0, 0x9A, 0x0C];
+      final tampered = Uint8List.fromList([
+        body[0],
+        ...overPayload,
+        ...body.sublist(2),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('remaining'),
+          ),
+        ),
+      );
+    });
+
+    test('a sample count over the hard cap', () {
+      final body = inflate(validBytes());
       // Replace the one-byte count (8) with a five-byte varint for 2^32.
+      expect(body[1], 8, reason: 'the count must still be one byte here');
       const huge = [0x80, 0x80, 0x80, 0x80, 0x10];
       final tampered = Uint8List.fromList([
         body[0],
@@ -135,7 +169,13 @@ void main() {
       ]);
       expect(
         () => codec.decode(recompress(tampered)),
-        throwsA(isA<ProfileSeriesCodecException>()),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('maximum $kMaxSeriesSampleCount'),
+          ),
+        ),
       );
     });
 
