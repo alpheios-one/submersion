@@ -280,6 +280,41 @@ void main() {
       },
     );
 
+    test('deleteComputer survives a leftover legacy dive_profiles', () async {
+      // v183 drops dive_profiles only once its rows have moved, so a device
+      // whose pack threw keeps the table, and its computer_id FK carries no
+      // ON DELETE action. Leaving it set fails the dive_computers delete
+      // with SqliteException(787), which is issue #823 all over again.
+      await db.customStatement(
+        'CREATE TABLE dive_profiles ('
+        'id TEXT NOT NULL PRIMARY KEY, '
+        'dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE, '
+        'computer_id TEXT REFERENCES dive_computers (id), '
+        'timestamp INTEGER NOT NULL, '
+        'depth REAL NOT NULL)',
+      );
+      await db.customStatement(
+        'INSERT INTO dive_profiles (id, dive_id, computer_id, timestamp, '
+        "depth) VALUES ('legacy-1', 'd-mine', 'comp-a', 0, 1.0)",
+      );
+
+      await expectLater(
+        DiveComputerRepository().deleteComputer('comp-a'),
+        completes,
+      );
+
+      final rows = await db
+          .customSelect('SELECT computer_id FROM dive_profiles')
+          .get();
+      expect(rows.single.data['computer_id'], isNull);
+      expect(
+        await (db.select(
+          db.diveComputers,
+        )..where((t) => t.id.equals('comp-a'))).getSingleOrNull(),
+        isNull,
+      );
+    });
+
     test('getDiveIdsForComputer lists dives by their series', () async {
       await profileSeries.insertSeries(
         diveId: 'd-mine',

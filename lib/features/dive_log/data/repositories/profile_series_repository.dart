@@ -56,31 +56,36 @@ class ProfileSeriesRepository {
     final summary = encoded.summary;
     final rowId = id ?? _uuid.v4();
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    await _db
-        .into(_db.diveProfileSeries)
-        .insert(
-          DiveProfileSeriesCompanion.insert(
-            id: rowId,
-            diveId: diveId,
-            computerId: Value(computerId),
-            sourceId: Value(sourceId),
-            isPrimary: Value(isPrimary),
-            sampleCount: summary.sampleCount,
-            startTimestamp: summary.startTimestamp,
-            endTimestamp: summary.endTimestamp,
-            maxDepth: summary.maxDepth,
-            firstDepth: summary.firstDepth,
-            lastDepth: summary.lastDepth,
-            hasDecoType: Value(summary.hasDecoType),
-            hasDecoStop: Value(summary.hasDecoStop),
-            hasPositiveCeiling: Value(summary.hasPositiveCeiling),
-            codecVersion: encoded.codecVersion,
-            samples: encoded.bytes,
-            createdAt: nowMs,
-            updatedAt: nowMs,
-          ),
-        );
-    await _markPending(rowId, nowMs);
+    // One transaction, like every other mutator here: a row that commits
+    // without its sync bookkeeping carries no HLC, and the strict watermark
+    // comparison then hides it from every incremental export.
+    await _db.transaction(() async {
+      await _db
+          .into(_db.diveProfileSeries)
+          .insert(
+            DiveProfileSeriesCompanion.insert(
+              id: rowId,
+              diveId: diveId,
+              computerId: Value(computerId),
+              sourceId: Value(sourceId),
+              isPrimary: Value(isPrimary),
+              sampleCount: summary.sampleCount,
+              startTimestamp: summary.startTimestamp,
+              endTimestamp: summary.endTimestamp,
+              maxDepth: summary.maxDepth,
+              firstDepth: summary.firstDepth,
+              lastDepth: summary.lastDepth,
+              hasDecoType: Value(summary.hasDecoType),
+              hasDecoStop: Value(summary.hasDecoStop),
+              hasPositiveCeiling: Value(summary.hasPositiveCeiling),
+              codecVersion: encoded.codecVersion,
+              samples: encoded.bytes,
+              createdAt: nowMs,
+              updatedAt: nowMs,
+            ),
+          );
+      await _markPending(rowId, nowMs);
+    });
     SyncEventBus.notifyLocalChange();
     return rowId;
   }
@@ -226,8 +231,8 @@ class ProfileSeriesRepository {
   /// bearing: `=` never matches NULL, which is how issue #1149 began.
   ///
   /// Promotes EVERY series the source owns, which is what the split path
-  /// wants. Use [promoteWinnerOwnedBy] for a primary swap, where exactly one
-  /// of them may end up live.
+  /// wants. Use [promoteWinnerOwnedBy] for a primary swap, where a series
+  /// another one supersedes must stay demoted.
   Future<int> promoteOwnedBy(
     String diveId, {
     required String? sourceId,
@@ -241,45 +246,75 @@ class ProfileSeriesRepository {
     now: now,
   );
 
-  /// Sets `is_primary` on exactly one of the series [sourceId] or
-  /// [computerId] own: the null-computer one first (a manual edit is the
-  /// live version of its source's samples, the rule `restoreOriginalProfile`
+  /// Sets `is_primary` on the series [sourceId] or [computerId] own that
+  /// nothing else the source owns supersedes. Returns the promoted ids,
+  /// empty when the source owns nothing.
+  ///
+  /// Ranking: the null-computer series first (a manual edit is the live
+  /// version of its source's samples, the rule `restoreOriginalProfile`
   /// encodes), then the greatest id. Both halves are derived from synced
-  /// values, so every device resolves the same winner. Returns the promoted
-  /// id, or null when the source owns nothing.
-  Future<String?> promoteWinnerOwnedBy(
+  /// values, so every device resolves the same winners.
+  ///
+  /// A lower-ranked series is superseded only where it overlaps a winner in
+  /// time. `saveEditedProfile` does not replace what it supersedes: it
+  /// demotes the original and inserts a second, null-computer generation
+  /// over the same timestamps, so promoting the whole owned set would
+  /// resurrect the original alongside the edit. That is what the retired
+  /// row-per-sample SQL expressed as `ROW_NUMBER() OVER (PARTITION BY
+  /// p.timestamp ...) WHERE rn = 1`: the winner at each timestamp. A series
+  /// covering a range no winner touches loses no timestamp to a rival, so it
+  /// is promoted too. Promoting only one series would have handed half its
+  /// profile back to any dive whose source owns two segments over disjoint
+  /// ranges, which is what a merge of one computer's split dive writes.
+  ///
+  /// The overlap test uses the stored `start_timestamp` / `end_timestamp`
+  /// summary columns, so no blob is decoded: a superseding generation shares
+  /// its original's range, and two segments of one dive do not.
+  Future<List<String>> promoteWinnerOwnedBy(
     String diveId, {
     required String? sourceId,
     required String? computerId,
     int? now,
   }) async {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    final query = _db.select(_db.diveProfileSeries)
-      ..where(
-        (t) =>
-            t.diveId.equals(diveId) &
-            _ownedBy(t, sourceId: sourceId, computerId: computerId),
-      )
-      ..orderBy([
-        (t) => OrderingTerm.desc(t.computerId.isNull()),
-        (t) => OrderingTerm.desc(t.id),
-      ])
-      ..limit(1);
-    final winner = await query.getSingleOrNull();
-    if (winner == null) return null;
+    final owned =
+        await (_db.select(_db.diveProfileSeries)
+              ..where(
+                (t) =>
+                    t.diveId.equals(diveId) &
+                    _ownedBy(t, sourceId: sourceId, computerId: computerId),
+              )
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.computerId.isNull()),
+                (t) => OrderingTerm.desc(t.id),
+              ]))
+            .get();
+    if (owned.isEmpty) return const [];
+    final winners = <DiveProfileSeriesRow>[];
+    for (final candidate in owned) {
+      final superseded = winners.any(
+        (winner) =>
+            candidate.startTimestamp <= winner.endTimestamp &&
+            winner.startTimestamp <= candidate.endTimestamp,
+      );
+      if (!superseded) winners.add(candidate);
+    }
+    final ids = [for (final winner in winners) winner.id];
     await _db.transaction(() async {
       await (_db.update(
         _db.diveProfileSeries,
-      )..where((t) => t.id.equals(winner.id))).write(
+      )..where((t) => t.id.isIn(ids))).write(
         DiveProfileSeriesCompanion(
           isPrimary: const Value(true),
           updatedAt: Value(nowMs),
         ),
       );
-      await _markPending(winner.id, nowMs);
+      for (final id in ids) {
+        await _markPending(id, nowMs);
+      }
     });
     SyncEventBus.notifyLocalChange();
-    return winner.id;
+    return ids;
   }
 
   /// Sets `is_primary` on every series [computerId] contributed, whatever

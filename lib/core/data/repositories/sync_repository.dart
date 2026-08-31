@@ -554,6 +554,24 @@ class SyncRepository {
       timestamp: 'updated_at',
       filter: null,
     ),
+    // The packed sample series (schema v182). A row can reach these tables
+    // unstamped two ways: the v182 pack runs on a device that had no clock
+    // to advance yet, and any series write whose sync bookkeeping did not
+    // land. Without an entry here such a row is invisible to the
+    // incremental export forever, because NULL never passes the strict
+    // watermark comparison.
+    (
+      entityType: 'diveProfileSeries',
+      table: 'dive_profile_series',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
+    (
+      entityType: 'tankPressureSeries',
+      table: 'tank_pressure_series',
+      timestamp: 'updated_at',
+      filter: null,
+    ),
   ];
 
   /// One-time self-heal for rows that carry `hlc IS NULL`. Such rows are
@@ -565,30 +583,51 @@ class SyncRepository {
   ///
   /// Self-limiting: every write path for these tables now stamps an HLC, so
   /// once the legacy rows are done this finds nothing.
+  /// Per table, and never fatal: a database can carry a table this scan
+  /// cannot read (a v183 pack that failed leaves a differently shaped
+  /// series table behind, which is the state the drop guard deliberately
+  /// preserves for a later retry). This runs at the start of every sync, so
+  /// one unreadable table must not stop the other tables from healing, let
+  /// alone fail the sync.
   Future<void> backfillMissingHlc() async {
     for (final target in _hlcBackfillTargets) {
-      final filter = target.filter == null ? '' : ' AND ${target.filter}';
-      final rows = await _db
-          .customSelect(
-            'SELECT id, "${target.timestamp}" AS ts FROM "${target.table}" '
-            'WHERE hlc IS NULL$filter',
-          )
-          .get();
-      if (rows.isEmpty) continue;
-      // One transaction per table: markRecordPending's own per-row transaction
-      // nests as a savepoint, so a library with many affected rows commits once
-      // instead of once per row (the per-row fsync was the sync-start cost
-      // flagged in review).
-      await _db.transaction(() async {
-        for (final row in rows) {
-          await markRecordPending(
-            entityType: target.entityType,
-            recordId: row.read<String>('id'),
-            localUpdatedAt: row.read<int>('ts'),
-          );
-        }
-      });
+      try {
+        await _backfillTable(target);
+      } catch (e, stackTrace) {
+        _log.warning(
+          'HLC backfill skipped for ${target.table}',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
+  }
+
+  Future<void> _backfillTable(
+    ({String entityType, String table, String timestamp, String? filter})
+    target,
+  ) async {
+    final filter = target.filter == null ? '' : ' AND ${target.filter}';
+    final rows = await _db
+        .customSelect(
+          'SELECT id, "${target.timestamp}" AS ts FROM "${target.table}" '
+          'WHERE hlc IS NULL$filter',
+        )
+        .get();
+    if (rows.isEmpty) return;
+    // One transaction per table: markRecordPending's own per-row transaction
+    // nests as a savepoint, so a library with many affected rows commits once
+    // instead of once per row (the per-row fsync was the sync-start cost
+    // flagged in review).
+    await _db.transaction(() async {
+      for (final row in rows) {
+        await markRecordPending(
+          entityType: target.entityType,
+          recordId: row.read<String>('id'),
+          localUpdatedAt: row.read<int>('ts'),
+        );
+      }
+    });
   }
 
   /// Stamp a fresh Hybrid Logical Clock onto the just-written entity row, if

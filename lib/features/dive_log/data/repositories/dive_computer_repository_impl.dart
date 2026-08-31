@@ -386,6 +386,17 @@ class DiveComputerRepository {
         'UPDATE dive_data_sources SET computer_id = NULL WHERE computer_id = ?',
         [id],
       );
+      // The v183 rung drops dive_profiles only once its rows have actually
+      // moved into the series table, so a device whose pack threw still
+      // carries it, and its computer_id FK has no ON DELETE action either.
+      // Same #823 failure as dives.computer_id, so clear it the same way.
+      // tank_pressure_profiles needs no equivalent: its FK is SET NULL.
+      if (await _legacyProfilesTableExists()) {
+        await _db.customStatement(
+          'UPDATE dive_profiles SET computer_id = NULL WHERE computer_id = ?',
+          [id],
+        );
+      }
 
       await (_db.delete(_db.diveComputers)..where((t) => t.id.equals(id))).go();
       await _syncRepository.logDeletion(
@@ -402,6 +413,20 @@ class DiveComputerRepository {
       );
       rethrow;
     }
+  }
+
+  /// Whether the pre-v183 row-per-sample `dive_profiles` table is still in
+  /// this database. Every current build reads samples from the series
+  /// tables, so a hit here means the v183 pack could not finish and the
+  /// table was deliberately kept for a later retry.
+  Future<bool> _legacyProfilesTableExists() async {
+    final rows = await _db
+        .customSelect(
+          "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+          "AND name = 'dive_profiles'",
+        )
+        .get();
+    return rows.isNotEmpty;
   }
 
   /// Insert a `dive_data_sources` snapshot for every dive that references

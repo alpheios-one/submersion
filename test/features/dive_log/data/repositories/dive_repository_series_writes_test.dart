@@ -84,6 +84,28 @@ void main() {
   });
 
   test(
+    'createDive rolls everything back when the series write fails',
+    () async {
+      // A NaN depth encodes fine and then fails the series insert: SQLite has
+      // no NaN, so the bound summary depths arrive as NULL and the NOT NULL
+      // constraint rejects the row. Any failure of that write must leave the
+      // dive absent rather than half written, because createDive rethrows and
+      // every caller reports total failure.
+      await expectLater(
+        dives.createDive(
+          dive('dive-1', const [
+            domain.DiveProfilePoint(timestamp: 0, depth: double.nan),
+          ]),
+        ),
+        throwsA(anything),
+      );
+      expect(await db.select(db.dives).get(), isEmpty);
+      expect(await db.select(db.diveDiveTypes).get(), isEmpty);
+      expect(await series.getSeriesForDive('dive-1'), isEmpty);
+    },
+  );
+
+  test(
     'saveEditedProfile demotes every series and inserts the edit under the primary source',
     () async {
       await dives.createDive(
@@ -242,6 +264,65 @@ void main() {
       final rows = await series.getSeriesForDive('dive-1');
       expect(rows.where((s) => s.isPrimary).map((s) => s.id), [b]);
       expect((await dives.getDiveProfile('dive-1')).single.depth, 2.0);
+    },
+  );
+
+  test(
+    'setPrimaryDataSource keeps every disjoint segment the winner owns',
+    () async {
+      await computer('comp-1');
+      await computer('comp-2');
+      await dives.createDive(dive('dive-1', const []));
+      await source('src-1', 'dive-1', 'comp-1', primary: true);
+      await source('src-2', 'dive-1', 'comp-2');
+      await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        sourceId: 'src-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: 1000,
+      );
+      // Two segments of comp-2 carrying no source of their own: what a merge
+      // of one computer's dive logged in two pieces leaves behind. They cover
+      // disjoint time ranges, so neither supersedes the other and both have to
+      // stay live.
+      final early = await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-2',
+        isPrimary: false,
+        samples: const [
+          ProfileSample(timestamp: 0, depth: 2.0),
+          ProfileSample(timestamp: 60, depth: 10.0),
+        ],
+        now: 1000,
+      );
+      final tail = await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-2',
+        isPrimary: false,
+        samples: const [
+          ProfileSample(timestamp: 600, depth: 12.0),
+          ProfileSample(timestamp: 660, depth: 3.0),
+        ],
+        now: 1000,
+      );
+
+      await dives.setPrimaryDataSource(
+        diveId: 'dive-1',
+        computerReadingId: 'src-2',
+      );
+
+      final rows = await series.getSeriesForDive('dive-1');
+      expect(rows.where((s) => s.isPrimary).map((s) => s.id).toSet(), {
+        early,
+        tail,
+      });
+      expect((await dives.getDiveProfile('dive-1')).map((p) => p.timestamp), [
+        0,
+        60,
+        600,
+        660,
+      ]);
     },
   );
 

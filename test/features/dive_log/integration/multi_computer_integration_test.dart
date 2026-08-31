@@ -191,13 +191,22 @@ void main() {
       final newPrimary = readingsAfterSwap.firstWhere((r) => r.isPrimary);
       expect(newPrimary.id, equals(secondaryReadingId));
 
-      // The swap also promotes the new primary's own series: exactly one
-      // series is primary now, and it belongs to the promoted computer.
+      // The swap also promotes the new primary's own series. The promoted
+      // computer contributed two single-sample series over disjoint times,
+      // and neither supersedes the other, so both go live: promoting just
+      // one would leave this dive rendering half the samples it has.
       final primarySeriesAfterSwap = (await profileSeries.getSeriesForDive(
         diveId,
       )).where((s) => s.isPrimary).toList();
-      expect(primarySeriesAfterSwap, hasLength(1));
-      expect(primarySeriesAfterSwap.single.computerId, 'dc-d5');
+      expect(primarySeriesAfterSwap, hasLength(2));
+      expect(
+        primarySeriesAfterSwap.map((s) => s.computerId),
+        everyElement('dc-d5'),
+      );
+      expect(
+        primarySeriesAfterSwap.expand((s) => s.samples).map((s) => s.timestamp),
+        [0, 60],
+      );
 
       // 7. Split the (now secondary) original reading into its own dive.
       final originalReading = readingsAfterSwap.firstWhere((r) => !r.isPrimary);

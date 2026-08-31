@@ -48,28 +48,33 @@ class TankPressureSeriesRepository {
     );
     final rowId = id ?? _uuid.v4();
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
-    await _db
-        .into(_db.tankPressureSeries)
-        .insert(
-          TankPressureSeriesCompanion.insert(
-            id: rowId,
-            diveId: diveId,
-            tankId: tankId,
-            computerId: Value(computerId),
-            sampleCount: encoded.summary.sampleCount,
-            startTimestamp: encoded.summary.startTimestamp,
-            endTimestamp: encoded.summary.endTimestamp,
-            codecVersion: encoded.codecVersion,
-            samples: encoded.bytes,
-            createdAt: nowMs,
-            updatedAt: nowMs,
-          ),
-        );
-    await _syncRepository.markRecordPending(
-      entityType: entityType,
-      recordId: rowId,
-      localUpdatedAt: nowMs,
-    );
+    // One transaction, like every other mutator here: a row that commits
+    // without its sync bookkeeping carries no HLC, and the strict watermark
+    // comparison then hides it from every incremental export.
+    await _db.transaction(() async {
+      await _db
+          .into(_db.tankPressureSeries)
+          .insert(
+            TankPressureSeriesCompanion.insert(
+              id: rowId,
+              diveId: diveId,
+              tankId: tankId,
+              computerId: Value(computerId),
+              sampleCount: encoded.summary.sampleCount,
+              startTimestamp: encoded.summary.startTimestamp,
+              endTimestamp: encoded.summary.endTimestamp,
+              codecVersion: encoded.codecVersion,
+              samples: encoded.bytes,
+              createdAt: nowMs,
+              updatedAt: nowMs,
+            ),
+          );
+      await _syncRepository.markRecordPending(
+        entityType: entityType,
+        recordId: rowId,
+        localUpdatedAt: nowMs,
+      );
+    });
     SyncEventBus.notifyLocalChange();
     return rowId;
   }

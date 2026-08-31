@@ -132,9 +132,24 @@ void main() {
 
       expect(freelistOnDisk(), 0);
 
+      final reports = <(int, int)>[];
       await DatabaseService.instance.initialize(
         locationService: _FakeLocation(dbPath),
+        onMigrationProgress: (current, total) => reports.add((current, total)),
       );
+      // The VACUUM is a step of its own. Without it in the count the ladder
+      // reports itself finished and the bar sits at 100% while a large file
+      // is rewritten, which is where a mobile watchdog kills the process.
+      final ladderSteps = AppDatabase.migrationStepCount(182);
+      expect(
+        reports,
+        contains((ladderSteps, ladderSteps + 1)),
+        reason: 'the VACUUM is announced before it starts',
+      );
+      expect(reports.last, (ladderSteps + 1, ladderSteps + 1));
+      expect(reports.map((r) => r.$2).toSet(), {
+        ladderSteps + 1,
+      }, reason: 'every report of this open counts the VACUUM');
       expect(
         DatabaseService.instance.lastOpenMode,
         DatabaseOpenMode.migrationThenBackground,

@@ -42,6 +42,12 @@ void Function(sqlite3.Database) _connectionSetup(String? keyHex) {
   return (db) => applyMainDatabaseSetup(db, keyHex: keyHex);
 }
 
+/// Default for [DatabaseService._runUpgradeLadder]'s VACUUM ticket: a caller
+/// that hands over no ticket gets the pre-existing behaviour.
+bool _alwaysPending() => true;
+
+void _noop() {}
+
 class DatabaseService {
   DatabaseService._();
 
@@ -288,8 +294,20 @@ class DatabaseService {
       // That is safe -- every step is idempotent by contract -- but it does
       // mean onMigrationProgress can restart at step 1, so a progress bar may
       // visibly rewind. A rewinding bar beats a bricked launch.
+      // The VACUUM ticket lives out here, not inside the ladder: a busy lock
+      // makes retryWhileDatabaseBusy call the whole thing again from the
+      // top, and rewriting a 769 MB file a second time is exactly the cost
+      // the one-shot design was avoiding. Taken at most once per open.
+      var vacuumTicket = true;
       await retryWhileDatabaseBusy(
-        () => _runUpgradeLadder(file, keyHex, stored, onMigrationProgress),
+        () => _runUpgradeLadder(
+          file,
+          keyHex,
+          stored,
+          onMigrationProgress,
+          vacuumPending: () => vacuumTicket,
+          takeVacuumTicket: () => vacuumTicket = false,
+        ),
       );
       lastOpenMode = DatabaseOpenMode.migrationThenBackground;
     } else {
@@ -312,11 +330,32 @@ class DatabaseService {
     File file,
     String? keyHex,
     int? storedBefore,
-    void Function(int currentStep, int totalSteps)? onMigrationProgress,
-  ) async {
+    void Function(int currentStep, int totalSteps)? onMigrationProgress, {
+    bool Function() vacuumPending = _alwaysPending,
+    void Function() takeVacuumTicket = _noop,
+  }) async {
+    // Whether this attempt will VACUUM, decided before the ladder starts so
+    // every progress report of this open counts the same total.
+    final willVacuum =
+        storedBefore != null && storedBefore < 183 && vacuumPending();
+    final ladderSteps = storedBefore == null
+        ? 0
+        : AppDatabase.migrationStepCount(storedBefore);
+    // The VACUUM is a step of the upgrade as the diver experiences it, so it
+    // is counted as one. Without it the ladder's last report reads
+    // "finished" and the bar sits full while a large file is rewritten, with
+    // nothing on screen saying the app is still working. The callback shape
+    // carries the total on every call, so an extra step needs no new API.
+    void report(int currentStep, int totalSteps) {
+      onMigrationProgress?.call(
+        currentStep,
+        willVacuum ? totalSteps + 1 : totalSteps,
+      );
+    }
+
     final migrator = AppDatabase(
       NativeDatabase(file, setup: _connectionSetup(keyHex)),
-      onMigrationProgress: onMigrationProgress,
+      onMigrationProgress: onMigrationProgress == null ? null : report,
     );
     try {
       // Force the upgrade ladder to completion before switching executors.
@@ -324,7 +363,7 @@ class DatabaseService {
       // [storedBefore] is the version the file had ON DISK before the
       // ladder ran, read by the caller: keying off the migrator's own
       // version here would always read 183 and never VACUUM.
-      if (storedBefore != null && storedBefore < 183) {
+      if (willVacuum) {
         // v183 dropped the row-per-sample tables, which on an older file are
         // most of its pages. VACUUM here: outside any migration transaction,
         // on the one exclusive main-isolate connection, and before the
@@ -337,7 +376,10 @@ class DatabaseService {
         // through the beforeOpen backstop never reaches this, and neither
         // does one whose VACUUM was killed part way. Both are correct, just
         // still carrying the free pages; the next real VACUUM is whatever
-        // maintenance the user runs.
+        // maintenance the user runs. The ticket is taken before the attempt,
+        // not after, so a VACUUM that throws is not retried either.
+        takeVacuumTicket();
+        report(ladderSteps, ladderSteps);
         try {
           await migrator.customStatement('VACUUM');
         } catch (e, stackTrace) {
@@ -348,6 +390,7 @@ class DatabaseService {
             stackTrace: stackTrace,
           );
         }
+        report(ladderSteps + 1, ladderSteps);
       }
     } catch (_) {
       // Best-effort close so we don't leak the connection (or its locks, which

@@ -313,21 +313,69 @@ void main() {
         computerId: 'comp-1',
         now: now + 3,
       );
-      expect(promoted, editSeries, reason: 'a manual edit outranks its source');
+      expect(promoted, [
+        editSeries,
+      ], reason: 'a manual edit outranks its source over the same range');
       expect((await repo.getSeriesById(editSeries))!.isPrimary, isTrue);
       expect((await repo.getSeriesById(computerSeries))!.isPrimary, isFalse);
     });
 
-    test('promoteWinnerOwnedBy returns null when nothing is owned', () async {
-      expect(
-        await repo.promoteWinnerOwnedBy(
+    test(
+      'promoteWinnerOwnedBy promotes every segment over a disjoint range',
+      () async {
+        // One computer, one dive logged in two pieces, neither carrying a
+        // source row: the shape DiveMergeService leaves behind. The retired
+        // row-per-sample SQL promoted the winner at EACH timestamp, so both
+        // segments stayed live; promoting a single series would hand the
+        // dive back half its profile.
+        final first = await repo.insertSeries(
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: false,
+          samples: const [
+            ProfileSample(timestamp: 0, depth: 1.0),
+            ProfileSample(timestamp: 60, depth: 10.0),
+          ],
+          now: now,
+        );
+        final second = await repo.insertSeries(
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: false,
+          samples: const [
+            ProfileSample(timestamp: 600, depth: 12.0),
+            ProfileSample(timestamp: 660, depth: 3.0),
+          ],
+          now: now,
+        );
+        await repo.demoteAll('dive-1');
+
+        final promoted = await repo.promoteWinnerOwnedBy(
           'dive-1',
-          sourceId: 'other-source',
-          computerId: 'other-computer',
-        ),
-        isNull,
-      );
-    });
+          sourceId: 'no-such-source',
+          computerId: 'comp-1',
+          now: now + 4,
+        );
+
+        expect(promoted.toSet(), {first, second});
+        expect((await repo.getSeriesById(first))!.isPrimary, isTrue);
+        expect((await repo.getSeriesById(second))!.isPrimary, isTrue);
+      },
+    );
+
+    test(
+      'promoteWinnerOwnedBy returns nothing when nothing is owned',
+      () async {
+        expect(
+          await repo.promoteWinnerOwnedBy(
+            'dive-1',
+            sourceId: 'other-source',
+            computerId: 'other-computer',
+          ),
+          isEmpty,
+        );
+      },
+    );
 
     test(
       'deleteOwnedBy removes the matching series and logs tombstones',

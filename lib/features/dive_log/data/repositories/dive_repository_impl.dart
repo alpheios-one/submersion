@@ -1212,213 +1212,223 @@ class DiveRepository {
       final id = dive.id.isEmpty ? _uuid.v4() : dive.id;
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      await _db
-          .into(_db.dives)
-          .insert(
-            DivesCompanion(
-              id: Value(id),
-              diverId: Value(dive.diverId),
-              diveNumber: Value(dive.diveNumber),
-              diveDateTime: Value(dive.dateTime.millisecondsSinceEpoch),
-              entryTime: Value(dive.entryTime?.millisecondsSinceEpoch),
-              exitTime: Value(dive.exitTime?.millisecondsSinceEpoch),
-              bottomTime: Value(dive.bottomTime?.inSeconds),
-              runtime: Value(dive.runtime?.inSeconds),
-              maxDepth: Value(dive.maxDepth),
-              avgDepth: Value(dive.avgDepth),
-              waterTemp: Value(dive.waterTemp),
-              airTemp: Value(dive.airTemp),
-              visibilityMeters: Value(dive.visibilityMeters),
-              // A measured distance supersedes the legacy bucket. Value(null)
-              // rather than Value.absent(): absent() preserves the existing
-              // column on a companion write, which would leave the dive
-              // carrying both a measurement and a contradicting bucket.
-              visibility: dive.visibilityMeters != null
-                  ? const Value(null)
-                  : Value(dive.visibility?.name),
-              diveType: Value(dive.diveTypeId),
-              buddy: Value(dive.buddy),
-              diveMaster: Value(dive.diveMaster),
-              diverRole: Value(dive.diverRoleId),
-              notes: Value(dive.notes),
-              name: Value(dive.name),
-              siteId: Value(dive.site?.id),
-              diveCenterId: Value(dive.diveCenter?.id),
-              tripId: Value(dive.tripId ?? dive.trip?.id),
-              rating: Value(dive.rating),
-              // Conditions fields
-              currentDirection: Value(dive.currentDirection?.name),
-              currentStrength: Value(dive.currentStrength?.name),
-              swellHeight: Value(dive.swellHeight),
-              entryMethod: Value(dive.entryMethod?.name),
-              exitMethod: Value(dive.exitMethod?.name),
-              waterType: Value(dive.waterType?.name),
-              altitude: Value(dive.altitude),
-              surfacePressure: Value(dive.surfacePressure),
-              // Entry/exit GPS (previously dropped on create, so file-imported
-              // dives never became eligible for site matching).
-              entryLatitude: Value(dive.entryLocation?.latitude),
-              entryLongitude: Value(dive.entryLocation?.longitude),
-              exitLatitude: Value(dive.exitLocation?.latitude),
-              exitLongitude: Value(dive.exitLocation?.longitude),
-              // Weather conditions
-              windSpeed: Value(dive.windSpeed),
-              windDirection: Value(dive.windDirection?.name),
-              cloudCover: Value(dive.cloudCover?.name),
-              precipitation: Value(dive.precipitation?.name),
-              humidity: Value(dive.humidity),
-              weatherDescription: Value(dive.weatherDescription),
-              weatherCode: Value(dive.weatherCode),
-              weatherSource: Value(dive.weatherSource?.name),
-              weatherFetchedAt: Value(
-                dive.weatherFetchedAt != null
-                    ? dive.weatherFetchedAt!.millisecondsSinceEpoch ~/ 1000
-                    : null,
+      // One transaction for the dive and every child it owns. The profile
+      // used to be written inside the child batch below and is now a
+      // separate series insert, so without this a failing profile write
+      // would leave the dive committed with its tanks and weights and no
+      // samples, while createDive rethrows and the caller reports that
+      // nothing was saved.
+      await _db.transaction(() async {
+        await _db
+            .into(_db.dives)
+            .insert(
+              DivesCompanion(
+                id: Value(id),
+                diverId: Value(dive.diverId),
+                diveNumber: Value(dive.diveNumber),
+                diveDateTime: Value(dive.dateTime.millisecondsSinceEpoch),
+                entryTime: Value(dive.entryTime?.millisecondsSinceEpoch),
+                exitTime: Value(dive.exitTime?.millisecondsSinceEpoch),
+                bottomTime: Value(dive.bottomTime?.inSeconds),
+                runtime: Value(dive.runtime?.inSeconds),
+                maxDepth: Value(dive.maxDepth),
+                avgDepth: Value(dive.avgDepth),
+                waterTemp: Value(dive.waterTemp),
+                airTemp: Value(dive.airTemp),
+                visibilityMeters: Value(dive.visibilityMeters),
+                // A measured distance supersedes the legacy bucket. Value(null)
+                // rather than Value.absent(): absent() preserves the existing
+                // column on a companion write, which would leave the dive
+                // carrying both a measurement and a contradicting bucket.
+                visibility: dive.visibilityMeters != null
+                    ? const Value(null)
+                    : Value(dive.visibility?.name),
+                diveType: Value(dive.diveTypeId),
+                buddy: Value(dive.buddy),
+                diveMaster: Value(dive.diveMaster),
+                diverRole: Value(dive.diverRoleId),
+                notes: Value(dive.notes),
+                name: Value(dive.name),
+                siteId: Value(dive.site?.id),
+                diveCenterId: Value(dive.diveCenter?.id),
+                tripId: Value(dive.tripId ?? dive.trip?.id),
+                rating: Value(dive.rating),
+                // Conditions fields
+                currentDirection: Value(dive.currentDirection?.name),
+                currentStrength: Value(dive.currentStrength?.name),
+                swellHeight: Value(dive.swellHeight),
+                entryMethod: Value(dive.entryMethod?.name),
+                exitMethod: Value(dive.exitMethod?.name),
+                waterType: Value(dive.waterType?.name),
+                altitude: Value(dive.altitude),
+                surfacePressure: Value(dive.surfacePressure),
+                // Entry/exit GPS (previously dropped on create, so file-imported
+                // dives never became eligible for site matching).
+                entryLatitude: Value(dive.entryLocation?.latitude),
+                entryLongitude: Value(dive.entryLocation?.longitude),
+                exitLatitude: Value(dive.exitLocation?.latitude),
+                exitLongitude: Value(dive.exitLocation?.longitude),
+                // Weather conditions
+                windSpeed: Value(dive.windSpeed),
+                windDirection: Value(dive.windDirection?.name),
+                cloudCover: Value(dive.cloudCover?.name),
+                precipitation: Value(dive.precipitation?.name),
+                humidity: Value(dive.humidity),
+                weatherDescription: Value(dive.weatherDescription),
+                weatherCode: Value(dive.weatherCode),
+                weatherSource: Value(dive.weatherSource?.name),
+                weatherFetchedAt: Value(
+                  dive.weatherFetchedAt != null
+                      ? dive.weatherFetchedAt!.millisecondsSinceEpoch ~/ 1000
+                      : null,
+                ),
+                // Surface interval and deco settings
+                surfaceIntervalSeconds: Value(dive.surfaceInterval?.inSeconds),
+                gradientFactorLow: Value(dive.gradientFactorLow),
+                gradientFactorHigh: Value(dive.gradientFactorHigh),
+                decoAlgorithm: Value(dive.decoAlgorithm),
+                decoConservatism: Value(dive.decoConservatism),
+                diveComputerModel: Value(dive.diveComputerModel),
+                diveComputerSerial: Value(dive.diveComputerSerial),
+                diveComputerFirmware: Value(dive.diveComputerFirmware),
+                // Weight system fields
+                weightAmount: Value(dive.weightAmount),
+                weightType: Value(dive.weightType?.name),
+                weightingFeedback: Value(dive.weightingFeedback?.name),
+                weightingFeedbackKg: Value(dive.weightingFeedbackKg),
+                // Favorite flag
+                isFavorite: Value(dive.isFavorite),
+                excludedFromStats: Value(dive.excludedFromStats),
+                excludedFromGasStats: Value(dive.excludedFromGasStats),
+                // CCR/SCR rebreather fields (v1.5)
+                diveMode: Value(dive.diveMode.code),
+                setpointLow: Value(dive.setpointLow),
+                setpointHigh: Value(dive.setpointHigh),
+                setpointDeco: Value(dive.setpointDeco),
+                scrType: Value(dive.scrType?.code),
+                scrInjectionRate: Value(dive.scrInjectionRate),
+                scrAdditionRatio: Value(dive.scrAdditionRatio),
+                scrOrificeSize: Value(dive.scrOrificeSize),
+                assumedVo2: Value(dive.assumedVo2),
+                diluentO2: Value(dive.diluentGas?.o2),
+                diluentHe: Value(dive.diluentGas?.he),
+                loopO2Min: Value(dive.loopO2Min),
+                loopO2Max: Value(dive.loopO2Max),
+                loopO2Avg: Value(dive.loopO2Avg),
+                loopVolume: Value(dive.loopVolume),
+                scrubberType: Value(dive.scrubber?.type),
+                scrubberDurationMinutes: Value(dive.scrubber?.ratedMinutes),
+                scrubberRemainingMinutes: Value(
+                  dive.scrubber?.remainingMinutes,
+                ),
+                // Dive planner (v1.5)
+                isPlanned: Value(dive.isPlanned),
+                // Training course (v1.5)
+                courseId: Value(dive.courseId),
+                // Import source tracking
+                importSource: Value(dive.importSource),
+                importId: Value(dive.importId),
+                importVersion: const Value(1),
+                createdAt: Value(now),
+                updatedAt: Value(now),
               ),
-              // Surface interval and deco settings
-              surfaceIntervalSeconds: Value(dive.surfaceInterval?.inSeconds),
-              gradientFactorLow: Value(dive.gradientFactorLow),
-              gradientFactorHigh: Value(dive.gradientFactorHigh),
-              decoAlgorithm: Value(dive.decoAlgorithm),
-              decoConservatism: Value(dive.decoConservatism),
-              diveComputerModel: Value(dive.diveComputerModel),
-              diveComputerSerial: Value(dive.diveComputerSerial),
-              diveComputerFirmware: Value(dive.diveComputerFirmware),
-              // Weight system fields
-              weightAmount: Value(dive.weightAmount),
-              weightType: Value(dive.weightType?.name),
-              weightingFeedback: Value(dive.weightingFeedback?.name),
-              weightingFeedbackKg: Value(dive.weightingFeedbackKg),
-              // Favorite flag
-              isFavorite: Value(dive.isFavorite),
-              excludedFromStats: Value(dive.excludedFromStats),
-              excludedFromGasStats: Value(dive.excludedFromGasStats),
-              // CCR/SCR rebreather fields (v1.5)
-              diveMode: Value(dive.diveMode.code),
-              setpointLow: Value(dive.setpointLow),
-              setpointHigh: Value(dive.setpointHigh),
-              setpointDeco: Value(dive.setpointDeco),
-              scrType: Value(dive.scrType?.code),
-              scrInjectionRate: Value(dive.scrInjectionRate),
-              scrAdditionRatio: Value(dive.scrAdditionRatio),
-              scrOrificeSize: Value(dive.scrOrificeSize),
-              assumedVo2: Value(dive.assumedVo2),
-              diluentO2: Value(dive.diluentGas?.o2),
-              diluentHe: Value(dive.diluentGas?.he),
-              loopO2Min: Value(dive.loopO2Min),
-              loopO2Max: Value(dive.loopO2Max),
-              loopO2Avg: Value(dive.loopO2Avg),
-              loopVolume: Value(dive.loopVolume),
-              scrubberType: Value(dive.scrubber?.type),
-              scrubberDurationMinutes: Value(dive.scrubber?.ratedMinutes),
-              scrubberRemainingMinutes: Value(dive.scrubber?.remainingMinutes),
-              // Dive planner (v1.5)
-              isPlanned: Value(dive.isPlanned),
-              // Training course (v1.5)
-              courseId: Value(dive.courseId),
-              // Import source tracking
-              importSource: Value(dive.importSource),
-              importId: Value(dive.importId),
-              importVersion: const Value(1),
-              createdAt: Value(now),
-              updatedAt: Value(now),
-            ),
-          );
-      await _syncRepository.markRecordPending(
-        entityType: 'dives',
-        recordId: id,
-        localUpdatedAt: now,
-      );
-      await _replaceDiveTypeRows(id, dive.diveTypeIds, now);
+            );
+        await _syncRepository.markRecordPending(
+          entityType: 'dives',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+        await _replaceDiveTypeRows(id, dive.diveTypeIds, now);
 
-      // Batch insert all child records for performance
-      // Profile points, tanks, weights, and equipment are inserted in a single
-      // transaction, which is ~100x faster than individual inserts.
-      await _db.batch((batch) {
-        // Insert tanks (preserve provided IDs if not empty, otherwise generate)
-        for (final tank in dive.tanks) {
-          final tankId = tank.id.isNotEmpty ? tank.id : _uuid.v4();
-          batch.insert(
-            _db.diveTanks,
-            DiveTanksCompanion(
-              id: Value(tankId),
-              diveId: Value(id),
-              volume: Value(tank.volume),
-              workingPressure: Value(tank.workingPressure),
-              startPressure: Value(tank.startPressure),
-              endPressure: Value(tank.endPressure),
-              o2Percent: Value(tank.gasMix.o2),
-              hePercent: Value(tank.gasMix.he),
-              tankOrder: Value(tank.order),
-              tankRole: Value(tank.role.name),
-              tankMaterial: Value(tank.material?.name),
-              tankName: Value(tank.name),
-              presetName: Value(tank.presetName),
-              computerId: Value(tank.computerId),
-            ),
+        // Batch insert all child records for performance
+        // Profile points, tanks, weights, and equipment are inserted in a single
+        // transaction, which is ~100x faster than individual inserts.
+        await _db.batch((batch) {
+          // Insert tanks (preserve provided IDs if not empty, otherwise generate)
+          for (final tank in dive.tanks) {
+            final tankId = tank.id.isNotEmpty ? tank.id : _uuid.v4();
+            batch.insert(
+              _db.diveTanks,
+              DiveTanksCompanion(
+                id: Value(tankId),
+                diveId: Value(id),
+                volume: Value(tank.volume),
+                workingPressure: Value(tank.workingPressure),
+                startPressure: Value(tank.startPressure),
+                endPressure: Value(tank.endPressure),
+                o2Percent: Value(tank.gasMix.o2),
+                hePercent: Value(tank.gasMix.he),
+                tankOrder: Value(tank.order),
+                tankRole: Value(tank.role.name),
+                tankMaterial: Value(tank.material?.name),
+                tankName: Value(tank.name),
+                presetName: Value(tank.presetName),
+                computerId: Value(tank.computerId),
+              ),
+            );
+          }
+
+          // Insert weights
+          for (final weight in dive.weights) {
+            final weightId = weight.id.isNotEmpty ? weight.id : _uuid.v4();
+            batch.insert(
+              _db.diveWeights,
+              DiveWeightsCompanion(
+                id: Value(weightId),
+                diveId: Value(id),
+                weightType: Value(weight.weightType.name),
+                amountKg: Value(weight.amountKg),
+                notes: Value(weight.notes),
+                createdAt: Value(now),
+              ),
+            );
+          }
+
+          // Insert custom fields
+          for (final field in dive.customFields) {
+            final fieldId = field.id.isNotEmpty ? field.id : _uuid.v4();
+            batch.insert(
+              _db.diveCustomFields,
+              DiveCustomFieldsCompanion(
+                id: Value(fieldId),
+                diveId: Value(id),
+                fieldKey: Value(field.key),
+                fieldValue: Value(field.value),
+                sortOrder: Value(field.sortOrder),
+                createdAt: Value(now),
+              ),
+            );
+          }
+
+          // Insert equipment associations
+          for (final item in dive.equipment) {
+            batch.insert(
+              _db.diveEquipment,
+              DiveEquipmentCompanion(
+                diveId: Value(id),
+                equipmentId: Value(item.id),
+              ),
+            );
+          }
+        });
+
+        // Profile samples: one packed primary series with no computer and no
+        // source, the same identity the legacy rows carried for a manual dive.
+        if (dive.profile.isNotEmpty) {
+          await _profileSeries.insertSeries(
+            diveId: id,
+            samples: [
+              for (final point in dive.profile) profileSampleFromPoint(point),
+            ],
+            now: now,
           );
         }
 
-        // Insert weights
-        for (final weight in dive.weights) {
-          final weightId = weight.id.isNotEmpty ? weight.id : _uuid.v4();
-          batch.insert(
-            _db.diveWeights,
-            DiveWeightsCompanion(
-              id: Value(weightId),
-              diveId: Value(id),
-              weightType: Value(weight.weightType.name),
-              amountKg: Value(weight.amountKg),
-              notes: Value(weight.notes),
-              createdAt: Value(now),
-            ),
-          );
-        }
-
-        // Insert custom fields
-        for (final field in dive.customFields) {
-          final fieldId = field.id.isNotEmpty ? field.id : _uuid.v4();
-          batch.insert(
-            _db.diveCustomFields,
-            DiveCustomFieldsCompanion(
-              id: Value(fieldId),
-              diveId: Value(id),
-              fieldKey: Value(field.key),
-              fieldValue: Value(field.value),
-              sortOrder: Value(field.sortOrder),
-              createdAt: Value(now),
-            ),
-          );
-        }
-
-        // Insert equipment associations
-        for (final item in dive.equipment) {
-          batch.insert(
-            _db.diveEquipment,
-            DiveEquipmentCompanion(
-              diveId: Value(id),
-              equipmentId: Value(item.id),
-            ),
-          );
+        // Insert tag associations
+        if (dive.tags.isNotEmpty) {
+          await _tagRepository.setTagsForDive(id, dive.tags);
         }
       });
-
-      // Profile samples: one packed primary series with no computer and no
-      // source, the same identity the legacy rows carried for a manual dive.
-      if (dive.profile.isNotEmpty) {
-        await _profileSeries.insertSeries(
-          diveId: id,
-          samples: [
-            for (final point in dive.profile) profileSampleFromPoint(point),
-          ],
-          now: now,
-        );
-      }
-
-      // Insert tag associations
-      if (dive.tags.isNotEmpty) {
-        await _tagRepository.setTagsForDive(id, dive.tags);
-      }
 
       SyncEventBus.notifyLocalChange();
       _log.info('Created dive with id: $id');
