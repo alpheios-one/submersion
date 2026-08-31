@@ -169,6 +169,19 @@ void main() {
       expect(inflate(full.sublist(0, full.length - 4)), hasLength(300));
     });
 
+    test('names itself and its cause when it lands in a log', () {
+      // toString is what a bare log line shows, so it has to carry both the
+      // type and the reason. Callers that wrap this (SyncEnvelope.open) pass
+      // `message` on rather than the exception, so the reason survives
+      // without a second type prefix in front of it.
+      expect(
+        const BoundedInflateException(
+          'inflated body exceeds 4096 byte(s)',
+        ).toString(),
+        'BoundedInflateException: inflated body exceeds 4096 byte(s)',
+      );
+    });
+
     test('lets a programming error surface instead of wrapping it', () {
       expect(
         () => inflateBounded(

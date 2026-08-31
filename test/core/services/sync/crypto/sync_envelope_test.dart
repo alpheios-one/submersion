@@ -196,7 +196,13 @@ void main() {
           isA<EnvelopeCorruptException>().having(
             (e) => e.message,
             'message',
-            contains('inflated body exceeds'),
+            allOf(
+              contains('inflated body exceeds'),
+              // The reason is passed through, not the exception: a nested
+              // 'BoundedInflateException:' prefix here would mean open
+              // interpolated the error object instead of its message.
+              isNot(contains('BoundedInflateException')),
+            ),
           ),
         ),
       );
