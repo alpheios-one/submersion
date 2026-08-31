@@ -666,6 +666,17 @@ class _StartupWrapperState extends State<StartupWrapper>
     await timeStartupStep('tileCache', () async {
       try {
         await TileCacheService.instance.initialize();
+        // Age-sweep the browse cache. Not awaited: it is an indexed delete
+        // that nothing downstream depends on, and blocking first frame on
+        // housekeeping is how a splash screen grows a 20-second hang. Scoped
+        // to the browse store, so a downloaded offline region is never swept.
+        unawaited(
+          TileCacheService.instance
+              .removeOldTiles(TileCacheService.browseTileMaxAge)
+              .catchError((Object e) {
+                debugPrint('Browse tile age sweep failed (will retry): $e');
+              }),
+        );
       } catch (e) {
         debugPrint('Warning: Tile cache initialization failed: $e');
       }

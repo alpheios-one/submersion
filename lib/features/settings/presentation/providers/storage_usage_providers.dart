@@ -15,13 +15,16 @@ import 'package:submersion/features/backup/data/repositories/backup_preferences.
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart';
 
 /// The real inventory, wired to path_provider and the live services.
 final storageInventoryProvider = Provider<StorageInventory>((ref) {
-  // Memoized because the three media cache pools plus the two thumbnail
-  // categories each resolve it, and it is a platform channel round trip that
-  // returns the same immutable path every time for the life of the process.
+  // Memoized because the local cache database and the two thumbnail categories
+  // each resolve it, and it is a platform channel round trip that returns the
+  // same immutable path every time for the life of the process. The media
+  // cache rows go through mediaCacheRoot(), which carries its own memo.
+  //
   // The MediaCacheStore itself is rebuilt per call on purpose: it captures the
   // LocalCacheDatabase at construction, and caching one across the session
   // would hold a stale handle after a database location migration.
@@ -37,10 +40,9 @@ final storageInventoryProvider = Provider<StorageInventory>((ref) {
         ref.read(databaseLocationServiceProvider).getDatabasePath(),
     backupsDirectoryPath: _resolveBackupsDirectoryPath,
     mediaCacheBytes: (kind) async {
-      final support = await resolveSupport();
       final store = MediaCacheStore(
         database: LocalCacheDatabaseService.instance.database,
-        root: Directory(p.join(support.path, 'Submersion', 'media_cache')),
+        root: await mediaCacheRoot(),
       );
       return store.totalBytes(kind);
     },
