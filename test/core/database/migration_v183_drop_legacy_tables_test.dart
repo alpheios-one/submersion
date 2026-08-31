@@ -459,6 +459,112 @@ void main() {
     },
   );
 
+  test(
+    'a v182 pack that throws still reaches 183 and keeps the legacy table',
+    () async {
+      final raw = sqlite3.sqlite3.openInMemory();
+      addTearDown(raw.close);
+      // Below 182, so the v182 rung itself runs. Its pack throws on the
+      // text timestamp (profileSampleOf casts unchecked), and an unguarded
+      // rung would rethrow out of onUpgrade and leave a database that
+      // cannot be opened on any relaunch.
+      legacyDdlAt180(raw, userVersion: 181);
+      seedParents(raw);
+      raw.execute(
+        "INSERT INTO dive_profiles (id, dive_id, is_primary, timestamp, "
+        "depth) VALUES ('p1', 'd1', 1, 'not-a-number', 1.0)",
+      );
+
+      final db = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      addTearDown(db.close);
+      await expectLater(db.customSelect('SELECT 1').get(), completes);
+
+      expect(scalar(raw, 'PRAGMA user_version'), 183);
+      expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 1);
+    },
+  );
+
+  test('an orphaned tank pressure row keeps its legacy table', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    legacyIndexes(raw);
+    seedParents(raw);
+    seedProfiles(raw);
+    seedPressures(raw);
+    // A pressure row whose tank is no longer in dive_tanks. The packer
+    // skips it (no insert could carry the foreign key), so dropping the
+    // table would destroy the only copy.
+    raw.execute(
+      'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, '
+      "pressure, computer_id) VALUES ('q9', 'd1', 't9', 0, 150.0, NULL)",
+    );
+
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await db.customSelect('SELECT 1').get();
+
+    expect(
+      scalar(
+        raw,
+        "SELECT COUNT(*) AS n FROM tank_pressure_profiles WHERE id = 'q9'",
+      ),
+      1,
+    );
+    // The profile side is independent and still drops.
+    expect(
+      raw.select("SELECT name FROM sqlite_master WHERE name = 'dive_profiles'"),
+      isEmpty,
+    );
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+  });
+
+  test('a dive packed for one computer keeps the rows of the other', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    seedParents(raw);
+    // First open: only c1 has legacy rows, so d1 packs and both legacy
+    // tables go.
+    raw.execute(
+      'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
+      'is_primary, timestamp, depth) VALUES '
+      "('p1', 'd1', 'c1', 's1', 1, 0, 0.0), "
+      "('p2', 'd1', 'c1', 's1', 1, 10, 12.0)",
+    );
+    final first = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    await first.customSelect('SELECT 1').get();
+    await first.close();
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 1);
+
+    // A second computer's legacy rows arrive afterwards (a restore, or a
+    // parallel branch that reached 182 by its own rung). _scanLegacyDives
+    // marks d1 packed because a series row exists, so these are never
+    // packed and the backstop must not drop them.
+    createLegacyProfileTables(raw);
+    raw.execute(
+      'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
+      'is_primary, timestamp, depth) VALUES '
+      "('p3', 'd1', 'c2', 's2', 0, 0, 0.0), "
+      "('p4', 'd1', 'c2', 's2', 0, 10, 11.0)",
+    );
+
+    final second = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(second.close);
+    await second.customSelect('SELECT 1').get();
+
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 2);
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 1);
+  });
+
   test('v183 is present in the migration ladder', () {
     expect(AppDatabase.currentSchemaVersion, 183);
     expect(AppDatabase.migrationVersions, contains(183));

@@ -315,6 +315,120 @@ Future<ProfilePackReport> packLegacyProfileRows(
   );
 }
 
+/// Legacy rows still waiting to be packed, per legacy table.
+typedef LegacyPackResidue = ({int profiles, int tanks});
+
+/// How many rows each legacy table still holds that the pack should have
+/// moved into the series tables and did not.
+///
+/// This is the gate on dropping a legacy table. [packLegacyProfileRows]
+/// never deletes what it packs, so "is the legacy table empty" cannot be
+/// the question; the question is whether a series row now covers every
+/// legacy row that could ever become one. Three reachable ways the pack
+/// leaves a row behind while returning normally, all of which this counts:
+/// a pressure row whose tank is gone is skipped as an orphan; a dive that
+/// already had a series row is never revisited, so a second computer's
+/// legacy rows are never packed; and every insert is `INSERT OR IGNORE`, so
+/// a series table shaped differently by a parallel branch can pack nothing
+/// at all.
+///
+/// Coverage is checked per (dive, computer) for profiles and per (dive,
+/// tank, computer) for tanks, resolving a dangling computer id to null the
+/// way the packer's own grouping does. Finer identity terms (`source_id`,
+/// `is_primary`) are deliberately left out: the pack works per dive, so
+/// partialness below the computer level can only come from an ignored
+/// insert, and gating on it would keep a table for a difference no read
+/// ever sees.
+///
+/// A row that can NEVER be packed does not count, or the table would be
+/// kept forever and its pages never reclaimed: a row with no timestamp,
+/// depth, or pressure holds no sample, and a row whose dive is gone could
+/// never have been rendered. A row whose tank is gone DOES count: the dive
+/// is still the diver's, and those bytes are the only copy left.
+Future<LegacyPackResidue> countLegacyRowsAwaitingPack(
+  DatabaseConnectionUser db, {
+  String profileTable = 'dive_profiles',
+  String tankTable = 'tank_pressure_profiles',
+}) async => (
+  profiles: await _countUnpackedProfileRows(db, profileTable),
+  tanks: await _countUnpackedTankRows(db, tankTable),
+);
+
+Future<int> _countUnpackedProfileRows(
+  DatabaseConnectionUser db,
+  String table,
+) async {
+  final columns = await _columnNames(db, table);
+  if (columns.isEmpty) return 0;
+  // A shape the packer cannot read, a missing series table, or a missing
+  // `dives` table all mean nothing moved: every row is still only here.
+  if (!columns.containsAll(const {'dive_id', 'timestamp', 'depth'}) ||
+      !await _tableExists(db, 'dive_profile_series') ||
+      !await _tableExists(db, 'dives')) {
+    return _countRows(db, table);
+  }
+  final coverage = columns.contains('computer_id')
+      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
+      : '';
+  final rows = await db
+      .customSelect(
+        'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
+        'AND p.depth IS NOT NULL '
+        'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
+        'AND NOT EXISTS (SELECT 1 FROM dive_profile_series s '
+        'WHERE s.dive_id = p.dive_id $coverage)',
+      )
+      .getSingle();
+  return rows.read<int>('n');
+}
+
+Future<int> _countUnpackedTankRows(
+  DatabaseConnectionUser db,
+  String table,
+) async {
+  final columns = await _columnNames(db, table);
+  if (columns.isEmpty) return 0;
+  if (!columns.containsAll(const {
+        'dive_id',
+        'tank_id',
+        'timestamp',
+        'pressure',
+      }) ||
+      !await _tableExists(db, 'tank_pressure_series') ||
+      !await _tableExists(db, 'dives')) {
+    return _countRows(db, table);
+  }
+  final coverage = columns.contains('computer_id')
+      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
+      : '';
+  final rows = await db
+      .customSelect(
+        'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
+        'AND p.pressure IS NOT NULL AND p.tank_id IS NOT NULL '
+        'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
+        'AND NOT EXISTS (SELECT 1 FROM tank_pressure_series s '
+        'WHERE s.dive_id = p.dive_id AND s.tank_id = p.tank_id $coverage)',
+      )
+      .getSingle();
+  return rows.read<int>('n');
+}
+
+/// The scalar subquery that mirrors [_resolvedParent] for `computer_id`: the
+/// legacy row's computer when it still names a `dive_computers` row, null
+/// otherwise. Null too when the parent table itself is gone, which is what
+/// the packer's empty parent set resolves every id to.
+Future<String> _resolvedComputerSql(DatabaseConnectionUser db) async =>
+    await _tableExists(db, 'dive_computers')
+    ? '(SELECT c.id FROM dive_computers c WHERE c.id = p.computer_id)'
+    : 'NULL';
+
+Future<int> _countRows(DatabaseConnectionUser db, String table) async {
+  final rows = await db
+      .customSelect('SELECT COUNT(*) AS n FROM $table')
+      .getSingle();
+  return rows.read<int>('n');
+}
+
 class _ProfileKey {
   const _ProfileKey({
     required this.computerId,

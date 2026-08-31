@@ -158,6 +158,63 @@ void main() {
     },
   );
 
+  test('a staged row whose dive has not arrived yet stays staged and packs '
+      'on the next call', () async {
+    await ensureLegacyStagingTables(db);
+    await stageLegacyProfileRows(db, [
+      {
+        'id': 'p-early',
+        'diveId': 'dive-2',
+        'isPrimary': true,
+        'timestamp': 0,
+        'depth': 5.0,
+      },
+    ]);
+
+    // dive-2 is not here yet: during a restore the dive rows can arrive in a
+    // later changeset than its samples. The pack skips the row as an orphan,
+    // and emptying the staging table would discard the only copy the peer
+    // ever sends.
+    final first = await packStagedLegacyRows(db);
+    expect(first.profileSeries, 0);
+    expect(first.skippedOrphans, 1);
+    expect(
+      (await db
+              .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')
+              .getSingle())
+          .data['n'],
+      1,
+    );
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion.insert(
+            id: 'dive-2',
+            diveDateTime: now,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+
+    final second = await packStagedLegacyRows(db);
+    expect(second.profileSeries, 1);
+    expect(
+      (await ProfileSeriesRepository().getSeriesForDive(
+        'dive-2',
+      )).single.samples.single.depth,
+      5.0,
+    );
+    expect(
+      (await db
+              .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')
+              .getSingle())
+          .data['n'],
+      0,
+    );
+  });
+
   test('a dive that already has a series ignores staged rows, and the staging '
       'is still emptied', () async {
     await ProfileSeriesRepository().insertSeries(

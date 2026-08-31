@@ -5,8 +5,8 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.d
 
 /// Where an older peer's row-per-sample arrays land now that the legacy
 /// tables are gone (v183). TEMP tables live for the connection; the packer
-/// reads them like it read `dive_profiles`, and they are emptied after each
-/// pack. Retire with the receive-side shim (plan 2d's
+/// reads them like it read `dive_profiles`, and each pack clears the rows it
+/// has finished with (see [packStagedLegacyRows]). Retire with the receive-side shim (plan 2d's
 /// SyncService.inboundOnlyLegacyEntities) once no peer below 182 can publish.
 const String kLegacyProfileStagingTable = 'dive_profiles_inbound';
 const String kLegacyTankStagingTable = 'tank_pressure_profiles_inbound';
@@ -151,15 +151,22 @@ int _rowsPerStatement(int columnCount) {
 }
 
 /// Packs whatever is staged into series (dives that already have a series
-/// are left alone, exactly as the migration packer does) and empties both
-/// staging tables.
+/// are left alone, exactly as the migration packer does) and clears the
+/// staged rows the pack is done with.
 ///
-/// The staging tables are emptied only after a successful pack. The TEMP
-/// table is the only copy of a peer's row once staged (the real
-/// `dive_profiles` / `tank_pressure_profiles` tables are gone), so if
-/// [packLegacyProfileRows] throws, the rows are left staged rather than
-/// discarded: the next apply in this session (another changeset, base file,
-/// or adopt) calls this again and retries the same staged rows. A TEMP
+/// The staging tables are cleared only after a successful pack, and then
+/// only of the rows whose dive now has a series row. Those are exactly the
+/// rows the pack has finished with: either it just packed them, or the dive
+/// already held a series and the staged copy lost to it, which is the
+/// intended precedence. Every other staged row is KEPT. The TEMP table is
+/// the only copy of a peer's row once staged (the real `dive_profiles` /
+/// `tank_pressure_profiles` tables are gone) and the peer never re-sends, so
+/// a row the pack could not move yet, most importantly one whose dive has
+/// not arrived in this restore, has to survive to the next apply rather than
+/// be discarded. The next apply in this session (another changeset, base
+/// file, or adopt) calls this again and retries it.
+///
+/// If [packLegacyProfileRows] throws, nothing is cleared at all. A TEMP
 /// table does not survive past this connection, so an app restart loses
 /// whatever is still staged; recovery then is the origin peer republishing
 /// its base or changeset, which stages the rows again.
@@ -172,7 +179,39 @@ Future<ProfilePackReport> packStagedLegacyRows(
     profileTable: kLegacyProfileStagingTable,
     tankTable: kLegacyTankStagingTable,
   );
-  await db.customStatement('DELETE FROM $kLegacyProfileStagingTable');
-  await db.customStatement('DELETE FROM $kLegacyTankStagingTable');
+  await _clearStagedRowsForPackedDives(
+    db,
+    staging: kLegacyProfileStagingTable,
+    series: 'dive_profile_series',
+  );
+  await _clearStagedRowsForPackedDives(
+    db,
+    staging: kLegacyTankStagingTable,
+    series: 'tank_pressure_series',
+  );
   return report;
+}
+
+/// Deletes the [staging] rows whose dive already has a [series] row.
+///
+/// Dive granularity on purpose: that is the granularity the packer's own
+/// scan works at, so a row this leaves behind is one a later pack can still
+/// move. A missing series table means nothing was packed, so nothing is
+/// cleared.
+Future<void> _clearStagedRowsForPackedDives(
+  DatabaseConnectionUser db, {
+  required String staging,
+  required String series,
+}) async {
+  final exists = await db
+      .customSelect(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable<String>(series)],
+      )
+      .get();
+  if (exists.isEmpty) return;
+  await db.customStatement(
+    'DELETE FROM $staging WHERE EXISTS ('
+    'SELECT 1 FROM $series s WHERE s.dive_id = $staging.dive_id)',
+  );
 }

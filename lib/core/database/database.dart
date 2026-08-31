@@ -4359,16 +4359,42 @@ class AppDatabase extends _$AppDatabase {
     return rows.isNotEmpty;
   }
 
-  /// Drops whichever legacy sample table the pack has provably emptied into
+  /// Drops whichever legacy sample table the pack has provably moved into
   /// its series table. Never both unconditionally: on a database missing one
   /// side's foreign-key parents only one series table exists, and the other
   /// legacy table is still the only copy of its samples.
+  ///
+  /// Two gates per table, and both are load-bearing. The series table must
+  /// exist, and [countLegacyRowsAwaitingPack] must find no legacy row that a
+  /// series row does not cover. A pack that returned normally is not proof
+  /// the rows moved: an orphaned pressure row is skipped, a dive that
+  /// already had a series row is never revisited so a second computer's rows
+  /// stay behind, and `INSERT OR IGNORE` can pack nothing at all into a
+  /// series table a parallel branch shaped differently. Dropping on any of
+  /// those destroys the only copy.
   Future<void> _dropPackedLegacySampleTables() async {
+    final residue = await countLegacyRowsAwaitingPack(this);
     if (await _tableExists('dive_profile_series')) {
-      await _dropLegacyProfileTable();
+      if (residue.profiles == 0) {
+        await _dropLegacyProfileTable();
+      } else {
+        developer.log(
+          'Keeping dive_profiles: ${residue.profiles} row(s) no series row '
+          'covers. A later open retries the pack.',
+          name: 'AppDatabase',
+        );
+      }
     }
     if (await _tableExists('tank_pressure_series')) {
-      await _dropLegacyTankTable();
+      if (residue.tanks == 0) {
+        await _dropLegacyTankTable();
+      } else {
+        developer.log(
+          'Keeping tank_pressure_profiles: ${residue.tanks} row(s) no series '
+          'row covers. A later open retries the pack.',
+          name: 'AppDatabase',
+        );
+      }
     }
   }
 
@@ -9590,9 +9616,30 @@ class AppDatabase extends _$AppDatabase {
         // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
         // tuple), so a retry after a failed ladder, or a collision re-run,
         // is safe. v183 below drops the legacy tables.
+        //
+        // Wrapped the way the v183 rung below is, and for the same reason:
+        // `profileSampleOf` casts unchecked, so one malformed legacy row
+        // (a text timestamp, say) would otherwise throw out of onUpgrade,
+        // `_runUpgradeLadder` would rethrow, and the database could not be
+        // opened on any relaunch. Nothing is dropped here, so continuing
+        // costs nothing: the legacy tables stay, and the v183 rung below or
+        // the beforeOpen backstop packs them later. The schema assert is
+        // inside the try for the same reason it is in v183: both the v183
+        // rung and the backstop re-assert it, so swallowing it here cannot
+        // leave the ladder with a schema no later step rebuilds.
         if (from < 182) {
-          await _assertProfileSeriesSchema();
-          await packLegacyProfileRows(this);
+          try {
+            await _assertProfileSeriesSchema();
+            await packLegacyProfileRows(this);
+          } catch (e, stackTrace) {
+            developer.log(
+              'v182: packing legacy profile rows failed; keeping the legacy '
+              'tables so no samples are lost',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
         }
         if (from < 182) await reportProgress();
         // v183: the legacy row-per-sample tables are gone. Their sync
