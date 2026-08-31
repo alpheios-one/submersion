@@ -47,12 +47,16 @@ const int kMaxTrackBodyBytes = 32 * 1024 * 1024;
 
 /// The largest compressed blob this codec will accept.
 ///
-/// gzip output for a body under [kMaxTrackBodyBytes] cannot exceed it by more
-/// than stream overhead even for incompressible input, and JSON never is, so
-/// matching the two cannot refuse a blob the body cap would have accepted.
-/// Without it, bytes appended after a complete gzip stream are copied whole
-/// into the native filter and then silently discarded: a spike with no
-/// output to show for it.
+/// Equal to [kMaxTrackBodyBytes], which is a margin rather than an identity.
+/// gzip can emit slightly more than it was given, so a maximal incompressible
+/// body really would produce a blob a little over this cap and be refused.
+/// Nothing legitimate reaches that: [kMaxTrackPointCount] binds first, at
+/// roughly 17 MB of body for a maximal track, and JSON of numeric tuples
+/// compresses rather than expanding, so the two caps are nowhere near meeting.
+///
+/// The cap earns its place regardless of where it sits. Bytes appended after
+/// a complete gzip stream are copied whole into the native filter and then
+/// silently discarded: a spike with no output to show for it.
 const int kMaxTrackBlobBytes = kMaxTrackBodyBytes;
 
 /// The largest number of commas this codec will accept in an inflated body.
