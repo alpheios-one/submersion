@@ -10465,6 +10465,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_sortField_fileSize => 'Dateigröße';
 
   @override
+  String get enum_sortField_lastDive => 'Letzter Tauchgang';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Letzte Wartung';
 
   @override

@@ -119,6 +119,23 @@ List<BuddyWithDiveCount> applyBuddyWithDiveCountSorting(
         return sort.direction == SortDirection.ascending
             ? comparison
             : -comparison;
+      case BuddySortField.lastDive:
+        final aDate = a.lastDiveAt;
+        final bDate = b.lastDiveAt;
+        // Buddies never dived with sort last in either direction, so the
+        // interesting rows (people you actually dive with) stay on top.
+        if (aDate == null || bDate == null) {
+          if (aDate == null && bDate == null) return byNameAscending(a, b);
+          return aDate == null ? 1 : -1;
+        }
+        final comparison = aDate.compareTo(bDate);
+        if (comparison == 0) {
+          // Deterministic tie-break, same reasoning as diveCount above.
+          return byNameAscending(a, b);
+        }
+        return sort.direction == SortDirection.ascending
+            ? comparison
+            : -comparison;
     }
   });
 
@@ -142,6 +159,9 @@ List<Buddy> applyBuddySorting(
         comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
       case BuddySortField.diveCount:
         // Dive count not available in basic Buddy entity, sort by name as fallback
+        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      case BuddySortField.lastDive:
+        // Last dive date not available in basic Buddy entity, sort by name as fallback
         comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
     }
 

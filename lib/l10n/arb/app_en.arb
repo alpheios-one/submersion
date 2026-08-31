@@ -6028,6 +6028,7 @@
   "enum_sortField_endDate": "End Date",
   "enum_sortField_fileName": "File Name",
   "enum_sortField_fileSize": "File Size",
+  "enum_sortField_lastDive": "Last Dive",
   "enum_sortField_lastServiceDate": "Last Service",
   "enum_sortField_maxDepth": "Max Depth",
   "enum_sortField_name": "Name",

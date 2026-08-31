@@ -3296,6 +3296,7 @@
   "enum_sortField_dateTaken": "תאריך הצילום",
   "enum_sortField_fileName": "שם הקובץ",
   "enum_sortField_fileSize": "גודל הקובץ",
+  "enum_sortField_lastDive": "צלילה אחרונה",
   "enum_sortField_lastServiceDate": "טיפול אחרון",
   "enum_sortField_maxDepth": "עומק מרבי",
   "enum_sortField_name": "שם",

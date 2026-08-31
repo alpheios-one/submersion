@@ -3296,6 +3296,7 @@
   "enum_sortField_dateTaken": "Készítés dátuma",
   "enum_sortField_fileName": "Fájlnév",
   "enum_sortField_fileSize": "Fájlméret",
+  "enum_sortField_lastDive": "Utolsó merülés",
   "enum_sortField_lastServiceDate": "Utolso szerviz",
   "enum_sortField_maxDepth": "Max melyseg",
   "enum_sortField_name": "Nev",

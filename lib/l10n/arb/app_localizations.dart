@@ -17738,6 +17738,12 @@ abstract class AppLocalizations {
   /// **'File Size'**
   String get enum_sortField_fileSize;
 
+  /// No description provided for @enum_sortField_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get enum_sortField_lastDive;
+
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
   /// In en, this message translates to:
