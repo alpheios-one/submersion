@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -116,6 +117,23 @@ void main() {
             contains('exceeds the 512 allowed'),
           ),
         ),
+      );
+    });
+
+    test('does not treat the decoder argument as a framing check', () {
+      // Dart's gzip decoder sniffs the header, so it reads a zlib stream
+      // too. Pinned because the parameter name suggests otherwise: it
+      // selects an intent, not a guarantee about what arrived, and a caller
+      // that needs to know which framing it was handed must check itself.
+      final body = utf8.encode('zlib body read by the gzip decoder');
+      expect(
+        inflateBounded(
+          zl(body),
+          decoder: gzip.decoder,
+          maxBytes: 1 << 20,
+          maxBlobBytes: 1 << 20,
+        ),
+        body,
       );
     });
 
