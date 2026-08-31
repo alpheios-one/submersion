@@ -59,7 +59,6 @@ void main() {
     required List<ServiceKind> kinds,
     Locale locale = const Locale('en'),
     Size surface = const Size(600, 1200),
-    Map<String, double> totals = const {},
     AsyncValue<List<ServiceRecord>>? recordsState,
     _MockServiceRecordNotifier? notifier,
     _FakeExportService? exportService,
@@ -83,9 +82,6 @@ void main() {
                 notifier ??
                 _MockServiceRecordNotifier(records, state: recordsState),
           ),
-          serviceRecordTotalCostProvider(
-            equipmentId,
-          ).overrideWith((ref) async => totals),
           equipmentItemProvider(equipmentId).overrideWith(
             (ref) async => const EquipmentItem(
               id: equipmentId,
