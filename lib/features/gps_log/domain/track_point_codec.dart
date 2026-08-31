@@ -97,9 +97,20 @@ List<GpsTrackPoint> decodeTrackPoints(Uint8List blob) {
     throw TrackPointCodecException(e.message);
   }
 
+  // Decoded in two steps so the message names the failure that happened.
+  // Folding them together reported a truncated gzip body, which fails as
+  // bytes, as though it were bad JSON, which is the wrong thing to go
+  // looking for in a log.
+  final String text;
+  try {
+    text = utf8.decode(body);
+  } on FormatException catch (e) {
+    throw TrackPointCodecException('body is not UTF-8: ${e.message}');
+  }
+
   final dynamic decoded;
   try {
-    decoded = jsonDecode(utf8.decode(body));
+    decoded = jsonDecode(text);
   } on FormatException catch (e) {
     throw TrackPointCodecException('not track point JSON: ${e.message}');
   }

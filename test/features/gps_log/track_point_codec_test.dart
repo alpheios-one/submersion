@@ -110,18 +110,33 @@ void main() {
       );
     });
 
-    test('a body that is not valid UTF-8', () {
+    test('a body that is not valid UTF-8, named as such', () {
+      // Bytes and JSON are distinct failures. Reporting a body that failed
+      // as bytes as though it were bad JSON sends a reader looking for the
+      // wrong thing.
       final blob = Uint8List.fromList(gzip.encode(const [0xC3, 0x28]));
       expect(
         () => decodeTrackPoints(blob),
-        throwsA(isA<TrackPointCodecException>()),
+        throwsA(
+          isA<TrackPointCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('UTF-8'),
+          ),
+        ),
       );
     });
 
-    test('a body that is not valid JSON', () {
+    test('a body that is not valid JSON, named as such', () {
       expect(
         () => decodeTrackPoints(_blobOf('[[1,2,3,')),
-        throwsA(isA<TrackPointCodecException>()),
+        throwsA(
+          isA<TrackPointCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('JSON'),
+          ),
+        ),
       );
     });
 

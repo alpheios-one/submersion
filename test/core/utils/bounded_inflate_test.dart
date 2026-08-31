@@ -127,6 +127,15 @@ void main() {
       );
     });
 
+    test('names itself in toString, which is what a log prints', () {
+      // The repository logs the exception object, not its message, so this
+      // string is the one a reader actually sees.
+      expect(
+        const BoundedInflateException('too big').toString(),
+        'BoundedInflateException: too big',
+      );
+    });
+
     test('rejects a negative body cap as a programming error', () {
       expect(
         () => inflateBounded(
