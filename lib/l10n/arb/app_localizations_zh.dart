@@ -1217,9 +1217,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_label_notSpecified => '未指定';
 
   @override
-  String get buddies_label_photoComingSoon => '照片功能将在 v2.0 推出';
-
-  @override
   String get buddies_message_added => '潜伴添加成功';
 
   @override
@@ -33819,4 +33816,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => '导出的文件';
+
+  @override
+  String get profilePhoto_sheet_title => '个人资料照片';
+
+  @override
+  String get profilePhoto_source_camera => '拍照';
+
+  @override
+  String get profilePhoto_source_library => '从图库中选择';
+
+  @override
+  String get profilePhoto_source_file => '选择文件';
+
+  @override
+  String get profilePhoto_source_contacts => '从通讯录中选择';
+
+  @override
+  String get profilePhoto_action_remove => '移除照片';
+
+  @override
+  String get profilePhoto_crop_title => '调整照片';
+
+  @override
+  String get profilePhoto_crop_hint => '拖动以调整位置，双指缩放';
+
+  @override
+  String get profilePhoto_error_tooLarge => '该图片太大，请尝试较小的图片。';
+
+  @override
+  String get profilePhoto_error_undecodable => '无法将该文件读取为图片。';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto => '该联系人没有照片。';
+
+  @override
+  String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
 }

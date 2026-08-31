@@ -2227,12 +2227,6 @@ abstract class AppLocalizations {
   /// **'Not specified'**
   String get buddies_label_notSpecified;
 
-  /// No description provided for @buddies_label_photoComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo support coming in v2.0'**
-  String get buddies_label_photoComingSoon;
-
   /// No description provided for @buddies_message_added.
   ///
   /// In en, this message translates to:
@@ -59086,6 +59080,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exported files'**
   String get settings_storageUsage_category_exports;
+
+  /// No description provided for @profilePhoto_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo'**
+  String get profilePhoto_sheet_title;
+
+  /// No description provided for @profilePhoto_source_camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get profilePhoto_source_camera;
+
+  /// No description provided for @profilePhoto_source_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Library'**
+  String get profilePhoto_source_library;
+
+  /// No description provided for @profilePhoto_source_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose File'**
+  String get profilePhoto_source_file;
+
+  /// No description provided for @profilePhoto_source_contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Contacts'**
+  String get profilePhoto_source_contacts;
+
+  /// No description provided for @profilePhoto_action_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get profilePhoto_action_remove;
+
+  /// No description provided for @profilePhoto_crop_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Photo'**
+  String get profilePhoto_crop_title;
+
+  /// No description provided for @profilePhoto_crop_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reposition, pinch to zoom'**
+  String get profilePhoto_crop_hint;
+
+  /// No description provided for @profilePhoto_error_tooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That image is too large to use. Try a smaller one.'**
+  String get profilePhoto_error_tooLarge;
+
+  /// No description provided for @profilePhoto_error_undecodable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read as an image.'**
+  String get profilePhoto_error_undecodable;
+
+  /// No description provided for @profilePhoto_error_contactNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'That contact does not have a photo.'**
+  String get profilePhoto_error_contactNoPhoto;
+
+  /// No description provided for @profilePhoto_error_contactPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts permission is required to choose a photo.'**
+  String get profilePhoto_error_contactPermission;
 }
 
 class _AppLocalizationsDelegate

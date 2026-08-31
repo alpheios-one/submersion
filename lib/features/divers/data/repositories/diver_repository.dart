@@ -142,6 +142,7 @@ class DiverRepository {
               email: Value(diver.email),
               phone: Value(diver.phone),
               photoPath: Value(diver.photoPath),
+              photo: Value(diver.photo),
               emergencyContactName: Value(diver.emergencyContact.name),
               emergencyContactPhone: Value(diver.emergencyContact.phone),
               emergencyContactRelation: Value(diver.emergencyContact.relation),
@@ -206,6 +207,7 @@ class DiverRepository {
           email: Value(diver.email),
           phone: Value(diver.phone),
           photoPath: Value(diver.photoPath),
+          photo: Value(diver.photo),
           emergencyContactName: Value(diver.emergencyContact.name),
           emergencyContactPhone: Value(diver.emergencyContact.phone),
           emergencyContactRelation: Value(diver.emergencyContact.relation),
@@ -674,6 +676,7 @@ class DiverRepository {
       email: row.email,
       phone: row.phone,
       photoPath: row.photoPath,
+      photo: row.photo,
       emergencyContact: domain.EmergencyContact(
         name: row.emergencyContactName,
         phone: row.emergencyContactPhone,

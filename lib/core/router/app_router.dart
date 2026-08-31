@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
@@ -611,6 +613,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     initialName: extra?['name'] as String?,
                     initialEmail: extra?['email'] as String?,
                     initialPhone: extra?['phone'] as String?,
+                    initialPhoto: extra?['photo'] as Uint8List?,
                   );
                 },
               ),

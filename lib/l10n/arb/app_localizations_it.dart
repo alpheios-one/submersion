@@ -1298,10 +1298,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get buddies_label_notSpecified => 'Non specificato';
 
   @override
-  String get buddies_label_photoComingSoon =>
-      'Supporto foto in arrivo nella v2.0';
-
-  @override
   String get buddies_message_added => 'Compagno aggiunto con successo';
 
   @override
@@ -35946,4 +35942,45 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'File esportati';
+
+  @override
+  String get profilePhoto_sheet_title => 'Foto del profilo';
+
+  @override
+  String get profilePhoto_source_camera => 'Scatta foto';
+
+  @override
+  String get profilePhoto_source_library => 'Scegli dalla libreria';
+
+  @override
+  String get profilePhoto_source_file => 'Scegli file';
+
+  @override
+  String get profilePhoto_source_contacts => 'Scegli dai contatti';
+
+  @override
+  String get profilePhoto_action_remove => 'Rimuovi foto';
+
+  @override
+  String get profilePhoto_crop_title => 'Regola foto';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'Trascina per spostare, pizzica per ingrandire';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'Questa immagine è troppo grande. Provane una più piccola.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'Impossibile leggere questo file come immagine.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'Questo contatto non ha una foto.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'È necessaria l\'autorizzazione ai contatti per scegliere una foto.';
 }

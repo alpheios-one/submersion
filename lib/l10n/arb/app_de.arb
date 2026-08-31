@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 Tauchgang} other{{count} Tauchgänge}}",
   "buddies_label_level": "Stufe",
   "buddies_label_notSpecified": "Nicht angegeben",
-  "buddies_label_photoComingSoon": "Fotounterstützung kommt in v2.0",
   "buddies_message_added": "Tauchpartner erfolgreich hinzugefügt",
   "buddies_message_contactImportUnavailable": "Kontaktimport ist auf dieser Plattform nicht verfügbar",
   "buddies_message_contactLoadFailed": "Kontakte konnten nicht geladen werden",
@@ -10493,5 +10492,17 @@
   "settings_storageUsage_category_pdfThumbnails": "Dokument-Miniaturansichten",
   "settings_storageUsage_category_backups": "Sicherungsdateien",
   "settings_storageUsage_category_temporary": "Temporäre Dateien",
-  "settings_storageUsage_category_exports": "Exportierte Dateien"
+  "settings_storageUsage_category_exports": "Exportierte Dateien",
+  "profilePhoto_sheet_title": "Profilfoto",
+  "profilePhoto_source_camera": "Foto aufnehmen",
+  "profilePhoto_source_library": "Aus Mediathek wählen",
+  "profilePhoto_source_file": "Datei wählen",
+  "profilePhoto_source_contacts": "Aus Kontakten wählen",
+  "profilePhoto_action_remove": "Foto entfernen",
+  "profilePhoto_crop_title": "Foto anpassen",
+  "profilePhoto_crop_hint": "Zum Verschieben ziehen, zum Zoomen zwei Finger",
+  "profilePhoto_error_tooLarge": "Dieses Bild ist zu groß. Bitte ein kleineres wählen.",
+  "profilePhoto_error_undecodable": "Diese Datei konnte nicht als Bild gelesen werden.",
+  "profilePhoto_error_contactNoPhoto": "Dieser Kontakt hat kein Foto.",
+  "profilePhoto_error_contactPermission": "Für die Auswahl eines Fotos wird die Kontaktberechtigung benötigt."
 }
