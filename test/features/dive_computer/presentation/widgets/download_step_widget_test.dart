@@ -176,6 +176,13 @@ Widget _buildWidget({
       }),
     ],
     child: MaterialApp(
+      // Pinned because every assertion below matches an English literal.
+      // flutter_test forwards the HOST machine's locale list rather than a
+      // fixed en_US, and this app supports eleven locales, so on a developer
+      // machine set to one of them an unpinned MaterialApp renders the
+      // translation and every find.textContaining fails. CI is en_US, so that
+      // breaks only for the contributor.
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
@@ -210,6 +217,8 @@ Widget _buildWidgetWithoutDevice({
       }),
     ],
     child: MaterialApp(
+      // Pinned for the same reason as _buildWidget above.
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(

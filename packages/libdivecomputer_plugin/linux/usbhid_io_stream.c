@@ -74,16 +74,28 @@ static int usbhid_read(void* userdata, void* data, size_t size,
     pfd.events = POLLIN;
     pfd.revents = 0;
 
-    const int ready = poll(&pfd, 1, stream->timeout_ms);
-    if (ready < 0) {
-        if (errno == EINTR) return LIBDC_STATUS_SUCCESS;
-        return LIBDC_STATUS_IO;
-    }
+    // A signal must not end the wait. Returning success with zero bytes here
+    // would be read as a timeout by uwatec_smart_usbhid_receive, which treats
+    // a packet shorter than one byte as a protocol error and aborts the
+    // download. libdivecomputer's own serial poll retries on EINTR for the
+    // same reason (serial_posix.c:673-689).
+    int ready = 0;
+    do {
+        ready = poll(&pfd, 1, stream->timeout_ms);
+    } while (ready < 0 && errno == EINTR);
+
+    if (ready < 0) return LIBDC_STATUS_IO;
     if (ready == 0) return LIBDC_STATUS_SUCCESS;
 
-    const ssize_t got = read(stream->fd, data, size);
+    ssize_t got = 0;
+    do {
+        got = read(stream->fd, data, size);
+    } while (got < 0 && errno == EINTR);
+
     if (got < 0) {
-        if (errno == EINTR || errno == EAGAIN) return LIBDC_STATUS_SUCCESS;
+        // EAGAIN after poll said readable means the report was consumed
+        // elsewhere; nothing arrived, which is the timeout shape.
+        if (errno == EAGAIN) return LIBDC_STATUS_SUCCESS;
         return LIBDC_STATUS_IO;
     }
     if (actual != NULL) *actual = (size_t)got;
@@ -131,7 +143,13 @@ static int usbhid_poll(void* userdata, int timeout) {
     pfd.events = POLLIN;
     pfd.revents = 0;
 
-    const int ready = poll(&pfd, 1, timeout);
+    // Retried on EINTR, as in usbhid_read above and in libdivecomputer's own
+    // serial poll: a signal arriving mid-wait is not an I/O failure.
+    int ready = 0;
+    do {
+        ready = poll(&pfd, 1, timeout);
+    } while (ready < 0 && errno == EINTR);
+
     if (ready < 0) return LIBDC_STATUS_IO;
     return ready == 0 ? LIBDC_STATUS_TIMEOUT : LIBDC_STATUS_SUCCESS;
 }

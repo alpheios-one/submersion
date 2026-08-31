@@ -21515,7 +21515,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveComputer_download_noUsbDeviceFound(Object model) {
-    return 'Nenhum $model encontrado por USB. Está ligado a este computador e ligado?';
+    return 'Nenhum $model encontrado por USB. Está conectado a este computador e ligado?';
   }
 
   @override

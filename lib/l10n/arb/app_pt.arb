@@ -1415,7 +1415,7 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Ocorreu um erro",
   "diveComputer_download_noSerialPortsFound": "Nenhuma porta serial USB encontrada. O computador de mergulho está conectado e ligado?",
-  "diveComputer_download_noUsbDeviceFound": "Nenhum {model} encontrado por USB. Está ligado a este computador e ligado?",
+  "diveComputer_download_noUsbDeviceFound": "Nenhum {model} encontrado por USB. Está conectado a este computador e ligado?",
   "@diveComputer_download_noUsbDeviceFound": {
     "placeholders": {
       "model": {
