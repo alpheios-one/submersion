@@ -95,7 +95,8 @@ class TrackParseException implements Exception {
 void validateFixCount(int count) {
   if (count > kMaxTrackPointCount) {
     throw TrackParseException(
-      '$count positions exceeds the $kMaxTrackPointCount a track can store',
+      'file has $count position(s), over the $kMaxTrackPointCount '
+      'a track can store',
       reason: TrackParseReason.tooLarge,
     );
   }
