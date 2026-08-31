@@ -7079,6 +7079,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'خطأ في تحميل أنواع الغوص';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'خطأ في تحميل المعدات';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'خطأ في تحميل الرحلات';
 
   @override
@@ -7104,6 +7107,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'نطاق المدة (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'المعدات';
 
   @override
   String get diveLog_search_label_trip => 'رحلة';

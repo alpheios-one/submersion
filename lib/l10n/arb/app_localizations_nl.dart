@@ -7170,6 +7170,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'Fout bij laden duiktypes';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Fout bij laden uitrusting';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Fout bij laden van reizen';
 
   @override
@@ -7195,6 +7199,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Duurbereik (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Uitrusting';
 
   @override
   String get diveLog_search_label_trip => 'Reis';
