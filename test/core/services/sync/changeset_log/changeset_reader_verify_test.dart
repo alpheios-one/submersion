@@ -169,6 +169,102 @@ void main() {
     );
   });
 
+  test(
+    'a peer whose read throws is reported and does not block other peers',
+    () async {
+      await setUpTestDatabase();
+      addTearDown(() => tearDownTestDatabase());
+      final db = DatabaseService.instance.database;
+      final serializer = SyncDataSerializer();
+      final codec = ChangesetCodec(serializer);
+      final writer = ChangesetWriter(
+        serializer,
+        codec,
+        PublishStateStore(db),
+        compactionByteRatio: 1000.0,
+        compactionMaxChangesets: 1 << 30,
+      );
+      final reader = ChangesetReader(codec, PeerCursorStore(db));
+      final provider = FakeCloudStorageProvider();
+      final folder = await provider.getOrCreateSyncFolder();
+
+      // A healthy peer publishes normally.
+      final goodPeerId = await SyncRepository().getDeviceId();
+      await DiveRepository().createDive(
+        createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+      );
+      await writer.publish(
+        provider: provider,
+        deviceId: goodPeerId,
+        folderId: folder,
+        deletions: const [],
+      );
+
+      // A broken peer: a valid manifest, but its changeset bytes are not
+      // JSON, so decodeChangeset throws out of the per-peer read.
+      const badPeerId = 'peer-broken';
+      final manifest = SyncManifest(
+        deviceId: badPeerId,
+        deviceName: 'Broken Phone',
+        provider: provider.providerId,
+        headSeq: 1,
+        updatedAt: 0,
+      );
+      await provider.uploadFile(
+        manifest.toBytes(),
+        ChangesetLogLayout.manifestName(badPeerId),
+        folderId: folder,
+      );
+      await provider.uploadFile(
+        Uint8List.fromList(utf8.encode('not json')),
+        ChangesetLogLayout.changesetName(badPeerId, 1),
+        folderId: folder,
+      );
+
+      final applied = <SyncPayload>[];
+      final result = await reader.pull(
+        provider: provider,
+        selfDeviceId: 'reader-x',
+        folderId: folder,
+        apply: (p) async => applied.add(p),
+        applyBaseFile: spyApplyBaseFile(applied),
+      );
+
+      expect(result.readFailedPeerDeviceIds, {
+        badPeerId,
+      }, reason: 'a per-peer read failure must be reported, not swallowed');
+      expect(
+        result.readFailedPeerNames[badPeerId],
+        'Broken Phone',
+        reason: 'the peer name from its manifest must reach the result',
+      );
+
+      final ids = applied
+          .expand((p) => p.data.dives.map((d) => d['id']))
+          .toSet();
+      expect(
+        ids,
+        contains('d1'),
+        reason: 'one bad peer must not block the healthy peers',
+      );
+
+      final badCursor = await PeerCursorStore(
+        db,
+      ).get(badPeerId, provider.providerId);
+      expect(
+        badCursor,
+        isNull,
+        reason:
+            'the failed peer cursor must stay put so the next sync '
+            'retries it',
+      );
+      final goodCursor = await PeerCursorStore(
+        db,
+      ).get(goodPeerId, provider.providerId);
+      expect(goodCursor, isNotNull);
+    },
+  );
+
   test('a manifest naming a base with no part count is not applied', () async {
     await setUpTestDatabase();
     addTearDown(() => tearDownTestDatabase());

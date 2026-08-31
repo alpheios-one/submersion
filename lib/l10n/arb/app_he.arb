@@ -4725,6 +4725,8 @@
   "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "מכשיר {shortId}",
   "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
   "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " ו-",
+  "settings_cloudSync_peerReadFailed_banner": "לא ניתן היה לקרוא את השינויים מ-{deviceList} במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.",
+  "settings_cloudSync_peerReadFailed_bannerPlural": "לא ניתן היה לקרוא את השינויים מ-{deviceList} במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} מסתנכרן מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלו מוחזקים בינתיים.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} מסתנכרנים מגרסה חדשה יותר של Submersion, ולכן השינויים האחרונים שלהם מוחזקים בינתיים.",
   "settings_cloudSync_peerRequiresUpdate_updateAction": "עדכן מכשיר זה כדי לקבל אותם.",

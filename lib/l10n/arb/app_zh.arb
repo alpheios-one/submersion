@@ -4885,6 +4885,8 @@
   "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "设备 {shortId}",
   "settings_cloudSync_peerNeedsAdopt_listSeparator": "、",
   "settings_cloudSync_peerNeedsAdopt_listLastSeparator": "和",
+  "settings_cloudSync_peerReadFailed_banner": "上次同步时无法读取 {deviceList} 的更改，因此未合并。下次同步将自动重试。",
+  "settings_cloudSync_peerReadFailed_bannerPlural": "上次同步时无法读取 {deviceList} 的更改，因此未合并。下次同步将自动重试。",
   "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} 正在从更新版本的 Submersion 同步，因此其最新更改暂时被保留。",
   "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} 正在从更新版本的 Submersion 同步，因此它们的最新更改暂时被保留。",
   "settings_cloudSync_peerRequiresUpdate_updateAction": "更新此设备即可接收这些更改。",

@@ -4721,6 +4721,8 @@
   "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "الجهاز {shortId}",
   "settings_cloudSync_peerNeedsAdopt_listSeparator": "، ",
   "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " و",
+  "settings_cloudSync_peerReadFailed_banner": "تعذرت قراءة تغييرات {deviceList} أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.",
+  "settings_cloudSync_peerReadFailed_bannerPlural": "تعذرت قراءة تغييرات {deviceList} أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} يزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراته مؤقتًا.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} تزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراتها مؤقتًا.",
   "settings_cloudSync_peerRequiresUpdate_updateAction": "حدّث هذا الجهاز لاستلامها.",

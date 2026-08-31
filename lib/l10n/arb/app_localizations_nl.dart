@@ -15753,6 +15753,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' en ';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Wijzigingen van $deviceList konden tijdens de laatste synchronisatie niet worden gelezen en zijn daarom niet samengevoegd. De volgende synchronisatie probeert het automatisch opnieuw.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Wijzigingen van $deviceList konden tijdens de laatste synchronisatie niet worden gelezen en zijn daarom niet samengevoegd. De volgende synchronisatie probeert het automatisch opnieuw.';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList synchroniseert vanaf een nieuwere versie van Submersion, dus de nieuwste wijzigingen worden voorlopig vastgehouden.';
   }

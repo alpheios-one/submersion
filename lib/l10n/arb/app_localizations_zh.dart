@@ -15086,6 +15086,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList 正在从更新版本的 Submersion 同步，因此其最新更改暂时被保留。';
   }

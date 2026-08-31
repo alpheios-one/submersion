@@ -15813,6 +15813,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'A(z) $deviceList változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'A(z) $deviceList változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList a Submersion újabb verziójából szinkronizál, ezért a legújabb változtatásai egyelőre visszatartva maradnak.';
   }
