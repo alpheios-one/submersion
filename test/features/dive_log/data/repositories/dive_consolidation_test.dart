@@ -750,7 +750,7 @@ void main() {
       final sharedTank = originalTanks.firstWhere((t) => t.id == 'tank-t1');
       expect(sharedTank.computerId, equals('comp-t'));
 
-      // -- Tank pressure series ------------------------------------------
+      // Tank pressure series ---------------------------------------------
       final newDivePressures = await TankPressureSeriesRepository()
           .getSeriesForDive(newDiveId);
       expect(newDivePressures, hasLength(2));
@@ -847,7 +847,7 @@ void main() {
       expect(clone.startPressure, equals(200.0));
       expect(clone.endPressure, equals(100.0));
 
-      // -- Tank pressure series ------------------------------------------
+      // Tank pressure series ---------------------------------------------
       // comp-s's pressure series stay on the original dive; the one that
       // lived on the shared tank still points at tank-t1, which is
       // still on that dive.
@@ -1269,7 +1269,7 @@ void main() {
         ),
       );
 
-      // One past the 32766 bound-variable cap of the bundled SQLite -- the
+      // One past the 32766 bound-variable cap of the bundled SQLite, the
       // limit the legacy row-per-sample promote used to bump into. A series
       // promotes by row id rather than by binding one variable per sample, so
       // this is now a single series carrying every sample.

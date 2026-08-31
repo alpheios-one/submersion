@@ -39,6 +39,15 @@ void legacyDdlAt180(sqlite3.Database rawDb, {int userVersion = 180}) {
 /// before that open would let the ladder's own pack-and-drop empty them out
 /// from under the test, so those tests open first and call this afterwards,
 /// leaving the FK parents [legacyDdlAt180] already created untouched.
+///
+/// `dive_profiles` carries all 33 columns the v181 Drift table declared, not
+/// just the ones a given test seeds. `profileSampleOf` is the only decode
+/// path of the v182/v183 migration and it reads by column name, yielding
+/// null for any name it gets wrong; a thinner fixture would make a mistyped
+/// name indistinguishable from an absent column and let the field be
+/// dropped for every upgrading user with the suite still green.
+/// `legacy_profile_column_roundtrip_test.dart` holds the fixture to that
+/// shape.
 void createLegacyProfileTables(sqlite3.Database rawDb) {
   rawDb.execute('''
     CREATE TABLE dive_profiles (
@@ -49,9 +58,30 @@ void createLegacyProfileTables(sqlite3.Database rawDb) {
       is_primary INTEGER NOT NULL DEFAULT 1,
       timestamp INTEGER NOT NULL,
       depth REAL NOT NULL,
+      pressure REAL,
       temperature REAL,
-      ndl INTEGER,
+      heart_rate INTEGER,
+      heading REAL,
+      ascent_rate REAL,
       ceiling REAL,
+      ndl INTEGER,
+      setpoint REAL,
+      pp_o2 REAL,
+      o2_sensor1 REAL,
+      o2_sensor2 REAL,
+      o2_sensor3 REAL,
+      o2_sensor4 REAL,
+      o2_sensor5 REAL,
+      o2_sensor6 REAL,
+      o2_sensor_mv1 INTEGER,
+      o2_sensor_mv2 INTEGER,
+      o2_sensor_mv3 INTEGER,
+      o2_sensor_mv4 INTEGER,
+      o2_sensor_mv5 INTEGER,
+      o2_sensor_mv6 INTEGER,
+      cns REAL,
+      tts INTEGER,
+      rbt INTEGER,
       deco_type INTEGER,
       heart_rate_source TEXT
     )

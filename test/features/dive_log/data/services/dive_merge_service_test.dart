@@ -321,8 +321,8 @@ void main() {
 
         final mergedSeries = await profileSeries.getSeriesForDive(mergedId);
         // Every series, gap-fill included, must carry the source
-        // computerId -- a's series hosts the gap fill (it is the only
-        // series on the segment before the gap).
+        // computerId. a's series hosts the gap fill, being the only
+        // series on the segment before the gap.
         expect(mergedSeries.every((s) => s.computerId == 'comp-1'), isTrue);
         final sampleCount = mergedSeries.fold<int>(
           0,
@@ -337,7 +337,7 @@ void main() {
         '(#449 review)', () async {
       // 'a' has a user-edited primary series (computerId null, the identity
       // DiveRepository.createDive wrote) plus a lingering non-primary
-      // computer series -- mirrors saveEditedProfile.
+      // computer series, mirroring saveEditedProfile.
       await seedDive('a', entry: DateTime.utc(2026, 7, 1, 9));
       await profileSeries.insertSeries(
         diveId: 'a',
@@ -359,11 +359,21 @@ void main() {
       ].where((p) => p.timestamp > 1800 && p.timestamp < 3600).toList();
       expect(gapSamples, isNotEmpty);
       // Attributed to the primary (edited) series, not the secondary source.
-      final hostSeries = mergedSeries.firstWhere(
-        (s) => s.samples.any((p) => p.timestamp > 1800 && p.timestamp < 3600),
+      // Every series holding a gap sample is asserted, not just the first
+      // one found: gap samples landing in BOTH strands is exactly the #449
+      // regression, and a lookup that stops at the first match would let it
+      // through.
+      final hostSeries = mergedSeries
+          .where(
+            (s) =>
+                s.samples.any((p) => p.timestamp > 1800 && p.timestamp < 3600),
+          )
+          .toList();
+      expect(hostSeries, hasLength(1));
+      expect(
+        hostSeries.every((s) => s.isPrimary && s.computerId == null),
+        isTrue,
       );
-      expect(hostSeries.isPrimary, isTrue);
-      expect(hostSeries.computerId, isNull);
     });
 
     test('gap samples match the source profile sample rate', () async {

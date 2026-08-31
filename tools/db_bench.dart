@@ -108,8 +108,11 @@ const _searchSql = '''
     'SELECT diver_id, COUNT(*) AS n FROM dives '
     'GROUP BY diver_id ORDER BY n DESC LIMIT 1',
   );
+  // Samples live in packed series blobs since v182, so the densest dive is
+  // the one whose series carry the most samples between them, not the one
+  // with the most rows.
   final dense = db.select(
-    'SELECT dive_id, COUNT(*) AS n FROM dive_profiles '
+    'SELECT dive_id, SUM(sample_count) AS n FROM dive_profile_series '
     'GROUP BY dive_id ORDER BY n DESC LIMIT 1',
   );
   return (
@@ -131,17 +134,17 @@ List<({String label, String sql, List<Object?> params})> _queries(
   final inList = List.filled(pageIds.length, '?').join(',');
   return [
     (
-      label: 'profile_fetch_densest (${t.denseSamples} rows)',
+      label: 'profile_fetch_densest (${t.denseSamples} samples)',
       sql:
-          'SELECT * FROM dive_profiles WHERE dive_id = ? '
-          'ORDER BY timestamp ASC',
+          'SELECT * FROM dive_profile_series WHERE dive_id = ? '
+          'ORDER BY start_timestamp ASC, id ASC',
       params: [t.denseDiveId],
     ),
     (
       label: 'pressure_fetch_densest',
       sql:
-          'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
-          'ORDER BY timestamp ASC',
+          'SELECT * FROM tank_pressure_series WHERE dive_id = ? '
+          'ORDER BY start_timestamp ASC, id ASC',
       params: [t.denseDiveId],
     ),
     (
@@ -211,12 +214,13 @@ void _bench(Database db, String term, bool asJson) {
     final sw = Stopwatch()..start();
     for (final id in hydrateIds) {
       db.select(
-        'SELECT * FROM dive_profiles WHERE dive_id = ? ORDER BY timestamp ASC',
+        'SELECT * FROM dive_profile_series WHERE dive_id = ? '
+        'ORDER BY start_timestamp ASC, id ASC',
         [id],
       );
       db.select(
-        'SELECT * FROM tank_pressure_profiles WHERE dive_id = ? '
-        'ORDER BY timestamp ASC',
+        'SELECT * FROM tank_pressure_series WHERE dive_id = ? '
+        'ORDER BY start_timestamp ASC, id ASC',
         [id],
       );
       db.select('SELECT * FROM dive_tanks WHERE dive_id = ?', [id]);

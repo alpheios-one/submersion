@@ -290,7 +290,7 @@ class DiveConsolidationService {
         // Re-points at the target's copy of the owning source (issue
         // #1149): without this the copied samples would reference a source
         // row on the now-deleted secondary, and two file-imported sources
-        // -- both null computerId -- would be indistinguishable on the
+        // (both null computerId) would be indistinguishable on the
         // merged dive. Read before the delete below removes the secondary
         // dive (and, with it, ownership of these rows).
         for (final s in await _profileSeries.getSeriesForDive(secondary.id)) {

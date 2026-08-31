@@ -2170,7 +2170,7 @@ class StatisticsRepository {
   /// used before the packed-series migration. The derivation follows the same
   /// conventions as [AscentRateCalculator], which computes rates per-dive for
   /// the profile chart, but smooths by a different (cheaper, set-based)
-  /// filter -- see [rateWindowSeconds]:
+  /// filter (see [rateWindowSeconds]):
   ///
   /// - Samples are averaged into fixed [rateWindowSeconds] buckets, which
   ///   makes the result independent of the computer's sample interval and keeps
@@ -2254,11 +2254,11 @@ class StatisticsRepository {
   /// was never recorded and cannot be recovered here.
   ///
   /// Samples are ordered by `(timestamp, stored order)` rather than timestamp
-  /// alone. Ties cannot lose time whichever way they fall -- every sample but
-  /// the last of a tied group yields a zero-length interval, and the last
-  /// carries the whole step to the next timestamp -- but if tied samples sit
-  /// in different buckets, the tie order decides which bucket that step lands
-  /// in.
+  /// alone. Ties cannot lose time whichever way they fall, because every
+  /// sample but the last of a tied group yields a zero-length interval and
+  /// the last carries the whole step to the next timestamp. If tied samples
+  /// sit in different buckets, though, the tie order decides which bucket
+  /// that step lands in.
   ///
   /// Only primary profile rows are counted, matching [getAscentDescentRates]:
   /// a dive logged by two computers, or one whose original profile was demoted

@@ -278,7 +278,7 @@ class DiveSplitService {
       // series (user-edited primary series stay with the original dive).
       // Every branch is additionally gated on the series not being spoken
       // for by a DIFFERENT source (issue #1149). The computerId rules
-      // cannot separate two file-imported sources -- both sides are null --
+      // cannot separate two file-imported sources (both sides are null),
       // so on a dive carrying two of them the null-family branch swept up
       // the other source's samples and carried them onto the new dive,
       // taking them off the dive being split from entirely. A series whose

@@ -97,7 +97,7 @@ void main() {
     /// `SyncPayload.toJson` (and so `ChangesetCodec.encodeChangeset` /
     /// `encodeBaseParts`, which route through it) calls `data.toJson` under
     /// the hood, which drops those keys (inbound only) before the bytes are
-    /// ever built -- so both helpers assemble the wire bytes from raw JSON
+    /// ever built, so both helpers assemble the wire bytes from raw JSON
     /// instead of going through a `SyncPayload` object.
     Map<String, dynamic> buildPayloadJson(
       Map<String, dynamic> dataJson,
@@ -165,8 +165,8 @@ void main() {
     /// 1) and pulls it through the real merge path: the "first contact"
     /// shape for a peer this device has never synced with before (cold
     /// start), applied via the streaming base-file path
-    /// (`_applyRemoteBaseFile*`), which reads `_baseApplyEntityFlags` --
-    /// `entityHasUpdatedAt` unioned with `inboundOnlyLegacyEntities` -- to
+    /// (`_applyRemoteBaseFile*`), which reads `_baseApplyEntityFlags`
+    /// (`entityHasUpdatedAt` unioned with `inboundOnlyLegacyEntities`) to
     /// decide which tables to read off the wire.
     Future<void> pullPeerBasePayload(
       Map<String, dynamic> dataJson,
