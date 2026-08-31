@@ -310,6 +310,82 @@ void main() {
   });
 
   test(
+    'a malformed single record is skipped and a sound sibling applies',
+    () async {
+      dbA = await setUpTestDatabase();
+      switchTo(dbA);
+      await seedFkPrereqs(dbA);
+      await seedBareDive(dbA, 'd1');
+      await seedBareDive(dbA, 'd2');
+      final goodId = await ProfileSeriesRepository().insertSeries(
+        diveId: 'd1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: 1000,
+      );
+      final good = await SyncDataSerializer().fetchRecord(
+        'diveProfileSeries',
+        goodId,
+      );
+      final malformedId = await ProfileSeriesRepository().insertSeries(
+        diveId: 'd2',
+        samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+        now: 1000,
+      );
+      final malformedSource = await SyncDataSerializer().fetchRecord(
+        'diveProfileSeries',
+        malformedId,
+      );
+      // Not valid base64, so DiveProfileSeriesRow.fromJson itself throws
+      // before the soundness filter ever runs. resolveConflict and the
+      // adopt/restore loop call upsertRecord with no per-record catch, so an
+      // unguarded parse here aborts the whole restore.
+      final malformed = {...malformedSource!, 'samples': 'not base64!'};
+      await ProfileSeriesRepository().deleteForDive('d1');
+      await ProfileSeriesRepository().deleteForDive('d2');
+
+      await SyncDataSerializer().upsertRecord('diveProfileSeries', malformed);
+      await SyncDataSerializer().upsertRecord('diveProfileSeries', good!);
+
+      final remaining = await ProfileSeriesRepository().getRowsForDives([
+        'd1',
+        'd2',
+      ]);
+      expect(remaining.map((r) => r.id), [goodId]);
+    },
+  );
+
+  test('a malformed single tank record is skipped and a sound sibling '
+      'applies', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await dbA
+        .into(dbA.diveTanks)
+        .insert(DiveTanksCompanion.insert(id: 'tank1', diveId: 'd1'));
+    final goodId = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd1',
+      tankId: 'tank1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+    final good = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      goodId,
+    );
+    await TankPressureSeriesRepository().deleteForDive('d1');
+    final malformed = {...good!, 'id': 'tps-malformed', 'samples': 'not b64!'};
+
+    await SyncDataSerializer().upsertRecord('tankPressureSeries', malformed);
+    await SyncDataSerializer().upsertRecord('tankPressureSeries', good);
+
+    final remaining = await TankPressureSeriesRepository().getSeriesForDive(
+      'd1',
+    );
+    expect(remaining, hasLength(1));
+  });
+
+  test(
     'a peer blob whose sample count disagrees with the header is skipped',
     () async {
       dbA = await setUpTestDatabase();

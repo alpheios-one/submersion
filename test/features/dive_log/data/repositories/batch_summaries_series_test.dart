@@ -86,4 +86,51 @@ void main() {
   test('an empty id list returns an empty map', () async {
     expect(await dives.getBatchProfileSummaries(const []), isEmpty);
   });
+
+  group('an unreadable blob', () {
+    /// Overwrites [id]'s blob with bytes the codec cannot decode. Storage
+    /// can bit-rot even though the writer never produces this.
+    Future<void> corrupt(String id) async {
+      await (db.update(
+        db.diveProfileSeries,
+      )..where((t) => t.id.equals(id))).write(
+        DiveProfileSeriesCompanion(
+          samples: Value(Uint8List.fromList(const [1, 2, 3, 4])),
+        ),
+      );
+    }
+
+    test('blanks only its own dive, not every sparkline', () async {
+      final badId = await series.insertSeries(
+        diveId: 'dive-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: now,
+      );
+      await series.insertSeries(
+        diveId: 'dive-2',
+        samples: const [ProfileSample(timestamp: 0, depth: 2.0)],
+        now: now,
+      );
+      await corrupt(badId);
+
+      final summaries = await dives.getBatchProfileSummaries([
+        'dive-1',
+        'dive-2',
+      ], maxSamples: 120);
+      expect(summaries.keys.toSet(), {'dive-2'});
+    });
+
+    test('still lets getDiveById return the dive', () async {
+      final badId = await series.insertSeries(
+        diveId: 'dive-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: now,
+      );
+      await corrupt(badId);
+
+      final dive = await dives.getDiveById('dive-1');
+      expect(dive, isNotNull);
+      expect(dive!.profile, isEmpty);
+    });
+  });
 }

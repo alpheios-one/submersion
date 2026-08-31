@@ -4,7 +4,9 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
     as domain;
@@ -28,6 +30,7 @@ class TankPressureSeriesRepository {
   AppDatabase get _db => _database ?? DatabaseService.instance.database;
   final SyncRepository _syncRepository;
   final _uuid = const Uuid();
+  final _log = LoggerService.forClass(TankPressureSeriesRepository);
 
   /// Inserts one series and marks it pending. [samples] must be non-empty;
   /// any order, the repository sorts by timestamp (stable) and drops exact
@@ -99,7 +102,7 @@ class TankPressureSeriesRepository {
                 (t) => OrderingTerm.asc(t.id),
               ]))
             .get();
-    return [for (final row in rows) _decode(row)];
+    return [for (final row in rows) ?_decodeOrNull(row)];
   }
 
   Future<List<domain.TankPressureSeries>> getSeriesForTank(
@@ -114,7 +117,7 @@ class TankPressureSeriesRepository {
                 (t) => OrderingTerm.asc(t.id),
               ]))
             .get();
-    return [for (final row in rows) _decode(row)];
+    return [for (final row in rows) ?_decodeOrNull(row)];
   }
 
   /// Whether [diveId] has any tank pressure series. A count, no decode.
@@ -402,7 +405,17 @@ class TankPressureSeriesRepository {
         localUpdatedAt: nowMs,
       );
 
-  domain.TankPressureSeries _decode(TankPressureSeriesRow row) {
+  /// The tank twin of `ProfileSeriesRepository._decodeOrNull`: one
+  /// unreadable blob skips its own series rather than failing every read
+  /// that touches the dive.
+  domain.TankPressureSeries? _decodeOrNull(TankPressureSeriesRow row) {
+    final List<TankPressureSample> samples;
+    try {
+      samples = _codec.decode(row.samples);
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping unreadable tankPressureSeries ${row.id}: $e');
+      return null;
+    }
     return domain.TankPressureSeries(
       id: row.id,
       diveId: row.diveId,
@@ -413,7 +426,7 @@ class TankPressureSeriesRepository {
         startTimestamp: row.startTimestamp,
         endTimestamp: row.endTimestamp,
       ),
-      samples: _codec.decode(row.samples),
+      samples: samples,
       codecVersion: row.codecVersion,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

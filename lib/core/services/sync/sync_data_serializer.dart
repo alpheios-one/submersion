@@ -2989,18 +2989,39 @@ class SyncDataSerializer {
             );
         return;
       case 'diveProfileSeries':
-        final row = DiveProfileSeriesRow.fromJson(
-          data,
-          serializer: _syncBlobSerializer,
-        );
+        // Parsed inside a try for the reason the batch path documents: a
+        // truncated base64 `samples` string throws FormatException and a
+        // missing key throws TypeError, both before the soundness filter
+        // can run. resolveConflict and the adopt/restore loop call this
+        // with no per-record catch, so an unguarded parse turns one
+        // malformed peer record into a failed restore. `on Object` because
+        // [data] is untrusted wire data from a peer.
+        final DiveProfileSeriesRow row;
+        try {
+          row = DiveProfileSeriesRow.fromJson(
+            data,
+            serializer: _syncBlobSerializer,
+          );
+        } on Object catch (e) {
+          _log.warning('Skipping a malformed diveProfileSeries record: $e');
+          return;
+        }
         if (!_profileSeriesBlobIsSound(row)) return;
         await _db.into(_db.diveProfileSeries).insertOnConflictUpdate(row);
         return;
       case 'tankPressureSeries':
-        final row = TankPressureSeriesRow.fromJson(
-          data,
-          serializer: _syncBlobSerializer,
-        );
+        // See the diveProfileSeries case above: same per-record try, same
+        // reason.
+        final TankPressureSeriesRow row;
+        try {
+          row = TankPressureSeriesRow.fromJson(
+            data,
+            serializer: _syncBlobSerializer,
+          );
+        } on Object catch (e) {
+          _log.warning('Skipping a malformed tankPressureSeries record: $e');
+          return;
+        }
         if (!_tankSeriesBlobIsSound(row)) return;
         await _db.into(_db.tankPressureSeries).insertOnConflictUpdate(row);
         return;

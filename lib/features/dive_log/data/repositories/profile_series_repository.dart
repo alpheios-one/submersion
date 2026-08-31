@@ -4,9 +4,11 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_sample_dedupe.dart';
@@ -32,6 +34,7 @@ class ProfileSeriesRepository {
   AppDatabase get _db => _database ?? DatabaseService.instance.database;
   final SyncRepository _syncRepository;
   final _uuid = const Uuid();
+  final _log = LoggerService.forClass(ProfileSeriesRepository);
 
   /// Inserts one series and marks it pending so it gets an HLC.
   ///
@@ -111,7 +114,7 @@ class ProfileSeriesRepository {
       query.where((t) => t.isPrimary.equals(true));
     }
     final rows = await query.get();
-    return [for (final row in rows) _decode(row)];
+    return [for (final row in rows) ?_decodeOrNull(row)];
   }
 
   /// Every series of every dive in [diveIds], grouped by dive, each list in
@@ -127,7 +130,9 @@ class ProfileSeriesRepository {
     final rows = await _rowsForDives(diveIds);
     final byDive = <String, List<ProfileSeries>>{};
     for (final row in rows) {
-      byDive.putIfAbsent(row.diveId, () => []).add(_decode(row));
+      final series = _decodeOrNull(row);
+      if (series == null) continue;
+      byDive.putIfAbsent(row.diveId, () => []).add(series);
     }
     return byDive;
   }
@@ -136,7 +141,7 @@ class ProfileSeriesRepository {
     final row = await (_db.select(
       _db.diveProfileSeries,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
-    return row == null ? null : _decode(row);
+    return row == null ? null : _decodeOrNull(row);
   }
 
   /// Whether [diveId] has any primary series. A count, so no blob is read
@@ -609,7 +614,21 @@ class ProfileSeriesRepository {
         localUpdatedAt: nowMs,
       );
 
-  ProfileSeries _decode(DiveProfileSeriesRow row) {
+  /// Decodes one row, or returns null when its blob does not decode.
+  ///
+  /// One unreadable blob (a decode failure the writer never should have let
+  /// through, but storage can still bit-rot) skips its own series rather
+  /// than failing every read that touches the dive: the retired row-per-
+  /// sample read could only ever return fewer rows, and
+  /// `series_profile_aggregates._decodeStreams` already applies this policy.
+  ProfileSeries? _decodeOrNull(DiveProfileSeriesRow row) {
+    final List<ProfileSample> samples;
+    try {
+      samples = _codec.decode(row.samples);
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping unreadable diveProfileSeries ${row.id}: $e');
+      return null;
+    }
     return ProfileSeries(
       id: row.id,
       diveId: row.diveId,
@@ -627,7 +646,7 @@ class ProfileSeriesRepository {
         hasDecoStop: row.hasDecoStop,
         hasPositiveCeiling: row.hasPositiveCeiling,
       ),
-      samples: _codec.decode(row.samples),
+      samples: samples,
       codecVersion: row.codecVersion,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

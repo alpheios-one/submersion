@@ -285,4 +285,31 @@ void main() {
     );
     expect(await repo.hasSeriesForDive('dive-1'), isTrue);
   });
+
+  group('an unreadable blob', () {
+    test('getSeriesForDive skips it and keeps the rest', () async {
+      final badId = await repo.insertSeries(
+        diveId: 'dive-1',
+        tankId: 'tank-a',
+        samples: samples,
+        now: now,
+      );
+      final goodId = await repo.insertSeries(
+        diveId: 'dive-1',
+        tankId: 'tank-b',
+        samples: samples,
+        now: now,
+      );
+      await (db.update(
+        db.tankPressureSeries,
+      )..where((t) => t.id.equals(badId))).write(
+        TankPressureSeriesCompanion(
+          samples: Value(Uint8List.fromList(const [1, 2, 3, 4])),
+        ),
+      );
+
+      final read = await repo.getSeriesForDive('dive-1');
+      expect(read.map((s) => s.id), [goodId]);
+    });
+  });
 }

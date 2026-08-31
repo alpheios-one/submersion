@@ -359,4 +359,64 @@ void main() {
       expect(await repo.getSeriesForDive('dive-1'), isEmpty);
     });
   });
+
+  group('unreadable blobs', () {
+    /// Overwrites [id]'s blob with bytes the codec cannot decode. Storage
+    /// can bit-rot even though the writer never produces this.
+    Future<void> corrupt(String id) async {
+      await (db.update(
+        db.diveProfileSeries,
+      )..where((t) => t.id.equals(id))).write(
+        DiveProfileSeriesCompanion(
+          samples: Value(Uint8List.fromList(const [1, 2, 3, 4])),
+        ),
+      );
+    }
+
+    test('getSeriesForDive skips the bad row and keeps the rest', () async {
+      final badId = await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: samples,
+        now: now,
+      );
+      final goodId = await repo.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        samples: const [ProfileSample(timestamp: 100, depth: 3.0)],
+        now: now,
+      );
+      await corrupt(badId);
+
+      final read = await repo.getSeriesForDive('dive-1');
+      expect(read.map((s) => s.id), [goodId]);
+    });
+
+    test('getSeriesForDives skips the bad row and keeps the rest', () async {
+      final badId = await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: samples,
+        now: now,
+      );
+      final goodId = await repo.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        samples: const [ProfileSample(timestamp: 100, depth: 3.0)],
+        now: now,
+      );
+      await corrupt(badId);
+
+      final byDive = await repo.getSeriesForDives(['dive-1']);
+      expect(byDive['dive-1']!.map((s) => s.id), [goodId]);
+    });
+
+    test('getSeriesById returns null for an unreadable row', () async {
+      final badId = await repo.insertSeries(
+        diveId: 'dive-1',
+        samples: samples,
+        now: now,
+      );
+      await corrupt(badId);
+      expect(await repo.getSeriesById(badId), isNull);
+    });
+  });
 }
