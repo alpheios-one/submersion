@@ -44,6 +44,16 @@ void main() {
       expect(name, isNot(contains('*')));
     });
 
+    test('the tag is 64 bits wide', () {
+      // Pinned because the width is unmigratable. The moment an attributed
+      // backup exists in a shared folder its name has to keep parsing, so the
+      // choice is made once. At 8 hex digits two devices in one folder could
+      // collide and one would be classified as the other, which is exactly the
+      // deletion this module refuses to allow.
+      expect(deviceTag(thisDevice), matches(RegExp(r'^[0-9a-f]{16}$')));
+      expect(deviceTag(thisDevice), isNot(deviceTag(otherDevice)));
+    });
+
     test('the same device always produces the same tag', () {
       final a = buildBackupFilename(
         timestamp: '2026-08-31_121314',

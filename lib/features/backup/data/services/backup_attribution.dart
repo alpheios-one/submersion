@@ -31,8 +31,18 @@ const String _backupPrefix = 'submersion_backup_';
 /// the set against the crypto constant.
 const Set<String> backupFileExtensions = {'.db', '.sbe'};
 
-/// A tag is exactly eight lowercase hex digits, the prefix of a SHA-1.
-final RegExp _tagPattern = RegExp(r'^[0-9a-f]{8}$');
+/// Width of the device tag in hex digits, so 64 bits of the SHA-1.
+///
+/// Not the 8 that readability alone would pick. The width cannot be widened
+/// after the fact: once one attributed backup exists in a shared folder, its
+/// name has to keep parsing for as long as the file lives. Eight more
+/// characters now is the entire cost, and what it buys off is a tag collision
+/// classifying another device's backup as this device's, which deletes
+/// someone's only copy.
+const int _tagHexLength = 16;
+
+/// A tag is exactly [_tagHexLength] lowercase hex digits, a SHA-1 prefix.
+final RegExp _tagPattern = RegExp('^[0-9a-f]{$_tagHexLength}\$');
 
 /// A short, stable, filesystem-safe tag for [deviceId].
 ///
@@ -40,7 +50,7 @@ final RegExp _tagPattern = RegExp(r'^[0-9a-f]{8}$');
 /// into a filename that may sync to a shared cloud folder, and so an id
 /// containing separators or spaces cannot produce an unusable name.
 String deviceTag(String deviceId) =>
-    sha1.convert(utf8.encode(deviceId)).toString().substring(0, 8);
+    sha1.convert(utf8.encode(deviceId)).toString().substring(0, _tagHexLength);
 
 /// Builds a backup filename that records which device wrote it.
 ///
@@ -68,8 +78,9 @@ String? backupDeviceTagFromFilename(String filename) {
 
   // A backup extension is required, and the tag has to run to the end of the
   // stem. A directory scan sees whatever else the folder holds, and sidecars
-  // borrow a real backup's name: `...__dabcd1234.db.tmp` from an interrupted
-  // write, `...__dabcd1234 (conflicted copy).db` from a sync client. Reading a
+  // borrow a real backup's name: `...__dabcd1234ef567890.db.tmp` from an interrupted
+  // write, `...__dabcd1234ef567890 (conflicted copy).db` from a sync client.
+  // Reading a
   // tag out of one of those would claim a file we did not write, which is the
   // single outcome this module exists to prevent.
   final extension = backupFileExtensions.firstWhere(
