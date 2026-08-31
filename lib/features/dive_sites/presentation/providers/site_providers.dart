@@ -236,11 +236,11 @@ final sortedSitesWithCountsProvider =
       final sitesAsync = ref.watch(filteredSitesWithCountsProvider);
       final sort = ref.watch(siteSortProvider);
 
-      return sitesAsync.whenData((sites) => _applySiteSorting(sites, sort));
+      return sitesAsync.whenData((sites) => applySiteSorting(sites, sort));
     });
 
 /// Apply sorting to a list of sites
-List<SiteWithDiveCount> _applySiteSorting(
+List<SiteWithDiveCount> applySiteSorting(
   List<SiteWithDiveCount> sites,
   SortState<SiteSortField> sort,
 ) {
@@ -265,6 +265,12 @@ List<SiteWithDiveCount> _applySiteSorting(
           comparison = (a.site.maxDepth ?? 0).compareTo(b.site.maxDepth ?? 0);
         case SiteSortField.diveCount:
           comparison = a.diveCount.compareTo(b.diveCount);
+        case SiteSortField.lastDived:
+          // Sites never dived fall back to the epoch-like sentinel, so they
+          // trail the list under the default descending direction.
+          comparison = (a.lastDivedAt ?? DateTime(1900)).compareTo(
+            b.lastDivedAt ?? DateTime(1900),
+          );
       }
 
       if (invertForText) {

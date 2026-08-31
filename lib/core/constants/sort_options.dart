@@ -33,7 +33,8 @@ enum SiteSortField {
   rating('Rating', Icons.star),
   difficulty('Difficulty', Icons.trending_up),
   depth('Max Depth', Icons.vertical_align_bottom),
-  diveCount('Dive Count', Icons.scuba_diving);
+  diveCount('Dive Count', Icons.scuba_diving),
+  lastDived('Last Dived', Icons.history);
 
   final String displayName;
   final IconData icon;

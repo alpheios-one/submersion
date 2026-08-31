@@ -35,6 +35,7 @@ extension SiteSortFieldDisplay on SiteSortField {
     SiteSortField.difficulty => l10n.enum_sortField_difficulty,
     SiteSortField.depth => l10n.enum_sortField_maxDepth,
     SiteSortField.diveCount => l10n.enum_sortField_diveCount,
+    SiteSortField.lastDived => l10n.enum_siteField_lastDived,
   };
 }
 
