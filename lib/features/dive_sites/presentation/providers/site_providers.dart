@@ -266,11 +266,21 @@ List<SiteWithDiveCount> applySiteSorting(
         case SiteSortField.diveCount:
           comparison = a.diveCount.compareTo(b.diveCount);
         case SiteSortField.lastDived:
-          // Sites never dived fall back to the epoch-like sentinel, so they
-          // trail the list under the default descending direction.
-          comparison = (a.lastDivedAt ?? DateTime(1900)).compareTo(
-            b.lastDivedAt ?? DateTime(1900),
-          );
+          // Sites never dived always sort last regardless of direction,
+          // with a name tie-break; return before the direction inversion
+          // below so the pinning is not flipped.
+          final aDate = a.lastDivedAt;
+          final bDate = b.lastDivedAt;
+          if (aDate == null || bDate == null) {
+            if (aDate == null && bDate == null) {
+              return a.site.name.compareTo(b.site.name);
+            }
+            return aDate == null ? 1 : -1;
+          }
+          comparison = aDate.compareTo(bDate);
+          if (comparison == 0) {
+            return a.site.name.compareTo(b.site.name);
+          }
       }
 
       if (invertForText) {

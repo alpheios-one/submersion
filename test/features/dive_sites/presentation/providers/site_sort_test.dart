@@ -73,7 +73,7 @@ void main() {
       expect(sorted.map((s) => s.site.name), ['Recent', 'Old', 'Never']);
     });
 
-    test('never-dived sites sort before dived sites when ascending', () {
+    test('never-dived sites sort after dived sites when ascending', () {
       final sites = [
         _site('Recent', lastDivedAt: DateTime(2026, 3, 15)),
         _site('Never'),
@@ -88,7 +88,44 @@ void main() {
         ),
       );
 
-      expect(sorted.map((s) => s.site.name), ['Never', 'Old', 'Recent']);
+      expect(sorted.map((s) => s.site.name), ['Old', 'Recent', 'Never']);
+    });
+
+    test('sites with the same last-dived date tie-break alphabetically', () {
+      final sameDate = DateTime(2023, 8, 20);
+      final sites = [
+        _site('Charlie', lastDivedAt: sameDate),
+        _site('Alice', lastDivedAt: sameDate),
+        _site('Bob', lastDivedAt: sameDate),
+      ];
+
+      final sorted = applySiteSorting(
+        sites,
+        const SortState(
+          field: SiteSortField.lastDived,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((s) => s.site.name), ['Alice', 'Bob', 'Charlie']);
+    });
+
+    test('never-dived sites tie-break alphabetically among themselves', () {
+      final sites = [
+        _site('Zeta'),
+        _site('Recent', lastDivedAt: DateTime(2026, 3, 15)),
+        _site('Alpha'),
+      ];
+
+      final sorted = applySiteSorting(
+        sites,
+        const SortState(
+          field: SiteSortField.lastDived,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(sorted.map((s) => s.site.name), ['Recent', 'Alpha', 'Zeta']);
     });
 
     test('does not mutate the input list', () {
