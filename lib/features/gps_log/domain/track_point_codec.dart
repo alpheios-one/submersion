@@ -187,9 +187,9 @@ int _countCommas(Uint8List body) {
 /// Returns [value] as a finite number, or throws naming the offending field.
 ///
 /// Finiteness is not pedantry: JSON has no infinity literal, but an
-/// out-of-range exponent such as `1e999` parses to one, and `toInt()` on
-/// infinity throws an `UnsupportedError` that no call site is written to
-/// expect.
+/// out-of-range exponent such as `1e999` parses to `Infinity`, and
+/// `toInt()` on an infinity throws an `UnsupportedError` that no call site
+/// is written to expect.
 ///
 /// The two rejections are reported apart because only one of them can safely
 /// name what it saw. [value] is peer-supplied and nothing upstream bounds a

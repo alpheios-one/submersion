@@ -252,9 +252,10 @@ void main() {
     });
 
     test('a non-finite number, which is safe to name', () {
-      // JSON has no infinity literal, but an out-of-range exponent parses to
-      // one, and toInt() on it throws an UnsupportedError no caller expects.
-      // A non-finite num is NaN or an infinity, so printing it cannot grow.
+      // JSON has no infinity literal, but an out-of-range exponent such as
+      // 1e999 parses to Infinity, and toInt() on an infinity throws an
+      // UnsupportedError no caller expects. A non-finite num is NaN or an
+      // infinity, so printing it cannot grow.
       expect(
         () => decodeTrackPoints(_blobOf('[[1e999,1,2,null]]')),
         throwsA(
