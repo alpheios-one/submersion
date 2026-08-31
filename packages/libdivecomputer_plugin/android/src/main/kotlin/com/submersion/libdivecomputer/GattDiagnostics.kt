@@ -205,6 +205,50 @@ object GattDiagnostics {
     }
 
     /**
+     * Message for a subscription whose CCCD write was never issued: the
+     * characteristic carries no CCCD, or the local stack refused to queue
+     * the write. Nothing reached the computer, so there is no ATT status to
+     * report and none is claimed.
+     *
+     * Shared by both sites that start a subscription, the first one in
+     * onServicesDiscovered and the Data TX one that a credit-flow device
+     * starts from onDescriptorWrite instead.
+     */
+    const val SUBSCRIPTION_NOT_STARTED =
+        "Notification subscription could not be started; the connection " +
+            "cannot carry a serial session"
+
+    /**
+     * Message for a Data TX CCCD write the computer accepted and then
+     * completed with a failure status.
+     *
+     * This is the other half of [SUBSCRIPTION_NOT_STARTED] and has to read
+     * differently: there the write never left this phone, while here the
+     * computer answered and refused, so the ATT status is its own account
+     * of why. Either way the peripheral sends nothing and every
+     * libdivecomputer read blocks to timeout.
+     */
+    fun describeDataSubscriptionFailure(status: Int): String =
+        "Data TX notification subscription failed: status=$status " +
+            "(${describeAttStatus(status)}); the computer will send nothing, " +
+            "so the connection cannot carry a serial session"
+
+    /**
+     * The Terminal I/O twin of [describeDataSubscriptionFailure], for the
+     * Credits TX subscription that is written first.
+     *
+     * Only reached on a module that requires credit flow control, which
+     * keeps its UART bridge closed until the subscription exists (#923):
+     * that failure is terminal rather than something to run without. A
+     * u-blox module, where flow control is optional, never comes here; it
+     * abandons credits and carries on, which is a warning, not an error.
+     */
+    fun describeCreditsSubscriptionFailure(status: Int): String =
+        "Terminal I/O: Credits TX subscription failed: status=$status " +
+            "(${describeAttStatus(status)}); the module keeps its UART " +
+            "bridge closed without it, so no command can reach the computer"
+
+    /**
      * Message for a discovery that completed but exposed no service
      * carrying both a write and a notify/indicate characteristic, which is
      * the pair the serial bridge needs.

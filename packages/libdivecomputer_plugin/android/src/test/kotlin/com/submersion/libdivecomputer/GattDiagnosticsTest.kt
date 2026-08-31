@@ -275,4 +275,65 @@ class GattDiagnosticsTest {
         assertTrue(message.contains("00001800-0000-1000-8000-00805f9b34fb"))
         assertTrue(message.contains("0000fefb-0000-1000-8000-00805f9b34fb"))
     }
+
+    @Test
+    fun aRefusedDataSubscriptionNamesTheAttReasonForIt() {
+        // onDescriptorWrite is an ATT callback, so status 8 here is an
+        // authorization failure, not the connection timeout the same number
+        // means on onConnectionStateChange. Sending a reporter after range
+        // and battery for a bond problem is the misdiagnosis this suite
+        // exists to prevent.
+        val message = GattDiagnostics.describeDataSubscriptionFailure(
+            GattDiagnostics.ATT_INSUFFICIENT_AUTHORIZATION
+        )
+
+        assertTrue(message.contains("status=8"))
+        assertTrue(message.contains("authorization"))
+        assertFalse(message.contains("out of range"))
+    }
+
+    @Test
+    fun aRefusedCreditsSubscriptionNamesTheBridgeItLeavesShut() {
+        // A Telit module answers nothing at all without this subscription,
+        // so the message has to say why the link is dead rather than just
+        // that a descriptor write failed (#923).
+        val message = GattDiagnostics.describeCreditsSubscriptionFailure(
+            GattDiagnostics.ATT_INSUFFICIENT_AUTHENTICATION
+        )
+
+        assertTrue(message.contains("Credits TX"))
+        assertTrue(message.contains("bridge"))
+        assertTrue(message.contains("status=5"))
+        assertTrue(message.contains("pairing"))
+    }
+
+    @Test
+    fun theTwoSubscriptionFailuresAreNotInterchangeable() {
+        // They are logged from adjacent branches of one callback. An
+        // implementation that routed both through a single message would
+        // leave a log that cannot say which subscription died, which is the
+        // difference between a Terminal I/O handshake problem and a data
+        // characteristic the computer refuses to push.
+        val status = GattDiagnostics.GATT_ERROR
+        val data = GattDiagnostics.describeDataSubscriptionFailure(status)
+        val credits = GattDiagnostics.describeCreditsSubscriptionFailure(status)
+
+        assertFalse(data == credits)
+        assertTrue(data.contains("Data TX"))
+        assertFalse(data.contains("Credits TX"))
+    }
+
+    @Test
+    fun aSubscribeThatNeverStartedClaimsNoStatusItCouldNotHave() {
+        // Nothing reached the computer on this path, so there is no ATT
+        // status to name. A message that rendered one anyway would invent a
+        // verdict the peripheral never gave.
+        assertFalse(GattDiagnostics.SUBSCRIPTION_NOT_STARTED.contains("status="))
+        assertFalse(
+            GattDiagnostics.SUBSCRIPTION_NOT_STARTED ==
+                GattDiagnostics.describeDataSubscriptionFailure(
+                    GattDiagnostics.GATT_SUCCESS
+                )
+        )
+    }
 }

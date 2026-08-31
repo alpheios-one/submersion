@@ -401,8 +401,7 @@ class BleIoStream(
                     // Only the two DEBUG lines inside subscribeToNotifications
                     // said anything, and neither is an error.
                     NativeLogger.e(TAG, "BLE",
-                        "Notification subscription could not be started; the " +
-                            "connection cannot carry a serial session")
+                        GattDiagnostics.SUBSCRIPTION_NOT_STARTED)
                 }
             } else {
                 // Discovery worked but nothing here can carry a serial
@@ -443,6 +442,20 @@ class BleIoStream(
                 ) {
                     return
                 }
+                // On a credit-flow device Data TX is subscribed from here
+                // rather than from onServicesDiscovered, so the error that
+                // path logs for a subscribe that never started belongs on
+                // this one too. Without it the credits handshake succeeding
+                // and the data subscribe then failing to start reads as a
+                // clean connect that answers nothing.
+                NativeLogger.e(TAG, "BLE", GattDiagnostics.SUBSCRIPTION_NOT_STARTED)
+            } else if (completed == SetupStep.CREDITS_NOTIFY) {
+                // Credits are required and the module refused the
+                // subscription: the branch above already took every case
+                // where the failure is survivable. Nothing more is
+                // attempted, so this is the last word on the connect.
+                NativeLogger.e(TAG, "BLE",
+                    GattDiagnostics.describeCreditsSubscriptionFailure(status))
             } else if (completed == SetupStep.DATA_NOTIFY && ok) {
                 // The one point where the peripheral has confirmed it will
                 // push data. connectAndDiscover reports on this rather than
@@ -456,6 +469,15 @@ class BleIoStream(
                 } else if (!creditsRequired) {
                     abandonCreditFlowControl("initial credit write rejected")
                 }
+            } else if (completed == SetupStep.DATA_NOTIFY) {
+                // The computer accepted the CCCD write and then completed it
+                // with a failure status, which leaves dataNotifyReady false
+                // and fails the connect. writeDescriptor() returning true is
+                // only the local stack queueing the write; the peripheral's
+                // answer arrives here, and until this the whole account of a
+                // refusal was the DEBUG status line above.
+                NativeLogger.e(TAG, "BLE",
+                    GattDiagnostics.describeDataSubscriptionFailure(status))
             }
 
             // Nothing further in flight; GATT is free for I/O.
