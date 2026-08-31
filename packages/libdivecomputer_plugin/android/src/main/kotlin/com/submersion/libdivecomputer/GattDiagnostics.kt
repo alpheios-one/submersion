@@ -24,17 +24,42 @@ object GattDiagnostics {
     const val DEVICE_TYPE_LE = 2
     const val DEVICE_TYPE_DUAL = 3
 
-    // Mirrors android.bluetooth.BluetoothGatt.GATT_SUCCESS plus the
-    // connection-layer statuses the stack passes through unchanged. Only
-    // GATT_SUCCESS and a handful of ATT codes are public API; the rest come
-    // from the HCI error codes in stack/include/gatt_api.h and are stable.
+    // A BluetoothGattCallback status is read in one of two disjoint number
+    // spaces, and they collide. An operation callback (onServicesDiscovered,
+    // onDescriptorWrite, onCharacteristicRead/Write) carries an ATT protocol
+    // error; onConnectionStateChange carries an HCI connection error passed
+    // through unchanged. Both define 8: ATT 0x08 is insufficient
+    // authorization, HCI 0x08 is connection timeout. Describing one with the
+    // other's table does not degrade to a vague answer, it produces a
+    // confident wrong one, so the two tables are kept apart and each
+    // describer names the space it reads.
+
+    // ATT protocol errors (Bluetooth core spec vol 3 part F 3.4.1.1, mirrored
+    // in stack/include/gatt_api.h). GATT_SUCCESS and a handful of these are
+    // public API on android.bluetooth.BluetoothGatt; the rest are stable.
     const val GATT_SUCCESS = 0
-    const val GATT_INSUFFICIENT_AUTHENTICATION = 5
-    const val GATT_CONN_TIMEOUT = 8
-    const val GATT_CONN_TERMINATE_PEER_USER = 19
-    const val GATT_CONN_TERMINATE_LOCAL_HOST = 22
-    const val GATT_CONN_LMP_TIMEOUT = 34
-    const val GATT_CONN_FAIL_ESTABLISH = 62
+    const val ATT_INVALID_HANDLE = 1
+    const val ATT_READ_NOT_PERMITTED = 2
+    const val ATT_WRITE_NOT_PERMITTED = 3
+    const val ATT_INSUFFICIENT_AUTHENTICATION = 5
+    const val ATT_REQUEST_NOT_SUPPORTED = 6
+    const val ATT_INVALID_OFFSET = 7
+    const val ATT_INSUFFICIENT_AUTHORIZATION = 8
+    const val ATT_ATTRIBUTE_NOT_FOUND = 10
+    const val ATT_INSUFFICIENT_KEY_SIZE = 12
+    const val ATT_INVALID_ATTRIBUTE_LENGTH = 13
+    const val ATT_INSUFFICIENT_ENCRYPTION = 15
+
+    // HCI connection errors, as delivered to onConnectionStateChange.
+    const val CONN_TIMEOUT = 8
+    const val CONN_TERMINATE_PEER_USER = 19
+    const val CONN_TERMINATE_LOCAL_HOST = 22
+    const val CONN_LMP_TIMEOUT = 34
+    const val CONN_FAIL_ESTABLISH = 62
+    const val CONN_AUTH_FAILURE = 137
+    const val CONN_TIMEOUT_HCI = 147
+
+    // Reported in both spaces.
     const val GATT_INTERNAL_ERROR = 129
     const val GATT_ERROR = 133
     const val GATT_CONN_CANCEL = 256
@@ -66,24 +91,41 @@ object GattDiagnostics {
     fun describeTransport(leRequested: Boolean): String =
         if (leRequested) "LE" else "AUTO (LE cannot be demanded below API 23)"
 
-    /** Human-readable reason for a BluetoothGattCallback status code. */
-    fun describeGattStatus(status: Int): String = when (status) {
+    /**
+     * Reason for a status delivered by an ATT operation callback, such as
+     * [android.bluetooth.BluetoothGattCallback.onServicesDiscovered].
+     *
+     * Do not use for onConnectionStateChange: see [describeConnectionStatus]
+     * and the note on the constants above for the codes that collide.
+     */
+    fun describeAttStatus(status: Int): String = when (status) {
         GATT_SUCCESS ->
             "success"
-        GATT_INSUFFICIENT_AUTHENTICATION ->
+        ATT_INVALID_HANDLE ->
+            "the computer rejected the handle as invalid"
+        ATT_READ_NOT_PERMITTED ->
+            "the computer does not permit reading that attribute"
+        ATT_WRITE_NOT_PERMITTED ->
+            "the computer does not permit writing that attribute"
+        ATT_INSUFFICIENT_AUTHENTICATION ->
             "insufficient authentication; the stored pairing keys are stale " +
                 "or the computer demanded encryption"
-        GATT_CONN_TIMEOUT ->
-            "the connection timed out; the computer moved out of range or " +
-                "switched its radio off"
-        GATT_CONN_TERMINATE_PEER_USER ->
-            "the computer closed the connection"
-        GATT_CONN_TERMINATE_LOCAL_HOST ->
-            "this phone closed the connection"
-        GATT_CONN_LMP_TIMEOUT ->
-            "the computer stopped answering the radio link"
-        GATT_CONN_FAIL_ESTABLISH ->
-            "the connection could not be established"
+        ATT_REQUEST_NOT_SUPPORTED ->
+            "the computer does not support that request"
+        ATT_INVALID_OFFSET ->
+            "the computer rejected the offset as invalid"
+        ATT_INSUFFICIENT_AUTHORIZATION ->
+            "insufficient authorization; usually a bond problem, so removing " +
+                "the pairing on both sides and pairing again is the first " +
+                "thing to try"
+        ATT_ATTRIBUTE_NOT_FOUND ->
+            "the computer reported no such attribute"
+        ATT_INSUFFICIENT_KEY_SIZE ->
+            "the negotiated encryption key is too short for that attribute"
+        ATT_INVALID_ATTRIBUTE_LENGTH ->
+            "the computer rejected the attribute length"
+        ATT_INSUFFICIENT_ENCRYPTION ->
+            "the attribute needs an encrypted link and this one is not"
         GATT_INTERNAL_ERROR ->
             "internal Bluetooth stack error"
         GATT_ERROR ->
@@ -94,7 +136,43 @@ object GattDiagnostics {
         GATT_FAILURE ->
             "the operation failed"
         else ->
-            "unknown GATT status ($status)"
+            "unknown ATT status ($status)"
+    }
+
+    /**
+     * Reason for a status delivered by
+     * [android.bluetooth.BluetoothGattCallback.onConnectionStateChange],
+     * which reads in the HCI connection space rather than the ATT one.
+     */
+    fun describeConnectionStatus(status: Int): String = when (status) {
+        GATT_SUCCESS ->
+            "success"
+        CONN_TIMEOUT ->
+            "the connection timed out; the computer moved out of range or " +
+                "switched its radio off"
+        CONN_TERMINATE_PEER_USER ->
+            "the computer closed the connection"
+        CONN_TERMINATE_LOCAL_HOST ->
+            "this phone closed the connection"
+        CONN_LMP_TIMEOUT ->
+            "the computer stopped answering the radio link"
+        CONN_FAIL_ESTABLISH ->
+            "the connection could not be established"
+        CONN_AUTH_FAILURE ->
+            "authentication failed; the pairing keys are stale on one side"
+        CONN_TIMEOUT_HCI ->
+            "the connection could not be established before the radio gave up"
+        GATT_INTERNAL_ERROR ->
+            "internal Bluetooth stack error"
+        GATT_ERROR ->
+            "generic GATT error; on a connect this is usually a stale bond " +
+                "or a computer that is not advertising"
+        GATT_CONN_CANCEL ->
+            "the connection attempt was cancelled"
+        GATT_FAILURE ->
+            "the operation failed"
+        else ->
+            "unknown connection status ($status)"
     }
 
     /**
@@ -116,7 +194,7 @@ object GattDiagnostics {
      */
     fun describeDiscoveryFailure(status: Int, deviceType: Int): String {
         val base = "Service discovery failed: status=$status " +
-            "(${describeGattStatus(status)}); the computer's radio is " +
+            "(${describeAttStatus(status)}); the computer's radio is " +
             describeDeviceType(deviceType)
         if (deviceType != DEVICE_TYPE_DUAL) return base
         return "$base. Dual-mode is a known trap: under TRANSPORT_AUTO " +

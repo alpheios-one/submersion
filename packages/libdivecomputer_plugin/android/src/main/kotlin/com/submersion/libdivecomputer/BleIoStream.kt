@@ -158,6 +158,11 @@ class BleIoStream(
     private val gattOperation = Semaphore(1)
     private val connectSemaphore = Semaphore(0)
     private var connected = false
+
+    // Whether the Data TX CCCD write completed successfully. Assigning
+    // notifyCharacteristic only means a candidate was found; until the
+    // descriptor write lands the peripheral sends nothing.
+    private var dataNotifyReady = false
     private var readBuffer = ByteArray(0)
 
     private val pinSemaphore = Semaphore(0)
@@ -199,7 +204,17 @@ class BleIoStream(
                 // Request a larger MTU before discovering services.
                 // Android defaults to 23 bytes (20 payload); CoreBluetooth
                 // negotiates automatically but Android requires an explicit call.
-                gatt.requestMtu(512)
+                // A refused request never produces onMtuChanged, and
+                // onMtuChanged is the only path in this class that reaches
+                // discoverServices(), so a discarded false here costs the
+                // caller the whole 15-second connect timeout for a failure
+                // the stack already reported. Same reasoning as the
+                // discoverServices() check in onMtuChanged below.
+                if (!gatt.requestMtu(512)) {
+                    NativeLogger.e(TAG, "BLE",
+                        "requestMtu(512) was refused by the Bluetooth stack")
+                    connectSemaphore.release()
+                }
             } else {
                 connected = false
                 lastDisconnectStatus = status
@@ -228,7 +243,9 @@ class BleIoStream(
                 // drains the semaphore before issuing.
                 lastWriteStatus = BluetoothGatt.GATT_FAILURE
                 writeSemaphore.release()
-                NativeLogger.d(TAG, "BLE", "onConnectionStateChange: disconnected status=$status")
+                NativeLogger.d(TAG, "BLE",
+                    "onConnectionStateChange: disconnected status=$status " +
+                        "(${GattDiagnostics.describeConnectionStatus(status)})")
                 connectSemaphore.release()
             }
         }
@@ -251,9 +268,15 @@ class BleIoStream(
                 // Silent before #957: the only trace a Petrel 2 owner could
                 // send was "writeChar=null", which is a symptom of both this
                 // branch and the no-usable-service one below.
+                // Release first. describeDiscoveryFailure's second argument
+                // is deviceType(), a binder round trip that raises
+                // SecurityException if BLUETOOTH_CONNECT is revoked
+                // mid-download; AOSP swallows a throw from this callback, so
+                // the release would simply never run and an immediate failure
+                // would become a 15-second hang.
+                connectSemaphore.release()
                 NativeLogger.e(TAG, "BLE",
                     GattDiagnostics.describeDiscoveryFailure(status, deviceType()))
-                connectSemaphore.release()
                 return
             }
 
@@ -370,6 +393,17 @@ class BleIoStream(
                 } else {
                     subscribeToNotifications(gatt, bestNotify, SetupStep.DATA_NOTIFY)
                 }
+                if (!startedSetup) {
+                    // The characteristics are assigned by now, so without
+                    // this the connect reports success on a link that can
+                    // never deliver a byte: every libdivecomputer read would
+                    // block to timeout with no notification subscription.
+                    // Only the two DEBUG lines inside subscribeToNotifications
+                    // said anything, and neither is an error.
+                    NativeLogger.e(TAG, "BLE",
+                        "Notification subscription could not be started; the " +
+                            "connection cannot carry a serial session")
+                }
             } else {
                 // Discovery worked but nothing here can carry a serial
                 // session. Name what the computer did expose: those UUIDs
@@ -410,6 +444,10 @@ class BleIoStream(
                     return
                 }
             } else if (completed == SetupStep.DATA_NOTIFY && ok) {
+                // The one point where the peripheral has confirmed it will
+                // push data. connectAndDiscover reports on this rather than
+                // on the characteristic being non-null.
+                dataNotifyReady = true
                 if (creditsWriteCharacteristic == null) {
                     // No credit flow control on this device, or already
                     // abandoned: GATT is free for I/O.
@@ -682,6 +720,17 @@ class BleIoStream(
         } else {
             device.connectGatt(context, false, gattCallback)
         }
+        // connectGatt returns null when the adapter service is unbound or
+        // BLE is unsupported, which is what turning Bluetooth off between
+        // the scan and the download looks like. No callback can ever fire,
+        // so waiting would burn the full 15 seconds and then report the
+        // generic failure that issue #957 was filed about.
+        if (gatt == null) {
+            NativeLogger.e(TAG, "BLE",
+                "connectGatt returned null; Bluetooth is off or the adapter " +
+                    "is unavailable")
+            return false
+        }
         if (!connectSemaphore.tryAcquire(15, TimeUnit.SECONDS)) {
             NativeLogger.e(TAG, "BLE", "connectAndDiscover: semaphore timeout")
             return false
@@ -690,8 +739,11 @@ class BleIoStream(
         // granted, so a failed handshake means the first command write would
         // fail rather than the download merely being slow (issue #923).
         val terminalIoReady = creditsWriteCharacteristic == null || credits > 0
-        val ok = connected && writeCharacteristic != null && terminalIoReady
-        NativeLogger.d(TAG, "BLE", "connectAndDiscover: connected=$connected writeChar=${writeCharacteristic?.uuid} credits=$credits result=$ok")
+        val ok = connected &&
+            writeCharacteristic != null &&
+            dataNotifyReady &&
+            terminalIoReady
+        NativeLogger.d(TAG, "BLE", "connectAndDiscover: connected=$connected writeChar=${writeCharacteristic?.uuid} notifyReady=$dataNotifyReady credits=$credits result=$ok")
         return ok
     }
 

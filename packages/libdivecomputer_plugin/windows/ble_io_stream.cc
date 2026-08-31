@@ -20,15 +20,18 @@ namespace {
 // bug report reads the same way as the ones this code was modelled on.
 constexpr char kBleCategory[] = "BLE";
 
+// Colon-free upper-case hex, the one form a Windows address takes anywhere
+// else in this plugin: ble_scanner.cc formats the same uint64 as "%012llX",
+// that string is DiscoveredDevice::address(), it is the access-code storage
+// key, it is what dive_computer_host_api_impl.cc parses back with strtoull,
+// and it is what the Dart log prints. A colon-separated form here would mean
+// the connect and error lines could not be matched to the device that
+// produced them, and bluetoothAddressesMatch (discovery_providers.dart) only
+// upper-cases before comparing, so it would not bridge the two spellings.
 std::string FormatAddress(uint64_t address) {
-    char buffer[18];
-    std::snprintf(buffer, sizeof(buffer), "%02X:%02X:%02X:%02X:%02X:%02X",
-                  static_cast<unsigned>((address >> 40) & 0xFF),
-                  static_cast<unsigned>((address >> 32) & 0xFF),
-                  static_cast<unsigned>((address >> 24) & 0xFF),
-                  static_cast<unsigned>((address >> 16) & 0xFF),
-                  static_cast<unsigned>((address >> 8) & 0xFF),
-                  static_cast<unsigned>(address & 0xFF));
+    char buffer[13];
+    std::snprintf(buffer, sizeof(buffer), "%012llX",
+                  static_cast<unsigned long long>(address));
     return std::string(buffer);
 }
 
@@ -164,14 +167,26 @@ bool BleIoStream::ConnectAndDiscover(uint64_t bluetooth_address) {
                       bluetooth_address)
                       .get();
         if (!device_) {
-            // Windows resolves the address against its own device database,
-            // so this is not "the computer is off": it is Windows holding no
-            // LE record for the address at all, which is what a dual-mode
-            // computer known only as a Bluetooth Classic device looks like.
+            // Phrased as a lead rather than a verdict, for the same reason
+            // the Android twin was (GattDiagnostics.describeDiscoveryFailure):
+            // naming one cause as fact sends the reporter down it. Windows
+            // resolves the address against its own device database, so a
+            // dual-mode computer known only as a Classic device is one
+            // explanation, but the single-argument FromBluetoothAddressAsync
+            // resolves against a public address type and so also misses a
+            // random-static advertiser (#1232), and a stored address the
+            // stack has not seen advertise recently fails here too
+            // (discovery_providers.dart).
             NativeLogger::Error(kBleCategory,
                                 "No Bluetooth LE device for " + address +
-                                    "; Windows has no LE record for this "
-                                    "address");
+                                    "; Windows resolved no LE record for this "
+                                    "address. Known causes: a dual-mode "
+                                    "computer Windows knows only as a "
+                                    "Bluetooth Classic device, an address "
+                                    "the stack has not seen advertise "
+                                    "recently, or a random-static advertising "
+                                    "address. Re-running a scan before the "
+                                    "connect distinguishes the second");
             return false;
         }
 
@@ -192,15 +207,20 @@ bool BleIoStream::ConnectAndDiscover(uint64_t bluetooth_address) {
         }
 
         return DiscoverCharacteristics();
+    // DiscoverCharacteristics runs inside this try and does not catch its
+    // own .get() throws, so these handlers see discovery failures too.
+    // Saying "connect" would tell the reader the link never came up when it
+    // may have come up and died during discovery, which is exactly the
+    // distinction #957 was about.
     } catch (const winrt::hresult_error& e) {
         NativeLogger::Error(kBleCategory,
-                            "Connect to " + address + " threw: " +
-                                winrt::to_string(e.message()));
+                            "Connect or service discovery for " + address +
+                                " threw: " + winrt::to_string(e.message()));
         return false;
     } catch (...) {
         NativeLogger::Error(kBleCategory,
-                            "Connect to " + address + " threw an unknown "
-                            "error");
+                            "Connect or service discovery for " + address +
+                                " threw an unknown error");
         return false;
     }
 }
@@ -231,7 +251,6 @@ bool BleIoStream::DiscoverCharacteristics() {
     Candidate best;
 
     for (auto const& service : services_result.Services()) {
-        discovered_service_uuids.push_back(DescribeUuid(service.Uuid()));
         auto chars_result =
             service.GetCharacteristicsAsync(BluetoothCacheMode::Uncached)
                 .get();
@@ -242,6 +261,13 @@ bool BleIoStream::DiscoverCharacteristics() {
                                    DescribeGattStatus(chars_result.Status()));
             continue;
         }
+        // Counted only now. Pushing before the gate made the terminal "no
+        // usable service; N service(s) seen" line assert a fact about
+        // characteristics that were never enumerated: on an unpaired machine
+        // every service returns AccessDenied, and the summary would send a
+        // maintainer into UUID archaeology when the adjacent WARN lines
+        // already say the machine simply needs pairing.
+        discovered_service_uuids.push_back(DescribeUuid(service.Uuid()));
 
         GattCharacteristic best_write{nullptr};
         int best_write_score = -1;
@@ -403,19 +429,34 @@ bool BleIoStream::DiscoverCharacteristics() {
         // precisely so an optional handshake cannot break a working device.
         // Treat a throw exactly like a non-Success status instead.
         auto credits_cccd_result = GattCommunicationStatus::Unreachable;
+        // Kept separate from the status. Unreachable is only a convenient
+        // non-Success value to take the failure branch with, and running it
+        // through DescribeGattStatus would report "out of range, switched
+        // its radio off, or dropped the link" for what may be an
+        // authentication or access error whose HRESULT names the real cause.
+        // On a Telit module this is terminal, so it is the last line in the
+        // log and has to be true.
+        std::string credits_cccd_threw;
         try {
             credits_cccd_result =
                 credits_notify_characteristic_
                     .WriteClientCharacteristicConfigurationDescriptorAsync(
                         credits_cccd_value)
                     .get();
+        } catch (const winrt::hresult_error& e) {
+            credits_cccd_result = GattCommunicationStatus::Unreachable;
+            credits_cccd_threw = winrt::to_string(e.message());
         } catch (...) {
             credits_cccd_result = GattCommunicationStatus::Unreachable;
+            credits_cccd_threw = "unknown error";
         }
         if (credits_cccd_result != GattCommunicationStatus::Success) {
             NativeLogger::Warn(kBleCategory,
                                "Terminal I/O credit subscription failed: " +
-                                   DescribeGattStatus(credits_cccd_result));
+                                   (credits_cccd_threw.empty()
+                                        ? DescribeGattStatus(
+                                              credits_cccd_result)
+                                        : "threw: " + credits_cccd_threw));
             if (credits_required_) return false;
             // u-blox flow control is optional; fall back to running without it
             // rather than failing a device that works today.
