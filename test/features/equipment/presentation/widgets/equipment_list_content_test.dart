@@ -822,6 +822,75 @@ void main() {
       expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
       expect(find.text('No equipment in this category'), findsOneWidget);
     });
+
+    testWidgets(
+      'chip row stays clearable when the status list is empty and the '
+      'empty state blames the status, not the category',
+      (tester) async {
+        // A selected category must survive switching to a status with zero
+        // items: the row (with All Types) stays visible so the filter can be
+        // cleared, and the empty state names the status as the cause.
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+
+        await tester.pumpWidget(
+          testApp(
+            locale: const Locale('en'),
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              // No item carries any non-active status, so every status
+              // filter comes back empty while the default view has gear.
+              equipmentByStatusProvider.overrideWith(
+                (ref, status) => const <EquipmentItem>[],
+              ),
+              activeEquipmentProvider.overrideWith((ref) async => items),
+              equipmentListViewModeProvider.overrideWith(
+                (ref) => ListViewMode.detailed,
+              ),
+              equipmentTableConfigProvider.overrideWith(
+                (ref) => _TestEquipTableConfigNotifier(_testConfig),
+              ),
+              highlightedEquipmentIdProvider.overrideWith((ref) => null),
+            ],
+            child: const EquipmentListContent(showAppBar: false),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(chip(EquipmentType.wetsuit.displayName));
+        await tester.pumpAndSettle();
+        expect(find.text('Delta Suit'), findsOneWidget);
+
+        await tester.tap(find.byType(DropdownButton<Object?>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(EquipmentListTile), findsNothing);
+        // The chip row must not vanish: All Types is the only way to clear
+        // the category filter.
+        expect(chip('All Types'), findsOneWidget);
+        expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
+        // The status list was empty before the category narrowed anything,
+        // so the category is not to blame.
+        expect(find.text('No equipment in this category'), findsNothing);
+        expect(find.text('No equipment with this status'), findsOneWidget);
+
+        // Clearing via All Types actually resets the category filter: back
+        // on the default view the full list returns.
+        await tester.tap(chip('All Types'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(DropdownButton<Object?>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('All Equipment').last);
+        await tester.pumpAndSettle();
+        expect(find.byType(EquipmentListTile), findsNWidgets(4));
+      },
+    );
   });
 
   group('filter selection and refresh target the right provider (#636)', () {

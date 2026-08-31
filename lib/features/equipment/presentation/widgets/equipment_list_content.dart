@@ -191,7 +191,13 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           serviceUrgency: serviceUrgency,
         ),
       );
-      return _buildTableModeScaffold(context, sortedAsync, availableTypes);
+      return _buildTableModeScaffold(
+        context,
+        sortedAsync,
+        availableTypes,
+        hadItemsBeforeTypeFilter:
+            (equipmentAsync.value ?? const <EquipmentItem>[]).isNotEmpty,
+      );
     }
 
     // The visible list depends on which status filter is active, so derive
@@ -218,7 +224,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             serviceUrgency: serviceUrgency,
           );
           return sorted.isEmpty
-              ? _buildEmptyState(context, ref)
+              ? _buildEmptyState(
+                  context,
+                  ref,
+                  hadItemsBeforeTypeFilter: equipment.isNotEmpty,
+                )
               : _buildEquipmentList(context, ref, sorted);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -468,8 +478,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   Widget _buildTableModeScaffold(
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
-    List<EquipmentType> availableTypes,
-  ) {
+    List<EquipmentType> availableTypes, {
+    required bool hadItemsBeforeTypeFilter,
+  }) {
     final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
         .map((e) => e.id)
         .toList();
@@ -504,7 +515,13 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               SelectionEntryBar(controller: _selection),
             _buildFilterChips(context),
             _buildTypeFilterChips(context, availableTypes),
-            Expanded(child: _buildTableView(context, equipmentAsync)),
+            Expanded(
+              child: _buildTableView(
+                context,
+                equipmentAsync,
+                hadItemsBeforeTypeFilter: hadItemsBeforeTypeFilter,
+              ),
+            ),
           ],
         ),
       ),
@@ -514,14 +531,19 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   /// Build the [EntityTableView] for equipment table mode.
   Widget _buildTableView(
     BuildContext context,
-    AsyncValue<List<EquipmentItem>> equipmentAsync,
-  ) {
+    AsyncValue<List<EquipmentItem>> equipmentAsync, {
+    required bool hadItemsBeforeTypeFilter,
+  }) {
     return equipmentAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, s) => _buildErrorState(context, e),
       data: (equipment) {
         if (equipment.isEmpty) {
-          return _buildEmptyState(context, ref);
+          return _buildEmptyState(
+            context,
+            ref,
+            hadItemsBeforeTypeFilter: hadItemsBeforeTypeFilter,
+          );
         }
         final config = ref.watch(equipmentTableConfigProvider);
         final notifier = ref.read(equipmentTableConfigProvider.notifier);
@@ -734,7 +756,12 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     List<EquipmentType> availableTypes,
   ) {
-    if (availableTypes.length < 2) return const SizedBox.shrink();
+    // Keep the row whenever a category is selected -- even if the status
+    // filter left nothing to show -- so "All Types" stays reachable and the
+    // filter never gets stuck (it is only clearable from this row).
+    if (availableTypes.length < 2 && _selectedType == null) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -824,9 +851,18 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool hadItemsBeforeTypeFilter,
+  }) {
+    // Blame the category only when it actually narrowed something away; if
+    // the status-filtered source was already empty, the status (or the lack
+    // of any gear) is the real cause and the wording should say so.
+    final blameCategory = _selectedType != null && hadItemsBeforeTypeFilter;
+
     String filterText;
-    if (_selectedType != null) {
+    if (blameCategory) {
       filterText = context.l10n.equipment_list_emptyState_filterText_type(
         _selectedType!.displayName,
       );
@@ -856,7 +892,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           ),
           const SizedBox(height: 8),
           Text(
-            _selectedType != null
+            blameCategory
                 ? context.l10n.equipment_list_emptyState_noTypeMatch
                 : _selectedFilter == null
                 ? context.l10n.equipment_list_emptyState_addPrompt
@@ -868,7 +904,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             ),
             textAlign: TextAlign.center,
           ),
-          if (_selectedFilter == null && _selectedType == null) ...[
+          if (_selectedFilter == null && !blameCategory) ...[
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {
