@@ -268,12 +268,12 @@ class BleIoStream(
                 // Silent before #957: the only trace a Petrel 2 owner could
                 // send was "writeChar=null", which is a symptom of both this
                 // branch and the no-usable-service one below.
-                // Release first. describeDiscoveryFailure's second argument
-                // is deviceType(), a binder round trip that raises
-                // SecurityException if BLUETOOTH_CONNECT is revoked
-                // mid-download; AOSP swallows a throw from this callback, so
-                // the release would simply never run and an immediate failure
-                // would become a 15-second hang.
+                // Release first, and deviceType() swallows its own
+                // SecurityException: the argument is a binder round trip that
+                // can fail if BLUETOOTH_CONNECT is revoked mid-download, and
+                // AOSP swallows a throw from this callback. Ordering alone
+                // saves the release but still loses the log line, so both are
+                // needed.
                 connectSemaphore.release()
                 NativeLogger.e(TAG, "BLE",
                     GattDiagnostics.describeDiscoveryFailure(status, deviceType()))
@@ -680,7 +680,18 @@ class BleIoStream(
     // every connect and every discovery failure because a dual-mode radio
     // changes what a failure means (issue #957); the stack answers UNKNOWN
     // for a device it has not seen advertise, which is itself worth seeing.
-    private fun deviceType(): Int = device.type
+    // device.type is a binder round trip annotated
+    // @RequiresPermission(BLUETOOTH_CONNECT), and the permission can be
+    // revoked mid-download. Both callers are inside a log argument, and AOSP
+    // swallows a throw from a GATT callback, so an escaping SecurityException
+    // would silently delete the very error line it is decorating. An unknown
+    // radio type costs one clause of a diagnostic; a lost diagnostic costs
+    // the whole bug report.
+    private fun deviceType(): Int = try {
+        device.type
+    } catch (e: SecurityException) {
+        GattDiagnostics.DEVICE_TYPE_UNKNOWN
+    }
 
     // Connect to the BLE device and discover services.
     // Blocks until ready or timeout. Returns true on success.

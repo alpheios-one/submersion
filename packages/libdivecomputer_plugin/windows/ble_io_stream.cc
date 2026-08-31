@@ -1,6 +1,7 @@
 #include "ble_io_stream.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <sstream>
@@ -28,6 +29,17 @@ constexpr char kBleCategory[] = "BLE";
 // the connect and error lines could not be matched to the device that
 // produced them, and bluetoothAddressesMatch (discovery_providers.dart) only
 // upper-cases before comparing, so it would not bridge the two spellings.
+// HRESULT code plus message. The message alone is localized and often
+// generic ("The object has been closed"), while the code is what a bug
+// report can be searched on and what names an access or authentication
+// failure precisely.
+std::string DescribeHresult(const winrt::hresult_error& e) {
+    char code[16];
+    std::snprintf(code, sizeof(code), "0x%08X",
+                  static_cast<unsigned int>(static_cast<int32_t>(e.code())));
+    return std::string(code) + " " + winrt::to_string(e.message());
+}
+
 std::string FormatAddress(uint64_t address) {
     char buffer[13];
     std::snprintf(buffer, sizeof(buffer), "%012llX",
@@ -215,7 +227,7 @@ bool BleIoStream::ConnectAndDiscover(uint64_t bluetooth_address) {
     } catch (const winrt::hresult_error& e) {
         NativeLogger::Error(kBleCategory,
                             "Connect or service discovery for " + address +
-                                " threw: " + winrt::to_string(e.message()));
+                                " threw: " + DescribeHresult(e));
         return false;
     } catch (...) {
         NativeLogger::Error(kBleCategory,
@@ -445,7 +457,7 @@ bool BleIoStream::DiscoverCharacteristics() {
                     .get();
         } catch (const winrt::hresult_error& e) {
             credits_cccd_result = GattCommunicationStatus::Unreachable;
-            credits_cccd_threw = winrt::to_string(e.message());
+            credits_cccd_threw = DescribeHresult(e);
         } catch (...) {
             credits_cccd_result = GattCommunicationStatus::Unreachable;
             credits_cccd_threw = "unknown error";
