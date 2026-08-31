@@ -1320,8 +1320,22 @@ class BackupService {
   Future<String> _generateFilename() async {
     final dateFormat = DateFormat('yyyy-MM-dd_HHmmss');
     final timestamp = dateFormat.format(DateTime.now());
+    final unattributed = 'submersion_backup_$timestamp.db';
     try {
       final deviceId = await _syncRepository.getDeviceId();
+      if (deviceId.isEmpty) {
+        // An empty id is not an id, and it is not harmless to hash: sha1('')
+        // is a constant, so every device in this state would mint the SAME
+        // tag and claim each other's backups in a shared folder. Only the
+        // read side's empty-id guard stops that today, and safety that
+        // depends on the far end of the system checking for you is worth
+        // making local. Unreadable and empty are one condition.
+        _log.warning(
+          'Backup device attribution unavailable (empty device id); '
+          'writing an unattributed name',
+        );
+        return unattributed;
+      }
       return buildBackupFilename(timestamp: timestamp, deviceId: deviceId);
     } catch (e, st) {
       _log.warning(
@@ -1329,7 +1343,7 @@ class BackupService {
         error: e,
         stackTrace: st,
       );
-      return 'submersion_backup_$timestamp.db';
+      return unattributed;
     }
   }
 

@@ -62,11 +62,16 @@ String deviceTag(String deviceId) =>
 /// The historic prefix and extension are preserved so the cloud listing
 /// (`namePattern: 'submersion_backup_'`) and the plaintext-cleanup glob
 /// (`submersion_backup_*.db`) keep working untouched.
+///
+/// Always `.db`. The encrypted artifact is named by swapping the extension
+/// (`basenameWithoutExtension(name) + BackupCrypto.fileExtension`) in
+/// `BackupService`, and it still parses because `.sbe` is in
+/// [backupFileExtensions]. Taking an extension here would let a caller mint a
+/// name this module's own parser cannot attribute.
 String buildBackupFilename({
   required String timestamp,
   required String deviceId,
-  String extension = '.db',
-}) => '$_backupPrefix$timestamp$_deviceMarker${deviceTag(deviceId)}$extension';
+}) => '$_backupPrefix$timestamp$_deviceMarker${deviceTag(deviceId)}.db';
 
 /// The device tag embedded in [filename], or null when it carries none.
 ///
@@ -78,10 +83,9 @@ String? backupDeviceTagFromFilename(String filename) {
 
   // A backup extension is required, and the tag has to run to the end of the
   // stem. A directory scan sees whatever else the folder holds, and sidecars
-  // borrow a real backup's name: `...__dabcd1234ef567890.db.tmp` from an interrupted
-  // write, `...__dabcd1234ef567890 (conflicted copy).db` from a sync client.
-  // Reading a
-  // tag out of one of those would claim a file we did not write, which is the
+  // borrow a real backup's name: `...__d<tag>.db.tmp` from an interrupted
+  // write, `...__d<tag> (conflicted copy).db` from a sync client. Reading a tag
+  // out of one of those would claim a file we did not write, which is the
   // single outcome this module exists to prevent.
   final extension = backupFileExtensions.firstWhere(
     filename.endsWith,
