@@ -190,6 +190,32 @@ void main() {
       expect(Directory(p.join(temp.path, 'picked', '1')).existsSync(), isTrue);
     });
 
+    test('leaves an empty directory it did not empty alone', () async {
+      // A pick materializing right now creates its subdirectory before it
+      // opens the destination file, so an empty directory is not evidence of
+      // abandoned scratch. Only what this pass emptied is a prune candidate.
+      final inFlight = Directory(p.join(temp.path, 'picked', 'in_flight'));
+      await inFlight.create(recursive: true);
+      await write(picked('0/dives.zip'), 10, const Duration(days: 2));
+
+      await build().run(now: now);
+
+      expect(
+        inFlight.existsSync(),
+        isTrue,
+        reason: 'a writer may be about to create its file in there',
+      );
+      expect(Directory(p.join(temp.path, 'picked', '0')).existsSync(), isFalse);
+    });
+
+    test('prunes the whole chain a nested file left empty', () async {
+      await write(picked('0/inner/dives.zip'), 10, const Duration(days: 2));
+
+      await build().run(now: now);
+
+      expect(Directory(p.join(temp.path, 'picked', '0')).existsSync(), isFalse);
+    });
+
     test('never touches anything outside the directories it owns', () async {
       // The temp root holds files other plugins wrote, and share files whose
       // names this app cannot distinguish from theirs. Documents holds the

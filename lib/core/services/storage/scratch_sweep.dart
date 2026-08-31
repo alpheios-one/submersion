@@ -136,8 +136,8 @@ class StorageScratchSweep {
     return report;
   }
 
-  /// Deletes files under [dir] last modified before [maxAge], then prunes any
-  /// directory it emptied. A directory that does not exist is a no-op.
+  /// Deletes files under [dir] last modified before [maxAge], then prunes the
+  /// directories it emptied. A directory that does not exist is a no-op.
   Future<ScratchSweepReport> _sweep(
     Directory dir,
     Duration maxAge,
@@ -146,6 +146,7 @@ class StorageScratchSweep {
     if (!await dir.exists()) return ScratchSweepReport.empty;
 
     final cutoff = now.subtract(maxAge);
+    final emptied = <String>{};
     var files = 0;
     var bytes = 0;
 
@@ -158,6 +159,7 @@ class StorageScratchSweep {
         await entity.delete();
         files++;
         bytes += size;
+        emptied.addAll(_ancestorsWithin(dir, entity.parent));
       } on FileSystemException {
         // Skip an entry that vanished or is unreadable. A file being written
         // right now is exactly the case worth losing rather than fighting.
@@ -165,21 +167,35 @@ class StorageScratchSweep {
       }
     }
 
-    await _pruneEmptyDirectories(dir);
+    await _pruneEmptyDirectories(emptied);
     return ScratchSweepReport(filesDeleted: files, bytesReclaimed: bytes);
   }
 
-  /// Removes directories under [root] that the sweep left empty, deepest
-  /// first. [root] itself is kept: the writers expect it to exist.
-  Future<void> _pruneEmptyDirectories(Directory root) async {
-    final directories = <Directory>[];
-    await for (final entity in root.list(recursive: true, followLinks: false)) {
-      if (entity is Directory) directories.add(entity);
+  /// Every directory from [from] up to, but not including, [root].
+  Iterable<String> _ancestorsWithin(Directory root, Directory from) sync* {
+    final stop = p.canonicalize(root.path);
+    var current = p.canonicalize(from.path);
+    while (current != stop && p.isWithin(stop, current)) {
+      yield current;
+      current = p.dirname(current);
     }
-    directories.sort((a, b) => b.path.length.compareTo(a.path.length));
+  }
 
-    for (final directory in directories) {
+  /// Removes the directories this pass emptied, deepest first. The target
+  /// root itself is never a candidate: the writers expect it to exist.
+  ///
+  /// Only what the sweep emptied is considered. An empty directory it did not
+  /// empty is not abandoned scratch: `materializePickedFiles` creates a pick's
+  /// directory before it opens the destination file, so pruning on emptiness
+  /// alone could delete that directory out from under the writer and fail the
+  /// very import the age gates exist to protect.
+  Future<void> _pruneEmptyDirectories(Set<String> paths) async {
+    final ordered = paths.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
+
+    for (final path in ordered) {
       try {
+        final directory = Directory(path);
         if (await directory.list().isEmpty) await directory.delete();
       } on FileSystemException {
         continue;
