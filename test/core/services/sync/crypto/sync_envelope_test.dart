@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/services/sync/changeset_log/base_chunker.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/sync_envelope.dart';
 
@@ -143,4 +144,178 @@ void main() {
       );
     });
   });
+
+  group('SyncEnvelope payload size cap', () {
+    final key = SecretKey(List<int>.generate(32, (i) => i));
+    const keyId = '8f14e45f-ceea-467f-ab37-a10a8d5f4c11';
+
+    test('the cap clears the only structurally bounded payload', () {
+      // Base parts are sliced to exactly BaseChunker.defaultPartSize, so a
+      // 648 MB library publishes as 78 identical 8 MiB envelopes rather
+      // than one large one. Anchoring the cap to that constant keeps the
+      // relationship visible if either moves.
+      expect(
+        SyncEnvelope.defaultMaxPlaintextBytes,
+        greaterThanOrEqualTo(BaseChunker.defaultPartSize * 32),
+      );
+    });
+
+    test('open refuses a gzip bomb inside an authentic envelope', () async {
+      // Sealed with the real key, so this is the in-trust-boundary case the
+      // cap exists for: a malicious or buggy peer, or a compromised device.
+      // The gzip flag lives at header offset 20, outside both the ciphertext
+      // and the AAD, so setting it after sealing leaves authentication
+      // intact, which is exactly how an attacker reaches gzip.decode.
+      final bomb = _gzipZeros(mebibytes: 512);
+      expect(bomb.length, lessThan(1 << 20));
+      final envelope = await SyncEnvelope.seal(
+        plaintext: bomb,
+        dataKey: key,
+        libraryKeyId: keyId,
+        filename: 'ssv1.devA.cs.000000000001.json',
+        compress: false,
+      );
+      envelope[20] |= 0x01;
+
+      final before = ProcessInfo.currentRss;
+      await expectLater(
+        SyncEnvelope.open(
+          envelope: envelope,
+          dataKey: key,
+          expectedLibraryKeyId: keyId,
+          filename: 'ssv1.devA.cs.000000000001.json',
+          maxPlaintextBytes: 64 * 1024,
+        ),
+        throwsA(
+          isA<EnvelopeCorruptException>().having(
+            (e) => e.message,
+            'message',
+            contains('exceeds'),
+          ),
+        ),
+      );
+      // Buffering the whole body would need 512 MiB. Loose enough for GC
+      // noise and still far under that.
+      expect(ProcessInfo.currentRss - before, lessThan(64 * 1024 * 1024));
+    });
+
+    test('open refuses a flipped gzip flag rather than leaking a raw '
+        'FormatException', () async {
+      // An attacker with no key can still flip the unauthenticated flag
+      // byte. That turns plaintext into "not a gzip stream", which used to
+      // surface as dart:io's FormatException past every `on
+      // EnvelopeCorruptException` handler in sync.
+      final envelope = await SyncEnvelope.seal(
+        plaintext: Uint8List.fromList(utf8.encode('{"not":"gzip"}')),
+        dataKey: key,
+        libraryKeyId: keyId,
+        filename: 'ssv1.devA.manifest.json',
+        compress: false,
+      );
+      envelope[20] |= 0x01;
+
+      await expectLater(
+        SyncEnvelope.open(
+          envelope: envelope,
+          dataKey: key,
+          expectedLibraryKeyId: keyId,
+          filename: 'ssv1.devA.manifest.json',
+        ),
+        throwsA(isA<EnvelopeCorruptException>()),
+      );
+    });
+
+    test('an uncompressed payload over the cap still opens', () async {
+      // The cap bounds inflation, not the file: a payload with no gzip flag
+      // was never amplified, so refusing it would only strand data.
+      final plain = Uint8List.fromList(
+        List<int>.generate(8192, (i) => i % 251),
+      );
+      final envelope = await SyncEnvelope.seal(
+        plaintext: plain,
+        dataKey: key,
+        libraryKeyId: keyId,
+        filename: 'ssv1.devA.base.000000000001.p0000',
+        compress: false,
+      );
+      expect(
+        await SyncEnvelope.open(
+          envelope: envelope,
+          dataKey: key,
+          expectedLibraryKeyId: keyId,
+          filename: 'ssv1.devA.base.000000000001.p0000',
+          maxPlaintextBytes: 1024,
+        ),
+        plain,
+      );
+    });
+
+    test('seal stores a payload over the cap uncompressed so it can be '
+        'read back', () async {
+      // A device must never write an envelope it would itself refuse.
+      // Degrading to uncompressed keeps the write path total: the upload is
+      // larger, but nothing is stranded, which is the safer half of the
+      // trade for a payload this size.
+      final plain = Uint8List.fromList(
+        utf8.encode('{"repeat":"${'ab' * 4000}"}'),
+      );
+      final envelope = await SyncEnvelope.seal(
+        plaintext: plain,
+        dataKey: key,
+        libraryKeyId: keyId,
+        filename: 'ssv1.devA.cs.000000000002.json',
+        maxPlaintextBytes: 1024,
+      );
+      expect(envelope[20] & 0x01, 0, reason: 'gzip flag must not be set');
+      expect(
+        await SyncEnvelope.open(
+          envelope: envelope,
+          dataKey: key,
+          expectedLibraryKeyId: keyId,
+          filename: 'ssv1.devA.cs.000000000002.json',
+          maxPlaintextBytes: 1024,
+        ),
+        plain,
+      );
+    });
+
+    test('seal still compresses a payload under the cap', () async {
+      final plain = Uint8List.fromList(
+        utf8.encode('{"repeat":"${'ab' * 4000}"}'),
+      );
+      final envelope = await SyncEnvelope.seal(
+        plaintext: plain,
+        dataKey: key,
+        libraryKeyId: keyId,
+        filename: 'ssv1.devA.cs.000000000003.json',
+        maxPlaintextBytes: 1 << 20,
+      );
+      expect(envelope[20] & 0x01, 0x01, reason: 'gzip flag must be set');
+      expect(envelope.length, lessThan(plain.length));
+    });
+  });
+}
+
+/// Gzips [mebibytes] MiB of zeros without ever holding them.
+Uint8List _gzipZeros({required int mebibytes}) {
+  final chunks = <List<int>>[];
+  final sink = gzip.encoder.startChunkedConversion(_Collect(chunks));
+  final block = Uint8List(1024 * 1024);
+  for (var i = 0; i < mebibytes; i++) {
+    sink.add(block);
+  }
+  sink.close();
+  return Uint8List.fromList([for (final c in chunks) ...c]);
+}
+
+class _Collect implements Sink<List<int>> {
+  _Collect(this.chunks);
+
+  final List<List<int>> chunks;
+
+  @override
+  void add(List<int> data) => chunks.add(data);
+
+  @override
+  void close() {}
 }
