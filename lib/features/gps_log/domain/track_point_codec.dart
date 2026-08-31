@@ -2,29 +2,155 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:submersion/core/utils/bounded_inflate.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+/// Thrown when a track points blob cannot be decoded, or when a track is too
+/// large to encode.
+///
+/// One declared type, because the alternative was whatever the first failing
+/// positional cast happened to raise: a `_TypeError` for a wrong element
+/// type, a `RangeError` for a short tuple. `_TypeError` is private, so a
+/// caller could not even name it in an `on` clause, and every read of a
+/// synced blob had to either catch everything or catch nothing.
+class TrackPointCodecException implements Exception {
+  const TrackPointCodecException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'TrackPointCodecException: $message';
+}
+
+/// The largest number of points this codec will write or read.
+///
+/// 262,144 is over 72 hours of one-hertz fixes, where a recorded track uses
+/// a 20 m distance filter and the longest imported day this app has seen is
+/// nearer 21,000. The cap is not a claim about plausible tracks but a bound
+/// on allocation: decoding materialises the parsed JSON tuples and the
+/// [GpsTrackPoint] objects at the same time, so an uncapped count sizes an
+/// object graph directly from peer-supplied bytes.
+///
+/// Encode enforces the same cap. A blob this codec would refuse to read must
+/// never be written, or an oversized import would persist as a track whose
+/// points can never be loaded back.
+const int kMaxTrackPointCount = 1 << 18;
+
+/// The largest uncompressed body this codec will inflate.
+///
+/// The outer bound against unbounded inflation, not the binding guard:
+/// [kMaxTrackPointCount] tuples of full-precision JSON come to roughly 17 MB,
+/// so this leaves headroom rather than sitting on the real limit. It still
+/// has to exist, because the point cap can only be checked after the body is
+/// already in memory.
+const int kMaxTrackBodyBytes = 32 * 1024 * 1024;
+
+/// The largest compressed blob this codec will accept.
+///
+/// gzip output for a body under [kMaxTrackBodyBytes] cannot exceed it by more
+/// than stream overhead even for incompressible input, and JSON never is, so
+/// matching the two cannot refuse a blob the body cap would have accepted.
+/// Without it, bytes appended after a complete gzip stream are copied whole
+/// into the native filter and then silently discarded: a spike with no
+/// output to show for it.
+const int kMaxTrackBlobBytes = kMaxTrackBodyBytes;
 
 /// Encodes points as a gzipped JSON array of
 /// [wallClockEpochSeconds, lat, lon, accuracyMeters] tuples.
+///
+/// Throws [TrackPointCodecException] if [points] is longer than
+/// [kMaxTrackPointCount].
 Uint8List encodeTrackPoints(List<GpsTrackPoint> points) {
+  if (points.length > kMaxTrackPointCount) {
+    throw TrackPointCodecException(
+      'track of ${points.length} point(s) exceeds the '
+      '$kMaxTrackPointCount this codec can read back',
+    );
+  }
   final json = jsonEncode([
     for (final p in points) [p.timestamp, p.latitude, p.longitude, p.accuracy],
   ]);
   return Uint8List.fromList(gzip.encode(utf8.encode(json)));
 }
 
+/// Decodes a blob written by [encodeTrackPoints].
+///
+/// The blob is peer-supplied: `gpsTracks` is a synced entity and its points
+/// column rides through sync as base64, so a remote device's bytes are
+/// written verbatim and inflated here. Everything is therefore bounded
+/// before it is allocated and shape-checked before it is cast.
+///
+/// Throws [TrackPointCodecException] for every malformed input, including an
+/// oversized blob, a body that inflates past [kMaxTrackBodyBytes], more than
+/// [kMaxTrackPointCount] points, and any tuple that is not four finite
+/// numbers with an optional null accuracy.
 List<GpsTrackPoint> decodeTrackPoints(Uint8List blob) {
-  final json = utf8.decode(gzip.decode(blob));
-  final list = jsonDecode(json) as List<dynamic>;
-  return [
-    for (final raw in list)
+  final Uint8List body;
+  try {
+    body = inflateBounded(
+      blob,
+      codec: gzip,
+      maxBytes: kMaxTrackBodyBytes,
+      maxBlobBytes: kMaxTrackBlobBytes,
+    );
+  } on BoundedInflateException catch (e) {
+    throw TrackPointCodecException(e.message);
+  }
+
+  final dynamic decoded;
+  try {
+    decoded = jsonDecode(utf8.decode(body));
+  } on FormatException catch (e) {
+    throw TrackPointCodecException('not track point JSON: ${e.message}');
+  }
+
+  if (decoded is! List) {
+    throw TrackPointCodecException(
+      'expected a JSON array, got ${decoded.runtimeType}',
+    );
+  }
+  if (decoded.length > kMaxTrackPointCount) {
+    throw TrackPointCodecException(
+      'blob declares ${decoded.length} point(s), over the '
+      '$kMaxTrackPointCount allowed',
+    );
+  }
+
+  final points = <GpsTrackPoint>[];
+  for (var i = 0; i < decoded.length; i++) {
+    final raw = decoded[i];
+    if (raw is! List || raw.length != 4) {
+      throw TrackPointCodecException('point $i is not a four-element tuple');
+    }
+    final rawAccuracy = raw[3];
+    points.add(
       GpsTrackPoint(
-        timestamp: (raw[0] as num).toInt(),
-        latitude: (raw[1] as num).toDouble(),
-        longitude: (raw[2] as num).toDouble(),
-        accuracy: raw[3] == null ? null : (raw[3] as num).toDouble(),
+        timestamp: _requireFinite(raw[0], i, 'timestamp').toInt(),
+        latitude: _requireFinite(raw[1], i, 'latitude').toDouble(),
+        longitude: _requireFinite(raw[2], i, 'longitude').toDouble(),
+        // Null is the only non-numeric accuracy the encoder writes.
+        accuracy: rawAccuracy == null
+            ? null
+            : _requireFinite(rawAccuracy, i, 'accuracy').toDouble(),
       ),
-  ];
+    );
+  }
+  return points;
+}
+
+/// Returns [value] as a finite number, or throws naming the offending field.
+///
+/// Finiteness is not pedantry: JSON has no infinity literal, but an
+/// out-of-range exponent such as `1e999` parses to one, and `toInt()` on
+/// infinity throws an `UnsupportedError` that no call site is written to
+/// expect.
+num _requireFinite(Object? value, int index, String field) {
+  if (value is! num || !value.isFinite) {
+    throw TrackPointCodecException(
+      'point $index has a non-finite $field: $value',
+    );
+  }
+  return value;
 }
 
 /// Converts a real-UTC instant to the app's wall-clock-as-UTC epoch seconds:

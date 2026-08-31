@@ -3834,6 +3834,7 @@
   "gpsTrack_importError_unreadable": "Impossibile leggere il file. Potrebbe essere danneggiato o incompleto.",
   "gpsTrack_importError_noPositions": "Il file non contiene posizioni GPS con marca temporale.",
   "gpsTrack_importError_badData": "Il file contiene una posizione o una marca temporale che l'app non riesce a leggere.",
+  "gpsTrack_importError_tooLarge": "Il file contiene troppe posizioni per essere salvato come una sola traccia. Dividilo in tracce più brevi e importale separatamente.",
   "gpsTrack_export_saved": "Traccia salvata",
   "gpsTrack_action_export": "Esporta",
   "gpsTrack_action_shareGpx": "Condividi come GPX",

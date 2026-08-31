@@ -21432,6 +21432,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsTrack_importError_badData => '该文件包含本应用无法读取的位置或时间戳。';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      '该文件的位置点过多，无法保存为单条轨迹。请将其拆分为较短的轨迹后分别导入。';
+
+  @override
   String get gpsTrack_export_saved => '轨迹已保存';
 
   @override

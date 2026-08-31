@@ -37178,6 +37178,12 @@ abstract class AppLocalizations {
   /// **'That file has a position or timestamp this app cannot read.'**
   String get gpsTrack_importError_badData;
 
+  /// Track import failed: the file has more positions than a single track can store.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has too many positions to store as one track. Split it into shorter tracks and import them separately.'**
+  String get gpsTrack_importError_tooLarge;
+
   /// No description provided for @gpsTrack_export_saved.
   ///
   /// In en, this message translates to:
