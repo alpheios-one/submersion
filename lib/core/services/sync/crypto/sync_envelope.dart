@@ -142,9 +142,15 @@ abstract final class SyncEnvelope {
       // the AAD and so is not authenticated at all, which is what lets a
       // keyless attacker turn any file into "not a gzip stream".
       //
-      // The blob cap matches the body cap and can never refuse what the
-      // body cap would accept: seal only sets the flag when the gzip is
-      // strictly smaller than its plaintext.
+      // The blob cap matches the body cap. For anything this seal wrote
+      // that is free: the flag is only set when the gzip came out strictly
+      // smaller than its plaintext, so the blob is always the shorter of
+      // the two and the body cap is the one that binds. A foreign writer
+      // is not bound by that, so a blob over the cap is refused on its
+      // length even if it would have inflated to something under it. That
+      // is deliberate. Such an envelope is itself a quarter-gigabyte file,
+      // and the alternative is copying it whole into the native filter
+      // before the first chunk comes back.
       try {
         return inflateBounded(
           payload,

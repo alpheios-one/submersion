@@ -72,11 +72,12 @@ void main() {
     });
 
     test('refuses a gzip bomb without inflating it whole', () {
-      // Half a gigabyte of zeros, deflated a mebibyte at a time so the
+      // Half a gigabyte of zeros, gzipped a mebibyte at a time so the
       // fixture itself never costs half a gigabyte. Asserting on memory
-      // rather than the clock is deliberate: zlib inflates this in well
-      // under a second, so a time bound cannot tell a chunked abort from a
-      // decoder that buffered the lot and checked its length afterwards.
+      // rather than the clock is deliberate: the inflater gets through this
+      // in well under a second, so a time bound cannot tell a chunked abort
+      // from a decoder that buffered the lot and checked its length
+      // afterwards.
       final bomb = compressZeros(gzip.encoder, mebibytes: 512);
       expect(bomb.length, lessThan(1 << 20));
 
@@ -137,8 +138,9 @@ void main() {
     });
 
     test('returns an empty body for empty input', () {
-      // zlib accepts zero bytes as zero output rather than as corruption.
-      // Ruling on an empty body is the caller's job, not the inflater's.
+      // Both framings accept zero bytes as zero output rather than as
+      // corruption. Ruling on an empty body is the caller's job, not the
+      // inflater's.
       expect(
         inflateBounded(
           Uint8List(0),
