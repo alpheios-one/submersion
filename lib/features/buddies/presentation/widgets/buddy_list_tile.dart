@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/constants/buddy_field.dart';
@@ -290,30 +289,12 @@ class _BuddyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final path = buddy.photoPath;
-    final photo = path == null || path.isEmpty ? null : File(path);
-    final hasPhoto = photo != null && photo.existsSync();
-    final avatar = CircleAvatar(
-      radius: ringColor == null ? 20 : 18,
+    return ProfileAvatar(
+      photo: buddy.photo,
+      initials: buddy.initials,
       backgroundColor: backgroundColor,
-      backgroundImage: hasPhoto ? FileImage(photo) : null,
-      child: hasPhoto
-          ? null
-          : Text(
-              buddy.initials,
-              style: TextStyle(
-                color: foregroundColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-    );
-    if (ringColor == null) return avatar;
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: ringColor!, width: 2),
-      ),
-      child: avatar,
+      foregroundColor: foregroundColor,
+      ringColor: ringColor,
     );
   }
 }

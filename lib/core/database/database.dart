@@ -22,7 +22,15 @@ class Divers extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Never written for divers; kept so a
+  /// database that predates v181 still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the diver rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   // Emergency contact
   TextColumn get emergencyContactName => text().nullable()();
   TextColumn get emergencyContactPhone => text().nullable()();
@@ -1986,7 +1994,16 @@ class Buddies extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Two readers disagreed about how to
+  /// load it and nothing ever wrote it; kept so a database that predates v181
+  /// still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the buddy rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
@@ -3326,7 +3343,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 180;
+  static const int currentSchemaVersion = 181;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3715,6 +3732,14 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
+    // v181: divers.photo and buddies.photo, the profile photo blobs. Claimed
+    // against origin/main at 180, having been renumbered from 180 when PR
+    // #1374 (statistics exclusion) landed and took that rung while this
+    // branch held only its design docs. A rung at or below the shipped
+    // version merges with no conflict marker and its onUpgrade step then
+    // never runs, so re-verify this number if this branch sits open while
+    // main advances again.
+    181,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5574,6 +5599,21 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
       );
+    }
+  }
+
+  /// Idempotent DDL for the v181 divers.photo and buddies.photo columns.
+  /// Holds a 512x512 square JPEG, so it is nullable with no default. Self-
+  /// guards on each table existing, which is what makes it safe to call from
+  /// both the ladder and beforeOpen.
+  Future<void> _assertProfilePhotoColumns() async {
+    for (final table in const ['divers', 'buddies']) {
+      final cols = await customSelect("PRAGMA table_info('$table')").get();
+      if (cols.isEmpty) continue;
+      final names = cols.map((c) => c.read<String>('name')).toSet();
+      if (!names.contains('photo')) {
+        await customStatement('ALTER TABLE $table ADD COLUMN photo BLOB');
+      }
     }
   }
 
@@ -9263,6 +9303,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
+        // v181: divers.photo and buddies.photo, the profile photo blobs.
+        if (from < 181) {
+          await _assertProfilePhotoColumns();
+        }
+        if (from < 181) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9514,6 +9559,11 @@ class AppDatabase extends _$AppDatabase {
         // on every open: the helper is column-only with no backfill, so it
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
+
+        // v181 backstop: re-assert divers.photo and buddies.photo. A database
+        // that arrives by restore or sync-adopt never runs onUpgrade, and
+        // every read of a diver or buddy row would throw without the column.
+        await _assertProfilePhotoColumns();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
