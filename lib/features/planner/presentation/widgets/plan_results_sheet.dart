@@ -90,9 +90,17 @@ IconData _issueIcon(PlanIssueSeverity severity) {
 /// severity-sorted issue list. The page owns the sheet chrome and passes the
 /// [controller] so the sheet scrolls as one.
 class PlanResultsSheet extends ConsumerWidget {
-  const PlanResultsSheet({super.key, required this.controller});
+  const PlanResultsSheet({
+    super.key,
+    required this.controller,
+    this.shrinkWrap = false,
+  });
 
   final ScrollController controller;
+
+  /// When true, lays out to natural height with scrolling disabled so an
+  /// outer scrollable (the phone tab deck) owns the scroll gesture instead.
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -111,7 +119,9 @@ class PlanResultsSheet extends ConsumerWidget {
     final bailout = ref.watch(planBailoutProvider);
 
     return ListView(
-      controller: controller,
+      controller: shrinkWrap ? null : controller,
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
       children: [
         _grip(theme),
