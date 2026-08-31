@@ -98,6 +98,18 @@ class SwissBathyTileCache extends Table {
   TextColumn get gridJson => text().nullable()();
   IntColumn get fetchedAt => integer()();
 
+  /// The STAC item's `datetime` (or `updated`/`created` fallback) at the
+  /// time this tile was last downloaded — the version token the periodic
+  /// freshness check compares against. Null for 'empty' rows and rows
+  /// written before this field existed (v14).
+  TextColumn get sourceDatetime => text().nullable()();
+
+  /// When this row was last confirmed current: set to [fetchedAt] on
+  /// download, bumped without a re-download when a freshness check finds no
+  /// version change. Null means "never checked" and is treated as due for a
+  /// check immediately, which covers rows written before this field existed.
+  IntColumn get checkedAt => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {tileKey};
 }
@@ -250,7 +262,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -341,6 +353,38 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 14) {
         await m.createTable(swissBathyTileCache);
       }
+      // v15: periodic swissBATHY3D tile freshness check -- the version token
+      // and last-checked timestamp that let a stale-but-cached tile be
+      // revalidated with one light STAC item lookup instead of an unbounded
+      // re-download.
+      //
+      // Column-existence checked first, not just from<15: v14's createTable
+      // above already builds the table with the CURRENT (post-v15) column
+      // set for any upgrade path that starts below v14, so blindly adding
+      // these columns again would collide there. And if a ladder collision
+      // left v14's createTable unrun, the table does not exist yet either --
+      // the beforeOpen re-assert below creates it with the full current
+      // schema, so there is nothing to add here in that case.
+      if (from < 15) {
+        final cols = await customSelect(
+          "PRAGMA table_info('swiss_bathy_tile_cache')",
+        ).get();
+        final columnNames = cols.map((c) => c.read<String>('name')).toSet();
+        if (columnNames.isNotEmpty) {
+          if (!columnNames.contains('source_datetime')) {
+            await m.addColumn(
+              swissBathyTileCache,
+              swissBathyTileCache.sourceDatetime,
+            );
+          }
+          if (!columnNames.contains('checked_at')) {
+            await m.addColumn(
+              swissBathyTileCache,
+              swissBathyTileCache.checkedAt,
+            );
+          }
+        }
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -428,6 +472,8 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           grid_json TEXT NULL,
           fetched_at INTEGER NOT NULL,
+          source_datetime TEXT NULL,
+          checked_at INTEGER NULL,
           PRIMARY KEY (tile_key)
         )
       ''');

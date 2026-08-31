@@ -44,6 +44,85 @@ void main() {
       expect(requested.queryParameters['bbox'], bbox.join(','));
     });
 
+    test('carries the item datetime as the asset version token', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'properties': {'datetime': '2023-05-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {
+                      'href': 'https://example.org/tile_2685_1240_grid.zip',
+                    },
+                  },
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final asset = await client.findAsset(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(asset!.datetime, '2023-05-01T00:00:00Z');
+    });
+
+    test(
+      'falls back to "updated" then "created" when datetime is absent',
+      () async {
+        final client = SwissStacClient(
+          client: MockClient(
+            (_) async => http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'properties': {'created': '2021-01-01T00:00:00Z'},
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            ),
+          ),
+        );
+        final asset = await client.findAsset(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        );
+        expect(asset!.datetime, '2021-01-01T00:00:00Z');
+      },
+    );
+
+    test('datetime is null when the item has no properties', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final asset = await client.findAsset(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(asset!.datetime, isNull);
+    });
+
     test('falls back to any zip asset when none looks like a grid', () async {
       final client = SwissStacClient(
         client: MockClient(

@@ -31,6 +31,15 @@ class SwissBathy3dSource implements BathymetrySource {
   static const String sourceId = 'swissbathy3d';
   static const double tileSizeMeters = 1000;
 
+  /// How long a cached tile is served without a freshness check. Chosen to
+  /// keep the periodic check rare — swissBATHY3D lakes are re-surveyed on
+  /// the order of years, not days — while still noticing an update within a
+  /// bounded time. A stale tile still costs at most one light STAC item
+  /// lookup, never a re-download unless the version actually changed (see
+  /// [_refreshIfStale]), so this does not multiply the up-to-81-tile cost a
+  /// single wide-span page view can already trigger (see fetch()).
+  static const Duration staleCheckInterval = Duration(days: 30);
+
   final SwissStacClient _stac;
   final SwissBathyTileCacheRepository _tileCache;
 
@@ -121,7 +130,10 @@ class SwissBathy3dSource implements BathymetrySource {
     final tileKey = '${tileE}_$tileN';
 
     final cached = await _tileCache.read(tileKey);
-    if (cached != null) return cached;
+    if (cached != null) {
+      if (!_isStale(cached.checkedAt)) return cached.grid;
+      return _refreshIfStale(tileKey, tileE, tileN, lake, cached);
+    }
     if (await _tileCache.hasCachedAnswer(tileKey)) return null;
 
     final SwissBathyAsset? asset;
@@ -158,8 +170,67 @@ class SwissBathy3dSource implements BathymetrySource {
     } on FormatException catch (e) {
       throw BathymetryFetchException('swissBATHY3D grid parse failed: $e');
     }
-    await _tileCache.writeOk(tileKey, grid);
+    await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
     return grid;
+  }
+
+  static bool _isStale(DateTime? checkedAt) {
+    if (checkedAt == null) return true;
+    return DateTime.now().difference(checkedAt) >= staleCheckInterval;
+  }
+
+  /// Revalidates an expired cached tile with one light STAC item lookup (no
+  /// asset download) and only re-downloads the zip when the item's version
+  /// token actually changed. Any failure along the way — the metadata
+  /// lookup itself, the re-download, or reparsing — falls back to serving
+  /// the still-cached [cached] grid unchanged rather than propagating an
+  /// error: a stale-but-present tile beats no tile, and per the fair-use
+  /// requirement this must never turn into an unbounded re-download loop.
+  Future<BathymetryGrid?> _refreshIfStale(
+    String tileKey,
+    int tileE,
+    int tileN,
+    SwissLakeLevel lake,
+    SwissBathyTileCacheEntry cached,
+  ) async {
+    final SwissBathyAsset? asset;
+    try {
+      asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
+    } on SwissStacException {
+      return cached.grid; // metadata lookup failed -- retry on next visit
+    } on BathymetryFetchException {
+      return cached.grid; // no known collection id resolved right now
+    }
+
+    if (asset == null || asset.datetime == cached.sourceDatetime) {
+      // No newer survey published (a null item lookup is treated the same
+      // way: nothing to update, not "delete this known-good tile") -- just
+      // record that the check happened, so the next one is due again in
+      // staleCheckInterval.
+      await _tileCache.touch(tileKey, sourceDatetime: asset?.datetime);
+      return cached.grid;
+    }
+
+    try {
+      final zipBytes = await _stac.downloadBytes(asset.href);
+      final gridText = _extractGridText(zipBytes);
+      if (gridText == null) {
+        await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
+        return cached.grid;
+      }
+      final grid = parseSwissLv95Grid(
+        gridText,
+        sourceId: sourceId,
+        fetchedAt: DateTime.now(),
+        referenceLevelMeters: lake.meanLevelMeters,
+      );
+      await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
+      return grid;
+    } on SwissStacException {
+      return cached.grid;
+    } on FormatException {
+      return cached.grid;
+    }
   }
 
   /// Merges same-resolution tile grids into one rectangular [BathymetryGrid]

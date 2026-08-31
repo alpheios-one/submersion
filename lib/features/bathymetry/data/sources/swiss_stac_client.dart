@@ -14,7 +14,18 @@ class SwissBathyAsset {
   /// it finds inside the zip).
   final String format;
 
-  const SwissBathyAsset({required this.href, required this.format});
+  /// The owning STAC item's `datetime` property (falling back to `updated`
+  /// then `created` when absent), as a raw ISO-8601 string. Used as an
+  /// opaque version token for the periodic tile freshness check
+  /// ([SwissBathy3dSource.staleCheckInterval]) — never parsed, only compared
+  /// for equality. Null when the item carries none of those properties.
+  final String? datetime;
+
+  const SwissBathyAsset({
+    required this.href,
+    required this.format,
+    this.datetime,
+  });
 }
 
 /// Thrown on any transient STAC failure (network error, timeout, non-200,
@@ -99,18 +110,38 @@ class SwissStacClient {
     }
     final features = body['features'] as List<dynamic>? ?? const [];
     for (final feature in features) {
-      final assets =
-          (feature as Map<String, dynamic>)['assets'] as Map<String, dynamic>?;
+      final featureMap = feature as Map<String, dynamic>;
+      final assets = featureMap['assets'] as Map<String, dynamic>?;
       if (assets == null) continue;
       final picked = _pickAsset(assets);
-      if (picked != null) return picked;
+      if (picked == null) continue;
+      final properties = featureMap['properties'] as Map<String, dynamic>?;
+      return SwissBathyAsset(
+        href: picked.href,
+        format: picked.format,
+        datetime: _itemDatetime(properties),
+      );
     }
     return null;
   }
 
-  static SwissBathyAsset? _pickAsset(Map<String, dynamic> assets) {
-    SwissBathyAsset? bestGrid;
-    SwissBathyAsset? anyZip;
+  /// `properties.datetime`, falling back to `updated` then `created` — STAC
+  /// items always carry at least one of these. Used only as an opaque
+  /// version token, never parsed as a date.
+  static String? _itemDatetime(Map<String, dynamic>? properties) {
+    if (properties == null) return null;
+    for (final key in const ['datetime', 'updated', 'created']) {
+      final value = properties[key];
+      if (value is String && value.isNotEmpty) return value;
+    }
+    return null;
+  }
+
+  static ({String href, String format})? _pickAsset(
+    Map<String, dynamic> assets,
+  ) {
+    ({String href, String format})? bestGrid;
+    ({String href, String format})? anyZip;
     for (final asset in assets.values) {
       final href = (asset as Map<String, dynamic>?)?['href'] as String?;
       if (href == null) continue;
@@ -119,9 +150,9 @@ class SwissStacClient {
       final looksLikeGrid = lower.contains('grid') || lower.contains('asc');
       final looksLikeXyz = lower.contains('xyz');
       if (looksLikeGrid && !looksLikeXyz) {
-        bestGrid ??= SwissBathyAsset(href: href, format: 'esri-ascii');
+        bestGrid ??= (href: href, format: 'esri-ascii');
       }
-      anyZip ??= SwissBathyAsset(href: href, format: 'unknown');
+      anyZip ??= (href: href, format: 'unknown');
     }
     return bestGrid ?? anyZip;
   }

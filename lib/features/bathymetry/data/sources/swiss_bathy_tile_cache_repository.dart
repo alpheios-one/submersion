@@ -5,6 +5,29 @@ import 'package:drift/drift.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 
+/// A cached 'ok' tile plus the freshness bookkeeping the periodic staleness
+/// check needs: the STAC version token it was downloaded under, and when
+/// that token was last confirmed current.
+class SwissBathyTileCacheEntry {
+  final BathymetryGrid grid;
+
+  /// The STAC item `datetime` (or fallback) this tile was downloaded under.
+  /// Null for tiles cached before this field existed (v14) — treated as
+  /// "unknown version", so the first freshness check always touches it
+  /// rather than comparing against nothing.
+  final String? sourceDatetime;
+
+  /// When [sourceDatetime] was last confirmed current. Null means "never
+  /// checked" (including rows written before this field existed).
+  final DateTime? checkedAt;
+
+  const SwissBathyTileCacheEntry({
+    required this.grid,
+    this.sourceDatetime,
+    this.checkedAt,
+  });
+}
+
 /// Cache-first access to one swissBATHY3D tile's parsed, depth-converted
 /// grid, keyed by the LV95 1-km tile index (e.g. "2600_1200"). This is the
 /// layer that guarantees a tile is downloaded and parsed only once, per the
@@ -15,10 +38,10 @@ class SwissBathyTileCacheRepository {
 
   const SwissBathyTileCacheRepository(this._db);
 
-  /// The cached grid for [tileKey], or null when uncached OR when the tile
+  /// The cached entry for [tileKey], or null when uncached OR when the tile
   /// is a cached negative ('empty'). Use [hasCachedAnswer] to tell those
   /// apart from "never looked up".
-  Future<BathymetryGrid?> read(String tileKey) async {
+  Future<SwissBathyTileCacheEntry?> read(String tileKey) async {
     final row = await (_db.select(
       _db.swissBathyTileCache,
     )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
@@ -26,7 +49,16 @@ class SwissBathyTileCacheRepository {
     final json = row.gridJson;
     if (json == null) return null;
     try {
-      return BathymetryGrid.fromJson(jsonDecode(json) as Map<String, dynamic>);
+      final grid = BathymetryGrid.fromJson(
+        jsonDecode(json) as Map<String, dynamic>,
+      );
+      return SwissBathyTileCacheEntry(
+        grid: grid,
+        sourceDatetime: row.sourceDatetime,
+        checkedAt: row.checkedAt == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(row.checkedAt!),
+      );
     } catch (_) {
       return null; // corrupt row: caller re-derives and overwrites it
     }
@@ -42,7 +74,12 @@ class SwissBathyTileCacheRepository {
     return row != null;
   }
 
-  Future<void> writeOk(String tileKey, BathymetryGrid grid) async {
+  Future<void> writeOk(
+    String tileKey,
+    BathymetryGrid grid, {
+    String? sourceDatetime,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
     await _db
         .into(_db.swissBathyTileCache)
         .insertOnConflictUpdate(
@@ -50,7 +87,9 @@ class SwissBathyTileCacheRepository {
             tileKey: tileKey,
             status: 'ok',
             gridJson: Value(jsonEncode(grid.toJson())),
-            fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            fetchedAt: now,
+            sourceDatetime: Value(sourceDatetime),
+            checkedAt: Value(now),
           ),
         );
   }
@@ -65,5 +104,23 @@ class SwissBathyTileCacheRepository {
             fetchedAt: DateTime.now().millisecondsSinceEpoch,
           ),
         );
+  }
+
+  /// Records that [tileKey]'s freshness was just confirmed, without
+  /// touching its grid: the periodic check found no version change (or
+  /// could not tell), so only the checked-at stamp advances, pushing the
+  /// next check [SwissBathy3dSource.staleCheckInterval] into the future.
+  /// A no-op when [tileKey] has no 'ok' row (nothing to touch).
+  Future<void> touch(String tileKey, {String? sourceDatetime}) async {
+    await (_db.update(
+      _db.swissBathyTileCache,
+    )..where((t) => t.tileKey.equals(tileKey) & t.status.equals('ok'))).write(
+      SwissBathyTileCacheCompanion(
+        checkedAt: Value(DateTime.now().millisecondsSinceEpoch),
+        sourceDatetime: sourceDatetime == null
+            ? const Value.absent()
+            : Value(sourceDatetime),
+      ),
+    );
   }
 }

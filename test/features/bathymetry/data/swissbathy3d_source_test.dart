@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/utils/lv95_transform.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
@@ -345,6 +346,220 @@ nodata_value -9999
       expect(grid.rows, 2);
       expect(grid.cols, 2);
       expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+    });
+  });
+
+  group('SwissBathy3dSource periodic freshness check', () {
+    Future<void> backdateCheckedAt(GeoPoint point, DateTime checkedAt) async {
+      final lv95 = Lv95Transform.fromWgs84(point.latitude, point.longitude);
+      final tileKey = SwissBathy3dSource.tileKeyFor(lv95);
+      await (db.update(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).write(
+        SwissBathyTileCacheCompanion(
+          checkedAt: Value(checkedAt.millisecondsSinceEpoch),
+        ),
+      );
+    }
+
+    test('a stale cached tile triggers exactly one light metadata check and '
+        'no download when the source version is unchanged', () async {
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final first = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+
+      await backdateCheckedAt(
+        zurichseePoint,
+        DateTime.now().subtract(const Duration(days: 31)),
+      );
+
+      final second = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 2); // exactly one extra light metadata lookup
+      expect(downloadCalls, 1); // unchanged version: no re-download
+      expect(second.depthAt(0, 0), first.depthAt(0, 0));
+    });
+
+    test(
+      'a stale cached tile is re-downloaded when the source version changed',
+      () async {
+        const updatedGrid = '''
+ncols 2
+nrows 2
+xllcorner 2685000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+500.0 500.0
+500.0 500.0
+''';
+
+        var itemCalls = 0;
+        var downloadCalls = 0;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            itemCalls++;
+            final datetime = itemCalls == 1
+                ? '2023-01-01T00:00:00Z'
+                : '2024-06-01T00:00:00Z';
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'properties': {'datetime': datetime},
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          downloadCalls++;
+          final body = downloadCalls == 1 ? gridBody : updatedGrid;
+          return http.Response.bytes(_zipOf('tile.asc', body), 200);
+        });
+
+        final first = await source.fetch(zurichseePoint, spanMeters: 100);
+        expect(downloadCalls, 1);
+
+        await backdateCheckedAt(
+          zurichseePoint,
+          DateTime.now().subtract(const Duration(days: 31)),
+        );
+
+        final second = await source.fetch(zurichseePoint, spanMeters: 100);
+        expect(itemCalls, 2);
+        expect(downloadCalls, 2); // changed version: re-downloaded
+        expect(second.depthAt(0, 0), isNot(first.depthAt(0, 0)));
+
+        // The refreshed version is now cached: a third fetch right after
+        // does not check again (checkedAt was just bumped).
+        final third = await source.fetch(zurichseePoint, spanMeters: 100);
+        expect(itemCalls, 2);
+        expect(third.depthAt(0, 0), second.depthAt(0, 0));
+      },
+    );
+
+    test(
+      'a failed metadata check on a stale tile serves the cached grid '
+      'without throwing, offline-safe like the fetch-failure fallback',
+      () async {
+        var itemCalls = 0;
+        var downloadCalls = 0;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            itemCalls++;
+            if (itemCalls == 1) {
+              return http.Response(
+                jsonEncode({
+                  'features': [
+                    {
+                      'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                      'assets': {
+                        'grid': {'href': 'https://example.org/tile_grid.zip'},
+                      },
+                    },
+                  ],
+                }),
+                200,
+              );
+            }
+            return http.Response('server error', 500);
+          }
+          downloadCalls++;
+          return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+        });
+
+        final first = await source.fetch(zurichseePoint, spanMeters: 100);
+
+        await backdateCheckedAt(
+          zurichseePoint,
+          DateTime.now().subtract(const Duration(days: 31)),
+        );
+
+        final second = await source.fetch(zurichseePoint, spanMeters: 100);
+        expect(itemCalls, 2);
+        expect(downloadCalls, 1); // the failed check never re-downloads
+        expect(second.depthAt(0, 0), first.depthAt(0, 0));
+      },
+    );
+
+    test('a tile cached before the freshness fields existed (checkedAt null) '
+        'is treated as due for a check immediately', () async {
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+
+      // Simulate a row written before checkedAt/sourceDatetime existed.
+      final lv95 = Lv95Transform.fromWgs84(
+        zurichseePoint.latitude,
+        zurichseePoint.longitude,
+      );
+      final tileKey = SwissBathy3dSource.tileKeyFor(lv95);
+      await (db.update(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).write(
+        const SwissBathyTileCacheCompanion(
+          checkedAt: Value(null),
+          sourceDatetime: Value(null),
+        ),
+      );
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 2); // checked immediately since checkedAt is null
+      // A null sourceDatetime (pre-v15 row) never equals a real version
+      // token, so this one-off check re-downloads once to establish a
+      // baseline -- after which sourceDatetime is populated and later
+      // checks behave like the "unchanged version" case above.
+      expect(downloadCalls, 2);
+      expect(grid.rows, 4);
     });
   });
 
