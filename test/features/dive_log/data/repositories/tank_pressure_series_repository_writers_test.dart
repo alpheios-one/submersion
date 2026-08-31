@@ -107,6 +107,27 @@ void main() {
     expect(rows.firstWhere((r) => r.id == b).tankId, 'tank-a');
   });
 
+  test('swapTanks without now stamps the current wall-clock time', () async {
+    final a = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+    final b = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-b',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 100.0)],
+      now: 1000,
+    );
+    await repo.swapTanks('dive-1', 'tank-a', 'tank-b');
+    final rows = await db.select(db.tankPressureSeries).get();
+    expect(rows.firstWhere((r) => r.id == a).tankId, 'tank-b');
+    expect(rows.firstWhere((r) => r.id == b).tankId, 'tank-a');
+    expect(rows.firstWhere((r) => r.id == a).updatedAt, greaterThan(0));
+    expect(rows.firstWhere((r) => r.id == b).updatedAt, greaterThan(0));
+  });
+
   test('stampComputerWhereNull touches only null-computer series', () async {
     final manual = await repo.insertSeries(
       diveId: 'dive-1',
@@ -127,6 +148,24 @@ void main() {
     expect(rows.firstWhere((r) => r.id == manual).updatedAt, 2000);
     expect(rows.firstWhere((r) => r.id == owned).updatedAt, 1000);
   });
+
+  test(
+    'stampComputerWhereNull without now stamps the current wall-clock time',
+    () async {
+      final manual = await repo.insertSeries(
+        diveId: 'dive-1',
+        tankId: 'tank-a',
+        samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+        now: 1000,
+      );
+      expect(await repo.stampComputerWhereNull('dive-1', 'comp-1'), 1);
+      final row = await (db.select(
+        db.tankPressureSeries,
+      )..where((t) => t.id.equals(manual))).getSingle();
+      expect(row.computerId, 'comp-1');
+      expect(row.updatedAt, greaterThan(0));
+    },
+  );
 
   test('getRowsForDives chunks past the SQL variable ceiling', () async {
     const count = 2000;

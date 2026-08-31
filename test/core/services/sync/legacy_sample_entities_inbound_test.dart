@@ -11,6 +11,8 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/legacy_sample_staging.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_chunker.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
@@ -20,6 +22,7 @@ import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_series_identity.dart';
@@ -528,5 +531,104 @@ void main() {
         );
       },
     );
+  });
+
+  group('serializer: direct upsertRecord/upsertRecords staging paths', () {
+    setUp(() async {
+      await setUpTestDatabase();
+    });
+
+    tearDown(() => tearDownTestDatabase());
+
+    test("upsertRecord('diveProfiles', ...) stages a single row that packs "
+        'into a series', () async {
+      await DiveRepository().createDive(_dive('d-single', const []));
+
+      await SyncDataSerializer().upsertRecord('diveProfiles', {
+        'id': 'p-single',
+        'diveId': 'd-single',
+        'timestamp': 0,
+        'depth': 5.0,
+        'isPrimary': true,
+      });
+
+      final db = DatabaseService.instance.database;
+      final report = await packStagedLegacyRows(db);
+      expect(report.profileSeries, 1);
+
+      final series = await ProfileSeriesRepository().getSeriesForDive(
+        'd-single',
+      );
+      expect(series, hasLength(1));
+      expect(series.single.samples.single.depth, 5.0);
+    });
+
+    test("upsertRecord('tankPressureProfiles', ...) stages a single row that "
+        'packs into a tank pressure series', () async {
+      await DiveRepository().createDive(_dive('d-tank-single', const []));
+      final db = DatabaseService.instance.database;
+      await db
+          .into(db.diveTanks)
+          .insert(
+            DiveTanksCompanion.insert(
+              id: 'tank-single',
+              diveId: 'd-tank-single',
+            ),
+          );
+
+      await SyncDataSerializer().upsertRecord('tankPressureProfiles', {
+        'id': 'q-single',
+        'diveId': 'd-tank-single',
+        'tankId': 'tank-single',
+        'timestamp': 0,
+        'pressure': 200.0,
+      });
+
+      final report = await packStagedLegacyRows(db);
+      expect(report.tankSeries, 1);
+
+      final series = await TankPressureSeriesRepository().getSeriesForDive(
+        'd-tank-single',
+      );
+      expect(series, hasLength(1));
+      expect(series.single.samples.single.pressure, 200.0);
+    });
+
+    test("upsertRecords('tankPressureProfiles', ...) batch-stages multiple "
+        'rows that pack into one tank pressure series', () async {
+      await DiveRepository().createDive(_dive('d-tank-batch', const []));
+      final db = DatabaseService.instance.database;
+      await db
+          .into(db.diveTanks)
+          .insert(
+            DiveTanksCompanion.insert(id: 'tank-batch', diveId: 'd-tank-batch'),
+          );
+
+      await SyncDataSerializer().upsertRecords('tankPressureProfiles', [
+        {
+          'id': 'q-batch-1',
+          'diveId': 'd-tank-batch',
+          'tankId': 'tank-batch',
+          'timestamp': 0,
+          'pressure': 200.0,
+        },
+        {
+          'id': 'q-batch-2',
+          'diveId': 'd-tank-batch',
+          'tankId': 'tank-batch',
+          'timestamp': 60,
+          'pressure': 180.0,
+        },
+      ]);
+
+      final report = await packStagedLegacyRows(db);
+      expect(report.tankSeries, 1);
+
+      final series = await TankPressureSeriesRepository().getSeriesForDive(
+        'd-tank-batch',
+      );
+      expect(series, hasLength(1));
+      expect(series.single.samples.map((s) => s.pressure), [200.0, 180.0]);
+    });
   });
 }

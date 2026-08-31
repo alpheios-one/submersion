@@ -408,6 +408,108 @@ void main() {
     );
   });
 
+  test('a corrupt tank peer blob is skipped, never written', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await dbA
+        .into(dbA.diveTanks)
+        .insert(DiveTanksCompanion.insert(id: 'tank1', diveId: 'd1'));
+    final id = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd1',
+      tankId: 'tank1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+    final json = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      id,
+    );
+    await TankPressureSeriesRepository().deleteForDive('d1');
+    final corrupted = {
+      ...json!,
+      'samples': base64Encode(const [1, 2, 3]),
+    };
+    await SyncDataSerializer().upsertRecord('tankPressureSeries', corrupted);
+    expect(
+      await TankPressureSeriesRepository().getSeriesForDive('d1'),
+      isEmpty,
+    );
+  });
+
+  test('a batch of tank series with one corrupt blob writes only the sound '
+      'rows', () async {
+    dbA = await setUpTestDatabase();
+    switchTo(dbA);
+    await seedFkPrereqs(dbA);
+    await seedBareDive(dbA, 'd1');
+    await seedBareDive(dbA, 'd2');
+    await seedBareDive(dbA, 'd3');
+    for (final entry in {'tank1': 'd1', 'tank2': 'd2', 'tank3': 'd3'}.entries) {
+      await dbA
+          .into(dbA.diveTanks)
+          .insert(
+            DiveTanksCompanion.insert(id: entry.key, diveId: entry.value),
+          );
+    }
+    final goodId = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd1',
+      tankId: 'tank1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: 1000,
+    );
+    final good = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      goodId,
+    );
+    final corruptId = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd2',
+      tankId: 'tank2',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 190.0)],
+      now: 1000,
+    );
+    final corruptSource = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      corruptId,
+    );
+    // Valid base64 that decodes to bytes the codec rejects, mirroring the
+    // diveProfileSeries batch test above.
+    final corrupt = {
+      ...corruptSource!,
+      'samples': base64Encode(const [1, 2, 3]),
+    };
+    final malformedId = await TankPressureSeriesRepository().insertSeries(
+      diveId: 'd3',
+      tankId: 'tank3',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 180.0)],
+      now: 1000,
+    );
+    final malformedSource = await SyncDataSerializer().fetchRecord(
+      'tankPressureSeries',
+      malformedId,
+    );
+    // Not valid base64 at all: throws inside TankPressureSeriesRow.fromJson
+    // itself, before soundness is ever checked.
+    final malformed = {...malformedSource!, 'samples': 'not base64!'};
+    await TankPressureSeriesRepository().deleteForDive('d1');
+    await TankPressureSeriesRepository().deleteForDive('d2');
+    await TankPressureSeriesRepository().deleteForDive('d3');
+
+    await SyncDataSerializer().upsertRecords('tankPressureSeries', [
+      good!,
+      corrupt,
+      malformed,
+    ]);
+
+    final remaining = await TankPressureSeriesRepository().getRowsForDives([
+      'd1',
+      'd2',
+      'd3',
+    ]);
+    expect(remaining.map((r) => r.id), [goodId]);
+  });
+
   test(
     'a tank pressure series pushed by A arrives on B byte for byte',
     () async {

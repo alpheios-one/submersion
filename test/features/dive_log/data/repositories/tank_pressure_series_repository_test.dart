@@ -156,6 +156,27 @@ void main() {
     },
   );
 
+  test('deleteOwnedByComputer with a non-null computerId removes only that '
+      "computer's series", () async {
+    final owned = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      computerId: 'comp-1',
+      samples: samples,
+      now: now,
+    );
+    final manual = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-b',
+      samples: samples,
+      now: now,
+    );
+
+    expect(await repo.deleteOwnedByComputer('dive-1', 'comp-1'), [owned]);
+    final remaining = await repo.getSeriesForDive('dive-1');
+    expect(remaining.map((s) => s.id), [manual]);
+  });
+
   test('restoreSeriesRow puts the captured row back and queues it', () async {
     final id = await repo.insertSeries(
       diveId: 'dive-1',
@@ -189,6 +210,29 @@ void main() {
       db.tankPressureSeries,
     )..where((t) => t.id.equals(id))).getSingle();
     expect(verbatim.hlc, captured.hlc);
+  });
+
+  test('restoreSeriesRow without now stamps the pending record with '
+      'wall-clock time', () async {
+    final id = await repo.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      samples: samples,
+      now: now,
+    );
+    final captured = await (db.select(
+      db.tankPressureSeries,
+    )..where((t) => t.id.equals(id))).getSingle();
+    await repo.deleteForDive('dive-1');
+    await (db.delete(db.syncRecords)..where((t) => t.recordId.equals(id))).go();
+
+    await repo.restoreSeriesRow(captured);
+
+    final pending = await (db.select(
+      db.syncRecords,
+    )..where((t) => t.recordId.equals(id))).getSingle();
+    expect(pending.entityType, TankPressureSeriesRepository.entityType);
+    expect(pending.localUpdatedAt, greaterThan(0));
   });
 
   test('restoreSeriesRow removes the tombstone the delete logged', () async {

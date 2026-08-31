@@ -286,4 +286,67 @@ void main() {
       );
     },
   );
+
+  test('when no segment series is primary the gap fill lands on the one with '
+      'a computerId', () async {
+    await createDive('a', runtimeMin: 10, depth: 20, computerId: 'comp-a');
+    await createDive('b', runtimeMin: 10, depth: 20, computerId: 'comp-b');
+    // Demote every series: the computer id is then the only signal
+    // _adjacentDraft has left to pick a segment's representative series.
+    await profileSeries.demoteAll('a');
+    await profileSeries.demoteAll('b');
+
+    final outcome = await service.apply(['a', 'b']);
+
+    final merged = await profileSeries.getSeriesForDive(outcome.mergedDive.id);
+    expect(merged, hasLength(2));
+    expect(merged.every((s) => s.isPrimary), isFalse);
+    expect(merged.map((s) => s.computerId).toSet(), {'comp-a', 'comp-b'});
+    // The gap fill (extra 0-depth samples beyond the original three
+    // points) landed on one of the computer-attributed series, never
+    // dropped for lack of a primary host.
+    expect(merged.any((s) => s.samples.length > 3), isTrue);
+  });
+
+  test('the gap fill falls back to the later dive when the earlier one has no '
+      'profile', () async {
+    await createDive('a', runtimeMin: 10, depth: 20);
+    await createDive('b', runtimeMin: 10, depth: 20);
+    // 'a' is the dive the gap follows (afterDiveId); stripping its series
+    // forces _adjacentDraft's afterDiveId lookup to come back null, so the
+    // fill can only land through the beforeDiveId fallback onto 'b'.
+    await profileSeries.deleteForDive('a');
+
+    final outcome = await service.apply(['a', 'b']);
+
+    final merged = await profileSeries.getSeriesForDive(outcome.mergedDive.id);
+    expect(merged, hasLength(1));
+    final host = merged.single;
+    // b's own three re-based points contribute exactly two 0-depth
+    // samples (entry and exit); every extra 0-depth sample beyond those
+    // came from the gap fill landing on this series through the
+    // beforeDiveId fallback.
+    expect(host.samples.length, greaterThan(3));
+    expect(host.samples.where((s) => s.depth == 0).length, greaterThan(2));
+    expect(host.samples.any((s) => s.depth > 0), isTrue);
+  });
+
+  test('a merge of two profile-less dives creates an unattributed gap-fill '
+      'series', () async {
+    await createDive('a', runtimeMin: 10, depth: 20);
+    await createDive('b', runtimeMin: 10, depth: 20);
+    await profileSeries.deleteForDive('a');
+    await profileSeries.deleteForDive('b');
+
+    final outcome = await service.apply(['a', 'b']);
+
+    final merged = await profileSeries.getSeriesForDive(outcome.mergedDive.id);
+    expect(merged, hasLength(1));
+    final synthetic = merged.single;
+    expect(synthetic.computerId, isNull);
+    expect(synthetic.sourceId, isNull);
+    expect(synthetic.isPrimary, isTrue);
+    expect(synthetic.samples, isNotEmpty);
+    expect(synthetic.samples.every((s) => s.depth == 0), isTrue);
+  });
 }

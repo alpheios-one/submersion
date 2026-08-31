@@ -377,6 +377,42 @@ void main() {
     expect(report.skippedRows, 1);
   });
 
+  test('skippedRows counts a legacy tank row without a tank id, timestamp, or '
+      'pressure', () async {
+    final open = await openLegacy();
+    seedParents(open.raw);
+    // Loosen the columns the fixture declares NOT NULL by rebuilding the
+    // table (already recreated by openLegacy) without those constraints,
+    // mirroring the profile-side test above.
+    open.raw.execute('DROP TABLE tank_pressure_profiles');
+    open.raw.execute('''
+        CREATE TABLE tank_pressure_profiles (
+          id TEXT NOT NULL PRIMARY KEY,
+          dive_id TEXT NOT NULL,
+          tank_id TEXT,
+          timestamp INTEGER,
+          pressure REAL,
+          computer_id TEXT
+        )
+      ''');
+    open.raw.execute(
+      'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, '
+      "timestamp, pressure) VALUES ('q1', 'd1', 't1', 0, 200.0), "
+      "('q2', 'd1', 't1', NULL, 190.0), ('q3', 'd1', NULL, 30, 185.0), "
+      "('q4', 'd1', 't1', 60, NULL), ('q5', 'd1', 't1', 90, 180.0)",
+    );
+    final report = await packLegacyProfileRows(open.db, nowMs: 1);
+    expect(report.tankSeries, 1);
+    expect(report.skippedRows, 3);
+
+    final tanks = await rows(open.db, 'SELECT * FROM tank_pressure_series');
+    expect(tanks, hasLength(1));
+    expect(tankCodec.decode(tanks.single['samples'] as dynamic), [
+      const TankPressureSample(timestamp: 0, pressure: 200.0),
+      const TankPressureSample(timestamp: 90, pressure: 180.0),
+    ]);
+  });
+
   test(
     'the migration hlc carries the device id, not the persisted node id',
     () async {

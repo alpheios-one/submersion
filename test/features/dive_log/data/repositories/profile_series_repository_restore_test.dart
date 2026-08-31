@@ -136,6 +136,25 @@ void main() {
     expect(pending.entityType, ProfileSeriesRepository.entityType);
   });
 
+  test('restoreSeriesRow without now stamps the pending record with '
+      'wall-clock time', () async {
+    final captured = await (db.select(
+      db.diveProfileSeries,
+    )..where((t) => t.id.equals(computerSeries))).getSingle();
+    await repo.deleteForDive('dive-1');
+    await (db.delete(
+      db.syncRecords,
+    )..where((t) => t.recordId.equals(computerSeries))).go();
+
+    await repo.restoreSeriesRow(captured);
+
+    final pending = await (db.select(
+      db.syncRecords,
+    )..where((t) => t.recordId.equals(computerSeries))).getSingle();
+    expect(pending.entityType, ProfileSeriesRepository.entityType);
+    expect(pending.localUpdatedAt, greaterThan(0));
+  });
+
   test(
     'restoreSeriesRow keeps the row untouched without markPending',
     () async {
