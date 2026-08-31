@@ -7202,6 +7202,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Hiba a merülés típusok betöltésekor';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Hiba a felszerelés betöltésekor';
+
+  @override
   String get diveLog_search_errorLoadingTrips =>
       'Hiba az utazasok betoltesekor';
 
@@ -7228,6 +7232,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Idotartam tartomany (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Felszerelés';
 
   @override
   String get diveLog_search_label_trip => 'Utazas';
