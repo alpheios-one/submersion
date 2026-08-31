@@ -8148,6 +8148,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Nehezssgi szint';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Merulesi statisztika';
+
+  @override
   String get diveSites_detail_section_divesAtSite =>
       'Merulesek ezen a helyszinen';
 
@@ -8162,6 +8165,27 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Ertekeles';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Atlagos idotartam';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'Elso merules';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Utolso merules';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Leghosszabb merules';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Legmelyebb merules';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Legsekelyebb merules';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Nem elerheto';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {

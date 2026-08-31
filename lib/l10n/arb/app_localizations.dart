@@ -13728,6 +13728,12 @@ abstract class AppLocalizations {
   /// **'Difficulty Level'**
   String get diveSites_detail_section_difficultyLevel;
 
+  /// No description provided for @diveSites_detail_section_diveStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Statistics'**
+  String get diveSites_detail_section_diveStatistics;
+
   /// No description provided for @diveSites_detail_section_divesAtSite.
   ///
   /// In en, this message translates to:
@@ -13757,6 +13763,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rating'**
   String get diveSites_detail_section_rating;
+
+  /// No description provided for @diveSites_detail_stats_avgDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Duration'**
+  String get diveSites_detail_stats_avgDuration;
+
+  /// No description provided for @diveSites_detail_stats_firstDive.
+  ///
+  /// In en, this message translates to:
+  /// **'First Dive'**
+  String get diveSites_detail_stats_firstDive;
+
+  /// No description provided for @diveSites_detail_stats_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get diveSites_detail_stats_lastDive;
+
+  /// No description provided for @diveSites_detail_stats_longestDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Dive'**
+  String get diveSites_detail_stats_longestDive;
+
+  /// No description provided for @diveSites_detail_stats_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest Dive'**
+  String get diveSites_detail_stats_maxDepth;
+
+  /// No description provided for @diveSites_detail_stats_minDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Shallowest Dive'**
+  String get diveSites_detail_stats_minDepth;
+
+  /// No description provided for @diveSites_detail_stats_notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get diveSites_detail_stats_notAvailable;
 
   /// No description provided for @diveSites_detail_semantics_copyToClipboard.
   ///

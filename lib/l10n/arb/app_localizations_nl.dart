@@ -8105,6 +8105,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Moeilijkheidsgraad';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Duikstatistieken';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'Duiken op deze stek';
 
   @override
@@ -8118,6 +8121,27 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Beoordeling';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Gemiddelde duur';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'Eerste duik';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Laatste duik';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Langste duik';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Diepste duik';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Ondiepste duik';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Niet beschikbaar';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {

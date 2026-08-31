@@ -8013,6 +8013,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'مستوى الصعوبة';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'إحصائيات الغوص';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'الغوصات في هذا الموقع';
 
   @override
@@ -8026,6 +8029,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'التقييم';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'متوسط المدة';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'أول غطسة';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'آخر غطسة';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'أطول غطسة';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'أعمق غطسة';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'أقل غطسة عمقًا';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'غير متوفر';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {

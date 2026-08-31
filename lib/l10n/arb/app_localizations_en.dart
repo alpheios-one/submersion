@@ -8027,6 +8027,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Difficulty Level';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Dive Statistics';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'Dives at this Site';
 
   @override
@@ -8040,6 +8043,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Rating';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Average Duration';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'First Dive';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Last Dive';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Longest Dive';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Deepest Dive';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Shallowest Dive';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Not available';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
