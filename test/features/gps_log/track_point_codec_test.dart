@@ -207,10 +207,33 @@ void main() {
       );
     });
 
-    test('a non-numeric timestamp', () {
+    test('a non-numeric timestamp, reported by type not by value', () {
       expect(
         () => decodeTrackPoints(_blobOf('[["x",1,2,null]]')),
-        throwsA(isA<TrackPointCodecException>()),
+        throwsA(
+          isA<TrackPointCodecException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('non-numeric timestamp'), contains('String')),
+          ),
+        ),
+      );
+    });
+
+    test('never puts a rejected value into the message', () {
+      // Nothing upstream bounds a single element: this body carries three
+      // commas, so it clears the comma cap, and its one string clears the
+      // body cap. Interpolating it was measured building a 20,971,556
+      // character message, which the repository logs whole.
+      final huge = 'A' * (1024 * 1024);
+      final blob = _blobOf('[["$huge",0,0,0]]');
+      expect(
+        () => decodeTrackPoints(blob),
+        throwsA(
+          isA<TrackPointCodecException>()
+              .having((e) => e.message.length, 'message length', lessThan(120))
+              .having((e) => e.message, 'message', isNot(contains('AAAA'))),
+        ),
       );
     });
 
@@ -228,12 +251,19 @@ void main() {
       );
     });
 
-    test('a non-finite number', () {
+    test('a non-finite number, which is safe to name', () {
       // JSON has no infinity literal, but an out-of-range exponent parses to
       // one, and toInt() on it throws an UnsupportedError no caller expects.
+      // A non-finite num is NaN or an infinity, so printing it cannot grow.
       expect(
         () => decodeTrackPoints(_blobOf('[[1e999,1,2,null]]')),
-        throwsA(isA<TrackPointCodecException>()),
+        throwsA(
+          isA<TrackPointCodecException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('non-finite timestamp'), contains('Infinity')),
+          ),
+        ),
       );
     });
   });

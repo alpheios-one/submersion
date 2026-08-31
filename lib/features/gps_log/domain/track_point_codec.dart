@@ -190,8 +190,21 @@ int _countCommas(Uint8List body) {
 /// out-of-range exponent such as `1e999` parses to one, and `toInt()` on
 /// infinity throws an `UnsupportedError` that no call site is written to
 /// expect.
+///
+/// The two rejections are reported apart because only one of them can safely
+/// name what it saw. [value] is peer-supplied and nothing upstream bounds a
+/// single element: a 20 MB string carries only three commas, so it clears
+/// both the body cap and the comma cap, and interpolating it was measured
+/// building a 20,971,556 character message that the repository then logged
+/// whole. A type name says as much and cannot grow.
 num _requireFinite(Object? value, int index, String field) {
-  if (value is! num || !value.isFinite) {
+  if (value is! num) {
+    throw TrackPointCodecException(
+      'point $index has a non-numeric $field: ${value.runtimeType}',
+    );
+  }
+  if (!value.isFinite) {
+    // Safe to print: a non-finite num is NaN or an infinity, never long.
     throw TrackPointCodecException(
       'point $index has a non-finite $field: $value',
     );
