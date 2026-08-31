@@ -25,6 +25,15 @@ const String _deviceMarker = '__d';
 
 const String _backupPrefix = 'submersion_backup_';
 
+/// Extensions a backup artifact can carry: the plaintext `.db` and the
+/// encrypted framed variant (`BackupCrypto.fileExtension`). Named here rather
+/// than imported so this module depends on nothing but a string; a test pins
+/// the set against the crypto constant.
+const Set<String> backupFileExtensions = {'.db', '.sbe'};
+
+/// A tag is exactly eight lowercase hex digits, the prefix of a SHA-1.
+final RegExp _tagPattern = RegExp(r'^[0-9a-f]{8}$');
+
 /// A short, stable, filesystem-safe tag for [deviceId].
 ///
 /// Hashed rather than truncated so nothing about the device identity leaks
@@ -35,7 +44,7 @@ String deviceTag(String deviceId) =>
 
 /// Builds a backup filename that records which device wrote it.
 ///
-/// Attribution lives in the NAME, not in [BackupRecord], on purpose. An
+/// Attribution lives in the NAME, not in the `BackupRecord`, on purpose. An
 /// orphaned backup is by definition a file whose record has been lost, so a
 /// device id stored in the record is exactly the information that is already
 /// missing. The name is the only part that survives losing SharedPreferences.
@@ -56,15 +65,25 @@ String buildBackupFilename({
 /// name that has been renamed by hand.
 String? backupDeviceTagFromFilename(String filename) {
   if (!filename.startsWith(_backupPrefix)) return null;
-  final marker = filename.lastIndexOf(_deviceMarker);
+
+  // A backup extension is required, and the tag has to run to the end of the
+  // stem. A directory scan sees whatever else the folder holds, and sidecars
+  // borrow a real backup's name: `...__dabcd1234.db.tmp` from an interrupted
+  // write, `...__dabcd1234 (conflicted copy).db` from a sync client. Reading a
+  // tag out of one of those would claim a file we did not write, which is the
+  // single outcome this module exists to prevent.
+  final extension = backupFileExtensions.firstWhere(
+    filename.endsWith,
+    orElse: () => '',
+  );
+  if (extension.isEmpty) return null;
+
+  final stem = filename.substring(0, filename.length - extension.length);
+  final marker = stem.lastIndexOf(_deviceMarker);
   if (marker < 0) return null;
 
-  final afterMarker = filename.substring(marker + _deviceMarker.length);
-  final dot = afterMarker.indexOf('.');
-  final tag = dot < 0 ? afterMarker : afterMarker.substring(0, dot);
-  if (tag.length != 8) return null;
-  if (!RegExp(r'^[0-9a-f]{8}$').hasMatch(tag)) return null;
-  return tag;
+  final tag = stem.substring(marker + _deviceMarker.length);
+  return _tagPattern.hasMatch(tag) ? tag : null;
 }
 
 /// Who wrote [filename], from the name alone.

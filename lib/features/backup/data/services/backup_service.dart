@@ -1321,10 +1321,14 @@ class BackupService {
     final dateFormat = DateFormat('yyyy-MM-dd_HHmmss');
     final timestamp = dateFormat.format(DateTime.now());
     try {
-      final deviceId = await SyncRepository().getDeviceId();
+      final deviceId = await _syncRepository.getDeviceId();
       return buildBackupFilename(timestamp: timestamp, deviceId: deviceId);
-    } catch (e) {
-      _log.warning('Backup device attribution unavailable: $e');
+    } catch (e, st) {
+      _log.warning(
+        'Backup device attribution unavailable; writing an unattributed name',
+        error: e,
+        stackTrace: st,
+      );
       return 'submersion_backup_$timestamp.db';
     }
   }

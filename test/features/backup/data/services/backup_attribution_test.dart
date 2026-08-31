@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/backup/data/services/backup_attribution.dart';
+import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 
 void main() {
   const thisDevice = '9f8e7d6c-1111-2222-3333-444455556666';
@@ -87,6 +88,38 @@ void main() {
       expect(backupDeviceTagFromFilename('holiday_photos.db'), isNull);
       expect(backupDeviceTagFromFilename('.hidden.db.tmp'), isNull);
     });
+
+    test('a sidecar borrowing a backup name carries no tag', () {
+      // The part 2 scan sees the whole directory, not just what this app
+      // wrote. An interrupted write or a sync client's decoration keeps the
+      // real backup's name and adds to it, so a parse that stopped at the
+      // first dot would read our own tag back out of a file we never wrote.
+      final name = buildBackupFilename(
+        timestamp: '2026-08-31_121314',
+        deviceId: thisDevice,
+      );
+
+      expect(backupDeviceTagFromFilename('$name.tmp'), isNull);
+      expect(backupDeviceTagFromFilename('$name.part'), isNull);
+      expect(
+        backupDeviceTagFromFilename(
+          name.replaceAll('.db', ' (conflicted copy).db'),
+        ),
+        isNull,
+      );
+      expect(
+        backupDeviceTagFromFilename(name.replaceAll('.db', '.txt')),
+        isNull,
+      );
+    });
+
+    test('the extension set covers the encrypted artifact', () {
+      // The encrypted name is derived as basenameWithoutExtension + this
+      // constant, so a change there would silently make every encrypted
+      // backup unattributable.
+      expect(backupFileExtensions, contains(BackupCrypto.fileExtension));
+      expect(backupFileExtensions, contains('.db'));
+    });
   });
 
   group('classifyBackupFile', () {
@@ -126,6 +159,21 @@ void main() {
           filename: 'submersion_backup_2026-08-31_121314.db',
           thisDeviceId: thisDevice,
         ),
+        BackupOwnership.unattributed,
+      );
+    });
+
+    test('a sidecar is never claimed, even carrying our own tag', () {
+      // The safety-relevant half of the parse hardening: this file's name
+      // contains this device's tag, and it still must not be offered for
+      // deletion, because it is not one of our backups.
+      final name = buildBackupFilename(
+        timestamp: '2026-08-31_121314',
+        deviceId: thisDevice,
+      );
+
+      expect(
+        classifyBackupFile(filename: '$name.tmp', thisDeviceId: thisDevice),
         BackupOwnership.unattributed,
       );
     });
