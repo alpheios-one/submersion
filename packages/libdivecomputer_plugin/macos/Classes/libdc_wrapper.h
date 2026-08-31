@@ -88,6 +88,36 @@ int libdc_descriptor_lookup_model(unsigned int transport, unsigned int model,
                                   libdc_descriptor_info_t *info);
 
 // ============================================================
+// USB HID Discovery Helpers
+// ============================================================
+
+// Transport bitmask of the descriptor identified by vendor/product/model.
+// Returns 0 when no descriptor matches, which is also a valid "no transports"
+// answer; callers only ever test individual bits, so the two are equivalent.
+//
+// The USB HID download path uses this to decide whether a model is worth
+// looking for on the HID bus before it probes serial ports (issue #1271).
+unsigned int libdc_descriptor_transports(const char *vendor, const char *product,
+                                         unsigned int model);
+
+// Whether the descriptor identified by vendor/product/model accepts a USB HID
+// device with this vendor and product id. Returns 1 for a match, 0 otherwise.
+//
+// The id tables live in libdivecomputer's own filter functions
+// (dc_filter_uwatec, dc_filter_suunto), reachable through the public
+// dc_descriptor_filter(). Asking libdivecomputer rather than copying the
+// tables here means new HID hardware arrives with a submodule bump.
+//
+// A descriptor that does not declare DC_TRANSPORT_USBHID rejects every id.
+// That has to be decided from the transport bitmask rather than from the
+// filter: a filter with no USB HID branch (dc_filter_shearwater, for one)
+// falls through to "accept", so the filter alone would say yes for hardware
+// that has no HID interface at all.
+int libdc_usbhid_match(const char *vendor, const char *product,
+                       unsigned int model,
+                       unsigned short vid, unsigned short pid);
+
+// ============================================================
 // Custom I/O Callbacks (for BLE bridge)
 // ============================================================
 

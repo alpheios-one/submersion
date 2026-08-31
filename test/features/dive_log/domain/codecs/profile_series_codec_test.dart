@@ -4,13 +4,13 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/codecs/bounded_inflate.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
-import 'package:submersion/features/dive_log/domain/codecs/series_body_zlib.dart';
 
 /// A fully populated sample: every one of the 28 fields present.
 ProfileSample fullSample(int i) => ProfileSample(
@@ -193,6 +193,38 @@ void main() {
     });
   });
 
+  group('encode limits', () {
+    test('refuses more samples than decode would accept', () {
+      // encode and decode have to agree: part 2 drops the source rows once
+      // a series is packed, so a blob decode refuses is unrecoverable.
+      final tooMany = [
+        for (var i = 0; i < kMaxSeriesSampleCount + 1; i++) minimalSample(i),
+      ];
+      expect(() => codec.encode(tooMany), throwsArgumentError);
+    });
+
+    test('a field table may not change a v1 field kind', () {
+      // cast() is lazy, so without this the mismatch escapes as a TypeError
+      // from inside a presence loop rather than as a table error.
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+        ProfileField('cns', ProfileFieldKind.deltaInt),
+      ];
+      const wrong = ProfileSeriesCodec(fieldTables: {9: table});
+      expect(
+        () => wrong.encode([fullSample(0)], version: 9),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('cns is float64 in v1'),
+          ),
+        ),
+      );
+    });
+  });
+
   group('malformed input', () {
     Uint8List validBytes() =>
         codec.encode([for (var i = 0; i < 8; i++) fullSample(i)]).bytes;
@@ -367,7 +399,33 @@ void main() {
 
     test('a sample count larger than the payload', () {
       final body = inflate(validBytes());
+      // Replace the one-byte count (8) with a three-byte varint for 200,000:
+      // under the hard cap, so this exercises the payload-size guard.
+      expect(body[1], 8, reason: 'the count must still be one byte here');
+      const overPayload = [0xC0, 0x9A, 0x0C];
+      final tampered = Uint8List.fromList([
+        body[0],
+        ...overPayload,
+        ...body.sublist(2),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('remaining'),
+          ),
+        ),
+      );
+    });
+
+    test('a sample count over the hard cap', () {
+      final body = inflate(validBytes());
       // Replace the one-byte count (8) with a five-byte varint for 2^32.
+      // The cap is checked before the payload guard, so no crafted body has
+      // to be large enough to make the count plausible.
+      expect(body[1], 8, reason: 'the count must still be one byte here');
       const huge = [0x80, 0x80, 0x80, 0x80, 0x10];
       final tampered = Uint8List.fromList([
         body[0],
@@ -376,7 +434,124 @@ void main() {
       ]);
       expect(
         () => codec.decode(recompress(tampered)),
-        throwsA(isA<ProfileSeriesCodecException>()),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('maximum $kMaxSeriesSampleCount'),
+          ),
+        ),
+      );
+    });
+
+    test('a sample count of exactly the cap clears the cap guard', () {
+      // Pins which side of the boundary the cap sits on: this count is
+      // legal, so it must fall through to the payload guard instead. An
+      // off-by-one to >= would make every maximal series undecodable.
+      final body = inflate(validBytes());
+      expect(body[1], 8, reason: 'the count must still be one byte here');
+      final atCap = ByteWriter()..writeVarUint(kMaxSeriesSampleCount);
+      final tampered = Uint8List.fromList([
+        body[0],
+        ...atCap.takeBytes(),
+        ...body.sublist(2),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('remaining'),
+          ),
+        ),
+      );
+    });
+
+    test('a sample count one past the cap is refused by the cap', () {
+      final body = inflate(validBytes());
+      expect(body[1], 8, reason: 'the count must still be one byte here');
+      final pastCap = ByteWriter()..writeVarUint(kMaxSeriesSampleCount + 1);
+      final tampered = Uint8List.fromList([
+        body[0],
+        ...pastCap.takeBytes(),
+        ...body.sublist(2),
+      ]);
+      expect(
+        () => codec.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('maximum $kMaxSeriesSampleCount'),
+          ),
+        ),
+      );
+    });
+
+    test('a string run length near 2^63 does not overrun the guard', () {
+      // values.length + length would wrap negative and let the append loop
+      // run unbounded, which no sample-count cap can see: the declared
+      // count here is a legitimate 3.
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+        ProfileField('heart_rate_source', ProfileFieldKind.runLengthString),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 1, depth: 2.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 2, depth: 3.0, heartRateSource: 'a'),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      const runLengthOffset = 1 + 1 + (1 + 3) + (1 + 24) + 1 + 1;
+      expect(body[runLengthOffset], 3);
+      final huge = ByteWriter()..writeVarUint(maxVarInt * 2 + 1);
+      final tampered = Uint8List.fromList([
+        ...body.sublist(0, runLengthOffset),
+        ...huge.takeBytes(),
+        ...body.sublist(runLengthOffset + 1),
+      ]);
+      expect(
+        () => small.decode(recompress(tampered)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('overruns'),
+          ),
+        ),
+      );
+    });
+
+    test('a zero-length string run is refused', () {
+      // Accepting one would make the format non-canonical: padding runs
+      // decode to the same samples from different bytes.
+      const table = [
+        ProfileField('timestamp', ProfileFieldKind.deltaInt),
+        ProfileField('depth', ProfileFieldKind.float64),
+        ProfileField('heart_rate_source', ProfileFieldKind.runLengthString),
+      ];
+      const small = ProfileSeriesCodec(fieldTables: {9: table});
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 1.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 1, depth: 2.0, heartRateSource: 'a'),
+        ProfileSample(timestamp: 2, depth: 3.0, heartRateSource: 'a'),
+      ];
+      final body = inflate(small.encode(samples, version: 9).bytes);
+      const runLengthOffset = 1 + 1 + (1 + 3) + (1 + 24) + 1 + 1;
+      expect(body[runLengthOffset], 3);
+      body[runLengthOffset] = 0;
+      expect(
+        () => small.decode(recompress(body)),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('empty'),
+          ),
+        ),
       );
     });
 
@@ -497,7 +672,7 @@ void main() {
 
     test('an inflated body over the cap is refused', () {
       final oversized = Uint8List.fromList(
-        ZLibCodec(level: 6).encode(Uint8List(kMaxInflatedSeriesBodyBytes + 1)),
+        ZLibCodec(level: 6).encode(Uint8List(kMaxSeriesBodyBytes + 1)),
       );
       // A few kilobytes of stored blob, tens of megabytes once inflated.
       expect(oversized.length, lessThan(1 << 20));
@@ -517,7 +692,7 @@ void main() {
       // The cap refuses only what exceeds it. This body inflates fine and
       // then fails on its content, which proves the inflate itself ran.
       final justUnder = Uint8List.fromList(
-        ZLibCodec(level: 6).encode(Uint8List(kMaxInflatedSeriesBodyBytes)),
+        ZLibCodec(level: 6).encode(Uint8List(kMaxSeriesBodyBytes)),
       );
       expect(
         () => codec.decode(justUnder),

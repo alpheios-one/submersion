@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:submersion/features/dive_log/domain/codecs/bounded_inflate.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
-import 'package:submersion/features/dive_log/domain/codecs/series_body_zlib.dart';
 
 /// One tank pressure reading as the v181 `tank_pressure_profiles` table
 /// stored it (the codec's column order), minus the identity columns (`id`,
@@ -87,8 +87,18 @@ class TankPressureSeriesCodec {
   static final ZLibCodec _zlib = ZLibCodec(level: 6);
 
   /// Encodes a non-empty, timestamp-ordered series. Throws [ArgumentError]
-  /// on an empty list or on decreasing timestamps.
+  /// on an empty list, on more than [kMaxSeriesSampleCount] samples, or on
+  /// decreasing timestamps.
   EncodedTankPressureSeries encode(List<TankPressureSample> samples) {
+    // Refuse to write what decode would refuse to read; see the profile
+    // codec for why an unreadable blob is worse than a refused encode.
+    if (samples.length > kMaxSeriesSampleCount) {
+      throw ArgumentError.value(
+        samples.length,
+        'samples',
+        'more than the maximum $kMaxSeriesSampleCount samples',
+      );
+    }
     final summary = TankPressureSeriesSummary.of(samples);
     for (var i = 1; i < samples.length; i++) {
       if (samples[i].timestamp < samples[i - 1].timestamp) {
@@ -120,7 +130,7 @@ class TankPressureSeriesCodec {
   /// Decodes a blob written by [encode]. Throws
   /// [ProfileSeriesCodecException] on anything malformed.
   List<TankPressureSample> decode(Uint8List bytes) {
-    final body = inflateSeriesBody(bytes);
+    final body = inflateBounded(bytes);
     if (body.isEmpty) {
       throw const ProfileSeriesCodecException('empty body');
     }
@@ -132,6 +142,13 @@ class TankPressureSeriesCodec {
     final count = reader.readVarUint();
     if (count == 0) {
       throw const ProfileSeriesCodecException('empty series');
+    }
+    // The count sizes both column lists, so cap it before the payload guard
+    // below, which a body at the inflate cap would leave far too generous.
+    if (count > kMaxSeriesSampleCount) {
+      throw ProfileSeriesCodecException(
+        'sample count $count exceeds the maximum $kMaxSeriesSampleCount',
+      );
     }
     // Every sample carries at least a one-byte timestamp delta, so a count
     // the remaining payload cannot hold is corruption, not a large series.

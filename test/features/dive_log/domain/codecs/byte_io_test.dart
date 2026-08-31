@@ -130,6 +130,30 @@ void main() {
       expect(reader.readVarUint, throwsA(isA<ProfileSeriesCodecException>()));
     });
 
+    test('a padded varint is refused as non-canonical', () {
+      // Every one of these decodes to a value the writer encodes in fewer
+      // bytes, so accepting them would give one series several valid byte
+      // forms. The ten-byte case is only the longest instance of that.
+      final padded = <String, List<int>>{
+        'zero in two bytes': [0x80, 0x00],
+        'one in three bytes': [0x81, 0x80, 0x00],
+        'zero in ten bytes': [...List.filled(9, 0x80), 0x00],
+      };
+      for (final entry in padded.entries) {
+        final reader = ByteReader(Uint8List.fromList(entry.value));
+        expect(
+          reader.readVarUint,
+          throwsA(isA<ProfileSeriesCodecException>()),
+          reason: entry.key,
+        );
+      }
+    });
+
+    test('a single zero byte is canonical and decodes', () {
+      // The one varint that ends in a zero byte legitimately.
+      expect(ByteReader(Uint8List.fromList([0x00])).readVarUint(), 0);
+    });
+
     test('the largest 63-bit varint still decodes', () {
       // 2^63 - 1: eight bytes of 0xFF then 0x7F.
       final reader = ByteReader(
@@ -225,6 +249,94 @@ void main() {
       final writer = ByteWriter();
       writer.writeColumn<int>(const [], writer.writeVarInt);
       expect(writer.takeBytes(), [kPresenceAbsent]);
+    });
+  });
+
+  group('reader bounds against overflow', () {
+    test('a length near 2^63 is refused, not passed to sublistView', () {
+      // _ensure adding _offset to count would wrap negative here, and the
+      // guard would fall through to a RangeError from Uint8List.sublistView
+      // instead of the exception decode() documents.
+      final reader = ByteReader(Uint8List.fromList([1, 2, 3, 4]))..readByte();
+      expect(
+        () => reader.readBytes(maxVarInt * 2 + 1),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('a length one past the end is still refused', () {
+      final reader = ByteReader(Uint8List.fromList([1, 2, 3, 4]))..readByte();
+      expect(
+        () => reader.readBytes(4),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+      expect(reader.readBytes(3), [2, 3, 4]);
+    });
+  });
+
+  group('writer range', () {
+    // The reader refuses a varint whose payload reaches bit 63. The writer
+    // has to refuse the same values, or a release build (where asserts are
+    // stripped) would emit one truncated byte and call it an encoding.
+    test('writeVarUint refuses a negative value', () {
+      expect(() => ByteWriter().writeVarUint(-1), throwsArgumentError);
+    });
+
+    test('writeVarUint has no upper-bound gap against the reader', () {
+      // The reader refuses a varint whose payload reaches bit 63, which
+      // raises the question of whether the writer can emit one. It cannot:
+      // 2^63-1 is the largest Dart int, it encodes in nine bytes, and the
+      // guard needs a tenth. So the writer's accepted range (0 .. 2^63-1)
+      // is exactly the reader's decodable range, and no upper bound on the
+      // writer would exclude anything reachable.
+      const maxDartInt = 9223372036854775807;
+      for (final value in [1 << 62, maxDartInt - 1, maxDartInt]) {
+        final bytes = (ByteWriter()..writeVarUint(value)).takeBytes();
+        expect(bytes, hasLength(9));
+        expect(ByteReader(bytes).readVarUint(), value);
+      }
+      // The tenth byte the guard exists for cannot come from the writer,
+      // only from a crafted blob.
+      final crafted = Uint8List.fromList([
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x01,
+      ]);
+      expect(
+        () => ByteReader(crafted).readVarUint(),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('writeVarInt round-trips the extremes of the zigzag range', () {
+      for (final value in [(1 << 62) - 1, -(1 << 62)]) {
+        final writer = ByteWriter()..writeVarInt(value);
+        expect(ByteReader(writer.takeBytes()).readVarInt(), value);
+      }
+    });
+
+    test('writeByte refuses values outside a byte', () {
+      // addByte keeps the low eight bits, so without the check a release
+      // build writes 44 for 300 and the blob claims a version it is not.
+      for (final value in [-1, 256, 300]) {
+        expect(() => ByteWriter().writeByte(value), throwsArgumentError);
+      }
+      expect((ByteWriter()..writeByte(255)).takeBytes(), [255]);
+    });
+
+    test('writeVarInt refuses values whose zigzag overflows', () {
+      // (value << 1) runs into the sign bit here, so the zigzag mapping
+      // would silently produce a negative varuint.
+      for (final value in [1 << 62, -(1 << 62) - 1, 1 << 63]) {
+        expect(() => ByteWriter().writeVarInt(value), throwsArgumentError);
+      }
     });
   });
 }

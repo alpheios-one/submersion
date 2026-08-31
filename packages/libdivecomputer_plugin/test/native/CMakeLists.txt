@@ -52,6 +52,25 @@ target_include_directories(test_descriptor_match_integration PRIVATE
     ${CONFIG_DIR}
 )
 
+# Integration test: the USB HID descriptor queries (issue #1271). Links the
+# real descriptor table so dc_descriptor_filter's vendor/product id lists are
+# the ones under test, not a copy of them. Same minimal source set as the
+# matcher integration test above.
+add_executable(test_usbhid_descriptor_match
+    test_usbhid_descriptor_match.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${LIBDC_DIR}/src/descriptor.c
+    ${LIBDC_DIR}/src/iterator.c
+    ${LIBDC_DIR}/src/array.c
+    ${LIBDC_DIR}/src/platform.c
+    ${LIBDC_DIR}/src/version.c
+)
+target_include_directories(test_usbhid_descriptor_match PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${CONFIG_DIR}
+)
+
 # Regression test for issue #280: hw_ostc3_read must accumulate the bytes each
 # read actually returns, not assume every dc_iostream_read filled the full
 # request (false for the one-notification-per-read BLE transport). The test
@@ -211,6 +230,7 @@ add_test(NAME test_dive_converter COMMAND test_dive_converter)
 add_test(NAME test_serial_callbacks COMMAND test_serial_callbacks)
 add_test(NAME test_descriptor_matcher COMMAND test_descriptor_matcher)
 add_test(NAME test_descriptor_match_integration COMMAND test_descriptor_match_integration)
+add_test(NAME test_usbhid_descriptor_match COMMAND test_usbhid_descriptor_match)
 add_test(NAME test_hw_ostc3_read COMMAND test_hw_ostc3_read)
 add_test(NAME test_shearwater_petrel_foreach COMMAND test_shearwater_petrel_foreach)
 add_test(NAME test_shearwater_common_download COMMAND test_shearwater_common_download)

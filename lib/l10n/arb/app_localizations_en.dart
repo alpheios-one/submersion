@@ -4823,7 +4823,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Equipment';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Marine Life';
+  String get diveLog_detail_section_marineLife => 'Species';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5148,7 +5148,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'No equipment selected';
 
   @override
-  String get diveLog_edit_noMarineLife => 'No marine life logged';
+  String get diveLog_edit_noMarineLife => 'No species logged';
 
   @override
   String get diveLog_edit_notSpecified => 'Not specified';
@@ -5288,7 +5288,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Exit Time';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Marine Life';
+  String get diveLog_edit_section_marineLife => 'Species';
 
   @override
   String get diveLog_edit_section_notes => 'Notes';
@@ -6194,8 +6194,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add depth range, difficulty or rating';
 
   @override
-  String get diveSites_edit_invite_lifeNotes =>
-      'Add marine life, notes or sharing';
+  String get diveSites_edit_invite_lifeNotes => 'Add species, notes or sharing';
 
   @override
   String get diveSites_edit_invite_location => 'Add GPS position or altitude';
@@ -7093,6 +7092,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'Error loading dive types';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'Error loading equipment';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Error loading trips';
 
   @override
@@ -7118,6 +7120,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Duration Range (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Equipment';
 
   @override
   String get diveLog_search_label_trip => 'Trip';
@@ -7245,7 +7250,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Search species...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Add Marine Life';
+  String get diveLog_speciesPicker_title => 'Add Species';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Clear search';
@@ -8027,6 +8032,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Difficulty Level';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Dive Statistics';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'Dives at this Site';
 
   @override
@@ -8040,6 +8048,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Rating';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Average Duration';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'First Dive';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Last Dive';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Longest Dive';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Deepest Dive';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Shallowest Dive';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Not available';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8411,8 +8440,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Difficulty Level';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'Expected Marine Life';
+  String get diveSites_edit_section_expectedMarineLife => 'Expected Species';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS Coordinates';
@@ -12275,7 +12303,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marineLife_siteSection_noExpected => 'No expected species added';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'No marine life spotted yet';
+  String get marineLife_siteSection_noSpotted => 'No species spotted yet';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12289,7 +12317,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Spotted Here';
 
   @override
-  String get marineLife_siteSection_title => 'Marine Life';
+  String get marineLife_siteSection_title => 'Species';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Back';
@@ -12738,7 +12766,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Marine life sightings added to a dive will show up here.';
+      'Species sightings added to a dive will show up here.';
 
   @override
   String get marineLife_speciesPage_noMatch => 'No species match your search';
@@ -14000,6 +14028,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nav_sites => 'Sites';
 
   @override
+  String get nav_species => 'Species';
+
+  @override
   String get nav_statistics => 'Statistics';
 
   @override
@@ -15073,7 +15104,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Equipment used in dive';
 
   @override
-  String get diveDetailSection_sightings_name => 'Marine Life Sightings';
+  String get diveDetailSection_sightings_name => 'Species Sightings';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16554,8 +16585,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_manage_species => 'Species';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'Manage marine life species catalog';
+  String get settings_manage_species_subtitle => 'Manage the species catalog';
 
   @override
   String get settings_manage_tags => 'Tags';
@@ -17495,7 +17525,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'Species sightings';
 
   @override
-  String get statistics_category_marineLife_title => 'Marine Life';
+  String get statistics_category_marineLife_title => 'Species';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17834,7 +17864,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', selected';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Marine Life';
+  String get statistics_marineLife_appBar_title => 'Species';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'No site data';
@@ -17857,8 +17887,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Best Sites for Marine Life';
+  String get statistics_marineLife_bestSites_title => 'Best Sites';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'No sighting data';
@@ -21145,6 +21174,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'No USB serial ports found. Is the dive computer connected and powered on?';
+
+  @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'No $model found over USB. Is it connected to this computer and powered on?';
+  }
 
   @override
   String get diveComputer_download_stalePairing =>
