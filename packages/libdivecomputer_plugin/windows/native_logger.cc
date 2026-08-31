@@ -37,9 +37,17 @@ void NativeLogger::Log(const std::string& category, const std::string& level,
     // outlives no shutdown of its own.
     std::lock_guard<std::mutex> lock(mutex_);
     if (api_ == nullptr) return;
-    // A logging failure must never take the download with it.
-    api_->OnLogEvent(
-        category, level, message, [] {}, [](const FlutterError&) {});
+    // A logging failure must never take the download with it. The no-op
+    // reply callbacks only cover a Dart-side error reply; a throw from the
+    // send itself (a bad_alloc from the string or EncodableValue copies)
+    // would escape, and the BLE transport logs from a std::thread whose
+    // entry function has no handler, where an escaping exception is
+    // std::terminate. Android's NativeLogger.kt wraps the same call.
+    try {
+        api_->OnLogEvent(
+            category, level, message, [] {}, [](const FlutterError&) {});
+    } catch (...) {
+    }
 }
 
 }  // namespace libdivecomputer_plugin

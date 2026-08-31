@@ -7092,6 +7092,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'Error loading dive types';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'Error loading equipment';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Error loading trips';
 
   @override
@@ -7117,6 +7120,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Duration Range (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Equipment';
 
   @override
   String get diveLog_search_label_trip => 'Trip';

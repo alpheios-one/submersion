@@ -7040,6 +7040,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'שגיאה בטעינת סוגי צלילה';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'שגיאה בטעינת הציוד';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'שגיאה בטעינת טיולים';
 
   @override
@@ -7065,6 +7068,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'טווח משך (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'ציוד';
 
   @override
   String get diveLog_search_label_trip => 'טיול';

@@ -7228,6 +7228,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Error al cargar tipos de inmersión';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Error al cargar el equipo';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Error al cargar los viajes';
 
   @override
@@ -7253,6 +7257,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Rango de duracion (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Equipo';
 
   @override
   String get diveLog_search_label_trip => 'Viaje';

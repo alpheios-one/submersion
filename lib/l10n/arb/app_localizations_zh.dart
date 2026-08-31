@@ -6865,6 +6865,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => '加载潜水类型出错';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => '加载装备出错';
+
+  @override
   String get diveLog_search_errorLoadingTrips => '加载旅行出错';
 
   @override
@@ -6890,6 +6893,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => '时长范围（分钟）';
+
+  @override
+  String get diveLog_search_label_equipment => '装备';
 
   @override
   String get diveLog_search_label_trip => '旅行';

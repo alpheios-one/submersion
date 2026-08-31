@@ -104,7 +104,7 @@ List<GpsTrackPoint> decodeTrackPoints(Uint8List blob) {
   try {
     body = inflateBounded(
       blob,
-      codec: gzip,
+      decoder: gzip.decoder,
       maxBytes: kMaxTrackBodyBytes,
       maxBlobBytes: kMaxTrackBlobBytes,
     );
