@@ -9,6 +9,8 @@ import 'package:submersion/core/services/sync/changeset_log/base_chunker.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/sync_envelope.dart';
 
+import '../../../../support/compression_bombs.dart';
+
 Map<String, dynamic> _vectors() =>
     jsonDecode(
           File('test/fixtures/crypto/crypto_vectors.json').readAsStringSync(),
@@ -166,7 +168,11 @@ void main() {
       // The gzip flag lives at header offset 20, outside both the ciphertext
       // and the AAD, so setting it after sealing leaves authentication
       // intact, which is exactly how an attacker reaches gzip.decode.
-      final bomb = _gzipZeros(mebibytes: 512);
+      final bomb = compressZeros(gzip.encoder, mebibytes: 512);
+      // The cap below has to clear the compressed blob, because open fuses
+      // maxBlobBytes to it. Sized under it, the pre-conversion blob guard
+      // fires and nothing is ever inflated, which would leave the chunked
+      // abort (the whole point of the fix) untested at this layer.
       expect(bomb.length, lessThan(1 << 20));
       final envelope = await SyncEnvelope.seal(
         plaintext: bomb,
@@ -184,13 +190,13 @@ void main() {
           dataKey: key,
           expectedLibraryKeyId: keyId,
           filename: 'ssv1.devA.cs.000000000001.json',
-          maxPlaintextBytes: 64 * 1024,
+          maxPlaintextBytes: 1 << 20,
         ),
         throwsA(
           isA<EnvelopeCorruptException>().having(
             (e) => e.message,
             'message',
-            contains('exceeds'),
+            contains('inflated body exceeds'),
           ),
         ),
       );
@@ -203,8 +209,9 @@ void main() {
         'FormatException', () async {
       // An attacker with no key can still flip the unauthenticated flag
       // byte. That turns plaintext into "not a gzip stream", which used to
-      // surface as dart:io's FormatException past every `on
-      // EnvelopeCorruptException` handler in sync.
+      // escape as dart:io's FormatException: a type no caller can classify,
+      // so ChangesetReader's `on EnvelopeCorruptException` break could not
+      // see it and the failure fell through to the per-peer catch instead.
       final envelope = await SyncEnvelope.seal(
         plaintext: Uint8List.fromList(utf8.encode('{"not":"gzip"}')),
         dataKey: key,
@@ -294,28 +301,4 @@ void main() {
       expect(envelope.length, lessThan(plain.length));
     });
   });
-}
-
-/// Gzips [mebibytes] MiB of zeros without ever holding them.
-Uint8List _gzipZeros({required int mebibytes}) {
-  final chunks = <List<int>>[];
-  final sink = gzip.encoder.startChunkedConversion(_Collect(chunks));
-  final block = Uint8List(1024 * 1024);
-  for (var i = 0; i < mebibytes; i++) {
-    sink.add(block);
-  }
-  sink.close();
-  return Uint8List.fromList([for (final c in chunks) ...c]);
-}
-
-class _Collect implements Sink<List<int>> {
-  _Collect(this.chunks);
-
-  final List<List<int>> chunks;
-
-  @override
-  void add(List<int> data) => chunks.add(data);
-
-  @override
-  void close() {}
 }

@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/utils/bounded_inflate.dart';
 
+import '../../support/compression_bombs.dart';
+
 void main() {
   Uint8List gz(List<int> body) => Uint8List.fromList(gzip.encode(body));
   Uint8List zl(List<int> body) => Uint8List.fromList(zlib.encode(body));
@@ -75,7 +77,7 @@ void main() {
       // rather than the clock is deliberate: zlib inflates this in well
       // under a second, so a time bound cannot tell a chunked abort from a
       // decoder that buffered the lot and checked its length afterwards.
-      final bomb = _deflateZeros(mebibytes: 512);
+      final bomb = compressZeros(gzip.encoder, mebibytes: 512);
       expect(bomb.length, lessThan(1 << 20));
 
       final before = ProcessInfo.currentRss;
@@ -186,28 +188,4 @@ void main() {
       );
     });
   });
-}
-
-/// Deflates [mebibytes] MiB of zeros without ever holding them.
-Uint8List _deflateZeros({required int mebibytes}) {
-  final chunks = <List<int>>[];
-  final sink = gzip.encoder.startChunkedConversion(_Collect(chunks));
-  final block = Uint8List(1024 * 1024);
-  for (var i = 0; i < mebibytes; i++) {
-    sink.add(block);
-  }
-  sink.close();
-  return Uint8List.fromList([for (final c in chunks) ...c]);
-}
-
-class _Collect implements Sink<List<int>> {
-  _Collect(this.chunks);
-
-  final List<List<int>> chunks;
-
-  @override
-  void add(List<int> data) => chunks.add(data);
-
-  @override
-  void close() {}
 }
