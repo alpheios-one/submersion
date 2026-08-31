@@ -21471,6 +21471,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem található USB soros port. A búvárszámítógép csatlakoztatva van és be van kapcsolva?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Nem található $model USB-n. Csatlakoztatva van ehhez a számítógéphez és be van kapcsolva?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'Ennek a merülőkomputernek a Bluetooth-párosítása elavult. Felejtesd el a merülőkomputert az eszközöd Bluetooth-beállításaiban, majd párosítsd újra a merülőkomputer Bluetooth menüjéből.';
 

@@ -21622,6 +21622,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun port série USB trouvé. L\'ordinateur de plongée est-il connecté et allumé ?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Aucun $model détecté en USB. Est-il connecté à cet ordinateur et allumé ?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'L\'appairage Bluetooth de cet ordinateur de plongée n\'est plus valide. Oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis appairez-le à nouveau depuis le menu Bluetooth de l\'ordinateur de plongée.';
 

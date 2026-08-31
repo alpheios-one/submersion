@@ -1415,6 +1415,14 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Ein Fehler ist aufgetreten",
   "diveComputer_download_noSerialPortsFound": "Keine USB-Seriellports gefunden. Ist der Tauchcomputer angeschlossen und eingeschaltet?",
+  "diveComputer_download_noUsbDeviceFound": "Kein {model} über USB gefunden. Ist er mit diesem Computer verbunden und eingeschaltet?",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "Die Bluetooth-Kopplung dieses Tauchcomputers ist veraltet. Entfernen Sie den Tauchcomputer in den Bluetooth-Einstellungen Ihres Geräts und koppeln Sie ihn anschließend über das Bluetooth-Menü des Tauchcomputers erneut.",
   "diveComputer_download_discoveryStalled": "Der Tauchcomputer wurde verbunden, hat aber vor dem Start des Downloads nicht mehr geantwortet. Meist ist die Bluetooth-Kopplung veraltet: Entfernen Sie den Tauchcomputer in den Bluetooth-Einstellungen Ihres Geräts und versuchen Sie es erneut.",
   "diveComputer_download_serialConnectFailedWithDetails": "Verbindung zum Tauchcomputer konnte nicht hergestellt werden.\n\nDiagnosedetails (mit Entwicklern teilen):\n{details}",

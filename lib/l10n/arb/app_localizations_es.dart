@@ -21555,6 +21555,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se encontraron puertos serie USB. ¿Está el ordenador de buceo conectado y encendido?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'No se encontró ningún $model por USB. ¿Está conectado a este ordenador y encendido?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'El emparejamiento Bluetooth de este ordenador de buceo está obsoleto. Olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a emparejarlo desde el menú Bluetooth del ordenador de buceo.';
 

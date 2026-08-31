@@ -21501,6 +21501,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine USB-Seriellports gefunden. Ist der Tauchcomputer angeschlossen und eingeschaltet?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Kein $model über USB gefunden. Ist er mit diesem Computer verbunden und eingeschaltet?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'Die Bluetooth-Kopplung dieses Tauchcomputers ist veraltet. Entfernen Sie den Tauchcomputer in den Bluetooth-Einstellungen Ihres Geräts und koppeln Sie ihn anschließend über das Bluetooth-Menü des Tauchcomputers erneut.';
 

@@ -35527,6 +35527,12 @@ abstract class AppLocalizations {
   /// **'No USB serial ports found. Is the dive computer connected and powered on?'**
   String get diveComputer_download_noSerialPortsFound;
 
+  /// No description provided for @diveComputer_download_noUsbDeviceFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No {model} found over USB. Is it connected to this computer and powered on?'**
+  String diveComputer_download_noUsbDeviceFound(Object model);
+
   /// No description provided for @diveComputer_download_stalePairing.
   ///
   /// In en, this message translates to:

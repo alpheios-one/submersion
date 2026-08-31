@@ -1415,6 +1415,14 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Se produjo un error",
   "diveComputer_download_noSerialPortsFound": "No se encontraron puertos serie USB. ¿Está el ordenador de buceo conectado y encendido?",
+  "diveComputer_download_noUsbDeviceFound": "No se encontró ningún {model} por USB. ¿Está conectado a este ordenador y encendido?",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "El emparejamiento Bluetooth de este ordenador de buceo está obsoleto. Olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a emparejarlo desde el menú Bluetooth del ordenador de buceo.",
   "diveComputer_download_discoveryStalled": "Se conectó al ordenador de buceo, pero dejó de responder antes de que comenzara la descarga. Normalmente esto significa que el emparejamiento Bluetooth está obsoleto: olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a intentarlo.",
   "diveComputer_download_serialConnectFailedWithDetails": "No se pudo conectar al ordenador de buceo.\n\nDetalles de diagnóstico (compartir con los desarrolladores):\n{details}",

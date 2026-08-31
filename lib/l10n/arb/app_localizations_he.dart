@@ -20992,6 +20992,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא נמצאו חיבורי USB טוריים. האם מחשב הצלילה מחובר ופועל?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'לא נמצא $model דרך USB. האם הוא מחובר למחשב הזה ומופעל?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'התאמת ה-Bluetooth של מחשב הצלילה הזה אינה עדכנית. שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך, ולאחר מכן התאם אותו מחדש מתפריט ה-Bluetooth של מחשב הצלילה.';
 

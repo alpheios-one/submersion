@@ -1519,6 +1519,14 @@
   "diveComputer_download_newDivesOnlySubtitle": "仅下载自上次同步以来新增的潜水",
   "diveComputer_download_newDivesOnlyTitle": "仅下载新潜水",
   "diveComputer_download_noSerialPortsFound": "未找到 USB 串行端口。潜水电脑是否已连接并开机？",
+  "diveComputer_download_noUsbDeviceFound": "未通过 USB 找到 {model}。它是否已连接到这台电脑并已开机？",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。",
   "diveComputer_download_discoveryStalled": "已连接到潜水电脑，但在下载开始前它停止响应。这通常表示蓝牙配对已失效：请在设备的蓝牙设置中忽略该潜水电脑，然后重试。",
   "diveComputer_download_preparing": "准备中...",
