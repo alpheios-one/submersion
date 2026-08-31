@@ -7,6 +7,7 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.d
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
+import 'package:submersion/features/dive_log/domain/codecs/series_body_zlib.dart';
 
 /// The bytes and scalars a `dive_profile_series` row stores.
 class EncodedProfileSeries {
@@ -93,12 +94,7 @@ class ProfileSeriesCodec {
   /// stream, an unknown version, a truncated block, trailing bytes, or a
   /// sample without timestamp or depth.
   List<ProfileSample> decode(Uint8List bytes) {
-    final Uint8List body;
-    try {
-      body = Uint8List.fromList(_zlib.decode(bytes));
-    } catch (e) {
-      throw ProfileSeriesCodecException('not a zlib stream: $e');
-    }
+    final body = inflateSeriesBody(bytes);
     if (body.isEmpty) {
       throw const ProfileSeriesCodecException('empty body');
     }
@@ -256,7 +252,10 @@ class ProfileSeriesCodec {
     final values = <String>[];
     for (var run = 0; run < runCount; run++) {
       final length = reader.readVarUint();
-      if (values.length + length > presentCount) {
+      // Subtract rather than add: a run length near 2^63 makes
+      // `values.length + length` wrap negative, and the loop below would
+      // then never terminate.
+      if (length > presentCount - values.length) {
         throw ProfileSeriesCodecException(
           'string run $run of length $length overruns the $presentCount '
           'present values',

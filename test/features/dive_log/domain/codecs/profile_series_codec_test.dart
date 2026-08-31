@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -9,6 +10,7 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
+import 'package:submersion/features/dive_log/domain/codecs/series_body_zlib.dart';
 
 /// A fully populated sample: every one of the 28 fields present.
 ProfileSample fullSample(int i) => ProfileSample(
@@ -433,6 +435,106 @@ void main() {
           ),
         ),
       );
+    });
+  });
+
+  group('hostile input', () {
+    /// The three-field table the by-hand bodies below are written against:
+    /// [version][count][timestamp block][depth block][string block].
+    const table = [
+      ProfileField('timestamp', ProfileFieldKind.deltaInt),
+      ProfileField('depth', ProfileFieldKind.float64),
+      ProfileField('heart_rate_source', ProfileFieldKind.runLengthString),
+    ];
+    const small = ProfileSeriesCodec(fieldTables: {9: table});
+
+    /// A body for three fully present samples whose string column carries
+    /// [runs] verbatim as (run length, byte length, bytes) triples.
+    Uint8List blobWithStringRuns(List<(int, int, List<int>)> runs) {
+      final writer = ByteWriter()
+        ..writeByte(9)
+        ..writeVarUint(3)
+        ..writeByte(kPresenceAll)
+        ..writeVarInt(0)
+        ..writeVarInt(1)
+        ..writeVarInt(1)
+        ..writeByte(kPresenceAll)
+        ..writeFloat64(1)
+        ..writeFloat64(2)
+        ..writeFloat64(3)
+        ..writeByte(kPresenceAll)
+        ..writeVarUint(runs.length);
+      for (final (length, byteLength, bytes) in runs) {
+        writer
+          ..writeVarUint(length)
+          ..writeVarUint(byteLength)
+          ..writeBytes(bytes);
+      }
+      return Uint8List.fromList(ZLibCodec(level: 6).encode(writer.takeBytes()));
+    }
+
+    test('a string run length near 2^63 is refused, not looped over', () {
+      // One legitimate run puts a value in the accumulator, so the second
+      // run's length plus that value wraps negative under an additive
+      // guard and the run loop never terminates.
+      final blob = blobWithStringRuns([
+        (1, 1, utf8.encode('a')),
+        ((1 << 63) - 1, 1, utf8.encode('b')),
+      ]);
+      expect(
+        () => small.decode(blob),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    }, timeout: const Timeout(Duration(seconds: 30)));
+
+    test('a string run byte length near 2^63 is refused', () {
+      final blob = blobWithStringRuns([(3, (1 << 63) - 1, utf8.encode('abc'))]);
+      expect(
+        () => small.decode(blob),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
+    test('an inflated body over the cap is refused', () {
+      final oversized = Uint8List.fromList(
+        ZLibCodec(level: 6).encode(Uint8List(kMaxInflatedSeriesBodyBytes + 1)),
+      );
+      // A few kilobytes of stored blob, tens of megabytes once inflated.
+      expect(oversized.length, lessThan(1 << 20));
+      expect(
+        () => codec.decode(oversized),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('inflate'),
+          ),
+        ),
+      );
+    });
+
+    test('a body just under the cap is still inflated', () {
+      // The cap refuses only what exceeds it. This body inflates fine and
+      // then fails on its content, which proves the inflate itself ran.
+      final justUnder = Uint8List.fromList(
+        ZLibCodec(level: 6).encode(Uint8List(kMaxInflatedSeriesBodyBytes)),
+      );
+      expect(
+        () => codec.decode(justUnder),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            isNot(contains('inflate')),
+          ),
+        ),
+      );
+    });
+
+    test('a twenty thousand sample series with every field round trips', () {
+      final samples = [for (var i = 0; i < 20000; i++) fullSample(i)];
+      final encoded = codec.encode(samples);
+      expect(codec.decode(encoded.bytes), samples);
     });
   });
 

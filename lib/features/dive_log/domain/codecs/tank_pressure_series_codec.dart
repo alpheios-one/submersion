@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
+import 'package:submersion/features/dive_log/domain/codecs/series_body_zlib.dart';
 
 /// One tank pressure reading as the v181 `tank_pressure_profiles` table
 /// stored it (the codec's column order), minus the identity columns (`id`,
@@ -119,12 +120,7 @@ class TankPressureSeriesCodec {
   /// Decodes a blob written by [encode]. Throws
   /// [ProfileSeriesCodecException] on anything malformed.
   List<TankPressureSample> decode(Uint8List bytes) {
-    final Uint8List body;
-    try {
-      body = Uint8List.fromList(_zlib.decode(bytes));
-    } catch (e) {
-      throw ProfileSeriesCodecException('not a zlib stream: $e');
-    }
+    final body = inflateSeriesBody(bytes);
     if (body.isEmpty) {
       throw const ProfileSeriesCodecException('empty body');
     }

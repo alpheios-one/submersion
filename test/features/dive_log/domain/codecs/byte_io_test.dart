@@ -146,6 +146,18 @@ void main() {
       );
     });
 
+    test('a count near 2^63 throws the codec exception, not a RangeError', () {
+      // The bounds check must not add the count to the offset: 2^63 - 1 plus
+      // any positive offset wraps negative and slips past an additive guard,
+      // and sublistView then reports a RangeError the callers do not catch.
+      final reader = ByteReader(Uint8List.fromList([1, 2, 3]));
+      reader.readByte();
+      expect(
+        () => reader.readBytes((1 << 63) - 1),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
     test('offset and remaining track consumption', () {
       final reader = ByteReader(Uint8List.fromList([1, 2, 3]));
       reader.readByte();

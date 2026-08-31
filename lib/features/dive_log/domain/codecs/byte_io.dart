@@ -110,7 +110,11 @@ class ByteReader {
   }
 
   void _ensure(int count) {
-    if (count < 0 || _offset + count > _bytes.length) {
+    // Subtract rather than add: a count near 2^63 makes `_offset + count`
+    // wrap negative, so an additive guard would wave it through and
+    // sublistView would raise a RangeError this class promises never to
+    // let escape.
+    if (count < 0 || count > _bytes.length - _offset) {
       throw ProfileSeriesCodecException(
         'unexpected end of data: needed $count byte(s) at offset $_offset '
         'of ${_bytes.length}',
