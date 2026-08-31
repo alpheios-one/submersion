@@ -119,7 +119,9 @@ void main() {
 
       final expected = formatMoney(120, 'EUR');
       await scrollTo(tester, find.text(expected));
-      expect(find.text(expected), findsOneWidget);
+      // Both the record row and the (now correctly non-empty) total row show
+      // the same formatted amount.
+      expect(find.text(expected), findsWidgets);
       expect(expected, contains('€'));
     });
 
