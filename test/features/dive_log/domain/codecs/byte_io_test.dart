@@ -130,6 +130,30 @@ void main() {
       expect(reader.readVarUint, throwsA(isA<ProfileSeriesCodecException>()));
     });
 
+    test('a padded varint is refused as non-canonical', () {
+      // Every one of these decodes to a value the writer encodes in fewer
+      // bytes, so accepting them would give one series several valid byte
+      // forms. The ten-byte case is only the longest instance of that.
+      final padded = <String, List<int>>{
+        'zero in two bytes': [0x80, 0x00],
+        'one in three bytes': [0x81, 0x80, 0x00],
+        'zero in ten bytes': [...List.filled(9, 0x80), 0x00],
+      };
+      for (final entry in padded.entries) {
+        final reader = ByteReader(Uint8List.fromList(entry.value));
+        expect(
+          reader.readVarUint,
+          throwsA(isA<ProfileSeriesCodecException>()),
+          reason: entry.key,
+        );
+      }
+    });
+
+    test('a single zero byte is canonical and decodes', () {
+      // The one varint that ends in a zero byte legitimately.
+      expect(ByteReader(Uint8List.fromList([0x00])).readVarUint(), 0);
+    });
+
     test('the largest 63-bit varint still decodes', () {
       // 2^63 - 1: eight bytes of 0xFF then 0x7F.
       final reader = ByteReader(

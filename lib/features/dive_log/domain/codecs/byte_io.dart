@@ -102,6 +102,13 @@ class ByteReader {
     return _bytes[_offset++];
   }
 
+  /// Accepts only the minimal encoding of a value. LEB128 lets any value be
+  /// padded with continuation bytes carrying no payload, so `0x80 0x00` and
+  /// `0x00` would otherwise both decode to zero and one series would have
+  /// several valid byte forms. A terminating byte of zero is canonical only
+  /// as the whole varint, which is what `shift > 0` tests. That also refuses
+  /// the ten-byte form the bit-63 guard below cannot reach, since its tenth
+  /// byte must carry a zero payload to get that far.
   int readVarUint() {
     var result = 0;
     var shift = 0;
@@ -111,7 +118,14 @@ class ByteReader {
         throw const ProfileSeriesCodecException('varint overflows 63 bits');
       }
       result |= (byte & 0x7F) << shift;
-      if ((byte & 0x80) == 0) return result;
+      if ((byte & 0x80) == 0) {
+        if (shift > 0 && (byte & 0x7F) == 0) {
+          throw const ProfileSeriesCodecException(
+            'non-canonical varint: padded with an empty terminating byte',
+          );
+        }
+        return result;
+      }
       shift += 7;
       if (shift > 63) {
         throw const ProfileSeriesCodecException('varint longer than 64 bits');

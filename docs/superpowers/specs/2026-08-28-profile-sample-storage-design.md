@@ -184,6 +184,13 @@ Layout:
    `dart:io` compression is already used by `track_point_codec.dart` and
    `sync_envelope.dart`.
 
+Varints are canonical: every value has exactly one encoding, the shortest
+one. LEB128 otherwise allows padding a value with continuation bytes that
+carry no payload, which would give one series several valid byte forms and
+make byte comparison of two blobs meaningless. The reader refuses any
+varint whose terminating byte carries a zero payload, unless that byte is
+the whole varint (the encoding of zero).
+
 Field table (dive profile), with encoding:
 
 | field | encoding |
@@ -412,8 +419,8 @@ Codec:
   bit-exactness.
 - A version-1 blob decoded under a hypothetical later field table yields
   the new fields null.
-- An unknown version, a truncated payload, and a malformed block each throw
-  `ProfileSeriesCodecException`.
+- An unknown version, a truncated payload, a malformed block, and a
+  non-canonical (padded) varint each throw `ProfileSeriesCodecException`.
 
 Summary scalars:
 
