@@ -238,19 +238,7 @@ void main() {
     testWidgets(
       'selecting an equipment chip applies the equipmentIds filter (#1407)',
       (tester) async {
-        final db = DatabaseService.instance.database;
-        final now = DateTime(2026, 6, 1).millisecondsSinceEpoch;
-        await db
-            .into(db.equipment)
-            .insert(
-              EquipmentCompanion(
-                id: const Value('eq1'),
-                name: const Value('Backplate BCD'),
-                type: const Value('bcd'),
-                createdAt: Value(now),
-                updatedAt: Value(now),
-              ),
-            );
+        await _seedDiverScopedEquipment();
 
         final overrides = await getBaseOverrides();
         late WidgetRef capturedRef;
@@ -311,5 +299,108 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'a duplicated incoming equipment id still deselects in one tap (#1407)',
+      (tester) async {
+        await _seedDiverScopedEquipment();
+
+        final overrides = await getBaseOverrides();
+        late WidgetRef capturedRef;
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              ...overrides,
+              diveRepositoryProvider.overrideWithValue(repository),
+              diveListNotifierProvider.overrideWith((ref) {
+                return DiveListNotifier(repository, ref);
+              }),
+              // A filter state built elsewhere is not guaranteed to hold
+              // distinct ids; the page must not let that strand a chip.
+              diveFilterProvider.overrideWith(
+                (ref) => const DiveFilterState(equipmentIds: ['eq1', 'eq1']),
+              ),
+            ].cast(),
+            child: MaterialApp(
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: Consumer(
+                  builder: (context, ref, _) {
+                    capturedRef = ref;
+                    return const DiveSearchPage();
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // An incoming equipment filter auto-expands Gas & Equipment, so unlike
+        // the test above this one must not tap the header (that would collapse
+        // it and take the chips back out of the tree).
+        final chip = find.widgetWithText(FilterChip, 'Backplate BCD');
+        expect(chip, findsOneWidget);
+        expect(tester.widget<FilterChip>(chip).selected, isTrue);
+
+        await tester.ensureVisible(chip);
+        await tester.pumpAndSettle();
+        await tester.tap(chip);
+        await tester.pumpAndSettle();
+
+        // One tap clears it: without deduplication the second occurrence
+        // survives and the chip stays lit with no way back.
+        expect(tester.widget<FilterChip>(chip).selected, isFalse);
+
+        final errors = <FlutterErrorDetails>[];
+        FlutterError.onError = (d) => errors.add(d);
+        await tester.ensureVisible(find.text('Search'));
+        await tester.tap(find.text('Search'));
+        await tester.pump();
+        FlutterError.onError = FlutterError.presentError;
+
+        expect(capturedRef.read(diveFilterProvider).equipmentIds, isEmpty);
+      },
+    );
   });
+}
+
+/// Seeds a default diver plus one piece of equipment owned by that diver.
+///
+/// `allEquipmentProvider` is diver-scoped, and `getAllEquipment` skips its
+/// `where` clause entirely when the resolved diver id is null. Seeding an
+/// unowned row against an empty `divers` table would therefore pass without
+/// ever exercising that filter, so the diver is seeded first (it is also the
+/// FK parent of `equipment.diverId`) and the item is attached to it.
+Future<void> _seedDiverScopedEquipment() async {
+  final db = DatabaseService.instance.database;
+  final now = DateTime(2026, 6, 1).millisecondsSinceEpoch;
+
+  await db
+      .into(db.divers)
+      .insert(
+        DiversCompanion(
+          id: const Value('diver1'),
+          name: const Value('Test Diver'),
+          isDefault: const Value(true),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+
+  await db
+      .into(db.equipment)
+      .insert(
+        EquipmentCompanion(
+          id: const Value('eq1'),
+          diverId: const Value('diver1'),
+          name: const Value('Backplate BCD'),
+          type: const Value('bcd'),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
 }

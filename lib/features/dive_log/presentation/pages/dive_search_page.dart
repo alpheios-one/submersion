@@ -127,7 +127,10 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
     _diveTypeId = filter.diveTypeId;
     _minO2Percent = filter.minO2Percent;
     _maxO2Percent = filter.maxO2Percent;
-    _equipmentIds = List.from(filter.equipmentIds);
+    // Deduplicated on the way in: the chip toggle below drops a single
+    // occurrence per tap, so a repeated id would leave a chip stuck selected
+    // with no way to clear it.
+    _equipmentIds = filter.equipmentIds.toSet().toList();
     _buddyNameFilter = filter.buddyNameFilter;
     _noBuddyOnly = filter.noBuddyOnly ?? false;
     _selectedTagIds = List.from(filter.tagIds);
@@ -738,9 +741,11 @@ class _DiveSearchPageState extends ConsumerState<DiveSearchPage> {
                       onSelected: (selected) {
                         setState(() {
                           if (selected) {
-                            _equipmentIds.add(item.id);
+                            if (!_equipmentIds.contains(item.id)) {
+                              _equipmentIds.add(item.id);
+                            }
                           } else {
-                            _equipmentIds.remove(item.id);
+                            _equipmentIds.removeWhere((id) => id == item.id);
                           }
                         });
                       },
