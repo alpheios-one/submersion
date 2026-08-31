@@ -11355,6 +11355,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'équipement $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Aucun $filterText';
   }
@@ -11362,6 +11367,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Aucun equipement avec ce statut';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Aucun équipement dans cette catégorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11380,6 +11389,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get equipment_list_filterServiceDue => 'Revision due';
+
+  @override
+  String get equipment_list_typeFilterAll => 'Tous les types';
 
   @override
   String get equipment_list_retryButton => 'Reessayer';

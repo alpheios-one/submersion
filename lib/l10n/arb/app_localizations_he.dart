@@ -11061,12 +11061,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'ציוד $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'אין $filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => 'אין ציוד עם סטטוס זה';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => 'אין ציוד בקטגוריה זו';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11085,6 +11093,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_list_filterServiceDue => 'טיפול נדרש';
+
+  @override
+  String get equipment_list_typeFilterAll => 'כל הסוגים';
 
   @override
   String get equipment_list_retryButton => 'נסה שוב';

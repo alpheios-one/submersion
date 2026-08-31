@@ -69,6 +69,17 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   bool _selectionFromList = false;
   Object? _selectedFilter;
 
+  /// One-click category filter (#1274). Applied client-side on top of the
+  /// status filter, so both compose with AND semantics.
+  EquipmentType? _selectedType;
+
+  /// Narrow [equipment] to the selected category, if one is chosen.
+  List<EquipmentItem> _applyTypeFilter(List<EquipmentItem> equipment) {
+    final type = _selectedType;
+    if (type == null) return equipment;
+    return equipment.where((e) => e.type == type).toList();
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -165,22 +176,28 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       equipmentAsync = ref.watch(equipmentByStatusProvider(status));
     }
 
+    // Category chips are derived from the pre-category list, so the row keeps
+    // offering the other categories while one of them is selected.
+    final availableTypes = _availableTypes(
+      equipmentAsync.value ?? const <EquipmentItem>[],
+    );
+
     // Table mode uses a dedicated scaffold with column configuration support.
     if (viewMode == ListViewMode.table) {
       final sortedAsync = equipmentAsync.whenData(
         (equipment) => applyEquipmentSorting(
-          equipment,
+          _applyTypeFilter(equipment),
           sort,
           serviceUrgency: serviceUrgency,
         ),
       );
-      return _buildTableModeScaffold(context, sortedAsync);
+      return _buildTableModeScaffold(context, sortedAsync, availableTypes);
     }
 
     // The visible list depends on which status filter is active, so derive
     // selectable ids from the same branch the list renders.
     final sortedVisible = applyEquipmentSorting(
-      equipmentAsync.value ?? const <EquipmentItem>[],
+      _applyTypeFilter(equipmentAsync.value ?? const <EquipmentItem>[]),
       sort,
       serviceUrgency: serviceUrgency,
     );
@@ -196,7 +213,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       return equipmentAsync.when(
         data: (equipment) {
           final sorted = applyEquipmentSorting(
-            equipment,
+            _applyTypeFilter(equipment),
             sort,
             serviceUrgency: serviceUrgency,
           );
@@ -222,6 +239,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                   : _buildCompactAppBar(context),
               if (widget.headerExtension != null) widget.headerExtension!,
               _buildFilterChips(context),
+              _buildTypeFilterChips(context, availableTypes),
               Expanded(child: buildContent()),
             ],
           ),
@@ -301,6 +319,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           body: Column(
             children: [
               _buildFilterChips(context),
+              _buildTypeFilterChips(context, availableTypes),
               Expanded(child: buildContent()),
             ],
           ),
@@ -449,6 +468,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   Widget _buildTableModeScaffold(
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
+    List<EquipmentType> availableTypes,
   ) {
     final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
         .map((e) => e.id)
@@ -483,6 +503,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             else
               SelectionEntryBar(controller: _selection),
             _buildFilterChips(context),
+            _buildTypeFilterChips(context, availableTypes),
             Expanded(child: _buildTableView(context, equipmentAsync)),
           ],
         ),
@@ -696,6 +717,55 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     );
   }
 
+  /// Categories offered as chips: every type present in [equipment] (in enum
+  /// order), plus the selected type even when nothing matches it anymore, so
+  /// the filter always stays visible and clearable.
+  List<EquipmentType> _availableTypes(List<EquipmentItem> equipment) {
+    final present = equipment.map((e) => e.type).toSet();
+    final selected = _selectedType;
+    if (selected != null) present.add(selected);
+    return EquipmentType.values.where(present.contains).toList();
+  }
+
+  /// One-click category filter (#1274): a horizontally scrollable chip row,
+  /// same idiom as the course list. Hidden when the gear is all one type
+  /// (nothing to narrow).
+  Widget _buildTypeFilterChips(
+    BuildContext context,
+    List<EquipmentType> availableTypes,
+  ) {
+    if (availableTypes.length < 2) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            FilterChip(
+              label: Text(context.l10n.equipment_list_typeFilterAll),
+              selected: _selectedType == null,
+              onSelected: (selected) {
+                if (selected) setState(() => _selectedType = null);
+              },
+            ),
+            for (final type in availableTypes) ...[
+              const SizedBox(width: 8),
+              FilterChip(
+                avatar: Icon(equipmentTypeIcon(type), size: 18),
+                label: Text(type.displayName),
+                selected: _selectedType == type,
+                onSelected: (selected) {
+                  setState(() => _selectedType = selected ? type : null);
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEquipmentList(
     BuildContext context,
     WidgetRef ref,
@@ -756,7 +826,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
 
   Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
     String filterText;
-    if (_selectedFilter == null) {
+    if (_selectedType != null) {
+      filterText = context.l10n.equipment_list_emptyState_filterText_type(
+        _selectedType!.displayName,
+      );
+    } else if (_selectedFilter == null) {
       filterText = context.l10n.equipment_list_emptyState_filterText_equipment;
     } else if (_selectedFilter == _serviceDueFilter) {
       filterText = context.l10n.equipment_list_emptyState_filterText_serviceDue;
@@ -782,7 +856,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           ),
           const SizedBox(height: 8),
           Text(
-            _selectedFilter == null
+            _selectedType != null
+                ? context.l10n.equipment_list_emptyState_noTypeMatch
+                : _selectedFilter == null
                 ? context.l10n.equipment_list_emptyState_addPrompt
                 : _selectedFilter == _serviceDueFilter
                 ? context.l10n.equipment_list_emptyState_serviceDueUpToDate
@@ -792,7 +868,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             ),
             textAlign: TextAlign.center,
           ),
-          if (_selectedFilter == null) ...[
+          if (_selectedFilter == null && _selectedType == null) ...[
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {

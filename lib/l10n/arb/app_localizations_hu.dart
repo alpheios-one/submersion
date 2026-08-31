@@ -11286,6 +11286,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type felszerelés';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Nincs $filterText';
   }
@@ -11293,6 +11298,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Nincs ilyen allapotu felszereles';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Nincs felszerelés ebben a kategóriában';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11311,6 +11320,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_list_filterServiceDue => 'Szerviz esedek';
+
+  @override
+  String get equipment_list_typeFilterAll => 'Összes típus';
 
   @override
   String get equipment_list_retryButton => 'Ujra';

@@ -664,6 +664,166 @@ void main() {
     );
   });
 
+  group('category filter (#1274)', () {
+    final items = [
+      _makeEquipment(
+        id: 'e1',
+        name: 'Alpha Reg',
+        type: EquipmentType.regulator,
+      ),
+      _makeEquipment(id: 'e2', name: 'Bravo BCD', type: EquipmentType.bcd),
+      _makeEquipment(id: 'e3', name: 'Charlie BCD', type: EquipmentType.bcd),
+      _makeEquipment(id: 'e4', name: 'Delta Suit', type: EquipmentType.wetsuit),
+    ];
+
+    Future<void> pumpPhoneList(
+      WidgetTester tester, {
+      List<EquipmentItem>? equipment,
+    }) async {
+      final overrides = await _buildPhoneOverrides(
+        items: equipment ?? items,
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: overrides,
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    Finder chip(String label) => find.widgetWithText(FilterChip, label);
+
+    testWidgets('shows one chip per type present plus All Types', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      expect(chip('All Types'), findsOneWidget);
+      expect(chip(EquipmentType.regulator.displayName), findsOneWidget);
+      expect(chip(EquipmentType.bcd.displayName), findsOneWidget);
+      expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
+      // No fins in the fixture, so no fins chip.
+      expect(chip(EquipmentType.fins.displayName), findsNothing);
+    });
+
+    testWidgets('tapping a type chip narrows the list to that type', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await tester.tap(chip(EquipmentType.bcd.displayName));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Bravo BCD'), findsOneWidget);
+      expect(find.text('Charlie BCD'), findsOneWidget);
+      expect(find.text('Alpha Reg'), findsNothing);
+      expect(find.text('Delta Suit'), findsNothing);
+    });
+
+    testWidgets('the All Types chip restores the full list', (tester) async {
+      await pumpPhoneList(tester);
+
+      await tester.tap(chip(EquipmentType.wetsuit.displayName));
+      await tester.pumpAndSettle();
+      expect(find.byType(EquipmentListTile), findsOneWidget);
+
+      await tester.tap(chip('All Types'));
+      await tester.pumpAndSettle();
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('re-tapping the selected type chip clears the filter', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await tester.tap(chip(EquipmentType.bcd.displayName));
+      await tester.pumpAndSettle();
+      expect(find.byType(EquipmentListTile), findsNWidgets(2));
+
+      await tester.tap(chip(EquipmentType.bcd.displayName));
+      await tester.pumpAndSettle();
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('type filter composes with the status filter (AND)', (
+      tester,
+    ) async {
+      // The status provider is overridden to return the full fixture list, so
+      // after picking a status the type chip must still narrow client-side.
+      await pumpPhoneList(tester);
+
+      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
+      await tester.pumpAndSettle();
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+
+      await tester.tap(chip(EquipmentType.regulator.displayName));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Alpha Reg'), findsOneWidget);
+      expect(find.byType(EquipmentListTile), findsOneWidget);
+    });
+
+    testWidgets('empty type match shows the category empty state', (
+      tester,
+    ) async {
+      // Select a type, then shrink the source list so nothing matches; the
+      // selected chip must stay visible (clearable) and the empty state must
+      // name the category.
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final source = StateProvider<List<EquipmentItem>>((ref) => items);
+
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            equipmentByStatusProvider.overrideWith(
+              (ref, status) => ref.watch(source),
+            ),
+            activeEquipmentProvider.overrideWith(
+              (ref) async => ref.watch(source),
+            ),
+            equipmentListViewModeProvider.overrideWith(
+              (ref) => ListViewMode.detailed,
+            ),
+            equipmentTableConfigProvider.overrideWith(
+              (ref) => _TestEquipTableConfigNotifier(_testConfig),
+            ),
+            highlightedEquipmentIdProvider.overrideWith((ref) => null),
+          ],
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(chip(EquipmentType.wetsuit.displayName));
+      await tester.pumpAndSettle();
+      expect(find.text('Delta Suit'), findsOneWidget);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(EquipmentListContent)),
+      );
+      container.read(source.notifier).state = [items.first];
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EquipmentListTile), findsNothing);
+      // The selected chip stays on screen so the filter can be cleared.
+      expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
+      expect(find.text('No equipment in this category'), findsOneWidget);
+    });
+  });
+
   group('filter selection and refresh target the right provider (#636)', () {
     Future<void> pumpPhoneList(
       WidgetTester tester,

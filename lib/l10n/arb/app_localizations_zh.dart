@@ -10802,12 +10802,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10825,6 +10833,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_list_filterServiceDue => '需要维护';
+
+  @override
+  String get equipment_list_typeFilterAll => '全部类型';
 
   @override
   String get equipment_list_retryButton => '重试';
