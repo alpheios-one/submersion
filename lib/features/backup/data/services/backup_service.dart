@@ -27,6 +27,7 @@ import 'package:submersion/features/backup/data/services/backup_encryption_key_s
 import 'package:submersion/core/services/database_service.dart'
     show DatabaseService;
 import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
+import 'package:submersion/features/backup/data/services/backup_attribution.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/backup/data/services/backup_database_adapter.dart';
@@ -175,7 +176,7 @@ class BackupService {
     BackupTarget target, {
     required bool isAutomatic,
   }) async {
-    final filename = _generateFilename();
+    final filename = await _generateFilename();
     final encKey = await _activeBackupKey();
 
     final String ref;
@@ -354,7 +355,7 @@ class BackupService {
     _log.info('Exporting backup to temp for sharing');
 
     final encKey = await _activeBackupKey();
-    final filename = _generateFilename();
+    final filename = await _generateFilename();
     final tempDir = await resolveSyncTempDir();
 
     if (encKey == null) {
@@ -1304,10 +1305,28 @@ class BackupService {
   // Private Helpers
   // ===========================================================================
 
-  String _generateFilename() {
+  /// Names a new backup, tagging it with the device that wrote it.
+  ///
+  /// The tag lives in the filename rather than only in the [BackupRecord]
+  /// because an orphaned backup is one whose record has been lost, so a device
+  /// id in the record is exactly the information already missing. Attribution
+  /// is what makes it safe to offer a forgotten backup for deletion in a
+  /// shared cloud folder, where another device's backups sit in the same
+  /// directory and are equally absent from this device's history.
+  ///
+  /// Falls back to the historic unattributed name if the device id cannot be
+  /// read. An unattributed backup is never offered for deletion, so degrading
+  /// this way costs reclaimable space, never someone's only copy.
+  Future<String> _generateFilename() async {
     final dateFormat = DateFormat('yyyy-MM-dd_HHmmss');
     final timestamp = dateFormat.format(DateTime.now());
-    return 'submersion_backup_$timestamp.db';
+    try {
+      final deviceId = await SyncRepository().getDeviceId();
+      return buildBackupFilename(timestamp: timestamp, deviceId: deviceId);
+    } catch (e) {
+      _log.warning('Backup device attribution unavailable: $e');
+      return 'submersion_backup_$timestamp.db';
+    }
   }
 
   Future<({int diveCount, int siteCount})> _getDiveSiteCounts() async {
