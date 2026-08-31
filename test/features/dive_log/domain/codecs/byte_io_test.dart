@@ -246,6 +246,39 @@ void main() {
       expect(() => ByteWriter().writeVarUint(-1), throwsArgumentError);
     });
 
+    test('writeVarUint has no upper-bound gap against the reader', () {
+      // The reader refuses a varint whose payload reaches bit 63, which
+      // raises the question of whether the writer can emit one. It cannot:
+      // 2^63-1 is the largest Dart int, it encodes in nine bytes, and the
+      // guard needs a tenth. So the writer's accepted range (0 .. 2^63-1)
+      // is exactly the reader's decodable range, and no upper bound on the
+      // writer would exclude anything reachable.
+      const maxDartInt = 9223372036854775807;
+      for (final value in [1 << 62, maxDartInt - 1, maxDartInt]) {
+        final bytes = (ByteWriter()..writeVarUint(value)).takeBytes();
+        expect(bytes, hasLength(9));
+        expect(ByteReader(bytes).readVarUint(), value);
+      }
+      // The tenth byte the guard exists for cannot come from the writer,
+      // only from a crafted blob.
+      final crafted = Uint8List.fromList([
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x80,
+        0x01,
+      ]);
+      expect(
+        () => ByteReader(crafted).readVarUint(),
+        throwsA(isA<ProfileSeriesCodecException>()),
+      );
+    });
+
     test('writeVarInt round-trips the extremes of the zigzag range', () {
       for (final value in [(1 << 62) - 1, -(1 << 62)]) {
         final writer = ByteWriter()..writeVarInt(value);
