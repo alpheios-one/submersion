@@ -4672,7 +4672,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_equipment => '装备';
 
   @override
-  String get diveLog_detail_section_marineLife => '海洋生物';
+  String get diveLog_detail_section_marineLife => '物种';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -4985,7 +4985,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => '未选择装备';
 
   @override
-  String get diveLog_edit_noMarineLife => '未记录海洋生物';
+  String get diveLog_edit_noMarineLife => '未记录物种';
 
   @override
   String get diveLog_edit_notSpecified => '未指定';
@@ -5119,7 +5119,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_section_exitTime => '出水时间';
 
   @override
-  String get diveLog_edit_section_marineLife => '海洋生物';
+  String get diveLog_edit_section_marineLife => '物种';
 
   @override
   String get diveLog_edit_section_notes => '备注';
@@ -5993,7 +5993,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_invite_diveInfo => '添加深度范围、难度或评分';
 
   @override
-  String get diveSites_edit_invite_lifeNotes => '添加海洋生物、笔记或共享';
+  String get diveSites_edit_invite_lifeNotes => '添加物种、笔记或共享';
 
   @override
   String get diveSites_edit_invite_location => '添加 GPS 位置或海拔';
@@ -7015,7 +7015,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => '搜索物种...';
 
   @override
-  String get diveLog_speciesPicker_title => '添加海洋生物';
+  String get diveLog_speciesPicker_title => '添加物种';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => '清除搜索';
@@ -8169,7 +8169,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => '难度等级';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => '预期海洋生物';
+  String get diveSites_edit_section_expectedMarineLife => '预期物种';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS 坐标';
@@ -11910,7 +11910,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_noExpected => '未添加预期物种';
 
   @override
-  String get marineLife_siteSection_noSpotted => '尚无海洋生物目击记录';
+  String get marineLife_siteSection_noSpotted => '尚无物种目击记录';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -11924,7 +11924,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => '发现此处';
 
   @override
-  String get marineLife_siteSection_title => '海洋生物';
+  String get marineLife_siteSection_title => '物种';
 
   @override
   String get marineLife_speciesDetail_backTooltip => '返回';
@@ -12357,7 +12357,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesPage_emptyTitle => '还没有物种';
 
   @override
-  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的海洋生物目击会显示在这里。';
+  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的物种目击会显示在这里。';
 
   @override
   String get marineLife_speciesPage_noMatch => '没有符合搜索条件的物种';
@@ -13584,6 +13584,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_sites => '潜水点';
 
   @override
+  String get nav_species => '物种';
+
+  @override
   String get nav_statistics => '统计';
 
   @override
@@ -14599,7 +14602,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_equipment_description => '潜水中使用的装备';
 
   @override
-  String get diveDetailSection_sightings_name => '海洋生物目击';
+  String get diveDetailSection_sightings_name => '物种目击';
 
   @override
   String get diveDetailSection_sightings_description => '观察到的物种、目击详情';
@@ -16021,7 +16024,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_species => '物种';
 
   @override
-  String get settings_manage_species_subtitle => '管理海洋生物物种目录';
+  String get settings_manage_species_subtitle => '管理物种目录';
 
   @override
   String get settings_manage_tags => '标签';
@@ -16920,7 +16923,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => '物种目击';
 
   @override
-  String get statistics_category_marineLife_title => '海洋生物';
+  String get statistics_category_marineLife_title => '物种';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17237,7 +17240,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', 已选择';
 
   @override
-  String get statistics_marineLife_appBar_title => '海洋生物';
+  String get statistics_marineLife_appBar_title => '物种';
 
   @override
   String get statistics_marineLife_bestSites_empty => '无潜水点数据';
@@ -17258,7 +17261,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title => '海洋生物最佳潜水点';
+  String get statistics_marineLife_bestSites_title => '最佳潜水点';
 
   @override
   String get statistics_marineLife_mostCommon_empty => '无目击数据';

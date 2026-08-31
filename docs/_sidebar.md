@@ -23,7 +23,7 @@
   * [O2 Tracking](features/oxygen-tracking.md)
   * [Multi-Gas Diving](features/multi-gas.md)
   * [Buddies & Certs](features/buddies.md)
-  * [Marine Life](features/marine-life.md)
+  * [Species](features/marine-life.md)
   * [Trips](features/trips.md)
   * [Tags](features/tags.md)
 

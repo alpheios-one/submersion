@@ -4913,7 +4913,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Equipamentos';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Vida Marinha';
+  String get diveLog_detail_section_marineLife => 'Espécies';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5247,7 +5247,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum equipamento selecionado';
 
   @override
-  String get diveLog_edit_noMarineLife => 'Nenhuma vida marinha registrada';
+  String get diveLog_edit_noMarineLife => 'Nenhuma espécie registrada';
 
   @override
   String get diveLog_edit_notSpecified => 'Nao especificado';
@@ -5388,7 +5388,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Horario de Saida';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Vida Marinha';
+  String get diveLog_edit_section_marineLife => 'Espécies';
 
   @override
   String get diveLog_edit_section_notes => 'Anotacoes';
@@ -6312,7 +6312,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'Adicionar vida marinha, notas ou compartilhamento';
+      'Adicionar espécies, notas ou compartilhamento';
 
   @override
   String get diveSites_edit_invite_location =>
@@ -7382,7 +7382,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Buscar especies...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Adicionar Vida Marinha';
+  String get diveLog_speciesPicker_title => 'Adicionar Espécies';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Limpar busca';
@@ -8585,8 +8585,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Nivel de Dificuldade';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'Vida Marinha Esperada';
+  String get diveSites_edit_section_expectedMarineLife => 'Espécies Esperadas';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'Coordenadas GPS';
@@ -12510,7 +12509,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_siteSection_noSpotted =>
-      'Nenhuma vida marinha avistada ainda';
+      'Nenhuma espécie avistada ainda';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12524,7 +12523,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Avistados Aqui';
 
   @override
-  String get marineLife_siteSection_title => 'Vida Marinha';
+  String get marineLife_siteSection_title => 'Espécies';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Voltar';
@@ -12981,7 +12980,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Os avistamentos de vida marinha adicionados a um mergulho aparecerão aqui.';
+      'Os avistamentos de espécies adicionados a um mergulho aparecerão aqui.';
 
   @override
   String get marineLife_speciesPage_noMatch =>
@@ -14262,6 +14261,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_sites => 'Pontos de Mergulho';
 
   @override
+  String get nav_species => 'Espécies';
+
+  @override
   String get nav_statistics => 'Estatisticas';
 
   @override
@@ -15348,7 +15350,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Equipamento utilizado no mergulho';
 
   @override
-  String get diveDetailSection_sightings_name => 'Avistamentos de Vida Marinha';
+  String get diveDetailSection_sightings_name => 'Avistamentos de Espécies';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16867,7 +16869,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_manage_species_subtitle =>
-      'Gerenciar catalogo de especies de vida marinha';
+      'Gerenciar o catálogo de espécies';
 
   @override
   String get settings_manage_tags => 'Etiquetas';
@@ -17826,7 +17828,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Avistamentos de especies';
 
   @override
-  String get statistics_category_marineLife_title => 'Vida Marinha';
+  String get statistics_category_marineLife_title => 'Espécies';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -18175,7 +18177,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', selecionado';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Vida Marinha';
+  String get statistics_marineLife_appBar_title => 'Espécies';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'Nenhum dado de ponto';
@@ -18198,8 +18200,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Melhores Pontos para Vida Marinha';
+  String get statistics_marineLife_bestSites_title => 'Melhores Pontos';
 
   @override
   String get statistics_marineLife_mostCommon_empty =>

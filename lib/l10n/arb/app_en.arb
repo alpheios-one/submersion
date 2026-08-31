@@ -2824,7 +2824,7 @@
   "diveLog_detail_section_details": "Details",
   "diveLog_detail_section_diveProfile": "Dive Profile",
   "diveLog_detail_section_equipment": "Equipment",
-  "diveLog_detail_section_marineLife": "Marine Life",
+  "diveLog_detail_section_marineLife": "Species",
   "diveLog_detail_sightingPhotos": "{count, plural, =1{1 photo} other{{count} photos}}",
   "@diveLog_detail_sightingPhotos": {
     "placeholders": {
@@ -2965,7 +2965,7 @@
   "diveLog_edit_marineLifeHint": "Tap \"Add\" to record sightings",
   "diveLog_edit_nearbySitesFirst": "Nearby sites first",
   "diveLog_edit_noEquipmentSelected": "No equipment selected",
-  "diveLog_edit_noMarineLife": "No marine life logged",
+  "diveLog_edit_noMarineLife": "No species logged",
   "diveLog_edit_notSpecified": "Not specified",
   "diveLog_edit_notesHint": "Add notes about this dive...",
   "diveLog_edit_overline_tanks": "Tanks",
@@ -3053,7 +3053,7 @@
   "diveLog_edit_section_entryTime": "Entry Time",
   "diveLog_edit_section_equipment": "Equipment",
   "diveLog_edit_section_exitTime": "Exit Time",
-  "diveLog_edit_section_marineLife": "Marine Life",
+  "diveLog_edit_section_marineLife": "Species",
   "diveLog_edit_section_notes": "Notes",
   "diveLog_edit_section_rating": "Rating",
   "diveLog_edit_section_tags": "Tags",
@@ -3490,7 +3490,7 @@
   "@diveSites_edit_invite_diveInfo": {
     "description": "Empty-state invitation for the Dive info group"
   },
-  "diveSites_edit_invite_lifeNotes": "Add marine life, notes or sharing",
+  "diveSites_edit_invite_lifeNotes": "Add species, notes or sharing",
   "@diveSites_edit_invite_lifeNotes": {
     "description": "Empty-state invitation for the Life & notes group"
   },
@@ -3958,7 +3958,7 @@
   "diveLog_speciesPicker_noResults": "No species found",
   "diveLog_speciesPicker_noSpecies": "No species available",
   "diveLog_speciesPicker_searchHint": "Search species...",
-  "diveLog_speciesPicker_title": "Add Marine Life",
+  "diveLog_speciesPicker_title": "Add Species",
   "diveLog_speciesPicker_tooltip_clearSearch": "Clear search",
   "diveLog_summary_action_importComputer": "Import from Computer",
   "diveLog_summary_action_logDive": "Log Dive",
@@ -4973,7 +4973,7 @@
   "diveSites_edit_section_altitude": "Altitude",
   "diveSites_edit_section_depthRange": "Depth Range",
   "diveSites_edit_section_difficultyLevel": "Difficulty Level",
-  "diveSites_edit_section_expectedMarineLife": "Expected Marine Life",
+  "diveSites_edit_section_expectedMarineLife": "Expected Species",
   "diveSites_edit_section_gpsCoordinates": "GPS Coordinates",
   "diveSites_edit_section_hazards": "Hazards & Safety",
   "diveSites_edit_section_rating": "Rating",
@@ -7141,10 +7141,10 @@
   "marineLife_siteSection_errorLoadingSightings": "Error loading sightings",
   "marineLife_siteSection_expectedSpecies": "Expected Species",
   "marineLife_siteSection_noExpected": "No expected species added",
-  "marineLife_siteSection_noSpotted": "No marine life spotted yet",
+  "marineLife_siteSection_noSpotted": "No species spotted yet",
   "marineLife_siteSection_spottedCountSemantics": "{name}, spotted {count} times",
   "marineLife_siteSection_spottedHere": "Spotted Here",
-  "marineLife_siteSection_title": "Marine Life",
+  "marineLife_siteSection_title": "Species",
   "marineLife_speciesDetail_backTooltip": "Back",
   "marineLife_speciesDetail_depthRangeTitle": "Depth Range",
   "marineLife_speciesDetail_descriptionTitle": "Description",
@@ -7347,7 +7347,7 @@
     }
   },
   "marineLife_speciesPage_emptyTitle": "No species yet",
-  "marineLife_speciesPage_emptyHint": "Marine life sightings added to a dive will show up here.",
+  "marineLife_speciesPage_emptyHint": "Species sightings added to a dive will show up here.",
   "marineLife_speciesPage_noMatch": "No species match your search",
   "marineLife_speciesPage_error": "Could not load your species: {error}",
   "@marineLife_speciesPage_error": {
@@ -8617,6 +8617,7 @@
   "nav_planningSubtitle": "Dive Planner, Calculators",
   "nav_settings": "Settings",
   "nav_sites": "Sites",
+  "nav_species": "Species",
   "nav_statistics": "Statistics",
   "nav_tooltip_closeMenu": "Close menu",
   "nav_tooltip_collapseMenu": "Collapse menu",
@@ -8664,6 +8665,9 @@
   },
   "@nav_sites": {
     "description": "Navigation label for dive sites section"
+  },
+  "@nav_species": {
+    "description": "Navigation label for the species section"
   },
   "@nav_statistics": {
     "description": "Navigation label for statistics section"
@@ -9323,7 +9327,7 @@
   "diveDetailSection_signatures_description": "Buddy/instructor signature display and capture",
   "diveDetailSection_equipment_name": "Equipment",
   "diveDetailSection_equipment_description": "Equipment used in dive",
-  "diveDetailSection_sightings_name": "Marine Life Sightings",
+  "diveDetailSection_sightings_name": "Species Sightings",
   "diveDetailSection_sightings_description": "Species spotted, sighting details",
   "diveDetailSection_media_name": "Media",
   "diveDetailSection_media_description": "Photos/videos gallery",
@@ -9892,7 +9896,7 @@
   "settings_manage_diveTypes_subtitle": "Manage custom dive types",
   "settings_manage_header_manageData": "Manage Data",
   "settings_manage_species": "Species",
-  "settings_manage_species_subtitle": "Manage marine life species catalog",
+  "settings_manage_species_subtitle": "Manage the species catalog",
   "settings_manage_tags": "Tags",
   "settings_manage_tags_subtitle": "Manage, merge, and delete tags",
   "settings_manage_tankPresets": "Tank Presets",
@@ -10678,7 +10682,7 @@
   "statistics_category_geographic_subtitle": "Countries & regions",
   "statistics_category_geographic_title": "Geographic",
   "statistics_category_marineLife_subtitle": "Species sightings",
-  "statistics_category_marineLife_title": "Marine Life",
+  "statistics_category_marineLife_title": "Species",
   "statistics_category_overview_title": "Overview",
   "@statistics_category_overview_title": {
     "description": "Title for the Overview entry in the Statistics category list"
@@ -10776,12 +10780,12 @@
   "statistics_geographic_trips_summary": "{count} trips. Top: {topName} with {topCount} dives",
   "statistics_geographic_trips_title": "Dives Per Trip",
   "statistics_listContent_selectedSuffix": ", selected",
-  "statistics_marineLife_appBar_title": "Marine Life",
+  "statistics_marineLife_appBar_title": "Species",
   "statistics_marineLife_bestSites_empty": "No site data",
   "statistics_marineLife_bestSites_error": "Failed to load site data",
   "statistics_marineLife_bestSites_subtitle": "Sites with most species variety",
   "statistics_marineLife_bestSites_summary": "{count} sites. Best: {topName} with {topCount} species",
-  "statistics_marineLife_bestSites_title": "Best Sites for Marine Life",
+  "statistics_marineLife_bestSites_title": "Best Sites",
   "statistics_marineLife_mostCommon_empty": "No sighting data",
   "statistics_marineLife_mostCommon_error": "Failed to load sighting data",
   "statistics_marineLife_mostCommon_subtitle": "Species spotted most often",

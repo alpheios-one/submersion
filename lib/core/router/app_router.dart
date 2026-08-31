@@ -1371,7 +1371,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/species',
             name: 'species',
-            builder: (context, state) => const SpeciesPage(),
+            // A nav destination: the rail and bottom bar reach it with `go`,
+            // so it cross-fades like its siblings instead of animating in.
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SpeciesPage(),
+            ),
             routes: [
               GoRoute(
                 path: 'manage',

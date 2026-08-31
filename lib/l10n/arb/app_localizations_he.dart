@@ -4791,7 +4791,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'ציוד';
 
   @override
-  String get diveLog_detail_section_marineLife => 'חיים ימיים';
+  String get diveLog_detail_section_marineLife => 'מינים';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5113,7 +5113,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'לא נבחר ציוד';
 
   @override
-  String get diveLog_edit_noMarineLife => 'לא נרשמו חיים ימיים';
+  String get diveLog_edit_noMarineLife => 'לא נרשמו מינים';
 
   @override
   String get diveLog_edit_notSpecified => 'לא צוין';
@@ -5250,7 +5250,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'שעת יציאה';
 
   @override
-  String get diveLog_edit_section_marineLife => 'חיים ימיים';
+  String get diveLog_edit_section_marineLife => 'מינים';
 
   @override
   String get diveLog_edit_section_notes => 'הערות';
@@ -6148,8 +6148,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'הוספת טווח עומק, רמת קושי או דירוג';
 
   @override
-  String get diveSites_edit_invite_lifeNotes =>
-      'הוספת חיים ימיים, הערות או שיתוף';
+  String get diveSites_edit_invite_lifeNotes => 'הוספת מינים, הערות או שיתוף';
 
   @override
   String get diveSites_edit_invite_location => 'הוספת מיקום GPS או גובה';
@@ -7193,7 +7192,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'חפש מינים...';
 
   @override
-  String get diveLog_speciesPicker_title => 'הוסף חיים ימיים';
+  String get diveLog_speciesPicker_title => 'הוספת מינים';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'נקה חיפוש';
@@ -8370,7 +8369,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'רמת קושי';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => 'חיים ימיים צפויים';
+  String get diveSites_edit_section_expectedMarineLife => 'מינים צפויים';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'קואורדינטות GPS';
@@ -12198,7 +12197,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get marineLife_siteSection_noExpected => 'לא נוספו מינים צפויים';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'עדיין לא נצפה חי ימי';
+  String get marineLife_siteSection_noSpotted => 'עדיין לא נצפו מינים';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12212,7 +12211,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'נצפו כאן';
 
   @override
-  String get marineLife_siteSection_title => 'חי ימי';
+  String get marineLife_siteSection_title => 'מינים';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'חזרה';
@@ -12654,7 +12653,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'תצפיות של חיים ימיים שנוספו לצלילה יופיעו כאן.';
+      'תצפיות של מינים שנוספו לצלילה יופיעו כאן.';
 
   @override
   String get marineLife_speciesPage_noMatch => 'אין מינים שתואמים לחיפוש';
@@ -13906,6 +13905,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_sites => 'אתרים';
 
   @override
+  String get nav_species => 'מינים';
+
+  @override
   String get nav_statistics => 'סטטיסטיקות';
 
   @override
@@ -14971,7 +14973,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveDetailSection_equipment_description => 'ציוד שהשתמש בצלילה';
 
   @override
-  String get diveDetailSection_sightings_name => 'תצפיות חיי ים';
+  String get diveDetailSection_sightings_name => 'תצפיות מינים';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16438,7 +16440,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_manage_species => 'מינים';
 
   @override
-  String get settings_manage_species_subtitle => 'ניהול קטלוג מיני חי ימי';
+  String get settings_manage_species_subtitle => 'ניהול קטלוג המינים';
 
   @override
   String get settings_manage_tags => 'תגיות';
@@ -17370,7 +17372,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'תצפיות מינים';
 
   @override
-  String get statistics_category_marineLife_title => 'חיים ימיים';
+  String get statistics_category_marineLife_title => 'מינים';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17700,7 +17702,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', נבחר';
 
   @override
-  String get statistics_marineLife_appBar_title => 'חיים ימיים';
+  String get statistics_marineLife_appBar_title => 'מינים';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'אין נתוני אתרים';
@@ -17723,8 +17725,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'האתרים הטובים ביותר לחיים ימיים';
+  String get statistics_marineLife_bestSites_title => 'האתרים הטובים ביותר';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'אין נתוני תצפיות';

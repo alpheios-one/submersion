@@ -1,4 +1,4 @@
-# Marine Life
+# Species
 
 Track species sightings and build a database of your underwater encounters.
 

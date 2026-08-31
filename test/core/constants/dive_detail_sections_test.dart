@@ -409,10 +409,7 @@ void main() {
       expect(DiveDetailSectionId.buddies.displayName, 'Buddies');
       expect(DiveDetailSectionId.signatures.displayName, 'Signatures');
       expect(DiveDetailSectionId.equipment.displayName, 'Equipment');
-      expect(
-        DiveDetailSectionId.sightings.displayName,
-        'Marine Life Sightings',
-      );
+      expect(DiveDetailSectionId.sightings.displayName, 'Species Sightings');
       expect(DiveDetailSectionId.media.displayName, 'Media');
       expect(DiveDetailSectionId.tags.displayName, 'Tags');
       expect(DiveDetailSectionId.notes.displayName, 'Notes');
@@ -550,7 +547,7 @@ void main() {
       );
       expect(
         DiveDetailSectionId.sightings.localizedDisplayName(l10n),
-        'Marine Life Sightings',
+        'Species Sightings',
       );
       expect(DiveDetailSectionId.media.localizedDisplayName(l10n), 'Media');
       expect(DiveDetailSectionId.tags.localizedDisplayName(l10n), 'Tags');

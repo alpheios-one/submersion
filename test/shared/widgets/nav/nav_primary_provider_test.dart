@@ -163,6 +163,7 @@ void main() {
           'sites',
           'trips',
           'media',
+          'species',
           'dive-centers',
           'certifications',
           'courses',

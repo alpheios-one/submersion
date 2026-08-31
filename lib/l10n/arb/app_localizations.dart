@@ -8180,7 +8180,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_detail_section_marineLife;
 
   /// No description provided for @diveLog_detail_sightingPhotos.
@@ -8750,7 +8750,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_noMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'No marine life logged'**
+  /// **'No species logged'**
   String get diveLog_edit_noMarineLife;
 
   /// No description provided for @diveLog_edit_notSpecified.
@@ -8966,7 +8966,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_edit_section_marineLife;
 
   /// No description provided for @diveLog_edit_section_notes.
@@ -10478,7 +10478,7 @@ abstract class AppLocalizations {
   /// Empty-state invitation for the Life & notes group
   ///
   /// In en, this message translates to:
-  /// **'Add marine life, notes or sharing'**
+  /// **'Add species, notes or sharing'**
   String get diveSites_edit_invite_lifeNotes;
 
   /// Empty-state invitation for the Location group
@@ -12338,7 +12338,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_speciesPicker_title.
   ///
   /// In en, this message translates to:
-  /// **'Add Marine Life'**
+  /// **'Add Species'**
   String get diveLog_speciesPicker_title;
 
   /// No description provided for @diveLog_speciesPicker_tooltip_clearSearch.
@@ -14408,7 +14408,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_edit_section_expectedMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'Expected Marine Life'**
+  /// **'Expected Species'**
   String get diveSites_edit_section_expectedMarineLife;
 
   /// No description provided for @diveSites_edit_section_gpsCoordinates.
@@ -21185,7 +21185,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_noSpotted.
   ///
   /// In en, this message translates to:
-  /// **'No marine life spotted yet'**
+  /// **'No species spotted yet'**
   String get marineLife_siteSection_noSpotted;
 
   /// No description provided for @marineLife_siteSection_spottedCountSemantics.
@@ -21206,7 +21206,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get marineLife_siteSection_title;
 
   /// No description provided for @marineLife_speciesDetail_backTooltip.
@@ -21836,7 +21836,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_speciesPage_emptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Marine life sightings added to a dive will show up here.'**
+  /// **'Species sightings added to a dive will show up here.'**
   String get marineLife_speciesPage_emptyHint;
 
   /// No description provided for @marineLife_speciesPage_noMatch.
@@ -23762,6 +23762,12 @@ abstract class AppLocalizations {
   /// **'Sites'**
   String get nav_sites;
 
+  /// Navigation label for the species section
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get nav_species;
+
   /// Navigation label for statistics section
   ///
   /// In en, this message translates to:
@@ -25493,7 +25499,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_sightings_name.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life Sightings'**
+  /// **'Species Sightings'**
   String get diveDetailSection_sightings_name;
 
   /// No description provided for @diveDetailSection_sightings_description.
@@ -27910,7 +27916,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_manage_species_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Manage marine life species catalog'**
+  /// **'Manage the species catalog'**
   String get settings_manage_species_subtitle;
 
   /// No description provided for @settings_manage_tags.
@@ -29552,7 +29558,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_category_marineLife_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_category_marineLife_title;
 
   /// Title for the Overview entry in the Statistics category list
@@ -30119,7 +30125,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_appBar_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_marineLife_appBar_title;
 
   /// No description provided for @statistics_marineLife_bestSites_empty.
@@ -30153,7 +30159,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_bestSites_title.
   ///
   /// In en, this message translates to:
-  /// **'Best Sites for Marine Life'**
+  /// **'Best Sites'**
   String get statistics_marineLife_bestSites_title;
 
   /// No description provided for @statistics_marineLife_mostCommon_empty.

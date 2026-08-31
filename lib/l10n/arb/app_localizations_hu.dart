@@ -4894,7 +4894,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Felszereles';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Tengeri elet';
+  String get diveLog_detail_section_marineLife => 'Fajok';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5225,7 +5225,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs kivalasztott felszereles';
 
   @override
-  String get diveLog_edit_noMarineLife => 'Nincs rogzitett tengeri elet';
+  String get diveLog_edit_noMarineLife => 'Nincs rögzített faj';
 
   @override
   String get diveLog_edit_notSpecified => 'Nincs megadva';
@@ -5365,7 +5365,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Kiszallas ideje';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Tengeri elet';
+  String get diveLog_edit_section_marineLife => 'Fajok';
 
   @override
   String get diveLog_edit_section_notes => 'Jegyzetek';
@@ -6288,7 +6288,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'Élővilág, jegyzetek vagy megosztás hozzáadása';
+      'Fajok, jegyzetek vagy megosztás hozzáadása';
 
   @override
   String get diveSites_edit_invite_location =>
@@ -7356,7 +7356,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Fajok keresese...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Tengeri elet hozzaadasa';
+  String get diveLog_speciesPicker_title => 'Fajok hozzáadása';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Kereses torlese';
@@ -8562,8 +8562,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Nehezssgi szint';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'Varhato tengeri elet';
+  String get diveSites_edit_section_expectedMarineLife => 'Várható fajok';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS koordinatak';
@@ -12466,8 +12465,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincsenek vart fajok hozzaadva';
 
   @override
-  String get marineLife_siteSection_noSpotted =>
-      'Meg nem eszleltek tengeri elolenyt';
+  String get marineLife_siteSection_noSpotted => 'Még nem észleltek fajt';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12481,7 +12479,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Itt eszlelve';
 
   @override
-  String get marineLife_siteSection_title => 'Tengeri elet';
+  String get marineLife_siteSection_title => 'Fajok';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Vissza';
@@ -12935,7 +12933,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'A merüléshez hozzáadott tengeri élőlény-észlelések itt jelennek meg.';
+      'A merüléshez hozzáadott faj-észlelések itt jelennek meg.';
 
   @override
   String get marineLife_speciesPage_noMatch =>
@@ -14211,6 +14209,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nav_sites => 'Merulohelyek';
 
   @override
+  String get nav_species => 'Fajok';
+
+  @override
   String get nav_statistics => 'Statisztikak';
 
   @override
@@ -15294,8 +15295,7 @@ class AppLocalizationsHu extends AppLocalizations {
       'A merülésen használt felszerelés';
 
   @override
-  String get diveDetailSection_sightings_name =>
-      'Tengeri élőlény megfigyelések';
+  String get diveDetailSection_sightings_name => 'Faj-megfigyelések';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16810,8 +16810,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_manage_species => 'Fajok';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'Tengeri elolenyek fajkatalogusanak kezelese';
+  String get settings_manage_species_subtitle => 'Fajkatalógus kezelése';
 
   @override
   String get settings_manage_tags => 'Címkék';
@@ -17761,7 +17760,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'Fajok eszlelesek';
 
   @override
-  String get statistics_category_marineLife_title => 'Tengeri elet';
+  String get statistics_category_marineLife_title => 'Fajok';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -18112,7 +18111,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', kivalasztva';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Tengeri elet';
+  String get statistics_marineLife_appBar_title => 'Fajok';
 
   @override
   String get statistics_marineLife_bestSites_empty =>
@@ -18136,8 +18135,7 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Legjobb tengeri elet helyszinek';
+  String get statistics_marineLife_bestSites_title => 'Legjobb helyszínek';
 
   @override
   String get statistics_marineLife_mostCommon_empty =>

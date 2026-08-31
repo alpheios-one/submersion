@@ -4819,7 +4819,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'المعدات';
 
   @override
-  String get diveLog_detail_section_marineLife => 'الحياة البحرية';
+  String get diveLog_detail_section_marineLife => 'الأنواع';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5142,7 +5142,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'لم يتم اختيار معدات';
 
   @override
-  String get diveLog_edit_noMarineLife => 'لم يتم تسجيل حياة بحرية';
+  String get diveLog_edit_noMarineLife => 'لم يتم تسجيل أنواع';
 
   @override
   String get diveLog_edit_notSpecified => 'غير محدد';
@@ -5279,7 +5279,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'وقت الخروج';
 
   @override
-  String get diveLog_edit_section_marineLife => 'الحياة البحرية';
+  String get diveLog_edit_section_marineLife => 'الأنواع';
 
   @override
   String get diveLog_edit_section_notes => 'الملاحظات';
@@ -6181,7 +6181,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'إضافة الحياة البحرية أو الملاحظات أو المشاركة';
+      'إضافة الأنواع أو الملاحظات أو المشاركة';
 
   @override
   String get diveSites_edit_invite_location => 'إضافة إحداثيات GPS أو الارتفاع';
@@ -7231,7 +7231,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'البحث عن الأنواع...';
 
   @override
-  String get diveLog_speciesPicker_title => 'إضافة حياة بحرية';
+  String get diveLog_speciesPicker_title => 'إضافة أنواع';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'مسح البحث';
@@ -8418,8 +8418,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'مستوى الصعوبة';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'الحياة البحرية المتوقعة';
+  String get diveSites_edit_section_expectedMarineLife => 'الأنواع المتوقعة';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'إحداثيات GPS';
@@ -12280,7 +12279,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get marineLife_siteSection_noExpected => 'لم تتم إضافة أنواع متوقعة';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'لم يتم رصد حياة بحرية بعد';
+  String get marineLife_siteSection_noSpotted => 'لم يتم رصد أنواع بعد';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12294,7 +12293,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'تم رصدها هنا';
 
   @override
-  String get marineLife_siteSection_title => 'الحياة البحرية';
+  String get marineLife_siteSection_title => 'الأنواع';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'رجوع';
@@ -12741,7 +12740,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'مشاهدات الحياة البحرية المضافة إلى غوصة ستظهر هنا.';
+      'مشاهدات الأنواع المضافة إلى غوصة ستظهر هنا.';
 
   @override
   String get marineLife_speciesPage_noMatch => 'لا توجد أنواع تطابق بحثك';
@@ -14001,6 +14000,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_sites => 'المواقع';
 
   @override
+  String get nav_species => 'الأنواع';
+
+  @override
   String get nav_statistics => 'الإحصائيات';
 
   @override
@@ -15076,7 +15078,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'المعدات المستخدمة في الغوصة';
 
   @override
-  String get diveDetailSection_sightings_name => 'مشاهدات الحياة البحرية';
+  String get diveDetailSection_sightings_name => 'مشاهدات الأنواع';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16559,8 +16561,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_manage_species => 'الأنواع';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'إدارة كتالوج أنواع الحياة البحرية';
+  String get settings_manage_species_subtitle => 'إدارة كتالوج الأنواع';
 
   @override
   String get settings_manage_tags => 'الوسوم';
@@ -17499,7 +17500,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'رصد الأنواع';
 
   @override
-  String get statistics_category_marineLife_title => 'الحياة البحرية';
+  String get statistics_category_marineLife_title => 'الأنواع';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17836,7 +17837,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => '، محدد';
 
   @override
-  String get statistics_marineLife_appBar_title => 'الحياة البحرية';
+  String get statistics_marineLife_appBar_title => 'الأنواع';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'لا توجد بيانات مواقع';
@@ -17859,8 +17860,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'أفضل المواقع للحياة البحرية';
+  String get statistics_marineLife_bestSites_title => 'أفضل المواقع';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'لا توجد بيانات رصد';
