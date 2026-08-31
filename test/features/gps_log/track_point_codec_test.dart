@@ -93,6 +93,45 @@ void main() {
       );
     });
 
+    test('refuses a comma-dense body before it is parsed', () {
+      // The densest legal tuple, repeated to fill the body cap. Measured at
+      // 3.35 million of them, jsonDecode alone cost about 370 MB before any
+      // count could be checked, which is the whole reason the comma bound
+      // runs first.
+      final tuples = List.filled(kMaxTrackBodyCommas, '[0,0,0,0]').join(',');
+      expect(
+        () => decodeTrackPoints(_blobOf('[$tuples]')),
+        throwsA(
+          isA<TrackPointCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('comma'),
+          ),
+        ),
+      );
+    });
+
+    test('a flat array of scalars is refused on commas too', () {
+      // No inner brackets at all, so an element count that leans on tuple
+      // structure would miss this entirely.
+      final scalars = List.filled(kMaxTrackBodyCommas + 2, '0').join(',');
+      expect(
+        () => decodeTrackPoints(_blobOf('[$scalars]')),
+        throwsA(isA<TrackPointCodecException>()),
+      );
+    });
+
+    test('a maximal legitimate track sits inside the comma bound', () {
+      // The encoder writes 4N-1 commas for N points, so the cap must not
+      // refuse what encodeTrackPoints is willing to write.
+      final points = List.generate(
+        kMaxTrackPointCount,
+        (i) => const GpsTrackPoint(timestamp: 0, latitude: 0, longitude: 0),
+      );
+      final blob = encodeTrackPoints(points);
+      expect(decodeTrackPoints(blob).length, kMaxTrackPointCount);
+    });
+
     test('accepts exactly the point cap', () {
       final tuples = List.filled(kMaxTrackPointCount, '[0,0,0,null]').join(',');
       expect(

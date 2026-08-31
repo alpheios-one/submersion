@@ -55,6 +55,21 @@ const int kMaxTrackBodyBytes = 32 * 1024 * 1024;
 /// output to show for it.
 const int kMaxTrackBlobBytes = kMaxTrackBodyBytes;
 
+/// The largest number of commas this codec will accept in an inflated body.
+///
+/// [kMaxTrackBodyBytes] bounds the bytes but NOT the object graph jsonDecode
+/// builds from them, and the point cap can only be checked once that graph
+/// exists. 32 MiB of the densest legal tuple, `[0,0,0,0]`, is 3.35 million of
+/// them: measured, jsonDecode alone took RSS from 258 MB to 630 MB before any
+/// count was looked at. A flat array of scalars costs much the same.
+///
+/// Commas give a bound that can be had from the raw bytes. For any JSON array
+/// `elementCount <= commaCount + 1`, and this encoder writes exactly
+/// `4N - 1` commas for N points, so a legitimate maximal track sits one comma
+/// under this cap and cannot be refused. Nesting or strings in a hostile body
+/// only add commas, which makes the check stricter, never weaker.
+const int kMaxTrackBodyCommas = 4 * kMaxTrackPointCount;
+
 /// Encodes points as a gzipped JSON array of
 /// [wallClockEpochSeconds, lat, lon, accuracyMeters] tuples.
 ///
@@ -95,6 +110,17 @@ List<GpsTrackPoint> decodeTrackPoints(Uint8List blob) {
     );
   } on BoundedInflateException catch (e) {
     throw TrackPointCodecException(e.message);
+  }
+
+  // Before the parse, not after: this is the only bound on what jsonDecode
+  // is about to allocate. Counted over the bytes, which is exact for UTF-8
+  // (no continuation byte is below 0x80) and saves decoding a body that is
+  // going to be refused anyway.
+  final commas = _countCommas(body);
+  if (commas > kMaxTrackBodyCommas) {
+    throw TrackPointCodecException(
+      'body has $commas comma(s), over the $kMaxTrackBodyCommas allowed',
+    );
   }
 
   // Decoded in two steps so the message names the failure that happened.
@@ -147,6 +173,15 @@ List<GpsTrackPoint> decodeTrackPoints(Uint8List blob) {
     );
   }
   return points;
+}
+
+/// Counts the 0x2C bytes in [body].
+int _countCommas(Uint8List body) {
+  var count = 0;
+  for (var i = 0; i < body.length; i++) {
+    if (body[i] == 0x2C) count++;
+  }
+  return count;
 }
 
 /// Returns [value] as a finite number, or throws naming the offending field.
