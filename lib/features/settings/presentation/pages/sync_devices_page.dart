@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
 import 'package:submersion/core/services/sync/sync_device_footprint.dart';
+import 'package:submersion/core/utils/byte_format.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_device_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/sync_maintenance_progress_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -108,7 +109,7 @@ class _Summary extends StatelessWidget {
             l10n.settings_syncDevices_summary(
               devices.length,
               files,
-              _formatBytes(bytes),
+              formatBytes(bytes),
             ),
             style: theme.textTheme.titleMedium,
           ),
@@ -117,7 +118,7 @@ class _Summary extends StatelessWidget {
             Text(
               l10n.settings_syncDevices_summary_removable(
                 removable.length,
-                _formatBytes(removableBytes),
+                formatBytes(removableBytes),
               ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -155,7 +156,7 @@ class _DeviceTile extends ConsumerWidget {
     final l10n = context.l10n;
     final theme = Theme.of(context);
     final when = device.publishedAt ?? device.lastModified;
-    final size = _formatBytes(device.byteCount);
+    final size = formatBytes(device.byteCount);
     return ListTile(
       isThreeLine: true,
       leading: Icon(_icon, color: _color(theme)),
@@ -232,7 +233,7 @@ class _DeviceTile extends ConsumerWidget {
         device.shortId,
       ),
     );
-    final size = _formatBytes(device.byteCount);
+    final size = formatBytes(device.byteCount);
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -336,17 +337,4 @@ class _Message extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Sizes are a floor: providers that report no size for a file count zero.
-String _formatBytes(int bytes) {
-  if (bytes < 1024) return '$bytes B';
-  const units = ['KB', 'MB', 'GB', 'TB'];
-  var value = bytes / 1024;
-  var unit = 0;
-  while (value >= 1024 && unit < units.length - 1) {
-    value /= 1024;
-    unit++;
-  }
-  return '${value.toStringAsFixed(value >= 10 ? 0 : 1)} ${units[unit]}';
 }

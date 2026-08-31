@@ -2599,6 +2599,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_action_cancel => 'Megse';
 
   @override
+  String get common_action_clearRating => 'Értékelés törlése';
+
+  @override
   String get common_action_close => 'Bezaras';
 
   @override
@@ -35699,4 +35702,98 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transfer_section_cloudSubtitle => 'Importalas felhobol';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Tárhelyhasználat';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Tárhelyhasználat';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Nézze meg, mi foglal helyet ezen az eszközön';
+
+  @override
+  String get settings_storageUsage_total => 'Összesen';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Eddig összesen';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Újraszámítás';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Nem érhető el';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Nem sikerült megmérni';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Alkalmazásadatok';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Médiagyorsítótár';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Gyorsítótárak';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Biztonsági mentések';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Ideiglenes fájlok';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exportált fájlok';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Merülésnapló-adatbázis';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Helyi gyorsítótár-adatbázis';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Eredeti fényképek és videók';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Videóváltozatok';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Előkészített átvitelek';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Átkódolt videó';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Térképcsempék';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Hálózati képek';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Videó-bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Dokumentum-bélyegképek';
+
+  @override
+  String get settings_storageUsage_category_backups =>
+      'Biztonsági mentési fájlok';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Ideiglenes fájlok';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exportált fájlok';
 }

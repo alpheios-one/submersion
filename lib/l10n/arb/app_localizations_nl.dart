@@ -2592,6 +2592,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get common_action_cancel => 'Annuleren';
 
   @override
+  String get common_action_clearRating => 'Beoordeling wissen';
+
+  @override
   String get common_action_close => 'Sluiten';
 
   @override
@@ -35609,4 +35612,98 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transfer_section_cloudSubtitle => 'Importeren uit de cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Opslaggebruik';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Opslaggebruik';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Bekijk wat ruimte inneemt op dit apparaat';
+
+  @override
+  String get settings_storageUsage_total => 'Totaal';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Totaal tot nu toe';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Opnieuw berekenen';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Niet beschikbaar';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Meten niet gelukt';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App-gegevens';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Mediacache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Back-ups';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Tijdelijke bestanden';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Geëxporteerde bestanden';
+
+  @override
+  String get settings_storageUsage_category_database => 'Duiklogboekdatabase';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Lokale cachedatabase';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Originele foto\'s en video\'s';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniaturen';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Videoversies';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Voorbereide overdrachten';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Getranscodeerde video';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Kaarttegels';
+
+  @override
+  String get settings_storageUsage_category_networkImages =>
+      'Netwerkafbeeldingen';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Videominiaturen';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Documentminiaturen';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Back-upbestanden';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Tijdelijke bestanden';
+
+  @override
+  String get settings_storageUsage_category_exports =>
+      'Geëxporteerde bestanden';
 }
