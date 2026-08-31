@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
@@ -611,6 +613,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     initialName: extra?['name'] as String?,
                     initialEmail: extra?['email'] as String?,
                     initialPhone: extra?['phone'] as String?,
+                    initialPhoto: extra?['photo'] as Uint8List?,
                   );
                 },
               ),
@@ -1557,7 +1560,14 @@ class _DiveComputerDiscoveryWizardRoute extends ConsumerWidget {
 
 /// Wrapper that creates a [DiveComputerAdapter] for quick download
 /// from a known (previously paired) computer.
-class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
+///
+/// The adapter is created once per route instance and reused across
+/// rebuilds. [diveComputerByIdProvider] re-emits on every dive_computers
+/// table tick, and a completed download writes that table (device serial
+/// and firmware), so this widget rebuilds in the middle of the wizard. A
+/// fresh adapter built here on every rebuild would carry none of the
+/// downloaded dives, and the wizard's Review step would list nothing.
+class _DiveComputerDownloadWizardRoute extends ConsumerStatefulWidget {
   const _DiveComputerDownloadWizardRoute({
     required this.computerId,
     this.forceFullDownload = false,
@@ -1567,13 +1577,28 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
   final bool forceFullDownload;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final diverId = ref.watch(currentDiverIdProvider) ?? '';
-    final importService = ref.watch(diveImportServiceProvider);
-    final computerRepo = ref.watch(diveComputerRepositoryProvider);
-    final diveRepo = ref.watch(diveRepositoryProvider);
-    final consolidationService = ref.watch(diveConsolidationServiceProvider);
-    final computerAsync = ref.watch(diveComputerByIdProvider(computerId));
+  ConsumerState<_DiveComputerDownloadWizardRoute> createState() =>
+      _DiveComputerDownloadWizardRouteState();
+}
+
+class _DiveComputerDownloadWizardRouteState
+    extends ConsumerState<_DiveComputerDownloadWizardRoute> {
+  DiveComputerAdapter? _adapter;
+
+  @override
+  void didUpdateWidget(_DiveComputerDownloadWizardRoute oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.computerId != widget.computerId ||
+        oldWidget.forceFullDownload != widget.forceFullDownload) {
+      _adapter = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final computerAsync = ref.watch(
+      diveComputerByIdProvider(widget.computerId),
+    );
 
     return computerAsync.when(
       data: (computer) {
@@ -1587,18 +1612,21 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
             ),
           );
         }
-        return UnifiedImportWizard(
-          adapter: DiveComputerAdapter(
-            importService: importService,
-            computerRepository: computerRepo,
-            diveRepository: diveRepo,
-            consolidationService: consolidationService,
-            diverId: diverId,
-            knownComputer: computer,
-            ref: ref,
-            forceFullDownload: forceFullDownload,
-          ),
+        final adapter = _adapter ??= DiveComputerAdapter(
+          importService: ref.read(diveImportServiceProvider),
+          computerRepository: ref.read(diveComputerRepositoryProvider),
+          diveRepository: ref.read(diveRepositoryProvider),
+          consolidationService: ref.read(diveConsolidationServiceProvider),
+          diverId: ref.read(currentDiverIdProvider) ?? '',
+          knownComputer: computer,
+          ref: ref,
+          forceFullDownload: widget.forceFullDownload,
         );
+        // A new adapter is a new session: key the wizard on it so the reset
+        // in didUpdateWidget starts the wizard over instead of handing a
+        // fresh adapter to a wizard mid-flow (which pins the one it started
+        // with).
+        return UnifiedImportWizard(key: ObjectKey(adapter), adapter: adapter);
       },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),

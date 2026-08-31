@@ -693,7 +693,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 次潜水} other{{count} 次潜水}}",
   "buddies_label_level": "等级",
   "buddies_label_notSpecified": "未指定",
-  "buddies_label_photoComingSoon": "照片功能将在 v2.0 推出",
   "buddies_list_bulkDelete_cancel": "取消",
   "buddies_list_bulkDelete_confirm": "删除",
   "buddies_list_bulkDelete_content": "确定要删除 {count} {count, plural, =1{位潜伴} other{位潜伴}}吗？此操作无法撤消。",
@@ -10485,5 +10484,17 @@
   "settings_storageUsage_category_pdfThumbnails": "文档缩略图",
   "settings_storageUsage_category_backups": "备份文件",
   "settings_storageUsage_category_temporary": "临时文件",
-  "settings_storageUsage_category_exports": "导出的文件"
+  "settings_storageUsage_category_exports": "导出的文件",
+  "profilePhoto_sheet_title": "个人资料照片",
+  "profilePhoto_source_camera": "拍照",
+  "profilePhoto_source_library": "从图库中选择",
+  "profilePhoto_source_file": "选择文件",
+  "profilePhoto_source_contacts": "从通讯录中选择",
+  "profilePhoto_action_remove": "移除照片",
+  "profilePhoto_crop_title": "调整照片",
+  "profilePhoto_crop_hint": "拖动以调整位置，双指缩放",
+  "profilePhoto_error_tooLarge": "该图片太大，请尝试较小的图片。",
+  "profilePhoto_error_undecodable": "无法将该文件读取为图片。",
+  "profilePhoto_error_contactNoPhoto": "该联系人没有照片。",
+  "profilePhoto_error_contactPermission": "选择照片需要通讯录访问权限。"
 }

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/dive_detail_section_pairs.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -4669,15 +4670,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildBuddyTile(BuildContext context, BuddyWithRole bwr) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: ProfileAvatar(
+        photo: bwr.buddy.photo,
+        initials: bwr.buddy.initials,
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Text(
-          bwr.buddy.initials,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       title: Text(bwr.buddy.name),
       subtitle: Text(bwr.role.localizedName(context.l10n)),

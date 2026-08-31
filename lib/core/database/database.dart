@@ -23,7 +23,15 @@ class Divers extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Never written for divers; kept so a
+  /// database that predates v181 still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the diver rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   // Emergency contact
   TextColumn get emergencyContactName => text().nullable()();
   TextColumn get emergencyContactPhone => text().nullable()();
@@ -1904,7 +1912,16 @@ class Buddies extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Two readers disagreed about how to
+  /// load it and nothing ever wrote it; kept so a database that predates v181
+  /// still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the buddy rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
@@ -3359,7 +3376,7 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// 183 rather than 182, even though 182 is the rung that made the change:
   /// no released build was ever stamped 182. Shipped devices are at 180, the
-  /// 181 rung is still an open PR, and 182 and 183 land in the same release,
+  /// 181 rung shipped in PR #1390, and 182 and 183 land in the same release,
   /// so nothing in the fleet is held by 183 that 182 did not already hold.
   /// The extra step records that v183, not v182, is the rung that drops the
   /// legacy tables and purges their `deletion_log` rows. The floor is stamped
@@ -3721,6 +3738,14 @@ class AppDatabase extends _$AppDatabase {
     // Column-only rung with no backfill, so the beforeOpen backstop is
     // safe to re-run.
     180,
+    // v181: divers.photo and buddies.photo, the profile photo blobs. Claimed
+    // against origin/main at 180, having been renumbered from 180 when PR
+    // #1374 (statistics exclusion) landed and took that rung while this
+    // branch held only its design docs. A rung at or below the shipped
+    // version merges with no conflict marker and its onUpgrade step then
+    // never runs, so re-verify this number if this branch sits open while
+    // main advances again.
+    181,
     // v182 (packed profile series, spec 2026-08-28-profile-sample-storage):
     // dive_profile_series and tank_pressure_series, one zlib columnar blob
     // per (dive, computer, source, is_primary) group and per (dive, tank,
@@ -3729,8 +3754,7 @@ class AppDatabase extends _$AppDatabase {
     // device converges (the #1360 lesson). The legacy tables stay until the
     // consumers move; the same PR retires them in a later plan. 176 remains
     // skipped; the ladder is non-contiguous by design. Numbered 182 because
-    // PR #1390 (profile photos) holds 181; 181 is absent from this ladder
-    // until that PR merges into main and main merges here.
+    // PR #1390 (profile photos) took 181.
     182,
     // v183 (packed profile series, plan 2e): drop the row-per-sample
     // dive_profiles and tank_pressure_profiles tables and purge the sync
@@ -5852,6 +5876,21 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
       );
+    }
+  }
+
+  /// Idempotent DDL for the v181 divers.photo and buddies.photo columns.
+  /// Holds a 512x512 square JPEG, so it is nullable with no default. Self-
+  /// guards on each table existing, which is what makes it safe to call from
+  /// both the ladder and beforeOpen.
+  Future<void> _assertProfilePhotoColumns() async {
+    for (final table in const ['divers', 'buddies']) {
+      final cols = await customSelect("PRAGMA table_info('$table')").get();
+      if (cols.isEmpty) continue;
+      final names = cols.map((c) => c.read<String>('name')).toSet();
+      if (!names.contains('photo')) {
+        await customStatement('ALTER TABLE $table ADD COLUMN photo BLOB');
+      }
     }
   }
 
@@ -9541,6 +9580,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveStatsExclusionColumns();
         }
         if (from < 180) await reportProgress();
+        // v181: divers.photo and buddies.photo, the profile photo blobs.
+        if (from < 181) {
+          await _assertProfilePhotoColumns();
+        }
+        if (from < 181) await reportProgress();
         // v182: packed profile series tables, then pack every legacy
         // row-per-sample row into them. Both steps are idempotent (IF NOT
         // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
@@ -9859,6 +9903,10 @@ class AppDatabase extends _$AppDatabase {
         // cannot resurrect or overwrite diver data.
         await _assertDiveStatsExclusionColumns();
 
+        // v181 backstop: re-assert divers.photo and buddies.photo. A database
+        // that arrives by restore or sync-adopt never runs onUpgrade, and
+        // every read of a diver or buddy row would throw without the column.
+        await _assertProfilePhotoColumns();
         // v182 backstop: re-assert the packed profile series tables, then
         // pack any dive that still has legacy rows and no series row. A
         // schema-version collision with a parallel branch skips the rung on

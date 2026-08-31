@@ -1292,9 +1292,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get buddies_label_notSpecified => 'Nincs megadva';
 
   @override
-  String get buddies_label_photoComingSoon => 'Fotó támogatás a v2.0-ban';
-
-  @override
   String get buddies_message_added => 'Búvártárs sikeresen hozzáadva';
 
   @override
@@ -35791,4 +35788,45 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Exportált fájlok';
+
+  @override
+  String get profilePhoto_sheet_title => 'Profilkép';
+
+  @override
+  String get profilePhoto_source_camera => 'Fénykép készítése';
+
+  @override
+  String get profilePhoto_source_library => 'Választás a könyvtárból';
+
+  @override
+  String get profilePhoto_source_file => 'Fájl választása';
+
+  @override
+  String get profilePhoto_source_contacts => 'Választás a névjegyekből';
+
+  @override
+  String get profilePhoto_action_remove => 'Fénykép eltávolítása';
+
+  @override
+  String get profilePhoto_crop_title => 'Fénykép igazítása';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'Húzza az áthelyezéshez, csippentsen a nagyításhoz';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'Ez a kép túl nagy. Próbáljon egy kisebbet.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'Ezt a fájlt nem sikerült képként beolvasni.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'Ennek a névjegynek nincs fényképe.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'A fénykép kiválasztásához névjegy-hozzáférési engedély szükséges.';
 }

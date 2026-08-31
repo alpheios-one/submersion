@@ -673,7 +673,7 @@ class SyncDataSerializer {
     })
   >
   get _baseTables => [
-    (key: 'divers', table: _db.divers, blob: false, full: null),
+    (key: 'divers', table: _db.divers, blob: true, full: null),
     (key: 'diverSettings', table: _db.diverSettings, blob: false, full: null),
     (key: 'dives', table: _db.dives, blob: false, full: null),
     (key: 'diveTanks', table: _db.diveTanks, blob: false, full: null),
@@ -736,7 +736,7 @@ class SyncDataSerializer {
       blob: false,
       full: null,
     ),
-    (key: 'buddies', table: _db.buddies, blob: false, full: null),
+    (key: 'buddies', table: _db.buddies, blob: true, full: null),
     (key: 'mediaStores', table: _db.mediaStores, blob: false, full: null),
     (
       key: 'connectedAccounts',
@@ -1590,7 +1590,7 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.divers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row?.toJson(serializer: _syncBlobSerializer);
       case 'diverSettings':
         final row = await (_db.select(
           _db.diverSettings,
@@ -1680,7 +1680,7 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.buddies,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row?.toJson(serializer: _syncBlobSerializer);
       case 'mediaStores':
         final row = await (_db.select(
           _db.mediaStores,
@@ -2006,7 +2006,9 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.divers,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       case 'diverSettings':
         final rows = await (_db.select(
           _db.diverSettings,
@@ -2061,7 +2063,9 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.buddies,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       case 'mediaStores':
         final rows = await (_db.select(
           _db.mediaStores,
@@ -2492,7 +2496,12 @@ class SyncDataSerializer {
       case 'divers':
         await _db
             .into(_db.divers)
-            .insertOnConflictUpdate(Diver.fromJson(data).toCompanion(false));
+            .insertOnConflictUpdate(
+              Diver.fromJson(
+                data,
+                serializer: _syncBlobSerializer,
+              ).toCompanion(false),
+            );
         return;
       case 'diverSettings':
         await _db
@@ -2599,7 +2608,12 @@ class SyncDataSerializer {
       case 'buddies':
         await _db
             .into(_db.buddies)
-            .insertOnConflictUpdate(Buddy.fromJson(data).toCompanion(false));
+            .insertOnConflictUpdate(
+              Buddy.fromJson(
+                data,
+                serializer: _syncBlobSerializer,
+              ).toCompanion(false),
+            );
         return;
       case 'mediaStores':
         await _db
@@ -3077,7 +3091,14 @@ class SyncDataSerializer {
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
             _db.divers,
-            records.map((r) => Diver.fromJson(r).toCompanion(false)).toList(),
+            records
+                .map(
+                  (r) => Diver.fromJson(
+                    r,
+                    serializer: _syncBlobSerializer,
+                  ).toCompanion(false),
+                )
+                .toList(),
           ),
         );
         return;
@@ -3239,7 +3260,14 @@ class SyncDataSerializer {
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
             _db.buddies,
-            records.map((r) => Buddy.fromJson(r).toCompanion(false)).toList(),
+            records
+                .map(
+                  (r) => Buddy.fromJson(
+                    r,
+                    serializer: _syncBlobSerializer,
+                  ).toCompanion(false),
+                )
+                .toList(),
           ),
         );
         return;
@@ -4709,7 +4737,8 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    // Divers carry the profile photo BLOB; base64-encode it.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportDiverSettings(
@@ -4957,7 +4986,8 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    // Buddies carry the profile photo BLOB; base64-encode it.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportMediaStores(

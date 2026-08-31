@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 immersione} other{{count} immersioni}}",
   "buddies_label_level": "Livello",
   "buddies_label_notSpecified": "Non specificato",
-  "buddies_label_photoComingSoon": "Supporto foto in arrivo nella v2.0",
   "buddies_message_added": "Compagno aggiunto con successo",
   "buddies_message_contactImportUnavailable": "L'importazione dei contatti non è disponibile su questa piattaforma",
   "buddies_message_contactLoadFailed": "Impossibile caricare i contatti",
@@ -10485,5 +10484,17 @@
   "settings_storageUsage_category_pdfThumbnails": "Miniature dei documenti",
   "settings_storageUsage_category_backups": "File di backup",
   "settings_storageUsage_category_temporary": "File temporanei",
-  "settings_storageUsage_category_exports": "File esportati"
+  "settings_storageUsage_category_exports": "File esportati",
+  "profilePhoto_sheet_title": "Foto del profilo",
+  "profilePhoto_source_camera": "Scatta foto",
+  "profilePhoto_source_library": "Scegli dalla libreria",
+  "profilePhoto_source_file": "Scegli file",
+  "profilePhoto_source_contacts": "Scegli dai contatti",
+  "profilePhoto_action_remove": "Rimuovi foto",
+  "profilePhoto_crop_title": "Regola foto",
+  "profilePhoto_crop_hint": "Trascina per spostare, pizzica per ingrandire",
+  "profilePhoto_error_tooLarge": "Questa immagine è troppo grande. Provane una più piccola.",
+  "profilePhoto_error_undecodable": "Impossibile leggere questo file come immagine.",
+  "profilePhoto_error_contactNoPhoto": "Questo contatto non ha una foto.",
+  "profilePhoto_error_contactPermission": "È necessaria l'autorizzazione ai contatti per scegliere una foto."
 }

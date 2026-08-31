@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{غطسة واحدة} other{{count} غطسة}}",
   "buddies_label_level": "المستوى",
   "buddies_label_notSpecified": "غير محدد",
-  "buddies_label_photoComingSoon": "دعم الصور قادم في الإصدار 2.0",
   "buddies_message_added": "تمت إضافة الرفيق بنجاح",
   "buddies_message_contactImportUnavailable": "استيراد جهات الاتصال غير متوفر على هذا النظام",
   "buddies_message_contactLoadFailed": "فشل تحميل جهات الاتصال",
@@ -10485,5 +10484,17 @@
   "settings_storageUsage_category_pdfThumbnails": "الصور المصغرة للمستندات",
   "settings_storageUsage_category_backups": "ملفات النسخ الاحتياطي",
   "settings_storageUsage_category_temporary": "الملفات المؤقتة",
-  "settings_storageUsage_category_exports": "الملفات المصدرة"
+  "settings_storageUsage_category_exports": "الملفات المصدرة",
+  "profilePhoto_sheet_title": "صورة الملف الشخصي",
+  "profilePhoto_source_camera": "التقاط صورة",
+  "profilePhoto_source_library": "الاختيار من المكتبة",
+  "profilePhoto_source_file": "اختيار ملف",
+  "profilePhoto_source_contacts": "الاختيار من جهات الاتصال",
+  "profilePhoto_action_remove": "إزالة الصورة",
+  "profilePhoto_crop_title": "تعديل الصورة",
+  "profilePhoto_crop_hint": "اسحب لتغيير الموضع، وقرّب بإصبعين للتكبير",
+  "profilePhoto_error_tooLarge": "هذه الصورة كبيرة جدًا. جرّب صورة أصغر.",
+  "profilePhoto_error_undecodable": "تعذّرت قراءة هذا الملف كصورة.",
+  "profilePhoto_error_contactNoPhoto": "جهة الاتصال هذه ليس لها صورة.",
+  "profilePhoto_error_contactPermission": "يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة."
 }

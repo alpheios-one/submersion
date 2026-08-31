@@ -588,7 +588,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 mergulho} other{{count} mergulhos}}",
   "buddies_label_level": "Nível",
   "buddies_label_notSpecified": "Não especificado",
-  "buddies_label_photoComingSoon": "Suporte a fotos em breve na v2.0",
   "buddies_message_added": "Companheiro adicionado com sucesso",
   "buddies_message_contactImportUnavailable": "Importação de contatos não está disponível nesta plataforma",
   "buddies_message_contactLoadFailed": "Falha ao carregar contatos",
@@ -10485,5 +10484,17 @@
   "settings_storageUsage_category_pdfThumbnails": "Miniaturas de documentos",
   "settings_storageUsage_category_backups": "Ficheiros de cópia de segurança",
   "settings_storageUsage_category_temporary": "Ficheiros temporários",
-  "settings_storageUsage_category_exports": "Ficheiros exportados"
+  "settings_storageUsage_category_exports": "Ficheiros exportados",
+  "profilePhoto_sheet_title": "Foto do perfil",
+  "profilePhoto_source_camera": "Tirar foto",
+  "profilePhoto_source_library": "Escolher da biblioteca",
+  "profilePhoto_source_file": "Escolher ficheiro",
+  "profilePhoto_source_contacts": "Escolher dos contactos",
+  "profilePhoto_action_remove": "Remover foto",
+  "profilePhoto_crop_title": "Ajustar foto",
+  "profilePhoto_crop_hint": "Arraste para mover, aperte para ampliar",
+  "profilePhoto_error_tooLarge": "Essa imagem é demasiado grande. Tente uma mais pequena.",
+  "profilePhoto_error_undecodable": "Não foi possível ler esse ficheiro como imagem.",
+  "profilePhoto_error_contactNoPhoto": "Esse contacto não tem foto.",
+  "profilePhoto_error_contactPermission": "É necessária permissão de contactos para escolher uma foto."
 }
