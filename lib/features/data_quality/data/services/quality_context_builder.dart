@@ -42,7 +42,7 @@ class QualityContextBuilder {
       primaryOnly: true,
     );
     final samples = <QualitySample>[
-      for (final p in mergeSeriesPoints(primarySeries))
+      for (final p in mergeSeriesPointsCollapsingDuplicates(primarySeries))
         if (p.depth.isFinite &&
             (p.temperature == null || p.temperature!.isFinite))
           QualitySample(t: p.timestamp, depth: p.depth, temp: p.temperature),

@@ -70,6 +70,27 @@ void main() {
   });
 
   test(
+    'collapses identical samples from same-identity unioned series',
+    () async {
+      // Two devices packing the same unattributed profile union two primary
+      // series of one identity (null computer, null source) after sync. The
+      // builder must read them the way the merged profile read does: each
+      // duplicated sample counts once, so detectors see no doubled points.
+      final entry = DateTime.utc(2026, 7, 2, 10);
+      await seedDive(id: 'd2', entry: entry);
+      const samples = [
+        ProfileSample(timestamp: 0, depth: 0.0),
+        ProfileSample(timestamp: 10, depth: 8.0),
+      ];
+      await profileSeries.insertSeries(diveId: 'd2', samples: samples);
+      await profileSeries.insertSeries(diveId: 'd2', samples: samples);
+
+      final ctx = (await builder.buildAll(['d2'])).single;
+      expect(ctx.primarySamples.map((s) => s.t), [0, 10]);
+    },
+  );
+
+  test(
     'builds tank pressures (dropping non-finite) and gas switches',
     () async {
       final entry = DateTime.utc(2026, 7, 1, 10);

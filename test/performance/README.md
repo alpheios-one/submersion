@@ -84,9 +84,17 @@ Profile points are generated every 2 seconds of dive time (matching real dive co
 `profile_series_benchmark_test.dart` compares the packed profile series read
 path against the legacy row-per-sample shapes, on a fixture synthesized from
 a real development database rather than generated data. Build the fixture
-once with `dart run tools/synth_fixture.dart <source.db> <out.db> --replicas
-25` (never point it at a live database; it copies the source first). Then
-run the gate with `SUBMERSION_BENCH_FIXTURE=<out.db> flutter test
---run-skipped --tags performance test/performance/profile_series_benchmark_test.dart`.
+once (never point the tool at a live database; it copies the source first):
+
+```bash
+dart run tools/synth_fixture.dart <source.db> <out.db> --replicas 25
+```
+
+Then run the gate:
+
+```bash
+SUBMERSION_BENCH_FIXTURE=<out.db> flutter test --run-skipped --tags performance test/performance/profile_series_benchmark_test.dart
+```
+
 The test skips with a message when `SUBMERSION_BENCH_FIXTURE` is unset.
 The per-dive row measures the two profile reads (dive profile samples and tank pressure samples), not a full dive entity hydrate.
