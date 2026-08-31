@@ -1312,6 +1312,10 @@ class StatisticsRepository {
   /// be expressed in SQL, so dives that only carry those will slightly
   /// undercount the duration stats.
   ///
+  /// These are descriptive numbers, so [DiveStatsScope] applies: a dive the
+  /// diver ticked "exclude from statistics" and a planner entry for a dive
+  /// never made contribute to none of them, the count included.
+  ///
   /// Returns [SiteDiveStatistics.empty] (diveCount 0, all other fields null)
   /// when the site has no matching dives, or on error.
   Future<SiteDiveStatistics> getSiteDiveStatistics({
@@ -1333,6 +1337,7 @@ class StatisticsRepository {
           MAX(dive_date_time) AS last_dive_at
         FROM dives
         WHERE site_id = ? $diverFilter
+          ${DiveStatsScope.and(alias: 'dives')}
         ''', variables: params.map((p) => Variable(p)).toList()).getSingle();
 
       final diveCount = result.read<int>('dive_count');

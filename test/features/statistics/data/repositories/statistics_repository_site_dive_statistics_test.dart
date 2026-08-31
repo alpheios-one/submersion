@@ -64,6 +64,8 @@ void main() {
     double? maxDepth,
     int? runtime,
     int? bottomTime,
+    bool excludedFromStats = false,
+    bool isPlanned = false,
   }) async {
     final diveId = id ?? 'dive-${DateTime.now().microsecondsSinceEpoch}';
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -78,6 +80,8 @@ void main() {
             maxDepth: Value(maxDepth),
             runtime: Value(runtime),
             bottomTime: Value(bottomTime),
+            excludedFromStats: Value(excludedFromStats),
+            isPlanned: Value(isPlanned),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
@@ -266,6 +270,86 @@ void main() {
         expect(stats.diveCount, equals(1));
         expect(stats.maxDepthReached, equals(10));
         expect(stats.longestDiveSeconds, equals(1200));
+      },
+    );
+
+    // The card is descriptive: the numbers a diver reads as "what this site is
+    // like". DiveStatsScope is what keeps a dive they ticked "exclude from
+    // statistics" (issue #526) and a planner entry for a dive never made out of
+    // every one of them, the count included.
+    test('omits a dive excluded from statistics, the count included', () async {
+      final siteId = await insertSite();
+      await insertDive(
+        id: 'dive-counted',
+        siteId: siteId,
+        diveDateTime: DateTime.utc(2026, 1, 1),
+        maxDepth: 18,
+        runtime: 2400,
+      );
+      await insertDive(
+        id: 'dive-excluded',
+        siteId: siteId,
+        diveDateTime: DateTime.utc(2026, 1, 2),
+        maxDepth: 40,
+        runtime: 3600,
+        excludedFromStats: true,
+      );
+
+      final stats = await repository.getSiteDiveStatistics(siteId: siteId);
+
+      expect(stats.diveCount, equals(1));
+      expect(stats.maxDepthReached, equals(18));
+      expect(stats.minDepthReached, equals(18));
+      expect(stats.longestDiveSeconds, equals(2400));
+      expect(stats.averageDurationSeconds, equals(2400.0));
+      expect(stats.lastDiveAt, equals(DateTime.utc(2026, 1, 1)));
+    });
+
+    test('omits a planned dive that was never made', () async {
+      final siteId = await insertSite();
+      await insertDive(
+        id: 'dive-logged',
+        siteId: siteId,
+        diveDateTime: DateTime.utc(2026, 1, 1),
+        maxDepth: 18,
+        runtime: 2400,
+      );
+      await insertDive(
+        id: 'dive-planned',
+        siteId: siteId,
+        diveDateTime: DateTime.utc(2026, 5, 1),
+        maxDepth: 60,
+        runtime: 4800,
+        isPlanned: true,
+      );
+
+      final stats = await repository.getSiteDiveStatistics(siteId: siteId);
+
+      expect(stats.diveCount, equals(1));
+      expect(stats.maxDepthReached, equals(18));
+      expect(stats.longestDiveSeconds, equals(2400));
+      expect(stats.lastDiveAt, equals(DateTime.utc(2026, 1, 1)));
+    });
+
+    test(
+      'reports no data when every dive at the site is out of scope',
+      () async {
+        final siteId = await insertSite();
+        await insertDive(
+          id: 'dive-excluded-only',
+          siteId: siteId,
+          diveDateTime: DateTime.utc(2026, 1, 1),
+          maxDepth: 18,
+          runtime: 2400,
+          excludedFromStats: true,
+        );
+
+        final stats = await repository.getSiteDiveStatistics(siteId: siteId);
+
+        expect(stats.diveCount, equals(0));
+        expect(stats.hasData, isFalse);
+        expect(stats.maxDepthReached, isNull);
+        expect(stats.firstDiveAt, isNull);
       },
     );
 
