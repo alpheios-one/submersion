@@ -14528,6 +14528,10 @@
   "@gpsTrack_importError_badData": {
     "description": "Track import failed: a coordinate or timestamp in the file is unusable."
   },
+  "gpsTrack_importError_tooLarge": "That file has too many positions to store as one track. Split it into shorter tracks and import them separately.",
+  "@gpsTrack_importError_tooLarge": {
+    "description": "Track import failed: the file has more positions than a single track can store."
+  },
   "gpsTrack_export_saved": "Track saved",
   "gpsTrack_action_export": "Export",
   "gpsTrack_action_shareGpx": "Share as GPX",

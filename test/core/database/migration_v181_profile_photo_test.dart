@@ -66,7 +66,12 @@ void main() {
     expect(AppDatabase.migrationVersions, contains(181));
   });
 
-  test('the sync compatibility floor is unchanged', () {
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 170);
+  test('the sync compatibility floor is not lowered', () {
+    // v181 itself left the floor at 170; the packed-profile-series branch
+    // later raised it to 183, so this pins only that no rung lowers it.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(170),
+    );
   });
 }
