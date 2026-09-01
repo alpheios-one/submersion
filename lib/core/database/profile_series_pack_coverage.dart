@@ -200,9 +200,7 @@ Future<String> legacyRowCoveredSql(
     // takes the same null-is-a-wildcard rule as computer_id, for the same
     // reason (adoptUnattributed moves it from NULL to a source).
     final sourceMatch = 's.source_id IS ${await resolvedSourceSql(db)}';
-    final primary = columns.contains('is_primary')
-        ? 'CASE WHEN p.is_primary THEN 1 ELSE 0 END'
-        : '1';
+    final primary = columns.contains('is_primary') ? _primarySql : '1';
     group =
         'AND (p.source_id IS NULL OR $sourceMatch) '
         'AND s.is_primary = $primary';
@@ -210,6 +208,23 @@ Future<String> legacyRowCoveredSql(
   return 'EXISTS (SELECT 1 FROM $seriesTable s '
       'WHERE s.dive_id = p.dive_id $tank $computer $group)';
 }
+
+/// The legacy `is_primary` value as the 0 or 1 a series row stores, spelled
+/// to agree with the packer's `_boolOf` on EVERY value.
+///
+/// A plain `CASE WHEN p.is_primary` disagrees with it twice, and each
+/// disagreement leaves the staged rows undrained forever while the packer
+/// re-runs over them on every sync apply: SQLite sends a NULL to the ELSE
+/// and reads it as demoted, where `_boolOf` reads an absent flag as the
+/// dive's live profile; and it applies its own text-to-numeric rule, so a
+/// peer's `"isPrimary": "yes"`, which INTEGER affinity leaves as text, reads
+/// as demoted where `_boolOf` reads any non-num as primary. Testing
+/// `typeof` first confines SQLite's truthiness to the numeric values both
+/// sides agree on. Change this and `_boolOf` together.
+const String _primarySql =
+    'CASE WHEN p.is_primary IS NULL THEN 1 '
+    "WHEN typeof(p.is_primary) IN ('integer', 'real') "
+    'THEN (CASE WHEN p.is_primary THEN 1 ELSE 0 END) ELSE 1 END';
 
 /// [resolvedComputerSql]'s twin for `source_id`.
 Future<String> resolvedSourceSql(DatabaseConnectionUser db) async =>

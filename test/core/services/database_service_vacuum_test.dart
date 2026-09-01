@@ -167,6 +167,64 @@ void main() {
     },
   );
 
+  test('a file stamped 183 whose legacy table the BACKSTOP drops is '
+      'VACUUMed', () async {
+    // The v183 rung is explicitly allowed to skip its drop: its own pack
+    // threw, the series table's foreign-key parents were absent, or the
+    // residue count found rows no series covered. The file is stamped 183
+    // either way, and the beforeOpen backstop drops the tables on the first
+    // later open whose pack succeeds. That open has no pending ladder, so a
+    // reclamation keyed on the stored version never runs for it, and there
+    // is no other VACUUM of the live database anywhere in the app: the
+    // diver's file keeps every freed page forever.
+    await seedFile((raw) {
+      raw.execute('DROP TABLE IF EXISTS dive_profiles');
+      raw.execute('''
+          CREATE TABLE dive_profiles (
+            id TEXT NOT NULL PRIMARY KEY,
+            dive_id TEXT NOT NULL,
+            computer_id TEXT,
+            source_id TEXT,
+            is_primary INTEGER NOT NULL DEFAULT 1,
+            timestamp INTEGER NOT NULL,
+            depth REAL NOT NULL,
+            temperature REAL
+          )
+        ''');
+      raw.execute(
+        'CREATE INDEX idx_dive_profiles_dive_id ON dive_profiles(dive_id)',
+      );
+      final stmt = raw.prepare(
+        'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, '
+        'temperature) VALUES (?, ?, ?, ?, ?)',
+      );
+      raw.execute('BEGIN');
+      for (var i = 0; i < 20000; i++) {
+        // Dangling dive id, as in the test above: the rows are skipped as
+        // orphans, so the residue is zero and the backstop drops the table.
+        stmt.execute(['sample-$i', 'ghost-dive', i, i % 40 + 0.5, 21.0]);
+      }
+      raw.execute('COMMIT');
+      stmt.close();
+      // Already at the current version, so there is no ladder to run.
+      raw.execute('PRAGMA user_version = 183');
+    });
+
+    expect(freelistOnDisk(), 0);
+
+    await DatabaseService.instance.initialize(
+      locationService: _FakeLocation(dbPath),
+    );
+    expect(DatabaseService.instance.lastOpenMode, DatabaseOpenMode.background);
+    await DatabaseService.instance.close(strict: true);
+
+    expect(
+      freelistOnDisk(),
+      0,
+      reason: 'the pages the backstop freed have to come back',
+    );
+  });
+
   test('a file already at 183 is not VACUUMed', () async {
     await seedFile((raw) {
       // A freelist the open must leave alone: pages freed by a bulk delete

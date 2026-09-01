@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/domain/models/incoming_dive_data.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_cloud_client.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_dive_parser.dart';
 import 'package:submersion/core/services/suunto_cloud/suunto_session_store.dart';
@@ -17,6 +18,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_computer_rep
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_cancellation_token.dart';
@@ -50,7 +52,16 @@ final suuntoCloudDivesFetchedProvider = StateProvider<bool>((ref) => false);
 
 /// Outcome of a single `SuuntoCloudAdapter._consolidateDive` call. Mirrors
 /// `DiveComputerAdapter`'s outcome type -- see that class for the rationale.
-enum _ConsolidateOutcome { consolidated, skippedSameComputer, failed }
+enum _ConsolidateOutcome {
+  consolidated,
+  skippedSameComputer,
+  keptStandalone,
+  failed,
+}
+
+/// What a `_consolidateDive` call did, plus the id of the standalone dive it
+/// left behind (only [_ConsolidateOutcome.keptStandalone] leaves one).
+typedef _ConsolidateResult = ({_ConsolidateOutcome outcome, String? diveId});
 
 /// Import source adapter for dives pulled from the Suunto cloud
 /// (app.suunto.com), via the undocumented Sports-Tracker API.
@@ -65,6 +76,8 @@ enum _ConsolidateOutcome { consolidated, skippedSameComputer, failed }
 /// is resolved per-dive (by device model + serial number) instead of once
 /// per session.
 class SuuntoCloudAdapter implements ImportSourceAdapter {
+  static final _log = LoggerService.forClass(SuuntoCloudAdapter);
+
   SuuntoCloudAdapter({
     required DiveImportService importService,
     required DiveComputerRepository computerRepository,
@@ -321,14 +334,22 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
         final diveGroup = bundle.groups[ImportEntityType.dives];
         final matchResult = diveGroup?.matchResults?[index];
         if (matchResult != null) {
-          final outcome = await _consolidateDive(
+          final result = await _consolidateDive(
             parsed,
             matchResult.diveId,
             comp,
           );
-          switch (outcome) {
+          switch (result.outcome) {
             case _ConsolidateOutcome.consolidated:
               consolidated++;
+              importedCountByComputerId[comp.id] =
+                  (importedCountByComputerId[comp.id] ?? 0) + 1;
+            case _ConsolidateOutcome.keptStandalone:
+              // The fold refused, but the download survived as its own dive,
+              // so it counts as imported rather than skipped.
+              imported++;
+              final keptId = result.diveId;
+              if (keptId != null) importedDiveIds.add(keptId);
               importedCountByComputerId[comp.id] =
                   (importedCountByComputerId[comp.id] ?? 0) + 1;
             case _ConsolidateOutcome.skippedSameComputer:
@@ -490,8 +511,8 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
 
   /// Consolidate a downloaded dive as a secondary computer reading on an
   /// existing dive. Mirrors `DiveComputerAdapter._consolidateDive` -- see
-  /// that method's doc comment for the two failure modes it guards against.
-  Future<_ConsolidateOutcome> _consolidateDive(
+  /// that method's doc comment for the failure modes it guards against.
+  Future<_ConsolidateResult> _consolidateDive(
     SuuntoParsedDive parsed,
     String targetDiveId,
     DiveComputer comp,
@@ -500,7 +521,7 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
       targetDiveId,
     );
     if (targetComputerId != null && targetComputerId == comp.id) {
-      return _ConsolidateOutcome.skippedSameComputer;
+      return (outcome: _ConsolidateOutcome.skippedSameComputer, diveId: null);
     }
 
     String? newDiveId;
@@ -516,18 +537,44 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
         targetDiveId: targetDiveId,
         secondaryDiveIds: [newDiveId],
       );
-      return _ConsolidateOutcome.consolidated;
-    } catch (_) {
+      return (outcome: _ConsolidateOutcome.consolidated, diveId: newDiveId);
+    } on UnreadableSeriesException catch (e) {
+      // The refusal is about the PRE-EXISTING target dive's stored series,
+      // not about this download, so the download is kept as its own dive
+      // instead of being compensated away.
+      final keptId = newDiveId;
+      if (keptId != null) {
+        _log.warning(
+          'Kept downloaded dive $keptId standalone instead of folding it '
+          'into $targetDiveId: that dive holds ${e.seriesIds.length} '
+          'series this build cannot decode',
+        );
+        return (outcome: _ConsolidateOutcome.keptStandalone, diveId: keptId);
+      }
+      // Nothing was imported, so there is nothing to keep or compensate.
+      _log.error('Consolidation fold refused for $targetDiveId', error: e);
+      return (outcome: _ConsolidateOutcome.failed, diveId: null);
+    } catch (e, st) {
+      _log.error(
+        'Consolidation fold failed for dive into $targetDiveId',
+        error: e,
+        stackTrace: st,
+      );
       if (newDiveId != null) {
         try {
           await _diveRepository.bulkDeleteDives([newDiveId]);
-        } catch (_) {
+        } catch (deleteError, deleteStack) {
           // The compensating delete failed too; fall through rather than
           // rethrow, so the import loop still processes the remaining dives
           // instead of aborting on a stranded standalone dive.
+          _log.error(
+            'Compensating delete failed for orphaned dive $newDiveId',
+            error: deleteError,
+            stackTrace: deleteStack,
+          );
         }
       }
-      return _ConsolidateOutcome.failed;
+      return (outcome: _ConsolidateOutcome.failed, diveId: null);
     }
   }
 }

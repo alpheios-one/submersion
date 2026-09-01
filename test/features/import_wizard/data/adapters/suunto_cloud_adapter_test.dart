@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_computer_rep
     hide DiveMatchResult;
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
@@ -476,6 +477,39 @@ void main() {
       expect(result.consolidatedCount, 0);
       expect(result.skippedCount, 1);
       verify(mockDiveRepo.bulkDeleteDives(['new-dive-id'])).called(1);
+    });
+
+    test('keeps the imported dive standalone when the PRE-EXISTING target '
+        'holds a series this build cannot decode', () async {
+      final bundle = await bundleWithMatch();
+      when(
+        mockDiveRepo.getComputerIdForDive('existing-dive'),
+      ).thenAnswer((_) async => 'other-computer');
+      stubImportAsNew();
+      when(
+        mockConsolidationService.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      ).thenThrow(const UnreadableSeriesException(['series-1']));
+
+      final result = await adapter.performImport(
+        bundle,
+        {
+          ImportEntityType.dives: {0},
+        },
+        {
+          ImportEntityType.dives: {0: DuplicateAction.consolidate},
+        },
+      );
+
+      // The refusal is about the target's stored blob, not the download, so
+      // the freshly imported dive is kept rather than compensated away.
+      expect(result.consolidatedCount, 0);
+      expect(result.skippedCount, 0);
+      expect(result.importedCounts[ImportEntityType.dives], 1);
+      expect(result.importedDiveIds, ['new-dive-id']);
+      verifyNever(mockDiveRepo.bulkDeleteDives(any));
     });
 
     test('does not rethrow when the compensating delete also fails', () async {

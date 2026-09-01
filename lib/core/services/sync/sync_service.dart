@@ -3621,6 +3621,9 @@ class SyncService {
           if (inboundOnlyLegacyEntities.containsKey(table)) {
             sawLegacySamples = true;
           }
+          if (table == 'dives' || table == 'diveTanks') {
+            sawParents = true;
+          }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
         },

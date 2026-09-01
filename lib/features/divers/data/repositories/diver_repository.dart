@@ -284,6 +284,24 @@ class DiverRepository {
     return [for (final r in rows) r.read<String>(column)];
   }
 
+  /// Whether the pre-v183 row-per-sample `dive_profiles` table is still in
+  /// this database. Every current build reads samples from the series
+  /// tables, so a hit here means the v183 pack could not finish and the
+  /// table was deliberately kept for a later retry.
+  ///
+  /// Mirrors `DiveComputerRepository._legacyProfilesTableExists`; the two
+  /// guard the same statement against the same failure and the check is one
+  /// query, not worth a dependency between the repositories.
+  Future<bool> _legacyProfilesTableExists() async {
+    final rows = await _db
+        .customSelect(
+          "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+          "AND name = 'dive_profiles'",
+        )
+        .get();
+    return rows.isNotEmpty;
+  }
+
   /// Delete a diver, reassigning shared trips/sites to a surviving diver first.
   ///
   /// - If surviving divers exist, shared trips and sites owned by [id] are
@@ -433,6 +451,25 @@ class DiverRepository {
             entityType: 'dives',
             recordId: diveId,
             localUpdatedAt: clearedAt,
+          );
+        }
+        // The v183 rung drops dive_profiles only once its rows have actually
+        // moved into the series table, so a device whose pack threw still
+        // carries it, and its computer_id FK has no ON DELETE action. A
+        // surviving row on another diver's dive fails step 4's
+        // `DELETE FROM dive_computers` with SqliteException(787) and rolls
+        // the whole delete back, so the diver could never be deleted on that
+        // device. Same #823 failure, same fix as
+        // DiveComputerRepository.deleteComputer. The table is no longer
+        // synced, so this only unblocks the FK: nothing to stamp or mark.
+        if (await _legacyProfilesTableExists()) {
+          await _db.customStatement(
+            'UPDATE dive_profiles SET computer_id = NULL '
+            'WHERE computer_id IN '
+            '(SELECT id FROM dive_computers WHERE diver_id = ?) '
+            // stats-scope-exempt: reassignment cascade, not a statistic.
+            'AND dive_id NOT IN (SELECT id FROM dives WHERE diver_id = ?)',
+            [id, id],
           );
         }
 

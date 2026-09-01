@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:submersion/core/database/legacy_tank_orphan_adoption.dart';
 import 'package:submersion/core/database/profile_series_pack_coverage.dart';
 import 'package:submersion/core/database/profile_series_pack_rows.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
@@ -127,7 +128,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
   // kept, not deleted, and the migration's own adoption still heals this
   // device's rows.
   if (canPackTanks && !byGroupIdentity) {
-    await _adoptStrandedTankPressures(db, tankTable);
+    await adoptStrandedTankPressures(db, tankTable);
   }
   final tankScan = canPackTanks
       ? await _scanLegacyDives(
@@ -135,6 +136,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
           legacyTable: tankTable,
           seriesTable: 'tank_pressure_series',
           byTank: true,
+          byGroupIdentity: byGroupIdentity,
         )
       : _emptyScan;
   final unpackedProfileDives = profileScan.unpacked;
@@ -209,19 +211,35 @@ Future<ProfilePackReport> packLegacyProfileRows(
                 variables: [Variable<String>(diveId)],
               )
               .get();
-          final groups = <_ProfileKey, List<ProfileSample>>{};
+          final groups = <_ProfileKey, _ProfileGroup>{};
           for (final row in rows) {
             final sample = profileSampleOf(row.data);
             if (sample == null) {
               skippedRows++;
               continue;
             }
+            // The RAW parent ids are kept alongside the resolved key. The
+            // key resolves a dangling id to null so the insert can satisfy
+            // the foreign key, which merges those rows into the
+            // null-parent group; coverage is a different question, and it
+            // is asked of the raw value, because "names no computer" and
+            // "names a computer this device has not merged yet" are the
+            // wildcard and a distinct source respectively. A merged group
+            // therefore carries more than one raw identity, and is covered
+            // only when every one of them is.
+            final rawComputerId = _textOf(row.data['computer_id']);
+            final rawSourceId = _textOf(row.data['source_id']);
             final key = _ProfileKey(
-              computerId: _resolvedParent(row.data['computer_id'], computerIds),
-              sourceId: _resolvedParent(row.data['source_id'], sourceIds),
+              computerId: _resolvedParent(rawComputerId, computerIds),
+              sourceId: _resolvedParent(rawSourceId, sourceIds),
               isPrimary: hasPrimary ? _boolOf(row.data['is_primary']) : true,
             );
-            groups.putIfAbsent(key, () => []).add(sample);
+            (groups[key] ??= (samples: [], rawParents: {}))
+              ..samples.add(sample)
+              ..rawParents.add((
+                computerId: rawComputerId,
+                sourceId: rawSourceId,
+              ));
           }
           for (final entry in groups.entries) {
             if (!diveIds.contains(diveId)) {
@@ -234,21 +252,23 @@ Future<ProfilePackReport> packLegacyProfileRows(
             // and the original it demoted), and (dive, computer) alone
             // calls the second one done.
             final covered = byGroupIdentity
-                ? coveredProfileGroups.any(
-                    (g) =>
-                        g.diveId == diveId &&
-                        g.isPrimary == key.isPrimary &&
-                        (key.computerId == null ||
-                            g.computerId == key.computerId) &&
-                        (key.sourceId == null || g.sourceId == key.sourceId),
+                ? entry.value.rawParents.every(
+                    (raw) => coveredProfileGroups.any(
+                      (g) =>
+                          g.diveId == diveId &&
+                          g.isPrimary == key.isPrimary &&
+                          (raw.computerId == null ||
+                              g.computerId == key.computerId) &&
+                          (raw.sourceId == null || g.sourceId == key.sourceId),
+                    ),
                   )
                 : coveredProfiles.contains((diveId, key.computerId));
             if (covered) {
               // Already packed under this identity; the stored series wins.
               continue;
             }
-            final samples = dedupeExactSamples(entry.value);
-            dropped += entry.value.length - samples.length;
+            final samples = dedupeExactSamples(entry.value.samples);
+            dropped += entry.value.samples.length - samples.length;
             final encoded = codec.encode(samples);
             final summary = encoded.summary;
             final inserted = await db.customUpdate(
@@ -343,27 +363,30 @@ Future<ProfilePackReport> packLegacyProfileRows(
                 variables: [Variable<String>(diveId)],
               )
               .get();
-          final groups = <_TankKey, List<TankPressureSample>>{};
+          final groups = <_TankKey, _TankGroup>{};
           for (final row in rows) {
-            final tankId = row.data['tank_id'] as String?;
+            final tankId = _textOf(row.data['tank_id']);
             final timestamp = row.data['timestamp'] as num?;
             final pressure = row.data['pressure'] as num?;
             if (tankId == null || timestamp == null || pressure == null) {
               skippedRows++;
               continue;
             }
+            // Raw alongside resolved, for the reason the profile loop above
+            // documents.
+            final rawComputerId = _textOf(row.data['computer_id']);
             final key = _TankKey(
               tankId: tankId,
-              computerId: _resolvedParent(row.data['computer_id'], computerIds),
+              computerId: _resolvedParent(rawComputerId, computerIds),
             );
-            groups
-                .putIfAbsent(key, () => [])
-                .add(
-                  TankPressureSample(
-                    timestamp: timestamp.toInt(),
-                    pressure: pressure.toDouble(),
-                  ),
-                );
+            (groups[key] ??= (samples: [], rawComputerIds: {}))
+              ..samples.add(
+                TankPressureSample(
+                  timestamp: timestamp.toInt(),
+                  pressure: pressure.toDouble(),
+                ),
+              )
+              ..rawComputerIds.add(rawComputerId);
           }
           for (final entry in groups.entries) {
             final key = entry.key;
@@ -372,14 +395,16 @@ Future<ProfilePackReport> packLegacyProfileRows(
               continue;
             }
             // Same null-is-a-wildcard rule as the profile check above, on
-            // the identity-grained path only.
+            // the identity-grained path only, and asked of the raw ids for
+            // the same reason.
             final coveredTank = byGroupIdentity
-                ? coveredTanks.any(
-                    (g) =>
-                        g.diveId == diveId &&
-                        g.tankId == key.tankId &&
-                        (key.computerId == null ||
-                            g.computerId == key.computerId),
+                ? entry.value.rawComputerIds.every(
+                    (raw) => coveredTanks.any(
+                      (g) =>
+                          g.diveId == diveId &&
+                          g.tankId == key.tankId &&
+                          (raw == null || g.computerId == key.computerId),
+                    ),
                   )
                 : coveredTanks.contains((
                     diveId: diveId,
@@ -389,8 +414,8 @@ Future<ProfilePackReport> packLegacyProfileRows(
             if (coveredTank) {
               continue;
             }
-            final samples = dedupeExactPressureSamples(entry.value);
-            dropped += entry.value.length - samples.length;
+            final samples = dedupeExactPressureSamples(entry.value.samples);
+            dropped += entry.value.samples.length - samples.length;
             final encoded = codec.encode(samples);
             final inserted = await db.customUpdate(
               'INSERT OR IGNORE INTO tank_pressure_series ('
@@ -456,102 +481,6 @@ Future<ProfilePackReport> packLegacyProfileRows(
   );
 }
 
-/// Re-points pressure rows whose tank id is no longer one of the dive's
-/// tanks at a tank that is, in place, before anything is packed.
-///
-/// `tank_pressure_series.tank_id` is a NOT NULL foreign key, so an orphan
-/// cannot be packed as it stands, and after v183 every reader reads series:
-/// leaving it behind drops that dive's pressure curve and per-cylinder SAC,
-/// and its rows keep the legacy table alive forever, since the residue
-/// count can never cover a tank that does not exist.
-///
-/// The rule is the v102 rung's ([AppDatabase] `_relinkStrandedTankPressures`)
-/// and `GasAnalysisService`'s read-time resolver, so a dive reads the same
-/// before and after packing: exact id matches are left alone, and the
-/// remaining orphans, in first-sample order, are paired with the dive's
-/// still-unmatched tanks in tank order. Both sides are totally ordered
-/// (ties broken by id) and every device runs it over the same rows, so two
-/// devices packing the same logbook reach the same tank ids and the derived
-/// series ids still converge.
-///
-/// Healing the rows rather than remapping in memory keeps everything
-/// downstream, the coverage predicate and residue count included, working
-/// on ids that exist. Idempotent: a second run finds no orphans.
-Future<void> _adoptStrandedTankPressures(
-  DatabaseConnectionUser db,
-  String table,
-) async {
-  if (!await legacyTableExists(db, 'dive_tanks')) return;
-  final tankColumns = await legacyColumnNames(db, 'dive_tanks');
-  if (!tankColumns.containsAll(const {'id', 'dive_id'})) return;
-  final hasOrder = tankColumns.contains('tank_order');
-  final tankRows = await db
-      .customSelect(
-        'SELECT dive_id, id${hasOrder ? ', tank_order' : ''} FROM dive_tanks',
-      )
-      .get();
-  final tanksByDive = <String, List<({String id, int order})>>{};
-  for (final r in tankRows) {
-    (tanksByDive[r.read<String>('dive_id')] ??= []).add((
-      id: r.read<String>('id'),
-      order: hasOrder ? (r.readNullable<int>('tank_order') ?? 0) : 0,
-    ));
-  }
-  if (tanksByDive.isEmpty) return;
-
-  final keyRows = await db
-      .customSelect(
-        'SELECT dive_id, tank_id, MIN(timestamp) AS first_ts FROM $table '
-        'WHERE tank_id IS NOT NULL AND timestamp IS NOT NULL '
-        'GROUP BY dive_id, tank_id',
-      )
-      .get();
-  final keysByDive = <String, List<({String tankId, int firstTs})>>{};
-  for (final r in keyRows) {
-    (keysByDive[r.read<String>('dive_id')] ??= []).add((
-      tankId: r.read<String>('tank_id'),
-      firstTs: r.read<int>('first_ts'),
-    ));
-  }
-
-  for (final entry in keysByDive.entries) {
-    final diveId = entry.key;
-    final tanks = tanksByDive[diveId];
-    if (tanks == null || tanks.isEmpty) continue;
-    final currentIds = {for (final t in tanks) t.id};
-    final matchedIds = {
-      for (final k in entry.value)
-        if (currentIds.contains(k.tankId)) k.tankId,
-    };
-    final orphans =
-        [
-          for (final k in entry.value)
-            if (!currentIds.contains(k.tankId)) k,
-        ]..sort((a, b) {
-          final byTime = a.firstTs.compareTo(b.firstTs);
-          return byTime != 0 ? byTime : a.tankId.compareTo(b.tankId);
-        });
-    if (orphans.isEmpty) continue;
-    final free =
-        [
-          for (final t in tanks)
-            if (!matchedIds.contains(t.id)) t,
-        ]..sort((a, b) {
-          // id tie-break: tanks sharing the default order must still pair
-          // deterministically, and Dart's sort is not stable.
-          final byOrder = a.order.compareTo(b.order);
-          return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
-        });
-    final pairs = orphans.length < free.length ? orphans.length : free.length;
-    for (var i = 0; i < pairs; i++) {
-      await db.customStatement(
-        'UPDATE $table SET tank_id = ? WHERE dive_id = ? AND tank_id = ?',
-        [free[i].id, diveId, orphans[i].tankId],
-      );
-    }
-  }
-}
-
 class _ProfileKey {
   const _ProfileKey({
     required this.computerId,
@@ -573,6 +502,22 @@ class _ProfileKey {
   @override
   int get hashCode => Object.hash(computerId, sourceId, isPrimary);
 }
+
+/// One packed profile group: the samples, plus every RAW `(computer_id,
+/// source_id)` pair that resolved into this group's key. Coverage is asked
+/// of the raw pairs, the way [legacyRowCoveredSql] asks it of the raw
+/// columns; the key's resolved ids are what the insert can actually store.
+typedef _ProfileGroup = ({
+  List<ProfileSample> samples,
+  Set<({String? computerId, String? sourceId})> rawParents,
+});
+
+/// [_ProfileGroup]'s pressure twin. A pressure row carries no source or
+/// primary flag, so its raw identity is the computer id alone.
+typedef _TankGroup = ({
+  List<TankPressureSample> samples,
+  Set<String?> rawComputerIds,
+});
 
 class _TankKey {
   const _TankKey({required this.tankId, required this.computerId});
@@ -706,13 +651,19 @@ Future<Set<String>> _parentIds(DatabaseConnectionUser db, String table) async {
   return {for (final row in rows) row.read<String>('id')};
 }
 
-/// [value] when it still names a row in [parents], null otherwise. A legacy
+/// [id] when it still names a row in [parents], null otherwise. A legacy
 /// row can point at a computer or source that has since been deleted, which
 /// under `PRAGMA foreign_keys = ON` no insert could carry.
-String? _resolvedParent(Object? value, Set<String> parents) {
-  final id = value as String?;
-  return id != null && parents.contains(id) ? id : null;
-}
+String? _resolvedParent(String? id, Set<String> parents) =>
+    id != null && parents.contains(id) ? id : null;
+
+/// A legacy id column read as text, or null when the value is not text.
+///
+/// Every id column is declared TEXT, so SQLite's affinity has already made
+/// this the identity function for anything a supported build wrote. It is
+/// here for a restored or hand-repaired file, where a value of another
+/// storage class would otherwise throw from a cast and cost the dive.
+String? _textOf(Object? value) => value is String ? value : null;
 
 /// The clock value migrated rows carry. Null when this device has never
 /// synced: there is no device id to stamp with, and nothing to publish to.
@@ -740,11 +691,20 @@ Future<String?> _migrationHlc(DatabaseConnectionUser db, int nowMs) async {
   return Hlc(nowMs, 0, deviceId).toString();
 }
 
+/// The legacy `is_primary` value as a bool.
+///
+/// The SQL half of this rule is `_primarySql` in
+/// `profile_series_pack_coverage.dart`, and the two decide the same thing
+/// for the same row: this one whether to WRITE the series, that one whether
+/// the staged rows may be cleared. They have to agree on every value, so
+/// change them together.
 bool _boolOf(Object? value) {
   if (value is bool) return value;
   if (value is num) return value != 0;
   // Every legacy schema declares is_primary NOT NULL DEFAULT 1, so a null
   // here means the column is not carrying a value at all; a legacy row with
-  // no flag is the dive's live profile, which is what true says.
+  // no flag is the dive's live profile, which is what true says. Text lands
+  // here too: the staging table takes a peer's JSON, and INTEGER affinity
+  // leaves a value it cannot convert as text.
   return true;
 }

@@ -531,6 +531,73 @@ void main() {
         );
       },
     );
+
+    test('adopting a base that carries only the missing parent drains the rows '
+        'staged by an earlier changeset', () async {
+      // A pre-v183 peer published diveProfiles for a dive before the dive
+      // itself synced, so the rows staged and were kept for a later apply.
+      // The cloud base was written by an upgraded peer: it carries the
+      // dive but no legacy rows at all, so only the parent flag can tell
+      // the packer that the block is gone.
+      await SyncDataSerializer().upsertRecord('diveProfiles', {
+        'id': 'p-orphan',
+        'diveId': 'd-late-parent',
+        'timestamp': 0,
+        'depth': 7.0,
+        'isPrimary': true,
+      });
+      expect(
+        await SyncDataSerializer().hasStagedLegacySamples(),
+        isTrue,
+        reason: 'the row stages even though its dive has not arrived',
+      );
+
+      await DiveRepository().createDive(_dive('template-late', const []));
+      final diveRow =
+          Map<String, dynamic>.from(
+              (await SyncDataSerializer().fetchRecord(
+                'dives',
+                'template-late',
+              ))!,
+            )
+            ..['id'] = 'd-late-parent'
+            ..['hlc'] = const Hlc(9000, 0, 'peer-183-adopt').toString();
+      final dataJson = SyncData(dives: [diveRow]).toJson();
+      final payloadJson = <String, dynamic>{
+        'version': syncFormatVersion,
+        'exportedAt': 9000,
+        'deviceId': 'peer-183-adopt',
+        'lastSyncTimestamp': null,
+        'checksum': sha256
+            .convert(utf8.encode(jsonEncode(dataJson)))
+            .toString(),
+        'data': dataJson,
+        'deletions': <String, dynamic>{},
+        'uploadNonce': null,
+        'epochId': null,
+        'seq': null,
+        'baseSeq': null,
+        'sinceHlc': null,
+        'toHlc': null,
+      };
+
+      final tmpDir = await Directory.systemTemp.createTemp('adopt_parent');
+      final tmp = File('${tmpDir.path}/base.json');
+      await tmp.writeAsBytes(utf8.encode(jsonEncode(payloadJson)));
+      await buildService().debugAdoptStreaming([tmp.path], [9000], const []);
+      await tmpDir.delete(recursive: true);
+
+      final series = await ProfileSeriesRepository().getSeriesForDive(
+        'd-late-parent',
+      );
+      expect(
+        series,
+        hasLength(1),
+        reason: 'the adopt delivered the parent that was blocking the pack',
+      );
+      expect(series.single.samples.single.depth, 7.0);
+      expect(await SyncDataSerializer().hasStagedLegacySamples(), isFalse);
+    });
   });
 
   group('serializer: direct upsertRecord/upsertRecords staging paths', () {

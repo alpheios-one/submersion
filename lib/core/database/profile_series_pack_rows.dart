@@ -4,6 +4,7 @@
 /// Flutter, only what a headless isolate can run.
 library;
 
+import 'package:submersion/core/utils/number_utils.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 /// Reads a legacy `dive_profiles` row by column name. Absent columns (an
@@ -46,6 +47,16 @@ ProfileSample? profileSampleOf(Map<String, Object?> data) {
   );
 }
 
-double? realOf(Object? value) => (value as num?)?.toDouble();
+/// One OPTIONAL sample field, or null when the stored value is not a number.
+///
+/// SQLite carries a storage class per value, not per column, so a
+/// REAL-affinity column in a restored or hand-repaired file can hold text it
+/// could not convert. A cast would throw, and the packer's isolation is
+/// per DIVE: one unreadable pressure reading would cost that dive its entire
+/// profile, permanently, because nothing reads the legacy tables after v183.
+/// Degrading the one field is the proportionate answer. `timestamp` and
+/// `depth` above are deliberately NOT read this way: without them there is
+/// no sample, so the row is skipped as a whole.
+double? realOf(Object? value) => asDoubleOrNull(value);
 
-int? intOf(Object? value) => (value as num?)?.toInt();
+int? intOf(Object? value) => value is num ? value.toInt() : null;
