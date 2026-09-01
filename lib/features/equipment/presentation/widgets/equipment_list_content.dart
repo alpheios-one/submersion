@@ -706,6 +706,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: DropdownButton<Object?>(
+                key: const ValueKey('equipment_status_filter_dropdown'),
                 value: _selectedFilter,
                 underline: const SizedBox(),
                 focusColor: Colors.transparent,
@@ -904,7 +905,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             ),
             textAlign: TextAlign.center,
           ),
-          if (_selectedFilter == null && !blameCategory) ...[
+          if (_selectedFilter == null && _selectedType == null) ...[
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {

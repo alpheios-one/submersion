@@ -756,7 +756,9 @@ void main() {
       // after picking a status the type chip must still narrow client-side.
       await pumpPhoneList(tester);
 
-      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.tap(
+        find.byKey(const ValueKey('equipment_status_filter_dropdown')),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
       await tester.pumpAndSettle();
@@ -821,7 +823,66 @@ void main() {
       // The selected chip stays on screen so the filter can be cleared.
       expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
       expect(find.text('No equipment in this category'), findsOneWidget);
+      // A category filter is active, so the add-first-equipment CTA (which
+      // implies there is no gear at all) must not appear.
+      expect(find.text('Add Your First Equipment'), findsNothing);
     });
+
+    testWidgets(
+      'add-first-equipment CTA stays hidden when a type is selected and the '
+      'underlying list becomes empty (#1435)',
+      (tester) async {
+        // Regression: the CTA visibility used to key off blameCategory,
+        // which is false once the pre-filter source is empty -- letting the
+        // "add your first equipment" button reappear while a type chip is
+        // still selected and displayed.
+        SharedPreferences.setMockInitialValues({});
+        final prefs = await SharedPreferences.getInstance();
+        final source = StateProvider<List<EquipmentItem>>((ref) => items);
+
+        await tester.pumpWidget(
+          testApp(
+            locale: const Locale('en'),
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              equipmentByStatusProvider.overrideWith(
+                (ref, status) => ref.watch(source),
+              ),
+              activeEquipmentProvider.overrideWith(
+                (ref) async => ref.watch(source),
+              ),
+              equipmentListViewModeProvider.overrideWith(
+                (ref) => ListViewMode.detailed,
+              ),
+              equipmentTableConfigProvider.overrideWith(
+                (ref) => _TestEquipTableConfigNotifier(_testConfig),
+              ),
+              highlightedEquipmentIdProvider.overrideWith((ref) => null),
+            ],
+            child: const EquipmentListContent(showAppBar: false),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(chip(EquipmentType.wetsuit.displayName));
+        await tester.pumpAndSettle();
+        expect(find.text('Delta Suit'), findsOneWidget);
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(EquipmentListContent)),
+        );
+        container.read(source.notifier).state = const <EquipmentItem>[];
+        await tester.pumpAndSettle();
+
+        expect(find.byType(EquipmentListTile), findsNothing);
+        expect(chip(EquipmentType.wetsuit.displayName), findsOneWidget);
+        expect(find.text('Add Your First Equipment'), findsNothing);
+      },
+    );
 
     testWidgets(
       'chip row stays clearable when the status list is empty and the '
@@ -865,7 +926,9 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Delta Suit'), findsOneWidget);
 
-        await tester.tap(find.byType(DropdownButton<Object?>));
+        await tester.tap(
+          find.byKey(const ValueKey('equipment_status_filter_dropdown')),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
         await tester.pumpAndSettle();
@@ -884,7 +947,9 @@ void main() {
         // on the default view the full list returns.
         await tester.tap(chip('All Types'));
         await tester.pumpAndSettle();
-        await tester.tap(find.byType(DropdownButton<Object?>));
+        await tester.tap(
+          find.byKey(const ValueKey('equipment_status_filter_dropdown')),
+        );
         await tester.pumpAndSettle();
         await tester.tap(find.text('All Equipment').last);
         await tester.pumpAndSettle();
@@ -923,7 +988,9 @@ void main() {
         ),
       ]);
 
-      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.tap(
+        find.byKey(const ValueKey('equipment_status_filter_dropdown')),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
       await tester.pumpAndSettle();
@@ -1043,7 +1110,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.tap(
+        find.byKey(const ValueKey('equipment_status_filter_dropdown')),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
       await tester.pumpAndSettle();

@@ -19172,7 +19172,7 @@ abstract class AppLocalizations {
   /// **'{status} equipment'**
   String equipment_list_emptyState_filterText_status(Object status);
 
-  /// No description provided for @equipment_list_emptyState_filterText_type.
+  /// Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. "Wetsuit equipment"
   ///
   /// In en, this message translates to:
   /// **'{type} equipment'**
@@ -19190,7 +19190,7 @@ abstract class AppLocalizations {
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
 
-  /// No description provided for @equipment_list_emptyState_noTypeMatch.
+  /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
   ///
   /// In en, this message translates to:
   /// **'No equipment in this category'**
@@ -19226,7 +19226,7 @@ abstract class AppLocalizations {
   /// **'Service Due'**
   String get equipment_list_filterServiceDue;
 
-  /// No description provided for @equipment_list_typeFilterAll.
+  /// Label of the chip that clears the category filter and shows equipment of every type
   ///
   /// In en, this message translates to:
   /// **'All Types'**

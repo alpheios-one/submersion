@@ -6744,6 +6744,7 @@
     }
   },
   "@equipment_list_emptyState_filterText_type": {
+    "description": "Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. \"Wetsuit equipment\"",
     "placeholders": {
       "type": {
         "type": "Object"
@@ -6770,6 +6771,12 @@
         "type": "int"
       }
     }
+  },
+  "@equipment_list_emptyState_noTypeMatch": {
+    "description": "Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items"
+  },
+  "@equipment_list_typeFilterAll": {
+    "description": "Label of the chip that clears the category filter and shows equipment of every type"
   },
   "@equipment_list_tile_daysCount": {
     "placeholders": {
