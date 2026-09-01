@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/app.dart' show resolveAppLocale;
 import 'package:submersion/app.dart';
+import 'package:submersion/core/services/storage/scratch_sweep.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
@@ -716,6 +718,34 @@ class _StartupWrapperState extends State<StartupWrapper>
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
         );
+      }
+    }());
+
+    // Scratch-file sweep, at most once a day. Unlike the media sweep above,
+    // whose probe is one indexed SELECT, this walks the filesystem, so it
+    // carries a stamp rather than running unguarded on every launch. Same
+    // fire-and-forget shape: housekeeping must never delay first frame, and
+    // a failure is a whole launch away from its retry.
+    unawaited(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final stampMs = prefs.getInt(kScratchSweepStampKey);
+        final lastSweptAt = stampMs == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(stampMs);
+        final now = DateTime.now();
+        if (!shouldSweepScratch(lastSweptAt: lastSweptAt, now: now)) return;
+
+        await StorageScratchSweep(
+          temporaryDirectory: getTemporaryDirectory,
+          supportDirectory: getApplicationSupportDirectory,
+        ).run(now: now);
+
+        // Stamped after the pass, so a sweep that throws part way retries
+        // tomorrow rather than being recorded as done.
+        await prefs.setInt(kScratchSweepStampKey, now.millisecondsSinceEpoch);
+      } catch (e, stackTrace) {
+        debugPrint('Scratch sweep failed (will retry): $e\n$stackTrace');
       }
     }());
     // coverage:ignore-end

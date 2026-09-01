@@ -15,6 +15,7 @@ import 'package:submersion/core/services/sync/crypto/keyslots.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
+import 'package:submersion/features/backup/data/services/backup_attribution.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
@@ -68,6 +69,17 @@ class FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
 
   @override
   String? get databaseKeyHex => null;
+}
+
+/// Sync repository whose device id is fixed by the test, including the empty
+/// string a corrupt or half-initialized metadata row can hand back.
+class _FixedDeviceIdSyncRepository extends SyncRepository {
+  _FixedDeviceIdSyncRepository(this.deviceId);
+
+  final String deviceId;
+
+  @override
+  Future<String> getDeviceId() async => deviceId;
 }
 
 /// Spy sync repository: records the post-restore re-baseline without touching a
@@ -276,6 +288,42 @@ void main() {
       preferences = BackupPreferences(prefs);
       fakeCloud = FakeCloudStorageProvider();
       fakeDb = FakeBackupDatabaseAdapter();
+    });
+
+    group('backup filename attribution', () {
+      Future<BackupRecord> backupWithDeviceId(String deviceId) => BackupService(
+        dbAdapter: fakeDb,
+        preferences: preferences,
+        syncRepository: _FixedDeviceIdSyncRepository(deviceId),
+      ).performBackup();
+
+      test('the injected repository supplies the tag', () async {
+        // Also the regression guard for the naming path reaching around the
+        // constructor: a fresh SyncRepository() here would hit the real
+        // DatabaseService singleton, throw, and silently produce the legacy
+        // name, with nothing in the test able to see it.
+        final record = await backupWithDeviceId('live-device-id');
+
+        expect(
+          backupDeviceTagFromFilename(record.filename),
+          deviceTag('live-device-id'),
+        );
+      });
+
+      test(
+        'an empty device id writes the historic unattributed name',
+        () async {
+          // sha1('') is a constant, so tagging with it would stamp the same
+          // da39a3ee... tag on every device in this state, and in a shared
+          // folder they would claim each other's backups. An empty id is not an
+          // id; it degrades the same way an unreadable one does.
+          final record = await backupWithDeviceId('');
+
+          expect(backupDeviceTagFromFilename(record.filename), isNull);
+          expect(record.filename, startsWith('submersion_backup_'));
+          expect(record.filename, endsWith('.db'));
+        },
+      );
     });
 
     group('post-restore sync intent', () {
