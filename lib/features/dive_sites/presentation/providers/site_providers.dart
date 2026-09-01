@@ -266,9 +266,10 @@ List<SiteWithDiveCount> applySiteSorting(
         case SiteSortField.diveCount:
           comparison = a.diveCount.compareTo(b.diveCount);
         case SiteSortField.lastDived:
-          // Sites never dived always sort last regardless of direction,
-          // with a name tie-break; return before the direction inversion
-          // below so the pinning is not flipped.
+          // Sites never dived always sort last regardless of direction, and
+          // ties (including the never-dived group) always break A->Z for
+          // determinism, independent of direction. Both cases return early,
+          // before the direction inversion below, so neither is flipped.
           final aDate = a.lastDivedAt;
           final bDate = b.lastDivedAt;
           if (aDate == null || bDate == null) {
