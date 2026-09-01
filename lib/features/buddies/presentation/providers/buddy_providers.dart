@@ -157,12 +157,13 @@ List<Buddy> applyBuddySorting(
     switch (sort.field) {
       case BuddySortField.name:
         comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        break;
       case BuddySortField.diveCount:
-        // Dive count not available in basic Buddy entity, sort by name as fallback
-        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
       case BuddySortField.lastDive:
-        // Last dive date not available in basic Buddy entity, sort by name as fallback
+        // Dive count / last dive date not available in basic Buddy entity,
+        // sort by name as fallback
         comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        break;
     }
 
     if (invertForText) {
