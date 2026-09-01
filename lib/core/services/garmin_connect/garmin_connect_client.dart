@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -410,12 +409,7 @@ class GarminConnectClient {
       url,
       headers: {
         ..._oauthHeaders,
-        'Authorization': signer.authorizationHeader(
-          method: 'GET',
-          url: url,
-          nonce: _nonce(),
-          timestamp: _timestamp(),
-        ),
+        'Authorization': signer.authorizationHeader(method: 'GET', url: url),
       },
     );
     _throwForStatus(response, 'Could not obtain a Garmin access token');
@@ -460,8 +454,6 @@ class GarminConnectClient {
           method: 'POST',
           url: url,
           bodyParams: bodyParams,
-          nonce: _nonce(),
-          timestamp: _timestamp(),
         ),
       },
       body: utf8.encode(
@@ -584,8 +576,9 @@ class GarminConnectClient {
     }
     throw GarminApiException(
       response.statusCode == 200
-          ? 'Unexpected response from Garmin (the sign-in page may be '
-                'blocked from this network)'
+          ? 'Unexpected response from Garmin for ${response.request?.url} '
+                '(a sign-in page or other interstitial may be blocked from '
+                'this network)'
           : 'Garmin returned HTTP ${response.statusCode}',
       statusCode: response.statusCode,
     );
@@ -598,15 +591,4 @@ class GarminConnectClient {
       statusCode: response.statusCode,
     );
   }
-
-  static String _nonce() {
-    final random = Random.secure();
-    return List.generate(
-      32,
-      (_) => '0123456789abcdef'[random.nextInt(16)],
-    ).join();
-  }
-
-  static String _timestamp() =>
-      (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
 }

@@ -335,6 +335,7 @@ class GarminCloudAdapter implements ImportSourceAdapter {
               consolidated++;
               importedCountByComputerId[comp.id] =
                   (importedCountByComputerId[comp.id] ?? 0) + 1;
+              break;
             case _ConsolidateOutcome.skippedSameComputer:
             case _ConsolidateOutcome.failed:
               skipped++;

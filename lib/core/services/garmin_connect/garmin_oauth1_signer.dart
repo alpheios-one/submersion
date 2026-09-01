@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 
@@ -36,19 +37,20 @@ class GarminOAuth1Signer {
   /// rejects.
   ///
   /// [nonce] and [timestamp] are injectable purely so tests can pin them;
-  /// production callers omit both.
+  /// production callers omit both and get a fresh random nonce and the
+  /// current time.
   String authorizationHeader({
     required String method,
     required Uri url,
     Map<String, String> bodyParams = const {},
-    required String nonce,
-    required String timestamp,
+    String? nonce,
+    String? timestamp,
   }) {
     final oauthParams = <String, String>{
       'oauth_consumer_key': consumerKey,
-      'oauth_nonce': nonce,
+      'oauth_nonce': nonce ?? _generateNonce(),
       'oauth_signature_method': 'HMAC-SHA1',
-      'oauth_timestamp': timestamp,
+      'oauth_timestamp': timestamp ?? _generateTimestamp(),
       'oauth_version': '1.0',
       'oauth_token': ?token,
     };
@@ -149,4 +151,15 @@ class GarminOAuth1Signer {
     }
     return buffer.toString();
   }
+
+  static String _generateNonce() {
+    final random = Random.secure();
+    return List.generate(
+      32,
+      (_) => '0123456789abcdef'[random.nextInt(16)],
+    ).join();
+  }
+
+  static String _generateTimestamp() =>
+      (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
 }
