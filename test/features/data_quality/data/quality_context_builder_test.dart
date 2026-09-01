@@ -149,6 +149,48 @@ void main() {
     },
   );
 
+  test("a neighbor's last depth matches the merged profile on an end-timestamp "
+      'tie', () async {
+    // Two primary series of one dive sharing an end timestamp: the sync
+    // union of the same profile from two devices, and the shape the
+    // neighbor query's tie-break has to agree with. Series order is
+    // (start_timestamp, id), so the LATER-starting series carries the
+    // merged profile's last sample even though its id sorts first.
+    final entry = DateTime.utc(2026, 7, 1, 10);
+    await seedDive(id: 'dA', entry: entry, serial: 'SN-1');
+    await seedDive(
+      id: 'dB',
+      entry: entry.add(const Duration(hours: 1)),
+      serial: 'SN-1',
+    );
+    await profileSeries.insertSeries(
+      diveId: 'dB',
+      id: 'zz-earlier-start',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 4.0),
+        ProfileSample(timestamp: 600, depth: 9.0),
+      ],
+    );
+    await profileSeries.insertSeries(
+      diveId: 'dB',
+      id: 'aa-later-start',
+      samples: const [
+        ProfileSample(timestamp: 300, depth: 7.0),
+        ProfileSample(timestamp: 600, depth: 2.0),
+      ],
+    );
+
+    final merged = await diveRepo.getMergedProfile('dB');
+    final ctx = (await builder.buildAll(['dA'])).single;
+
+    expect(
+      ctx.neighbors.single.lastSampleDepth,
+      merged.last.depth,
+      reason: 'the neighbor query must agree with the merged read',
+    );
+    expect(ctx.neighbors.single.firstSampleDepth, merged.first.depth);
+  });
+
   test(
     'finds same-diver neighbors within the window with edge depths',
     () async {

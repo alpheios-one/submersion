@@ -111,10 +111,36 @@ const _searchSql = '''
   // Samples live in packed series blobs since v182, so the densest dive is
   // the one whose series carry the most samples between them, not the one
   // with the most rows.
+  if (diver.isEmpty) {
+    stderr.writeln('This database has no dives; nothing to benchmark.');
+    exit(65);
+  }
+  final hasSeries = db
+      .select(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+        "AND name = 'dive_profile_series'",
+      )
+      .isNotEmpty;
+  if (!hasSeries) {
+    stderr.writeln(
+      'No dive_profile_series table: this benchmark measures the packed '
+      'series reads, so it needs a database migrated to v182 or later. '
+      'Open it in the app once to run the migration, or point at a newer '
+      'copy.',
+    );
+    exit(65);
+  }
   final dense = db.select(
     'SELECT dive_id, SUM(sample_count) AS n FROM dive_profile_series '
     'GROUP BY dive_id ORDER BY n DESC LIMIT 1',
   );
+  if (dense.isEmpty || dense.first['dive_id'] == null) {
+    stderr.writeln(
+      'dive_profile_series is empty: this database has no packed profiles '
+      'to read, so the profile benchmarks would measure nothing.',
+    );
+    exit(65);
+  }
   return (
     diverId: diver.first['diver_id'] as String,
     denseDiveId: dense.first['dive_id'] as String,

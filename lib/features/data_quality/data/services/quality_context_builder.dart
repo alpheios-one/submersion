@@ -117,7 +117,14 @@ class QualityContextBuilder {
           'ORDER BY s.start_timestamp ASC, s.id ASC LIMIT 1) AS first_depth, '
           '(SELECT s.last_depth FROM dive_profile_series s '
           'WHERE s.dive_id = dives.id AND s.is_primary = 1 '
-          'ORDER BY s.end_timestamp DESC, s.id DESC LIMIT 1) AS last_depth '
+          // start_timestamp before id: series order is (start_timestamp,
+          // id), so on an end-timestamp tie (the sync union of one profile
+          // from two devices) the merged read's last sample comes from the
+          // LATER-starting series, whatever its id sorts as. Ordering by id
+          // alone picked the other one and reported a last depth no other
+          // reader agrees with.
+          'ORDER BY s.end_timestamp DESC, s.start_timestamp DESC, '
+          's.id DESC LIMIT 1) AS last_depth '
           'FROM dives WHERE id != ?1 AND diver_id IS ?2 '
           'AND COALESCE(entry_time, dive_date_time) BETWEEN ?3 AND ?4 '
           'ORDER BY COALESCE(entry_time, dive_date_time) ASC',
