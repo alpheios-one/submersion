@@ -150,6 +150,7 @@ class BuddyRepository {
           row.data['certification_agency'] as String?,
         ),
         photoPath: row.data['photo_path'] as String?,
+        photo: row.data['photo'] as Uint8List?,
         notes: (row.data['notes'] as String?) ?? '',
         isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -180,6 +181,7 @@ class BuddyRepository {
               email: Value(buddy.email),
               phone: Value(buddy.phone),
               photoPath: Value(buddy.photoPath),
+              photo: Value(buddy.photo),
               notes: Value(buddy.notes),
               isFavorite: Value(buddy.isFavorite),
               createdAt: Value(now.millisecondsSinceEpoch),
@@ -242,6 +244,7 @@ class BuddyRepository {
             row.data['certification_agency'] as String?,
           ),
           photoPath: row.data['photo_path'] as String?,
+          photo: row.data['photo'] as Uint8List?,
           notes: (row.data['notes'] as String?) ?? '',
           isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -290,6 +293,7 @@ class BuddyRepository {
           email: Value(buddy.email),
           phone: Value(buddy.phone),
           photoPath: Value(buddy.photoPath),
+          photo: Value(buddy.photo),
           notes: Value(buddy.notes),
           isFavorite: Value(buddy.isFavorite),
           updatedAt: Value(now),
@@ -383,6 +387,7 @@ class BuddyRepository {
           row.data['certification_agency'] as String?,
         ),
         photoPath: row.data['photo_path'] as String?,
+        photo: row.data['photo'] as Uint8List?,
         notes: (row.data['notes'] as String?) ?? '',
         isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -445,6 +450,7 @@ class BuddyRepository {
         email: b.email,
         phone: b.phone,
         photoPath: b.photoPath,
+        photo: b.photo,
         notes: b.notes,
         isFavorite: b.isFavorite,
         createdAt: DateTime.fromMillisecondsSinceEpoch(b.createdAt),
@@ -836,6 +842,7 @@ class BuddyRepository {
             row.data['certification_agency'] as String?,
           ),
           photoPath: row.data['photo_path'] as String?,
+          photo: row.data['photo'] as Uint8List?,
           notes: (row.data['notes'] as String?) ?? '',
           isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -1115,6 +1122,7 @@ class BuddyRepository {
       certificationLevel: null,
       certificationAgency: null,
       photoPath: row.photoPath,
+      photo: row.photo,
       notes: row.notes,
       isFavorite: row.isFavorite,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),

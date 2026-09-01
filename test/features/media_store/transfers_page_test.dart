@@ -49,12 +49,22 @@ void main() {
 
   tearDown(() => db.close());
 
-  Widget app(List<MediaTransferQueueEntry> entries) => ProviderScope(
+  Widget app(
+    List<MediaTransferQueueEntry> entries, {
+    Map<String, String> labels = const {},
+    bool suspended = false,
+  }) => ProviderScope(
     overrides: [
       mediaTransferQueueRepositoryProvider.overrideWithValue(repo),
       localAssetCacheRepositoryProvider.overrideWithValue(assetCache),
       mediaTransferEntriesProvider.overrideWith((ref) => Stream.value(entries)),
       mediaStoreRuntimeProvider.overrideWith((ref) async => null),
+      // The rows name their media; without this the lookup would reach for
+      // an uninitialised database.
+      mediaTransferLabelsProvider.overrideWith((ref) async => labels),
+      mediaTransfersSuspendedProvider.overrideWith(
+        (ref) => Stream.value(suspended),
+      ),
     ],
     child: const MaterialApp(
       // Pinned: these tests find widgets by their English strings.
@@ -456,5 +466,56 @@ void main() {
     await pumpRoute(tester);
 
     expect(builds, 1);
+  });
+
+  // Issue #1356: the reporter's queue read as a column of bare UUIDs. The row
+  // carries only the media id; the file name lives on the media row.
+  testWidgets('rows name the media file rather than its id', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot, labels: {'m-a': 'IMG_0042.HEIC'}));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('IMG_0042.HEIC'), findsOneWidget);
+    expect(find.text('m-a'), findsNothing);
+  });
+
+  testWidgets('a row whose media is unknown falls back to the id', (
+    tester,
+  ) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('m-a'), findsOneWidget);
+  });
+
+  testWidgets('a suspended queue shows the paused notice above the list', (
+    tester,
+  ) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot, suspended: true));
+    // Two frames: the list, then the suspension stream's first value.
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Transfers paused'), findsOneWidget);
+    expect(find.text('Waiting'), findsOneWidget);
   });
 }

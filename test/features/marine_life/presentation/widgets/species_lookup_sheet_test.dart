@@ -62,12 +62,13 @@ class _FakeLookup implements SpeciesLookupService {
 }
 
 /// Opens the sheet from a button so the popped value can be captured.
-Future<SpeciesLookupResult? Function()> _open(
+Future<SpeciesLookupOutcome? Function()> _open(
   WidgetTester tester,
   _FakeLookup service, {
   String initialQuery = '',
+  bool allowCreateWithout = true,
 }) async {
-  SpeciesLookupResult? popped;
+  SpeciesLookupOutcome? popped;
   var closed = false;
   await tester.pumpWidget(
     testApp(
@@ -82,6 +83,7 @@ Future<SpeciesLookupResult? Function()> _open(
             popped = await showSpeciesLookupSheet(
               context,
               initialQuery: initialQuery,
+              allowCreateWithout: allowCreateWithout,
             );
             closed = true;
           },
@@ -141,7 +143,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.resolved, [52188]);
-    expect(read(), _resolved);
+    expect(
+      read(),
+      isA<SpeciesLookupChosen>().having((o) => o.result, 'result', _resolved),
+    );
   });
 
   testWidgets('shows the empty state for a query with no hits', (tester) async {
@@ -169,13 +174,33 @@ void main() {
     expect(service.queries, hasLength(2));
   });
 
-  testWidgets('Create without lookup pops with null', (tester) async {
+  testWidgets('Create without lookup pops its own outcome, distinct from a '
+      'dismissal', (tester) async {
     final service = _FakeLookup();
     final read = await _open(tester, service, initialQuery: 'whale');
 
     await tester.tap(find.text('Create without lookup'));
     await tester.pumpAndSettle();
 
+    expect(read(), isA<SpeciesLookupCreateWithout>());
+  });
+
+  testWidgets('dismissing the sheet pops null', (tester) async {
+    final service = _FakeLookup();
+    final read = await _open(tester, service, initialQuery: 'whale');
+
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+
     expect(read(), isNull);
+  });
+
+  testWidgets('the create-without escape is withheld when the caller has no '
+      'name to fall back on', (tester) async {
+    final service = _FakeLookup();
+    await _open(tester, service, allowCreateWithout: false);
+
+    expect(find.text('Create without lookup'), findsNothing);
+    expect(find.byKey(const ValueKey('lookup_create_without')), findsNothing);
   });
 }

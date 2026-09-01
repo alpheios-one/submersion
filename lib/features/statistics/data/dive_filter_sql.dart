@@ -15,17 +15,20 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
   final conditions = <String>[];
   final params = <Object?>[];
 
-  // Date range. dive_date_time is epoch MILLISECONDS (wall-clock-as-UTC).
-  if (filter.startDate != null) {
+  // Date range. dive_date_time is epoch MILLISECONDS (wall-clock-as-UTC), and
+  // the bounds are already normalized to that frame by DiveFilterState, so the
+  // two sides of the comparison agree on where a day starts (issue #1368).
+  // Half-open: the end bound is the start of the day AFTER endDate, which
+  // keeps the whole end day and matches apply() and the paginated list.
+  final startBoundMs = filter.startDateBoundMs;
+  if (startBoundMs != null) {
     conditions.add('dive_date_time >= ?');
-    params.add(filter.startDate!.millisecondsSinceEpoch);
+    params.add(startBoundMs);
   }
-  if (filter.endDate != null) {
-    // apply() keeps dives up to endDate + 1 day (inclusive of the end day).
-    conditions.add('dive_date_time <= ?');
-    params.add(
-      filter.endDate!.add(const Duration(days: 1)).millisecondsSinceEpoch,
-    );
+  final endBoundMs = filter.endDateBoundMs;
+  if (endBoundMs != null) {
+    conditions.add('dive_date_time < ?');
+    params.add(endBoundMs);
   }
 
   // Dive type: membership against the many-to-many junction.
@@ -249,13 +252,15 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 /// surfaces intersect with) can't drift apart. Mirrors
 /// `StatisticsRepository.scanRecordedDecoSignals`:
 ///
-/// - A deco-stop profile point (`deco_type = 2`) or a `decoStopStart` event
-///   means deco.
-/// - A profile that carries `deco_type` values, none of which is 2, means
-///   no-deco: the computer recorded obligations and reported none.
-/// - A positive `ceiling` on a profile with no `deco_type` at all also means
-///   deco (some import sources only ever write a stop depth).
-/// - A dive with no qualifying profile data matches neither branch; it is
+/// - A series with a recorded deco stop (`has_deco_stop`) or a
+///   `decoStopStart` event means deco.
+/// - A series that carries `deco_type` values (`has_deco_type`) but never a
+///   stop means no-deco: the computer recorded obligations and reported
+///   none.
+/// - A positive ceiling (`has_positive_ceiling`) on a series with no
+///   `deco_type` at all also means deco (some import sources only ever
+///   write a stop depth).
+/// - A dive with no qualifying series data matches neither branch; it is
 ///   only classifiable via the computed fallback, which this SQL-only axis
 ///   does not have access to.
 ///
@@ -271,16 +276,16 @@ String decoSignalCondition({
   required String diveIdRef,
 }) {
   final hasDecoStop =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.deco_type = 2) '
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_deco_stop = 1) '
       "OR EXISTS (SELECT 1 FROM dive_profile_events e "
       "WHERE e.dive_id = $diveIdRef AND e.event_type = 'decoStopStart')";
   final hasDecoType =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.deco_type IS NOT NULL)';
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_deco_type = 1)';
   final hasPositiveCeiling =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.ceiling > 0)';
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_positive_ceiling = 1)';
 
   if (wantDeco) {
     return '($hasDecoStop OR (NOT ($hasDecoType) AND $hasPositiveCeiling))';

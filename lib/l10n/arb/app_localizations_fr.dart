@@ -1304,10 +1304,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get buddies_label_notSpecified => 'Non spécifié';
 
   @override
-  String get buddies_label_photoComingSoon =>
-      'Support photo disponible dans la v2.0';
-
-  @override
   String get buddies_message_added => 'Binôme ajouté avec succès';
 
   @override
@@ -2615,6 +2611,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get common_action_cancel => 'Annuler';
+
+  @override
+  String get common_action_clearRating => 'Effacer la note';
 
   @override
   String get common_action_close => 'Fermer';
@@ -4929,7 +4928,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Equipement';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Vie marine';
+  String get diveLog_detail_section_marineLife => 'Espèces';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5262,7 +5261,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'Aucun equipement selectionne';
 
   @override
-  String get diveLog_edit_noMarineLife => 'Aucune vie marine enregistree';
+  String get diveLog_edit_noMarineLife => 'Aucune espèce enregistrée';
 
   @override
   String get diveLog_edit_notSpecified => 'Non specifie';
@@ -5403,7 +5402,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Heure de sortie';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Vie marine';
+  String get diveLog_edit_section_marineLife => 'Espèces';
 
   @override
   String get diveLog_edit_section_notes => 'Notes';
@@ -6335,7 +6334,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveSites_edit_invite_lifeNotes =>
-      'Ajouter vie marine, notes ou partage';
+      'Ajouter espèces, notes ou partage';
 
   @override
   String get diveSites_edit_invite_location =>
@@ -7257,6 +7256,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Erreur lors du chargement des types de plongée';
 
   @override
+  String get diveLog_search_errorLoadingEquipment =>
+      'Erreur lors du chargement de l\'équipement';
+
+  @override
   String get diveLog_search_errorLoadingTrips =>
       'Erreur de chargement des voyages';
 
@@ -7283,6 +7286,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Plage de duree (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Équipement';
 
   @override
   String get diveLog_search_label_trip => 'Voyage';
@@ -7411,7 +7417,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Rechercher des especes...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Ajouter de la vie marine';
+  String get diveLog_speciesPicker_title => 'Ajouter des espèces';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch =>
@@ -8202,6 +8208,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Niveau de difficulte';
 
   @override
+  String get diveSites_detail_section_diveStatistics =>
+      'Statistiques de plongee';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'Plongees sur ce site';
 
   @override
@@ -8215,6 +8225,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Evaluation';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Duree moyenne';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'Premiere plongee';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Derniere plongee';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Plongee la plus longue';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Plongee la plus profonde';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Plongee la moins profonde';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Non disponible';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8596,7 +8627,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Niveau de difficulte';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => 'Vie marine attendue';
+  String get diveSites_edit_section_expectedMarineLife => 'Espèces attendues';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'Coordonnees GPS';
@@ -12534,7 +12565,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune espece attendue ajoutee';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'Aucune vie marine observee';
+  String get marineLife_siteSection_noSpotted => 'Aucune espèce observée';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12548,7 +12579,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Observees ici';
 
   @override
-  String get marineLife_siteSection_title => 'Vie marine';
+  String get marineLife_siteSection_title => 'Espèces';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Retour';
@@ -12655,6 +12686,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String marineLife_speciesEdit_errorSaving(Object error) {
     return 'Erreur lors de l\'enregistrement de l\'espece : $error';
   }
+
+  @override
+  String get marineLife_speciesEdit_notFoundMessage =>
+      'Cette espèce n\'existe plus.';
 
   @override
   String get marineLife_speciesEdit_saveButton => 'Enregistrer';
@@ -13005,7 +13040,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Les observations de vie marine ajoutées à une plongée apparaîtront ici.';
+      'Les observations d\'espèces ajoutées à une plongée apparaîtront ici.';
 
   @override
   String get marineLife_speciesPage_noMatch =>
@@ -14290,6 +14325,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nav_sites => 'Sites';
 
   @override
+  String get nav_species => 'Espèces';
+
+  @override
   String get nav_statistics => 'Statistiques';
 
   @override
@@ -15381,7 +15419,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Equipement utilise lors de la plongee';
 
   @override
-  String get diveDetailSection_sightings_name => 'Observations de vie marine';
+  String get diveDetailSection_sightings_name => 'Observations d\'espèces';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -16906,7 +16944,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_manage_species_subtitle =>
-      'Gerer le catalogue d\'especes marines';
+      'Gérer le catalogue d\'espèces';
 
   @override
   String get settings_manage_tags => 'Etiquettes';
@@ -17783,6 +17821,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez entrer le nom du signataire';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Impossible d\'enregistrer la signature. Veuillez réessayer.';
+
+  @override
   String get signatures_field_instructorName => 'Nom de l\'instructeur';
 
   @override
@@ -17867,7 +17909,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Observations d\'especes';
 
   @override
-  String get statistics_category_marineLife_title => 'Vie marine';
+  String get statistics_category_marineLife_title => 'Espèces';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -18219,7 +18261,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', selectionne';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Vie marine';
+  String get statistics_marineLife_appBar_title => 'Espèces';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'Aucune donnee de site';
@@ -18242,8 +18284,7 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Meilleurs sites pour la vie marine';
+  String get statistics_marineLife_bestSites_title => 'Meilleurs sites';
 
   @override
   String get statistics_marineLife_mostCommon_empty =>
@@ -19850,13 +19891,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, carnet PDF';
 
   @override
-  String get transfer_section_exportTitle => 'Exporter';
+  String get transfer_section_exportTitle => 'Export de fichier';
 
   @override
   String get transfer_section_importSubtitle => 'Fichiers CSV, UDDF';
 
   @override
-  String get transfer_section_importTitle => 'Importer';
+  String get transfer_section_importTitle => 'Import de fichier';
 
   @override
   String get transfer_summary_description =>
@@ -21602,6 +21643,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun port série USB trouvé. L\'ordinateur de plongée est-il connecté et allumé ?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'Aucun $model détecté en USB. Est-il connecté à cet ordinateur et allumé ?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'L\'appairage Bluetooth de cet ordinateur de plongée n\'est plus valide. Oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis appairez-le à nouveau depuis le menu Bluetooth de l\'ordinateur de plongée.';
 
@@ -22658,6 +22704,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get gpsTrack_importError_badData =>
       'Ce fichier contient une position ou un horodatage que l\'application ne peut pas lire.';
+
+  @override
+  String get gpsTrack_importError_tooLarge =>
+      'Ce fichier contient trop de positions pour être enregistré comme une seule trace. Divisez-le en traces plus courtes et importez-les séparément.';
 
   @override
   String get gpsTrack_export_saved => 'Trace enregistrée';
@@ -23959,6 +24009,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Stockage des médias connecté';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'Le stockage cloud n\'a pas encore pu être lu. Patientez un instant, puis réessayez.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Déconnecter';
 
   @override
@@ -24005,6 +24059,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Échec';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transferts en pause';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'Cet appareil et le stockage cloud ne s\'accordent plus sur le magasin utilisé. Reconnecter le stockage des médias adopte celui que le cloud contient désormais.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -35848,4 +35910,233 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Comptée dans toutes les statistiques';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Se connecter à Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Connectez-vous avec votre compte app.suunto.com pour importer vos plongées directement. Votre mot de passe n\'est jamais conservé : seule la session obtenue est mise en cache.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'L\'e-mail est requis';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Mot de passe';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired =>
+      'Le mot de passe est requis';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Se connecter';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Connexion…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Connecté en tant que $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Liste des plongées…';
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Récupération de la plongée $current sur $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle =>
+      'Impossible de récupérer les plongées';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Réessayer';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées trouvées',
+      one: '1 plongée trouvée',
+      zero: 'Aucune plongée trouvée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count plongées n\'ont pas pu être converties et ont été ignorées.',
+      one: '1 plongée n\'a pas pu être convertie et a été ignorée.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_review_sortTooltip => 'Trier';
+
+  @override
+  String get importWizard_review_sortByDate => 'Date';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Profondeur';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Temps';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Importer les plongees depuis votre application Suunto ou votre compte app.suunto.com';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Importer depuis le cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Utilisation du stockage';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Utilisation du stockage';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'Voyez ce qui occupe de l\'espace sur cet appareil';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total provisoire';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalculer';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Non disponible';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Mesure impossible';
+
+  @override
+  String get settings_storageUsage_group_appData => 'Données de l\'application';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Cache multimédia';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Sauvegardes';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Fichiers temporaires';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Fichiers exportés';
+
+  @override
+  String get settings_storageUsage_category_database =>
+      'Base de données du carnet de plongée';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Base de données de cache locale';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Photos et vidéos originales';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Miniatures';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Versions vidéo';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Transferts préparés';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Vidéo transcodée';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Tuiles de carte';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Images réseau';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Miniatures vidéo';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Miniatures de documents';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Fichiers de sauvegarde';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Fichiers temporaires';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Fichiers exportés';
+
+  @override
+  String get profilePhoto_sheet_title => 'Photo de profil';
+
+  @override
+  String get profilePhoto_source_camera => 'Prendre une photo';
+
+  @override
+  String get profilePhoto_source_library => 'Choisir dans la galerie';
+
+  @override
+  String get profilePhoto_source_file => 'Choisir un fichier';
+
+  @override
+  String get profilePhoto_source_contacts => 'Choisir dans les contacts';
+
+  @override
+  String get profilePhoto_action_remove => 'Supprimer la photo';
+
+  @override
+  String get profilePhoto_crop_title => 'Ajuster la photo';
+
+  @override
+  String get profilePhoto_crop_hint =>
+      'Faites glisser pour déplacer, pincez pour zoomer';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'Cette image est trop volumineuse. Essayez-en une plus petite.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'Ce fichier n\'a pas pu être lu comme une image.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'Ce contact n\'a pas de photo.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'L\'autorisation d\'accès aux contacts est requise pour choisir une photo.';
 }

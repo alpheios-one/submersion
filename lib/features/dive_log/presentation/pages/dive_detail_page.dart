@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/dive_detail_section_pairs.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -4669,15 +4670,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildBuddyTile(BuildContext context, BuddyWithRole bwr) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: ProfileAvatar(
+        photo: bwr.buddy.photo,
+        initials: bwr.buddy.initials,
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Text(
-          bwr.buddy.initials,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       title: Text(bwr.buddy.name),
       subtitle: Text(bwr.role.localizedName(context.l10n)),
@@ -5257,26 +5253,36 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       instructorId = courseAsync.value!.instructorId;
     }
 
+    // Captured before the sheet closes: the save outlives it, and reporting
+    // a failure needs a messenger that is still in the tree.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+
     showSignatureCaptureSheet(
       context: context,
       initialSignerName: instructorName,
-      onSave: (strokes, signerName) async {
-        // Get the canvas dimensions from the capture widget
-        // Using a reasonable default for signature capture
-        const width = 400.0;
-        const height = 200.0;
-
-        await ref
+      onSave: (strokes, signerName, canvasSize) async {
+        // The strokes are in the capture canvas's own coordinates, so the
+        // PNG is rendered at that exact size. A hardcoded size cropped
+        // every signature drawn on a canvas wider than it (issue #1358).
+        final signature = await ref
             .read(signatureSaveNotifierProvider.notifier)
             .saveFromStrokes(
               diveId: dive.id,
               strokes: strokes,
-              width: width,
-              height: height,
+              width: canvasSize.width,
+              height: canvasSize.height,
               signerName: signerName,
               signerId: instructorId,
               backgroundColor: Colors.white,
             );
+        // A null result means the save threw. Nothing watches the notifier's
+        // AsyncValue, so without this the failure is entirely silent.
+        if (signature == null) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.signatures_error_saveFailed)),
+          );
+        }
       },
     );
   }

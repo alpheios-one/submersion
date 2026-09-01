@@ -107,11 +107,34 @@ LocalFileResolver _bookmarkResolver({
   usesSecurityScopedBookmarks: () => true,
 );
 
+/// A temp directory that is genuinely on the boot volume.
+///
+/// [Directory.systemTemp] follows `$TMPDIR`, and this repo's own speed guide
+/// (docs/developer/local-test-performance.md) tells developers to point that
+/// at a RAM disk. On macOS a RAM disk must mount under `/Volumes/`, which is
+/// exactly the pattern `VolumeStatus.volumeRootOf` uses to identify a
+/// removable drive. Tests here assert that a temp path needs no mount probe,
+/// so on such a machine the premise inverts and they fail for a reason that
+/// has nothing to do with the code under test.
+///
+/// Anchoring to the home directory keeps the real heuristics in play while
+/// guaranteeing the boot volume. CI is unaffected either way.
+Future<Directory> _bootVolumeTemp(String prefix) async {
+  if (Platform.isMacOS) {
+    final home = Platform.environment['HOME'];
+    if (home != null && home.isNotEmpty && !home.startsWith('/Volumes/')) {
+      final base = Directory('$home/Library/Caches');
+      if (base.existsSync()) return base.createTemp(prefix);
+    }
+  }
+  return Directory.systemTemp.createTemp(prefix);
+}
+
 void main() {
   late Directory tempDir;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('local_resolver_test_');
+    tempDir = await _bootVolumeTemp('local_resolver_test_');
   });
 
   tearDown(() async {
@@ -559,8 +582,9 @@ void main() {
         bookmarkStorage: _NullBookmarkStorage(),
         platform: LocalMediaPlatform(),
         exifExtractor: ExifExtractor(),
-        // The REAL volume-root heuristics: a temp path lives on the system
-        // volume on every platform the app ships to.
+        // The REAL volume-root heuristics. tempDir is anchored to the boot
+        // volume by _bootVolumeTemp, because $TMPDIR may point at a RAM disk
+        // under /Volumes on a developer machine.
         volumeStatus: VolumeStatus(
           directoryExists: (path) async {
             probes.add(path);

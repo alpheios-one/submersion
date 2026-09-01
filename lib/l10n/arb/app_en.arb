@@ -844,7 +844,6 @@
   "buddies_label_diveCount": "{count, plural, =1{1 dive} other{{count} dives}}",
   "buddies_label_level": "Level",
   "buddies_label_notSpecified": "Not specified",
-  "buddies_label_photoComingSoon": "Photo support coming in v2.0",
   "buddies_message_added": "Buddy added successfully",
   "buddies_message_contactImportUnavailable": "Contact import is not available on this platform",
   "buddies_message_contactLoadFailed": "Failed to load contacts",
@@ -1615,6 +1614,7 @@
   "settings_manage_preDiveChecklists_subtitle": "Buddy checks, CCR build lists, gear packing",
   "common_action_back": "Back",
   "common_action_cancel": "Cancel",
+  "common_action_clearRating": "Clear rating",
   "common_action_close": "Close",
   "common_action_continue": "Continue",
   "common_action_delete": "Delete",
@@ -1631,6 +1631,9 @@
   },
   "@common_action_cancel": {
     "description": "Generic cancel action"
+  },
+  "@common_action_clearRating": {
+    "description": "Tooltip on the icon that removes a star rating from a form row, returning it to no rating"
   },
   "@common_action_close": {
     "description": "Generic close action used for dialogs, menus, etc."
@@ -2821,7 +2824,7 @@
   "diveLog_detail_section_details": "Details",
   "diveLog_detail_section_diveProfile": "Dive Profile",
   "diveLog_detail_section_equipment": "Equipment",
-  "diveLog_detail_section_marineLife": "Marine Life",
+  "diveLog_detail_section_marineLife": "Species",
   "diveLog_detail_sightingPhotos": "{count, plural, =1{1 photo} other{{count} photos}}",
   "@diveLog_detail_sightingPhotos": {
     "placeholders": {
@@ -2962,7 +2965,7 @@
   "diveLog_edit_marineLifeHint": "Tap \"Add\" to record sightings",
   "diveLog_edit_nearbySitesFirst": "Nearby sites first",
   "diveLog_edit_noEquipmentSelected": "No equipment selected",
-  "diveLog_edit_noMarineLife": "No marine life logged",
+  "diveLog_edit_noMarineLife": "No species logged",
   "diveLog_edit_notSpecified": "Not specified",
   "diveLog_edit_notesHint": "Add notes about this dive...",
   "diveLog_edit_overline_tanks": "Tanks",
@@ -3050,7 +3053,7 @@
   "diveLog_edit_section_entryTime": "Entry Time",
   "diveLog_edit_section_equipment": "Equipment",
   "diveLog_edit_section_exitTime": "Exit Time",
-  "diveLog_edit_section_marineLife": "Marine Life",
+  "diveLog_edit_section_marineLife": "Species",
   "diveLog_edit_section_notes": "Notes",
   "diveLog_edit_section_rating": "Rating",
   "diveLog_edit_section_tags": "Tags",
@@ -3487,7 +3490,7 @@
   "@diveSites_edit_invite_diveInfo": {
     "description": "Empty-state invitation for the Dive info group"
   },
-  "diveSites_edit_invite_lifeNotes": "Add marine life, notes or sharing",
+  "diveSites_edit_invite_lifeNotes": "Add species, notes or sharing",
   "@diveSites_edit_invite_lifeNotes": {
     "description": "Empty-state invitation for the Life & notes group"
   },
@@ -3909,6 +3912,7 @@
   "diveLog_search_end": "End",
   "diveLog_search_errorLoadingCenters": "Error loading dive centers",
   "diveLog_search_errorLoadingDiveTypes": "Error loading dive types",
+  "diveLog_search_errorLoadingEquipment": "Error loading equipment",
   "diveLog_search_errorLoadingTrips": "Error loading trips",
   "diveLog_search_filter_any": "Any",
   "diveLog_search_gasTrimix": "Trimix (<21% O₂)",
@@ -3918,6 +3922,7 @@
   "diveLog_search_label_diveSite": "Dive Site",
   "diveLog_search_label_diveType": "Dive Type",
   "diveLog_search_label_durationRange": "Duration Range (min)",
+  "diveLog_search_label_equipment": "Equipment",
   "diveLog_search_label_trip": "Trip",
   "diveLog_search_search": "Search",
   "diveLog_search_section_conditions": "Conditions",
@@ -3955,7 +3960,7 @@
   "diveLog_speciesPicker_noResults": "No species found",
   "diveLog_speciesPicker_noSpecies": "No species available",
   "diveLog_speciesPicker_searchHint": "Search species...",
-  "diveLog_speciesPicker_title": "Add Marine Life",
+  "diveLog_speciesPicker_title": "Add Species",
   "diveLog_speciesPicker_tooltip_clearSearch": "Clear search",
   "diveLog_summary_action_importComputer": "Import from Computer",
   "diveLog_summary_action_logDive": "Log Dive",
@@ -4804,11 +4809,19 @@
   "diveSites_detail_section_depthRange": "Depth Range",
   "diveSites_detail_section_description": "Description",
   "diveSites_detail_section_difficultyLevel": "Difficulty Level",
+  "diveSites_detail_section_diveStatistics": "Dive Statistics",
   "diveSites_detail_section_divesAtSite": "Dives at this Site",
   "diveSites_detail_section_hazards": "Hazards & Safety",
   "diveSites_detail_section_location": "Location",
   "diveSites_detail_section_notes": "Notes",
   "diveSites_detail_section_rating": "Rating",
+  "diveSites_detail_stats_avgDuration": "Average Duration",
+  "diveSites_detail_stats_firstDive": "First Dive",
+  "diveSites_detail_stats_lastDive": "Last Dive",
+  "diveSites_detail_stats_longestDive": "Longest Dive",
+  "diveSites_detail_stats_maxDepth": "Deepest Dive",
+  "diveSites_detail_stats_minDepth": "Shallowest Dive",
+  "diveSites_detail_stats_notAvailable": "Not available",
   "diveSites_detail_semantics_copyToClipboard": "Copy {label} to clipboard",
   "diveSites_detail_semantics_viewDivesAtSite": "View dives at this site",
   "diveSites_detail_semantics_viewFullscreenMap": "View fullscreen map",
@@ -4962,7 +4975,7 @@
   "diveSites_edit_section_altitude": "Altitude",
   "diveSites_edit_section_depthRange": "Depth Range",
   "diveSites_edit_section_difficultyLevel": "Difficulty Level",
-  "diveSites_edit_section_expectedMarineLife": "Expected Marine Life",
+  "diveSites_edit_section_expectedMarineLife": "Expected Species",
   "diveSites_edit_section_gpsCoordinates": "GPS Coordinates",
   "diveSites_edit_section_hazards": "Hazards & Safety",
   "diveSites_edit_section_rating": "Rating",
@@ -7133,10 +7146,10 @@
   "marineLife_siteSection_errorLoadingSightings": "Error loading sightings",
   "marineLife_siteSection_expectedSpecies": "Expected Species",
   "marineLife_siteSection_noExpected": "No expected species added",
-  "marineLife_siteSection_noSpotted": "No marine life spotted yet",
+  "marineLife_siteSection_noSpotted": "No species spotted yet",
   "marineLife_siteSection_spottedCountSemantics": "{name}, spotted {count} times",
   "marineLife_siteSection_spottedHere": "Spotted Here",
-  "marineLife_siteSection_title": "Marine Life",
+  "marineLife_siteSection_title": "Species",
   "marineLife_speciesDetail_backTooltip": "Back",
   "marineLife_speciesDetail_depthRangeTitle": "Depth Range",
   "marineLife_speciesDetail_descriptionTitle": "Description",
@@ -7164,6 +7177,7 @@
   "marineLife_speciesEdit_editTitle": "Edit Species",
   "marineLife_speciesEdit_errorLoading": "Error loading species: {error}",
   "marineLife_speciesEdit_errorSaving": "Error saving species: {error}",
+  "marineLife_speciesEdit_notFoundMessage": "This species no longer exists.",
   "marineLife_speciesEdit_saveButton": "Save",
   "marineLife_speciesEdit_scientificNameHint": "e.g., Amphiprion ocellaris",
   "marineLife_speciesEdit_scientificNameLabel": "Scientific Name",
@@ -7338,7 +7352,7 @@
     }
   },
   "marineLife_speciesPage_emptyTitle": "No species yet",
-  "marineLife_speciesPage_emptyHint": "Marine life sightings added to a dive will show up here.",
+  "marineLife_speciesPage_emptyHint": "Species sightings added to a dive will show up here.",
   "marineLife_speciesPage_noMatch": "No species match your search",
   "marineLife_speciesPage_error": "Could not load your species: {error}",
   "@marineLife_speciesPage_error": {
@@ -8608,6 +8622,7 @@
   "nav_planningSubtitle": "Dive Planner, Calculators",
   "nav_settings": "Settings",
   "nav_sites": "Sites",
+  "nav_species": "Species",
   "nav_statistics": "Statistics",
   "nav_tooltip_closeMenu": "Close menu",
   "nav_tooltip_collapseMenu": "Collapse menu",
@@ -8655,6 +8670,9 @@
   },
   "@nav_sites": {
     "description": "Navigation label for dive sites section"
+  },
+  "@nav_species": {
+    "description": "Navigation label for the species section"
   },
   "@nav_statistics": {
     "description": "Navigation label for statistics section"
@@ -9314,7 +9332,7 @@
   "diveDetailSection_signatures_description": "Buddy/instructor signature display and capture",
   "diveDetailSection_equipment_name": "Equipment",
   "diveDetailSection_equipment_description": "Equipment used in dive",
-  "diveDetailSection_sightings_name": "Marine Life Sightings",
+  "diveDetailSection_sightings_name": "Species Sightings",
   "diveDetailSection_sightings_description": "Species spotted, sighting details",
   "diveDetailSection_media_name": "Media",
   "diveDetailSection_media_description": "Photos/videos gallery",
@@ -9883,7 +9901,7 @@
   "settings_manage_diveTypes_subtitle": "Manage custom dive types",
   "settings_manage_header_manageData": "Manage Data",
   "settings_manage_species": "Species",
-  "settings_manage_species_subtitle": "Manage marine life species catalog",
+  "settings_manage_species_subtitle": "Manage the species catalog",
   "settings_manage_tags": "Tags",
   "settings_manage_tags_subtitle": "Manage, merge, and delete tags",
   "settings_manage_tankPresets": "Tank Presets",
@@ -10509,6 +10527,7 @@
   "signatures_drawSignatureSemantics": "Draw signature",
   "signatures_error_drawSignature": "Please draw a signature",
   "signatures_error_enterSignerName": "Please enter the signer name",
+  "signatures_error_saveFailed": "Could not save the signature. Please try again.",
   "signatures_field_instructorName": "Instructor Name",
   "signatures_field_instructorNameHint": "Enter instructor name",
   "signatures_handoff_title": "Hand your device to",
@@ -10590,6 +10609,9 @@
   "@signatures_error_enterSignerName": {
     "description": "Error shown when trying to save without entering a signer name"
   },
+  "@signatures_error_saveFailed": {
+    "description": "Error shown when saving a signature failed"
+  },
   "@signatures_field_instructorName": {
     "description": "Label for the instructor name text field"
   },
@@ -10665,7 +10687,7 @@
   "statistics_category_geographic_subtitle": "Countries & regions",
   "statistics_category_geographic_title": "Geographic",
   "statistics_category_marineLife_subtitle": "Species sightings",
-  "statistics_category_marineLife_title": "Marine Life",
+  "statistics_category_marineLife_title": "Species",
   "statistics_category_overview_title": "Overview",
   "@statistics_category_overview_title": {
     "description": "Title for the Overview entry in the Statistics category list"
@@ -10763,12 +10785,12 @@
   "statistics_geographic_trips_summary": "{count} trips. Top: {topName} with {topCount} dives",
   "statistics_geographic_trips_title": "Dives Per Trip",
   "statistics_listContent_selectedSuffix": ", selected",
-  "statistics_marineLife_appBar_title": "Marine Life",
+  "statistics_marineLife_appBar_title": "Species",
   "statistics_marineLife_bestSites_empty": "No site data",
   "statistics_marineLife_bestSites_error": "Failed to load site data",
   "statistics_marineLife_bestSites_subtitle": "Sites with most species variety",
   "statistics_marineLife_bestSites_summary": "{count} sites. Best: {topName} with {topCount} species",
-  "statistics_marineLife_bestSites_title": "Best Sites for Marine Life",
+  "statistics_marineLife_bestSites_title": "Best Sites",
   "statistics_marineLife_mostCommon_empty": "No sighting data",
   "statistics_marineLife_mostCommon_error": "Failed to load sighting data",
   "statistics_marineLife_mostCommon_subtitle": "Species spotted most often",
@@ -11902,9 +11924,9 @@
   "transfer_section_computersSubtitle": "Download from device",
   "transfer_section_computersTitle": "Dive Computers",
   "transfer_section_exportSubtitle": "CSV, UDDF, PDF logbook",
-  "transfer_section_exportTitle": "Export",
+  "transfer_section_exportTitle": "File Export",
   "transfer_section_importSubtitle": "CSV, UDDF files",
-  "transfer_section_importTitle": "Import",
+  "transfer_section_importTitle": "File Import",
   "transfer_summary_description": "Import and export dive data",
   "transfer_summary_selectSection": "Select a section from the list",
   "transfer_summary_title": "Transfer",
@@ -13825,6 +13847,14 @@
   },
   "diveComputer_download_errorOccurred": "An error occurred",
   "diveComputer_download_noSerialPortsFound": "No USB serial ports found. Is the dive computer connected and powered on?",
+  "diveComputer_download_noUsbDeviceFound": "No {model} found over USB. Is it connected to this computer and powered on?",
+  "@diveComputer_download_noUsbDeviceFound": {
+    "placeholders": {
+      "model": {
+        "type": "Object"
+      }
+    }
+  },
   "diveComputer_download_stalePairing": "This dive computer's Bluetooth pairing is out of date. Forget the dive computer in your device's Bluetooth settings, then pair it again from the dive computer's Bluetooth menu.",
   "diveComputer_download_discoveryStalled": "Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device's Bluetooth settings, then try again.",
   "diveComputer_download_serialConnectFailedWithDetails": "Could not connect to dive computer.\n\nDiagnostic details (share with developers):\n{details}",
@@ -14500,6 +14530,10 @@
   "gpsTrack_importError_badData": "That file has a position or timestamp this app cannot read.",
   "@gpsTrack_importError_badData": {
     "description": "Track import failed: a coordinate or timestamp in the file is unusable."
+  },
+  "gpsTrack_importError_tooLarge": "That file has too many positions to store as one track. Split it into shorter tracks and import them separately.",
+  "@gpsTrack_importError_tooLarge": {
+    "description": "Track import failed: the file has more positions than a single track can store."
   },
   "gpsTrack_export_saved": "Track saved",
   "gpsTrack_action_export": "Export",
@@ -15482,6 +15516,7 @@
   },
   "settings_mediaStorage_test_success": "Connection successful",
   "settings_mediaStorage_saved": "Media store connected",
+  "settings_mediaStorage_error_notReady": "The cloud storage could not be read yet. Wait a moment and try connecting again.",
   "settings_mediaStorage_action_disconnect": "Disconnect",
   "settings_mediaStorage_disconnect_confirm_title": "Disconnect media store?",
   "settings_mediaStorage_disconnect_confirm_body": "This device stops uploading and fetching media. Nothing in your bucket is deleted.",
@@ -15496,6 +15531,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Removing from cloud",
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
+  "settings_mediaStorage_transfers_suspended_title": "Transfers paused",
+  "settings_mediaStorage_transfers_suspended_subtitle": "This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.",
   "settings_mediaStorage_transfers_queued": "{count} queued",
   "@settings_mediaStorage_transfers_queued": {
     "placeholders": {
@@ -21671,5 +21708,103 @@
   "diveLog_edit_statisticsIncludedHint": "Counted in every statistic",
   "@diveLog_edit_statisticsIncludedHint": {
     "description": "Collapsed Statistics group hint when the dive is not excluded"
-  }
+  },
+  "suuntoCloud_signIn_title": "Sign in to Suunto",
+  "suuntoCloud_signIn_description": "Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.",
+  "suuntoCloud_signIn_emailLabel": "Email",
+  "suuntoCloud_signIn_emailRequired": "Email is required",
+  "suuntoCloud_signIn_passwordLabel": "Password",
+  "suuntoCloud_signIn_passwordRequired": "Password is required",
+  "suuntoCloud_signIn_button": "Sign In",
+  "suuntoCloud_signIn_signingIn": "Signing in…",
+  "suuntoCloud_signIn_signedInAs": "Signed in as {email}",
+  "suuntoCloud_fetch_listing": "Listing dives…",
+  "suuntoCloud_fetch_fetchingDiveOf": "Fetching dive {current} of {total}…",
+  "suuntoCloud_fetch_failedTitle": "Could not fetch dives",
+  "suuntoCloud_fetch_retry": "Try Again",
+  "suuntoCloud_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
+  "suuntoCloud_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
+  "@suuntoCloud_signIn_signedInAs": {
+    "description": "Success state on the Suunto sign-in step, once a session is established.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_fetchingDiveOf": {
+    "description": "Progress line while downloading each dive from the Suunto cloud.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_foundDives": {
+    "description": "Result headline after fetching dives from the Suunto cloud.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_someFailed": {
+    "description": "Shown when one or more fetched Suunto dives could not be converted and were skipped.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_review_sortTooltip": "Sort",
+  "importWizard_review_sortByDate": "Date",
+  "importWizard_review_sortByDepth": "Depth",
+  "importWizard_review_sortByDuration": "Time",
+  "transfer_importCloud_suuntoTitle": "Suunto",
+  "transfer_importCloud_suuntoSubtitle": "Import dives from your Suunto app / app.suunto.com account",
+  "transfer_section_cloudTitle": "Cloud",
+  "transfer_section_cloudSubtitle": "Import from cloud",
+  "settings_storageUsage_appBar_title": "Storage Usage",
+  "settings_storageUsage_tile_title": "Storage Usage",
+  "settings_storageUsage_tile_subtitle": "See what is using space on this device",
+  "settings_storageUsage_total": "Total",
+  "settings_storageUsage_totalPartial": "Total so far",
+  "settings_storageUsage_refresh_tooltip": "Recalculate",
+  "settings_storageUsage_unavailable": "Not available",
+  "settings_storageUsage_measureFailed": "Could not measure",
+  "settings_storageUsage_group_appData": "App Data",
+  "settings_storageUsage_group_mediaCache": "Media Cache",
+  "settings_storageUsage_group_caches": "Caches",
+  "settings_storageUsage_group_backups": "Backups",
+  "settings_storageUsage_group_temporary": "Temporary Files",
+  "settings_storageUsage_group_exports": "Exported Files",
+  "settings_storageUsage_category_database": "Dive log database",
+  "settings_storageUsage_category_localCache": "Local cache database",
+  "settings_storageUsage_category_mediaCacheOriginals": "Original photos and videos",
+  "settings_storageUsage_category_mediaCacheThumbs": "Thumbnails",
+  "settings_storageUsage_category_mediaCacheRenditions": "Video renditions",
+  "settings_storageUsage_category_mediaCacheStaging": "Staged transfers",
+  "settings_storageUsage_category_mediaCacheTranscode": "Transcoded video",
+  "settings_storageUsage_category_mapTiles": "Map tiles",
+  "settings_storageUsage_category_networkImages": "Network images",
+  "settings_storageUsage_category_videoThumbnails": "Video thumbnails",
+  "settings_storageUsage_category_pdfThumbnails": "Document thumbnails",
+  "settings_storageUsage_category_backups": "Backup files",
+  "settings_storageUsage_category_temporary": "Temporary files",
+  "settings_storageUsage_category_exports": "Exported files",
+  "profilePhoto_sheet_title": "Profile Photo",
+  "profilePhoto_source_camera": "Take Photo",
+  "profilePhoto_source_library": "Choose from Library",
+  "profilePhoto_source_file": "Choose File",
+  "profilePhoto_source_contacts": "Choose from Contacts",
+  "profilePhoto_action_remove": "Remove Photo",
+  "profilePhoto_crop_title": "Adjust Photo",
+  "profilePhoto_crop_hint": "Drag to reposition, pinch to zoom",
+  "profilePhoto_error_tooLarge": "That image is too large to use. Try a smaller one.",
+  "profilePhoto_error_undecodable": "That file could not be read as an image.",
+  "profilePhoto_error_contactNoPhoto": "That contact does not have a photo.",
+  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo."
 }

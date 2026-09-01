@@ -105,7 +105,6 @@ final _now = DateTime.now();
 const _emptySnapshot = DiveMergeSnapshot(
   mergedDiveId: 'target-dive',
   diveRows: [],
-  profileRows: [],
   tankRows: [],
   weightRows: [],
   customFieldRows: [],
@@ -116,7 +115,6 @@ const _emptySnapshot = DiveMergeSnapshot(
   sightingRows: [],
   eventRows: [],
   gasSwitchRows: [],
-  tankPressureRows: [],
   dataSourceRows: [],
   tideRows: [],
   mediaDiveIds: {},
