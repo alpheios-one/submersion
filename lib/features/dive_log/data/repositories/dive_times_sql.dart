@@ -36,20 +36,23 @@ String timestampRuntimeSecondsSql(String alias) =>
     'END';
 
 /// The span of the dive's profile samples in seconds, or NULL when it has no
-/// samples or they all share one timestamp.
+/// samples or they all share one timestamp. Read from the series summaries
+/// (`start_timestamp` / `end_timestamp`) over every series row of the dive,
+/// primary and demoted alike, the span the retired row-per-sample read
+/// produced (it had no `is_primary` filter either).
 ///
 /// Mirrors `Dive.calculateRuntimeFromProfile`, which returns null unless the
 /// span is positive; `NULLIF(..., 0)` is what carries that rule into SQL.
 String profileSpanSecondsSql(String alias) =>
-    'NULLIF((SELECT MAX(p.timestamp) - MIN(p.timestamp) FROM dive_profiles p '
-    'WHERE p.dive_id = $alias.id), 0)';
+    'NULLIF((SELECT MAX(s.end_timestamp) - MIN(s.start_timestamp) '
+    'FROM dive_profile_series s WHERE s.dive_id = $alias.id), 0)';
 
 /// The whole `Dive.effectiveRuntime` chain as one scalar expression, in
 /// seconds, NULL only for a dive that carries no duration in any form.
 ///
 /// `COALESCE` short-circuits in SQLite, so the correlated profile subquery is
 /// only executed for the dives that actually reach that step. A dive with an
-/// explicit `runtime` never touches `dive_profiles`, which is what keeps this
+/// explicit `runtime` never touches `dive_profile_series`, which is what keeps this
 /// usable in aggregates that scan the whole dive table.
 String effectiveRuntimeSecondsSql(String alias) =>
     'COALESCE('
