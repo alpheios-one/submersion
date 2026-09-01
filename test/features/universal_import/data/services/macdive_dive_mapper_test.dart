@@ -396,14 +396,14 @@ void main() {
     test(
       'Suunto EON Steel Black ZRAWDATA is passed through unmodified',
       () async {
-        final calls = <(String, String, int)>[];
+        final calls = <(String, String, Uint8List)>[];
         final payload = await MacDiveDiveMapper.toPayload(
           _suuntoRawDataLogbook(
             computer: 'Suunto EON Steel Black',
             raw: _suuntoFixture,
           ),
           parseRaw: (vendor, product, model, data) async {
-            calls.add((vendor, product, data.length));
+            calls.add((vendor, product, data));
             return _parsedDive(
               samples: [
                 pigeon.ProfileSample(
@@ -421,8 +421,10 @@ void main() {
         expect(calls.single.$1, 'Suunto');
         expect(calls.single.$2, 'EON Steel Black');
         // Unlike Shearwater, the bytes reach the parser exactly as MacDive
-        // stored them - no decompression pass.
-        expect(calls.single.$3, _suuntoFixture.length);
+        // stored them - no decompression pass. Compared byte for byte, not by
+        // length, because the XOR-delta half of the Shearwater decompressor
+        // rewrites a buffer in place without changing its size.
+        expect(calls.single.$3, orderedEquals(_suuntoFixture));
 
         final dives = payload.entitiesOf(ImportEntityType.dives);
         expect(dives.where((d) => d.containsKey('profile')), hasLength(1));
@@ -607,9 +609,21 @@ Uint8List _hex(String s) {
 
 /// Stand-in for a Suunto `ZRAWDATA` blob. The real format (SBEM for EON
 /// Steel, the Vyper dive-header layout for Cobra) is confirmed elsewhere
-/// against real MacDive data; these tests stub `parseRaw`, so the bytes only
-/// need to be non-empty and pass through _attachProfile unmodified.
-final _suuntoFixture = Uint8List.fromList(List.filled(24, 0x11));
+/// against real MacDive data; these tests stub `parseRaw`, so the bytes never
+/// have to be a valid dive - but their shape is chosen so that any accidental
+/// Shearwater-style transformation would visibly alter them:
+///
+/// * longer than 32 bytes, so [ShearwaterRawDecompressor.applyXorDelta] (which
+///   preserves length and would therefore slip past a length-only check) has
+///   blocks to fold together;
+/// * non-uniform, so that XOR fold produces different bytes rather than a
+///   coincidentally identical buffer;
+/// * 45 bytes, i.e. a bit count divisible by 9, so
+///   [ShearwaterRawDecompressor.decompressLre] would accept the stream instead
+///   of rejecting it as malformed and short-circuiting the test.
+final _suuntoFixture = Uint8List.fromList(
+  List.generate(45, (i) => (i * 7 + 3) & 0xFF),
+);
 
 /// One dive on [computer] carrying [raw] as its `ZRAWDATA`.
 MacDiveRawLogbook _suuntoRawDataLogbook({
