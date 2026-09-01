@@ -9712,9 +9712,26 @@ class AppDatabase extends _$AppDatabase {
               stackTrace: stackTrace,
             );
           }
-          await _purgeLegacySampleBookkeeping();
-          if (packed) {
-            await _dropPackedLegacySampleTables();
+          // Guarded like the beforeOpen backstop's own copy of these two
+          // steps, and for the same reason: a busy lock from the second
+          // isolate, or a legacy table shape the residue count cannot read,
+          // must not turn into a database that cannot open. onUpgrade
+          // rethrows, so an escape here replays on every relaunch, while
+          // skipping the drop costs only a table the backstop retires on a
+          // later open.
+          try {
+            await _purgeLegacySampleBookkeeping();
+            if (packed) {
+              await _dropPackedLegacySampleTables();
+            }
+          } catch (e, stackTrace) {
+            developer.log(
+              'v183: purging or dropping the legacy sample tables failed; '
+              'the backstop retries on a later open',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
           }
         }
         if (from < 183) await reportProgress();

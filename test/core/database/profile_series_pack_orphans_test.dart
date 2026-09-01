@@ -91,19 +91,26 @@ void main() {
     test('skips a pressure row whose tank is gone and counts it', () async {
       final open = await openLegacy();
       seedParents(open.raw);
+      // Both of d1's tanks are matched exactly, so there is nothing for the
+      // stale id to be adopted into and it stays an orphan. When a tank IS
+      // free the packer adopts instead of skipping; see
+      // profile_series_pack_orphan_tank_test.dart.
       open.raw.execute(
         'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, '
         "pressure, computer_id) VALUES ('q1', 'd1', 't1', 0, 200.0, 'c1'), "
+        "('q3', 'd1', 't2', 0, 205.0, 'c1'), "
         "('q2', 'd1', 'no-tank', 0, 210.0, NULL)",
       );
 
       final report = await packLegacyProfileRows(open.db, nowMs: 1);
-      expect(report.tankSeries, 1);
+      expect(report.tankSeries, 2);
       expect(report.skippedOrphans, 1);
       final series = await open.db
-          .customSelect('SELECT tank_id FROM tank_pressure_series')
+          .customSelect(
+            'SELECT tank_id FROM tank_pressure_series ORDER BY tank_id',
+          )
           .get();
-      expect(series.map((r) => r.read<String>('tank_id')), ['t1']);
+      expect(series.map((r) => r.read<String>('tank_id')), ['t1', 't2']);
     });
   });
 

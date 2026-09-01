@@ -115,6 +115,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
           byTank: false,
         )
       : _emptyScan;
+  if (canPackTanks) await _adoptStrandedTankPressures(db, tankTable);
   final tankScan = canPackTanks
       ? await _scanLegacyDives(
           db,
@@ -165,86 +166,107 @@ Future<ProfilePackReport> packLegacyProfileRows(
     const codec = ProfileSeriesCodec();
     final hasPrimary = profileColumns.contains('is_primary');
     for (final diveId in unpackedProfileDives) {
+      // One transaction per dive. Each group's INSERT would otherwise
+      // autocommit on its own, and the backstop runs outside any
+      // transaction of its own: a process killed between two groups of
+      // one dive leaves the rest unwritten, and two groups of the same
+      // (dive, computer) differ only below the granularity the residue
+      // count checks, so the survivors would read as covered and v183
+      // would drop the legacy table with the missing group still only
+      // in it. All of a dive's groups land, or none do.
+      final before = (
+        profileSeries: profileSeries,
+        dropped: dropped,
+        skipped: skipped,
+        skippedRows: skippedRows,
+      );
       try {
-        // Ordered by timestamp alone: the map below does the grouping, and
-        // ordering by the identity columns first would interleave two raw
-        // groups that resolve to one key (a dangling computer id merging into
-        // the null-computer group) out of timestamp order.
-        final rows = await db
-            .customSelect(
-              'SELECT * FROM $profileTable WHERE dive_id = ? '
-              'ORDER BY timestamp, rowid',
-              variables: [Variable<String>(diveId)],
-            )
-            .get();
-        final groups = <_ProfileKey, List<ProfileSample>>{};
-        for (final row in rows) {
-          final sample = profileSampleOf(row.data);
-          if (sample == null) {
-            skippedRows++;
-            continue;
+        await db.transaction(() async {
+          // Ordered by timestamp alone: the map below does the grouping, and
+          // ordering by the identity columns first would interleave two raw
+          // groups that resolve to one key (a dangling computer id merging into
+          // the null-computer group) out of timestamp order.
+          final rows = await db
+              .customSelect(
+                'SELECT * FROM $profileTable WHERE dive_id = ? '
+                'ORDER BY timestamp, rowid',
+                variables: [Variable<String>(diveId)],
+              )
+              .get();
+          final groups = <_ProfileKey, List<ProfileSample>>{};
+          for (final row in rows) {
+            final sample = profileSampleOf(row.data);
+            if (sample == null) {
+              skippedRows++;
+              continue;
+            }
+            final key = _ProfileKey(
+              computerId: _resolvedParent(row.data['computer_id'], computerIds),
+              sourceId: _resolvedParent(row.data['source_id'], sourceIds),
+              isPrimary: hasPrimary ? _boolOf(row.data['is_primary']) : true,
+            );
+            groups.putIfAbsent(key, () => []).add(sample);
           }
-          final key = _ProfileKey(
-            computerId: _resolvedParent(row.data['computer_id'], computerIds),
-            sourceId: _resolvedParent(row.data['source_id'], sourceIds),
-            isPrimary: hasPrimary ? _boolOf(row.data['is_primary']) : true,
-          );
-          groups.putIfAbsent(key, () => []).add(sample);
-        }
-        for (final entry in groups.entries) {
-          if (!diveIds.contains(diveId)) {
-            skipped++;
-            continue;
-          }
-          final key = entry.key;
-          if (coveredProfiles.contains((diveId, key.computerId))) {
-            // Already packed under this identity; the stored series wins.
-            continue;
-          }
-          final samples = dedupeExactSamples(entry.value);
-          dropped += entry.value.length - samples.length;
-          final encoded = codec.encode(samples);
-          final summary = encoded.summary;
-          final inserted = await db.customUpdate(
-            'INSERT OR IGNORE INTO dive_profile_series ('
-            'id, dive_id, computer_id, source_id, is_primary, sample_count, '
-            'start_timestamp, end_timestamp, max_depth, first_depth, last_depth, '
-            'has_deco_type, has_deco_stop, has_positive_ceiling, codec_version, '
-            'samples, created_at, updated_at, hlc) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            variables: [
-              Variable<String>(
-                profileSeriesMigratedId(
-                  diveId: diveId,
-                  computerId: key.computerId,
-                  sourceId: key.sourceId,
-                  isPrimary: key.isPrimary,
+          for (final entry in groups.entries) {
+            if (!diveIds.contains(diveId)) {
+              skipped++;
+              continue;
+            }
+            final key = entry.key;
+            if (coveredProfiles.contains((diveId, key.computerId))) {
+              // Already packed under this identity; the stored series wins.
+              continue;
+            }
+            final samples = dedupeExactSamples(entry.value);
+            dropped += entry.value.length - samples.length;
+            final encoded = codec.encode(samples);
+            final summary = encoded.summary;
+            final inserted = await db.customUpdate(
+              'INSERT OR IGNORE INTO dive_profile_series ('
+              'id, dive_id, computer_id, source_id, is_primary, sample_count, '
+              'start_timestamp, end_timestamp, max_depth, first_depth, last_depth, '
+              'has_deco_type, has_deco_stop, has_positive_ceiling, codec_version, '
+              'samples, created_at, updated_at, hlc) '
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              variables: [
+                Variable<String>(
+                  profileSeriesMigratedId(
+                    diveId: diveId,
+                    computerId: key.computerId,
+                    sourceId: key.sourceId,
+                    isPrimary: key.isPrimary,
+                  ),
                 ),
-              ),
-              Variable<String>(diveId),
-              Variable<String>(key.computerId),
-              Variable<String>(key.sourceId),
-              Variable<int>(key.isPrimary ? 1 : 0),
-              Variable<int>(summary.sampleCount),
-              Variable<int>(summary.startTimestamp),
-              Variable<int>(summary.endTimestamp),
-              Variable<double>(summary.maxDepth),
-              Variable<double>(summary.firstDepth),
-              Variable<double>(summary.lastDepth),
-              Variable<int>(summary.hasDecoType ? 1 : 0),
-              Variable<int>(summary.hasDecoStop ? 1 : 0),
-              Variable<int>(summary.hasPositiveCeiling ? 1 : 0),
-              Variable<int>(encoded.codecVersion),
-              Variable<Uint8List>(encoded.bytes),
-              Variable<int>(now),
-              Variable<int>(now),
-              Variable<String>(hlc),
-            ],
-            updateKind: UpdateKind.insert,
-          );
-          profileSeries += inserted;
-        }
+                Variable<String>(diveId),
+                Variable<String>(key.computerId),
+                Variable<String>(key.sourceId),
+                Variable<int>(key.isPrimary ? 1 : 0),
+                Variable<int>(summary.sampleCount),
+                Variable<int>(summary.startTimestamp),
+                Variable<int>(summary.endTimestamp),
+                Variable<double>(summary.maxDepth),
+                Variable<double>(summary.firstDepth),
+                Variable<double>(summary.lastDepth),
+                Variable<int>(summary.hasDecoType ? 1 : 0),
+                Variable<int>(summary.hasDecoStop ? 1 : 0),
+                Variable<int>(summary.hasPositiveCeiling ? 1 : 0),
+                Variable<int>(encoded.codecVersion),
+                Variable<Uint8List>(encoded.bytes),
+                Variable<int>(now),
+                Variable<int>(now),
+                Variable<String>(hlc),
+              ],
+              updateKind: UpdateKind.insert,
+            );
+            profileSeries += inserted;
+          }
+        });
       } catch (_) {
+        // The dive rolled back, so its partial counts did not happen.
+        profileSeries = before.profileSeries;
+        dropped = before.dropped;
+        skipped = before.skipped;
+        skippedRows = before.skippedRows;
         // One dive at a time. A legacy value no reader expects (a text
         // depth in a REAL column, from a hand-repaired or bit-rotted file)
         // or a group the codec refuses must not cost the dives the scan
@@ -268,78 +290,99 @@ Future<ProfilePackReport> packLegacyProfileRows(
   if (canPackTanks) {
     const codec = TankPressureSeriesCodec();
     for (final diveId in unpackedTankDives) {
+      // One transaction per dive. Each group's INSERT would otherwise
+      // autocommit on its own, and the backstop runs outside any
+      // transaction of its own: a process killed between two groups of
+      // one dive leaves the rest unwritten, and two groups of the same
+      // (dive, computer) differ only below the granularity the residue
+      // count checks, so the survivors would read as covered and v183
+      // would drop the legacy table with the missing group still only
+      // in it. All of a dive's groups land, or none do.
+      final before = (
+        tankSeries: tankSeries,
+        dropped: dropped,
+        skipped: skipped,
+        skippedRows: skippedRows,
+      );
       try {
-        final rows = await db
-            .customSelect(
-              'SELECT * FROM $tankTable WHERE dive_id = ? '
-              'ORDER BY timestamp, rowid',
-              variables: [Variable<String>(diveId)],
-            )
-            .get();
-        final groups = <_TankKey, List<TankPressureSample>>{};
-        for (final row in rows) {
-          final tankId = row.data['tank_id'] as String?;
-          final timestamp = row.data['timestamp'] as num?;
-          final pressure = row.data['pressure'] as num?;
-          if (tankId == null || timestamp == null || pressure == null) {
-            skippedRows++;
-            continue;
+        await db.transaction(() async {
+          final rows = await db
+              .customSelect(
+                'SELECT * FROM $tankTable WHERE dive_id = ? '
+                'ORDER BY timestamp, rowid',
+                variables: [Variable<String>(diveId)],
+              )
+              .get();
+          final groups = <_TankKey, List<TankPressureSample>>{};
+          for (final row in rows) {
+            final tankId = row.data['tank_id'] as String?;
+            final timestamp = row.data['timestamp'] as num?;
+            final pressure = row.data['pressure'] as num?;
+            if (tankId == null || timestamp == null || pressure == null) {
+              skippedRows++;
+              continue;
+            }
+            final key = _TankKey(
+              tankId: tankId,
+              computerId: _resolvedParent(row.data['computer_id'], computerIds),
+            );
+            groups
+                .putIfAbsent(key, () => [])
+                .add(
+                  TankPressureSample(
+                    timestamp: timestamp.toInt(),
+                    pressure: pressure.toDouble(),
+                  ),
+                );
           }
-          final key = _TankKey(
-            tankId: tankId,
-            computerId: _resolvedParent(row.data['computer_id'], computerIds),
-          );
-          groups
-              .putIfAbsent(key, () => [])
-              .add(
-                TankPressureSample(
-                  timestamp: timestamp.toInt(),
-                  pressure: pressure.toDouble(),
+          for (final entry in groups.entries) {
+            final key = entry.key;
+            if (!diveIds.contains(diveId) || !tankIds.contains(key.tankId)) {
+              skipped++;
+              continue;
+            }
+            if (coveredTanks.contains((diveId, key.tankId, key.computerId))) {
+              continue;
+            }
+            final samples = dedupeExactPressureSamples(entry.value);
+            dropped += entry.value.length - samples.length;
+            final encoded = codec.encode(samples);
+            final inserted = await db.customUpdate(
+              'INSERT OR IGNORE INTO tank_pressure_series ('
+              'id, dive_id, tank_id, computer_id, sample_count, start_timestamp, '
+              'end_timestamp, codec_version, samples, created_at, updated_at, hlc) '
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              variables: [
+                Variable<String>(
+                  tankPressureSeriesMigratedId(
+                    diveId: diveId,
+                    tankId: key.tankId,
+                    computerId: key.computerId,
+                  ),
                 ),
-              );
-        }
-        for (final entry in groups.entries) {
-          final key = entry.key;
-          if (!diveIds.contains(diveId) || !tankIds.contains(key.tankId)) {
-            skipped++;
-            continue;
+                Variable<String>(diveId),
+                Variable<String>(key.tankId),
+                Variable<String>(key.computerId),
+                Variable<int>(encoded.summary.sampleCount),
+                Variable<int>(encoded.summary.startTimestamp),
+                Variable<int>(encoded.summary.endTimestamp),
+                Variable<int>(encoded.codecVersion),
+                Variable<Uint8List>(encoded.bytes),
+                Variable<int>(now),
+                Variable<int>(now),
+                Variable<String>(hlc),
+              ],
+              updateKind: UpdateKind.insert,
+            );
+            tankSeries += inserted;
           }
-          if (coveredTanks.contains((diveId, key.tankId, key.computerId))) {
-            continue;
-          }
-          final samples = dedupeExactPressureSamples(entry.value);
-          dropped += entry.value.length - samples.length;
-          final encoded = codec.encode(samples);
-          final inserted = await db.customUpdate(
-            'INSERT OR IGNORE INTO tank_pressure_series ('
-            'id, dive_id, tank_id, computer_id, sample_count, start_timestamp, '
-            'end_timestamp, codec_version, samples, created_at, updated_at, hlc) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            variables: [
-              Variable<String>(
-                tankPressureSeriesMigratedId(
-                  diveId: diveId,
-                  tankId: key.tankId,
-                  computerId: key.computerId,
-                ),
-              ),
-              Variable<String>(diveId),
-              Variable<String>(key.tankId),
-              Variable<String>(key.computerId),
-              Variable<int>(encoded.summary.sampleCount),
-              Variable<int>(encoded.summary.startTimestamp),
-              Variable<int>(encoded.summary.endTimestamp),
-              Variable<int>(encoded.codecVersion),
-              Variable<Uint8List>(encoded.bytes),
-              Variable<int>(now),
-              Variable<int>(now),
-              Variable<String>(hlc),
-            ],
-            updateKind: UpdateKind.insert,
-          );
-          tankSeries += inserted;
-        }
+        });
       } catch (_) {
+        // The dive rolled back, so its partial counts did not happen.
+        tankSeries = before.tankSeries;
+        dropped = before.dropped;
+        skipped = before.skipped;
+        skippedRows = before.skippedRows;
         // One dive at a time. A legacy value no reader expects (a text
         // depth in a REAL column, from a hand-repaired or bit-rotted file)
         // or a group the codec refuses must not cost the dives the scan
@@ -468,6 +511,102 @@ Future<int> _countUnpackedTankRows(
       )
       .getSingle();
   return rows.read<int>('n');
+}
+
+/// Re-points pressure rows whose tank id is no longer one of the dive's
+/// tanks at a tank that is, in place, before anything is packed.
+///
+/// `tank_pressure_series.tank_id` is a NOT NULL foreign key, so an orphan
+/// cannot be packed as it stands, and after v183 every reader reads series:
+/// leaving it behind drops that dive's pressure curve and per-cylinder SAC,
+/// and its rows keep the legacy table alive forever, since the residue
+/// count can never cover a tank that does not exist.
+///
+/// The rule is the v102 rung's ([AppDatabase] `_relinkStrandedTankPressures`)
+/// and `GasAnalysisService`'s read-time resolver, so a dive reads the same
+/// before and after packing: exact id matches are left alone, and the
+/// remaining orphans, in first-sample order, are paired with the dive's
+/// still-unmatched tanks in tank order. Both sides are totally ordered
+/// (ties broken by id) and every device runs it over the same rows, so two
+/// devices packing the same logbook reach the same tank ids and the derived
+/// series ids still converge.
+///
+/// Healing the rows rather than remapping in memory keeps everything
+/// downstream, the coverage predicate and residue count included, working
+/// on ids that exist. Idempotent: a second run finds no orphans.
+Future<void> _adoptStrandedTankPressures(
+  DatabaseConnectionUser db,
+  String table,
+) async {
+  if (!await _tableExists(db, 'dive_tanks')) return;
+  final tankColumns = await _columnNames(db, 'dive_tanks');
+  if (!tankColumns.containsAll(const {'id', 'dive_id'})) return;
+  final hasOrder = tankColumns.contains('tank_order');
+  final tankRows = await db
+      .customSelect(
+        'SELECT dive_id, id${hasOrder ? ', tank_order' : ''} FROM dive_tanks',
+      )
+      .get();
+  final tanksByDive = <String, List<({String id, int order})>>{};
+  for (final r in tankRows) {
+    (tanksByDive[r.read<String>('dive_id')] ??= []).add((
+      id: r.read<String>('id'),
+      order: hasOrder ? (r.readNullable<int>('tank_order') ?? 0) : 0,
+    ));
+  }
+  if (tanksByDive.isEmpty) return;
+
+  final keyRows = await db
+      .customSelect(
+        'SELECT dive_id, tank_id, MIN(timestamp) AS first_ts FROM $table '
+        'WHERE tank_id IS NOT NULL AND timestamp IS NOT NULL '
+        'GROUP BY dive_id, tank_id',
+      )
+      .get();
+  final keysByDive = <String, List<({String tankId, int firstTs})>>{};
+  for (final r in keyRows) {
+    (keysByDive[r.read<String>('dive_id')] ??= []).add((
+      tankId: r.read<String>('tank_id'),
+      firstTs: r.read<int>('first_ts'),
+    ));
+  }
+
+  for (final entry in keysByDive.entries) {
+    final diveId = entry.key;
+    final tanks = tanksByDive[diveId];
+    if (tanks == null || tanks.isEmpty) continue;
+    final currentIds = {for (final t in tanks) t.id};
+    final matchedIds = {
+      for (final k in entry.value)
+        if (currentIds.contains(k.tankId)) k.tankId,
+    };
+    final orphans =
+        [
+          for (final k in entry.value)
+            if (!currentIds.contains(k.tankId)) k,
+        ]..sort((a, b) {
+          final byTime = a.firstTs.compareTo(b.firstTs);
+          return byTime != 0 ? byTime : a.tankId.compareTo(b.tankId);
+        });
+    if (orphans.isEmpty) continue;
+    final free =
+        [
+          for (final t in tanks)
+            if (!matchedIds.contains(t.id)) t,
+        ]..sort((a, b) {
+          // id tie-break: tanks sharing the default order must still pair
+          // deterministically, and Dart's sort is not stable.
+          final byOrder = a.order.compareTo(b.order);
+          return byOrder != 0 ? byOrder : a.id.compareTo(b.id);
+        });
+    final pairs = orphans.length < free.length ? orphans.length : free.length;
+    for (var i = 0; i < pairs; i++) {
+      await db.customStatement(
+        'UPDATE $table SET tank_id = ? WHERE dive_id = ? AND tank_id = ?',
+        [free[i].id, diveId, orphans[i].tankId],
+      );
+    }
+  }
 }
 
 /// SQL predicate: the legacy row aliased `p` is already represented by a

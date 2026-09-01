@@ -556,6 +556,38 @@ class SyncData {
 }
 
 /// Service for serializing and deserializing sync data
+/// Bytes of packed series blob one base-export page may hold.
+///
+/// The streamed base pages every other table at a row count, which bounds
+/// memory only while a row is small. A packed series row is not: a 1 Hz
+/// hour-long dive is tens of kilobytes, and a page holds the blobs AND the
+/// base64 the JSON carries, so 2,000 of them is hundreds of megabytes on
+/// the very path that exists to keep a large library from materialising
+/// whole (#358). Four mebibytes of blob is roughly 5.5 MB of base64 and a
+/// page that stays in the tens of megabytes on any library.
+const int kBaseBlobPageBytes = 4 * 1024 * 1024;
+
+/// The prefix of [rows] whose blob bytes fit in [budget].
+///
+/// Always at least one row, however large: a row over the budget on its own
+/// still has to move or the export never advances past it.
+///
+/// Top-level and public so the budgeting rule can be tested without an
+/// export; nothing outside this file and its test should need it.
+List<({String id, int bytes})> idsWithinBlobBudget(
+  List<({String id, int bytes})> rows,
+  int budget,
+) {
+  final taken = <({String id, int bytes})>[];
+  var total = 0;
+  for (final row in rows) {
+    if (taken.isNotEmpty && total + row.bytes > budget) break;
+    taken.add(row);
+    total += row.bytes;
+  }
+  return taken;
+}
+
 class SyncDataSerializer {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(SyncDataSerializer);
@@ -966,6 +998,95 @@ class SyncDataSerializer {
   static List<String> get debugBaseTableKeys =>
       SyncDataSerializer()._baseTables.map((t) => t.key).toList();
 
+  /// One keyset page of a BLOB table, bounded by [maxBytes] of blob rather
+  /// than by a row count. Reads the ids and blob lengths first (no blob
+  /// leaves SQLite for that), takes the prefix that fits, then loads only
+  /// those rows.
+  ///
+  /// Returns an empty list at the end of the table, which is how the caller
+  /// knows to stop: a short page here means the budget was reached, not that
+  /// the rows ran out.
+  Future<List<Map<String, dynamic>>> _pageBlobTableByBytes(
+    TableInfo<Table, dynamic> table, {
+    required String? cursor,
+    required int limit,
+    required int maxBytes,
+  }) async {
+    final name = table.actualTableName;
+    // Every BLOB column of the table, from the schema rather than a name
+    // this file would have to keep in step: `blob: true` marks any table
+    // carrying one (a diver avatar, a data source fingerprint), not only
+    // the packed series.
+    // Intersected with what the table actually has: a database shaped by a
+    // parallel branch can be missing a column this build declares, and the
+    // row pager below tolerates that until a row needs mapping. Naming the
+    // column in SQL would fail even on an empty table.
+    final actual = {
+      for (final r
+          in await _db.customSelect('PRAGMA table_info("$name")').get())
+        r.read<String>('name'),
+    };
+    final blobColumns = [
+      for (final c in table.$columns)
+        if (c.type == DriftSqlType.blob && actual.contains(c.name)) c.name,
+    ];
+    if (blobColumns.isEmpty) {
+      return _pageBaseTableById(
+        table,
+        cursor: cursor,
+        limit: limit,
+        blob: true,
+      );
+    }
+    final sizeExpr = blobColumns
+        .map((c) => 'COALESCE(LENGTH("$c"), 0)')
+        .join(' + ');
+    final sizeRows = cursor == null
+        ? await _db
+              .customSelect(
+                'SELECT id, $sizeExpr AS n FROM "$name" ORDER BY id LIMIT ?',
+                variables: [Variable.withInt(limit)],
+              )
+              .get()
+        : await _db
+              .customSelect(
+                'SELECT id, $sizeExpr AS n FROM "$name" WHERE id > ? '
+                'ORDER BY id LIMIT ?',
+                variables: [
+                  Variable.withString(cursor),
+                  Variable.withInt(limit),
+                ],
+              )
+              .get();
+    if (sizeRows.isEmpty) return const [];
+    final take = idsWithinBlobBudget([
+      for (final r in sizeRows)
+        (id: r.read<String>('id'), bytes: r.readNullable<int>('n') ?? 0),
+    ], maxBytes);
+    final last = take.last.id;
+    final rows = cursor == null
+        ? await _db
+              .customSelect(
+                'SELECT * FROM "$name" WHERE id <= ? ORDER BY id',
+                variables: [Variable.withString(last)],
+              )
+              .get()
+        : await _db
+              .customSelect(
+                'SELECT * FROM "$name" WHERE id > ? AND id <= ? ORDER BY id',
+                variables: [
+                  Variable.withString(cursor),
+                  Variable.withString(last),
+                ],
+              )
+              .get();
+    return [
+      for (final r in rows)
+        (table.map(r.data) as dynamic).toJson(serializer: _syncBlobSerializer)
+            as Map<String, dynamic>,
+    ];
+  }
+
   /// One keyset page (`id > cursor`, ascending, up to [limit]) of an id-PK
   /// table, as JSON rows identical to the table's own `toJson` (BLOB serializer
   /// applied for BLOB tables). O(n) total across pages; never loads the whole
@@ -1016,6 +1137,7 @@ class SyncDataSerializer {
     String? uploadNonce,
     int? seq,
     int pageSize = 2000,
+    int blobPageBytes = kBaseBlobPageBytes,
     DateTime Function() now = DateTime.now,
     Future<Directory> Function()? tempDir,
   }) async {
@@ -1077,17 +1199,27 @@ class SyncDataSerializer {
         if (spec.table != null) {
           String? cursor;
           while (true) {
-            final rows = await _pageBaseTableById(
-              spec.table!,
-              cursor: cursor,
-              limit: pageSize,
-              blob: spec.blob,
-            );
+            // A blob page is short when it hit its byte budget, not when the
+            // table ran out, so it pages until an empty one comes back.
+            final rows = spec.blob
+                ? await _pageBlobTableByBytes(
+                    spec.table!,
+                    cursor: cursor,
+                    limit: pageSize,
+                    maxBytes: blobPageBytes,
+                  )
+                : await _pageBaseTableById(
+                    spec.table!,
+                    cursor: cursor,
+                    limit: pageSize,
+                    blob: false,
+                  );
+            if (rows.isEmpty) break;
             for (final row in rows) {
               await emit(row);
             }
-            if (rows.length < pageSize) break;
             cursor = rows.last['id'] as String;
+            if (!spec.blob && rows.length < pageSize) break;
           }
         } else {
           for (final row in await spec.full!()) {
