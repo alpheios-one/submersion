@@ -274,7 +274,7 @@ List<SiteWithDiveCount> applySiteSorting(
           final bDate = b.lastDivedAt;
           if (aDate == null || bDate == null) {
             if (aDate == null && bDate == null) {
-              return a.site.name.compareTo(b.site.name);
+              return a.site.name.toLowerCase().compareTo(b.site.name.toLowerCase());
             }
             return aDate == null ? 1 : -1;
           }
