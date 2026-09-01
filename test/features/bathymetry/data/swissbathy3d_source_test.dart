@@ -15,6 +15,7 @@ import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.da
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
 Uint8List _zipOf(String entryName, String content) {
@@ -226,6 +227,85 @@ nodata_value -9999
         expect(grid.depthAt(0, 3), isNull);
       },
     );
+
+    test('the query coordinate stays inside the stitched mosaic\'s rendered '
+        'bounds, at realistic tile resolution and tile count', () async {
+      // The 3D scene always places the dive site marker at (0,0) in a
+      // frame centered on the exact query coordinate (see
+      // SiteSeascapeGeometryService._sitePin / BathymetryTerrainBuilder.
+      // enuBounds), so the terrain mesh built from a stitched mosaic must
+      // actually enclose that coordinate -- otherwise the marker renders
+      // outside the mesh it is supposed to sit on.
+      const center = zurichseePoint;
+      final centerLv95 = Lv95Transform.fromWgs84(
+        center.latitude,
+        center.longitude,
+      );
+      final baseTileE = (centerLv95.easting / 1000).floor();
+      final baseTileN = (centerLv95.northing / 1000).floor();
+
+      const cellsize = 2.0;
+      const cellsPerTile = 500; // swissBATHY3D's real 1 km / 2 m tiling
+
+      String tileGrid(int tileE, int tileN) {
+        final row = List.filled(cellsPerTile, '400.0').join(' ');
+        final buffer = StringBuffer()
+          ..writeln('ncols $cellsPerTile')
+          ..writeln('nrows $cellsPerTile')
+          ..writeln('xllcorner ${tileE * 1000}')
+          ..writeln('yllcorner ${tileN * 1000}')
+          ..writeln('cellsize $cellsize')
+          ..writeln('nodata_value -9999');
+        for (var r = 0; r < cellsPerTile; r++) {
+          buffer.writeln(row);
+        }
+        return buffer.toString();
+      }
+
+      // Deterministic fetch order: tileN outer, tileE inner (matches
+      // SwissBathy3dSource.fetch's nested loop).
+      final tileKeys = <String>[
+        for (var tN = baseTileN - 1; tN <= baseTileN + 1; tN++)
+          for (var tE = baseTileE - 1; tE <= baseTileE + 1; tE++) '${tE}_$tN',
+      ];
+      final tileBodies = {
+        for (final key in tileKeys)
+          key: tileGrid(
+            int.parse(key.split('_')[0]),
+            int.parse(key.split('_')[1]),
+          ),
+      };
+
+      var itemSeq = 0;
+      var downloadSeq = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          final key = tileKeys[itemSeq++];
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'assets': {
+                    'grid': {'href': 'https://example.org/$key.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        final key = tileKeys[downloadSeq++];
+        return http.Response.bytes(_zipOf('tile.asc', tileBodies[key]!), 200);
+      });
+
+      final grid = await source.fetch(center, spanMeters: 2500);
+      final box = BathymetryTerrainBuilder.enuBounds(grid, center);
+
+      expect(box.minEast, lessThanOrEqualTo(0));
+      expect(box.maxEast, greaterThanOrEqualTo(0));
+      expect(box.minNorth, lessThanOrEqualTo(0));
+      expect(box.maxNorth, greaterThanOrEqualTo(0));
+    });
 
     test('a transient failure on one tile does not sink neighboring tiles that '
         'already succeeded', () async {

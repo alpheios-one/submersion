@@ -12,7 +12,13 @@ import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 ///   rather than copied through. Only the origin corner is reprojected via
 ///   [Lv95Transform] (a local affine approximation of degrees-per-meter at
 ///   that point) rather than every cell — over a single ~1 km tile this adds
-///   negligible extra error on top of the transform's own ~1 m budget.
+///   negligible extra error on top of the transform's own ~1 m budget. The
+///   per-degree conversion uses [metersPerDegreeLatitude] — the same
+///   constant the dive_3d terrain builder uses to turn a grid's degrees
+///   back into scene meters — so a stitched mosaic's cell spacing agrees
+///   with how the 3D scene places the dive site marker on top of it; a
+///   mismatch here previously left the site pin drifting outside the
+///   rendered mesh.
 ///   Row/col ordering is untouched: both LV95 and WGS84 run (east, north).
 /// - Values are LN02 heights above sea level for the LAKE BED, not already
 ///   relative to the local water surface — depth = [referenceLevelMeters]
@@ -33,7 +39,7 @@ BathymetryGrid parseSwissLv95Grid(
   return BathymetryGrid(
     originLat: origin.latitude,
     originLon: origin.longitude,
-    cellSizeLatDeg: raw.cellsize / 111320.0,
+    cellSizeLatDeg: raw.cellsize / metersPerDegreeLatitude,
     cellSizeLonDeg: raw.cellsize / metersPerDegreeLongitude(origin.latitude),
     rows: raw.nrows,
     cols: raw.ncols,

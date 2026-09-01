@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lv95_grid.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 
 void main() {
   final body = File(
@@ -46,6 +48,27 @@ void main() {
         expect(grid.depthAt(1, 1), isNull);
       },
     );
+
+    test('the latitude cell size shares the terrain builder\'s meters-per-'
+        'degree constant, not an independent approximation', () {
+      // Bug: an independently chosen conversion constant here (even one
+      // off by under 1%) makes the grid's own idea of "how far apart are
+      // my rows" disagree with how BathymetryTerrainBuilder later turns
+      // those rows back into scene meters -- silently shifting a stitched
+      // mosaic's true-world footprint away from where the 3D scene places
+      // the dive site marker (always at the exact query coordinate).
+      final grid = parseSwissLv95Grid(
+        body,
+        sourceId: 'swissbathy3d',
+        fetchedAt: when,
+        referenceLevelMeters: 406.1,
+      );
+      expect(
+        grid.cellSizeLatDeg,
+        closeTo(100.0 / BathymetryTerrainBuilder.metersPerDegLat, 1e-15),
+      );
+      expect(BathymetryTerrainBuilder.metersPerDegLat, metersPerDegreeLatitude);
+    });
 
     test('a shore cell above the lake level becomes a negative depth', () {
       const aboveLakeLevel = '''
