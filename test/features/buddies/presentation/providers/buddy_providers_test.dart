@@ -438,6 +438,34 @@ void main() {
     });
   });
 
+  group('applyBuddySorting fallback (plain Buddy, no aggregates)', () {
+    test('lastDive falls back to name sorting, like diveCount', () {
+      final buddies = [
+        _makeBuddy(id: 'c', name: 'Charlie'),
+        _makeBuddy(id: 'a', name: 'Alice'),
+        _makeBuddy(id: 'b', name: 'Bob'),
+      ];
+
+      final descending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.descending,
+        ),
+      );
+      final ascending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(ascending.map((b) => b.name), ['Alice', 'Bob', 'Charlie']);
+      expect(descending.map((b) => b.name), ['Charlie', 'Bob', 'Alice']);
+    });
+  });
+
   group('buddyPickerSortProvider (issue #638)', () {
     test('defaults to dive count descending, not alphabetical', () {
       final container = ProviderContainer();
