@@ -128,6 +128,43 @@ void main() {
       expect(sorted.map((s) => s.site.name), ['Recent', 'Alpha', 'Zeta']);
     });
 
+    test('same-date tie-break ignores case when comparing site names', () {
+      final sameDate = DateTime(2023, 8, 20);
+      final sites = [
+        _site('bravo', lastDivedAt: sameDate),
+        _site('Alpha', lastDivedAt: sameDate),
+        _site('charlie', lastDivedAt: sameDate),
+      ];
+
+      final sorted = applySiteSorting(
+        sites,
+        const SortState(
+          field: SiteSortField.lastDived,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((s) => s.site.name), ['Alpha', 'bravo', 'charlie']);
+    });
+
+    test('never-dived tie-break ignores case when comparing site names', () {
+      final sites = [
+        _site('zeta'),
+        _site('Alpha'),
+        _site('Recent', lastDivedAt: DateTime(2026, 3, 15)),
+      ];
+
+      final sorted = applySiteSorting(
+        sites,
+        const SortState(
+          field: SiteSortField.lastDived,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(sorted.map((s) => s.site.name), ['Recent', 'Alpha', 'zeta']);
+    });
+
     test('does not mutate the input list', () {
       final sites = [
         _site('B', lastDivedAt: DateTime(2020)),
