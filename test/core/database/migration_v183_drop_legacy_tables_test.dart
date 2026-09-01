@@ -529,47 +529,77 @@ void main() {
     expect(scalar(raw, 'PRAGMA user_version'), 183);
   });
 
-  test('a dive packed for one computer keeps the rows of the other', () async {
-    final raw = sqlite3.sqlite3.openInMemory();
-    addTearDown(raw.close);
-    legacyDdlAt180(raw, userVersion: 182);
-    seedParents(raw);
-    // First open: only c1 has legacy rows, so d1 packs and both legacy
-    // tables go.
-    raw.execute(
-      'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
-      'is_primary, timestamp, depth) VALUES '
-      "('p1', 'd1', 'c1', 's1', 1, 0, 0.0), "
-      "('p2', 'd1', 'c1', 's1', 1, 10, 12.0)",
-    );
-    final first = AppDatabase(
-      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-    );
-    await first.customSelect('SELECT 1').get();
-    await first.close();
-    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 1);
+  test(
+    'a dive packed for one computer later packs the other\'s rows',
+    () async {
+      final raw = sqlite3.sqlite3.openInMemory();
+      addTearDown(raw.close);
+      legacyDdlAt180(raw, userVersion: 182);
+      seedParents(raw);
+      // First open: only c1 has legacy rows, so d1 packs and both legacy
+      // tables go.
+      raw.execute(
+        'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
+        'is_primary, timestamp, depth) VALUES '
+        "('p1', 'd1', 'c1', 's1', 1, 0, 0.0), "
+        "('p2', 'd1', 'c1', 's1', 1, 10, 12.0)",
+      );
+      final first = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      await first.customSelect('SELECT 1').get();
+      await first.close();
+      expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 1);
 
-    // A second computer's legacy rows arrive afterwards (a restore, or a
-    // parallel branch that reached 182 by its own rung). _scanLegacyDives
-    // marks d1 packed because a series row exists, so these are never
-    // packed and the backstop must not drop them.
-    createLegacyProfileTables(raw);
-    raw.execute(
-      'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
-      'is_primary, timestamp, depth) VALUES '
-      "('p3', 'd1', 'c2', 's2', 0, 0, 0.0), "
-      "('p4', 'd1', 'c2', 's2', 0, 10, 11.0)",
-    );
+      // A second computer's legacy rows arrive afterwards (a restore, or a
+      // parallel branch that reached 182 by its own rung). The scan asks
+      // whether each row's IDENTITY is covered, not just its dive, so these
+      // pack into their own series rather than sitting in a table no reader
+      // looks at; only then is the legacy table covered and dropped.
+      createLegacyProfileTables(raw);
+      raw.execute(
+        'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
+        'is_primary, timestamp, depth) VALUES '
+        "('p3', 'd1', 'c2', 's2', 0, 0, 0.0), "
+        "('p4', 'd1', 'c2', 's2', 0, 10, 11.0)",
+      );
 
-    final second = AppDatabase(
-      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-    );
-    addTearDown(second.close);
-    await second.customSelect('SELECT 1').get();
+      final second = AppDatabase(
+        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+      );
+      addTearDown(second.close);
+      await second.customSelect('SELECT 1').get();
 
-    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 2);
-    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 1);
-  });
+      expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 2);
+      expect(
+        columnOf(
+          raw,
+          'SELECT computer_id FROM dive_profile_series ORDER BY computer_id',
+          'computer_id',
+        ),
+        ['c1', 'c2'],
+      );
+      // c1's original series is untouched: re-visiting the dive must not
+      // write a second copy of an identity that already has one.
+      expect(
+        scalar(
+          raw,
+          "SELECT sample_count AS n FROM dive_profile_series "
+          "WHERE computer_id = 'c1'",
+        ),
+        2,
+      );
+      // Every legacy row is now represented, so the table goes.
+      expect(
+        columnOf(
+          raw,
+          "SELECT name FROM sqlite_master WHERE name = 'dive_profiles'",
+          'name',
+        ),
+        isEmpty,
+      );
+    },
+  );
 
   test('v183 is present in the migration ladder', () {
     expect(AppDatabase.currentSchemaVersion, 183);

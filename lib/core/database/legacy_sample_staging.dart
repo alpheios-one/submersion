@@ -179,29 +179,33 @@ Future<ProfilePackReport> packStagedLegacyRows(
     profileTable: kLegacyProfileStagingTable,
     tankTable: kLegacyTankStagingTable,
   );
-  await _clearStagedRowsForPackedDives(
+  await _clearStagedRowsAlreadyPacked(
     db,
     staging: kLegacyProfileStagingTable,
     series: 'dive_profile_series',
+    byTank: false,
   );
-  await _clearStagedRowsForPackedDives(
+  await _clearStagedRowsAlreadyPacked(
     db,
     staging: kLegacyTankStagingTable,
     series: 'tank_pressure_series',
+    byTank: true,
   );
   return report;
 }
 
-/// Deletes the [staging] rows whose dive already has a [series] row.
+/// Deletes the [staging] rows a [series] row of the same identity covers.
 ///
-/// Dive granularity on purpose: that is the granularity the packer's own
-/// scan works at, so a row this leaves behind is one a later pack can still
-/// move. A missing series table means nothing was packed, so nothing is
-/// cleared.
-Future<void> _clearStagedRowsForPackedDives(
+/// Identity, not dive: [legacyRowCoveredSql] carries the reasoning. A dive
+/// can hold a series for one computer while the staged rows are the only
+/// copy of another's, and clearing per dive discarded those outright.
+///
+/// A missing series table means nothing was packed, so nothing is cleared.
+Future<void> _clearStagedRowsAlreadyPacked(
   DatabaseConnectionUser db, {
   required String staging,
   required String series,
+  required bool byTank,
 }) async {
   final exists = await db
       .customSelect(
@@ -210,8 +214,16 @@ Future<void> _clearStagedRowsForPackedDives(
       )
       .get();
   if (exists.isEmpty) return;
+  final covered = await legacyRowCoveredSql(
+    db,
+    legacyTable: staging,
+    seriesTable: series,
+    byTank: byTank,
+  );
+  // The predicate aliases the legacy table `p`, and SQLite takes no alias in
+  // DELETE FROM, so the rows are selected in a subquery that can.
   await db.customStatement(
-    'DELETE FROM $staging WHERE EXISTS ('
-    'SELECT 1 FROM $series s WHERE s.dive_id = $staging.dive_id)',
+    'DELETE FROM $staging WHERE rowid IN ('
+    'SELECT p.rowid FROM $staging p WHERE $covered)',
   );
 }

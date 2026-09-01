@@ -112,6 +112,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
           db,
           legacyTable: profileTable,
           seriesTable: 'dive_profile_series',
+          byTank: false,
         )
       : _emptyScan;
   final tankScan = canPackTanks
@@ -119,6 +120,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
           db,
           legacyTable: tankTable,
           seriesTable: 'tank_pressure_series',
+          byTank: true,
         )
       : _emptyScan;
   final unpackedProfileDives = profileScan.unpacked;
@@ -140,6 +142,14 @@ Future<ProfilePackReport> packLegacyProfileRows(
     );
   }
   final hlc = await _migrationHlc(db, now);
+  // The identities already packed. A dive reaches the loops below when ANY
+  // of its rows is uncovered, so each group still has to be checked: without
+  // this, re-visiting a half-packed dive would write a second series for an
+  // identity that already has one (its id is a fresh uuid when the existing
+  // series came from ordinary use rather than a migration, so INSERT OR
+  // IGNORE would not catch it) and the dive would read as doubled samples.
+  final coveredProfiles = await _coveredProfileIdentities(db);
+  final coveredTanks = await _coveredTankIdentities(db);
   final diveIds = await _parentIds(db, 'dives');
   final computerIds = await _parentIds(db, 'dive_computers');
   final sourceIds = await _parentIds(db, 'dive_data_sources');
@@ -187,6 +197,10 @@ Future<ProfilePackReport> packLegacyProfileRows(
             continue;
           }
           final key = entry.key;
+          if (coveredProfiles.contains((diveId, key.computerId))) {
+            // Already packed under this identity; the stored series wins.
+            continue;
+          }
           final samples = dedupeExactSamples(entry.value);
           dropped += entry.value.length - samples.length;
           final encoded = codec.encode(samples);
@@ -288,6 +302,9 @@ Future<ProfilePackReport> packLegacyProfileRows(
           final key = entry.key;
           if (!diveIds.contains(diveId) || !tankIds.contains(key.tankId)) {
             skipped++;
+            continue;
+          }
+          if (coveredTanks.contains((diveId, key.tankId, key.computerId))) {
             continue;
           }
           final samples = dedupeExactPressureSamples(entry.value);
@@ -403,16 +420,18 @@ Future<int> _countUnpackedProfileRows(
       !await _tableExists(db, 'dives')) {
     return _countRows(db, table);
   }
-  final coverage = columns.contains('computer_id')
-      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
-      : '';
+  final covered = await legacyRowCoveredSql(
+    db,
+    legacyTable: table,
+    seriesTable: 'dive_profile_series',
+    byTank: false,
+  );
   final rows = await db
       .customSelect(
         'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
         'AND p.depth IS NOT NULL '
         'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
-        'AND NOT EXISTS (SELECT 1 FROM dive_profile_series s '
-        'WHERE s.dive_id = p.dive_id $coverage)',
+        'AND NOT $covered',
       )
       .getSingle();
   return rows.read<int>('n');
@@ -434,19 +453,52 @@ Future<int> _countUnpackedTankRows(
       !await _tableExists(db, 'dives')) {
     return _countRows(db, table);
   }
-  final coverage = columns.contains('computer_id')
-      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
-      : '';
+  final covered = await legacyRowCoveredSql(
+    db,
+    legacyTable: table,
+    seriesTable: 'tank_pressure_series',
+    byTank: true,
+  );
   final rows = await db
       .customSelect(
         'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
         'AND p.pressure IS NOT NULL AND p.tank_id IS NOT NULL '
         'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
-        'AND NOT EXISTS (SELECT 1 FROM tank_pressure_series s '
-        'WHERE s.dive_id = p.dive_id AND s.tank_id = p.tank_id $coverage)',
+        'AND NOT $covered',
       )
       .getSingle();
   return rows.read<int>('n');
+}
+
+/// SQL predicate: the legacy row aliased `p` is already represented by a
+/// row of [seriesTable].
+///
+/// Identity, not dive. A dive can be half packed: this device holds a series
+/// for one computer while a peer below v183 still publishes row-per-sample
+/// rows for the same dive from two. Asking "does this dive have a series"
+/// would call the second computer's rows done and, on the staging path where
+/// the staged rows are the only copy, discard them.
+///
+/// The identity is `(dive, computer)` for profiles and `(dive, tank,
+/// computer)` for pressures, resolving a dangling computer id to null the
+/// way the packer's own grouping does. Finer terms (`source_id`,
+/// `is_primary`) are deliberately left out, matching what gates dropping a
+/// legacy table: a difference below the computer level can only come from an
+/// ignored insert, and acting on it would pack a second series for an
+/// identity a read already resolves.
+Future<String> legacyRowCoveredSql(
+  DatabaseConnectionUser db, {
+  required String legacyTable,
+  required String seriesTable,
+  required bool byTank,
+}) async {
+  final columns = await _columnNames(db, legacyTable);
+  final computer = columns.contains('computer_id')
+      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
+      : '';
+  final tank = byTank ? 'AND s.tank_id = p.tank_id' : '';
+  return 'EXISTS (SELECT 1 FROM $seriesTable s '
+      'WHERE s.dive_id = p.dive_id $tank $computer)';
 }
 
 /// The scalar subquery that mirrors [_resolvedParent] for `computer_id`: the
@@ -533,25 +585,69 @@ Future<_LegacyDiveScan> _scanLegacyDives(
   DatabaseConnectionUser db, {
   required String legacyTable,
   required String seriesTable,
+  required bool byTank,
 }) async {
   if (!await _tableExists(db, seriesTable)) return _emptyScan;
+  final covered = await legacyRowCoveredSql(
+    db,
+    legacyTable: legacyTable,
+    seriesTable: seriesTable,
+    byTank: byTank,
+  );
+  // A dive is done only when EVERY one of its legacy rows is covered, hence
+  // MIN over the per-row predicate. Testing the dive alone would leave a
+  // second computer's rows unpacked forever on a half-packed dive.
   final rows = await db
       .customSelect(
-        'SELECT DISTINCT p.dive_id AS dive_id, EXISTS ('
-        'SELECT 1 FROM $seriesTable s WHERE s.dive_id = p.dive_id'
-        ') AS packed FROM $legacyTable p ORDER BY p.dive_id',
+        'SELECT p.dive_id AS dive_id, '
+        'MIN(CASE WHEN $covered THEN 1 ELSE 0 END) AS all_covered '
+        'FROM $legacyTable p GROUP BY p.dive_id ORDER BY p.dive_id',
       )
       .get();
   final unpacked = <String>[];
   var alreadyPacked = 0;
   for (final row in rows) {
-    if (row.read<int>('packed') != 0) {
+    if (row.read<int>('all_covered') != 0) {
       alreadyPacked++;
     } else {
       unpacked.add(row.read<String>('dive_id'));
     }
   }
   return (unpacked: unpacked, alreadyPacked: alreadyPacked);
+}
+
+/// The `(dive, computer)` identities `dive_profile_series` already holds.
+Future<Set<(String, String?)>> _coveredProfileIdentities(
+  DatabaseConnectionUser db,
+) async {
+  if (!await _tableExists(db, 'dive_profile_series')) return const {};
+  final rows = await db
+      .customSelect('SELECT dive_id, computer_id FROM dive_profile_series')
+      .get();
+  return {
+    for (final r in rows)
+      (r.read<String>('dive_id'), r.readNullable<String>('computer_id')),
+  };
+}
+
+/// The `(dive, tank, computer)` identities `tank_pressure_series` holds.
+Future<Set<(String, String, String?)>> _coveredTankIdentities(
+  DatabaseConnectionUser db,
+) async {
+  if (!await _tableExists(db, 'tank_pressure_series')) return const {};
+  final rows = await db
+      .customSelect(
+        'SELECT dive_id, tank_id, computer_id FROM tank_pressure_series',
+      )
+      .get();
+  return {
+    for (final r in rows)
+      (
+        r.read<String>('dive_id'),
+        r.read<String>('tank_id'),
+        r.readNullable<String>('computer_id'),
+      ),
+  };
 }
 
 /// Every id in [table], or an empty set when the table is absent. Loaded

@@ -1149,7 +1149,19 @@ class SyncService {
     // skipped below and the live row wins (clearing any local tombstone in the
     // merge heals a peer that already dropped the row on the buggy build).
     final contradictedByEntity = <String, Set<String>>{};
-    final liveByType = remotePayload.data.toJson();
+    // toJson omits the inbound-only legacy sample entities, so they are
+    // folded back in from the typed fields fromJson already parsed them
+    // into, the way the adopt path does. Without them a peer below v183
+    // that publishes a row both live and tombstoned (consolidation undo
+    // re-inserts the snapshot's rows while the old tombstones are still in
+    // its deletion_log) has the tombstone win: these entities carry no
+    // updatedAt, so _mergeEntity's local-deletion guard has no "newer than
+    // the deletion" escape and skips the live row entirely.
+    final liveByType = {
+      ...remotePayload.data.toJson(),
+      'diveProfiles': remotePayload.data.diveProfiles,
+      'tankPressureProfiles': remotePayload.data.tankPressureProfiles,
+    };
     for (final delEntry in remotePayload.deletions.entries) {
       final deletedIds = {for (final d in delEntry.value) d.id};
       if (deletedIds.isEmpty) continue;
