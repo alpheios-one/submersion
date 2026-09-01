@@ -121,7 +121,10 @@ class ProfileSeriesCodec {
     final blobVersion = reader.readByte();
     final table = fieldTables[blobVersion];
     if (table == null) {
-      throw ProfileSeriesCodecException('unknown codec version $blobVersion');
+      throw UnknownSeriesVersionException(
+        blobVersion,
+        fieldTables.keys.toSet(),
+      );
     }
     _validateTable(table);
     final count = reader.readVarUint();

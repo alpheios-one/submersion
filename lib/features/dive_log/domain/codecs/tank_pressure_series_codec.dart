@@ -137,7 +137,7 @@ class TankPressureSeriesCodec {
     final reader = ByteReader(body);
     final blobVersion = reader.readByte();
     if (blobVersion != version) {
-      throw ProfileSeriesCodecException('unknown codec version $blobVersion');
+      throw UnknownSeriesVersionException(blobVersion, const {version});
     }
     final count = reader.readVarUint();
     if (count == 0) {

@@ -1548,6 +1548,7 @@ class SyncService {
 
     await _packLegacySamplesIfPresent(
       data.diveProfiles.isNotEmpty || data.tankPressureProfiles.isNotEmpty,
+      parentsArrived: data.dives.isNotEmpty || data.diveTanks.isNotEmpty,
     );
 
     // Integrity backstop: applying a remote deletion of a parent can leave a
@@ -1574,24 +1575,35 @@ class SyncService {
   /// promises real. A staged row whose dive had not arrived is kept for the
   /// next apply, and the payload that finally brings that dive need not
   /// carry legacy rows of its own: gating on the payload alone let the rows
-  /// sit until the TEMP table died with the session.
+  /// sit until the next payload happened to carry legacy rows of its own.
   ///
   /// Runs inside the caller's deferred-FK merge transaction, so a throw here
   /// must never escape: it would roll back the whole payload while leaving
   /// the changeset reader's cursor advanced, and the next sync would neither
   /// replay nor retry the payload, wedging the peer permanently. The legacy
   /// rows this call packs are already applied and durable in
-  /// `legacy_sample_staging.dart`'s TEMP tables by the time it runs, and
+  /// `legacy_sample_staging.dart`'s staging tables by the time it runs, and
   /// [SyncDataSerializer.packLegacySamples] leaves them staged on a throw
   /// (it only empties the staging tables after a successful pack), so
   /// nothing is lost by deferring: the next apply in this session (another
-  /// changeset, base file, or adopt) packs the same staged rows. A TEMP
-  /// table does not survive an app restart, though, so that retry window
-  /// closes at the next open; recovery past that point is the origin peer
-  /// republishing its base or changeset, which stages the rows again.
-  Future<void> _packLegacySamplesIfPresent(bool anyLegacyRowsApplied) async {
-    if (!anyLegacyRowsApplied && !await _serializer.hasStagedLegacySamples()) {
-      return;
+  /// changeset, base file, or adopt) packs the same staged rows. The
+  /// staging tables are ordinary tables, not TEMP, so that retry survives
+  /// an app restart: the changeset cursor that would offer these rows again
+  /// is committed durably, and a staging that evaporated with the
+  /// connection made the promise false exactly when it mattered.
+  Future<void> _packLegacySamplesIfPresent(
+    bool anyLegacyRowsApplied, {
+    bool parentsArrived = false,
+  }) async {
+    if (!anyLegacyRowsApplied) {
+      // A staged row the last pass could not place is blocked on a parent
+      // (its dive, or a pressure row's tank). Only a payload that brought
+      // one can unblock it, so a payload that brought neither cannot, and
+      // re-running the whole pack on every apply to find that out is the
+      // difference between a bounded retry and a permanent per-apply cost
+      // for one row that may never be placeable.
+      if (!parentsArrived) return;
+      if (!await _serializer.hasStagedLegacySamples()) return;
     }
     try {
       final packed = await _serializer.packLegacySamples();
@@ -1736,6 +1748,7 @@ class SyncService {
       // tankPressureProfiles row has streamed through, so the packer only
       // runs when this base actually carried some.
       var sawLegacySamples = false;
+      var sawParents = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1767,13 +1780,19 @@ class SyncService {
           if (inboundOnlyLegacyEntities.containsKey(r.table)) {
             sawLegacySamples = true;
           }
+          if (r.table == 'dives' || r.table == 'diveTanks') {
+            sawParents = true;
+          }
           batch.add(r.row);
           if (batch.length >= batchSize) await flush();
         }
       }
       await flush();
 
-      await _packLegacySamplesIfPresent(sawLegacySamples);
+      await _packLegacySamplesIfPresent(
+        sawLegacySamples,
+        parentsArrived: sawParents,
+      );
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -1901,6 +1920,7 @@ class SyncService {
       // tankPressureProfiles row has streamed through, so the packer only
       // runs when this base actually carried some.
       var sawLegacySamples = false;
+      var sawParents = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1933,13 +1953,19 @@ class SyncService {
           if (inboundOnlyLegacyEntities.containsKey(table)) {
             sawLegacySamples = true;
           }
+          if (table == 'dives' || table == 'diveTanks') {
+            sawParents = true;
+          }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
         },
       );
       await flush();
 
-      await _packLegacySamplesIfPresent(sawLegacySamples);
+      await _packLegacySamplesIfPresent(
+        sawLegacySamples,
+        parentsArrived: sawParents,
+      );
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -2544,10 +2570,10 @@ class SyncService {
     // catch above.
     //
     // The two inbound-only legacy sample entities are the exception to the
-    // all-or-nothing part: their upsert goes to the TEMP staging tables of
+    // all-or-nothing part: their upsert goes to the staging tables of
     // legacy_sample_staging.dart, which insert in chunks, so a throw can
     // leave earlier chunks staged. Counting the whole batch failed is still
-    // right, and the partial stage is harmless: the staging is TEMP, the
+    // right, and the partial stage is harmless: the staged rows are
     // pack that reads it is idempotent, and a retry restages the same ids
     // over the same rows.
     if (toUpsert.isNotEmpty) {
@@ -3505,7 +3531,7 @@ class SyncService {
     // (v182 receive-side tolerance) below, but there is no local table to
     // clear for them any more (v183 dropped `dive_profiles` /
     // `tank_pressure_profiles`; an inbound row now stages in a per-connection
-    // TEMP table instead), so the clear loop skips them; the series tables,
+    // staging table instead), so the clear loop skips them; the series tables,
     // which [entityHasUpdatedAt] already lists, get no special treatment.
     for (final entity in _baseApplyEntityFlags.keys) {
       if (inboundOnlyLegacyEntities.containsKey(entity)) continue;
@@ -3539,6 +3565,7 @@ class SyncService {
     // tankPressureProfiles row has been applied from any unit, so the
     // packer only runs when the adopted library actually carried some.
     var sawLegacySamples = false;
+    var sawParents = false;
 
     for (final unit in units) {
       final changeset = unit.changeset;
@@ -3558,6 +3585,10 @@ class SyncService {
           if (records.isNotEmpty &&
               inboundOnlyLegacyEntities.containsKey(entry.key)) {
             sawLegacySamples = true;
+          }
+          if (records.isNotEmpty &&
+              (entry.key == 'dives' || entry.key == 'diveTanks')) {
+            sawParents = true;
           }
           await applyBatch(entry.key, records);
         }
@@ -3597,7 +3628,10 @@ class SyncService {
       await flush();
     }
 
-    await _packLegacySamplesIfPresent(sawLegacySamples);
+    await _packLegacySamplesIfPresent(
+      sawLegacySamples,
+      parentsArrived: sawParents,
+    );
 
     await _serializer.repairDanglingForeignKeys();
   }

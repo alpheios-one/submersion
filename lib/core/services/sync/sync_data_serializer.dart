@@ -3204,6 +3204,26 @@ class SyncDataSerializer {
         return false;
       }
       return true;
+    } on UnknownSeriesVersionException catch (e) {
+      // Forward compatibility, not corruption: a codec version above
+      // everything this build knows is a series a NEWER peer wrote, and the
+      // rules for raising the compatibility floor do not classify adding a
+      // codec version as breaking, so no floor holds that peer back. The
+      // samples are fine and this device will read them once it updates;
+      // discarding the row at the door would lose them for good, because
+      // nothing re-requests a record the sender believes it delivered. The
+      // row is stored with the scalars the peer computed (this build cannot
+      // recompute them without the field table), and every local reader
+      // skips a blob it cannot decode.
+      if (e.isForwardVersion) {
+        _log.info(
+          'Storing diveProfileSeries ${row.id} written by a newer codec '
+          '(version ${e.blobVersion}); it reads once this device updates',
+        );
+        return true;
+      }
+      _log.warning('Skipping diveProfileSeries ${row.id}: $e');
+      return false;
     } on ProfileSeriesCodecException catch (e) {
       _log.warning('Skipping diveProfileSeries ${row.id}: $e');
       return false;
@@ -3225,6 +3245,18 @@ class SyncDataSerializer {
         return false;
       }
       return true;
+    } on UnknownSeriesVersionException catch (e) {
+      // See _profileSeriesBlobIsSound: a newer codec version is stored, not
+      // discarded.
+      if (e.isForwardVersion) {
+        _log.info(
+          'Storing tankPressureSeries ${row.id} written by a newer codec '
+          '(version ${e.blobVersion}); it reads once this device updates',
+        );
+        return true;
+      }
+      _log.warning('Skipping tankPressureSeries ${row.id}: $e');
+      return false;
     } on ProfileSeriesCodecException catch (e) {
       _log.warning('Skipping tankPressureSeries ${row.id}: $e');
       return false;
@@ -4505,12 +4537,14 @@ class SyncDataSerializer {
     }
   }
 
-  // No case for 'diveProfiles' / 'tankPressureProfiles': they are inbound
-  // only (SyncService.inboundOnlyLegacyEntities), so no peer ever tombstones
-  // one, and there is no local row-per-sample table left to delete from
-  // (v183). A legacy tombstone falls through this switch with no default and
-  // is a silent no-op.
+  // 'diveProfiles' / 'tankPressureProfiles' have no local row-per-sample
+  // table left to delete from (v183), but a peer below the floor does still
+  // tombstone its own rows, and a copy of one can be sitting in the receive
+  // shim's staging table waiting for a dive that has not arrived. Packing
+  // it later would resurrect what the peer deleted, so the tombstone clears
+  // it there. Everything else falls through the switch with no default.
   Future<void> deleteRecord(String entityType, String recordId) async {
+    await deleteStagedLegacyRow(_db, entityType, recordId);
     switch (entityType) {
       case 'divers':
         await (_db.delete(

@@ -320,6 +320,59 @@ class ProfileSeriesRepository {
   /// Sets `is_primary` on every series [computerId] contributed, whatever
   /// source they carry. The multi-computer branch of a profile restore, where
   /// each computer's own samples become live again.
+  /// The identity columns of [diveId]'s series, in series order, without
+  /// touching the blobs.
+  ///
+  /// `computerId` and `isPrimary` live unencoded on the row, so a caller
+  /// that only wants those must not go through [getSeriesForDive]: that
+  /// inflates and column-decodes every sample of the dive to read them, on
+  /// the UI isolate, per tick. It is also lossier for this purpose, because
+  /// a blob that will not decode drops its whole row and with it a computer
+  /// the dive really does have.
+  Future<List<({String id, String? computerId, bool isPrimary})>>
+  getIdentitiesForDive(String diveId) async {
+    final rows =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([
+                _db.diveProfileSeries.id,
+                _db.diveProfileSeries.computerId,
+                _db.diveProfileSeries.isPrimary,
+              ])
+              ..where(_db.diveProfileSeries.diveId.equals(diveId))
+              ..orderBy([
+                OrderingTerm.asc(_db.diveProfileSeries.startTimestamp),
+                OrderingTerm.asc(_db.diveProfileSeries.id),
+              ]))
+            .get();
+    return [
+      for (final r in rows)
+        (
+          id: r.read(_db.diveProfileSeries.id)!,
+          computerId: r.read(_db.diveProfileSeries.computerId),
+          isPrimary: r.read(_db.diveProfileSeries.isPrimary) ?? false,
+        ),
+    ];
+  }
+
+  /// Whether any series of [diveId] is attributed to [computerId], the
+  /// exact predicate [promoteByComputer] promotes on.
+  ///
+  /// The demote-then-promote pair has to ask this first: promoting nothing
+  /// after demoting everything leaves the dive with no primary series at
+  /// all. [ownsAny] answers the source-grained question its own caller
+  /// needs; this is the computer-grained twin.
+  Future<bool> ownsComputer(String diveId, String computerId) async {
+    final count =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([_db.diveProfileSeries.id.count()])
+              ..where(
+                _db.diveProfileSeries.diveId.equals(diveId) &
+                    _db.diveProfileSeries.computerId.equals(computerId),
+              ))
+            .getSingle();
+    return (count.read(_db.diveProfileSeries.id.count()) ?? 0) > 0;
+  }
+
   Future<int> promoteByComputer(String diveId, String computerId, {int? now}) =>
       _setPrimary(
         (t) => t.diveId.equals(diveId) & t.computerId.equals(computerId),

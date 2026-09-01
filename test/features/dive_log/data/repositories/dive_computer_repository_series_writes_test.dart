@@ -14,6 +14,20 @@ void main() {
   late ProfileSeriesRepository series;
   late TankPressureSeriesRepository tankSeries;
 
+  Future<void> insertDive(String id) async {
+    const now = 1750000000000;
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion.insert(
+            id: id,
+            diveDateTime: now,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+  }
+
   Future<void> insertComputer(String id) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await db
@@ -133,6 +147,108 @@ void main() {
       expect(await tankSeries.getSeriesForDive(diveId), isEmpty);
       final tombstones = await db.select(db.deletionLog).get();
       expect(tombstones.map((t) => t.recordId).toSet(), {imported, tank});
+    },
+  );
+  test(
+    'the computer list survives a series whose blob will not decode',
+    () async {
+      // These questions are about identity columns, which live unencoded on
+      // the row. Answering them through the decoded read dropped an
+      // unreadable series entirely, so its computer vanished from the chip
+      // list and from the primary lookup that picks restoreOriginalProfile's
+      // branch.
+      await insertDive('dive-1');
+      await insertComputer('dc-a');
+      await insertComputer('dc-b');
+      final broken = await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'dc-a',
+        isPrimary: true,
+        samples: const [ProfileSample(timestamp: 0, depth: 3.0)],
+        now: 1000,
+      );
+      await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'dc-b',
+        isPrimary: false,
+        samples: const [ProfileSample(timestamp: 0, depth: 4.0)],
+        now: 1000,
+      );
+      final row = (await series.getRowsForDives([
+        'dive-1',
+      ])).firstWhere((r) => r.id == broken);
+      await db.customStatement(
+        'UPDATE dive_profile_series SET samples = ? WHERE id = ?',
+        [Uint8List.fromList(row.samples)..[3] ^= 0xFF, broken],
+      );
+
+      expect(
+        await computers.getComputerIdsForDive('dive-1'),
+        unorderedEquals(['dc-a', 'dc-b']),
+      );
+      expect(await computers.getPrimaryComputerId('dive-1'), 'dc-a');
+    },
+  );
+
+  test(
+    'setPrimaryProfile on a computer that owns no series changes nothing',
+    () async {
+      // demoteAll then promoteByComputer as two separate commits leaves the
+      // dive with NO primary series whenever the promote matches nothing: a
+      // null-computer series after a clearComputer, a consolidation that
+      // moved samples, a metadata-only source. The dive keeps rendering
+      // (getDiveById and getMergedProfile ignore the flag) while
+      // getDiveProfile, the rate aggregates and the quality prefilters all
+      // silently skip it. DiveRepository.setPrimaryDataSource guards the same
+      // pair with ownsAny.
+      await insertDive('dive-1');
+      await insertComputer('dc-a');
+      await series.insertSeries(
+        diveId: 'dive-1',
+        isPrimary: true,
+        samples: const [ProfileSample(timestamp: 0, depth: 3.0)],
+        now: 1000,
+      );
+
+      await computers.setPrimaryProfile('dive-1', 'dc-a');
+
+      final rows = await series.getRowsForDives(['dive-1']);
+      expect(
+        rows.where((r) => r.isPrimary),
+        hasLength(1),
+        reason: 'a dive must never be left with zero primary series',
+      );
+    },
+  );
+
+  test(
+    'setPrimaryProfile promotes the computer that does own series',
+    () async {
+      await insertDive('dive-1');
+      await insertComputer('dc-a');
+      await insertComputer('dc-b');
+      await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'dc-a',
+        isPrimary: true,
+        samples: const [ProfileSample(timestamp: 0, depth: 3.0)],
+        now: 1000,
+      );
+      await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'dc-b',
+        isPrimary: false,
+        samples: const [ProfileSample(timestamp: 0, depth: 4.0)],
+        now: 1000,
+      );
+
+      await computers.setPrimaryProfile('dive-1', 'dc-b');
+
+      final rows = await series.getRowsForDives(['dive-1']);
+      expect(
+        {for (final r in rows) r.computerId: r.isPrimary},
+        {'dc-a': false, 'dc-b': true},
+      );
     },
   );
 }

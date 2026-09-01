@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/data/services/dive_consolidation_se
 import 'package:submersion/features/dive_log/data/services/dive_split_service.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 
 import '../../../../helpers/test_database.dart';
 
@@ -309,6 +310,37 @@ void main() {
     expect(newProfiles.single.samples.single.depth, 21.7);
 
     expect(await fkViolations(), isEmpty);
+  });
+
+  test('splitting refuses a dive whose series cannot be decoded', () async {
+    // Split moves tanks and lets tank_pressure_series cascade on tank_id, so
+    // a blob the reads answer with null is invisible to the "anything still
+    // references this tank" check, loses its tank, and is deleted with no
+    // tombstone: gone here and kept forever by every peer.
+    await insertDive('dive-1', computerId: 'dc-a');
+    await insertSource('src-a', 'dive-1', 'dc-a', isPrimary: true);
+    await insertSource('src-b', 'dive-1', 'dc-b', isPrimary: false);
+    final seriesId = await insertProfileSeriesRow(
+      'dive-1',
+      'dc-a',
+      isPrimary: true,
+    );
+    await insertProfileSeriesRow('dive-1', 'dc-b', isPrimary: false);
+    final row = (await profileSeries.getRowsForDives([
+      'dive-1',
+    ])).firstWhere((r) => r.id == seriesId);
+    await db.customStatement(
+      'UPDATE dive_profile_series SET samples = ? WHERE id = ?',
+      [Uint8List.fromList(row.samples)..[3] ^= 0xFF, seriesId],
+    );
+
+    await expectLater(
+      service.split(diveId: 'dive-1', sourceId: 'src-b'),
+      throwsA(isA<UnreadableSeriesException>()),
+    );
+
+    expect((await db.select(db.dives).get()).length, 1);
+    expect(await profileSeries.getRowsForDives(['dive-1']), hasLength(2));
   });
 
   test('splitting the only source throws and writes nothing', () async {

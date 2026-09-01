@@ -4,7 +4,7 @@ import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_field_table.dart';
 
 /// Where an older peer's row-per-sample arrays land now that the legacy
-/// tables are gone (v183). TEMP tables live for the connection; the packer
+/// tables are gone (v183). Ordinary tables, created on demand; the packer
 /// reads them like it read `dive_profiles`, and each pack clears the rows it
 /// has finished with (see [packStagedLegacyRows]). Retire with the receive-side shim (plan 2d's
 /// SyncService.inboundOnlyLegacyEntities) once no peer below 182 can publish.
@@ -37,19 +37,32 @@ const List<String> _legacyTankColumns = [
 ];
 
 String _profileDdl() =>
-    'CREATE TEMP TABLE IF NOT EXISTS $kLegacyProfileStagingTable ('
+    'CREATE TABLE IF NOT EXISTS $kLegacyProfileStagingTable ('
     'id TEXT NOT NULL PRIMARY KEY, dive_id TEXT NOT NULL, computer_id TEXT, '
     'source_id TEXT, is_primary INTEGER NOT NULL DEFAULT 1, '
     '${[for (final f in kProfileFieldTableV1) '${f.name} ${_sqlType(f.kind)}'].join(', ')})';
 
 const String _tankDdl =
-    'CREATE TEMP TABLE IF NOT EXISTS $kLegacyTankStagingTable ('
+    'CREATE TABLE IF NOT EXISTS $kLegacyTankStagingTable ('
     'id TEXT NOT NULL PRIMARY KEY, dive_id TEXT NOT NULL, tank_id TEXT NOT NULL, '
     'computer_id TEXT, timestamp INTEGER NOT NULL, pressure REAL NOT NULL)';
 
 Future<void> ensureLegacyStagingTables(DatabaseConnectionUser db) async {
   await db.customStatement(_profileDdl());
   await db.customStatement(_tankDdl);
+  // The packer reads these one dive at a time (`WHERE dive_id = ?`, once per
+  // unpacked dive) and scans them whole to group by dive. A base restore
+  // from a peer below the floor stages the library row-per-sample, so
+  // without this the pack is a full table scan per dive over millions of
+  // rows. The PRIMARY KEY is on id, which answers none of that.
+  await db.customStatement(
+    'CREATE INDEX IF NOT EXISTS idx_${kLegacyProfileStagingTable}_dive '
+    'ON $kLegacyProfileStagingTable (dive_id)',
+  );
+  await db.customStatement(
+    'CREATE INDEX IF NOT EXISTS idx_${kLegacyTankStagingTable}_dive '
+    'ON $kLegacyTankStagingTable (dive_id)',
+  );
 }
 
 /// `diveId` -> `dive_id`, `ppO2` -> `pp_o2`, `o2SensorMv1` -> `o2_sensor_mv1`:
@@ -97,7 +110,7 @@ Future<int> stageLegacyTankRows(
 ///
 /// Chunked at [_maxStagedRowsPerStatement] rows per statement. A throw part
 /// way through therefore leaves the earlier chunks staged, which is harmless:
-/// the staging tables are TEMP and the pack that reads them is idempotent,
+/// the pack that reads the staging tables is idempotent,
 /// so the retry restages the same ids over the same rows
 /// (`INSERT OR REPLACE`) and packs once.
 ///
@@ -150,18 +163,59 @@ int _rowsPerStatement(int columnCount) {
       : _maxStagedRowsPerStatement;
 }
 
+/// The staging tables are ordinary tables, not TEMP.
+///
+/// A row the pack cannot place yet is kept for the next apply, and the
+/// changeset cursor that would offer it again is committed durably: with
+/// TEMP tables the promised retry ended at the next app launch with the row
+/// gone and the peer convinced it had been delivered. They are created on
+/// demand by [ensureLegacyStagingTables] and stay behind empty once drained,
+/// which costs one sqlite_master row and keeps every "is it empty" check
+/// meaning what it says. They go with the shim.
+
+/// Removes [recordId] from whichever staging table holds it.
+///
+/// A peer below the floor still deletes its own row-per-sample rows and
+/// publishes tombstones for them. Nothing local answers those: the tables
+/// they name are gone at v183. But a copy of that row can be sitting in
+/// staging, waiting for a dive that has not arrived, and packing it later
+/// would resurrect exactly what the peer deleted.
+///
+/// No-op when the staging tables were never created, which is the common
+/// case once every peer has upgraded.
+Future<void> deleteStagedLegacyRow(
+  DatabaseConnectionUser db,
+  String entityType,
+  String recordId,
+) async {
+  final table = switch (entityType) {
+    'diveProfiles' => kLegacyProfileStagingTable,
+    'tankPressureProfiles' => kLegacyTankStagingTable,
+    _ => null,
+  };
+  if (table == null) return;
+  final present = await db
+      .customSelect(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable<String>(table)],
+      )
+      .get();
+  if (present.isEmpty) return;
+  await db.customStatement('DELETE FROM $table WHERE id = ?', [recordId]);
+}
+
 /// True when either staging table exists and still holds a row.
 ///
 /// The pack is otherwise gated on the payload in hand carrying legacy rows,
 /// which misses the retry the shim promises: rows whose dive had not
 /// arrived are kept, and the payload that finally brings the dive need not
-/// carry any legacy rows of its own. Two indexed existence probes on TEMP
-/// tables, and only when the tables exist at all, so the common case (every
-/// peer upgraded, nothing ever staged) costs one sqlite_master lookup.
+/// carry any legacy rows of its own. Two indexed existence probes, and only
+/// when the tables exist at all, so the common case (every peer upgraded,
+/// nothing ever staged) costs one sqlite_master lookup.
 Future<bool> hasStagedLegacyRows(DatabaseConnectionUser db) async {
   final present = await db
       .customSelect(
-        "SELECT name FROM sqlite_temp_master WHERE type = 'table' "
+        "SELECT name FROM sqlite_master WHERE type = 'table' "
         'AND name IN (?, ?)',
         variables: [
           const Variable<String>(kLegacyProfileStagingTable),
@@ -185,32 +239,40 @@ Future<bool> hasStagedLegacyRows(DatabaseConnectionUser db) async {
 /// only of the rows whose dive now has a series row. Those are exactly the
 /// rows the pack has finished with: either it just packed them, or the dive
 /// already held a series and the staged copy lost to it, which is the
-/// intended precedence. Every other staged row is KEPT. The TEMP table is
-/// the only copy of a peer's row once staged (the real `dive_profiles` /
+/// intended precedence. Every other staged row is KEPT. The staging table
+/// is the only copy of a peer's row once staged (the real `dive_profiles` /
 /// `tank_pressure_profiles` tables are gone) and the peer never re-sends, so
 /// a row the pack could not move yet, most importantly one whose dive has
 /// not arrived in this restore, has to survive to the next apply rather than
 /// be discarded. The next apply in this session (another changeset, base
 /// file, or adopt) calls this again and retries it.
 ///
-/// If [packLegacyProfileRows] throws, nothing is cleared at all. A TEMP
-/// table does not survive past this connection, so an app restart loses
-/// whatever is still staged; recovery then is the origin peer republishing
-/// its base or changeset, which stages the rows again.
+/// If [packLegacyProfileRows] throws, nothing is cleared at all. The
+/// staging tables are ordinary tables, so whatever is still staged survives
+/// an app restart and the next apply that brings a missing parent retries
+/// it.
 Future<ProfilePackReport> packStagedLegacyRows(
   DatabaseConnectionUser db,
 ) async {
   await ensureLegacyStagingTables(db);
+  // byGroupIdentity: these rows are a PEER's, not this device's. The
+  // migration path can ask coverage at (dive, computer) because a finer
+  // difference there could only come from an ignored insert of its own
+  // rows; here a peer can legitimately hold two groups of one computer (a
+  // saved profile edit and the original it demoted), and the coarse
+  // question calls both of them done and then deletes them.
   final report = await packLegacyProfileRows(
     db,
     profileTable: kLegacyProfileStagingTable,
     tankTable: kLegacyTankStagingTable,
+    byGroupIdentity: true,
   );
   await _clearStagedRowsAlreadyPacked(
     db,
     staging: kLegacyProfileStagingTable,
     series: 'dive_profile_series',
     byTank: false,
+    byGroupIdentity: true,
   );
   await _clearStagedRowsAlreadyPacked(
     db,
@@ -233,6 +295,7 @@ Future<void> _clearStagedRowsAlreadyPacked(
   required String staging,
   required String series,
   required bool byTank,
+  bool byGroupIdentity = false,
 }) async {
   final exists = await db
       .customSelect(
@@ -246,6 +309,7 @@ Future<void> _clearStagedRowsAlreadyPacked(
     legacyTable: staging,
     seriesTable: series,
     byTank: byTank,
+    byGroupIdentity: byGroupIdentity,
   );
   // The predicate aliases the legacy table `p`, and SQLite takes no alias in
   // DELETE FROM, so the rows are selected in a subquery that can.

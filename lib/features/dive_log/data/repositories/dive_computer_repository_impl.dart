@@ -719,9 +719,12 @@ class DiveComputerRepository {
   /// Get all computer IDs that have profiles for a given dive
   Future<List<String>> getComputerIdsForDive(String diveId) async {
     try {
-      final series = await _profileSeries.getSeriesForDive(diveId);
+      // Identity columns only: they live unencoded on the row, so there is
+      // nothing to inflate here. Decoding the blobs also dropped a computer
+      // whose samples would not decode, which this question is not about.
+      final identities = await _profileSeries.getIdentitiesForDive(diveId);
       return {
-        for (final s in series)
+        for (final s in identities)
           if (s.computerId != null) s.computerId!,
       }.toList();
     } catch (e, stackTrace) {
@@ -780,8 +783,9 @@ class DiveComputerRepository {
   /// Get the primary profile's computer for a dive
   Future<String?> getPrimaryComputerId(String diveId) async {
     try {
-      final series = await _profileSeries.getSeriesForDive(diveId);
-      for (final s in series) {
+      // Identity columns only; see getComputerIdsForDive.
+      final identities = await _profileSeries.getIdentitiesForDive(diveId);
+      for (final s in identities) {
         if (s.isPrimary && s.computerId != null) return s.computerId;
       }
       return null;
@@ -803,17 +807,32 @@ class DiveComputerRepository {
       );
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      await _profileSeries.demoteAll(diveId, now: now);
-      await _profileSeries.promoteByComputer(diveId, computerId, now: now);
+      // Resolve what to promote BEFORE demoting anything, and do both in
+      // one transaction. Demoting every series and then promoting nothing
+      // leaves the dive with no primary at all: it keeps rendering
+      // (getDiveById and getMergedProfile ignore the flag) while
+      // getDiveProfile, the rate aggregates and the quality prefilters all
+      // silently skip it. That is reachable whenever the chosen computer
+      // owns no series (a null-computer series after a clearComputer, a
+      // consolidation that moved samples, a metadata-only source), and a
+      // crash between two separate commits produced it even when the
+      // promote would have matched. DiveRepository.setPrimaryDataSource
+      // guards the same pair the same way (issue #1149).
+      await _db.transaction(() async {
+        if (await _profileSeries.ownsComputer(diveId, computerId)) {
+          await _profileSeries.demoteAll(diveId, now: now);
+          await _profileSeries.promoteByComputer(diveId, computerId, now: now);
+        }
 
-      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
-        DivesCompanion(updatedAt: Value(now)),
-      );
-      await _syncRepository.markRecordPending(
-        entityType: 'dives',
-        recordId: diveId,
-        localUpdatedAt: now,
-      );
+        await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+          DivesCompanion(updatedAt: Value(now)),
+        );
+        await _syncRepository.markRecordPending(
+          entityType: 'dives',
+          recordId: diveId,
+          localUpdatedAt: now,
+        );
+      });
       SyncEventBus.notifyLocalChange();
 
       _log.info('Set primary profile for dive $diveId');

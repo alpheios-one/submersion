@@ -4433,18 +4433,25 @@ class AppDatabase extends _$AppDatabase {
   /// old-schema fixture (and a database that reached this rung through a
   /// guarded path) can lack the sync bookkeeping entirely, and a DELETE
   /// naming a missing table aborts the whole ladder.
+  /// sync_records ONLY. The deletion_log rows for these two entities stay,
+  /// because they are still load-bearing on the receive side: a peer below
+  /// the floor keeps publishing row-per-sample rows, and _mergeEntity's
+  /// local-deletion guard is what stops one this device already deleted
+  /// from being staged and packed back into a series. Purging them removed
+  /// that guard while the inbound shim still exists. (Nothing is at risk on
+  /// the send side either way: peers below 183 are held and apply none of
+  /// this device's payloads, so those tombstones were never reaching them.)
+  /// They can go with the shim.
   Future<void> _purgeLegacySampleBookkeeping() async {
-    for (final table in const ['sync_records', 'deletion_log']) {
-      final exists = await customSelect(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
-        variables: [Variable<String>(table)],
-      ).get();
-      if (exists.isEmpty) continue;
-      await customStatement(
-        "DELETE FROM $table WHERE entity_type IN ('diveProfiles', "
-        "'tankPressureProfiles')",
-      );
-    }
+    final exists = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+      "AND name = 'sync_records'",
+    ).get();
+    if (exists.isEmpty) return;
+    await customStatement(
+      "DELETE FROM sync_records WHERE entity_type IN ('diveProfiles', "
+      "'tankPressureProfiles')",
+    );
   }
 
   /// The `user_version` this database carries on disk right now.
@@ -10002,12 +10009,20 @@ class AppDatabase extends _$AppDatabase {
         // which is what makes this safe to keep running afterwards. Note the
         // v183 rung packs for itself: beforeOpen runs after onUpgrade, so on
         // the upgrading open this call comes too late to feed the drop.
-        await _assertProfileSeriesSchema();
         // Best effort: the ladder's own call is where a packing failure is
         // visible and retried. Here a malformed legacy table, a series table
         // a parallel branch shaped differently, or a busy lock from the
         // second isolate must not turn into a database that cannot open.
+        //
+        // The schema assert is INSIDE the try for that reason, the way the
+        // v182 and v183 rungs already place it. CREATE TABLE IF NOT EXISTS
+        // is a no-op against an existing table of any shape, so the assert
+        // goes on to CREATE INDEX ... (dive_id, is_primary): against a
+        // series table lacking that column SQLite raises "no such column",
+        // and outside the guard that throw failed the open on every launch
+        // rather than the one self-heal it belongs to.
         try {
+          await _assertProfileSeriesSchema();
           final report = await packLegacyProfileRows(this);
           if (report.failedDives > 0) {
             developer.log(
@@ -10033,9 +10048,19 @@ class AppDatabase extends _$AppDatabase {
           // drop from running at all, which is why this sits INSIDE the
           // pack's try rather than beside it.
           try {
-            if (await _legacySampleTablesPresent() &&
-                await _storedSchemaVersion() >= 183) {
-              await _dropPackedLegacySampleTables();
+            if (await _storedSchemaVersion() >= 183) {
+              // The purge is unconditional at 183, matching its own doc:
+              // those rows describe two entities this build never exports
+              // again, so they are dead whether or not the legacy tables
+              // are still here. Gating it on the tables tied it to
+              // something unrelated, and a device that crossed 183 through
+              // a parallel branch's rung of the same number (which dropped
+              // the tables itself) then kept them forever: sync_records
+              // that can never be acknowledged, and tombstones riding
+              // every base publish.
+              if (await _legacySampleTablesPresent()) {
+                await _dropPackedLegacySampleTables();
+              }
               await _purgeLegacySampleBookkeeping();
             }
           } catch (e, stackTrace) {

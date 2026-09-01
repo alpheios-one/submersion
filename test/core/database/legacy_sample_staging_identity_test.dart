@@ -1,6 +1,8 @@
+import 'package:drift/drift.dart' show Variable;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/legacy_sample_staging.dart';
+import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
@@ -100,6 +102,47 @@ void main() {
     expect(byComputer['comp-2']!.samples.map((s) => s.depth), [11.0, 12.0]);
   });
 
+  test('a staged group the dive has no series for still packs', () async {
+    // What this device holds for dive-1: one primary, no computer, no
+    // source (a manual dive or a file import).
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0),
+        ProfileSample(timestamp: 60, depth: 2.0),
+      ],
+      now: now,
+    );
+    // What a peer below the floor sends: the same dive with a saved profile
+    // edit, so its dive_profiles array carries TWO null-computer groups.
+    // Coverage keyed on (dive, computer) alone calls both of them done.
+    await ensureLegacyStagingTables(db);
+    await stageLegacyProfileRows(db, [
+      for (final (i, primary) in [(0, true), (1, false)])
+        for (var t = 0; t < 2; t++)
+          {
+            'id': 'p$i-$t',
+            'diveId': 'dive-1',
+            'isPrimary': primary,
+            'timestamp': t * 60,
+            'depth': 20.0 + i + t,
+          },
+    ]);
+
+    await packStagedLegacyRows(db);
+
+    final all = await series.getSeriesForDive('dive-1');
+    expect(
+      all.where((s) => !s.isPrimary),
+      hasLength(1),
+      reason: "the peer's demoted group was never this device's to discard",
+    );
+    // The primary group IS covered by what this device already holds, and
+    // the stored series wins: no second primary, and no overwrite.
+    expect(all.where((s) => s.isPrimary), hasLength(1));
+    expect(all.firstWhere((s) => s.isPrimary).samples.first.depth, 1.0);
+  });
+
   test('a staged row whose identity is not yet covered survives a pack that '
       'cannot place it', () async {
     // The dive has not arrived, so nothing can pack; the rows must remain
@@ -121,6 +164,156 @@ void main() {
         .customSelect('SELECT COUNT(*) AS n FROM $kLegacyProfileStagingTable')
         .getSingle();
     expect(staged.data['n'], 1);
+  });
+
+  test(
+    'a peer\'s pre-attribution pressures do not pack a second time',
+    () async {
+      // Consolidation and relink STAMP a computer onto series this device
+      // wrote with computer_id NULL. An older peer still holds the same
+      // readings unattributed and republishes them, so coverage keyed on an
+      // exact computer match finds nothing and packs a duplicate. Nothing
+      // collapses duplicate pressure series on read, so the cylinder's trace
+      // carries every reading twice and per-cylinder SAC roughly halves.
+      await tankSeries.insertSeries(
+        diveId: 'dive-1',
+        tankId: 'tank-a',
+        computerId: 'comp-1',
+        samples: const [
+          TankPressureSample(timestamp: 0, pressure: 200.0),
+          TankPressureSample(timestamp: 60, pressure: 190.0),
+        ],
+        now: now,
+      );
+      await ensureLegacyStagingTables(db);
+      await stageLegacyTankRows(db, [
+        for (var t = 0; t < 2; t++)
+          {
+            'id': 'tp-$t',
+            'diveId': 'dive-1',
+            'tankId': 'tank-a',
+            'computerId': null,
+            'timestamp': t * 60,
+            'pressure': 200.0 - t * 10,
+          },
+      ]);
+
+      await packStagedLegacyRows(db);
+
+      expect(await tankSeries.getRowsForDives(['dive-1']), hasLength(1));
+    },
+  );
+
+  test('a peer\'s pressures for a computer of their own still pack', () async {
+    // The wildcard is only for a staged row that names NO computer. One
+    // that names a different computer is a different source and has to
+    // land.
+    await tankSeries.insertSeries(
+      diveId: 'dive-1',
+      tankId: 'tank-a',
+      computerId: 'comp-1',
+      samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+      now: now,
+    );
+    await ensureLegacyStagingTables(db);
+    await stageLegacyTankRows(db, [
+      for (var t = 0; t < 2; t++)
+        {
+          'id': 'tp2-$t',
+          'diveId': 'dive-1',
+          'tankId': 'tank-a',
+          'computerId': 'comp-2',
+          'timestamp': t * 60,
+          'pressure': 150.0 - t,
+        },
+    ]);
+
+    await packStagedLegacyRows(db);
+
+    expect(await tankSeries.getRowsForDives(['dive-1']), hasLength(2));
+  });
+
+  test('a legacy tombstone removes the matching staged row', () async {
+    // A peer below the floor deletes a sample row and publishes the
+    // tombstone. Nothing local answers it: the row-per-sample tables are
+    // gone at v183, so deleteRecord no-oped and the staged copy survived to
+    // be packed on a later apply, resurrecting what the peer deleted.
+    await ensureLegacyStagingTables(db);
+    await stageLegacyProfileRows(db, [
+      {
+        'id': 'p-doomed',
+        'diveId': 'dive-1',
+        'isPrimary': true,
+        'timestamp': 0,
+        'depth': 5.0,
+      },
+      {
+        'id': 'p-kept',
+        'diveId': 'dive-1',
+        'isPrimary': true,
+        'timestamp': 60,
+        'depth': 6.0,
+      },
+    ]);
+    await stageLegacyTankRows(db, [
+      {
+        'id': 'q-doomed',
+        'diveId': 'dive-1',
+        'tankId': 'tank-a',
+        'timestamp': 0,
+        'pressure': 200.0,
+      },
+    ]);
+
+    await SyncDataSerializer().deleteRecord('diveProfiles', 'p-doomed');
+    await SyncDataSerializer().deleteRecord('tankPressureProfiles', 'q-doomed');
+
+    final profiles = await db
+        .customSelect('SELECT id FROM $kLegacyProfileStagingTable')
+        .get();
+    expect(profiles.map((r) => r.read<String>('id')), ['p-kept']);
+    final tanks = await db
+        .customSelect('SELECT COUNT(*) AS n FROM $kLegacyTankStagingTable')
+        .getSingle();
+    expect(tanks.read<int>('n'), 0);
+  });
+
+  test('a legacy tombstone with no staging tables is a no-op', () async {
+    // The common case once every peer has upgraded: nothing staged, and the
+    // TEMP tables were never created in this connection.
+    await expectLater(
+      SyncDataSerializer().deleteRecord('diveProfiles', 'p-none'),
+      completes,
+    );
+  });
+
+  test('staging outlives the connection that created it', () async {
+    // The retry the shim promises spans applies, and the changeset cursor
+    // that would offer these rows again is committed durably. A TEMP table
+    // meant the promise ended at the next app launch: the row gone, the
+    // peer convinced it had been delivered.
+    await ensureLegacyStagingTables(db);
+    await stageLegacyProfileRows(db, [
+      {
+        'id': 'p-orphan',
+        'diveId': 'not-here-yet',
+        'isPrimary': true,
+        'timestamp': 0,
+        'depth': 4.0,
+      },
+    ]);
+
+    final durable = await db
+        .customSelect(
+          "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+          variables: [const Variable<String>(kLegacyProfileStagingTable)],
+        )
+        .get();
+    expect(
+      durable,
+      isNotEmpty,
+      reason: 'a TEMP table is absent from sqlite_master',
+    );
   });
 
   test('a packed identity clears its staged rows', () async {

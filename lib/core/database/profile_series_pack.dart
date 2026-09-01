@@ -92,6 +92,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
   int? nowMs,
   String profileTable = 'dive_profiles',
   String tankTable = 'tank_pressure_profiles',
+  bool byGroupIdentity = false,
 }) async {
   final now = nowMs ?? DateTime.now().millisecondsSinceEpoch;
   final profileColumns = await _columnNames(db, profileTable);
@@ -113,6 +114,7 @@ Future<ProfilePackReport> packLegacyProfileRows(
           legacyTable: profileTable,
           seriesTable: 'dive_profile_series',
           byTank: false,
+          byGroupIdentity: byGroupIdentity,
         )
       : _emptyScan;
   if (canPackTanks) await _adoptStrandedTankPressures(db, tankTable);
@@ -149,7 +151,10 @@ Future<ProfilePackReport> packLegacyProfileRows(
   // identity that already has one (its id is a fresh uuid when the existing
   // series came from ordinary use rather than a migration, so INSERT OR
   // IGNORE would not catch it) and the dive would read as doubled samples.
-  final coveredProfiles = await _coveredProfileIdentities(db);
+  final coveredProfileGroups = await _coveredProfileGroups(db);
+  final coveredProfiles = {
+    for (final g in coveredProfileGroups) (g.diveId, g.computerId),
+  };
   final coveredTanks = await _coveredTankIdentities(db);
   final diveIds = await _parentIds(db, 'dives');
   final computerIds = await _parentIds(db, 'dive_computers');
@@ -213,7 +218,21 @@ Future<ProfilePackReport> packLegacyProfileRows(
               continue;
             }
             final key = entry.key;
-            if (coveredProfiles.contains((diveId, key.computerId))) {
+            // byGroupIdentity asks the finer question the staging path
+            // needs: a peer can hold two groups of one computer (an edit
+            // and the original it demoted), and (dive, computer) alone
+            // calls the second one done.
+            final covered = byGroupIdentity
+                ? coveredProfileGroups.any(
+                    (g) =>
+                        g.diveId == diveId &&
+                        g.isPrimary == key.isPrimary &&
+                        (key.computerId == null ||
+                            g.computerId == key.computerId) &&
+                        (key.sourceId == null || g.sourceId == key.sourceId),
+                  )
+                : coveredProfiles.contains((diveId, key.computerId));
+            if (covered) {
               // Already packed under this identity; the stored series wins.
               continue;
             }
@@ -341,7 +360,22 @@ Future<ProfilePackReport> packLegacyProfileRows(
               skipped++;
               continue;
             }
-            if (coveredTanks.contains((diveId, key.tankId, key.computerId))) {
+            // Same null-is-a-wildcard rule as the profile check above, on
+            // the identity-grained path only.
+            final coveredTank = byGroupIdentity
+                ? coveredTanks.any(
+                    (g) =>
+                        g.diveId == diveId &&
+                        g.tankId == key.tankId &&
+                        (key.computerId == null ||
+                            g.computerId == key.computerId),
+                  )
+                : coveredTanks.contains((
+                    diveId: diveId,
+                    tankId: key.tankId,
+                    computerId: key.computerId,
+                  ));
+            if (coveredTank) {
               continue;
             }
             final samples = dedupeExactPressureSamples(entry.value);
@@ -469,11 +503,20 @@ Future<int> _countUnpackedProfileRows(
     seriesTable: 'dive_profile_series',
     byTank: false,
   );
+  // Grouped before the correlated predicate, for the reason
+  // [legacyCoverageIdentityColumns] documents.
+  final identity = (await legacyCoverageIdentityColumns(
+    db,
+    legacyTable: table,
+    byTank: false,
+  )).join(', ');
   final rows = await db
       .customSelect(
-        'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
-        'AND p.depth IS NOT NULL '
-        'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
+        'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
+        '(SELECT $identity, COUNT(*) AS n FROM $table '
+        'WHERE timestamp IS NOT NULL AND depth IS NOT NULL '
+        'GROUP BY $identity) p '
+        'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
       )
       .getSingle();
@@ -502,11 +545,18 @@ Future<int> _countUnpackedTankRows(
     seriesTable: 'tank_pressure_series',
     byTank: true,
   );
+  final identity = (await legacyCoverageIdentityColumns(
+    db,
+    legacyTable: table,
+    byTank: true,
+  )).join(', ');
   final rows = await db
       .customSelect(
-        'SELECT COUNT(*) AS n FROM $table p WHERE p.timestamp IS NOT NULL '
-        'AND p.pressure IS NOT NULL AND p.tank_id IS NOT NULL '
-        'AND EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
+        'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
+        '(SELECT $identity, COUNT(*) AS n FROM $table '
+        'WHERE timestamp IS NOT NULL AND pressure IS NOT NULL '
+        'AND tank_id IS NOT NULL GROUP BY $identity) p '
+        'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
       )
       .getSingle();
@@ -609,6 +659,31 @@ Future<void> _adoptStrandedTankPressures(
   }
 }
 
+/// The columns [legacyRowCoveredSql] reads off the legacy row, so a caller
+/// can collapse the table to one row per identity before evaluating it.
+///
+/// The predicate is a correlated subquery: evaluated per legacy ROW it costs
+/// an index seek per sample, which on a million-sample table is the whole
+/// per-open cost of the backstop. Evaluated per identity it costs one seek
+/// per group, which is what the scan and the residue count both claim.
+Future<List<String>> legacyCoverageIdentityColumns(
+  DatabaseConnectionUser db, {
+  required String legacyTable,
+  required bool byTank,
+  bool byGroupIdentity = false,
+}) async {
+  final columns = await _columnNames(db, legacyTable);
+  return [
+    'dive_id',
+    if (byTank) 'tank_id',
+    if (columns.contains('computer_id')) 'computer_id',
+    if (byGroupIdentity && !byTank) ...[
+      if (columns.contains('source_id')) 'source_id',
+      if (columns.contains('is_primary')) 'is_primary',
+    ],
+  ];
+}
+
 /// SQL predicate: the legacy row aliased `p` is already represented by a
 /// row of [seriesTable].
 ///
@@ -630,15 +705,48 @@ Future<String> legacyRowCoveredSql(
   required String legacyTable,
   required String seriesTable,
   required bool byTank,
+  bool byGroupIdentity = false,
 }) async {
   final columns = await _columnNames(db, legacyTable);
+  // A legacy row that names no computer matches a series whatever computer
+  // the series carries, but ONLY on the identity-grained (staging) path.
+  // This device stamps a computer onto its own series after packing
+  // (consolidation's stampComputerWhereNull, relinkComputer,
+  // adoptUnattributed), while a peer below the floor still holds the same
+  // readings unattributed: an exact match would find nothing and pack the
+  // peer's copy a second time, and nothing collapses duplicate series on
+  // read. A staged row that DOES name a computer is a different source and
+  // still has to match exactly.
+  final computerMatch = 's.computer_id IS ${await _resolvedComputerSql(db)}';
   final computer = columns.contains('computer_id')
-      ? 'AND s.computer_id IS ${await _resolvedComputerSql(db)}'
+      ? byGroupIdentity
+            ? 'AND (p.computer_id IS NULL OR $computerMatch)'
+            : 'AND $computerMatch'
       : '';
   final tank = byTank ? 'AND s.tank_id = p.tank_id' : '';
+  var group = '';
+  if (byGroupIdentity && !byTank) {
+    // The two terms the packer groups on below the computer level. A
+    // pressure row has neither, so byTank needs nothing extra. source_id
+    // takes the same null-is-a-wildcard rule as computer_id, for the same
+    // reason (adoptUnattributed moves it from NULL to a source).
+    final sourceMatch = 's.source_id IS ${await _resolvedSourceSql(db)}';
+    final primary = columns.contains('is_primary')
+        ? 'CASE WHEN p.is_primary THEN 1 ELSE 0 END'
+        : '1';
+    group =
+        'AND (p.source_id IS NULL OR $sourceMatch) '
+        'AND s.is_primary = $primary';
+  }
   return 'EXISTS (SELECT 1 FROM $seriesTable s '
-      'WHERE s.dive_id = p.dive_id $tank $computer)';
+      'WHERE s.dive_id = p.dive_id $tank $computer $group)';
 }
+
+/// [_resolvedComputerSql]'s twin for `source_id`.
+Future<String> _resolvedSourceSql(DatabaseConnectionUser db) async =>
+    await _tableExists(db, 'dive_data_sources')
+    ? '(SELECT ds.id FROM dive_data_sources ds WHERE ds.id = p.source_id)'
+    : 'NULL';
 
 /// The scalar subquery that mirrors [_resolvedParent] for `computer_id`: the
 /// legacy row's computer when it still names a `dive_computers` row, null
@@ -725,6 +833,7 @@ Future<_LegacyDiveScan> _scanLegacyDives(
   required String legacyTable,
   required String seriesTable,
   required bool byTank,
+  bool byGroupIdentity = false,
 }) async {
   if (!await _tableExists(db, seriesTable)) return _emptyScan;
   final covered = await legacyRowCoveredSql(
@@ -732,15 +841,27 @@ Future<_LegacyDiveScan> _scanLegacyDives(
     legacyTable: legacyTable,
     seriesTable: seriesTable,
     byTank: byTank,
+    byGroupIdentity: byGroupIdentity,
   );
   // A dive is done only when EVERY one of its legacy rows is covered, hence
   // MIN over the per-row predicate. Testing the dive alone would leave a
   // second computer's rows unpacked forever on a half-packed dive.
+  // One row per identity, not per sample: the coverage predicate is a
+  // correlated subquery, so evaluating it inside the aggregate over the raw
+  // table cost an index seek per sample. Collapsing first makes the cost
+  // one pass plus a seek per group, which is what this always claimed.
+  final identity = (await legacyCoverageIdentityColumns(
+    db,
+    legacyTable: legacyTable,
+    byTank: byTank,
+    byGroupIdentity: byGroupIdentity,
+  )).join(', ');
   final rows = await db
       .customSelect(
         'SELECT p.dive_id AS dive_id, '
-        'MIN(CASE WHEN $covered THEN 1 ELSE 0 END) AS all_covered '
-        'FROM $legacyTable p GROUP BY p.dive_id ORDER BY p.dive_id',
+        'MIN(CASE WHEN $covered THEN 1 ELSE 0 END) AS all_covered FROM '
+        '(SELECT DISTINCT $identity FROM $legacyTable) p '
+        'GROUP BY p.dive_id ORDER BY p.dive_id',
       )
       .get();
   final unpacked = <String>[];
@@ -755,24 +876,34 @@ Future<_LegacyDiveScan> _scanLegacyDives(
   return (unpacked: unpacked, alreadyPacked: alreadyPacked);
 }
 
-/// The `(dive, computer)` identities `dive_profile_series` already holds.
-Future<Set<(String, String?)>> _coveredProfileIdentities(
-  DatabaseConnectionUser db,
-) async {
+/// The `(dive, computer, source, isPrimary)` groups `dive_profile_series`
+/// already holds. Callers that only want the coarse `(dive, computer)`
+/// coverage project the first two members out.
+Future<
+  Set<({String diveId, String? computerId, String? sourceId, bool isPrimary})>
+>
+_coveredProfileGroups(DatabaseConnectionUser db) async {
   if (!await _tableExists(db, 'dive_profile_series')) return const {};
   final rows = await db
-      .customSelect('SELECT dive_id, computer_id FROM dive_profile_series')
+      .customSelect(
+        'SELECT dive_id, computer_id, source_id, is_primary '
+        'FROM dive_profile_series',
+      )
       .get();
   return {
     for (final r in rows)
-      (r.read<String>('dive_id'), r.readNullable<String>('computer_id')),
+      (
+        diveId: r.read<String>('dive_id'),
+        computerId: r.readNullable<String>('computer_id'),
+        sourceId: r.readNullable<String>('source_id'),
+        isPrimary: r.read<int>('is_primary') != 0,
+      ),
   };
 }
 
 /// The `(dive, tank, computer)` identities `tank_pressure_series` holds.
-Future<Set<(String, String, String?)>> _coveredTankIdentities(
-  DatabaseConnectionUser db,
-) async {
+Future<Set<({String diveId, String tankId, String? computerId})>>
+_coveredTankIdentities(DatabaseConnectionUser db) async {
   if (!await _tableExists(db, 'tank_pressure_series')) return const {};
   final rows = await db
       .customSelect(
@@ -782,9 +913,9 @@ Future<Set<(String, String, String?)>> _coveredTankIdentities(
   return {
     for (final r in rows)
       (
-        r.read<String>('dive_id'),
-        r.read<String>('tank_id'),
-        r.readNullable<String>('computer_id'),
+        diveId: r.read<String>('dive_id'),
+        tankId: r.read<String>('tank_id'),
+        computerId: r.readNullable<String>('computer_id'),
       ),
   };
 }

@@ -93,6 +93,23 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_dive_tank '
         'ON tank_pressure_series (dive_id, tank_id)',
   ),
+  // The sync watermark filter. Every publish tick asks whether the pending
+  // series blobs exceed the changeset budget, and both export paths select
+  // on the same predicate; unindexed that is a full scan of the two largest
+  // tables in the database, on a steady-state device that has nothing to
+  // publish at all.
+  (
+    name: 'idx_dive_profile_series_hlc',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_hlc '
+        'ON dive_profile_series (hlc)',
+  ),
+  (
+    name: 'idx_tank_pressure_series_hlc',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_hlc '
+        'ON tank_pressure_series (hlc)',
+  ),
   (
     name: 'idx_dive_tanks_dive_id',
     ddl:

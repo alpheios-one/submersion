@@ -858,12 +858,14 @@ class DiveRepository {
   Future<List<domain.DiveProfilePoint>> getDiveProfile(String diveId) async {
     return await PerfTimer.measure('getDiveProfile', () async {
       try {
+        // primaryOnly in SQL, not a filter here: the rows this drops are
+        // packed blobs, and an edited two-computer dive carries three
+        // demoted ones that were being inflated and decoded only to be
+        // thrown away on the next line. This runs on the dive-detail tick
+        // and on the dashboard's first frame.
         final List<ProfileSeries> series = await _profileSeries
-            .getSeriesForDive(diveId);
-        return mergeSeriesPoints([
-          for (final s in series)
-            if (s.isPrimary) s,
-        ]);
+            .getSeriesForDive(diveId, primaryOnly: true);
+        return mergeSeriesPoints(series);
       } catch (e, stackTrace) {
         _log.error(
           'Failed to get profile for dive: $diveId',

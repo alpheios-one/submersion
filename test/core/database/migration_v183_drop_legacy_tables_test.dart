@@ -129,9 +129,16 @@ void main() {
         columnOf(raw, 'SELECT entity_type FROM sync_records', 'entity_type'),
         ['dives'],
       );
+      // The legacy tombstones STAY: _mergeEntity's local-deletion guard
+      // uses them to stop a peer below the floor from staging and packing a
+      // row this device already deleted. Only the export bookkeeping goes.
       expect(
-        columnOf(raw, 'SELECT entity_type FROM deletion_log', 'entity_type'),
-        ['dives'],
+        columnOf(
+          raw,
+          'SELECT entity_type FROM deletion_log ORDER BY entity_type',
+          'entity_type',
+        ),
+        ['diveProfiles', 'dives', 'tankPressureProfiles'],
       );
       expect(
         scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'),
@@ -293,8 +300,12 @@ void main() {
       ['dives'],
     );
     expect(
-      columnOf(raw, 'SELECT entity_type FROM deletion_log', 'entity_type'),
-      ['dives'],
+      columnOf(
+        raw,
+        'SELECT entity_type FROM deletion_log ORDER BY entity_type',
+        'entity_type',
+      ),
+      ['diveProfiles', 'dives', 'tankPressureProfiles'],
     );
   });
 

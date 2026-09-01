@@ -11,6 +11,35 @@ import '../../helpers/legacy_profile_fixtures.dart';
 /// cannot open: the ladder is where a packing failure is visible and retried,
 /// the backstop is a self-heal that has to stay best-effort.
 void main() {
+  test('a series table missing a column an INDEX names does not fail the '
+      'open', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    legacyDdlAt180(raw, userVersion: 182);
+    seedParents(raw);
+    seedProfiles(raw);
+    // Missing is_primary, which the schema self-heal's own index names.
+    // CREATE TABLE IF NOT EXISTS is a no-op against a table of any shape,
+    // so the DDL reaches CREATE INDEX ... (dive_id, is_primary) and SQLite
+    // raises "no such column". The column the sibling test omits, samples,
+    // is named by no index, so only this shape reaches that statement.
+    raw.execute('''
+      CREATE TABLE dive_profile_series (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL,
+        computer_id TEXT,
+        source_id TEXT,
+        samples BLOB NOT NULL
+      )
+    ''');
+
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await expectLater(db.customSelect('SELECT 1').get(), completes);
+  });
+
   test('a series table missing a column does not fail the open', () async {
     final raw = sqlite3.sqlite3.openInMemory();
     addTearDown(raw.close);

@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/data/repositories/profile_series_re
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
     as series;
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 
 /// Splits one data source's computer data out of a dive into a new dive —
 /// the inverse of DiveConsolidationService. The source's profile rows,
@@ -56,6 +57,19 @@ class DiveSplitService {
     if (sources.length < 2) {
       throw ArgumentError('cannot split the only source of dive $diveId');
     }
+
+    // Every series of this dive has to decode before anything moves. Split
+    // deletes the tanks it moves, and tank_pressure_series cascades on
+    // tank_id, so a series the reads answer with null (an unreadable blob)
+    // is invisible to the reference check below, gets its tank moved out
+    // from under it, and is cascade-deleted with no tombstone: gone here
+    // and kept forever by every peer. Merge and consolidate open with the
+    // same guard.
+    final unreadable = [
+      ...await _profileSeries.unreadableSeriesIds([diveId]),
+      ...await _tankSeries.unreadableSeriesIds([diveId]),
+    ];
+    if (unreadable.isNotEmpty) throw UnreadableSeriesException(unreadable);
 
     final diveRow = await (_db.select(
       _db.dives,
