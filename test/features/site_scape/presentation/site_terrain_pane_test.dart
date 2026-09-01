@@ -463,7 +463,7 @@ void main() {
           resolutionMeters: resolutionMeters,
           fetchedAt: DateTime.utc(2026, 7, 28),
         );
-        final center = const GeoPoint(12.151, -68.299);
+        const center = GeoPoint(12.151, -68.299);
         final scene = const SiteSeascapeGeometryService().build(
           SiteSeascapeInput(
             grid: grid,
