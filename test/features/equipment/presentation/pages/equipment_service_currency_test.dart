@@ -117,7 +117,7 @@ void main() {
       await scrollTo(tester, find.text(expected));
       // Both the record row and the (now correctly non-empty) total row show
       // the same formatted amount.
-      expect(find.text(expected), findsWidgets);
+      expect(find.text(expected), findsNWidgets(2));
       expect(expected, contains('€'));
     });
 

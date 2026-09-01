@@ -312,9 +312,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Filtered down to r1: the total must shrink with the visible list,
-      // not keep counting the hidden scrubber-repack record. findsWidgets
-      // because r1's own row now shows the same figure as the total.
-      expect(find.text(formatMoney(45, 'EUR')), findsWidgets);
+      // not keep counting the hidden scrubber-repack record. Exactly two
+      // occurrences: r1's own row and the total row.
+      expect(find.text(formatMoney(45, 'EUR')), findsNWidgets(2));
       expect(find.text(formatMoney(75, 'EUR')), findsNothing);
     });
 
