@@ -119,7 +119,7 @@ class PlanResultsSheet extends ConsumerWidget {
     final bailout = ref.watch(planBailoutProvider);
 
     return ListView(
-      controller: shrinkWrap ? null : controller,
+      controller: controller,
       shrinkWrap: shrinkWrap,
       physics: shrinkWrap ? const NeverScrollableScrollPhysics() : null,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
