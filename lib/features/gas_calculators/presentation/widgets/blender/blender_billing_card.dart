@@ -79,8 +79,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
+                // No bottom padding: it would be counted into this child's
+                // height and leave the heading riding above the link it is
+                // centred against.
                 BlenderSectionTitle(
                   context.l10n.gasCalculators_blender_billing,
+                  bottomPadding: 0,
                 ),
                 // Opens the global tank presets this card's dropdown
                 // reads (issue #1335 follow-up: the blender no longer
@@ -96,6 +100,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
             _cylinderRow(context, settings, units),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),

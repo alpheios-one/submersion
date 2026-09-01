@@ -85,6 +85,22 @@ Future<WidgetRef> _pump(
 }
 
 void main() {
+  testWidgets('the "Cost" heading sits level with the link beside it', (
+    tester,
+  ) async {
+    // Review point 6 on PR #1359: the heading read a few pixels high against
+    // the link on its right. BlenderSectionTitle carries its own bottom
+    // padding for the column it usually heads, and inside a centre-aligned
+    // Wrap that padding counts as part of the child, pushing the text up by
+    // half of it while the button beside it centres properly.
+    await _pump(tester);
+    final heading = tester.getCenter(find.text('Cost')).dy;
+    final link = tester
+        .getCenter(find.byKey(const Key('blender-cylinder-sizes-link')))
+        .dy;
+    expect(heading, closeTo(link, 1.0));
+  });
+
   // The arithmetic itself is pinned to the cent against both worked examples
   // in blend_billing_test.dart. What matters here is that the card is wired to
   // the real cylinder volume and prices, which proportionality demonstrates
