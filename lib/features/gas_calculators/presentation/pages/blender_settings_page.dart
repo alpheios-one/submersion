@@ -14,15 +14,36 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// defaults, kept off the always-visible calculator so the fields a diver
 /// sets once per session don't compete with the ones they retype every fill.
 /// Each card keeps its existing internal layout unchanged.
-class BlenderSettingsPage extends ConsumerStatefulWidget {
+class BlenderSettingsPage extends ConsumerWidget {
   const BlenderSettingsPage({super.key});
 
   @override
-  ConsumerState<BlenderSettingsPage> createState() =>
-      _BlenderSettingsPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Settings > Manage > Data reaches this page on its own route, so the
+    // calculator -- until now the only thing that started the load -- never
+    // mounts. Without this watch every card below shows a hard-coded default,
+    // and because saving writes the whole preferences blob at once, the first
+    // edit here would take the diver's saved mixes, billed fills and
+    // last-entered pressures down with it.
+    ref.watch(blenderPreferencesLoaderProvider);
+    // The load resolves after the first build and bumps the epoch. Re-keying
+    // on it rebuilds the body, and with it the controllers each card seeds in
+    // its own initState, onto the freshly loaded values -- the same contract
+    // the calculator uses for its own fields.
+    final epoch = ref.watch(blenderResetEpochProvider);
+    return _BlenderSettingsBody(key: ValueKey(epoch));
+  }
 }
 
-class _BlenderSettingsPageState extends ConsumerState<BlenderSettingsPage> {
+class _BlenderSettingsBody extends ConsumerStatefulWidget {
+  const _BlenderSettingsBody({super.key});
+
+  @override
+  ConsumerState<_BlenderSettingsBody> createState() =>
+      _BlenderSettingsBodyState();
+}
+
+class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
   late final List<TextEditingController> _gasO2;
   late final List<TextEditingController> _gasHe;
 

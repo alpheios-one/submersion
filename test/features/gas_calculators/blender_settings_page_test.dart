@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../helpers/test_app.dart';
+import '../../support/fake_app_settings_repository.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
@@ -36,6 +44,59 @@ Future<void> _pump(WidgetTester tester) async {
   );
   await tester.pumpAndSettle();
 }
+
+/// Preferences that differ from every hard-coded default, so a field showing
+/// a default is unambiguously a field that never saw storage.
+BlenderPreferences _storedPreferences() => const BlenderPreferences(
+  templates: [MixTemplate(o2: 21, he: 35)],
+  gasPrices: [1.5, null, null],
+  fillTempC: 5,
+  settledTempC: 15,
+  cylinderWaterLiters: 24,
+  model: BlendGasModel.ideal,
+  billedFills: [],
+  billedTo: 'Anna',
+  startPressureBar: 55,
+  startMix: GasMix(o2: 28),
+  targetPressureBar: 232,
+  targetMix: GasMix(o2: 18, he: 45),
+  fillGas1: GasMix(o2: 50),
+  fillGas2: GasMix(o2: 0, he: 80),
+  fillGas3: GasMix(o2: 21),
+);
+
+/// Opens the settings page on its own route, the way Settings > Manage > Data
+/// does -- the calculator never mounts, so nothing else can have triggered the
+/// preferences load.
+Future<void> _pumpSettingsPageAlone(
+  WidgetTester tester,
+  FakeAppSettingsRepository repository,
+) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        settingsProvider.overrideWith(
+          (ref) => _TestSettingsNotifier(const AppSettings()),
+        ),
+        appSettingsRepositoryProvider.overrideWithValue(repository),
+      ],
+      child: const MaterialApp(
+        locale: Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: BlenderSettingsPage(),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+String _fieldText(WidgetTester tester, Finder card, int index) => tester
+    .widget<TextField>(
+      find.descendant(of: card, matching: find.byType(TextField)).at(index),
+    )
+    .controller!
+    .text;
 
 void main() {
   testWidgets('the gear opens the Trimix Mixer settings page', (tester) async {
@@ -119,4 +180,48 @@ void main() {
       expect(location, '/tank-presets');
     },
   );
+
+  group('reached straight from Settings, without the calculator', () {
+    testWidgets('seeds its fields from the stored preferences', (tester) async {
+      final repository = FakeAppSettingsRepository()
+        ..blenderPreferences = _storedPreferences();
+      await _pumpSettingsPageAlone(tester, repository);
+
+      // Fill gas 1 is 50% O2 in storage and 100% in the defaults.
+      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 0), '50');
+      expect(_fieldText(tester, find.byType(BlenderDefaultsCard), 0), '1.5');
+      expect(find.text('21/35'), findsOneWidget);
+    });
+
+    testWidgets('editing one field does not overwrite the rest of the blob', (
+      tester,
+    ) async {
+      // Saving is whole-blob, so a page that never loaded would write its
+      // defaults over the templates, the billed-to name and the last-entered
+      // pressures the diver never touched.
+      final repository = FakeAppSettingsRepository()
+        ..blenderPreferences = _storedPreferences();
+      await _pumpSettingsPageAlone(tester, repository);
+
+      await tester.enterText(
+        find
+            .descendant(
+              of: find.byType(BlenderDefaultsCard),
+              matching: find.byType(TextField),
+            )
+            .first,
+        '2.25',
+      );
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+
+      final saved = repository.blenderPreferences!;
+      expect(saved.gasPrices.first, closeTo(2.25, 1e-9));
+      expect(saved.templates, const [MixTemplate(o2: 21, he: 35)]);
+      expect(saved.billedTo, 'Anna');
+      expect(saved.startPressureBar, 55);
+      expect(saved.targetMix, const GasMix(o2: 18, he: 45));
+      expect(saved.cylinderWaterLiters, 24);
+    });
+  });
 }
