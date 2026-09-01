@@ -38817,6 +38817,36 @@ abstract class AppLocalizations {
   /// **'Satellite'**
   String get settings_appearance_mapStyle_esriSatellite;
 
+  /// No description provided for @settings_appearance_bathymetryRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload Map Data'**
+  String get settings_appearance_bathymetryRefresh;
+
+  /// No description provided for @settings_appearance_bathymetryRefresh_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check swissBATHY3D lake depth data for updates'**
+  String get settings_appearance_bathymetryRefresh_subtitle;
+
+  /// No description provided for @settings_appearance_bathymetryRefresh_resultUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tile updated} other{{count} tiles updated}}'**
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count);
+
+  /// No description provided for @settings_appearance_bathymetryRefresh_resultUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'All data is up to date'**
+  String get settings_appearance_bathymetryRefresh_resultUpToDate;
+
+  /// No description provided for @settings_appearance_bathymetryRefresh_resultFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn't check all data; existing values were kept'**
+  String get settings_appearance_bathymetryRefresh_resultFailed;
+
   /// Generic re-parse action label
   ///
   /// In en, this message translates to:

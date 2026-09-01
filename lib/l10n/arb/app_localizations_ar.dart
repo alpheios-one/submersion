@@ -23127,6 +23127,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'قمر صناعي';
 
   @override
+  String get settings_appearance_bathymetryRefresh =>
+      'إعادة تحميل بيانات الخريطة';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      'التحقق من تحديثات بيانات أعماق swissBATHY3D';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تحديث $count بلاطات',
+      one: 'تم تحديث بلاطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate =>
+      'جميع البيانات محدثة';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      'تعذر التحقق من جميع البيانات؛ تم الاحتفاظ بالقيم الحالية';
+
+  @override
   String get common_action_reparse => 'إعادة التحليل';
 
   @override

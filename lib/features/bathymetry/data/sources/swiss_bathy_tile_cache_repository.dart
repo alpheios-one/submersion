@@ -74,6 +74,17 @@ class SwissBathyTileCacheRepository {
     return row != null;
   }
 
+  /// Every tile key with a usable ('ok') cached grid. Used by the manual
+  /// "reload map data" action, which revalidates every cached tile's
+  /// freshness immediately instead of waiting for each one's individual
+  /// [SwissBathy3dSource.staleCheckInterval] to elapse.
+  Future<List<String>> okTileKeys() async {
+    final rows = await (_db.select(
+      _db.swissBathyTileCache,
+    )..where((t) => t.status.equals('ok'))).get();
+    return [for (final row in rows) row.tileKey];
+  }
+
   Future<void> writeOk(
     String tileKey,
     BathymetryGrid grid, {

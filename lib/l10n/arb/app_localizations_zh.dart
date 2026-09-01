@@ -22338,6 +22338,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => '卫星';
 
   @override
+  String get settings_appearance_bathymetryRefresh => '重新加载地图数据';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      '检查 swissBATHY3D 湖泊深度数据是否有更新';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已更新 $count 个图块',
+      one: '已更新 1 个图块',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate => '所有数据均为最新';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      '无法检查所有数据；已保留现有数值';
+
+  @override
   String get common_action_reparse => '重新解析';
 
   @override

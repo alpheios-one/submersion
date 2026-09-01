@@ -711,6 +711,220 @@ nodata_value -9999
     });
   });
 
+  group('SwissBathy3dSource.refreshAllCachedTiles (manual reload)', () {
+    test('no cached tiles: nothing to check, no HTTP calls', () async {
+      final source = buildSource((_) async => http.Response('', 404));
+      final summary = await source.refreshAllCachedTiles();
+      expect(summary.total, 0);
+      expect(summary.updated, 0);
+      expect(summary.upToDate, 0);
+      expect(summary.failed, 0);
+    });
+
+    test('revalidates a freshly cached tile immediately, without waiting for '
+        'staleCheckInterval, and finds it unchanged', () async {
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+
+      // No backdating of checkedAt here: the manual action must revalidate
+      // right away instead of waiting for staleCheckInterval to elapse.
+      final summary = await source.refreshAllCachedTiles();
+      expect(itemCalls, 2); // exactly one extra light metadata lookup
+      expect(downloadCalls, 1); // unchanged version: no re-download
+      expect(summary.total, 1);
+      expect(summary.upToDate, 1);
+      expect(summary.updated, 0);
+      expect(summary.failed, 0);
+    });
+
+    test('re-downloads a cached tile whose version actually changed', () async {
+      const updatedGrid = '''
+ncols 2
+nrows 2
+xllcorner 2685000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+500.0 500.0
+500.0 500.0
+''';
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          final datetime = itemCalls == 1
+              ? '2023-01-01T00:00:00Z'
+              : '2024-06-01T00:00:00Z';
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'properties': {'datetime': datetime},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        final body = downloadCalls == 1 ? gridBody : updatedGrid;
+        return http.Response.bytes(_zipOf('tile.asc', body), 200);
+      });
+
+      final first = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      final summary = await source.refreshAllCachedTiles();
+      expect(itemCalls, 2);
+      expect(downloadCalls, 2); // changed version: re-downloaded
+      expect(summary.updated, 1);
+      expect(summary.upToDate, 0);
+      expect(summary.failed, 0);
+
+      final again = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(again.depthAt(0, 0), isNot(first.depthAt(0, 0)));
+    });
+
+    test('a failed metadata check counts as failed and keeps the cached grid '
+        'unchanged, offline-safe like the periodic check', () async {
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          if (itemCalls == 1) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': _requestedBbox(req),
+                    'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response('server error', 500);
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final first = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      final summary = await source.refreshAllCachedTiles();
+      expect(summary.failed, 1);
+      expect(summary.updated, 0);
+      expect(summary.upToDate, 0);
+      expect(downloadCalls, 1); // no re-download attempted
+
+      final again = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(again.depthAt(0, 0), first.depthAt(0, 0));
+    });
+
+    test(
+      'sweeps every cached tile independently and tallies mixed outcomes',
+      () async {
+        // Distinct lake, well outside zurichseePoint's tile (and away from
+        // its own tile's boundary, so spanMeters: 100 stays single-tile).
+        const bodenseePoint = GeoPoint(47.55, 9.20);
+
+        var itemCalls = 0;
+        var downloadCalls = 0;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            itemCalls++;
+            // Calls 1-2 are the initial fetches for the two tiles; call 3
+            // (whichever tile the sweep checks first) finds no change,
+            // call 4 (the other tile) fails transiently.
+            if (itemCalls <= 3) {
+              return http.Response(
+                jsonEncode({
+                  'features': [
+                    {
+                      'bbox': _requestedBbox(req),
+                      'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                      'assets': {
+                        'grid': {'href': 'https://example.org/tile_grid.zip'},
+                      },
+                    },
+                  ],
+                }),
+                200,
+              );
+            }
+            return http.Response('server error', 500);
+          }
+          downloadCalls++;
+          return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+        });
+
+        await source.fetch(zurichseePoint, spanMeters: 100);
+        await source.fetch(bodenseePoint, spanMeters: 100);
+        expect(itemCalls, 2);
+        expect(downloadCalls, 2);
+
+        final summary = await source.refreshAllCachedTiles();
+        expect(summary.total, 2);
+        expect(summary.upToDate, 1);
+        expect(summary.failed, 1);
+        expect(summary.updated, 0);
+      },
+    );
+
+    test('a cached "no tile here" negative is not part of the sweep, since '
+        'there is no grid to revalidate', () async {
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        itemCalls++;
+        return http.Response(jsonEncode({'features': []}), 200);
+      });
+
+      await expectLater(
+        source.fetch(zurichseePoint, spanMeters: 100),
+        throwsA(isA<BathymetryFetchException>()),
+      );
+      expect(itemCalls, 1);
+
+      final summary = await source.refreshAllCachedTiles();
+      expect(summary.total, 0);
+      expect(itemCalls, 1); // no extra lookup for the cached negative
+    });
+  });
+
   group('SwissBathy3dSource in the resolver chain', () {
     // Regression test for a bug observed after the swissBATHY3D integration:
     // a land coordinate outside every known lake stopped loading a 3D model

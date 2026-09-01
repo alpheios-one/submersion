@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
@@ -63,6 +64,27 @@ final swissLakeDepthServiceProvider = Provider<SwissLakeDepthService?>((ref) {
     return null;
   }
 });
+
+/// Immediately revalidates every cached swissBATHY3D tile's freshness (the
+/// "reload map data" action in Settings > Appearance), instead of waiting
+/// for each tile's individual [SwissBathy3dSource.staleCheckInterval] to
+/// elapse. Null when the local cache database is not initialized, matching
+/// [bathymetryRepositoryProvider].
+final swissBathyManualRefreshProvider =
+    Provider<Future<SwissBathyRefreshSummary?> Function()>((ref) {
+      return () async {
+        final LocalCacheDatabase db;
+        try {
+          db = LocalCacheDatabaseService.instance.database;
+        } on StateError {
+          return null;
+        }
+        final source = SwissBathy3dSource(
+          tileCache: SwissBathyTileCacheRepository(db),
+        );
+        return source.refreshAllCachedTiles();
+      };
+    });
 
 /// The cached/fetched grid for a QUANTIZED coordinate cell. Callers must
 /// key the family with [BathymetryRepository.quantize] so every coordinate

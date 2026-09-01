@@ -23549,6 +23549,33 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'Satélite';
 
   @override
+  String get settings_appearance_bathymetryRefresh =>
+      'Recarregar dados do mapa';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      'Verifica se há atualizações nos dados de profundidade swissBATHY3D';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count blocos atualizados',
+      one: '1 bloco atualizado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate =>
+      'Todos os dados estão atualizados';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      'Não foi possível verificar todos os dados; os valores existentes foram mantidos';
+
+  @override
   String get common_action_reparse => 'Reanalisar';
 
   @override

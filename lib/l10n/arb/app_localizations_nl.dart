@@ -23364,6 +23364,33 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'Satelliet';
 
   @override
+  String get settings_appearance_bathymetryRefresh =>
+      'Kaartgegevens vernieuwen';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      'Controleert swissBATHY3D-dieptegegevens op updates';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tegels bijgewerkt',
+      one: '1 tegel bijgewerkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate =>
+      'Alle gegevens zijn actueel';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      'Niet alle gegevens konden worden gecontroleerd; bestaande waarden zijn behouden';
+
+  @override
   String get common_action_reparse => 'Opnieuw verwerken';
 
   @override

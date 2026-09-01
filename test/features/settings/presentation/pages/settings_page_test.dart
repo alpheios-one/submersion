@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
+import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
+import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
@@ -1373,6 +1376,115 @@ void main() {
       // The section appearance page is shown for sites
       expect(find.byType(SectionAppearancePage), findsOneWidget);
     });
+  });
+
+  group('AppearanceSectionContent swissBATHY3D manual reload', () {
+    Widget buildAppearanceWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings?selected=appearance',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+          GoRoute(
+            path: '/settings/themes',
+            builder: (context, state) => const Text('Themes'),
+          ),
+        ],
+      );
+
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    testWidgets('reload tile calls the refresh action and shows a spinner '
+        'while pending', (tester) async {
+      var calls = 0;
+      final completer = Completer<SwissBathyRefreshSummary?>();
+      final overrides = [
+        ...getOverrides(),
+        swissBathyManualRefreshProvider.overrideWithValue(() {
+          calls++;
+          return completer.future;
+        }),
+      ];
+
+      await tester.pumpWidget(buildAppearanceWidget(overrides));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Reload Map Data'), findsOneWidget);
+      await tester.tap(find.text('Reload Map Data'));
+      await tester.pump();
+
+      expect(calls, 1);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      completer.complete(
+        const SwissBathyRefreshSummary(updated: 0, upToDate: 3, failed: 0),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('All data is up to date'), findsOneWidget);
+    });
+
+    testWidgets('shows how many tiles were updated on success', (tester) async {
+      final overrides = [
+        ...getOverrides(),
+        swissBathyManualRefreshProvider.overrideWithValue(
+          () async => const SwissBathyRefreshSummary(
+            updated: 2,
+            upToDate: 1,
+            failed: 0,
+          ),
+        ),
+      ];
+
+      await tester.pumpWidget(buildAppearanceWidget(overrides));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Reload Map Data'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2 tiles updated'), findsOneWidget);
+    });
+
+    testWidgets(
+      'a failed check leaves cached values in place and shows a non-alarming '
+      'message instead of an error',
+      (tester) async {
+        final overrides = [
+          ...getOverrides(),
+          swissBathyManualRefreshProvider.overrideWithValue(
+            () async => const SwissBathyRefreshSummary(
+              updated: 0,
+              upToDate: 0,
+              failed: 2,
+            ),
+          ),
+        ];
+
+        await tester.pumpWidget(buildAppearanceWidget(overrides));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Reload Map Data'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text("Couldn't check all data; existing values were kept"),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 
   group('ManageSectionContent checklist templates tile', () {

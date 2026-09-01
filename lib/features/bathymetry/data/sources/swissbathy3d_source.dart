@@ -193,13 +193,37 @@ class SwissBathy3dSource implements BathymetrySource {
     SwissLakeLevel lake,
     SwissBathyTileCacheEntry cached,
   ) async {
+    return (await _checkAndMaybeUpdate(
+      tileKey,
+      tileE,
+      tileN,
+      lake,
+      cached,
+    )).grid;
+  }
+
+  /// The same one-light-lookup, re-download-only-on-change check
+  /// [_refreshIfStale] performs, but reporting which of the three outcomes
+  /// happened rather than just the resulting grid — used by
+  /// [refreshAllCachedTiles], the manual "reload map data" action, to build
+  /// a summary of how many tiles were actually updated.
+  Future<({BathymetryGrid? grid, _TileCheckOutcome outcome})>
+  _checkAndMaybeUpdate(
+    String tileKey,
+    int tileE,
+    int tileN,
+    SwissLakeLevel lake,
+    SwissBathyTileCacheEntry cached,
+  ) async {
     final SwissBathyAsset? asset;
     try {
       asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
     } on SwissStacException {
-      return cached.grid; // metadata lookup failed -- retry on next visit
+      // metadata lookup failed -- retry on next check
+      return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     } on BathymetryFetchException {
-      return cached.grid; // no known collection id resolved right now
+      // no known collection id resolved right now
+      return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     }
 
     if (asset == null || asset.datetime == cached.sourceDatetime) {
@@ -208,7 +232,7 @@ class SwissBathy3dSource implements BathymetrySource {
       // record that the check happened, so the next one is due again in
       // staleCheckInterval.
       await _tileCache.touch(tileKey, sourceDatetime: asset?.datetime);
-      return cached.grid;
+      return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
     }
 
     try {
@@ -216,7 +240,7 @@ class SwissBathy3dSource implements BathymetrySource {
       final gridText = _extractGridText(zipBytes);
       if (gridText == null) {
         await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
-        return cached.grid;
+        return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
       }
       final grid = parseSwissLv95Grid(
         gridText,
@@ -225,12 +249,69 @@ class SwissBathy3dSource implements BathymetrySource {
         referenceLevelMeters: lake.meanLevelMeters,
       );
       await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
-      return grid;
+      return (grid: grid, outcome: _TileCheckOutcome.updated);
     } on SwissStacException {
-      return cached.grid;
+      return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     } on FormatException {
-      return cached.grid;
+      return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     }
+  }
+
+  /// Immediately revalidates every currently cached tile's freshness,
+  /// bypassing [staleCheckInterval] — the manual "reload map data" action's
+  /// entry point. Reuses [_checkAndMaybeUpdate], the exact same light STAC
+  /// item lookup with conditional re-download the periodic per-fetch check
+  /// performs, so this never re-downloads a tile whose version has not
+  /// actually changed. A tile whose check fails (offline, STAC error) keeps
+  /// serving its existing cached grid unchanged, counted as
+  /// [SwissBathyRefreshSummary.failed] rather than thrown — one failed tile
+  /// must not abort the sweep over the rest, matching the fair-use
+  /// requirement that a failed check never becomes a crash or a forced
+  /// re-download loop.
+  Future<SwissBathyRefreshSummary> refreshAllCachedTiles() async {
+    final tileKeys = await _tileCache.okTileKeys();
+    var updated = 0;
+    var upToDate = 0;
+    var failed = 0;
+    for (final tileKey in tileKeys) {
+      final cached = await _tileCache.read(tileKey);
+      if (cached == null) continue; // evicted/corrupted since listing
+
+      final parts = tileKey.split('_');
+      final tileE = parts.length == 2 ? int.tryParse(parts[0]) : null;
+      final tileN = parts.length == 2 ? int.tryParse(parts[1]) : null;
+      if (tileE == null || tileN == null) continue;
+
+      final tileCenter = Lv95Transform.toWgs84(
+        (tileE + 0.5) * tileSizeMeters,
+        (tileN + 0.5) * tileSizeMeters,
+      );
+      final lake = findSwissLake(
+        GeoPoint(tileCenter.latitude, tileCenter.longitude),
+      );
+      if (lake == null) continue; // should not happen for a real 'ok' tile
+
+      final result = await _checkAndMaybeUpdate(
+        tileKey,
+        tileE,
+        tileN,
+        lake,
+        cached,
+      );
+      switch (result.outcome) {
+        case _TileCheckOutcome.updated:
+          updated++;
+        case _TileCheckOutcome.upToDate:
+          upToDate++;
+        case _TileCheckOutcome.failed:
+          failed++;
+      }
+    }
+    return SwissBathyRefreshSummary(
+      updated: updated,
+      upToDate: upToDate,
+      failed: failed,
+    );
   }
 
   /// Merges same-resolution tile grids into one rectangular [BathymetryGrid]
@@ -345,4 +426,31 @@ class SwissBathy3dSource implements BathymetrySource {
     }
     return null;
   }
+}
+
+/// The result of one tile's freshness check in [SwissBathy3dSource._checkAndMaybeUpdate].
+enum _TileCheckOutcome { updated, upToDate, failed }
+
+/// Tally of a [SwissBathy3dSource.refreshAllCachedTiles] sweep, for the
+/// manual "reload map data" action's confirmation message.
+class SwissBathyRefreshSummary {
+  /// Tiles whose STAC version had genuinely changed and were re-downloaded.
+  final int updated;
+
+  /// Tiles checked and confirmed to already be the latest version.
+  final int upToDate;
+
+  /// Tiles whose check itself failed (offline, STAC error) — these kept
+  /// serving their existing cached grid unchanged, never counted as an
+  /// error the user needs to act on.
+  final int failed;
+
+  const SwissBathyRefreshSummary({
+    required this.updated,
+    required this.upToDate,
+    required this.failed,
+  });
+
+  /// Total tiles that were cached at the start of the sweep.
+  int get total => updated + upToDate + failed;
 }
