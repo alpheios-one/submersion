@@ -150,6 +150,33 @@ int _rowsPerStatement(int columnCount) {
       : _maxStagedRowsPerStatement;
 }
 
+/// True when either staging table exists and still holds a row.
+///
+/// The pack is otherwise gated on the payload in hand carrying legacy rows,
+/// which misses the retry the shim promises: rows whose dive had not
+/// arrived are kept, and the payload that finally brings the dive need not
+/// carry any legacy rows of its own. Two indexed existence probes on TEMP
+/// tables, and only when the tables exist at all, so the common case (every
+/// peer upgraded, nothing ever staged) costs one sqlite_master lookup.
+Future<bool> hasStagedLegacyRows(DatabaseConnectionUser db) async {
+  final present = await db
+      .customSelect(
+        "SELECT name FROM sqlite_temp_master WHERE type = 'table' "
+        'AND name IN (?, ?)',
+        variables: [
+          const Variable<String>(kLegacyProfileStagingTable),
+          const Variable<String>(kLegacyTankStagingTable),
+        ],
+      )
+      .get();
+  for (final row in present) {
+    final table = row.read<String>('name');
+    final any = await db.customSelect('SELECT 1 FROM $table LIMIT 1').get();
+    if (any.isNotEmpty) return true;
+  }
+  return false;
+}
+
 /// Packs whatever is staged into series (dives that already have a series
 /// are left alone, exactly as the migration packer does) and clears the
 /// staged rows the pack is done with.

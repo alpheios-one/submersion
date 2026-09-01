@@ -1602,6 +1602,9 @@ class SyncDataSerializer {
   /// and will migrate its own rows when it upgrades.
   Future<ProfilePackReport> packLegacySamples() => packStagedLegacyRows(_db);
 
+  /// True when a previous apply left rows staged that it could not place.
+  Future<bool> hasStagedLegacySamples() => hasStagedLegacyRows(_db);
+
   /// Convert payload to JSON string
   String serializePayload(SyncPayload payload) {
     return jsonEncode(payload.toJson());
@@ -3134,11 +3137,16 @@ class SyncDataSerializer {
             data,
             serializer: _syncBlobSerializer,
           );
+          // Inside the same guard as the parse, matching the batch path:
+          // the check only catches ProfileSeriesCodecException today, and
+          // resolveConflict and the adopt/restore loop call this with no
+          // per-record catch, so a decoder that ever leaked another error
+          // would take down a whole restore rather than one record.
+          if (!_profileSeriesBlobIsSound(row)) return;
         } on Object catch (e) {
           _log.warning('Skipping a malformed diveProfileSeries record: $e');
           return;
         }
-        if (!_profileSeriesBlobIsSound(row)) return;
         await _db.into(_db.diveProfileSeries).insertOnConflictUpdate(row);
         return;
       case 'tankPressureSeries':
@@ -3150,11 +3158,16 @@ class SyncDataSerializer {
             data,
             serializer: _syncBlobSerializer,
           );
+          // Inside the same guard as the parse, matching the batch path:
+          // the check only catches ProfileSeriesCodecException today, and
+          // resolveConflict and the adopt/restore loop call this with no
+          // per-record catch, so a decoder that ever leaked another error
+          // would take down a whole restore rather than one record.
+          if (!_tankSeriesBlobIsSound(row)) return;
         } on Object catch (e) {
           _log.warning('Skipping a malformed tankPressureSeries record: $e');
           return;
         }
-        if (!_tankSeriesBlobIsSound(row)) return;
         await _db.into(_db.tankPressureSeries).insertOnConflictUpdate(row);
         return;
     }

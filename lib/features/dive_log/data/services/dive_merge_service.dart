@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/data/repositories/profile_series_re
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
@@ -110,6 +111,17 @@ class DiveMergeService {
   /// overlapping timelines) -- nothing is read from the DB via a snapshot
   /// and nothing is written in that case.
   Future<DiveMergeOutcome> apply(List<String> diveIds) async {
+    // Every series this operation will carry across has to decode: it
+    // re-bases the samples onto the merged timeline and then deletes the
+    // dives that hold them, and reads answer an unreadable blob with null,
+    // so one would be dropped on the way through and then deleted with its
+    // dive. Checked before anything is written.
+    final unreadable = [
+      ...await _profileSeries.unreadableSeriesIds(diveIds),
+      ...await _tankSeries.unreadableSeriesIds(diveIds),
+    ];
+    if (unreadable.isNotEmpty) throw UnreadableSeriesException(unreadable);
+
     final sources = await _diveRepo.getDivesByIds(diveIds);
     final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
 

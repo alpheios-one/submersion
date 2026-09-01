@@ -1370,21 +1370,27 @@ class DiveComputerRepository {
         final insertEntries = pressuresByTank.entries
             .where((entry) => tankIdsByIndex.containsKey(entry.key))
             .toList();
-        for (final entry in insertEntries) {
-          if (entry.value.isEmpty) continue;
-          await _tankSeries.insertSeries(
-            diveId: diveId,
-            tankId: tankIdsByIndex[entry.key]!,
-            computerId: computerId,
-            samples: [
-              for (final point in entry.value)
-                TankPressureSample(
-                  timestamp: point.timestamp,
-                  pressure: point.pressure,
-                ),
-            ],
-          );
-        }
+        // One transaction for the pressure set: a multi-transmitter download
+        // whose second tank cannot be written must not leave the first
+        // committed and pending, publishing half a dive's pressures to peers
+        // as if they were all of them.
+        await _db.transaction(() async {
+          for (final entry in insertEntries) {
+            if (entry.value.isEmpty) continue;
+            await _tankSeries.insertSeries(
+              diveId: diveId,
+              tankId: tankIdsByIndex[entry.key]!,
+              computerId: computerId,
+              samples: [
+                for (final point in entry.value)
+                  TankPressureSample(
+                    timestamp: point.timestamp,
+                    pressure: point.pressure,
+                  ),
+              ],
+            );
+          }
+        });
         for (final entry in insertEntries) {
           _log.info(
             'Imported ${entry.value.length} pressure points for tank ${entry.key}',

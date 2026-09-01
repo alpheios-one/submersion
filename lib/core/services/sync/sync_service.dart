@@ -1567,8 +1567,14 @@ class SyncService {
   /// v182 receive-side tolerance: after a merge (changeset OR base file) has
   /// applied any inbound-only legacy row-per-sample rows, pack them into
   /// series for whichever dives don't already have one. A no-op (and no log)
-  /// when [anyLegacyRowsApplied] is false, which is the common case once
-  /// every peer has upgraded.
+  /// when this payload carried none AND nothing is still staged, which is
+  /// the common case once every peer has upgraded.
+  ///
+  /// The staging check is what makes the retry this method's own doc
+  /// promises real. A staged row whose dive had not arrived is kept for the
+  /// next apply, and the payload that finally brings that dive need not
+  /// carry legacy rows of its own: gating on the payload alone let the rows
+  /// sit until the TEMP table died with the session.
   ///
   /// Runs inside the caller's deferred-FK merge transaction, so a throw here
   /// must never escape: it would roll back the whole payload while leaving
@@ -1584,7 +1590,9 @@ class SyncService {
   /// closes at the next open; recovery past that point is the origin peer
   /// republishing its base or changeset, which stages the rows again.
   Future<void> _packLegacySamplesIfPresent(bool anyLegacyRowsApplied) async {
-    if (!anyLegacyRowsApplied) return;
+    if (!anyLegacyRowsApplied && !await _serializer.hasStagedLegacySamples()) {
+      return;
+    }
     try {
       final packed = await _serializer.packLegacySamples();
       _log.info(

@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/data/repositories/profile_series_re
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_consolidation_builder.dart';
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 
 /// Result of a successful consolidation: the target dive id plus the
 /// pre-consolidation snapshot needed to undo it.
@@ -54,6 +55,17 @@ class DiveConsolidationService {
     required List<String> secondaryDiveIds,
   }) async {
     final allIds = [targetDiveId, ...secondaryDiveIds];
+    // Every series this operation will carry across has to decode: it
+    // re-bases the samples onto the merged timeline and then deletes the
+    // dives that hold them, and reads answer an unreadable blob with null,
+    // so one would be dropped on the way through and then deleted with its
+    // dive. Checked before anything is written.
+    final unreadable = [
+      ...await _profileSeries.unreadableSeriesIds(allIds),
+      ...await _tankSeries.unreadableSeriesIds(allIds),
+    ];
+    if (unreadable.isNotEmpty) throw UnreadableSeriesException(unreadable);
+
     final dives = await _diveRepo.getDivesByIds(allIds);
 
     // classify() silently falls back to the earliest dive if primaryDiveId

@@ -143,6 +143,16 @@ class TankPressureSeriesRepository {
   /// returned. See `ProfileSeriesRepository._rowsForDives` for why: binding
   /// one SQL variable per dive id can exceed the engine's bound-variable
   /// ceiling on a whole library's filtered dive ids.
+  /// The tank twin of `ProfileSeriesRepository.unreadableSeriesIds`: the
+  /// ids of [diveIds]'s pressure series whose blob does not decode.
+  Future<List<String>> unreadableSeriesIds(List<String> diveIds) async {
+    if (diveIds.isEmpty) return const [];
+    return [
+      for (final row in await getRowsForDives(diveIds))
+        if (_decodeOrNull(row) == null) row.id,
+    ];
+  }
+
   Future<List<TankPressureSeriesRow>> getRowsForDives(
     List<String> diveIds,
   ) async {

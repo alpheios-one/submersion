@@ -67,30 +67,39 @@ class TankPressureRepository {
   ) async {
     if (pressuresByTank.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
-    for (final entry in pressuresByTank.entries) {
-      if (entry.value.isEmpty) continue;
-      await _tankSeries.insertSeries(
-        diveId: diveId,
-        tankId: entry.key,
-        samples: [
-          for (final point in entry.value)
-            TankPressureSample(
-              timestamp: point.timestamp,
-              pressure: point.pressure,
-            ),
-        ],
-        now: now,
+    // One transaction for the whole pressure set. Each insertSeries commits
+    // and marks itself pending on its own, so a tank that cannot be written
+    // (an encode the codec refuses, a constraint) would otherwise leave the
+    // tanks before it committed and pending, and half a dive's pressures
+    // would publish to peers as if they were all of them. The legacy
+    // row-per-sample write was one batch and had the same all-or-nothing
+    // behaviour.
+    await _db.transaction(() async {
+      for (final entry in pressuresByTank.entries) {
+        if (entry.value.isEmpty) continue;
+        await _tankSeries.insertSeries(
+          diveId: diveId,
+          tankId: entry.key,
+          samples: [
+            for (final point in entry.value)
+              TankPressureSample(
+                timestamp: point.timestamp,
+                pressure: point.pressure,
+              ),
+          ],
+          now: now,
+        );
+      }
+      // Only mark parent dive as pending - child data syncs with it
+      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+        DivesCompanion(updatedAt: Value(now)),
       );
-    }
-    // Only mark parent dive as pending - child data syncs with it
-    await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
-      DivesCompanion(updatedAt: Value(now)),
-    );
-    await _syncRepository.markRecordPending(
-      entityType: 'dives',
-      recordId: diveId,
-      localUpdatedAt: now,
-    );
+      await _syncRepository.markRecordPending(
+        entityType: 'dives',
+        recordId: diveId,
+        localUpdatedAt: now,
+      );
+    });
     SyncEventBus.notifyLocalChange();
   }
 

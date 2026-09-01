@@ -551,6 +551,21 @@ class ProfileSeriesRepository {
     return _rowsForDives(diveIds);
   }
 
+  /// The ids of [diveIds]'s series whose packed blob does not decode.
+  ///
+  /// Reads swallow an unreadable blob so one bad row cannot blank a whole
+  /// page, which is right for reading and wrong for a destructive
+  /// operation: merge and consolidate re-base their sources and then delete
+  /// them, so a blob that silently read as absent would be deleted with the
+  /// dive that held it. They ask this first.
+  Future<List<String>> unreadableSeriesIds(List<String> diveIds) async {
+    if (diveIds.isEmpty) return const [];
+    return [
+      for (final row in await _rowsForDives(diveIds))
+        if (_decodeOrNull(row) == null) row.id,
+    ];
+  }
+
   /// The primary rows of [diveIds] only, in the same order.
   ///
   /// The library-wide statistics aggregates count one stream per dive, so
