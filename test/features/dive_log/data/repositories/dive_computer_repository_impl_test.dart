@@ -829,6 +829,30 @@ void main() {
       expect(dive.diveType, 'technical');
     });
 
+    test('a deepstop event alone (precautionary, not mandatory deco) keeps the '
+        'dive type recreational', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 11, 30);
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 1.0, ndl: 3600),
+          ProfilePointData(timestamp: 600, depth: 18.0, ndl: 1200),
+        ],
+        durationSeconds: 1800,
+        maxDepth: 18.0,
+        events: const [EventData(timestamp: 900, type: 'deepstop')],
+        forceNew: true,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'recreational');
+    });
+
     test('a no-deco profile defaults the dive type to recreational', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 4, 1, 12, 0);

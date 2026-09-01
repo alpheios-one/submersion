@@ -1178,8 +1178,14 @@ class DiveComputerRepository {
         // on 'recreational', including dives whose samples show mandatory
         // deco (ceiling, deco stops, exhausted NDL). Default those to the
         // built-in 'technical' type instead.
+        //
+        // 'deepstop' events are excluded here even though _mapEventTypeString
+        // maps them to 'decoStopStart' for persistence/display: deep stops are
+        // precautionary, not mandatory deco, mirroring the decoType: 3
+        // exclusion already applied to samples.
         final decoEventMaps = events
-            ?.map((e) => _mapEventTypeString(e.type))
+            ?.where((e) => e.type != 'deepstop')
+            .map((e) => _mapEventTypeString(e.type))
             .whereType<String>()
             .map((type) => {'eventType': type})
             .toList();

@@ -1572,6 +1572,12 @@ class UddfEntityImporter {
       // and persisted as ProfileEvents after the dive row is created.
       final eventMaps = (diveData['events'] as List?)
           ?.cast<Map<String, dynamic>>();
+      // UDDF sources emit events under 'profileEvents' instead of 'events'
+      // (see the NOTE ON UDDF DIVERGENCE below). Only 'events' is persisted
+      // as ProfileEvents, but both shapes should count toward deco detection.
+      final decoDetectionEventMaps =
+          eventMaps ??
+          (diveData['profileEvents'] as List?)?.cast<Map<String, dynamic>>();
       // Sources without an explicit dive type used to land every dive on
       // 'recreational', including dives whose samples show mandatory deco
       // (ceiling, deco stops, exhausted NDL). Default those to the built-in
@@ -1587,7 +1593,7 @@ class UddfEntityImporter {
                 tts: p.tts,
               ),
             ),
-            eventMaps: eventMaps,
+            eventMaps: decoDetectionEventMaps,
           )
           ? 'technical'
           : 'recreational';

@@ -475,6 +475,19 @@ void main() {
       expect(dive.diveTypeIds, ['technical']);
     });
 
+    test('a decoStopStart event under profileEvents (UDDF source key) defaults '
+        'the type to technical', () async {
+      final dive = await importSingleDive({
+        'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+        'maxDepth': 40.0,
+        'duration': const Duration(seconds: 3600),
+        'profileEvents': <Map<String, dynamic>>[
+          {'eventType': 'decoStopStart', 'timestamp': 1800},
+        ],
+      });
+      expect(dive.diveTypeIds, ['technical']);
+    });
+
     test('a no-deco profile keeps the recreational default', () async {
       final dive = await importSingleDive({
         'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
