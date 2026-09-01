@@ -12,7 +12,8 @@ enum ProfileFieldKind {
   runLengthString,
 }
 
-/// One entry of a field table. [name] is the `dive_profiles` column name.
+/// One entry of a field table. [name] is the column name the v181
+/// `dive_profiles` table used.
 class ProfileField {
   const ProfileField(this.name, this.kind);
 
@@ -20,8 +21,9 @@ class ProfileField {
   final ProfileFieldKind kind;
 }
 
-/// Codec v1: every `dive_profiles` sample column, in this order. Never
-/// reorder or remove an entry; append under a new version instead.
+/// Codec v1: every sample column the v181 `dive_profiles` table stored (the
+/// codec's column order). Never reorder or remove an entry; append under a
+/// new version instead.
 const List<ProfileField> kProfileFieldTableV1 = [
   ProfileField('timestamp', ProfileFieldKind.deltaInt),
   ProfileField('depth', ProfileFieldKind.float64),

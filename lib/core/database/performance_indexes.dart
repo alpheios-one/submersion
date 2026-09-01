@@ -82,16 +82,33 @@ const List<PerformanceIndex> kPerformanceIndexes = [
   ),
   // -- per-dive child tables (the million-row scans) ---------------------
   (
-    name: 'idx_dive_profiles_dive_id',
+    name: 'idx_dive_profile_series_dive_primary',
     ddl:
-        'CREATE INDEX IF NOT EXISTS idx_dive_profiles_dive_id '
-        'ON dive_profiles(dive_id)',
+        'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
+        'ON dive_profile_series (dive_id, is_primary)',
   ),
   (
-    name: 'idx_tank_pressure_dive_tank',
+    name: 'idx_tank_pressure_series_dive_tank',
     ddl:
-        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_dive_tank '
-        'ON tank_pressure_profiles(dive_id, tank_id, timestamp)',
+        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_dive_tank '
+        'ON tank_pressure_series (dive_id, tank_id)',
+  ),
+  // The sync watermark filter. Every publish tick asks whether the pending
+  // series blobs exceed the changeset budget, and both export paths select
+  // on the same predicate; unindexed that is a full scan of the two largest
+  // tables in the database, on a steady-state device that has nothing to
+  // publish at all.
+  (
+    name: 'idx_dive_profile_series_hlc',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_hlc '
+        'ON dive_profile_series (hlc)',
+  ),
+  (
+    name: 'idx_tank_pressure_series_hlc',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_hlc '
+        'ON tank_pressure_series (hlc)',
   ),
   (
     name: 'idx_dive_tanks_dive_id',

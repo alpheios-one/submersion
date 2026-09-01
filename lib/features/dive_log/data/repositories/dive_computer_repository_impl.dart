@@ -10,22 +10,25 @@ import 'package:submersion/core/database/database.dart'
         DiveComputersCompanion,
         DiveDataSourcesCompanion,
         DiveDiveTypesCompanion,
-        DiveProfilesCompanion,
         DiveProfileEventsCompanion,
         DivesCompanion,
         DiveTanksCompanion,
         GasSwitchesCompanion,
-        DiveProfile,
-        DiveProfileEvent,
-        TankPressureProfilesCompanion;
+        DiveProfileEvent;
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart'
+    as codec;
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart'
+    show TankPressureSample;
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
@@ -46,6 +49,9 @@ class DiveComputerRepository {
 
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
+  final ProfileSeriesRepository _profileSeries = ProfileSeriesRepository();
+  final TankPressureSeriesRepository _tankSeries =
+      TankPressureSeriesRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
 
@@ -349,7 +355,7 @@ class DiveComputerRepository {
   /// snapshot (model + serial) of the device that produced it, backfilled
   /// here when missing, so the provenance record survives the delete and
   /// [_relinkOrphanedRows] can restore the links if the same hardware is
-  /// added again. FK references in `dives`, `dive_profiles`, and
+  /// added again. FK references in `dives`, `dive_profile_series`, and
   /// `dive_data_sources` are then nulled out so the delete is not blocked by
   /// foreign key constraints; the dive/profile/data-source rows themselves
   /// are preserved.
@@ -364,6 +370,13 @@ class DiveComputerRepository {
         await _backfillProvenanceSnapshots(_mapRowToComputer(row));
       }
 
+      // Clear the series first: their FK is ON DELETE SET NULL, so the
+      // dive_computers delete that follows would null series.computer_id via
+      // the cascade without restamping hlc, and peers would never learn of
+      // the change.
+      await _profileSeries.clearComputer(id);
+      await _tankSeries.clearComputer(id);
+
       // Clear FK references that would block the delete. dives.computer_id
       // has no ON DELETE action, so leaving it set fails the delete with
       // SqliteException(787) on any computer that a dive references (#823).
@@ -372,13 +385,20 @@ class DiveComputerRepository {
         [id],
       );
       await _db.customStatement(
-        'UPDATE dive_profiles SET computer_id = NULL WHERE computer_id = ?',
-        [id],
-      );
-      await _db.customStatement(
         'UPDATE dive_data_sources SET computer_id = NULL WHERE computer_id = ?',
         [id],
       );
+      // The v183 rung drops dive_profiles only once its rows have actually
+      // moved into the series table, so a device whose pack threw still
+      // carries it, and its computer_id FK has no ON DELETE action either.
+      // Same #823 failure as dives.computer_id, so clear it the same way.
+      // tank_pressure_profiles needs no equivalent: its FK is SET NULL.
+      if (await _legacyProfilesTableExists()) {
+        await _db.customStatement(
+          'UPDATE dive_profiles SET computer_id = NULL WHERE computer_id = ?',
+          [id],
+        );
+      }
 
       await (_db.delete(_db.diveComputers)..where((t) => t.id.equals(id))).go();
       await _syncRepository.logDeletion(
@@ -395,6 +415,20 @@ class DiveComputerRepository {
       );
       rethrow;
     }
+  }
+
+  /// Whether the pre-v183 row-per-sample `dive_profiles` table is still in
+  /// this database. Every current build reads samples from the series
+  /// tables, so a hit here means the v183 pack could not finish and the
+  /// table was deliberately kept for a later retry.
+  Future<bool> _legacyProfilesTableExists() async {
+    final rows = await _db
+        .customSelect(
+          "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+          "AND name = 'dive_profiles'",
+        )
+        .get();
+    return rows.isNotEmpty;
   }
 
   /// Insert a `dive_data_sources` snapshot for every dive that references
@@ -520,15 +554,7 @@ class DiveComputerRepository {
           .map((r) => r.read<String>('dive_id'))
           .toSet()
           .toList();
-      final matchedPh = List.filled(matchedDiveIds.length, '?').join(', ');
-      await _db.customStatement(
-        'UPDATE dive_profiles SET computer_id = ? '
-        'WHERE computer_id IS NULL AND dive_id IN ($matchedPh) '
-        'AND (SELECT COUNT(*) FROM dive_data_sources s '
-        'WHERE s.dive_id = dive_profiles.dive_id '
-        "AND s.source_format = 'dive_computer') = 1",
-        [computerId, ...matchedDiveIds],
-      );
+      await _profileSeries.relinkComputer(computerId, matchedDiveIds);
 
       _log.info(
         'Relinked ${sourceIds.length} data source(s) from previous '
@@ -692,49 +718,17 @@ class DiveComputerRepository {
   // Multi-Profile Operations
   // ============================================================================
 
-  /// Get all profile points for a dive, optionally filtered by computer
-  Future<List<DiveProfile>> getProfilesForDive(
-    String diveId, {
-    String? computerId,
-  }) async {
-    try {
-      final query = _db.select(_db.diveProfiles)
-        ..where((t) => t.diveId.equals(diveId))
-        ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]);
-
-      if (computerId != null) {
-        query.where((t) => t.computerId.equals(computerId));
-      }
-
-      return await query.get();
-    } catch (e, stackTrace) {
-      _log.error(
-        'Failed to get profiles for dive: $diveId',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      rethrow;
-    }
-  }
-
   /// Get all computer IDs that have profiles for a given dive
   Future<List<String>> getComputerIdsForDive(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND computer_id IS NOT NULL
-      ''',
-            variables: [Variable(diveId)],
-          )
-          .get();
-
-      return result
-          .map((row) => row.data['computer_id'] as String?)
-          .whereType<String>()
-          .toList();
+      // Identity columns only: they live unencoded on the row, so there is
+      // nothing to inflate here. Decoding the blobs also dropped a computer
+      // whose samples would not decode, which this question is not about.
+      final identities = await _profileSeries.getIdentitiesForDive(diveId);
+      return {
+        for (final s in identities)
+          if (s.computerId != null) s.computerId!,
+      }.toList();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get computer ids for dive: $diveId',
@@ -769,7 +763,7 @@ class DiveComputerRepository {
   /// The dive_data_sources row on [diveId] that describes [computerId], or
   /// null when the dive has no source row for that computer yet.
   ///
-  /// Used to stamp `dive_profiles.sourceId` at insert time (issue #1149).
+  /// Used to stamp the series row's `sourceId` at insert time (issue #1149).
   /// Primary first so a dive that somehow carries two rows for one computer
   /// resolves to the one the rest of the app treats as canonical.
   Future<String?> _dataSourceIdFor(String diveId, String computerId) async {
@@ -791,19 +785,12 @@ class DiveComputerRepository {
   /// Get the primary profile's computer for a dive
   Future<String?> getPrimaryComputerId(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            '''
-        SELECT DISTINCT computer_id
-        FROM dive_profiles
-        WHERE dive_id = ? AND is_primary = 1 AND computer_id IS NOT NULL
-        LIMIT 1
-      ''',
-            variables: [Variable(diveId)],
-          )
-          .getSingleOrNull();
-
-      return result?.data['computer_id'] as String?;
+      // Identity columns only; see getComputerIdsForDive.
+      final identities = await _profileSeries.getIdentitiesForDive(diveId);
+      for (final s in identities) {
+        if (s.isPrimary && s.computerId != null) return s.computerId;
+      }
+      return null;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get primary computer for dive: $diveId',
@@ -822,45 +809,32 @@ class DiveComputerRepository {
       );
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      // Clear all primary flags for this dive
-      await _db.customStatement(
-        '''
-        UPDATE dive_profiles
-        SET is_primary = 0
-        WHERE dive_id = ?
-      ''',
-        [diveId],
-      );
+      // Resolve what to promote BEFORE demoting anything, and do both in
+      // one transaction. Demoting every series and then promoting nothing
+      // leaves the dive with no primary at all: it keeps rendering
+      // (getDiveById and getMergedProfile ignore the flag) while
+      // getDiveProfile, the rate aggregates and the quality prefilters all
+      // silently skip it. That is reachable whenever the chosen computer
+      // owns no series (a null-computer series after a clearComputer, a
+      // consolidation that moved samples, a metadata-only source), and a
+      // crash between two separate commits produced it even when the
+      // promote would have matched. DiveRepository.setPrimaryDataSource
+      // guards the same pair the same way (issue #1149).
+      await _db.transaction(() async {
+        if (await _profileSeries.ownsComputer(diveId, computerId)) {
+          await _profileSeries.demoteAll(diveId, now: now);
+          await _profileSeries.promoteByComputer(diveId, computerId, now: now);
+        }
 
-      // Set the new primary
-      await _db.customStatement(
-        '''
-        UPDATE dive_profiles
-        SET is_primary = 1
-        WHERE dive_id = ? AND computer_id = ?
-      ''',
-        [diveId, computerId],
-      );
-
-      final profiles = await (_db.select(
-        _db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      for (final profile in profiles) {
+        await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+          DivesCompanion(updatedAt: Value(now)),
+        );
         await _syncRepository.markRecordPending(
-          entityType: 'diveProfiles',
-          recordId: profile.id,
+          entityType: 'dives',
+          recordId: diveId,
           localUpdatedAt: now,
         );
-      }
-
-      await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
-        DivesCompanion(updatedAt: Value(now)),
-      );
-      await _syncRepository.markRecordPending(
-        entityType: 'dives',
-        recordId: diveId,
-        localUpdatedAt: now,
-      );
+      });
       SyncEventBus.notifyLocalChange();
 
       _log.info('Set primary profile for dive $diveId');
@@ -1036,7 +1010,7 @@ class DiveComputerRepository {
           '''
         SELECT DISTINCT d.id, d.dive_date_time
         FROM dives d
-        INNER JOIN dive_profiles dp ON d.id = dp.dive_id
+        INNER JOIN dive_profile_series dp ON d.id = dp.dive_id
         WHERE dp.computer_id = ?
         ORDER BY d.dive_date_time DESC
         ${limit != null ? 'LIMIT $limit' : ''}
@@ -1062,8 +1036,8 @@ class DiveComputerRepository {
   ///
   /// Used by the replaceSource path so that a subsequent [importProfile] call
   /// inserts fresh data instead of short-circuiting. Also clears per-dive
-  /// derived tables (events, gas switches, tank pressure profiles) that lack
-  /// a computer_id column and would otherwise accumulate stale rows.
+  /// derived rows (events, gas switches, tank pressure series) that lack a
+  /// computer_id column and would otherwise accumulate stale rows.
   Future<void> clearSourceAndProfiles({
     required String diveId,
     required String computerId,
@@ -1074,18 +1048,12 @@ class DiveComputerRepository {
       'DELETE FROM dive_profile_events WHERE dive_id = ?',
       [diveId],
     );
-    await _db.customStatement(
-      'DELETE FROM tank_pressure_profiles WHERE dive_id = ?',
-      [diveId],
-    );
+    await _tankSeries.deleteForDive(diveId);
     await _db.customStatement('DELETE FROM gas_switches WHERE dive_id = ?', [
       diveId,
     ]);
     // Delete profile points for this computer+dive
-    await _db.customStatement(
-      'DELETE FROM dive_profiles WHERE dive_id = ? AND computer_id = ?',
-      [diveId, computerId],
-    );
+    await _profileSeries.deleteByComputer(diveId, computerId);
     // Delete the data source row for this computer+dive
     await _db.customStatement(
       'DELETE FROM dive_data_sources WHERE dive_id = ? AND computer_id = ?',
@@ -1358,32 +1326,15 @@ class DiveComputerRepository {
         isPrimary = true; // First profile is always primary
       }
 
-      // Check if this computer already has a profile for this dive
-      final existingProfiles = await _db
-          .customSelect(
-            '''
-        SELECT COUNT(*) as count
-        FROM dive_profiles
-        WHERE dive_id = ? AND computer_id = ?
-      ''',
-            variables: [Variable(diveId), Variable(computerId)],
-          )
-          .getSingle();
-
-      if ((existingProfiles.data['count'] as int) > 0) {
+      // The re-download guard: this computer already contributed a series.
+      if (await _profileSeries.hasSeriesForComputer(diveId, computerId)) {
         _log.info('Profile from this computer already exists for dive $diveId');
         return diveId;
       }
 
-      // If this dive has no profiles yet, make this one primary
-      final hasProfiles = await _db
-          .customSelect(
-            'SELECT COUNT(*) as count FROM dive_profiles WHERE dive_id = ?',
-            variables: [Variable(diveId)],
-          )
-          .getSingle();
-
-      if ((hasProfiles.data['count'] as int) == 0) {
+      // If this dive has no series yet, make this one primary
+      final hadSeries = await _profileSeries.hasAnySeries(diveId);
+      if (!hadSeries) {
         isPrimary = true;
       }
 
@@ -1394,50 +1345,15 @@ class DiveComputerRepository {
       // to the pre-v154 computerId convention.
       final ownerSourceId = await _dataSourceIdFor(diveId, computerId);
 
-      // Batch insert profile points for performance (~100x faster than individual)
-      // No individual sync records needed - parent dive sync covers child data
-      await _db.batch((batch) {
-        for (final point in points) {
-          batch.insert(
-            _db.diveProfiles,
-            DiveProfilesCompanion(
-              id: Value(_uuid.v4()),
-              diveId: Value(diveId),
-              computerId: Value(computerId),
-              sourceId: Value(ownerSourceId),
-              timestamp: Value(point.timestamp),
-              depth: Value(point.depth),
-              pressure: const Value(null),
-              temperature: Value(point.temperature),
-              heartRate: Value(point.heartRate),
-              heading: Value(point.heading),
-              isPrimary: Value(isPrimary),
-              // Decompression and rebreather data
-              setpoint: Value(point.setpoint),
-              ppO2: Value(point.ppO2),
-              cns: Value(point.cns),
-              ndl: Value(point.ndl),
-              ceiling: Value(point.ceiling),
-              ascentRate: Value(point.ascentRate),
-              rbt: Value(point.rbt),
-              decoType: Value(point.decoType),
-              tts: Value(point.tts),
-              o2Sensor1: Value(point.o2Sensor1),
-              o2Sensor2: Value(point.o2Sensor2),
-              o2Sensor3: Value(point.o2Sensor3),
-              o2Sensor4: Value(point.o2Sensor4),
-              o2Sensor5: Value(point.o2Sensor5),
-              o2Sensor6: Value(point.o2Sensor6),
-              o2SensorMv1: Value(point.o2SensorMv1),
-              o2SensorMv2: Value(point.o2SensorMv2),
-              o2SensorMv3: Value(point.o2SensorMv3),
-              o2SensorMv4: Value(point.o2SensorMv4),
-              o2SensorMv5: Value(point.o2SensorMv5),
-              o2SensorMv6: Value(point.o2SensorMv6),
-            ),
-          );
-        }
-      });
+      if (points.isNotEmpty) {
+        await _profileSeries.insertSeries(
+          diveId: diveId,
+          computerId: computerId,
+          sourceId: ownerSourceId,
+          isPrimary: isPrimary,
+          samples: [for (final point in points) _sampleFromPointData(point)],
+        );
+      }
 
       // Profile data changed (new source added or re-imported): drop any
       // stored safety review so it recomputes against the new profile.
@@ -1503,7 +1419,8 @@ class DiveComputerRepository {
         }
       }
 
-      // Insert per-tank pressure time-series data (batch insert, no individual sync)
+      // Insert per-tank pressure time-series data: one series insert per
+      // tank, each marked pending and stamped with an hlc by the repository.
       if (tankIdsByIndex.isNotEmpty) {
         // Group pressure readings by tank index. A sample can carry a reading
         // per air-integrated transmitter (issue #1223), so this walks
@@ -1518,27 +1435,30 @@ class DiveComputerRepository {
             ),
         ]);
 
-        // Batch insert pressure data for each tank
-        // No individual sync records - parent dive sync covers child data
+        // Insert one series per tank; each series is marked pending and
+        // stamped with an hlc by the repository.
         final insertEntries = pressuresByTank.entries
             .where((entry) => tankIdsByIndex.containsKey(entry.key))
             .toList();
-        await _db.batch((batch) {
+        // One transaction for the pressure set: a multi-transmitter download
+        // whose second tank cannot be written must not leave the first
+        // committed and pending, publishing half a dive's pressures to peers
+        // as if they were all of them.
+        await _db.transaction(() async {
           for (final entry in insertEntries) {
-            final tankId = tankIdsByIndex[entry.key]!;
-            for (final point in entry.value) {
-              batch.insert(
-                _db.tankPressureProfiles,
-                TankPressureProfilesCompanion.insert(
-                  id: _uuid.v4(),
-                  diveId: diveId,
-                  tankId: tankId,
-                  computerId: Value(computerId),
-                  timestamp: point.timestamp,
-                  pressure: point.pressure,
-                ),
-              );
-            }
+            if (entry.value.isEmpty) continue;
+            await _tankSeries.insertSeries(
+              diveId: diveId,
+              tankId: tankIdsByIndex[entry.key]!,
+              computerId: computerId,
+              samples: [
+                for (final point in entry.value)
+                  TankPressureSample(
+                    timestamp: point.timestamp,
+                    pressure: point.pressure,
+                  ),
+              ],
+            );
           }
         });
         for (final entry in insertEntries) {
@@ -2039,6 +1959,38 @@ class DiveComputerRepository {
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );
   }
+
+  /// Maps a parsed profile point to the codec's sample type. Per-sample
+  /// pressure is not carried here; it lives in the tank series.
+  static codec.ProfileSample _sampleFromPointData(ProfilePointData p) =>
+      codec.ProfileSample(
+        timestamp: p.timestamp,
+        depth: p.depth,
+        temperature: p.temperature,
+        heartRate: p.heartRate,
+        heading: p.heading,
+        setpoint: p.setpoint,
+        ppO2: p.ppO2,
+        cns: p.cns,
+        ndl: p.ndl,
+        ceiling: p.ceiling,
+        ascentRate: p.ascentRate,
+        rbt: p.rbt,
+        decoType: p.decoType,
+        tts: p.tts,
+        o2Sensor1: p.o2Sensor1,
+        o2Sensor2: p.o2Sensor2,
+        o2Sensor3: p.o2Sensor3,
+        o2Sensor4: p.o2Sensor4,
+        o2Sensor5: p.o2Sensor5,
+        o2Sensor6: p.o2Sensor6,
+        o2SensorMv1: p.o2SensorMv1,
+        o2SensorMv2: p.o2SensorMv2,
+        o2SensorMv3: p.o2SensorMv3,
+        o2SensorMv4: p.o2SensorMv4,
+        o2SensorMv5: p.o2SensorMv5,
+        o2SensorMv6: p.o2SensorMv6,
+      );
 
   /// Calculate bottom time (seconds) from profile points.
   ///

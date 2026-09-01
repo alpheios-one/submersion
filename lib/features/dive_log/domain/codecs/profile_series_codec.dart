@@ -121,7 +121,10 @@ class ProfileSeriesCodec {
     final blobVersion = reader.readByte();
     final table = fieldTables[blobVersion];
     if (table == null) {
-      throw ProfileSeriesCodecException('unknown codec version $blobVersion');
+      throw UnknownSeriesVersionException(
+        blobVersion,
+        fieldTables.keys.toSet(),
+      );
     }
     _validateTable(table);
     final count = reader.readVarUint();
@@ -351,6 +354,22 @@ class ProfileSeriesCodec {
     }
 
     final timestamps = column<int>('timestamp');
+    // The invariant encode enforces, re-checked here. Every retired reader
+    // got it from `ORDER BY timestamp`, and every consumer still assumes
+    // it: the merge interleaves on it, the aggregates difference
+    // consecutive samples, and the summary takes first and last rather than
+    // min and max. A crafted or bit-rotted blob can carry a decreasing
+    // delta, and the samples would then be silently out of order rather
+    // than refused.
+    for (var i = 1; i < timestamps.length; i++) {
+      final previous = timestamps[i - 1];
+      final current = timestamps[i];
+      if (previous != null && current != null && current < previous) {
+        throw ProfileSeriesCodecException(
+          'sample $i decreases from $previous to $current',
+        );
+      }
+    }
     final depths = column<double>('depth');
     final pressures = column<double>('pressure');
     final temperatures = column<double>('temperature');
