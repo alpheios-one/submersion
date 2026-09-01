@@ -431,7 +431,7 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
         .toDouble();
     // A single CustomScrollView so the chart and tab selector scroll away
     // with the rest of the page instead of staying pinned and eating the
-    // viewport (#scroll-planner-results).
+    // viewport (#1428).
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
