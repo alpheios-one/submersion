@@ -9,6 +9,7 @@ import 'package:submersion/core/database/database.dart'
         AppDatabase,
         DiveComputersCompanion,
         DiveDataSourcesCompanion,
+        DiveDiveTypesCompanion,
         DiveProfilesCompanion,
         DiveProfileEventsCompanion,
         DivesCompanion,
@@ -19,6 +20,7 @@ import 'package:submersion/core/database/database.dart'
         TankPressureProfilesCompanion;
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
+import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
@@ -1172,6 +1174,31 @@ class DiveComputerRepository {
         // not bottom time. Calculate bottom time from the profile.
         final bottomTimeSeconds = _calculateBottomTimeFromPoints(points);
 
+        // Downloaded profiles carry no dive type, so every dive used to land
+        // on 'recreational', including dives whose samples show mandatory
+        // deco (ceiling, deco stops, exhausted NDL). Default those to the
+        // built-in 'technical' type instead.
+        final decoEventMaps = events
+            ?.map((e) => _mapEventTypeString(e.type))
+            .whereType<String>()
+            .map((type) => {'eventType': type})
+            .toList();
+        final diveTypeId =
+            DecoDiveDetector.isDecoDive(
+              samples: points.map(
+                (p) => DecoDiveSample(
+                  depth: p.depth,
+                  ndl: p.ndl,
+                  ceiling: p.ceiling,
+                  decoType: p.decoType,
+                  tts: p.tts,
+                ),
+              ),
+              eventMaps: decoEventMaps,
+            )
+            ? 'technical'
+            : 'recreational';
+
         await _db
             .into(_db.dives)
             .insert(
@@ -1201,6 +1228,7 @@ class DiveComputerRepository {
                 decoAlgorithm: Value(decoAlgorithm),
                 decoConservatism: Value(decoConservatism),
                 diveMode: Value(diveMode.code),
+                diveType: Value(diveTypeId),
                 createdAt: Value(now),
                 updatedAt: Value(now),
                 entryLatitude: Value(entryLatitude),
@@ -1209,6 +1237,23 @@ class DiveComputerRepository {
                 exitLongitude: Value(exitLongitude),
               ),
             );
+
+        final diveTypeRowId = _uuid.v4();
+        await _db
+            .into(_db.diveDiveTypes)
+            .insert(
+              DiveDiveTypesCompanion(
+                id: Value(diveTypeRowId),
+                diveId: Value(diveId),
+                diveTypeId: Value(diveTypeId),
+                createdAt: Value(now),
+              ),
+            );
+        await _syncRepository.markRecordPending(
+          entityType: 'diveDiveTypes',
+          recordId: diveTypeRowId,
+          localUpdatedAt: now,
+        );
 
         await _syncRepository.markRecordPending(
           entityType: 'dives',

@@ -749,6 +749,109 @@ void main() {
       },
     );
 
+    Future<List<String>> diveTypeIdsFor(String diveId) async {
+      final rows = await (db.select(
+        db.diveDiveTypes,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      return rows.map((r) => r.diveTypeId).toList();
+    }
+
+    test(
+      'a profile with a deco ceiling defaults the dive type to technical',
+      () async {
+        final computerId = await insertComputer();
+        final entryTime = DateTime(2026, 4, 1, 9, 0);
+
+        final diveId = await repository.importProfile(
+          computerId: computerId,
+          profileStartTime: entryTime,
+          points: const [
+            ProfilePointData(timestamp: 0, depth: 1.5, ceiling: 0.0),
+            ProfilePointData(timestamp: 600, depth: 42.0, ceiling: 6.0),
+          ],
+          durationSeconds: 3600,
+          maxDepth: 42.0,
+          forceNew: true,
+        );
+
+        final dive = await (db.select(
+          db.dives,
+        )..where((t) => t.id.equals(diveId))).getSingle();
+        expect(dive.diveType, 'technical');
+        expect(await diveTypeIdsFor(diveId), ['technical']);
+      },
+    );
+
+    test('exhausted NDL with TTS remaining at depth defaults the dive type to '
+        'technical', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 10, 0);
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 30.0, ndl: 300, tts: 120),
+          ProfilePointData(timestamp: 900, depth: 32.0, ndl: 0, tts: 600),
+        ],
+        durationSeconds: 1800,
+        maxDepth: 32.0,
+        forceNew: true,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'technical');
+    });
+
+    test('a deco-stop event defaults the dive type to technical even with a '
+        'no-deco profile', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 11, 0);
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 1.0, ndl: 3600),
+          ProfilePointData(timestamp: 600, depth: 18.0, ndl: 1200),
+        ],
+        durationSeconds: 1800,
+        maxDepth: 18.0,
+        events: const [EventData(timestamp: 900, type: 'deco')],
+        forceNew: true,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'technical');
+    });
+
+    test('a no-deco profile defaults the dive type to recreational', () async {
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 12, 0);
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 1.0, ndl: 3600),
+          ProfilePointData(timestamp: 600, depth: 18.0, ndl: 1200, tts: 60),
+        ],
+        durationSeconds: 1800,
+        maxDepth: 18.0,
+        forceNew: true,
+      );
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'recreational');
+      expect(await diveTypeIdsFor(diveId), ['recreational']);
+    });
+
     test('importProfile persists the computer dive mode (gauge)', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 3, 15, 12, 0);

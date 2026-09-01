@@ -4,6 +4,7 @@ import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
@@ -1567,9 +1568,32 @@ class UddfEntityImporter {
       final parsedEntryTime = diveData['entryTime'] as DateTime?;
       final entryTime = parsedEntryTime ?? dateTime;
       final exitTime = runtime != null ? dateTime.add(runtime) : null;
+      // Parser-emitted profile events; consumed below for the deco default
+      // and persisted as ProfileEvents after the dive row is created.
+      final eventMaps = (diveData['events'] as List?)
+          ?.cast<Map<String, dynamic>>();
+      // Sources without an explicit dive type used to land every dive on
+      // 'recreational', including dives whose samples show mandatory deco
+      // (ceiling, deco stops, exhausted NDL). Default those to the built-in
+      // 'technical' type instead.
+      final defaultDiveType =
+          DecoDiveDetector.isDecoDive(
+            samples: profile.map(
+              (p) => DecoDiveSample(
+                depth: p.depth,
+                ndl: p.ndl,
+                ceiling: p.ceiling,
+                decoType: p.decoType,
+                tts: p.tts,
+              ),
+            ),
+            eventMaps: eventMaps,
+          )
+          ? 'technical'
+          : 'recreational';
       final diveTypeIds =
           (diveData['diveTypeIds'] as List?)?.cast<String>() ??
-          [diveData['diveType'] as String? ?? 'recreational'];
+          [diveData['diveType'] as String? ?? defaultDiveType];
 
       // Parse dive mode, planner flag, and favorite
       final diveMode =
@@ -1868,8 +1892,6 @@ class UddfEntityImporter {
       // event persistence is intentionally out of scope for Slice C; when a
       // future slice adds UDDF event import, unify the keys or add a second
       // consumer block here.
-      final eventMaps = (diveData['events'] as List?)
-          ?.cast<Map<String, dynamic>>();
       if (eventMaps != null && eventMaps.isNotEmpty) {
         final events = <ProfileEvent>[];
         for (final m in eventMaps) {
