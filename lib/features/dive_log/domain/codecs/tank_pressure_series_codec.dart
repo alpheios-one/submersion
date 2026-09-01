@@ -6,9 +6,9 @@ import 'package:submersion/features/dive_log/domain/codecs/bounded_inflate.dart'
 import 'package:submersion/features/dive_log/domain/codecs/byte_io.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
 
-/// One tank pressure reading as `tank_pressure_profiles` stores it, minus
-/// the identity columns (`id`, `dive_id`, `tank_id`, `computer_id`) that
-/// live on the series row.
+/// One tank pressure reading as the v181 `tank_pressure_profiles` table
+/// stored it (the codec's column order), minus the identity columns (`id`,
+/// `dive_id`, `tank_id`, `computer_id`) that live on the series row.
 class TankPressureSample extends Equatable {
   const TankPressureSample({required this.timestamp, required this.pressure});
 
@@ -17,6 +17,11 @@ class TankPressureSample extends Equatable {
 
   /// Bar.
   final double pressure;
+
+  /// The same reading [seconds] later (negative moves it earlier). Merge and
+  /// consolidation re-base a segment's samples onto the combined timeline.
+  TankPressureSample shiftedBy(int seconds) =>
+      TankPressureSample(timestamp: timestamp + seconds, pressure: pressure);
 
   @override
   List<Object?> get props => [timestamp, pressure];
@@ -132,7 +137,7 @@ class TankPressureSeriesCodec {
     final reader = ByteReader(body);
     final blobVersion = reader.readByte();
     if (blobVersion != version) {
-      throw ProfileSeriesCodecException('unknown codec version $blobVersion');
+      throw UnknownSeriesVersionException(blobVersion, const {version});
     }
     final count = reader.readVarUint();
     if (count == 0) {
@@ -163,6 +168,17 @@ class TankPressureSeriesCodec {
       throw ProfileSeriesCodecException(
         '${reader.remaining} trailing byte(s) after the last block',
       );
+    }
+    // The invariant encode enforces; see the profile codec for why every
+    // consumer still depends on it.
+    for (var i = 1; i < timestamps.length; i++) {
+      final previous = timestamps[i - 1];
+      final current = timestamps[i];
+      if (previous != null && current != null && current < previous) {
+        throw ProfileSeriesCodecException(
+          'sample $i decreases from $previous to $current',
+        );
+      }
     }
     return [
       for (var i = 0; i < count; i++)

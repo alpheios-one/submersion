@@ -3839,6 +3839,7 @@
   "gpsTrack_importError_unreadable": "A fájl nem olvasható. Sérült vagy hiányos lehet.",
   "gpsTrack_importError_noPositions": "A fájl nem tartalmaz időbélyeggel ellátott GPS-pozíciókat.",
   "gpsTrack_importError_badData": "A fájl olyan pozíciót vagy időbélyeget tartalmaz, amelyet az alkalmazás nem tud beolvasni.",
+  "gpsTrack_importError_tooLarge": "A fájl túl sok pozíciót tartalmaz ahhoz, hogy egyetlen nyomvonalként tárolható legyen. Bontsd rövidebb nyomvonalakra, és importáld őket külön.",
   "gpsTrack_export_saved": "Nyomvonal mentve",
   "gpsTrack_action_export": "Exportálás",
   "gpsTrack_action_shareGpx": "Megosztás GPX-ként",

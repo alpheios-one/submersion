@@ -3912,6 +3912,7 @@
   "gpsTrack_importError_unreadable": "تعذرت قراءة هذا الملف. قد يكون تالفًا أو غير مكتمل.",
   "gpsTrack_importError_noPositions": "لا يحتوي هذا الملف على مواقع GPS مؤرخة زمنيًا.",
   "gpsTrack_importError_badData": "يحتوي هذا الملف على موقع أو طابع زمني يتعذر على التطبيق قراءته.",
+  "gpsTrack_importError_tooLarge": "يحتوي هذا الملف على عدد كبير جدًا من المواقع بحيث لا يمكن تخزينه كمسار واحد. قسّمه إلى مسارات أقصر واستوردها بشكل منفصل.",
   "gpsTrack_export_saved": "تم حفظ المسار",
   "gpsTrack_action_export": "تصدير",
   "gpsTrack_action_shareGpx": "مشاركة كملف GPX",

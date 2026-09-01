@@ -14,7 +14,6 @@ import 'import_consolidation_service_test.mocks.dart';
 const _emptySnapshot = DiveMergeSnapshot(
   mergedDiveId: 'target-dive',
   diveRows: [],
-  profileRows: [],
   tankRows: [],
   weightRows: [],
   customFieldRows: [],
@@ -25,7 +24,6 @@ const _emptySnapshot = DiveMergeSnapshot(
   sightingRows: [],
   eventRows: [],
   gasSwitchRows: [],
-  tankPressureRows: [],
   dataSourceRows: [],
   tideRows: [],
   mediaDiveIds: {},

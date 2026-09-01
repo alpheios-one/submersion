@@ -661,8 +661,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Whether per-computer data attributed to [computerId] should be drawn.
   ///
   /// A `null` [computerId] (the null-means-primary convention used by
-  /// dive_profiles/dive_profile_events/tank_pressure_profiles rows — see
-  /// database.dart) or the active source's own computer always draws.
+  /// dive_profile_series, dive_profile_events and tank_pressure_series rows;
+  /// see database.dart) or the active source's own computer always draws.
   /// Other computers draw only while their source is overlaid. When the
   /// caller wired no active computer and no overlays (single-source dive),
   /// everything is visible.

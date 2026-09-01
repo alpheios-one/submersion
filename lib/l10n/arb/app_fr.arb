@@ -3839,6 +3839,7 @@
   "gpsTrack_importError_unreadable": "Ce fichier n'a pas pu être lu. Il est peut-être endommagé ou incomplet.",
   "gpsTrack_importError_noPositions": "Ce fichier ne contient aucune position GPS horodatée.",
   "gpsTrack_importError_badData": "Ce fichier contient une position ou un horodatage que l'application ne peut pas lire.",
+  "gpsTrack_importError_tooLarge": "Ce fichier contient trop de positions pour être enregistré comme une seule trace. Divisez-le en traces plus courtes et importez-les séparément.",
   "gpsTrack_export_saved": "Trace enregistrée",
   "gpsTrack_action_export": "Exporter",
   "gpsTrack_action_shareGpx": "Partager en GPX",

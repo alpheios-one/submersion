@@ -22216,6 +22216,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'يحتوي هذا الملف على موقع أو طابع زمني يتعذر على التطبيق قراءته.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'يحتوي هذا الملف على عدد كبير جدًا من المواقع بحيث لا يمكن تخزينه كمسار واحد. قسّمه إلى مسارات أقصر واستوردها بشكل منفصل.';
+
+  @override
   String get gpsTrack_export_saved => 'تم حفظ المسار';
 
   @override
