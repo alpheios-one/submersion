@@ -4054,6 +4054,7 @@
   "gpsTrack_importError_unreadable": "无法读取该文件。它可能已损坏或不完整。",
   "gpsTrack_importError_noPositions": "该文件没有带时间戳的 GPS 位置。",
   "gpsTrack_importError_badData": "该文件包含本应用无法读取的位置或时间戳。",
+  "gpsTrack_importError_tooLarge": "该文件的位置点过多，无法保存为单条轨迹。请将其拆分为较短的轨迹后分别导入。",
   "gpsTrack_export_saved": "轨迹已保存",
   "gpsTrack_action_export": "导出",
   "gpsTrack_action_shareGpx": "分享为 GPX",

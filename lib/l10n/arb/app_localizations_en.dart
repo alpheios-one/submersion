@@ -22235,6 +22235,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'That file has a position or timestamp this app cannot read.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'That file has too many positions to store as one track. Split it into shorter tracks and import them separately.';
+
+  @override
   String get gpsTrack_export_saved => 'Track saved';
 
   @override

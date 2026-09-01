@@ -1084,7 +1084,7 @@ final tankPressuresProvider =
       diveId,
     ) async {
       final repository = ref.watch(tankPressureRepositoryProvider);
-      // Analysis-input tick covers tank_pressure_profiles (and the dives
+      // Analysis-input tick covers tank_pressure_series (and the dives
       // cascade); the broad detail tick made every pressure curve re-query
       // on unrelated writes such as media.
       ref.invalidateSelfWhen(

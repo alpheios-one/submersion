@@ -9,6 +9,8 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/universal_import/data/repositories/csv_preset_repository.dart';
 
@@ -357,35 +359,46 @@ void main() {
 
     test('a deleted dive WITH child records is not resurrected and does not '
         'orphan its children', () async {
+      // The child here is diveProfileSeries, not the legacy row-per-sample
+      // diveProfiles: that table (and its Drift class) is gone as of v183,
+      // and an inbound diveProfiles row is now inbound-only staging that the
+      // packer empties immediately, so it can no longer stand in for a
+      // durable per-dive child in this scenario. diveProfileSeries is the
+      // real child now and cascades from its dive exactly as diveProfiles
+      // used to (see SyncService.parentRefs).
       final serializer = SyncDataSerializer();
       final diveRepo = DiveRepository();
 
       await diveRepo.createDive(
         createTestDiveWithBottomTime(id: 'dive-50', diveNumber: 50),
       );
-      await serializer.upsertRecord('diveProfiles', {
-        'id': 'prof-50',
-        'diveId': 'dive-50',
-        'isPrimary': true,
-        'timestamp': 0,
-        'depth': 5.0,
-      });
+      final seriesId = await ProfileSeriesRepository().insertSeries(
+        diveId: 'dive-50',
+        samples: const [ProfileSample(timestamp: 0, depth: 5.0)],
+        now: 1000,
+      );
       await buildService().performSync();
       final diveJson = await serializer.fetchRecord('dives', 'dive-50');
-      final profJson = await serializer.fetchRecord('diveProfiles', 'prof-50');
-      expect(profJson, isNotNull);
+      final seriesJson = await serializer.fetchRecord(
+        'diveProfileSeries',
+        seriesId,
+      );
+      expect(seriesJson, isNotNull);
 
       // Deleting the dive cascades the child away locally.
       await diveRepo.deleteDive('dive-50');
       expect(await serializer.fetchRecord('dives', 'dive-50'), isNull);
-      expect(await serializer.fetchRecord('diveProfiles', 'prof-50'), isNull);
+      expect(
+        await serializer.fetchRecord('diveProfileSeries', seriesId),
+        isNull,
+      );
 
-      // Peer still has the live dive AND its live child profile.
+      // Peer still has the live dive AND its live child series.
       final peerData = SyncData(
         dives: [
           {...diveJson!, 'updatedAt': 1000},
         ],
-        diveProfiles: [profJson!],
+        diveProfileSeries: [seriesJson!],
       );
       final checksum = sha256
           .convert(utf8.encode(jsonEncode(peerData.toJson())))
@@ -413,7 +426,7 @@ void main() {
         reason: 'the dive stays deleted',
       );
       expect(
-        await serializer.fetchRecord('diveProfiles', 'prof-50'),
+        await serializer.fetchRecord('diveProfileSeries', seriesId),
         isNull,
         reason: 'the orphaned child must not be resurrected either',
       );

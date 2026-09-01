@@ -22051,6 +22051,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'בקובץ יש מיקום או חותמת זמן שהאפליקציה אינה יכולה לקרוא.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'בקובץ יש יותר מדי מיקומים מכדי לשמור אותו כמסלול אחד. פצל אותו למסלולים קצרים יותר וייבא אותם בנפרד.';
+
+  @override
   String get gpsTrack_export_saved => 'המסלול נשמר';
 
   @override

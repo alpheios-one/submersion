@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_codec.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
@@ -312,4 +313,85 @@ void main() {
       reason: 'the cursor must not advance past a base that was never applied',
     );
   });
+
+  test('a refused envelope keeps the progress made below it', () async {
+    // An envelope the decorator rejects (an over-cap gzip payload from a
+    // peer, or a tampered one) used to throw clear out of the changeset
+    // loop to the per-peer catch, which skips the cursor upsert. Every
+    // seq already applied was then re-downloaded and re-applied on every
+    // later sync, and the cursor could never advance past the bad seq: a
+    // livelock, not the transient stop the error type promises.
+    await setUpTestDatabase();
+    addTearDown(() => tearDownTestDatabase());
+    final db = DatabaseService.instance.database;
+    final serializer = SyncDataSerializer();
+    final codec = ChangesetCodec(serializer);
+    final writer = ChangesetWriter(
+      serializer,
+      codec,
+      PublishStateStore(db),
+      compactionByteRatio: 1000.0,
+      compactionMaxChangesets: 1 << 30,
+    );
+    final reader = ChangesetReader(codec, PeerCursorStore(db));
+    final provider = _RefusingCloudStorageProvider();
+    final folder = await provider.getOrCreateSyncFolder();
+
+    final peerId = await SyncRepository().getDeviceId();
+    // Base @1, then changesets @2 and @3.
+    for (var i = 1; i <= 3; i++) {
+      await DiveRepository().createDive(
+        createTestDiveWithBottomTime(id: 'd$i', diveNumber: i),
+      );
+      await writer.publish(
+        provider: provider,
+        deviceId: peerId,
+        folderId: folder,
+        deletions: const [],
+      );
+    }
+    provider.refuseName = ChangesetLogLayout.changesetName(peerId, 3);
+
+    final applied = <SyncPayload>[];
+    await reader.pull(
+      provider: provider,
+      selfDeviceId: 'reader-x',
+      folderId: folder,
+      apply: (p) async => applied.add(p),
+      applyBaseFile: spyApplyBaseFile(applied),
+    );
+
+    final ids = applied.expand((p) => p.data.dives.map((d) => d['id'])).toSet();
+    expect(ids, contains('d2'), reason: 'seq 2 was readable and applied');
+    expect(
+      ids,
+      isNot(contains('d3')),
+      reason: 'a refused seq must not be applied',
+    );
+
+    final cursor = await PeerCursorStore(db).get(peerId, provider.providerId);
+    expect(
+      cursor?.lastSeqApplied,
+      2,
+      reason:
+          'the cursor must record the seqs already applied, so the next '
+          'sync retries only the refused one',
+    );
+  });
+}
+
+/// Refuses one file the way the encrypting decorator refuses an envelope it
+/// cannot open, so the reader sees a real [EnvelopeCorruptException] rather
+/// than a hand-thrown stand-in.
+class _RefusingCloudStorageProvider extends FakeCloudStorageProvider {
+  String? refuseName;
+
+  @override
+  Future<Uint8List> downloadFile(String fileId) async {
+    final name = fileId.substring(fileId.lastIndexOf('/') + 1);
+    if (name == refuseName) {
+      throw const EnvelopeCorruptException('Envelope payload rejected');
+    }
+    return super.downloadFile(fileId);
+  }
 }
