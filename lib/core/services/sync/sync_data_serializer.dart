@@ -3173,6 +3173,37 @@ class SyncDataSerializer {
     }
   }
 
+  /// Compares one header scalar against the value the blob decodes to, by
+  /// bit pattern rather than with `!=`.
+  ///
+  /// `!=` reports -0.0 as equal to 0.0, so a header that genuinely
+  /// disagrees with its blob at that value would pass the very check that
+  /// exists to catch a tampered one. It also reports NaN as different from
+  /// itself, which would be the wrong answer for a header that matches its
+  /// blob exactly; [_profileSeriesHeaderIsStorable] rejects a non-finite
+  /// header before this ever has to decide, for a different reason.
+  static bool _headerDoubleDiffers(double fromBlob, double fromHeader) =>
+      fromBlob.compareTo(fromHeader) != 0;
+
+  /// False when a scalar the row carries cannot be stored in its column.
+  ///
+  /// `max_depth`, `first_depth` and `last_depth` are NOT NULL REAL columns
+  /// and SQLite stores a non-finite double as NULL, so an infinite or NaN
+  /// header fails the insert. That insert is one batch for every series
+  /// record in the payload and runs inside the merge transaction, so one
+  /// such row would take down the whole batch rather than itself: this
+  /// filter drops it here, where a skip costs one record and one log line.
+  ///
+  /// Non-finite depths are a real input class ([ProfileSeriesSummary.of]
+  /// seeds `maxDepth` from the first sample with a `>` that never
+  /// overwrites a NaN seed, and the data-quality builder filters on
+  /// `depth.isFinite`), even though no peer can send one through JSON,
+  /// which encodes neither NaN nor infinity.
+  static bool _profileSeriesHeaderIsStorable(DiveProfileSeriesRow row) =>
+      row.maxDepth.isFinite &&
+      row.firstDepth.isFinite &&
+      row.lastDepth.isFinite;
+
   /// A peer's packed samples are decoded once before they are written so a
   /// corrupt or truncated blob never reaches the readers. Returns false (and
   /// logs) when the blob does not decode or when the summary computed from
@@ -3185,15 +3216,22 @@ class SyncDataSerializer {
   /// the blob, would otherwise write scalars that disagree with the samples
   /// they claim to summarize.
   bool _profileSeriesBlobIsSound(DiveProfileSeriesRow row) {
+    if (!_profileSeriesHeaderIsStorable(row)) {
+      _log.warning(
+        'Skipping diveProfileSeries ${row.id}: a non-finite depth scalar '
+        'cannot be stored in a NOT NULL REAL column',
+      );
+      return false;
+    }
     try {
       final decoded = const ProfileSeriesCodec().decode(row.samples);
       final summary = ProfileSeriesSummary.of(decoded);
       if (summary.sampleCount != row.sampleCount ||
           summary.startTimestamp != row.startTimestamp ||
           summary.endTimestamp != row.endTimestamp ||
-          summary.maxDepth != row.maxDepth ||
-          summary.firstDepth != row.firstDepth ||
-          summary.lastDepth != row.lastDepth ||
+          _headerDoubleDiffers(summary.maxDepth, row.maxDepth) ||
+          _headerDoubleDiffers(summary.firstDepth, row.firstDepth) ||
+          _headerDoubleDiffers(summary.lastDepth, row.lastDepth) ||
           summary.hasDecoType != row.hasDecoType ||
           summary.hasDecoStop != row.hasDecoStop ||
           summary.hasPositiveCeiling != row.hasPositiveCeiling) {
@@ -3231,6 +3269,10 @@ class SyncDataSerializer {
   }
 
   /// The tank twin of [_profileSeriesBlobIsSound].
+  ///
+  /// [TankPressureSeriesSummary] carries only counts and timestamps, so every
+  /// scalar compared here is an int; a double scalar added later belongs in
+  /// [_headerDoubleDiffers] rather than behind a plain `!=`.
   bool _tankSeriesBlobIsSound(TankPressureSeriesRow row) {
     try {
       final decoded = const TankPressureSeriesCodec().decode(row.samples);

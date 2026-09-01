@@ -476,32 +476,34 @@ void main() {
     },
   );
 
-  test(
-    'a v182 pack that throws still reaches 183 and keeps the legacy table',
-    () async {
-      final raw = sqlite3.sqlite3.openInMemory();
-      addTearDown(raw.close);
-      // Below 182, so the v182 rung itself runs. Its pack throws on the
-      // text timestamp (profileSampleOf casts unchecked), and an unguarded
-      // rung would rethrow out of onUpgrade and leave a database that
-      // cannot be opened on any relaunch.
-      legacyDdlAt180(raw, userVersion: 181);
-      seedParents(raw);
-      raw.execute(
-        "INSERT INTO dive_profiles (id, dive_id, is_primary, timestamp, "
-        "depth) VALUES ('p1', 'd1', 1, 'not-a-number', 1.0)",
-      );
+  test('a v182 pack that cannot write its series still reaches 183 and keeps '
+      'the legacy table', () async {
+    final raw = sqlite3.sqlite3.openInMemory();
+    addTearDown(raw.close);
+    // Below 182, so the v182 rung itself runs. A pre-existing
+    // dive_profile_series without its samples column, the shape
+    // backstop_resilience_test uses: CREATE TABLE IF NOT EXISTS leaves it
+    // alone, so every packer INSERT fails. An unguarded rung would let
+    // that out of onUpgrade and leave a database that cannot be opened on
+    // any relaunch, and the row is perfectly READABLE, so dropping the
+    // legacy table would destroy the only copy of it.
+    legacyDdlAt180(raw, userVersion: 181);
+    seedParents(raw);
+    raw.execute(
+      'INSERT INTO dive_profiles (id, dive_id, is_primary, timestamp, '
+      "depth) VALUES ('p1', 'd1', 1, 0, 1.0)",
+    );
+    malformedSeriesTable(raw);
 
-      final db = AppDatabase(
-        NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
-      );
-      addTearDown(db.close);
-      await expectLater(db.customSelect('SELECT 1').get(), completes);
+    final db = AppDatabase(
+      NativeDatabase.opened(raw, closeUnderlyingOnClose: false),
+    );
+    addTearDown(db.close);
+    await expectLater(db.customSelect('SELECT 1').get(), completes);
 
-      expect(scalar(raw, 'PRAGMA user_version'), 183);
-      expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 1);
-    },
-  );
+    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 1);
+  });
 
   test('an orphaned tank pressure row keeps its legacy table', () async {
     final raw = sqlite3.sqlite3.openInMemory();

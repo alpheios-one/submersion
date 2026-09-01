@@ -2903,15 +2903,20 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               handleBuiltInTouches: true,
               getTouchedSpotIndicator: (barData, spotIndexes) {
                 final suppressed = _suppressedDepthIndicatorSpots;
-                if (suppressed.isEmpty) {
-                  return defaultTouchedIndicators(barData, spotIndexes);
-                }
+                // spotIndexes can reference a touch captured against a
+                // previous frame's bar data (e.g. a consolidate-dive merge
+                // shortens the profile mid-touch); indexing barData.spots
+                // with a stale, now out-of-range index throws in fl_chart's
+                // own defaultTouchedIndicators, so drop those here first.
                 // Hide the built-in focus dot on the extra velocity bands so a
                 // single depth dot remains; every other line keeps its default
                 // indicator. See [velocityIndicatorSuppression].
                 return [
                   for (final index in spotIndexes)
-                    if (_isSuppressedIndicatorSpot(barData, index, suppressed))
+                    if (index < 0 || index >= barData.spots.length)
+                      null
+                    else if (suppressed.isNotEmpty &&
+                        _isSuppressedIndicatorSpot(barData, index, suppressed))
                       null
                     else
                       defaultTouchedIndicators(barData, [index]).first,

@@ -517,6 +517,35 @@ class ProfileSeriesRepository {
   Future<List<String>> deleteByIds(List<String> ids) =>
       ids.isEmpty ? Future.value(const []) : _delete((t) => t.id.isIn(ids));
 
+  /// Nulls `source_id` on every series of [sourceId] and restamps each, the
+  /// `clearComputer` rule applied to the other identity column.
+  ///
+  /// `source_id` is ON DELETE SET NULL, so deleting the `dive_data_sources`
+  /// row without this changes the series with no `updated_at` bump, no hlc
+  /// restamp and nothing pending. This device then resolves ownership
+  /// (`_ownedBy`, `getProfilesByDataSource`, `promoteWinnerOwnedBy`) as if
+  /// the series were unattributed while every peer still resolves it to the
+  /// deleted source, so the two group their source chips differently and a
+  /// later `setPrimaryDataSource` picks a different primary on each. Nothing
+  /// heals it either: a series row publishes only when its own hlc advances.
+  ///
+  /// Returns the number of series touched.
+  Future<int> clearSource(String sourceId, {int? now}) async {
+    final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
+    final ids = await _ids((t) => t.sourceId.equals(sourceId));
+    if (ids.isEmpty) return 0;
+    await _writeChunked(
+      ids,
+      DiveProfileSeriesCompanion(
+        sourceId: const Value(null),
+        updatedAt: Value(nowMs),
+      ),
+      nowMs,
+    );
+    SyncEventBus.notifyLocalChange();
+    return ids.length;
+  }
+
   /// Nulls `computer_id` on every series of [computerId] and restamps each
   /// (the FK's ON DELETE SET NULL would change the rows without an hlc bump,
   /// so peers would never learn). Returns the number of series touched.
@@ -547,12 +576,28 @@ class ProfileSeriesRepository {
   /// A recreated computer takes back the null-computer series of [diveIds]
   /// whose only computer source is the one being relinked (the legacy
   /// `dive_profiles` relink, series twin).
+  ///
+  /// A series that is primary while the same dive also carries a demoted one
+  /// is left alone. That is the shape `saveEditedProfile` writes, and the
+  /// primary half of it is the user's manual correction, which carries a null
+  /// computer on purpose rather than because a computer delete stripped one.
+  /// Stamping it would hand the edit to the next reparse of the dive, whose
+  /// first act is `deleteByComputer`, and a series is deleted whole: the
+  /// correction would be gone here and tombstoned on every peer. The same
+  /// predicate spares a file-imported profile that `setPrimaryDataSource`
+  /// promoted over the computer's samples.
+  ///
+  /// The demoted half is still relinked. It really is the computer's own
+  /// output, restoring its attribution is the point of the relink, and a
+  /// reparse that replaces a superseded generation replaces exactly what that
+  /// computer produced.
   Future<int> relinkComputer(
     String computerId,
     List<String> diveIds, {
     int? now,
   }) {
     if (diveIds.isEmpty) return Future.value(0);
+    final sibling = _db.alias(_db.diveProfileSeries, 'demoted_sibling');
     return _setComputer(
       computerId,
       (t) =>
@@ -565,7 +610,16 @@ class ProfileSeriesRepository {
               ..groupBy([
                 _db.diveDataSources.diveId,
               ], having: _db.diveDataSources.id.count().equals(1)),
-          ),
+          ) &
+          (t.isPrimary.equals(false) |
+              notExistsQuery(
+                _db.selectOnly(sibling)
+                  ..addColumns([sibling.id])
+                  ..where(
+                    sibling.diveId.equalsExp(t.diveId) &
+                        sibling.isPrimary.equals(false),
+                  ),
+              )),
       now: now,
     );
   }
