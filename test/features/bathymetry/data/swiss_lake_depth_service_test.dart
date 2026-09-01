@@ -77,6 +77,10 @@ void main() {
             jsonEncode({
               'features': [
                 {
+                  'bbox': req.url.queryParameters['bbox']!
+                      .split(',')
+                      .map(double.parse)
+                      .toList(),
                   'assets': {
                     'grid': {'href': 'https://example.org/tile_grid.zip'},
                   },

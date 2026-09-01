@@ -75,6 +75,17 @@ class SwissStacClient {
   /// Finds the best asset among the items intersecting [bbox] (WGS84:
   /// [minLon, minLat, maxLon, maxLat]) in [collectionId].
   ///
+  /// The `bbox` query parameter asks the server to filter spatially, but
+  /// this was never confirmed against the live API (see the class doc), and
+  /// even a compliant server can legitimately return a neighboring tile
+  /// whose bbox merely overlaps the query's edge buffer. Trusting the first
+  /// feature blindly would silently splice an unrelated tile into the
+  /// stitched mosaic — a real mesh, just not for the requested ground —
+  /// which is indistinguishable from correct data until a marker turns up
+  /// far outside it. So every candidate's OWN `bbox` is re-checked against
+  /// [bbox] here; a feature whose footprint does not actually overlap the
+  /// request is skipped rather than trusted.
+  ///
   /// Returns null when the collection exists but no item/asset covers the
   /// box — a definitive "no tile here", safe to cache as a negative result.
   /// Throws [SwissStacCollectionNotFoundException] when [collectionId]
@@ -111,6 +122,7 @@ class SwissStacClient {
     final features = body['features'] as List<dynamic>? ?? const [];
     for (final feature in features) {
       final featureMap = feature as Map<String, dynamic>;
+      if (!_featureOverlaps(featureMap, bbox)) continue;
       final assets = featureMap['assets'] as Map<String, dynamic>?;
       if (assets == null) continue;
       final picked = _pickAsset(assets);
@@ -123,6 +135,31 @@ class SwissStacClient {
       );
     }
     return null;
+  }
+
+  /// Whether STAC item [featureMap]'s own `bbox` genuinely overlaps the
+  /// requested [queryBbox]. A missing or malformed `bbox` is treated as no
+  /// overlap: a valid STAC item always carries one when it has geometry, so
+  /// its absence means the response cannot be trusted for this lookup.
+  static bool _featureOverlaps(
+    Map<String, dynamic> featureMap,
+    List<double> queryBbox,
+  ) {
+    final raw = featureMap['bbox'] as List<dynamic>?;
+    if (raw == null || raw.length < 4) return false;
+    final double minLon, minLat, maxLon, maxLat;
+    try {
+      minLon = (raw[0] as num).toDouble();
+      minLat = (raw[1] as num).toDouble();
+      maxLon = (raw[2] as num).toDouble();
+      maxLat = (raw[3] as num).toDouble();
+    } catch (_) {
+      return false;
+    }
+    return minLon <= queryBbox[2] &&
+        maxLon >= queryBbox[0] &&
+        minLat <= queryBbox[3] &&
+        maxLat >= queryBbox[1];
   }
 
   /// `properties.datetime`, falling back to `updated` then `created` — STAC

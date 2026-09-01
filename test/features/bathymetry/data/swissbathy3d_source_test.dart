@@ -25,6 +25,12 @@ Uint8List _zipOf(String entryName, String content) {
   return Uint8List.fromList(ZipEncoder().encode(archive));
 }
 
+/// Echoes the request's own `bbox` query parameter back as the mocked STAC
+/// feature's `bbox`, so these fixtures satisfy [SwissStacClient]'s overlap
+/// check the same way a real, spatially-honest server response would.
+List<double> _requestedBbox(http.Request req) =>
+    req.url.queryParameters['bbox']!.split(',').map(double.parse).toList();
+
 void main() {
   final gridBody = File(
     'test/fixtures/bathymetry/swissbathy3d_sample.asc',
@@ -86,6 +92,7 @@ void main() {
               jsonEncode({
                 'features': [
                   {
+                    'bbox': _requestedBbox(req),
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_grid.zip'},
                     },
@@ -193,6 +200,7 @@ nodata_value -9999
               jsonEncode({
                 'features': [
                   {
+                    'bbox': _requestedBbox(req),
                     'assets': {
                       'grid': {'href': href},
                     },
@@ -285,6 +293,7 @@ nodata_value -9999
             jsonEncode({
               'features': [
                 {
+                  'bbox': _requestedBbox(req),
                   'assets': {
                     'grid': {'href': 'https://example.org/$key.zip'},
                   },
@@ -305,6 +314,59 @@ nodata_value -9999
       expect(box.maxEast, greaterThanOrEqualTo(0));
       expect(box.minNorth, lessThanOrEqualTo(0));
       expect(box.maxNorth, greaterThanOrEqualTo(0));
+    });
+
+    test('a STAC server that ignores bbox filtering and always answers with an '
+        'unrelated tile fails the fetch instead of silently returning a mesh '
+        'that does not actually cover the query coordinate', () async {
+      // Regression test for the real Bug 6 symptom: the rendered terrain
+      // looked like genuine, plausible swissBATHY3D data, but the dive
+      // site marker (placed at the exact query coordinate, per
+      // BathymetryTerrainBuilder.enuBounds / SiteSeascapeGeometryService)
+      // sat far outside it. That can only happen if fetch() returns a
+      // grid whose real geographic footprint does not actually contain
+      // the query coordinate -- which is exactly what happens if
+      // SwissStacClient trusts the server's spatial filtering blindly and
+      // the server (bug, unsupported bbox param, or a differently-shaped
+      // items response than assumed -- never verified live, see
+      // SwissStacClient's class doc) answers every tile lookup with the
+      // same unrelated item regardless of the requested bbox.
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          // A real item, but for a location nowhere near any of the 9x9
+          // tiles this fetch actually asked about (its own declared bbox
+          // sits far from every requested tile bbox).
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': [8.9, 46.0, 8.91, 46.01],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/unrelated.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      await expectLater(
+        source.fetch(zurichseePoint, spanMeters: 2000),
+        throwsA(isA<BathymetryFetchException>()),
+      );
+      // Every one of the 3x3 requested tiles queried STAC (and each was
+      // correctly recognized as not actually answering that tile)...
+      expect(itemCalls, 9);
+      // ...so the mismatched asset was never downloaded and spliced into
+      // the mosaic at all.
+      expect(downloadCalls, 0);
     });
 
     test('a transient failure on one tile does not sink neighboring tiles that '
@@ -334,6 +396,7 @@ nodata_value -9999
               jsonEncode({
                 'features': [
                   {
+                    'bbox': _requestedBbox(req),
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_a.zip'},
                     },
@@ -406,6 +469,7 @@ nodata_value -9999
               jsonEncode({
                 'features': [
                   {
+                    'bbox': _requestedBbox(req),
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_a.zip'},
                     },
@@ -453,6 +517,7 @@ nodata_value -9999
             jsonEncode({
               'features': [
                 {
+                  'bbox': _requestedBbox(req),
                   'properties': {'datetime': '2023-01-01T00:00:00Z'},
                   'assets': {
                     'grid': {'href': 'https://example.org/tile_grid.zip'},
@@ -508,6 +573,7 @@ nodata_value -9999
               jsonEncode({
                 'features': [
                   {
+                    'bbox': _requestedBbox(req),
                     'properties': {'datetime': datetime},
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_grid.zip'},
@@ -558,6 +624,7 @@ nodata_value -9999
                 jsonEncode({
                   'features': [
                     {
+                      'bbox': _requestedBbox(req),
                       'properties': {'datetime': '2023-01-01T00:00:00Z'},
                       'assets': {
                         'grid': {'href': 'https://example.org/tile_grid.zip'},
@@ -599,6 +666,7 @@ nodata_value -9999
             jsonEncode({
               'features': [
                 {
+                  'bbox': _requestedBbox(req),
                   'properties': {'datetime': '2023-01-01T00:00:00Z'},
                   'assets': {
                     'grid': {'href': 'https://example.org/tile_grid.zip'},
