@@ -52,10 +52,20 @@ Future<void> adoptStrandedTankPressures(
   }
   if (tanksByDive.isEmpty) return;
 
+  // Filtered on storage class, not just on NULL. This is a prologue: it
+  // runs before the first dive's transaction and OUTSIDE the per-dive
+  // try/catch the rest of the design rests on, so a throw here costs every
+  // dive rather than one, on this open and on every later one. And SQLite
+  // orders storage classes, so MIN over a group whose values are all text
+  // returns text; drift's `read<int>` converts by parsing, which throws a
+  // FormatException on anything but a numeric string. A row this filter
+  // excludes holds no readable sample anyway, and the packer's own loops
+  // step over it for exactly the same reason.
   final keyRows = await db
       .customSelect(
         'SELECT dive_id, tank_id, MIN(timestamp) AS first_ts FROM $table '
-        'WHERE tank_id IS NOT NULL AND timestamp IS NOT NULL '
+        'WHERE ${readableTextSql('tank_id')} '
+        'AND ${readableNumberSql('timestamp')} '
         'GROUP BY dive_id, tank_id',
       )
       .get();

@@ -287,6 +287,35 @@ void main() {
       expect(report.tankSeries, 1);
     });
 
+    test('a text timestamp on an ORPHAN pressure row does not abort the '
+        'whole pack', () async {
+      // The orphan adoption is a prologue: it runs before the first dive's
+      // transaction and OUTSIDE the per-dive try/catch the rest of the
+      // design rests on, so a throw there costs every dive, on this open
+      // and on every later one. It reads MIN(timestamp) as an int, and
+      // SQLite's MIN over a group whose only values are TEXT returns TEXT,
+      // which drift parses and throws a FormatException on. Reported by
+      // Copilot on PR #1444.
+      final open = await openLegacy();
+      seedParents(open.raw);
+      // Orphan tank id, so the adoption pre-pass actually reaches this
+      // group, with a timestamp SQLite kept as text.
+      open.raw.execute(
+        'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, '
+        "pressure, computer_id) VALUES ('q1', 'd1', 'gone', 'noon', 200.0, "
+        'NULL)',
+      );
+      open.raw.execute(
+        'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, is_primary) '
+        "VALUES ('p1', 'd1', 0, 5.0, 1), ('p2', 'd1', 60, 6.0, 1)",
+      );
+
+      final report = await packLegacyProfileRows(open.db, nowMs: 1);
+
+      // The profile side has nothing wrong with it and must still land.
+      expect(report.profileSeries, 1);
+    });
+
     test('an unreadable row does not keep the legacy table alive', () async {
       // The residue count gates dropping the legacy table, and it already
       // excludes a row that can NEVER be packed so the table is not kept

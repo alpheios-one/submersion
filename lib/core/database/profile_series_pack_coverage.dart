@@ -80,7 +80,7 @@ Future<int> _countUnpackedProfileRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE ${_readableNumber('timestamp')} AND ${_readableNumber('depth')} '
+        'WHERE ${readableNumberSql('timestamp')} AND ${readableNumberSql('depth')} '
         'GROUP BY $identity) p '
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
@@ -120,9 +120,9 @@ Future<int> _countUnpackedTankRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE ${_readableNumber('timestamp')} '
-        'AND ${_readableNumber('pressure')} '
-        "AND typeof(tank_id) = 'text' GROUP BY $identity) p "
+        'WHERE ${readableNumberSql('timestamp')} '
+        'AND ${readableNumberSql('pressure')} '
+        "AND ${readableTextSql('tank_id')} GROUP BY $identity) p "
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
       )
@@ -251,8 +251,18 @@ Future<String> resolvedComputerSql(DatabaseConnectionUser db) async =>
 /// that row is not null but holds no sample, the packer steps over it, and
 /// counting it as awaiting pack would keep the legacy table and its pages
 /// forever waiting for a pack that can never claim it.
-String _readableNumber(String column) =>
+///
+/// Also the guard on READING such a column as a number. Drift's `read<int>`
+/// converts rather than casts, but converting is `int.parse`, so numeric
+/// text passes and anything else throws a [FormatException]. Any query that
+/// reads a legacy numeric column has to filter on this first.
+String readableNumberSql(String column) =>
     "typeof($column) IN ('integer', 'real')";
+
+/// SQL for "[column] holds text", the guard on reading a legacy id column
+/// with `read<String>`. See [readableNumberSql] for why a declared type is
+/// not enough on these tables.
+String readableTextSql(String column) => "typeof($column) = 'text'";
 
 Future<int> _countRows(DatabaseConnectionUser db, String table) async {
   final rows = await db
