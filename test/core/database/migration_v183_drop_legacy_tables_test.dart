@@ -246,8 +246,8 @@ void main() {
     },
   );
 
-  test('a pack that throws keeps the legacy tables but still purges the '
-      'bookkeeping', () async {
+  test('a table the pack cannot write keeps its legacy table, and the other '
+      'still packs', () async {
     final raw = sqlite3.sqlite3.openInMemory();
     addTearDown(raw.close);
     legacyDdlAt180(raw, userVersion: 182);
@@ -268,8 +268,10 @@ void main() {
     await expectLater(db.customSelect('SELECT 1').get(), completes);
 
     expect(scalar(raw, 'PRAGMA user_version'), 183);
-    // The samples are still only in the legacy tables, so the drop is skipped
-    // rather than destroying them.
+    // Only dive_profiles is unpackable here. Its samples are still only in
+    // the legacy table, so its drop is skipped rather than destroying them.
+    // The pressures are packed per dive independently of it, which is the
+    // point: one unwritable series table must not cost the other's rows.
     expect(
       columnOf(
         raw,
@@ -277,9 +279,13 @@ void main() {
             "'tank_pressure_profiles') ORDER BY name",
         'name',
       ),
-      ['dive_profiles', 'tank_pressure_profiles'],
+      ['dive_profiles'],
     );
     expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 11);
+    expect(
+      scalar(raw, 'SELECT COUNT(*) AS n FROM tank_pressure_series'),
+      greaterThan(0),
+    );
     // The bookkeeping purge does not depend on the pack: those rows describe
     // entities this build no longer exports either way.
     expect(

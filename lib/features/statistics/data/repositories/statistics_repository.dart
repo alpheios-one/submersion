@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart' show compute;
+import 'package:flutter/foundation.dart' show compute, visibleForTesting;
 
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/database/database.dart';
@@ -107,6 +107,41 @@ class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
   final _profileSeries = ProfileSeriesRepository();
+
+  /// How many dives' packed series the profile aggregates read at once.
+  ///
+  /// The aggregates run over the whole filtered library, and a packed series
+  /// is a blob: reading them all in one query holds every blob of every dive
+  /// in memory, and hands a copy of that to the worker isolate. Reading a
+  /// chunk at a time bounds both. A stream never spans dives, so a chunk
+  /// boundary cannot split one and the per-chunk totals combine exactly.
+  static const int defaultSeriesDiveChunkSize = 500;
+
+  /// Overridable so a test can force a chunk boundary without seeding a
+  /// library large enough to reach one.
+  @visibleForTesting
+  static int seriesDiveChunkSize = defaultSeriesDiveChunkSize;
+
+  static Iterable<List<String>> _diveChunks(List<String> ids) sync* {
+    final size = seriesDiveChunkSize;
+    for (var start = 0; start < ids.length; start += size) {
+      final end = start + size < ids.length ? start + size : ids.length;
+      yield ids.sublist(start, end);
+    }
+  }
+
+  /// The primary series of one chunk of dives, as blobs for the worker.
+  Future<List<SeriesBlob>> _primaryBlobs(List<String> diveIds) async {
+    final rows = await _profileSeries.getPrimaryRowsForDives(diveIds);
+    return [
+      for (final r in rows)
+        SeriesBlob(
+          diveId: r.diveId,
+          computerId: r.computerId,
+          samples: r.samples,
+        ),
+    ];
+  }
 
   /// Emits whenever any table the statistics queries read is written, so every
   /// statistics provider refreshes after a merge, a bulk delete, an import, or
@@ -2278,17 +2313,16 @@ class StatisticsRepository {
           .get();
       final diveIds = [for (final r in scoped) r.read<String>('id')];
       if (diveIds.isEmpty) return (avgAscent: null, avgDescent: null);
-      final rows = await _profileSeries.getRowsForDives(diveIds);
-      final blobs = [
-        for (final r in rows)
-          if (r.isPrimary)
-            SeriesBlob(
-              diveId: r.diveId,
-              computerId: r.computerId,
-              samples: r.samples,
-            ),
-      ];
-      return await compute(ascentDescentRatesFromBlobs, blobs);
+      var totals = emptyRateTotals;
+      for (final chunk in _diveChunks(diveIds)) {
+        final blobs = await _primaryBlobs(chunk);
+        if (blobs.isEmpty) continue;
+        totals = combineRateTotals(
+          totals,
+          await compute(ascentDescentTotalsFromBlobs, blobs),
+        );
+      }
+      return ratesFromTotals(totals);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get ascent/descent rates',
@@ -2359,17 +2393,16 @@ class StatisticsRepository {
           .get();
       final diveIds = [for (final r in scoped) r.read<String>('id')];
       if (diveIds.isEmpty) return [];
-      final rows = await _profileSeries.getRowsForDives(diveIds);
-      final blobs = [
-        for (final r in rows)
-          if (r.isPrimary)
-            SeriesBlob(
-              diveId: r.diveId,
-              computerId: r.computerId,
-              samples: r.samples,
-            ),
-      ];
-      return await compute(timeAtDepthRangesFromBlobs, blobs);
+      var seconds = <int, double>{};
+      for (final chunk in _diveChunks(diveIds)) {
+        final blobs = await _primaryBlobs(chunk);
+        if (blobs.isEmpty) continue;
+        seconds = combineDepthSeconds(
+          seconds,
+          await compute(timeAtDepthSecondsFromBlobs, blobs),
+        );
+      }
+      return bucketsFromSeconds(seconds);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get time at depth ranges',

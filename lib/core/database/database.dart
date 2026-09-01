@@ -9630,7 +9630,17 @@ class AppDatabase extends _$AppDatabase {
         if (from < 182) {
           try {
             await _assertProfileSeriesSchema();
-            await packLegacyProfileRows(this);
+            final report = await packLegacyProfileRows(this);
+            if (report.failedDives > 0) {
+              // Per-dive isolation means the pass as a whole succeeded, so
+              // this is the only place the skipped dives are visible. The
+              // residue count keeps their legacy table for a later open.
+              developer.log(
+                'v182: ${report.failedDives} dive(s) could not be packed and '
+                'stay in the legacy tables for a later open',
+                name: 'AppDatabase',
+              );
+            }
           } catch (e, stackTrace) {
             developer.log(
               'v182: packing legacy profile rows failed; keeping the legacy '
@@ -9681,7 +9691,17 @@ class AppDatabase extends _$AppDatabase {
           var packed = true;
           try {
             await _assertProfileSeriesSchema();
-            await packLegacyProfileRows(this);
+            final report = await packLegacyProfileRows(this);
+            if (report.failedDives > 0) {
+              // Per-dive isolation means the pass as a whole succeeded, so
+              // this is the only place the skipped dives are visible. The
+              // residue count keeps their legacy table for a later open.
+              developer.log(
+                'v183: ${report.failedDives} dive(s) could not be packed and '
+                'stay in the legacy tables for a later open',
+                name: 'AppDatabase',
+              );
+            }
           } catch (e, stackTrace) {
             packed = false;
             developer.log(
@@ -9971,7 +9991,14 @@ class AppDatabase extends _$AppDatabase {
         // a parallel branch shaped differently, or a busy lock from the
         // second isolate must not turn into a database that cannot open.
         try {
-          await packLegacyProfileRows(this);
+          final report = await packLegacyProfileRows(this);
+          if (report.failedDives > 0) {
+            developer.log(
+              'beforeOpen: ${report.failedDives} dive(s) could not be packed '
+              'and stay in the legacy tables for a later open',
+              name: 'AppDatabase',
+            );
+          }
           // v183 convergence: the rung skips its table drop when its own
           // pack threw, and a rung never runs twice, so without this the
           // legacy tables would survive forever on that database. Once a

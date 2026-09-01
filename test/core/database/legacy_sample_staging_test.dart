@@ -367,7 +367,13 @@ void main() {
           )
         ''');
 
-      await expectLater(packStagedLegacyRows(db), throwsA(anything));
+      // The packer isolates each dive, so this no longer throws: it reports
+      // the dive it could not write and moves on. What matters is unchanged,
+      // and is what this test is really about: the dive got no series row,
+      // so the staged rows are not cleared and remain the only copy.
+      final failed = await packStagedLegacyRows(db);
+      expect(failed.failedDives, 1);
+      expect(failed.profileSeries, 0);
 
       final staged = await db
           .customSelect('SELECT COUNT(*) AS n FROM dive_profiles_inbound')

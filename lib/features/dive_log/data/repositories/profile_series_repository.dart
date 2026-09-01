@@ -551,6 +551,29 @@ class ProfileSeriesRepository {
     return _rowsForDives(diveIds);
   }
 
+  /// The primary rows of [diveIds] only, in the same order.
+  ///
+  /// The library-wide statistics aggregates count one stream per dive, so
+  /// they want exactly these. Filtering in SQL rather than in Dart matters
+  /// because the discarded rows are packed blobs: a dive whose original was
+  /// demoted by an edit, or one logged by two computers, carries as much
+  /// again in rows the aggregate would drop after reading them.
+  Future<List<DiveProfileSeriesRow>> getPrimaryRowsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const [];
+    final rows = <DiveProfileSeriesRow>[];
+    for (final chunk in _chunks(diveIds)) {
+      rows.addAll(
+        await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.diveId.isIn(chunk) & t.isPrimary.equals(true))).get(),
+      );
+    }
+    rows.sort(_byDiveStartId);
+    return rows;
+  }
+
   /// [diveIds] queried in chunks of at most [_chunkSize], concatenated and
   /// sorted by `(diveId, startTimestamp, id)`, which is the order a single
   /// unchunked query with that `ORDER BY` would have returned.
