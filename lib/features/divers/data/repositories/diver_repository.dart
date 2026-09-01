@@ -272,13 +272,13 @@ class DiverRepository {
   /// know which rows they are about to change so they can mark them pending.
   Future<List<String>> _idsOf(
     String sql,
-    List<Object?> args, {
+    List<String> args, {
     String column = 'id',
   }) async {
     final rows = await _db
         .customSelect(
           sql,
-          variables: [for (final a in args) Variable<String>(a as String)],
+          variables: [for (final a in args) Variable.withString(a)],
         )
         .get();
     return [for (final r in rows) r.read<String>(column)];

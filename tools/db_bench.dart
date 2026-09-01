@@ -115,18 +115,22 @@ const _searchSql = '''
     stderr.writeln('This database has no dives; nothing to benchmark.');
     exit(65);
   }
-  final hasSeries = db
-      .select(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' "
-        "AND name = 'dive_profile_series'",
-      )
-      .isNotEmpty;
-  if (!hasSeries) {
+  // Both tables, not just the profile one: the benchmark reads
+  // tank_pressure_series too, and the two are created independently
+  // (_assertProfileSeriesSchema waits for each one's own foreign key
+  // parents, and tank_pressure_series needs dive_tanks while
+  // dive_profile_series does not). A database with one and not the other
+  // would clear a single-table check and then die mid-run.
+  for (final table in const ['dive_profile_series', 'tank_pressure_series']) {
+    final present = db.select(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+      [table],
+    ).isNotEmpty;
+    if (present) continue;
     stderr.writeln(
-      'No dive_profile_series table: this benchmark measures the packed '
-      'series reads, so it needs a database migrated to v182 or later. '
-      'Open it in the app once to run the migration, or point at a newer '
-      'copy.',
+      'No $table table: this benchmark measures the packed series reads, so '
+      'it needs a database migrated to v182 or later. Open it in the app '
+      'once to run the migration, or point at a newer copy.',
     );
     exit(65);
   }
