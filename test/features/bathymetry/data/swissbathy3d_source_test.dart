@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -166,6 +167,11 @@ void main() {
         // northing margin keeps it inside a single northing tile (1245), so
         // spanMeters=200 needs exactly two adjacent tiles east-west.
         const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+        // West/east of this longitude tells the two tiles apart from the
+        // request's own bbox — bounded-concurrency fetches no longer
+        // guarantee which tile's HTTP request lands first, so the mock must
+        // route by content, not by call order.
+        final boundaryLon = Lv95Transform.toWgs84(2685000, 1245500).longitude;
 
         const tileAGrid = '''
 ncols 2
@@ -193,14 +199,16 @@ nodata_value -9999
         final source = buildSource((req) async {
           if (req.url.path.endsWith('/items')) {
             itemCalls++;
-            final href = itemCalls == 1
+            final bbox = _requestedBbox(req);
+            final centerLon = (bbox[0] + bbox[2]) / 2;
+            final href = centerLon < boundaryLon
                 ? 'https://example.org/tile_a.zip'
                 : 'https://example.org/tile_b.zip';
             return http.Response(
               jsonEncode({
                 'features': [
                   {
-                    'bbox': _requestedBbox(req),
+                    'bbox': bbox,
                     'assets': {
                       'grid': {'href': href},
                     },
@@ -270,8 +278,6 @@ nodata_value -9999
         return buffer.toString();
       }
 
-      // Deterministic fetch order: tileN outer, tileE inner (matches
-      // SwissBathy3dSource.fetch's nested loop).
       final tileKeys = <String>[
         for (var tN = baseTileN - 1; tN <= baseTileN + 1; tN++)
           for (var tE = baseTileE - 1; tE <= baseTileE + 1; tE++) '${tE}_$tN',
@@ -284,11 +290,23 @@ nodata_value -9999
           ),
       };
 
-      var itemSeq = 0;
-      var downloadSeq = 0;
+      // Bounded-concurrency fetches no longer guarantee which of the nine
+      // tiles' HTTP requests lands first, so the mock derives the tile key
+      // from the request's own bbox center (inverse of _tileBboxWgs84)
+      // instead of assuming a fixed nested-loop call order.
+      String keyForRequest(http.Request req) {
+        final bbox = _requestedBbox(req);
+        final centerLat = (bbox[1] + bbox[3]) / 2;
+        final centerLon = (bbox[0] + bbox[2]) / 2;
+        final lv95 = Lv95Transform.fromWgs84(centerLat, centerLon);
+        final tE = (lv95.easting / 1000).floor();
+        final tN = (lv95.northing / 1000).floor();
+        return '${tE}_$tN';
+      }
+
       final source = buildSource((req) async {
         if (req.url.path.endsWith('/items')) {
-          final key = tileKeys[itemSeq++];
+          final key = keyForRequest(req);
           return http.Response(
             jsonEncode({
               'features': [
@@ -303,7 +321,7 @@ nodata_value -9999
             200,
           );
         }
-        final key = tileKeys[downloadSeq++];
+        final key = req.url.pathSegments.last.replaceAll('.zip', '');
         return http.Response.bytes(_zipOf('tile.asc', tileBodies[key]!), 200);
       });
 
@@ -372,10 +390,14 @@ nodata_value -9999
     test('a transient failure on one tile does not sink neighboring tiles that '
         'already succeeded', () async {
       // Same boundary point/span as the stitching test above: exactly two
-      // tiles. Tile A's STAC items lookup succeeds; tile B's returns a
+      // tiles. Tile A (west) always succeeds; tile B (east) always returns a
       // server error, simulating the kind of one-off network hiccup that
       // becomes likely once a single site view can span dozens of tiles.
+      // Routed by the request's own bbox rather than call order, since
+      // bounded-concurrency fetches no longer guarantee which tile's
+      // request lands first.
       const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      final boundaryLon = Lv95Transform.toWgs84(2685000, 1245500).longitude;
       const tileAGrid = '''
 ncols 2
 nrows 2
@@ -391,12 +413,14 @@ nodata_value -9999
       final source = buildSource((req) async {
         if (req.url.path.endsWith('/items')) {
           itemCalls++;
-          if (itemCalls == 1) {
+          final bbox = _requestedBbox(req);
+          final centerLon = (bbox[0] + bbox[2]) / 2;
+          if (centerLon < boundaryLon) {
             return http.Response(
               jsonEncode({
                 'features': [
                   {
-                    'bbox': _requestedBbox(req),
+                    'bbox': bbox,
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_a.zip'},
                     },
@@ -447,8 +471,12 @@ nodata_value -9999
     test('a missing tile inside the span is a gap, not a crash, when at least '
         'one neighboring tile has data', () async {
       // Same boundary point/span as above, but the east tile has no STAC
-      // item at all (empty feature list) — a genuine coverage gap.
+      // item at all (empty feature list) — a genuine coverage gap. Routed
+      // by the request's own bbox rather than call order, since
+      // bounded-concurrency fetches no longer guarantee which tile's
+      // request lands first.
       const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      final boundaryLon = Lv95Transform.toWgs84(2685000, 1245500).longitude;
       const tileAGrid = '''
 ncols 2
 nrows 2
@@ -464,12 +492,14 @@ nodata_value -9999
       final source = buildSource((req) async {
         if (req.url.path.endsWith('/items')) {
           itemCalls++;
-          if (itemCalls == 1) {
+          final bbox = _requestedBbox(req);
+          final centerLon = (bbox[0] + bbox[2]) / 2;
+          if (centerLon < boundaryLon) {
             return http.Response(
               jsonEncode({
                 'features': [
                   {
-                    'bbox': _requestedBbox(req),
+                    'bbox': bbox,
                     'assets': {
                       'grid': {'href': 'https://example.org/tile_a.zip'},
                     },
@@ -490,6 +520,133 @@ nodata_value -9999
       expect(grid.rows, 2);
       expect(grid.cols, 2);
       expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+    });
+
+    test('caps concurrent tile requests at maxConcurrentTileRequests for a '
+        'span wide enough to need more tiles than the limit', () async {
+      // 3x3 = 9 tiles for spanMeters 2500 (matches the realistic-tile-
+      // count stitching test above), comfortably more than
+      // SwissBathy3dSource.maxConcurrentTileRequests so a bounded worker
+      // pool can be told apart from firing every tile's request at once.
+      var active = 0;
+      var peak = 0;
+      // Once true, later requests (the tiles picked up after the first
+      // release) resolve immediately instead of queuing a new gate --
+      // otherwise those late gates would never be completed and the fetch
+      // would hang forever, since the release loop below only runs once.
+      var released = false;
+      final pendingGates = <Completer<void>>[];
+
+      final source = buildSource((req) async {
+        if (released) {
+          return http.Response(jsonEncode({'features': []}), 200);
+        }
+        active += 1;
+        if (active > peak) peak = active;
+        final gate = Completer<void>();
+        pendingGates.add(gate);
+        await gate.future;
+        active -= 1;
+        // Every tile reports "no data here" once released, so the fetch
+        // fails cleanly once all nine are accounted for -- this test only
+        // cares about how many requests were in flight at once, not the
+        // resulting grid.
+        return http.Response(jsonEncode({'features': []}), 200);
+      });
+
+      final pending = source.fetch(zurichseePoint, spanMeters: 2500);
+
+      // Yield repeatedly so the worker pool spins up to its limit before
+      // any gate is released.
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      expect(peak, SwissBathy3dSource.maxConcurrentTileRequests);
+
+      released = true;
+      for (final c in pendingGates) {
+        c.complete();
+      }
+      await expectLater(pending, throwsA(isA<BathymetryFetchException>()));
+    });
+
+    test('a tile already cached from an earlier fetch is served without a '
+        'repeat network call when a later, wider fetch spans it alongside a '
+        'genuinely new neighboring tile', () async {
+      // Same boundary point/span/tiles as the stitching test above.
+      const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
+      final boundaryLon = Lv95Transform.toWgs84(2685000, 1245500).longitude;
+      const tileAGrid = '''
+ncols 2
+nrows 2
+xllcorner 2684000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+      const tileBGrid = '''
+ncols 2
+nrows 2
+xllcorner 2685000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+410.0 410.0
+410.0 410.0
+''';
+
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          final bbox = _requestedBbox(req);
+          final centerLon = (bbox[0] + bbox[2]) / 2;
+          final href = centerLon < boundaryLon
+              ? 'https://example.org/tile_a.zip'
+              : 'https://example.org/tile_b.zip';
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': bbox,
+                  'assets': {
+                    'grid': {'href': href},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        final body = req.url.path.endsWith('tile_a.zip')
+            ? tileAGrid
+            : tileBGrid;
+        return http.Response.bytes(_zipOf('tile.asc', body), 200);
+      });
+
+      // Narrow fetch centered well inside tile A only (not at the
+      // boundary), caching just that one tile -- mirrors an earlier visit
+      // to a dive site before this wider one.
+      final tileACenter = Lv95Transform.toWgs84(2684500, 1245500);
+      await source.fetch(
+        GeoPoint(tileACenter.latitude, tileACenter.longitude),
+        spanMeters: 100,
+      );
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+
+      // Wider fetch spans both tile A (already cached) and tile B (new).
+      // The concurrency limit applies to the pool of tasks, but a
+      // cache-hit task resolves without ever reaching the network, so
+      // only tile B should trigger a fresh STAC lookup and download.
+      final grid = await source.fetch(boundaryPoint, spanMeters: 200);
+      expect(itemCalls, 2);
+      expect(downloadCalls, 2);
+      expect(grid.cols, 4);
     });
   });
 
@@ -902,6 +1059,88 @@ nodata_value -9999
         expect(summary.upToDate, 1);
         expect(summary.failed, 1);
         expect(summary.updated, 0);
+      },
+    );
+
+    test(
+      'caps concurrent freshness checks at maxConcurrentTileRequests when '
+      'more tiles are cached than the limit, the same bounded pool fetch '
+      'uses -- the manual "reload map data" action and the periodic check '
+      'must not each grow their own, independent concurrency policy',
+      () async {
+        // Five different lakes, so each fetch below caches exactly one
+        // distinct tile -- comfortably more than
+        // SwissBathy3dSource.maxConcurrentTileRequests.
+        const points = [
+          GeoPoint(47.25, 8.65), // Zürichsee
+          GeoPoint(47.65, 9.30), // Bodensee
+          GeoPoint(47.00, 8.45), // Vierwaldstättersee
+          GeoPoint(46.70, 7.75), // Thunersee
+          GeoPoint(47.14, 9.20), // Walensee
+        ];
+
+        var itemCalls = 0;
+        var gatingEnabled = false;
+        // Once true, later requests (the tile picked up after the first
+        // release, since 5 tiles exceed the 4-worker pool) resolve
+        // immediately instead of queuing a new gate -- otherwise that late
+        // gate would never be completed and the sweep would hang forever,
+        // since the release loop below only runs once.
+        var released = false;
+        var active = 0;
+        var peak = 0;
+        final pendingGates = <Completer<void>>[];
+
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            itemCalls++;
+            if (gatingEnabled && !released) {
+              active += 1;
+              if (active > peak) peak = active;
+              final gate = Completer<void>();
+              pendingGates.add(gate);
+              await gate.future;
+              active -= 1;
+            }
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': _requestedBbox(req),
+                    'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+        });
+
+        // Sequential, un-gated setup: cache one tile per lake.
+        for (final point in points) {
+          await source.fetch(point, spanMeters: 100);
+        }
+        expect(itemCalls, 5);
+
+        // Now the sweep itself, gated so peak concurrency is observable.
+        gatingEnabled = true;
+        final pending = source.refreshAllCachedTiles();
+        for (var i = 0; i < 10; i++) {
+          await Future<void>.delayed(Duration.zero);
+        }
+        expect(peak, SwissBathy3dSource.maxConcurrentTileRequests);
+
+        released = true;
+        for (final gate in pendingGates) {
+          gate.complete();
+        }
+        final summary = await pending;
+        expect(summary.total, 5);
+        expect(summary.upToDate, 5);
       },
     );
 

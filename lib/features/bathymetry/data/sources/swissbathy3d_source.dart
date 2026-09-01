@@ -40,6 +40,17 @@ class SwissBathy3dSource implements BathymetrySource {
   /// single wide-span page view can already trigger (see fetch()).
   static const Duration staleCheckInterval = Duration(days: 30);
 
+  /// Caps how many tiles are fetched or freshness-checked at once, in both
+  /// [fetch]'s stitching loop and [refreshAllCachedTiles]'s sweep. A wide
+  /// span can touch up to 81 tiles (see [staleCheckInterval]'s doc);
+  /// fetching them strictly one at a time made a single page view painfully
+  /// slow, but firing all of them at once would hammer the OGD server and
+  /// violate its fair-use clause against excessive use just as surely as an
+  /// unbounded download loop would. Bounded concurrency is the middle
+  /// ground; this is a named constant rather than a magic number so both
+  /// call sites stay in lockstep with each other and with the design intent.
+  static const int maxConcurrentTileRequests = 4;
+
   final SwissStacClient _stac;
   final SwissBathyTileCacheRepository _tileCache;
 
@@ -85,27 +96,36 @@ class SwissBathy3dSource implements BathymetrySource {
     final tileNMin = ((lv95.northing - half) / tileSizeMeters).floor();
     final tileNMax = ((lv95.northing + half) / tileSizeMeters).floor();
 
-    // Sequential, not parallel: each tile is cache-checked before any
-    // network call, and most requests hit the cache after the first visit
-    // to an area — no benefit in racing STAC lookups for a cold cache.
-    final tiles = <BathymetryGrid>[];
-    for (var tileN = tileNMin; tileN <= tileNMax; tileN++) {
-      for (var tileE = tileEMin; tileE <= tileEMax; tileE++) {
-        try {
-          final tile = await _fetchTile(tileE, tileN, lake);
-          if (tile != null) tiles.add(tile);
-        } on BathymetryFetchException {
-          // One tile's transient failure (network timeout, a bad STAC
-          // response) must not sink the whole stitched fetch when
-          // neighboring tiles — possibly including the one under the dive
-          // site itself — already succeeded. Treat it as a gap instead;
-          // never cached (see _fetchTile), so the next visit retries just
-          // this tile. A span can cover dozens of 1-km tiles, so this
-          // isolation matters far more here than it did for the
-          // single-tile fetch this replaced.
-        }
+    final tileCoords = <({int tileE, int tileN})>[
+      for (var tileN = tileNMin; tileN <= tileNMax; tileN++)
+        for (var tileE = tileEMin; tileE <= tileEMax; tileE++)
+          (tileE: tileE, tileN: tileN),
+    ];
+
+    // Bounded concurrency, not strictly sequential nor unbounded: up to
+    // maxConcurrentTileRequests tiles in flight at once. Each is
+    // cache-checked before any network call, so a warm cache stays cheap;
+    // for a cold cache spanning dozens of tiles, this keeps a single page
+    // view from either taking minutes (one at a time) or hammering the OGD
+    // server with dozens of simultaneous requests.
+    final results = await _runBounded(tileCoords, maxConcurrentTileRequests, (
+      coord,
+    ) async {
+      try {
+        return await _fetchTile(coord.tileE, coord.tileN, lake);
+      } on BathymetryFetchException {
+        // One tile's transient failure (network timeout, a bad STAC
+        // response) must not sink the whole stitched fetch when
+        // neighboring tiles — possibly including the one under the dive
+        // site itself — already succeeded (or are still in flight in
+        // another worker). Treat it as a gap instead; never cached (see
+        // _fetchTile), so the next visit retries just this tile. A span
+        // can cover dozens of 1-km tiles, so this isolation matters far
+        // more here than it did for the single-tile fetch this replaced.
+        return null;
       }
-    }
+    });
+    final tiles = [for (final tile in results) ?tile];
 
     if (tiles.isEmpty) {
       throw BathymetryFetchException(
@@ -267,20 +287,24 @@ class SwissBathy3dSource implements BathymetrySource {
   /// [SwissBathyRefreshSummary.failed] rather than thrown — one failed tile
   /// must not abort the sweep over the rest, matching the fair-use
   /// requirement that a failed check never becomes a crash or a forced
-  /// re-download loop.
+  /// re-download loop. Uses the same [maxConcurrentTileRequests]-bounded
+  /// concurrency as [fetch]'s tile-stitching loop, rather than an
+  /// independent sequential or unbounded sweep, so a large cache (many
+  /// visited lakes) revalidates quickly without exceeding the same
+  /// fair-use-driven concurrency ceiling.
   Future<SwissBathyRefreshSummary> refreshAllCachedTiles() async {
     final tileKeys = await _tileCache.okTileKeys();
-    var updated = 0;
-    var upToDate = 0;
-    var failed = 0;
-    for (final tileKey in tileKeys) {
+
+    final outcomes = await _runBounded(tileKeys, maxConcurrentTileRequests, (
+      tileKey,
+    ) async {
       final cached = await _tileCache.read(tileKey);
-      if (cached == null) continue; // evicted/corrupted since listing
+      if (cached == null) return null; // evicted/corrupted since listing
 
       final parts = tileKey.split('_');
       final tileE = parts.length == 2 ? int.tryParse(parts[0]) : null;
       final tileN = parts.length == 2 ? int.tryParse(parts[1]) : null;
-      if (tileE == null || tileN == null) continue;
+      if (tileE == null || tileN == null) return null;
 
       final tileCenter = Lv95Transform.toWgs84(
         (tileE + 0.5) * tileSizeMeters,
@@ -289,7 +313,7 @@ class SwissBathy3dSource implements BathymetrySource {
       final lake = findSwissLake(
         GeoPoint(tileCenter.latitude, tileCenter.longitude),
       );
-      if (lake == null) continue; // should not happen for a real 'ok' tile
+      if (lake == null) return null; // should not happen for a real 'ok' tile
 
       final result = await _checkAndMaybeUpdate(
         tileKey,
@@ -298,13 +322,22 @@ class SwissBathy3dSource implements BathymetrySource {
         lake,
         cached,
       );
-      switch (result.outcome) {
+      return result.outcome;
+    });
+
+    var updated = 0;
+    var upToDate = 0;
+    var failed = 0;
+    for (final outcome in outcomes) {
+      switch (outcome) {
         case _TileCheckOutcome.updated:
           updated++;
         case _TileCheckOutcome.upToDate:
           upToDate++;
         case _TileCheckOutcome.failed:
           failed++;
+        case null:
+          break; // evicted, corrupted, or unparseable tile key: not counted
       }
     }
     return SwissBathyRefreshSummary(
@@ -426,6 +459,38 @@ class SwissBathy3dSource implements BathymetrySource {
     }
     return null;
   }
+}
+
+/// Runs [task] over [items] with at most [maxConcurrent] running at once —
+/// a small work-stealing pool, not a fixed batch-of-N-then-wait loop, so a
+/// worker that finishes an early, cache-hit item immediately picks up the
+/// next one instead of sitting idle until the slowest item in its batch
+/// completes. Each result keeps its input's position in the returned list.
+/// [task] is expected to handle its own errors (as every caller in this
+/// file does): one item failing must never affect any other item's
+/// in-flight or still-pending work.
+Future<List<T>> _runBounded<S, T>(
+  List<S> items,
+  int maxConcurrent,
+  Future<T> Function(S item) task,
+) async {
+  final results = List<T?>.filled(items.length, null);
+  var nextIndex = 0;
+
+  Future<void> worker() async {
+    while (true) {
+      final index = nextIndex;
+      if (index >= items.length) return;
+      nextIndex++;
+      results[index] = await task(items[index]);
+    }
+  }
+
+  final workerCount = maxConcurrent < items.length
+      ? maxConcurrent
+      : items.length;
+  await Future.wait(List.generate(workerCount, (_) => worker()));
+  return results.cast<T>();
 }
 
 /// The result of one tile's freshness check in [SwissBathy3dSource._checkAndMaybeUpdate].
