@@ -22534,6 +22534,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fájl olyan pozíciót vagy időbélyeget tartalmaz, amelyet az alkalmazás nem tud beolvasni.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'A fájl túl sok pozíciót tartalmaz ahhoz, hogy egyetlen nyomvonalként tárolható legyen. Bontsd rövidebb nyomvonalakra, és importáld őket külön.';
+
+  @override
   String get gpsTrack_export_saved => 'Nyomvonal mentve';
 
   @override

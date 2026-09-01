@@ -996,20 +996,18 @@ class DiveProfilePoint extends Equatable {
 /// Used for multi-tank dives with AI transmitters providing
 /// continuous pressure data for each tank
 class TankPressurePoint extends Equatable {
-  final String id;
   final String tankId;
   final int timestamp; // seconds from dive start
   final double pressure; // bar
 
   const TankPressurePoint({
-    required this.id,
     required this.tankId,
     required this.timestamp,
     required this.pressure,
   });
 
   @override
-  List<Object?> get props => [id, tankId, timestamp, pressure];
+  List<Object?> get props => [tankId, timestamp, pressure];
 }
 
 /// Tank configuration for a dive

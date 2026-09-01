@@ -22607,6 +22607,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Il file contiene una posizione o una marca temporale che l\'app non riesce a leggere.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'Il file contiene troppe posizioni per essere salvato come una sola traccia. Dividilo in tracce più brevi e importale separatamente.';
+
+  @override
   String get gpsTrack_export_saved => 'Traccia salvata';
 
   @override
