@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_codec.dart';
@@ -209,9 +212,19 @@ class ChangesetReader {
         for (var seq = appliedThrough + 1; seq <= manifest.headSeq; seq++) {
           final csFile = byName[ChangesetLogLayout.changesetName(peerId, seq)];
           if (csFile == null) break; // gap -> apply what we have, retry later
-          final cs = _codec.decodeChangeset(
-            await provider.downloadFile(csFile.id),
-          );
+          final Uint8List csBytes;
+          try {
+            csBytes = await provider.downloadFile(csFile.id);
+          } on EnvelopeCorruptException {
+            // Same standing as the checksum failure below, so the same
+            // handling: break rather than throw, which reaches the cursor
+            // upsert and records the seqs already applied. Throwing here
+            // would unwind to the per-peer catch, which skips that upsert,
+            // so every later sync would re-download and re-apply this
+            // peer's whole backlog and still never advance past this seq.
+            break;
+          }
+          final cs = _codec.decodeChangeset(csBytes);
           if (!_codec.serializer.validateChecksum(cs)) {
             break; // corrupt changeset -> stop; a fixed sync retries from here
           }

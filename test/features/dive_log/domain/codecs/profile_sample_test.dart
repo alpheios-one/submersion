@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample_point.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
 void main() {
@@ -34,12 +34,12 @@ void main() {
   );
 
   test('fromPoint then toPoint is the identity on every point field', () {
-    final sample = ProfileSample.fromPoint(point);
+    final sample = profileSampleFromPoint(point);
     expect(sample.toPoint(), point);
   });
 
   test('fromPoint carries the legacy per-sample pressure separately', () {
-    final sample = ProfileSample.fromPoint(point, pressure: 180.5);
+    final sample = profileSampleFromPoint(point, pressure: 180.5);
     expect(sample.pressure, 180.5);
     // DiveProfilePoint has no pressure field, so it cannot survive toPoint.
     expect(sample.toPoint(), point);
@@ -47,7 +47,7 @@ void main() {
 
   test('a minimal point maps with every optional field null', () {
     const minimal = DiveProfilePoint(timestamp: 0, depth: 0.0);
-    final sample = ProfileSample.fromPoint(minimal);
+    final sample = profileSampleFromPoint(minimal);
     expect(sample.timestamp, 0);
     expect(sample.depth, 0.0);
     expect(sample.pressure, isNull);
@@ -58,9 +58,9 @@ void main() {
   });
 
   test('value equality covers every field', () {
-    final a = ProfileSample.fromPoint(point, pressure: 1.0);
-    final b = ProfileSample.fromPoint(point, pressure: 1.0);
-    final c = ProfileSample.fromPoint(point, pressure: 2.0);
+    final a = profileSampleFromPoint(point, pressure: 1.0);
+    final b = profileSampleFromPoint(point, pressure: 1.0);
+    final c = profileSampleFromPoint(point, pressure: 2.0);
     expect(a, b);
     expect(a.hashCode, b.hashCode);
     expect(a, isNot(c));

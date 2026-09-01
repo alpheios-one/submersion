@@ -41,18 +41,8 @@ void main() {
     final withTank = richSceneData(
       tankPressures: {
         't1': const [
-          TankPressurePoint(
-            id: 'p1',
-            tankId: 't1',
-            timestamp: 0,
-            pressure: 200,
-          ),
-          TankPressurePoint(
-            id: 'p2',
-            tankId: 't1',
-            timestamp: 180,
-            pressure: 80,
-          ),
+          TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+          TankPressurePoint(tankId: 't1', timestamp: 180, pressure: 80),
         ],
       },
     );
@@ -76,18 +66,8 @@ void main() {
     final data = richSceneData(
       tankPressures: {
         't1': const [
-          TankPressurePoint(
-            id: 'p1',
-            tankId: 't1',
-            timestamp: 0,
-            pressure: 200,
-          ),
-          TankPressurePoint(
-            id: 'p2',
-            tankId: 't1',
-            timestamp: 180,
-            pressure: 80,
-          ),
+          TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+          TankPressurePoint(tankId: 't1', timestamp: 180, pressure: 80),
         ],
       },
     );
