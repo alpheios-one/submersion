@@ -4130,6 +4130,29 @@ void main() {
       },
     );
 
+    testWidgets('touched spot indicator ignores a stale out-of-range index', (
+      tester,
+    ) async {
+      // Regression: consolidating two dives can shorten the profile mid
+      // touch, leaving spotIndexes from a previous frame's (longer) bar
+      // data. fl_chart's own defaultTouchedIndicators indexes
+      // barData.spots directly and throws a RangeError on a stale index;
+      // getTouchedSpotIndicator must drop it instead of forwarding it.
+      final profile = _makeProfile(points: 12);
+      await tester.pumpWidget(
+        buildWithLegend(profile: profile, ascentRates: const []),
+      );
+      await tester.pumpAndSettle();
+
+      final data = primaryChartData(tester);
+      final bar = data.lineBarsData.first;
+      final indicator = data.lineTouchData.getTouchedSpotIndicator;
+
+      expect(() => indicator(bar, [bar.spots.length + 685]), returnsNormally);
+      expect(indicator(bar, [bar.spots.length + 685]).single, isNull);
+      expect(indicator(bar, const [-1]).single, isNull);
+    });
+
     testWidgets('tooltip builds when hovering a non-first velocity segment', (
       tester,
     ) async {
