@@ -38844,7 +38844,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_appearance_bathymetryRefresh_resultFailed.
   ///
   /// In en, this message translates to:
-  /// **'Couldn't check all data; existing values were kept'**
+  /// **'Couldn\'t check all data; existing values were kept'**
   String get settings_appearance_bathymetryRefresh_resultFailed;
 
   /// Generic re-parse action label
