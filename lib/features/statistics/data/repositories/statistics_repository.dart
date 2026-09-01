@@ -2305,10 +2305,15 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
       final scoped = await _db
           .customSelect(
+            // Only dives that actually have a primary series: without this
+            // the chunk loop pages over every filtered dive, most of which
+            // return no blob at all on a library where profiles are the
+            // exception rather than the rule.
             'SELECT d.id AS id FROM dives d WHERE 1=1 $diverFilter '
-            '${df.clause}',
+            '${df.clause} AND EXISTS (SELECT 1 FROM dive_profile_series s '
+            'WHERE s.dive_id = d.id AND s.is_primary = 1)',
             variables: params.map((p) => Variable(p)).toList(),
-            readsFrom: {_db.dives},
+            readsFrom: {_db.dives, _db.diveProfileSeries},
           )
           .get();
       final diveIds = [for (final r in scoped) r.read<String>('id')];
@@ -2385,10 +2390,15 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
       final scoped = await _db
           .customSelect(
+            // Only dives that actually have a primary series: without this
+            // the chunk loop pages over every filtered dive, most of which
+            // return no blob at all on a library where profiles are the
+            // exception rather than the rule.
             'SELECT d.id AS id FROM dives d WHERE 1=1 $diverFilter '
-            '${df.clause}',
+            '${df.clause} AND EXISTS (SELECT 1 FROM dive_profile_series s '
+            'WHERE s.dive_id = d.id AND s.is_primary = 1)',
             variables: params.map((p) => Variable(p)).toList(),
-            readsFrom: {_db.dives},
+            readsFrom: {_db.dives, _db.diveProfileSeries},
           )
           .get();
       final diveIds = [for (final r in scoped) r.read<String>('id')];

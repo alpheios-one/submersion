@@ -12,6 +12,7 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_
 import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_sample_dedupe.dart';
+import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
 
 /// Every read and write of `dive_profile_series`. The only production code
 /// that encodes or decodes profile samples, apart from the migration packer.
@@ -411,6 +412,9 @@ class ProfileSeriesRepository {
         await _markPending(id, nowMs);
       }
     });
+    // Like every other mutator here: the rows just changed attribution, and
+    // the sync surfaces watch this rather than the table tick.
+    SyncEventBus.notifyLocalChange();
     return ids.length;
   }
 
@@ -457,19 +461,14 @@ class ProfileSeriesRepository {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
     final ids = await _ids(where);
     if (ids.isEmpty) return 0;
-    await _db.transaction(() async {
-      await (_db.update(
-        _db.diveProfileSeries,
-      )..where((t) => t.id.isIn(ids))).write(
-        DiveProfileSeriesCompanion(
-          isPrimary: Value(value),
-          updatedAt: Value(nowMs),
-        ),
-      );
-      for (final id in ids) {
-        await _markPending(id, nowMs);
-      }
-    });
+    await _writeChunked(
+      ids,
+      DiveProfileSeriesCompanion(
+        isPrimary: Value(value),
+        updatedAt: Value(nowMs),
+      ),
+      nowMs,
+    );
     SyncEventBus.notifyLocalChange();
     return ids.length;
   }
@@ -579,19 +578,15 @@ class ProfileSeriesRepository {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
     final ids = await _ids(where);
     if (ids.isEmpty) return 0;
-    await _db.transaction(() async {
-      await (_db.update(
-        _db.diveProfileSeries,
-      )..where((t) => t.id.isIn(ids))).write(
-        DiveProfileSeriesCompanion(
-          computerId: Value(computerId),
-          updatedAt: Value(nowMs),
-        ),
-      );
-      for (final id in ids) {
-        await _markPending(id, nowMs);
-      }
-    });
+    await _writeChunked(
+      ids,
+      DiveProfileSeriesCompanion(
+        computerId: Value(computerId),
+        updatedAt: Value(nowMs),
+      ),
+      nowMs,
+    );
+    SyncEventBus.notifyLocalChange();
     return ids.length;
   }
 
@@ -631,7 +626,7 @@ class ProfileSeriesRepository {
   ) async {
     if (diveIds.isEmpty) return const [];
     final rows = <DiveProfileSeriesRow>[];
-    for (final chunk in _chunks(diveIds)) {
+    for (final chunk in seriesIdChunks(diveIds)) {
       rows.addAll(
         await (_db.select(
           _db.diveProfileSeries,
@@ -642,7 +637,7 @@ class ProfileSeriesRepository {
     return rows;
   }
 
-  /// [diveIds] queried in chunks of at most [_chunkSize], concatenated and
+  /// [diveIds] queried in chunks of at most [kSeriesIdChunkSize], concatenated and
   /// sorted by `(diveId, startTimestamp, id)`, which is the order a single
   /// unchunked query with that `ORDER BY` would have returned.
   ///
@@ -656,7 +651,7 @@ class ProfileSeriesRepository {
   /// for necessity.
   Future<List<DiveProfileSeriesRow>> _rowsForDives(List<String> diveIds) async {
     final rows = <DiveProfileSeriesRow>[];
-    for (final chunk in _chunks(diveIds)) {
+    for (final chunk in seriesIdChunks(diveIds)) {
       rows.addAll(
         await (_db.select(
           _db.diveProfileSeries,
@@ -667,16 +662,30 @@ class ProfileSeriesRepository {
     return rows;
   }
 
-  static const int _chunkSize =
-      900; // safely under SQLite's bound-variable limit
-
-  static Iterable<List<String>> _chunks(List<String> ids) sync* {
-    for (var start = 0; start < ids.length; start += _chunkSize) {
-      final end = start + _chunkSize < ids.length
-          ? start + _chunkSize
-          : ids.length;
-      yield ids.sublist(start, end);
-    }
+  /// Applies [write] to [ids] in chunks of [kSeriesIdChunkSize] and marks each row
+  /// pending, all in one transaction.
+  ///
+  /// Chunked for the reason the read helpers are: one bound variable per id,
+  /// and these predicates are library-wide (clearComputer and
+  /// clearComputersOfDiverForForeignDives match every series of a computer,
+  /// not one dive's), so an unchunked `id.isIn(ids)` can pass the engine's
+  /// bound-variable ceiling on exactly the databases that most need the
+  /// operation to work.
+  Future<void> _writeChunked(
+    List<String> ids,
+    DiveProfileSeriesCompanion write,
+    int nowMs,
+  ) async {
+    await _db.transaction(() async {
+      for (final chunk in seriesIdChunks(ids)) {
+        await (_db.update(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.isIn(chunk))).write(write);
+        for (final id in chunk) {
+          await _markPending(id, nowMs);
+        }
+      }
+    });
   }
 
   static int _byDiveStartId(DiveProfileSeriesRow a, DiveProfileSeriesRow b) {
@@ -725,9 +734,13 @@ class ProfileSeriesRepository {
       for (final id in ids) {
         await _syncRepository.logDeletion(entityType: entityType, recordId: id);
       }
-      await (_db.delete(
-        _db.diveProfileSeries,
-      )..where((t) => t.id.isIn(ids))).go();
+      // Chunked like the writers: one bound variable per id, and these
+      // predicates reach beyond a single dive.
+      for (final chunk in seriesIdChunks(ids)) {
+        await (_db.delete(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.isIn(chunk))).go();
+      }
     });
     SyncEventBus.notifyLocalChange();
     return ids;

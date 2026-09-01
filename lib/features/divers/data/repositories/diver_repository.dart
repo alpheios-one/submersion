@@ -268,16 +268,6 @@ class DiverRepository {
     await deleteDiverWithReassignment(id);
   }
 
-  /// Delete a diver, reassigning shared trips/sites to a surviving diver first.
-  ///
-  /// - If surviving divers exist, shared trips and sites owned by [id] are
-  ///   reassigned to the current default diver (if not the one being deleted)
-  ///   or to the oldest surviving diver by [createdAt].
-  /// - Private (non-shared) records are deleted as usual.
-  /// - If no surviving diver exists, all records are deleted (same as
-  ///   [deleteDiver]).
-  ///
-  /// Returns a [DeleteDiverResult] describing what was reassigned.
   /// The [column] values of a raw query, for the cascade steps that have to
   /// know which rows they are about to change so they can mark them pending.
   Future<List<String>> _idsOf(
@@ -294,6 +284,16 @@ class DiverRepository {
     return [for (final r in rows) r.read<String>(column)];
   }
 
+  /// Delete a diver, reassigning shared trips/sites to a surviving diver first.
+  ///
+  /// - If surviving divers exist, shared trips and sites owned by [id] are
+  ///   reassigned to the current default diver (if not the one being deleted)
+  ///   or to the oldest surviving diver by [createdAt].
+  /// - Private (non-shared) records are deleted as usual.
+  /// - If no surviving diver exists, all records are deleted (same as
+  ///   [deleteDiver]).
+  ///
+  /// Returns a [DeleteDiverResult] describing what was reassigned.
   Future<DeleteDiverResult> deleteDiverWithReassignment(String id) async {
     try {
       _log.info('Deleting diver with reassignment: $id');

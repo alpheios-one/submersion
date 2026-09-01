@@ -226,6 +226,38 @@ void main() {
   });
 
   group('malformed input', () {
+    test('a blob whose timestamps decrease is refused', () {
+      // encode enforces this and every consumer assumes it: the merge
+      // interleaves on timestamp, the aggregates difference consecutive
+      // samples, and the summary takes first and last rather than min and
+      // max. A crafted or bit-rotted delta could otherwise hand all of them
+      // an out-of-order series with no complaint.
+      final body = ByteWriter()
+        ..writeByte(1)
+        ..writeVarUint(2);
+      // timestamp column: present, deltas +100 then -40.
+      body.writeColumn<int>([100, -40], body.writeVarInt);
+      // depth column, then every remaining field absent.
+      body.writeColumn<double>([1.0, 2.0], body.writeFloat64);
+      for (var i = 2; i < kProfileFieldTableV1.length; i++) {
+        body.writeByte(kPresenceAbsent);
+      }
+      final blob = Uint8List.fromList(
+        ZLibCodec(level: 6).encode(body.takeBytes()),
+      );
+
+      expect(
+        () => const ProfileSeriesCodec().decode(blob),
+        throwsA(
+          isA<ProfileSeriesCodecException>().having(
+            (e) => e.message,
+            'message',
+            contains('decreases'),
+          ),
+        ),
+      );
+    });
+
     Uint8List validBytes() =>
         codec.encode([for (var i = 0; i < 8; i++) fullSample(i)]).bytes;
 

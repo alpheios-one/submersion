@@ -169,6 +169,17 @@ class TankPressureSeriesCodec {
         '${reader.remaining} trailing byte(s) after the last block',
       );
     }
+    // The invariant encode enforces; see the profile codec for why every
+    // consumer still depends on it.
+    for (var i = 1; i < timestamps.length; i++) {
+      final previous = timestamps[i - 1];
+      final current = timestamps[i];
+      if (previous != null && current != null && current < previous) {
+        throw ProfileSeriesCodecException(
+          'sample $i decreases from $previous to $current',
+        );
+      }
+    }
     return [
       for (var i = 0; i < count; i++)
         TankPressureSample(

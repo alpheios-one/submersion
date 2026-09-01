@@ -672,8 +672,28 @@ class SyncRepository {
   /// none has one yet. Lexically comparable because the packed format zero-pads
   /// physical time and counter.
   Future<String?> _maxRowHlc() async {
-    final union = hlcTargets.values
-        .map((t) => 'SELECT MAX(hlc) AS h FROM "${t.table}"')
+    // Only the tables that exist. The series tables are created by
+    // _assertProfileSeriesSchema, which deliberately waits for their foreign
+    // key parents, so a partially built database (a migration fixture, or
+    // one caught mid-ladder) can reach here without them and a UNION naming
+    // a missing table takes the whole clock seed down. backfillMissingHlc
+    // already guards per table for exactly this.
+    final present = {
+      for (final r
+          in await _db
+              .customSelect(
+                "SELECT name FROM sqlite_master WHERE type = 'table'",
+              )
+              .get())
+        r.read<String>('name'),
+    };
+    final tables = [
+      for (final t in hlcTargets.values)
+        if (present.contains(t.table)) t.table,
+    ];
+    if (tables.isEmpty) return null;
+    final union = tables
+        .map((t) => 'SELECT MAX(hlc) AS h FROM "$t"')
         .join(' UNION ALL ');
     final row = await _db
         .customSelect('SELECT MAX(h) AS m FROM ($union)')

@@ -84,11 +84,6 @@ class DiveSplitService {
     // pressures, or events move. This follows the retired unlinkComputer's
     // convention.
 
-    // Read the series before the transaction deletes the old source row:
-    // dive_profile_series.source_id is ON DELETE SET NULL, so reading after
-    // the delete would lose the FK ownership signal.
-    final allProfileSeries = await _profileSeries.getSeriesForDive(diveId);
-    final allPressureSeries = await _tankSeries.getSeriesForDive(diveId);
     bool ownedByComputer(String? computerId) =>
         source.computerId != null && computerId == source.computerId;
     // The legacy row rule, applied to whole series: not owned by another
@@ -104,16 +99,24 @@ class DiveSplitService {
       return notOwnedByAnotherSource && byLegacyRule;
     }
 
-    final movingProfiles = [
-      for (final s in allProfileSeries)
-        if (profileBelongsToSource(s)) s,
-    ];
-    final movingPressures = [
-      for (final s in allPressureSeries)
-        if (ownedByComputer(s.computerId)) s,
-    ];
-
     await _db.transaction(() async {
+      // Read INSIDE the transaction, and before step 13's deletes: the
+      // legacy path read its rows inside too, and a read outside is a torn
+      // one, deciding what moves from a snapshot another writer can change
+      // before the moves are applied. Before the deletes because
+      // dive_profile_series.source_id is ON DELETE SET NULL, so reading
+      // after would lose the FK ownership signal this rule needs.
+      final allProfileSeries = await _profileSeries.getSeriesForDive(diveId);
+      final allPressureSeries = await _tankSeries.getSeriesForDive(diveId);
+      final movingProfiles = [
+        for (final s in allProfileSeries)
+          if (profileBelongsToSource(s)) s,
+      ];
+      final movingPressures = [
+        for (final s in allPressureSeries)
+          if (ownedByComputer(s.computerId)) s,
+      ];
+
       // 1. New dive: copy the original row, attribute it to the source's
       // computer, override summary fields with the source's snapshot, and
       // leave the logbook entry (site, notes, number) behind.

@@ -7,6 +7,7 @@ import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
 import 'package:submersion/core/database/dive_type_uniqueness.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/profile_series_pack_coverage.dart';
 import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -9634,6 +9635,14 @@ class AppDatabase extends _$AppDatabase {
         // inside the try for the same reason it is in v183: both the v183
         // rung and the backstop re-assert it, so swallowing it here cannot
         // leave the ladder with a schema no later step rebuilds.
+        // Deliberately redundant with the v183 rung below: `from < 182`
+        // implies `from < 183`, so on a single upgrade both packs run and
+        // the second finds everything covered. Kept because the v182 SCHEMA
+        // has to be correct on its own (a rung inserted between the two
+        // later, or a ladder interrupted between them, would otherwise
+        // leave a 182 database with legacy rows and no series), and because
+        // the cost is now one pass per distinct identity rather than per
+        // sample: see legacyCoverageIdentityColumns.
         if (from < 182) {
           try {
             await _assertProfileSeriesSchema();

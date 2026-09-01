@@ -5525,6 +5525,16 @@ class SyncDataSerializer {
   Future<int> pendingSeriesBlobBytes(String? hlcSince) async {
     var total = 0;
     for (final table in const ['dive_profile_series', 'tank_pressure_series']) {
+      // Guarded per table: _assertProfileSeriesSchema waits for each series
+      // table's foreign key parents, so a partially built database can reach
+      // a publish without one.
+      final exists = await _db
+          .customSelect(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+            variables: [Variable<String>(table)],
+          )
+          .get();
+      if (exists.isEmpty) continue;
       final row = await _db
           .customSelect(
             'SELECT COALESCE(SUM(LENGTH(samples)), 0) AS n FROM $table'

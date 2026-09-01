@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_
 import 'package:submersion/features/dive_log/domain/entities/profile_series.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/services/profile_sample_dedupe.dart';
+import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
 
 /// Every read and write of `tank_pressure_series`. See
 /// `ProfileSeriesRepository` for the conventions; this is its two-field
@@ -134,15 +135,6 @@ class TankPressureSeriesRepository {
     return (row.read(_db.tankPressureSeries.id.count()) ?? 0) > 0;
   }
 
-  /// Raw rows of every series of [diveIds], undecoded, for snapshots that
-  /// restore them verbatim through [restoreSeriesRow].
-  ///
-  /// [diveIds] is queried in chunks of at most [_chunkSize], concatenated
-  /// and sorted by `(diveId, tankId, startTimestamp, id)`, which is the
-  /// order a single unchunked query with that `ORDER BY` would have
-  /// returned. See `ProfileSeriesRepository._rowsForDives` for why: binding
-  /// one SQL variable per dive id can exceed the engine's bound-variable
-  /// ceiling on a whole library's filtered dive ids.
   /// The tank twin of `ProfileSeriesRepository.unreadableSeriesIds`: the
   /// ids of [diveIds]'s pressure series whose blob does not decode.
   Future<List<String>> unreadableSeriesIds(List<String> diveIds) async {
@@ -153,12 +145,21 @@ class TankPressureSeriesRepository {
     ];
   }
 
+  /// Raw rows of every series of [diveIds], undecoded, for snapshots that
+  /// restore them verbatim through [restoreSeriesRow].
+  ///
+  /// [diveIds] is queried in chunks of at most [kSeriesIdChunkSize], concatenated
+  /// and sorted by `(diveId, tankId, startTimestamp, id)`, which is the
+  /// order a single unchunked query with that `ORDER BY` would have
+  /// returned. See `ProfileSeriesRepository._rowsForDives` for why: binding
+  /// one SQL variable per dive id can exceed the engine's bound-variable
+  /// ceiling on a whole library's filtered dive ids.
   Future<List<TankPressureSeriesRow>> getRowsForDives(
     List<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return const [];
     final rows = <TankPressureSeriesRow>[];
-    for (final chunk in _chunks(diveIds)) {
+    for (final chunk in seriesIdChunks(diveIds)) {
       rows.addAll(
         await (_db.select(
           _db.tankPressureSeries,
@@ -167,18 +168,6 @@ class TankPressureSeriesRepository {
     }
     rows.sort(_byDiveTankStartId);
     return rows;
-  }
-
-  static const int _chunkSize =
-      900; // safely under SQLite's bound-variable limit
-
-  static Iterable<List<String>> _chunks(List<String> ids) sync* {
-    for (var start = 0; start < ids.length; start += _chunkSize) {
-      final end = start + _chunkSize < ids.length
-          ? start + _chunkSize
-          : ids.length;
-      yield ids.sublist(start, end);
-    }
   }
 
   static int _byDiveTankStartId(
@@ -378,9 +367,13 @@ class TankPressureSeriesRepository {
       for (final id in ids) {
         await _syncRepository.logDeletion(entityType: entityType, recordId: id);
       }
-      await (_db.delete(
-        _db.tankPressureSeries,
-      )..where((t) => t.id.isIn(ids))).go();
+      // Chunked like the writers: one bound variable per id, and these
+      // predicates reach beyond a single dive.
+      for (final chunk in seriesIdChunks(ids)) {
+        await (_db.delete(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.isIn(chunk))).go();
+      }
     });
     SyncEventBus.notifyLocalChange();
     return ids;
