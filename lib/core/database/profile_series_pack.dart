@@ -16,19 +16,23 @@ typedef ProfilePackReport = ({
   int droppedSamples,
   int skippedOrphans,
 
-  /// Legacy rows without a timestamp or depth (pressure, tank id for tanks),
-  /// stepped over.
+  /// Legacy rows without a READABLE timestamp or depth (pressure, tank id
+  /// for tanks), stepped over.
+  ///
+  /// Readable, not merely present: a hand-repaired or bit-rotted file can
+  /// hold text in a REAL column, and such a row holds no sample for the
+  /// same reason a null one does not.
   int skippedRows,
 
   /// Dives the packer could not read or encode, counted once per dive per
   /// legacy table and stepped over.
   ///
-  /// A legacy table can hold a value no reader expects: a text depth in a
-  /// REAL column from a hand-repaired or bit-rotted file, or a group the
-  /// codec refuses to encode. Isolating it per dive is what keeps one such
-  /// row from costing every dive the scan had not reached yet, which after
-  /// v183 (when nothing reads the legacy tables any more) would be a
-  /// silent, permanent loss rather than a deferred retry.
+  /// What lands here is a whole GROUP the codec refuses to encode, not one
+  /// bad value: an unreadable column is [skippedRows] and costs its own row.
+  /// Isolating the rest per dive is what keeps one such group from costing
+  /// every dive the scan had not reached yet, which after v183 (when
+  /// nothing reads the legacy tables any more) would be a silent, permanent
+  /// loss rather than a deferred retry.
   int failedDives,
 
   /// Dives whose legacy (or staged) rows were discarded because the dive
@@ -86,7 +90,8 @@ typedef ProfilePackReport = ({
 /// packs an older peer's inbound row-per-sample rows once the real
 /// `dive_profiles` / `tank_pressure_profiles` tables are gone (v183).
 ///
-/// A dive whose legacy rows are ALL malformed (null timestamp or depth) gets
+/// A dive whose legacy rows are ALL malformed (no readable timestamp or
+/// depth) gets
 /// no series row and is rescanned on every open; that is a bounded per-open
 /// cost on a damaged database, not a retry bug.
 Future<ProfilePackReport> packLegacyProfileRows(
@@ -365,10 +370,15 @@ Future<ProfilePackReport> packLegacyProfileRows(
               .get();
           final groups = <_TankKey, _TankGroup>{};
           for (final row in rows) {
+            // Type tests, not casts, for the reason [profileSampleOf]
+            // carries: an unreadable value means this ROW holds no sample,
+            // which is what a null in the same column means and has always
+            // been stepped over. A cast would throw instead, and the catch
+            // is per dive.
             final tankId = _textOf(row.data['tank_id']);
-            final timestamp = row.data['timestamp'] as num?;
-            final pressure = row.data['pressure'] as num?;
-            if (tankId == null || timestamp == null || pressure == null) {
+            final timestamp = row.data['timestamp'];
+            final pressure = row.data['pressure'];
+            if (tankId == null || timestamp is! num || pressure is! num) {
               skippedRows++;
               continue;
             }

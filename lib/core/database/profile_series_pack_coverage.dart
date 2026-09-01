@@ -36,10 +36,11 @@ typedef LegacyPackResidue = ({int profiles, int tanks});
 /// ever sees.
 ///
 /// A row that can NEVER be packed does not count, or the table would be
-/// kept forever and its pages never reclaimed: a row with no timestamp,
-/// depth, or pressure holds no sample, and a row whose dive is gone could
-/// never have been rendered. A row whose tank is gone DOES count: the dive
-/// is still the diver's, and those bytes are the only copy left.
+/// kept forever and its pages never reclaimed: a row with no READABLE
+/// timestamp, depth, or pressure holds no sample, and a row whose dive is
+/// gone could never have been rendered. A row whose tank is gone DOES
+/// count: the dive is still the diver's, and those bytes are the only copy
+/// left.
 Future<LegacyPackResidue> countLegacyRowsAwaitingPack(
   DatabaseConnectionUser db, {
   String profileTable = 'dive_profiles',
@@ -79,7 +80,7 @@ Future<int> _countUnpackedProfileRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE timestamp IS NOT NULL AND depth IS NOT NULL '
+        'WHERE ${_readableNumber('timestamp')} AND ${_readableNumber('depth')} '
         'GROUP BY $identity) p '
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
@@ -119,8 +120,9 @@ Future<int> _countUnpackedTankRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE timestamp IS NOT NULL AND pressure IS NOT NULL '
-        'AND tank_id IS NOT NULL GROUP BY $identity) p '
+        'WHERE ${_readableNumber('timestamp')} '
+        'AND ${_readableNumber('pressure')} '
+        "AND typeof(tank_id) = 'text' GROUP BY $identity) p "
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
       )
@@ -240,6 +242,17 @@ Future<String> resolvedComputerSql(DatabaseConnectionUser db) async =>
     await legacyTableExists(db, 'dive_computers')
     ? '(SELECT c.id FROM dive_computers c WHERE c.id = p.computer_id)'
     : 'NULL';
+
+/// SQL for "[column] holds a number the packer can read", the predicate
+/// half of `profileSampleOf`'s `is! num` test.
+///
+/// `IS NOT NULL` is not the same question. SQLite carries a storage class
+/// per value, so a REAL-affinity column can hold text it could not convert;
+/// that row is not null but holds no sample, the packer steps over it, and
+/// counting it as awaiting pack would keep the legacy table and its pages
+/// forever waiting for a pack that can never claim it.
+String _readableNumber(String column) =>
+    "typeof($column) IN ('integer', 'real')";
 
 Future<int> _countRows(DatabaseConnectionUser db, String table) async {
   final rows = await db

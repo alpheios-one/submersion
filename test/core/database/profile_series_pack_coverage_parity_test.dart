@@ -5,6 +5,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/legacy_sample_staging.dart';
 import 'package:submersion/core/database/profile_series_pack.dart';
+import 'package:submersion/core/database/profile_series_pack_coverage.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
@@ -236,21 +237,79 @@ void main() {
       expect(samples.read<int>('sample_count'), 2);
     });
 
-    test('a text depth costs one dive, not the pack', () async {
+    test('a text depth costs its own row, not the dive', () async {
+      // An unreadable timestamp or depth means the ROW holds no sample,
+      // which is the same thing a null in either column means, and nulls
+      // have always been stepped over as skippedRows. Failing the whole
+      // dive instead is worse than it looks: the dive is kept back for "a
+      // later open to retry", but the retry reads the same byte and fails
+      // the same way, so the profile is never visible and the legacy table
+      // that holds it can never be dropped.
       final open = await openLegacy();
       seedParents(open.raw);
       open.raw.execute(
         'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, is_primary) '
-        "VALUES ('bad', 'd1', 0, 'deep', 1)",
-      );
-      open.raw.execute(
-        'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, is_primary) '
-        "VALUES ('ok1', 'd2', 0, 5.0, 1), ('ok2', 'd2', 60, 6.0, 1)",
+        "VALUES ('bad', 'd1', 0, 'deep', 1), ('ok1', 'd1', 60, 6.0, 1), "
+        "('ok2', 'd1', 120, 7.0, 1)",
       );
 
       final report = await packLegacyProfileRows(open.db, nowMs: 1);
 
-      expect(report.profileSeries, 1, reason: 'd2 must still pack');
+      expect(report.failedDives, 0);
+      expect(report.skippedRows, 1);
+      expect(report.profileSeries, 1);
+      final samples = await open.db
+          .customSelect(
+            'SELECT sample_count FROM dive_profile_series WHERE dive_id = ?',
+            variables: const [Variable<String>('d1')],
+          )
+          .getSingle();
+      expect(samples.read<int>('sample_count'), 2);
+    });
+
+    test('a text timestamp on a pressure row costs its own row, not the '
+        'dive', () async {
+      // The tank loop's twin of the case above. Reported by Copilot on
+      // PR #1444.
+      final open = await openLegacy();
+      seedParents(open.raw);
+      open.raw.execute(
+        'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, '
+        "pressure, computer_id) VALUES ('q1', 'd1', 't1', 'noon', 200.0, NULL),"
+        " ('q2', 'd1', 't1', 60, 190.0, NULL), "
+        "('q3', 'd1', 't1', 120, 180.0, NULL)",
+      );
+
+      final report = await packLegacyProfileRows(open.db, nowMs: 1);
+
+      expect(report.failedDives, 0);
+      expect(report.skippedRows, 1);
+      expect(report.tankSeries, 1);
+    });
+
+    test('an unreadable row does not keep the legacy table alive', () async {
+      // The residue count gates dropping the legacy table, and it already
+      // excludes a row that can NEVER be packed so the table is not kept
+      // forever. A row whose timestamp or depth SQLite cannot read as a
+      // number is exactly that, the same as the null the count already
+      // steps over.
+      final open = await openLegacy();
+      seedParents(open.raw);
+      open.raw.execute(
+        'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, is_primary) '
+        "VALUES ('bad', 'd1', 0, 'deep', 1), ('ok1', 'd1', 60, 6.0, 1)",
+      );
+      open.raw.execute(
+        'INSERT INTO tank_pressure_profiles (id, dive_id, tank_id, timestamp, '
+        "pressure, computer_id) VALUES ('q1', 'd1', 't1', 'noon', 200.0, NULL),"
+        " ('q2', 'd1', 't1', 60, 190.0, NULL)",
+      );
+
+      await packLegacyProfileRows(open.db, nowMs: 1);
+
+      final residue = await countLegacyRowsAwaitingPack(open.db);
+      expect(residue.profiles, 0);
+      expect(residue.tanks, 0);
     });
   });
 }

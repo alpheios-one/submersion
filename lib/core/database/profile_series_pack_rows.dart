@@ -9,12 +9,20 @@ import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 /// Reads a legacy `dive_profiles` row by column name. Absent columns (an
 /// older fixture or a partially migrated table) read as null. Returns null
-/// when the row has no timestamp or depth: a restored or hand-repaired
-/// legacy table can hold such rows and they cannot become a sample.
+/// when the row has no READABLE timestamp or depth: a restored or
+/// hand-repaired legacy table can hold such rows and they cannot become a
+/// sample.
+///
+/// `is! num` rather than a null check, because the two are the same thing
+/// here. SQLite carries a storage class per value, so a REAL-affinity
+/// column can hold text it could not convert, and a cast would throw. The
+/// packer catches that per DIVE, so one unreadable byte would cost the
+/// dive its whole profile and keep its legacy rows back for a retry that
+/// re-reads the same byte and fails identically, forever.
 ProfileSample? profileSampleOf(Map<String, Object?> data) {
-  final timestamp = data['timestamp'] as num?;
-  final depth = data['depth'] as num?;
-  if (timestamp == null || depth == null) return null;
+  final timestamp = data['timestamp'];
+  final depth = data['depth'];
+  if (timestamp is! num || depth is! num) return null;
   return ProfileSample(
     timestamp: timestamp.toInt(),
     depth: depth.toDouble(),
