@@ -59087,24 +59087,6 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
   String garminConnect_fetch_someFailed(int count);
 
-  /// Header on the Garmin Connect fetch step showing how many of the fetched dives are currently selected to carry into the rest of the import.
-  ///
-  /// In en, this message translates to:
-  /// **'{selected} of {total} selected'**
-  String garminConnect_fetch_selectedOfTotal(int selected, int total);
-
-  /// Button that selects every dive fetched so far in the Garmin Connect fetch step.
-  ///
-  /// In en, this message translates to:
-  /// **'Select All'**
-  String get garminConnect_fetch_selectAll;
-
-  /// Button that deselects every dive fetched so far in the Garmin Connect fetch step.
-  ///
-  /// In en, this message translates to:
-  /// **'Deselect All'**
-  String get garminConnect_fetch_deselectAll;
-
   /// Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time.
   ///
   /// In en, this message translates to:

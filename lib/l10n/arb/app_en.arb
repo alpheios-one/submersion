@@ -21787,27 +21787,7 @@
   "garminConnect_fetch_loadMore": "Load More",
   "garminConnect_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
-  "garminConnect_fetch_selectedOfTotal": "{selected} of {total} selected",
-  "garminConnect_fetch_selectAll": "Select All",
-  "garminConnect_fetch_deselectAll": "Deselect All",
   "garminConnect_fetch_fetchAll": "Fetch All",
-  "@garminConnect_fetch_selectedOfTotal": {
-    "description": "Header on the Garmin Connect fetch step showing how many of the fetched dives are currently selected to carry into the rest of the import.",
-    "placeholders": {
-      "selected": {
-        "type": "int"
-      },
-      "total": {
-        "type": "int"
-      }
-    }
-  },
-  "@garminConnect_fetch_selectAll": {
-    "description": "Button that selects every dive fetched so far in the Garmin Connect fetch step."
-  },
-  "@garminConnect_fetch_deselectAll": {
-    "description": "Button that deselects every dive fetched so far in the Garmin Connect fetch step."
-  },
   "@garminConnect_fetch_fetchAll": {
     "description": "Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time."
   },

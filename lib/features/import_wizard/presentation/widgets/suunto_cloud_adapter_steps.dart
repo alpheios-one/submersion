@@ -292,6 +292,17 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
   final List<SuuntoParsedDive> _parsedDives = [];
   StreamIterator<List<SuuntoWorkoutSummary>>? _pageIterator;
 
+  /// Whether [_pageIterator] might still hold an open subscription.
+  ///
+  /// A [StreamIterator] already cancels its subscription internally once its
+  /// stream errors or completes, so cancelling it again is a harmless no-op
+  /// in production -- but it is *not* free: it still returns a genuine
+  /// `Future`, and awaiting one for an already-terminated iterator has been
+  /// observed to stall a test's `pumpAndSettle` indefinitely (the underlying
+  /// cross-zone microtask never gets flushed by fake-async time). Tracking
+  /// liveness explicitly lets a fresh fetch skip that redundant cancel.
+  bool _pageIteratorActive = false;
+
   @override
   void initState() {
     super.initState();
@@ -337,7 +348,11 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       _progressText = context.l10n.suuntoCloud_fetch_listing;
     });
 
+    if (_pageIteratorActive) {
+      await _pageIterator?.cancel();
+    }
     _pageIterator = StreamIterator(client.listDivesPaged());
+    _pageIteratorActive = true;
 
     try {
       final hasPage = await _pageIterator!.moveNext();
@@ -348,6 +363,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
         if (!mounted) return;
       } else {
         _hasMorePages = false;
+        _pageIteratorActive = false;
       }
 
       widget.onDivesFetched(List.unmodifiable(_parsedDives));
@@ -358,6 +374,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       ref.read(suuntoCloudDivesFetchedProvider.notifier).state = true;
     } on SuuntoApiException catch (e) {
       if (!mounted) return;
+      _pageIteratorActive = false;
       setState(() {
         _isFetching = false;
         _error = e.displayMessage;
@@ -365,6 +382,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       _discardDives();
     } catch (e) {
       if (!mounted) return;
+      _pageIteratorActive = false;
       setState(() {
         _isFetching = false;
         _error = '$e';
@@ -399,18 +417,21 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
         if (!mounted) return;
       } else {
         _hasMorePages = false;
+        _pageIteratorActive = false;
       }
 
       widget.onDivesFetched(List.unmodifiable(_parsedDives));
       setState(() => _isLoadingMore = false);
     } on SuuntoApiException catch (e) {
       if (!mounted) return;
+      _pageIteratorActive = false;
       setState(() {
         _isLoadingMore = false;
         _loadMoreError = e.displayMessage;
       });
     } catch (e) {
       if (!mounted) return;
+      _pageIteratorActive = false;
       setState(() {
         _isLoadingMore = false;
         _loadMoreError = '$e';

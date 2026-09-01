@@ -156,8 +156,10 @@ class SuuntoCloudClient {
           summaries.add(_toWorkoutSummary(item, activityId));
         }
       }
-      summaries.sort((a, b) => b.startTime.compareTo(a.startTime));
-      yield summaries;
+      if (summaries.isNotEmpty) {
+        summaries.sort((a, b) => b.startTime.compareTo(a.startTime));
+        yield summaries;
+      }
 
       if (items.length < pageSize) break;
       offset += pageSize;

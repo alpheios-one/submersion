@@ -35739,17 +35739,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String garminConnect_fetch_selectedOfTotal(int selected, int total) {
-    return '$selected of $total selected';
-  }
-
-  @override
-  String get garminConnect_fetch_selectAll => 'Select All';
-
-  @override
-  String get garminConnect_fetch_deselectAll => 'Deselect All';
-
-  @override
   String get garminConnect_fetch_fetchAll => 'Fetch All';
 
   @override

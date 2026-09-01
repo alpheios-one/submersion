@@ -794,7 +794,7 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
               children: [
                 Expanded(
                   child: Text(
-                    l10n.garminConnect_fetch_selectedOfTotal(
+                    l10n.universalImport_label_xOfYSelected(
                       _selectedIndices.length,
                       _parsedDives.length,
                     ),
@@ -805,11 +805,11 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
                 ),
                 TextButton(
                   onPressed: _selectAll,
-                  child: Text(l10n.garminConnect_fetch_selectAll),
+                  child: Text(l10n.universalImport_action_selectAll),
                 ),
                 TextButton(
                   onPressed: _deselectAll,
-                  child: Text(l10n.garminConnect_fetch_deselectAll),
+                  child: Text(l10n.universalImport_action_deselectAll),
                 ),
               ],
             ),
