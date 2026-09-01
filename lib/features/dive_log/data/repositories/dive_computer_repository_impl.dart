@@ -1052,11 +1052,31 @@ class DiveComputerRepository {
     ]);
     // Delete profile points for this computer+dive
     await _profileSeries.deleteByComputer(diveId, computerId);
-    // Delete the data source row for this computer+dive
-    await _db.customStatement(
-      'DELETE FROM dive_data_sources WHERE dive_id = ? AND computer_id = ?',
-      [diveId, computerId],
-    );
+    // Whatever series survive that (deleteByComputer never matches the
+    // null-computer series a manual edit writes) must give up their
+    // source_id explicitly before the row they point at goes: the FK is ON
+    // DELETE SET NULL, so the cascade would strip their attribution with no
+    // updated_at bump, no hlc restamp and nothing pending, leaving this
+    // device to resolve their owner differently from every peer forever (see
+    // ProfileSeriesRepository.clearSource). One transaction with the delete,
+    // so a failure between them cannot publish series that gave up an
+    // attribution the source row still claims.
+    await _db.transaction(() async {
+      final doomed =
+          await (_db.select(_db.diveDataSources)..where(
+                (t) =>
+                    t.diveId.equals(diveId) & t.computerId.equals(computerId),
+              ))
+              .get();
+      for (final source in doomed) {
+        await _profileSeries.clearSource(source.id);
+      }
+      // Delete the data source row for this computer+dive
+      await _db.customStatement(
+        'DELETE FROM dive_data_sources WHERE dive_id = ? AND computer_id = ?',
+        [diveId, computerId],
+      );
+    });
   }
 
   /// Import a profile and associate it with a dive (creating one if needed).

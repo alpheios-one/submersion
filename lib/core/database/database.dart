@@ -4338,8 +4338,10 @@ class AppDatabase extends _$AppDatabase {
   /// different parents, so one can be packable on a database where the other
   /// is not.
   Future<void> _dropLegacyProfileTable() async {
+    final present = await _tableExists('dive_profiles');
     await customStatement('DROP INDEX IF EXISTS idx_dive_profiles_dive_id');
     await customStatement('DROP TABLE IF EXISTS dive_profiles');
+    if (present) _droppedLegacySampleTables = true;
   }
 
   /// v183: drops the row-per-sample tank pressure table. The mirror of
@@ -4347,9 +4349,26 @@ class AppDatabase extends _$AppDatabase {
   /// (that table waits for `dive_tanks`, which `dive_profile_series` does
   /// not need).
   Future<void> _dropLegacyTankTable() async {
+    final present = await _tableExists('tank_pressure_profiles');
     await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
     await customStatement('DROP TABLE IF EXISTS tank_pressure_profiles');
+    if (present) _droppedLegacySampleTables = true;
   }
+
+  bool _droppedLegacySampleTables = false;
+
+  /// True once this connection has actually dropped a row-per-sample legacy
+  /// table, whether from the v183 rung or from the beforeOpen backstop.
+  ///
+  /// The pages those tables held are most of an older file, and only a
+  /// VACUUM returns them to the filesystem. Which open performs the drop is
+  /// not something the stored schema version can answer: the rung is allowed
+  /// to skip it (its pack threw, the series table's foreign-key parents were
+  /// absent, or the residue count found rows no series covered), and the
+  /// backstop then drops on the first later open whose pack succeeds, by
+  /// which time the file is long since stamped 183. So the reclamation keys
+  /// off this, the event itself. See [DatabaseService].
+  bool get droppedLegacySampleTables => _droppedLegacySampleTables;
 
   /// True when [table] exists in this database right now.
   Future<bool> _tableExists(String table) async {
