@@ -22432,6 +22432,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit bestand bevat een positie of tijdstempel die deze app niet kan lezen.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'Dit bestand bevat te veel posities om als één track op te slaan. Splits het in kortere tracks en importeer die apart.';
+
+  @override
   String get gpsTrack_export_saved => 'Track opgeslagen';
 
   @override

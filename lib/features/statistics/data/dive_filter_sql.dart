@@ -252,13 +252,15 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 /// surfaces intersect with) can't drift apart. Mirrors
 /// `StatisticsRepository.scanRecordedDecoSignals`:
 ///
-/// - A deco-stop profile point (`deco_type = 2`) or a `decoStopStart` event
-///   means deco.
-/// - A profile that carries `deco_type` values, none of which is 2, means
-///   no-deco: the computer recorded obligations and reported none.
-/// - A positive `ceiling` on a profile with no `deco_type` at all also means
-///   deco (some import sources only ever write a stop depth).
-/// - A dive with no qualifying profile data matches neither branch; it is
+/// - A series with a recorded deco stop (`has_deco_stop`) or a
+///   `decoStopStart` event means deco.
+/// - A series that carries `deco_type` values (`has_deco_type`) but never a
+///   stop means no-deco: the computer recorded obligations and reported
+///   none.
+/// - A positive ceiling (`has_positive_ceiling`) on a series with no
+///   `deco_type` at all also means deco (some import sources only ever
+///   write a stop depth).
+/// - A dive with no qualifying series data matches neither branch; it is
 ///   only classifiable via the computed fallback, which this SQL-only axis
 ///   does not have access to.
 ///
@@ -274,16 +276,16 @@ String decoSignalCondition({
   required String diveIdRef,
 }) {
   final hasDecoStop =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.deco_type = 2) '
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_deco_stop = 1) '
       "OR EXISTS (SELECT 1 FROM dive_profile_events e "
       "WHERE e.dive_id = $diveIdRef AND e.event_type = 'decoStopStart')";
   final hasDecoType =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.deco_type IS NOT NULL)';
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_deco_type = 1)';
   final hasPositiveCeiling =
-      'EXISTS (SELECT 1 FROM dive_profiles p '
-      'WHERE p.dive_id = $diveIdRef AND p.ceiling > 0)';
+      'EXISTS (SELECT 1 FROM dive_profile_series s '
+      'WHERE s.dive_id = $diveIdRef AND s.has_positive_ceiling = 1)';
 
   if (wantDeco) {
     return '($hasDecoStop OR (NOT ($hasDecoType) AND $hasPositiveCeiling))';

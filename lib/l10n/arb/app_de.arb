@@ -3910,6 +3910,7 @@
   "gpsTrack_importError_unreadable": "Diese Datei konnte nicht gelesen werden. Sie ist möglicherweise beschädigt oder unvollständig.",
   "gpsTrack_importError_noPositions": "Diese Datei enthält keine GPS-Positionen mit Zeitstempel.",
   "gpsTrack_importError_badData": "Diese Datei enthält eine Position oder einen Zeitstempel, die diese App nicht lesen kann.",
+  "gpsTrack_importError_tooLarge": "Diese Datei enthält zu viele Positionen für einen einzelnen Track. Teile sie in kürzere Tracks auf und importiere sie einzeln.",
   "gpsTrack_export_saved": "Track gespeichert",
   "gpsTrack_action_export": "Exportieren",
   "gpsTrack_action_shareGpx": "Als GPX teilen",

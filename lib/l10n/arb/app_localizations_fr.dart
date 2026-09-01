@@ -22697,6 +22697,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce fichier contient une position ou un horodatage que l\'application ne peut pas lire.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'Ce fichier contient trop de positions pour être enregistré comme une seule trace. Divisez-le en traces plus courtes et importez-les séparément.';
+
+  @override
   String get gpsTrack_export_saved => 'Trace enregistrée';
 
   @override

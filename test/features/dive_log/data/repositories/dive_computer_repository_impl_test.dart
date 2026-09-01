@@ -4,6 +4,8 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
     as domain;
 
@@ -11,11 +13,13 @@ import '../../../../helpers/test_database.dart';
 
 void main() {
   late DiveComputerRepository repository;
+  late ProfileSeriesRepository profileSeries;
   late AppDatabase db;
 
   setUp(() async {
     db = await setUpTestDatabase();
     repository = DiveComputerRepository();
+    profileSeries = ProfileSeriesRepository();
   });
 
   tearDown(() async {
@@ -85,28 +89,6 @@ void main() {
           ),
         );
     return diveId;
-  }
-
-  Future<void> insertProfile({
-    required String diveId,
-    String? computerId,
-    int timestamp = 0,
-    double depth = 5.0,
-    bool isPrimary = false,
-  }) async {
-    final id = 'profile-$timestamp-${DateTime.now().microsecondsSinceEpoch}';
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            computerId: Value(computerId),
-            isPrimary: Value(isPrimary),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-          ),
-        );
   }
 
   Future<void> insertDataSource({
@@ -391,24 +373,28 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('deleteComputer', () {
-    test('nulls out FK references in dive_profiles before deleting', () async {
+    test('nulls out FK references in the series before deleting', () async {
       final computerId = await insertComputer();
       final diveId = await insertDive();
-      await insertProfile(
+      final seriesId = await profileSeries.insertSeries(
         diveId: diveId,
         computerId: computerId,
-        timestamp: 0,
-        depth: 10.0,
+        samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+        now: 1000,
       );
+      final beforeHlc = (await profileSeries.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == seriesId).hlc;
 
       await repository.deleteComputer(computerId);
 
-      // Profile should still exist but with null computerId.
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      expect(profiles, hasLength(1));
-      expect(profiles.first.computerId, isNull);
+      // Series should still exist but with null computerId and a restamped
+      // hlc.
+      final seriesRow = (await profileSeries.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == seriesId);
+      expect(seriesRow.computerId, isNull);
+      expect(seriesRow.hlc, isNot(beforeHlc));
 
       // Computer should be deleted.
       final computers = await (db.select(
@@ -567,7 +553,12 @@ void main() {
           computerSerial: 'SN-12345',
           sourceFormat: 'dive_computer',
         );
-        await insertProfile(diveId: diveId, computerId: oldId);
+        final seriesId = await profileSeries.insertSeries(
+          diveId: diveId,
+          computerId: oldId,
+          samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+          now: 1000,
+        );
         await repository.deleteComputer(oldId);
 
         final created = await repository.createComputer(newComputer());
@@ -580,10 +571,10 @@ void main() {
           db.dives,
         )..where((t) => t.id.equals(diveId))).getSingle();
         expect(dive.computerId, equals(created.id));
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
-        expect(profiles.single.computerId, equals(created.id));
+        final series = (await profileSeries.getRowsForDives([
+          diveId,
+        ])).firstWhere((r) => r.id == seriesId);
+        expect(series.computerId, equals(created.id));
       },
     );
 
@@ -677,7 +668,12 @@ void main() {
           computerSerial: 'SN-99999',
           sourceFormat: 'dive_computer',
         );
-        await insertProfile(diveId: diveId, computerId: oldId);
+        final seriesId = await profileSeries.insertSeries(
+          diveId: diveId,
+          computerId: oldId,
+          samples: const [ProfileSample(timestamp: 0, depth: 10.0)],
+          now: 1000,
+        );
         await repository.deleteComputer(oldId);
 
         final created = await repository.createComputer(newComputer());
@@ -694,10 +690,10 @@ void main() {
           db.dives,
         )..where((t) => t.id.equals(diveId))).getSingle();
         expect(dive.computerId, equals(created.id));
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
-        expect(profiles.single.computerId, isNull);
+        final series = (await profileSeries.getRowsForDives([
+          diveId,
+        ])).firstWhere((r) => r.id == seriesId);
+        expect(series.computerId, isNull);
       },
     );
   });

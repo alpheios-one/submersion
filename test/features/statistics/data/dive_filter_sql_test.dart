@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as dive_entity;
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
@@ -12,9 +14,11 @@ import '../../../helpers/test_database.dart';
 
 void main() {
   late AppDatabase db;
+  late ProfileSeriesRepository seriesRepository;
 
   setUp(() async {
     db = await setUpTestDatabase();
+    seriesRepository = ProfileSeriesRepository();
   });
   tearDown(() async {
     await tearDownTestDatabase();
@@ -242,18 +246,19 @@ void main() {
     int? decoType,
     double? ceiling,
   }) async {
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-            decoType: Value(decoType),
-            ceiling: Value(ceiling),
-          ),
-        );
+    await seriesRepository.insertSeries(
+      diveId: diveId,
+      id: id,
+      samples: [
+        ProfileSample(
+          timestamp: timestamp,
+          depth: depth,
+          decoType: decoType,
+          ceiling: ceiling,
+        ),
+      ],
+      now: now,
+    );
   }
 
   Future<void> insertProfileEvent(
