@@ -134,10 +134,15 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
     required TileLayer tileLayerOptions,
   }) async {
     final regionId = _uuid.v4();
+    // A cancellation belongs to the download it was aimed at, so this both
+    // clears a stale one and handles the download that supersedes another:
+    // the service cancels the running download when a new one starts, and
+    // without being marked cancelled here that first download would fall
+    // through to its success path and record a region for the handful of
+    // tiles it had managed. Null when nothing was running, which is the
+    // ordinary case.
+    _cancelledRegionId = _activeRegionId;
     _activeRegionId = regionId;
-    // A cancellation belongs to the download it was aimed at. Clearing it here
-    // means a stale one can never be read as a cancellation of this download.
-    _cancelledRegionId = null;
     try {
       state = state.copyWith(
         isDownloading: true,

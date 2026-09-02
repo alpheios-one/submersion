@@ -126,6 +126,15 @@ class TileCacheService {
   StreamSubscription<DownloadProgress>? _activeDownloadSubscription;
   Object? _activeDownloadId;
 
+  /// The stream handed to the caller of [downloadRegion].
+  ///
+  /// Held because it is closed from the subscription's `onDone`, and
+  /// [cancelDownload] cancels that subscription: cancelling a subscription
+  /// suppresses its callbacks, so a cancel that lands before FMTC's own
+  /// progress stream closes would leave this open forever and the caller
+  /// awaiting it would never resume.
+  StreamController<TileDownloadProgress>? _activeDownloadController;
+
   /// The store the active download is filling.
   ///
   /// FMTC resolves a download by its instance id through a registry that is
@@ -222,6 +231,17 @@ class TileCacheService {
     _initialized = true;
     // coverage:ignore-end
   }
+
+  /// Whether a store belongs to this app.
+  ///
+  /// The FMTC root is shared, so [FMTCRoot.stats] can list stores this feature
+  /// did not create. Totals are shown next to a "Clear all cache" button that
+  /// only touches these, so counting anything else would put bytes on screen
+  /// that the button beside them cannot free.
+  static bool isOwnStoreName(String storeName) =>
+      storeName == _offlineStoreName ||
+      storeName == _browseStoreName ||
+      regionIdFromStoreName(storeName) != null;
 
   /// The store that holds the tiles of the region with this id.
   static String regionStoreName(String regionId) =>
@@ -494,6 +514,7 @@ class TileCacheService {
       );
 
       final controller = StreamController<TileDownloadProgress>();
+      _activeDownloadController = controller;
 
       _activeDownloadSubscription = streams.downloadProgress.listen(
         (progress) {
@@ -513,6 +534,7 @@ class TileCacheService {
           _activeDownloadRegionId = null;
           _activeDownloadStore = null;
           _activeDownloadSubscription = null;
+          _activeDownloadController = null;
           controller.close();
         },
       );
@@ -654,10 +676,21 @@ class TileCacheService {
     if (_activeDownloadId != null) {
       await _downloadControls.cancel(instanceId: _activeDownloadId!);
       await _activeDownloadSubscription?.cancel();
+      // Closed here rather than left to onDone, which the cancel above has
+      // just made unreachable. Without this the caller's `await for` never
+      // ends: the download would appear to run forever, its region would stay
+      // marked in-flight, and the sweep would protect its store indefinitely.
+      // Not awaited, because a controller nobody subscribed to only completes
+      // its close once something drains it.
+      final controller = _activeDownloadController;
+      if (controller != null && !controller.isClosed) {
+        unawaited(controller.close());
+      }
       _activeDownloadId = null;
       _activeDownloadRegionId = null;
       _activeDownloadStore = null;
       _activeDownloadSubscription = null;
+      _activeDownloadController = null;
     }
   }
 
@@ -699,6 +732,7 @@ class TileCacheService {
 
     final perStore = <({double size, int length, int hits, int misses})>[];
     for (final store in await FMTCRoot.stats.storesAvailable) {
+      if (!isOwnStoreName(store.storeName)) continue;
       // Skipped rather than fatal. A store can disappear between listing and
       // reading it, because the orphan sweep runs on this very page and
       // deletes stores while this total is being taken; a store that no longer

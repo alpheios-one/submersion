@@ -321,6 +321,50 @@ void main() {
       },
     );
 
+    test('a download that supersedes another discards it', () async {
+      // Starting a second region cancels the first inside the service. Without
+      // the first being marked cancelled, its loop would end and it would
+      // record a region for whatever few tiles it had, which is the phantom
+      // region this branch removed from the cancel path.
+      final notifier = container.read(downloadProgressProvider.notifier);
+      final first = notifier.downloadRegion(
+        name: 'Cozumel',
+        minLat: 20,
+        maxLat: 21,
+        minLng: -87,
+        maxLng: -86,
+        minZoom: 8,
+        maxZoom: 12,
+        tileLayerOptions: tileLayer,
+      );
+      await Future<void>.delayed(Duration.zero);
+      cache.progress.add(
+        const TileDownloadProgress(
+          downloadedTiles: 3,
+          totalTiles: 500,
+          failedTiles: 0,
+          tilesPerSecond: 3,
+          isComplete: false,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      // The service closes the first download's stream when the next starts.
+      unawaited(cache.progress.close());
+      cache.measuredBytes = 2 * 1024 * 1024;
+      await downloadOneRegion(tiles: 25);
+      await first;
+
+      final regions = await repository.getAllRegions();
+      expect(
+        regions,
+        hasLength(1),
+        reason: 'only the download that finished is a region',
+      );
+      expect(regions.single.tileCount, 25);
+      expect(cache.calls.where((c) => c.startsWith('discard:')), hasLength(1));
+    });
+
     test('a failed download leaves no store behind', () async {
       // The store is created before the first tile arrives, so a download that
       // throws anywhere after that would strand it holding tiles no region

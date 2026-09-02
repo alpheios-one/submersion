@@ -129,6 +129,30 @@ void main() {
       expect(TileCacheService.otherStoresStrategy, BrowseStoreStrategy.read);
     });
 
+    test('totals count this app\'s stores and no others', () {
+      // The FMTC root is shared, and the totals sit next to a button that only
+      // clears these. Counting a store that button cannot touch would put
+      // bytes on screen that nothing on the page can free.
+      for (final ours in const [
+        'submersion_tiles',
+        'submersion_tiles_browse',
+        'submersion_region_abc',
+      ]) {
+        expect(TileCacheService.isOwnStoreName(ours), isTrue, reason: ours);
+      }
+      for (final theirs in const [
+        'someone_elses_store',
+        'submersion_region_',
+        'tiles',
+      ]) {
+        expect(
+          TileCacheService.isOwnStoreName(theirs),
+          isFalse,
+          reason: theirs,
+        );
+      }
+    });
+
     test('orphan selection keeps every store it cannot prove is garbage', () {
       final orphans = TileCacheService.orphanRegionStores(
         availableStores: const [
