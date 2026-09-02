@@ -234,6 +234,59 @@ void main() {
       );
     });
 
+    test('rejects an all-surface profile the source says was a real dive', () {
+      // Zero on the two sides means opposite things, which is why they are not
+      // treated alike. A zero *recorded* scalar is MacDive saying it has no
+      // value. A zero *parsed* depth is libdivecomputer asserting the diver
+      // never left the surface, and against a recorded 30 m dive that is a
+      // wrong-format parse, not a shallow one.
+      final allSurface = _parsed(
+        durationSeconds: 2400,
+        samples: [_sample(0, 0.0), _sample(1200, 0.0), _sample(2400, 0.0)],
+      );
+      expect(
+        RawProfileSanityCheck.accepts(
+          allSurface,
+          recordedMaxDepthMeters: 30.0,
+          recordedDuration: const Duration(minutes: 40),
+        ),
+        isFalse,
+      );
+      // With nothing to contradict it, the same series is still accepted: the
+      // cross-check is the only thing that can know better.
+      expect(RawProfileSanityCheck.accepts(allSurface), isTrue);
+    });
+
+    test('rejects a zero-length profile the source says lasted an hour', () {
+      // One sample at t = 0 with no duration field is the duration-side twin
+      // of the case above.
+      expect(
+        RawProfileSanityCheck.accepts(
+          _parsed(maxDepthMeters: 28.0, samples: [_sample(0, 28.0)]),
+          recordedMaxDepthMeters: 30.0,
+          recordedDuration: const Duration(minutes: 60),
+        ),
+        isFalse,
+      );
+    });
+
+    test('a shallow recorded depth still tolerates a zero parse', () {
+      // The floors exist because relative tolerance is meaningless at small
+      // magnitudes; a 3 m recorded dive is not enough to call a 0 m parse
+      // wrong.
+      expect(
+        RawProfileSanityCheck.accepts(
+          _parsed(
+            durationSeconds: 200,
+            samples: [_sample(0, 0.0), _sample(200, 0.0)],
+          ),
+          recordedMaxDepthMeters: 3.0,
+          recordedDuration: const Duration(minutes: 4),
+        ),
+        isTrue,
+      );
+    });
+
     test('a missing or zero recorded scalar cannot reject anything', () {
       expect(
         RawProfileSanityCheck.accepts(

@@ -109,17 +109,27 @@ class RawProfileSanityCheck {
   }
 
   /// True unless [parsed] and [recorded] disagree by more than a factor of
-  /// [_grossFactor]. A missing, non-positive or non-finite value on either
-  /// side carries no information, so it cannot reject anything. [parsed] is
-  /// already known finite by the time this runs; [recorded] comes from the
-  /// source app and is checked here.
+  /// [_grossFactor].
+  ///
+  /// The two sides are treated differently, and deliberately so. A missing,
+  /// non-positive or non-finite [recorded] value is the source app saying it
+  /// has nothing for this dive, so it cannot reject anything; MacDive stores a
+  /// plain 0 where it has no figure. A [parsed] value of 0 is not the absence
+  /// of a claim - it is libdivecomputer asserting the diver never left the
+  /// surface, or that the dive took no time - and against a source that
+  /// recorded a real dive that is exactly the wrong-format parse this check
+  /// exists to catch. So [parsed] goes through the arithmetic like any other
+  /// value, where the floors keep it from firing on magnitudes too small to
+  /// mean anything.
+  ///
+  /// [parsed] is already known finite by the time this runs; [recorded] comes
+  /// from the source app and is checked here.
   static bool _withinGross({
     required double parsed,
     required double? recorded,
     required double floor,
   }) {
     if (recorded == null || !recorded.isFinite || recorded <= 0) return true;
-    if (parsed <= 0) return true;
     if (parsed > recorded * _grossFactor + floor) return false;
     if (parsed * _grossFactor + floor < recorded) return false;
     return true;

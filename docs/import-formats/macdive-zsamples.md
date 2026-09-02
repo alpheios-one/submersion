@@ -573,7 +573,11 @@ That last tolerance is deliberately gross. MacDive routinely omits its units
 row, so a whole logbook can be read as feet when it is metres (#912) - a 3.28x
 error in the recorded scalar that says nothing about whether the raw bytes
 decoded correctly. A tighter bound would discard good profiles to catch bad
-ones that the absolute limits already catch. A rejected parse falls back to
+ones that the absolute limits already catch. The two sides of that comparison
+are not symmetric: a recorded value of zero is MacDive saying it has no figure
+and cannot reject anything, while a parsed depth of zero is libdivecomputer
+asserting the diver never left the surface, which against a recorded 30 m dive
+is exactly the wrong-format parse this check exists to catch. A rejected parse falls back to
 exactly the behaviour an unrecognised computer already had: it counts toward
 one aggregated warning pointing at MacDive's XML export.
 
