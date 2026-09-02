@@ -325,12 +325,21 @@ class MacDiveDiveMapper {
     if (temps.isNotEmpty) {
       map['waterTemp'] ??= temps.reduce((a, b) => a < b ? a : b);
     }
-    // The latest stamp rather than the last record: the decoder reports what
-    // MacDive stored, and one library is known to hold a backwards step.
+    // The latest stamp rather than the last record, rounded like the points
+    // are. Records stay in stored order: the one backwards step in the
+    // reference library is a second descent whose clock restarts after a
+    // surfacing, and sorting it would interleave the two segments into a
+    // zigzag where MacDive draws them one after the other.
     final end = samples.map((s) => s.time).reduce((a, b) => a > b ? a : b);
-    if (end > Duration.zero) map['runtime'] ??= end;
+    if (end > Duration.zero) {
+      map['runtime'] ??= Duration(seconds: _wholeSeconds(end));
+    }
     return true;
   }
+
+  /// Sample times to the nearest whole second, the resolution profile points
+  /// carry app-wide.
+  static int _wholeSeconds(Duration d) => (d.inMilliseconds / 1000).round();
 
   /// One profile point in the shape `UddfEntityImporter` reads, matching the
   /// keys `MacDiveXmlParser` emits for the same fields. Pressures come out of
@@ -345,7 +354,7 @@ class MacDiveDiveMapper {
     MacDiveUnitConverter converter,
   ) {
     final point = <String, dynamic>{
-      'timestamp': (s.time.inMilliseconds / 1000).round(),
+      'timestamp': _wholeSeconds(s.time),
       'depth': s.depthMeters,
     };
     if (s.temperatureCelsius != null) {

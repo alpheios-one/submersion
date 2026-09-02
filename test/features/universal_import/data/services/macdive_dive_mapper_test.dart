@@ -747,6 +747,8 @@ void main() {
           (p) => (p as Map)['timestamp'],
         );
         expect(stamps, [0, 2, 8]);
+        // Runtime is rounded the same way, so it agrees with the last point.
+        expect(dive['runtime'], const Duration(seconds: 8));
       });
 
       test('zero readings are omitted rather than charted', () async {
@@ -797,6 +799,12 @@ void main() {
         );
         final dive = payload.entitiesOf(ImportEntityType.dives).single;
         expect(dive['runtime'], const Duration(seconds: 900));
+        // Stored order is kept: a restarted clock after a surfacing is a
+        // second descent, and sorting would interleave the two segments.
+        final stamps = (dive['profile'] as List).map(
+          (p) => (p as Map)['timestamp'],
+        );
+        expect(stamps, [0, 900, 600]);
       });
 
       test('a rejected raw parse falls back to ZSAMPLES silently', () async {
