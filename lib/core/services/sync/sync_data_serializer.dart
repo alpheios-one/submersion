@@ -8,9 +8,15 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/legacy_sample_staging.dart';
+import 'package:submersion/core/database/profile_series_pack.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_codec_exception.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_series_summary.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 
 /// Sync data format version for compatibility checking
 const int syncFormatVersion = 2;
@@ -216,6 +222,11 @@ class SyncData {
   final List<Map<String, dynamic>> divers;
   final List<Map<String, dynamic>> diverSettings;
   final List<Map<String, dynamic>> dives;
+
+  /// Inbound only since v182: older peers still send row-per-sample arrays;
+  /// they apply into the legacy tables and are packed into series by
+  /// [SyncDataSerializer.packLegacySamples]. Never exported, absent from
+  /// [toJson].
   final List<Map<String, dynamic>> diveProfiles;
   final List<Map<String, dynamic>> diveTanks;
   final List<Map<String, dynamic>> diveEquipment;
@@ -269,6 +280,11 @@ class SyncData {
   final List<Map<String, dynamic>> diveRoles;
   final List<Map<String, dynamic>> tankPresets;
   final List<Map<String, dynamic>> diveComputers;
+
+  /// Inbound only since v182: older peers still send row-per-sample arrays;
+  /// they apply into the legacy tables and are packed into series by
+  /// [SyncDataSerializer.packLegacySamples]. Never exported, absent from
+  /// [toJson].
   final List<Map<String, dynamic>> tankPressureProfiles;
   final List<Map<String, dynamic>> tideRecords;
   final List<Map<String, dynamic>> settings;
@@ -288,6 +304,8 @@ class SyncData {
   final List<Map<String, dynamic>> csvPresets;
   final List<Map<String, dynamic>> viewConfigs;
   final List<Map<String, dynamic>> fieldPresets;
+  final List<Map<String, dynamic>> diveProfileSeries;
+  final List<Map<String, dynamic>> tankPressureSeries;
 
   const SyncData({
     this.divers = const [],
@@ -365,13 +383,14 @@ class SyncData {
     this.csvPresets = const [],
     this.viewConfigs = const [],
     this.fieldPresets = const [],
+    this.diveProfileSeries = const [],
+    this.tankPressureSeries = const [],
   });
 
   Map<String, dynamic> toJson() => {
     'divers': divers,
     'diverSettings': diverSettings,
     'dives': dives,
-    'diveProfiles': diveProfiles,
     'diveTanks': diveTanks,
     'diveEquipment': diveEquipment,
     'diveWeights': diveWeights,
@@ -424,7 +443,6 @@ class SyncData {
     'diveRoles': diveRoles,
     'tankPresets': tankPresets,
     'diveComputers': diveComputers,
-    'tankPressureProfiles': tankPressureProfiles,
     'tideRecords': tideRecords,
     'settings': settings,
     'species': species,
@@ -443,6 +461,8 @@ class SyncData {
     'csvPresets': csvPresets,
     'viewConfigs': viewConfigs,
     'fieldPresets': fieldPresets,
+    'diveProfileSeries': diveProfileSeries,
+    'tankPressureSeries': tankPressureSeries,
   };
 
   factory SyncData.fromJson(Map<String, dynamic> json) {
@@ -524,6 +544,8 @@ class SyncData {
       csvPresets: _parseList(json['csvPresets']),
       viewConfigs: _parseList(json['viewConfigs']),
       fieldPresets: _parseList(json['fieldPresets']),
+      diveProfileSeries: _parseList(json['diveProfileSeries']),
+      tankPressureSeries: _parseList(json['tankPressureSeries']),
     );
   }
 
@@ -534,6 +556,38 @@ class SyncData {
 }
 
 /// Service for serializing and deserializing sync data
+/// Bytes of packed series blob one base-export page may hold.
+///
+/// The streamed base pages every other table at a row count, which bounds
+/// memory only while a row is small. A packed series row is not: a 1 Hz
+/// hour-long dive is tens of kilobytes, and a page holds the blobs AND the
+/// base64 the JSON carries, so 2,000 of them is hundreds of megabytes on
+/// the very path that exists to keep a large library from materialising
+/// whole (#358). Four mebibytes of blob is roughly 5.5 MB of base64 and a
+/// page that stays in the tens of megabytes on any library.
+const int kBaseBlobPageBytes = 4 * 1024 * 1024;
+
+/// The prefix of [rows] whose blob bytes fit in [budget].
+///
+/// Always at least one row, however large: a row over the budget on its own
+/// still has to move or the export never advances past it.
+///
+/// Top-level and public so the budgeting rule can be tested without an
+/// export; nothing outside this file and its test should need it.
+List<({String id, int bytes})> idsWithinBlobBudget(
+  List<({String id, int bytes})> rows,
+  int budget,
+) {
+  final taken = <({String id, int bytes})>[];
+  var total = 0;
+  for (final row in rows) {
+    if (taken.isNotEmpty && total + row.bytes > budget) break;
+    taken.add(row);
+    total += row.bytes;
+  }
+  return taken;
+}
+
 class SyncDataSerializer {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(SyncDataSerializer);
@@ -651,10 +705,9 @@ class SyncDataSerializer {
     })
   >
   get _baseTables => [
-    (key: 'divers', table: _db.divers, blob: false, full: null),
+    (key: 'divers', table: _db.divers, blob: true, full: null),
     (key: 'diverSettings', table: _db.diverSettings, blob: false, full: null),
     (key: 'dives', table: _db.dives, blob: false, full: null),
-    (key: 'diveProfiles', table: _db.diveProfiles, blob: false, full: null),
     (key: 'diveTanks', table: _db.diveTanks, blob: false, full: null),
     (
       key: 'diveEquipment',
@@ -715,7 +768,7 @@ class SyncDataSerializer {
       blob: false,
       full: null,
     ),
-    (key: 'buddies', table: _db.buddies, blob: false, full: null),
+    (key: 'buddies', table: _db.buddies, blob: true, full: null),
     (key: 'mediaStores', table: _db.mediaStores, blob: false, full: null),
     (
       key: 'connectedAccounts',
@@ -861,12 +914,6 @@ class SyncDataSerializer {
     ),
     (key: 'tankPresets', table: _db.tankPresets, blob: false, full: null),
     (key: 'diveComputers', table: _db.diveComputers, blob: false, full: null),
-    (
-      key: 'tankPressureProfiles',
-      table: _db.tankPressureProfiles,
-      blob: false,
-      full: null,
-    ),
     (key: 'tideRecords', table: _db.tideRecords, blob: false, full: null),
     (
       key: 'settings',
@@ -932,12 +979,113 @@ class SyncDataSerializer {
       blob: false,
       full: () => _exportFieldPresets(null),
     ),
+    (
+      key: 'diveProfileSeries',
+      table: _db.diveProfileSeries,
+      blob: true,
+      full: null,
+    ),
+    (
+      key: 'tankPressureSeries',
+      table: _db.tankPressureSeries,
+      blob: true,
+      full: null,
+    ),
   ];
 
   /// Test seam: the base table order, asserted equal to SyncData.toJson keys so
   /// a dropped/added/misordered entity is caught at build time.
   static List<String> get debugBaseTableKeys =>
       SyncDataSerializer()._baseTables.map((t) => t.key).toList();
+
+  /// One keyset page of a BLOB table, bounded by [maxBytes] of blob rather
+  /// than by a row count. Reads the ids and blob lengths first (no blob
+  /// leaves SQLite for that), takes the prefix that fits, then loads only
+  /// those rows.
+  ///
+  /// Returns an empty list at the end of the table, which is how the caller
+  /// knows to stop: a short page here means the budget was reached, not that
+  /// the rows ran out.
+  Future<List<Map<String, dynamic>>> _pageBlobTableByBytes(
+    TableInfo<Table, dynamic> table, {
+    required String? cursor,
+    required int limit,
+    required int maxBytes,
+  }) async {
+    final name = table.actualTableName;
+    // Every BLOB column of the table, from the schema rather than a name
+    // this file would have to keep in step: `blob: true` marks any table
+    // carrying one (a diver avatar, a data source fingerprint), not only
+    // the packed series.
+    // Intersected with what the table actually has: a database shaped by a
+    // parallel branch can be missing a column this build declares, and the
+    // row pager below tolerates that until a row needs mapping. Naming the
+    // column in SQL would fail even on an empty table.
+    final actual = {
+      for (final r
+          in await _db.customSelect('PRAGMA table_info("$name")').get())
+        r.read<String>('name'),
+    };
+    final blobColumns = [
+      for (final c in table.$columns)
+        if (c.type == DriftSqlType.blob && actual.contains(c.name)) c.name,
+    ];
+    if (blobColumns.isEmpty) {
+      return _pageBaseTableById(
+        table,
+        cursor: cursor,
+        limit: limit,
+        blob: true,
+      );
+    }
+    final sizeExpr = blobColumns
+        .map((c) => 'COALESCE(LENGTH("$c"), 0)')
+        .join(' + ');
+    final sizeRows = cursor == null
+        ? await _db
+              .customSelect(
+                'SELECT id, $sizeExpr AS n FROM "$name" ORDER BY id LIMIT ?',
+                variables: [Variable.withInt(limit)],
+              )
+              .get()
+        : await _db
+              .customSelect(
+                'SELECT id, $sizeExpr AS n FROM "$name" WHERE id > ? '
+                'ORDER BY id LIMIT ?',
+                variables: [
+                  Variable.withString(cursor),
+                  Variable.withInt(limit),
+                ],
+              )
+              .get();
+    if (sizeRows.isEmpty) return const [];
+    final take = idsWithinBlobBudget([
+      for (final r in sizeRows)
+        (id: r.read<String>('id'), bytes: r.readNullable<int>('n') ?? 0),
+    ], maxBytes);
+    final last = take.last.id;
+    final rows = cursor == null
+        ? await _db
+              .customSelect(
+                'SELECT * FROM "$name" WHERE id <= ? ORDER BY id',
+                variables: [Variable.withString(last)],
+              )
+              .get()
+        : await _db
+              .customSelect(
+                'SELECT * FROM "$name" WHERE id > ? AND id <= ? ORDER BY id',
+                variables: [
+                  Variable.withString(cursor),
+                  Variable.withString(last),
+                ],
+              )
+              .get();
+    return [
+      for (final r in rows)
+        (table.map(r.data) as dynamic).toJson(serializer: _syncBlobSerializer)
+            as Map<String, dynamic>,
+    ];
+  }
 
   /// One keyset page (`id > cursor`, ascending, up to [limit]) of an id-PK
   /// table, as JSON rows identical to the table's own `toJson` (BLOB serializer
@@ -989,6 +1137,7 @@ class SyncDataSerializer {
     String? uploadNonce,
     int? seq,
     int pageSize = 2000,
+    int blobPageBytes = kBaseBlobPageBytes,
     DateTime Function() now = DateTime.now,
     Future<Directory> Function()? tempDir,
   }) async {
@@ -1050,17 +1199,27 @@ class SyncDataSerializer {
         if (spec.table != null) {
           String? cursor;
           while (true) {
-            final rows = await _pageBaseTableById(
-              spec.table!,
-              cursor: cursor,
-              limit: pageSize,
-              blob: spec.blob,
-            );
+            // A blob page is short when it hit its byte budget, not when the
+            // table ran out, so it pages until an empty one comes back.
+            final rows = spec.blob
+                ? await _pageBlobTableByBytes(
+                    spec.table!,
+                    cursor: cursor,
+                    limit: pageSize,
+                    maxBytes: blobPageBytes,
+                  )
+                : await _pageBaseTableById(
+                    spec.table!,
+                    cursor: cursor,
+                    limit: pageSize,
+                    blob: false,
+                  );
+            if (rows.isEmpty) break;
             for (final row in rows) {
               await emit(row);
             }
-            if (rows.length < pageSize) break;
             cursor = rows.last['id'] as String;
+            if (!spec.blob && rows.length < pageSize) break;
           }
         } else {
           for (final row in await spec.full!()) {
@@ -1169,10 +1328,6 @@ class SyncDataSerializer {
         () => _exportDiverSettings(hlcSince),
       ),
       dives: await _safeExport('dives', () => _exportDives(hlcSince)),
-      diveProfiles: await _safeExport(
-        'diveProfiles',
-        () => _exportDiveProfiles(hlcSince),
-      ),
       diveTanks: await _safeExport(
         'diveTanks',
         () => _exportDiveTanks(hlcSince),
@@ -1363,10 +1518,6 @@ class SyncDataSerializer {
         'diveComputers',
         () => _exportDiveComputers(hlcSince),
       ),
-      tankPressureProfiles: await _safeExport(
-        'tankPressureProfiles',
-        () => _exportTankPressureProfiles(hlcSince),
-      ),
       tideRecords: await _safeExport(
         'tideRecords',
         () => _exportTideRecords(hlcSince),
@@ -1433,8 +1584,26 @@ class SyncDataSerializer {
         'fieldPresets',
         () => _exportFieldPresets(hlcSince),
       ),
+      diveProfileSeries: await _safeExport(
+        'diveProfileSeries',
+        () => _exportDiveProfileSeries(hlcSince),
+      ),
+      tankPressureSeries: await _safeExport(
+        'tankPressureSeries',
+        () => _exportTankPressureSeries(hlcSince),
+      ),
     );
   }
+
+  /// Packs legacy row-per-sample rows that an older peer's changeset staged
+  /// (the real `dive_profiles` / `tank_pressure_profiles` tables are gone as
+  /// of v183; see `legacy_sample_staging.dart`) into series rows. Dives that
+  /// already have a series are left alone: the peer is held below the floor
+  /// and will migrate its own rows when it upgrades.
+  Future<ProfilePackReport> packLegacySamples() => packStagedLegacyRows(_db);
+
+  /// True when a previous apply left rows staged that it could not place.
+  Future<bool> hasStagedLegacySamples() => hasStagedLegacyRows(_db);
 
   /// Convert payload to JSON string
   String serializePayload(SyncPayload payload) {
@@ -1556,7 +1725,7 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.divers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row?.toJson(serializer: _syncBlobSerializer);
       case 'diverSettings':
         final row = await (_db.select(
           _db.diverSettings,
@@ -1565,11 +1734,6 @@ class SyncDataSerializer {
       case 'dives':
         final row = await (_db.select(
           _db.dives,
-        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
-      case 'diveProfiles':
-        final row = await (_db.select(
-          _db.diveProfiles,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'diveTanks':
@@ -1651,7 +1815,7 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.buddies,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row?.toJson(serializer: _syncBlobSerializer);
       case 'mediaStores':
         final row = await (_db.select(
           _db.mediaStores,
@@ -1843,11 +2007,6 @@ class SyncDataSerializer {
           _db.diveComputers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row == null ? null : _withoutDeviceLocalFields(row.toJson());
-      case 'tankPressureProfiles':
-        final row = await (_db.select(
-          _db.tankPressureProfiles,
-        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
       case 'tideRecords':
         final row = await (_db.select(
           _db.tideRecords,
@@ -1938,6 +2097,16 @@ class SyncDataSerializer {
           _db.fieldPresets,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'diveProfileSeries':
+        final row = await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson(serializer: _syncBlobSerializer);
+      case 'tankPressureSeries':
+        final row = await (_db.select(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson(serializer: _syncBlobSerializer);
     }
     return null;
   }
@@ -1972,7 +2141,9 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.divers,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       case 'diverSettings':
         final rows = await (_db.select(
           _db.diverSettings,
@@ -2027,7 +2198,9 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.buddies,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       case 'mediaStores':
         final rows = await (_db.select(
           _db.mediaStores,
@@ -2202,6 +2375,20 @@ class SyncDataSerializer {
           _db.settings,
         )..where((t) => t.key.isIn(idList))).get();
         return {for (final r in rows) r.key: r.toJson()};
+      case 'diveProfileSeries':
+        final rows = await (_db.select(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
+      case 'tankPressureSeries':
+        final rows = await (_db.select(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {
+          for (final r in rows) r.id: r.toJson(serializer: _syncBlobSerializer),
+        };
       default:
         // Clockless / composite-key entities are never fetched by the merge;
         // fall back to per-id reads so the method is total and correct.
@@ -2444,7 +2631,12 @@ class SyncDataSerializer {
       case 'divers':
         await _db
             .into(_db.divers)
-            .insertOnConflictUpdate(Diver.fromJson(data).toCompanion(false));
+            .insertOnConflictUpdate(
+              Diver.fromJson(
+                data,
+                serializer: _syncBlobSerializer,
+              ).toCompanion(false),
+            );
         return;
       case 'diverSettings':
         await _db
@@ -2461,9 +2653,11 @@ class SyncDataSerializer {
             .insertOnConflictUpdate(Dive.fromJson(data).toCompanion(false));
         return;
       case 'diveProfiles':
-        await _db
-            .into(_db.diveProfiles)
-            .insertOnConflictUpdate(DiveProfile.fromJson(data));
+        // The row-per-sample tables are gone (v183): an older peer's row
+        // stages in a TEMP table instead and is packed into a series after
+        // the merge (SyncService._packLegacySamplesIfPresent).
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyProfileRows(_db, [data]);
         return;
       case 'diveTanks':
         await _db
@@ -2549,7 +2743,12 @@ class SyncDataSerializer {
       case 'buddies':
         await _db
             .into(_db.buddies)
-            .insertOnConflictUpdate(Buddy.fromJson(data).toCompanion(false));
+            .insertOnConflictUpdate(
+              Buddy.fromJson(
+                data,
+                serializer: _syncBlobSerializer,
+              ).toCompanion(false),
+            );
         return;
       case 'mediaStores':
         await _db
@@ -2792,9 +2991,10 @@ class SyncDataSerializer {
             );
         return;
       case 'tankPressureProfiles':
-        await _db
-            .into(_db.tankPressureProfiles)
-            .insertOnConflictUpdate(TankPressureProfile.fromJson(data));
+        // See the 'diveProfiles' case above: stages into a TEMP table and
+        // packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyTankRows(_db, [data]);
         return;
       case 'tideRecords':
         await _db
@@ -2923,6 +3123,185 @@ class SyncDataSerializer {
               FieldPreset.fromJson(_withTimestampDefaults(data)),
             );
         return;
+      case 'diveProfileSeries':
+        // Parsed inside a try for the reason the batch path documents: a
+        // truncated base64 `samples` string throws FormatException and a
+        // missing key throws TypeError, both before the soundness filter
+        // can run. resolveConflict and the adopt/restore loop call this
+        // with no per-record catch, so an unguarded parse turns one
+        // malformed peer record into a failed restore. `on Object` because
+        // [data] is untrusted wire data from a peer.
+        final DiveProfileSeriesRow row;
+        try {
+          row = DiveProfileSeriesRow.fromJson(
+            data,
+            serializer: _syncBlobSerializer,
+          );
+          // Inside the same guard as the parse, matching the batch path:
+          // the check only catches ProfileSeriesCodecException today, and
+          // resolveConflict and the adopt/restore loop call this with no
+          // per-record catch, so a decoder that ever leaked another error
+          // would take down a whole restore rather than one record.
+          if (!_profileSeriesBlobIsSound(row)) return;
+        } on Object catch (e) {
+          _log.warning('Skipping a malformed diveProfileSeries record: $e');
+          return;
+        }
+        await _db.into(_db.diveProfileSeries).insertOnConflictUpdate(row);
+        return;
+      case 'tankPressureSeries':
+        // See the diveProfileSeries case above: same per-record try, same
+        // reason.
+        final TankPressureSeriesRow row;
+        try {
+          row = TankPressureSeriesRow.fromJson(
+            data,
+            serializer: _syncBlobSerializer,
+          );
+          // Inside the same guard as the parse, matching the batch path:
+          // the check only catches ProfileSeriesCodecException today, and
+          // resolveConflict and the adopt/restore loop call this with no
+          // per-record catch, so a decoder that ever leaked another error
+          // would take down a whole restore rather than one record.
+          if (!_tankSeriesBlobIsSound(row)) return;
+        } on Object catch (e) {
+          _log.warning('Skipping a malformed tankPressureSeries record: $e');
+          return;
+        }
+        await _db.into(_db.tankPressureSeries).insertOnConflictUpdate(row);
+        return;
+    }
+  }
+
+  /// Compares one header scalar against the value the blob decodes to, by
+  /// bit pattern rather than with `!=`.
+  ///
+  /// `!=` reports -0.0 as equal to 0.0, so a header that genuinely
+  /// disagrees with its blob at that value would pass the very check that
+  /// exists to catch a tampered one. It also reports NaN as different from
+  /// itself, which would be the wrong answer for a header that matches its
+  /// blob exactly; [_profileSeriesHeaderIsStorable] rejects a non-finite
+  /// header before this ever has to decide, for a different reason.
+  static bool _headerDoubleDiffers(double fromBlob, double fromHeader) =>
+      fromBlob.compareTo(fromHeader) != 0;
+
+  /// False when a scalar the row carries cannot be stored in its column.
+  ///
+  /// `max_depth`, `first_depth` and `last_depth` are NOT NULL REAL columns
+  /// and SQLite stores a non-finite double as NULL, so an infinite or NaN
+  /// header fails the insert. That insert is one batch for every series
+  /// record in the payload and runs inside the merge transaction, so one
+  /// such row would take down the whole batch rather than itself: this
+  /// filter drops it here, where a skip costs one record and one log line.
+  ///
+  /// Non-finite depths are a real input class ([ProfileSeriesSummary.of]
+  /// seeds `maxDepth` from the first sample with a `>` that never
+  /// overwrites a NaN seed, and the data-quality builder filters on
+  /// `depth.isFinite`), even though no peer can send one through JSON,
+  /// which encodes neither NaN nor infinity.
+  static bool _profileSeriesHeaderIsStorable(DiveProfileSeriesRow row) =>
+      row.maxDepth.isFinite &&
+      row.firstDepth.isFinite &&
+      row.lastDepth.isFinite;
+
+  /// A peer's packed samples are decoded once before they are written so a
+  /// corrupt or truncated blob never reaches the readers. Returns false (and
+  /// logs) when the blob does not decode or when the summary computed from
+  /// the decoded samples disagrees with any scalar the row carries.
+  ///
+  /// The scalars are recomputed rather than only compared by count because
+  /// seven SQL consumers read them directly without ever decoding the blob
+  /// (deco classification, runtime fallback, quality neighbours and more):
+  /// a row whose header was tampered with, or corrupted independently of
+  /// the blob, would otherwise write scalars that disagree with the samples
+  /// they claim to summarize.
+  bool _profileSeriesBlobIsSound(DiveProfileSeriesRow row) {
+    if (!_profileSeriesHeaderIsStorable(row)) {
+      _log.warning(
+        'Skipping diveProfileSeries ${row.id}: a non-finite depth scalar '
+        'cannot be stored in a NOT NULL REAL column',
+      );
+      return false;
+    }
+    try {
+      final decoded = const ProfileSeriesCodec().decode(row.samples);
+      final summary = ProfileSeriesSummary.of(decoded);
+      if (summary.sampleCount != row.sampleCount ||
+          summary.startTimestamp != row.startTimestamp ||
+          summary.endTimestamp != row.endTimestamp ||
+          _headerDoubleDiffers(summary.maxDepth, row.maxDepth) ||
+          _headerDoubleDiffers(summary.firstDepth, row.firstDepth) ||
+          _headerDoubleDiffers(summary.lastDepth, row.lastDepth) ||
+          summary.hasDecoType != row.hasDecoType ||
+          summary.hasDecoStop != row.hasDecoStop ||
+          summary.hasPositiveCeiling != row.hasPositiveCeiling) {
+        _log.warning(
+          'Skipping diveProfileSeries ${row.id}: the header scalars do not '
+          'match the summary the blob decodes to',
+        );
+        return false;
+      }
+      return true;
+    } on UnknownSeriesVersionException catch (e) {
+      // Forward compatibility, not corruption: a codec version above
+      // everything this build knows is a series a NEWER peer wrote, and the
+      // rules for raising the compatibility floor do not classify adding a
+      // codec version as breaking, so no floor holds that peer back. The
+      // samples are fine and this device will read them once it updates;
+      // discarding the row at the door would lose them for good, because
+      // nothing re-requests a record the sender believes it delivered. The
+      // row is stored with the scalars the peer computed (this build cannot
+      // recompute them without the field table), and every local reader
+      // skips a blob it cannot decode.
+      if (e.isForwardVersion) {
+        _log.info(
+          'Storing diveProfileSeries ${row.id} written by a newer codec '
+          '(version ${e.blobVersion}); it reads once this device updates',
+        );
+        return true;
+      }
+      _log.warning('Skipping diveProfileSeries ${row.id}: $e');
+      return false;
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping diveProfileSeries ${row.id}: $e');
+      return false;
+    }
+  }
+
+  /// The tank twin of [_profileSeriesBlobIsSound].
+  ///
+  /// [TankPressureSeriesSummary] carries only counts and timestamps, so every
+  /// scalar compared here is an int; a double scalar added later belongs in
+  /// [_headerDoubleDiffers] rather than behind a plain `!=`.
+  bool _tankSeriesBlobIsSound(TankPressureSeriesRow row) {
+    try {
+      final decoded = const TankPressureSeriesCodec().decode(row.samples);
+      final summary = TankPressureSeriesSummary.of(decoded);
+      if (summary.sampleCount != row.sampleCount ||
+          summary.startTimestamp != row.startTimestamp ||
+          summary.endTimestamp != row.endTimestamp) {
+        _log.warning(
+          'Skipping tankPressureSeries ${row.id}: the header scalars do not '
+          'match the summary the blob decodes to',
+        );
+        return false;
+      }
+      return true;
+    } on UnknownSeriesVersionException catch (e) {
+      // See _profileSeriesBlobIsSound: a newer codec version is stored, not
+      // discarded.
+      if (e.isForwardVersion) {
+        _log.info(
+          'Storing tankPressureSeries ${row.id} written by a newer codec '
+          '(version ${e.blobVersion}); it reads once this device updates',
+        );
+        return true;
+      }
+      _log.warning('Skipping tankPressureSeries ${row.id}: $e');
+      return false;
+    } on ProfileSeriesCodecException catch (e) {
+      _log.warning('Skipping tankPressureSeries ${row.id}: $e');
+      return false;
     }
   }
 
@@ -2952,7 +3331,14 @@ class SyncDataSerializer {
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
             _db.divers,
-            records.map((r) => Diver.fromJson(r).toCompanion(false)).toList(),
+            records
+                .map(
+                  (r) => Diver.fromJson(
+                    r,
+                    serializer: _syncBlobSerializer,
+                  ).toCompanion(false),
+                )
+                .toList(),
           ),
         );
         return;
@@ -2979,12 +3365,10 @@ class SyncDataSerializer {
         );
         return;
       case 'diveProfiles':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.diveProfiles,
-            records.map((r) => DiveProfile.fromJson(r)).toList(),
-          ),
-        );
+        // See upsertRecord's 'diveProfiles' case: stages into a TEMP table
+        // and packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyProfileRows(_db, records);
         return;
       case 'diveTanks':
         await _db.batch(
@@ -3116,7 +3500,14 @@ class SyncDataSerializer {
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
             _db.buddies,
-            records.map((r) => Buddy.fromJson(r).toCompanion(false)).toList(),
+            records
+                .map(
+                  (r) => Buddy.fromJson(
+                    r,
+                    serializer: _syncBlobSerializer,
+                  ).toCompanion(false),
+                )
+                .toList(),
           ),
         );
         return;
@@ -3501,12 +3892,10 @@ class SyncDataSerializer {
         );
         return;
       case 'tankPressureProfiles':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.tankPressureProfiles,
-            records.map((r) => TankPressureProfile.fromJson(r)).toList(),
-          ),
-        );
+        // See upsertRecord's 'tankPressureProfiles' case: stages into a TEMP
+        // table and packs after the merge.
+        await ensureLegacyStagingTables(_db);
+        await stageLegacyTankRows(_db, records);
         return;
       case 'tideRecords':
         await _db.batch(
@@ -3690,6 +4079,51 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'diveProfileSeries':
+        // Each record is parsed inside its own try: a truncated base64
+        // `samples` string throws FormatException, a missing key throws
+        // TypeError, and either one, eagerly parsed before the soundness
+        // filter, used to fail the whole batch instead of just that record.
+        // `on Object` is deliberate here: [r] is untrusted wire data from a
+        // peer, so any parse failure it can provoke must be caught, not
+        // just the two shapes seen so far.
+        final rows = <DiveProfileSeriesRow>[];
+        for (final r in records) {
+          try {
+            final row = DiveProfileSeriesRow.fromJson(
+              r,
+              serializer: _syncBlobSerializer,
+            );
+            if (_profileSeriesBlobIsSound(row)) rows.add(row);
+          } on Object catch (e) {
+            _log.warning('Skipping a malformed diveProfileSeries record: $e');
+          }
+        }
+        if (rows.isEmpty) return;
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(_db.diveProfileSeries, rows),
+        );
+        return;
+      case 'tankPressureSeries':
+        // See the diveProfileSeries case above: same per-record try, same
+        // reason.
+        final rows = <TankPressureSeriesRow>[];
+        for (final r in records) {
+          try {
+            final row = TankPressureSeriesRow.fromJson(
+              r,
+              serializer: _syncBlobSerializer,
+            );
+            if (_tankSeriesBlobIsSound(row)) rows.add(row);
+          } on Object catch (e) {
+            _log.warning('Skipping a malformed tankPressureSeries record: $e');
+          }
+        }
+        if (rows.isEmpty) return;
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(_db.tankPressureSeries, rows),
+        );
+        return;
       default:
         throw ArgumentError('upsertRecords: unknown entityType $entityType');
     }
@@ -3857,8 +4291,6 @@ class SyncDataSerializer {
         return plain(_db.diveDiveTypes, _db.diveDiveTypes.id);
       case 'diveBuddies':
         return plain(_db.diveBuddies, _db.diveBuddies.id);
-      case 'diveProfiles':
-        return plain(_db.diveProfiles, _db.diveProfiles.id);
       case 'diveProfileEvents':
         return plain(_db.diveProfileEvents, _db.diveProfileEvents.id);
       case 'diveSafetyReviews':
@@ -3887,8 +4319,6 @@ class SyncDataSerializer {
         return plain(_db.viewConfigs, _db.viewConfigs.id);
       case 'fieldPresets':
         return plain(_db.fieldPresets, _db.fieldPresets.id);
-      case 'tankPressureProfiles':
-        return plain(_db.tankPressureProfiles, _db.tankPressureProfiles.id);
       case 'tideRecords':
         return plain(_db.tideRecords, _db.tideRecords.id);
       case 'sightings':
@@ -3905,6 +4335,10 @@ class SyncDataSerializer {
         return plain(_db.media, _db.media.id);
       case 'mediaSmartAlbums':
         return plain(_db.mediaSmartAlbums, _db.mediaSmartAlbums.id);
+      case 'diveProfileSeries':
+        return plain(_db.diveProfileSeries, _db.diveProfileSeries.id);
+      case 'tankPressureSeries':
+        return plain(_db.tankPressureSeries, _db.tankPressureSeries.id);
       default:
         // Fail loud: a synced entity without a case here would silently
         // enumerate zero local ids, so streaming adopt would never delete its
@@ -4088,8 +4522,6 @@ class SyncDataSerializer {
         return _db.diveDiveTypes;
       case 'diveBuddies':
         return _db.diveBuddies;
-      case 'diveProfiles':
-        return _db.diveProfiles;
       case 'diveProfileEvents':
         return _db.diveProfileEvents;
       case 'diveSafetyReviews':
@@ -4118,8 +4550,6 @@ class SyncDataSerializer {
         return _db.viewConfigs;
       case 'fieldPresets':
         return _db.fieldPresets;
-      case 'tankPressureProfiles':
-        return _db.tankPressureProfiles;
       case 'tideRecords':
         return _db.tideRecords;
       case 'sightings':
@@ -4136,6 +4566,10 @@ class SyncDataSerializer {
         return _db.media;
       case 'mediaSmartAlbums':
         return _db.mediaSmartAlbums;
+      case 'diveProfileSeries':
+        return _db.diveProfileSeries;
+      case 'tankPressureSeries':
+        return _db.tankPressureSeries;
       default:
         throw ArgumentError.value(
           entityType,
@@ -4145,7 +4579,14 @@ class SyncDataSerializer {
     }
   }
 
+  // 'diveProfiles' / 'tankPressureProfiles' have no local row-per-sample
+  // table left to delete from (v183), but a peer below the floor does still
+  // tombstone its own rows, and a copy of one can be sitting in the receive
+  // shim's staging table waiting for a dive that has not arrived. Packing
+  // it later would resurrect what the peer deleted, so the tombstone clears
+  // it there. Everything else falls through the switch with no default.
   Future<void> deleteRecord(String entityType, String recordId) async {
+    await deleteStagedLegacyRow(_db, entityType, recordId);
     switch (entityType) {
       case 'divers':
         await (_db.delete(
@@ -4159,11 +4600,6 @@ class SyncDataSerializer {
         return;
       case 'dives':
         await (_db.delete(_db.dives)..where((t) => t.id.equals(recordId))).go();
-        return;
-      case 'diveProfiles':
-        await (_db.delete(
-          _db.diveProfiles,
-        )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'diveTanks':
         await (_db.delete(
@@ -4426,11 +4862,6 @@ class SyncDataSerializer {
           _db.diveComputers,
         )..where((t) => t.id.equals(recordId))).go();
         return;
-      case 'tankPressureProfiles':
-        await (_db.delete(
-          _db.tankPressureProfiles,
-        )..where((t) => t.id.equals(recordId))).go();
-        return;
       case 'tideRecords':
         await (_db.delete(
           _db.tideRecords,
@@ -4521,6 +4952,16 @@ class SyncDataSerializer {
           _db.fieldPresets,
         )..where((t) => t.id.equals(recordId))).go();
         return;
+      case 'diveProfileSeries':
+        await (_db.delete(
+          _db.diveProfileSeries,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'tankPressureSeries':
+        await (_db.delete(
+          _db.tankPressureSeries,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
     }
   }
 
@@ -4538,7 +4979,8 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    // Divers carry the profile photo BLOB; base64-encode it.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportDiverSettings(
@@ -4561,26 +5003,6 @@ class SyncDataSerializer {
     // Export via the generated data-class toJson() so the keys are symmetric
     // with Dive.fromJson used on import. A hand-maintained map silently drops
     // fields (e.g. bottomTime, GPS) and breaks cross-device sync.
-    return rows.map((r) => r.toJson()).toList();
-  }
-
-  Future<List<Map<String, dynamic>>> _exportDiveProfiles(
-    String? hlcSince,
-  ) async {
-    // Profile points don't have updatedAt, export all for modified dives
-    if (hlcSince != null) {
-      final modifiedDives = await (_db.select(
-        _db.dives,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
-      final diveIds = modifiedDives.map((d) => d.id).toSet();
-      if (diveIds.isEmpty) return [];
-
-      final rows = await (_db.select(
-        _db.diveProfiles,
-      )..where((t) => t.diveId.isIn(diveIds))).get();
-      return rows.map((r) => r.toJson()).toList();
-    }
-    final rows = await _db.select(_db.diveProfiles).get();
     return rows.map((r) => r.toJson()).toList();
   }
 
@@ -4806,7 +5228,8 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    // Buddies carry the profile photo BLOB; base64-encode it.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportMediaStores(
@@ -5127,6 +5550,70 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
+  /// The stored size, in bytes, of the packed sample blobs an incremental
+  /// changeset would carry above [hlcSince] (everything when it is null).
+  ///
+  /// The changeset export builds its whole payload in memory, base64 and
+  /// `jsonEncode` alive at once, which the base path deliberately avoids by
+  /// streaming to a temp file. These two entities are the only ones whose
+  /// rows carry a large blob AND can all move at once: the v182 migration
+  /// stamps every packed row with one freshly issued HLC, so the first
+  /// changeset after the upgrade would otherwise select the entire packed
+  /// corpus into a single unstreamed payload. [ChangesetWriter] asks this
+  /// first and publishes a streamed base instead when the answer is too big.
+  ///
+  /// `length()` on a blob column reads the record header, not the payload,
+  /// so this costs a scan of two small tables and no blob reads.
+  Future<int> pendingSeriesBlobBytes(String? hlcSince) async {
+    var total = 0;
+    for (final table in const ['dive_profile_series', 'tank_pressure_series']) {
+      // Guarded per table: _assertProfileSeriesSchema waits for each series
+      // table's foreign key parents, so a partially built database can reach
+      // a publish without one.
+      final exists = await _db
+          .customSelect(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+            variables: [Variable<String>(table)],
+          )
+          .get();
+      if (exists.isEmpty) continue;
+      final row = await _db
+          .customSelect(
+            'SELECT COALESCE(SUM(LENGTH(samples)), 0) AS n FROM $table'
+            '${hlcSince == null ? '' : ' WHERE hlc > ?'}',
+            variables: hlcSince == null
+                ? const []
+                : [Variable<String>(hlcSince)],
+          )
+          .getSingle();
+      total += row.read<int>('n');
+    }
+    return total;
+  }
+
+  Future<List<Map<String, dynamic>>> _exportDiveProfileSeries(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.diveProfileSeries);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    // The packed samples BLOB rides as base64, like gps_tracks.points.
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportTankPressureSeries(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.tankPressureSeries);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
+  }
+
   Future<List<Map<String, dynamic>>> _exportDivePlans(String? hlcSince) async {
     final query = _db.select(_db.divePlans);
     if (hlcSince != null) {
@@ -5262,25 +5749,6 @@ class SyncDataSerializer {
     final copy = Map<String, dynamic>.from(data);
     copy.remove('bluetoothAddress');
     return copy;
-  }
-
-  Future<List<Map<String, dynamic>>> _exportTankPressureProfiles(
-    String? hlcSince,
-  ) async {
-    if (hlcSince != null) {
-      final modifiedDives = await (_db.select(
-        _db.dives,
-      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
-      final diveIds = modifiedDives.map((d) => d.id).toSet();
-      if (diveIds.isEmpty) return [];
-
-      final rows = await (_db.select(
-        _db.tankPressureProfiles,
-      )..where((t) => t.diveId.isIn(diveIds))).get();
-      return rows.map((r) => r.toJson()).toList();
-    }
-    final rows = await _db.select(_db.tankPressureProfiles).get();
-    return rows.map((r) => r.toJson()).toList();
   }
 
   Future<List<Map<String, dynamic>>> _exportTideRecords(

@@ -971,7 +971,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     // Try to get per-tank pressure data first (works for single and multi-tank)
     List<double>? pressures;
     if (tanks.isNotEmpty) {
-      // Load per-tank pressure data from tank_pressure_profiles table
+      // Load per-tank pressure data from the tank_pressure_series table
       final tankPressureRepo = ref.watch(tankPressureRepositoryProvider);
       final allTankPressures = await tankPressureRepo.getTankPressuresForDive(
         diveId,

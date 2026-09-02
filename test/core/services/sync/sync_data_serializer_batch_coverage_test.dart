@@ -95,7 +95,6 @@ void main() {
           (type: 'divers', table: db.divers.actualTableName),
           (type: 'diverSettings', table: db.diverSettings.actualTableName),
           (type: 'dives', table: db.dives.actualTableName),
-          (type: 'diveProfiles', table: db.diveProfiles.actualTableName),
           (type: 'diveTanks', table: db.diveTanks.actualTableName),
           (type: 'diveWeights', table: db.diveWeights.actualTableName),
           (type: 'diveSites', table: db.diveSites.actualTableName),
@@ -140,10 +139,6 @@ void main() {
           (type: 'diveTypes', table: db.diveTypes.actualTableName),
           (type: 'tankPresets', table: db.tankPresets.actualTableName),
           (type: 'diveComputers', table: db.diveComputers.actualTableName),
-          (
-            type: 'tankPressureProfiles',
-            table: db.tankPressureProfiles.actualTableName,
-          ),
           (type: 'tideRecords', table: db.tideRecords.actualTableName),
           (type: 'species', table: db.species.actualTableName),
           (type: 'sightings', table: db.sightings.actualTableName),

@@ -1217,9 +1217,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_label_notSpecified => '未指定';
 
   @override
-  String get buddies_label_photoComingSoon => '照片功能将在 v2.0 推出';
-
-  @override
   String get buddies_message_added => '潜伴添加成功';
 
   @override
@@ -2461,6 +2458,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get common_action_cancel => '取消';
+
+  @override
+  String get common_action_clearRating => '清除评分';
 
   @override
   String get common_action_close => '关闭';
@@ -4672,7 +4672,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_section_equipment => '装备';
 
   @override
-  String get diveLog_detail_section_marineLife => '海洋生物';
+  String get diveLog_detail_section_marineLife => '物种';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -4985,7 +4985,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => '未选择装备';
 
   @override
-  String get diveLog_edit_noMarineLife => '未记录海洋生物';
+  String get diveLog_edit_noMarineLife => '未记录物种';
 
   @override
   String get diveLog_edit_notSpecified => '未指定';
@@ -5119,7 +5119,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_section_exitTime => '出水时间';
 
   @override
-  String get diveLog_edit_section_marineLife => '海洋生物';
+  String get diveLog_edit_section_marineLife => '物种';
 
   @override
   String get diveLog_edit_section_notes => '备注';
@@ -5993,7 +5993,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_invite_diveInfo => '添加深度范围、难度或评分';
 
   @override
-  String get diveSites_edit_invite_lifeNotes => '添加海洋生物、笔记或共享';
+  String get diveSites_edit_invite_lifeNotes => '添加物种、笔记或共享';
 
   @override
   String get diveSites_edit_invite_location => '添加 GPS 位置或海拔';
@@ -6865,6 +6865,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => '加载潜水类型出错';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => '加载装备出错';
+
+  @override
   String get diveLog_search_errorLoadingTrips => '加载旅行出错';
 
   @override
@@ -6890,6 +6893,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => '时长范围（分钟）';
+
+  @override
+  String get diveLog_search_label_equipment => '装备';
 
   @override
   String get diveLog_search_label_trip => '旅行';
@@ -7015,7 +7021,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => '搜索物种...';
 
   @override
-  String get diveLog_speciesPicker_title => '添加海洋生物';
+  String get diveLog_speciesPicker_title => '添加物种';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => '清除搜索';
@@ -7783,6 +7789,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => '难度等级';
 
   @override
+  String get diveSites_detail_section_diveStatistics => '潜水统计';
+
+  @override
   String get diveSites_detail_section_divesAtSite => '此潜水点的潜水记录';
 
   @override
@@ -7796,6 +7805,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => '评分';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => '平均时长';
+
+  @override
+  String get diveSites_detail_stats_firstDive => '首次潜水';
+
+  @override
+  String get diveSites_detail_stats_lastDive => '最近潜水';
+
+  @override
+  String get diveSites_detail_stats_longestDive => '最长潜水';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => '最深潜水';
+
+  @override
+  String get diveSites_detail_stats_minDepth => '最浅潜水';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => '不可用';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8145,7 +8175,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => '难度等级';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife => '预期海洋生物';
+  String get diveSites_edit_section_expectedMarineLife => '预期物种';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS 坐标';
@@ -9958,6 +9988,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_fileSize => '文件大小';
 
   @override
+  String get enum_sortField_lastDive => '最近潜水';
+
+  @override
   String get enum_sortField_lastServiceDate => '最近维护';
 
   @override
@@ -10772,12 +10805,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10791,10 +10832,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
+  String get equipment_list_filterServiceDue => '需要维护';
 
   @override
-  String get equipment_list_filterServiceDue => '需要维护';
+  String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';
@@ -11898,7 +11963,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_noExpected => '未添加预期物种';
 
   @override
-  String get marineLife_siteSection_noSpotted => '尚无海洋生物目击记录';
+  String get marineLife_siteSection_noSpotted => '尚无物种目击记录';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -11912,7 +11977,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => '发现此处';
 
   @override
-  String get marineLife_siteSection_title => '海洋生物';
+  String get marineLife_siteSection_title => '物种';
 
   @override
   String get marineLife_speciesDetail_backTooltip => '返回';
@@ -12012,6 +12077,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String marineLife_speciesEdit_errorSaving(Object error) {
     return '保存物种出错：$error';
   }
+
+  @override
+  String get marineLife_speciesEdit_notFoundMessage => '该物种已不存在。';
 
   @override
   String get marineLife_speciesEdit_saveButton => '保存';
@@ -12342,7 +12410,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get marineLife_speciesPage_emptyTitle => '还没有物种';
 
   @override
-  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的海洋生物目击会显示在这里。';
+  String get marineLife_speciesPage_emptyHint => '添加到潜水记录中的物种目击会显示在这里。';
 
   @override
   String get marineLife_speciesPage_noMatch => '没有符合搜索条件的物种';
@@ -13569,6 +13637,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_sites => '潜水点';
 
   @override
+  String get nav_species => '物种';
+
+  @override
   String get nav_statistics => '统计';
 
   @override
@@ -14584,7 +14655,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_equipment_description => '潜水中使用的装备';
 
   @override
-  String get diveDetailSection_sightings_name => '海洋生物目击';
+  String get diveDetailSection_sightings_name => '物种目击';
 
   @override
   String get diveDetailSection_sightings_description => '观察到的物种、目击详情';
@@ -15060,6 +15131,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -16006,7 +16087,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_manage_species => '物种';
 
   @override
-  String get settings_manage_species_subtitle => '管理海洋生物物种目录';
+  String get settings_manage_species_subtitle => '管理物种目录';
 
   @override
   String get settings_manage_tags => '标签';
@@ -16823,6 +16904,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signatures_error_enterSignerName => '请输入签名者姓名';
 
   @override
+  String get signatures_error_saveFailed => '无法保存签名。请重试。';
+
+  @override
   String get signatures_field_instructorName => '教练名称';
 
   @override
@@ -16902,7 +16986,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => '物种目击';
 
   @override
-  String get statistics_category_marineLife_title => '海洋生物';
+  String get statistics_category_marineLife_title => '物种';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17219,7 +17303,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', 已选择';
 
   @override
-  String get statistics_marineLife_appBar_title => '海洋生物';
+  String get statistics_marineLife_appBar_title => '物种';
 
   @override
   String get statistics_marineLife_bestSites_empty => '无潜水点数据';
@@ -17240,7 +17324,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title => '海洋生物最佳潜水点';
+  String get statistics_marineLife_bestSites_title => '最佳潜水点';
 
   @override
   String get statistics_marineLife_mostCommon_empty => '无目击数据';
@@ -18733,13 +18817,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV、UDDF、PDF 日志本';
 
   @override
-  String get transfer_section_exportTitle => '导出';
+  String get transfer_section_exportTitle => '文件导出';
 
   @override
   String get transfer_section_importSubtitle => 'CSV、UDDF 文件';
 
   @override
-  String get transfer_section_importTitle => '导入';
+  String get transfer_section_importTitle => '文件导入';
 
   @override
   String get transfer_summary_description => '导入和导出潜水数据';
@@ -20399,6 +20483,11 @@ class AppLocalizationsZh extends AppLocalizations {
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return '未通过 USB 找到 $model。它是否已连接到这台电脑并已开机？';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       '此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。';
 
@@ -21404,6 +21493,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gpsTrack_importError_badData => '该文件包含本应用无法读取的位置或时间戳。';
+
+  @override
+  String get gpsTrack_importError_tooLarge =>
+      '该文件的位置点过多，无法保存为单条轨迹。请将其拆分为较短的轨迹后分别导入。';
 
   @override
   String get gpsTrack_export_saved => '轨迹已保存';
@@ -22648,6 +22741,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_saved => '媒体存储已连接';
 
   @override
+  String get settings_mediaStorage_error_notReady => '尚无法读取云存储。请稍候片刻后重试。';
+
+  @override
   String get settings_mediaStorage_action_disconnect => '断开连接';
 
   @override
@@ -22689,6 +22785,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => '失败';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title => '传输已暂停';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      '此设备与云存储对正在使用的存储库不再一致。重新连接媒体存储将采用云端当前保存的存储库。';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -33085,6 +33188,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return '正在下载资料库（$downloaded/$total）';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return '正在导入资料库（$percent%）';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider => '未配置云服务商';
 
   @override
@@ -33637,4 +33753,343 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_edit_statisticsIncludedHint => '计入所有统计';
+
+  @override
+  String get suuntoCloud_signIn_title => '登录 Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      '使用您的 app.suunto.com 账户登录，即可直接导入潜水记录。您的密码不会被保存，仅缓存由此生成的会话。';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => '电子邮件';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => '请输入电子邮件';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => '密码';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => '请输入密码';
+
+  @override
+  String get suuntoCloud_signIn_button => '登录';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => '正在登录…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return '已登录为 $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => '正在列出潜水记录…';
+
+  @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return '正在获取第 $current 次潜水，共 $total 次…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => '无法获取潜水记录';
+
+  @override
+  String get suuntoCloud_fetch_retry => '重试';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => '加载更多';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '找到 $count 次潜水',
+      one: '找到 1 次潜水',
+      zero: '未找到潜水记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水无法转换，已跳过。',
+      one: '有 1 次潜水无法转换，已跳过。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_signIn_title => '登录 Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      '使用您的 Garmin Connect 账户登录，即可直接导入潜水记录。您的密码不会被保存，仅缓存由此生成的会话。';
+
+  @override
+  String get garminConnect_signIn_emailLabel => '电子邮件';
+
+  @override
+  String get garminConnect_signIn_emailRequired => '请输入电子邮件';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => '密码';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => '请输入密码';
+
+  @override
+  String get garminConnect_signIn_button => '登录';
+
+  @override
+  String get garminConnect_signIn_signingIn => '正在登录…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return '已登录为 $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => '需要验证';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return '请输入发送到您 $method 的验证码。';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => '验证码';
+
+  @override
+  String get garminConnect_mfa_codeRequired => '请输入验证码';
+
+  @override
+  String get garminConnect_mfa_button => '验证';
+
+  @override
+  String get garminConnect_mfa_submitting => '正在验证…';
+
+  @override
+  String get garminConnect_fetch_listing => '正在列出潜水记录…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return '正在获取第 $current 次潜水，共 $total 次…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => '无法获取潜水记录';
+
+  @override
+  String get garminConnect_fetch_retry => '重试';
+
+  @override
+  String get garminConnect_fetch_loadMore => '加载更多';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '找到 $count 次潜水',
+      one: '找到 1 次潜水',
+      zero: '未找到潜水记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水无法转换，已跳过。',
+      one: '有 1 次潜水无法转换，已跳过。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => '加载全部';
+
+  @override
+  String get importWizard_review_sortTooltip => '排序';
+
+  @override
+  String get importWizard_review_sortByDate => '日期';
+
+  @override
+  String get importWizard_review_sortByDepth => '深度';
+
+  @override
+  String get importWizard_review_sortByDuration => '时间';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      '从您的 Suunto 应用或 app.suunto.com 账户导入潜水记录';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      '从您的 Garmin Connect 账户导入潜水记录';
+
+  @override
+  String get transfer_section_cloudTitle => '云端';
+
+  @override
+  String get transfer_section_cloudSubtitle => '从云端导入';
+
+  @override
+  String get settings_storageUsage_appBar_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_title => '存储使用情况';
+
+  @override
+  String get settings_storageUsage_tile_subtitle => '查看此设备上的空间占用';
+
+  @override
+  String get settings_storageUsage_total => '总计';
+
+  @override
+  String get settings_storageUsage_totalPartial => '当前总计';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => '重新计算';
+
+  @override
+  String get settings_storageUsage_unavailable => '不可用';
+
+  @override
+  String get settings_storageUsage_measureFailed => '无法测量';
+
+  @override
+  String get settings_storageUsage_group_appData => '应用数据';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => '媒体缓存';
+
+  @override
+  String get settings_storageUsage_group_caches => '缓存';
+
+  @override
+  String get settings_storageUsage_group_backups => '备份';
+
+  @override
+  String get settings_storageUsage_group_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_group_exports => '导出的文件';
+
+  @override
+  String get settings_storageUsage_category_database => '潜水日志数据库';
+
+  @override
+  String get settings_storageUsage_category_localCache => '本地缓存数据库';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals => '原始照片和视频';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => '缩略图';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions => '视频转码版本';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging => '暂存的传输';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode => '已转码视频';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => '地图瓦片';
+
+  @override
+  String get settings_storageUsage_category_networkImages => '网络图片';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails => '视频缩略图';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails => '文档缩略图';
+
+  @override
+  String get settings_storageUsage_category_backups => '备份文件';
+
+  @override
+  String get settings_storageUsage_category_temporary => '临时文件';
+
+  @override
+  String get settings_storageUsage_category_exports => '导出的文件';
+
+  @override
+  String get profilePhoto_sheet_title => '个人资料照片';
+
+  @override
+  String get profilePhoto_source_camera => '拍照';
+
+  @override
+  String get profilePhoto_source_library => '从图库中选择';
+
+  @override
+  String get profilePhoto_source_file => '选择文件';
+
+  @override
+  String get profilePhoto_source_contacts => '从通讯录中选择';
+
+  @override
+  String get profilePhoto_action_remove => '移除照片';
+
+  @override
+  String get profilePhoto_crop_title => '调整照片';
+
+  @override
+  String get profilePhoto_crop_hint => '拖动以调整位置，双指缩放';
+
+  @override
+  String get profilePhoto_error_tooLarge => '该图片太大，请尝试较小的图片。';
+
+  @override
+  String get profilePhoto_error_undecodable => '无法将该文件读取为图片。';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto => '该联系人没有照片。';
+
+  @override
+  String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
 }

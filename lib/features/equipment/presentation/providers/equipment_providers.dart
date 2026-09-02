@@ -18,6 +18,7 @@ import 'package:submersion/features/equipment/domain/entities/service_clock_stat
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_filter_state.dart';
 import 'package:submersion/features/equipment/domain/services/service_due_engine.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
@@ -86,6 +87,27 @@ final allEquipmentProvider = FutureProvider<List<EquipmentItem>>((ref) async {
   ref.invalidateSelfWhen(repository.watchEquipmentChanges());
 
   return repository.getAllEquipment(diverId: validatedDiverId);
+});
+
+/// Equipment filter state provider.
+///
+/// Holds the status and category axes edited in the equipment filter panel.
+/// Kept outside the list widget so the panel can be opened from any of the
+/// three layouts (phone app bar, master-detail compact bar, table mode's
+/// TableModeLayout actions) and they all narrow the same list.
+final equipmentFilterProvider = StateProvider<EquipmentFilterState>(
+  (ref) => const EquipmentFilterState(),
+);
+
+/// The gear categories the diver actually owns, in [EquipmentType] order.
+///
+/// Drives the filter panel's category chips so it never offers a type with no
+/// gear behind it. Derived from every item -- including retired -- because the
+/// status axis can put retired gear back on screen.
+final ownedEquipmentTypesProvider = Provider<List<EquipmentType>>((ref) {
+  final all = ref.watch(allEquipmentProvider).value ?? const <EquipmentItem>[];
+  final present = all.map((e) => e.type).toSet();
+  return EquipmentType.values.where(present.contains).toList();
 });
 
 /// Equipment sort state provider
@@ -393,18 +415,6 @@ final mostRecentServiceRecordProvider =
       return repository.getMostRecentRecord(equipmentId);
     });
 
-/// Total service cost for equipment, keyed by the currency of each record.
-/// Kept per currency so mixed-currency histories are never added together.
-final serviceRecordTotalCostProvider =
-    FutureProvider.family<Map<String, double>, String>((
-      ref,
-      equipmentId,
-    ) async {
-      final repository = ref.watch(serviceRecordRepositoryProvider);
-      ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
-      return repository.getTotalServiceCostByCurrency(equipmentId);
-    });
-
 /// Service record count for equipment
 final serviceRecordCountProvider = FutureProvider.family<int, String>((
   ref,
@@ -441,7 +451,6 @@ class ServiceRecordNotifier
     await _loadRecords();
     _ref.invalidate(serviceRecordsForEquipmentProvider(equipmentId));
     _ref.invalidate(mostRecentServiceRecordProvider(equipmentId));
-    _ref.invalidate(serviceRecordTotalCostProvider(equipmentId));
     _ref.invalidate(serviceRecordCountProvider(equipmentId));
     // Also refresh equipment to update lastServiceDate
     _ref.invalidate(equipmentItemProvider(equipmentId));

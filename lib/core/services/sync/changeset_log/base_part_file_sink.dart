@@ -26,6 +26,7 @@ class BasePartFileSink {
     required String? wholeChecksum,
     required List<String> partChecksums,
     required Future<Uint8List?> Function(int index) downloadPart,
+    void Function(int downloaded, int total)? onPartDownloaded,
   }) async {
     final dir = await _tempDir();
     final path = basePartTempPath(dir.path, name, _uuid.v4());
@@ -51,6 +52,7 @@ class BasePartFileSink {
         }
         wholeInput.add(part);
         out.add(part);
+        onPartDownloaded?.call(i + 1, partCount);
       }
     } catch (_) {
       ok = false;

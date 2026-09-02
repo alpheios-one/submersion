@@ -1,4 +1,5 @@
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 
@@ -7,7 +8,19 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
 /// Used by both the provider layer (UI filter state) and the repository layer
 /// (SQL WHERE clause generation for paginated queries).
 class DiveFilterState {
+  /// Inclusive first day of the range, treated as a CALENDAR DATE: only the
+  /// year/month/day are read, and any time-of-day or timezone flag the value
+  /// carries is discarded.
+  ///
+  /// Producers build these locally (the filter sheet's presets, and
+  /// `showAppDatePicker` by construction) while `dives.dive_date_time` holds a
+  /// wall clock flagged as UTC. Comparing the two frames raw shifted the day
+  /// boundary by the device's UTC offset (issue #1368), so every comparison
+  /// site goes through [startDateBoundMs] / [endDateBoundMs] instead.
   final DateTime? startDate;
+
+  /// Inclusive last day of the range. See [startDate] for the calendar-date
+  /// semantics; the whole of this day is kept.
   final DateTime? endDate;
   final String? diveTypeId;
   final String? siteId;
@@ -108,6 +121,29 @@ class DiveFilterState {
     this.equipmentAttrMin,
     this.equipmentAttrMax,
   });
+
+  /// Inclusive lower bound for `dives.dive_date_time`, in the wall-clock-as-UTC
+  /// epoch milliseconds that column stores. Null when [startDate] is unset.
+  ///
+  /// Every date comparison, in SQL and in [apply], binds this value, so the
+  /// three implementations of the axis cannot drift apart.
+  int? get startDateBoundMs {
+    final date = startDate;
+    if (date == null) return null;
+    return wallClockUtcDayStart(date).millisecondsSinceEpoch;
+  }
+
+  /// EXCLUSIVE upper bound for `dives.dive_date_time`: the start of the day
+  /// after [endDate], so the whole of the end day is inside the range. Null
+  /// when [endDate] is unset.
+  int? get endDateBoundMs {
+    final date = endDate;
+    if (date == null) return null;
+    // UTC has no DST, so adding a day here is exact.
+    return wallClockUtcDayStart(
+      date,
+    ).add(const Duration(days: 1)).millisecondsSinceEpoch;
+  }
 
   bool get hasActiveFilters =>
       startDate != null ||
@@ -276,13 +312,26 @@ class DiveFilterState {
   /// axis intersect this result with `decoFilteredDiveIdsProvider`, which
   /// resolves it through the same SQL condition the paginated list uses.
   List<Dive> apply(List<Dive> dives) {
+    final startBound = startDateBoundMs;
+    final endBound = endDateBoundMs;
     return dives.where((dive) {
-      if (startDate != null && dive.dateTime.isBefore(startDate!)) {
-        return false;
-      }
-      if (endDate != null &&
-          dive.dateTime.isAfter(endDate!.add(const Duration(days: 1)))) {
-        return false;
+      if (startBound != null || endBound != null) {
+        // Compare CALENDAR DAYS, not instants. Reducing the dive to the start
+        // of its own day makes this identical to the SQL half-open range
+        // (`>= startBound AND < endBound`), because both bounds are themselves
+        // day starts: a timestamp satisfies them exactly when its day does.
+        // Going through the day start also keeps the comparison honest for a
+        // caller holding a local-flagged entity, since only the digits the
+        // diver sees are read.
+        final diveDay = wallClockUtcDayStart(
+          dive.dateTime,
+        ).millisecondsSinceEpoch;
+        if (startBound != null && diveDay < startBound) {
+          return false;
+        }
+        if (endBound != null && diveDay >= endBound) {
+          return false;
+        }
       }
       if (diveTypeId != null && !dive.diveTypeIds.contains(diveTypeId)) {
         return false;

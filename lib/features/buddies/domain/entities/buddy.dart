@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 import 'package:submersion/core/constants/enums.dart';
@@ -13,6 +15,9 @@ class Buddy extends Equatable {
   final CertificationLevel? certificationLevel;
   final CertificationAgency? certificationAgency;
   final String? photoPath;
+
+  /// Profile photo: a 512x512 square JPEG. Supersedes [photoPath].
+  final Uint8List? photo;
   final String notes;
   final bool isFavorite;
   final DateTime createdAt;
@@ -27,6 +32,7 @@ class Buddy extends Equatable {
     this.certificationLevel,
     this.certificationAgency,
     this.photoPath,
+    this.photo,
     this.notes = '',
     this.isFavorite = false,
     required this.createdAt,
@@ -66,6 +72,7 @@ class Buddy extends Equatable {
     CertificationLevel? certificationLevel,
     CertificationAgency? certificationAgency,
     String? photoPath,
+    Uint8List? photo,
     String? notes,
     bool? isFavorite,
     DateTime? createdAt,
@@ -80,10 +87,35 @@ class Buddy extends Equatable {
       certificationLevel: certificationLevel ?? this.certificationLevel,
       certificationAgency: certificationAgency ?? this.certificationAgency,
       photoPath: photoPath ?? this.photoPath,
+      photo: photo ?? this.photo,
       notes: notes ?? this.notes,
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  /// Create a copy with the profile photo explicitly removed.
+  ///
+  /// [copyWith] uses the plain `??` idiom, so `copyWith(photo: null)` keeps
+  /// the current value rather than clearing it. This mirrors
+  /// `Certification.clearPhotos`, which solves the same problem for the
+  /// certification card blobs.
+  Buddy clearPhoto() {
+    return Buddy(
+      id: id,
+      diverId: diverId,
+      name: name,
+      email: email,
+      phone: phone,
+      certificationLevel: certificationLevel,
+      certificationAgency: certificationAgency,
+      photoPath: photoPath,
+      photo: null,
+      notes: notes,
+      isFavorite: isFavorite,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -97,6 +129,7 @@ class Buddy extends Equatable {
     certificationLevel,
     certificationAgency,
     photoPath,
+    photo,
     notes,
     isFavorite,
     createdAt,

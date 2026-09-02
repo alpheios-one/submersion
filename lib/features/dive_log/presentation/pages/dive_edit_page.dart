@@ -1058,6 +1058,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: l10n.diveLog_edit_section_rating,
                   value: _rating,
                   onChanged: (v) => setState(() => _rating = v),
+                  clearTooltip: l10n.common_action_clearRating,
                 ),
               ),
               _gatedRow(
@@ -2615,12 +2616,22 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// Opens the previously-used-tag picker (#1171) over [selected], so tagging
   /// stays consistent without having to recall earlier spellings. Reports the
   /// merged list (existing plus newly picked) through [onPicked].
+  ///
+  /// [host] is the context the sheet is pushed from, so it decides which
+  /// navigator owns the picker. It defaults to the page, which is right when
+  /// Browse sits on the form itself. A caller whose Browse action lives inside
+  /// a dialog must pass that dialog's context instead: `showDialog` defaults
+  /// to the root navigator while `showModalBottomSheet` defaults to the
+  /// nearest one, which under the app's `ShellRoute` is the shell navigator
+  /// sitting *below* the dialog. Pushed from the page, the picker would open
+  /// behind the dialog with the dialog's barrier eating every tap (#1366).
   void _showTagPickerFor({
     required List<Tag> selected,
     required ValueChanged<List<Tag>> onPicked,
+    BuildContext? host,
   }) {
     showModalBottomSheet<void>(
-      context: context,
+      context: host ?? context,
       isScrollControlled: true,
       builder: (sheetContext) => DraggableScrollableSheet(
         initialChildSize: 0.7,
@@ -3557,7 +3568,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
           actions: [
             TextButton(
+              // `ctx` is inside the dialog route, so the picker lands on the
+              // same (root) navigator and opens above the dialog (#1366).
               onPressed: () => _showTagPickerFor(
+                host: ctx,
                 selected: picked,
                 onPicked: (tags) => setSt(() => picked = tags),
               ),
@@ -4954,6 +4968,24 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Preserve legacy buddy/divemaster text fields
         buddy: _existingDive?.buddy,
         diveMaster: _existingDive?.diveMaster,
+        // Fields this form has no widget for. Every column updateDive does
+        // write, it writes unconditionally, with no merge against the stored
+        // row, so anything not carried through here is reset to the entity
+        // default on every save (issue #1392). Columns it deliberately omits
+        // (computerId, the entry/exit location pair) are not at risk and are
+        // not listed. The census test in dive_edit_save_field_census_test.dart
+        // fails when a new field is added to the writer without a carry here.
+        isPlanned: _existingDive?.isPlanned ?? false,
+        diveComputerModel: _existingDive?.diveComputerModel,
+        diveComputerSerial: _existingDive?.diveComputerSerial,
+        diveComputerFirmware: _existingDive?.diveComputerFirmware,
+        decoAlgorithm: _existingDive?.decoAlgorithm,
+        decoConservatism: _existingDive?.decoConservatism,
+        gradientFactorLow: _existingDive?.gradientFactorLow,
+        gradientFactorHigh: _existingDive?.gradientFactorHigh,
+        weatherCode: _existingDive?.weatherCode,
+        importId: _existingDive?.importId,
+        surfaceInterval: _existingDive?.surfaceInterval,
         diverRoleId: _diverRoleId,
         // CCR/SCR rebreather settings
         diveMode: _diveMode,

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:submersion/core/services/sync/changeset_log/base_json_stream_reader.dart';
+import 'package:submersion/core/services/sync/changeset_log/byte_progress_stream.dart';
 
 /// Isolate entrypoint for the base-file parse worker.
 ///
@@ -17,7 +18,14 @@ import 'package:submersion/core/services/sync/changeset_log/base_json_stream_rea
 ///     {'type': 'ready', 'port': SendPort}           (handshake)
 ///     {'type': 'deletions', 'exportedAt': int, 'rows': List}
 ///     {'type': 'batch', 'rows': List, 'done': bool}
+///     {'type': 'progress', 'bytes': int, 'total': int}  (liveness heartbeat)
 ///     {'type': 'error', 'message': String}
+///
+/// A progress message is sent every few MiB of file consumed during a pass
+/// and once at its end. It is not a reply: the client treats it as proof the
+/// worker is alive and restarts its inactivity timeout, so a pass over a
+/// multi-hundred-MB base can legitimately take minutes without being mistaken
+/// for a dead worker (issue #1421).
 ///
 /// [args] is `[mainSendPort, filePath]` (Isolate.spawn passes one message).
 void baseParseWorkerMain(List<Object> args) {
@@ -45,12 +53,22 @@ void baseParseWorkerMain(List<Object> args) {
     'message': e.toString(),
   });
 
+  final total = File(filePath).lengthSync();
+  Stream<List<int>> openWithProgress() => withByteProgress(
+    File(filePath).openRead(),
+    onProgress: (consumed) => mainSendPort.send(<String, Object>{
+      'type': 'progress',
+      'bytes': consumed,
+      'total': total,
+    }),
+  );
+
   Future<void> runDeletions() async {
     try {
       var exportedAt = 0;
       final rows = <Map<String, Object?>>[];
       await BaseJsonStreamReader().parse(
-        File(filePath).openRead(),
+        openWithProgress(),
         onScalar: (key, raw) async {
           if (key == 'exportedAt') {
             exportedAt = (jsonDecode(utf8.decode(raw)) as num?)?.toInt() ?? 0;
@@ -86,7 +104,7 @@ void baseParseWorkerMain(List<Object> args) {
     try {
       var batch = <Map<String, Object?>>[];
       await BaseJsonStreamReader().parse(
-        File(filePath).openRead(),
+        openWithProgress(),
         wantRows: (section, table) =>
             section == 'data' && tables.contains(table),
         onRow: (section, table, rowBytes) async {

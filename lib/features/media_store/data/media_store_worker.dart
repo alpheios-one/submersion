@@ -23,13 +23,15 @@ class MediaStoreWorker {
     Future<WorkerGate> Function(MediaTransferQueueEntry entry)? gate,
     Duration entryBudget = defaultEntryBudget,
     Duration preflightBudget = defaultPreflightBudget,
+    Duration preflightRetryWindow = defaultPreflightRetryWindow,
   }) : _queue = queue,
        _pipeline = pipeline,
        _deleteProcessor = deleteProcessor,
        _preflight = preflight,
        _gate = gate,
        _entryBudget = entryBudget,
-       _preflightBudget = preflightBudget;
+       _preflightBudget = preflightBudget,
+       _preflightRetryWindow = preflightRetryWindow;
 
   final MediaTransferQueueRepository _queue;
   final MediaUploadPipeline _pipeline;
@@ -66,12 +68,28 @@ class MediaStoreWorker {
   /// stall here wedges the drain without a single row being touched.
   static const Duration defaultPreflightBudget = Duration(seconds: 30);
 
+  /// How long a drain the preflight suspended waits before trying again.
+  ///
+  /// A suspended drain leaves its due rows untouched, which is right for the
+  /// rows (no attempt burned, no backoff written) but left the queue with
+  /// nothing to wake it: [MediaTransferQueueRepository.earliestPendingWakeup]
+  /// deliberately skips rows that are already due. Every retry then hung on
+  /// an external trigger re-running the same check, and on desktop, where
+  /// the app sits in one process for days, the rows read "Waiting" for as
+  /// long (issue #1356). The preflight is one small GET, so a periodic retry
+  /// costs almost nothing, and it is what lets a marker that was merely slow
+  /// to download from iCloud clear on its own.
+  static const Duration defaultPreflightRetryWindow = Duration(minutes: 10);
+
   final Duration _entryBudget;
   final Duration _preflightBudget;
+  final Duration _preflightRetryWindow;
 
   final _log = LoggerService.forClass(MediaStoreWorker);
   bool _running = false;
   bool _disposed = false;
+  bool _suspended = false;
+  final _suspensionChanges = StreamController<bool>.broadcast();
   Future<void>? _activeDrain;
   Timer? _wakeup;
   Duration? _wakeupDelay;
@@ -87,6 +105,35 @@ class MediaStoreWorker {
   /// that need to observe completion await this instead of racing it.
   Future<void>? get activeDrain => _activeDrain;
 
+  /// Whether the most recent preflight suspended the drain. The queue's rows
+  /// carry no trace of a suspension (they are left exactly as they were), so
+  /// without this the only record was a log line and the settings page could
+  /// not tell "paused" from "queued" (issue #1356).
+  bool get isSuspended => _suspended;
+
+  /// The current value on subscribe, then every change.
+  ///
+  /// Emitting the current value is load-bearing, not a convenience: the
+  /// runtime fires its first drain before any reader can subscribe, and
+  /// [_setSuspended] never repeats a value it has already sent. A reader
+  /// that sampled [isSuspended] and then subscribed would silently lose a
+  /// flip that landed in between, and nothing would ever re-send it.
+  Stream<bool> get suspensionChanges => Stream<bool>.multi((controller) {
+    controller.add(_suspended);
+    final subscription = _suspensionChanges.stream.listen(
+      controller.add,
+      onError: controller.addError,
+      onDone: controller.close,
+    );
+    controller.onCancel = subscription.cancel;
+  });
+
+  void _setSuspended(bool value) {
+    if (_suspended == value) return;
+    _suspended = value;
+    if (!_suspensionChanges.isClosed) _suspensionChanges.add(value);
+  }
+
   Future<void> drain() async {
     if (_disposed || _running) return;
     _running = true;
@@ -95,11 +142,20 @@ class MediaStoreWorker {
     // stopped the drain, an exception out of the pipeline - leaves work
     // behind on purpose, and must not arm the immediate wakeup below.
     var drainedToEmpty = false;
+    // Whether the preflight stopped this drain, for ANY reason. Separate from
+    // the user-visible [isSuspended], which speaks only for a determinate
+    // refusal: a preflight that could not answer (offline) still leaves due
+    // rows behind with nothing to pick them up, so scheduling has to know
+    // about it even though the UI must not.
+    var preflightBlocked = false;
     try {
       while (true) {
         // Re-checked per entry, not once per drain: a store wipe or user
         // disconnect mid-drain must suspend the rest of the queue.
-        if (!await _preflightPasses()) return;
+        if (!await _preflightPasses()) {
+          preflightBlocked = true;
+          return;
+        }
         final entry = await _queue.nextPending(DateTime.now());
         if (entry == null) {
           drainedToEmpty = true;
@@ -133,7 +189,10 @@ class MediaStoreWorker {
       }
     } finally {
       _running = false;
-      await _armWakeup(drainedToEmpty: drainedToEmpty);
+      await _armWakeup(
+        drainedToEmpty: drainedToEmpty,
+        preflightBlocked: preflightBlocked,
+      );
     }
   }
 
@@ -197,9 +256,21 @@ class MediaStoreWorker {
     final preflight = _preflight;
     if (preflight == null) return true;
     try {
-      if (await preflight().timeout(_preflightBudget)) return true;
+      if (await preflight().timeout(_preflightBudget)) {
+        _setSuspended(false);
+        return true;
+      }
+      // A determinate refusal: this device has detached, or the store no
+      // longer carries the marker it attached to. Only this answer is
+      // reported as a suspension, because only this one is about the store.
       _log.warning('Media store preflight failed; drain suspended');
+      _setSuspended(true);
     } on Object catch (e, stackTrace) {
+      // Could not determine, which is not the same thing and must not be
+      // dressed up as a store problem. Being offline lands here on every
+      // provider - the marker read goes to the network, and drain() runs
+      // this check BEFORE the gate that owns offline - and an ordinary
+      // offline moment must not tell the user their store is broken.
       _log.warning(
         'Media store preflight could not run; drain suspended',
         error: e,
@@ -224,7 +295,15 @@ class MediaStoreWorker {
   ///
   /// [drainedToEmpty] says the drain looked and found nothing due. That is
   /// what makes the already-due branch below safe; see it for why.
-  Future<void> _armWakeup({required bool drainedToEmpty}) async {
+  ///
+  /// [preflightBlocked] says the preflight stopped the drain. Its due rows
+  /// are still due, so the immediate branch must not take them (it would spin
+  /// against a check that keeps failing); they get the
+  /// [defaultPreflightRetryWindow] instead.
+  Future<void> _armWakeup({
+    required bool drainedToEmpty,
+    required bool preflightBlocked,
+  }) async {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
@@ -237,6 +316,30 @@ class MediaStoreWorker {
       // One clock reading for both the query and the delay, so the timer
       // cannot be handed a negative duration by the query's own latency.
       final now = DateTime.now();
+      if (preflightBlocked) {
+        // Always arm, even with an empty queue. A blocked preflight is
+        // re-run only by a drain, and a suspension is cleared only by one
+        // that passes, so a drain that armed nothing here could never
+        // recover in this process. Both halves need it: an offline blip
+        // would otherwise strand every due row until an unrelated trigger,
+        // and the final iteration of an emptying drain can record a
+        // suspension with nothing left to carry a timer, leaving the notice
+        // standing forever over a queue with nothing in it.
+        //
+        // Never later than a row's own backoff. That timer is the one this
+        // branch replaces, and a row deferred for thirty seconds must not
+        // wait out the retry window because an unrelated check failed.
+        final due = await _queue.earliestPendingWakeup(now);
+        final backoff = due?.difference(now);
+        final delay = backoff != null && backoff > Duration.zero
+            ? (backoff < _preflightRetryWindow
+                  ? backoff
+                  : _preflightRetryWindow)
+            : _preflightRetryWindow;
+        _wakeupDelay = delay;
+        _wakeup = Timer(delay, () => unawaited(drain()));
+        return;
+      }
       // The drain asked "what is due?" against its own clock reading, and
       // earliestPendingWakeup asks "what is not due yet?" against this one.
       // Those are complements only if no time passed in between, so a row
@@ -246,8 +349,9 @@ class MediaStoreWorker {
       // straight back to a fresh drain.
       //
       // Only when the drain reached an empty queue. A drain that declined to
-      // run (offline, failed preflight) left its due row behind deliberately,
-      // and re-kicking that would spin against a drain that keeps declining.
+      // run (offline, or the preflight case handled above) left its due row
+      // behind deliberately, and re-kicking that would spin against a drain
+      // that keeps declining.
       // A drain that emptied the queue cannot: every loop exit consumes its
       // entry, so the next drain either takes this row or is itself a decline.
       if (drainedToEmpty && await _queue.nextPending(now) != null) {
@@ -280,6 +384,7 @@ class MediaStoreWorker {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
+    _suspensionChanges.close();
   }
 
   Future<void> enqueueAndKick(String mediaId) async {

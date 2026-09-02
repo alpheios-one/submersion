@@ -138,6 +138,28 @@ if [ -d /Volumes/fltmp/tmp ]; then
 fi
 ```
 
+#### One consequence worth knowing
+
+On macOS a RAM disk can only mount under `/Volumes/`, and that is exactly the
+pattern `VolumeStatus.volumeRootOf` uses to recognise a removable drive. Any
+test that writes a fixture to `Directory.systemTemp` and then expects it to
+look like it is on the boot volume will therefore see the opposite once
+`TMPDIR` points at the RAM disk.
+
+That bit `local_file_resolver_test.dart`, which asserted a temp path needs no
+mount probe: the resolver classified the fixture as sitting on an unmounted
+volume and returned `UnavailableData`. Because the pre-push hook runs the tests
+affected by your change, the failure blocked pushes for a reason unrelated to
+the code being pushed. CI never saw it, since CI uses the default temp
+directory.
+
+That test now anchors its fixtures to the boot volume itself, so the RAM disk
+is safe to use. If you hit the same shape in a new test, either anchor the
+fixture the same way or pass an explicit `platformOverride` to `VolumeStatus`
+rather than relying on the real heuristics. As a one-off escape hatch,
+`TMPDIR=/private/tmp` in front of a single command restores the default without
+unsetting anything.
+
 ### 3. Recreate it at login
 
 A RAM disk does not survive a reboot. Create

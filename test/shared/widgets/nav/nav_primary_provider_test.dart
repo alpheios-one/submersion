@@ -166,6 +166,7 @@ void main() {
           'dive-centers',
           'certifications',
           'courses',
+          'species',
           'planning',
           'transfer',
           'gps-log',

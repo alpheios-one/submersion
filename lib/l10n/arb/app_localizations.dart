@@ -2227,12 +2227,6 @@ abstract class AppLocalizations {
   /// **'Not specified'**
   String get buddies_label_notSpecified;
 
-  /// No description provided for @buddies_label_photoComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo support coming in v2.0'**
-  String get buddies_label_photoComingSoon;
-
   /// No description provided for @buddies_message_added.
   ///
   /// In en, this message translates to:
@@ -4420,6 +4414,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get common_action_cancel;
+
+  /// Tooltip on the icon that removes a star rating from a form row, returning it to no rating
+  ///
+  /// In en, this message translates to:
+  /// **'Clear rating'**
+  String get common_action_clearRating;
 
   /// Generic close action used for dialogs, menus, etc.
   ///
@@ -8180,7 +8180,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_detail_section_marineLife;
 
   /// No description provided for @diveLog_detail_sightingPhotos.
@@ -8750,7 +8750,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_noMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'No marine life logged'**
+  /// **'No species logged'**
   String get diveLog_edit_noMarineLife;
 
   /// No description provided for @diveLog_edit_notSpecified.
@@ -8966,7 +8966,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_edit_section_marineLife.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get diveLog_edit_section_marineLife;
 
   /// No description provided for @diveLog_edit_section_notes.
@@ -10478,7 +10478,7 @@ abstract class AppLocalizations {
   /// Empty-state invitation for the Life & notes group
   ///
   /// In en, this message translates to:
-  /// **'Add marine life, notes or sharing'**
+  /// **'Add species, notes or sharing'**
   String get diveSites_edit_invite_lifeNotes;
 
   /// Empty-state invitation for the Location group
@@ -12059,6 +12059,12 @@ abstract class AppLocalizations {
   /// **'Error loading dive types'**
   String get diveLog_search_errorLoadingDiveTypes;
 
+  /// No description provided for @diveLog_search_errorLoadingEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading equipment'**
+  String get diveLog_search_errorLoadingEquipment;
+
   /// No description provided for @diveLog_search_errorLoadingTrips.
   ///
   /// In en, this message translates to:
@@ -12112,6 +12118,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Duration Range (min)'**
   String get diveLog_search_label_durationRange;
+
+  /// No description provided for @diveLog_search_label_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get diveLog_search_label_equipment;
 
   /// No description provided for @diveLog_search_label_trip.
   ///
@@ -12338,7 +12350,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_speciesPicker_title.
   ///
   /// In en, this message translates to:
-  /// **'Add Marine Life'**
+  /// **'Add Species'**
   String get diveLog_speciesPicker_title;
 
   /// No description provided for @diveLog_speciesPicker_tooltip_clearSearch.
@@ -13728,6 +13740,12 @@ abstract class AppLocalizations {
   /// **'Difficulty Level'**
   String get diveSites_detail_section_difficultyLevel;
 
+  /// No description provided for @diveSites_detail_section_diveStatistics.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Statistics'**
+  String get diveSites_detail_section_diveStatistics;
+
   /// No description provided for @diveSites_detail_section_divesAtSite.
   ///
   /// In en, this message translates to:
@@ -13757,6 +13775,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rating'**
   String get diveSites_detail_section_rating;
+
+  /// No description provided for @diveSites_detail_stats_avgDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Duration'**
+  String get diveSites_detail_stats_avgDuration;
+
+  /// No description provided for @diveSites_detail_stats_firstDive.
+  ///
+  /// In en, this message translates to:
+  /// **'First Dive'**
+  String get diveSites_detail_stats_firstDive;
+
+  /// No description provided for @diveSites_detail_stats_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get diveSites_detail_stats_lastDive;
+
+  /// No description provided for @diveSites_detail_stats_longestDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Dive'**
+  String get diveSites_detail_stats_longestDive;
+
+  /// No description provided for @diveSites_detail_stats_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest Dive'**
+  String get diveSites_detail_stats_maxDepth;
+
+  /// No description provided for @diveSites_detail_stats_minDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Shallowest Dive'**
+  String get diveSites_detail_stats_minDepth;
+
+  /// No description provided for @diveSites_detail_stats_notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get diveSites_detail_stats_notAvailable;
 
   /// No description provided for @diveSites_detail_semantics_copyToClipboard.
   ///
@@ -14360,7 +14420,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveSites_edit_section_expectedMarineLife.
   ///
   /// In en, this message translates to:
-  /// **'Expected Marine Life'**
+  /// **'Expected Species'**
   String get diveSites_edit_section_expectedMarineLife;
 
   /// No description provided for @diveSites_edit_section_gpsCoordinates.
@@ -17678,6 +17738,12 @@ abstract class AppLocalizations {
   /// **'File Size'**
   String get enum_sortField_fileSize;
 
+  /// No description provided for @enum_sortField_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get enum_sortField_lastDive;
+
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
   /// In en, this message translates to:
@@ -19112,6 +19178,12 @@ abstract class AppLocalizations {
   /// **'{status} equipment'**
   String equipment_list_emptyState_filterText_status(Object status);
 
+  /// Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. "Wetsuit equipment"
+  ///
+  /// In en, this message translates to:
+  /// **'{type} equipment'**
+  String equipment_list_emptyState_filterText_type(Object type);
+
   /// No description provided for @equipment_list_emptyState_noEquipment.
   ///
   /// In en, this message translates to:
@@ -19123,6 +19195,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
+
+  /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment in this category'**
+  String get equipment_list_emptyState_noTypeMatch;
 
   /// No description provided for @equipment_list_emptyState_serviceDueUpToDate.
   ///
@@ -19142,17 +19220,65 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// No description provided for @equipment_list_filterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter:'**
-  String get equipment_list_filterLabel;
-
   /// No description provided for @equipment_list_filterServiceDue.
   ///
   /// In en, this message translates to:
   /// **'Service Due'**
   String get equipment_list_filterServiceDue;
+
+  /// Label of the chip that clears the category filter and shows equipment of every type
+  ///
+  /// In en, this message translates to:
+  /// **'All Types'**
+  String get equipment_list_typeFilterAll;
+
+  /// No description provided for @equipment_list_filterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter equipment'**
+  String get equipment_list_filterTooltip;
+
+  /// No description provided for @equipment_list_activeFilter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get equipment_list_activeFilter_clear;
+
+  /// No description provided for @equipment_filter_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Equipment'**
+  String get equipment_filter_title;
+
+  /// No description provided for @equipment_filter_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get equipment_filter_clearAll;
+
+  /// No description provided for @equipment_filter_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get equipment_filter_apply;
+
+  /// No description provided for @equipment_filter_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get equipment_filter_cancel;
+
+  /// No description provided for @equipment_filter_section_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_filter_section_category;
 
   /// No description provided for @equipment_list_retryButton.
   ///
@@ -21161,7 +21287,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_noSpotted.
   ///
   /// In en, this message translates to:
-  /// **'No marine life spotted yet'**
+  /// **'No species spotted yet'**
   String get marineLife_siteSection_noSpotted;
 
   /// No description provided for @marineLife_siteSection_spottedCountSemantics.
@@ -21182,7 +21308,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_siteSection_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get marineLife_siteSection_title;
 
   /// No description provided for @marineLife_speciesDetail_backTooltip.
@@ -21346,6 +21472,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error saving species: {error}'**
   String marineLife_speciesEdit_errorSaving(Object error);
+
+  /// No description provided for @marineLife_speciesEdit_notFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This species no longer exists.'**
+  String get marineLife_speciesEdit_notFoundMessage;
 
   /// No description provided for @marineLife_speciesEdit_saveButton.
   ///
@@ -21806,7 +21938,7 @@ abstract class AppLocalizations {
   /// No description provided for @marineLife_speciesPage_emptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Marine life sightings added to a dive will show up here.'**
+  /// **'Species sightings added to a dive will show up here.'**
   String get marineLife_speciesPage_emptyHint;
 
   /// No description provided for @marineLife_speciesPage_noMatch.
@@ -23732,6 +23864,12 @@ abstract class AppLocalizations {
   /// **'Sites'**
   String get nav_sites;
 
+  /// Navigation label for the species section
+  ///
+  /// In en, this message translates to:
+  /// **'Species'**
+  String get nav_species;
+
   /// Navigation label for statistics section
   ///
   /// In en, this message translates to:
@@ -25463,7 +25601,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_sightings_name.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life Sightings'**
+  /// **'Species Sightings'**
   String get diveDetailSection_sightings_name;
 
   /// No description provided for @diveDetailSection_sightings_description.
@@ -26231,6 +26369,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList);
 
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
@@ -27880,7 +28030,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_manage_species_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Manage marine life species catalog'**
+  /// **'Manage the species catalog'**
   String get settings_manage_species_subtitle;
 
   /// No description provided for @settings_manage_tags.
@@ -29375,6 +29525,12 @@ abstract class AppLocalizations {
   /// **'Please enter the signer name'**
   String get signatures_error_enterSignerName;
 
+  /// Error shown when saving a signature failed
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the signature. Please try again.'**
+  String get signatures_error_saveFailed;
+
   /// Label for the instructor name text field
   ///
   /// In en, this message translates to:
@@ -29516,7 +29672,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_category_marineLife_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_category_marineLife_title;
 
   /// Title for the Overview entry in the Statistics category list
@@ -30083,7 +30239,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_appBar_title.
   ///
   /// In en, this message translates to:
-  /// **'Marine Life'**
+  /// **'Species'**
   String get statistics_marineLife_appBar_title;
 
   /// No description provided for @statistics_marineLife_bestSites_empty.
@@ -30117,7 +30273,7 @@ abstract class AppLocalizations {
   /// No description provided for @statistics_marineLife_bestSites_title.
   ///
   /// In en, this message translates to:
-  /// **'Best Sites for Marine Life'**
+  /// **'Best Sites'**
   String get statistics_marineLife_bestSites_title;
 
   /// No description provided for @statistics_marineLife_mostCommon_empty.
@@ -32607,7 +32763,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_exportTitle.
   ///
   /// In en, this message translates to:
-  /// **'Export'**
+  /// **'File Export'**
   String get transfer_section_exportTitle;
 
   /// No description provided for @transfer_section_importSubtitle.
@@ -32619,7 +32775,7 @@ abstract class AppLocalizations {
   /// No description provided for @transfer_section_importTitle.
   ///
   /// In en, this message translates to:
-  /// **'Import'**
+  /// **'File Import'**
   String get transfer_section_importTitle;
 
   /// No description provided for @transfer_summary_description.
@@ -35491,6 +35647,12 @@ abstract class AppLocalizations {
   /// **'No USB serial ports found. Is the dive computer connected and powered on?'**
   String get diveComputer_download_noSerialPortsFound;
 
+  /// No description provided for @diveComputer_download_noUsbDeviceFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No {model} found over USB. Is it connected to this computer and powered on?'**
+  String diveComputer_download_noUsbDeviceFound(Object model);
+
   /// No description provided for @diveComputer_download_stalePairing.
   ///
   /// In en, this message translates to:
@@ -37129,6 +37291,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That file has a position or timestamp this app cannot read.'**
   String get gpsTrack_importError_badData;
+
+  /// Track import failed: the file has more positions than a single track can store.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has too many positions to store as one track. Split it into shorter tracks and import them separately.'**
+  String get gpsTrack_importError_tooLarge;
 
   /// No description provided for @gpsTrack_export_saved.
   ///
@@ -39277,6 +39445,12 @@ abstract class AppLocalizations {
   /// **'Media store connected'**
   String get settings_mediaStorage_saved;
 
+  /// No description provided for @settings_mediaStorage_error_notReady.
+  ///
+  /// In en, this message translates to:
+  /// **'The cloud storage could not be read yet. Wait a moment and try connecting again.'**
+  String get settings_mediaStorage_error_notReady;
+
   /// No description provided for @settings_mediaStorage_action_disconnect.
   ///
   /// In en, this message translates to:
@@ -39360,6 +39534,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed'**
   String get settings_mediaStorage_transfers_state_failed;
+
+  /// No description provided for @settings_mediaStorage_transfers_suspended_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers paused'**
+  String get settings_mediaStorage_transfers_suspended_title;
+
+  /// No description provided for @settings_mediaStorage_transfers_suspended_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.'**
+  String get settings_mediaStorage_transfers_suspended_subtitle;
 
   /// No description provided for @settings_mediaStorage_transfers_queued.
   ///
@@ -57791,6 +57977,21 @@ abstract class AppLocalizations {
   /// **'Uploading library ({uploaded} of {total})'**
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total);
 
+  /// No description provided for @settings_cloudSync_progress_downloadingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading library ({downloaded} of {total})'**
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  );
+
+  /// No description provided for @settings_cloudSync_progress_importingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing library ({percent}%)'**
+  String settings_cloudSync_progress_importingLibrary(int percent);
+
   /// No description provided for @settings_cloudSync_result_noProvider.
   ///
   /// In en, this message translates to:
@@ -58774,6 +58975,552 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Counted in every statistic'**
   String get diveLog_edit_statisticsIncludedHint;
+
+  /// No description provided for @suuntoCloud_signIn_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Suunto'**
+  String get suuntoCloud_signIn_title;
+
+  /// No description provided for @suuntoCloud_signIn_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  String get suuntoCloud_signIn_description;
+
+  /// No description provided for @suuntoCloud_signIn_emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get suuntoCloud_signIn_emailLabel;
+
+  /// No description provided for @suuntoCloud_signIn_emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get suuntoCloud_signIn_emailRequired;
+
+  /// No description provided for @suuntoCloud_signIn_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get suuntoCloud_signIn_passwordLabel;
+
+  /// No description provided for @suuntoCloud_signIn_passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get suuntoCloud_signIn_passwordRequired;
+
+  /// No description provided for @suuntoCloud_signIn_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get suuntoCloud_signIn_button;
+
+  /// No description provided for @suuntoCloud_signIn_signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get suuntoCloud_signIn_signingIn;
+
+  /// Success state on the Suunto sign-in step, once a session is established.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String suuntoCloud_signIn_signedInAs(String email);
+
+  /// No description provided for @suuntoCloud_fetch_listing.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing dives…'**
+  String get suuntoCloud_fetch_listing;
+
+  /// Progress line while paging through the Suunto cloud's workout list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String suuntoCloud_fetch_listingFound(int count);
+
+  /// Progress line while downloading each dive from the Suunto cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dive {current} of {total}…'**
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total);
+
+  /// No description provided for @suuntoCloud_fetch_failedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch dives'**
+  String get suuntoCloud_fetch_failedTitle;
+
+  /// No description provided for @suuntoCloud_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get suuntoCloud_fetch_retry;
+
+  /// No description provided for @suuntoCloud_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get suuntoCloud_fetch_loadMore;
+
+  /// Result headline after fetching dives from the Suunto cloud.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
+  String suuntoCloud_fetch_foundDives(int count);
+
+  /// Shown when one or more fetched Suunto dives could not be converted and were skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
+  String suuntoCloud_fetch_someFailed(int count);
+
+  /// No description provided for @garminConnect_signIn_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Garmin Connect'**
+  String get garminConnect_signIn_title;
+
+  /// No description provided for @garminConnect_signIn_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  String get garminConnect_signIn_description;
+
+  /// No description provided for @garminConnect_signIn_emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get garminConnect_signIn_emailLabel;
+
+  /// No description provided for @garminConnect_signIn_emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get garminConnect_signIn_emailRequired;
+
+  /// No description provided for @garminConnect_signIn_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get garminConnect_signIn_passwordLabel;
+
+  /// No description provided for @garminConnect_signIn_passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get garminConnect_signIn_passwordRequired;
+
+  /// No description provided for @garminConnect_signIn_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get garminConnect_signIn_button;
+
+  /// No description provided for @garminConnect_signIn_signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get garminConnect_signIn_signingIn;
+
+  /// Success state on the Garmin Connect sign-in step, once a session is established.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String garminConnect_signIn_signedInAs(String email);
+
+  /// No description provided for @garminConnect_mfa_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Required'**
+  String get garminConnect_mfa_title;
+
+  /// Instructions on the Garmin Connect MFA step, naming where the code was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code sent to your {method}.'**
+  String garminConnect_mfa_description(String method);
+
+  /// No description provided for @garminConnect_mfa_codeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get garminConnect_mfa_codeLabel;
+
+  /// No description provided for @garminConnect_mfa_codeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code is required'**
+  String get garminConnect_mfa_codeRequired;
+
+  /// No description provided for @garminConnect_mfa_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get garminConnect_mfa_button;
+
+  /// No description provided for @garminConnect_mfa_submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying…'**
+  String get garminConnect_mfa_submitting;
+
+  /// No description provided for @garminConnect_fetch_listing.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing dives…'**
+  String get garminConnect_fetch_listing;
+
+  /// Progress line while paging through Garmin Connect's activity list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String garminConnect_fetch_listingFound(int count);
+
+  /// Progress line while downloading each dive from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dive {current} of {total}…'**
+  String garminConnect_fetch_fetchingDiveOf(int current, int total);
+
+  /// No description provided for @garminConnect_fetch_failedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch dives'**
+  String get garminConnect_fetch_failedTitle;
+
+  /// No description provided for @garminConnect_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get garminConnect_fetch_retry;
+
+  /// No description provided for @garminConnect_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get garminConnect_fetch_loadMore;
+
+  /// Result headline after fetching dives from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
+  String garminConnect_fetch_foundDives(int count);
+
+  /// Shown when one or more fetched Garmin Connect dives could not be converted and were skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
+  String garminConnect_fetch_someFailed(int count);
+
+  /// Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch All'**
+  String get garminConnect_fetch_fetchAll;
+
+  /// No description provided for @importWizard_review_sortTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get importWizard_review_sortTooltip;
+
+  /// No description provided for @importWizard_review_sortByDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get importWizard_review_sortByDate;
+
+  /// No description provided for @importWizard_review_sortByDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get importWizard_review_sortByDepth;
+
+  /// No description provided for @importWizard_review_sortByDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get importWizard_review_sortByDuration;
+
+  /// No description provided for @transfer_importCloud_suuntoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Suunto'**
+  String get transfer_importCloud_suuntoTitle;
+
+  /// No description provided for @transfer_importCloud_suuntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import dives from your Suunto app / app.suunto.com account'**
+  String get transfer_importCloud_suuntoSubtitle;
+
+  /// No description provided for @transfer_importCloud_garminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Garmin'**
+  String get transfer_importCloud_garminTitle;
+
+  /// No description provided for @transfer_importCloud_garminSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import dives from your Garmin Connect account'**
+  String get transfer_importCloud_garminSubtitle;
+
+  /// No description provided for @transfer_section_cloudTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud'**
+  String get transfer_section_cloudTitle;
+
+  /// No description provided for @transfer_section_cloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from cloud'**
+  String get transfer_section_cloudSubtitle;
+
+  /// No description provided for @settings_storageUsage_appBar_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Usage'**
+  String get settings_storageUsage_appBar_title;
+
+  /// No description provided for @settings_storageUsage_tile_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Usage'**
+  String get settings_storageUsage_tile_title;
+
+  /// No description provided for @settings_storageUsage_tile_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See what is using space on this device'**
+  String get settings_storageUsage_tile_subtitle;
+
+  /// No description provided for @settings_storageUsage_total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get settings_storageUsage_total;
+
+  /// No description provided for @settings_storageUsage_totalPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Total so far'**
+  String get settings_storageUsage_totalPartial;
+
+  /// No description provided for @settings_storageUsage_refresh_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Recalculate'**
+  String get settings_storageUsage_refresh_tooltip;
+
+  /// No description provided for @settings_storageUsage_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get settings_storageUsage_unavailable;
+
+  /// No description provided for @settings_storageUsage_measureFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not measure'**
+  String get settings_storageUsage_measureFailed;
+
+  /// No description provided for @settings_storageUsage_group_appData.
+  ///
+  /// In en, this message translates to:
+  /// **'App Data'**
+  String get settings_storageUsage_group_appData;
+
+  /// No description provided for @settings_storageUsage_group_mediaCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Media Cache'**
+  String get settings_storageUsage_group_mediaCache;
+
+  /// No description provided for @settings_storageUsage_group_caches.
+  ///
+  /// In en, this message translates to:
+  /// **'Caches'**
+  String get settings_storageUsage_group_caches;
+
+  /// No description provided for @settings_storageUsage_group_backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups'**
+  String get settings_storageUsage_group_backups;
+
+  /// No description provided for @settings_storageUsage_group_temporary.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Files'**
+  String get settings_storageUsage_group_temporary;
+
+  /// No description provided for @settings_storageUsage_group_exports.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported Files'**
+  String get settings_storageUsage_group_exports;
+
+  /// No description provided for @settings_storageUsage_category_database.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive log database'**
+  String get settings_storageUsage_category_database;
+
+  /// No description provided for @settings_storageUsage_category_localCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Local cache database'**
+  String get settings_storageUsage_category_localCache;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheOriginals.
+  ///
+  /// In en, this message translates to:
+  /// **'Original photos and videos'**
+  String get settings_storageUsage_category_mediaCacheOriginals;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheThumbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Thumbnails'**
+  String get settings_storageUsage_category_mediaCacheThumbs;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheRenditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Video renditions'**
+  String get settings_storageUsage_category_mediaCacheRenditions;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheStaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Staged transfers'**
+  String get settings_storageUsage_category_mediaCacheStaging;
+
+  /// No description provided for @settings_storageUsage_category_mediaCacheTranscode.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcoded video'**
+  String get settings_storageUsage_category_mediaCacheTranscode;
+
+  /// No description provided for @settings_storageUsage_category_mapTiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Map tiles'**
+  String get settings_storageUsage_category_mapTiles;
+
+  /// No description provided for @settings_storageUsage_category_networkImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Network images'**
+  String get settings_storageUsage_category_networkImages;
+
+  /// No description provided for @settings_storageUsage_category_videoThumbnails.
+  ///
+  /// In en, this message translates to:
+  /// **'Video thumbnails'**
+  String get settings_storageUsage_category_videoThumbnails;
+
+  /// No description provided for @settings_storageUsage_category_pdfThumbnails.
+  ///
+  /// In en, this message translates to:
+  /// **'Document thumbnails'**
+  String get settings_storageUsage_category_pdfThumbnails;
+
+  /// No description provided for @settings_storageUsage_category_backups.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup files'**
+  String get settings_storageUsage_category_backups;
+
+  /// No description provided for @settings_storageUsage_category_temporary.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary files'**
+  String get settings_storageUsage_category_temporary;
+
+  /// No description provided for @settings_storageUsage_category_exports.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported files'**
+  String get settings_storageUsage_category_exports;
+
+  /// No description provided for @profilePhoto_sheet_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo'**
+  String get profilePhoto_sheet_title;
+
+  /// No description provided for @profilePhoto_source_camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get profilePhoto_source_camera;
+
+  /// No description provided for @profilePhoto_source_library.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Library'**
+  String get profilePhoto_source_library;
+
+  /// No description provided for @profilePhoto_source_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose File'**
+  String get profilePhoto_source_file;
+
+  /// No description provided for @profilePhoto_source_contacts.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Contacts'**
+  String get profilePhoto_source_contacts;
+
+  /// No description provided for @profilePhoto_action_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Photo'**
+  String get profilePhoto_action_remove;
+
+  /// No description provided for @profilePhoto_crop_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Photo'**
+  String get profilePhoto_crop_title;
+
+  /// No description provided for @profilePhoto_crop_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reposition, pinch to zoom'**
+  String get profilePhoto_crop_hint;
+
+  /// No description provided for @profilePhoto_error_tooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'That image is too large to use. Try a smaller one.'**
+  String get profilePhoto_error_tooLarge;
+
+  /// No description provided for @profilePhoto_error_undecodable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read as an image.'**
+  String get profilePhoto_error_undecodable;
+
+  /// No description provided for @profilePhoto_error_contactNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'That contact does not have a photo.'**
+  String get profilePhoto_error_contactNoPhoto;
+
+  /// No description provided for @profilePhoto_error_contactPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Contacts permission is required to choose a photo.'**
+  String get profilePhoto_error_contactPermission;
 }
 
 class _AppLocalizationsDelegate

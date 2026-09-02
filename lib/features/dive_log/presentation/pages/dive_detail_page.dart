@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/dive_detail_section_pairs.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -1660,6 +1661,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   Widget _buildProfileSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Every async chart input below is read through the built-in
+    // AsyncValue.value, which keeps the previous value while a provider
+    // reloads. The valueOrNull polyfill returns null during a reload, and
+    // these providers reload behind any detail change tick (the first-view
+    // safety review write included): the chart would drop its overlays and
+    // estimated pressure series for a frame, then draw them again.
+    //
     // Get profile analysis (async to avoid blocking UI with Buhlmann computation)
     final analysis = ref
         .watch(
@@ -1668,7 +1676,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             sourceId: ref.watch(activeDiveSourceProvider(dive.id)),
           )),
         )
-        .valueOrNull;
+        .value;
 
     // Get marker settings
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
@@ -1681,11 +1689,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Get per-tank pressure data for multi-tank visualization
     final tankPressuresAsync = ref.watch(tankPressuresProvider(dive.id));
-    final tankPressures = tankPressuresAsync.valueOrNull;
+    final tankPressures = tankPressuresAsync.value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(dive.id))
-        .valueOrNull;
+        .value;
 
     // Get playback state
     final playbackState = ref.watch(playbackProvider(dive.id));
@@ -1696,10 +1704,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Profiles grouped by owning data source, plus the active-source and
     // overlay view state driving the whole page.
     final sourceProfiles =
-        ref.watch(sourceProfilesProvider(dive.id)).valueOrNull ??
+        ref.watch(sourceProfilesProvider(dive.id)).value ??
         const <String, SourceProfile>{};
     final dataSources =
-        ref.watch(diveDataSourcesProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(diveDataSourcesProvider(dive.id)).value ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
     final isMultiSource = dataSources.length >= 2;
@@ -1787,7 +1795,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
 
     final photoMedia =
-        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(mediaForDiveProvider(dive.id)).value ?? const [];
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]
         : photoMarkersFromMedia(
@@ -1803,7 +1811,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // ghosted next to the actual logged profile.
     final plannedOverlay = ref
         .watch(plannedProfileOverlayProvider(dive.id))
-        .valueOrNull;
+        .value;
     final overlays = <ChartSourceOverlay>[
       for (final id in overlayIds)
         if (id != activeSource?.id &&
@@ -2043,14 +2051,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             estimatedTankPressures?.pressures ?? tankPressures,
                         estimatedTankIds:
                             estimatedTankPressures?.estimatedTankIds,
-                        gasSwitches: gasSwitchesAsync.valueOrNull,
+                        gasSwitches: gasSwitchesAsync.value,
                         gasSegments:
                             (dive.tanks.isEmpty || chartProfile.isEmpty)
                             ? null
                             : buildGasUsageSegments(
                                 tanks: dive.tanks,
-                                gasSwitches:
-                                    gasSwitchesAsync.valueOrNull ?? const [],
+                                gasSwitches: gasSwitchesAsync.value ?? const [],
                                 diveDurationSeconds:
                                     chartProfile.last.timestamp,
                                 firstSampleSeconds:
@@ -4669,15 +4676,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildBuddyTile(BuildContext context, BuddyWithRole bwr) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: ProfileAvatar(
+        photo: bwr.buddy.photo,
+        initials: bwr.buddy.initials,
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Text(
-          bwr.buddy.initials,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       title: Text(bwr.buddy.name),
       subtitle: Text(bwr.role.localizedName(context.l10n)),
@@ -5257,26 +5259,36 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       instructorId = courseAsync.value!.instructorId;
     }
 
+    // Captured before the sheet closes: the save outlives it, and reporting
+    // a failure needs a messenger that is still in the tree.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+
     showSignatureCaptureSheet(
       context: context,
       initialSignerName: instructorName,
-      onSave: (strokes, signerName) async {
-        // Get the canvas dimensions from the capture widget
-        // Using a reasonable default for signature capture
-        const width = 400.0;
-        const height = 200.0;
-
-        await ref
+      onSave: (strokes, signerName, canvasSize) async {
+        // The strokes are in the capture canvas's own coordinates, so the
+        // PNG is rendered at that exact size. A hardcoded size cropped
+        // every signature drawn on a canvas wider than it (issue #1358).
+        final signature = await ref
             .read(signatureSaveNotifierProvider.notifier)
             .saveFromStrokes(
               diveId: dive.id,
               strokes: strokes,
-              width: width,
-              height: height,
+              width: canvasSize.width,
+              height: canvasSize.height,
               signerName: signerName,
               signerId: instructorId,
               backgroundColor: Colors.white,
             );
+        // A null result means the save threw. Nothing watches the notifier's
+        // AsyncValue, so without this the failure is entirely silent.
+        if (signature == null) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.signatures_error_saveFailed)),
+          );
+        }
       },
     );
   }

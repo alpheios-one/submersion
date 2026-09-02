@@ -33,7 +33,6 @@ void main() {
       final frac = t / durationSec;
       points.add(
         TankPressurePoint(
-          id: 'pp-$tankId-$t',
           tankId: tankId,
           timestamp: t,
           pressure: start + (end - start) * frac,

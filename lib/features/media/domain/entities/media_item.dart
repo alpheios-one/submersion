@@ -177,6 +177,19 @@ class MediaItem extends Equatable {
   /// Returns true if this is a video
   bool get isVideo => mediaType == MediaType.video;
 
+  /// True for a signature of either kind: instructor or buddy.
+  ///
+  /// [MediaType] has no buddy member -- a `buddy_signature` row parses as
+  /// [MediaType.photo] -- so the source type carries the rest. Both halves
+  /// are needed: instructor rows written before the v72 backfill are typed
+  /// only by [mediaType], and buddy rows only by [sourceType].
+  ///
+  /// A signature attaches to a dive but is not a moment within it, so every
+  /// surface that shows dive media excludes them through this.
+  bool get isSignature =>
+      mediaType == MediaType.instructorSignature ||
+      sourceType == MediaSourceType.signature;
+
   /// True for attachment documents (PDFs and opaque files).
   bool get isDocument => mediaType == MediaType.document;
 
