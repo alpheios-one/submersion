@@ -47,6 +47,17 @@ static void expect_ble_match(const char *name, const char *expected_product,
     }
 }
 
+static void expect_no_ble_match(const char *name) {
+    libdc_descriptor_info_t info;
+    memset(&info, 0, sizeof(info));
+    int ok = libdc_descriptor_match(name, LIBDC_TRANSPORT_BLE, &info);
+    if (ok) {
+        fprintf(stderr, "FAIL: \"%s\" resolved to %s %s/0x%02x, expected no match\n",
+                name, info.vendor, info.product, info.model);
+        assert(!ok);
+    }
+}
+
 // The reported device: BLE name "HUD" must resolve to the G2 HUD (0x42),
 // not the family-level "Aladin Sport Matrix" fallback (0x17).
 static void test_hud_resolves_to_g2_hud(void) {
@@ -167,6 +178,53 @@ static void test_symbios_hud_resolves_to_hud(void) {
     printf("PASS: test_symbios_hud_resolves_to_hud\n");
 }
 
+// Issue #123: the Suunto Ocean advertises "S19 <4 hex> LE". dc_filter_oceans
+// prefix-matches the two characters "S1" with strncasecmp, so the Oceans S1
+// descriptor claimed the watch: the download wizard announced a "Recognized
+// Device" and the connect then failed, because Submersion was speaking the
+// Oceans line protocol to a Suunto smartwatch. libdivecomputer has no support
+// for the Ocean (its protocol is still uncaptured upstream), so the only
+// correct answer is to claim nothing.
+//
+// Both the hex group and the MAC address rotate between sessions
+// ("S19 1DFC LE", then "S19 700B LE" five minutes later), so only the "S19"
+// model code and the " LE" suffix are stable enough to match on.
+static void test_suunto_ocean_is_not_claimed_by_oceans_s1(void) {
+    expect_no_ble_match("S19 1DFC LE");
+    expect_no_ble_match("S19 700B LE");
+    printf("PASS: test_suunto_ocean_is_not_claimed_by_oceans_s1\n");
+}
+
+// Advertised names vary in case by Bluetooth stack and firmware, exactly as
+// the alias tables above assume.
+static void test_suunto_ocean_rejection_is_case_insensitive(void) {
+    expect_no_ble_match("s19 1dfc le");
+    expect_no_ble_match("S19 1dfc Le");
+    printf("PASS: test_suunto_ocean_rejection_is_case_insensitive\n");
+}
+
+// The rejection is keyed on the whole observed shape, not on the "S19" model
+// code alone, so it cannot quietly grow to cover names we have never seen.
+static void test_suunto_rejection_requires_the_full_shape(void) {
+    expect_ble_match("S19", "S1", 0);
+    expect_ble_match("S19 1DFC", "S1", 0);
+    expect_ble_match("S19 1DFC LE EXTRA", "S1", 0);
+    printf("PASS: test_suunto_rejection_requires_the_full_shape\n");
+}
+
+// Issue #123 regression guard: the Oceans S1 itself must be untouched. Its
+// real advertised name is documented nowhere: not in libdivecomputer, not in
+// Subsurface, not in the S1 manual, which pairs by QR code. That is exactly
+// why this fix rejects one known-foreign name instead of tightening the "S1"
+// prefix on a guess. Every plausible S1 name still resolves.
+static void test_oceans_s1_names_still_resolve(void) {
+    expect_ble_match("S1", "S1", 0);
+    expect_ble_match("S1 1234", "S1", 0);
+    expect_ble_match("S12345", "S1", 0);
+    expect_ble_match("S1-1234", "S1", 0);
+    printf("PASS: test_oceans_s1_names_still_resolve\n");
+}
+
 int main(void) {
     test_hud_resolves_to_g2_hud();
     test_other_short_aliases_resolve();
@@ -180,6 +238,10 @@ int main(void) {
     test_other_perdix_models_unchanged();
     test_symbios_handset_resolves_to_handset();
     test_symbios_hud_resolves_to_hud();
+    test_suunto_ocean_is_not_claimed_by_oceans_s1();
+    test_suunto_ocean_rejection_is_case_insensitive();
+    test_suunto_rejection_requires_the_full_shape();
+    test_oceans_s1_names_still_resolve();
     printf("\nAll descriptor match integration tests passed.\n");
     return 0;
 }
