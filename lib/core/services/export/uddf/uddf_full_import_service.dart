@@ -487,7 +487,10 @@ class UddfFullImportService {
     final undatedTrips = trips
         .where((trip) => trip['startDate'] == null || trip['endDate'] == null)
         .toList();
-    if (undatedTrips.isEmpty) return;
+    if (undatedTrips.isEmpty) {
+      _dropTripNameDates(trips);
+      return;
+    }
 
     // One pass over the dives, so a large logbook does not pay for a scan per
     // trip.
@@ -524,6 +527,19 @@ class UddfFullImportService {
       if (trip['endDate'] == null && end != null) {
         trip['endDate'] = DateTime(end.year, end.month, end.day);
       }
+    }
+
+    _dropTripNameDates(trips);
+  }
+
+  /// Drops the date recovered from a trip's name once it has been used.
+  ///
+  /// These maps travel across layers, and the payload merger copies every key
+  /// it finds when folding a duplicate trip from a second file, so a scratch
+  /// key left behind does not stay local to parsing.
+  void _dropTripNameDates(List<Map<String, dynamic>> trips) {
+    for (final trip in trips) {
+      trip.remove('nameDate');
     }
   }
 

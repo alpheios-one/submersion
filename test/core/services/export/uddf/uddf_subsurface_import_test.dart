@@ -246,6 +246,15 @@ void main() {
       },
     );
 
+    test('does not leak the date recovered from a trip name', () async {
+      // The trip maps travel across layers, and the payload merger copies
+      // every key it finds when folding a duplicate trip from a second file,
+      // so the scratch key has to be gone by the time parsing returns.
+      final result = await service.importAllDataFromUddf(_subsurfaceUddf);
+
+      expect(result.trips.single.containsKey('nameDate'), isFalse);
+    });
+
     test('dates a trip with no location from the date in its name', () async {
       // Subsurface names a trip "<location><NBSP><date>", so a trip with no
       // location is just the separator and the date. Dart counts U+00A0 as
@@ -265,6 +274,7 @@ void main() {
       expect(trip['location'], isNull);
       expect(trip['startDate'], DateTime(2019, 11, 2));
       expect(trip['endDate'], DateTime(2019, 11, 2));
+      expect(trip.containsKey('nameDate'), isFalse);
     });
 
     test('still reads a divetrip that is itself the trip', () async {

@@ -292,16 +292,22 @@ class UddfImportParsers {
     return GasMix(o2: o2, he: he);
   }
 
-  /// Trailing timezone info on a UDDF datetime: a "Z", or an offset in any of
-  /// the shapes ISO 8601 allows ("+02:00", "+0200", "+02").
+  /// A datetime carrying trailing timezone info: a "Z", or an offset in any
+  /// of the shapes ISO 8601 allows ("+02:00", "+0200", "+02"). Group 1 is the
+  /// datetime with that suffix removed.
   ///
-  /// The lookbehind is what makes the compact forms safe to strip: it demands
-  /// a clock time immediately before the offset, so the trailing "-05" of a
-  /// bare "2008-09-05" cannot be mistaken for one. Without the compact forms
-  /// the suffix survived, [DateTime.parse] applied the offset, and the wall
-  /// clock was stored shifted by it ("08:42:30+0200" landed as 06:42:30).
+  /// Requiring a clock time in front of the offset is what makes the compact
+  /// forms safe to strip: the trailing "-05" of a bare "2008-09-05" cannot be
+  /// mistaken for one. Without the compact forms the suffix survived,
+  /// [DateTime.parse] applied the offset, and the wall clock was stored
+  /// shifted by it ("08:42:30+0200" landed as 06:42:30).
+  ///
+  /// The time is captured rather than asserted with a lookbehind, because
+  /// this package builds for web too, where a Dart RegExp becomes a JS one
+  /// and lookbehind throws on Safari older than 16.4. A static final field
+  /// would take UDDF import down entirely on first use there.
   static final RegExp _timeZoneSuffixPattern = RegExp(
-    r'(?<=\d{2}:\d{2}(?::\d{2})?(?:[.,]\d+)?)\s*(?:Z|[+-]\d{2}:?\d{2}|[+-]\d{2})$',
+    r'^(.*\d{2}:\d{2}(?::\d{2})?(?:[.,]\d+)?)\s*(?:Z|[+-]\d{2}:?\d{2}|[+-]\d{2})$',
   );
 
   /// A date carrying no time, optionally followed by the "T" separator that
@@ -328,7 +334,8 @@ class UddfImportParsers {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return null;
     // Strip any trailing timezone info (Z, +HH:MM, -HH:MM, etc.)
-    final bare = trimmed.replaceFirst(_timeZoneSuffixPattern, '');
+    final bare =
+        _timeZoneSuffixPattern.firstMatch(trimmed)?.group(1) ?? trimmed;
     final dt =
         DateTime.tryParse(bare) ??
         DateTime.tryParse(
