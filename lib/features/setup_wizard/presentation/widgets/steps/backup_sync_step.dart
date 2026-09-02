@@ -33,6 +33,10 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
 
   Future<void> _connect(CloudProviderType type) async {
     final notifier = ref.read(setupWizardProvider(widget.mode).notifier);
+    // Captured before any await: this controller is container-owned, so it
+    // still rolls the selection back if the step is disposed mid-connect,
+    // where reading it off `ref` would throw instead.
+    final selection = ref.read(selectedCloudProviderTypeProvider.notifier);
     setState(() => _connecting = true);
     try {
       if (type == CloudProviderType.dropbox) {
@@ -47,13 +51,18 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
       }
       if (!mounted) return;
       // Activation contract mirrored from CloudSyncPage._selectProvider.
-      ref.read(selectedCloudProviderTypeProvider.notifier).state = type;
+      selection.state = type;
       final instance = cloudProviderInstanceFor(type);
       // Desktop Google Drive authenticates through the system browser, which
       // can take as long as the user does. The shared helper keeps a
       // cancellable wait dialog up so the wizard does not sit frozen with no
       // way out; every other provider and platform authenticates directly.
       await authenticateWithBrowserWait(context, instance, type);
+      // A desktop browser round trip is user-paced and can easily outlast
+      // this step (the user backs out of the wizard while the browser is
+      // up). Both `ref` and the autoDispose draft notifier throw once that
+      // happens, so stop here rather than at the first of them.
+      if (!mounted) return;
       await ref.read(syncInitializerProvider).saveProvider(type);
       ref.read(syncStateProvider.notifier).refreshState();
       notifier.setConnectedProvider(type);
@@ -66,9 +75,9 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
         if (peers.isNotEmpty && mounted) widget.onLibraryFound!();
       }
     } catch (e) {
-      ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
-      notifier.setConnectedProvider(null);
+      selection.state = null;
       if (mounted) {
+        notifier.setConnectedProvider(null);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.setup_sync_error(e))),
         );

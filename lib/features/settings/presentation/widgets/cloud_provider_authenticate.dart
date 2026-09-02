@@ -19,14 +19,19 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// OAuth round trip, with no way to back out.
 ///
 /// Throws [CloudStorageException] if the user cancels.
+///
+/// [debugForceBrowserWait] overrides the platform check so the dialog branch
+/// is reachable in tests on any host; production callers leave it null.
 Future<void> authenticateWithBrowserWait(
   BuildContext context,
   CloudStorageProvider cloudProvider,
-  CloudProviderType provider,
-) async {
+  CloudProviderType provider, {
+  @visibleForTesting bool? debugForceBrowserWait,
+}) async {
   final needsDialog =
-      provider == CloudProviderType.googledrive &&
-      (Platform.isWindows || Platform.isLinux);
+      debugForceBrowserWait ??
+      (provider == CloudProviderType.googledrive &&
+          (Platform.isWindows || Platform.isLinux));
   if (!needsDialog) {
     await cloudProvider.authenticate();
     return;
@@ -54,26 +59,40 @@ Future<void> authenticateWithBrowserWait(
       await showDialog<bool>(
         context: context,
         barrierDismissible: false,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(
-            dialogContext.l10n.settings_cloudSync_googleDrive_browserWait_title,
-          ),
-          content: Text(
-            dialogContext
-                .l10n
-                .settings_cloudSync_googleDrive_browserWait_message,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => closeDialog(true),
-              child: Text(
-                MaterialLocalizations.of(dialogContext).cancelButtonLabel,
-              ),
+        // Cancel is the only way out: a system back gesture or Escape that
+        // popped the route would leave dialogClosed false, so the pending
+        // auth's later closeDialog would pop whatever route is underneath --
+        // the caller's page, or the wizard's first-run screen.
+        builder: (dialogContext) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text(
+              dialogContext
+                  .l10n
+                  .settings_cloudSync_googleDrive_browserWait_title,
             ),
-          ],
+            content: Text(
+              dialogContext
+                  .l10n
+                  .settings_cloudSync_googleDrive_browserWait_message,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => closeDialog(true),
+                child: Text(
+                  MaterialLocalizations.of(dialogContext).cancelButtonLabel,
+                ),
+              ),
+            ],
+          ),
         ),
       ) ??
       false;
+  // Belt and braces for the same hazard: whatever closed the route -- Cancel,
+  // the auth settling, or a pop that slipped past PopScope -- the dialog is
+  // gone by the time showDialog returns, so latch the flag here rather than
+  // trusting every future dismissal path to run through closeDialog.
+  dialogClosed = true;
   if (cancelled) {
     // Abandon the pending flow; the loopback listener times out on its
     // own. Swallow its eventual error so nothing surfaces later.
