@@ -10465,6 +10465,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_sortField_fileSize => 'Dateigröße';
 
   @override
+  String get enum_sortField_lastDive => 'Letzter Tauchgang';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Letzte Wartung';
 
   @override
@@ -15881,6 +15884,16 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' und ';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Änderungen von $deviceList konnten bei der letzten Synchronisierung nicht gelesen werden und wurden daher nicht zusammengeführt. Die nächste Synchronisierung versucht es automatisch erneut.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Änderungen von $deviceList konnten bei der letzten Synchronisierung nicht gelesen werden und wurden daher nicht zusammengeführt. Die nächste Synchronisierung versucht es automatisch erneut.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -35793,6 +35806,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Tauchgänge werden aufgelistet…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge werden aufgelistet… (bisher $count gefunden)',
+      one: 'Tauchgänge werden aufgelistet… (bisher 1 gefunden)',
+      zero: 'Tauchgänge werden aufgelistet…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'Tauchgang $current von $total wird geladen…';
   }
@@ -35803,6 +35828,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Wiederholen';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Mehr laden';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35830,6 +35858,116 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'Bei Garmin Connect anmelden';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Melde dich mit deinem Garmin Connect-Konto an, um deine Tauchgänge direkt zu importieren. Dein Passwort wird nie gespeichert, nur die daraus entstehende Sitzung.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'E-Mail';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Passwort';
+
+  @override
+  String get garminConnect_signIn_passwordRequired =>
+      'Passwort ist erforderlich';
+
+  @override
+  String get garminConnect_signIn_button => 'Anmelden';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Anmeldung läuft…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Angemeldet als $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Verifizierung erforderlich';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Gib den Bestätigungscode ein, der an $method gesendet wurde.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Bestätigungscode';
+
+  @override
+  String get garminConnect_mfa_codeRequired =>
+      'Bestätigungscode ist erforderlich';
+
+  @override
+  String get garminConnect_mfa_button => 'Bestätigen';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Bestätigung läuft…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Tauchgänge werden aufgelistet…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge werden aufgelistet… (bisher $count gefunden)',
+      one: 'Tauchgänge werden aufgelistet… (bisher 1 gefunden)',
+      zero: 'Tauchgänge werden aufgelistet…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Tauchgang $current von $total wird geladen…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle =>
+      'Tauchgänge konnten nicht geladen werden';
+
+  @override
+  String get garminConnect_fetch_retry => 'Wiederholen';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Mehr laden';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+      zero: 'Keine Tauchgänge gefunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.',
+      one:
+          '1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Alle laden';
+
+  @override
   String get importWizard_review_sortTooltip => 'Sortieren';
 
   @override
@@ -35847,6 +35985,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Tauchgänge aus deinem Garmin Connect-Konto importieren';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';

@@ -150,6 +150,39 @@ void main() {
     },
   );
   test(
+    'clearSourceAndProfiles restamps the edited series whose source it deletes',
+    () async {
+      // deleteByComputer never matches the null-computer edit, so the edit
+      // survives the clear while the cascade on the deleted
+      // dive_data_sources row nulls its source_id: ON DELETE SET NULL moves
+      // no updated_at, restamps no hlc and marks nothing pending, so this
+      // device reads the edit as unattributed while every peer still reads
+      // it as owned by the deleted source, permanently.
+      final diveId = await importDive();
+      final sourceId = (await series.getSeriesForDive(diveId)).single.sourceId;
+      final edit = await series.insertSeries(
+        diveId: diveId,
+        sourceId: sourceId,
+        samples: const [ProfileSample(timestamp: 0, depth: 9.0)],
+        now: 1000,
+      );
+      final before = (await series.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == edit);
+      await computers.clearSourceAndProfiles(
+        diveId: diveId,
+        computerId: 'comp-1',
+      );
+      final after = (await series.getRowsForDives([
+        diveId,
+      ])).firstWhere((r) => r.id == edit);
+      expect(after.sourceId, isNull);
+      expect(after.updatedAt, greaterThan(before.updatedAt));
+      expect(after.hlc, isNot(before.hlc));
+    },
+  );
+
+  test(
     'the computer list survives a series whose blob will not decode',
     () async {
       // These questions are about identity columns, which live unencoded on

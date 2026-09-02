@@ -4,16 +4,25 @@
 /// Flutter, only what a headless isolate can run.
 library;
 
+import 'package:submersion/core/utils/number_utils.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 
 /// Reads a legacy `dive_profiles` row by column name. Absent columns (an
 /// older fixture or a partially migrated table) read as null. Returns null
-/// when the row has no timestamp or depth: a restored or hand-repaired
-/// legacy table can hold such rows and they cannot become a sample.
+/// when the row has no READABLE timestamp or depth: a restored or
+/// hand-repaired legacy table can hold such rows and they cannot become a
+/// sample.
+///
+/// `is! num` rather than a null check, because the two are the same thing
+/// here. SQLite carries a storage class per value, so a REAL-affinity
+/// column can hold text it could not convert, and a cast would throw. The
+/// packer catches that per DIVE, so one unreadable byte would cost the
+/// dive its whole profile and keep its legacy rows back for a retry that
+/// re-reads the same byte and fails identically, forever.
 ProfileSample? profileSampleOf(Map<String, Object?> data) {
-  final timestamp = data['timestamp'] as num?;
-  final depth = data['depth'] as num?;
-  if (timestamp == null || depth == null) return null;
+  final timestamp = data['timestamp'];
+  final depth = data['depth'];
+  if (timestamp is! num || depth is! num) return null;
   return ProfileSample(
     timestamp: timestamp.toInt(),
     depth: depth.toDouble(),
@@ -46,6 +55,16 @@ ProfileSample? profileSampleOf(Map<String, Object?> data) {
   );
 }
 
-double? realOf(Object? value) => (value as num?)?.toDouble();
+/// One OPTIONAL sample field, or null when the stored value is not a number.
+///
+/// SQLite carries a storage class per value, not per column, so a
+/// REAL-affinity column in a restored or hand-repaired file can hold text it
+/// could not convert. A cast would throw, and the packer's isolation is
+/// per DIVE: one unreadable pressure reading would cost that dive its entire
+/// profile, permanently, because nothing reads the legacy tables after v183.
+/// Degrading the one field is the proportionate answer. `timestamp` and
+/// `depth` above are deliberately NOT read this way: without them there is
+/// no sample, so the row is skipped as a whole.
+double? realOf(Object? value) => asDoubleOrNull(value);
 
-int? intOf(Object? value) => (value as num?)?.toInt();
+int? intOf(Object? value) => value is num ? value.toInt() : null;
