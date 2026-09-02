@@ -17,6 +17,13 @@ class CapturingMediaRepository implements MediaRepository {
   }) async => writes.add((id: id, isOrphaned: isOrphaned));
 
   @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not stubbed');
+  dynamic noSuchMethod(Invocation invocation) {
+    // Symbol.toString() renders as Symbol("name"); report just the name so
+    // the failure reads as the method that was called.
+    final name = invocation.memberName
+        .toString()
+        .replaceFirst(RegExp(r'^Symbol\("'), '')
+        .replaceFirst(RegExp(r'"\)$'), '');
+    throw UnimplementedError('CapturingMediaRepository.$name is not stubbed');
+  }
 }
