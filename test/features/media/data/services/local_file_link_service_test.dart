@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:path/path.dart' as p;
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/local_bookmark_storage.dart';
 import 'package:submersion/features/media/data/services/local_file_handle_factory.dart';
@@ -24,6 +25,15 @@ MediaItem _saved(MediaItem item) => item.copyWith(
 void main() {
   late MockMediaRepository repo;
   late List<String> created;
+  late Directory tmp;
+
+  /// A real file, because the service refuses to link a path that does not
+  /// exist. Returns the path.
+  String photo(String name) {
+    final f = File(p.join(tmp.path, name));
+    f.writeAsBytesSync([1, 2, 3]);
+    return f.path;
+  }
 
   LocalFileLinkService service({
     MediaSourceMetadata? metadata,
@@ -45,7 +55,8 @@ void main() {
     );
   }
 
-  setUp(() {
+  setUp(() async {
+    tmp = await Directory.systemTemp.createTemp('local_file_link_');
     repo = MockMediaRepository();
     created = [];
     when(repo.createMedia(any)).thenAnswer(
@@ -53,10 +64,29 @@ void main() {
     );
   });
 
+  tearDown(() => tmp.delete(recursive: true));
+
+  test(
+    'a path with no file behind it throws instead of writing a row',
+    () async {
+      final linked = <String>{};
+      await expectLater(
+        service().linkFileForDive(
+          path: p.join(tmp.path, 'gone.jpg'),
+          diveId: 'dive-1',
+          linkedPaths: linked,
+        ),
+        throwsA(isA<FileSystemException>()),
+      );
+      verifyNever(repo.createMedia(any));
+      expect(linked, isEmpty);
+    },
+  );
+
   test('links the file in place as a localFile row, copying nothing', () async {
     final linked = <String>{};
     final item = await service().linkFileForDive(
-      path: '/photos/shark.jpg',
+      path: photo('shark.jpg'),
       diveId: 'dive-1',
       linkedPaths: linked,
       caption: 'Shark!',
@@ -67,7 +97,7 @@ void main() {
     final saved =
         verify(repo.createMedia(captureAny)).captured.single as MediaItem;
     expect(saved.sourceType, MediaSourceType.localFile);
-    expect(saved.localPath, '/photos/shark.jpg');
+    expect(saved.localPath, p.join(tmp.path, 'shark.jpg'));
     // No app-owned copy: filePath is the copy slot and stays empty.
     expect(saved.filePath, isNull);
     expect(saved.diveId, 'dive-1');
@@ -75,14 +105,15 @@ void main() {
     expect(saved.caption, 'Shark!');
     expect(saved.mediaType, MediaType.photo);
     expect(saved.takenAt, DateTime.utc(2025, 1, 15, 10));
-    expect(linked, contains('/photos/shark.jpg'));
+    expect(linked, contains(p.join(tmp.path, 'shark.jpg')));
     expect(created, ['media-shark.jpg']);
   });
 
   test('an already-linked path is skipped and nothing is written', () async {
-    final linked = <String>{'/photos/shark.jpg'};
+    final path = photo('shark.jpg');
+    final linked = <String>{path};
     final item = await service().linkFileForDive(
-      path: '/photos/shark.jpg',
+      path: path,
       diveId: 'dive-1',
       linkedPaths: linked,
     );
@@ -103,14 +134,14 @@ void main() {
     );
 
     await service(metadata: exif).linkFileForDive(
-      path: '/photos/a.jpg',
+      path: photo('a.jpg'),
       diveId: 'dive-1',
       linkedPaths: {},
       takenAt: DateTime.utc(2025, 1, 15, 10, 3, 20),
       fallbackTakenAt: DateTime.utc(2025, 1, 15, 10),
     );
     await service(metadata: exif).linkFileForDive(
-      path: '/photos/b.jpg',
+      path: photo('b.jpg'),
       diveId: 'dive-1',
       linkedPaths: {},
       fallbackTakenAt: DateTime.utc(2025, 1, 15, 10),
@@ -132,7 +163,7 @@ void main() {
     await service(
       metadata: const MediaSourceMetadata(mimeType: 'video/mp4'),
     ).linkFileForDive(
-      path: '/photos/clip.mp4',
+      path: photo('clip.mp4'),
       diveId: 'dive-1',
       linkedPaths: {},
     );
@@ -143,7 +174,7 @@ void main() {
 
   test('unreadable metadata does not block the link', () async {
     final item = await service(metadataThrows: true).linkFileForDive(
-      path: '/photos/a.jpg',
+      path: photo('a.jpg'),
       diveId: 'dive-1',
       linkedPaths: {},
       fallbackTakenAt: DateTime.utc(2025),
@@ -161,7 +192,7 @@ void main() {
       final linked = <String>{};
       await expectLater(
         service().linkFileForDive(
-          path: '/photos/a.jpg',
+          path: photo('a.jpg'),
           diveId: 'dive-1',
           linkedPaths: linked,
         ),

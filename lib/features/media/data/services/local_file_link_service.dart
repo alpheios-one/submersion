@@ -53,6 +53,7 @@ class LocalFileLinkService {
 
   /// Links [path] to [diveId], or returns null when [linkedPaths] already
   /// holds the path so a re-run of the same import never double-links.
+  /// Throws a [FileSystemException] when nothing exists at [path].
   ///
   /// [takenAt] is a capture time the source asserted (a logbook's own
   /// offset from dive start); it wins over the file's EXIF time, which wins
@@ -72,10 +73,17 @@ class LocalFileLinkService {
       _log.info('Skipping already-linked $path for dive $diveId');
       return null;
     }
+    // Fail fast rather than write a row that is broken from birth: a file
+    // can vanish between the wizard resolving it and the import committing,
+    // and the attach loop counts a thrown link as a failure it can report.
+    final file = File(path);
+    if (!file.existsSync()) {
+      throw FileSystemException('Photo not found', path);
+    }
 
     MediaSourceMetadata? metadata;
     try {
-      metadata = await _readMetadata(File(path));
+      metadata = await _readMetadata(file);
     } catch (e) {
       // Metadata is a nicety; the link itself must not depend on a
       // readable EXIF block.
