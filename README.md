@@ -14,192 +14,129 @@ all fits in the same logbook.
 
 Free and open source, on iOS, Android, macOS, Windows and Linux.
 
-<table>
-<tr>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/01-dive-logging.jpg" alt="Dive list beside a dive detail pane with header statistics, the dive profile with events, deco status, oxygen exposure and tissue loading">
-<br><sub><em>A dive's detail pane: header stats, the profile with events, deco status, oxygen exposure and tissue loading.</em></sub>
-</td>
-<td width="42%">
-<h3>Comprehensive Dive Logging</h3>
-<p>Every dive, fully detailed and in your control.</p>
-<ul>
-<li>Depth, duration, temperatures, conditions, weather and tide</li>
-<li>Any number of cylinders: air, nitrox, trimix, CCR and SCR</li>
-<li>Buddies, divemasters, trips, tags, ratings and signatures</li>
-<li>Cards, or a sortable table with the columns you choose</li>
-</ul>
-</td>
-</tr>
-</table>
+<img align="left" width="50%" src="docs/assets/screenshots/readme/01-dive-logging.jpg" alt="Dive list beside a dive detail pane with header statistics, the dive profile with events, deco status, oxygen exposure and tissue loading">
 
-<table>
-<tr>
-<td width="42%">
-<h3>Profile &amp; Decompression Analysis</h3>
-<p>Serious technical-diving instrumentation.</p>
-<ul>
-<li>B&uuml;hlmann ZH-L16C with your own gradient factors</li>
-<li>All 16 tissue compartments, nitrogen and helium</li>
-<li>CNS%, OTU and ppO&#8322; with daily and weekly totals</li>
-<li>Your computer's NDL, ceiling and TTS beside the model's</li>
-</ul>
-</td>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/02-profile-deco.jpg" alt="Tissue loading panel with a bar per compartment and a heat map of on-gassing and off-gassing over the dive">
-<br><sub><em>Tissue loading for all 16 compartments, and how each one loaded and unloaded through the dive.</em></sub>
-</td>
-</tr>
-</table>
+### Comprehensive Dive Logging
 
-<table>
-<tr>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/03-dive-computers.jpg" alt="Dive computer download review step showing a 70 percent match against an existing dive, both profiles overlaid, and four resolution actions">
-<br><sub><em>The review step of a download: a likely duplicate shown against the existing dive, both profiles overlaid, and the four ways to resolve it.</em></sub>
-</td>
-<td width="42%">
-<h3>350+ Dive Computers</h3>
-<p>Download straight from your computer.</p>
-<ul>
-<li>30 manufacturers over Bluetooth LE and USB</li>
-<li>Incremental downloads: only what is new</li>
-<li>Duplicate review with four ways to resolve a match</li>
-<li>Two computers on one dive, profiles overlaid</li>
-</ul>
-</td>
-</tr>
-</table>
+Every dive, fully detailed and in your control.
+
+- Depth, duration, temperatures, conditions, weather and tide
+- Any number of cylinders: air, nitrox, trimix, CCR and SCR
+- Buddies, divemasters, trips, tags, ratings and signatures
+- Cards, or a sortable table with the columns you choose
+
+<br clear="all"><br>
+
+<img align="right" width="50%" src="docs/assets/screenshots/readme/02-profile-deco.jpg" alt="Tissue loading panel with a bar per compartment and a heat map of on-gassing and off-gassing over the dive">
+
+### Profile &amp; Decompression Analysis
+
+Serious technical-diving instrumentation.
+
+- B&uuml;hlmann ZH-L16C with your own gradient factors
+- All 16 tissue compartments, nitrogen and helium
+- CNS%, OTU and ppO&#8322; with daily and weekly totals
+- Your computer's NDL, ceiling and TTS beside the model's
+
+<br clear="all"><br>
+
+<img align="left" width="50%" src="docs/assets/screenshots/readme/03-dive-computers.jpg" alt="Dive computer download review step showing a 70 percent match against an existing dive, both profiles overlaid, and four resolution actions">
+
+### 350+ Dive Computers
+
+Download straight from your computer.
+
+- 30 manufacturers over Bluetooth LE and USB
+- Incremental downloads: only what is new
+- Duplicate review with four ways to resolve a match
+- Two computers on one dive, profiles overlaid
+
+<br clear="all"><br>
 
 > **Confirmed working:** Shearwater Teric, Aqualung i300C, Aqualung i330R. Have a
 > different dive computer? [Help us expand this list](https://github.com/submersion-app/submersion/issues);
 > we are looking for testers.
 
-<table>
-<tr>
-<td width="42%">
-<h3>Sites, Maps &amp; Marine Life</h3>
-<p>Where you dove, and what lives there.</p>
-<ul>
-<li>3,600 dive sites and 3,600 dive centers built in</li>
-<li>Clustering, a dive heat map, and offline map regions</li>
-<li>Bathymetry overlays and 3D seafloor terrain</li>
-<li>685 species, recorded per dive and per site</li>
-</ul>
-</td>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/04-sites-maps.jpg" alt="Dive site list beside an interactive map with clustered markers and a dive heat map">
-<br><sub><em>Sites beside the map, with clustering and the heat map on.</em></sub>
-</td>
-</tr>
-</table>
+<img align="right" width="50%" src="docs/assets/screenshots/readme/04-sites-maps.jpg" alt="Dive site list beside an interactive map with clustered markers and a dive heat map">
 
-<table>
-<tr>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/05-planning.jpg" alt="Dive planner with a multi-segment profile, gas list and decompression schedule">
-<br><sub><em>A plan as segments, with the schedule the model produces.</em></sub>
-</td>
-<td width="42%">
-<h3>Dive Planning &amp; Gas</h3>
-<p>Plan with the gas, gear and tissues you will actually have.</p>
-<ul>
-<li>Multi-segment plans for OC, CCR, SCR and PSCR</li>
-<li>Bailout checked against the worst moment of the profile</li>
-<li>Contingencies, range tables and repetitive-dive seeding</li>
-<li>MOD, best mix, rock bottom, and a real-gas blender</li>
-</ul>
-</td>
-</tr>
-</table>
+### Sites, Maps &amp; Marine Life
 
-<table>
-<tr>
-<td width="42%">
-<h3>Photos, Gear &amp; Certifications</h3>
-<p>The rest of what a dive leaves behind.</p>
-<ul>
-<li>Photos and video matched to a dive by capture time</li>
-<li>Each shot marked at its depth on the profile</li>
-<li>Equipment with service schedules, reminders and costs</li>
-<li>A wallet of certification cards, plus courses and checklists</li>
-</ul>
-</td>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/06-photos-gear.jpg" alt="A dive video shown full screen with a dive computer face overlay reading depth, NDL, time, gas and tank pressure, and a small dive profile marking the moment it was taken">
-<br><sub><em>A photo or video full screen, with what your computer read at that moment and where it sits on the profile.</em></sub>
-</td>
-</tr>
-</table>
+Where you dove, and what lives there.
 
-<table>
-<tr>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/07-statistics.jpg" alt="Dive statistics overview in dark mode with totals, personal records and most visited sites">
-<br><sub><em>Statistics: totals, records, and nine more pages behind them.</em></sub>
-</td>
-<td width="42%">
-<h3>Statistics &amp; Records</h3>
-<p>See your diving life at a glance.</p>
-<ul>
-<li>Ten pages: totals, progression, conditions, gas and more</li>
-<li>Personal records: deepest, longest, coldest, warmest</li>
-<li>Breakdowns by year, country, site and dive type</li>
-<li>SAC trends, depth distribution and ascent-rate analysis</li>
-</ul>
-</td>
-</tr>
-</table>
+- 3,600 dive sites and 3,600 dive centers built in
+- Clustering, a dive heat map, and offline map regions
+- Bathymetry overlays and 3D seafloor terrain
+- 685 species, recorded per dive and per site
 
-<table>
-<tr>
-<td width="42%">
-<h3>Your Data, Encrypted</h3>
-<p>No server. No account. No lock-in.</p>
-<ul>
-<li>SQLite encrypted at rest, opened with Face ID, Touch ID or a passphrase</li>
-<li>End-to-end encrypted sync through your own iCloud, Google Drive, Dropbox or S3</li>
-<li>Encrypted backups, one taken automatically before every upgrade</li>
-<li>Export to UDDF 3.2, CSV, Excel, KML, GPX and printable PDF</li>
-</ul>
-</td>
-<td width="58%">
-<img src="docs/assets/screenshots/readme/08-your-data.jpg" alt="Data settings with backup and restore, database cloud sync, photo and media sources, database storage, offline maps and data quality">
-<br><sub><em>Backup, sync, storage and offline maps, all under one settings page.</em></sub>
-</td>
-</tr>
-</table>
+<br clear="all"><br>
 
-<table>
-<tr>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/09-profile-player.jpg" alt="Full-screen dive profile playback with depth, temperature, NDL, ppO2 and tank pressure over time">
-<br><sub><em>Full-screen playback with depth, temperature, NDL, ppO&#8322; and tank pressure on one timeline.</em></sub>
-</td>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/10-tissue-3d.jpg" alt="Three-dimensional landscape of the 16 tissue compartments over the course of a dive">
-<br><sub><em>The 16 tissue compartments as a landscape that rises and falls through the dive.</em></sub>
-</td>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/11-site-terrain.jpg" alt="Three-dimensional seafloor terrain of a dive site with the dive's estimated path drawn on it">
-<br><sub><em>A site's 3D seafloor from bathymetry data, with the dive's estimated path.</em></sub>
-</td>
-</tr>
-<tr>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/12-marine-life.jpg" alt="Marine life statistics with species sightings">
-<br><sub><em>Species sightings across the log.</em></sub>
-</td>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/13-gas-blender.jpg" alt="Trimix blender showing the partial-pressure fill procedure and fill cost">
-<br><sub><em>The blender: fill procedure for the target mix, and what the fill costs.</em></sub>
-</td>
-<td width="33%">
-<img src="docs/assets/screenshots/readme/14-themes.jpg" alt="Theme gallery showing the five app themes">
-<br><sub><em>Five themes, each in light and dark.</em></sub>
-</td>
-</tr>
-</table>
+<img align="left" width="50%" src="docs/assets/screenshots/readme/05-planning.jpg" alt="Dive planner with a multi-segment profile, gas list and decompression schedule">
+
+### Dive Planning &amp; Gas
+
+Plan with the gas, gear and tissues you will actually have.
+
+- Multi-segment plans for OC, CCR, SCR and PSCR
+- Bailout checked against the worst moment of the profile
+- Contingencies, range tables and repetitive-dive seeding
+- MOD, best mix, rock bottom, and a real-gas blender
+
+<br clear="all"><br>
+
+<img align="right" width="50%" src="docs/assets/screenshots/readme/06-photos-gear.jpg" alt="A dive video shown full screen with a dive computer face overlay reading depth, NDL, time, gas and tank pressure, and a small dive profile marking the moment it was taken">
+
+### Photos, Gear &amp; Certifications
+
+The rest of what a dive leaves behind.
+
+- Photos and video matched to a dive by capture time
+- Each shot marked at its depth on the profile
+- Equipment with service schedules, reminders and costs
+- A wallet of certification cards, plus courses and checklists
+
+<br clear="all"><br>
+
+<img align="left" width="50%" src="docs/assets/screenshots/readme/07-statistics.jpg" alt="Dive statistics overview in dark mode with totals, personal records and most visited sites">
+
+### Statistics &amp; Records
+
+See your diving life at a glance.
+
+- Ten pages: totals, progression, conditions, gas and more
+- Personal records: deepest, longest, coldest, warmest
+- Breakdowns by year, country, site and dive type
+- SAC trends, depth distribution and ascent-rate analysis
+
+<br clear="all"><br>
+
+<img align="right" width="50%" src="docs/assets/screenshots/readme/08-your-data.jpg" alt="Data settings with backup and restore, database cloud sync, photo and media sources, database storage, offline maps and data quality">
+
+### Your Data, Encrypted
+
+No server. No account. No lock-in.
+
+- SQLite encrypted at rest, opened with Face ID, Touch ID or a passphrase
+- End-to-end encrypted sync through your own iCloud, Google Drive, Dropbox or S3
+- Encrypted backups, one taken automatically before every upgrade
+- Export to UDDF 3.2, CSV, Excel, KML, GPX and printable PDF
+
+<br clear="all"><br>
+
+<p align="center">
+  <img width="32%" src="docs/assets/screenshots/readme/09-profile-player.jpg" alt="Full-screen dive profile playback with depth, temperature, NDL, ppO2 and tank pressure over time">
+  <img width="32%" src="docs/assets/screenshots/readme/10-tissue-3d.jpg" alt="Three-dimensional landscape of the 16 tissue compartments over the course of a dive">
+  <img width="32%" src="docs/assets/screenshots/readme/11-site-terrain.jpg" alt="Three-dimensional seafloor terrain of a dive site with the dive's estimated path drawn on it">
+</p>
+
+<p align="center"><sub>Full-screen profile playback &middot; The 16 tissue compartments as a landscape &middot; A site's 3D seafloor with the dive's path</sub></p>
+
+<p align="center">
+  <img width="32%" src="docs/assets/screenshots/readme/12-marine-life.jpg" alt="Marine life statistics with species sightings">
+  <img width="32%" src="docs/assets/screenshots/readme/13-gas-blender.jpg" alt="Trimix blender showing the partial-pressure fill procedure and fill cost">
+  <img width="32%" src="docs/assets/screenshots/readme/14-themes.jpg" alt="Theme gallery showing the five app themes">
+</p>
+
+<p align="center"><sub>Species sightings across the log &middot; The blender's fill procedure and cost &middot; Five themes, each in light and dark</sub></p>
 
 ## Why Submersion?
 
