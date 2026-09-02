@@ -11,6 +11,8 @@ import 'package:submersion/features/universal_import/data/models/import_payload.
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/services/dive_computer_descriptor_index.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_raw_types.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_samples_decoder.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_sqlite_sample.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_converter.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
@@ -71,9 +73,14 @@ typedef MacDiveRawPrePass = Uint8List? Function(Uint8List raw);
 ///
 /// Not every dive has `ZRAWDATA` at all: presence tracks how the dive entered
 /// MacDive (a native download versus manual entry or a file import) rather
-/// than the vendor. `ZSAMPLES` is AES-encrypted with a per-dive key and
-/// remains undecodable, but where a dive has both columns the `ZRAWDATA` one
-/// is the readable one.
+/// than the vendor. Every dive MacDive ever drew a profile for does have
+/// `ZSAMPLES`, its own copy of that profile, which [MacDiveSamplesDecoder]
+/// reads without the platform channel. It carries fewer channels than the raw
+/// download (no per-cell ppO2, no deco settings, no events), so it is the
+/// fallback rather than the first choice: a dive lands on it when it has no
+/// `ZRAWDATA`, when the raw parse is rejected, or when this platform cannot
+/// reach libdivecomputer at all. Only a dive with profile bytes in neither
+/// readable form counts toward the aggregated warning.
 class MacDiveDiveMapper {
   const MacDiveDiveMapper._();
 
@@ -152,71 +159,44 @@ class MacDiveDiveMapper {
         converter,
         multiDiver: diverNames.length > 1,
       );
+      var attached = false;
       if (ffiAvailable && _hasRawProfile(d)) {
         try {
-          if (!await _attachProfile(d, map, parse, descriptors)) undecoded++;
+          attached = await _attachProfile(d, map, parse, descriptors);
         } on MissingPluginException {
           ffiAvailable = false;
         } on PlatformException catch (e) {
           if (e.code == 'UNSUPPORTED' || e.code == 'channel-error') {
             ffiAvailable = false;
-          } else {
-            undecoded++;
           }
         } catch (_) {
           // A single corrupt blob must not abort a 500-dive import.
-          undecoded++;
         }
-      } else if (_hasRawProfile(d)) {
-        undecoded++;
       }
+      // Whatever kept the raw download from producing a profile, MacDive's
+      // own copy of the samples is still there to read.
+      if (!attached) attached = _attachSamples(d, map, converter);
+      if (!attached && _hasProfileBytes(d)) undecoded++;
       diveMaps.add(map);
     }
 
-    // Aggregated warnings, one per cause, so a 500-dive import does not
-    // produce 500 identical summary lines.
-    if (!ffiAvailable) {
-      warnings.add(
-        const ImportWarning(
-          severity: ImportWarningSeverity.info,
-          message:
-              'Dive profiles could not be decoded on this platform. Dive '
-              'details were imported without depth profiles.',
-          entityType: ImportEntityType.dives,
-        ),
-      );
-    } else if (undecoded > 0) {
+    // One aggregated warning, so a 500-dive import does not produce 500
+    // identical summary lines. Its wording depends on why: with no platform
+    // channel the raw downloads were never tried, whereas with one they were
+    // tried and rejected, and then MacDive's own samples could not be read
+    // either, which is the case the XML export can still rescue.
+    if (undecoded > 0) {
       warnings.add(
         ImportWarning(
           severity: ImportWarningSeverity.info,
-          message:
-              '$undecoded dive(s) had profile data Submersion could not '
-              'decode. To import those profiles, export from MacDive as XML '
-              '(File > Export > MacDive XML) and import that file instead.',
-          entityType: ImportEntityType.dives,
-        ),
-      );
-    }
-
-    // Dives that MacDive did not download itself - manual entries and file
-    // imports - keep their samples only in the encrypted ZSAMPLES column, so
-    // there is nothing to decode for them regardless of which computer they
-    // name.
-    final encryptedOnly = logbook.dives
-        .where(
-          (d) =>
-              (d.samplesBlob?.isNotEmpty ?? false) &&
-              !(d.rawDataBlob?.isNotEmpty ?? false),
-        )
-        .length;
-    if (encryptedOnly > 0) {
-      warnings.add(
-        ImportWarning(
-          severity: ImportWarningSeverity.info,
-          message:
-              '$encryptedOnly dive(s) store their profile in a MacDive format '
-              'Submersion cannot read. Export those from MacDive as XML '
-              '(File > Export > MacDive XML) to import their profiles.',
+          message: ffiAvailable
+              ? '$undecoded dive(s) had profile data Submersion could not '
+                    'decode. To import those profiles, export from MacDive '
+                    'as XML (File > Export > MacDive XML) and import that '
+                    'file instead.'
+              : '$undecoded dive(s) had dive computer data that could not be '
+                    'decoded on this platform. Their details were imported '
+                    'without depth profiles.',
           entityType: ImportEntityType.dives,
         ),
       );
@@ -309,6 +289,80 @@ class MacDiveDiveMapper {
 
   static bool _hasRawProfile(MacDiveRawDive d) =>
       d.rawDataBlob != null && d.rawDataBlob!.isNotEmpty;
+
+  static bool _hasSamples(MacDiveRawDive d) =>
+      d.samplesBlob != null && d.samplesBlob!.isNotEmpty;
+
+  /// Whether the dive stores a profile in either column, i.e. whether ending
+  /// up without one is worth telling the user about.
+  static bool _hasProfileBytes(MacDiveRawDive d) =>
+      _hasRawProfile(d) || _hasSamples(d);
+
+  /// Decodes [d]'s `ZSAMPLES` into profile samples on [map]. Returns false
+  /// when the column is absent or unreadable. An empty sample array is a
+  /// successful decode of a dive MacDive itself shows no profile for, so it
+  /// returns true and attaches nothing.
+  static bool _attachSamples(
+    MacDiveRawDive d,
+    Map<String, dynamic> map,
+    MacDiveUnitConverter converter,
+  ) {
+    if (!_hasSamples(d)) return false;
+    final samples = MacDiveSamplesDecoder.decode(d.samplesBlob!);
+    if (samples == null) return false;
+    if (samples.isEmpty) return true;
+
+    map['profile'] = [for (final s in samples) _samplePoint(s, converter)];
+    // As with the raw path, MacDive's scalar fields win where it has them.
+    final maxDepth = samples
+        .map((s) => s.depthMeters)
+        .reduce((a, b) => a > b ? a : b);
+    if (maxDepth > 0) map['maxDepth'] ??= maxDepth;
+    final temps = samples
+        .map((s) => s.temperatureCelsius)
+        .whereType<double>()
+        .toList();
+    if (temps.isNotEmpty) {
+      map['waterTemp'] ??= temps.reduce((a, b) => a < b ? a : b);
+    }
+    final last = samples.last.time;
+    if (last > Duration.zero) map['runtime'] ??= last;
+    return true;
+  }
+
+  /// One profile point in the shape `UddfEntityImporter` reads, matching the
+  /// keys `MacDiveXmlParser` emits for the same fields. Pressures come out of
+  /// the column in the diver's display unit, like the tank columns, so they
+  /// go through [converter]; depth and temperature are already SI. A zero
+  /// pressure, ppO2 or heart rate is MacDive's "no reading" and is left out
+  /// rather than charted as a real value.
+  static Map<String, dynamic> _samplePoint(
+    MacDiveSqliteSample s,
+    MacDiveUnitConverter converter,
+  ) {
+    final point = <String, dynamic>{
+      'timestamp': s.time.inSeconds,
+      'depth': s.depthMeters,
+    };
+    if (s.temperatureCelsius != null) {
+      point['temperature'] = s.temperatureCelsius;
+    }
+    final pressures = <Map<String, dynamic>>[
+      for (final (index, raw) in [s.pressure, s.pressure2].indexed)
+        if (raw != null && raw > 0)
+          {'pressure': converter.pressureToBar(raw), 'tankIndex': index},
+    ];
+    if (pressures.isNotEmpty) point['allTankPressures'] = pressures;
+    if (s.ppO2 != null && s.ppO2! > 0) point['ppO2'] = s.ppO2;
+    if (s.heartRate != null && s.heartRate! > 0) {
+      point['heartRate'] = s.heartRate;
+    }
+    if (s.ndtMinutes != null) point['ndl'] = s.ndtMinutes! * 60;
+    if (s.ttsMinutes != null) point['tts'] = s.ttsMinutes! * 60;
+    final stop = s.nextStopDepthMeters;
+    if (stop != null && stop > 0) point['ceiling'] = stop;
+    return point;
+  }
 
   /// Vendors whose `ZRAWDATA` is not yet in the layout libdivecomputer's
   /// parsers read, keyed by the descriptor vendor name.
