@@ -13,13 +13,17 @@ Requires Pillow (`pip3 install --user Pillow`).
 
 import os
 import sys
+from collections import Counter
 
 from PIL import Image
 
 # Paths are anchored to this file, not the working directory, so the script
-# behaves the same from the repo root, a subdirectory, or a worktree. This
-# file lives at <repo>/scripts/readme/, so the repo root is three levels up.
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# behaves the same from the repo root, a subdirectory, or a worktree.
+# This file is <repo>/scripts/readme/import_website_shots.py: its directory
+# is scripts/readme, the parent of that is scripts, and the parent of that
+# is the repo root.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(os.path.dirname(_HERE))
 DEFAULT_SRC = os.path.join(os.path.dirname(REPO_ROOT), "submersion-website", "screenshots")
 OUT_DIR = os.path.join(REPO_ROOT, "docs", "assets", "screenshots", "readme")
 
@@ -116,7 +120,7 @@ def main():
     # A duplicated output name in MAPPING would overwrite an earlier image
     # with no error and leave the README showing the wrong screen.
     outputs = [out for _, out, _ in MAPPING]
-    dupes = sorted({out for out in outputs if outputs.count(out) > 1})
+    dupes = sorted(out for out, n in Counter(outputs).items() if n > 1)
     if dupes:
         sys.exit("MAPPING has duplicate output names: " + ", ".join(dupes))
 
