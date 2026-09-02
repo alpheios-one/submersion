@@ -1,7 +1,8 @@
 # README asset generators
 
 `import_website_shots.py` regenerates every image embedded in the top-level
-`README.md`. Run it from the repo root. It requires Pillow
+`README.md`. It resolves its paths from its own location, so it can be run
+from any directory. It requires Pillow
 (`pip3 install --user Pillow`).
 
 ```bash

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Import the website's screenshots into the README asset directory.
 
-Run from the repo root:  python3 scripts/readme/import_website_shots.py [SRC_DIR]
+Run from anywhere:  python3 scripts/readme/import_website_shots.py [SRC_DIR]
 
 Source images live in the sibling submersion-website repository
 (https://github.com/submersion-app/submersion-website) under `screenshots/`.
@@ -15,8 +15,12 @@ import sys
 
 from PIL import Image
 
-DEFAULT_SRC = "../submersion-website/screenshots"
-OUT_DIR = "docs/assets/screenshots/readme"
+# Paths are anchored to this file, not the working directory, so the script
+# behaves the same from the repo root, a subdirectory, or a worktree. This
+# file lives at <repo>/scripts/readme/, so the repo root is three levels up.
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_SRC = os.path.join(os.path.dirname(REPO_ROOT), "submersion-website", "screenshots")
+OUT_DIR = os.path.join(REPO_ROOT, "docs", "assets", "screenshots", "readme")
 
 SHOWCASE_WIDTH = 1600
 GALLERY_WIDTH = 900
@@ -75,7 +79,14 @@ def flatten(img):
 
         left = next((x for x in range(width) if alpha[x, y] >= OPAQUE), None)
         if left is None:
-            continue  # fully transparent row: nothing to extend from
+            # Nothing in this row to extend from. Leaving it would bake the
+            # black beneath the alpha into the JPEG as a dark band, so stop
+            # and say so rather than invent pixels: this fill handles rounded
+            # corners, not transparent margins or drop shadows.
+            raise ValueError(
+                f"row {y} has no pixel with alpha >= {OPAQUE}; the corner fill "
+                "only handles rounded corners, not transparent margins or shadows"
+            )
         right = next(x for x in range(width - 1, -1, -1) if alpha[x, y] >= OPAQUE)
 
         fill = pixels[left, y][:3] + (255,)
@@ -113,7 +124,10 @@ def main():
         # so close it here rather than leaving it to the garbage collector.
         # flatten() returns a new image, which stays valid past the with block.
         with Image.open(src) as src_img:
-            img = flatten(src_img)
+            try:
+                img = flatten(src_img)
+            except ValueError as err:
+                sys.exit(f"{src}: {err}")
         height = round(img.height * width / img.width)
         img = img.resize((width, height), Image.LANCZOS)
 
@@ -122,7 +136,8 @@ def main():
 
         size = os.path.getsize(out)
         total += size
-        print(f"wrote {out} ({width}x{height}, {size / 1024:.0f} KB)")
+        rel = os.path.relpath(out, REPO_ROOT)
+        print(f"wrote {rel} ({width}x{height}, {size / 1024:.0f} KB)")
 
     print(f"\n{len(MAPPING)} images, {total / 1024 / 1024:.2f} MB total")
 
