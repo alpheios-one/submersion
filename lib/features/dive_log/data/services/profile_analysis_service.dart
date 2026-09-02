@@ -1889,9 +1889,16 @@ class ProfileAnalysisService {
 
     for (int i = 0; i < depths.length; i++) {
       final diluent = _activeGasSegmentAtTimestamp(timestamps[i], gasSegments);
-      final diluentFN2 = diluent.fN2.clamp(0.0, 1.0);
-      final diluentFHe = diluent.fHe.clamp(0.0, 1.0);
-      final diluentInert = (diluentFN2 + diluentFHe).clamp(0.0, 1.0);
+      // Inert fractions summing past 1 (import noise) are scaled back to 1
+      // together so the recorded He:N2 ratio survives; the diluent then has
+      // no O2 left and its MOD reads as unavailable.
+      final rawFN2 = math.max(diluent.fN2, 0.0);
+      final rawFHe = math.max(diluent.fHe, 0.0);
+      final rawInert = rawFN2 + rawFHe;
+      final overFull = rawInert > 1.0;
+      final diluentFN2 = overFull ? rawFN2 / rawInert : rawFN2;
+      final diluentFHe = overFull ? rawFHe / rawInert : rawFHe;
+      final diluentInert = overFull ? 1.0 : rawInert;
       diluentO2Fractions.add(1.0 - diluentInert);
 
       final ambientPressure = 1.0 + (depths[i] / 10.0);

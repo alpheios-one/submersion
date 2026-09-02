@@ -1068,6 +1068,27 @@ void main() {
       expect(analysis.modCurve![3], closeTo(67.778, 0.01));
     });
 
+    test('an over-full diluent is renormalized, keeping its He:N2 ratio', () {
+      // Import noise can hand us inert fractions summing past 1. The split
+      // must still follow the recorded He:N2 ratio (0.8:0.4) rather than the
+      // clipped one, and the diluent has no O2 left for a MOD.
+      final analysis = analyzeLoop(
+        gasSegments: const [
+          ProfileGasSegment(
+            startTimestamp: 0,
+            fN2: 0.8,
+            fHe: 0.4,
+            setpoint: 1.3,
+          ),
+        ],
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // 4.1 bar inert split 2:1.
+      expect(analysis.ppN2Curve![2], closeTo(4.1 * 2 / 3, 0.001));
+      expect(analysis.ppHeCurve![2], closeTo(4.1 / 3, 0.001));
+      expect(analysis.modCurve![2], 0.0);
+    });
+
     test('no loop information keeps the legacy first-tank curves', () {
       final analysis = analyzeLoop(gasSegments: null);
       // No setpoint segments and no measured ppO2: the loop cannot be
