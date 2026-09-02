@@ -90,6 +90,7 @@ void main() {
         findsOneWidget,
       );
       expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
+      expect(find.byType(UnavailableMediaPlaceholder), findsNothing);
       // Bytes came from the row's own source, so the stale flag is corrected
       // in place instead of staying red until the viewer happens to open.
       expect(repository.writes, [(id: 'm1', isOrphaned: false)]);

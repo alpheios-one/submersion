@@ -356,6 +356,9 @@ void main() {
       );
 
       final repository = CapturingMediaRepository();
+      // Assert against the semantics tree itself, not the widgets that feed
+      // it: the claim under test is what assistive tech hears.
+      final semantics = tester.ensureSemantics();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -386,19 +389,23 @@ void main() {
         findsOneWidget,
       );
       expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
+      expect(find.byType(UnavailableMediaPlaceholder), findsNothing);
       // The label must not read the stale flag either: a screen reader
       // should never hear "missing" over a thumbnail that just rendered.
       final l10n = tester.element(find.byType(TripGalleryPage)).l10n;
       expect(
-        find.byWidgetPredicate(
-          (w) =>
-              w is Semantics &&
-              w.properties.label == l10n.trips_gallery_thumbnail_photo,
-        ),
+        find.bySemanticsLabel(_contains(l10n.trips_gallery_thumbnail_photo)),
         findsOneWidget,
+      );
+      expect(
+        find.bySemanticsLabel(
+          _contains(l10n.media_unavailablePlaceholder_fileNotFound),
+        ),
+        findsNothing,
       );
       // The resolver produced bytes, so the stale flag is corrected.
       expect(repository.writes, [(id: 'media-orphan', isOrphaned: false)]);
+      semantics.dispose();
     });
 
     testWidgets('an item nothing can serve announces the missing reason', (
@@ -423,6 +430,7 @@ void main() {
         updatedAt: DateTime(2024, 1, 15),
       );
 
+      final semantics = tester.ensureSemantics();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -449,18 +457,26 @@ void main() {
 
       final l10n = tester.element(find.byType(TripGalleryPage)).l10n;
       expect(find.byType(UnavailableMediaPlaceholder), findsOneWidget);
+      // Both reach the semantics tree: the tile's plain label and the
+      // placeholder's reason.
       expect(
-        find.text(l10n.media_unavailablePlaceholder_fileNotFound),
+        find.bySemanticsLabel(_contains(l10n.trips_gallery_thumbnail_photo)),
         findsOneWidget,
       );
       expect(
-        find.byWidgetPredicate(
-          (w) =>
-              w is Semantics &&
-              w.properties.label == l10n.trips_gallery_thumbnail_photo,
+        find.bySemanticsLabel(
+          _contains(l10n.media_unavailablePlaceholder_fileNotFound),
         ),
         findsOneWidget,
       );
+      semantics.dispose();
     });
   });
 }
+
+/// A semantics-label pattern that matches a node containing [text].
+///
+/// [CommonFinders.bySemanticsLabel] compares a String label for equality,
+/// so a merged node ("Photo thumbnail...\nFile not found") would miss a
+/// plain-string match while still being exactly what a screen reader reads.
+RegExp _contains(String text) => RegExp(RegExp.escape(text));
