@@ -3311,11 +3311,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_avgDepth,
                 units.formatDepth(dive.avgDepth),
               ),
-            if (dive.waterType != null)
+            // Effective, so a dive that never had a water type of its own
+            // still shows the one its site carries (issue #1427).
+            if (dive.effectiveWaterType != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.waterType!.displayName,
+                dive.effectiveWaterType!.displayName,
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(

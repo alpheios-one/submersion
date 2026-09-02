@@ -285,6 +285,21 @@ class Dive extends Equatable {
   /// Effective start time of the dive (entryTime if set, otherwise dateTime)
   DateTime get effectiveEntryTime => entryTime ?? dateTime;
 
+  /// Water type of the dive, falling back to the assigned site's (issue
+  /// #1427).
+  ///
+  /// [waterType] is snapped from the site when a site is assigned (see
+  /// `waterTypeAfterSiteAssign`), but dives logged or imported before that,
+  /// and dives whose site gained its water type later, still carry null. The
+  /// site's answer is the best one available for those, so displays and
+  /// statistics read this rather than [waterType]. A value the diver set on
+  /// the dive always wins: a site's water type is a default, not a fact about
+  /// every dive made there.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  WaterType? get effectiveWaterType => waterType ?? site?.waterType;
+
   /// User-defined name, normalized for display: trimmed, with empty or
   /// whitespace-only values treated as unset (null). In-app writes never
   /// store such values, but synced rows from other writers can; display

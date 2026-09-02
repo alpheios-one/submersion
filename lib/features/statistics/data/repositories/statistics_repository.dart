@@ -1181,6 +1181,12 @@ class StatisticsRepository {
 
   /// Get water type distribution (salt/fresh).
   ///
+  /// Buckets each dive by its *effective* water type: the value on the dive
+  /// when it has one, otherwise the one on its site (issue #1427). Dives
+  /// logged before the site's water type was filled in, and imports that never
+  /// carried the field, would otherwise sit outside the chart even though the
+  /// app knows what water they were in. Mirrors `Dive.effectiveWaterType`.
+  ///
   /// Emits the stored WaterType enum name as a stable key; the presentation
   /// layer translates it (see `waterTypeDistributionLabel`).
   Future<List<DistributionSegment>> getWaterTypeDistribution({
@@ -1188,16 +1194,29 @@ class StatisticsRepository {
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      // Qualified: dive_sites carries a diver_id of its own, so the bare
+      // column name is ambiguous once the site is joined in.
+      final diverFilter = diverId != null ? 'AND dives.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
+      // The fallback is resolved in a subquery so the outer GROUP BY names one
+      // unambiguous column rather than repeating the COALESCE, matching the
+      // shape the visibility distribution above already uses.
       final results = await _db.customSelect('''
         SELECT
           water_type,
           COUNT(*) AS count
-        FROM dives
-        WHERE water_type IS NOT NULL AND water_type != '' $diverFilter ${df.clause}
+        FROM (
+          SELECT COALESCE(
+            NULLIF(dives.water_type, ''),
+            NULLIF(dive_sites.water_type, '')
+          ) AS water_type
+          FROM dives
+          LEFT JOIN dive_sites ON dive_sites.id = dives.site_id
+          WHERE 1 = 1 $diverFilter ${df.clause}
+        )
+        WHERE water_type IS NOT NULL
         GROUP BY water_type
         ORDER BY count DESC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
