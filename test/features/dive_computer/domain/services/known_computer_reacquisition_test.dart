@@ -97,19 +97,17 @@ void main() {
       );
     });
 
-    test(
-      'matches manufacturer and model case- and whitespace-insensitively',
-      () {
-        final match = sameModelFallbackDevice(
-          computer: _computer(
-            manufacturer: ' ratio ',
-            model: 'IX3M 2021 GPS FANCY',
-          ),
-          discovered: [_device(fresh)],
-        );
-        expect(match?.address, fresh);
-      },
-    );
+    test('matches manufacturer and model ignoring case and surrounding '
+        'whitespace, like findByHardwareIdentity', () {
+      final match = sameModelFallbackDevice(
+        computer: _computer(
+          manufacturer: ' ratio ',
+          model: 'IX3M 2021 GPS FANCY',
+        ),
+        discovered: [_device(fresh)],
+      );
+      expect(match?.address, fresh);
+    });
 
     test('returns null when the saved computer has no model identity', () {
       expect(

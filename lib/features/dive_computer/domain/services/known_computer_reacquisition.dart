@@ -12,8 +12,9 @@ import 'package:submersion/features/dive_computer/domain/entities/device_model.d
 /// on the stored one never finds them even while they are advertising.
 ///
 /// Returns the single device libdivecomputer recognized as the saved
-/// computer's manufacturer and model, or null when there is none or more than
-/// one. With two candidates nothing distinguishes the saved computer from a
+/// computer's manufacturer and model (compared ignoring case and surrounding
+/// whitespace, as the repository's hardware-identity lookup does), or null
+/// when there is none or more than one. With two candidates nothing distinguishes the saved computer from a
 /// buddy's, so the caller keeps the stored address. The serial number reported
 /// by the download later confirms (or rejects) the match before the stored
 /// address is rewritten.

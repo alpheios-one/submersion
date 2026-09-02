@@ -314,8 +314,13 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
       );
       await _repository.updateComputer(updated);
       _computer = updated;
-    } catch (e) {
-      debugPrint('[DownloadNotifier] Device info persist failed: $e');
+    } catch (e, stackTrace) {
+      _log.error(
+        'Device info persist failed for ${computer.displayName}',
+        category: LogCategory.libdc,
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
