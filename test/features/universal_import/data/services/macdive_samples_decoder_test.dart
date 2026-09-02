@@ -216,6 +216,33 @@ void main() {
         expect(MacDiveSamplesDecoder.decode(blob), isNull);
       });
 
+      test('a length word that reaches into the trailer block', () {
+        // One 12-byte temperature record needs three blocks from MacDive's
+        // encoder: the record, its padding, and the trailer block. Two blocks
+        // with a length of 12 would read the trailer's own first word as the
+        // temperature, so the run must end before the trailer block.
+        final plain = Uint8List(16);
+        ByteData.sublistView(plain)
+          ..setFloat32(0, 0.0, Endian.little)
+          ..setFloat32(4, 3.0, Endian.little)
+          ..setFloat32(8, 21.0, Endian.little)
+          ..setUint32(12, 12, Endian.little);
+        final blob = Uint8List(8 + plain.length);
+        ByteData.sublistView(blob)
+          ..setUint32(0, 4, Endian.little)
+          ..setUint32(
+            4,
+            MacDiveSamplesDecoder.optionTemperature,
+            Endian.little,
+          );
+        blob.setRange(
+          8,
+          blob.length,
+          MacDiveSamplesDecoder.cipher.encrypt(plain),
+        );
+        expect(MacDiveSamplesDecoder.decode(blob), isNull);
+      });
+
       test('a record run that is not a whole number of records', () {
         final blob = _encode([
           [0.0, 0.0],

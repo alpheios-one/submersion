@@ -88,7 +88,10 @@ class MacDiveSamplesDecoder {
     final plain = cipher.decrypt(body);
     final plainData = ByteData.sublistView(plain);
     final length = plainData.getUint32(plain.length - 4, Endian.little);
-    if (length > plain.length - 4) return null;
+    // The encoder pads the record run to a block boundary and then appends
+    // the block that carries this word, so the run always ends before that
+    // last block starts.
+    if (length > plain.length - TeaBlockCipher.blockSize) return null;
 
     final stride = _baseRecordLength + _fieldLength * _bitCount(options);
     if (length % stride != 0) return null;
