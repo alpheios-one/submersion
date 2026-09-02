@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "Esa imagen es demasiado grande. Prueba con una más pequeña.",
   "profilePhoto_error_undecodable": "No se pudo leer ese archivo como imagen.",
   "profilePhoto_error_contactNoPhoto": "Ese contacto no tiene foto.",
-  "profilePhoto_error_contactPermission": "Se necesita permiso de contactos para elegir una foto."
+  "profilePhoto_error_contactPermission": "Se necesita permiso de contactos para elegir una foto.",
+  "diveComputer_merge_title": "Combinar ordenadores de buceo",
+  "diveComputer_merge_intro": "{count} registros pasarán a ser uno. Las inmersiones, los perfiles y el historial de descargas se moverán al registro que conserves. Los demás registros se eliminarán.",
+  "diveComputer_merge_keepLabel": "Conservar este registro",
+  "diveComputer_merge_serialLabel": "Número de serie {serial}",
+  "diveComputer_merge_noSerial": "Sin número de serie",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{Los otros registros no tienen inmersiones asociadas.} =1{1 inmersión se moverá al registro que conserves.} other{{count} inmersiones se moverán al registro que conserves.}}",
+  "diveComputer_merge_serialMismatchWarning": "Estos registros indican números de serie distintos. Podrían ser ordenadores físicos diferentes.",
+  "diveComputer_merge_action": "Combinar",
+  "diveComputer_merge_snackbar": "{count, plural, =1{1 registro combinado en {name}} other{{count} registros combinados en {name}}}",
+  "diveComputer_merge_failed": "No se pudieron combinar los ordenadores: {error}",
+  "diveComputer_list_selection_mergeTooltip": "Combinar ordenadores",
+  "diveComputer_detail_mergeMenu": "Combinar con otro ordenador",
+  "diveComputer_detail_mergePickerTitle": "Combinar con",
+  "diveComputer_detail_mergePickerEmpty": "No hay otros ordenadores con los que combinar.",
+  "diveComputer_detail_mergePickerSameSerial": "Mismo número de serie",
+  "diveComputer_detail_duplicateBanner": "{name} indica el mismo número de serie. Puede que este ordenador esté guardado dos veces.",
+  "diveComputer_detail_duplicateBannerAction": "Combinar"
 }

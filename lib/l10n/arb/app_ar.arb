@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "هذه الصورة كبيرة جدًا. جرّب صورة أصغر.",
   "profilePhoto_error_undecodable": "تعذّرت قراءة هذا الملف كصورة.",
   "profilePhoto_error_contactNoPhoto": "جهة الاتصال هذه ليس لها صورة.",
-  "profilePhoto_error_contactPermission": "يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة."
+  "profilePhoto_error_contactPermission": "يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة.",
+  "diveComputer_merge_title": "دمج أجهزة كمبيوتر الغوص",
+  "diveComputer_merge_intro": "ستصبح {count} سجلات سجلاً واحداً. تنتقل الغطسات والملفات وسجل التنزيل إلى السجل الذي تحتفظ به، وتُحذف السجلات الأخرى.",
+  "diveComputer_merge_keepLabel": "الاحتفاظ بهذا السجل",
+  "diveComputer_merge_serialLabel": "الرقم التسلسلي {serial}",
+  "diveComputer_merge_noSerial": "لا يوجد رقم تسلسلي",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{لا توجد غطسات مرتبطة بالسجلات الأخرى.} =1{ستنتقل غطسة واحدة إلى السجل المحتفظ به.} other{ستنتقل {count} غطسات إلى السجل المحتفظ به.}}",
+  "diveComputer_merge_serialMismatchWarning": "تُبلغ هذه السجلات عن أرقام تسلسلية مختلفة. قد تكون أجهزة مختلفة.",
+  "diveComputer_merge_action": "دمج",
+  "diveComputer_merge_snackbar": "{count, plural, =1{تم دمج سجل واحد في {name}} other{تم دمج {count} سجلات في {name}}}",
+  "diveComputer_merge_failed": "تعذّر دمج أجهزة الكمبيوتر: {error}",
+  "diveComputer_list_selection_mergeTooltip": "دمج أجهزة الكمبيوتر",
+  "diveComputer_detail_mergeMenu": "الدمج مع جهاز كمبيوتر آخر",
+  "diveComputer_detail_mergePickerTitle": "الدمج مع",
+  "diveComputer_detail_mergePickerEmpty": "لا توجد أجهزة كمبيوتر أخرى للدمج معها.",
+  "diveComputer_detail_mergePickerSameSerial": "نفس الرقم التسلسلي",
+  "diveComputer_detail_duplicateBanner": "يُبلغ {name} عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً مرتين.",
+  "diveComputer_detail_duplicateBannerAction": "دمج"
 }

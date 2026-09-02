@@ -36033,4 +36033,83 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'È necessaria l\'autorizzazione ai contatti per scegliere una foto.';
+
+  @override
+  String get diveComputer_merge_title => 'Unisci computer subacquei';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count schede diventeranno una sola. Immersioni, profili e cronologia dei download passano alla scheda che conservi. Le altre schede vengono eliminate.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Conserva questa scheda';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Numero di serie $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Nessun numero di serie';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni passeranno alla scheda conservata.',
+      one: '1 immersione passerà alla scheda conservata.',
+      zero: 'Nessuna immersione è collegata alle altre schede.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Queste schede riportano numeri di serie diversi. Potrebbero essere computer fisici diversi.';
+
+  @override
+  String get diveComputer_merge_action => 'Unisci';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count schede unite in $name',
+      one: '1 scheda unita in $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Impossibile unire i computer: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Unisci computer';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Unisci con un altro computer';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Unisci con';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Non ci sono altri computer con cui unire.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Stesso numero di serie';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name riporta lo stesso numero di serie. Potrebbe essere questo computer salvato due volte.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Unisci';
 }

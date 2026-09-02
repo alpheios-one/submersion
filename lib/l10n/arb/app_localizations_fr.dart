@@ -36133,4 +36133,85 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'L\'autorisation d\'accès aux contacts est requise pour choisir une photo.';
+
+  @override
+  String get diveComputer_merge_title => 'Fusionner les ordinateurs de plongée';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count fiches n\'en feront plus qu\'une. Les plongées, les profils et l\'historique des téléchargements passent sur la fiche que vous conservez. Les autres fiches sont supprimées.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Conserver cette fiche';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Numéro de série $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Pas de numéro de série';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées passeront sur la fiche conservée.',
+      one: '1 plongée passera sur la fiche conservée.',
+      zero: 'Aucune plongée n\'est rattachée aux autres fiches.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Ces fiches indiquent des numéros de série différents. Il peut s\'agir d\'ordinateurs distincts.';
+
+  @override
+  String get diveComputer_merge_action => 'Fusionner';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fiches fusionnées dans $name',
+      one: '1 fiche fusionnée dans $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Impossible de fusionner les ordinateurs : $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip =>
+      'Fusionner les ordinateurs';
+
+  @override
+  String get diveComputer_detail_mergeMenu =>
+      'Fusionner avec un autre ordinateur';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Fusionner avec';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Aucun autre ordinateur avec lequel fusionner.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Même numéro de série';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name indique le même numéro de série. Cet ordinateur est peut-être enregistré deux fois.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Fusionner';
 }

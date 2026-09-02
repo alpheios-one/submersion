@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "התמונה הזו גדולה מדי. נסו תמונה קטנה יותר.",
   "profilePhoto_error_undecodable": "לא ניתן היה לקרוא את הקובץ הזה כתמונה.",
   "profilePhoto_error_contactNoPhoto": "לאיש הקשר הזה אין תמונה.",
-  "profilePhoto_error_contactPermission": "נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה."
+  "profilePhoto_error_contactPermission": "נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה.",
+  "diveComputer_merge_title": "מיזוג מחשבי צלילה",
+  "diveComputer_merge_intro": "{count} רשומות יהפכו לאחת. הצלילות, הפרופילים והיסטוריית ההורדות יעברו לרשומה שתשמור. שאר הרשומות יימחקו.",
+  "diveComputer_merge_keepLabel": "לשמור רשומה זו",
+  "diveComputer_merge_serialLabel": "מספר סידורי {serial}",
+  "diveComputer_merge_noSerial": "אין מספר סידורי",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{לא משויכות צלילות לרשומות האחרות.} =1{צלילה אחת תעבור לרשומה שתישמר.} other{{count} צלילות יעברו לרשומה שתישמר.}}",
+  "diveComputer_merge_serialMismatchWarning": "רשומות אלו מדווחות על מספרים סידוריים שונים. ייתכן שמדובר במחשבים שונים.",
+  "diveComputer_merge_action": "מיזוג",
+  "diveComputer_merge_snackbar": "{count, plural, =1{רשומה אחת מוזגה לתוך {name}} other{{count} רשומות מוזגו לתוך {name}}}",
+  "diveComputer_merge_failed": "לא ניתן למזג את המחשבים: {error}",
+  "diveComputer_list_selection_mergeTooltip": "מיזוג מחשבים",
+  "diveComputer_detail_mergeMenu": "מיזוג עם מחשב אחר",
+  "diveComputer_detail_mergePickerTitle": "מיזוג עם",
+  "diveComputer_detail_mergePickerEmpty": "אין מחשבים אחרים למיזוג.",
+  "diveComputer_detail_mergePickerSameSerial": "אותו מספר סידורי",
+  "diveComputer_detail_duplicateBanner": "{name} מדווח על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר פעמיים.",
+  "diveComputer_detail_duplicateBannerAction": "מיזוג"
 }

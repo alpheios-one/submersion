@@ -36078,4 +36078,83 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'Se necesita permiso de contactos para elegir una foto.';
+
+  @override
+  String get diveComputer_merge_title => 'Combinar ordenadores de buceo';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count registros pasarán a ser uno. Las inmersiones, los perfiles y el historial de descargas se moverán al registro que conserves. Los demás registros se eliminarán.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Conservar este registro';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Número de serie $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Sin número de serie';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones se moverán al registro que conserves.',
+      one: '1 inmersión se moverá al registro que conserves.',
+      zero: 'Los otros registros no tienen inmersiones asociadas.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Estos registros indican números de serie distintos. Podrían ser ordenadores físicos diferentes.';
+
+  @override
+  String get diveComputer_merge_action => 'Combinar';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count registros combinados en $name',
+      one: '1 registro combinado en $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'No se pudieron combinar los ordenadores: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Combinar ordenadores';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Combinar con otro ordenador';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Combinar con';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'No hay otros ordenadores con los que combinar.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Mismo número de serie';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name indica el mismo número de serie. Puede que este ordenador esté guardado dos veces.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Combinar';
 }

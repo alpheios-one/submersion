@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "该图片太大，请尝试较小的图片。",
   "profilePhoto_error_undecodable": "无法将该文件读取为图片。",
   "profilePhoto_error_contactNoPhoto": "该联系人没有照片。",
-  "profilePhoto_error_contactPermission": "选择照片需要通讯录访问权限。"
+  "profilePhoto_error_contactPermission": "选择照片需要通讯录访问权限。",
+  "diveComputer_merge_title": "合并潜水电脑",
+  "diveComputer_merge_intro": "{count} 条记录将合并为一条。潜水、剖面和下载历史会移到你保留的记录中，其余记录将被删除。",
+  "diveComputer_merge_keepLabel": "保留此记录",
+  "diveComputer_merge_serialLabel": "序列号 {serial}",
+  "diveComputer_merge_noSerial": "无序列号",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{其他记录没有关联的潜水。} =1{1 次潜水将移到保留的记录中。} other{{count} 次潜水将移到保留的记录中。}}",
+  "diveComputer_merge_serialMismatchWarning": "这些记录的序列号不同，可能是不同的设备。",
+  "diveComputer_merge_action": "合并",
+  "diveComputer_merge_snackbar": "{count, plural, =1{已将 1 条记录合并到 {name}} other{已将 {count} 条记录合并到 {name}}}",
+  "diveComputer_merge_failed": "无法合并潜水电脑：{error}",
+  "diveComputer_list_selection_mergeTooltip": "合并潜水电脑",
+  "diveComputer_detail_mergeMenu": "与其他潜水电脑合并",
+  "diveComputer_detail_mergePickerTitle": "合并到",
+  "diveComputer_detail_mergePickerEmpty": "没有其他可合并的潜水电脑。",
+  "diveComputer_detail_mergePickerSameSerial": "序列号相同",
+  "diveComputer_detail_duplicateBanner": "{name} 的序列号与此相同，可能是同一台潜水电脑被保存了两次。",
+  "diveComputer_detail_duplicateBannerAction": "合并"
 }

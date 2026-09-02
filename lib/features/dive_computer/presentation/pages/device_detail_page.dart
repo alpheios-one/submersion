@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/log_failure.dart';
 import 'package:submersion/features/dive_computer/presentation/utils/last_download_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
+import 'package:submersion/features/dive_computer/domain/services/dive_computer_merge_rules.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/reparse_providers.dart';
+import 'package:submersion/features/dive_computer/presentation/widgets/dive_computer_merge_sheet.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -84,6 +87,14 @@ class DeviceDetailPage extends ConsumerWidget {
                 ),
               ),
               PopupMenuItem(
+                value: 'merge',
+                child: ListTile(
+                  leading: const Icon(Icons.merge_type),
+                  title: Text(context.l10n.diveComputer_detail_mergeMenu),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              PopupMenuItem(
                 value: 'delete',
                 child: ListTile(
                   leading: const Icon(Icons.delete),
@@ -100,6 +111,7 @@ class DeviceDetailPage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildDuplicateBanner(context, ref, computer),
             _buildInfoCard(context, computer, colorScheme),
             const SizedBox(height: 16),
             _buildStatsCard(context, computer, colorScheme),
@@ -110,6 +122,63 @@ class DeviceDetailPage extends ConsumerWidget {
               _buildNotesCard(context, computer, colorScheme),
             ],
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Points at another saved record that reports this computer's serial
+  /// number (#645). Shrinks to nothing while loading or when there is none,
+  /// so the page never reserves space for a banner it may not show.
+  Widget _buildDuplicateBanner(
+    BuildContext context,
+    WidgetRef ref,
+    DiveComputer computer,
+  ) {
+    final duplicates =
+        ref.watch(possibleDuplicateComputersProvider(computer.id)).value ??
+        const <DiveComputer>[];
+    if (duplicates.isEmpty) return const SizedBox.shrink();
+
+    final colorScheme = Theme.of(context).colorScheme;
+    final names = duplicates.map((d) => d.displayName).join(', ');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Card(
+        key: const ValueKey('duplicate_banner'),
+        color: colorScheme.tertiaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.copy_all, color: colorScheme.onTertiaryContainer),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      context.l10n.diveComputer_detail_duplicateBanner(names),
+                      style: TextStyle(color: colorScheme.onTertiaryContainer),
+                    ),
+                  ),
+                ],
+              ),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton.icon(
+                  key: const ValueKey('duplicate_banner_merge'),
+                  onPressed: () =>
+                      _mergeWith(context, ref, computer, duplicates),
+                  icon: const Icon(Icons.merge_type),
+                  label: Text(
+                    context.l10n.diveComputer_detail_duplicateBannerAction,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -525,9 +594,123 @@ class DeviceDetailPage extends ConsumerWidget {
       case 'edit':
         _showEditDialog(context, ref, computer);
         break;
+      case 'merge':
+        logFailure(
+          _showMergePicker(context, ref, computer),
+          DeviceDetailPage,
+          'open merge picker',
+        );
+        break;
       case 'delete':
         _showDeleteConfirmation(context, ref, computer);
         break;
+    }
+  }
+
+  /// Lists the diver's other computers so one can be merged with this one.
+  /// Records that share this computer's serial number are listed first.
+  Future<void> _showMergePicker(
+    BuildContext context,
+    WidgetRef ref,
+    DiveComputer computer,
+  ) async {
+    final all = await ref.read(allDiveComputersProvider.future);
+    if (!context.mounted) return;
+
+    final duplicates = duplicateCandidatesFor(computer, all);
+    final duplicateIds = duplicates.map((d) => d.id).toSet();
+    final others = [
+      ...duplicates,
+      for (final other in all)
+        if (other.id != computer.id && !duplicateIds.contains(other.id)) other,
+    ];
+
+    final chosen = await showModalBottomSheet<DiveComputer>(
+      context: context,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  sheetContext.l10n.diveComputer_detail_mergePickerTitle,
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              if (others.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  child: Text(
+                    sheetContext.l10n.diveComputer_detail_mergePickerEmpty,
+                  ),
+                )
+              else
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      for (final other in others)
+                        ListTile(
+                          key: ValueKey('merge_pick_${other.id}'),
+                          leading: const Icon(Icons.watch),
+                          title: Text(other.displayName),
+                          subtitle: Text(
+                            duplicateIds.contains(other.id)
+                                ? sheetContext
+                                      .l10n
+                                      .diveComputer_detail_mergePickerSameSerial
+                                : other.fullName,
+                          ),
+                          trailing: duplicateIds.contains(other.id)
+                              ? Icon(
+                                  Icons.copy_all,
+                                  color: theme.colorScheme.tertiary,
+                                )
+                              : null,
+                          onTap: () => Navigator.of(sheetContext).pop(other),
+                        ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+    if (chosen == null || !context.mounted) return;
+    await _mergeWith(context, ref, computer, [chosen]);
+  }
+
+  /// Opens the merge sheet for this computer and [others]. When another
+  /// record survives, the page moves to it: this one no longer exists.
+  Future<void> _mergeWith(
+    BuildContext context,
+    WidgetRef ref,
+    DiveComputer computer,
+    List<DiveComputer> others,
+  ) async {
+    final computers = [computer, ...others];
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await DiveComputerMergeSheet.show(context, computers);
+    if (result == null || !context.mounted) return;
+
+    final survivor = computers.firstWhere((c) => c.id == result.survivorId);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          context.l10n.diveComputer_merge_snackbar(
+            result.mergedComputerIds.length,
+            survivor.displayName,
+          ),
+        ),
+      ),
+    );
+    if (survivor.id != computer.id) {
+      context.pushReplacement('/dive-computers/${survivor.id}');
     }
   }
 

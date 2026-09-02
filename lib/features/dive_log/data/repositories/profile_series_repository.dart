@@ -552,6 +552,21 @@ class ProfileSeriesRepository {
   Future<int> clearComputer(String computerId, {int? now}) =>
       _setComputer(null, (t) => t.computerId.equals(computerId), now: now);
 
+  /// Moves every series of [fromComputerIds] onto [toComputerId] and restamps
+  /// each, for a dive computer merge (#645). Returns the number touched.
+  Future<int> repointComputer(
+    List<String> fromComputerIds,
+    String toComputerId, {
+    int? now,
+  }) {
+    if (fromComputerIds.isEmpty) return Future.value(0);
+    return _setComputer(
+      toComputerId,
+      (t) => t.computerId.isIn(fromComputerIds),
+      now: now,
+    );
+  }
+
   /// Diver reassignment: a computer that now belongs to [diverId] must not
   /// stay attributed on dives the diver does not own.
   Future<int> clearComputersOfDiverForForeignDives(

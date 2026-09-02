@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "Essa imagem é demasiado grande. Tente uma mais pequena.",
   "profilePhoto_error_undecodable": "Não foi possível ler esse ficheiro como imagem.",
   "profilePhoto_error_contactNoPhoto": "Esse contacto não tem foto.",
-  "profilePhoto_error_contactPermission": "É necessária permissão de contactos para escolher uma foto."
+  "profilePhoto_error_contactPermission": "É necessária permissão de contactos para escolher uma foto.",
+  "diveComputer_merge_title": "Mesclar computadores de mergulho",
+  "diveComputer_merge_intro": "{count} registros se tornarão um. Mergulhos, perfis e histórico de download passam para o registro que você mantiver. Os outros registros são excluídos.",
+  "diveComputer_merge_keepLabel": "Manter este registro",
+  "diveComputer_merge_serialLabel": "Número de série {serial}",
+  "diveComputer_merge_noSerial": "Sem número de série",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{Nenhum mergulho está vinculado aos outros registros.} =1{1 mergulho passará para o registro mantido.} other{{count} mergulhos passarão para o registro mantido.}}",
+  "diveComputer_merge_serialMismatchWarning": "Estes registros informam números de série diferentes. Podem ser computadores físicos diferentes.",
+  "diveComputer_merge_action": "Mesclar",
+  "diveComputer_merge_snackbar": "{count, plural, =1{1 registro mesclado em {name}} other{{count} registros mesclados em {name}}}",
+  "diveComputer_merge_failed": "Não foi possível mesclar os computadores: {error}",
+  "diveComputer_list_selection_mergeTooltip": "Mesclar computadores",
+  "diveComputer_detail_mergeMenu": "Mesclar com outro computador",
+  "diveComputer_detail_mergePickerTitle": "Mesclar com",
+  "diveComputer_detail_mergePickerEmpty": "Não há outros computadores para mesclar.",
+  "diveComputer_detail_mergePickerSameSerial": "Mesmo número de série",
+  "diveComputer_detail_duplicateBanner": "{name} informa o mesmo número de série. Pode ser este computador salvo duas vezes.",
+  "diveComputer_detail_duplicateBannerAction": "Mesclar"
 }

@@ -10519,5 +10519,22 @@
   "profilePhoto_error_tooLarge": "Cette image est trop volumineuse. Essayez-en une plus petite.",
   "profilePhoto_error_undecodable": "Ce fichier n'a pas pu être lu comme une image.",
   "profilePhoto_error_contactNoPhoto": "Ce contact n'a pas de photo.",
-  "profilePhoto_error_contactPermission": "L'autorisation d'accès aux contacts est requise pour choisir une photo."
+  "profilePhoto_error_contactPermission": "L'autorisation d'accès aux contacts est requise pour choisir une photo.",
+  "diveComputer_merge_title": "Fusionner les ordinateurs de plongée",
+  "diveComputer_merge_intro": "{count} fiches n'en feront plus qu'une. Les plongées, les profils et l'historique des téléchargements passent sur la fiche que vous conservez. Les autres fiches sont supprimées.",
+  "diveComputer_merge_keepLabel": "Conserver cette fiche",
+  "diveComputer_merge_serialLabel": "Numéro de série {serial}",
+  "diveComputer_merge_noSerial": "Pas de numéro de série",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{Aucune plongée n'est rattachée aux autres fiches.} =1{1 plongée passera sur la fiche conservée.} other{{count} plongées passeront sur la fiche conservée.}}",
+  "diveComputer_merge_serialMismatchWarning": "Ces fiches indiquent des numéros de série différents. Il peut s'agir d'ordinateurs distincts.",
+  "diveComputer_merge_action": "Fusionner",
+  "diveComputer_merge_snackbar": "{count, plural, =1{1 fiche fusionnée dans {name}} other{{count} fiches fusionnées dans {name}}}",
+  "diveComputer_merge_failed": "Impossible de fusionner les ordinateurs : {error}",
+  "diveComputer_list_selection_mergeTooltip": "Fusionner les ordinateurs",
+  "diveComputer_detail_mergeMenu": "Fusionner avec un autre ordinateur",
+  "diveComputer_detail_mergePickerTitle": "Fusionner avec",
+  "diveComputer_detail_mergePickerEmpty": "Aucun autre ordinateur avec lequel fusionner.",
+  "diveComputer_detail_mergePickerSameSerial": "Même numéro de série",
+  "diveComputer_detail_duplicateBanner": "{name} indique le même numéro de série. Cet ordinateur est peut-être enregistré deux fois.",
+  "diveComputer_detail_duplicateBannerAction": "Fusionner"
 }

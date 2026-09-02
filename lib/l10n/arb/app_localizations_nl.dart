@@ -35792,4 +35792,84 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'Toegang tot contacten is vereist om een foto te kiezen.';
+
+  @override
+  String get diveComputer_merge_title => 'Duikcomputers samenvoegen';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count records worden één. Duiken, profielen en downloadgeschiedenis gaan naar het record dat je bewaart. De andere records worden verwijderd.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Dit record bewaren';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Serienummer $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Geen serienummer';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken gaan naar het record dat je bewaart.',
+      one: '1 duik gaat naar het record dat je bewaart.',
+      zero: 'Aan de andere records zijn geen duiken gekoppeld.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Deze records melden verschillende serienummers. Het kunnen verschillende computers zijn.';
+
+  @override
+  String get diveComputer_merge_action => 'Samenvoegen';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records samengevoegd in $name',
+      one: '1 record samengevoegd in $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Computers konden niet worden samengevoegd: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip =>
+      'Computers samenvoegen';
+
+  @override
+  String get diveComputer_detail_mergeMenu =>
+      'Samenvoegen met een andere computer';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Samenvoegen met';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Er zijn geen andere computers om mee samen te voegen.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'Zelfde serienummer';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name meldt hetzelfde serienummer. Mogelijk is deze computer twee keer opgeslagen.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Samenvoegen';
 }
