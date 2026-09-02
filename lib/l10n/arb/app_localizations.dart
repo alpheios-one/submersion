@@ -21098,6 +21098,30 @@ abstract class AppLocalizations {
   /// **'Save this fill'**
   String get gasCalculators_blender_saveFill;
 
+  /// No description provided for @gasCalculators_blender_flushFeeEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge a fee to purge the fill hose'**
+  String get gasCalculators_blender_flushFeeEnable;
+
+  /// No description provided for @gasCalculators_blender_flushFeeModePerInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Once per bill'**
+  String get gasCalculators_blender_flushFeeModePerInvoice;
+
+  /// No description provided for @gasCalculators_blender_flushFeeModePerFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Once per fill'**
+  String get gasCalculators_blender_flushFeeModePerFill;
+
+  /// No description provided for @gasCalculators_blender_flushFeeVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Purge volume'**
+  String get gasCalculators_blender_flushFeeVolume;
+
   /// No description provided for @gasCalculators_blender_billed.
   ///
   /// In en, this message translates to:

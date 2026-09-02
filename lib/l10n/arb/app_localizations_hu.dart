@@ -12409,6 +12409,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Töltés mentése';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Díj felszámítása a töltőtömlő átöblítéséért';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Egyszer számlánként';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'Egyszer töltésenként';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Öblítési térfogat';
+
+  @override
   String get gasCalculators_blender_billed => 'Számlázva';
 
   @override

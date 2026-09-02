@@ -11862,6 +11862,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_saveFill => '保存本次充填';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable => '收取充气软管吹扫费';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice => '每张账单一次';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => '每次充填一次';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => '吹扫量';
+
+  @override
   String get gasCalculators_blender_billed => '已计费';
 
   @override

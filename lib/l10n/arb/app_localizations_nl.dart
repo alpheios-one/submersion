@@ -12357,6 +12357,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Deze vulling opslaan';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Een vergoeding rekenen voor het doorspoelen van de vulslang';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Eenmaal per factuur';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'Eenmaal per vulling';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Spoelvolume';
+
+  @override
   String get gasCalculators_blender_billed => 'Gefactureerd';
 
   @override

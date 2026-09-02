@@ -7,6 +7,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_card.dart';
@@ -88,6 +89,43 @@ void main() {
         total: 40,
       );
       expect(fill.isManual, isTrue);
+    });
+
+    test('a custom mix round-trips through JSON alongside the fill', () {
+      const fill = BilledFill(
+        id: 'c',
+        label: 'Tx 21/35',
+        lines: [],
+        total: 40,
+        customMix: BilledCustomMix(cylinderLiters: 11.1, o2: 21, he: 35),
+      );
+      final decoded = BilledFill.fromJson(
+        jsonDecode(jsonEncode(fill.toJson())) as Map<String, dynamic>,
+      )!;
+      expect(decoded.customMix, isNotNull);
+      expect(decoded.customMix!.cylinderLiters, 11.1);
+      expect(decoded.customMix!.o2, 21);
+      expect(decoded.customMix!.he, 35);
+    });
+
+    test('a fill without a custom mix decodes with none', () {
+      const fill = BilledFill(id: 'd', label: 'x', lines: [], total: 1);
+      final decoded = BilledFill.fromJson(
+        jsonDecode(jsonEncode(fill.toJson())) as Map<String, dynamic>,
+      )!;
+      expect(decoded.customMix, isNull);
+    });
+
+    test('copyWith can clear a custom mix', () {
+      const fill = BilledFill(
+        id: 'e',
+        label: 'Tx 21/35',
+        lines: [],
+        total: 40,
+        customMix: BilledCustomMix(cylinderLiters: 11.1, o2: 21, he: 35),
+      );
+      expect(fill.copyWith(label: 'x').customMix, isNotNull);
+      expect(fill.copyWith(clearCustomMix: true).customMix, isNull);
     });
 
     test('an unpriced line makes the total incomplete, not smaller', () {
@@ -208,6 +246,97 @@ void main() {
       expect(fills.single.total, closeTo(12.50, 0.001));
     });
 
+    testWidgets('a custom mix line records the cylinder and gas entered', (
+      tester,
+    ) async {
+      final ref = await _pump(tester);
+      await tester.tap(find.byKey(const Key('blender-add-manual-line')));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('blender-line-cylinder')),
+        '11.1',
+      );
+      await tester.enterText(
+        find.byKey(const Key('blender-line-amount')),
+        '30',
+      );
+      // Description left blank on purpose: the label falls back to the mix.
+      await tester.enterText(find.widgetWithText(TextField, 'O₂ (%)'), '21');
+      await tester.enterText(find.widgetWithText(TextField, 'He (%)'), '35');
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      final fills = ref.read(blenderBilledFillsProvider);
+      expect(fills, hasLength(1));
+      expect(fills.single.label, 'Tx 21/35');
+      expect(fills.single.customMix, isNotNull);
+      expect(fills.single.customMix!.cylinderLiters, closeTo(11.1, 0.001));
+      expect(fills.single.customMix!.o2, 21);
+      expect(fills.single.customMix!.he, 35);
+    });
+
+    testWidgets('re-editing a manual line pre-fills its saved mix', (
+      tester,
+    ) async {
+      final ref = await _pump(tester);
+      ref.read(blenderBilledFillsProvider.notifier).state = const [
+        BilledFill(
+          id: 'a',
+          label: 'Tx 21/35',
+          lines: [],
+          total: 30,
+          customMix: BilledCustomMix(cylinderLiters: 11.1, o2: 21, he: 35),
+        ),
+      ];
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Edit Tx 21/35'));
+      await tester.pumpAndSettle();
+
+      final o2Field = tester.widget<TextField>(
+        find.widgetWithText(TextField, 'O₂ (%)'),
+      );
+      expect(o2Field.controller!.text, '21');
+      final heField = tester.widget<TextField>(
+        find.widgetWithText(TextField, 'He (%)'),
+      );
+      expect(heField.controller!.text, '35');
+
+      // Changing the mix and saving updates the stored fill rather than
+      // adding a second one.
+      await tester.enterText(find.widgetWithText(TextField, 'He (%)'), '45');
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      final fills = ref.read(blenderBilledFillsProvider);
+      expect(fills, hasLength(1));
+      expect(fills.single.customMix!.he, 45);
+    });
+
+    testWidgets('a computed fill offers no mix fields when re-edited', (
+      tester,
+    ) async {
+      final ref = await _pump(tester);
+      ref.read(blenderBilledFillsProvider.notifier).state = const [
+        BilledFill(
+          id: 'a',
+          label: 'Tx 18/45',
+          lines: [BilledGasLine(gas: 'O₂', addedBar: 10, cost: 10)],
+          total: 10,
+        ),
+      ];
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Edit Tx 18/45'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('blender-line-cylinder')), findsNothing);
+      expect(find.widgetWithText(TextField, 'O₂ (%)'), findsNothing);
+    });
+
     testWidgets('clearing asks first and then empties the bill', (
       tester,
     ) async {
@@ -262,6 +391,92 @@ void main() {
       expect(fills, hasLength(kMaxBilledFills));
       expect(fills.last.label, 'fill ${kMaxBilledFills + 4}');
       expect(fills.first.label, 'fill 5');
+    });
+  });
+
+  group('flush fee', () {
+    testWidgets('is off by default', (tester) async {
+      await _pump(tester);
+      expect(
+        find.byKey(const Key('blender-flush-fee-liters-o2')),
+        findsNothing,
+      );
+    });
+
+    testWidgets(
+      'once enabled and priced, a bill-once line appears even with nothing filled yet',
+      (tester) async {
+        await _pump(tester);
+        await tester.tap(find.byKey(const Key('blender-flush-fee-enabled')));
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const Key('blender-flush-fee-price-o2')),
+          '7.5',
+        );
+        await tester.pumpAndSettle();
+
+        // The default purge volume is 20 L, so 20 / 100 * 7.5 = 1.50.
+        expect(
+          find.byKey(const Key('blender-flush-fee-liters-o2')),
+          findsOneWidget,
+        );
+        expect(find.textContaining('1.50'), findsWidgets);
+      },
+    );
+
+    testWidgets('per-fill mode charges nothing until a fill is saved', (
+      tester,
+    ) async {
+      final ref = await _pump(tester);
+      ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+      ref.read(blenderFlushFeeModeProvider.notifier).state =
+          FlushFeeMode.perFill;
+      ref.read(blenderFlushFeeGasesProvider.notifier).state = const [
+        FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5),
+        FlushFeeGasSetting(volumeLiters: 20),
+        FlushFeeGasSetting(volumeLiters: 20),
+      ];
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('blender-flush-fee-liters-o2')),
+        findsNothing,
+      );
+
+      ref.read(blenderBilledFillsProvider.notifier).state = const [
+        BilledFill(id: 'a', label: 'Tx 18/45', lines: [], total: 35),
+      ];
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('blender-flush-fee-liters-o2')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('1.50'), findsWidgets);
+    });
+
+    testWidgets('editing the invoice line liter field re-prices it', (
+      tester,
+    ) async {
+      final ref = await _pump(tester);
+      ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+      ref.read(blenderFlushFeeGasesProvider.notifier).state = const [
+        FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5),
+        FlushFeeGasSetting(volumeLiters: 20),
+        FlushFeeGasSetting(volumeLiters: 20),
+      ];
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.byKey(const Key('blender-flush-fee-liters-o2')),
+        '40',
+      );
+      await tester.pumpAndSettle();
+
+      // 40 / 100 * 7.5 = 3.00.
+      expect(find.textContaining('3.00'), findsWidgets);
+      expect(
+        ref.read(blenderFlushFeeGasesProvider)[0].volumeLiters,
+        closeTo(40, 0.001),
+      );
     });
   });
 }

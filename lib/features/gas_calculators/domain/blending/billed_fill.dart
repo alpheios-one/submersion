@@ -37,6 +37,43 @@ class BilledGasLine {
   }
 }
 
+/// The cylinder and mix behind a manually entered bill line.
+///
+/// Kept alongside the free-typed [BilledFill.total] rather than replacing it:
+/// the amount charged at a real counter is still whatever the blender typed,
+/// this only records what was actually filled so the line reads as more than
+/// a bare number (issue #1335).
+class BilledCustomMix {
+  const BilledCustomMix({
+    required this.cylinderLiters,
+    required this.o2,
+    required this.he,
+  });
+
+  final double cylinderLiters;
+  final double o2;
+  final double he;
+
+  Map<String, dynamic> toJson() => {
+    'cylinderLiters': cylinderLiters,
+    'o2': o2,
+    'he': he,
+  };
+
+  static BilledCustomMix? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final liters = json['cylinderLiters'];
+    final o2 = json['o2'];
+    final he = json['he'];
+    if (liters is! num || o2 is! num || he is! num) return null;
+    return BilledCustomMix(
+      cylinderLiters: liters.toDouble(),
+      o2: o2.toDouble(),
+      he: he.toDouble(),
+    );
+  }
+}
+
 /// A cylinder the blender has finished and wants on the bill.
 ///
 /// Saved rather than recomputed: the blend that produced it is about to be
@@ -50,6 +87,7 @@ class BilledFill {
     required this.label,
     required this.lines,
     required this.total,
+    this.customMix,
   });
 
   final String id;
@@ -64,6 +102,11 @@ class BilledFill {
   /// Null when the fill was saved before every gas had a price.
   final double? total;
 
+  /// The cylinder and mix entered for a manual line, when the blender chose
+  /// to record one. Always null for a computed fill: [lines] already
+  /// itemises it.
+  final BilledCustomMix? customMix;
+
   bool get isManual => lines.isEmpty;
 
   /// [clearTotal] is how an amount gets removed. Null is meaningful here: it
@@ -74,15 +117,22 @@ class BilledFill {
   /// A boolean rather than an `Object?` sentinel because the sentinel form
   /// gives up compile-time typing: `copyWith(total: 40)` then compiles and
   /// throws at run time on the int literal.
+  ///
+  /// [clearCustomMix] follows the same shape: re-editing a manual line to
+  /// remove its mix has to be expressible, and `customMix ?? this.customMix`
+  /// could not tell "unchanged" from "cleared" any more than `total` could.
   BilledFill copyWith({
     String? label,
     double? total,
     bool clearTotal = false,
+    BilledCustomMix? customMix,
+    bool clearCustomMix = false,
   }) => BilledFill(
     id: id,
     label: label ?? this.label,
     lines: lines,
     total: clearTotal ? null : (total ?? this.total),
+    customMix: clearCustomMix ? null : (customMix ?? this.customMix),
   );
 
   Map<String, dynamic> toJson() => {
@@ -90,6 +140,7 @@ class BilledFill {
     'label': label,
     'lines': lines.map((l) => l.toJson()).toList(),
     if (total != null) 'total': total,
+    if (customMix != null) 'customMix': customMix!.toJson(),
   };
 
   static BilledFill? fromJson(Object? json) {
@@ -109,6 +160,7 @@ class BilledFill {
                 .toList()
           : const [],
       total: total is num ? total.toDouble() : null,
+      customMix: BilledCustomMix.fromJson(json['customMix']),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -83,6 +84,19 @@ final blenderBilledFillsProvider = StateProvider<List<BilledFill>>(
 /// Who the bill is for. Free text; the costing card seeds it from the
 /// logbook's diver.
 final blenderBilledToProvider = StateProvider<String>((ref) => '');
+
+/// Whether a hose-purge flat fee is charged at all.
+final blenderFlushFeeEnabledProvider = StateProvider<bool>((ref) => false);
+
+/// How often the flush fee's lines appear on the bill.
+final blenderFlushFeeModeProvider = StateProvider<FlushFeeMode>(
+  (ref) => FlushFeeMode.perInvoice,
+);
+
+/// One entry per [FlushFeeGasKind], in that enum's order.
+final blenderFlushFeeGasesProvider = StateProvider<List<FlushFeeGasSetting>>(
+  (ref) => defaultFlushFeeGases,
+);
 
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);
@@ -171,6 +185,10 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderFillGas1Provider.notifier).state = stored.fillGas1;
   ref.read(blenderFillGas2Provider.notifier).state = stored.fillGas2;
   ref.read(blenderFillGas3Provider.notifier).state = stored.fillGas3;
+  ref.read(blenderFlushFeeEnabledProvider.notifier).state =
+      stored.flushFeeEnabled;
+  ref.read(blenderFlushFeeModeProvider.notifier).state = stored.flushFeeMode;
+  ref.read(blenderFlushFeeGasesProvider.notifier).state = stored.flushFeeGases;
   // The input fields hold their own text, seeded once in initState. Without
   // this the cylinder volume and price boxes keep showing defaults over
   // freshly loaded preferences, and the next edit saves those defaults back
@@ -209,6 +227,9 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             fillGas1: ref.read(blenderFillGas1Provider),
             fillGas2: ref.read(blenderFillGas2Provider),
             fillGas3: ref.read(blenderFillGas3Provider),
+            flushFeeEnabled: ref.read(blenderFlushFeeEnabledProvider),
+            flushFeeMode: ref.read(blenderFlushFeeModeProvider),
+            flushFeeGases: ref.read(blenderFlushFeeGasesProvider),
           ),
         );
   } catch (e, stackTrace) {

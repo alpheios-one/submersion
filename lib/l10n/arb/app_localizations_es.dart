@@ -12439,6 +12439,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Guardar este llenado';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Cobrar una tarifa por purgar la manguera de llenado';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Una vez por factura';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'Una vez por llenado';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Volumen de purga';
+
+  @override
   String get gasCalculators_blender_billed => 'Facturado';
 
   @override

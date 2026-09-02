@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 
 void main() {
   group('MixTemplate', () {
@@ -53,6 +54,17 @@ void main() {
       expect(prefs.fillGas2, const GasMix(o2: 0, he: 100));
       expect(prefs.fillGas3, const GasMix(o2: 21));
     });
+
+    test('the flush fee starts off, once per bill, unpriced', () {
+      final prefs = BlenderPreferences.defaults(cylinderWaterLiters: 12);
+      expect(prefs.flushFeeEnabled, isFalse);
+      expect(prefs.flushFeeMode, FlushFeeMode.perInvoice);
+      expect(prefs.flushFeeGases, hasLength(3));
+      expect(
+        prefs.flushFeeGases.map((g) => g.pricePer100),
+        everyElement(isNull),
+      );
+    });
   });
 
   group('JSON', () {
@@ -72,6 +84,13 @@ void main() {
             fillGas1: const GasMix(o2: 99.5),
             fillGas2: const GasMix(o2: 0, he: 99),
             fillGas3: const GasMix(o2: 20.9),
+            flushFeeEnabled: true,
+            flushFeeMode: FlushFeeMode.perFill,
+            flushFeeGases: const [
+              FlushFeeGasSetting(volumeLiters: 20, pricePer100: 5),
+              FlushFeeGasSetting(volumeLiters: 25, pricePer100: 12),
+              FlushFeeGasSetting(volumeLiters: 15),
+            ],
           );
       final decoded = BlenderPreferences.fromJson(
         jsonDecode(jsonEncode(prefs.toJson())) as Map<String, dynamic>,
@@ -89,6 +108,12 @@ void main() {
       expect(decoded.fillGas1, const GasMix(o2: 99.5));
       expect(decoded.fillGas2, const GasMix(o2: 0, he: 99));
       expect(decoded.fillGas3, const GasMix(o2: 20.9));
+      expect(decoded.flushFeeEnabled, isTrue);
+      expect(decoded.flushFeeMode, FlushFeeMode.perFill);
+      expect(decoded.flushFeeGases[0].volumeLiters, 20);
+      expect(decoded.flushFeeGases[0].pricePer100, 5);
+      expect(decoded.flushFeeGases[1].pricePer100, 12);
+      expect(decoded.flushFeeGases[2].pricePer100, isNull);
     });
 
     test('a malformed mix falls back per field', () {
@@ -119,6 +144,9 @@ void main() {
       expect(decoded.gasPrices, [2.55, null, null]);
       expect(decoded.fillTempC, kReferenceTempC);
       expect(decoded.model, BlendGasModel.zFactor);
+      expect(decoded.flushFeeEnabled, isFalse);
+      expect(decoded.flushFeeMode, FlushFeeMode.perInvoice);
+      expect(decoded.flushFeeGases, hasLength(3));
     });
 
     test('an impossible template is dropped on read', () {

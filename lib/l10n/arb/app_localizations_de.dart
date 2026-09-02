@@ -12439,6 +12439,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Diese Füllung speichern';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Gebühr für das Spülen des Füllschlauchs berechnen';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Einmal pro Abrechnung';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => 'Einmal pro Füllung';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Spülvolumen';
+
+  @override
   String get gasCalculators_blender_billed => 'Abgerechnet';
 
   @override
