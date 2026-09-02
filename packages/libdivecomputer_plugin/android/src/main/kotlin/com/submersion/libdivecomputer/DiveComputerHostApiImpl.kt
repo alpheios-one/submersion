@@ -219,6 +219,11 @@ class DiveComputerHostApiImpl(
                     TAG, "LDC",
                     "download crashed: ${t.javaClass.simpleName}: ${t.message}"
                 )
+                // Do not leave a GATT client registered behind the crash: its
+                // notification subscription would survive into the next
+                // attempt and double every packet (issue #285).
+                activeBleStream?.close()
+                activeBleStream = null
                 reportError(
                     "download_error",
                     "Download failed unexpectedly (${t.javaClass.simpleName})."
@@ -449,6 +454,21 @@ class DiveComputerHostApiImpl(
         }
         NativeLogger.d(TAG, "LDC", "nativeDownloadRun returned: $result")
 
+        // Capture the status that explains the failure BEFORE tearing the
+        // stream down, as the connect path above does: close() disconnects,
+        // and the resulting callback can overwrite it with a fresh (benign)
+        // status, which would silently skip the stale-bond repair below.
+        val downloadDisconnectStatus = bleStream.lastDisconnectStatus
+
+        // The native side closes the iostream, and with it this GATT client,
+        // on every path libdivecomputer returns through; this call is then a
+        // no-op. It is here for the path that never reaches that close: the
+        // JNI call throwing. A client left registered after a failed attempt
+        // keeps its notification subscription in the Bluetooth stack, so the
+        // next attempt against the same computer sees every packet delivered
+        // twice (issue #285, Android trace). close() is idempotent.
+        bleStream.close()
+
         // Report completion or error.
         if (result == 0) {
             mainHandler.post { flutterApi.onDownloadComplete(0, null, null) { } }
@@ -457,10 +477,9 @@ class DiveComputerHostApiImpl(
             // encryption keys (GATT status 5), the bond is stale. Remove
             // it so that a fresh pairing can be negotiated on retry.
             if (!isRetry &&
-                bleStream.lastDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
+                downloadDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
             ) {
                 NativeLogger.w(TAG, "BLE", "Auth failure (GATT status 5), removing stale bond and retrying")
-                bleStream.close()
                 if (bleStream.removeBond()) {
                     activeBleStream = null
                     LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
