@@ -246,7 +246,9 @@ class _DiveProfilePanelContentState
     // consolidated dive it interleaves two computers' samples, and this
     // panel drew that as a full-band sawtooth with a doubled point count
     // (#543). The analysis is computed over the same series so its curves
-    // stay index-aligned with what is drawn.
+    // stay index-aligned with what is drawn: sourceProfileAnalysisProvider
+    // resolves a stale selection to the primary the same way the provider
+    // above does.
     final activeSourceProfile = ref.watch(
       activeSourceProfileProvider(widget.diveId),
     );

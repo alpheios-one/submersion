@@ -322,9 +322,11 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and photo pins scaled to it drift off the visible span (#1167).
-    final chartProfile = (dataSources.length >= 2 && activeProfile != null)
-        ? activeProfile.points
-        : dive.profile;
+    // activeSourceProfileProvider is the one rule for this, shared with the
+    // detail page and the dive-list panel (#543).
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(widget.diveId))?.points ??
+        dive.profile;
 
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]

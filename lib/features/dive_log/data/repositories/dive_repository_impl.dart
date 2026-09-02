@@ -1207,15 +1207,17 @@ class DiveRepository {
   }
 
   /// The series a sparkline summarises: the primary ones when the dive has
-  /// any, every series otherwise. Same rule as [getDiveProfile]'s
-  /// `primaryOnly` read, so the mini chart and the lazily loaded list
-  /// profile show the same shape.
+  /// any, every series otherwise.
   ///
   /// A demoted series is either a consolidated secondary computer's copy of
   /// the dive or the originals a saved edit superseded. Interleaving either
   /// with the primary drew the mini chart as a sawtooth between two
-  /// computers' depths (#543). A dive whose only series are demoted (none
-  /// promoted yet) still gets a summary from all of them.
+  /// computers' depths (#543). With a primary present this matches
+  /// [getDiveProfile]'s `primaryOnly` read, so the mini chart and the lazily
+  /// loaded list profile show the same shape. The two deliberately differ
+  /// when NO series is primary (none promoted yet): that read returns an
+  /// empty list, while a sparkline is better drawn from whatever exists
+  /// than left blank, so every series contributes here.
   static List<ProfileSeries> _sparklineSeries(List<ProfileSeries> series) {
     final primary = [
       for (final s in series)
