@@ -163,6 +163,9 @@ class MacDiveSamplesDecoder {
   static const int _v1RecordLength = 24;
 
   static List<MacDiveSqliteSample>? _decodeV1(Uint8List blob) {
+    // No length trailer in this version, so the only structural check is
+    // that the bytes divide into whole records.
+    if ((blob.length - _v1HeaderLength) % _v1RecordLength != 0) return null;
     final data = ByteData.sublistView(blob);
     final samples = <MacDiveSqliteSample>[];
     for (

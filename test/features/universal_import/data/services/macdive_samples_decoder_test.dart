@@ -206,6 +206,15 @@ void main() {
         final blob = _encode([(0.0, 0.0), (double.nan, 3.0)], options: 0);
         expect(MacDiveSamplesDecoder.decode(blob), isNull);
       });
+
+      test('a version 1 blob with a partial trailing record', () {
+        // Version 1 has no length trailer, so whole records are the only
+        // structural guarantee; a torn record must not decode as a prefix.
+        final blob = Uint8List(4 + 24 + 10);
+        ByteData.sublistView(blob).setUint32(0, 1, Endian.little);
+        expect(MacDiveSamplesDecoder.decode(blob), isNull);
+        expect(MacDiveSamplesDecoder.decode(blob.sublist(0, 28)), hasLength(1));
+      });
     });
   });
 }
