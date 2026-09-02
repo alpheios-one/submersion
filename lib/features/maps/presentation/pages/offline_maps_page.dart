@@ -459,13 +459,15 @@ class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
   /// there is nothing honest to show but "unknown".
   ///
   /// [regionStoreIds] is null while that list is still loading, which is
-  /// neither answer yet.
+  /// neither answer yet and says so in words: this string is read aloud by
+  /// screen readers as part of the tile's label, so a bare ellipsis would be
+  /// both unlocalized and meaningless to hear.
   String _sizeLabel(
     BuildContext context,
     CachedRegion region,
     Set<String>? regionStoreIds,
   ) {
-    if (regionStoreIds == null) return '\u2026';
+    if (regionStoreIds == null) return context.l10n.common_label_loading;
     return regionStoreIds.contains(region.id)
         ? region.formattedSize
         : context.l10n.maps_offline_sizeUnknown;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -281,5 +283,49 @@ void main() {
 
     expect(find.textContaining('will not reclaim storage'), findsOneWidget);
     expect(find.textContaining('free up'), findsNothing);
+  });
+
+  testWidgets('a size still being measured is not reported as unknown', (
+    tester,
+  ) async {
+    // The transient state is its own answer. Showing "Unknown" here would be a
+    // claim the app is about to contradict, and a bare ellipsis is neither
+    // localized nor meaningful read aloud.
+    final base = await getBaseOverrides();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          cachedRegionsProvider.overrideWith(
+            (ref) async => [_region(id: 'owns', name: 'Cozumel')],
+          ),
+          // Never completes, so the page stays in the measuring state.
+          regionStoreIdsProvider.overrideWith(
+            (ref) => Completer<Set<String>>().future,
+          ),
+          cacheStatsProvider.overrideWith(
+            (ref) async => const CacheStats(
+              tileCount: 900,
+              sizeKiB: 8000,
+              hits: 10,
+              misses: 2,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: OfflineMapsPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.textContaining('Loading'), findsWidgets);
+    expect(find.textContaining('Unknown'), findsNothing);
+    expect(find.textContaining('17.6 MB'), findsNothing);
   });
 }

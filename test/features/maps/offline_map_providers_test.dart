@@ -25,6 +25,7 @@ class _FakeTileCache implements TileCacheService {
   int measuredBytes = 0;
   Object? deleteTilesError;
   Object? downloadError;
+  Object? clearCacheError;
   Set<String> regionStoreIds = {};
 
   @override
@@ -92,6 +93,8 @@ class _FakeTileCache implements TileCacheService {
   @override
   Future<void> clearCache() async {
     calls.add('clearCache');
+    final error = clearCacheError;
+    if (error != null) throw error;
   }
 
   @override
@@ -298,6 +301,32 @@ void main() {
 
       expect(cache.calls, contains('clearCache'));
       expect(await repository.getAllRegions(), isEmpty);
+    });
+  });
+
+  group('clear all failure', () {
+    test('keeps the rows when the tiles could not all be cleared', () async {
+      // Same invariant as a single delete: rows are the only handle on the
+      // bytes, so they outlive a clear that did not finish.
+      await repository.createRegion(
+        id: 'a',
+        name: 'Cozumel',
+        minLat: 20,
+        maxLat: 21,
+        minLng: -87,
+        maxLng: -86,
+        minZoom: 8,
+        maxZoom: 12,
+        tileCount: 10,
+        sizeBytes: 1024,
+      );
+      cache.clearCacheError = StateError('one store is locked');
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .clearAllCache();
+
+      expect(await repository.getAllRegions(), hasLength(1));
     });
   });
 

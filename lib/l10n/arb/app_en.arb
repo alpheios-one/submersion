@@ -14622,6 +14622,7 @@
   },
   "maps_offline_deleteRegionLegacyMessage": "Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions' and cannot be freed on their own. Deleting it will not reclaim storage.",
   "@maps_offline_deleteRegionLegacyMessage": {
+    "description": "Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.",
     "placeholders": {
       "name": {
         "type": "Object"
@@ -14743,6 +14744,9 @@
   },
   "maps_offline_size": "Size",
   "maps_offline_sizeUnknown": "Unknown",
+  "@maps_offline_sizeUnknown": {
+    "description": "Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as \"25.0 MB\"."
+  },
   "maps_offline_tiles": "Tiles",
   "maps_offline_tilesPerSecond": "{rate} tiles/sec",
   "@maps_offline_tilesPerSecond": {

@@ -710,11 +710,27 @@ class TileCacheService {
     _ensureInitialized();
     await _store!.manage.reset();
     await _browseStore!.manage.reset();
+    // Guarded per store for the same reason as the orphan sweep: one locked
+    // store must not keep the rest of the cache on disk. The failures are
+    // collected rather than swallowed, because "Clear all cache" that silently
+    // freed only some of it would be the same false claim this change removes.
+    final failed = <String>[];
     for (final store in await FMTCRoot.stats.storesAvailable) {
       if (regionIdFromStoreName(store.storeName) == null) continue;
-      await store.manage.delete();
+      try {
+        await store.manage.delete();
+      } catch (e) {
+        failed.add(store.storeName);
+        _log.warning('Could not delete region store ${store.storeName}: $e');
+      }
     }
     _inFlightRegionIds.clear();
+    if (failed.isNotEmpty) {
+      throw StateError(
+        'Could not delete ${failed.length} region tile '
+        '${failed.length == 1 ? "store" : "stores"}: ${failed.join(", ")}',
+      );
+    }
     // coverage:ignore-end
   }
 
