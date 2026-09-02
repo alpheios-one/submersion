@@ -8,11 +8,15 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Applies a dive consolidation via [service] and shows the resulting
 /// success-with-undo or error SnackBar.
 ///
-/// Called by the multi-select combine dialog's consolidation panel
-/// (`combine_dives_dialog.dart`). It lives in its own file rather than in the
-/// dialog so the apply/undo/SnackBar logic is not tied to one widget: a
-/// per-dive "add another computer to this dive" entry point (#552) would call
-/// the same function.
+/// Two callers share this: the multi-select combine dialog's consolidation
+/// panel (`combine_dives_dialog.dart`, which pops itself and then calls this
+/// without awaiting) and the data quality inbox's "consolidate duplicate"
+/// repair (`data_quality_inbox_page.dart`, which awaits it). It lives in its
+/// own file rather than in the dialog so the apply/undo/SnackBar logic is not
+/// tied to one widget.
+///
+/// Only [context] is read synchronously, before the first `await`, so a caller
+/// may dismiss its own route first.
 Future<void> runDiveConsolidation({
   required BuildContext context,
   required DiveConsolidationService service,
