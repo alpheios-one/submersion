@@ -515,7 +515,7 @@ class UddfFullImportService {
     for (final trip in undatedTrips) {
       final uddfId = trip['uddfId'] as String?;
       final range = uddfId == null ? null : ranges[uddfId];
-      final nameDate = trip['nameDate'] as DateTime?;
+      final nameDate = trip['_nameDate'] as DateTime?;
       final start = range?.earliest ?? nameDate;
       final end = range?.latest ?? nameDate;
       // Trip dates are calendar days in the diver's own frame, while dive
@@ -539,7 +539,7 @@ class UddfFullImportService {
   /// key left behind does not stay local to parsing.
   void _dropTripNameDates(List<Map<String, dynamic>> trips) {
     for (final trip in trips) {
-      trip.remove('nameDate');
+      trip.remove('_nameDate');
     }
   }
 
@@ -694,17 +694,6 @@ class UddfFullImportService {
         }
       }
 
-      // Subsurface points a dive at its trip with <tripmembership>, and its
-      // generated trip ids carry none of the prefixes the <link> handling
-      // below keys on.
-      final tripMembershipRef = beforeElement
-          .findElements('tripmembership')
-          .firstOrNull
-          ?.getAttribute('ref');
-      if (tripMembershipRef != null && tripMembershipRef.isNotEmpty) {
-        diveData['tripRef'] = tripMembershipRef;
-      }
-
       // Extract link references for trip, dive center, and buddies
       final buddyRefs = <String>[];
       final unmatchedBuddyNames = <String>[];
@@ -722,6 +711,18 @@ class UddfFullImportService {
             buddyRefs.add(ref);
           }
         }
+      }
+
+      // Subsurface points a dive at its trip with <tripmembership>, and its
+      // generated trip ids carry none of the prefixes the <link> handling
+      // above keys on. Read after the links, so that where a file somehow
+      // carries both, the UDDF-standard element is the one that decides.
+      final tripMembershipRef = beforeElement
+          .findElements('tripmembership')
+          .firstOrNull
+          ?.getAttribute('ref');
+      if (tripMembershipRef != null && tripMembershipRef.isNotEmpty) {
+        diveData['tripRef'] = tripMembershipRef;
       }
 
       // Also parse inline buddy elements in informationbeforedive

@@ -336,12 +336,15 @@ class UddfImportParsers {
     // Strip any trailing timezone info (Z, +HH:MM, -HH:MM, etc.)
     final bare =
         _timeZoneSuffixPattern.firstMatch(trimmed)?.group(1) ?? trimmed;
-    final dt =
-        DateTime.tryParse(bare) ??
-        DateTime.tryParse(
-          _dateWithoutTimePattern.firstMatch(bare)?.group(1) ?? '',
-        );
-    if (dt == null) return null;
+    var dt = DateTime.tryParse(bare);
+    if (dt == null) {
+      final dateWithoutTime = _dateWithoutTimePattern
+          .firstMatch(bare)
+          ?.group(1);
+      if (dateWithoutTime == null) return null;
+      dt = DateTime.tryParse(dateWithoutTime);
+      if (dt == null) return null;
+    }
     return DateTime.utc(
       dt.year,
       dt.month,
@@ -477,7 +480,7 @@ class UddfImportParsers {
       final location = nameParts.group(1)?.trim();
       final nameDate = DateTime.tryParse(nameParts.group(2)!);
       if (nameDate != null) {
-        trip['nameDate'] = nameDate;
+        trip['_nameDate'] = nameDate;
         if (location != null && location.isNotEmpty) {
           name = location;
           locationFromName = location;

@@ -252,7 +252,7 @@ void main() {
       // so the scratch key has to be gone by the time parsing returns.
       final result = await service.importAllDataFromUddf(_subsurfaceUddf);
 
-      expect(result.trips.single.containsKey('nameDate'), isFalse);
+      expect(result.trips.single.containsKey('_nameDate'), isFalse);
     });
 
     test('dates a trip with no location from the date in its name', () async {
@@ -274,7 +274,7 @@ void main() {
       expect(trip['location'], isNull);
       expect(trip['startDate'], DateTime(2019, 11, 2));
       expect(trip['endDate'], DateTime(2019, 11, 2));
-      expect(trip.containsKey('nameDate'), isFalse);
+      expect(trip.containsKey('_nameDate'), isFalse);
     });
 
     test('still reads a divetrip that is itself the trip', () async {

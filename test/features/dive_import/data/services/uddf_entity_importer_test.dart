@@ -448,9 +448,10 @@ void main() {
 
     test('numbers dives sharing a timestamp in file order', () async {
       // A logbook of dives entered by hand carries no times, so a whole day
-      // of them ties at midnight. List.sort only preserves input order below
-      // its insertion-sort threshold, so the batch has to be big enough to
-      // reach the quicksort path (ties reorder from around 40 elements).
+      // of them ties at midnight, and the numbering must follow the file.
+      // List.sort makes no stability guarantee: small batches happen to keep
+      // their input order today, so this one is deliberately large enough
+      // that ties are observably reordered without the tie-breaker.
       const undatedCount = 60;
       final data = UddfImportResult(
         dives: [
