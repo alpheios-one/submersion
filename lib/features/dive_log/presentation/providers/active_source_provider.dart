@@ -20,9 +20,15 @@ final overlaySourcesProvider = StateProvider.autoDispose
 /// The series the profile chart draws for [diveId] on a multi-source dive:
 /// the active source's own profile, or the primary's when nothing is
 /// selected (or the selection went stale after a split). Null on a
-/// single-source dive and while the sources are still loading, so callers
-/// fall back to `dive.profile`, which is identical to the primary's series
-/// there.
+/// single-source dive and while the data sources are still loading, so
+/// callers fall back to `dive.profile`, which is identical to the primary's
+/// series there.
+///
+/// Once the dive is known to have two or more sources this never returns
+/// null: while the per-source profiles are still loading (or the resolved
+/// source has no entry) it returns an EMPTY profile for that source, so the
+/// chart shows its empty-state placeholder for a frame instead of flashing
+/// the merged union.
 ///
 /// This is the one rule behind every chart surface (detail page, fullscreen,
 /// dive-list panel). `dive.profile` is the merged union of EVERY source's
@@ -46,5 +52,11 @@ final activeSourceProfileProvider = Provider.autoDispose
           ? primary
           : dataSources.where((s) => s.id == activeSourceId).firstOrNull ??
                 primary;
-      return sourceProfiles[active.id];
+      return sourceProfiles[active.id] ??
+          SourceProfile(
+            sourceId: active.id,
+            computerId: active.computerId,
+            isEdited: false,
+            points: const [],
+          );
     });

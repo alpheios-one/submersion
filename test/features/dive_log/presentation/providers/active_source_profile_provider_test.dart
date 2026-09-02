@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -67,12 +69,23 @@ void main() {
     required List<DiveDataSource> sources,
     required Map<String, SourceProfile> profiles,
     String? activeSourceId,
-    bool resolve = true,
+    bool sourcesResolve = true,
+    bool profilesResolve = true,
   }) async {
+    // Never-completing futures model the two loading windows: before the
+    // data sources arrive, and between them and the per-source profiles.
+    final pendingSources = Completer<List<DiveDataSource>>();
+    final pendingProfiles = Completer<Map<String, SourceProfile>>();
     final container = ProviderContainer(
       overrides: [
-        diveDataSourcesProvider(diveId).overrideWith((ref) async => sources),
-        sourceProfilesProvider(diveId).overrideWith((ref) async => profiles),
+        diveDataSourcesProvider(diveId).overrideWith(
+          (ref) =>
+              sourcesResolve ? Future.value(sources) : pendingSources.future,
+        ),
+        sourceProfilesProvider(diveId).overrideWith(
+          (ref) =>
+              profilesResolve ? Future.value(profiles) : pendingProfiles.future,
+        ),
         if (activeSourceId != null)
           activeDiveSourceProvider(
             diveId,
@@ -82,8 +95,10 @@ void main() {
     addTearDown(container.dispose);
     // Keep the autoDispose family member alive across the awaits below.
     container.listen(activeSourceProfileProvider(diveId), (_, _) {});
-    if (resolve) {
+    if (sourcesResolve) {
       await container.read(diveDataSourcesProvider(diveId).future);
+    }
+    if (profilesResolve) {
       await container.read(sourceProfilesProvider(diveId).future);
     }
     return container;
@@ -156,11 +171,26 @@ void main() {
     },
   );
 
-  test('resolves to null while the sources are still loading', () async {
+  test('a multi-source dive whose profiles are still loading resolves to an '
+      'empty profile for the active source, never dive.profile', () async {
     final container = await containerWith(
       sources: twoSources,
       profiles: twoProfiles,
-      resolve: false,
+      profilesResolve: false,
+    );
+
+    final profile = container.read(activeSourceProfileProvider(diveId));
+    expect(profile, isNotNull);
+    expect(profile!.sourceId, 'src-a');
+    expect(profile.computerId, 'dc-a');
+    expect(profile.points, isEmpty);
+  });
+
+  test('resolves to null while the data sources are still loading', () async {
+    final container = await containerWith(
+      sources: twoSources,
+      profiles: twoProfiles,
+      sourcesResolve: false,
     );
 
     expect(container.read(activeSourceProfileProvider(diveId)), isNull);
