@@ -61,6 +61,7 @@ extension BuddySortFieldDisplay on BuddySortField {
   String localizedName(AppLocalizations l10n) => switch (this) {
     BuddySortField.name => l10n.enum_sortField_name,
     BuddySortField.diveCount => l10n.enum_sortField_diveCount,
+    BuddySortField.lastDive => l10n.enum_sortField_lastDive,
   };
 }
 

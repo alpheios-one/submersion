@@ -10282,6 +10282,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_sortField_fileSize => 'حجم الملف';
 
   @override
+  String get enum_sortField_lastDive => 'آخر غوصة';
+
+  @override
   String get enum_sortField_lastServiceDate => 'آخر صيانة';
 
   @override

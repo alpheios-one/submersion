@@ -9988,6 +9988,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_fileSize => '文件大小';
 
   @override
+  String get enum_sortField_lastDive => '最近潜水';
+
+  @override
   String get enum_sortField_lastServiceDate => '最近维护';
 
   @override

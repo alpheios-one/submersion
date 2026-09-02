@@ -3369,6 +3369,7 @@
   "enum_sortField_dateTaken": "Aufnahmedatum",
   "enum_sortField_fileName": "Dateiname",
   "enum_sortField_fileSize": "Dateigröße",
+  "enum_sortField_lastDive": "Letzter Tauchgang",
   "enum_sortField_lastServiceDate": "Letzte Wartung",
   "enum_sortField_maxDepth": "Max. Tiefe",
   "enum_sortField_name": "Name",

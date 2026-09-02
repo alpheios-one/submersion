@@ -10388,6 +10388,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_sortField_fileSize => 'Bestandsgrootte';
 
   @override
+  String get enum_sortField_lastDive => 'Laatste duik';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Laatste onderhoud';
 
   @override

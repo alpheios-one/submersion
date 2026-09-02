@@ -3369,6 +3369,7 @@
   "enum_sortField_dateTaken": "Opnamedatum",
   "enum_sortField_fileName": "Bestandsnaam",
   "enum_sortField_fileSize": "Bestandsgrootte",
+  "enum_sortField_lastDive": "Laatste duik",
   "enum_sortField_lastServiceDate": "Laatste onderhoud",
   "enum_sortField_maxDepth": "Max diepte",
   "enum_sortField_name": "Naam",

@@ -10436,6 +10436,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_sortField_fileSize => 'Fájlméret';
 
   @override
+  String get enum_sortField_lastDive => 'Utolsó merülés';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Utolso szerviz';
 
   @override

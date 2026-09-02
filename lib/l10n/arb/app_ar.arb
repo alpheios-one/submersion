@@ -3369,6 +3369,7 @@
   "enum_sortField_dateTaken": "تاريخ الالتقاط",
   "enum_sortField_fileName": "اسم الملف",
   "enum_sortField_fileSize": "حجم الملف",
+  "enum_sortField_lastDive": "آخر غوصة",
   "enum_sortField_lastServiceDate": "آخر صيانة",
   "enum_sortField_maxDepth": "أقصى عمق",
   "enum_sortField_name": "الاسم",

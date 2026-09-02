@@ -68,7 +68,8 @@ enum EquipmentSortField {
 /// Sort fields for Buddies
 enum BuddySortField {
   name('Name', Icons.sort_by_alpha),
-  diveCount('Dive Count', Icons.scuba_diving);
+  diveCount('Dive Count', Icons.scuba_diving),
+  lastDive('Last Dive', Icons.history);
 
   final String displayName;
   final IconData icon;
