@@ -464,6 +464,35 @@ void main() {
       expect(ascending.map((b) => b.name), ['Alice', 'Bob', 'Charlie']);
       expect(descending.map((b) => b.name), ['Charlie', 'Bob', 'Alice']);
     });
+
+    test('name keeps its inverted direction, unlike the fallbacks', () {
+      // The name field reads descending as A to Z, which is the opposite of
+      // what the fallback fields above do. Pinned because the two now share
+      // one comparison and only the inversion tells them apart.
+      final buddies = [
+        _makeBuddy(id: 'c', name: 'Charlie'),
+        _makeBuddy(id: 'a', name: 'Alice'),
+        _makeBuddy(id: 'b', name: 'Bob'),
+      ];
+
+      final descending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.name,
+          direction: SortDirection.descending,
+        ),
+      );
+      final ascending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.name,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(descending.map((b) => b.name), ['Alice', 'Bob', 'Charlie']);
+      expect(ascending.map((b) => b.name), ['Charlie', 'Bob', 'Alice']);
+    });
   });
 
   group('buddyPickerSortProvider (issue #638)', () {

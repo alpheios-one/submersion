@@ -150,21 +150,17 @@ List<Buddy> applyBuddySorting(
   final sorted = List<Buddy>.from(buddies);
 
   sorted.sort((a, b) {
-    int comparison;
-    // For text fields, invert direction (user expects descending = A→Z)
-    final invertForText = sort.field == BuddySortField.name;
-
-    switch (sort.field) {
-      case BuddySortField.name:
-        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
-        break;
-      case BuddySortField.diveCount:
-      case BuddySortField.lastDive:
-        // Dive count / last dive date not available in basic Buddy entity,
-        // sort by name as fallback
-        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
-        break;
-    }
+    // Every field compares names here: the plain Buddy entity carries neither
+    // a dive count nor a last-dive date, so those two fall back to the
+    // alphabet. Only the direction differs between the fields, so that is all
+    // the switch decides. It stays exhaustive, so a new BuddySortField has to
+    // be considered in this function too.
+    final comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    final invertForText = switch (sort.field) {
+      // For text fields, invert direction (user expects descending = A→Z)
+      BuddySortField.name => true,
+      BuddySortField.diveCount || BuddySortField.lastDive => false,
+    };
 
     if (invertForText) {
       return sort.direction == SortDirection.ascending
