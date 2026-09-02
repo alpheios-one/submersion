@@ -2,17 +2,19 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 
-/// Records calls made to [DiveConsolidationService.apply] and [.undo] so tests
-/// can assert on the wiring contract without touching a real database.
+/// Records calls made to [DiveConsolidationService.apply] and
+/// [DiveConsolidationService.undo] so tests can assert on the wiring contract
+/// without touching a real database.
 ///
 /// Shared by combine_dives_dialog_test.dart (which drives the success path
 /// through the real dialog) and run_dive_consolidation_test.dart (which owns
 /// the undo and apply-failure branches of `runDiveConsolidation`).
 ///
-/// [outcomeSnapshot] is built from [mergedDiveId] rather than being a `const`
-/// literal on purpose: const instances are canonicalized, so two fakes sharing
-/// a literal would share one object and an identity assertion against it would
-/// silently weaken into a structural-equality check.
+/// [outcomeSnapshot] is built from the `mergedDiveId` argument rather than
+/// being a `const` literal on purpose: const instances are canonicalized, so
+/// two fakes sharing a literal would share one object and an identity
+/// assertion against it would silently weaken into a structural-equality
+/// check.
 class FakeDiveConsolidationService extends DiveConsolidationService {
   FakeDiveConsolidationService({
     String mergedDiveId = 'target-dive',
