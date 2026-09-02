@@ -12,6 +12,8 @@
 // without any network call, the same coordinate/cache-key derivation the
 // production pipeline performs, so that derivation is visible in the
 // running app without a debugger.
+import 'dart:typed_data';
+
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
@@ -21,6 +23,7 @@ import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cac
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
+import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
 /// One swissBATHY3D tile's cache status, for [SwissBathyDebugInfo.tiles].
@@ -255,5 +258,119 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
   if (info.firstTileStacUrl != null) {
     buf.write('first tile STAC query: ${info.firstTileStacUrl}');
   }
+  return buf.toString();
+}
+
+// ---------------------------------------------------------------------
+// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+//
+// Investigated Bug 11 (two real, independently-meaningful dive sites
+// reportedly render a pixel-identical visible 3D profile even though the
+// fetch/stitch layer above was proven, with the real coordinates, to
+// return different grids). Everything above this point diagnoses the
+// FETCH layer; this section instead fingerprints the RENDER layer —
+// the actual [MeshData] a [SiteSeascapeGeometryService.buildWithLabels]
+// call hands to [Scene3d] — plus records when that call last actually ran
+// for a given site, so a stale/reused Scene3d (rather than a stale/reused
+// grid) can be told apart from a genuine rebuild that just happens to
+// produce the same numbers.
+// ---------------------------------------------------------------------
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Timestamp of the
+/// last [SiteSeascapeGeometryService.buildWithLabels] call per site id,
+/// written by the caller in `site_seascape_providers.dart` right after
+/// `built` resolves (both the synchronous and the `compute()`-isolate
+/// branch funnel through that one call site back on the main isolate).
+/// A plain module-level map is enough here: this is throwaway diagnostic
+/// state for a single debugging session, not app state.
+final Map<String, DateTime> _swissBathyDebugLastBuiltAt = {};
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+void recordSwissBathySceneBuilt(String siteId) {
+  _swissBathyDebugLastBuiltAt[siteId] = DateTime.now();
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+DateTime? swissBathyDebugLastBuiltAtFor(String siteId) =>
+    _swissBathyDebugLastBuiltAt[siteId];
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. A cheap, order- and
+/// value-sensitive fingerprint of a mesh's flat position buffer, plus when
+/// the scene that produced it was last (re)built for [siteId] — everything
+/// needed to tell "two sites really did render the same triangles" apart
+/// from "the mesh differs but happens to look the same" without shipping
+/// the whole array.
+class SwissBathyRenderFingerprint {
+  final String siteId;
+  final int vertexCount;
+  final List<double> firstPositions;
+  final List<double> lastPositions;
+
+  /// FNV-1a over the position buffer's raw bytes. Two fingerprints with
+  /// the same [vertexCount] but a different [hash] are proof the meshes
+  /// differ even if the first/last samples happen to match.
+  final int hash;
+  final DateTime? lastBuiltAt;
+
+  const SwissBathyRenderFingerprint({
+    required this.siteId,
+    required this.vertexCount,
+    required this.firstPositions,
+    required this.lastPositions,
+    required this.hash,
+    required this.lastBuiltAt,
+  });
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// [SwissBathyRenderFingerprint] for the terrain mesh currently on screen
+/// for [siteId] — read-only, no recomputation of the mesh itself.
+SwissBathyRenderFingerprint buildSwissBathyRenderFingerprint({
+  required String siteId,
+  required MeshData mesh,
+}) {
+  final positions = mesh.positions;
+  final firstCount = positions.length < 3 ? positions.length : 3;
+  final lastStart = positions.length < 3 ? 0 : positions.length - 3;
+  return SwissBathyRenderFingerprint(
+    siteId: siteId,
+    vertexCount: mesh.vertexCount,
+    firstPositions: positions.sublist(0, firstCount).toList(),
+    lastPositions: positions.sublist(lastStart).toList(),
+    hash: _fnv1aHash(positions),
+    lastBuiltAt: swissBathyDebugLastBuiltAtFor(siteId),
+  );
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. FNV-1a folded over
+/// the buffer's raw bytes rather than its double values, so it is exact
+/// (no rounding/formatting loss) and cheap enough to run on a tap.
+int _fnv1aHash(Float32List values) {
+  final bytes = values.buffer.asUint8List(
+    values.offsetInBytes,
+    values.lengthInBytes,
+  );
+  var hash = 0x811c9dc5;
+  for (final b in bytes) {
+    hash ^= b;
+    hash = (hash * 0x01000193) & 0xFFFFFFFF;
+  }
+  return hash;
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// [SwissBathyRenderFingerprint] as plain, copy-pasteable text, appended
+/// below [formatSwissBathyDebugInfo]'s fetch-layer output.
+String formatSwissBathyRenderFingerprint(SwissBathyRenderFingerprint fp) {
+  final buf = StringBuffer()
+    ..writeln('--- render layer (temporary) ---')
+    ..writeln('vertexCount: ${fp.vertexCount}')
+    ..writeln('positions[0:3]: ${fp.firstPositions}')
+    ..writeln('positions[-3:]: ${fp.lastPositions}')
+    ..writeln('positions hash (fnv1a32): 0x${fp.hash.toRadixString(16)}')
+    ..write(
+      'buildWithLabels() last ran for this site: '
+      '${fp.lastBuiltAt?.toIso8601String() ?? "not recorded yet"}',
+    );
   return buf.toString();
 }

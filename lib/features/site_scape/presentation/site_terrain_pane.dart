@@ -10,6 +10,7 @@ import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.da
 import 'package:submersion/features/bathymetry/presentation/swiss_bathy_debug_info.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
+import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -207,7 +208,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                       top: 56,
                       left: 8,
                       right: 8,
-                      child: _sourceChip(sourceId, resolutionMeters),
+                      child: _sourceChip(sourceId, resolutionMeters, scene),
                     ),
                     // The legend describes the depth ramp; a photographed
                     // surface has no ramp to explain. It sits LEFT because the
@@ -312,7 +313,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     );
   }
 
-  Widget _sourceChip(String sourceId, double resolutionMeters) {
+  Widget _sourceChip(String sourceId, double resolutionMeters, Scene3d scene) {
     // TEMPORARY - DEBUG ONLY, remove before upstream PR: site.location is
     // already resolved by this point (siteSeascapeProvider awaited it to
     // reach SiteSeascapeReady), so re-watching it here is a cache hit, not
@@ -360,7 +361,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                 ],
               ),
               // TEMPORARY - DEBUG ONLY, remove before upstream PR.
-              if (_debugExpanded) _debugPanel(),
+              if (_debugExpanded) _debugPanel(scene),
             ],
           ),
         ),
@@ -369,14 +370,23 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   }
 
   // TEMPORARY - DEBUG ONLY, remove before upstream PR.
-  Widget _debugPanel() {
+  Widget _debugPanel(Scene3d scene) {
+    // TEMPORARY - DEBUG ONLY, remove before upstream PR: the render-layer
+    // fingerprint needs no network/cache lookups (unlike the fetch-layer
+    // panel below), so it is available synchronously off the mesh that is
+    // already on screen — read at build time, not behind a FutureBuilder.
+    final renderFingerprint = buildSwissBathyRenderFingerprint(
+      siteId: widget.siteId,
+      mesh: scene.layers.first.mesh,
+    );
+    final renderText = formatSwissBathyRenderFingerprint(renderFingerprint);
     final future = _debugFuture;
     if (future == null) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 4),
-        child: Text(
-          'debug: site coordinate not loaded yet',
-          style: TextStyle(fontSize: 10),
+      return Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: SelectableText(
+          'debug: site coordinate not loaded yet\n$renderText',
+          style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
         ),
       );
     }
@@ -386,18 +396,22 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
         future: future,
         builder: (context, snapshot) {
           final info = snapshot.data;
-          if (info == null) {
-            return const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            );
-          }
-          final text = formatSwissBathyDebugInfo(info);
+          final text = info == null
+              ? renderText
+              : '${formatSwissBathyDebugInfo(info)}\n$renderText';
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (info == null)
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
               SelectableText(
                 text,
                 style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
