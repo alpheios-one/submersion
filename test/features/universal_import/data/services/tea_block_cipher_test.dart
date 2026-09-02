@@ -46,6 +46,12 @@ void main() {
       expect(plain[3], 27);
     });
 
+    test('a key word outside 32 bits is rejected', () {
+      expect(() => TeaBlockCipher(1 << 32, 0, 0, 0), throwsAssertionError);
+      expect(() => TeaBlockCipher(0, 0, 0, -1), throwsAssertionError);
+      expect(const TeaBlockCipher(0xFFFFFFFF, 0, 0, 0).k0, 0xFFFFFFFF);
+    });
+
     test('a buffer that is not whole blocks is rejected', () {
       const cipher = TeaBlockCipher(1, 2, 3, 4);
       expect(() => cipher.decrypt(Uint8List(12)), throwsArgumentError);

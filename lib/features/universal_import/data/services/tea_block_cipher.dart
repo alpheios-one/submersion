@@ -13,8 +13,14 @@ import 'dart:typed_data';
 /// Words are little-endian on the wire, matching how MacDive reads the
 /// buffer as `uint32_t` pairs on Apple hardware.
 class TeaBlockCipher {
-  /// Takes the four 32-bit words `k[0]..k[3]` of the TEA key schedule.
-  const TeaBlockCipher(this.k0, this.k1, this.k2, this.k3);
+  /// Takes the four 32-bit words `k[0]..k[3]` of the TEA key schedule. Each
+  /// must already fit in 32 bits; the rounds reduce every sum modulo 2^32,
+  /// so an oversized word would be silently folded rather than rejected.
+  const TeaBlockCipher(this.k0, this.k1, this.k2, this.k3)
+    : assert(k0 >= 0 && k0 <= _mask, 'k0 must be a 32-bit word'),
+      assert(k1 >= 0 && k1 <= _mask, 'k1 must be a 32-bit word'),
+      assert(k2 >= 0 && k2 <= _mask, 'k2 must be a 32-bit word'),
+      assert(k3 >= 0 && k3 <= _mask, 'k3 must be a 32-bit word');
 
   final int k0;
   final int k1;

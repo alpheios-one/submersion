@@ -313,24 +313,24 @@ class MacDiveDiveMapper {
     if (samples.isEmpty) return true;
 
     map['profile'] = [for (final s in samples) _samplePoint(s, converter)];
-    // As with the raw path, MacDive's scalar fields win where it has them.
-    final maxDepth = samples
-        .map((s) => s.depthMeters)
-        .reduce((a, b) => a > b ? a : b);
-    if (maxDepth > 0) map['maxDepth'] ??= maxDepth;
-    final temps = samples
-        .map((s) => s.temperatureCelsius)
-        .whereType<double>()
-        .toList();
-    if (temps.isNotEmpty) {
-      map['waterTemp'] ??= temps.reduce((a, b) => a < b ? a : b);
+
+    // Scalars in one pass. Records stay in stored order: the one backwards
+    // step in the reference library is a second descent whose clock restarts
+    // after a surfacing, and sorting it would interleave the two segments
+    // into a zigzag where MacDive draws them one after the other. So the
+    // runtime is the latest stamp rather than the last record's.
+    var maxDepth = 0.0;
+    double? minTemp;
+    var end = Duration.zero;
+    for (final s in samples) {
+      if (s.depthMeters > maxDepth) maxDepth = s.depthMeters;
+      final t = s.temperatureCelsius;
+      if (t != null && (minTemp == null || t < minTemp)) minTemp = t;
+      if (s.time > end) end = s.time;
     }
-    // The latest stamp rather than the last record, rounded like the points
-    // are. Records stay in stored order: the one backwards step in the
-    // reference library is a second descent whose clock restarts after a
-    // surfacing, and sorting it would interleave the two segments into a
-    // zigzag where MacDive draws them one after the other.
-    final end = samples.map((s) => s.time).reduce((a, b) => a > b ? a : b);
+    // As with the raw path, MacDive's scalar fields win where it has them.
+    if (maxDepth > 0) map['maxDepth'] ??= maxDepth;
+    if (minTemp != null) map['waterTemp'] ??= minTemp;
     if (end > Duration.zero) {
       map['runtime'] ??= Duration(seconds: _wholeSeconds(end));
     }
