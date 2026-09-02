@@ -22,6 +22,13 @@
 // and unit-number digits are zeroed (the bug was first reported against real
 // Symbios devices in issue #288).
 
+// Every check in this file is an assert, so a build that defines NDEBUG would
+// compile all of them out and leave each test printing PASS while verifying
+// nothing. CI configures without a build type today, so asserts are live, but
+// adding -DCMAKE_BUILD_TYPE=Release is an ordinary thing to do and would
+// silently turn this file into a no-op. Keep assertions regardless.
+#undef NDEBUG
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
