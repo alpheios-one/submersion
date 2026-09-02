@@ -96,4 +96,35 @@ void main() {
 
     expect(find.textContaining('Low confidence - estimate'), findsOneWidget);
   });
+
+  testWidgets('body composition term renders its label and source', (
+    tester,
+  ) async {
+    const bmiPrediction = WeightPrediction(
+      totalKg: 8.6,
+      terms: [
+        PredictionTerm(
+          label: 'bmi',
+          kg: 0.6,
+          source: TermSource.bodyComposition,
+        ),
+      ],
+      confidence: PredictionConfidence.low,
+      supportingDives: 0,
+    );
+    await tester.pumpWidget(
+      localizedMaterialApp(
+        home: const SingleChildScrollView(
+          child: WeightPredictionCard(prediction: bmiPrediction, units: units),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('How this was calculated'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Body composition (estimated from BMI)'), findsOneWidget);
+    expect(find.text('+0.6 kg'), findsOneWidget);
+  });
 }

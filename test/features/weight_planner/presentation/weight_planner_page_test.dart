@@ -4,6 +4,7 @@ import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
 import 'package:submersion/core/buoyancy/weight_observation.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/divers/data/repositories/diver_weight_entry_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver_weight_entry.dart';
@@ -13,6 +14,7 @@ import 'package:submersion/features/equipment/domain/entities/equipment_item.dar
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
@@ -67,8 +69,14 @@ void main() {
     WidgetTester tester, {
     List<dynamic> extraOverrides = const [],
     DiverWeightEntry? latestWeight,
+    double? latestHeight,
+    AppSettings? settings,
   }) async {
-    final base = await getBaseOverrides();
+    final base = await getBaseOverrides(
+      settingsNotifier: settings == null
+          ? null
+          : MockSettingsNotifier(settings),
+    );
     await tester.pumpWidget(
       testApp(
         locale: const Locale('en'),
@@ -85,6 +93,7 @@ void main() {
           latestDiverWeightProvider.overrideWith(
             (ref) async => latestWeight ?? entry,
           ),
+          latestDiverHeightProvider.overrideWith((ref) async => latestHeight),
           tankPresetsProvider.overrideWith(
             (ref) async => [
               TankPresetEntity.fromBuiltIn(TankPresets.al80),
@@ -286,6 +295,112 @@ void main() {
           .map((s) => s.depthM)
           .reduce((a, b) => a > b ? a : b);
       expect(deepest, 30);
+    });
+  });
+
+  group('BMI factor', () {
+    Future<void> pumpWithHeight(WidgetTester tester) =>
+        pumpPage(tester, latestHeight: 165.0);
+
+    testWidgets('profile height prefills the field and adds a body '
+        'composition term', (tester) async {
+      await pumpWithHeight(tester);
+      final field = tester.widget<TextField>(
+        find.widgetWithText(TextField, 'Height (optional)'),
+      );
+      expect(field.controller?.text, '165');
+      // 80 kg at 165 cm.
+      expect(find.textContaining('BMI 29.4'), findsOneWidget);
+
+      await tester.tap(find.text('How this was calculated'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Body composition (estimated from BMI)'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a different height changes the prediction', (tester) async {
+      await pumpWithHeight(tester);
+      final before = predictedText(tester);
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Height (optional)'),
+        '190',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('BMI 22.2'), findsOneWidget);
+      expect(predictedText(tester), isNot(before));
+    });
+
+    testWidgets('imperial depth units split the height into feet and '
+        'inches', (tester) async {
+      await pumpPage(
+        tester,
+        settings: const AppSettings(depthUnit: DepthUnit.feet),
+        latestHeight: 165.0,
+      );
+      String? text(String label) => tester
+          .widget<TextField>(find.widgetWithText(TextField, label))
+          .controller
+          ?.text;
+      // 165 cm is 65 inches: 5 ft 5 in. The whole-inch seed reads back as
+      // 165.1 cm, so the BMI lands a tenth lower than the metric case.
+      expect(text('Height (ft)'), '5');
+      expect(text('Inches'), '5');
+      expect(find.textContaining('BMI 29.3'), findsOneWidget);
+    });
+
+    testWidgets('a height that differs from the profile offers the save '
+        'action', (tester) async {
+      await pumpPage(tester);
+      expect(find.byTooltip('Save weight to profile'), findsNothing);
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Height (optional)'),
+        '170',
+      );
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Save weight to profile'), findsOneWidget);
+    });
+
+    testWidgets('save-to-profile stores the entered height', (tester) async {
+      await setUpTestDatabase();
+      addTearDown(tearDownTestDatabase);
+      final db = DatabaseService.instance.database;
+      await db.customStatement(
+        "INSERT INTO divers (id, name, created_at, updated_at) "
+        "VALUES ('diver-1', 'Eric', 1000, 1000)",
+      );
+
+      await pumpPage(
+        tester,
+        latestWeight: null,
+        extraOverrides: [
+          validatedCurrentDiverIdProvider.overrideWith(
+            (ref) async => 'diver-1',
+          ),
+        ],
+      );
+
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Body Weight (optional)'),
+        '85',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Height (optional)'),
+        '170',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Save weight to profile'));
+      await tester.pumpAndSettle();
+
+      final entries = await DiverWeightEntryRepository().getEntriesForDiver(
+        'diver-1',
+      );
+      expect(entries.single.weightKg, 85.0);
+      expect(entries.single.heightCm, 170.0);
     });
   });
 }

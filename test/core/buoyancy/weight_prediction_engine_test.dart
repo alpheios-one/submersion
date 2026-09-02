@@ -267,4 +267,93 @@ void main() {
       expect(neoKg - trilamKg, closeTo(4.0, 0.5));
     });
   });
+
+  group('BMI factor', () {
+    RigSpec rigWithHeight(double? heightCm) => RigSpec(
+      gear: const [suit, bcd],
+      tanks: const [al80Spec],
+      waterType: WaterType.salt,
+      bodyWeightKg: 80,
+      heightCm: heightCm,
+    );
+
+    FittedWeightModel fitWithHeight(double? heightCm, {int dives = 20}) =>
+        WeightPredictionEngine.fit(
+          observations: [for (var i = 0; i < dives; i++) obs(index: i)],
+          gearById: gearById,
+          bodyWeightKg: 80,
+          heightCm: heightCm,
+          now: now,
+        );
+
+    test('no height anywhere means no body composition term', () {
+      final prediction = fit(const []).predict(rigWithHeight(null));
+      expect(prediction.terms.any((t) => t.label == 'bmi'), isFalse);
+    });
+
+    test('the reference height adds a zero term and leaves the total '
+        'unchanged', () {
+      final model = fit(const []);
+      final without = model.predict(rigWithHeight(null));
+      final at175 = model.predict(rigWithHeight(175));
+      expect(at175.totalKg, closeTo(without.totalKg, 1e-9));
+      final term = at175.terms.singleWhere((t) => t.label == 'bmi');
+      expect(term.kg, closeTo(0, 1e-9));
+      expect(term.source, TermSource.bodyComposition);
+    });
+
+    test('a shorter diver predicts more lead, a taller one less', () {
+      final model = fit(const []);
+      final base = model.predict(rigWithHeight(175)).totalKg;
+      expect(
+        model.predict(rigWithHeight(160)).totalKg,
+        greaterThan(base + 0.5),
+      );
+      expect(model.predict(rigWithHeight(195)).totalKg, lessThan(base - 0.5));
+    });
+
+    test('history dominates: a fitted diver still predicts the carried '
+        'weight', () {
+      final model = fitWithHeight(160);
+      expect(model.predict(rigWithHeight(160)).totalKg, closeTo(8.0, 0.5));
+    });
+
+    test('the fit height is the fallback when the rig omits it', () {
+      final model = fitWithHeight(160);
+      expect(model.heightCm, 160);
+      final explicit = model.predict(rigWithHeight(160));
+      final fallback = model.predict(rigWithHeight(null));
+      expect(fallback.totalKg, closeTo(explicit.totalKg, 1e-9));
+      expect(fallback.terms.any((t) => t.label == 'bmi'), isTrue);
+    });
+
+    test('a different rig height shifts a fitted prediction by the term '
+        'delta', () {
+      final model = fitWithHeight(175);
+      final at175 = model.predict(rigWithHeight(175)).totalKg;
+      final at160 = model.predict(rigWithHeight(160)).totalKg;
+      // 80 kg: BMI 31.25 at 160 cm against 26.12 at 175 cm, 0.0024 kg per
+      // BMI unit per kg of body mass.
+      expect(at160 - at175, closeTo(0.985, 0.05));
+    });
+
+    test('the term needs a real body weight, never the default', () {
+      final model = WeightPredictionEngine.fit(
+        observations: const [],
+        gearById: gearById,
+        bodyWeightKg: null,
+        heightCm: 175,
+        now: now,
+      );
+      final prediction = model.predict(
+        const RigSpec(
+          gear: [suit, bcd],
+          tanks: [al80Spec],
+          waterType: WaterType.salt,
+          heightCm: 175,
+        ),
+      );
+      expect(prediction.terms.any((t) => t.label == 'bmi'), isFalse);
+    });
+  });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -12,13 +13,20 @@ import 'package:submersion/features/tank_presets/presentation/providers/tank_pre
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The rig inputs for a weight prediction: gear chips (with set/item
-/// pickers), tank preset rows, water type, and body weight. Shared by the
-/// Weight Planner tool; the plan editor derives tanks/water from the plan.
+/// pickers), tank preset rows, water type, body weight, and optional height
+/// (centimetres, or feet and inches under imperial depth units). Shared by
+/// the Weight Planner tool; the plan editor derives tanks/water from the plan.
 class RigComposer extends ConsumerWidget {
   final List<EquipmentItem> gear;
   final List<TankPresetEntity> tanks;
   final WaterType waterType;
   final TextEditingController bodyWeightController;
+  final TextEditingController heightCmController;
+  final TextEditingController heightFeetController;
+  final TextEditingController heightInchesController;
+
+  /// BMI derived from the entered weight and height; null hides the readout.
+  final double? bmi;
   final UnitFormatter units;
   final bool showSaveBodyWeight;
   final ValueChanged<EquipmentItem> onGearAdded;
@@ -37,6 +45,10 @@ class RigComposer extends ConsumerWidget {
     required this.tanks,
     required this.waterType,
     required this.bodyWeightController,
+    required this.heightCmController,
+    required this.heightFeetController,
+    required this.heightInchesController,
+    this.bmi,
     required this.units,
     required this.showSaveBodyWeight,
     required this.onGearAdded,
@@ -231,9 +243,67 @@ class RigComposer extends ConsumerWidget {
               ),
               onChanged: (_) => onChanged(),
             ),
+            const SizedBox(height: 12),
+            _heightFields(context),
+            if (bmi != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  context.l10n.tools_weight_bmiHelper(
+                    NumberFormat.decimalPatternDigits(
+                      locale: Localizations.localeOf(context).toString(),
+                      decimalDigits: 1,
+                    ).format(bmi),
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Height entry in the diver's units. Mirrors the body-weight history
+  /// dialog: one centimetre field, or feet and inches side by side.
+  Widget _heightFields(BuildContext context) {
+    if (units.heightIsMetric) {
+      return TextField(
+        controller: heightCmController,
+        decoration: InputDecoration(
+          labelText: context.l10n.tools_weight_heightOptional,
+          suffixText: 'cm',
+        ),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        onChanged: (_) => onChanged(),
+      );
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: heightFeetController,
+            decoration: InputDecoration(
+              labelText: context.l10n.bodyWeight_heightFeetLabel,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: false),
+            onChanged: (_) => onChanged(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: heightInchesController,
+            decoration: InputDecoration(
+              labelText: context.l10n.bodyWeight_heightInchesLabel,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: false),
+            onChanged: (_) => onChanged(),
+          ),
+        ),
+      ],
     );
   }
 }

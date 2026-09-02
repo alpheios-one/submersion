@@ -204,6 +204,7 @@ class BuoyancySection extends ConsumerWidget {
     return switch (raw) {
       'personal' => l10n.tools_weight_personalTerm,
       'water' => l10n.tools_weight_waterTerm,
+      'bmi' => l10n.tools_weight_bmiTerm,
       'suit' => l10n.buoyancy_suitTerm,
       'lead' => l10n.buoyancy_leadTerm,
       // Fallback for a tank with no preset/user name (see the assembler and
@@ -220,6 +221,7 @@ class BuoyancySection extends ConsumerWidget {
       TermSource.userSpec => l10n.tools_weight_source_userSpec,
       TermSource.typeDefault => l10n.tools_weight_source_typeDefault,
       TermSource.physics => l10n.tools_weight_source_physics,
+      TermSource.bodyComposition => l10n.tools_weight_source_bodyComposition,
     };
   }
 }

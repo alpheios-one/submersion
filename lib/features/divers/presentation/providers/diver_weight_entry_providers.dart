@@ -33,3 +33,14 @@ final latestDiverWeightProvider = FutureProvider<DiverWeightEntry?>((
   final entries = await ref.watch(diverWeightEntriesProvider.future);
   return entries.isEmpty ? null : entries.first;
 });
+
+/// The active diver's most recent recorded height in centimetres: the newest
+/// entry that carries one. Height is optional per entry and changes far more
+/// slowly than weight, so a newer weight-only entry must not discard it.
+final latestDiverHeightProvider = FutureProvider<double?>((ref) async {
+  final entries = await ref.watch(diverWeightEntriesProvider.future);
+  for (final entry in entries) {
+    if (entry.heightCm != null) return entry.heightCm;
+  }
+  return null;
+});

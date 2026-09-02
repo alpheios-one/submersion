@@ -36,6 +36,8 @@ class WeightPredictionCard extends StatelessWidget {
         TermSource.userSpec => context.l10n.tools_weight_source_userSpec,
         TermSource.typeDefault => context.l10n.tools_weight_source_typeDefault,
         TermSource.physics => context.l10n.tools_weight_source_physics,
+        TermSource.bodyComposition =>
+          context.l10n.tools_weight_source_bodyComposition,
       };
 
   String _termLabel(BuildContext context, PredictionTerm term) {
@@ -43,6 +45,7 @@ class WeightPredictionCard extends StatelessWidget {
       return context.l10n.tools_weight_personalTerm;
     }
     if (term.label == 'water') return context.l10n.tools_weight_waterTerm;
+    if (term.label == 'bmi') return context.l10n.tools_weight_bmiTerm;
     return term.label;
   }
 

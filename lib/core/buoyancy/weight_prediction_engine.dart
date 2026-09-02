@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:equatable/equatable.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/buoyancy_physics.dart';
 import 'package:submersion/core/buoyancy/gear_feature.dart';
 import 'package:submersion/core/buoyancy/ridge_regression.dart';
@@ -38,19 +39,24 @@ class RigSpec extends Equatable {
   final WaterType? waterType;
   final double? bodyWeightKg;
 
+  /// Diver height for the body-composition term. Null falls back to the
+  /// height the model was fitted with, like [bodyWeightKg].
+  final double? heightCm;
+
   const RigSpec({
     this.gear = const [],
     this.tanks = const [],
     this.waterType,
     this.bodyWeightKg,
+    this.heightCm,
   });
 
   @override
-  List<Object?> get props => [gear, tanks, waterType, bodyWeightKg];
+  List<Object?> get props => [gear, tanks, waterType, bodyWeightKg, heightCm];
 }
 
 /// Where a breakdown term's value came from.
-enum TermSource { measured, userSpec, typeDefault, physics }
+enum TermSource { measured, userSpec, typeDefault, physics, bodyComposition }
 
 class PredictionTerm extends Equatable {
   final String label;
@@ -111,14 +117,27 @@ class WeightPredictionEngine {
   /// returns null for ids that must not become features (lead/tank items,
   /// or per the caller's policy). Deleted gear should be given a weak
   /// zero-prior feature by the caller so its dives still inform the fit.
+  ///
+  /// [heightCm] enables the body-composition (BMI) term. It is treated like
+  /// a physics term: subtracted before the regression so the personal
+  /// intercept explains only what neither physics nor BMI can, then added
+  /// back by [FittedWeightModel.predict]. It needs a real [bodyWeightKg];
+  /// the default body mass would fabricate a BMI.
   static FittedWeightModel fit({
     required List<WeightObservation> observations,
     required GearFeature? Function(String equipmentId) gearById,
     double? bodyWeightKg,
+    double? heightCm,
     DateTime? now,
   }) {
     final effectiveNow = now ?? DateTime.now();
     final bodyMass = bodyWeightKg ?? BuoyancyPhysics.defaultBodyMassKg;
+    final bodyCompositionKg = bodyWeightKg == null
+        ? 0.0
+        : BodyComposition.leadTermKg(
+            bodyMassKg: bodyWeightKg,
+            heightCm: heightCm,
+          );
 
     // Collect the distinct gear features seen in history.
     final featuresById = <String, GearFeature>{};
@@ -157,7 +176,7 @@ class WeightPredictionEngine {
       final corrected =
           observation.carriedKg + _feedbackAdjustment(observation);
       final physics = _observationPhysics(observation, bodyMass, featuresById);
-      y.add(corrected - physics);
+      y.add(corrected - physics - bodyCompositionKg);
 
       final row = List.filled(featureIds.length + 1, 0.0);
       row[0] = 1.0;
@@ -219,6 +238,7 @@ class WeightPredictionEngine {
       supportingDives: supportingDives,
       residualStdKg: residualStd,
       bodyWeightKg: bodyWeightKg,
+      heightCm: heightCm,
     );
   }
 
@@ -298,6 +318,9 @@ class FittedWeightModel {
   final double residualStdKg;
   final double? bodyWeightKg;
 
+  /// Height the model was fitted with; the fallback for rigs that omit it.
+  final double? heightCm;
+
   const FittedWeightModel._({
     required this.personalCoefficient,
     required this.coefficientsById,
@@ -305,6 +328,7 @@ class FittedWeightModel {
     required this.supportingDives,
     required this.residualStdKg,
     required this.bodyWeightKg,
+    required this.heightCm,
   });
 
   WeightPrediction predict(RigSpec rig) {
@@ -321,6 +345,25 @@ class FittedWeightModel {
             : TermSource.typeDefault,
       ),
     );
+
+    // Mirrors the subtraction in [WeightPredictionEngine.fit]; a rig may
+    // carry a different body than the calibration did.
+    final knownBodyMass = rig.bodyWeightKg ?? bodyWeightKg;
+    final height = rig.heightCm ?? heightCm;
+    if (knownBodyMass != null &&
+        BodyComposition.bmi(weightKg: knownBodyMass, heightCm: height) !=
+            null) {
+      terms.add(
+        PredictionTerm(
+          label: 'bmi',
+          kg: BodyComposition.leadTermKg(
+            bodyMassKg: knownBodyMass,
+            heightCm: height,
+          ),
+          source: TermSource.bodyComposition,
+        ),
+      );
+    }
 
     var gearDryMass = 0.0;
     for (final gear in rig.gear) {

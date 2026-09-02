@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/gear_feature.dart';
 import 'package:submersion/core/buoyancy/placement_predictor.dart';
 import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
@@ -54,7 +55,11 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   double? _maxDepthDraft;
   int? _bottomMinutesDraft;
   final _bodyWeightController = TextEditingController();
+  final _heightCmController = TextEditingController();
+  final _heightFeetController = TextEditingController();
+  final _heightInchesController = TextEditingController();
   bool _bodyWeightSeeded = false;
+  bool _heightSeeded = false;
   bool _tanksSeeded = false;
   String? _deltaText;
   Timer? _deltaTimer;
@@ -63,6 +68,9 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   void dispose() {
     _deltaTimer?.cancel();
     _bodyWeightController.dispose();
+    _heightCmController.dispose();
+    _heightFeetController.dispose();
+    _heightInchesController.dispose();
     super.dispose();
   }
 
@@ -72,6 +80,18 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   double? _bodyWeightKg(UnitFormatter units) {
     final parsed = parseUserDecimal(_bodyWeightController.text);
     return parsed != null ? units.weightToKg(parsed) : null;
+  }
+
+  /// Entered height in centimetres, or null when the field(s) are empty so
+  /// the prediction falls back to the profile height.
+  double? _heightCm(UnitFormatter units) {
+    if (units.heightIsMetric) {
+      return parseUserDecimal(_heightCmController.text);
+    }
+    final feet = parseUserDecimal(_heightFeetController.text);
+    final inches = parseUserDecimal(_heightInchesController.text);
+    if (feet == null && inches == null) return null;
+    return units.feetInchesToCm(feet ?? 0, inches ?? 0);
   }
 
   WeightPrediction? _predict(FittedWeightModel? model, UnitFormatter units) {
@@ -92,6 +112,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
         tanks: tanks,
         waterType: _water,
         bodyWeightKg: _bodyWeightKg(units),
+        heightCm: _heightCm(units),
       ),
     );
   }
@@ -127,6 +148,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
       model: model,
       waterType: _water,
       bodyWeightKg: _bodyWeightKg(units),
+      heightCm: _heightCm(units),
     );
     final input = TwinInput(
       profile: _squareProfile(),
@@ -264,6 +286,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
             diverId: diverId,
             measuredAt: now,
             weightKg: kg,
+            heightCm: _heightCm(units),
             createdAt: now,
             updatedAt: now,
           ),
@@ -298,6 +321,19 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
         (shown * 10).roundToDouble() / 10,
       );
     }
+    // Prefill height from the newest profile entry that records one, once.
+    // Whole centimetres or whole inches need no locale formatting.
+    final latestHeight = ref.watch(latestDiverHeightProvider).valueOrNull;
+    if (!_heightSeeded && latestHeight != null) {
+      _heightSeeded = true;
+      if (units.heightIsMetric) {
+        _heightCmController.text = '${latestHeight.round()}';
+      } else {
+        final split = units.cmToFeetInches(latestHeight);
+        _heightFeetController.text = '${split.feet}';
+        _heightInchesController.text = '${split.inches}';
+      }
+    }
     // Start with one tank once presets load.
     final presets = ref.watch(tankPresetsProvider).valueOrNull;
     if (!_tanksSeeded && presets != null && presets.isNotEmpty) {
@@ -325,9 +361,19 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
 
     final savedWeightKg = latestWeight?.weightKg;
     final enteredKg = _bodyWeightKg(units);
-    final showSave =
+    final enteredHeight = _heightCm(units);
+    final weightDiffers =
         enteredKg != null &&
         (savedWeightKg == null || (enteredKg - savedWeightKg).abs() > 0.05);
+    // Half a centimetre absorbs the whole-inch rounding of an imperial seed.
+    final heightDiffers =
+        enteredHeight != null &&
+        (latestHeight == null || (enteredHeight - latestHeight).abs() > 0.5);
+    // A profile entry always carries a weight, so height alone cannot save.
+    final showSave = enteredKg != null && (weightDiffers || heightDiffers);
+    final bmi = enteredKg == null
+        ? null
+        : BodyComposition.bmi(weightKg: enteredKg, heightCm: enteredHeight);
 
     final content = SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -354,6 +400,10 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
             tanks: _tanks,
             waterType: _water,
             bodyWeightController: _bodyWeightController,
+            heightCmController: _heightCmController,
+            heightFeetController: _heightFeetController,
+            heightInchesController: _heightInchesController,
+            bmi: bmi,
             units: units,
             showSaveBodyWeight: showSave,
             onGearAdded: (item) => _mutate(units, () => _gear.add(item)),

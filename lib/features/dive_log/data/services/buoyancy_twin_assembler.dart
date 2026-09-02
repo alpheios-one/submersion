@@ -1,3 +1,4 @@
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/buoyancy_physics.dart';
 import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
 import 'package:submersion/core/buoyancy/gear_feature.dart';
@@ -112,12 +113,16 @@ class BuoyancyTwinAssembler {
   /// Composes the suit input and the constant static terms from an equipment
   /// list, mirroring how [FittedWeightModel.predict] labels and sources each
   /// term. Reused by the Dive Planner and Weight Planner surfaces.
+  ///
+  /// [heightCm] feeds the body-composition term; null falls back to the
+  /// height the model was fitted with, as [FittedWeightModel.predict] does.
   static RigTerms composeRigTerms({
     required List<EquipmentItem> items,
     required List<TwinTankInput> tanks,
     required FittedWeightModel model,
     required WaterType? waterType,
     required double? bodyWeightKg,
+    double? heightCm,
   }) {
     final suitItem = _exposureSuit(items);
     final bodyMass = bodyWeightKg ?? BuoyancyPhysics.defaultBodyMassKg;
@@ -134,6 +139,24 @@ class BuoyancyTwinAssembler {
             : TermSource.typeDefault,
       ),
     );
+
+    // Same guard as predict: a real body weight, never the default.
+    final knownBodyMass = bodyWeightKg ?? model.bodyWeightKg;
+    final height = heightCm ?? model.heightCm;
+    if (knownBodyMass != null &&
+        BodyComposition.bmi(weightKg: knownBodyMass, heightCm: height) !=
+            null) {
+      staticTerms.add(
+        TwinStaticTerm(
+          label: 'bmi',
+          kg: BodyComposition.leadTermKg(
+            bodyMassKg: knownBodyMass,
+            heightCm: height,
+          ),
+          source: TermSource.bodyComposition,
+        ),
+      );
+    }
 
     for (final item in items) {
       final feature = _featureFor(item);
