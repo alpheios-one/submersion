@@ -1147,12 +1147,16 @@ class DiveComputerRepository {
         // deco (ceiling, deco stops, exhausted NDL). Default those to the
         // built-in 'technical' type instead.
         //
-        // 'deepstop' events are excluded here even though _mapEventTypeString
-        // maps them to 'decoStopStart' for persistence/display: deep stops are
-        // precautionary, not mandatory deco, mirroring the decoType: 3
-        // exclusion already applied to samples.
+        // _mapEventTypeString is a display mapping and is lossy: it collapses
+        // libdivecomputer's 'deepstop' onto 'decoStopStart' and
+        // 'ceiling_safetystop' onto 'decoViolation'. Both of those raw events
+        // are precautionary rather than proof of a mandatory deco obligation
+        // (a deep stop, and breaching a *safety* stop ceiling), so they are
+        // filtered out before detection, mirroring the decoType: 3 exclusion
+        // already applied to samples. The mapping itself stays untouched so
+        // the persisted profile events and their icons are unchanged.
         final decoEventMaps = events
-            ?.where((e) => e.type != 'deepstop')
+            ?.where((e) => !_nonDecoEventTypes.contains(e.type))
             .map((e) => _mapEventTypeString(e.type))
             .whereType<String>()
             .map((type) => {'eventType': type})
@@ -2005,6 +2009,14 @@ class DiveComputerRepository {
         (timestamp: point.timestamp, depth: point.depth),
     ]);
   }
+
+  /// Raw libdivecomputer event types that [_mapEventTypeString] folds into a
+  /// deco-flavoured label for display, but which do not by themselves prove a
+  /// decompression obligation. See the deco-default block in [importProfile].
+  static const Set<String> _nonDecoEventTypes = {
+    'deepstop',
+    'ceiling_safetystop',
+  };
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.
   ///
