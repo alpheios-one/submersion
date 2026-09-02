@@ -325,8 +325,10 @@ class MacDiveDiveMapper {
     if (temps.isNotEmpty) {
       map['waterTemp'] ??= temps.reduce((a, b) => a < b ? a : b);
     }
-    final last = samples.last.time;
-    if (last > Duration.zero) map['runtime'] ??= last;
+    // The latest stamp rather than the last record: the decoder reports what
+    // MacDive stored, and one library is known to hold a backwards step.
+    final end = samples.map((s) => s.time).reduce((a, b) => a > b ? a : b);
+    if (end > Duration.zero) map['runtime'] ??= end;
     return true;
   }
 

@@ -109,14 +109,20 @@ void main() {
     });
 
     test('fractional seconds survive the float', () {
-      final blob = _encode([(2.5, 1.0), (7.25, 2.0)], options: 0);
+      final blob = _encode([
+        [2.5, 1.0],
+        [7.25, 2.0],
+      ], options: 0);
       final samples = MacDiveSamplesDecoder.decode(blob)!;
       expect(samples.map((s) => s.time.inMilliseconds), [2500, 7250]);
     });
 
     test('versions 2 and 3 share the version 4 layout', () {
       for (final version in [2, 3]) {
-        final blob = _encode([(0.0, 0.0), (5.0, 3.0)], options: 0);
+        final blob = _encode([
+          [0.0, 0.0],
+          [5.0, 3.0],
+        ], options: 0);
         ByteData.sublistView(blob).setUint32(0, version, Endian.little);
         final samples = MacDiveSamplesDecoder.decode(blob);
         expect(samples, isNotNull, reason: 'version $version');
@@ -125,9 +131,25 @@ void main() {
     });
 
     test('bits above the low byte of the options word are ignored', () {
-      final blob = _encode([(0.0, 0.0), (5.0, 3.0)], options: 0);
+      final blob = _encode([
+        [0.0, 0.0],
+        [5.0, 3.0],
+      ], options: 0);
       ByteData.sublistView(blob).setUint32(4, 0x100, Endian.little);
       expect(MacDiveSamplesDecoder.decode(blob), hasLength(2));
+    });
+
+    test('a non-finite optional field is dropped, not fatal', () {
+      // A bad reading inside a profile MacDive still displays: keep the
+      // sample, lose the field.
+      final blob = _encode([
+        [0.0, 0.0, 27.5],
+        [10.0, 5.5, double.nan],
+        [20.0, 12.25, double.infinity],
+      ], options: MacDiveSamplesDecoder.optionTemperature);
+      final samples = MacDiveSamplesDecoder.decode(blob)!;
+      expect(samples.map((s) => s.depthMeters), [0.0, 5.5, 12.25]);
+      expect(samples.map((s) => s.temperatureCelsius), [27.5, null, null]);
     });
 
     test('version 1 records are unencrypted 24-byte fixed layouts', () {
@@ -137,7 +159,7 @@ void main() {
       var offset = 4;
       for (final (time, depth, air, ndt, ppo2, temp) in [
         (0.0, 0.0, 200.0, 99, 0.21, 22.0),
-        (30.0, 18.0, 190.0, 40, 0.59, 21.5),
+        (30.0, 18.0, double.nan, 40, 0.59, 21.5),
       ]) {
         data.setFloat32(offset, time, Endian.little);
         data.setFloat32(offset + 4, depth, Endian.little);
@@ -153,7 +175,9 @@ void main() {
       final s = samples[1];
       expect(s.time, const Duration(seconds: 30));
       expect(s.depthMeters, 18.0);
-      expect(s.pressure, 190.0);
+      // Non-finite optional values are dropped here too.
+      expect(s.pressure, isNull);
+      expect(samples[0].pressure, 200.0);
       expect(s.ndtMinutes, 40);
       expect(s.ppO2, closeTo(0.59, 1e-6));
       expect(s.temperatureCelsius, 21.5);
@@ -193,7 +217,10 @@ void main() {
       });
 
       test('a record run that is not a whole number of records', () {
-        final blob = _encode([(0.0, 0.0), (5.0, 3.0)], options: 0);
+        final blob = _encode([
+          [0.0, 0.0],
+          [5.0, 3.0],
+        ], options: 0);
         // Claim pressure is present: the stride becomes 12, which does not
         // divide the 16-byte run.
         ByteData.sublistView(
@@ -203,7 +230,10 @@ void main() {
       });
 
       test('a non-finite time or depth', () {
-        final blob = _encode([(0.0, 0.0), (double.nan, 3.0)], options: 0);
+        final blob = _encode([
+          [0.0, 0.0],
+          [double.nan, 3.0],
+        ], options: 0);
         expect(MacDiveSamplesDecoder.decode(blob), isNull);
       });
 
@@ -219,15 +249,18 @@ void main() {
   });
 }
 
-/// Encodes bare (time, depth) records the way MacDive's encoder does: pack,
-/// pad to a block boundary, append a block whose last word is the byte length
-/// of the packed run, then TEA-ECB the lot under the app key.
-Uint8List _encode(List<(double, double)> records, {required int options}) {
-  final packed = Uint8List(records.length * 8);
+/// Encodes float-only records the way MacDive's encoder does: pack each
+/// record's 32-bit floats back to back, pad to a block boundary, append a
+/// block whose last word is the byte length of the packed run, then TEA-ECB
+/// the lot under the app key. Every record must have the same width.
+Uint8List _encode(List<List<double>> records, {required int options}) {
+  final width = records.isEmpty ? 0 : records.first.length * 4;
+  final packed = Uint8List(records.length * width);
   final data = ByteData.sublistView(packed);
   for (var i = 0; i < records.length; i++) {
-    data.setFloat32(i * 8, records[i].$1, Endian.little);
-    data.setFloat32(i * 8 + 4, records[i].$2, Endian.little);
+    for (var j = 0; j < records[i].length; j++) {
+      data.setFloat32(i * width + j * 4, records[i][j], Endian.little);
+    }
   }
   final blocks = (packed.length + 7) ~/ 8 + 1;
   final plain = Uint8List(blocks * 8)..setRange(0, packed.length, packed);

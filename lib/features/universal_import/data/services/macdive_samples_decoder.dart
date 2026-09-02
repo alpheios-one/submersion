@@ -23,7 +23,7 @@ import 'package:submersion/features/universal_import/data/services/tea_block_cip
 /// padding and, in the last four bytes of the buffer, the byte length of the
 /// record run. Every record starts with `time` and `depth` as 32-bit floats
 /// and then carries one 4-byte field per set options bit, in the fixed order
-/// [_fieldOrder] lists (which is not bit order).
+/// the reads in [_decodeV2] follow (which is not bit order).
 ///
 /// Version 1 predates the encryption: the same 4-byte version word, then
 /// unencrypted 24-byte records of time, depth, pressure, NDT, ppO2 and
@@ -40,8 +40,8 @@ class MacDiveSamplesDecoder {
   /// build blobs the same way MacDive's encoder does.
   static const cipher = TeaBlockCipher(0x86, 0x16, 0x80, 0x60);
 
-  /// Options bits. The optional fields are written in [_fieldOrder], not in
-  /// bit order, so the bit values matter only for presence.
+  /// Options bits. Presence is all they encode; the fields themselves are
+  /// laid out in the encoder's own order, not in bit order.
   static const int optionPressure = 1 << 0;
   static const int optionHeartRate = 1 << 1;
   static const int optionNdt = 1 << 2;
@@ -55,28 +55,6 @@ class MacDiveSamplesDecoder {
   /// tests bits 0 to 7 and nothing above.
   static const int _optionMask = 0xFF;
 
-  /// The order MacDive's encoder emits the optional fields, straight from
-  /// the disassembly: pressure, second pressure, heart rate, NDT, ppO2,
-  /// temperature, next stop depth, TTS.
-  static const List<int> _fieldOrder = [
-    optionPressure,
-    optionPressure2,
-    optionHeartRate,
-    optionNdt,
-    optionPpO2,
-    optionTemperature,
-    optionNextStopDepth,
-    optionTts,
-  ];
-
-  /// The fields MacDive stores as 32-bit integers; every other field is a
-  /// 32-bit float.
-  static const Set<int> _integerFields = {
-    optionHeartRate,
-    optionNdt,
-    optionTts,
-  };
-
   static const int _headerLength = 8;
   static const int _baseRecordLength = 8;
   static const int _fieldLength = 4;
@@ -85,6 +63,11 @@ class MacDiveSamplesDecoder {
   /// blob this decoder understands or fail its structural checks, so a
   /// corrupt or foreign column never turns into a plausible-looking profile.
   /// An empty list means MacDive stored a profile with no samples.
+  ///
+  /// Time and depth must be finite for the blob to be accepted at all. An
+  /// optional field that is not finite is dropped from its sample instead:
+  /// that is a bad reading inside a profile MacDive still displays, not a
+  /// sign the blob is foreign.
   static List<MacDiveSqliteSample>? decode(Uint8List blob) {
     if (blob.length < 4) return null;
     final version = ByteData.sublistView(blob).getUint32(0, Endian.little);
@@ -107,38 +90,38 @@ class MacDiveSamplesDecoder {
     final length = plainData.getUint32(plain.length - 4, Endian.little);
     if (length > plain.length - 4) return null;
 
-    var stride = _baseRecordLength;
-    for (final field in _fieldOrder) {
-      if ((options & field) != 0) stride += _fieldLength;
-    }
+    final stride = _baseRecordLength + _fieldLength * _bitCount(options);
     if (length % stride != 0) return null;
 
     final samples = <MacDiveSqliteSample>[];
     for (var offset = 0; offset < length; offset += stride) {
-      final reader = _RecordReader(plainData, offset);
-      final time = reader.float();
-      final depth = reader.float();
+      final record = _RecordReader(plainData, offset, options);
+      final time = record.float();
+      final depth = record.float();
       if (!time.isFinite || !depth.isFinite) return null;
-      // Optional fields, keyed by their option bit, read in emission order.
-      final values = <int, num>{
-        for (final field in _fieldOrder)
-          if ((options & field) != 0)
-            field: _integerFields.contains(field)
-                ? reader.int32()
-                : reader.float(),
-      };
+      // The optional fields, in the order MacDive's encoder emits them,
+      // straight from the disassembly. Each read advances only when its bit
+      // is set.
+      final pressure = record.optionalFloat(optionPressure);
+      final pressure2 = record.optionalFloat(optionPressure2);
+      final heartRate = record.optionalInt32(optionHeartRate);
+      final ndt = record.optionalInt32(optionNdt);
+      final ppO2 = record.optionalFloat(optionPpO2);
+      final temperature = record.optionalFloat(optionTemperature);
+      final nextStop = record.optionalFloat(optionNextStopDepth);
+      final tts = record.optionalInt32(optionTts);
       samples.add(
         MacDiveSqliteSample(
           time: _duration(time),
           depthMeters: depth,
-          pressure: values[optionPressure] as double?,
-          pressure2: values[optionPressure2] as double?,
-          heartRate: values[optionHeartRate] as int?,
-          ndtMinutes: values[optionNdt] as int?,
-          ppO2: values[optionPpO2] as double?,
-          temperatureCelsius: values[optionTemperature] as double?,
-          nextStopDepthMeters: values[optionNextStopDepth] as double?,
-          ttsMinutes: values[optionTts] as int?,
+          pressure: pressure,
+          pressure2: pressure2,
+          heartRate: heartRate,
+          ndtMinutes: ndt,
+          ppO2: ppO2,
+          temperatureCelsius: temperature,
+          nextStopDepthMeters: nextStop,
+          ttsMinutes: tts,
         ),
       );
     }
@@ -159,18 +142,18 @@ class MacDiveSamplesDecoder {
       offset + _v1RecordLength <= blob.length;
       offset += _v1RecordLength
     ) {
-      final reader = _RecordReader(data, offset);
-      final time = reader.float();
-      final depth = reader.float();
+      final record = _RecordReader(data, offset, 0);
+      final time = record.float();
+      final depth = record.float();
       if (!time.isFinite || !depth.isFinite) return null;
       samples.add(
         MacDiveSqliteSample(
           time: _duration(time),
           depthMeters: depth,
-          pressure: reader.float(),
-          ndtMinutes: reader.int32(),
-          ppO2: reader.float(),
-          temperatureCelsius: reader.float(),
+          pressure: record.finiteFloat(),
+          ndtMinutes: record.int32(),
+          ppO2: record.finiteFloat(),
+          temperatureCelsius: record.finiteFloat(),
         ),
       );
     }
@@ -179,13 +162,23 @@ class MacDiveSamplesDecoder {
 
   static Duration _duration(double seconds) =>
       Duration(milliseconds: (seconds * 1000).round());
+
+  /// Number of set bits in [v]; one 4-byte field per set option bit.
+  static int _bitCount(int v) {
+    var count = 0;
+    for (var rest = v; rest != 0; rest &= rest - 1) {
+      count++;
+    }
+    return count;
+  }
 }
 
 /// Sequential little-endian reads through one record.
 class _RecordReader {
-  _RecordReader(this._data, this._offset);
+  _RecordReader(this._data, this._offset, this._options);
 
   final ByteData _data;
+  final int _options;
   int _offset;
 
   double float() {
@@ -199,4 +192,17 @@ class _RecordReader {
     _offset += 4;
     return v;
   }
+
+  /// A float that is null when it is not a number MacDive could have shown.
+  double? finiteFloat() {
+    final v = float();
+    return v.isFinite ? v : null;
+  }
+
+  /// Reads a float only when [bit] is set in the record's options word.
+  double? optionalFloat(int bit) =>
+      (_options & bit) != 0 ? finiteFloat() : null;
+
+  /// Reads an int only when [bit] is set in the record's options word.
+  int? optionalInt32(int bit) => (_options & bit) != 0 ? int32() : null;
 }

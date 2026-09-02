@@ -781,6 +781,24 @@ void main() {
         expect(dive['runtime'], const Duration(seconds: 900));
       });
 
+      test('runtime is the latest stamp, not the last record', () async {
+        // The reference library holds one dive whose samples step backwards
+        // once; the decoder passes that through, so the mapper must not
+        // trust record order for the dive's length.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 24.0, 0),
+              (900.0, 3.0, 120.0, 40, 0.27, 23.0, 0),
+              (600.0, 18.0, 150.0, 20, 0.6, 21.0, 0),
+            ]),
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive['runtime'], const Duration(seconds: 900));
+      });
+
       test('a rejected raw parse falls back to ZSAMPLES silently', () async {
         // Shearwater dives in the reference library have both columns. A raw
         // parse the sanity check throws out used to cost the dive its profile
