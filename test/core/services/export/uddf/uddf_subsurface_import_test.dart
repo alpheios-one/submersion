@@ -138,6 +138,39 @@ void main() {
       );
     });
 
+    test('ignores a compact timezone offset', () {
+      // "+0200" and "+02" are valid ISO 8601. Left in place, DateTime.parse
+      // applies the offset and the wall clock is stored shifted by it.
+      expect(
+        UddfImportParsers.parseDiveDateTime('2024-06-15T08:42:30+0200'),
+        DateTime.utc(2024, 6, 15, 8, 42, 30),
+      );
+      expect(
+        UddfImportParsers.parseDiveDateTime('2024-06-15T08:42:30-0500'),
+        DateTime.utc(2024, 6, 15, 8, 42, 30),
+      );
+      expect(
+        UddfImportParsers.parseDiveDateTime('2024-06-15T08:42:30+02'),
+        DateTime.utc(2024, 6, 15, 8, 42, 30),
+      );
+      expect(
+        UddfImportParsers.parseDiveDateTime('2024-06-15T08:42:30.500+02:00'),
+        DateTime.utc(2024, 6, 15, 8, 42, 30),
+      );
+    });
+
+    test('does not mistake a date for a timezone offset', () {
+      // The "-05" ending a bare date must not be stripped as an offset.
+      expect(
+        UddfImportParsers.parseDiveDateTime('2008-09-05'),
+        DateTime.utc(2008, 9, 5),
+      );
+      expect(
+        UddfImportParsers.parseDiveDateTime('2008-09-05T'),
+        DateTime.utc(2008, 9, 5),
+      );
+    });
+
     test('returns null for empty and unparseable input', () {
       expect(UddfImportParsers.parseDiveDateTime(null), isNull);
       expect(UddfImportParsers.parseDiveDateTime(''), isNull);

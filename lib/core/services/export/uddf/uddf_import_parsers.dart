@@ -292,10 +292,16 @@ class UddfImportParsers {
     return GasMix(o2: o2, he: he);
   }
 
-  /// Trailing timezone info on a UDDF datetime: a "Z", or an offset such as
-  /// "+02:00" or "-05:00".
+  /// Trailing timezone info on a UDDF datetime: a "Z", or an offset in any of
+  /// the shapes ISO 8601 allows ("+02:00", "+0200", "+02").
+  ///
+  /// The lookbehind is what makes the compact forms safe to strip: it demands
+  /// a clock time immediately before the offset, so the trailing "-05" of a
+  /// bare "2008-09-05" cannot be mistaken for one. Without the compact forms
+  /// the suffix survived, [DateTime.parse] applied the offset, and the wall
+  /// clock was stored shifted by it ("08:42:30+0200" landed as 06:42:30).
   static final RegExp _timeZoneSuffixPattern = RegExp(
-    r'[Z+\-](?=\d{2}:\d{2}$)|Z$',
+    r'(?<=\d{2}:\d{2}(?::\d{2})?(?:[.,]\d+)?)\s*(?:Z|[+-]\d{2}:?\d{2}|[+-]\d{2})$',
   );
 
   /// A date carrying no time, optionally followed by the "T" separator that
@@ -322,7 +328,7 @@ class UddfImportParsers {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return null;
     // Strip any trailing timezone info (Z, +HH:MM, -HH:MM, etc.)
-    final bare = trimmed.split(_timeZoneSuffixPattern).first;
+    final bare = trimmed.replaceFirst(_timeZoneSuffixPattern, '');
     final dt =
         DateTime.tryParse(bare) ??
         DateTime.tryParse(
