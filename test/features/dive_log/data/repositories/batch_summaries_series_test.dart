@@ -56,9 +56,35 @@ void main() {
     },
   );
 
-  test('every series of a dive contributes, primary or not', () async {
+  // #543: a consolidated dive carries the secondary computer's series
+  // demoted next to the primary's; the sparkline must not interleave them.
+  test('a demoted series is left out when the dive has a primary', () async {
     await series.insertSeries(
       diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0),
+        ProfileSample(timestamp: 10, depth: 3.0),
+      ],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
+      samples: const [
+        ProfileSample(timestamp: 5, depth: 20.0),
+        ProfileSample(timestamp: 15, depth: 20.0),
+      ],
+      now: now,
+    );
+    final summaries = await dives.getBatchProfileSummaries(['dive-1']);
+    expect(summaries['dive-1']!.map((p) => p.timestamp), [0, 10]);
+    expect(summaries['dive-1']!.map((p) => p.depth), [1.0, 3.0]);
+  });
+
+  test('with no primary series every series contributes', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
       samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
       now: now,
     );

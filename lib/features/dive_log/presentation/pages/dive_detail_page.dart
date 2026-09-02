@@ -1722,11 +1722,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       for (final (index, s) in dataSources.indexed) s.id: sourceColorAt(index),
     };
 
-    // The chart's main series: the active source's own points on a
-    // multi-source dive; dive.profile otherwise (identical for the primary).
+    // The active source's profile, for attribution (activeComputerId) and
+    // the overlay set below.
     final activeProfile = activeSource == null
         ? null
         : sourceProfiles[activeSource.id];
+    // The chart's main series: the active source's own points on a
+    // multi-source dive; dive.profile otherwise (identical for the primary).
+    // activeSourceProfileProvider is the one rule for this, shared with the
+    // dive-list panel and the selected-point lookups further down (#543).
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -1735,9 +1739,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and a range extent that runs past its end (#1167).
-    final chartProfile = (isMultiSource && activeProfile != null)
-        ? activeProfile.points
-        : dive.profile;
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
 
     // Keep the playback and range extents on the drawn series.
     //
@@ -2280,11 +2283,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         : analysis.decoStatuses.length - 1;
     final status = analysis.decoStatuses[index];
 
-    // Build "at time" subtitle when a point is selected
+    // Build "at time" subtitle when a point is selected. The index came from
+    // the chart, which draws the active source's series, so it is resolved
+    // against that series and never against the merged dive.profile: on a
+    // consolidated dive the union has every computer's samples, so the same
+    // index lands on a different time (#543).
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
     final String? timeSubtitle =
-        selectedPointIndex != null && selectedPointIndex < dive.profile.length
+        selectedPointIndex != null && selectedPointIndex < chartProfile.length
         ? context.l10n.diveLog_detail_collapsed_atTime(
-            _formatTimestamp(dive.profile[selectedPointIndex].timestamp),
+            _formatTimestamp(chartProfile[selectedPointIndex].timestamp),
           )
         : null;
 
@@ -2477,13 +2486,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     }
 
     // Determine which phase the selected point falls into (using original
-    // non-overlapping segments for correct timestamp matching)
+    // non-overlapping segments for correct timestamp matching). The index is
+    // a chart index, so it is resolved against the series the chart draws
+    // (#543), see activeSourceProfileProvider.
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
     DivePhase? selectedPhase;
     int? selectedSegmentIndex;
     if (selectedPointIndex != null &&
-        dive.profile.isNotEmpty &&
-        selectedPointIndex < dive.profile.length) {
-      final selectedTimestamp = dive.profile[selectedPointIndex].timestamp;
+        chartProfile.isNotEmpty &&
+        selectedPointIndex < chartProfile.length) {
+      final selectedTimestamp = chartProfile[selectedPointIndex].timestamp;
       for (int i = 0; i < displaySegments.length; i++) {
         if (selectedTimestamp >= displaySegments[i].startTimestamp &&
             selectedTimestamp <= displaySegments[i].endTimestamp) {

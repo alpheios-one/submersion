@@ -1176,9 +1176,9 @@ class DiveRepository {
   /// shape (descents, safety stops, multilevel profiles) without spline
   /// smoothing flattening short features.
   ///
-  /// Merges every series of a dive (primary and demoted alike, since a batch
-  /// summary is not the edit-aware chart); a dive with no series is absent
-  /// from the result.
+  /// Summarises a dive's primary series only when it has any, every series
+  /// otherwise ([_sparklineSeries]); a dive with no series is absent from
+  /// the result.
   Future<Map<String, List<domain.DiveProfilePoint>>> getBatchProfileSummaries(
     List<String> diveIds, {
     int maxSamples = 120,
@@ -1190,7 +1190,7 @@ class DiveRepository {
         final result = <String, List<domain.DiveProfilePoint>>{
           for (final entry in byDive.entries)
             entry.key: _downsample([
-              for (final p in mergeSeriesPoints(entry.value))
+              for (final p in mergeSeriesPoints(_sparklineSeries(entry.value)))
                 domain.DiveProfilePoint(timestamp: p.timestamp, depth: p.depth),
             ], maxSamples),
         };
@@ -1204,6 +1204,24 @@ class DiveRepository {
       );
       return {};
     }
+  }
+
+  /// The series a sparkline summarises: the primary ones when the dive has
+  /// any, every series otherwise. Same rule as [getDiveProfile]'s
+  /// `primaryOnly` read, so the mini chart and the lazily loaded list
+  /// profile show the same shape.
+  ///
+  /// A demoted series is either a consolidated secondary computer's copy of
+  /// the dive or the originals a saved edit superseded. Interleaving either
+  /// with the primary drew the mini chart as a sawtooth between two
+  /// computers' depths (#543). A dive whose only series are demoted (none
+  /// promoted yet) still gets a summary from all of them.
+  static List<ProfileSeries> _sparklineSeries(List<ProfileSeries> series) {
+    final primary = [
+      for (final s in series)
+        if (s.isPrimary) s,
+    ];
+    return primary.isEmpty ? series : primary;
   }
 
   /// Evenly spaces [points] down to at most [maxSamples], keeping the first

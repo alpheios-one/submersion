@@ -5,6 +5,8 @@ import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/deco/entities/o2_exposure.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
@@ -87,6 +89,9 @@ Widget _buildPanel({
   String? highlightedDiveId,
   Dive? diveToReturn,
   ProfileAnalysis? analysis,
+  List<DiveDataSource> sources = const [],
+  Map<String, SourceProfile> sourceProfiles = const {},
+  ProfileAnalysis? activeSourceAnalysis,
 }) {
   return testApp(
     overrides: [
@@ -100,9 +105,24 @@ Widget _buildPanel({
           highlightedDiveId,
         ).overrideWith((ref) => Future.value(diveToReturn)),
       if (highlightedDiveId != null)
+        diveDataSourcesProvider(
+          highlightedDiveId,
+        ).overrideWith((ref) => Future.value(sources)),
+      if (highlightedDiveId != null)
+        sourceProfilesProvider(
+          highlightedDiveId,
+        ).overrideWith((ref) => Future.value(sourceProfiles)),
+      // Single-source dives delegate to the dive-level analysis; a
+      // multi-source dive asks for the active source's own analysis.
+      if (highlightedDiveId != null)
         profileAnalysisProvider(
           highlightedDiveId,
         ).overrideWith((ref) => Future.value(analysis)),
+      if (highlightedDiveId != null && sources.length >= 2)
+        sourceProfileAnalysisProvider((
+          diveId: highlightedDiveId,
+          sourceId: null,
+        )).overrideWith((ref) => Future.value(activeSourceAnalysis)),
       if (highlightedDiveId != null)
         gasSwitchesProvider(
           highlightedDiveId,
@@ -182,6 +202,9 @@ void main() {
             diveProvider(
               'loading-dive',
             ).overrideWith((ref) => Future.value(null)),
+            diveDataSourcesProvider(
+              'loading-dive',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               'loading-dive',
             ).overrideWith((ref) => Future.value(null)),
@@ -549,9 +572,15 @@ void main() {
             diveProvider(
               'dive-switch-1',
             ).overrideWith((ref) => Future.value(dive1)),
+            diveDataSourcesProvider(
+              'dive-switch-1',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             diveProvider(
               'dive-switch-2',
             ).overrideWith((ref) => Future.value(dive2)),
+            diveDataSourcesProvider(
+              'dive-switch-2',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               'dive-switch-1',
             ).overrideWith((ref) => Future.value(null)),
@@ -762,6 +791,9 @@ void main() {
             ),
             highlightedDiveIdProvider.overrideWith((ref) => diveId),
             diveProvider(diveId).overrideWith((ref) => Future.value(dive)),
+            diveDataSourcesProvider(
+              diveId,
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               diveId,
             ).overrideWith((ref) => Future.value(null)),
@@ -800,6 +832,129 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DiveProfileChart), findsOneWidget);
+    });
+    // -----------------------------------------------------------------------
+    // Multi-source dives (#543)
+    // -----------------------------------------------------------------------
+
+    testWidgets(
+      'a consolidated dive draws the active source, not the merged union',
+      (tester) async {
+        const diveId = 'consolidated';
+        final now = DateTime(2026, 7, 13);
+        // The primary (Perdix) samples every 10 s at 15 C; the consolidated
+        // Garmin copy samples every second at 16.5 C.
+        final perdix = List.generate(
+          7,
+          (i) => DiveProfilePoint(
+            timestamp: i * 10,
+            depth: i < 4 ? i * 3.0 : (6 - i) * 3.0,
+            temperature: 15.0,
+          ),
+        );
+        final garmin = List.generate(
+          61,
+          (i) => DiveProfilePoint(
+            timestamp: i,
+            depth: i < 31 ? i * 0.3 : (60 - i) * 0.3,
+            temperature: 16.5,
+          ),
+        );
+        // What getDiveById hands out: both series interleaved by timestamp.
+        final merged = [...perdix, ...garmin]
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        final dive = _makeDiveWithProfile(id: diveId, profile: merged);
+        final sources = [
+          DiveDataSource(
+            id: 'src-perdix',
+            diveId: diveId,
+            computerId: 'dc-perdix',
+            isPrimary: true,
+            importedAt: now,
+            createdAt: now,
+          ),
+          DiveDataSource(
+            id: 'src-garmin',
+            diveId: diveId,
+            computerId: 'dc-garmin',
+            isPrimary: false,
+            importedAt: now,
+            createdAt: now,
+          ),
+        ];
+        final profiles = {
+          'src-perdix': SourceProfile(
+            sourceId: 'src-perdix',
+            computerId: 'dc-perdix',
+            isEdited: false,
+            points: perdix,
+          ),
+          'src-garmin': SourceProfile(
+            sourceId: 'src-garmin',
+            computerId: 'dc-garmin',
+            isEdited: false,
+            points: garmin,
+          ),
+        };
+
+        await tester.pumpWidget(
+          _buildPanel(
+            highlightedDiveId: diveId,
+            diveToReturn: dive,
+            sources: sources,
+            sourceProfiles: profiles,
+            activeSourceAnalysis: _makeAnalysis(profileLength: perdix.length),
+          ),
+        );
+        // dive, data sources and source profiles each resolve on their own
+        // tick, and the derived provider rebuilds the panel one frame later.
+        await tester.pump();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        final chart = tester.widget<DiveProfileChart>(
+          find.byType(DiveProfileChart),
+        );
+        expect(chart.profile, perdix);
+        expect(chart.profile.length, isNot(merged.length));
+        expect(chart.activeComputerId, 'dc-perdix');
+        expect(chart.diveDurationSeconds, perdix.last.timestamp);
+        // Every temperature drawn is the active computer's reading; the
+        // merged union would alternate 15 / 16.5 sample by sample.
+        expect(chart.profile.map((p) => p.temperature).toSet(), {15.0});
+      },
+    );
+
+    testWidgets('a single-source dive still draws dive.profile', (
+      tester,
+    ) async {
+      final dive = _makeDiveWithProfile(id: 'single');
+      await tester.pumpWidget(
+        _buildPanel(
+          highlightedDiveId: 'single',
+          diveToReturn: dive,
+          sources: [
+            DiveDataSource(
+              id: 'src-only',
+              diveId: 'single',
+              computerId: 'dc-only',
+              isPrimary: true,
+              importedAt: DateTime(2026, 7, 13),
+              createdAt: DateTime(2026, 7, 13),
+            ),
+          ],
+          analysis: _makeAnalysis(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.profile, dive.profile);
+      expect(chart.activeComputerId, isNull);
     });
   });
 }
