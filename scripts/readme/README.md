@@ -51,8 +51,10 @@ using the nearest opaque pixel in the same row instead. See `flatten()`.
 
 Edit the `MAPPING` table in the script, re-run it, and update the
 corresponding `<img>` tag in `README.md`. Keep the two in step: the script
-writes exactly the filenames the README references, and nothing prunes an
-output that is no longer mapped, so delete orphans by hand.
+writes exactly the filenames the README references. It never deletes
+anything, but at the end of a run it lists any file in the output directory
+it did not write, so an image dropped from `MAPPING` is easy to spot and
+remove by hand.
 
 Always view the output images before committing, and confirm each one shows
 the screen its README caption claims.

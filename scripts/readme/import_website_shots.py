@@ -5,7 +5,8 @@ Run from anywhere:  python3 scripts/readme/import_website_shots.py [SRC_DIR]
 
 Source images live in the sibling submersion-website repository
 (https://github.com/submersion-app/submersion-website) under `screenshots/`.
-Pass SRC_DIR to point at a checkout somewhere else, or set SUBMERSION_WEBSITE.
+If that checkout is somewhere else, pass its `screenshots/` directory as
+SRC_DIR, or set SUBMERSION_WEBSITE to the same directory.
 
 Requires Pillow (`pip3 install --user Pillow`).
 """
@@ -112,6 +113,13 @@ def main():
             "this repo, or pass the path to its screenshots/ directory."
         )
 
+    # A duplicated output name in MAPPING would overwrite an earlier image
+    # with no error and leave the README showing the wrong screen.
+    outputs = [out for _, out, _ in MAPPING]
+    dupes = sorted({out for out in outputs if outputs.count(out) > 1})
+    if dupes:
+        sys.exit("MAPPING has duplicate output names: " + ", ".join(dupes))
+
     # Check every source up front so a rename on the website side reports all
     # the missing files at once, rather than one per run.
     missing = [
@@ -149,6 +157,19 @@ def main():
         print(f"wrote {rel} ({width}x{height}, {size / 1024:.0f} KB)")
 
     print(f"\n{len(MAPPING)} images, {total / 1024 / 1024:.2f} MB total")
+
+    # Point out anything in the output directory this run did not write, so
+    # an image dropped from MAPPING is easy to spot. Deleting is left to the
+    # person, since a file here may be referenced from somewhere else.
+    orphans = sorted(
+        name
+        for name in os.listdir(OUT_DIR)
+        if name not in outputs and not name.startswith(".")
+    )
+    if orphans:
+        print(f"\nnot produced by this script (delete by hand if stale):")
+        for name in orphans:
+            print(f"  {name}")
 
 
 if __name__ == "__main__":
