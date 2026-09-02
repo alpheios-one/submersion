@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Minus / level / plus, with a reset button once zoomed.
+/// Minus / level / plus, led by a reset button once zoomed.
 ///
 /// Extracted from the dive profile legend so the statistics trend charts get
 /// the same control rather than a lookalike. Zooming in with no visible way
@@ -41,6 +41,20 @@ class ChartZoomControls extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Leads the row so that appearing does not displace the buttons: the
+        // hosts pin these controls to the trailing edge, so a trailing reset
+        // button would slide minus/plus left and land on the plus the user
+        // just clicked.
+        if (isZoomed)
+          IconButton(
+            key: _key('zoom-reset'),
+            onPressed: onResetZoom,
+            icon: const Icon(Icons.fit_screen),
+            iconSize: 18,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            tooltip: context.l10n.diveLog_profile_tooltip_resetZoom,
+          ),
         IconButton(
           key: _key('zoom-out'),
           onPressed: zoomLevel > minZoom ? onZoomOut : null,
@@ -71,16 +85,6 @@ class ChartZoomControls extends StatelessWidget {
           constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           tooltip: context.l10n.diveLog_profile_tooltip_zoomIn,
         ),
-        if (isZoomed)
-          IconButton(
-            key: _key('zoom-reset'),
-            onPressed: onResetZoom,
-            icon: const Icon(Icons.fit_screen),
-            iconSize: 18,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            tooltip: context.l10n.diveLog_profile_tooltip_resetZoom,
-          ),
       ],
     );
   }
