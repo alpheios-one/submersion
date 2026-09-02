@@ -359,9 +359,12 @@ class CachedRegionsNotifier
   /// delete removed the tiles and then failed before the row. Either way the
   /// tiles are unreachable, which is the condition this whole change exists to
   /// prevent, so the sweep runs whenever the offline maps page is opened.
-  Future<void> pruneOrphanStores() async {
+  ///
+  /// Returns how many stores it reclaimed, which the caller needs because the
+  /// storage totals on screen were measured before those bytes went away.
+  Future<int> pruneOrphanStores() async {
     final regions = await _repository.getAllRegions();
-    await _cacheService.pruneOrphanRegionStores(
+    return _cacheService.pruneOrphanRegionStores(
       knownRegionIds: regions.map((r) => r.id).toSet(),
     );
   }

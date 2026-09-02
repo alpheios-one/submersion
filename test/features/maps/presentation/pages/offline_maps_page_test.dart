@@ -60,9 +60,9 @@ class _UnreadableTileCache implements TileCacheService {
       throw StateError('tile cache unavailable');
 
   @override
-  Future<void> pruneOrphanRegionStores({
+  Future<int> pruneOrphanRegionStores({
     required Set<String> knownRegionIds,
-  }) async {}
+  }) async => 0;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -80,9 +80,9 @@ class _FailingTileCache implements TileCacheService {
   Future<Set<String>> getRegionStoreIds() async => {'owns'};
 
   @override
-  Future<void> pruneOrphanRegionStores({
+  Future<int> pruneOrphanRegionStores({
     required Set<String> knownRegionIds,
-  }) async {}
+  }) async => 0;
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>

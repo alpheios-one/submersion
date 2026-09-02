@@ -77,11 +77,14 @@ class _FakeTileCache implements TileCacheService {
     return regionStoreIds;
   }
 
+  int prunedStores = 0;
+
   @override
-  Future<void> pruneOrphanRegionStores({
+  Future<int> pruneOrphanRegionStores({
     required Set<String> knownRegionIds,
   }) async {
     calls.add('prune:${knownRegionIds.join(",")}');
+    return prunedStores;
   }
 
   @override
@@ -392,6 +395,18 @@ void main() {
           .pruneOrphanStores();
 
       expect(cache.calls, contains('prune:kept'));
+    });
+
+    test('the sweep reports what it reclaimed', () async {
+      // The caller needs this: storage totals already on screen were measured
+      // before the sweep deleted anything.
+      cache.prunedStores = 3;
+
+      final reclaimed = await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .pruneOrphanStores();
+
+      expect(reclaimed, 3);
     });
   });
 }

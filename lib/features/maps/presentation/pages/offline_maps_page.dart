@@ -41,9 +41,15 @@ class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
 
   Future<void> _pruneOrphanStores() async {
     try {
-      await ref
+      final reclaimed = await ref
           .read(cachedRegionsNotifierProvider.notifier)
           .pruneOrphanStores();
+      // The totals on screen were measured before the sweep ran, so they still
+      // count bytes that are now gone. Only when something was actually
+      // deleted, to avoid a second round of backend reads on every open.
+      if (reclaimed > 0 && mounted) {
+        ref.invalidate(cacheStatsProvider);
+      }
     } catch (e, st) {
       // Housekeeping: a failure here leaves the tiles where they were and is
       // retried the next time the page opens, so it must not reach the diver.

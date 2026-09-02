@@ -603,7 +603,10 @@ class TileCacheService {
   /// [knownRegionIds] must be every region currently recorded; anything else
   /// carrying the region prefix is unreachable and is deleted. Stores that are
   /// not ours are never touched.
-  Future<void> pruneOrphanRegionStores({
+  ///
+  /// Returns how many stores it deleted, so a caller showing storage totals
+  /// knows whether they still describe what is on disk.
+  Future<int> pruneOrphanRegionStores({
     required Set<String> knownRegionIds,
   }) async {
     // coverage:ignore-start
@@ -614,17 +617,23 @@ class TileCacheService {
       knownRegionIds: knownRegionIds,
       inFlightRegionIds: _inFlightRegionIds,
     );
+    var deleted = 0;
     for (final storeName in orphans) {
       // Per store, so one locked or corrupt store cannot stop the others from
       // being reclaimed. The loop order is stable, so an aborting sweep would
       // hide every orphan behind the same failing one on every future run.
       try {
         await FMTCStore(storeName).manage.delete();
+        deleted++;
         _log.info('Deleted orphaned region tile store $storeName');
-      } catch (e) {
-        _log.warning('Could not delete orphaned region store $storeName: $e');
+      } catch (e, st) {
+        _log.warning(
+          'Could not delete orphaned region store $storeName: $e',
+          stackTrace: st,
+        );
       }
     }
+    return deleted;
     // coverage:ignore-end
   }
 
@@ -736,9 +745,12 @@ class TileCacheService {
       if (regionIdFromStoreName(store.storeName) == null) continue;
       try {
         await store.manage.delete();
-      } catch (e) {
+      } catch (e, st) {
         failed.add(store.storeName);
-        _log.warning('Could not delete region store ${store.storeName}: $e');
+        _log.warning(
+          'Could not delete region store ${store.storeName}: $e',
+          stackTrace: st,
+        );
       }
     }
     _inFlightRegionIds.clear();
