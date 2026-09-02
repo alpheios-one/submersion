@@ -10303,6 +10303,8 @@
   "settings_cloudSync_progress_pulling": "Wijzigingen ophalen...",
   "settings_cloudSync_progress_publishing": "Wijzigingen publiceren...",
   "settings_cloudSync_progress_uploadingLibrary": "Bibliotheek uploaden ({uploaded} van {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Bibliotheek downloaden ({downloaded} van {total})",
+  "settings_cloudSync_progress_importingLibrary": "Bibliotheek importeren ({percent}%)",
   "settings_cloudSync_result_noProvider": "Geen cloudprovider ingesteld",
   "settings_cloudSync_result_notAuthenticated": "Niet geverifieerd bij de cloudprovider",
   "settings_cloudSync_result_timedOut": "Time-out bij de synchronisatie",

@@ -34895,6 +34895,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'جارٍ تنزيل المكتبة ($downloaded من $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'جارٍ استيراد المكتبة ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'لم يتم إعداد أي مزود تخزين سحابي';
 

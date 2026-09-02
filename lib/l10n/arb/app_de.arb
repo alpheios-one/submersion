@@ -10303,6 +10303,8 @@
   "settings_cloudSync_progress_pulling": "Änderungen werden abgerufen...",
   "settings_cloudSync_progress_publishing": "Änderungen werden veröffentlicht...",
   "settings_cloudSync_progress_uploadingLibrary": "Bibliothek wird hochgeladen ({uploaded} von {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Bibliothek wird heruntergeladen ({downloaded} von {total})",
+  "settings_cloudSync_progress_importingLibrary": "Bibliothek wird importiert ({percent} %)",
   "settings_cloudSync_result_noProvider": "Kein Cloud-Anbieter konfiguriert",
   "settings_cloudSync_result_notAuthenticated": "Nicht beim Cloud-Anbieter authentifiziert",
   "settings_cloudSync_result_timedOut": "Zeitüberschreitung bei der Synchronisierung",

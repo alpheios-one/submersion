@@ -35284,6 +35284,19 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Descargando la biblioteca ($downloaded de $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importando la biblioteca ($percent %)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'No hay ningún proveedor en la nube configurado';
 
