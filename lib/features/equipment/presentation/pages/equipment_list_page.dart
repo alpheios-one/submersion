@@ -124,6 +124,16 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
             ),
           ),
           appBarActions: [
+            IconButton(
+              icon: const Icon(Icons.search, size: 20),
+              tooltip: context.l10n.equipment_list_searchTooltip,
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: EquipmentSearchDelegate(context.l10n),
+                );
+              },
+            ),
             // Table mode has no app bar of its own inside the content, so the
             // filter panel is reachable only from here.
             IconButton(
@@ -136,16 +146,6 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
               ),
               tooltip: context.l10n.equipment_list_filterTooltip,
               onPressed: () => showEquipmentFilterSheet(context, ref),
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, size: 20),
-              tooltip: context.l10n.equipment_list_searchTooltip,
-              onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: EquipmentSearchDelegate(context.l10n),
-                );
-              },
             ),
             IconButton(
               icon: const Icon(Icons.sort, size: 20),

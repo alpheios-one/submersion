@@ -252,7 +252,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                     title: context.l10n.equipment_appBar_title,
                   ),
                   actions: [
-                    _buildFilterAction(context, filter),
                     IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.equipment_list_searchTooltip,
@@ -263,6 +262,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                         );
                       },
                     ),
+                    _buildFilterAction(context, filter),
                     IconButton(
                       icon: const Icon(Icons.sort),
                       tooltip: context.l10n.equipment_list_sortTooltip,
@@ -586,11 +586,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          _buildFilterAction(
-            context,
-            ref.watch(equipmentFilterProvider),
-            iconSize: 20,
-          ),
           IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.equipment_list_searchTooltip,
@@ -600,6 +595,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                 delegate: EquipmentSearchDelegate(context.l10n),
               );
             },
+          ),
+          _buildFilterAction(
+            context,
+            ref.watch(equipmentFilterProvider),
+            iconSize: 20,
           ),
           IconButton(
             icon: const Icon(Icons.sort, size: 20),
