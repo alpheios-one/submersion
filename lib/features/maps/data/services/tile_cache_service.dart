@@ -126,6 +126,16 @@ class TileCacheService {
   StreamSubscription<DownloadProgress>? _activeDownloadSubscription;
   Object? _activeDownloadId;
 
+  /// The store the active download is filling.
+  ///
+  /// FMTC resolves a download by its instance id through a registry that is
+  /// global to the process, so any store handle would in fact cancel it. That
+  /// is an internal detail of the package, and reaching for the shared offline
+  /// store to cancel a download running against a region store reads like a
+  /// bug even while it works. Holding the real one costs nothing and says what
+  /// is meant.
+  FMTCStore? _activeDownloadStore;
+
   /// The region the active download belongs to.
   ///
   /// [_activeDownloadId] alone says a download is running but not whose it is,
@@ -449,7 +459,7 @@ class TileCacheService {
 
     // Cancel any existing download
     if (_activeDownloadId != null) {
-      _store!.download.cancel(instanceId: _activeDownloadId!);
+      _downloadControls.cancel(instanceId: _activeDownloadId!);
       _activeDownloadSubscription?.cancel();
     }
 
@@ -474,6 +484,7 @@ class TileCacheService {
 
       _activeDownloadId = DateTime.now().millisecondsSinceEpoch;
       _activeDownloadRegionId = regionId;
+      _activeDownloadStore = regionStore;
 
       final streams = regionStore.download.startForeground(
         region: downloadableRegion,
@@ -500,6 +511,7 @@ class TileCacheService {
         onDone: () {
           _activeDownloadId = null;
           _activeDownloadRegionId = null;
+          _activeDownloadStore = null;
           _activeDownloadSubscription = null;
           controller.close();
         },
@@ -640,32 +652,40 @@ class TileCacheService {
   /// Cancel an ongoing download.
   Future<void> cancelDownload() async {
     if (_activeDownloadId != null) {
-      await _store!.download.cancel(instanceId: _activeDownloadId!);
+      await _downloadControls.cancel(instanceId: _activeDownloadId!);
       await _activeDownloadSubscription?.cancel();
       _activeDownloadId = null;
       _activeDownloadRegionId = null;
+      _activeDownloadStore = null;
       _activeDownloadSubscription = null;
     }
   }
 
+  /// The download API of whichever store owns the running download.
+  ///
+  /// Falls back to the shared store only when nothing is running, where the
+  /// call is a no-op either way.
+  StoreDownload get _downloadControls =>
+      (_activeDownloadStore ?? _store!).download;
+
   /// Pause an ongoing download.
   Future<void> pauseDownload() async {
     if (_activeDownloadId != null) {
-      await _store!.download.pause(instanceId: _activeDownloadId!);
+      await _downloadControls.pause(instanceId: _activeDownloadId!);
     }
   }
 
   /// Resume a paused download.
   void resumeDownload() {
     if (_activeDownloadId != null) {
-      _store!.download.resume(instanceId: _activeDownloadId!);
+      _downloadControls.resume(instanceId: _activeDownloadId!);
     }
   }
 
   /// Check if a download is currently paused.
   bool get isDownloadPaused {
     if (_activeDownloadId == null) return false;
-    return _store!.download.isPaused(instanceId: _activeDownloadId!);
+    return _downloadControls.isPaused(instanceId: _activeDownloadId!);
   }
 
   /// Get statistics about the tile cache.
@@ -679,7 +699,20 @@ class TileCacheService {
 
     final perStore = <({double size, int length, int hits, int misses})>[];
     for (final store in await FMTCRoot.stats.storesAvailable) {
-      perStore.add(await store.stats.all);
+      // Skipped rather than fatal. A store can disappear between listing and
+      // reading it, because the orphan sweep runs on this very page and
+      // deletes stores while this total is being taken; a store that no longer
+      // exists contributes nothing anyway. A locked one under-reports, which
+      // is still a better answer than an error card in place of the figure.
+      try {
+        perStore.add(await store.stats.all);
+      } catch (e, st) {
+        _log.warning(
+          'Skipped unreadable tile store ${store.storeName} in cache '
+          'totals: $e',
+          stackTrace: st,
+        );
+      }
     }
     return aggregateCacheStats(perStore);
     // coverage:ignore-end
