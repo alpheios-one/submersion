@@ -126,6 +126,13 @@ class TileCacheService {
   StreamSubscription<DownloadProgress>? _activeDownloadSubscription;
   Object? _activeDownloadId;
 
+  /// The region the active download belongs to.
+  ///
+  /// [_activeDownloadId] alone says a download is running but not whose it is,
+  /// and cleanup for an abandoned download can arrive after a new one has
+  /// started. Without this, discarding the old one would cancel the new one.
+  String? _activeDownloadRegionId;
+
   /// Regions whose store exists but whose database row does not yet, because
   /// the download is still running or its row is still being written.
   ///
@@ -466,6 +473,7 @@ class TileCacheService {
       await regionStore.manage.create();
 
       _activeDownloadId = DateTime.now().millisecondsSinceEpoch;
+      _activeDownloadRegionId = regionId;
 
       final streams = regionStore.download.startForeground(
         region: downloadableRegion,
@@ -491,6 +499,7 @@ class TileCacheService {
         onError: controller.addError,
         onDone: () {
           _activeDownloadId = null;
+          _activeDownloadRegionId = null;
           _activeDownloadSubscription = null;
           controller.close();
         },
@@ -556,7 +565,14 @@ class TileCacheService {
   /// whole change is about.
   Future<void> discardRegionDownload(String regionId) async {
     // coverage:ignore-start
-    await cancelDownload();
+    // Only if this region still owns the running download. A cancelled
+    // download's cleanup runs after its progress stream drains, by which time
+    // the diver may already have started another region: cancelling
+    // unconditionally would kill that new download, and it would then be
+    // recorded as a complete region holding whatever few tiles it had managed.
+    if (_activeDownloadRegionId == regionId) {
+      await cancelDownload();
+    }
     await deleteRegionTiles(regionId);
     // coverage:ignore-end
   }
@@ -618,6 +634,7 @@ class TileCacheService {
       await _store!.download.cancel(instanceId: _activeDownloadId!);
       await _activeDownloadSubscription?.cancel();
       _activeDownloadId = null;
+      _activeDownloadRegionId = null;
       _activeDownloadSubscription = null;
     }
   }
