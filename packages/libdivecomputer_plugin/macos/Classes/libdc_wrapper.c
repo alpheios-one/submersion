@@ -234,19 +234,23 @@ static const char *ble_alias_product(const char *name) {
 //
 // Across two scans five minutes apart the same watch advertised "S19 1DFC LE"
 // and then "S19 700B LE" from two different MAC addresses, so the hex group is
-// a rotating privacy identifier and "S19" is the stable model code. The second
-// digit is left open because a sibling model on the same platform would differ
-// there while colliding with the identical "S1" prefix; everything else is
-// pinned, so a name of any other shape is left alone.
+// a rotating privacy identifier and "S19" is the stable model code.
+//
+// Every character outside the rotating group is pinned, including the "9".
+// A sibling model on the same platform would carry a different code and would
+// collide with the same "S1" prefix, but suppressing a name nobody has
+// captured is the same guess this fix exists to avoid, and its cost is worse:
+// hiding a device is harder to diagnose than mislabelling one. Add a model
+// code here only with a real advertised name behind it, from a log.
 static int is_suunto_ng_ble_name(const char *name) {
-    // "S1d hhhh LE"
+    // "S19 hhhh LE"
     static const size_t kLength = 11;
 
     if (name == NULL || strlen(name) != kLength) {
         return 0;
     }
     if (toupper((unsigned char)name[0]) != 'S' || name[1] != '1' ||
-        !isdigit((unsigned char)name[2])) {
+        name[2] != '9') {
         return 0;
     }
     if (name[3] != ' ' || name[8] != ' ') {

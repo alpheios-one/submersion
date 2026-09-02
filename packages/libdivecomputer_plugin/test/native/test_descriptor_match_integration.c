@@ -212,6 +212,17 @@ static void test_suunto_rejection_requires_the_full_shape(void) {
     printf("PASS: test_suunto_rejection_requires_the_full_shape\n");
 }
 
+// The model code is pinned to the captured "S19" rather than to any "S1x", so
+// a sibling model on the same Suunto platform is still claimed by the Oceans
+// S1 row until someone logs its advertised name. That is deliberate:
+// suppressing a name nobody has captured is the same guess this fix avoids,
+// and hiding a device is harder to diagnose than mislabelling one.
+static void test_unobserved_model_codes_are_not_suppressed(void) {
+    expect_ble_match("S18 1DFC LE", "S1", 0);
+    expect_ble_match("S10 700B LE", "S1", 0);
+    printf("PASS: test_unobserved_model_codes_are_not_suppressed\n");
+}
+
 // Issue #123 regression guard: the Oceans S1 itself must be untouched. Its
 // real advertised name is documented nowhere: not in libdivecomputer, not in
 // Subsurface, not in the S1 manual, which pairs by QR code. That is exactly
@@ -241,6 +252,7 @@ int main(void) {
     test_suunto_ocean_is_not_claimed_by_oceans_s1();
     test_suunto_ocean_rejection_is_case_insensitive();
     test_suunto_rejection_requires_the_full_shape();
+    test_unobserved_model_codes_are_not_suppressed();
     test_oceans_s1_names_still_resolve();
     printf("\nAll descriptor match integration tests passed.\n");
     return 0;
