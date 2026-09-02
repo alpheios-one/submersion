@@ -89,13 +89,17 @@ class LocalOnlyTombstoneGc {
   final PublishStateStore _publishStates;
   final _log = LoggerService.forClass(LocalOnlyTombstoneGc);
 
+  /// One metadata read and two indexed existence checks. The three metadata
+  /// signals come off a single row rather than through the repository's
+  /// per-field accessors, each of which would re-read it.
   Future<SyncHistoryEvidence> gatherEvidence() async {
+    final metadata = await _syncRepository.getOrCreateMetadata();
     return SyncHistoryEvidence(
-      providerConfigured: await _syncRepository.getCloudProvider() != null,
-      hasLastSyncTime: await _syncRepository.getLastSyncTime() != null,
+      providerConfigured: metadata.syncProvider != null,
+      hasLastSyncTime: metadata.lastSyncTimestamp != null,
       hasPeerCursors: await _peerCursors.hasAny(),
       hasPublishState: await _publishStates.hasAny(),
-      hasAcceptedEpoch: await _syncRepository.getLastAcceptedEpochId() != null,
+      hasAcceptedEpoch: metadata.lastAcceptedEpochId != null,
     );
   }
 
