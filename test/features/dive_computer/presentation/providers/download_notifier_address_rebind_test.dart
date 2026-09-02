@@ -59,16 +59,23 @@ void main() {
   late MockDiveComputerService service;
   late StreamController<DownloadEvent> events;
   late DownloadNotifier notifier;
+  // Every computer record the notifier persisted, in order. Collected by the
+  // stub rather than read back through verify(), which throws when nothing
+  // was persisted; that lets the helper below return null honestly.
+  late List<DiveComputer> updates;
 
   setUp(() {
     repository = MockDiveComputerRepository();
     service = MockDiveComputerService();
     events = StreamController<DownloadEvent>.broadcast();
+    updates = [];
     when(service.downloadEvents).thenAnswer((_) => events.stream);
     when(
       service.startDownload(any, fingerprint: anyNamed('fingerprint')),
     ).thenAnswer((_) async {});
-    when(repository.updateComputer(any)).thenAnswer((_) async {});
+    when(repository.updateComputer(any)).thenAnswer((invocation) async {
+      updates.add(invocation.positionalArguments.first as DiveComputer);
+    });
     notifier = DownloadNotifier(service: service, repository: repository);
   });
 
@@ -92,8 +99,7 @@ void main() {
       ),
     );
     await pumpEventQueue();
-    final captured = verify(repository.updateComputer(captureAny)).captured;
-    return captured.isEmpty ? null : captured.last as DiveComputer;
+    return updates.lastOrNull;
   }
 
   // Issue #1423: the address stored for a saved Bluetooth computer is a
@@ -181,6 +187,7 @@ void main() {
         DownloadCompleteEvent(0, serialNumber: '074691', firmwareVersion: null),
       );
       await pumpEventQueue();
+      expect(updates, isEmpty);
       verifyNever(repository.updateComputer(any));
     });
   });

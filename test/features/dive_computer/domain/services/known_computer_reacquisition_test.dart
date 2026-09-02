@@ -25,10 +25,11 @@ DiscoveredDevice _device(
   String? manufacturer = 'Ratio',
   String? model = 'iX3M 2021 GPS Fancy',
   String name = 'RATIO-074691',
+  DeviceConnectionType connectionType = DeviceConnectionType.ble,
 }) => DiscoveredDevice(
   id: address,
   name: name,
-  connectionType: DeviceConnectionType.ble,
+  connectionType: connectionType,
   address: address,
   recognizedModel: manufacturer == null || model == null
       ? null
@@ -82,6 +83,20 @@ void main() {
         sameModelFallbackDevice(
           computer: _computer(),
           discovered: [_device(fresh), _device(stale)],
+        ),
+        isNull,
+      );
+    });
+
+    test('ignores a same-model device on another transport', () {
+      // Only a Bluetooth address goes stale this way; a USB port for the
+      // same model is not a stand-in for the saved Bluetooth computer.
+      expect(
+        sameModelFallbackDevice(
+          computer: _computer(),
+          discovered: [
+            _device('/dev/ttyUSB0', connectionType: DeviceConnectionType.usb),
+          ],
         ),
         isNull,
       );
