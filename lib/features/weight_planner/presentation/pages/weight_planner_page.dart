@@ -82,16 +82,22 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     return parsed != null ? units.weightToKg(parsed) : null;
   }
 
-  /// Entered height in centimetres, or null when the field(s) are empty so
-  /// the prediction falls back to the profile height.
+  /// Entered height in centimetres, or null when the field(s) are empty or
+  /// implausible (an inches-only entry, a typo), so the prediction falls back
+  /// to the profile height and nothing unusable reaches the profile.
   double? _heightCm(UnitFormatter units) {
+    final double? cm;
     if (units.heightIsMetric) {
-      return parseUserDecimal(_heightCmController.text);
+      cm = parseUserDecimal(_heightCmController.text);
+    } else {
+      final feet = parseUserDecimal(_heightFeetController.text);
+      final inches = parseUserDecimal(_heightInchesController.text);
+      cm = (feet == null && inches == null)
+          ? null
+          : units.feetInchesToCm(feet ?? 0, inches ?? 0);
     }
-    final feet = parseUserDecimal(_heightFeetController.text);
-    final inches = parseUserDecimal(_heightInchesController.text);
-    if (feet == null && inches == null) return null;
-    return units.feetInchesToCm(feet ?? 0, inches ?? 0);
+    if (cm == null || !BodyComposition.isPlausibleHeight(cm)) return null;
+    return cm;
   }
 
   WeightPrediction? _predict(FittedWeightModel? model, UnitFormatter units) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
 import 'package:submersion/core/buoyancy/twin_analyzer.dart';
 import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
@@ -204,7 +205,7 @@ class BuoyancySection extends ConsumerWidget {
     return switch (raw) {
       'personal' => l10n.tools_weight_personalTerm,
       'water' => l10n.tools_weight_waterTerm,
-      'bmi' => l10n.tools_weight_bmiTerm,
+      BodyComposition.termLabel => l10n.tools_weight_bmiTerm,
       'suit' => l10n.buoyancy_suitTerm,
       'lead' => l10n.buoyancy_leadTerm,
       // Fallback for a tank with no preset/user name (see the assembler and

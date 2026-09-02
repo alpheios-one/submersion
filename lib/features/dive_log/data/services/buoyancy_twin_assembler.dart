@@ -148,7 +148,7 @@ class BuoyancyTwinAssembler {
             null) {
       staticTerms.add(
         TwinStaticTerm(
-          label: 'bmi',
+          label: BodyComposition.termLabel,
           kg: BodyComposition.leadTermKg(
             bodyMassKg: knownBodyMass,
             heightCm: height,

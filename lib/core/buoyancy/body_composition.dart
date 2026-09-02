@@ -10,6 +10,10 @@
 ///
 /// Sign convention matches the rest of the engine: positive = more lead.
 class BodyComposition {
+  /// Breakdown-term key shared by the engine, the twin assembler, and the
+  /// widgets that localize it.
+  static const String termLabel = 'bmi';
+
   /// The height the mass-only personal prior implicitly assumes. At this
   /// height the term is zero, so divers of average build see no change.
   static const double referenceHeightCm = 175.0;
@@ -27,11 +31,15 @@ class BodyComposition {
   /// kilogram of lean tissue: 1/0.9 - 1/1.1 L, at roughly 1 kg/L of water.
   static const double leadPerKgFatSwap = 0.2;
 
+  /// Whether a height is within the adult plausibility bounds.
+  static bool isPlausibleHeight(double heightCm) =>
+      heightCm >= minHeightCm && heightCm <= maxHeightCm;
+
   /// Body mass index (kg/m^2), or null when either input is missing or
   /// implausible.
   static double? bmi({required double weightKg, required double? heightCm}) {
     if (heightCm == null || weightKg <= 0) return null;
-    if (heightCm < minHeightCm || heightCm > maxHeightCm) return null;
+    if (!isPlausibleHeight(heightCm)) return null;
     final heightM = heightCm / 100.0;
     return weightKg / (heightM * heightM);
   }

@@ -352,6 +352,21 @@ void main() {
       expect(find.textContaining('BMI 29.3'), findsOneWidget);
     });
 
+    testWidgets('an implausible height is ignored, not offered for saving', (
+      tester,
+    ) async {
+      await pumpPage(tester);
+      // An inches-only imperial entry would read as ~13 cm; the metric field
+      // exercises the same guard.
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Height (optional)'),
+        '13',
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('BMI '), findsNothing);
+      expect(find.byTooltip('Save weight to profile'), findsNothing);
+    });
+
     testWidgets('a height that differs from the profile offers the save '
         'action', (tester) async {
       await pumpPage(tester);

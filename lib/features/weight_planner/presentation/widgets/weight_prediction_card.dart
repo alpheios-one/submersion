@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -45,7 +46,9 @@ class WeightPredictionCard extends StatelessWidget {
       return context.l10n.tools_weight_personalTerm;
     }
     if (term.label == 'water') return context.l10n.tools_weight_waterTerm;
-    if (term.label == 'bmi') return context.l10n.tools_weight_bmiTerm;
+    if (term.label == BodyComposition.termLabel) {
+      return context.l10n.tools_weight_bmiTerm;
+    }
     return term.label;
   }
 

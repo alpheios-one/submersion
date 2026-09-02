@@ -22,6 +22,15 @@ void main() {
     });
   });
 
+  group('BodyComposition.isPlausibleHeight', () {
+    test('accepts the adult range and rejects the rest', () {
+      expect(BodyComposition.isPlausibleHeight(100), isTrue);
+      expect(BodyComposition.isPlausibleHeight(250), isTrue);
+      expect(BodyComposition.isPlausibleHeight(99.9), isFalse);
+      expect(BodyComposition.isPlausibleHeight(12.7), isFalse);
+    });
+  });
+
   group('BodyComposition.leadTermKg', () {
     test('is zero at the reference build the mass rule already assumes', () {
       expect(

@@ -355,7 +355,7 @@ class FittedWeightModel {
             null) {
       terms.add(
         PredictionTerm(
-          label: 'bmi',
+          label: BodyComposition.termLabel,
           kg: BodyComposition.leadTermKg(
             bodyMassKg: knownBodyMass,
             heightCm: height,
