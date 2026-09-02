@@ -86,23 +86,31 @@ Dive _makeDiveNoProfile({String id = 'dive-no-profile'}) {
   );
 }
 
-/// Pumps until the rendered [DiveProfileChart] draws [expected], or gives up
-/// after a bounded number of frames so a regression fails on the assertion
-/// that follows rather than hanging. `pumpAndSettle` is not used: the chart
-/// hosts implicit animations that can keep a frame scheduled.
+/// Pumps until the rendered [DiveProfileChart] draws [expected], failing
+/// with a clear message after a bounded number of frames so a regression
+/// names the series the chart actually drew rather than hanging or failing
+/// on a later, less specific assertion. `pumpAndSettle` is not used: the
+/// chart hosts implicit animations that can keep a frame scheduled.
 Future<void> _pumpUntilChartProfile(
   WidgetTester tester,
   List<DiveProfilePoint> expected,
 ) async {
-  for (var i = 0; i < 20; i++) {
+  const maxFrames = 50;
+  List<DiveProfileChart> charts = const [];
+  for (var i = 0; i < maxFrames; i++) {
     await tester.pump(const Duration(milliseconds: 10));
-    final charts = tester.widgetList<DiveProfileChart>(
-      find.byType(DiveProfileChart),
-    );
+    charts = tester
+        .widgetList<DiveProfileChart>(find.byType(DiveProfileChart))
+        .toList();
     if (charts.length == 1 && listEquals(charts.single.profile, expected)) {
       return;
     }
   }
+  fail(
+    'DiveProfileChart did not draw the expected ${expected.length}-point '
+    'series within $maxFrames frames; found ${charts.length} chart(s) with '
+    '${charts.map((c) => c.profile.length).toList()} point(s).',
+  );
 }
 
 Widget _buildPanel({
