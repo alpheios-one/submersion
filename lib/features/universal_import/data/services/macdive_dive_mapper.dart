@@ -9,12 +9,13 @@ import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
+import 'package:submersion/features/universal_import/data/services/dive_computer_descriptor_index.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_converter.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/parsed_dive_profile_mapper.dart';
-import 'package:submersion/features/universal_import/data/services/shearwater_filename_parser.dart';
+import 'package:submersion/features/universal_import/data/services/raw_profile_sanity_check.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_raw_decompressor.dart';
 
 /// Signature of the native raw-parse call, injectable so tests can exercise
@@ -27,31 +28,52 @@ typedef MacDiveRawParseFn =
       Uint8List data,
     );
 
+/// Signature of the native descriptor-list call, injectable for the same
+/// reason as [MacDiveRawParseFn].
+typedef MacDiveDescriptorFetchFn =
+    Future<List<pigeon.DeviceDescriptor>> Function();
+
+/// A transform applied to `ZRAWDATA` before libdivecomputer sees it, returning
+/// null when the bytes are not in the form this vendor's transform expects.
+typedef MacDiveRawPrePass = Uint8List? Function(Uint8List raw);
+
 /// Maps a [MacDiveRawLogbook] (raw SQLite rows read by [MacDiveDbReader])
 /// into a unified [ImportPayload] the rest of the import pipeline consumes
 /// without knowing the source was SQLite. Key conventions mirror the M2
 /// `MacDiveXmlParser` so the downstream `UddfEntityImporter` processes
 /// both sources through the same code path.
 ///
-/// Profile samples come from `ZRAWDATA`. For Shearwater computers this holds
-/// the raw download stream still in its compressed form: [ShearwaterRawDecompressor]
-/// reverses the two compression passes to recover Petrel Native Format, which
-/// libdivecomputer parses directly. See
+/// Profile samples come from `ZRAWDATA`, the raw download MacDive kept from
+/// whatever device layer it used. Decoding it takes two steps.
+///
+/// First, resolve `ZDIVE.ZCOMPUTER` - a display string such as
+/// "Shearwater Teric" - to a libdivecomputer descriptor. That resolution runs
+/// against libdivecomputer's own descriptor list via
+/// [DiveComputerDescriptorIndex], not a table maintained here: every model the
+/// vendored submodule supports is a candidate, and the set grows on its own as
+/// the submodule advances. Two earlier rounds of this feature each added a
+/// hardcoded entry for one more family (#961 for Shearwater, #1400 for three
+/// Suunto models) and each left every other model on the warning path with its
+/// bytes sitting unread in the database; #1436 replaced the tables outright.
+///
+/// Second, hand the bytes to `parseRawDiveData`. Almost every vendor's
+/// `ZRAWDATA` is already in the exact layout libdivecomputer's parsers expect,
+/// because MacDive downloaded it through libdivecomputer too. Shearwater is
+/// the one known exception ([_rawPrePasses]): its stream is still transport
+/// compressed, so [ShearwaterRawDecompressor] has to reverse two passes first.
+///
+/// Nothing about that resolution proves the bytes belong to the parser it
+/// selected, so [RawProfileSanityCheck] gates the result. A dive whose parse
+/// is rejected, or whose computer resolves to nothing, counts toward one
+/// aggregated [ImportWarning] pointing at MacDive's XML export - exactly the
+/// behaviour every unrecognised computer already had. See
 /// `docs/import-formats/macdive-zsamples.md`.
 ///
-/// A handful of Suunto computers ([_suuntoVendorProduct]) store `ZRAWDATA`
-/// uncompressed, already in the exact byte layout libdivecomputer's own
-/// parsers expect (SBEM for the EON Steel family, the Vyper dive-header
-/// format for Cobra) - confirmed by feeding real MacDive exports through
-/// `parseRawDiveData` with no transformation. Those bytes go straight to the
-/// parser; only Shearwater's stream needs decompressing first.
-///
-/// `ZSAMPLES` is AES-encrypted with a per-dive key and remains undecodable,
-/// but it is also redundant: every dive that has `ZSAMPLES` from a computer
-/// [_vendorProduct] recognises also has a usable `ZRAWDATA`. Dives on an
-/// unrecognised computer carry no decodable `ZRAWDATA`; those raise one
-/// aggregated [ImportWarning] pointing at MacDive's XML export as the
-/// working profile path.
+/// Not every dive has `ZRAWDATA` at all: presence tracks how the dive entered
+/// MacDive (a native download versus manual entry or a file import) rather
+/// than the vendor. `ZSAMPLES` is AES-encrypted with a per-dive key and
+/// remains undecodable, but where a dive has both columns the `ZRAWDATA` one
+/// is the readable one.
 class MacDiveDiveMapper {
   const MacDiveDiveMapper._();
 
@@ -65,6 +87,7 @@ class MacDiveDiveMapper {
   static Future<ImportPayload> toPayload(
     MacDiveRawLogbook logbook, {
     MacDiveRawParseFn? parseRaw,
+    MacDiveDescriptorFetchFn? fetchDescriptors,
   }) async {
     // MacDive routinely omits its own SystemOfUnits row, so fall back to
     // inferring the display unit from the stored magnitudes rather than
@@ -97,6 +120,31 @@ class MacDiveDiveMapper {
     // retrying it for the remaining 500 dives.
     var ffiAvailable = true;
     var undecoded = 0;
+
+    // The descriptor list is a static table inside libdivecomputer, identical
+    // for every dive, so it is read once per import rather than once per dive.
+    // Skipped entirely when no dive has raw bytes, so a logbook of manual
+    // entries never touches the platform channel.
+    var descriptors = const DiveComputerDescriptorIndex.empty();
+    if (logbook.dives.any(_hasRawProfile)) {
+      try {
+        descriptors = DiveComputerDescriptorIndex.fromDescriptors(
+          await (fetchDescriptors ?? _defaultDescriptors)(),
+        );
+        // libdivecomputer always knows some computers, so an empty list means
+        // the native side could not answer, not that nothing is supported.
+        // Reporting that as "this platform cannot decode profiles" is more
+        // honest than reporting every dive as undecodable.
+        ffiAvailable = !descriptors.isEmpty;
+      } on MissingPluginException {
+        ffiAvailable = false;
+      } on PlatformException {
+        ffiAvailable = false;
+      } catch (_) {
+        ffiAvailable = false;
+      }
+    }
+
     for (final d in logbook.dives) {
       final map = _buildDiveMap(
         d,
@@ -106,7 +154,7 @@ class MacDiveDiveMapper {
       );
       if (ffiAvailable && _hasRawProfile(d)) {
         try {
-          if (!await _attachProfile(d, map, parse)) undecoded++;
+          if (!await _attachProfile(d, map, parse, descriptors)) undecoded++;
         } on MissingPluginException {
           ffiAvailable = false;
         } on PlatformException catch (e) {
@@ -150,8 +198,10 @@ class MacDiveDiveMapper {
       );
     }
 
-    // Dives recorded on non-Shearwater computers keep their samples only in
-    // the encrypted ZSAMPLES column, so there is nothing to decode for them.
+    // Dives that MacDive did not download itself - manual entries and file
+    // imports - keep their samples only in the encrypted ZSAMPLES column, so
+    // there is nothing to decode for them regardless of which computer they
+    // name.
     final encryptedOnly = logbook.dives
         .where(
           (d) =>
@@ -254,42 +304,24 @@ class MacDiveDiveMapper {
     data,
   );
 
+  static Future<List<pigeon.DeviceDescriptor>> _defaultDescriptors() =>
+      pigeon.DiveComputerHostApi().getDeviceDescriptors();
+
   static bool _hasRawProfile(MacDiveRawDive d) =>
       d.rawDataBlob != null && d.rawDataBlob!.isNotEmpty;
 
-  /// MacDive's `ZCOMPUTER` strings for the handful of Suunto models confirmed
-  /// (against real MacDive `ZRAWDATA`, not just the vendor name) to store
-  /// their raw download already in libdivecomputer's native format. Every
-  /// entry here is a full string match against `ZCOMPUTER` as MacDive writes
-  /// it, unlike Shearwater's "strip the prefix, look up the model" scheme,
-  /// because these were verified one model at a time rather than derived from
-  /// a general naming convention. Add a computer here only after confirming
-  /// its `ZRAWDATA` parses cleanly - unlike Shearwater's transport-compressed
-  /// stream, an unverified Suunto model could be stored in a different raw
-  /// format entirely.
-  static const _suuntoVendorProduct = {
-    'Suunto EON Steel': ('Suunto', 'EON Steel'),
-    'Suunto EON Steel Black': ('Suunto', 'EON Steel Black'),
-    'Suunto Cobra': ('Suunto', 'Cobra'),
+  /// Vendors whose `ZRAWDATA` is not yet in the layout libdivecomputer's
+  /// parsers read, keyed by the descriptor vendor name.
+  ///
+  /// Shearwater is the only known member and is the exception rather than the
+  /// rule: libdivecomputer decompresses inside its own device layer
+  /// (`shearwater_common.c`), so any host that downloads through
+  /// libdivecomputer ends up holding native bytes. MacDive storing the
+  /// compressed stream tells us its Shearwater download path is its own.
+  /// A second such vendor is one entry here, not a rework.
+  static const _rawPrePasses = <String, MacDiveRawPrePass>{
+    'Shearwater': ShearwaterRawDecompressor.decompress,
   };
-
-  /// MacDive records the computer as a display string such as
-  /// "Shearwater Teric". Strip the vendor prefix and reuse the model table
-  /// the Shearwater Cloud importer already maintains. Suunto has no such
-  /// prefix convention to strip, so [_suuntoVendorProduct] matches the whole
-  /// string instead.
-  static (String, String)? _vendorProduct(String? computer) {
-    if (computer == null) return null;
-    final trimmed = computer.trim();
-    if (trimmed.isEmpty) return null;
-    final suunto = _suuntoVendorProduct[trimmed];
-    if (suunto != null) return suunto;
-    const prefix = 'Shearwater ';
-    final model = trimmed.startsWith(prefix)
-        ? trimmed.substring(prefix.length)
-        : trimmed;
-    return ShearwaterFilenameParser.vendorProduct(model);
-  }
 
   /// Decodes [d]'s `ZRAWDATA` into profile samples on [map]. Returns false
   /// when the dive carries raw bytes we could not turn into a profile, so the
@@ -298,41 +330,75 @@ class MacDiveDiveMapper {
     MacDiveRawDive d,
     Map<String, dynamic> map,
     MacDiveRawParseFn parse,
+    DiveComputerDescriptorIndex descriptors,
   ) async {
-    final vendorProduct = _vendorProduct(d.computer);
-    if (vendorProduct == null) return false;
+    final candidates = descriptors.resolve(d.computer);
+    if (candidates.isEmpty) return false;
 
-    // Only Shearwater stores ZRAWDATA in its own transport-compressed form;
-    // every other recognised vendor's bytes are already the native format
-    // libdivecomputer expects (see _suuntoVendorProduct).
-    final payload = vendorProduct.$1 == 'Shearwater'
-        ? ShearwaterRawDecompressor.decompress(d.rawDataBlob!)
-        : d.rawDataBlob!;
+    // Every candidate shares a vendor and product and differs only by model
+    // number, so the pre-pass runs once rather than per candidate.
+    final prePass = _rawPrePasses[candidates.first.vendor];
+    final payload = prePass == null ? d.rawDataBlob! : prePass(d.rawDataBlob!);
     if (payload == null || payload.isEmpty) return false;
 
-    final parsed = await parse(vendorProduct.$1, vendorProduct.$2, 0, payload);
-    // A failed native parse does not always surface as an error: the macOS
-    // wrapper has been observed returning success with a zeroed dive (no
-    // samples, 0 m, epoch date). Treat "no samples" as the real signal, so a
-    // regression in decompression shows up as a warning rather than a wave of
-    // silently empty dives.
-    final samples = ParsedDiveProfileMapper.samples(parsed);
-    if (samples.isEmpty) return false;
+    for (final candidate in candidates) {
+      final parsed = await _tryParse(parse, candidate, payload);
+      if (parsed == null) continue;
 
-    map['profile'] = samples;
-    // MacDive's own scalar fields win where it has them - the user may have
-    // corrected them - so parsed values only fill gaps, and only with values
-    // that mean something.
-    if (parsed.maxDepthMeters > 0) map['maxDepth'] ??= parsed.maxDepthMeters;
-    if (parsed.avgDepthMeters > 0) map['avgDepth'] ??= parsed.avgDepthMeters;
-    map['decoAlgorithm'] ??= parsed.decoAlgorithm;
-    map['gradientFactorLow'] ??= parsed.gfLow;
-    map['gradientFactorHigh'] ??= parsed.gfHigh;
-    map['waterTemp'] ??= ParsedDiveProfileMapper.minSampleTemperature(parsed);
-    if (map['runtime'] == null && parsed.durationSeconds > 0) {
-      map['runtime'] = Duration(seconds: parsed.durationSeconds);
+      // A failed native parse does not always surface as an error: the macOS
+      // wrapper has been observed returning success with a zeroed dive, and
+      // now that any libdivecomputer-supported model is attempted rather than
+      // an allowlist, a structurally plausible parse of the wrong format is a
+      // live possibility too.
+      if (!RawProfileSanityCheck.accepts(
+        parsed,
+        recordedMaxDepthMeters: (map['maxDepth'] as num?)?.toDouble(),
+        recordedDuration: map['runtime'] as Duration?,
+      )) {
+        continue;
+      }
+      final samples = ParsedDiveProfileMapper.samples(parsed);
+      if (samples.isEmpty) continue;
+
+      map['profile'] = samples;
+      // MacDive's own scalar fields win where it has them - the user may have
+      // corrected them - so parsed values only fill gaps, and only with values
+      // that mean something.
+      if (parsed.maxDepthMeters > 0) map['maxDepth'] ??= parsed.maxDepthMeters;
+      if (parsed.avgDepthMeters > 0) map['avgDepth'] ??= parsed.avgDepthMeters;
+      map['decoAlgorithm'] ??= parsed.decoAlgorithm;
+      map['gradientFactorLow'] ??= parsed.gfLow;
+      map['gradientFactorHigh'] ??= parsed.gfHigh;
+      map['waterTemp'] ??= ParsedDiveProfileMapper.minSampleTemperature(parsed);
+      if (map['runtime'] == null && parsed.durationSeconds > 0) {
+        map['runtime'] = Duration(seconds: parsed.durationSeconds);
+      }
+      return true;
     }
-    return true;
+    return false;
+  }
+
+  /// Runs one candidate model through the parser, returning null when that
+  /// model did not work out. Errors that mean the channel itself is gone are
+  /// rethrown, because retrying the next candidate cannot help.
+  static Future<pigeon.ParsedDive?> _tryParse(
+    MacDiveRawParseFn parse,
+    DiveComputerModel candidate,
+    Uint8List payload,
+  ) async {
+    try {
+      return await parse(
+        candidate.vendor,
+        candidate.product,
+        candidate.model,
+        payload,
+      );
+    } on MissingPluginException {
+      rethrow;
+    } on PlatformException catch (e) {
+      if (e.code == 'UNSUPPORTED' || e.code == 'channel-error') rethrow;
+      return null;
+    }
   }
 
   // ---- dive types / centers / certifications / service records / divers ----

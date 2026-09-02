@@ -351,6 +351,7 @@ void main() {
       final calls = <(String, String, int)>[];
       final payload = await MacDiveDiveMapper.toPayload(
         _rawDataLogbook(),
+        fetchDescriptors: _fakeDescriptors,
         parseRaw: (vendor, product, model, data) async {
           calls.add((vendor, product, data.length));
           return _parsedDive(
@@ -402,6 +403,7 @@ void main() {
             computer: 'Suunto EON Steel Black',
             raw: _suuntoFixture,
           ),
+          fetchDescriptors: _fakeDescriptors,
           parseRaw: (vendor, product, model, data) async {
             calls.add((vendor, product, data));
             return _parsedDive(
@@ -433,16 +435,20 @@ void main() {
     );
 
     test(
-      'Suunto EON Steel and Cobra also resolve to (Suunto, model)',
+      'any libdivecomputer-supported model resolves, not an allowlist',
       () async {
-        final calls = <(String, String)>[];
+        // Before #1436 only three Suunto models were decodable, because they
+        // were the three someone happened to have data for. Every model
+        // libdivecomputer knows must now reach the parser; the D5 and Zoop
+        // Novo were on the warning path with their bytes sitting unread.
+        final calls = <(String, String, int)>[];
         Future<pigeon.ParsedDive> parse(
           String vendor,
           String product,
           int model,
           Uint8List data,
         ) async {
-          calls.add((vendor, product));
+          calls.add((vendor, product, model));
           return _parsedDive(
             samples: [
               pigeon.ProfileSample(
@@ -455,27 +461,160 @@ void main() {
           );
         }
 
-        await MacDiveDiveMapper.toPayload(
-          _suuntoRawDataLogbook(
-            computer: 'Suunto EON Steel',
-            raw: _suuntoFixture,
-          ),
-          parseRaw: parse,
-        );
-        await MacDiveDiveMapper.toPayload(
-          _suuntoRawDataLogbook(computer: 'Suunto Cobra', raw: _suuntoFixture),
-          parseRaw: parse,
-        );
+        for (final computer in [
+          'Suunto EON Steel',
+          'Suunto Cobra',
+          'Suunto D5',
+          'Mares Puck 4',
+        ]) {
+          final payload = await MacDiveDiveMapper.toPayload(
+            _suuntoRawDataLogbook(computer: computer, raw: _suuntoFixture),
+            fetchDescriptors: _fakeDescriptors,
+            parseRaw: parse,
+          );
+          expect(
+            payload.warnings,
+            isEmpty,
+            reason: '$computer should decode without a warning',
+          );
+        }
 
-        expect(calls, [('Suunto', 'EON Steel'), ('Suunto', 'Cobra')]);
+        // The model number now comes from the descriptor rather than being
+        // left as 0 for find_descriptor to wildcard-match.
+        expect(calls, [
+          ('Suunto', 'EON Steel', 0x00),
+          ('Suunto', 'Cobra', 0x0C),
+          ('Suunto', 'D5', 0x02),
+          ('Mares', 'Puck 4', 0x35),
+        ]);
       },
     );
+
+    test('a spacing variant still resolves to the descriptor name', () async {
+      // Source apps spell products without the space libdivecomputer uses.
+      final calls = <(String, String)>[];
+      await MacDiveDiveMapper.toPayload(
+        _suuntoRawDataLogbook(computer: 'Mares Puck4', raw: _suuntoFixture),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (vendor, product, model, data) async {
+          calls.add((vendor, product));
+          return _parsedDive(
+            samples: [pigeon.ProfileSample(timeSeconds: 0, depthMeters: 3.0)],
+          );
+        },
+      );
+      expect(calls, [('Mares', 'Puck 4')]);
+    });
+
+    test('every model of an ambiguous product name is tried', () async {
+      // libdivecomputer declares (Suunto, Zoop Novo) twice, 0x1E and 0x1F.
+      // The parser is the same either way, but the model number reaches it,
+      // so a first-match-wins rule would silently pick a header layout.
+      final models = <int>[];
+      final payload = await MacDiveDiveMapper.toPayload(
+        _suuntoRawDataLogbook(
+          computer: 'Suunto Zoop Novo',
+          raw: _suuntoFixture,
+        ),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (vendor, product, model, data) async {
+          models.add(model);
+          // 0x1E produces a dive no one has ever made; only 0x1F is real.
+          return model == 0x1E
+              ? _parsedDive(
+                  samples: [
+                    pigeon.ProfileSample(timeSeconds: 0, depthMeters: 4000.0),
+                  ],
+                )
+              : _parsedDive(
+                  samples: [
+                    pigeon.ProfileSample(timeSeconds: 0, depthMeters: 12.0),
+                  ],
+                );
+        },
+      );
+
+      expect(models, [0x1E, 0x1F]);
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      expect(dives.single.containsKey('profile'), isTrue);
+      expect(payload.warnings, isEmpty);
+    });
+
+    test('a parser error on one model falls through to the next', () async {
+      // libdivecomputer rejecting one model of an ambiguous name is a normal
+      // result, not a reason to give up on the dive.
+      final models = <int>[];
+      final payload = await MacDiveDiveMapper.toPayload(
+        _suuntoRawDataLogbook(
+          computer: 'Suunto Zoop Novo',
+          raw: _suuntoFixture,
+        ),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (vendor, product, model, data) async {
+          models.add(model);
+          if (model == 0x1E) {
+            throw PlatformException(code: 'PARSE_ERROR', message: 'bad header');
+          }
+          return _parsedDive(
+            samples: [pigeon.ProfileSample(timeSeconds: 0, depthMeters: 12.0)],
+          );
+        },
+      );
+
+      expect(models, [0x1E, 0x1F]);
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      expect(dives.single.containsKey('profile'), isTrue);
+      expect(payload.warnings, isEmpty);
+    });
+
+    test('an unsupported-platform error stops the whole import', () async {
+      // Unlike a parse error, this says the channel itself cannot serve us, so
+      // trying the next model - or the next dive - cannot help.
+      var calls = 0;
+      final payload = await MacDiveDiveMapper.toPayload(
+        _rawDataLogbook(),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (v, p, m, d) async {
+          calls++;
+          throw PlatformException(code: 'UNSUPPORTED', message: 'no parser');
+        },
+      );
+
+      expect(calls, 1, reason: 'must not retry once the channel is out');
+      expect(payload.warnings, hasLength(1));
+      expect(payload.warnings.single.message, contains('this platform'));
+    });
+
+    test('an implausible parse is rejected rather than attached', () async {
+      // Dropping the allowlist means the parser is now offered bytes it may
+      // not own. A structurally valid series that no dive could produce must
+      // not become a profile.
+      final payload = await MacDiveDiveMapper.toPayload(
+        _suuntoRawDataLogbook(computer: 'Suunto D5', raw: _suuntoFixture),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (v, p, m, d) async => _parsedDive(
+          samples: [
+            pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+            pigeon.ProfileSample(timeSeconds: 600, depthMeters: 4000.0),
+          ],
+        ),
+      );
+
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      expect(dives.single.containsKey('profile'), isFalse);
+      expect(payload.warnings, hasLength(1));
+      expect(payload.warnings.single.message.toLowerCase(), contains('xml'));
+    });
 
     test(
       'unrecognised computer counts toward one aggregated warning',
       () async {
+        // A real MacDive value: "Oceanic" is a libdivecomputer vendor but
+        // "Matrix Master" is not one of its products, so resolution has to
+        // fail closed rather than settle for the vendor.
         final payload = await MacDiveDiveMapper.toPayload(
           _rawDataLogbook(computer: 'Oceanic Matrix Master'),
+          fetchDescriptors: _fakeDescriptors,
           parseRaw: (v, p, m, d) async =>
               fail('parser must not be reached for an unknown model'),
         );
@@ -492,12 +631,58 @@ void main() {
     test('missing platform channel warns once, not once per dive', () async {
       final payload = await MacDiveDiveMapper.toPayload(
         _rawDataLogbook(),
+        fetchDescriptors: _fakeDescriptors,
         parseRaw: (v, p, m, d) async =>
             throw MissingPluginException('no channel'),
       );
 
       expect(payload.warnings, hasLength(1));
       expect(payload.warnings.single.message, contains('this platform'));
+    });
+
+    test('an unreadable descriptor list warns about the platform', () async {
+      // libdivecomputer always knows some computers, so an empty or failing
+      // descriptor call means the native side could not answer. Reporting
+      // that as "every one of your dives is undecodable" would be wrong.
+      for (final fetch in <MacDiveDescriptorFetchFn>[
+        () async => throw MissingPluginException('no channel'),
+        () async => throw PlatformException(code: 'UNSUPPORTED'),
+        () async => throw StateError('something else entirely'),
+        () async => [],
+      ]) {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _rawDataLogbook(),
+          fetchDescriptors: fetch,
+          parseRaw: (v, p, m, d) async =>
+              fail('parser must not be reached without descriptors'),
+        );
+        expect(payload.warnings, hasLength(1));
+        expect(payload.warnings.single.message, contains('this platform'));
+      }
+    });
+
+    test('the descriptor list is read once per import, not per dive', () async {
+      var fetches = 0;
+      await MacDiveDiveMapper.toPayload(
+        _rawDataLogbook(),
+        fetchDescriptors: () async {
+          fetches++;
+          return _fakeDescriptors();
+        },
+        parseRaw: (v, p, m, d) async => _parsedDive(
+          samples: [pigeon.ProfileSample(timeSeconds: 0, depthMeters: 3.0)],
+        ),
+      );
+      expect(fetches, 1);
+    });
+
+    test('a logbook with no raw bytes never asks for descriptors', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      await MacDiveDiveMapper.toPayload(
+        logbook,
+        fetchDescriptors: () async =>
+            fail('descriptors must not be fetched with nothing to decode'),
+      );
     });
 
     test(
@@ -606,6 +791,34 @@ Uint8List _hex(String s) {
   }
   return out;
 }
+
+pigeon.DeviceDescriptor _descriptor(String vendor, String product, int model) =>
+    pigeon.DeviceDescriptor(
+      vendor: vendor,
+      product: product,
+      model: model,
+      transports: const [pigeon.TransportType.ble],
+    );
+
+/// A slice of what `getDeviceDescriptors()` returns, with the real vendor,
+/// product and model values from libdivecomputer's `descriptor.c`. The full
+/// list is a few hundred entries across thirty-odd vendors; these cover the
+/// cases the mapper has to get right - one Shearwater (the only vendor
+/// needing a pre-pass), the three Suunto models #1400 hardcoded, a Suunto and
+/// a Mares that were unreachable before #1436, and a product name
+/// libdivecomputer declares twice.
+Future<List<pigeon.DeviceDescriptor>> _fakeDescriptors() async => [
+  _descriptor('Shearwater', 'Teric', 8),
+  _descriptor('Shearwater', 'Tern', 12),
+  _descriptor('Suunto', 'EON Steel', 0),
+  _descriptor('Suunto', 'D5', 2),
+  _descriptor('Suunto', 'EON Steel Black', 3),
+  _descriptor('Suunto', 'Cobra', 0x0C),
+  _descriptor('Suunto', 'Zoop Novo', 0x1E),
+  _descriptor('Suunto', 'Zoop Novo', 0x1F),
+  _descriptor('Mares', 'Puck 4', 0x35),
+  _descriptor('Oceanic', 'Geo 4.0', 0x4653),
+];
 
 /// Stand-in for a Suunto `ZRAWDATA` blob. The real format (SBEM for EON
 /// Steel, the Vyper dive-header layout for Cobra) is confirmed elsewhere
