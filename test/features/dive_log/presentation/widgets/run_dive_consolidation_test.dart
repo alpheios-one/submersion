@@ -177,6 +177,11 @@ void main() {
 /// and settles. The helper needs nothing but a [BuildContext] with a
 /// [ScaffoldMessenger] and localizations above it, so there is no dialog in
 /// the way of the wiring under test.
+///
+/// The locale is pinned to English: flutter_test forwards the HOST machine's
+/// locale list, so an unpinned MaterialApp resolves against it and a developer
+/// whose primary locale is one of the app's other ten would get a translated
+/// UI, failing every English SnackBar assertion below while CI stayed green.
 Future<void> _pumpAndRun(
   WidgetTester tester, {
   required _FakeDiveConsolidationService service,
@@ -186,6 +191,7 @@ Future<void> _pumpAndRun(
 }) async {
   await tester.pumpWidget(
     MaterialApp(
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
