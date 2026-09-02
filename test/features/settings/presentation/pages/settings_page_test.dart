@@ -1487,6 +1487,88 @@ void main() {
     );
   });
 
+  group('AppearanceSectionContent swissBATHY3D manual reload on the '
+      'desktop master-detail layout', () {
+    // Every prior test for this tile pumped it at the default 800x600 test
+    // surface, which is below ResponsiveBreakpoints.masterDetail (1100px).
+    // SettingsPage.build() only takes the split-view MasterDetailScaffold
+    // branch at >=1100px; below that (including exactly 800px) it falls
+    // back to the mobile ?selected= deep-link path, which happens to render
+    // the same _AppearanceSectionContent widget but through a different
+    // parent (SettingsSectionDetailPage instead of MasterDetailScaffold's
+    // split Row). This test pumps the real '/settings' route at a genuine
+    // desktop width with the master list and detail pane both mounted at
+    // once, taps "Appearance" in the master list exactly like a user would,
+    // and checks the reload tile actually appears in the live detail pane.
+    Widget buildWideSettingsWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+          GoRoute(
+            path: '/settings/themes',
+            builder: (context, state) => const Text('Themes'),
+          ),
+        ],
+      );
+
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    testWidgets(
+      'tapping Appearance in the master list reveals the reload tile in '
+      'the detail pane',
+      (tester) async {
+        tester.view.devicePixelRatio = 1.0;
+        tester.view.physicalSize = const Size(1400, 900);
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final overrides = [
+          ...getOverrides(),
+          swissBathyManualRefreshProvider.overrideWithValue(
+            () async => const SwissBathyRefreshSummary(
+              updated: 0,
+              upToDate: 0,
+              failed: 0,
+            ),
+          ),
+        ];
+
+        await tester.pumpWidget(buildWideSettingsWidget(overrides));
+        await tester.pumpAndSettle();
+
+        // Master list is showing; the detail pane starts on the summary.
+        expect(find.text('Appearance'), findsOneWidget);
+        expect(find.text('Reload Map Data'), findsNothing);
+
+        await tester.tap(find.text('Appearance'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text('Reload Map Data'),
+          findsOneWidget,
+          reason:
+              'the split-view detail pane must render the same reload tile '
+              'the mobile ?selected= path shows',
+        );
+      },
+    );
+  });
+
   group('ManageSectionContent checklist templates tile', () {
     /// Build a widget that renders the SettingsPage via GoRouter with
     /// ?selected=manage, which renders the _SettingsSectionDetailPage

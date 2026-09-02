@@ -429,61 +429,69 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
     final chartHeight = (constraints.maxHeight * 0.30)
         .clamp(160.0, 260.0)
         .toDouble();
-    return Column(
-      children: [
-        SizedBox(
-          height: chartHeight,
-          child: Stack(
-            children: [
-              const Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: PlanProfileChart(),
+    // A single CustomScrollView so the chart and tab selector scroll away
+    // with the rest of the page instead of staying pinned and eating the
+    // viewport (#1428).
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: chartHeight,
+            child: Stack(
+              children: [
+                const Positioned.fill(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: PlanProfileChart(),
+                  ),
                 ),
-              ),
-              PlanChartReadouts(
-                onIssuesTap: () =>
-                    ref.read(plannerPhoneTabProvider.notifier).state = 3,
-              ),
-              const Positioned(
-                left: 8,
-                right: 56,
-                bottom: 8,
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: ContingencyChips(overlay: true),
+                PlanChartReadouts(
+                  onIssuesTap: () =>
+                      ref.read(plannerPhoneTabProvider.notifier).state = 3,
                 ),
-              ),
-              Positioned(
-                right: 10,
-                bottom: 10,
-                child: IconButton.filledTonal(
-                  icon: const Icon(Icons.open_in_full, size: 18),
-                  // PUSH (not go): back returns to this canvas with its
-                  // state on the stack, instead of closing the app (#647).
-                  onPressed: () => context.push('/planning/dive-planner/chart'),
+                const Positioned(
+                  left: 8,
+                  right: 56,
+                  bottom: 8,
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: ContingencyChips(overlay: true),
+                  ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: 10,
+                  bottom: 10,
+                  child: IconButton.filledTonal(
+                    icon: const Icon(Icons.open_in_full, size: 18),
+                    // PUSH (not go): back returns to this canvas with its
+                    // state on the stack, instead of closing the app (#647).
+                    onPressed: () =>
+                        context.push('/planning/dive-planner/chart'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SegmentedButton<int>(
-            segments: [
-              for (var i = 0; i < tabs.length; i++)
-                ButtonSegment(value: i, label: Text(tabs[i])),
-            ],
-            selected: {tab},
-            showSelectedIcon: false,
-            onSelectionChanged: (selection) =>
-                ref.read(plannerPhoneTabProvider.notifier).state =
-                    selection.first,
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SegmentedButton<int>(
+              segments: [
+                for (var i = 0; i < tabs.length; i++)
+                  ButtonSegment(value: i, label: Text(tabs[i])),
+              ],
+              selected: {tab},
+              showSelectedIcon: false,
+              onSelectionChanged: (selection) =>
+                  ref.read(plannerPhoneTabProvider.notifier).state =
+                      selection.first,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Expanded(child: _phoneTabBody(tab)),
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        SliverToBoxAdapter(child: _phoneTabBody(tab)),
       ],
     );
   }
@@ -491,23 +499,26 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
   Widget _phoneTabBody(int tab) {
     switch (tab) {
       case 0:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [SegmentList()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: SegmentList(),
         );
       case 1:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [PlanTankList()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: PlanTankList(),
         );
       case 2:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [PlanSetupAccordion()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: PlanSetupAccordion(),
         );
       case 3:
       default:
-        return PlanResultsPane(controller: _wideResultsController);
+        return PlanResultsPane(
+          controller: _wideResultsController,
+          shrinkWrap: true,
+        );
     }
   }
 

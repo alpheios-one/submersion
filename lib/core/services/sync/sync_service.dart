@@ -83,6 +83,15 @@ class SyncResult {
   /// [skippedPeerNames].
   final Map<String, String> newerSchemaPeerNames;
 
+  /// Peers whose changeset read threw during the pull. Their cursors stayed
+  /// put, so the next sync retries them; the UI names them so the user can
+  /// see whose data did not merge this run.
+  final Set<String> readFailedPeerDeviceIds;
+
+  /// Display names for [readFailedPeerDeviceIds], same contract as
+  /// [skippedPeerNames].
+  final Map<String, String> readFailedPeerNames;
+
   /// Set with [SyncResultStatus.awaitingAdoption]: the cloud library was
   /// replaced under this marker's epoch and the user must adopt (or defer)
   /// before any sync can proceed.
@@ -99,6 +108,8 @@ class SyncResult {
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.newerSchemaPeerNames = const {},
+    this.readFailedPeerDeviceIds = const {},
+    this.readFailedPeerNames = const {},
     this.replaceMarker,
   });
 
@@ -798,6 +809,8 @@ class SyncService {
         skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
         newerSchemaPeerNames: pullResult.newerSchemaPeerNames,
+        readFailedPeerDeviceIds: pullResult.readFailedPeerDeviceIds,
+        readFailedPeerNames: pullResult.readFailedPeerNames,
       );
     } on TimeoutException {
       _log.warning('Sync timed out');

@@ -10222,6 +10222,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
+  String get enum_sortField_lastDive => 'צלילה אחרונה';
+
+  @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';
 
   @override
@@ -15475,6 +15478,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -35145,6 +35158,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'מציג רשימת צלילות…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מציג רשימת צלילות… (נמצאו $count צלילות עד כה)',
+      one: 'מציג רשימת צלילות… (נמצאה צלילה אחת עד כה)',
+      zero: 'מציג רשימת צלילות…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'מוריד צלילה $current מתוך $total…';
   }
@@ -35154,6 +35179,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'נסה שוב';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'טען עוד';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35179,6 +35207,111 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'התחברות ל-Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'התחבר עם חשבון Garmin Connect שלך כדי לייבא את הצלילות שלך ישירות. הסיסמה שלך לעולם אינה נשמרת, רק ההפעלה שנוצרת ממנה.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'דוא\"ל';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'נדרש דוא\"ל';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'סיסמה';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'נדרשת סיסמה';
+
+  @override
+  String get garminConnect_signIn_button => 'התחברות';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'מתחבר…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'מחובר כ-$email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'נדרש אימות';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'הזן את קוד האימות שנשלח אל $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'קוד אימות';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'נדרש קוד אימות';
+
+  @override
+  String get garminConnect_mfa_button => 'אמת';
+
+  @override
+  String get garminConnect_mfa_submitting => 'מאמת…';
+
+  @override
+  String get garminConnect_fetch_listing => 'מציג רשימת צלילות…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מציג רשימת צלילות… (נמצאו $count צלילות עד כה)',
+      one: 'מציג רשימת צלילות… (נמצאה צלילה אחת עד כה)',
+      zero: 'מציג רשימת צלילות…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'מוריד צלילה $current מתוך $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'לא ניתן להוריד את הצלילות';
+
+  @override
+  String get garminConnect_fetch_retry => 'נסה שוב';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'טען עוד';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמצאו $count צלילות',
+      one: 'נמצאה צלילה אחת',
+      zero: 'לא נמצאו צלילות',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לא ניתן היה להמיר $count צלילות והן דולגו.',
+      one: 'לא ניתן היה להמיר צלילה אחת והיא דולגה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'טען הכול';
+
+  @override
   String get importWizard_review_sortTooltip => 'מיון';
 
   @override
@@ -35196,6 +35329,13 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'ייבוא צלילות מאפליקציית Suunto או מחשבון app.suunto.com';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'ייבוא צלילות מחשבון Garmin Connect שלך';
 
   @override
   String get transfer_section_cloudTitle => 'ענן';
