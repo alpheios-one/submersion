@@ -21,6 +21,10 @@
 // model-code digits [4:6] are significant, so the surrounding manufacture-date
 // and unit-number digits are zeroed (the bug was first reported against real
 // Symbios devices in issue #288).
+//
+// Regression for issue #1419: the Seac Tablet never appeared in a BLE scan.
+// Its filter demanded a name of "Tablet" plus ASCII digits and nothing else,
+// so any separator or letter in the advertised serial dropped the device.
 
 // Every check in this file is an assert, so a build that defines NDEBUG would
 // compile all of them out and leave each test printing PASS while verifying
@@ -243,6 +247,60 @@ static void test_oceans_s1_names_still_resolve(void) {
     printf("PASS: test_oceans_s1_names_still_resolve\n");
 }
 
+// Issue #1419: a Seac Tablet was never discovered over BLE on Android even
+// though the same computer downloads fine over the USB cable. "Tablet" is the
+// only BLE-capable Seac row, so the digits in its advertised name are a plain
+// serial and disambiguate nothing -- yet upstream matched them with
+// dc_match_prefix_with_number, which accepts "Tablet" followed by ASCII digits
+// and NOTHING else. Any separator or letter in the serial made the scanner
+// drop the advertisement before it ever reached the wizard.
+//
+// The serials below are synthetic: no digit position is significant, only the
+// shape of the name.
+static void test_seac_tablet_serial_spellings_resolve(void) {
+    // The form upstream documented, and the bare model word.
+    expect_ble_match("Tablet123456", "Tablet", 0x10);
+    expect_ble_match("Tablet", "Tablet", 0x10);
+    // Separated serials.
+    expect_ble_match("Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("Tablet-123456", "Tablet", 0x10);
+    expect_ble_match("Tablet_123456", "Tablet", 0x10);
+    // Alphanumeric serials.
+    expect_ble_match("Tablet1A2B3C", "Tablet", 0x10);
+    expect_ble_match("Tablet A1B2C3", "Tablet", 0x10);
+    // Vendor-prefixed, the spelling several other vendors advertise.
+    expect_ble_match("Seac Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SeacTablet123456", "Tablet", 0x10);
+    // Advertised names vary in case by firmware and Bluetooth stack.
+    expect_ble_match("TABLET-123456", "Tablet", 0x10);
+    expect_ble_match("SEAC TABLET 123456", "Tablet", 0x10);
+    printf("PASS: test_seac_tablet_serial_spellings_resolve\n");
+}
+
+// "Tablet" is an ordinary English word, so widening the Seac filter must not
+// turn every nearby consumer peripheral into a "recognized" dive computer.
+// A false positive is worse than a miss: the wizard promises a download and
+// then speaks the Seac protocol to something that cannot answer (issue #123).
+// The serial token has to contain a digit, and only one separator is allowed,
+// which is what keeps these out.
+static void test_seac_filter_does_not_claim_generic_tablets(void) {
+    expect_no_ble_match("Tablet PC");
+    expect_no_ble_match("Tablet-Pro");
+    expect_no_ble_match("Tabletop");
+    expect_no_ble_match("Tablet S6 Lite");
+    expect_no_ble_match("My Tablet 123456");
+    expect_no_ble_match("Seac");
+    printf("PASS: test_seac_filter_does_not_claim_generic_tablets\n");
+}
+
+// The other two Seac Screen rows are cable-only (DC_TRANSPORT_SERIAL), so a
+// BLE advertisement must not resolve to them however it is spelled.
+static void test_seac_cable_only_models_stay_off_ble(void) {
+    expect_no_ble_match("Screen123456");
+    expect_no_ble_match("Action123456");
+    printf("PASS: test_seac_cable_only_models_stay_off_ble\n");
+}
+
 int main(void) {
     test_hud_resolves_to_g2_hud();
     test_other_short_aliases_resolve();
@@ -261,6 +319,9 @@ int main(void) {
     test_suunto_rejection_requires_the_full_shape();
     test_unobserved_model_codes_are_not_suppressed();
     test_oceans_s1_names_still_resolve();
+    test_seac_tablet_serial_spellings_resolve();
+    test_seac_filter_does_not_claim_generic_tablets();
+    test_seac_cable_only_models_stay_off_ble();
     printf("\nAll descriptor match integration tests passed.\n");
     return 0;
 }
