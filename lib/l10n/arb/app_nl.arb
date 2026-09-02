@@ -9949,8 +9949,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Fotominiatuur. Tik om volledig scherm te bekijken",
   "trips_gallery_thumbnail_video": "Videominiatuur. Tik om volledig scherm te bekijken",
-  "trips_gallery_thumbnail_photoMissing": "Fotominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken",
-  "trips_gallery_thumbnail_videoMissing": "Videominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken",
   "trips_photos_thumbnail_photo": "Fotominiatuur. Tik om de galerij te openen",
   "trips_photos_thumbnail_video": "Videominiatuur. Tik om de galerij te openen",
   "trips_picker_suggestedSemantics": "Voorgestelde reis: {name}. Tik om te gebruiken",

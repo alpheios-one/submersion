@@ -9949,8 +9949,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Miniature de photo. Appuyez pour voir en plein écran",
   "trips_gallery_thumbnail_video": "Miniature de vidéo. Appuyez pour voir en plein écran",
-  "trips_gallery_thumbnail_photoMissing": "Miniature de photo, absente de l’appareil. Appuyez pour voir en plein écran",
-  "trips_gallery_thumbnail_videoMissing": "Miniature de vidéo, absente de l’appareil. Appuyez pour voir en plein écran",
   "trips_photos_thumbnail_photo": "Miniature de photo. Appuyez pour ouvrir la galerie",
   "trips_photos_thumbnail_video": "Miniature de vidéo. Appuyez pour ouvrir la galerie",
   "trips_picker_suggestedSemantics": "Voyage suggéré : {name}. Appuyez pour l’utiliser",

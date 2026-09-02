@@ -9949,8 +9949,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Fotovorschau. Tippen, um im Vollbild anzuzeigen",
   "trips_gallery_thumbnail_video": "Videovorschau. Tippen, um im Vollbild anzuzeigen",
-  "trips_gallery_thumbnail_photoMissing": "Fotovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen",
-  "trips_gallery_thumbnail_videoMissing": "Videovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen",
   "trips_photos_thumbnail_photo": "Fotovorschau. Tippen, um die Galerie zu öffnen",
   "trips_photos_thumbnail_video": "Videovorschau. Tippen, um die Galerie zu öffnen",
   "trips_picker_suggestedSemantics": "Vorgeschlagene Reise: {name}. Tippen, um sie zu verwenden",

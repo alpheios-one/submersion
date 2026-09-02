@@ -393,6 +393,16 @@ void main() {
       expect(find.byType(MediaItemView), findsOneWidget);
       expect(find.byType(Image), findsOneWidget);
       expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
+      // The label must not read the stale flag either: a screen reader
+      // should never hear "missing" over a thumbnail that just rendered.
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.label == 'Photo thumbnail. Tap to view full screen',
+        ),
+        findsOneWidget,
+      );
       // The resolver produced bytes, so the stale flag is corrected.
       expect(repository.writes, [(id: 'media-orphan', isOrphaned: false)]);
     });

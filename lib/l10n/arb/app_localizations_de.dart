@@ -33733,14 +33733,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Videovorschau. Tippen, um im Vollbild anzuzeigen';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Fotovorschau. Tippen, um die Galerie zu öffnen';
 

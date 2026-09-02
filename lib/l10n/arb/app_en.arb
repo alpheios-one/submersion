@@ -20028,8 +20028,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Photo thumbnail. Tap to view full screen",
   "trips_gallery_thumbnail_video": "Video thumbnail. Tap to view full screen",
-  "trips_gallery_thumbnail_photoMissing": "Photo thumbnail, missing from device. Tap to view full screen",
-  "trips_gallery_thumbnail_videoMissing": "Video thumbnail, missing from device. Tap to view full screen",
   "trips_photos_thumbnail_photo": "Photo thumbnail. Tap to open gallery",
   "trips_photos_thumbnail_video": "Video thumbnail. Tap to open gallery",
   "trips_picker_suggestedSemantics": "Suggested trip: {name}. Tap to use",

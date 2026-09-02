@@ -33820,14 +33820,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Miniatura de vídeo. Toque para ver em tela cheia';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Miniatura de foto, ausente no dispositivo. Toque para ver em tela cheia';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Miniatura de vídeo, ausente no dispositivo. Toque para ver em tela cheia';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Miniatura de foto. Toque para abrir a galeria';
 
