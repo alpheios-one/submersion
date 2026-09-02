@@ -82,6 +82,17 @@ final blenderBilledFillsProvider = StateProvider<List<BilledFill>>(
 /// logbook's diver.
 final blenderBilledToProvider = StateProvider<String>((ref) => '');
 
+/// When the running bill started. Defaults to today so the date is editable
+/// from the moment a bill is open, not only once it is paid.
+final blenderBilledDateProvider = StateProvider<DateTime>(
+  (ref) => DateTime.now(),
+);
+
+/// Bills already paid and archived, oldest first.
+final blenderArchivedInvoicesProvider = StateProvider<List<ArchivedInvoice>>(
+  (ref) => const [],
+);
+
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);
 
@@ -159,6 +170,11 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderGasModelProvider.notifier).state = stored.model;
   ref.read(blenderBilledFillsProvider.notifier).state = stored.billedFills;
   ref.read(blenderBilledToProvider.notifier).state = stored.billedTo;
+  if (stored.billedDate != null) {
+    ref.read(blenderBilledDateProvider.notifier).state = stored.billedDate!;
+  }
+  ref.read(blenderArchivedInvoicesProvider.notifier).state =
+      stored.archivedInvoices;
   if (stored.currencyCode != null) {
     ref.read(blenderCurrencyProvider.notifier).state = stored.currencyCode!;
   }
@@ -194,6 +210,8 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             model: ref.read(blenderGasModelProvider),
             billedFills: ref.read(blenderBilledFillsProvider),
             billedTo: ref.read(blenderBilledToProvider),
+            billedDate: ref.read(blenderBilledDateProvider),
+            archivedInvoices: ref.read(blenderArchivedInvoicesProvider),
           ),
         );
   } catch (e, stackTrace) {

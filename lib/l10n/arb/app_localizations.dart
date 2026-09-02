@@ -21020,11 +21020,23 @@ abstract class AppLocalizations {
   /// **'Save this fill'**
   String get gasCalculators_blender_saveFill;
 
-  /// No description provided for @gasCalculators_blender_billed.
+  /// No description provided for @gasCalculators_blender_billedDate.
   ///
   /// In en, this message translates to:
-  /// **'Billed'**
-  String get gasCalculators_blender_billed;
+  /// **'Invoice dated {date}'**
+  String gasCalculators_blender_billedDate(String date);
+
+  /// No description provided for @gasCalculators_blender_billedDateEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Change invoice date'**
+  String get gasCalculators_blender_billedDateEdit;
+
+  /// No description provided for @gasCalculators_blender_tariff.
+  ///
+  /// In en, this message translates to:
+  /// **'Current tariff'**
+  String get gasCalculators_blender_tariff;
 
   /// No description provided for @gasCalculators_blender_billedNone.
   ///
@@ -21056,23 +21068,53 @@ abstract class AppLocalizations {
   /// **'Amount'**
   String get gasCalculators_blender_lineAmount;
 
-  /// No description provided for @gasCalculators_blender_clearBilled.
+  /// No description provided for @gasCalculators_blender_export.
   ///
   /// In en, this message translates to:
-  /// **'Clear'**
-  String get gasCalculators_blender_clearBilled;
+  /// **'Export'**
+  String get gasCalculators_blender_export;
 
-  /// No description provided for @gasCalculators_blender_clearBilledTitle.
+  /// No description provided for @gasCalculators_blender_exportPdf.
   ///
   /// In en, this message translates to:
-  /// **'Clear the bill?'**
-  String get gasCalculators_blender_clearBilledTitle;
+  /// **'Export as PDF'**
+  String get gasCalculators_blender_exportPdf;
 
-  /// No description provided for @gasCalculators_blender_clearBilledBody.
+  /// No description provided for @gasCalculators_blender_exportImage.
   ///
   /// In en, this message translates to:
-  /// **'This removes all {count} saved fills.'**
-  String gasCalculators_blender_clearBilledBody(int count);
+  /// **'Export as Image'**
+  String get gasCalculators_blender_exportImage;
+
+  /// No description provided for @gasCalculators_blender_exportExcel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as Excel'**
+  String get gasCalculators_blender_exportExcel;
+
+  /// No description provided for @gasCalculators_blender_exportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String gasCalculators_blender_exportError(String error);
+
+  /// No description provided for @gasCalculators_blender_pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get gasCalculators_blender_pay;
+
+  /// No description provided for @gasCalculators_blender_payTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark the bill as paid?'**
+  String get gasCalculators_blender_payTitle;
+
+  /// No description provided for @gasCalculators_blender_payBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This archives all {count} saved fills and starts a new bill.'**
+  String gasCalculators_blender_payBody(int count);
 
   /// No description provided for @gasCalculators_blender_editLine.
   ///

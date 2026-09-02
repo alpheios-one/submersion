@@ -12395,7 +12395,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Diese Füllung speichern';
 
   @override
-  String get gasCalculators_blender_billed => 'Abgerechnet';
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Rechnung vom $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Rechnungsdatum ändern';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Aktueller Tarif';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12414,14 +12422,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Betrag';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Leeren';
+  String get gasCalculators_blender_export => 'Exportieren';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Rechnung leeren?';
+  String get gasCalculators_blender_exportPdf => 'Als PDF exportieren';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Damit werden alle $count gespeicherten Füllungen entfernt.';
+  String get gasCalculators_blender_exportImage => 'Als Bild exportieren';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Als Excel exportieren';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Export fehlgeschlagen: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Bezahlen';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'Rechnung als bezahlt markieren?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Dies archiviert alle $count gespeicherten Füllungen und beginnt eine neue Rechnung.';
   }
 
   @override

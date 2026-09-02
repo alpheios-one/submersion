@@ -7,6 +7,7 @@ class BilledGasLine {
     required this.gas,
     required this.addedBar,
     required this.cost,
+    this.freeGasLiters,
   });
 
   /// The gas as it was labelled when the fill was saved, e.g. "He" or
@@ -17,10 +18,19 @@ class BilledGasLine {
   final double addedBar;
   final double? cost;
 
+  /// Free gas at the surface, in litres, frozen at save time the same way
+  /// [addedBar] is. Nullable rather than required: a fill saved before this
+  /// field existed has no volume to fall back on, and recomputing it would
+  /// need the cylinder's water capacity *at the time*, which was never kept
+  /// per line. The invoice shows volume when this is present and falls back
+  /// to pressure for older rows rather than guessing.
+  final double? freeGasLiters;
+
   Map<String, dynamic> toJson() => {
     'gas': gas,
     'addedBar': addedBar,
     if (cost != null) 'cost': cost,
+    if (freeGasLiters != null) 'freeGasLiters': freeGasLiters,
   };
 
   static BilledGasLine? fromJson(Object? json) {
@@ -29,10 +39,12 @@ class BilledGasLine {
     final bar = json['addedBar'];
     if (gas is! String || bar is! num) return null;
     final cost = json['cost'];
+    final liters = json['freeGasLiters'];
     return BilledGasLine(
       gas: gas,
       addedBar: bar.toDouble(),
       cost: cost is num ? cost.toDouble() : null,
+      freeGasLiters: liters is num ? liters.toDouble() : null,
     );
   }
 }
@@ -147,4 +159,73 @@ List<BilledFill> appendCapped(List<BilledFill> fills, BilledFill fill) {
   final next = [...fills, fill];
   if (next.length <= kMaxBilledFills) return next;
   return next.sublist(next.length - kMaxBilledFills);
+}
+
+/// Enough recent invoices to be useful without letting a synced blob grow
+/// forever, matching [kMaxBilledFills]'s reasoning.
+const int kMaxArchivedInvoices = 50;
+
+/// A running bill as it stood when "Pay" archived it: the invoice date, who
+/// it was billed to, every line, and the total.
+///
+/// A minimal record rather than a full invoice history feature (that is
+/// issue #22) - just enough that archiving loses nothing, so a later
+/// history view has real data to build on instead of starting from zero.
+class ArchivedInvoice {
+  const ArchivedInvoice({
+    required this.id,
+    required this.date,
+    required this.billedTo,
+    required this.fills,
+    required this.total,
+  });
+
+  final String id;
+  final DateTime date;
+  final String billedTo;
+  final List<BilledFill> fills;
+
+  /// Null when the bill was paid with an unpriced line still on it.
+  final double? total;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'date': date.toIso8601String(),
+    'billedTo': billedTo,
+    'fills': fills.map((f) => f.toJson()).toList(),
+    if (total != null) 'total': total,
+  };
+
+  static ArchivedInvoice? fromJson(Object? json) {
+    if (json is! Map) return null;
+    final id = json['id'];
+    final dateRaw = json['date'];
+    if (id is! String || dateRaw is! String) return null;
+    final date = DateTime.tryParse(dateRaw);
+    if (date == null) return null;
+    final billedTo = json['billedTo'];
+    final rawFills = json['fills'];
+    final total = json['total'];
+    return ArchivedInvoice(
+      id: id,
+      date: date,
+      billedTo: billedTo is String ? billedTo : '',
+      fills: rawFills is List
+          ? rawFills.map(BilledFill.fromJson).whereType<BilledFill>().toList()
+          : const [],
+      total: total is num ? total.toDouble() : null,
+    );
+  }
+}
+
+/// [invoices] with [invoice] on the end, dropping the oldest to stay within
+/// [kMaxArchivedInvoices]. See [appendCapped] for why the cap is applied here
+/// rather than on read.
+List<ArchivedInvoice> appendArchivedCapped(
+  List<ArchivedInvoice> invoices,
+  ArchivedInvoice invoice,
+) {
+  final next = [...invoices, invoice];
+  if (next.length <= kMaxArchivedInvoices) return next;
+  return next.sublist(next.length - kMaxArchivedInvoices);
 }

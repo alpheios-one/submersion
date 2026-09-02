@@ -12365,7 +12365,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Töltés mentése';
 
   @override
-  String get gasCalculators_blender_billed => 'Számlázva';
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Számla kelte: $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit =>
+      'Számla dátumának módosítása';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Aktuális díjszabás';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12384,14 +12393,32 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Összeg';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Ürítés';
+  String get gasCalculators_blender_export => 'Exportálás';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Üríted a számlát?';
+  String get gasCalculators_blender_exportPdf => 'Exportálás PDF-be';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Ezzel mind a(z) $count mentett töltés törlődik.';
+  String get gasCalculators_blender_exportImage => 'Exportálás képként';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exportálás Excelbe';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Az exportálás sikertelen: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Fizetés';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'Megjelölöd a számlát fizetettként?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Ez archiválja mind a(z) $count mentett töltést, és új számlát kezd.';
   }
 
   @override

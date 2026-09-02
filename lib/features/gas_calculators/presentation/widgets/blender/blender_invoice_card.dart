@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -7,9 +8,11 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_export_sheet.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 /// The running bill for a blending session.
 ///
@@ -29,6 +32,10 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   /// The logbook name is a starting point, offered once. Re-seeding on every
   /// rebuild would fight the diver as they typed a customer's name.
   bool _seededBilledTo = false;
+
+  /// Wraps the whole card for the "Export as Image" option, so it captures
+  /// exactly what the diver is already looking at.
+  final _exportBoundaryKey = GlobalKey();
 
   @override
   void initState() {
@@ -67,6 +74,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     final units = UnitFormatter(settings);
     final decimals = pressureDecimalsFor(settings.pressureUnit);
     final total = totalOf(fills);
+    final billedDate = ref.watch(blenderBilledDateProvider);
     final theme = Theme.of(context);
 
     // Seed the name from the logbook, once, and only when the diver has not
@@ -79,93 +87,262 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     final diver = ref.watch(currentDiverProvider).valueOrNull;
     _seedBilledTo(diver?.name.trim() ?? '');
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BlenderSectionTitle(context.l10n.gasCalculators_blender_billed),
-            TextField(
-              controller: _billedTo,
-              decoration: InputDecoration(
-                labelText: context.l10n.gasCalculators_blender_billedTo,
-                isDense: true,
-                border: const OutlineInputBorder(),
+    return RepaintBoundary(
+      key: _exportBoundaryKey,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _dateHeader(context, billedDate, settings),
+              _tariffSummary(context, settings, currency),
+              TextField(
+                controller: _billedTo,
+                decoration: InputDecoration(
+                  labelText: context.l10n.gasCalculators_blender_billedTo,
+                  isDense: true,
+                  border: const OutlineInputBorder(),
+                ),
+                onChanged: (v) =>
+                    ref.read(blenderBilledToProvider.notifier).state = v,
+                onEditingComplete: () => saveBlenderPreferences(ref),
+                onSubmitted: (_) => saveBlenderPreferences(ref),
               ),
-              onChanged: (v) =>
-                  ref.read(blenderBilledToProvider.notifier).state = v,
-              onEditingComplete: () => saveBlenderPreferences(ref),
-              onSubmitted: (_) => saveBlenderPreferences(ref),
-            ),
-            const SizedBox(height: 16),
-            if (fills.isEmpty)
-              Text(
-                context.l10n.gasCalculators_blender_billedNone,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              )
-            else
-              for (final f in fills)
-                _fillLine(context, f, currency, units, decimals),
-            const SizedBox(height: 8),
-            // A Wrap so the two actions drop to separate lines on the
-            // narrowest phone rather than overflowing.
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                TextButton.icon(
-                  key: const Key('blender-add-manual-line'),
-                  onPressed: () => _editLine(null),
-                  icon: const Icon(Icons.add, size: 18),
-                  label: Text(
-                    context.l10n.gasCalculators_blender_addManualLine,
+              const SizedBox(height: 16),
+              if (fills.isEmpty)
+                Text(
+                  context.l10n.gasCalculators_blender_billedNone,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
+                )
+              else
+                for (final f in fills)
+                  _fillLine(context, f, currency, units, decimals),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                key: const Key('blender-add-manual-line'),
+                onPressed: () => _editLine(null),
+                icon: const Icon(Icons.add, size: 18),
+                label: Text(context.l10n.gasCalculators_blender_addManualLine),
+              ),
+              if (fills.isNotEmpty) ...[
+                const Divider(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      context.l10n.gasCalculators_blender_billedTotal,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      formatMoney(total.amount, currency),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-                if (fills.isNotEmpty)
-                  TextButton(
-                    key: const Key('blender-clear-billed'),
-                    onPressed: _confirmClear,
+                if (!total.complete)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      context.l10n.gasCalculators_blender_clearBilled,
+                      context.l10n.gasCalculators_blender_billedIncomplete,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
                     ),
                   ),
+                const SizedBox(height: 12),
+                // A Wrap so the two actions drop to separate lines on the
+                // narrowest phone rather than overflowing.
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    OutlinedButton.icon(
+                      key: const Key('blender-export'),
+                      onPressed: () => _openExportSheet(
+                        context,
+                        fills,
+                        currency,
+                        units,
+                        decimals,
+                        billedDate,
+                        total,
+                      ),
+                      icon: const Icon(Icons.ios_share, size: 18),
+                      label: Text(context.l10n.gasCalculators_blender_export),
+                    ),
+                    FilledButton.icon(
+                      key: const Key('blender-pay'),
+                      onPressed: _confirmPay,
+                      icon: const Icon(Icons.check_circle_outline, size: 18),
+                      label: Text(context.l10n.gasCalculators_blender_pay),
+                    ),
+                  ],
+                ),
               ],
-            ),
-            if (fills.isNotEmpty) ...[
-              const Divider(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    context.l10n.gasCalculators_blender_billedTotal,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Text(
-                    formatMoney(total.amount, currency),
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dateHeader(
+    BuildContext context,
+    DateTime date,
+    AppSettings settings,
+  ) {
+    final units = UnitFormatter(settings);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: BlenderSectionTitle(
+              context.l10n.gasCalculators_blender_billedDate(
+                units.formatDate(date),
               ),
-              if (!total.complete)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    context.l10n.gasCalculators_blender_billedIncomplete,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.error,
-                    ),
-                  ),
+            ),
+          ),
+          IconButton(
+            key: const Key('blender-billed-date-edit'),
+            icon: const Icon(Icons.edit_calendar_outlined, size: 20),
+            visualDensity: VisualDensity.compact,
+            tooltip: context.l10n.gasCalculators_blender_billedDateEdit,
+            onPressed: () => _pickDate(context, date, settings),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickDate(
+    BuildContext context,
+    DateTime current,
+    AppSettings settings,
+  ) async {
+    final picked = await showAppDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+      dateFormat: settings.dateFormat,
+    );
+    if (picked == null) return;
+    ref.read(blenderBilledDateProvider.notifier).state = picked;
+    saveBlenderPreferences(ref);
+  }
+
+  /// The gas tariff, so it can be checked at a glance without switching to
+  /// the "Cost" card. Zipped by bank index against the gas *currently*
+  /// configured for that bank, matching how the price fields there are
+  /// labelled - not by grouping historical invoice lines, which may have
+  /// been filled from a bank since reconfigured to a different gas
+  /// (PR #1215 review).
+  Widget _tariffSummary(
+    BuildContext context,
+    AppSettings settings,
+    String currency,
+  ) {
+    final gases = [
+      ref.watch(blenderFillGas1Provider),
+      ref.watch(blenderFillGas2Provider),
+      ref.watch(blenderFillGas3Provider),
+    ];
+    final prices = ref.watch(blenderGasPricesProvider);
+    final units = UnitFormatter(settings);
+    final parts = <String>[];
+    for (var i = 0; i < gases.length; i++) {
+      final price = i < prices.length ? prices[i] : null;
+      if (price == null) continue;
+      final display = blenderDisplayPrice(price, settings);
+      parts.add(
+        '${formatPreciseGasName(context, gases[i])} '
+        '${formatMoney(display, currency)}/100${units.volumeSymbol}',
+      );
+    }
+    if (parts.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        '${context.l10n.gasCalculators_blender_tariff}: ${parts.join('  ·  ')}',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  void _openExportSheet(
+    BuildContext context,
+    List<BilledFill> fills,
+    String currency,
+    UnitFormatter units,
+    int decimals,
+    DateTime billedDate,
+    BilledTotal total,
+  ) {
+    final settings = ref.read(settingsProvider);
+    final gases = [
+      ref.read(blenderFillGas1Provider),
+      ref.read(blenderFillGas2Provider),
+      ref.read(blenderFillGas3Provider),
+    ];
+    final prices = ref.read(blenderGasPricesProvider);
+    final tariffParts = <String>[];
+    for (var i = 0; i < gases.length; i++) {
+      final price = i < prices.length ? prices[i] : null;
+      if (price == null) continue;
+      final display = blenderDisplayPrice(price, settings);
+      tariffParts.add(
+        '${formatPreciseGasName(context, gases[i])} '
+        '${formatMoney(display, currency)}/100${units.volumeSymbol}',
+      );
+    }
+
+    final data = BlenderInvoiceExportData(
+      date: context.l10n.gasCalculators_blender_billedDate(
+        units.formatDate(billedDate),
+      ),
+      billedTo: ref.read(blenderBilledToProvider),
+      tariff: tariffParts.join('  ·  '),
+      fills: [
+        for (final fill in fills)
+          BlenderInvoiceExportFill(
+            label: fill.label,
+            total: fill.total == null ? '' : formatMoney(fill.total!, currency),
+            lines: [
+              for (final line in fill.lines)
+                BlenderInvoiceExportLine(
+                  gas: line.gas,
+                  volume: line.freeGasLiters != null
+                      ? units.formatVolume(line.freeGasLiters)
+                      : units.formatPressure(line.addedBar, decimals: decimals),
+                  cost: line.cost == null
+                      ? ''
+                      : formatMoney(line.cost!, currency),
                 ),
             ],
-          ],
-        ),
+          ),
+      ],
+      total: total.complete ? formatMoney(total.amount, currency) : '',
+      incomplete: !total.complete,
+    );
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => BlenderInvoiceExportSheet(
+        data: data,
+        imageBoundaryKey: _exportBoundaryKey,
       ),
     );
   }
@@ -243,7 +420,15 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                   Expanded(
                     flex: 4,
                     child: Text(
-                      units.formatPressure(line.addedBar, decimals: decimals),
+                      // Volume when this line has one (every fill saved
+                      // since #1335); pressure-only rows saved before that
+                      // fall back, since their volume was never kept.
+                      line.freeGasLiters != null
+                          ? units.formatVolume(line.freeGasLiters)
+                          : units.formatPressure(
+                              line.addedBar,
+                              decimals: decimals,
+                            ),
                       style: theme.textTheme.bodySmall,
                       textAlign: TextAlign.end,
                     ),
@@ -312,15 +497,21 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     saveBlenderPreferences(ref);
   }
 
-  Future<void> _confirmClear() async {
-    final count = ref.read(blenderBilledFillsProvider).length;
+  /// Archives the running bill and starts a fresh one.
+  ///
+  /// Replaces the old "Clear" action rather than sitting beside it: a bill
+  /// that is only cleared, never archived, is the exact history gap issue
+  /// #22 (a full invoice archive view) would otherwise have to backfill from
+  /// nothing. The confirmation dialog is kept, since paying is just as
+  /// destructive to the running bill as clearing was.
+  Future<void> _confirmPay() async {
+    final fills = ref.read(blenderBilledFillsProvider);
+    final count = fills.length;
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(context.l10n.gasCalculators_blender_clearBilledTitle),
-        content: Text(
-          context.l10n.gasCalculators_blender_clearBilledBody(count),
-        ),
+        title: Text(context.l10n.gasCalculators_blender_payTitle),
+        content: Text(context.l10n.gasCalculators_blender_payBody(count)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -328,13 +519,29 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text(context.l10n.gasCalculators_blender_clearBilled),
+            child: Text(context.l10n.gasCalculators_blender_pay),
           ),
         ],
       ),
     );
     if (ok != true) return;
+
+    final total = totalOf(fills);
+    final archived = ArchivedInvoice(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      date: ref.read(blenderBilledDateProvider),
+      billedTo: ref.read(blenderBilledToProvider),
+      fills: fills,
+      total: total.complete ? total.amount : null,
+    );
+    ref
+        .read(blenderArchivedInvoicesProvider.notifier)
+        .state = appendArchivedCapped(
+      ref.read(blenderArchivedInvoicesProvider),
+      archived,
+    );
     ref.read(blenderBilledFillsProvider.notifier).state = const [];
+    ref.read(blenderBilledDateProvider.notifier).state = DateTime.now();
     saveBlenderPreferences(ref);
   }
 }

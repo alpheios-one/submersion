@@ -84,6 +84,8 @@ class BlenderPreferences {
     required this.model,
     required this.billedFills,
     required this.billedTo,
+    this.billedDate,
+    this.archivedInvoices = const [],
   });
 
   /// Enough to keep a synced blob small. Nobody blends 50 distinct mixes.
@@ -123,9 +125,21 @@ class BlenderPreferences {
   /// a fill station fills other people's cylinders.
   final String billedTo;
 
+  /// When the running bill started. Null means "not set yet", which the
+  /// invoice card reads as today: the date is editable from the moment a
+  /// bill is open, not only once it is paid.
+  final DateTime? billedDate;
+
+  /// Bills already paid and archived, oldest first. See [ArchivedInvoice].
+  final List<ArchivedInvoice> archivedInvoices;
+
   /// Lives beside [BilledFill] itself; re-exposed here because the JSON read
   /// path enforces it.
   static const int maxBilledFills = kMaxBilledFills;
+
+  /// Lives beside [ArchivedInvoice] itself; re-exposed here for the same
+  /// reason as [maxBilledFills].
+  static const int maxArchivedInvoices = kMaxArchivedInvoices;
 
   factory BlenderPreferences.defaults({required double cylinderWaterLiters}) =>
       BlenderPreferences(
@@ -138,6 +152,8 @@ class BlenderPreferences {
         model: BlendGasModel.zFactor,
         billedFills: const [],
         billedTo: '',
+        billedDate: null,
+        archivedInvoices: const [],
       );
 
   BlenderPreferences copyWith({
@@ -151,6 +167,8 @@ class BlenderPreferences {
     BlendGasModel? model,
     List<BilledFill>? billedFills,
     String? billedTo,
+    DateTime? billedDate,
+    List<ArchivedInvoice>? archivedInvoices,
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
@@ -167,6 +185,10 @@ class BlenderPreferences {
         .take(maxBilledFills)
         .toList(),
     billedTo: billedTo ?? this.billedTo,
+    billedDate: billedDate ?? this.billedDate,
+    archivedInvoices: (archivedInvoices ?? this.archivedInvoices)
+        .take(maxArchivedInvoices)
+        .toList(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -179,6 +201,8 @@ class BlenderPreferences {
     'model': model.name,
     'billedFills': billedFills.map((f) => f.toJson()).toList(),
     'billedTo': billedTo,
+    if (billedDate != null) 'billedDate': billedDate!.toIso8601String(),
+    'archivedInvoices': archivedInvoices.map((a) => a.toJson()).toList(),
   };
 
   /// Every field falls back independently, so one corrupt entry never costs
@@ -214,6 +238,20 @@ class BlenderPreferences {
 
     final billedTo = json['billedTo'];
 
+    final billedDateRaw = json['billedDate'];
+    final billedDate = billedDateRaw is String
+        ? DateTime.tryParse(billedDateRaw)
+        : null;
+
+    final rawArchived = json['archivedInvoices'];
+    final archivedInvoices = rawArchived is List
+        ? rawArchived
+              .map(ArchivedInvoice.fromJson)
+              .whereType<ArchivedInvoice>()
+              .take(maxArchivedInvoices)
+              .toList()
+        : <ArchivedInvoice>[];
+
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
@@ -228,6 +266,8 @@ class BlenderPreferences {
       ),
       billedFills: fills,
       billedTo: billedTo is String ? billedTo : '',
+      billedDate: billedDate,
+      archivedInvoices: archivedInvoices,
     );
   }
 }

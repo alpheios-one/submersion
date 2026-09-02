@@ -12445,7 +12445,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Enregistrer ce remplissage';
 
   @override
-  String get gasCalculators_blender_billed => 'Facturé';
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Facture du $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit =>
+      'Modifier la date de facture';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Tarif actuel';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12464,14 +12473,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Montant';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Vider';
+  String get gasCalculators_blender_export => 'Exporter';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Vider la facture ?';
+  String get gasCalculators_blender_exportPdf => 'Exporter en PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Cela supprime les $count remplissages enregistrés.';
+  String get gasCalculators_blender_exportImage => 'Exporter en image';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exporter en Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Échec de l\'export : $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Payer';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'Marquer la facture comme payée ?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Cela archive les $count remplissages enregistrés et démarre une nouvelle facture.';
   }
 
   @override

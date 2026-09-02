@@ -7041,21 +7041,42 @@
   "gasCalculators_blender_costBasis": "Billed on the pressure delivered (cylinder water capacity × bar added), the way a fill station meters it.",
   "gasCalculators_blender_costMissingPrice": "Enter a price for every gas to see the total.",
   "gasCalculators_blender_saveFill": "Save this fill",
-  "gasCalculators_blender_billed": "Billed",
+  "gasCalculators_blender_billedDate": "Invoice dated {date}",
+  "gasCalculators_blender_billedDateEdit": "Change invoice date",
+  "gasCalculators_blender_tariff": "Current tariff",
   "gasCalculators_blender_billedNone": "Nothing billed yet. Finish a fill and save it here.",
   "gasCalculators_blender_billedTo": "Billed to",
   "gasCalculators_blender_addManualLine": "Add a line",
   "gasCalculators_blender_lineDescription": "Description",
   "gasCalculators_blender_lineAmount": "Amount",
-  "gasCalculators_blender_clearBilled": "Clear",
-  "gasCalculators_blender_clearBilledTitle": "Clear the bill?",
-  "gasCalculators_blender_clearBilledBody": "This removes all {count} saved fills.",
+  "gasCalculators_blender_export": "Export",
+  "gasCalculators_blender_exportPdf": "Export as PDF",
+  "gasCalculators_blender_exportImage": "Export as Image",
+  "gasCalculators_blender_exportExcel": "Export as Excel",
+  "gasCalculators_blender_exportError": "Export failed: {error}",
+  "gasCalculators_blender_pay": "Pay",
+  "gasCalculators_blender_payTitle": "Mark the bill as paid?",
+  "gasCalculators_blender_payBody": "This archives all {count} saved fills and starts a new bill.",
   "gasCalculators_blender_editLine": "Edit {label}",
   "gasCalculators_blender_deleteLine": "Delete {label}",
   "gasCalculators_blender_fillAdded": "{mix} added to the bill",
   "gasCalculators_blender_billedIncomplete": "One or more lines have no price, so this total is incomplete.",
   "gasCalculators_blender_billedTotal": "Total",
-  "@gasCalculators_blender_clearBilledBody": {
+  "@gasCalculators_blender_billedDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_exportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@gasCalculators_blender_payBody": {
     "placeholders": {
       "count": {
         "type": "int"

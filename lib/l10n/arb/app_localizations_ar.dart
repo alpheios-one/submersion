@@ -12184,7 +12184,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'حفظ هذه التعبئة';
 
   @override
-  String get gasCalculators_blender_billed => 'الفاتورة';
+  String gasCalculators_blender_billedDate(String date) {
+    return 'فاتورة بتاريخ $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'تغيير تاريخ الفاتورة';
+
+  @override
+  String get gasCalculators_blender_tariff => 'التعرفة الحالية';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12203,14 +12211,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'المبلغ';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'إفراغ';
+  String get gasCalculators_blender_export => 'تصدير';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'إفراغ الفاتورة؟';
+  String get gasCalculators_blender_exportPdf => 'تصدير كملف PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'سيؤدي هذا إلى حذف جميع التعبئات المحفوظة وعددها $count.';
+  String get gasCalculators_blender_exportImage => 'تصدير كصورة';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'تصدير كملف Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'دفع';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'وضع علامة على الفاتورة كمدفوعة؟';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'سيؤدي هذا إلى أرشفة جميع التعبئات المحفوظة وعددها $count وبدء فاتورة جديدة.';
   }
 
   @override
