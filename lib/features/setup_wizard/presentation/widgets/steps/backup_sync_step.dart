@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
@@ -52,7 +53,16 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
       if (!mounted) return;
       // Activation contract mirrored from CloudSyncPage._selectProvider.
       selection.state = type;
-      final instance = cloudProviderInstanceFor(type);
+      // Resolve the backend the way that page does, rather than reaching for
+      // the raw singleton: this provider applies account-first credential
+      // resolution and the custom-folder check, so the singleton shortcut
+      // quietly broke the contract the comment above claims.
+      final instance = ref.read(cloudStorageProviderProvider);
+      if (instance == null) {
+        throw CloudStorageException(
+          context.l10n.settings_cloudSync_provider_initFailed(type.name),
+        );
+      }
       // Desktop Google Drive authenticates through the system browser, which
       // can take as long as the user does. The shared helper keeps a
       // cancellable wait dialog up so the wizard does not sit frozen with no

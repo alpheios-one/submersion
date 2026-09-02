@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType;
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 import 'package:submersion/core/services/sync/sync_initializer.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
@@ -20,6 +21,24 @@ import '../../../../../helpers/test_app.dart';
 class _FakeSyncInit implements SyncInitializer {
   @override
   Future<void> saveProvider(CloudProviderType? provider) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Authenticates on demand, so both the success and failure branches of
+/// _connect are reachable.
+class _FakeCloudProvider implements CloudStorageProvider {
+  final Object? failWith;
+  var authenticateCalls = 0;
+
+  _FakeCloudProvider({this.failWith});
+
+  @override
+  Future<void> authenticate() async {
+    authenticateCalls++;
+    if (failWith != null) throw failWith!;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -220,6 +239,127 @@ void main() {
       await tester.pumpAndSettle();
     });
   }
+
+  testWidgets('connecting Google Drive records it in the draft', (
+    tester,
+  ) async {
+    // _connect resolves the backend through cloudStorageProviderProvider --
+    // the same seam Cloud Sync settings uses -- so a fake can stand in for
+    // the real Drive singleton here.
+    late ProviderContainer container;
+    final cloud = _FakeCloudProvider();
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => true),
+          cloudStorageProviderProvider.overrideWithValue(cloud),
+          syncInitializerProvider.overrideWithValue(_FakeSyncInit()),
+          syncStateProvider.overrideWith((ref) => _FakeSyncNotifier()),
+        ],
+        child: Builder(
+          builder: (context) {
+            container = ProviderScope.containerOf(context);
+            return const BackupSyncStep(mode: SetupWizardMode.firstRun);
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Google Drive'));
+    await tester.pumpAndSettle();
+
+    expect(cloud.authenticateCalls, 1);
+    expect(
+      container.read(selectedCloudProviderTypeProvider),
+      CloudProviderType.googledrive,
+    );
+    expect(
+      container
+          .read(setupWizardProvider(SetupWizardMode.firstRun))
+          .connectedProvider,
+      CloudProviderType.googledrive,
+    );
+    expect(find.text('Connected to Google Drive'), findsOneWidget);
+  });
+
+  testWidgets('a failed connect rolls the selection back and reports it', (
+    tester,
+  ) async {
+    late ProviderContainer container;
+    final cloud = _FakeCloudProvider(
+      failWith: const CloudStorageException('no network'),
+    );
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => true),
+          cloudStorageProviderProvider.overrideWithValue(cloud),
+          syncInitializerProvider.overrideWithValue(_FakeSyncInit()),
+          syncStateProvider.overrideWith((ref) => _FakeSyncNotifier()),
+        ],
+        child: Builder(
+          builder: (context) {
+            container = ProviderScope.containerOf(context);
+            return const BackupSyncStep(mode: SetupWizardMode.firstRun);
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Google Drive'));
+    await tester.pumpAndSettle();
+
+    // Nothing may stay half-selected after a failure: the card list comes
+    // back and both the global selection and the draft are cleared.
+    expect(container.read(selectedCloudProviderTypeProvider), isNull);
+    expect(
+      container
+          .read(setupWizardProvider(SetupWizardMode.firstRun))
+          .connectedProvider,
+      isNull,
+    );
+    expect(find.text('Google Drive'), findsOneWidget);
+    expect(find.textContaining('no network'), findsOneWidget);
+  });
+
+  testWidgets('connect reports an unresolvable backend instead of hanging', (
+    tester,
+  ) async {
+    // cloudStorageProviderProvider returns null in custom-folder mode, where
+    // app-managed sync is off. Surfacing that beats silently doing nothing.
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => true),
+          cloudStorageProviderProvider.overrideWithValue(null),
+          syncInitializerProvider.overrideWithValue(_FakeSyncInit()),
+          syncStateProvider.overrideWith((ref) => _FakeSyncNotifier()),
+        ],
+        child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Google Drive'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('googledrive'), findsOneWidget);
+    expect(find.text('Google Drive'), findsOneWidget);
+  });
 
   testWidgets('first run can disconnect and return to the provider cards', (
     tester,
