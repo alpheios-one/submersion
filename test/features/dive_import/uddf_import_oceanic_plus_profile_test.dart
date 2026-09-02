@@ -35,6 +35,19 @@ import '../../helpers/test_database.dart';
 
 const _fixturePath = 'test/dives/issue_279_oceanic_plus_export.uddf';
 
+/// The fixture holds nine dives.
+const _expectedDiveCount = 9;
+
+/// Oceanic+ records one sample every 15 seconds.
+const _sampleCadenceSeconds = 15;
+
+/// The shortest dive in the fixture has 99 samples; anything below this means
+/// samples were dropped rather than merely reordered.
+const _minSamplesPerDive = 50;
+
+/// Fixed clock for rows the test creates itself.
+final _fixedNow = DateTime.utc(2024, 1, 15, 12);
+
 ImportRepositories _buildRepositories() {
   return ImportRepositories(
     tripRepository: TripRepository(),
@@ -53,18 +66,29 @@ ImportRepositories _buildRepositories() {
 }
 
 Future<String> _createTestDiver() async {
-  final now = DateTime.now();
   const diverId = 'diver-issue-279';
   await DiverRepository().createDiver(
     domain.Diver(
       id: diverId,
       name: 'Test Diver',
       isDefault: true,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: _fixedNow,
+      updatedAt: _fixedNow,
     ),
   );
   return diverId;
+}
+
+/// Asserts every sample sits on the Oceanic+ cadence: sample i is at
+/// i * 15 s. This is the exact shape that collapsed to all zeros before the
+/// lenient integer parser landed.
+void _expectFullCadence(List<int> timestamps, {required String reason}) {
+  expect(timestamps.length, greaterThan(_minSamplesPerDive), reason: reason);
+  expect(
+    timestamps,
+    List<int>.generate(timestamps.length, (i) => i * _sampleCadenceSeconds),
+    reason: reason,
+  );
 }
 
 void main() {
@@ -86,24 +110,26 @@ void main() {
   });
 
   group('Oceanic+ direct export (issue #279)', () {
-    test('parser yields a profile for every dive', () async {
+    test('parser yields a full-cadence profile for every dive', () async {
       final parsed = await exportService.importAllDataFromUddf(content);
 
-      expect(parsed.dives, hasLength(9));
+      expect(parsed.dives, hasLength(_expectedDiveCount));
       for (final dive in parsed.dives) {
         final profile = dive['profile'] as List<Map<String, dynamic>>?;
         expect(profile, isNotNull);
-        expect(profile!.length, greaterThan(50));
-        // Timestamps advance at the 15 s Oceanic+ cadence instead of
-        // collapsing to zero.
-        expect(profile[1]['timestamp'], 15);
-        expect(profile[2]['timestamp'], 30);
+        _expectFullCadence(
+          profile!.map((p) => p['timestamp'] as int).toList(),
+          reason: 'parsed dive at ${dive['dateTime']}',
+        );
       }
     });
 
     test('persisted dives read back with their full profile', () async {
       final diverId = await _createTestDiver();
       final parsed = await exportService.importAllDataFromUddf(content);
+      final parsedSampleCounts =
+          parsed.dives.map((d) => (d['profile'] as List).length).toList()
+            ..sort();
 
       await importer.import(
         data: parsed,
@@ -114,21 +140,30 @@ void main() {
 
       final diveRepo = DiveRepository();
       final dives = await diveRepo.getAllDives();
-      expect(dives, hasLength(9));
+      expect(dives, hasLength(_expectedDiveCount));
 
-      final sampleRows = await db.select(db.diveProfileSeries).get();
-      expect(sampleRows, isNotEmpty);
+      // One packed series row per dive, and its sample count must match what
+      // the parser produced for that dive, so nothing was dropped between
+      // parse and persistence.
+      final seriesRows = await db.select(db.diveProfileSeries).get();
+      expect(seriesRows, hasLength(_expectedDiveCount));
+      expect(
+        seriesRows.map((r) => r.diveId).toSet(),
+        dives.map((d) => d.id).toSet(),
+      );
+      final persistedSampleCounts =
+          seriesRows.map((r) => r.sampleCount).toList()..sort();
+      expect(persistedSampleCounts, parsedSampleCounts);
 
+      final seriesByDive = {for (final r in seriesRows) r.diveId: r};
       for (final summary in dives) {
         final dive = await diveRepo.getDiveById(summary.id);
         expect(dive, isNotNull);
-        expect(
-          dive!.profile.length,
-          greaterThan(50),
+        _expectFullCadence(
+          dive!.profile.map((p) => p.timestamp).toList(),
           reason: 'dive ${dive.id} lost its profile on import',
         );
-        expect(dive.profile.first.timestamp, 0);
-        expect(dive.profile[1].timestamp, 15);
+        expect(dive.profile.length, seriesByDive[dive.id]!.sampleCount);
         expect(dive.maxDepth, greaterThan(5));
         expect(dive.runtime, isNotNull);
         expect(dive.runtime!.inSeconds, greaterThan(1000));
