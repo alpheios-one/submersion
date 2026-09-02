@@ -14,6 +14,14 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 /// case up front and return this code instead of that raw error.
 const metadataWriteLivePhotoUnsupportedCode = 'LIVE_PHOTO_UNSUPPORTED';
 
+/// Native error code for a video, which Submersion deliberately refuses.
+///
+/// Writing metadata to a video cannot be done in place: it meant exporting a
+/// copy, creating a new asset from it and deleting the original. Submersion
+/// must never delete a user's original media (issue #1472), so the whole path
+/// was removed rather than made non-destructive.
+const metadataWriteVideoUnsupportedCode = 'VIDEO_UNSUPPORTED';
+
 /// Exception thrown when metadata writing fails.
 class MetadataWriteException implements Exception {
   final String message;
@@ -122,18 +130,21 @@ class DiveMediaMetadata {
       (latitude != null && longitude != null);
 }
 
-/// Service for writing dive metadata to photos and videos.
+/// Service for writing dive metadata to photos.
 ///
 /// Uses platform channels to access native APIs:
-/// - iOS/macOS: PHPhotoLibrary with CGImageDestination (photos) and AVFoundation (videos)
-/// - Android: MediaStore with ExifInterface (photos) and MediaMetadataRetriever (videos)
+/// - iOS/macOS: PHPhotoLibrary with CGImageDestination
+/// - Android: MediaStore with ExifInterface
 ///
 /// Supports:
 /// - JPEG photos (EXIF)
 /// - HEIC/HEIF photos (EXIF via CGImageDestination)
-/// - MOV/MP4 videos (QuickTime metadata)
 ///
-/// Does not support Live Photos on iOS or macOS: see
+/// Photos are edited in place, so the asset keeps its identity and the user
+/// keeps Revert to Original.
+///
+/// Does not support videos: see [metadataWriteVideoUnsupportedCode]. Does not
+/// support Live Photos on iOS or macOS: see
 /// [metadataWriteLivePhotoUnsupportedCode].
 class MetadataWriteService {
   static const _channel = MethodChannel('com.submersion.app/metadata');
@@ -143,9 +154,9 @@ class MetadataWriteService {
   ///
   /// [platformAssetId] - The platform-specific asset identifier.
   /// [metadata] - The dive metadata to write.
-  /// [isVideo] - Whether the asset is a video (affects which metadata format is used).
-  /// [keepOriginal] - For videos only: whether to keep the original after creating
-  ///                  a new video with metadata. Ignored for photos.
+  /// [isVideo] - Whether the asset is a video. Videos are refused here, and
+  ///             the flag still travels to the native side so it refuses a
+  ///             mislabelled asset too.
   ///
   /// Returns true if successful.
   /// Throws [MetadataWriteException] with a user-friendly message on failure.
@@ -153,18 +164,25 @@ class MetadataWriteService {
     required String platformAssetId,
     required DiveMediaMetadata metadata,
     required bool isVideo,
-    bool keepOriginal = false,
   }) async {
-    _log.info(
-      'Writing metadata to ${isVideo ? "video" : "photo"}: $platformAssetId'
-      '${isVideo ? " (keepOriginal: $keepOriginal)" : ""}',
-    );
-
     if (!isSupported) {
       throw const MetadataWriteException(
         'Metadata writing is only supported on iOS, macOS, and Android.',
       );
     }
+
+    // Refused up front so no argument that could destroy an original ever
+    // reaches the platform channel. The UI does not offer the action for a
+    // video, so this is a backstop rather than a user-facing path.
+    if (isVideo) {
+      _log.warning('Refusing to write metadata to a video: $platformAssetId');
+      throw const MetadataWriteException(
+        'Writing dive data to videos is not supported.',
+        code: metadataWriteVideoUnsupportedCode,
+      );
+    }
+
+    _log.info('Writing metadata to photo: $platformAssetId');
 
     if (!metadata.hasData) {
       _log.warning('No metadata to write');
@@ -180,7 +198,6 @@ class MetadataWriteService {
         'metadata': metadata.toMap(),
         'description': metadata.buildDescription(),
         'isVideo': isVideo,
-        'keepOriginal': keepOriginal,
       });
       // ignore: avoid_print
       print('[MetadataWriteService] Platform channel returned: $result');
@@ -226,6 +243,10 @@ class MetadataWriteService {
             'Cannot modify iCloud-only or shared album items.';
       case 'UNSUPPORTED_FORMAT':
         return 'This file format does not support metadata writing.';
+      case metadataWriteVideoUnsupportedCode:
+        // Deliberately discards the native message for the same reason as the
+        // Live Photo case below.
+        return 'Writing dive data to videos is not supported.';
       case metadataWriteLivePhotoUnsupportedCode:
         // Deliberately discards the native message: PhotoKit's own text for
         // this case is an untranslated error-domain string.
@@ -248,9 +269,9 @@ class MetadataWriteService {
   /// Get supported file types for the current platform.
   List<String> get supportedTypes {
     if (Platform.isIOS || Platform.isMacOS) {
-      return ['JPEG', 'HEIC', 'HEIF', 'PNG', 'MOV', 'MP4'];
+      return ['JPEG', 'HEIC', 'HEIF', 'PNG'];
     } else if (Platform.isAndroid) {
-      return ['JPEG', 'PNG', 'MP4', 'MOV'];
+      return ['JPEG', 'PNG'];
     }
     return [];
   }

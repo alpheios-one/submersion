@@ -6,24 +6,11 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Result from the write metadata dialog.
-class WriteMetadataResult {
-  /// Whether the user confirmed the write.
-  final bool confirmed;
-
-  /// For videos, whether to keep the original after creating a new one.
-  final bool keepOriginal;
-
-  const WriteMetadataResult({
-    required this.confirmed,
-    this.keepOriginal = false,
-  });
-}
-
-/// Dialog for confirming write of dive metadata to photo/video.
+/// Dialog for confirming write of dive metadata to a photo.
 ///
-/// Shows a preview of the metadata that will be written and warns
-/// about the modification. For videos, offers option to keep or delete original.
+/// Shows a preview of the metadata that will be written and warns about the
+/// modification. Videos are not offered: writing to one meant replacing the
+/// asset and deleting the original, which Submersion never does (issue #1472).
 class WriteMetadataDialog extends StatefulWidget {
   final MediaItem item;
   final AppSettings settings;
@@ -41,10 +28,6 @@ class WriteMetadataDialog extends StatefulWidget {
 }
 
 class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
-  bool _keepOriginal = true;
-
-  bool get _isVideo => widget.item.mediaType == MediaType.video;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -57,21 +40,15 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
       siteName: widget.siteName,
     );
 
-    final title = _isVideo
-        ? context.l10n.media_writeMetadata_titleVideo
-        : context.l10n.media_writeMetadata_titlePhoto;
-
     return AlertDialog(
-      title: Text(title),
+      title: Text(context.l10n.media_writeMetadata_titlePhoto),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _isVideo
-                  ? context.l10n.media_writeMetadata_descriptionVideo
-                  : context.l10n.media_writeMetadata_descriptionPhoto,
+              context.l10n.media_writeMetadata_descriptionPhoto,
               style: textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -162,32 +139,18 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
 
             const SizedBox(height: 16),
 
-            // Warning - different for video vs photo
             _buildWarningSection(colorScheme, textTheme),
-
-            // Video-specific: keep original option
-            if (_isVideo) ...[
-              const SizedBox(height: 12),
-              _buildKeepOriginalOption(colorScheme, textTheme),
-            ],
           ],
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(
-            context,
-          ).pop(const WriteMetadataResult(confirmed: false)),
+          onPressed: () => Navigator.of(context).pop(false),
           child: Text(context.l10n.media_writeMetadata_cancelButton),
         ),
         FilledButton(
           onPressed: metadata.hasData
-              ? () => Navigator.of(context).pop(
-                  WriteMetadataResult(
-                    confirmed: true,
-                    keepOriginal: _isVideo ? _keepOriginal : false,
-                  ),
-                )
+              ? () => Navigator.of(context).pop(true)
               : null,
           child: Text(context.l10n.media_writeMetadata_writeButton),
         ),
@@ -196,67 +159,21 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
   }
 
   Widget _buildWarningSection(ColorScheme colorScheme, TextTheme textTheme) {
-    final String warningText;
-    final IconData warningIcon;
-
-    if (_isVideo) {
-      warningText = context.l10n.media_writeMetadata_warningVideoText;
-      warningIcon = Icons.info_outline;
-    } else {
-      warningText = context.l10n.media_writeMetadata_warningPhotoText;
-      warningIcon = Icons.warning_amber_rounded;
-    }
-
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: _isVideo
-            ? colorScheme.primaryContainer.withValues(alpha: 0.3)
-            : colorScheme.errorContainer.withValues(alpha: 0.3),
+        color: colorScheme.errorContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(
-            warningIcon,
-            color: _isVideo ? colorScheme.primary : colorScheme.error,
-            size: 20,
-          ),
+          Icon(Icons.warning_amber_rounded, color: colorScheme.error, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              warningText,
-              style: textTheme.bodySmall?.copyWith(
-                color: _isVideo ? colorScheme.primary : colorScheme.error,
-              ),
+              context.l10n.media_writeMetadata_warningPhotoText,
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.error),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeepOriginalOption(
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.l10n.media_writeMetadata_keepOriginalVideo,
-              style: textTheme.bodyMedium,
-            ),
-          ),
-          Switch(
-            value: _keepOriginal,
-            onChanged: (value) => setState(() => _keepOriginal = value),
           ),
         ],
       ),
@@ -312,21 +229,20 @@ class _MetadataRow extends StatelessWidget {
   }
 }
 
-/// Shows the write metadata dialog and returns the result.
+/// Shows the write metadata dialog.
 ///
-/// Returns a [WriteMetadataResult] with:
-/// - `confirmed`: true if user wants to proceed with the write
-/// - `keepOriginal`: for videos, whether to keep the original video
-Future<WriteMetadataResult> showWriteMetadataDialog({
+/// Returns true if the user confirmed the write, false if they cancelled or
+/// dismissed the dialog.
+Future<bool> showWriteMetadataDialog({
   required BuildContext context,
   required MediaItem item,
   required AppSettings settings,
   String? siteName,
 }) async {
-  final result = await showDialog<WriteMetadataResult>(
+  final result = await showDialog<bool>(
     context: context,
     builder: (_) =>
         WriteMetadataDialog(item: item, settings: settings, siteName: siteName),
   );
-  return result ?? const WriteMetadataResult(confirmed: false);
+  return result ?? false;
 }

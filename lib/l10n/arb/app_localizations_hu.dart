@@ -13813,18 +13813,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kovetkezo metaadatok kerülnek a fotora:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'A kovetkezo metaadatok kerülnek a videora:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Merülesi ido';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'Eredeti video megtartasa';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13844,16 +13836,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'Merülesi adatok irasa a fotora';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'Merülesi adatok irasa a videora';
-
-  @override
   String get media_writeMetadata_warningPhotoText =>
       'Ez modositja az eredeti fotot.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'Egy uj video keszül a metaadatokkal. A video metaadatok nem modosithatok helyben.';
 
   @override
   String get media_writeMetadata_writeButton => 'Iras';

@@ -13195,16 +13195,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_descriptionPhoto => '以下元数据将写入照片：';
 
   @override
-  String get media_writeMetadata_descriptionVideo => '以下元数据将写入视频：';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => '潜水时间';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo => '保留原始视频';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13223,14 +13217,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => '写入潜水数据到照片';
 
   @override
-  String get media_writeMetadata_titleVideo => '写入潜水数据到视频';
-
-  @override
   String get media_writeMetadata_warningPhotoText => '这将修改原始照片。';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      '将创建包含元数据的新视频。视频元数据无法就地修改。';
 
   @override
   String get media_writeMetadata_writeButton => '写入';

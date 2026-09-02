@@ -13850,18 +13850,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los siguientes metadatos se escribiran en la foto:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'Los siguientes metadatos se escribiran en el video:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Hora de inmersion';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'Conservar video original';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13882,16 +13874,8 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escribir datos de inmersion en la foto';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'Escribir datos de inmersion en el video';
-
-  @override
   String get media_writeMetadata_warningPhotoText =>
       'Esto modificara la foto original.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'Se creara un nuevo video con los metadatos. Los metadatos del video no se pueden modificar en su lugar.';
 
   @override
   String get media_writeMetadata_writeButton => 'Escribir';

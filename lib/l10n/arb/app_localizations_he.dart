@@ -13512,17 +13512,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'המטא-נתונים הבאים ייכתבו לתמונה:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'המטא-נתונים הבאים ייכתבו לסרטון:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'זמן צלילה';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo => 'שמור סרטון מקורי';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13542,15 +13535,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'כתוב נתוני צלילה לתמונה';
 
   @override
-  String get media_writeMetadata_titleVideo => 'כתוב נתוני צלילה לסרטון';
-
-  @override
   String get media_writeMetadata_warningPhotoText =>
       'פעולה זו תשנה את התמונה המקורית.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'ייווצר סרטון חדש עם המטא-נתונים. לא ניתן לשנות מטא-נתונים של סרטון במקום.';
 
   @override
   String get media_writeMetadata_writeButton => 'כתוב';

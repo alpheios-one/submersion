@@ -13605,18 +13605,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيتم كتابة البيانات الوصفية التالية على الصورة:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'سيتم كتابة البيانات الوصفية التالية على الفيديو:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'وقت الغوصة';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'الاحتفاظ بالفيديو الأصلي';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13636,16 +13628,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'كتابة بيانات الغوصة على الصورة';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'كتابة بيانات الغوصة على الفيديو';
-
-  @override
   String get media_writeMetadata_warningPhotoText =>
       'سيؤدي هذا إلى تعديل الصورة الأصلية.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'سيتم إنشاء فيديو جديد مع البيانات الوصفية. لا يمكن تعديل البيانات الوصفية للفيديو في مكانها.';
 
   @override
   String get media_writeMetadata_writeButton => 'كتابة';

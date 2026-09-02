@@ -316,7 +316,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
           // Non-null once mediaList is known non-empty. Every consumer below
           // reads the hydrated record: the mini profile, the Perdix gate, the
-          // toolbar's Go-to-dive and hasEnrichment flags, the bottom
+          // toolbar's Go-to-dive and write-metadata flags, the bottom
           // depth/temp/elapsed chips and the info sheet.
           final currentItem = hydratedItem!;
           final enrichment = currentItem.enrichment;
@@ -489,7 +489,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onGoToDive: widget.showGoToDive && currentDiveId != null
                         ? () => context.pushOrReturnTo('/dives/$currentDiveId')
                         : null,
-                    hasEnrichment: enrichment?.depthMeters != null,
+                    canWriteMetadata:
+                        enrichment?.depthMeters != null && !currentItem.isVideo,
                     showPerdixToggle: perdixToggleAvailable,
                     perdixEnabled: settings.perdixOverlayEnabled,
                     onTogglePerdix: () => ref
@@ -682,17 +683,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
     // Show confirmation dialog
     debugPrint('[MediaViewerPage] Showing confirmation dialog...');
-    final dialogResult = await showWriteMetadataDialog(
+    final confirmed = await showWriteMetadataDialog(
       context: context,
       item: item,
       settings: settings,
       siteName: siteName,
     );
 
-    debugPrint(
-      '[MediaViewerPage] Dialog result: confirmed=${dialogResult.confirmed}',
-    );
-    if (!dialogResult.confirmed || !mounted) return;
+    debugPrint('[MediaViewerPage] Dialog result: confirmed=$confirmed');
+    if (!confirmed || !mounted) return;
 
     // Show loading indicator. The navigator is captured up front so the
     // dialog can still be dismissed if this page is unmounted while the
@@ -733,7 +732,6 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
         platformAssetId: item.platformAssetId!,
         metadata: metadata,
         isVideo: isVideo,
-        keepOriginal: dialogResult.keepOriginal,
       );
       debugPrint('[MediaViewerPage] writeMetadata returned: $success');
 
@@ -1334,7 +1332,12 @@ class _TopOverlay extends StatelessWidget {
   final void Function(Rect? anchor) onShare;
   final VoidCallback onWriteMetadata;
   final VoidCallback onTagSpecies;
-  final bool hasEnrichment;
+
+  /// Whether the write-dive-data action is offered. Needs enrichment depth to
+  /// have anything to write, and a photo to write it to: videos cannot be
+  /// edited in place, and replacing one would destroy the original
+  /// (issue #1472).
+  final bool canWriteMetadata;
 
   /// Whether the Perdix overlay toggle is shown (media synced to a profile).
   final bool showPerdixToggle;
@@ -1358,7 +1361,7 @@ class _TopOverlay extends StatelessWidget {
     required this.onShare,
     required this.onWriteMetadata,
     required this.onTagSpecies,
-    required this.hasEnrichment,
+    required this.canWriteMetadata,
     required this.showPerdixToggle,
     required this.perdixEnabled,
     required this.onTogglePerdix,
@@ -1414,7 +1417,7 @@ class _TopOverlay extends StatelessWidget {
                     onPressed: onGoToDive,
                   ),
                 // Write metadata button (only shown if photo has dive data)
-                if (hasEnrichment)
+                if (canWriteMetadata)
                   IconButton(
                     icon: const Icon(Icons.edit_note, color: Colors.white),
                     tooltip:

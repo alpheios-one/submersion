@@ -44,6 +44,66 @@ void main() {
     isVideo: false,
   );
 
+  group('videos (issue #1472)', () {
+    test('a video write is refused before the platform channel', () async {
+      var invoked = false;
+      handler = (_) async {
+        invoked = true;
+        return true;
+      };
+
+      await expectLater(
+        MetadataWriteService().writeMetadata(
+          platformAssetId: 'asset-1',
+          metadata: _metadata,
+          isVideo: true,
+        ),
+        throwsA(isA<MetadataWriteException>()),
+      );
+      expect(
+        invoked,
+        isFalse,
+        reason: 'the native video path is gone; nothing should reach it',
+      );
+    }, skip: !_metadataWriteSupported);
+
+    test('the channel payload carries no keep-original instruction', () async {
+      MethodCall? seen;
+      handler = (call) async {
+        seen = call;
+        return true;
+      };
+
+      await write();
+
+      final args = seen!.arguments as Map;
+      expect(
+        args.containsKey('keepOriginal'),
+        isFalse,
+        reason:
+            'issue #1472: no argument may tell the native side whether to '
+            'delete the original',
+      );
+    }, skip: !_metadataWriteSupported);
+
+    test('a native video refusal is given a curated message', () async {
+      // Reachable only if an asset labelled a photo turns out to be a video.
+      handler = (_) async => throw PlatformException(
+        code: metadataWriteVideoUnsupportedCode,
+        message: 'raw native',
+      );
+
+      await expectLater(
+        write(),
+        throwsA(
+          isA<MetadataWriteException>()
+              .having((e) => e.code, 'code', metadataWriteVideoUnsupportedCode)
+              .having((e) => e.message, 'message', isNot(contains('raw'))),
+        ),
+      );
+    }, skip: !_metadataWriteSupported);
+  });
+
   group('live photos', () {
     test('the native refusal is carried through as a distinct code', () async {
       handler = (_) async => throw PlatformException(

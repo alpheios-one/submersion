@@ -13908,18 +13908,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les metadonnees suivantes seront ecrites sur la photo :';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'Les metadonnees suivantes seront ecrites sur la video :';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Heure de plongee';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'Conserver la video originale';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13940,16 +13932,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ecrire les donnees de plongee sur la photo';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'Ecrire les donnees de plongee sur la video';
-
-  @override
   String get media_writeMetadata_warningPhotoText =>
       'Ceci modifiera la photo originale.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'Une nouvelle video sera creee avec les metadonnees. Les metadonnees video ne peuvent pas etre modifiees sur place.';
 
   @override
   String get media_writeMetadata_writeButton => 'Ecrire';

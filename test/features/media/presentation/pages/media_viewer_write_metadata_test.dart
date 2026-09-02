@@ -53,11 +53,12 @@ MediaItem item({
   String id = 'm1',
   String? platformAssetId = 'asset-1',
   double? depthMeters = 18.3,
+  MediaType mediaType = MediaType.photo,
 }) => MediaItem(
   id: id,
   diveId: 'dive-1',
   platformAssetId: platformAssetId,
-  mediaType: MediaType.photo,
+  mediaType: mediaType,
   sourceType: MediaSourceType.platformGallery,
   takenAt: DateTime.utc(2026, 7, 1, 10),
   createdAt: DateTime.utc(2026, 7, 1),
@@ -153,6 +154,14 @@ void main() {
 
   testWidgets('the action is hidden without enrichment depth', (tester) async {
     await pump(tester, item(depthMeters: null));
+    expect(find.byIcon(Icons.edit_note), findsNothing);
+  });
+
+  testWidgets('the action is hidden for videos (issue #1472)', (tester) async {
+    // Writing metadata to a video meant exporting a copy, creating a new
+    // asset and deleting the original. The whole path is gone, so the
+    // action must not be offered for one.
+    await pump(tester, item(mediaType: MediaType.video));
     expect(find.byIcon(Icons.edit_note), findsNothing);
   });
 

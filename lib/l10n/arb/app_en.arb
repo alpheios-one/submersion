@@ -7883,18 +7883,14 @@
   "media_writeMetadata_cancelButton": "Cancel",
   "media_writeMetadata_depthLabel": "Depth",
   "media_writeMetadata_descriptionPhoto": "The following metadata will be written to the photo:",
-  "media_writeMetadata_descriptionVideo": "The following metadata will be written to the video:",
   "media_writeMetadata_diveTimeLabel": "Dive time",
   "media_writeMetadata_gpsLabel": "GPS",
-  "media_writeMetadata_keepOriginalVideo": "Keep original video",
   "media_writeMetadata_livePhotoUnsupported": "Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.",
   "media_writeMetadata_noDataAvailable": "No dive data available to write.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",
   "media_writeMetadata_titlePhoto": "Write Dive Data to Photo",
-  "media_writeMetadata_titleVideo": "Write Dive Data to Video",
   "media_writeMetadata_warningPhotoText": "This will modify the original photo.",
-  "media_writeMetadata_warningVideoText": "A new video will be created with the metadata. Video metadata cannot be modified in-place.",
   "media_writeMetadata_writeButton": "Write",
   "@media_diveMediaSection_selectedCount": {
     "placeholders": {
