@@ -19748,6 +19748,19 @@ class AppLocalizationsZh extends AppLocalizations {
       '暂不支持此格式。请导出为 UDDF 或 CSV。';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      '重复检测未能运行，因此下方没有任何条目被标记为日志中已存在。导入前请先核对列表。';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      '此文件没有可映射的列。请返回重新选择文件，或改用其他来源。';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return '导入无法继续：$details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => '列映射';
 
   @override

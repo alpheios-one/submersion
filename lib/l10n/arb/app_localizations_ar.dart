@@ -20454,6 +20454,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذه الصيغة غير مدعومة بعد. يرجى التصدير كـ UDDF أو CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'تعذّر تشغيل كشف التكرارات، لذلك لم يُوسم أي عنصر أدناه بأنه موجود مسبقًا في سجلك. راجع القائمة قبل الاستيراد.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'لا يحتوي هذا الملف على أعمدة لربطها. ارجع واختر الملف مرة أخرى، أو اختر مصدرًا آخر.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'تعذّر متابعة الاستيراد: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'تعيين الأعمدة';
 
   @override

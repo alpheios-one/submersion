@@ -20767,6 +20767,19 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a formátum még nem támogatott. Exportálj UDDF vagy CSV formátumban.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'A duplikátumkeresés nem futott le, ezért az alábbiak közül semmi nincs megjelölve úgy, hogy már szerepel a naplóban. Importálás előtt ellenőrizd a listát.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Ebben a fájlban nincsenek megfeleltethető oszlopok. Lépj vissza, és válaszd ki újra a fájlt, vagy válassz másik forrást.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'Az importálás nem folytatható: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Oszlop leképezés';
 
   @override

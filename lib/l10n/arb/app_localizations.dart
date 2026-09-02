@@ -34392,6 +34392,24 @@ abstract class AppLocalizations {
   /// **'This format is not yet supported. Please export as UDDF or CSV.'**
   String get universalImport_error_unsupportedFormat;
 
+  /// Warning on the review step when duplicate detection failed and the incoming rows were left unmarked
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate detection could not run, so nothing below is marked as already in your logbook. Check the list before importing.'**
+  String get universalImport_error_duplicateCheckFailed;
+
+  /// Shown on the column mapping step when the file produced no columns to map
+  ///
+  /// In en, this message translates to:
+  /// **'This file has no columns to map. Go back and select the file again, or choose a different source.'**
+  String get universalImport_error_noColumnsToMap;
+
+  /// Error shown when the import wizard could not advance past the current step
+  ///
+  /// In en, this message translates to:
+  /// **'Import could not continue: {details}'**
+  String universalImport_error_stepFailed(Object details);
+
   /// Title for the CSV column mapping step
   ///
   /// In en, this message translates to:

@@ -20834,6 +20834,19 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo formato non è ancora supportato. Esporta come UDDF o CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'Non è stato possibile eseguire il rilevamento dei duplicati, quindi nulla qui sotto è contrassegnato come già presente nel tuo registro. Controlla l\'elenco prima di importare.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Questo file non ha colonne da mappare. Torna indietro e seleziona di nuovo il file, oppure scegli un\'altra sorgente.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'Impossibile continuare l\'importazione: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Mappatura Colonne';
 
   @override

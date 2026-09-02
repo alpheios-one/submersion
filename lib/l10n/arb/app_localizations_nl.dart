@@ -20666,6 +20666,19 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit formaat wordt nog niet ondersteund. Exporteer als UDDF of CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'Duplicaatdetectie kon niet worden uitgevoerd, dus niets hieronder is gemarkeerd als al aanwezig in je logboek. Controleer de lijst voordat je importeert.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Dit bestand heeft geen kolommen om toe te wijzen. Ga terug en selecteer het bestand opnieuw, of kies een andere bron.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'Importeren kon niet doorgaan: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Kolomtoewijzing';
 
   @override

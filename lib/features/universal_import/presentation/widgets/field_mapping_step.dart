@@ -99,6 +99,14 @@ class _FieldMappingStepState extends ConsumerState<FieldMappingStep> {
 
     final headers = state.detectionResult?.csvHeaders ?? [];
 
+    // With no columns there is nothing to map, and the preset and save
+    // controls act on an empty list. Rendering the normal editor here is what
+    // produced the reported "Column Mapping / 0 of 0 columns mapped" dead end,
+    // so say what happened instead.
+    if (headers.isEmpty) {
+      return _NoColumnsNotice(error: state.error);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -107,6 +115,15 @@ class _FieldMappingStepState extends ConsumerState<FieldMappingStep> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (state.error != null) ...[
+                Text(
+                  state.error!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
               Row(
                 children: [
                   Expanded(
@@ -248,6 +265,56 @@ class _FieldMappingStepState extends ConsumerState<FieldMappingStep> {
     ref
         .read(universalImportNotifierProvider.notifier)
         .updateFieldMapping(newMapping);
+  }
+}
+
+/// Shown in place of the mapping editor when the file yielded no columns.
+///
+/// Reached when a parse failed upstream (so the wizard has no payload to skip
+/// this step with) or when a CSV was detected without a usable header row.
+/// [error] carries whatever the notifier recorded about the failure.
+class _NoColumnsNotice extends StatelessWidget {
+  const _NoColumnsNotice({required this.error});
+
+  final String? error;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ExcludeSemantics(
+              child: Icon(
+                Icons.error_outline,
+                size: 40,
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              context.l10n.universalImport_error_noColumnsToMap,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
+            ),
+            if (error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                error!,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
 

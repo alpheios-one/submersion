@@ -14,6 +14,7 @@ import 'package:submersion/features/universal_import/data/models/import_payload.
 import 'package:submersion/features/universal_import/data/parsers/macdive_sqlite_parser.dart';
 import 'package:submersion/features/universal_import/data/parsers/macdive_xml_parser.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 
 import '../../../../fixtures/macdive_sqlite/build_synthetic_db.dart';
@@ -41,6 +42,22 @@ Future<void> _waitForAsyncWork(UniversalImportNotifier notifier) async {
   for (var i = 0; i < 100; i++) {
     await Future<void>.delayed(Duration.zero);
     if (!notifier.state.isLoading) break;
+  }
+}
+
+/// Run [action], absorbing the [ImportStepFailure] it raises when the file
+/// produced no payload.
+///
+/// Most cases below feed placeholder bytes on purpose and assert on the state
+/// the notifier recorded along the way (options, step, error), not on a
+/// payload. The notifier reports "nothing came out of this file" by throwing
+/// so the wizard stays on the step the user is looking at rather than
+/// advancing to one that has nothing to act on.
+Future<void> _tolerating(Future<void> Function() action) async {
+  try {
+    await action();
+  } on ImportStepFailure catch (_) {
+    // Expected for these fixtures.
   }
 }
 
@@ -183,25 +200,28 @@ void main() {
     });
 
     group('confirmFieldMapping', () {
-      test('sets step to review when payload is null', () {
-        notifier.confirmFieldMapping();
+      test('sets step to review when payload is null', () async {
+        await _tolerating(notifier.confirmFieldMapping);
 
         expect(notifier.state.currentStep, ImportWizardStep.review);
       });
 
-      test('does not change step when called again (payload still null)', () {
-        // First call sets step to review.
-        notifier.confirmFieldMapping();
-        expect(notifier.state.currentStep, ImportWizardStep.review);
+      test(
+        'does not change step when called again (payload still null)',
+        () async {
+          // First call sets step to review.
+          await _tolerating(notifier.confirmFieldMapping);
+          expect(notifier.state.currentStep, ImportWizardStep.review);
 
-        // Manually move step back to fieldMapping to prove
-        // confirmFieldMapping will advance again when payload is null.
-        notifier.skipAdditionalFile();
-        expect(notifier.state.currentStep, ImportWizardStep.fieldMapping);
+          // Manually move step back to fieldMapping to prove
+          // confirmFieldMapping will advance again when payload is null.
+          notifier.skipAdditionalFile();
+          expect(notifier.state.currentStep, ImportWizardStep.fieldMapping);
 
-        notifier.confirmFieldMapping();
-        expect(notifier.state.currentStep, ImportWizardStep.review);
-      });
+          await _tolerating(notifier.confirmFieldMapping);
+          expect(notifier.state.currentStep, ImportWizardStep.review);
+        },
+      );
     });
 
     group('toggleSelection', () {
@@ -354,7 +374,7 @@ void main() {
         // State starts with no detectionResult.
         expect(notifier.state.detectionResult, isNull);
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         // Nothing should change -- still at initial step with no options.
         expect(notifier.state.currentStep, ImportWizardStep.fileSelection);
@@ -378,7 +398,7 @@ void main() {
           format: ImportFormat.csv,
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         // The effective options should use the pending overrides.
         expect(notifier.state.options, isNotNull);
@@ -400,7 +420,9 @@ void main() {
 
           notifier.setPendingSourceOverride(SourceApp.macdive);
 
-          await notifier.confirmSource(overrideApp: SourceApp.shearwater);
+          await _tolerating(
+            () => notifier.confirmSource(overrideApp: SourceApp.shearwater),
+          );
           await _waitForAsyncWork(notifier);
 
           expect(notifier.state.options!.sourceApp, SourceApp.shearwater);
@@ -424,9 +446,11 @@ void main() {
             format: ImportFormat.csv,
           );
 
-          await notifier.confirmSource(
-            overrideApp: SourceApp.subsurface,
-            overrideFormat: ImportFormat.subsurfaceXml,
+          await _tolerating(
+            () => notifier.confirmSource(
+              overrideApp: SourceApp.subsurface,
+              overrideFormat: ImportFormat.subsurfaceXml,
+            ),
           );
           await _waitForAsyncWork(notifier);
 
@@ -444,7 +468,7 @@ void main() {
           files: [testPickedFile(_csvBytes('<xml></xml>'), 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.subsurfaceXml);
@@ -461,7 +485,7 @@ void main() {
             files: [testPickedFile(_csvBytes('<xml></xml>'), 'test-file')],
           );
 
-          await notifier.confirmSource();
+          await _tolerating(notifier.confirmSource);
           await _waitForAsyncWork(notifier);
 
           expect(notifier.state.options!.sourceApp, SourceApp.generic);
@@ -485,7 +509,7 @@ void main() {
         expect(notifier.state.pendingSourceOverride, SourceApp.macdive);
         expect(notifier.state.pendingFormatOverride, ImportFormat.csv);
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         // The pending override was CSV, so this takes the CSV path.
         // No need to wait for background parse since CSV path doesn't fire
@@ -506,7 +530,7 @@ void main() {
           files: [testPickedFile(csvData, 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         expect(notifier.state.options, isNotNull);
         expect(notifier.state.options!.format, ImportFormat.csv);
@@ -532,7 +556,7 @@ void main() {
           files: [testPickedFile(csvData, 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         // Pipeline should have parsed the CSV and stored the result.
         expect(notifier.state.parsedCsv, isNotNull);
@@ -552,7 +576,7 @@ void main() {
           files: [testPickedFile(_csvBytes('<xml></xml>'), 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         // Non-CSV formats skip fieldMapping and go straight to review.
@@ -572,7 +596,7 @@ void main() {
             files: [testPickedFile(Uint8List(0), 'test-file')],
           );
 
-          await notifier.confirmSource();
+          await _tolerating(notifier.confirmSource);
 
           // Pipeline failure falls through to the non-pipeline CSV path.
           expect(notifier.state.options!.format, ImportFormat.csv);
@@ -596,7 +620,7 @@ void main() {
 
         // After confirmSource completes, step should advance past
         // sourceConfirmation to either fieldMapping or additionalFiles.
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         expect(
           notifier.state.currentStep,
@@ -673,7 +697,7 @@ void main() {
           currentStep: ImportWizardStep.fieldMapping,
         );
 
-        await notifier.confirmFieldMapping();
+        await _tolerating(notifier.confirmFieldMapping);
 
         // Payload should remain unchanged (early return).
         expect(notifier.state.payload, existingPayload);
@@ -683,7 +707,7 @@ void main() {
       });
 
       test('advances to review step when payload is null', () async {
-        await notifier.confirmFieldMapping();
+        await _tolerating(notifier.confirmFieldMapping);
 
         expect(notifier.state.currentStep, ImportWizardStep.review);
       });
@@ -697,11 +721,14 @@ void main() {
           ),
         );
 
-        await notifier.confirmFieldMapping();
+        await expectLater(
+          notifier.confirmFieldMapping(),
+          throwsA(isA<ImportStepFailure>()),
+        );
 
-        // _parseAndCheckDuplicates returns early when bytes are null,
-        // so no error is set, but step is advanced to review.
-        expect(notifier.state.currentStep, ImportWizardStep.review);
+        // Unreadable bytes are reported, not passed over in silence: the
+        // wizard has to know the step failed or it advances anyway.
+        expect(notifier.state.error, isNotNull);
         expect(notifier.state.payload, isNull);
         expect(notifier.state.isLoading, isFalse);
       });
@@ -717,11 +744,12 @@ void main() {
           ],
         );
 
-        await notifier.confirmFieldMapping();
+        await expectLater(
+          notifier.confirmFieldMapping(),
+          throwsA(isA<ImportStepFailure>()),
+        );
 
-        // _parseAndCheckDuplicates returns early when options is null,
-        // so no error but step is advanced to review.
-        expect(notifier.state.currentStep, ImportWizardStep.review);
+        expect(notifier.state.error, isNotNull);
         expect(notifier.state.payload, isNull);
         expect(notifier.state.isLoading, isFalse);
       });
@@ -743,7 +771,7 @@ void main() {
             loadingStates.add(state.isLoading);
           });
 
-          await notifier.confirmFieldMapping();
+          await _tolerating(notifier.confirmFieldMapping);
 
           // The placeholder parser returns an empty payload, which triggers
           // the error path. Loading should have been set to true then false.
@@ -762,7 +790,7 @@ void main() {
           files: [testPickedFile(_csvBytes('some bytes'), 'test-file')],
         );
 
-        await notifier.confirmFieldMapping();
+        await _tolerating(notifier.confirmFieldMapping);
 
         // PlaceholderParser returns empty entities -> error path.
         expect(notifier.state.error, isNotNull);
@@ -781,7 +809,7 @@ void main() {
             files: [testPickedFile(_csvBytes('test data'), 'test-file')],
           );
 
-          await notifier.confirmFieldMapping();
+          await _tolerating(notifier.confirmFieldMapping);
 
           // PlaceholderParser produces a warning about unsupported format.
           expect(notifier.state.error, isNotNull);
@@ -801,7 +829,7 @@ void main() {
           ],
         );
 
-        await notifier.confirmFieldMapping();
+        await _tolerating(notifier.confirmFieldMapping);
 
         // Parsing invalid XML should produce an error.
         // Either it throws (caught in catch block) or returns empty payload.
@@ -833,7 +861,7 @@ void main() {
           fieldMapping: mapping,
         );
 
-        await notifier.confirmFieldMapping();
+        await _tolerating(notifier.confirmFieldMapping);
 
         // The CSV parser should use the field mapping and produce dives.
         // It may fail at duplicate checking (no provider overrides), but
@@ -861,7 +889,7 @@ void main() {
           files: [testPickedFile(csvData, 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         expect(notifier.state.options, isNotNull);
         expect(notifier.state.options!.format, ImportFormat.csv);
@@ -889,7 +917,7 @@ void main() {
           files: [testPickedFile(csvData, 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
 
         // If a preset was detected, it should be stored in state.
         // Even if no preset matches, the flow should still work.
@@ -912,7 +940,7 @@ void main() {
             files: [testPickedFile(csvData, 'test-file')],
           );
 
-          await notifier.confirmSource();
+          await _tolerating(notifier.confirmSource);
 
           expect(notifier.state.currentStep, ImportWizardStep.fieldMapping);
         },
@@ -930,7 +958,7 @@ void main() {
           files: [testPickedFile(_csvBytes('<uddf></uddf>'), 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.uddf);
@@ -950,7 +978,7 @@ void main() {
           ],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.subsurfaceXml);
@@ -967,7 +995,7 @@ void main() {
           files: [testPickedFile(_csvBytes('fit data'), 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.fit);
@@ -984,7 +1012,7 @@ void main() {
           files: [testPickedFile(_csvBytes('db data'), 'test-file')],
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.shearwaterDb);
@@ -1005,7 +1033,7 @@ void main() {
             files: [testPickedFile(_csvBytes('data'), 'test-file')],
           );
 
-          await notifier.confirmSource();
+          await _tolerating(notifier.confirmSource);
           await _waitForAsyncWork(notifier);
 
           expect(
@@ -1031,7 +1059,9 @@ void main() {
           files: [testPickedFile(_csvBytes('data'), 'test-file')],
         );
 
-        await notifier.confirmSource(overrideApp: SourceApp.scubapro);
+        await _tolerating(
+          () => notifier.confirmSource(overrideApp: SourceApp.scubapro),
+        );
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.sourceApp, SourceApp.scubapro);
@@ -1048,9 +1078,11 @@ void main() {
           files: [testPickedFile(_csvBytes('data'), 'test-file')],
         );
 
-        await notifier.confirmSource(
-          overrideApp: SourceApp.shearwater,
-          overrideFormat: ImportFormat.shearwaterDb,
+        await _tolerating(
+          () => notifier.confirmSource(
+            overrideApp: SourceApp.shearwater,
+            overrideFormat: ImportFormat.shearwaterDb,
+          ),
         );
         await _waitForAsyncWork(notifier);
 
@@ -1273,7 +1305,7 @@ void main() {
           );
 
           // Step 1: Confirm source.
-          await notifier.confirmSource();
+          await _tolerating(notifier.confirmSource);
           expect(notifier.state.options, isNotNull);
           expect(notifier.state.options!.format, ImportFormat.csv);
 
@@ -1290,7 +1322,7 @@ void main() {
           expect(notifier.state.fieldMapping, mapping);
 
           // Step 3: Confirm field mapping (triggers parse).
-          await notifier.confirmFieldMapping();
+          await _tolerating(notifier.confirmFieldMapping);
           expect(notifier.state.currentStep, ImportWizardStep.review);
         },
       );
@@ -1306,7 +1338,7 @@ void main() {
           currentStep: ImportWizardStep.sourceConfirmation,
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         await _waitForAsyncWork(notifier);
 
         expect(notifier.state.options!.format, ImportFormat.uddf);
@@ -1324,7 +1356,7 @@ void main() {
           ),
         );
 
-        await notifier.confirmSource();
+        await _tolerating(notifier.confirmSource);
         expect(notifier.state.options, isNotNull);
 
         notifier.updateFieldMapping(
