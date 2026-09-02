@@ -94,6 +94,11 @@ void main() {
           ),
         ],
         child: const MaterialApp(
+          // flutter_test forwards the host machine's locale list rather than a
+          // fixed en_US, and this app supports 11 locales, so an unpinned
+          // MaterialApp renders in the contributor's own language and every
+          // English assertion below misses.
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: OfflineMapsPage(),
@@ -170,6 +175,11 @@ void main() {
           ),
         ],
         child: const MaterialApp(
+          // flutter_test forwards the host machine's locale list rather than a
+          // fixed en_US, and this app supports 11 locales, so an unpinned
+          // MaterialApp renders in the contributor's own language and every
+          // English assertion below misses.
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: OfflineMapsPage(),
