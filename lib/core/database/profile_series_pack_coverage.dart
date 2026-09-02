@@ -36,10 +36,11 @@ typedef LegacyPackResidue = ({int profiles, int tanks});
 /// ever sees.
 ///
 /// A row that can NEVER be packed does not count, or the table would be
-/// kept forever and its pages never reclaimed: a row with no timestamp,
-/// depth, or pressure holds no sample, and a row whose dive is gone could
-/// never have been rendered. A row whose tank is gone DOES count: the dive
-/// is still the diver's, and those bytes are the only copy left.
+/// kept forever and its pages never reclaimed: a row with no READABLE
+/// timestamp, depth, or pressure holds no sample, and a row whose dive is
+/// gone could never have been rendered. A row whose tank is gone DOES
+/// count: the dive is still the diver's, and those bytes are the only copy
+/// left.
 Future<LegacyPackResidue> countLegacyRowsAwaitingPack(
   DatabaseConnectionUser db, {
   String profileTable = 'dive_profiles',
@@ -79,7 +80,7 @@ Future<int> _countUnpackedProfileRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE timestamp IS NOT NULL AND depth IS NOT NULL '
+        'WHERE ${readableNumberSql('timestamp')} AND ${readableNumberSql('depth')} '
         'GROUP BY $identity) p '
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
@@ -119,8 +120,9 @@ Future<int> _countUnpackedTankRows(
       .customSelect(
         'SELECT COALESCE(SUM(p.n), 0) AS n FROM '
         '(SELECT $identity, COUNT(*) AS n FROM $table '
-        'WHERE timestamp IS NOT NULL AND pressure IS NOT NULL '
-        'AND tank_id IS NOT NULL GROUP BY $identity) p '
+        'WHERE ${readableNumberSql('timestamp')} '
+        'AND ${readableNumberSql('pressure')} '
+        "AND ${readableTextSql('tank_id')} GROUP BY $identity) p "
         'WHERE EXISTS (SELECT 1 FROM dives d WHERE d.id = p.dive_id) '
         'AND NOT $covered',
       )
@@ -200,9 +202,7 @@ Future<String> legacyRowCoveredSql(
     // takes the same null-is-a-wildcard rule as computer_id, for the same
     // reason (adoptUnattributed moves it from NULL to a source).
     final sourceMatch = 's.source_id IS ${await resolvedSourceSql(db)}';
-    final primary = columns.contains('is_primary')
-        ? 'CASE WHEN p.is_primary THEN 1 ELSE 0 END'
-        : '1';
+    final primary = columns.contains('is_primary') ? _primarySql : '1';
     group =
         'AND (p.source_id IS NULL OR $sourceMatch) '
         'AND s.is_primary = $primary';
@@ -210,6 +210,23 @@ Future<String> legacyRowCoveredSql(
   return 'EXISTS (SELECT 1 FROM $seriesTable s '
       'WHERE s.dive_id = p.dive_id $tank $computer $group)';
 }
+
+/// The legacy `is_primary` value as the 0 or 1 a series row stores, spelled
+/// to agree with the packer's `_boolOf` on EVERY value.
+///
+/// A plain `CASE WHEN p.is_primary` disagrees with it twice, and each
+/// disagreement leaves the staged rows undrained forever while the packer
+/// re-runs over them on every sync apply: SQLite sends a NULL to the ELSE
+/// and reads it as demoted, where `_boolOf` reads an absent flag as the
+/// dive's live profile; and it applies its own text-to-numeric rule, so a
+/// peer's `"isPrimary": "yes"`, which INTEGER affinity leaves as text, reads
+/// as demoted where `_boolOf` reads any non-num as primary. Testing
+/// `typeof` first confines SQLite's truthiness to the numeric values both
+/// sides agree on. Change this and `_boolOf` together.
+const String _primarySql =
+    'CASE WHEN p.is_primary IS NULL THEN 1 '
+    "WHEN typeof(p.is_primary) IN ('integer', 'real') "
+    'THEN (CASE WHEN p.is_primary THEN 1 ELSE 0 END) ELSE 1 END';
 
 /// [resolvedComputerSql]'s twin for `source_id`.
 Future<String> resolvedSourceSql(DatabaseConnectionUser db) async =>
@@ -225,6 +242,27 @@ Future<String> resolvedComputerSql(DatabaseConnectionUser db) async =>
     await legacyTableExists(db, 'dive_computers')
     ? '(SELECT c.id FROM dive_computers c WHERE c.id = p.computer_id)'
     : 'NULL';
+
+/// SQL for "[column] holds a number the packer can read", the predicate
+/// half of `profileSampleOf`'s `is! num` test.
+///
+/// `IS NOT NULL` is not the same question. SQLite carries a storage class
+/// per value, so a REAL-affinity column can hold text it could not convert;
+/// that row is not null but holds no sample, the packer steps over it, and
+/// counting it as awaiting pack would keep the legacy table and its pages
+/// forever waiting for a pack that can never claim it.
+///
+/// Also the guard on READING such a column as a number. Drift's `read<int>`
+/// converts rather than casts, but converting is `int.parse`, so numeric
+/// text passes and anything else throws a [FormatException]. Any query that
+/// reads a legacy numeric column has to filter on this first.
+String readableNumberSql(String column) =>
+    "typeof($column) IN ('integer', 'real')";
+
+/// SQL for "[column] holds text", the guard on reading a legacy id column
+/// with `read<String>`. See [readableNumberSql] for why a declared type is
+/// not enough on these tables.
+String readableTextSql(String column) => "typeof($column) = 'text'";
 
 Future<int> _countRows(DatabaseConnectionUser db, String table) async {
   final rows = await db

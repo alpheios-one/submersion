@@ -17738,6 +17738,12 @@ abstract class AppLocalizations {
   /// **'File Size'**
   String get enum_sortField_fileSize;
 
+  /// No description provided for @enum_sortField_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get enum_sortField_lastDive;
+
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
   /// In en, this message translates to:
@@ -26279,6 +26285,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList);
 
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///

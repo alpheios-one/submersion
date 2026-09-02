@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
@@ -30,6 +31,8 @@ class ChangesetReadResult {
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.newerSchemaPeerNames = const {},
+    this.readFailedPeerDeviceIds = const {},
+    this.readFailedPeerNames = const {},
     this.retiredPeerIds = const {},
     this.retiredPeerHasFiles = false,
   });
@@ -61,6 +64,18 @@ class ChangesetReadResult {
   /// published one, keyed by device id. Same fallback contract as
   /// [skippedPeerNames]: absent means the UI shows a short id label.
   final Map<String, String> newerSchemaPeerNames;
+
+  /// Peers whose read threw partway through this pull (a provider error, a
+  /// malformed manifest or changeset, an apply failure, ...). Their cursors
+  /// stayed put, so the next sync retries them -- but the caller must surface
+  /// them rather than reporting a misleadingly clean sync.
+  final Set<String> readFailedPeerDeviceIds;
+
+  /// Display names for the entries in [readFailedPeerDeviceIds] whose
+  /// manifests were parsed (and named the device) before the failure. Same
+  /// fallback contract as [skippedPeerNames]: absent means the UI shows a
+  /// short id label.
+  final Map<String, String> readFailedPeerNames;
   final Set<String> retiredPeerIds;
 
   /// True when a retired peer still has non-marker files in the bucket (a
@@ -79,6 +94,7 @@ class ChangesetReader {
   final ChangesetCodec _codec;
   final PeerCursorStore _peerCursors;
   final BasePartFileSink _baseSink;
+  static final _log = LoggerService.forClass(ChangesetReader);
 
   Future<ChangesetReadResult> pull({
     required CloudStorageProvider provider,
@@ -125,11 +141,16 @@ class ChangesetReader {
     final skippedPeerNames = <String, String>{};
     final newerSchemaPeerDeviceIds = <String>{};
     final newerSchemaPeerNames = <String, String>{};
+    final readFailedPeerDeviceIds = <String>{};
+    final readFailedPeerNames = <String, String>{};
 
     var peersProcessed = 0;
     var payloadsApplied = 0;
 
     for (final peerId in peerIds) {
+      // Captured as soon as the manifest parses, so the catch below can name
+      // the peer even when the failure comes later in the read.
+      String? peerName;
       try {
         // A retired peer's files are being deleted; never merge from them and
         // never advance a cursor against them.
@@ -140,6 +161,10 @@ class ChangesetReader {
           await provider.downloadFile(manifestFile.id),
         );
         peerManifests.add(manifest);
+        final manifestName = manifest.deviceName;
+        if (manifestName != null && manifestName.isNotEmpty) {
+          peerName = manifestName;
+        }
 
         // Stale-epoch filter: once this device is on a library epoch, a peer
         // stamped with a different epoch (including an unstamped legacy peer)
@@ -245,9 +270,21 @@ class ChangesetReader {
             appliedHlcHigh: appliedHlc,
           );
         }
-      } catch (_) {
+      } catch (e, stackTrace) {
         // One bad peer must not block the others; its cursor stays put so the
-        // next sync retries it.
+        // next sync retries it. Record the failure so the caller can surface
+        // it instead of reporting a misleadingly clean sync.
+        readFailedPeerDeviceIds.add(peerId);
+        if (peerName != null) {
+          readFailedPeerNames[peerId] = peerName;
+        }
+        _log.warning(
+          'Failed to read peer $peerId'
+          '${peerName != null ? ' ($peerName)' : ''}; '
+          'cursor kept for retry next sync',
+          error: e,
+          stackTrace: stackTrace,
+        );
         continue;
       }
     }
@@ -260,6 +297,8 @@ class ChangesetReader {
       skippedPeerNames: skippedPeerNames,
       newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
       newerSchemaPeerNames: newerSchemaPeerNames,
+      readFailedPeerDeviceIds: readFailedPeerDeviceIds,
+      readFailedPeerNames: readFailedPeerNames,
       retiredPeerIds: retiredPeerIds,
       retiredPeerHasFiles: retiredPeerHasFiles,
     );

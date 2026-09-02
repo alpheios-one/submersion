@@ -10501,6 +10501,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_sortField_fileSize => 'Taille du fichier';
 
   @override
+  String get enum_sortField_lastDive => 'Dernière plongée';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Derniere revision';
 
   @override
@@ -15922,6 +15925,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' et ';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Les modifications de $deviceList n\'ont pas pu être lues lors de la dernière synchronisation et n\'ont donc pas été fusionnées. La prochaine synchronisation réessaiera automatiquement.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Les modifications de $deviceList n\'ont pas pu être lues lors de la dernière synchronisation et n\'ont donc pas été fusionnées. La prochaine synchronisation réessaiera automatiquement.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {

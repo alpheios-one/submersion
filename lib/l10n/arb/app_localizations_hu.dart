@@ -10436,6 +10436,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_sortField_fileSize => 'Fájlméret';
 
   @override
+  String get enum_sortField_lastDive => 'Utolsó merülés';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Utolso szerviz';
 
   @override
@@ -15811,6 +15814,16 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'A(z) $deviceList változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'A(z) $deviceList változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {

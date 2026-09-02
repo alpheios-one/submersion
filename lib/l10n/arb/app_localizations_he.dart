@@ -10222,6 +10222,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
+  String get enum_sortField_lastDive => 'צלילה אחרונה';
+
+  @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';
 
   @override
@@ -15475,6 +15478,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {

@@ -185,6 +185,58 @@ void main() {
       expect(rows.firstWhere((r) => r.id == a).computerId, 'comp-a');
       expect(rows.firstWhere((r) => r.id == b).computerId, isNull);
     });
+
+    test('relinkComputer leaves a user-edited series unattributed and takes '
+        'back the demoted original', () async {
+      // The state a re-added computer finds on a dive the user edited before
+      // the old computer was deleted: the computer's own samples demoted and
+      // stripped of their computer by clearComputer, and the manual edit
+      // primary with a null computer of its own. Stamping the edit hands it
+      // to the next reparse, whose first act is deleteByComputer, and a
+      // series is deleted whole.
+      await insertComputerDataSource('d-mine');
+      final original = await profileSeries.insertSeries(
+        diveId: 'd-mine',
+        isPrimary: false,
+        samples: one,
+        now: 1000,
+      );
+      final edit = await profileSeries.insertSeries(
+        diveId: 'd-mine',
+        isPrimary: true,
+        samples: one,
+        now: 1000,
+      );
+      expect(
+        await profileSeries.relinkComputer('comp-a', ['d-mine'], now: 2000),
+        1,
+      );
+      final rows = await profileSeries.getRowsForDives(['d-mine']);
+      expect(rows.firstWhere((r) => r.id == original).computerId, 'comp-a');
+      expect(rows.firstWhere((r) => r.id == edit).computerId, isNull);
+    });
+
+    test(
+      'relinkComputer still stamps the live series of an unedited dive',
+      () async {
+        // The same shape without an edit: one primary null-computer series and
+        // nothing demoted beside it, which is what a plain computer delete
+        // leaves behind. That one is the computer's own and has to come back.
+        await insertComputerDataSource('d-mine');
+        final live = await profileSeries.insertSeries(
+          diveId: 'd-mine',
+          isPrimary: true,
+          samples: one,
+          now: 1000,
+        );
+        expect(
+          await profileSeries.relinkComputer('comp-a', ['d-mine'], now: 2000),
+          1,
+        );
+        final rows = await profileSeries.getRowsForDives(['d-mine']);
+        expect(rows.firstWhere((r) => r.id == live).computerId, 'comp-a');
+      },
+    );
   });
 
   group('TankPressureSeriesRepository computer link', () {

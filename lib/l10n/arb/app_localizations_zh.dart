@@ -9988,6 +9988,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_fileSize => '文件大小';
 
   @override
+  String get enum_sortField_lastDive => '最近潜水';
+
+  @override
   String get enum_sortField_lastServiceDate => '最近维护';
 
   @override
@@ -15084,6 +15087,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {

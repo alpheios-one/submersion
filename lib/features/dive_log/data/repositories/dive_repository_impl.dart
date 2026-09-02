@@ -1130,13 +1130,25 @@ class DiveRepository {
 
         final primaryComputerId = primaryReading?.computerId;
 
-        if (primaryComputerId != null) {
+        // Take the by-computer branch only when that computer actually owns a
+        // series. Deleting the edit and then promoting nothing leaves the
+        // dive with zero primary series: it keeps rendering, because
+        // getDiveById and getMergedProfile ignore the flag, while
+        // getDiveProfile, getAscentDescentRates, getTimeAtDepthRanges and the
+        // data-quality prefilters all silently skip it. That is reachable
+        // whenever the primary source names a computer that owns no samples
+        // (a metadata-only source, or one whose samples a consolidation
+        // re-stamped onto a different computer). setPrimaryDataSource and
+        // DiveComputerRepository.setPrimaryProfile guard their own
+        // demote-then-promote pairs the same way (issue #1149).
+        if (primaryComputerId != null &&
+            await _profileSeries.ownsComputer(diveId, primaryComputerId)) {
           // Multi-computer dive: only the previously-primary computer's
           // series come back.
           await _profileSeries.promoteByComputer(diveId, primaryComputerId);
         } else {
-          // Single-computer dive (or no computer reading): everything left is
-          // the live profile.
+          // Single-computer dive (or no computer reading, or a primary
+          // computer that owns nothing): everything left is the live profile.
           await _profileSeries.promoteAll(diveId);
         }
       });
@@ -6272,9 +6284,20 @@ class DiveRepository {
   /// Delete a computer reading snapshot by its ID.
   Future<void> deleteComputerReading(String id) async {
     try {
-      await (_db.delete(
-        _db.diveDataSources,
-      )..where((t) => t.id.equals(id))).go();
+      // Clear the series first: dive_profile_series.source_id is ON DELETE
+      // SET NULL, so the delete below would strip their attribution through
+      // the cascade without a fresh updated_at, an hlc restamp or a pending
+      // mark, and this device would resolve their owner differently from
+      // every peer forever (see ProfileSeriesRepository.clearSource). The
+      // computer_id twin of this is DiveComputerRepository.deleteComputer.
+      // One transaction, so a failure between them cannot publish series
+      // that gave up an attribution the source row still claims.
+      await _db.transaction(() async {
+        await _profileSeries.clearSource(id);
+        await (_db.delete(
+          _db.diveDataSources,
+        )..where((t) => t.id.equals(id))).go();
+      });
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(

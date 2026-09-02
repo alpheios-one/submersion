@@ -6,13 +6,23 @@ import 'package:submersion/core/database/profile_series_pack.dart';
 
 import '../../helpers/legacy_profile_fixtures.dart';
 
-/// One unreadable legacy row must cost its own dive and nothing more.
+/// One unreadable legacy VALUE must cost its own row and nothing more.
 ///
 /// The rungs and the beforeOpen backstop catch whatever the packer throws,
 /// which keeps the database openable but leaves every dive the packer had
 /// not reached yet unpacked, on this open and on every later one. Nothing
 /// reads `dive_profiles` after v183, so those profiles would be invisible
 /// while the dive still looked whole.
+///
+/// An unreadable timestamp, depth or pressure means the ROW holds no
+/// sample, which is what a null in the same column has always meant, so it
+/// is counted in `skippedRows` and the rest of the dive still packs. Costing
+/// the whole dive instead only looked like a deferred retry: the dive was
+/// held back for a later open that reads the same byte and fails the same
+/// way, so its good samples were never visible either. Failure at DIVE
+/// granularity is still real, for a group the codec or the database refuses
+/// to write, and is pinned by `migration_v183_rung_resilience_test.dart`
+/// and `backstop_resilience_test.dart`.
 void main() {
   Future<({AppDatabase db, sqlite3.Database raw})> openLegacy() async {
     final raw = sqlite3.sqlite3.openInMemory();
@@ -28,8 +38,8 @@ void main() {
   }
 
   /// A row whose `depth` holds text. SQLite's REAL affinity keeps a
-  /// non-numeric string as TEXT, so the packer's `as num?` throws on it the
-  /// way a bit-rotted or hand-repaired table would.
+  /// non-numeric string as TEXT, the way a bit-rotted or hand-repaired
+  /// table would, and the packer reads it as no sample at all.
   void unreadableProfileRow(sqlite3.Database raw, String id, String diveId) {
     raw.execute(
       'INSERT INTO dive_profiles (id, dive_id, computer_id, source_id, '
@@ -53,7 +63,7 @@ void main() {
     return [for (final r in rows) r.read<String>('dive_id')];
   }
 
-  test('an unreadable dive does not stop the dives after it', () async {
+  test('an unreadable row does not stop the dives after it', () async {
     final open = await openLegacy();
     seedParents(open.raw);
     // d1 sorts first, and the scan walks dives in dive_id order.
@@ -63,12 +73,13 @@ void main() {
     final report = await packLegacyProfileRows(open.db, nowMs: 1);
 
     expect(report.profileSeries, 1);
-    expect(report.failedDives, 1);
+    expect(report.failedDives, 0);
+    expect(report.skippedRows, 1);
     expect(await packedDiveIds(open.db, 'dive_profile_series'), ['d2']);
   });
 
   test(
-    'an unreadable profile dive does not stop the tank pressure pack',
+    'an unreadable profile row does not stop the tank pressure pack',
     () async {
       final open = await openLegacy();
       seedParents(open.raw);
@@ -80,14 +91,15 @@ void main() {
 
       final report = await packLegacyProfileRows(open.db, nowMs: 1);
 
-      expect(report.failedDives, 1);
+      expect(report.failedDives, 0);
+      expect(report.skippedRows, 1);
       expect(report.tankSeries, 1);
       expect(await packedDiveIds(open.db, 'tank_pressure_series'), ['d1']);
     },
   );
 
   test(
-    'an unreadable tank dive does not stop the tank dives after it',
+    'an unreadable tank row does not stop the tank dives after it',
     () async {
       final open = await openLegacy();
       seedParents(open.raw);
@@ -105,7 +117,8 @@ void main() {
 
       final report = await packLegacyProfileRows(open.db, nowMs: 1);
 
-      expect(report.failedDives, 1);
+      expect(report.failedDives, 0);
+      expect(report.skippedRows, 1);
       expect(report.tankSeries, 1);
       expect(await packedDiveIds(open.db, 'tank_pressure_series'), ['d2']);
     },
