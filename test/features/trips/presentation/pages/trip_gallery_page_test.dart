@@ -471,6 +471,53 @@ void main() {
       );
       semantics.dispose();
     });
+
+    testWidgets('a video tile carries the video label', (tester) async {
+      final testDive = Dive(
+        id: 'dive-1',
+        dateTime: DateTime(2024, 1, 15, 10, 30),
+        diveNumber: 1,
+      );
+
+      final video = MediaItem(
+        id: 'media-video',
+        diveId: 'dive-1',
+        mediaType: MediaType.video,
+        takenAt: DateTime(2024, 1, 15, 10, 45),
+        platformAssetId: 'asset-video',
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      );
+
+      final semantics = tester.ensureSemantics();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mediaForTripProvider('test-trip').overrideWith((ref) {
+              return Future.value({
+                testDive: [video],
+              });
+            }),
+            mediaResolverOverride(),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripGalleryPage(tripId: 'test-trip'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final l10n = tester.element(find.byType(TripGalleryPage)).l10n;
+      expect(
+        find.bySemanticsLabel(_contains(l10n.trips_gallery_thumbnail_video)),
+        findsOneWidget,
+      );
+      expect(find.byIcon(Icons.videocam), findsOneWidget);
+      semantics.dispose();
+    });
   });
 }
 
