@@ -22797,6 +22797,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Excluir \"$name\"?\n\nEsta região foi baixada por uma versão anterior, portanto seus tiles estão armazenados junto com os de outras regiões e não podem ser liberados separadamente. Excluí-la não libera armazenamento.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22887,6 +22892,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Tamanho';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Desconhecido';
 
   @override
   String get maps_offline_tiles => 'Tiles';

@@ -103,6 +103,21 @@ class TileCacheService {
   /// Incidental browse caching. Capped and swept.
   static const String _browseStoreName = 'submersion_tiles_browse';
 
+  /// Prefix of a downloaded region's own store.
+  ///
+  /// FMTC 10 can delete a whole store or tiles older than a date, and nothing
+  /// in between: there is no call that says "remove the tiles inside this
+  /// rectangle". So a region only becomes deletable by being a store. Every
+  /// region downloaded from this version on gets one of these, named for the
+  /// region's id, and [deleteRegionTiles] is then a store delete.
+  ///
+  /// Regions downloaded before this change have their tiles commingled in
+  /// [_offlineStoreName] with old browse tiles, and there is no way to tell
+  /// after the fact which tile belongs to which region. Those keep the old
+  /// behaviour: deleting one frees nothing, and the UI does not claim a size
+  /// it cannot measure for them.
+  static const String regionStorePrefix = 'submersion_region_';
+
   static final LoggerService _log = LoggerService.forClass(TileCacheService);
 
   bool _initialized = false;
@@ -110,6 +125,14 @@ class TileCacheService {
   FMTCStore? _browseStore;
   StreamSubscription<DownloadProgress>? _activeDownloadSubscription;
   Object? _activeDownloadId;
+
+  /// Regions whose store exists but whose database row does not yet, because
+  /// the download is still running or its row is still being written.
+  ///
+  /// [pruneOrphanRegionStores] deletes a region store with no row, which is
+  /// exactly what an in-flight download looks like from the outside, so it
+  /// has to be told to leave these alone.
+  final Set<String> _inFlightRegionIds = {};
 
   /// Whether the service has been initialized.
   bool get isInitialized => _initialized;
@@ -183,6 +206,59 @@ class TileCacheService {
     // coverage:ignore-end
   }
 
+  /// The store that holds the tiles of the region with this id.
+  static String regionStoreName(String regionId) =>
+      '$regionStorePrefix$regionId';
+
+  /// The region a store belongs to, or `null` if the store is not a region
+  /// store.
+  ///
+  /// [_offlineStoreName] and [_browseStoreName] deliberately fall outside the
+  /// prefix: reading either of them as a region would let the orphan sweep
+  /// delete every legacy tile in the app.
+  static String? regionIdFromStoreName(String storeName) =>
+      storeName.startsWith(regionStorePrefix) &&
+          storeName.length > regionStorePrefix.length
+      ? storeName.substring(regionStorePrefix.length)
+      : null;
+
+  /// How a map treats the stores it does not name: read them, never write.
+  ///
+  /// This is what lets a map view read every downloaded region without
+  /// enumerating them, so the tile provider's configuration stays a constant
+  /// as regions come and go.
+  ///
+  /// It must stay [BrowseStoreStrategy.read]. A write strategy here would let
+  /// incidental panning add tiles to every downloaded region, which would grow
+  /// them without bound and make each region's measured size a running total
+  /// of wherever the diver happened to pan.
+  static const BrowseStoreStrategy otherStoresStrategy =
+      BrowseStoreStrategy.read;
+
+  /// The region stores that no longer belong to any region, and so hold tiles
+  /// nothing can reach.
+  ///
+  /// A store outlives its row when the app dies between creating the store and
+  /// writing the region, or when a delete removes the tiles and then fails.
+  /// Pure and [visibleForTesting]: this is the decision worth asserting, while
+  /// the deletion around it needs a live backend.
+  @visibleForTesting
+  static Set<String> orphanRegionStores({
+    required Iterable<String> availableStores,
+    required Set<String> knownRegionIds,
+    required Set<String> inFlightRegionIds,
+  }) {
+    final orphans = <String>{};
+    for (final storeName in availableStores) {
+      final regionId = regionIdFromStoreName(storeName);
+      if (regionId == null) continue;
+      if (knownRegionIds.contains(regionId)) continue;
+      if (inFlightRegionIds.contains(regionId)) continue;
+      orphans.add(storeName);
+    }
+    return orphans;
+  }
+
   /// Which stores a browsing map reads and writes, and how.
   ///
   /// The load-bearing invariant is that the offline store is `read` and never
@@ -242,6 +318,7 @@ class TileCacheService {
     _ensureInitialized();
     return FMTCTileProvider(
       stores: browseStoreStrategies(),
+      otherStoresStrategy: otherStoresStrategy,
       loadingStrategy: loadingStrategy,
       errorHandler: handleTileError,
     );
@@ -309,6 +386,7 @@ class TileCacheService {
     _ensureInitialized();
     return FMTCTileProvider(
       stores: offlineStoreStrategies(),
+      otherStoresStrategy: otherStoresStrategy,
       loadingStrategy: BrowseLoadingStrategy.cacheOnly,
     );
     // coverage:ignore-end
@@ -337,12 +415,20 @@ class TileCacheService {
     return await _store!.download.countTiles(downloadableRegion);
   }
 
-  /// Download tiles for a rectangular region.
+  /// Download tiles for a rectangular region into that region's own store.
+  ///
+  /// [regionId] is the id the region will be recorded under, so the caller
+  /// has to mint it before calling. The store is created here and belongs to
+  /// the region from this moment: either the caller records the region and
+  /// calls [finishRegionDownload], or it calls [discardRegionDownload] and the
+  /// partial tiles go with it. Until one of those happens the store is
+  /// protected from [pruneOrphanRegionStores].
   ///
   /// Returns a stream of [TileDownloadProgress] updates.
   ///
   /// Use [cancelDownload] to cancel an ongoing download.
-  Stream<TileDownloadProgress> downloadRegion({
+  Future<Stream<TileDownloadProgress>> downloadRegion({
+    required String regionId,
     required LatLng southWest,
     required LatLng northEast,
     required int minZoom,
@@ -350,7 +436,8 @@ class TileCacheService {
     required TileLayer options,
     int parallelThreads = 5,
     bool skipExistingTiles = true,
-  }) {
+  }) async {
+    // coverage:ignore-start
     _ensureInitialized();
 
     // Cancel any existing download
@@ -367,9 +454,13 @@ class TileCacheService {
       options: options,
     );
 
+    _inFlightRegionIds.add(regionId);
+    final regionStore = FMTCStore(regionStoreName(regionId));
+    await regionStore.manage.create();
+
     _activeDownloadId = DateTime.now().millisecondsSinceEpoch;
 
-    final streams = _store!.download.startForeground(
+    final streams = regionStore.download.startForeground(
       region: downloadableRegion,
       parallelThreads: parallelThreads,
       skipExistingTiles: skipExistingTiles,
@@ -399,6 +490,101 @@ class TileCacheService {
     );
 
     return controller.stream;
+    // coverage:ignore-end
+  }
+
+  /// The size in bytes of the tiles belonging to [regionId].
+  ///
+  /// A real measurement of the region's own store, which replaced a flat
+  /// 20 KiB per tile that had never read the cache. Real tiles vary by about
+  /// an order of magnitude with zoom and terrain, so the constant was wrong
+  /// for essentially every region.
+  ///
+  /// Returns 0 for a region with no store of its own, which is every region
+  /// downloaded before per-region stores existed. Callers must distinguish
+  /// that from a measured zero: see [getRegionStoreIds].
+  Future<int> measureRegionSize(String regionId) async {
+    // coverage:ignore-start
+    _ensureInitialized();
+    final store = FMTCStore(regionStoreName(regionId));
+    if (!await store.manage.ready) return 0;
+    final stats = await store.stats.all;
+    // FMTC reports KiB.
+    return (stats.size * 1024).round();
+    // coverage:ignore-end
+  }
+
+  /// Delete the tiles belonging to [regionId].
+  ///
+  /// A no-op for a region with no store of its own: its tiles are commingled
+  /// with every other legacy region's in [_offlineStoreName] and cannot be
+  /// separated. Only "Clear all cache" reclaims those.
+  Future<void> deleteRegionTiles(String regionId) async {
+    // coverage:ignore-start
+    _ensureInitialized();
+    final store = FMTCStore(regionStoreName(regionId));
+    if (await store.manage.ready) {
+      await store.manage.delete();
+      _log.info('Deleted tile store for region $regionId');
+    }
+    _inFlightRegionIds.remove(regionId);
+    // coverage:ignore-end
+  }
+
+  /// Abandon a download: cancel it, then delete the store it was filling.
+  ///
+  /// Without this a cancelled or failed download would leave its partial
+  /// tiles on disk with no region to reach them by, which is the leak this
+  /// whole change is about.
+  Future<void> discardRegionDownload(String regionId) async {
+    // coverage:ignore-start
+    await cancelDownload();
+    await deleteRegionTiles(regionId);
+    // coverage:ignore-end
+  }
+
+  /// Release the protection [downloadRegion] took, once the region's row
+  /// exists and the store can be reached through it.
+  void finishRegionDownload(String regionId) {
+    _inFlightRegionIds.remove(regionId);
+  }
+
+  /// The ids of the regions that own their tiles.
+  ///
+  /// A region outside this set was downloaded before per-region stores, so
+  /// its size cannot be measured and its tiles cannot be freed individually.
+  Future<Set<String>> getRegionStoreIds() async {
+    // coverage:ignore-start
+    _ensureInitialized();
+    final stores = await FMTCRoot.stats.storesAvailable;
+    return stores
+        .map((s) => regionIdFromStoreName(s.storeName))
+        .nonNulls
+        .toSet();
+    // coverage:ignore-end
+  }
+
+  /// Delete region stores that no longer belong to any region.
+  ///
+  /// [knownRegionIds] must be every region currently recorded; anything else
+  /// carrying the region prefix is unreachable and is deleted. Stores that are
+  /// not ours are never touched.
+  Future<void> pruneOrphanRegionStores({
+    required Set<String> knownRegionIds,
+  }) async {
+    // coverage:ignore-start
+    _ensureInitialized();
+    final available = await FMTCRoot.stats.storesAvailable;
+    final orphans = orphanRegionStores(
+      availableStores: available.map((s) => s.storeName),
+      knownRegionIds: knownRegionIds,
+      inFlightRegionIds: _inFlightRegionIds,
+    );
+    for (final storeName in orphans) {
+      await FMTCStore(storeName).manage.delete();
+      _log.info('Deleted orphaned region tile store $storeName');
+    }
+    // coverage:ignore-end
   }
 
   /// Cancel an ongoing download.
@@ -432,27 +618,78 @@ class TileCacheService {
   }
 
   /// Get statistics about the tile cache.
+  ///
+  /// Covers every store, region stores included: they hold the bulk of the
+  /// bytes once regions are downloaded, and a total that skipped them would
+  /// under-report exactly the storage this is shown to explain.
   Future<CacheStats> getCacheStats() async {
     // coverage:ignore-start
     _ensureInitialized();
 
-    final offline = await _store!.stats.all;
-    final browse = await _browseStore!.stats.all;
-    return CacheStats(
-      tileCount: offline.length + browse.length,
-      sizeKiB: offline.size + browse.size,
-      hits: offline.hits + browse.hits,
-      misses: offline.misses + browse.misses,
-    );
+    final perStore = <({double size, int length, int hits, int misses})>[];
+    for (final store in await FMTCRoot.stats.storesAvailable) {
+      perStore.add(await store.stats.all);
+    }
+    return aggregateCacheStats(perStore);
     // coverage:ignore-end
   }
 
-  /// Clear all cached tiles from the store.
+  /// Roll per-store statistics into one figure for the whole cache.
+  ///
+  /// Tiles and bytes add up, because a tile belongs to one store. Hits and
+  /// misses do not, and the difference matters now that the number of stores
+  /// grows with the number of downloaded regions:
+  ///
+  /// * FMTC records a miss against *every* store it was allowed to read, so
+  ///   one uncached tile increments as many counters as there are stores.
+  ///   Summing those would make the miss count, and with it the hit rate,
+  ///   deteriorate as a diver downloads more regions, which has nothing to do
+  ///   with how the cache is performing. Each store's own count is the number
+  ///   of misses over its lifetime, so the largest is the best available
+  ///   estimate of the total.
+  /// * A hit is recorded only against the stores that actually held the tile,
+  ///   so hits are summed. A tile present in two overlapping regions counts
+  ///   twice, which is the one inaccuracy left here and is bounded by how much
+  ///   the diver's regions overlap.
+  ///
+  /// Pure and [visibleForTesting]: the arithmetic is worth pinning, the
+  /// backend calls around it are not testable.
+  @visibleForTesting
+  static CacheStats aggregateCacheStats(
+    Iterable<({double size, int length, int hits, int misses})> perStore,
+  ) {
+    var tileCount = 0;
+    var sizeKiB = 0.0;
+    var hits = 0;
+    var misses = 0;
+    for (final stats in perStore) {
+      tileCount += stats.length;
+      sizeKiB += stats.size;
+      hits += stats.hits;
+      if (stats.misses > misses) misses = stats.misses;
+    }
+    return CacheStats(
+      tileCount: tileCount,
+      sizeKiB: sizeKiB,
+      hits: hits,
+      misses: misses,
+    );
+  }
+
+  /// Clear all cached tiles.
+  ///
+  /// Resets the two shared stores and deletes every region store outright.
+  /// The caller is expected to delete the region rows alongside this.
   Future<void> clearCache() async {
     // coverage:ignore-start
     _ensureInitialized();
     await _store!.manage.reset();
     await _browseStore!.manage.reset();
+    for (final store in await FMTCRoot.stats.storesAvailable) {
+      if (regionIdFromStoreName(store.storeName) == null) continue;
+      await store.manage.delete();
+    }
+    _inFlightRegionIds.clear();
     // coverage:ignore-end
   }
 

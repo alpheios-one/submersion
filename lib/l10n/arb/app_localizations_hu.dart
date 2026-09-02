@@ -22722,6 +22722,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Törli a(z) \"$name\" régiót?\n\nEzt a régiót egy korábbi verzió töltötte le, ezért a csempéi más régiókéval együtt tárolódnak, és nem szabadíthatók fel külön. A törlése nem szabadít fel tárhelyet.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22812,6 +22817,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Meret';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Ismeretlen';
 
   @override
   String get maps_offline_tiles => 'Csempek';

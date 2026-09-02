@@ -21622,6 +21622,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '删除 \"$name\" 吗？\n\n此区域由早期版本下载，其瓦片与其他区域的瓦片存储在一起，无法单独释放。删除不会回收存储空间。';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -21711,6 +21716,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get maps_offline_size => '尺寸';
+
+  @override
+  String get maps_offline_sizeUnknown => '未知';
 
   @override
   String get maps_offline_tiles => '瓦片';

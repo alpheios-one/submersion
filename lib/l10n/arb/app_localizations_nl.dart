@@ -22617,6 +22617,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '\"$name\" verwijderen?\n\nDeze regio is met een eerdere versie gedownload, dus de tegels staan samen met die van andere regio\'s opgeslagen en kunnen niet afzonderlijk worden vrijgemaakt. Verwijderen maakt geen opslagruimte vrij.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22707,6 +22712,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Grootte';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Onbekend';
 
   @override
   String get maps_offline_tiles => 'Tegels';

@@ -1,0 +1,193 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/maps/data/repositories/offline_map_repository.dart';
+import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
+import 'package:submersion/features/maps/domain/entities/cached_region.dart';
+import 'package:submersion/features/maps/presentation/pages/offline_maps_page.dart';
+import 'package:submersion/features/maps/presentation/providers/offline_map_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../../../helpers/mock_providers.dart';
+
+CachedRegion _region({required String id, required String name}) =>
+    CachedRegion(
+      id: id,
+      name: name,
+      minLat: 20,
+      maxLat: 21,
+      minLng: -87,
+      maxLng: -86,
+      minZoom: 8,
+      maxZoom: 12,
+      tileCount: 900,
+      // What a legacy row holds: 900 tiles times a flat 20 KiB, a number that
+      // never read the tile cache.
+      sizeBytes: 900 * 20 * 1024,
+      createdAt: DateTime(2026, 1, 1),
+      lastAccessedAt: DateTime(2026, 1, 2),
+    );
+
+/// A repository backed by a list, so the page's delete path can run without a
+/// database. Only the members the page reaches are implemented.
+class _FakeRepository implements OfflineMapRepository {
+  _FakeRepository(this.regions);
+  List<CachedRegion> regions;
+
+  @override
+  Future<List<CachedRegion>> getAllRegions() async => regions;
+
+  @override
+  Future<void> deleteRegion(String id) async {
+    regions = regions.where((r) => r.id != id).toList();
+  }
+
+  @override
+  Stream<void> watchRegionsChanges() => const Stream<void>.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} should not be called');
+}
+
+/// A tile cache whose tile removal fails, which is the case the page has to
+/// report rather than silently leave the region in place.
+class _FailingTileCache implements TileCacheService {
+  @override
+  Future<void> deleteRegionTiles(String regionId) async =>
+      throw StateError('store is locked');
+
+  @override
+  Future<Set<String>> getRegionStoreIds() async => {'owns'};
+
+  @override
+  Future<void> pruneOrphanRegionStores({
+    required Set<String> knownRegionIds,
+  }) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} should not be called');
+}
+
+void main() {
+  Future<void> pumpPage(
+    WidgetTester tester, {
+    required List<CachedRegion> regions,
+    required Set<String> regionStoreIds,
+  }) async {
+    final base = await getBaseOverrides();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          cachedRegionsProvider.overrideWith((ref) async => regions),
+          regionStoreIdsProvider.overrideWith((ref) async => regionStoreIds),
+          cacheStatsProvider.overrideWith(
+            (ref) async => const CacheStats(
+              tileCount: 900,
+              sizeKiB: 8000,
+              hits: 10,
+              misses: 2,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: OfflineMapsPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+  }
+
+  testWidgets('a region that owns its tiles shows its measured size', (
+    tester,
+  ) async {
+    await pumpPage(
+      tester,
+      regions: [_region(id: 'owns', name: 'Cozumel')],
+      regionStoreIds: {'owns'},
+    );
+
+    expect(find.textContaining('17.6 MB'), findsWidgets);
+  });
+
+  testWidgets('a region whose size was never measured says so', (tester) async {
+    // Issue #1403: the stored size is a flat 20 KiB per tile that has never
+    // read the store, so rendering it as a byte figure is a fabrication that
+    // looks authoritative.
+    await pumpPage(
+      tester,
+      regions: [_region(id: 'legacy', name: 'Bonaire')],
+      regionStoreIds: const {},
+    );
+
+    expect(find.textContaining('17.6 MB'), findsNothing);
+    expect(find.textContaining('Unknown'), findsWidgets);
+  });
+
+  testWidgets('the delete prompt does not promise bytes it cannot free', (
+    tester,
+  ) async {
+    await pumpPage(
+      tester,
+      regions: [_region(id: 'legacy', name: 'Bonaire')],
+      regionStoreIds: const {},
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.textContaining('will not reclaim storage'), findsOneWidget);
+    expect(find.textContaining('free up'), findsNothing);
+  });
+
+  testWidgets('a delete that could not free the tiles says so', (tester) async {
+    // The region stays in the list on purpose, so the bytes stay reachable.
+    // Without a message that reads as the delete button doing nothing, which
+    // is the failure mode this whole issue is about.
+    final base = await getBaseOverrides();
+    final repository = _FakeRepository([_region(id: 'owns', name: 'Cozumel')]);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          offlineMapRepositoryProvider.overrideWithValue(repository),
+          tileCacheServiceProvider.overrideWithValue(_FailingTileCache()),
+          cacheStatsProvider.overrideWith(
+            (ref) async => const CacheStats(
+              tileCount: 900,
+              sizeKiB: 8000,
+              hits: 10,
+              misses: 2,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: OfflineMapsPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    await tester.pump();
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('store is locked'), findsOneWidget);
+    expect(repository.regions, hasLength(1));
+  });
+}

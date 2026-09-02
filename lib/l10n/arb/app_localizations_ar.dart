@@ -22390,6 +22390,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'حذف \"$name\"؟\n\nتم تنزيل هذه المنطقة بإصدار سابق، لذا تُخزَّن بلاطاتها مع بلاطات مناطق أخرى ولا يمكن تحريرها بمفردها. لن يؤدي حذفها إلى استعادة مساحة تخزين.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22480,6 +22485,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'الحجم';
+
+  @override
+  String get maps_offline_sizeUnknown => 'غير معروف';
 
   @override
   String get maps_offline_tiles => 'البلاطات';

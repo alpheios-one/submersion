@@ -14620,6 +14620,14 @@
       }
     }
   },
+  "maps_offline_deleteRegionLegacyMessage": "Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions' and cannot be freed on their own. Deleting it will not reclaim storage.",
+  "@maps_offline_deleteRegionLegacyMessage": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "maps_offline_deleteRegionMessage": "Delete \"{name}\" and its {count} cached tiles?\n\nThis will free up {size} of storage.",
   "@maps_offline_deleteRegionMessage": {
     "placeholders": {
@@ -14734,6 +14742,7 @@
     }
   },
   "maps_offline_size": "Size",
+  "maps_offline_sizeUnknown": "Unknown",
   "maps_offline_tiles": "Tiles",
   "maps_offline_tilesPerSecond": "{rate} tiles/sec",
   "@maps_offline_tilesPerSecond": {

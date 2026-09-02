@@ -37532,6 +37532,12 @@ abstract class AppLocalizations {
   /// **'Delete {name} region'**
   String maps_offline_deleteRegion(Object name);
 
+  /// No description provided for @maps_offline_deleteRegionLegacyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.'**
+  String maps_offline_deleteRegionLegacyMessage(Object name);
+
   /// No description provided for @maps_offline_deleteRegionMessage.
   ///
   /// In en, this message translates to:
@@ -37658,6 +37664,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Size'**
   String get maps_offline_size;
+
+  /// No description provided for @maps_offline_sizeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get maps_offline_sizeUnknown;
 
   /// No description provided for @maps_offline_tiles.
   ///
