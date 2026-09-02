@@ -20,6 +20,7 @@ class BlenderMixRow extends StatelessWidget {
     required this.onMix,
     required this.pressureSymbol,
     this.onSave,
+    this.errorText,
   });
 
   static const double _stackBelow = 420;
@@ -36,6 +37,11 @@ class BlenderMixRow extends StatelessWidget {
   /// same debounce every other persisted blender field uses. Null when the
   /// row's values are not persisted.
   final VoidCallback? onSave;
+
+  /// Shown under both the O2 and He fields when set. The two fractions are
+  /// only ever invalid together (negative, or summing past 100%), so there is
+  /// no single field to pin the message to.
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +128,7 @@ class BlenderMixRow extends StatelessWidget {
       inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
       decoration: InputDecoration(
         labelText: label,
+        errorText: errorText,
         isDense: true,
         border: const OutlineInputBorder(),
       ),

@@ -85,22 +85,6 @@ Future<WidgetRef> _pump(
 }
 
 void main() {
-  testWidgets('the "Cost" heading sits level with the link beside it', (
-    tester,
-  ) async {
-    // Review point 6 on PR #1359: the heading read a few pixels high against
-    // the link on its right. BlenderSectionTitle carries its own bottom
-    // padding for the column it usually heads, and inside a centre-aligned
-    // Wrap that padding counts as part of the child, pushing the text up by
-    // half of it while the button beside it centres properly.
-    await _pump(tester);
-    final heading = tester.getCenter(find.text('Cost')).dy;
-    final link = tester
-        .getCenter(find.byKey(const Key('blender-cylinder-sizes-link')))
-        .dy;
-    expect(heading, closeTo(link, 1.0));
-  });
-
   // The arithmetic itself is pinned to the cent against both worked examples
   // in blend_billing_test.dart. What matters here is that the card is wired to
   // the real cylinder volume and prices, which proportionality demonstrates
@@ -195,50 +179,56 @@ void main() {
     expect(ref.read(blenderCylinderLitersProvider), closeTo(24, 0.01));
   });
 
-  testWidgets('the cylinder-sizes link navigates to the global tank presets', (
-    tester,
-  ) async {
-    late String location;
-    final router = GoRouter(
-      initialLocation: '/gas-calculators',
-      routes: [
-        GoRoute(
-          path: '/gas-calculators',
-          builder: (context, state) => const Scaffold(
-            body: SingleChildScrollView(child: BlenderBillingCard()),
-          ),
-        ),
-        GoRoute(
-          path: '/tank-presets',
-          builder: (context, state) {
-            location = GoRouterState.of(context).uri.toString();
-            return const Scaffold(body: Text('Tank Presets'));
-          },
-        ),
-      ],
-    );
-
-    await tester.pumpWidget(
-      testAppRouter(
-        locale: const Locale('en'),
-        router: router,
-        overrides: [
-          settingsProvider.overrideWith(
-            (ref) => _TestSettingsNotifier(
-              const AppSettings(defaultCurrency: 'CHF'),
+  testWidgets(
+    'the cylinder-sizes link, last in the presets dropdown, navigates to '
+    'the global tank presets',
+    (tester) async {
+      // Issue #1335 follow-up review: moved from its own header button into
+      // the dropdown it manages, as the last entry.
+      late String location;
+      final router = GoRouter(
+        initialLocation: '/gas-calculators',
+        routes: [
+          GoRoute(
+            path: '/gas-calculators',
+            builder: (context, state) => const Scaffold(
+              body: SingleChildScrollView(child: BlenderBillingCard()),
             ),
           ),
-          tankPresetsProvider.overrideWith((ref) async => _presets()),
+          GoRoute(
+            path: '/tank-presets',
+            builder: (context, state) {
+              location = GoRouterState.of(context).uri.toString();
+              return const Scaffold(body: Text('Tank Presets'));
+            },
+          ),
         ],
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
 
-    await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        testAppRouter(
+          locale: const Locale('en'),
+          router: router,
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => _TestSettingsNotifier(
+                const AppSettings(defaultCurrency: 'CHF'),
+              ),
+            ),
+            tankPresetsProvider.overrideWith((ref) async => _presets()),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(location, '/tank-presets');
-  });
+      await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
+      await tester.pumpAndSettle();
+
+      expect(location, '/tank-presets');
+    },
+  );
 
   testWidgets('submitting a typed cylinder volume saves the preferences', (
     tester,

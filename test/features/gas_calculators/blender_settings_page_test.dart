@@ -168,11 +168,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // The billing card sits below the fold on the default test surface, so
-      // its link has to be scrolled into view before it can be tapped, same
-      // as a diver would need to scroll down to reach it.
+      // its dropdown has to be scrolled into view before it can be opened,
+      // same as a diver would need to scroll down to reach it.
       await tester.ensureVisible(
-        find.byKey(const Key('blender-cylinder-sizes-link')),
+        find.byKey(const Key('blender-cylinder-presets')),
       );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('blender-cylinder-presets')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('blender-cylinder-sizes-link')));
       await tester.pumpAndSettle();

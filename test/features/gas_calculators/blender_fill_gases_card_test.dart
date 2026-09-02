@@ -70,4 +70,47 @@ void main() {
     expect(ref.read(blenderFillGas1Provider).o2, closeTo(95, 0.001));
     expect(repo.blenderPreferences?.fillGas1.o2, closeTo(95, 0.001));
   });
+
+  testWidgets(
+    'fill-gas rows are labelled by the computed gas name, not a number',
+    (tester) async {
+      // PR #1359 review point 1: "1./2./3." told a diver nothing about what
+      // each bank actually holds. The defaults are O2, helium, then air.
+      await _pump(tester);
+
+      expect(find.text('O₂'), findsOneWidget);
+      expect(find.text('Helium'), findsOneWidget);
+      expect(find.text('Air'), findsOneWidget);
+      expect(find.text('1.'), findsNothing);
+    },
+  );
+
+  testWidgets('a fill-gas label updates as its O2/He fields change', (
+    tester,
+  ) async {
+    await _pump(tester);
+
+    await tester.enterText(find.byType(TextField).first, '32');
+    await tester.pumpAndSettle();
+
+    expect(find.text('EAN32'), findsOneWidget);
+    expect(find.text('O₂'), findsNothing);
+  });
+
+  testWidgets('an invalid fill-gas mix is flagged inline on the row', (
+    tester,
+  ) async {
+    // PR #1359 review point 2: computeBlend throws the same
+    // BlendError.invalidMix, but until now that only surfaced back on the
+    // calculator page -- a navigation away from the field that caused it.
+    await _pump(tester);
+
+    final heFields = find.byWidgetPredicate(
+      (w) => w is TextField && (w.decoration?.labelText ?? '').startsWith('He'),
+    );
+    await tester.enterText(heFields.first, '150');
+    await tester.pumpAndSettle();
+
+    expect(find.text("A gas mix's O₂ + He cannot exceed 100%."), findsWidgets);
+  });
 }

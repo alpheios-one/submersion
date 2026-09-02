@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_field_parsing.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_mix_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -29,6 +31,10 @@ class BlenderFillGasesCard extends ConsumerWidget {
       blenderFillGas2Provider,
       blenderFillGas3Provider,
     ];
+    // Watched, not read: the row's leading label names the gas the bank
+    // currently holds, so it has to rebuild the moment O2 or He changes
+    // rather than only on the next mix/save.
+    final gases = [for (final p in providers) ref.watch(p)];
 
     return Card(
       child: Padding(
@@ -41,7 +47,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
               if (i > 0) const SizedBox(height: 12),
               BlenderMixRow(
                 pressureSymbol: units.pressureSymbol,
-                leading: '${i + 1}.',
+                leading: formatPreciseGasName(context, gases[i]),
                 o2Controller: o2Controllers[i],
                 heController: heControllers[i],
                 // A blank box keeps the value it had. See mixPercentOrKeep.
@@ -53,6 +59,12 @@ class BlenderFillGasesCard extends ConsumerWidget {
                   );
                 },
                 onSave: () => saveBlenderPreferences(ref),
+                // Surfaced here rather than only back on the calculator page:
+                // computeBlend throws the same BlendError.invalidMix, but that
+                // card is a navigation away from the field that caused it.
+                errorText: isValidGasMix(gases[i])
+                    ? null
+                    : context.l10n.gasCalculators_blender_error_invalidMix,
               ),
             ],
           ],

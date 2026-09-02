@@ -21,10 +21,21 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// cylinder-size vault, so renaming or deleting a size under Settings ->
 /// Manage -> Tank Presets is renaming or deleting it here too.
 class _CylinderChoice {
-  const _CylinderChoice({required this.label, required this.liters});
+  const _CylinderChoice({required this.label, required this.liters})
+    : isManageLink = false;
+
+  /// The "manage cylinder sizes" entry appended after the presets: a marker
+  /// rather than a null value, because [PopupMenuButton] reads a null
+  /// selection as "dismissed without choosing" and never calls [onSelected]
+  /// for it.
+  const _CylinderChoice.manageLink()
+    : label = '',
+      liters = 0,
+      isManageLink = true;
 
   final String label;
   final double liters;
+  final bool isManageLink;
 }
 
 /// What the blend costs at the fill station's prices.
@@ -72,35 +83,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // A Wrap rather than a Row: the heading and the link together
-            // are a few pixels too wide for the narrowest phone, and dropping
-            // the link to its own line reads better than truncating it.
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                // No bottom padding: it would be counted into this child's
-                // height and leave the heading riding above the link it is
-                // centred against.
-                BlenderSectionTitle(
-                  context.l10n.gasCalculators_blender_billing,
-                  bottomPadding: 0,
-                ),
-                // Opens the global tank presets this card's dropdown
-                // reads (issue #1335 follow-up: the blender no longer
-                // keeps its own cylinder-size vault, so this jumps
-                // straight to Settings -> Manage -> Tank Presets).
-                TextButton.icon(
-                  key: const Key('blender-cylinder-sizes-link'),
-                  onPressed: () => context.push('/tank-presets'),
-                  icon: const Icon(Icons.straighten, size: 18),
-                  label: Text(
-                    context.l10n.gasCalculators_blender_manageCylinderSizes,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+            BlenderSectionTitle(context.l10n.gasCalculators_blender_billing),
             _cylinderRow(context, settings, units),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
@@ -236,8 +219,35 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                     value: choice,
                     child: Text(choice.label),
                   ),
+                if (choices.isNotEmpty) const PopupMenuDivider(),
+                // Last, directly under the list it manages (issue #1335
+                // follow-up review): opens the global tank presets this
+                // dropdown reads, since the blender no longer keeps its own
+                // cylinder-size vault.
+                PopupMenuItem<_CylinderChoice>(
+                  key: const Key('blender-cylinder-sizes-link'),
+                  value: const _CylinderChoice.manageLink(),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.straighten, size: 18),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          context
+                              .l10n
+                              .gasCalculators_blender_manageCylinderSizes,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
               onSelected: (choice) {
+                if (choice.isManageLink) {
+                  context.push('/tank-presets');
+                  return;
+                }
                 ref.read(blenderCylinderLitersProvider.notifier).state =
                     choice.liters;
                 _cylinder.text = formatRoundedForInput(
