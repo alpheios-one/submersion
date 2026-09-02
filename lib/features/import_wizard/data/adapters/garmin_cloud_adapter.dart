@@ -15,6 +15,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_computer_rep
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
+import 'package:submersion/features/import_wizard/data/adapters/cloud_computer_identity.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_cancellation_token.dart';
@@ -407,11 +408,10 @@ class GarminCloudAdapter implements ImportSourceAdapter {
     }
   }
 
-  String _computerCacheKey(GarminParsedDive parsed) {
-    final serial = parsed.serialNumber?.trim();
-    if (serial != null && serial.isNotEmpty) return serial;
-    return parsed.deviceModel?.trim() ?? 'Garmin';
-  }
+  String _computerCacheKey(GarminParsedDive parsed) =>
+      normalizedIdentityPart(parsed.serialNumber) ??
+      normalizedIdentityPart(parsed.deviceModel) ??
+      'Garmin';
 
   DiveComputer? _computerFor(GarminParsedDive parsed) =>
       _computersByKey[_computerCacheKey(parsed)];
@@ -425,10 +425,10 @@ class GarminCloudAdapter implements ImportSourceAdapter {
     final cached = _computersByKey[cacheKey];
     if (cached != null) return cached;
 
-    final model = parsed.deviceModel?.trim() ?? 'Garmin';
-    final serial = parsed.serialNumber?.trim();
+    final model = normalizedIdentityPart(parsed.deviceModel) ?? 'Garmin';
+    final serial = normalizedIdentityPart(parsed.serialNumber);
 
-    if (serial != null && serial.isNotEmpty) {
+    if (serial != null) {
       final existing = await _computerRepository.findByHardwareIdentity(
         manufacturer: 'Garmin',
         model: model,
@@ -450,7 +450,7 @@ class GarminCloudAdapter implements ImportSourceAdapter {
         model: model,
       ).copyWith(
         serialNumber: serial,
-        firmwareVersion: parsed.firmwareVersion,
+        firmwareVersion: normalizedIdentityPart(parsed.firmwareVersion),
         connectionType: 'cloud',
       ),
     );

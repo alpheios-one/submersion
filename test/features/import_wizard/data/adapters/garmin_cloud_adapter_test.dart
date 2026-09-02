@@ -31,6 +31,7 @@ GarminParsedDive makeParsedDive({
   double maxDepth = 18.5,
   String? deviceModel = 'Descent Mk2',
   String? serialNumber = 'SN-1',
+  String? firmwareVersion,
 }) {
   return GarminParsedDive(
     dive: DownloadedDive(
@@ -41,6 +42,7 @@ GarminParsedDive makeParsedDive({
     ),
     deviceModel: deviceModel,
     serialNumber: serialNumber,
+    firmwareVersion: firmwareVersion,
   );
 }
 
@@ -207,6 +209,47 @@ void main() {
         await adapter.buildBundle();
 
         verifyNever(mockComputerRepo.createComputer(any));
+      },
+    );
+
+    test('falls back to Garmin when the model is present but blank', () async {
+      adapter.setParsedDives([
+        makeParsedDive(deviceModel: '   ', serialNumber: null),
+      ]);
+
+      await adapter.buildBundle();
+
+      // A blank model is the same thing as a missing one, but `?.trim()`
+      // yields '' rather than null, so a plain `?? 'Garmin'` never fires and
+      // the computer is registered with an empty name.
+      final created =
+          verify(mockComputerRepo.createComputer(captureAny)).captured.single
+              as DiveComputer;
+      expect(created.name, 'Garmin');
+      expect(created.model, 'Garmin');
+    });
+
+    test(
+      'stores a blank serial and firmware as null rather than \'\'',
+      () async {
+        adapter.setParsedDives([
+          makeParsedDive(
+            deviceModel: 'Descent Mk2',
+            serialNumber: '',
+            firmwareVersion: '   ',
+          ),
+        ]);
+
+        await adapter.buildBundle();
+
+        // Matches how DiveComputerRepository.findOrRegisterImportedComputer
+        // stores an imported computer, so a cloud import and a file import of
+        // the same device do not end up as two differently-shaped rows.
+        final created =
+            verify(mockComputerRepo.createComputer(captureAny)).captured.single
+                as DiveComputer;
+        expect(created.serialNumber, isNull);
+        expect(created.firmwareVersion, isNull);
       },
     );
   });
