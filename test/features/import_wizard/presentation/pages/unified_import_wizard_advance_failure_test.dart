@@ -90,6 +90,10 @@ class _FailingStepAdapter implements ImportSourceAdapter {
 
 Widget _wizard(ImportSourceAdapter adapter) => ProviderScope(
   child: MaterialApp(
+    // flutter_test forwards the host machine's locale list rather than a fixed
+    // en_US, and the app ships 11 locales, so an unpinned MaterialApp renders
+    // translated on a non-English machine and every assertion below misses.
+    locale: const Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: UnifiedImportWizard(adapter: adapter),
