@@ -16,6 +16,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/pump_until.dart';
 import '../../../../helpers/test_app.dart';
 
 /// The table-mode side panel hosts the same chart as the detail page and
@@ -112,13 +113,13 @@ void main() {
 
       diveGate = Completer<void>();
       container.invalidate(diveProvider(diveId));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
-
-      expect(
-        container.read(estimatedTankPressuresProvider(diveId)).isReloading,
-        isTrue,
-        reason: 'precondition: the estimate must be mid-reload',
+      // Pump until the reload window is actually open rather than assuming
+      // a frame count; the gate holds it open until this test closes it.
+      await pumpUntil(
+        tester,
+        () =>
+            container.read(estimatedTankPressuresProvider(diveId)).isReloading,
+        reason: 'the estimate must be mid-reload',
       );
       expect(
         chart(tester).estimatedTankIds,
@@ -158,13 +159,12 @@ void main() {
 
     analysisGate = Completer<ProfileAnalysis?>();
     container.read(trigger.notifier).state = 1;
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-
-    expect(
-      container.read(profileAnalysisProvider(diveId)).isReloading,
-      isTrue,
-      reason: 'precondition: the analysis must be mid-reload',
+    // Pump until the reload window is actually open rather than assuming
+    // a frame count; the gate holds it open until this test closes it.
+    await pumpUntil(
+      tester,
+      () => container.read(profileAnalysisProvider(diveId)).isReloading,
+      reason: 'the analysis must be mid-reload',
     );
     expect(
       chart(tester).ceilingCurve,

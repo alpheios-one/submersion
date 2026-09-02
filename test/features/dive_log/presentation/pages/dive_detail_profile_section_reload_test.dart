@@ -16,6 +16,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_c
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/pump_until.dart';
 
 /// Regression cover for the one-time profile chart flash on first open.
 ///
@@ -129,13 +130,13 @@ void main() {
       // estimatedTankPressuresProvider reloads.
       diveGate = Completer<void>();
       container.invalidate(diveProvider(dive.id));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 50));
-
-      expect(
-        container.read(estimatedTankPressuresProvider(dive.id)).isReloading,
-        isTrue,
-        reason: 'precondition: the estimate must be mid-reload',
+      // Pump until the reload window is actually open rather than assuming
+      // a frame count; the gate holds it open until this test closes it.
+      await pumpUntil(
+        tester,
+        () =>
+            container.read(estimatedTankPressuresProvider(dive.id)).isReloading,
+        reason: 'the estimate must be mid-reload',
       );
       expect(
         chart(tester).estimatedTankIds,
@@ -178,17 +179,16 @@ void main() {
 
     analysisGate = Completer<ProfileAnalysis?>();
     container.read(trigger.notifier).state = 1;
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-
-    expect(
-      container
+    // Pump until the reload window is actually open rather than assuming
+    // a frame count; the gate holds it open until this test closes it.
+    await pumpUntil(
+      tester,
+      () => container
           .read(
             sourceProfileAnalysisProvider((diveId: dive.id, sourceId: null)),
           )
           .isReloading,
-      isTrue,
-      reason: 'precondition: the analysis must be mid-reload',
+      reason: 'the analysis must be mid-reload',
     );
     expect(
       chart(tester).ceilingCurve,
