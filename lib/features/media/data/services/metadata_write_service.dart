@@ -150,13 +150,14 @@ class MetadataWriteService {
   static const _channel = MethodChannel('com.submersion.app/metadata');
   final _log = LoggerService.forClass(MetadataWriteService);
 
-  /// Write dive metadata to a photo or video in the device library.
+  /// Write dive metadata to a photo in the device library.
   ///
   /// [platformAssetId] - The platform-specific asset identifier.
   /// [metadata] - The dive metadata to write.
-  /// [isVideo] - Whether the asset is a video. Videos are refused here, and
-  ///             the flag still travels to the native side so it refuses a
-  ///             mislabelled asset too.
+  /// [isVideo] - Whether the asset is a video. Videos are refused here, before
+  ///             the platform channel. The flag still travels to the native
+  ///             side, which additionally checks the media type the library
+  ///             itself reports, so an asset mislabelled here is refused too.
   ///
   /// Returns true if successful.
   /// Throws [MetadataWriteException] with a user-friendly message on failure.

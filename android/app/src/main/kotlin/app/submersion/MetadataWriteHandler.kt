@@ -69,8 +69,8 @@ class MetadataWriteHandler(
             // A video cannot be edited in place. The old path remuxed a copy,
             // inserted a new MediaStore entry and deleted the original, which
             // Submersion must never do (issue #1472). Refuse instead; the UI
-            // does not offer the action for a video, so this only catches a
-            // mislabelled asset.
+            // does not offer the action for a video, so this is reached only
+            // by a mislabelled asset.
             if (isVideo) {
                 result.error("VIDEO_UNSUPPORTED", "Writing metadata to a video is not supported.", null)
                 return
@@ -78,6 +78,22 @@ class MetadataWriteHandler(
 
             val contentUri =
                 ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
+
+            // Trust MediaStore over the caller. writePhotoMetadata opens the
+            // asset "rw" and hands the descriptor to ExifInterface, so a video
+            // that reached it would be written into. Proceed only for
+            // something MediaStore itself calls an image.
+            val mimeType = appContext.contentResolver.getType(contentUri)
+            if (mimeType == null) {
+                result.error("ASSET_NOT_FOUND", "Photo not found with ID: $assetId", null)
+                return
+            }
+            if (!mimeType.startsWith("image/")) {
+                val code =
+                    if (mimeType.startsWith("video/")) "VIDEO_UNSUPPORTED" else "UNSUPPORTED_FORMAT"
+                result.error(code, "Writing metadata to $mimeType is not supported.", null)
+                return
+            }
 
             writePhotoMetadata(contentUri, metadata, description, result)
         } catch (e: Exception) {

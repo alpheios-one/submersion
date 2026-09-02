@@ -81,12 +81,14 @@ class MetadataWriteHandler: NSObject {
             return
         }
 
-        if isVideo {
+        // Trust the library over the caller: a video mislabelled as a photo
+        // would otherwise fall through to the photo path.
+        if isVideo || asset.mediaType == .video {
             // A video cannot be edited in place. The old path exported a copy,
             // created a new asset and deleted the original, which Submersion
             // must never do (issue #1472). Refuse instead; the UI does not
-            // offer the action for a video, so this only catches a mislabelled
-            // asset.
+            // offer the action for a video, so this is reached only by a
+            // mislabelled asset.
             print("[MetadataWriteHandler] Asset is a video; metadata writing is not supported")
             result(FlutterError(
                 code: "VIDEO_UNSUPPORTED",
