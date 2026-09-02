@@ -4722,6 +4722,8 @@
   "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "Gerät {shortId}",
   "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
   "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " und ",
+  "settings_cloudSync_peerReadFailed_banner": "Änderungen von {deviceList} konnten bei der letzten Synchronisierung nicht gelesen werden und wurden daher nicht zusammengeführt. Die nächste Synchronisierung versucht es automatisch erneut.",
+  "settings_cloudSync_peerReadFailed_bannerPlural": "Änderungen von {deviceList} konnten bei der letzten Synchronisierung nicht gelesen werden und wurden daher nicht zusammengeführt. Die nächste Synchronisierung versucht es automatisch erneut.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} synchronisiert von einer neueren Version von Submersion, daher werden die neuesten Änderungen vorerst zurückgehalten.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} synchronisieren von einer neueren Version von Submersion, daher werden ihre neuesten Änderungen vorerst zurückgehalten.",
   "settings_cloudSync_peerRequiresUpdate_updateAction": "Aktualisieren Sie dieses Gerät, um sie zu erhalten.",

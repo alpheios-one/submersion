@@ -15589,6 +15589,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'تعذرت قراءة تغييرات $deviceList أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'تعذرت قراءة تغييرات $deviceList أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList يزامن من إصدار أحدث من Submersion، لذا يتم تعليق أحدث تغييراته مؤقتًا.';
   }

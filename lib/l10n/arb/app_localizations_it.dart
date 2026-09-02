@@ -15871,6 +15871,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' e ';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Le modifiche di $deviceList non sono state lette durante l\'ultima sincronizzazione, quindi non sono state unite. La prossima sincronizzazione riproverà automaticamente.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Le modifiche di $deviceList non sono state lette durante l\'ultima sincronizzazione, quindi non sono state unite. La prossima sincronizzazione riproverà automaticamente.';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList si sincronizza da una versione più recente di Submersion, quindi le sue ultime modifiche sono per ora trattenute.';
   }

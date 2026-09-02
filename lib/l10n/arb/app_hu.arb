@@ -4649,6 +4649,8 @@
   "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "{shortId} eszköz",
   "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
   "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " és ",
+  "settings_cloudSync_peerReadFailed_banner": "A(z) {deviceList} változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.",
+  "settings_cloudSync_peerReadFailed_bannerPlural": "A(z) {deviceList} változásait nem sikerült beolvasni a legutóbbi szinkronizálás során, ezért nem lettek egyesítve. A következő szinkronizálás automatikusan újrapróbálja.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamed": "{deviceList} a Submersion újabb verziójából szinkronizál, ezért a legújabb változtatásai egyelőre visszatartva maradnak.",
   "settings_cloudSync_peerRequiresUpdate_bannerNamedPlural": "{deviceList} a Submersion újabb verziójából szinkronizálnak, ezért a legújabb változtatásaik egyelőre visszatartva maradnak.",
   "settings_cloudSync_peerRequiresUpdate_updateAction": "Frissítsd ezt az eszközt, hogy megkapd őket.",

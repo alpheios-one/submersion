@@ -26280,6 +26280,18 @@ abstract class AppLocalizations {
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
+  /// No description provided for @settings_cloudSync_peerReadFailed_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList);
+
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
   /// In en, this message translates to:
