@@ -50,6 +50,9 @@ class _FakeTileCache implements TileCacheService {
     bool skipExistingTiles = true,
   }) async {
     calls.add('download:$regionId');
+    // Mirrors the service, which tears down any running download before
+    // starting the next one, closing the stream its caller is still awaiting.
+    if (downloadStarted) await cancelDownload();
     final gate = setupGate;
     if (gate != null) await gate.future;
     final error = downloadError;
@@ -349,8 +352,6 @@ void main() {
       );
       await Future<void>.delayed(Duration.zero);
 
-      // The service closes the first download's stream when the next starts.
-      unawaited(cache.progress.close());
       cache.measuredBytes = 2 * 1024 * 1024;
       await downloadOneRegion(tiles: 25);
       await first;

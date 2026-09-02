@@ -477,11 +477,14 @@ class TileCacheService {
     // coverage:ignore-start
     _ensureInitialized();
 
-    // Cancel any existing download
-    if (_activeDownloadId != null) {
-      _downloadControls.cancel(instanceId: _activeDownloadId!);
-      _activeDownloadSubscription?.cancel();
-    }
+    // Cancel any existing download, through the full teardown rather than a
+    // partial one. Cancelling the subscription alone suppresses its onDone,
+    // which is what would have closed the stream the previous caller is still
+    // awaiting: it would wait on it forever, and the region it was downloading
+    // would stay marked in-flight, protecting its store from the sweep for the
+    // life of the process. Awaited so the old download is fully torn down
+    // before this one takes over its bookkeeping.
+    await cancelDownload();
 
     final bounds = LatLngBounds(southWest, northEast);
     final region = RectangleRegion(bounds);
