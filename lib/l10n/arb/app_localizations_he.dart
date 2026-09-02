@@ -15562,10 +15562,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'לא ניתן לפתוח את הדפדפן. נסה את כפתור פתח מחדש את הדפדפן.';
+      'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'קוד הרשאה';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_copyLink => 'העתקת קישור';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
@@ -15579,6 +15582,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       'הדפדפן שלך פתח דף הרשאה של Dropbox. אשר את הגישה, ולאחר מכן הדבק כאן את הקוד שמוצג על ידי Dropbox.';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_linkCopied =>
+      'הקישור הועתק. הדבק אותו בדפדפן שלך כדי לאשר.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>

@@ -15899,11 +15899,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Nem sikerült megnyitni a böngészőt. Próbáld a Böngésző újranyitása gombot.';
+      'Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
       'Engedélyezési kód';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_copyLink => 'Link másolása';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
@@ -15917,6 +15920,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       'A böngésződ megnyitott egy Dropbox engedélyezési oldalt. Engedélyezd a hozzáférést, majd illeszd be ide a Dropbox által mutatott kódot.';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_linkCopied =>
+      'Link másolva. Illeszd be a böngésződbe az engedélyezéshez.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>

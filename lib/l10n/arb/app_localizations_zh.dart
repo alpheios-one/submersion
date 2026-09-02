@@ -15171,10 +15171,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_browserFailed =>
-      '无法打开浏览器。请尝试“重新打开浏览器”按钮。';
+      '无法打开浏览器。请使用“复制链接”，并将地址粘贴到浏览器中。';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => '授权码';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_copyLink => '复制链接';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode => '输入浏览器中显示的授权码';
@@ -15187,6 +15190,10 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       '浏览器已打开 Dropbox 授权页面。请批准访问权限，然后将 Dropbox 显示的代码粘贴到此处。';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_linkCopied =>
+      '链接已复制。请粘贴到浏览器中进行授权。';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser => '重新打开浏览器';

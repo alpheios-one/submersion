@@ -15955,11 +15955,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'No se pudo abrir el navegador. Prueba el botón Reabrir navegador.';
+      'No se pudo abrir el navegador. Usa Copiar enlace y pega la dirección en tu navegador.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
       'Código de autorización';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_copyLink => 'Copiar enlace';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
@@ -15973,6 +15976,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       'Tu navegador abrió una página de autorización de Dropbox. Aprueba el acceso y luego pega aquí el código que te muestra Dropbox.';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_linkCopied =>
+      'Enlace copiado. Pégalo en tu navegador para autorizar.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>

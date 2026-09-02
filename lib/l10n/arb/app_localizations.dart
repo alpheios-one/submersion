@@ -26414,7 +26414,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_cloudSync_dropbox_connect_browserFailed.
   ///
   /// In en, this message translates to:
-  /// **'Could not open your browser. Try the Reopen browser button.'**
+  /// **'Could not open your browser. Use Copy link and paste the address into your browser.'**
   String get settings_cloudSync_dropbox_connect_browserFailed;
 
   /// No description provided for @settings_cloudSync_dropbox_connect_codeLabel.
@@ -26422,6 +26422,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Authorization code'**
   String get settings_cloudSync_dropbox_connect_codeLabel;
+
+  /// No description provided for @settings_cloudSync_dropbox_connect_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_cloudSync_dropbox_connect_copyLink;
 
   /// No description provided for @settings_cloudSync_dropbox_connect_emptyCode.
   ///
@@ -26440,6 +26446,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your browser opened a Dropbox authorization page. Approve access, then paste the code Dropbox shows you here.'**
   String get settings_cloudSync_dropbox_connect_instructions;
+
+  /// No description provided for @settings_cloudSync_dropbox_connect_linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied. Paste it into your browser to authorize.'**
+  String get settings_cloudSync_dropbox_connect_linkCopied;
 
   /// No description provided for @settings_cloudSync_dropbox_connect_reopenBrowser.
   ///

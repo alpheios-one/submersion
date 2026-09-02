@@ -15675,10 +15675,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'تعذر فتح المتصفح. جرب زر إعادة فتح المتصفح.';
+      'تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'رمز التفويض';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_copyLink => 'نسخ الرابط';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
@@ -15692,6 +15695,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       'فتح متصفحك صفحة تفويض من Dropbox. وافق على الوصول، ثم الصق هنا الرمز الذي يعرضه Dropbox.';
+
+  @override
+  String get settings_cloudSync_dropbox_connect_linkCopied =>
+      'تم نسخ الرابط. الصقه في متصفحك للتفويض.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>
