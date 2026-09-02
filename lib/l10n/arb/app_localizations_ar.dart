@@ -12262,6 +12262,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'الإجمالي';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => 'أرشيف الفواتير';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'تصفية حسب التاريخ';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'لا توجد فواتير مدفوعة بعد.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'لا توجد فواتير ضمن هذا النطاق الزمني.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count تعبئات';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'غير مكتمل';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'بدون عنوان';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'الفاتورة غير موجودة.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

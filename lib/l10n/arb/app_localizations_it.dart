@@ -12488,6 +12488,35 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'Totale';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => 'Archivio fatture';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filtra per data';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Nessuna fattura pagata finora.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Nessuna fattura in questo periodo.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count ricariche';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incompleto';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Senza titolo';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Fattura non trovata.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

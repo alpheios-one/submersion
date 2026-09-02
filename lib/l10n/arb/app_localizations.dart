@@ -21146,6 +21146,54 @@ abstract class AppLocalizations {
   /// **'Total'**
   String get gasCalculators_blender_billedTotal;
 
+  /// No description provided for @gasCalculators_blender_invoiceArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice archive'**
+  String get gasCalculators_blender_invoiceArchive;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by date'**
+  String get gasCalculators_blender_invoiceArchiveFilter;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No paid invoices yet.'**
+  String get gasCalculators_blender_invoiceArchiveEmpty;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices in this date range.'**
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveFillCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} fills'**
+  String gasCalculators_blender_invoiceArchiveFillCount(int count);
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete'**
+  String get gasCalculators_blender_invoiceArchiveIncomplete;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled'**
+  String get gasCalculators_blender_invoiceArchiveUntitled;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice not found.'**
+  String get gasCalculators_blender_invoiceArchiveNotFound;
+
   /// No description provided for @gasCalculators_tab_mod.
   ///
   /// In en, this message translates to:

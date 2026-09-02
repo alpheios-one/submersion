@@ -12473,6 +12473,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'Gesamt';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => 'Rechnungsarchiv';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter =>
+      'Nach Datum filtern';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Noch keine bezahlten Rechnungen.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Keine Rechnungen in diesem Zeitraum.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count Füllungen';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Unvollständig';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Ohne Titel';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Rechnung nicht gefunden.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

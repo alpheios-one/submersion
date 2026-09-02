@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -92,6 +93,47 @@ final blenderBilledDateProvider = StateProvider<DateTime>(
 final blenderArchivedInvoicesProvider = StateProvider<List<ArchivedInvoice>>(
   (ref) => const [],
 );
+
+/// The date range narrowing the invoice archive view. Ephemeral by design,
+/// matching [preDiveSessionFilterProvider]: a filter is a view of the current
+/// screen, not a stored preference, so it resets the next time the archive
+/// is opened rather than persisting across sessions.
+final blenderInvoiceArchiveFilterProvider = StateProvider<DateTimeRange?>(
+  (ref) => null,
+);
+
+/// Archived invoices matching [blenderInvoiceArchiveFilterProvider], newest
+/// first so a fill station checking "what did I just charge" does not have to
+/// scroll past months of history.
+final filteredBlenderArchivedInvoicesProvider = Provider<List<ArchivedInvoice>>(
+  (ref) {
+    final invoices = ref.watch(blenderArchivedInvoicesProvider);
+    final range = ref.watch(blenderInvoiceArchiveFilterProvider);
+    final filtered = range == null
+        ? invoices
+        : invoices
+              .where((invoice) => _inDateRange(invoice.date, range))
+              .toList();
+    return filtered.reversed.toList();
+  },
+);
+
+/// Whether [date] falls within [range], inclusive of the whole end day: the
+/// picker yields whole days, so an invoice paid at 23:30 on the last selected
+/// day must still match.
+bool _inDateRange(DateTime date, DateTimeRange range) {
+  final startOfFirstDay = DateTime(
+    range.start.year,
+    range.start.month,
+    range.start.day,
+  );
+  final endOfLastDay = DateTime(
+    range.end.year,
+    range.end.month,
+    range.end.day,
+  ).add(const Duration(days: 1));
+  return !date.isBefore(startOfFirstDay) && date.isBefore(endOfLastDay);
+}
 
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);

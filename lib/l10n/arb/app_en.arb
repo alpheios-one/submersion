@@ -7062,6 +7062,21 @@
   "gasCalculators_blender_fillAdded": "{mix} added to the bill",
   "gasCalculators_blender_billedIncomplete": "One or more lines have no price, so this total is incomplete.",
   "gasCalculators_blender_billedTotal": "Total",
+  "gasCalculators_blender_invoiceArchive": "Invoice archive",
+  "gasCalculators_blender_invoiceArchiveFilter": "Filter by date",
+  "gasCalculators_blender_invoiceArchiveEmpty": "No paid invoices yet.",
+  "gasCalculators_blender_invoiceArchiveEmptyFiltered": "No invoices in this date range.",
+  "gasCalculators_blender_invoiceArchiveFillCount": "{count} fills",
+  "gasCalculators_blender_invoiceArchiveIncomplete": "Incomplete",
+  "gasCalculators_blender_invoiceArchiveUntitled": "Untitled",
+  "gasCalculators_blender_invoiceArchiveNotFound": "Invoice not found.",
+  "@gasCalculators_blender_invoiceArchiveFillCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@gasCalculators_blender_billedDate": {
     "placeholders": {
       "date": {

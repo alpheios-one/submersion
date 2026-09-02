@@ -170,6 +170,36 @@ void main() {
       expect(decoded.billedDate, isNull);
     });
 
+    test('an archived invoice keeps its currency snapshot through JSON, and '
+        'an older one without it decodes to null rather than a made-up '
+        'code', () {
+      final withCurrency = ArchivedInvoice.fromJson(
+        jsonDecode(
+              jsonEncode(
+                ArchivedInvoice(
+                  id: 'a',
+                  date: DateTime(2026, 3, 5),
+                  billedTo: 'Ada',
+                  fills: const [],
+                  total: 35,
+                  currencyCode: 'CHF',
+                ).toJson(),
+              ),
+            )
+            as Map<String, dynamic>,
+      )!;
+      expect(withCurrency.currencyCode, 'CHF');
+
+      final withoutCurrency = ArchivedInvoice.fromJson({
+        'id': 'b',
+        'date': DateTime(2026, 3, 5).toIso8601String(),
+        'billedTo': 'Ada',
+        'fills': [],
+        'total': 35,
+      })!;
+      expect(withoutCurrency.currencyCode, isNull);
+    });
+
     test('archived invoices are capped, dropping the oldest', () {
       var invoices = <ArchivedInvoice>[];
       for (var i = 0; i < kMaxArchivedInvoices + 5; i++) {
@@ -302,6 +332,10 @@ void main() {
       expect(archived.single.billedTo, 'Ada');
       expect(archived.single.fills.single.label, 'Tx 18/45');
       expect(archived.single.total, 35);
+      // Snapshotted from the currency configured at the moment of paying, so
+      // a later change to the default currency cannot silently relabel an
+      // already-paid total.
+      expect(archived.single.currencyCode, 'CHF');
     });
 
     testWidgets('an unpriced fill flags the total as incomplete', (

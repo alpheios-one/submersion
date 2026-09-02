@@ -12444,6 +12444,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'Összesen';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => 'Számla-archívum';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter =>
+      'Szűrés dátum szerint';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Még nincs kifizetett számla.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Nincs számla ebben az időszakban.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count töltés';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Hiányos';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Névtelen';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'A számla nem található.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

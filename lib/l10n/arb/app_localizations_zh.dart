@@ -11896,6 +11896,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => '合计';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => '账单存档';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => '按日期筛选';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty => '尚无已付款账单。';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered => '此时间段内没有账单。';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count 次充装';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => '不完整';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => '无标题';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound => '未找到该账单。';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

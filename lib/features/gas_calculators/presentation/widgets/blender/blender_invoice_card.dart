@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/utils/currency.dart';
@@ -6,7 +7,9 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billed_line_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_export_sheet.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
@@ -212,6 +215,13 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
             ),
           ),
           IconButton(
+            key: const Key('blender-invoice-archive'),
+            icon: const Icon(Icons.history, size: 20),
+            visualDensity: VisualDensity.compact,
+            tooltip: context.l10n.gasCalculators_blender_invoiceArchive,
+            onPressed: () => context.push(kBlenderInvoiceArchiveRoute),
+          ),
+          IconButton(
             key: const Key('blender-billed-date-edit'),
             icon: const Icon(Icons.edit_calendar_outlined, size: 20),
             visualDensity: VisualDensity.compact,
@@ -409,42 +419,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
           // The itemisation is what makes the total checkable at the counter,
           // so it stays visible rather than hiding behind a disclosure.
           for (final line in fill.lines)
-            Padding(
-              padding: const EdgeInsets.only(left: 16, top: 2),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: Text(line.gas, style: theme.textTheme.bodySmall),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Text(
-                      // Volume when this line has one (every fill saved
-                      // since #1335); pressure-only rows saved before that
-                      // fall back, since their volume was never kept.
-                      line.freeGasLiters != null
-                          ? units.formatVolume(line.freeGasLiters)
-                          : units.formatPressure(
-                              line.addedBar,
-                              decimals: decimals,
-                            ),
-                      style: theme.textTheme.bodySmall,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Text(
-                      line.cost == null
-                          ? ''
-                          : formatMoney(line.cost!, currency),
-                      style: theme.textTheme.bodySmall,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ],
-              ),
+            BlenderBilledLineRow(
+              line: line,
+              currency: currency,
+              units: units,
+              decimals: decimals,
             ),
         ],
       ),
@@ -533,6 +512,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
       billedTo: ref.read(blenderBilledToProvider),
       fills: fills,
       total: total.complete ? total.amount : null,
+      currencyCode: ref.read(blenderCurrencyProvider),
     );
     ref
         .read(blenderArchivedInvoicesProvider.notifier)

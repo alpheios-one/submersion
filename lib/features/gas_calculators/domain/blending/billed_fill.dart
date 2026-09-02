@@ -178,6 +178,7 @@ class ArchivedInvoice {
     required this.billedTo,
     required this.fills,
     required this.total,
+    this.currencyCode,
   });
 
   final String id;
@@ -188,12 +189,21 @@ class ArchivedInvoice {
   /// Null when the bill was paid with an unpriced line still on it.
   final double? total;
 
+  /// The currency [total] was priced in when this bill was paid. Nullable
+  /// because [blenderCurrencyProvider] can drift between two "Pay" actions -
+  /// without a snapshot, an older archived total would silently be read back
+  /// in whatever currency happens to be configured today. A row archived
+  /// before this field existed falls back to the currency configured at
+  /// display time, the best guess available for it.
+  final String? currencyCode;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'date': date.toIso8601String(),
     'billedTo': billedTo,
     'fills': fills.map((f) => f.toJson()).toList(),
     if (total != null) 'total': total,
+    if (currencyCode != null) 'currencyCode': currencyCode,
   };
 
   static ArchivedInvoice? fromJson(Object? json) {
@@ -206,6 +216,7 @@ class ArchivedInvoice {
     final billedTo = json['billedTo'];
     final rawFills = json['fills'];
     final total = json['total'];
+    final currencyCode = json['currencyCode'];
     return ArchivedInvoice(
       id: id,
       date: date,
@@ -214,6 +225,7 @@ class ArchivedInvoice {
           ? rawFills.map(BilledFill.fromJson).whereType<BilledFill>().toList()
           : const [],
       total: total is num ? total.toDouble() : null,
+      currencyCode: currencyCode is String ? currencyCode : null,
     );
   }
 }

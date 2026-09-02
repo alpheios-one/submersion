@@ -12181,6 +12181,35 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_billedTotal => 'סה\"כ';
 
   @override
+  String get gasCalculators_blender_invoiceArchive => 'ארכיון חשבוניות';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'סינון לפי תאריך';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'אין עדיין חשבוניות ששולמו.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'אין חשבוניות בטווח התאריכים הזה.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count מילויים';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'לא שלם';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'ללא כותרת';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'החשבונית לא נמצאה.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
