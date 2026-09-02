@@ -882,6 +882,65 @@ void main() {
         expect(dive.containsKey('profile'), isFalse);
       });
 
+      test(
+        'without a channel, unreadable samples still get the XML hint',
+        () async {
+          // Two dives without a profile for two different reasons: one whose
+          // samples were read and rejected (the XML export can rescue it) and
+          // one whose only bytes are a raw download this platform cannot try.
+          // Lumping both under "this platform" would hide the remedy for the
+          // first, so each cause gets its own warning.
+          final logbook = _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: Uint8List.fromList(List.filled(64, 0x42)),
+          );
+          final payload = await MacDiveDiveMapper.toPayload(
+            MacDiveRawLogbook(
+              dives: [
+                ...logbook.dives,
+                MacDiveRawDive(
+                  pk: 2,
+                  uuid: 'dive-2',
+                  computer: 'Shearwater Teric',
+                  rawDataBlob: _compressedFixture,
+                ),
+              ],
+              sitesByPk: const {},
+              buddiesByPk: const {},
+              tagsByPk: const {},
+              gearByPk: const {},
+              tanksByPk: const {},
+              gasesByPk: const {},
+              tankAndGases: const [],
+              crittersByPk: const {},
+              certifications: const [],
+              serviceRecords: const [],
+              events: const [],
+              diveToBuddyPks: const {},
+              diveToTagPks: const {},
+              diveToGearPks: const {},
+              diveToCritterPks: const {},
+              unitsPreference: 'Metric',
+            ),
+            fetchDescriptors: () async => throw MissingPluginException('none'),
+          );
+
+          expect(payload.warnings, hasLength(2));
+          final messages = payload.warnings.map((w) => w.message).toList();
+          expect(
+            messages.where((m) => m.startsWith('1 dive') && m.contains('XML')),
+            hasLength(1),
+          );
+          expect(
+            messages.where(
+              (m) => m.startsWith('1 dive') && m.contains('this platform'),
+            ),
+            hasLength(1),
+          );
+        },
+      );
+
       test('unreadable ZSAMPLES count toward the aggregated warning', () async {
         final payload = await MacDiveDiveMapper.toPayload(
           _samplesLogbook(

@@ -126,7 +126,12 @@ class MacDiveDiveMapper {
     // Once the platform channel reports it is unavailable there is no point
     // retrying it for the remaining 500 dives.
     var ffiAvailable = true;
-    var undecoded = 0;
+    // Dives that end up without a profile, split by what the user can do
+    // about it: bytes that were read and rejected (the XML export can still
+    // rescue those) versus a raw download this platform could not attempt on
+    // a dive with nothing else to read.
+    var unreadable = 0;
+    var platformBlocked = 0;
 
     // The descriptor list is a static table inside libdivecomputer, identical
     // for every dive, so it is read once per import rather than once per dive.
@@ -176,27 +181,38 @@ class MacDiveDiveMapper {
       // Whatever kept the raw download from producing a profile, MacDive's
       // own copy of the samples is still there to read.
       if (!attached) attached = _attachSamples(d, map, converter);
-      if (!attached && _hasProfileBytes(d)) undecoded++;
+      if (!attached && _hasProfileBytes(d)) {
+        if (!ffiAvailable && _hasRawProfile(d) && !_hasSamples(d)) {
+          platformBlocked++;
+        } else {
+          unreadable++;
+        }
+      }
       diveMaps.add(map);
     }
 
-    // One aggregated warning, so a 500-dive import does not produce 500
-    // identical summary lines. Its wording depends on why: with no platform
-    // channel the raw downloads were never tried, whereas with one they were
-    // tried and rejected, and then MacDive's own samples could not be read
-    // either, which is the case the XML export can still rescue.
-    if (undecoded > 0) {
+    // Aggregated warnings, one per cause, so a 500-dive import does not
+    // produce 500 identical summary lines.
+    if (unreadable > 0) {
       warnings.add(
         ImportWarning(
           severity: ImportWarningSeverity.info,
-          message: ffiAvailable
-              ? '$undecoded dive(s) had profile data Submersion could not '
-                    'decode. To import those profiles, export from MacDive '
-                    'as XML (File > Export > MacDive XML) and import that '
-                    'file instead.'
-              : '$undecoded dive(s) had dive computer data that could not be '
-                    'decoded on this platform. Their details were imported '
-                    'without depth profiles.',
+          message:
+              '$unreadable dive(s) had profile data Submersion could not '
+              'decode. To import those profiles, export from MacDive as XML '
+              '(File > Export > MacDive XML) and import that file instead.',
+          entityType: ImportEntityType.dives,
+        ),
+      );
+    }
+    if (platformBlocked > 0) {
+      warnings.add(
+        ImportWarning(
+          severity: ImportWarningSeverity.info,
+          message:
+              '$platformBlocked dive(s) had dive computer data that could '
+              'not be decoded on this platform. Their details were imported '
+              'without depth profiles.',
           entityType: ImportEntityType.dives,
         ),
       );
