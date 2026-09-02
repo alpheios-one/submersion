@@ -160,20 +160,21 @@ void main() {
       expect(saved?.bluetoothAddress, _staleAddress);
     });
 
-    test(
-      'keeps the stored address when the reported serial names another unit',
-      () async {
-        // The same-model fallback can only pick a device by model. A serial
-        // that disagrees with the saved one means this download came from a
-        // different physical computer; do not point the saved entry at it.
-        final saved = await completeDownload(
-          computer: _savedComputer(),
-          device: _device(_freshAddress),
-          serialNumber: '999999',
-        );
-        expect(saved?.bluetoothAddress, _staleAddress);
-      },
-    );
+    test('leaves the record untouched when the reported serial names another '
+        'unit', () async {
+      // The same-model fallback can only pick a device by model. A serial
+      // that disagrees with the saved one means this download came from a
+      // different physical computer: neither its address nor its serial or
+      // firmware belong on the saved entry.
+      final saved = await completeDownload(
+        computer: _savedComputer(),
+        device: _device(_freshAddress),
+        serialNumber: '999999',
+        firmwareVersion: '9.9.9',
+      );
+      expect(saved, isNull);
+      expect(updates, isEmpty);
+    });
 
     test('rebinds when the saved computer has no serial yet', () async {
       final saved = await completeDownload(

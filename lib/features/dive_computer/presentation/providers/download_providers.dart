@@ -295,6 +295,11 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   /// Persist device info (serial number, firmware version) and the Bluetooth
   /// address the download actually used on the computer record after a
   /// successful download.
+  ///
+  /// The saved-computer flow may have picked the device by make and model
+  /// alone (issue #1423), so a reported serial that disagrees with the stored
+  /// one means another physical computer answered. Nothing from that unit
+  /// belongs on this record: not its serial, firmware, or address.
   Future<void> _persistDeviceInfo(
     String? reportedSerialNumber,
     String? reportedFirmwareVersion,
@@ -306,9 +311,21 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     // stored by an earlier download.
     final serialNumber = _nonBlank(reportedSerialNumber);
     final firmwareVersion = _nonBlank(reportedFirmwareVersion);
+    final storedSerial = _nonBlank(computer.serialNumber);
+    if (storedSerial != null &&
+        serialNumber != null &&
+        storedSerial != serialNumber) {
+      _log.warning(
+        'Downloaded from ${_device?.name} (${_device?.address}) with serial '
+        '$serialNumber, but ${computer.displayName} is serial $storedSerial; '
+        'leaving its record untouched',
+        category: LogCategory.bluetooth,
+      );
+      return;
+    }
 
     try {
-      final address = _addressToRebind(computer, serialNumber);
+      final address = _addressToRebind(computer);
       if (serialNumber == null && firmwareVersion == null && address == null) {
         return;
       }
@@ -340,11 +357,9 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   /// A stored Bluetooth address is host-local and can go stale (issue #1423:
   /// iOS mints a new CoreBluetooth identifier when the computer rotates its
   /// address), so a completed download is the moment to remember the address
-  /// that worked. The saved-computer flow may have picked the device by make
-  /// and model alone, so a reported serial that disagrees with the stored one
-  /// means another physical computer answered; the stored address is then
-  /// left pointing at the diver's own unit.
-  String? _addressToRebind(DiveComputer computer, String? serialNumber) {
+  /// that worked. The caller has already confirmed the serial, or has none to
+  /// compare.
+  String? _addressToRebind(DiveComputer computer) {
     final device = _device;
     if (device == null) return null;
     final isBluetooth =
@@ -354,20 +369,6 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
 
     final stored = computer.bluetoothAddress;
     if (stored != null && bluetoothAddressesMatch(stored, device.address)) {
-      return null;
-    }
-
-    final storedSerial = computer.serialNumber?.trim() ?? '';
-    final reportedSerial = serialNumber?.trim() ?? '';
-    if (storedSerial.isNotEmpty &&
-        reportedSerial.isNotEmpty &&
-        storedSerial != reportedSerial) {
-      _log.warning(
-        'Downloaded from ${device.name} (${device.address}) with serial '
-        '$reportedSerial, but ${computer.displayName} is serial '
-        '$storedSerial; keeping its stored address $stored',
-        category: LogCategory.bluetooth,
-      );
       return null;
     }
 
