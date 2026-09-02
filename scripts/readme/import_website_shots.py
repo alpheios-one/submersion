@@ -55,6 +55,11 @@ def flatten(img):
     each transparent pixel instead takes the color of the nearest opaque pixel
     in its row. Corners end up squared in the titlebar/content color, which
     reads correctly in both light and dark.
+
+    The fill is written at full alpha. Pillow's RGBA to RGB conversion drops
+    the alpha band rather than compositing it, so the copied pixel's own alpha
+    could not darken the result either way, but writing 255 keeps the intent
+    legible without relying on that detail.
     """
     if img.mode not in ("RGBA", "LA") and "transparency" not in img.info:
         return img.convert("RGB")
@@ -73,10 +78,10 @@ def flatten(img):
             continue  # fully transparent row: nothing to extend from
         right = next(x for x in range(width - 1, -1, -1) if alpha[x, y] >= OPAQUE)
 
-        fill = pixels[left, y]
+        fill = pixels[left, y][:3] + (255,)
         for x in range(left):
             pixels[x, y] = fill
-        fill = pixels[right, y]
+        fill = pixels[right, y][:3] + (255,)
         for x in range(right + 1, width):
             pixels[x, y] = fill
 
@@ -104,7 +109,11 @@ def main():
         if not os.path.isfile(src):
             sys.exit(f"missing source screenshot: {src}")
 
-        img = flatten(Image.open(src))
+        # Image.open is lazy and holds the file open until the image is closed,
+        # so close it here rather than leaving it to the garbage collector.
+        # flatten() returns a new image, which stays valid past the with block.
+        with Image.open(src) as src_img:
+            img = flatten(src_img)
         height = round(img.height * width / img.width)
         img = img.resize((width, height), Image.LANCZOS)
 
