@@ -4424,42 +4424,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Merge undone';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Merging dive at $time into this dive.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirm merge';
-
-  @override
-  String get diveLog_mergeDialog_empty => 'No other dives found on this day.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error loading dives: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Merge';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Next';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Select a dive from the same day to merge as an additional computer.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Merge with another dive';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'What this does';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Select which computer\'s profile to edit from.';
 

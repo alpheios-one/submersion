@@ -4511,43 +4511,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Mesclagem desfeita';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'O mergulho às $time será mesclado a este mergulho.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmar mesclagem';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Nenhum outro mergulho encontrado neste dia.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'O perfil, os cilindros, as pressões, os eventos, as tags, os parceiros e os avistamentos deste mergulho serão incorporados a este mergulho como uma fonte de computador adicional. Esta ação pode ser revertida com \'Desvincular computador\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Erro ao carregar os mergulhos: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Mesclar';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Próximo';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Selecione um mergulho do mesmo dia para mesclar como um computador adicional.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Mesclar com outro mergulho';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'O que isso faz';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Selecione de qual perfil de computador editar.';
 

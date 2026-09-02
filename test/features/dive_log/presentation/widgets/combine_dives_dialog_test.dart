@@ -83,8 +83,8 @@ class _ThrowingMergeService implements DiveMergeService {
 
 /// Fake [DiveConsolidationService] that records `apply`/`undo` calls so
 /// tests can assert on the wiring contract without touching a real database.
-/// Mirrors the fake in merge_dive_dialog_test.dart (the apply-failure path is
-/// already covered there, since both dialogs share `runDiveConsolidation`).
+/// Mirrors the fake in run_dive_consolidation_test.dart, which owns the
+/// undo and apply-failure branches of the shared `runDiveConsolidation`.
 class _FakeDiveConsolidationService extends DiveConsolidationService {
   _FakeDiveConsolidationService() : super(DiveRepository());
 

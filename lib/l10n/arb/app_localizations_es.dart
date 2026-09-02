@@ -4510,43 +4510,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Fusión deshecha';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Se fusionará la inmersión de las $time con esta inmersión.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmar fusión';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'No se encontraron otras inmersiones en este día.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'El perfil, los tanques, las presiones, los eventos, las etiquetas, los compañeros y los avistamientos de esta inmersión se incorporarán a esta inmersión como un ordenador adicional. Esta acción se puede revertir con \'Desvincular ordenador\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error al cargar las inmersiones: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Fusionar';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Siguiente';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Selecciona una inmersión del mismo día para fusionarla como ordenador adicional.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Fusionar con otra inmersión';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Qué hace esto';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Selecciona desde qué perfil de ordenador editar.';
 
