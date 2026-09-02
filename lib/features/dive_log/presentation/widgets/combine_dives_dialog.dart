@@ -567,10 +567,10 @@ class _CombineDivesDialogState extends ConsumerState<CombineDivesDialog> {
   /// Applies the consolidation via [runDiveConsolidation] (apply + Undo
   /// SnackBar + error mapping, shared with the data quality inbox's
   /// "consolidate duplicate" repair). The dialog closes immediately;
-  /// [runDiveConsolidation] only
-  /// touches [context] synchronously before its first `await`, so doing that
-  /// after [Navigator.pop] is safe (the dialog's element isn't actually
-  /// unmounted until the pop's exit transition finishes).
+  /// [runDiveConsolidation] only touches [context] synchronously before its
+  /// first `await`, so doing that after [Navigator.pop] is safe (the dialog's
+  /// element isn't actually unmounted until the pop's exit transition
+  /// finishes).
   void _confirmConsolidation(ConsolidationReady ready) {
     final container = ProviderScope.containerOf(context, listen: false);
     final service = ref.read(diveConsolidationServiceProvider);

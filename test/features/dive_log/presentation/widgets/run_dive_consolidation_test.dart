@@ -91,19 +91,29 @@ void main() {
       'tapping Undo still works once the calling dialog has been popped',
       (tester) async {
         final service = FakeDiveConsolidationService();
+        var consolidatedCalls = 0;
 
         // Mirrors combine_dives_dialog.dart's _confirmConsolidation, which
         // pops itself and then calls runDiveConsolidation with the dialog's
         // own (deactivating) context. The helper reads context only before
         // its first await; this test fails if that ever changes, e.g. if the
         // Undo closure starts re-reading ScaffoldMessenger.of(context).
-        await _pumpAndRunFromPoppedDialog(tester, service: service);
+        await _pumpAndRunFromPoppedDialog(
+          tester,
+          service: service,
+          onConsolidated: () => consolidatedCalls++,
+        );
 
         await tester.tap(find.text('Undo'));
         await tester.pumpAndSettle();
 
         expect(service.undoCallCount, 1);
         expect(find.text('Merge undone'), findsOneWidget);
+        // Both refreshes still reach the caller even though the dialog that
+        // started this is gone. Production depends on exactly that: the real
+        // callback invalidates providers through a captured container rather
+        // than `ref`, because the dialog's State is disposed by now.
+        expect(consolidatedCalls, 2);
         expect(tester.takeException(), isNull);
       },
     );
