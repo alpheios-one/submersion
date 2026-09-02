@@ -17,16 +17,14 @@ class BaseApplyProgress {
   final void Function(double fraction)? _onProgress;
   final LoggerService _log = LoggerService.forClass(BaseApplyProgress);
   final Stopwatch _stopwatch = Stopwatch()..start();
+  Duration _passStarted = Duration.zero;
   int _pass = 0;
   double _floor = 0.0;
   double _last = 0.0;
 
   /// Marks the start of zero-based [pass]; the previous pass is complete.
   void beginPass(int pass) {
-    _log.info(
-      'Peer base pass ${_pass + 1}/$_passes done in '
-      '${_stopwatch.elapsed.inSeconds}s',
-    );
+    _logPassDone();
     _pass = pass;
     _emit(_pass / _passes);
   }
@@ -50,14 +48,23 @@ class BaseApplyProgress {
     );
     _floor = _last;
     _pass = 0;
+    _passStarted = _stopwatch.elapsed;
   }
 
   void done() {
-    _log.info(
-      'Peer base pass $_passes/$_passes done in '
-      '${_stopwatch.elapsed.inSeconds}s',
-    );
+    _logPassDone();
     _emit(1.0);
+  }
+
+  /// Logs the pass that just ended with its own duration and the running
+  /// total, then starts timing the next one.
+  void _logPassDone() {
+    final now = _stopwatch.elapsed;
+    _log.info(
+      'Peer base pass ${_pass + 1}/$_passes done in '
+      '${(now - _passStarted).inSeconds}s (${now.inSeconds}s total)',
+    );
+    _passStarted = now;
   }
 
   void _emit(double fraction) {

@@ -323,14 +323,17 @@ void main() {
       await tearDownTestDatabase();
       await setUpTestDatabase();
       final tmpDir = await Directory.systemTemp.createTemp('parity_progress');
-      final tmp = File('${tmpDir.path}/base.json');
-      await tmp.writeAsBytes(
-        utf8.encode(SyncDataSerializer().serializePayload(payload)),
-      );
-      final seen = <double>[];
-      await svc.debugApplyBaseFile(tmp.path, onProgress: seen.add);
-      await tmpDir.delete(recursive: true);
-      return seen;
+      try {
+        final tmp = File('${tmpDir.path}/base.json');
+        await tmp.writeAsBytes(
+          utf8.encode(SyncDataSerializer().serializePayload(payload)),
+        );
+        final seen = <double>[];
+        await svc.debugApplyBaseFile(tmp.path, onProgress: seen.add);
+        return seen;
+      } finally {
+        await tmpDir.delete(recursive: true);
+      }
     }
 
     void expectMonotonicToOne(List<double> seen) {
