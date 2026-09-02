@@ -1,8 +1,9 @@
 # README asset generators
 
-`import_website_shots.py` regenerates every image embedded in the top-level
-`README.md`. It resolves its paths from its own location, so it can be run
-from any directory. It requires Pillow
+`import_website_shots.py` regenerates the screenshots embedded in the
+top-level `README.md`: everything under `docs/assets/screenshots/readme/`.
+The logo and the badges are not its concern. It resolves its paths from its
+own location, so it can be run from any directory. It requires Pillow
 (`pip3 install --user Pillow`).
 
 ```bash

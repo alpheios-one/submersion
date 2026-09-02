@@ -112,13 +112,22 @@ def main():
             "this repo, or pass the path to its screenshots/ directory."
         )
 
+    # Check every source up front so a rename on the website side reports all
+    # the missing files at once, rather than one per run.
+    missing = [
+        name for name, _, _ in MAPPING if not os.path.isfile(os.path.join(src_dir, name))
+    ]
+    if missing:
+        sys.exit(
+            f"{len(missing)} source screenshot(s) missing from {src_dir}:\n  "
+            + "\n  ".join(missing)
+        )
+
     os.makedirs(OUT_DIR, exist_ok=True)
     total = 0
 
     for src_name, out_name, width in MAPPING:
         src = os.path.join(src_dir, src_name)
-        if not os.path.isfile(src):
-            sys.exit(f"missing source screenshot: {src}")
 
         # Image.open is lazy and holds the file open until the image is closed,
         # so close it here rather than leaving it to the garbage collector.
