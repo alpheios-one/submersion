@@ -164,6 +164,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             gas: formatPreciseGasName(context, line.gas),
             addedBar: line.addedBar,
             cost: line.cost,
+            freeGasLiters: line.freeGasLiters,
           ),
       ],
       total: billing.total,

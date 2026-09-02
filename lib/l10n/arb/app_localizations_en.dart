@@ -12262,6 +12262,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_billed => 'Billed';
 
   @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Invoice dated $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Change invoice date';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Current tariff';
+
+  @override
   String get gasCalculators_blender_billedNone =>
       'Nothing billed yet. Finish a fill and save it here.';
 
@@ -12278,14 +12289,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Amount';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Clear';
+  String get gasCalculators_blender_export => 'Export';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Clear the bill?';
+  String get gasCalculators_blender_exportPdf => 'Export as PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'This removes all $count saved fills.';
+  String get gasCalculators_blender_exportImage => 'Export as Image';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Export as Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Pay';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'Mark the bill as paid?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'This archives all $count saved fills and starts a new bill.';
   }
 
   @override
@@ -12309,6 +12337,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Invoice archive';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filter by date';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'No paid invoices yet.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'No invoices in this date range.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count fills';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incomplete';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Untitled';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Invoice not found.';
 
   @override
   String get gasCalculators_blender_defaults => 'Default settings and billing';

@@ -12375,6 +12375,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_billed => 'Gefactureerd';
 
   @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Factuur van $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Factuurdatum wijzigen';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Huidig tarief';
+
+  @override
   String get gasCalculators_blender_billedNone =>
       'Nog niets gefactureerd. Rond een vulling af en sla die hier op.';
 
@@ -12391,14 +12402,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Bedrag';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Wissen';
+  String get gasCalculators_blender_export => 'Exporteren';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Factuur wissen?';
+  String get gasCalculators_blender_exportPdf => 'Exporteren als PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Dit verwijdert alle $count opgeslagen vullingen.';
+  String get gasCalculators_blender_exportImage => 'Exporteren als afbeelding';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exporteren als Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Exporteren mislukt: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Betalen';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'Factuur als betaald markeren?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Dit archiveert alle $count opgeslagen vullingen en start een nieuwe factuur.';
   }
 
   @override
@@ -12422,6 +12450,35 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Totaal';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Factuurarchief';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filteren op datum';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Nog geen betaalde facturen.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Geen facturen in deze periode.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count vullingen';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Onvolledig';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Zonder titel';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Factuur niet gevonden.';
 
   @override
   String get gasCalculators_blender_defaults =>

@@ -12163,6 +12163,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_billed => 'חיוב';
 
   @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'חשבונית מתאריך $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'שינוי תאריך החשבונית';
+
+  @override
+  String get gasCalculators_blender_tariff => 'תעריף נוכחי';
+
+  @override
   String get gasCalculators_blender_billedNone =>
       'עדיין אין חיובים. סיים מילוי ושמור אותו כאן.';
 
@@ -12179,14 +12190,31 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'סכום';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'נקה';
+  String get gasCalculators_blender_export => 'ייצוא';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'לנקות את החיוב?';
+  String get gasCalculators_blender_exportPdf => 'ייצוא כ-PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'פעולה זו תמחק את כל $count המילויים השמורים.';
+  String get gasCalculators_blender_exportImage => 'ייצוא כתמונה';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'ייצוא כ-Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'תשלום';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'לסמן את החשבונית כשולמה?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'פעולה זו תעביר לארכיון את כל $count המילויים השמורים ותתחיל חשבונית חדשה.';
   }
 
   @override
@@ -12210,6 +12238,35 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'סה\"כ';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'ארכיון חשבוניות';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'סינון לפי תאריך';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'אין עדיין חשבוניות ששולמו.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'אין חשבוניות בטווח התאריכים הזה.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count מילויים';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'לא שלם';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'ללא כותרת';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'החשבונית לא נמצאה.';
 
   @override
   String get gasCalculators_blender_defaults => 'הגדרות ברירת מחדל וחיוב';

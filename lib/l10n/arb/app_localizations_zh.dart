@@ -11877,6 +11877,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_billed => '已计费';
 
   @override
+  String gasCalculators_blender_billedDate(String date) {
+    return '开票日期：$date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => '更改开票日期';
+
+  @override
+  String get gasCalculators_blender_tariff => '当前价目';
+
+  @override
   String get gasCalculators_blender_billedNone => '尚无计费内容。完成一次充填后保存到这里。';
 
   @override
@@ -11892,14 +11903,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => '金额';
 
   @override
-  String get gasCalculators_blender_clearBilled => '清空';
+  String get gasCalculators_blender_export => '导出';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => '清空账单？';
+  String get gasCalculators_blender_exportPdf => '导出为 PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return '这将删除全部 $count 条已保存的充填记录。';
+  String get gasCalculators_blender_exportImage => '导出为图片';
+
+  @override
+  String get gasCalculators_blender_exportExcel => '导出为 Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => '付款';
+
+  @override
+  String get gasCalculators_blender_payTitle => '将账单标记为已付款？';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return '这将归档全部 $count 条已保存的充填记录并开始一张新账单。';
   }
 
   @override
@@ -11922,6 +11950,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => '合计';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => '账单存档';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => '按日期筛选';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty => '尚无已付款账单。';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered => '此时间段内没有账单。';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count 次充装';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => '不完整';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => '无标题';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound => '未找到该账单。';
 
   @override
   String get gasCalculators_blender_defaults => '默认设置与计费';

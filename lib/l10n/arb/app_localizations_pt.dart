@@ -12469,6 +12469,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_billed => 'Faturado';
 
   @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Fatura de $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Alterar data da fatura';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Tarifa atual';
+
+  @override
   String get gasCalculators_blender_billedNone =>
       'Ainda nada faturado. Termina um enchimento e guarda-o aqui.';
 
@@ -12485,14 +12496,31 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Valor';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Limpar';
+  String get gasCalculators_blender_export => 'Exportar';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Limpar a fatura?';
+  String get gasCalculators_blender_exportPdf => 'Exportar como PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Isto remove os $count enchimentos guardados.';
+  String get gasCalculators_blender_exportImage => 'Exportar como imagem';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exportar como Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Falha na exportação: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Pagar';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'Marcar a fatura como paga?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Isto arquiva todos os $count enchimentos guardados e inicia uma nova fatura.';
   }
 
   @override
@@ -12516,6 +12544,35 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Arquivo de faturas';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filtrar por data';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Ainda não há faturas pagas.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Nenhuma fatura neste período.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count enchimentos';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incompleto';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Sem título';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Fatura não encontrada.';
 
   @override
   String get gasCalculators_blender_defaults =>

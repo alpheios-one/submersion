@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
@@ -98,6 +99,58 @@ final blenderFlushFeeGasesProvider = StateProvider<List<FlushFeeGasSetting>>(
   (ref) => defaultFlushFeeGases,
 );
 
+/// When the running bill started. Defaults to today so the date is editable
+/// from the moment a bill is open, not only once it is paid.
+final blenderBilledDateProvider = StateProvider<DateTime>(
+  (ref) => DateTime.now(),
+);
+
+/// Bills already paid and archived, oldest first.
+final blenderArchivedInvoicesProvider = StateProvider<List<ArchivedInvoice>>(
+  (ref) => const [],
+);
+
+/// The date range narrowing the invoice archive view. Ephemeral by design,
+/// matching [preDiveSessionFilterProvider]: a filter is a view of the current
+/// screen, not a stored preference, so it resets the next time the archive
+/// is opened rather than persisting across sessions.
+final blenderInvoiceArchiveFilterProvider = StateProvider<DateTimeRange?>(
+  (ref) => null,
+);
+
+/// Archived invoices matching [blenderInvoiceArchiveFilterProvider], newest
+/// first so a fill station checking "what did I just charge" does not have to
+/// scroll past months of history.
+final filteredBlenderArchivedInvoicesProvider = Provider<List<ArchivedInvoice>>(
+  (ref) {
+    final invoices = ref.watch(blenderArchivedInvoicesProvider);
+    final range = ref.watch(blenderInvoiceArchiveFilterProvider);
+    final filtered = range == null
+        ? invoices
+        : invoices
+              .where((invoice) => _inDateRange(invoice.date, range))
+              .toList();
+    return filtered.reversed.toList();
+  },
+);
+
+/// Whether [date] falls within [range], inclusive of the whole end day: the
+/// picker yields whole days, so an invoice paid at 23:30 on the last selected
+/// day must still match.
+bool _inDateRange(DateTime date, DateTimeRange range) {
+  final startOfFirstDay = DateTime(
+    range.start.year,
+    range.start.month,
+    range.start.day,
+  );
+  final endOfLastDay = DateTime(
+    range.end.year,
+    range.end.month,
+    range.end.day,
+  ).add(const Duration(days: 1));
+  return !date.isBefore(startOfFirstDay) && date.isBefore(endOfLastDay);
+}
+
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);
 
@@ -189,6 +242,11 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
       stored.flushFeeEnabled;
   ref.read(blenderFlushFeeModeProvider.notifier).state = stored.flushFeeMode;
   ref.read(blenderFlushFeeGasesProvider.notifier).state = stored.flushFeeGases;
+  if (stored.billedDate != null) {
+    ref.read(blenderBilledDateProvider.notifier).state = stored.billedDate!;
+  }
+  ref.read(blenderArchivedInvoicesProvider.notifier).state =
+      stored.archivedInvoices;
   // The input fields hold their own text, seeded once in initState. Without
   // this the cylinder volume and price boxes keep showing defaults over
   // freshly loaded preferences, and the next edit saves those defaults back
@@ -230,6 +288,8 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             flushFeeEnabled: ref.read(blenderFlushFeeEnabledProvider),
             flushFeeMode: ref.read(blenderFlushFeeModeProvider),
             flushFeeGases: ref.read(blenderFlushFeeGasesProvider),
+            billedDate: ref.read(blenderBilledDateProvider),
+            archivedInvoices: ref.read(blenderArchivedInvoicesProvider),
           ),
         );
   } catch (e, stackTrace) {
