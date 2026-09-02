@@ -102,7 +102,7 @@ class MacDiveSamplesDecoder {
 
     var stride = _baseRecordLength;
     for (final field in _fieldOrder) {
-      if (options & field != 0) stride += _fieldLength;
+      if ((options & field) != 0) stride += _fieldLength;
     }
     if (length % stride != 0) return null;
 
@@ -121,7 +121,7 @@ class MacDiveSamplesDecoder {
       double? nextStop;
       int? tts;
       for (final field in _fieldOrder) {
-        if (options & field == 0) continue;
+        if ((options & field) == 0) continue;
         switch (field) {
           case optionPressure:
             pressure = reader.float();
