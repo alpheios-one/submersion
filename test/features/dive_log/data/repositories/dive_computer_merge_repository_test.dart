@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_merge_repository.dart';
 
 import '../../../../helpers/test_database.dart';
@@ -471,6 +472,28 @@ void main() {
       expect((await diveRow('d1')).updatedAt, 1000);
       expect((await diveRow('d2')).updatedAt, 1000);
       expect(await isPending('dives', 'd1'), isFalse);
+    });
+
+    test('notifies the sync bus exactly once, after the commit', () async {
+      await insertComputer(id: 'a');
+      await insertComputer(id: 'b');
+      await insertDive('d1', computerId: 'b');
+      await insertProfileSeries('ps1', diveId: 'd1', computerId: 'b');
+      await insertTank('t', diveId: 'd1');
+      await insertTankSeries('ts1', diveId: 'd1', tankId: 't', computerId: 'b');
+
+      var notifications = 0;
+      final subscription = SyncEventBus.changes.listen((_) {
+        notifications += 1;
+      });
+      addTearDown(subscription.cancel);
+
+      await repository.mergeComputers(survivorId: 'a', duplicateIds: ['b']);
+      await Future<void>.delayed(Duration.zero);
+
+      // The series repositories restamp their rows inside the merge
+      // transaction; only the merge itself may announce the change.
+      expect(notifications, 1);
     });
 
     test('keeps the survivor bluetooth address when it has one', () async {

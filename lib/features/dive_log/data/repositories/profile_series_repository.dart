@@ -554,6 +554,10 @@ class ProfileSeriesRepository {
 
   /// Moves every series of [fromComputerIds] onto [toComputerId] and restamps
   /// each, for a dive computer merge (#645). Returns the number touched.
+  ///
+  /// Does not notify the sync bus: the merge runs this inside its own
+  /// transaction and notifies once after commit, so a notification here
+  /// would fire while the rows are still uncommitted.
   Future<int> repointComputer(
     List<String> fromComputerIds,
     String toComputerId, {
@@ -564,6 +568,7 @@ class ProfileSeriesRepository {
       toComputerId,
       (t) => t.computerId.isIn(fromComputerIds),
       now: now,
+      notify: false,
     );
   }
 
@@ -643,6 +648,7 @@ class ProfileSeriesRepository {
     String? computerId,
     Expression<bool> Function($DiveProfileSeriesTable t) where, {
     int? now,
+    bool notify = true,
   }) async {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
     final ids = await _ids(where);
@@ -655,7 +661,7 @@ class ProfileSeriesRepository {
       ),
       nowMs,
     );
-    SyncEventBus.notifyLocalChange();
+    if (notify) SyncEventBus.notifyLocalChange();
     return ids.length;
   }
 
