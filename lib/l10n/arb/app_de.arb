@@ -10492,7 +10492,7 @@
   "garminConnect_fetch_loadMore": "Mehr laden",
   "garminConnect_fetch_foundDives": "{count, plural, =0{Keine Tauchgänge gefunden} =1{1 Tauchgang gefunden} other{{count} Tauchgänge gefunden}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.} other{{count} Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.}}",
-  "garminConnect_fetch_fetchAll": "Fetch All",
+  "garminConnect_fetch_fetchAll": "Alle laden",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren",
   "transfer_importCloud_garminTitle": "Garmin",

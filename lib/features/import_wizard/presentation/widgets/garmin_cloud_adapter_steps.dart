@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -425,18 +423,17 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
   /// deselecting is an opt-out rather than an opt-in action.
   final Set<int> _selectedIndices = {};
 
-  StreamIterator<List<GarminActivitySummary>>? _pageIterator;
+  /// Cursor for the next unfetched listing page.
+  ///
+  /// Only advanced once a page's listing call has actually returned, so a
+  /// page that failed is re-requested by the next Load More rather than
+  /// skipped.
+  int _nextPageStart = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchFirstPage());
-  }
-
-  @override
-  void dispose() {
-    _pageIterator?.cancel();
-    super.dispose();
   }
 
   /// Clears any dives a previous attempt loaded, WITHOUT flipping
@@ -470,20 +467,24 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
       _selectedIndices.clear();
       _failedCount = 0;
       _hasMorePages = true;
+      _nextPageStart = 0;
+      // A retry starts the whole fetch over, so no paging error or spinner
+      // from the previous attempt may survive into it.
+      _loadMoreError = null;
+      _isLoadingMore = false;
+      _isFetchingAll = false;
       _progressText = context.l10n.garminConnect_fetch_listing;
     });
 
-    _pageIterator = StreamIterator(client.listDivesPaged());
-
     try {
-      final hasPage = await _pageIterator!.moveNext();
+      final page = await client.fetchDivePage();
       if (!mounted) return;
+      _nextPageStart = page.nextStart;
+      _hasMorePages = page.hasMore;
 
-      if (hasPage) {
-        await _downloadPage(client, _pageIterator!.current);
+      if (page.dives.isNotEmpty) {
+        await _downloadPage(client, page.dives);
         if (!mounted) return;
-      } else {
-        _hasMorePages = false;
       }
 
       _publishSelection();
@@ -518,8 +519,7 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
   /// instead, leaving everything fetched so far intact.
   Future<void> _loadMore() async {
     final client = widget.client;
-    final iterator = _pageIterator;
-    if (client == null || iterator == null || _isLoadingMore) return;
+    if (client == null || _isLoadingMore || !_hasMorePages) return;
 
     setState(() {
       _isLoadingMore = true;
@@ -527,14 +527,14 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
     });
 
     try {
-      final hasPage = await iterator.moveNext();
+      final page = await client.fetchDivePage(start: _nextPageStart);
       if (!mounted) return;
+      _nextPageStart = page.nextStart;
+      _hasMorePages = page.hasMore;
 
-      if (hasPage) {
-        await _downloadPage(client, iterator.current);
+      if (page.dives.isNotEmpty) {
+        await _downloadPage(client, page.dives);
         if (!mounted) return;
-      } else {
-        _hasMorePages = false;
       }
 
       _publishSelection();
@@ -562,7 +562,13 @@ class _GarminCloudFetchStepState extends ConsumerState<GarminCloudFetchStep> {
   /// to hammer a failing endpoint wouldn't recover on its own.
   Future<void> _fetchAll() async {
     if (_isFetchingAll || _isLoadingMore) return;
-    setState(() => _isFetchingAll = true);
+    // The loop below stops on _loadMoreError, so an error left over from an
+    // earlier page would make this button a silent no-op. Clearing it here
+    // is what makes Fetch All a genuine retry after a failed page.
+    setState(() {
+      _isFetchingAll = true;
+      _loadMoreError = null;
+    });
 
     while (mounted && _hasMorePages && _loadMoreError == null) {
       await _loadMore();

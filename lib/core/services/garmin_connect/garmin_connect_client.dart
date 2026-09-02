@@ -50,6 +50,29 @@ class GarminActivitySummary {
   final double? longitude;
 }
 
+/// One page of the dive-activity listing, plus the cursor needed to ask for
+/// the page after it.
+class GarminDivePage {
+  const GarminDivePage({
+    required this.dives,
+    required this.nextStart,
+    required this.hasMore,
+  });
+
+  /// The page's dive activities, newest first. Empty only when the account's
+  /// history is exhausted -- [GarminConnectClient.fetchDivePage] walks past
+  /// listing pages that hold no dives rather than returning them.
+  final List<GarminActivitySummary> dives;
+
+  /// The `start` to hand [GarminConnectClient.fetchDivePage] for the next
+  /// page. Meaningless once [hasMore] is false.
+  final int nextStart;
+
+  /// Whether Garmin reported a full listing page, meaning there is more
+  /// history past this one.
+  final bool hasMore;
+}
+
 /// The outcome of a sign-in attempt.
 ///
 /// Garmin interposes a code challenge for MFA-enabled accounts, so a
@@ -257,19 +280,32 @@ class GarminConnectClient {
     await _completeLogin(json['serviceTicketId'] as String);
   }
 
-  /// Streams pages of dive activities, newest first.
+  /// Fetches the page of dive activities at [start], newest first.
   ///
   /// Garmin's activity list is itself paginated newest-to-oldest (`start`
-  /// walks forward from the most recent activity), so yielding each page as
-  /// it arrives -- rather than buffering the diver's entire history before
+  /// walks forward from the most recent activity). Fetching one page at a
+  /// time -- rather than buffering the diver's entire history before
   /// returning anything -- lets a caller start acting on the newest dives
   /// while older pages are still being fetched. Each page is additionally
   /// sorted newest first on its own as a defensive measure, in case Garmin
   /// ever returns a page out of order.
-  Stream<List<GarminActivitySummary>> listDivesPaged({
+  ///
+  /// A listing page can hold no dives at all once the per-item check has
+  /// run, so this walks past such pages internally: a returned page is
+  /// either non-empty or genuinely the end of the account's history, and a
+  /// caller never has to tell "nothing on this page" apart from "nothing
+  /// left".
+  ///
+  /// Exposed as an explicit cursor rather than only as [listDivesPaged] so
+  /// a caller can retry a single failed page. A `Stream` that has thrown is
+  /// terminated for good, and asking a terminated one for its next page
+  /// reports "no more pages" -- silently truncating the history at whatever
+  /// page happened to hit a transient network error.
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
     int pageSize = 15,
-  }) async* {
-    var start = 0;
+  }) async {
+    var offset = start;
 
     while (true) {
       final page = await _getJsonList(
@@ -277,7 +313,7 @@ class GarminConnectClient {
           '$_apiBase/activitylist-service/activities/search/activities',
         ).replace(
           queryParameters: {
-            'start': '$start',
+            'start': '$offset',
             'limit': '$pageSize',
             // Server-side narrowing to the diving parent category. The
             // per-item check below still runs, so a change in how Garmin
@@ -286,7 +322,13 @@ class GarminConnectClient {
           },
         ),
       );
-      if (page.isEmpty) break;
+      if (page.isEmpty) {
+        return GarminDivePage(
+          dives: const [],
+          nextStart: offset,
+          hasMore: false,
+        );
+      }
 
       final summaries = <GarminActivitySummary>[];
       for (final entry in page) {
@@ -294,11 +336,32 @@ class GarminConnectClient {
         final summary = _toActivitySummary(item);
         if (summary != null) summaries.add(summary);
       }
-      summaries.sort((a, b) => b.startTime.compareTo(a.startTime));
-      yield summaries;
 
-      if (page.length < pageSize) break;
-      start += pageSize;
+      final hasMore = page.length >= pageSize;
+      offset += pageSize;
+      if (summaries.isNotEmpty || !hasMore) {
+        summaries.sort((a, b) => b.startTime.compareTo(a.startTime));
+        return GarminDivePage(
+          dives: summaries,
+          nextStart: offset,
+          hasMore: hasMore,
+        );
+      }
+    }
+  }
+
+  /// Streams pages of dive activities, newest first, walking the cursor
+  /// [fetchDivePage] hands back until the history runs out.
+  Stream<List<GarminActivitySummary>> listDivesPaged({
+    int pageSize = 15,
+  }) async* {
+    var start = 0;
+
+    while (true) {
+      final page = await fetchDivePage(start: start, pageSize: pageSize);
+      if (page.dives.isNotEmpty) yield page.dives;
+      if (!page.hasMore) break;
+      start = page.nextStart;
     }
   }
 

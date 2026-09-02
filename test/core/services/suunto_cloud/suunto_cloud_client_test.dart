@@ -266,6 +266,82 @@ void main() {
     );
   });
 
+  group('fetchDivePage', () {
+    test('walks past a listing page that holds no dives', () async {
+      final client = SuuntoCloudClient(
+        httpClient: MockClient((request) async {
+          final offset = int.parse(request.url.queryParameters['offset']!);
+          // The listing carries every activity type; 78 is scuba diving and
+          // 1 is a run, which the client filters out on its own side.
+          final items = offset == 0
+              ? [
+                  {'key': 'run-1', 'activityId': 1, 'startTime': 1},
+                  {'key': 'run-2', 'activityId': 1, 'startTime': 2},
+                ]
+              : [
+                  {'key': 'dive-1', 'activityId': 78, 'startTime': 3},
+                ];
+          return http.Response(jsonEncode({'payload': items}), 200);
+        }),
+      );
+
+      final page = await client.fetchDivePage(pageSize: 2);
+
+      // The first listing page filtered down to nothing. Returning it as-is
+      // would read to a caller as "the account has no dives", so the client
+      // keeps walking until it has a real page or runs out of history.
+      expect(page.dives.map((d) => d.key).toList(), ['dive-1']);
+      expect(page.hasMore, isFalse);
+    });
+
+    test(
+      'hands back a cursor the caller can resume the next page from',
+      () async {
+        final client = SuuntoCloudClient(
+          httpClient: MockClient((request) async {
+            final offset = int.parse(request.url.queryParameters['offset']!);
+            final items = offset == 0
+                ? [
+                    {'key': 'dive-1', 'activityId': 78, 'startTime': 2},
+                    {'key': 'dive-2', 'activityId': 78, 'startTime': 1},
+                  ]
+                : [
+                    {'key': 'dive-3', 'activityId': 78, 'startTime': 0},
+                  ];
+            return http.Response(jsonEncode({'payload': items}), 200);
+          }),
+        );
+
+        final first = await client.fetchDivePage(pageSize: 2);
+        expect(first.dives.map((d) => d.key).toList(), ['dive-1', 'dive-2']);
+        expect(first.hasMore, isTrue);
+
+        // Fetching a page is a plain call rather than a step through a live
+        // stream, so a caller that hit a transient failure can ask for the
+        // same page again instead of losing the rest of the history.
+        final second = await client.fetchDivePage(
+          offset: first.nextOffset,
+          pageSize: 2,
+        );
+        expect(second.dives.map((d) => d.key).toList(), ['dive-3']);
+        expect(second.hasMore, isFalse);
+      },
+    );
+
+    test('reports an exhausted history as an empty page', () async {
+      final client = SuuntoCloudClient(
+        httpClient: MockClient(
+          (request) async => http.Response(jsonEncode({'payload': []}), 200),
+        ),
+      );
+
+      final page = await client.fetchDivePage();
+
+      expect(page.dives, isEmpty);
+      expect(page.hasMore, isFalse);
+    });
+  });
+
   group('fetchSmlJson', () {
     test('GETs the per-dive sml endpoint with the session header', () async {
       http.Request? captured;

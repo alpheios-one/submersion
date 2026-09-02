@@ -111,13 +111,43 @@ class _FakeGarminClient extends GarminConnectClient {
     _token = const GarminOAuth1Token(token: 'tok', tokenSecret: 'sec');
   }
 
+  /// The pages [fetchDivePage] serves, in order. Empty pages are dropped:
+  /// the real client walks past dive-less listing pages internally, so a
+  /// page it hands back is either non-empty or the end of the history.
+  List<List<GarminActivitySummary>> get pages =>
+      [dives].where((page) => page.isNotEmpty).toList();
+
+  /// Every `start` [fetchDivePage] has been asked for, so a test can assert
+  /// a retry re-requests the page that failed rather than skipping it.
+  final List<int> requestedPageStarts = [];
+
+  /// `start` is used as a plain page index here. The fake owns both sides of
+  /// the cursor, so counting pages reads more clearly than mimicking
+  /// Garmin's item offsets.
   @override
-  Stream<List<GarminActivitySummary>> listDivesPaged({
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
     int pageSize = 100,
-  }) async* {
+  }) async {
+    requestedPageStarts.add(start);
     final error = listError;
     if (error != null) throw error;
-    if (dives.isNotEmpty) yield dives;
+    return _pageAt(start);
+  }
+
+  GarminDivePage _pageAt(int start) {
+    final all = pages;
+    if (start >= all.length) {
+      return GarminDivePage(dives: const [], nextStart: start, hasMore: false);
+    }
+    // Always reports "there may be more", the way a full listing page does.
+    // The end of the history is only learned from the empty page past the
+    // last one, which is what the real client does too.
+    return GarminDivePage(
+      dives: all[start],
+      nextStart: start + 1,
+      hasMore: true,
+    );
   }
 
   @override
@@ -141,18 +171,22 @@ class _MultiPageClient extends _FakeGarminClient {
 
   final List<GarminActivitySummary> page2;
 
-  /// When set, held open right before yielding [page2] -- lets a test
+  /// When set, held open right before serving [page2] -- lets a test
   /// observe the "Load More"/"Fetch All" in-flight state instead of it
   /// resolving before the test can pump a frame to see it.
   Completer<void>? secondPageGate;
 
   @override
-  Stream<List<GarminActivitySummary>> listDivesPaged({
+  List<List<GarminActivitySummary>> get pages =>
+      [dives, page2].where((page) => page.isNotEmpty).toList();
+
+  @override
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
     int pageSize = 100,
-  }) async* {
-    if (dives.isNotEmpty) yield dives;
-    if (secondPageGate != null) await secondPageGate!.future;
-    if (page2.isNotEmpty) yield page2;
+  }) async {
+    if (start > 0 && secondPageGate != null) await secondPageGate!.future;
+    return super.fetchDivePage(start: start, pageSize: pageSize);
   }
 }
 
@@ -169,11 +203,47 @@ class _FailingSecondPageClient extends _FakeGarminClient {
   final Object error;
 
   @override
-  Stream<List<GarminActivitySummary>> listDivesPaged({
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
     int pageSize = 100,
-  }) async* {
-    if (dives.isNotEmpty) yield dives;
-    throw error;
+  }) async {
+    requestedPageStarts.add(start);
+    if (start > 0) throw error;
+    return _pageAt(start);
+  }
+}
+
+/// Fails the *second* page exactly once, then serves it -- the shape a
+/// transient network error has when the diver taps Load More and then tries
+/// again. The real client's page cursor has to survive the throw for the
+/// retry to reach the same page rather than falling off the end of the
+/// history.
+class _RecoveringSecondPageClient extends _FakeGarminClient {
+  _RecoveringSecondPageClient({
+    required List<GarminActivitySummary> page1,
+    required this.page2,
+    required super.fitBytesByActivityId,
+  }) : super(dives: page1);
+
+  final List<GarminActivitySummary> page2;
+
+  bool _hasFailed = false;
+
+  @override
+  List<List<GarminActivitySummary>> get pages =>
+      [dives, page2].where((page) => page.isNotEmpty).toList();
+
+  @override
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
+    int pageSize = 100,
+  }) async {
+    requestedPageStarts.add(start);
+    if (start > 0 && !_hasFailed) {
+      _hasFailed = true;
+      throw const GarminApiException('page 2 blew up');
+    }
+    return _pageAt(start);
   }
 }
 
@@ -208,12 +278,14 @@ class _RecoveringClient extends _FakeGarminClient {
   int attempts = 0;
 
   @override
-  Stream<List<GarminActivitySummary>> listDivesPaged({
+  Future<GarminDivePage> fetchDivePage({
+    int start = 0,
     int pageSize = 100,
-  }) async* {
+  }) async {
     attempts++;
+    requestedPageStarts.add(start);
     if (attempts == 1) throw const GarminApiException('temporary failure');
-    if (dives.isNotEmpty) yield dives;
+    return _pageAt(start);
   }
 }
 
@@ -829,6 +901,76 @@ void main() {
       expect(fetched, hasLength(1));
       expect(find.textContaining('socket died'), findsOneWidget);
       expect(find.text('Load More'), findsOneWidget);
+    });
+
+    testWidgets(
+      'Load More retries the page that failed rather than walking past it',
+      (tester) async {
+        final client = _RecoveringSecondPageClient(
+          page1: [_activity(1)],
+          page2: [_activity(2)],
+          fitBytesByActivityId: {1: fitBytes, 2: fitBytes},
+        );
+        List<GarminParsedDive>? fetched;
+
+        await tester.pumpWidget(
+          _host(
+            store: _FakeSessionStore(),
+            clientFactory: _FakeGarminClient.new,
+            child: GarminCloudFetchStep(
+              client: client,
+              onDivesFetched: (dives) => fetched = dives,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Load More'));
+        await tester.pumpAndSettle();
+        expect(find.text('page 2 blew up'), findsOneWidget);
+
+        await tester.tap(find.text('Load More'));
+        await tester.pumpAndSettle();
+
+        // The cursor stayed parked on the page that threw, so the retry
+        // asked for that same page instead of reporting the history as
+        // exhausted and hiding the button.
+        expect(client.requestedPageStarts, [0, 1, 1]);
+        expect(fetched, hasLength(2));
+        expect(find.text('Found 2 dives'), findsOneWidget);
+        expect(find.text('page 2 blew up'), findsNothing);
+      },
+    );
+
+    testWidgets('Fetch All still runs after an earlier page failed', (
+      tester,
+    ) async {
+      final client = _RecoveringSecondPageClient(
+        page1: [_activity(1)],
+        page2: [_activity(2)],
+        fitBytesByActivityId: {1: fitBytes, 2: fitBytes},
+      );
+
+      await tester.pumpWidget(
+        _host(
+          store: _FakeSessionStore(),
+          clientFactory: _FakeGarminClient.new,
+          child: GarminCloudFetchStep(client: client, onDivesFetched: (_) {}),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Load More'));
+      await tester.pumpAndSettle();
+      expect(find.text('page 2 blew up'), findsOneWidget);
+
+      // Fetch All stops looping on a paging error, so a stale one left over
+      // from the tap above would make this button a silent no-op.
+      await tester.tap(find.text('Fetch All'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Found 2 dives'), findsOneWidget);
+      expect(find.text('page 2 blew up'), findsNothing);
     });
 
     testWidgets(

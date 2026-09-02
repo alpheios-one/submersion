@@ -10492,7 +10492,7 @@
   "garminConnect_fetch_loadMore": "Carregar mais",
   "garminConnect_fetch_foundDives": "{count, plural, =0{Nenhum mergulho encontrado} =1{1 mergulho encontrado} other{{count} mergulhos encontrados}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{1 mergulho não pôde ser convertido e foi ignorado.} other{{count} mergulhos não puderam ser convertidos e foram ignorados.}}",
-  "garminConnect_fetch_fetchAll": "Fetch All",
+  "garminConnect_fetch_fetchAll": "Carregar tudo",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "Importar mergulhos da sua aplicacao Suunto ou da conta app.suunto.com",
   "transfer_importCloud_garminTitle": "Garmin",

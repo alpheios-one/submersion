@@ -33863,7 +33863,7 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get garminConnect_fetch_fetchAll => 'Fetch All';
+  String get garminConnect_fetch_fetchAll => '加载全部';
 
   @override
   String get importWizard_review_sortTooltip => '排序';

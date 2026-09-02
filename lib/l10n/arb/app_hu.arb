@@ -10492,7 +10492,7 @@
   "garminConnect_fetch_loadMore": "Továbbiak betöltése",
   "garminConnect_fetch_foundDives": "{count, plural, =0{Nem található merülés} =1{1 merülés található} other{{count} merülés található}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{1 merülést nem sikerült konvertálni, ezért kimaradt.} other{{count} merülést nem sikerült konvertálni, ezért kimaradtak.}}",
-  "garminConnect_fetch_fetchAll": "Fetch All",
+  "garminConnect_fetch_fetchAll": "Összes betöltése",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "Merulesek importalasa a Suunto alkalmazasbol vagy az app.suunto.com fiokbol",
   "transfer_importCloud_garminTitle": "Garmin",

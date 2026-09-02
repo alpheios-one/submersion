@@ -35984,7 +35984,7 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get garminConnect_fetch_fetchAll => 'Fetch All';
+  String get garminConnect_fetch_fetchAll => 'Carica tutto';
 
   @override
   String get importWizard_review_sortTooltip => 'Ordina';

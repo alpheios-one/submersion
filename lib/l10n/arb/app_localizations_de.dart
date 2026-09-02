@@ -35919,7 +35919,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get garminConnect_fetch_fetchAll => 'Fetch All';
+  String get garminConnect_fetch_fetchAll => 'Alle laden';
 
   @override
   String get importWizard_review_sortTooltip => 'Sortieren';

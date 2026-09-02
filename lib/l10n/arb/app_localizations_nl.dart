@@ -35739,7 +35739,7 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get garminConnect_fetch_fetchAll => 'Fetch All';
+  String get garminConnect_fetch_fetchAll => 'Alles laden';
 
   @override
   String get importWizard_review_sortTooltip => 'Sorteren';

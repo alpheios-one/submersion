@@ -587,6 +587,66 @@ void main() {
     );
   });
 
+  group('fetchDivePage', () {
+    test('walks past a listing page that holds no dives', () async {
+      final server = _FakeGarminServer()
+        ..activities.addAll([
+          _diveActivity(id: 1, typeKey: 'running'),
+          _diveActivity(id: 2, typeKey: 'running'),
+          _diveActivity(id: 3),
+        ]);
+      final client = GarminConnectClient(httpClient: server.client);
+      await client.login('diver@example.com', 'hunter2');
+
+      final page = await client.fetchDivePage(pageSize: 2);
+
+      // The first listing page filtered down to nothing. Returning it as-is
+      // would read to a caller as "the account has no dives", so the client
+      // keeps walking until it has a real page or runs out of history.
+      expect(page.dives.map((d) => d.activityId).toList(), [3]);
+      expect(page.hasMore, isFalse);
+    });
+
+    test(
+      'hands back a cursor the caller can resume the next page from',
+      () async {
+        final server = _FakeGarminServer()
+          ..activities.addAll([
+            _diveActivity(id: 1, startTimeGmt: '2026-03-03 08:00:00'),
+            _diveActivity(id: 2, startTimeGmt: '2026-03-02 08:00:00'),
+            _diveActivity(id: 3, startTimeGmt: '2026-03-01 08:00:00'),
+          ]);
+        final client = GarminConnectClient(httpClient: server.client);
+        await client.login('diver@example.com', 'hunter2');
+
+        final first = await client.fetchDivePage(pageSize: 2);
+        expect(first.dives.map((d) => d.activityId).toList(), [1, 2]);
+        expect(first.hasMore, isTrue);
+
+        // Fetching a page is a plain call rather than a step through a live
+        // stream, so a caller that hit a transient failure can ask for the
+        // same page again instead of losing the rest of the history.
+        final second = await client.fetchDivePage(
+          start: first.nextStart,
+          pageSize: 2,
+        );
+        expect(second.dives.map((d) => d.activityId).toList(), [3]);
+        expect(second.hasMore, isFalse);
+      },
+    );
+
+    test('reports an exhausted history as an empty page', () async {
+      final server = _FakeGarminServer();
+      final client = GarminConnectClient(httpClient: server.client);
+      await client.login('diver@example.com', 'hunter2');
+
+      final page = await client.fetchDivePage();
+
+      expect(page.dives, isEmpty);
+      expect(page.hasMore, isFalse);
+    });
+  });
+
   group('downloadActivityFit', () {
     test('unwraps the ZIP Garmin serves the FIT file inside', () async {
       final server = _FakeGarminServer()..fitFiles[42] = [1, 2, 3, 4];

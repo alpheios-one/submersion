@@ -10492,7 +10492,7 @@
   "garminConnect_fetch_loadMore": "تحميل المزيد",
   "garminConnect_fetch_foundDives": "{count, plural, =0{لم يتم العثور على غوصات} =1{تم العثور على غوصة واحدة} other{تم العثور على {count} غوصة}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{تعذّر تحويل غوصة واحدة وتم تخطيها.} other{تعذّر تحويل {count} غوصة وتم تخطيها.}}",
-  "garminConnect_fetch_fetchAll": "Fetch All",
+  "garminConnect_fetch_fetchAll": "تحميل الكل",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "استيراد الغوصات من تطبيق Suunto أو حساب app.suunto.com",
   "transfer_importCloud_garminTitle": "Garmin",

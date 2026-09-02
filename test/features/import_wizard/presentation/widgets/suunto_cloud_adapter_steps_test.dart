@@ -80,14 +80,48 @@ class _FakeCloudClient extends SuuntoCloudClient {
   @override
   Future<bool> verifySession() async => sessionValid;
 
+  /// The pages [fetchDivePage] serves, in order. Empty pages are dropped:
+  /// the real client walks past dive-less listing pages internally, so a
+  /// page it hands back is either non-empty or the end of the history.
+  List<List<SuuntoWorkoutSummary>> get pages =>
+      [workouts].where((page) => page.isNotEmpty).toList();
+
+  /// Every `offset` [fetchDivePage] has been asked for, so a test can assert
+  /// a retry re-requests the page that failed rather than skipping it.
+  final List<int> requestedPageOffsets = [];
+
+  /// `offset` is used as a plain page index here. The fake owns both sides
+  /// of the cursor, so counting pages reads more clearly than mimicking the
+  /// server's item offsets.
   @override
-  Stream<List<SuuntoWorkoutSummary>> listDivesPaged({
+  Future<SuuntoDivePage> fetchDivePage({
     int sinceMs = 0,
+    int offset = 0,
     int pageSize = 100,
-  }) async* {
+  }) async {
+    requestedPageOffsets.add(offset);
     final error = listError;
     if (error != null) throw error;
-    if (workouts.isNotEmpty) yield workouts;
+    return _pageAt(offset);
+  }
+
+  SuuntoDivePage _pageAt(int offset) {
+    final all = pages;
+    if (offset >= all.length) {
+      return SuuntoDivePage(
+        dives: const [],
+        nextOffset: offset,
+        hasMore: false,
+      );
+    }
+    // Always reports "there may be more", the way a full listing page does.
+    // The end of the history is only learned from the empty page past the
+    // last one, which is what the real client does too.
+    return SuuntoDivePage(
+      dives: all[offset],
+      nextOffset: offset + 1,
+      hasMore: true,
+    );
   }
 
   @override
@@ -111,19 +145,27 @@ class _MultiPageClient extends _FakeCloudClient {
 
   final List<SuuntoWorkoutSummary> page2;
 
-  /// When set, held open right before yielding [page2] -- lets a test
+  /// When set, held open right before serving [page2] -- lets a test
   /// observe the "Load More" in-flight state instead of it resolving
   /// before the test can pump a frame to see it.
   Completer<void>? secondPageGate;
 
   @override
-  Stream<List<SuuntoWorkoutSummary>> listDivesPaged({
+  List<List<SuuntoWorkoutSummary>> get pages =>
+      [workouts, page2].where((page) => page.isNotEmpty).toList();
+
+  @override
+  Future<SuuntoDivePage> fetchDivePage({
     int sinceMs = 0,
+    int offset = 0,
     int pageSize = 100,
-  }) async* {
-    if (workouts.isNotEmpty) yield workouts;
-    if (secondPageGate != null) await secondPageGate!.future;
-    if (page2.isNotEmpty) yield page2;
+  }) async {
+    if (offset > 0 && secondPageGate != null) await secondPageGate!.future;
+    return super.fetchDivePage(
+      sinceMs: sinceMs,
+      offset: offset,
+      pageSize: pageSize,
+    );
   }
 }
 
@@ -140,12 +182,49 @@ class _FailingSecondPageClient extends _FakeCloudClient {
   final Object error;
 
   @override
-  Stream<List<SuuntoWorkoutSummary>> listDivesPaged({
+  Future<SuuntoDivePage> fetchDivePage({
     int sinceMs = 0,
+    int offset = 0,
     int pageSize = 100,
-  }) async* {
-    if (workouts.isNotEmpty) yield workouts;
-    throw error;
+  }) async {
+    requestedPageOffsets.add(offset);
+    if (offset > 0) throw error;
+    return _pageAt(offset);
+  }
+}
+
+/// Fails the *second* page exactly once, then serves it -- the shape a
+/// transient network error has when the diver taps Load More and then tries
+/// again. The real client's page cursor has to survive the throw for the
+/// retry to reach the same page rather than falling off the end of the
+/// history.
+class _RecoveringSecondPageClient extends _FakeCloudClient {
+  _RecoveringSecondPageClient({
+    required List<SuuntoWorkoutSummary> page1,
+    required this.page2,
+    required super.smlByKey,
+  }) : super(workouts: page1);
+
+  final List<SuuntoWorkoutSummary> page2;
+
+  bool _hasFailed = false;
+
+  @override
+  List<List<SuuntoWorkoutSummary>> get pages =>
+      [workouts, page2].where((page) => page.isNotEmpty).toList();
+
+  @override
+  Future<SuuntoDivePage> fetchDivePage({
+    int sinceMs = 0,
+    int offset = 0,
+    int pageSize = 100,
+  }) async {
+    requestedPageOffsets.add(offset);
+    if (offset > 0 && !_hasFailed) {
+      _hasFailed = true;
+      throw const SuuntoApiException('page 2 blew up');
+    }
+    return _pageAt(offset);
   }
 }
 
@@ -664,6 +743,45 @@ void main() {
     });
 
     testWidgets(
+      'Load More retries the page that failed rather than walking past it',
+      (tester) async {
+        final client = _RecoveringSecondPageClient(
+          page1: [_workout('w1')],
+          page2: [_workout('w2')],
+          smlByKey: {'w1': _diveJson(), 'w2': _diveJson()},
+        );
+        List<SuuntoParsedDive>? fetched;
+
+        await tester.pumpWidget(
+          _host(
+            store: _FakeSessionStore(),
+            clientFactory: _FakeCloudClient.new,
+            child: SuuntoCloudFetchStep(
+              client: client,
+              onDivesFetched: (dives) => fetched = dives,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Load More'));
+        await tester.pumpAndSettle();
+        expect(find.text('page 2 blew up'), findsOneWidget);
+
+        await tester.tap(find.text('Load More'));
+        await tester.pumpAndSettle();
+
+        // The cursor stayed parked on the page that threw, so the retry
+        // asked for that same page instead of reporting the history as
+        // exhausted and hiding the button.
+        expect(client.requestedPageOffsets, [0, 1, 1]);
+        expect(fetched, hasLength(2));
+        expect(find.text('Found 2 dives'), findsOneWidget);
+        expect(find.text('page 2 blew up'), findsNothing);
+      },
+    );
+
+    testWidgets(
       'shows a spinner and progress text while Load More is in flight',
       (tester) async {
         final client = _MultiPageClient(
@@ -827,12 +945,14 @@ class _RecoveringClient extends _FakeCloudClient {
   int attempts = 0;
 
   @override
-  Stream<List<SuuntoWorkoutSummary>> listDivesPaged({
+  Future<SuuntoDivePage> fetchDivePage({
     int sinceMs = 0,
+    int offset = 0,
     int pageSize = 100,
-  }) async* {
+  }) async {
     attempts++;
+    requestedPageOffsets.add(offset);
     if (attempts == 1) throw const SuuntoApiException('temporary failure');
-    if (workouts.isNotEmpty) yield workouts;
+    return _pageAt(offset);
   }
 }

@@ -10492,7 +10492,7 @@
   "garminConnect_fetch_loadMore": "Cargar más",
   "garminConnect_fetch_foundDives": "{count, plural, =0{No se encontraron inmersiones} =1{Se encontró 1 inmersión} other{Se encontraron {count} inmersiones}}",
   "garminConnect_fetch_someFailed": "{count, plural, =1{No se pudo convertir 1 inmersión y se omitió.} other{No se pudieron convertir {count} inmersiones y se omitieron.}}",
-  "garminConnect_fetch_fetchAll": "Fetch All",
+  "garminConnect_fetch_fetchAll": "Cargar todo",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "Importa inmersiones desde tu aplicacion Suunto o tu cuenta de app.suunto.com",
   "transfer_importCloud_garminTitle": "Garmin",

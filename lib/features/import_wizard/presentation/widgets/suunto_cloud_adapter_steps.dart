@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -290,29 +289,18 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
   String? _progressText;
 
   final List<SuuntoParsedDive> _parsedDives = [];
-  StreamIterator<List<SuuntoWorkoutSummary>>? _pageIterator;
 
-  /// Whether [_pageIterator] might still hold an open subscription.
+  /// Cursor for the next unfetched listing page.
   ///
-  /// A [StreamIterator] already cancels its subscription internally once its
-  /// stream errors or completes, so cancelling it again is a harmless no-op
-  /// in production -- but it is *not* free: it still returns a genuine
-  /// `Future`, and awaiting one for an already-terminated iterator has been
-  /// observed to stall a test's `pumpAndSettle` indefinitely (the underlying
-  /// cross-zone microtask never gets flushed by fake-async time). Tracking
-  /// liveness explicitly lets a fresh fetch skip that redundant cancel.
-  bool _pageIteratorActive = false;
+  /// Only advanced once a page's listing call has actually returned, so a
+  /// page that failed is re-requested by the next Load More rather than
+  /// skipped.
+  int _nextPageOffset = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchFirstPage());
-  }
-
-  @override
-  void dispose() {
-    _pageIterator?.cancel();
-    super.dispose();
   }
 
   /// Clears any dives a previous attempt loaded, WITHOUT flipping
@@ -345,25 +333,23 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       _parsedDives.clear();
       _failedCount = 0;
       _hasMorePages = true;
+      _nextPageOffset = 0;
+      // A retry starts the whole fetch over, so no paging error or spinner
+      // from the previous attempt may survive into it.
+      _loadMoreError = null;
+      _isLoadingMore = false;
       _progressText = context.l10n.suuntoCloud_fetch_listing;
     });
 
-    if (_pageIteratorActive) {
-      await _pageIterator?.cancel();
-    }
-    _pageIterator = StreamIterator(client.listDivesPaged());
-    _pageIteratorActive = true;
-
     try {
-      final hasPage = await _pageIterator!.moveNext();
+      final page = await client.fetchDivePage();
       if (!mounted) return;
+      _nextPageOffset = page.nextOffset;
+      _hasMorePages = page.hasMore;
 
-      if (hasPage) {
-        await _downloadPage(client, _pageIterator!.current);
+      if (page.dives.isNotEmpty) {
+        await _downloadPage(client, page.dives);
         if (!mounted) return;
-      } else {
-        _hasMorePages = false;
-        _pageIteratorActive = false;
       }
 
       widget.onDivesFetched(List.unmodifiable(_parsedDives));
@@ -374,7 +360,6 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       ref.read(suuntoCloudDivesFetchedProvider.notifier).state = true;
     } on SuuntoApiException catch (e) {
       if (!mounted) return;
-      _pageIteratorActive = false;
       setState(() {
         _isFetching = false;
         _error = e.displayMessage;
@@ -382,7 +367,6 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
       _discardDives();
     } catch (e) {
       if (!mounted) return;
-      _pageIteratorActive = false;
       setState(() {
         _isFetching = false;
         _error = '$e';
@@ -400,8 +384,7 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
   /// instead, leaving everything fetched so far intact.
   Future<void> _loadMore() async {
     final client = widget.client;
-    final iterator = _pageIterator;
-    if (client == null || iterator == null || _isLoadingMore) return;
+    if (client == null || _isLoadingMore || !_hasMorePages) return;
 
     setState(() {
       _isLoadingMore = true;
@@ -409,29 +392,26 @@ class _SuuntoCloudFetchStepState extends ConsumerState<SuuntoCloudFetchStep> {
     });
 
     try {
-      final hasPage = await iterator.moveNext();
+      final page = await client.fetchDivePage(offset: _nextPageOffset);
       if (!mounted) return;
+      _nextPageOffset = page.nextOffset;
+      _hasMorePages = page.hasMore;
 
-      if (hasPage) {
-        await _downloadPage(client, iterator.current);
+      if (page.dives.isNotEmpty) {
+        await _downloadPage(client, page.dives);
         if (!mounted) return;
-      } else {
-        _hasMorePages = false;
-        _pageIteratorActive = false;
       }
 
       widget.onDivesFetched(List.unmodifiable(_parsedDives));
       setState(() => _isLoadingMore = false);
     } on SuuntoApiException catch (e) {
       if (!mounted) return;
-      _pageIteratorActive = false;
       setState(() {
         _isLoadingMore = false;
         _loadMoreError = e.displayMessage;
       });
     } catch (e) {
       if (!mounted) return;
-      _pageIteratorActive = false;
       setState(() {
         _isLoadingMore = false;
         _loadMoreError = '$e';
