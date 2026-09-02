@@ -454,42 +454,53 @@ class TileCacheService {
       options: options,
     );
 
+    // Protected from the orphan sweep from here until the caller records the
+    // region or discards the download. Every exit path below releases it: a
+    // region left marked in-flight is one pruneOrphanRegionStores skips
+    // forever, so a store half-created here would become exactly the
+    // unreachable bytes per-region stores exist to prevent.
     _inFlightRegionIds.add(regionId);
-    final regionStore = FMTCStore(regionStoreName(regionId));
-    await regionStore.manage.create();
 
-    _activeDownloadId = DateTime.now().millisecondsSinceEpoch;
+    try {
+      final regionStore = FMTCStore(regionStoreName(regionId));
+      await regionStore.manage.create();
 
-    final streams = regionStore.download.startForeground(
-      region: downloadableRegion,
-      parallelThreads: parallelThreads,
-      skipExistingTiles: skipExistingTiles,
-      instanceId: _activeDownloadId!,
-    );
+      _activeDownloadId = DateTime.now().millisecondsSinceEpoch;
 
-    final controller = StreamController<TileDownloadProgress>();
+      final streams = regionStore.download.startForeground(
+        region: downloadableRegion,
+        parallelThreads: parallelThreads,
+        skipExistingTiles: skipExistingTiles,
+        instanceId: _activeDownloadId!,
+      );
 
-    _activeDownloadSubscription = streams.downloadProgress.listen(
-      (progress) {
-        controller.add(
-          TileDownloadProgress(
-            downloadedTiles: progress.attemptedTilesCount,
-            totalTiles: progress.maxTilesCount,
-            failedTiles: progress.failedTilesCount,
-            tilesPerSecond: progress.tilesPerSecond,
-            isComplete: progress.percentageProgress >= 100,
-          ),
-        );
-      },
-      onError: controller.addError,
-      onDone: () {
-        _activeDownloadId = null;
-        _activeDownloadSubscription = null;
-        controller.close();
-      },
-    );
+      final controller = StreamController<TileDownloadProgress>();
 
-    return controller.stream;
+      _activeDownloadSubscription = streams.downloadProgress.listen(
+        (progress) {
+          controller.add(
+            TileDownloadProgress(
+              downloadedTiles: progress.attemptedTilesCount,
+              totalTiles: progress.maxTilesCount,
+              failedTiles: progress.failedTilesCount,
+              tilesPerSecond: progress.tilesPerSecond,
+              isComplete: progress.percentageProgress >= 100,
+            ),
+          );
+        },
+        onError: controller.addError,
+        onDone: () {
+          _activeDownloadId = null;
+          _activeDownloadSubscription = null;
+          controller.close();
+        },
+      );
+
+      return controller.stream;
+    } catch (_) {
+      _inFlightRegionIds.remove(regionId);
+      rethrow;
+    }
     // coverage:ignore-end
   }
 
@@ -523,11 +534,18 @@ class TileCacheService {
     // coverage:ignore-start
     _ensureInitialized();
     final store = FMTCStore(regionStoreName(regionId));
-    if (await store.manage.ready) {
-      await store.manage.delete();
-      _log.info('Deleted tile store for region $regionId');
+    try {
+      if (await store.manage.ready) {
+        await store.manage.delete();
+        _log.info('Deleted tile store for region $regionId');
+      }
+    } finally {
+      // Released even when the delete failed, and especially then: the
+      // protection exists only to shield a download in progress, and holding
+      // it past a failure is what would stop the sweep from ever reclaiming
+      // the store that is still sitting there.
+      _inFlightRegionIds.remove(regionId);
     }
-    _inFlightRegionIds.remove(regionId);
     // coverage:ignore-end
   }
 

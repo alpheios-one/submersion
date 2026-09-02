@@ -204,9 +204,7 @@ void main() {
       );
       expect(cache.calls.where((c) => c.startsWith('measure:')), isEmpty);
     });
-  });
 
-  group('download', () {
     test('a failed download leaves no store behind', () async {
       // The store is created before the first tile arrives, so a download that
       // throws anywhere after that would strand it holding tiles no region
