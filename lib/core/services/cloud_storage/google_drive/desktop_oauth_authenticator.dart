@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis_auth/auth_io.dart' as gauth;
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_authenticator.dart';
@@ -12,6 +11,8 @@ import 'package:submersion/core/services/cloud_storage/google_drive/google_drive
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
 import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/utils/log_failure.dart';
+import 'package:submersion/shared/utils/browser_launch.dart';
 
 /// Runs the user-consent step of the loopback flow and returns credentials.
 typedef ObtainConsentCredentials =
@@ -59,7 +60,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
            obtainConsent ?? gauth.obtainAccessCredentialsViaUserConsent,
        _buildClient = buildClient ?? gauth.autoRefreshingClient,
        _baseClientFactory = baseClientFactory ?? _timedClient,
-       _launchBrowser = launchBrowser ?? launchUrlString;
+       _launchBrowser = launchBrowser ?? _openConsentPage;
 
   static final _log = LoggerService.forClass(DesktopOAuthAuthenticator);
 
@@ -71,6 +72,12 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
   /// on top of it -- on sync and, via `mediaHttpClient()`, on the media
   /// transfer queue (#1279).
   static http.Client _timedClient() => TimeoutHttpClient.overSockets();
+
+  /// Hands the consent URL to the browser, with the Linux fallback chain
+  /// url_launcher alone does not provide.
+  static Future<void> _openConsentPage(String url) async {
+    await openInBrowser(Uri.parse(url));
+  }
 
   /// openid + email are included so the id_token carries the account email
   /// for the settings tile subtitle; drive.appdata is the only Drive scope.
@@ -112,7 +119,17 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     final base = _baseClientFactory();
     try {
       final credentials = await _obtainConsent(_clientId, scopes, base, (url) {
-        unawaited(_launchBrowser(url));
+        // The loopback flow then parks on the redirect until the browser
+        // comes back with a code, so a launch that failed reads as a hang.
+        // The URL goes to the log either way: on a desktop with no working
+        // https scheme handler (see openInBrowser) that log line is the only
+        // way to finish consent by hand.
+        _log.info('Google consent URL: $url');
+        logFailure(
+          _launchBrowser(url),
+          DesktopOAuthAuthenticator,
+          'open the Google consent page',
+        );
       });
       await _tokenStore.save(credentials);
       _installClient(credentials);

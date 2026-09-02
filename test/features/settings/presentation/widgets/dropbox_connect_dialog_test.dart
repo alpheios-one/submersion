@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +16,28 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import '../../../../support/fake_keychain_storage.dart';
 
 void main() {
+  // The dialog's own copy, not a platform message: url_launcher fails in
+  // ways that mean nothing to a diver (a PlatformException from GIO on
+  // Linux, a bare false everywhere else), so both shapes route here.
+  const browserError =
+      'Could not open your browser. Use Copy link and paste the address '
+      'into your browser.';
+
+  /// Records Clipboard.setData without touching a real pasteboard.
+  List<MethodCall> recordClipboard(WidgetTester tester) {
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          calls.add(call);
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+    return calls;
+  }
+
   DropboxStorageProvider provider(MockClient mock) {
     final auth = DropboxAuthManager(
       appKey: 'k',
@@ -53,6 +76,7 @@ void main() {
     List<Uri>? opened,
     bool openResult = true,
     List<bool>? openResultQueue,
+    Object? openThrows,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -72,6 +96,7 @@ void main() {
                   provider: p,
                   openUri: (uri) async {
                     opened?.add(uri);
+                    if (openThrows != null) throw openThrows;
                     if (openResultQueue != null && openResultQueue.isNotEmpty) {
                       return openResultQueue.removeAt(0);
                     }
@@ -108,11 +133,22 @@ void main() {
     // launchUrl reports "no browser opened" by returning false, not by
     // throwing; the dialog must not stay silent about it.
     await pumpDialog(tester, provider(happyMock()), openResult: false);
-    expect(
-      find.text('Could not open your browser. Try the Reopen browser button.'),
-      findsOneWidget,
-    );
+    expect(find.text(browserError), findsOneWidget);
     expect(find.text('Connect Dropbox'), findsOneWidget);
+  });
+
+  testWidgets('a thrown launch failure points at Copy link rather than '
+      'dumping the raw platform exception', (tester) async {
+    // url_launcher_linux reports "no https scheme handler registered" by
+    // throwing a PlatformException. A raw toString() in the error slot told
+    // the user nothing they could act on.
+    await pumpDialog(
+      tester,
+      provider(happyMock()),
+      openThrows: PlatformException(code: 'Launch Error', message: 'no app'),
+    );
+    expect(find.text(browserError), findsOneWidget);
+    expect(find.textContaining('PlatformException'), findsNothing);
   });
 
   testWidgets('a successful Reopen browser clears the stale browser error', (
@@ -123,12 +159,54 @@ void main() {
       provider(happyMock()),
       openResultQueue: [false, true],
     );
-    const browserError =
-        'Could not open your browser. Try the Reopen browser button.';
     expect(find.text(browserError), findsOneWidget);
 
     await tester.tap(find.text('Reopen browser'));
     await tester.pumpAndSettle();
+    expect(find.text(browserError), findsNothing);
+  });
+
+  testWidgets('Copy link puts the authorize URL on the clipboard', (
+    tester,
+  ) async {
+    // The escape hatch that makes the dialog usable when no browser opens.
+    // A Linux desktop whose GIO handler is stale reports a SUCCESSFUL
+    // launch and shows nothing, so no error state can be relied on to
+    // reveal this affordance -- it is always present.
+    final calls = recordClipboard(tester);
+    final opened = <Uri>[];
+    await pumpDialog(tester, provider(happyMock()), opened: opened);
+
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
+
+    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
+    expect((setData.arguments as Map)['text'], opened.single.toString());
+    expect(
+      find.text('Link copied. Paste it into your browser to authorize.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Copy link copies the same URL the browser was given, so the '
+      'pasted code still matches the pending PKCE verifier', (tester) async {
+    final calls = recordClipboard(tester);
+    final opened = <Uri>[];
+    await pumpDialog(
+      tester,
+      provider(happyMock()),
+      opened: opened,
+      openResult: false,
+    );
+    expect(find.text(browserError), findsOneWidget);
+
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
+
+    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
+    expect((setData.arguments as Map)['text'], opened.single.toString());
+    // The copy confirmation replaces the failure: the user has what they
+    // need, and leaving both up reads as two contradictory statuses.
     expect(find.text(browserError), findsNothing);
   });
 

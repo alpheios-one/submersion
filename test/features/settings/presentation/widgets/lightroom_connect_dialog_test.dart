@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,10 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import '../../../../support/fake_keychain_storage.dart';
 
 void main() {
+  const browserError =
+      'Could not open your browser. Use Copy link and paste the address '
+      'into your browser.';
+
   AdobeImsAuthManager manager(MockClient mock) => AdobeImsAuthManager(
     store: LightroomAuthStore(storage: InMemoryKeychain()),
     httpClient: mock,
@@ -160,10 +165,7 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Could not open your browser. Try the Reopen browser button.'),
-      findsOneWidget,
-    );
+    expect(find.text(browserError), findsOneWidget);
 
     openResult = true;
     await tester.tap(find.text('Reopen browser'));
@@ -171,9 +173,34 @@ void main() {
 
     expect(opened, hasLength(2));
     expect(opened[0], opened[1], reason: 'same verifier, same URL');
+    expect(find.text(browserError), findsNothing);
+  });
+
+  testWidgets('Copy link puts the authorize URL on the clipboard', (
+    tester,
+  ) async {
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          calls.add(call);
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+
+    final opened = <Uri>[];
+    await pumpDialog(tester, manager(happyMock()), opened: opened);
+
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
+
+    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
+    expect((setData.arguments as Map)['text'], opened.single.toString());
     expect(
-      find.text('Could not open your browser. Try the Reopen browser button.'),
-      findsNothing,
+      find.text('Link copied. Paste it into your browser to authorize.'),
+      findsOneWidget,
     );
   });
 
@@ -214,6 +241,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(opened, isEmpty);
+    expect(
+      find.text('Enter your Adobe client ID before connecting.'),
+      findsOneWidget,
+    );
+    // The same escape hatch as Dropbox: with no authorize URI to copy, the
+    // button must report the auth error rather than throwing.
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
     expect(
       find.text('Enter your Adobe client ID before connecting.'),
       findsOneWidget,

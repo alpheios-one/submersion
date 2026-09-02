@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/lightroom/adobe_ims_auth_manager.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/utils/browser_launch.dart';
 
 /// The paste-the-redirected-URL OAuth dialog: opens the Adobe IMS
 /// authorize page in the system browser and exchanges the pasted URL (or
 /// raw code). Pops `true` on success.
 ///
-/// [openUri] is injectable for widget tests; production uses url_launcher.
+/// Copy link is always offered, not just after a failed launch: on Linux a
+/// stale GIO scheme handler makes the launch report success and show nothing
+/// (Debian 13), so there is no error state to hang the escape hatch off.
+///
+/// [openUri] is injectable for widget tests; production uses [openInBrowser].
 class LightroomConnectDialog extends StatefulWidget {
   const LightroomConnectDialog({
     required this.authManager,
@@ -35,9 +41,12 @@ class LightroomConnectDialog extends StatefulWidget {
 }
 
 class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
+  static final _log = LoggerService.forClass(LightroomConnectDialog);
+
   final _codeController = TextEditingController();
   Uri? _authorizeUri;
   String? _errorText;
+  bool _linkCopied = false;
   bool _connecting = false;
 
   @override
@@ -55,33 +64,62 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
     super.dispose();
   }
 
-  Future<void> _openBrowser() async {
+  /// The pending authorize URI, generated on first use.
+  ///
+  /// The same URI is reused by Reopen browser and Copy link: a second
+  /// [AdobeImsAuthManager.beginAuthorization] would replace the pending PKCE
+  /// verifier, and the code from the page already open would then fail the
+  /// exchange. Returns null after reporting an auth error inline.
+  Uri? _pendingAuthorizeUri() {
     try {
-      final uri = _authorizeUri ??= widget.authManager.beginAuthorization(
+      return _authorizeUri ??= widget.authManager.beginAuthorization(
         clientId: widget.clientId,
         clientSecret: widget.clientSecret,
         redirectUri: widget.redirectUri,
       );
-      final open =
-          widget.openUri ??
-          (Uri u) => launchUrl(u, mode: LaunchMode.externalApplication);
-      final opened = await open(uri);
-      if (!mounted) return;
-      // launchUrl reports failure by returning false, not only by throwing.
-      // A successful (re)open clears any stale error.
-      setState(
-        () => _errorText = opened
-            ? null
-            : context.l10n.settings_cloudSync_dropbox_connect_browserFailed,
-      );
     } on CloudStorageException catch (e) {
-      // The dialog is barrier-dismissible; the open can outlive this State.
-      if (!mounted) return;
-      setState(() => _errorText = e.displayMessage);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _errorText = e.toString());
+      if (mounted) setState(() => _errorText = e.displayMessage);
+      return null;
     }
+  }
+
+  Future<void> _openBrowser() async {
+    final uri = _pendingAuthorizeUri();
+    if (uri == null) return;
+
+    bool opened;
+    try {
+      opened = await (widget.openUri ?? openInBrowser)(uri);
+    } catch (e) {
+      // Off Linux, url_launcher reports "no handler" by throwing a raw
+      // PlatformException. Its toString() named no action a diver could
+      // take, so the failure reads the same either way and the detail goes
+      // to the log.
+      _log.warning('Could not open the Adobe authorize page: $e');
+      opened = false;
+    }
+    // The dialog is barrier-dismissible; the open can outlive this State.
+    if (!mounted) return;
+    // launchUrl reports failure by returning false, not only by throwing.
+    // A successful (re)open clears any stale error.
+    setState(
+      () => _errorText = opened
+          ? null
+          : context.l10n.settings_cloudSync_dropbox_connect_browserFailed,
+    );
+  }
+
+  /// Copies the authorize URL so the user can open it by hand.
+  Future<void> _copyLink() async {
+    final uri = _pendingAuthorizeUri();
+    if (uri == null) return;
+    await Clipboard.setData(ClipboardData(text: uri.toString()));
+    if (!mounted) return;
+    setState(() {
+      _linkCopied = true;
+      // The user now has the link, so the launch failure is spent advice.
+      _errorText = null;
+    });
   }
 
   Future<void> _connect() async {
@@ -120,13 +158,31 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return AlertDialog(
+      // Scrollable so the copy-link row cannot push the code field off a
+      // short window; the actions stay pinned below it.
+      scrollable: true,
       title: Text(l10n.settings_lightroom_connect_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.settings_lightroom_connect_instructions),
-          const SizedBox(height: 16),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              onPressed: _connecting ? null : _copyLink,
+              icon: const Icon(Icons.link, size: 18),
+              label: Text(l10n.settings_cloudSync_dropbox_connect_copyLink),
+            ),
+          ),
+          if (_linkCopied)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                l10n.settings_cloudSync_dropbox_connect_linkCopied,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           TextField(
             controller: _codeController,
             autofocus: true,
