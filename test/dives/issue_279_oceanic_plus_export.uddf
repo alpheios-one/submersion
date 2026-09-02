@@ -7,15 +7,15 @@
             </contact>
         </manufacturer>
         <version>0.0.1</version>
-        <datetime>2025-02-04T01:36:20.565Z</datetime>
+        <datetime>2017-02-04T01:36:20.565Z</datetime>
     </generator>
     <divesite>
         <site id="site_67967df50a920e3cfb15217b">
             <name>site_67967df50a920e3cfb15217b</name>
             <geography>
                 <location>site_67967df50a920e3cfb15217b</location>
-                <latitude>18.148453</latitude>
-                <longitude>-65.51405</longitude>
+                <latitude>18.1</latitude>
+                <longitude>-65.5</longitude>
                 <altitude>-1.0671948</altitude>
             </geography>
         </site>
@@ -23,8 +23,8 @@
             <name>site_6796639f8f75135d076729c8</name>
             <geography>
                 <location>site_6796639f8f75135d076729c8</location>
-                <latitude>18.146833</latitude>
-                <longitude>-65.51356</longitude>
+                <latitude>18.1</latitude>
+                <longitude>-65.5</longitude>
                 <altitude>-10.0</altitude>
             </geography>
         </site>
@@ -32,8 +32,8 @@
             <name>site_6796448984195815e98acc1d</name>
             <geography>
                 <location>site_6796448984195815e98acc1d</location>
-                <latitude>18.146704</latitude>
-                <longitude>-65.51325</longitude>
+                <latitude>18.1</latitude>
+                <longitude>-65.5</longitude>
                 <altitude>-1.0</altitude>
             </geography>
         </site>
@@ -41,8 +41,8 @@
             <name>site_65c69b447a8f976ca9bf2ee0</name>
             <geography>
                 <location>site_65c69b447a8f976ca9bf2ee0</location>
-                <latitude>25.133114</latitude>
-                <longitude>-80.398895</longitude>
+                <latitude>25.1</latitude>
+                <longitude>-80.4</longitude>
                 <altitude>0.54057604</altitude>
             </geography>
         </site>
@@ -50,8 +50,8 @@
             <name>site_65c69b447a8f976ca9bf2edd</name>
             <geography>
                 <location>site_65c69b447a8f976ca9bf2edd</location>
-                <latitude>25.133217</latitude>
-                <longitude>-80.39904</longitude>
+                <latitude>25.1</latitude>
+                <longitude>-80.4</longitude>
                 <altitude>-0.6951638</altitude>
             </geography>
         </site>
@@ -59,8 +59,8 @@
             <name>site_653ea94b75f1ed0d230a47cd</name>
             <geography>
                 <location>site_653ea94b75f1ed0d230a47cd</location>
-                <latitude>41.10444</latitude>
-                <longitude>-80.14582</longitude>
+                <latitude>41.1</latitude>
+                <longitude>-80.1</longitude>
                 <altitude>367.77213</altitude>
             </geography>
         </site>
@@ -68,8 +68,8 @@
             <name>site_653ea94b75f1ed0d230a47ca</name>
             <geography>
                 <location>site_653ea94b75f1ed0d230a47ca</location>
-                <latitude>41.104397</latitude>
-                <longitude>-80.145584</longitude>
+                <latitude>41.1</latitude>
+                <longitude>-80.1</longitude>
                 <altitude>380.77774</altitude>
             </geography>
         </site>
@@ -77,8 +77,8 @@
             <name>site_653da0b3880e266bc21cc053</name>
             <geography>
                 <location>site_653da0b3880e266bc21cc053</location>
-                <latitude>41.104454</latitude>
-                <longitude>-80.145805</longitude>
+                <latitude>41.1</latitude>
+                <longitude>-80.1</longitude>
                 <altitude>379.26135</altitude>
             </geography>
         </site>
@@ -86,8 +86,8 @@
             <name>site_653da0b462cf9c66379d0f95</name>
             <geography>
                 <location>site_653da0b462cf9c66379d0f95</location>
-                <latitude>41.104397</latitude>
-                <longitude>-80.1459</longitude>
+                <latitude>41.1</latitude>
+                <longitude>-80.1</longitude>
                 <altitude>353.4968</altitude>
             </geography>
         </site>
@@ -104,7 +104,7 @@
             <dive id="dive_67967df50a920e3cfb15217b">
                 <informationbeforedive>
                     <link ref="site_67967df50a920e3cfb15217b"/>
-                    <datetime>2025-01-26T11:15:52.000-00:04</datetime>
+                    <datetime>2017-01-26T11:15:52.000-00:04</datetime>
                     <altitude>-1.0671948</altitude>
                 </informationbeforedive>
                 <samples>
@@ -1228,7 +1228,7 @@
             <dive id="dive_6796639f8f75135d076729c8">
                 <informationbeforedive>
                     <link ref="site_6796639f8f75135d076729c8"/>
-                    <datetime>2025-01-26T09:34:32.000-00:04</datetime>
+                    <datetime>2017-01-26T09:34:32.000-00:04</datetime>
                     <altitude>-10.0</altitude>
                 </informationbeforedive>
                 <samples>
@@ -2082,7 +2082,7 @@
             <dive id="dive_6796448984195815e98acc1d">
                 <informationbeforedive>
                     <link ref="site_6796448984195815e98acc1d"/>
-                    <datetime>2025-01-26T09:10:46.000-00:04</datetime>
+                    <datetime>2017-01-26T09:10:46.000-00:04</datetime>
                     <altitude>-1.0</altitude>
                 </informationbeforedive>
                 <samples>
@@ -2791,7 +2791,7 @@
             <dive id="dive_65c69b447a8f976ca9bf2ee0">
                 <informationbeforedive>
                     <link ref="site_65c69b447a8f976ca9bf2ee0"/>
-                    <datetime>2024-02-09T13:59:26.000-00:05</datetime>
+                    <datetime>2016-02-09T13:59:26.000-00:05</datetime>
                     <altitude>0.54057604</altitude>
                 </informationbeforedive>
                 <samples>
@@ -3638,7 +3638,7 @@
             <dive id="dive_65c69b447a8f976ca9bf2edd">
                 <informationbeforedive>
                     <link ref="site_65c69b447a8f976ca9bf2edd"/>
-                    <datetime>2024-02-09T12:50:38.000-00:05</datetime>
+                    <datetime>2016-02-09T12:50:38.000-00:05</datetime>
                     <altitude>-0.6951638</altitude>
                 </informationbeforedive>
                 <samples>
@@ -4695,7 +4695,7 @@
             <dive id="dive_653ea94b75f1ed0d230a47cd">
                 <informationbeforedive>
                     <link ref="site_653ea94b75f1ed0d230a47cd"/>
-                    <datetime>2023-10-29T10:44:49.000-00:04</datetime>
+                    <datetime>2015-10-29T10:44:49.000-00:04</datetime>
                     <altitude>367.77213</altitude>
                 </informationbeforedive>
                 <samples>
@@ -5419,7 +5419,7 @@
             <dive id="dive_653ea94b75f1ed0d230a47ca">
                 <informationbeforedive>
                     <link ref="site_653ea94b75f1ed0d230a47ca"/>
-                    <datetime>2023-10-29T10:06:57.000-00:04</datetime>
+                    <datetime>2015-10-29T10:06:57.000-00:04</datetime>
                     <altitude>380.77774</altitude>
                 </informationbeforedive>
                 <samples>
@@ -5938,7 +5938,7 @@
             <dive id="dive_653da0b3880e266bc21cc053">
                 <informationbeforedive>
                     <link ref="site_653da0b3880e266bc21cc053"/>
-                    <datetime>2023-10-28T13:45:19.000-00:04</datetime>
+                    <datetime>2015-10-28T13:45:19.000-00:04</datetime>
                     <altitude>379.26135</altitude>
                 </informationbeforedive>
                 <samples>
@@ -7212,7 +7212,7 @@
             <dive id="dive_653da0b462cf9c66379d0f95">
                 <informationbeforedive>
                     <link ref="site_653da0b462cf9c66379d0f95"/>
-                    <datetime>2023-10-28T12:07:15.000-00:04</datetime>
+                    <datetime>2015-10-28T12:07:15.000-00:04</datetime>
                     <altitude>353.4968</altitude>
                 </informationbeforedive>
                 <samples>

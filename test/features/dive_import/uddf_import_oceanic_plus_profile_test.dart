@@ -5,7 +5,9 @@
 // This exercises the full path the app uses for a UDDF file: parse with
 // ExportService, then persist with UddfEntityImporter against an in-memory
 // AppDatabase, then read the dive back through DiveRepository. The fixture is
-// the real export attached to the issue.
+// the export attached to the issue with site coordinates rounded to one
+// decimal place and dive dates shifted back by eight years; sample data,
+// element structure and number formatting are untouched.
 
 import 'dart:io';
 
