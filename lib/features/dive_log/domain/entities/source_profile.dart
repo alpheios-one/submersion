@@ -1,4 +1,5 @@
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 
 /// One data source's profile samples for a dive, keyed by the
 /// dive_data_sources row that owns them.
@@ -37,12 +38,26 @@ class SourceProfile {
 /// boundary count as disjoint: a Combine's synthesized surface fill is
 /// appended to the segment before the gap, so the next segment starts exactly
 /// where it ended.
+///
+/// Each span is the min and max of its points rather than the first and last.
+/// Sorted order is not an invariant of [SourceProfile.points]: mergeSeriesPoints
+/// sorts only when it has two or more series to interleave and returns a lone
+/// series' samples untouched, which is exactly the shape a source owning one
+/// series has. Reading the ends off an unsorted list would misjudge the span
+/// and pick the wrong rendering mode.
 bool sourceProfilesAreSequential(Iterable<SourceProfile> profiles) {
-  final spans = <(int, int)>[
-    for (final p in profiles)
-      if (p.points.isNotEmpty)
-        (p.points.first.timestamp, p.points.last.timestamp),
-  ]..sort((a, b) => a.$1.compareTo(b.$1));
+  final spans = <(int, int)>[];
+  for (final profile in profiles) {
+    if (profile.points.isEmpty) continue;
+    var start = profile.points.first.timestamp;
+    var end = start;
+    for (final point in profile.points) {
+      if (point.timestamp < start) start = point.timestamp;
+      if (point.timestamp > end) end = point.timestamp;
+    }
+    spans.add((start, end));
+  }
+  spans.sort((a, b) => a.$1.compareTo(b.$1));
   if (spans.length < 2) return false;
   // Compared against the furthest end seen so far, not just the previous
   // span's: a span nested inside an earlier one starts later but overlaps it.
@@ -53,3 +68,16 @@ bool sourceProfilesAreSequential(Iterable<SourceProfile> profiles) {
   }
   return true;
 }
+
+/// Whether a dive's chart draws one source at a time, with the others
+/// available as overlays, rather than the whole merged profile (issue #1451).
+///
+/// Two or more sources is a necessary condition but not a sufficient one: the
+/// halves of a dive a Combine stitched together arrive as several sources that
+/// never overlap in time, and drawing one of those hides the rest of the dive.
+/// Shared by every surface that renders a profile so the three of them cannot
+/// drift apart.
+bool usesPerSourceRendering(
+  List<DiveDataSource> sources,
+  Iterable<SourceProfile> profiles,
+) => sources.length >= 2 && !sourceProfilesAreSequential(profiles);

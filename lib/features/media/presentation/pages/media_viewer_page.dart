@@ -401,9 +401,10 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             // one dive a Combine stitched together, not alternative
             // recordings of it: the face reads the whole dive, not the
             // active half (#1451). Mirrors the detail and fullscreen pages.
-            final isMultiSource =
-                dataSources.length >= 2 &&
-                !sourceProfilesAreSequential(sourceProfiles.values);
+            final isMultiSource = usesPerSourceRendering(
+              dataSources,
+              sourceProfiles.values,
+            );
             final perdixProfile = (isMultiSource && activeProfile != null)
                 ? activeProfile.points
                 : dive?.profile ?? const [];

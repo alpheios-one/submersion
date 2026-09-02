@@ -85,6 +85,29 @@ void main() {
       );
     });
 
+    test('reads each span as min and max, not first and last', () {
+      // mergeSeriesPoints returns a lone series' samples untouched, so a
+      // source that owns one series can hand over points in any order. Taking
+      // the ends off the list would read the second source's span as
+      // (2100, 1500), an inverted interval that overlaps the first.
+      expect(
+        sourceProfilesAreSequential([
+          _source('first', [600, 0, 1200]),
+          _source('second', [2100, 2700, 1500]),
+        ]),
+        isTrue,
+      );
+      // The mirror case: genuinely overlapping sources stay overlapping when
+      // their points arrive out of order.
+      expect(
+        sourceProfilesAreSequential([
+          _source('a', [1200, 0, 600]),
+          _source('b', [1190, 10, 610]),
+        ]),
+        isFalse,
+      );
+    });
+
     test('answers on argument order, not iteration order', () {
       expect(
         sourceProfilesAreSequential([

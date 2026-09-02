@@ -38,17 +38,18 @@ void main() {
   final firstHalf = segment(6, startSeconds: 0);
   final secondHalf = segment(6, startSeconds: 900);
 
-  DiveDataSource carriedSource(String id) => DiveDataSource(
-    id: id,
-    diveId: 'test-dive-1',
-    // A file or cloud import has no computer to collapse the halves on;
-    // that is the case that reached the page as two selectable sources.
-    computerId: null,
-    isPrimary: false,
-    sourceFileFormat: 'uddf',
-    importedAt: now,
-    createdAt: now,
-  );
+  DiveDataSource carriedSource(String id, {required String diveId}) =>
+      DiveDataSource(
+        id: id,
+        diveId: diveId,
+        // A file or cloud import has no computer to collapse the halves on;
+        // that is the case that reached the page as two selectable sources.
+        computerId: null,
+        isPrimary: false,
+        sourceFileFormat: 'uddf',
+        importedAt: now,
+        createdAt: now,
+      );
 
   late Dive dive;
   late List<DiveDataSource> sources;
@@ -58,7 +59,10 @@ void main() {
     dive = createTestDiveWithBottomTime().copyWith(
       profile: [...firstHalf, ...secondHalf],
     );
-    sources = [carriedSource('src-first'), carriedSource('src-second')];
+    sources = [
+      carriedSource('src-first', diveId: dive.id),
+      carriedSource('src-second', diveId: dive.id),
+    ];
     profiles = {
       'src-first': SourceProfile(
         sourceId: 'src-first',
