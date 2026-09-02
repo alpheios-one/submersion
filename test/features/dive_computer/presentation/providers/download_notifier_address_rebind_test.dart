@@ -129,6 +129,21 @@ void main() {
       expect(saved?.serialNumber, '074691');
     });
 
+    test(
+      'blank serial and firmware strings do not erase stored values',
+      () async {
+        final saved = await completeDownload(
+          computer: _savedComputer(),
+          device: _device(_freshAddress),
+          serialNumber: '',
+          firmwareVersion: ' ',
+        );
+        expect(saved?.bluetoothAddress, _freshAddress);
+        expect(saved?.serialNumber, '074691');
+        expect(saved?.firmwareVersion, '5.0.0');
+      },
+    );
+
     test('fills in a missing stored address', () async {
       final saved = await completeDownload(
         computer: _savedComputer(bluetoothAddress: null),

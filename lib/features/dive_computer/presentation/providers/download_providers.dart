@@ -296,11 +296,16 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   /// address the download actually used on the computer record after a
   /// successful download.
   Future<void> _persistDeviceInfo(
-    String? serialNumber,
-    String? firmwareVersion,
+    String? reportedSerialNumber,
+    String? reportedFirmwareVersion,
   ) async {
     final computer = _computer;
     if (computer == null) return;
+
+    // A backend that reports '' rather than null must not blank out values
+    // stored by an earlier download.
+    final serialNumber = _nonBlank(reportedSerialNumber);
+    final firmwareVersion = _nonBlank(reportedFirmwareVersion);
 
     try {
       final address = _addressToRebind(computer, serialNumber);
@@ -322,6 +327,11 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         stackTrace: stackTrace,
       );
     }
+  }
+
+  static String? _nonBlank(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
   }
 
   /// The address to store for [computer] after downloading from [_device],
