@@ -276,4 +276,20 @@ void main() {
       expect(find.text('2 photos bundled in the archive'), findsOneWidget);
     });
   });
+
+  testWidgets('shows the scanning state while a folder resolves', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedPictures(1);
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(isLoading: true);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('Scanning folder...'), findsOneWidget);
+      expect(find.text('Choose photo folder...'), findsNothing);
+    });
+  });
 }

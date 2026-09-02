@@ -80,4 +80,27 @@ void main() {
     // Neither existing file was overwritten.
     expect(await File(p.join(dest.path, 'a.jpg')).readAsBytes(), [7, 7, 7]);
   });
+
+  test(
+    'compares files larger than one chunk without loading them whole',
+    () async {
+      // Three chunks plus a tail, differing only in the final byte.
+      final big = List<int>.generate(64 * 1024 * 3 + 17, (i) => i % 251);
+      final src = await source('big.jpg', big);
+      await dest.create(recursive: true);
+      await File(p.join(dest.path, 'big.jpg')).writeAsBytes(big);
+      final almost = List<int>.of(big)..[big.length - 1] = 0;
+      await File(p.join(dest.path, 'big_1.jpg')).writeAsBytes(almost);
+
+      final out = await exportBundledPhoto(
+        source: src,
+        destinationDir: dest.path,
+      );
+
+      // The identical multi-chunk file is reused; the near-identical one is
+      // not mistaken for it.
+      expect(out, p.join(dest.path, 'big.jpg'));
+      expect(dest.listSync().length, 2);
+    },
+  );
 }

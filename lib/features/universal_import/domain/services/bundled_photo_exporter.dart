@@ -37,12 +37,26 @@ Future<String> exportBundledPhoto({
   return copied.path;
 }
 
+/// Compares two files in fixed-size chunks so memory stays bounded no
+/// matter how large the photo is.
 Future<bool> _sameBytes(File a, File b) async {
   if (await a.length() != await b.length()) return false;
-  final bytesA = await a.readAsBytes();
-  final bytesB = await b.readAsBytes();
-  for (var i = 0; i < bytesA.length; i++) {
-    if (bytesA[i] != bytesB[i]) return false;
+  final readerA = await a.open();
+  final readerB = await b.open();
+  try {
+    while (true) {
+      final chunkA = await readerA.read(_compareChunkBytes);
+      final chunkB = await readerB.read(_compareChunkBytes);
+      if (chunkA.length != chunkB.length) return false;
+      if (chunkA.isEmpty) return true;
+      for (var i = 0; i < chunkA.length; i++) {
+        if (chunkA[i] != chunkB[i]) return false;
+      }
+    }
+  } finally {
+    await readerA.close();
+    await readerB.close();
   }
-  return true;
 }
+
+const _compareChunkBytes = 64 * 1024;
