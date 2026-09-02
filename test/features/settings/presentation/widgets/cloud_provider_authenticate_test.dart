@@ -129,7 +129,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AlertDialog), findsNothing);
-    expect(error, isA<CloudStorageException>());
+    expect(error, isA<CloudAuthCancelled>());
     expect(find.text('connect'), findsOneWidget);
 
     // The abandoned loopback listener eventually times out; its error must

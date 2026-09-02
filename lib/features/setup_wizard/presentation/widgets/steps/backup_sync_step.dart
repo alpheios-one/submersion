@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
@@ -59,9 +58,20 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
       // quietly broke the contract the comment above claims.
       final instance = ref.read(cloudStorageProviderProvider);
       if (instance == null) {
-        throw CloudStorageException(
-          context.l10n.settings_cloudSync_provider_initFailed(type.name),
+        // Report it the way CloudSyncPage does, rather than throwing: routing
+        // this through setup_sync_error would print the exception's own type
+        // name into the snackbar alongside the message.
+        selection.state = null;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.settings_cloudSync_provider_initFailed(
+                _providerName(type),
+              ),
+            ),
+          ),
         );
+        return;
       }
       // Desktop Google Drive authenticates through the system browser, which
       // can take as long as the user does. The shared helper keeps a
@@ -84,6 +94,11 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
             .peerSyncFiles(instance);
         if (peers.isNotEmpty && mounted) widget.onLibraryFound!();
       }
+    } on CloudAuthCancelled {
+      // A deliberate cancel: undo the pending selection silently so the cards
+      // come back, with no error shown for a choice the user made.
+      selection.state = null;
+      if (mounted) notifier.setConnectedProvider(null);
     } catch (e) {
       selection.state = null;
       if (mounted) {

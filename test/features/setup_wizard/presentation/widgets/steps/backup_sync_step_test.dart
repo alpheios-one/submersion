@@ -10,6 +10,7 @@ import 'package:submersion/core/services/sync/sync_initializer.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/cloud_provider_authenticate.dart';
 import 'package:submersion/features/setup_wizard/domain/setup_wizard_models.dart';
 import 'package:submersion/features/setup_wizard/presentation/providers/setup_wizard_providers.dart';
 import 'package:submersion/features/setup_wizard/presentation/widgets/steps/backup_sync_step.dart';
@@ -55,14 +56,25 @@ class _FakeSyncNotifier extends StateNotifier<SyncState>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+Widget _englishTestApp({required Widget child, List<dynamic>? overrides}) =>
+    testApp(locale: const Locale('en'), overrides: overrides, child: child);
+
 void main() {
   testWidgets('backup toggle reveals frequency and updates draft', (
     tester,
   ) async {
+    // Prove these English text finders are independent of the machine running
+    // the suite. Without an explicit app locale below, this German host locale
+    // makes the test fail before it ever reaches the interaction assertions.
+    tester.binding.platformDispatcher.localesTestValue = const [
+      Locale('de', 'DE'),
+    ];
+    addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+
     late ProviderContainer container;
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           // Deterministic gates: not Apple, no Dropbox key, no Drive.
@@ -98,7 +110,7 @@ void main() {
   ) async {
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -125,7 +137,7 @@ void main() {
     // offered it all along.
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -155,7 +167,7 @@ void main() {
     // the same treatment the wizard already gives an unconfigured Dropbox.
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -178,7 +190,7 @@ void main() {
     // config page opens without going through the onboarding redirect.
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -218,7 +230,7 @@ void main() {
     ) async {
       final overrides = await getBaseOverrides();
       await tester.pumpWidget(
-        testApp(
+        _englishTestApp(
           overrides: [
             ...overrides,
             isApplePlatformProvider.overrideWithValue(false),
@@ -250,7 +262,7 @@ void main() {
     final cloud = _FakeCloudProvider();
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -296,7 +308,7 @@ void main() {
     );
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -332,6 +344,50 @@ void main() {
     expect(find.textContaining('no network'), findsOneWidget);
   });
 
+  testWidgets('cancelling the sign-in rolls back without an error', (
+    tester,
+  ) async {
+    // A cancel is a decision, not a failure: the cards come back and nothing
+    // is reported, unlike the genuine-failure case above.
+    late ProviderContainer container;
+    final cloud = _FakeCloudProvider(failWith: const CloudAuthCancelled());
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      _englishTestApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => true),
+          cloudStorageProviderProvider.overrideWithValue(cloud),
+          syncInitializerProvider.overrideWithValue(_FakeSyncInit()),
+          syncStateProvider.overrideWith((ref) => _FakeSyncNotifier()),
+        ],
+        child: Builder(
+          builder: (context) {
+            container = ProviderScope.containerOf(context);
+            return const BackupSyncStep(mode: SetupWizardMode.firstRun);
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Google Drive'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(selectedCloudProviderTypeProvider), isNull);
+    expect(
+      container
+          .read(setupWizardProvider(SetupWizardMode.firstRun))
+          .connectedProvider,
+      isNull,
+    );
+    expect(find.text('Google Drive'), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
+    expect(find.textContaining('Could not connect'), findsNothing);
+  });
+
   testWidgets('connect reports an unresolvable backend instead of hanging', (
     tester,
   ) async {
@@ -339,7 +395,7 @@ void main() {
     // app-managed sync is off. Surfacing that beats silently doing nothing.
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -357,7 +413,15 @@ void main() {
     await tester.tap(find.text('Google Drive'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('googledrive'), findsOneWidget);
+    // The message carries the display name, not the enum's `googledrive`.
+    expect(
+      find.text(
+        AppLocalizationsEn().settings_cloudSync_provider_initFailed(
+          'Google Drive',
+        ),
+      ),
+      findsOneWidget,
+    );
     expect(find.text('Google Drive'), findsOneWidget);
   });
 
@@ -367,7 +431,7 @@ void main() {
     late ProviderContainer container;
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
@@ -413,7 +477,7 @@ void main() {
   ) async {
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(true),
@@ -437,7 +501,7 @@ void main() {
   ) async {
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
-      testApp(
+      _englishTestApp(
         overrides: [
           ...overrides,
           isApplePlatformProvider.overrideWithValue(true),

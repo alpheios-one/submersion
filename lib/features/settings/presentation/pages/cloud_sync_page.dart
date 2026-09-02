@@ -875,6 +875,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
 
       // Refresh sync state after successful authentication
       ref.read(syncStateProvider.notifier).refreshState();
+    } on CloudAuthCancelled {
+      // The user backed out of the browser sign-in deliberately. Clear the
+      // half-made selection, but do not dress a decision up as a failure.
+      ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
     } catch (e) {
       // Clear the provider selection on failure
       ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
