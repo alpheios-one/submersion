@@ -11,6 +11,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/universal_import/data/models/detection_result.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_options.dart';
+import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 import 'package:submersion/features/universal_import/presentation/widgets/field_mapping_step.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -93,5 +94,41 @@ void main() {
     expect(find.text('Column Mapping'), findsOneWidget);
     expect(find.text('Date'), findsOneWidget);
     expect(find.text('Max Depth'), findsOneWidget);
+  });
+
+  testWidgets('says nothing while a successful non-CSV import skips past', (
+    tester,
+  ) async {
+    // The wizard skips this step once a payload exists, and PageView builds
+    // AND mounts every page it animates over, so a successful UDDF import
+    // renders this step for part of the 300ms sweep to review. A UDDF has no
+    // csvHeaders, so the no-columns branch is live here even though nothing
+    // went wrong -- it must not flash an error at a working import.
+    final container = await _container();
+    container.read(universalImportNotifierProvider.notifier).state = container
+        .read(universalImportNotifierProvider)
+        .copyWith(
+          detectionResult: const DetectionResult(
+            format: ImportFormat.uddf,
+            confidence: 0.9,
+          ),
+          options: const ImportOptions(
+            sourceApp: SourceApp.generic,
+            format: ImportFormat.uddf,
+          ),
+          payload: const ImportPayload(
+            entities: {
+              ImportEntityType.dives: [
+                {'dateTime': '2026-01-01', 'maxDepth': 30.0},
+              ],
+            },
+          ),
+        );
+
+    await _pump(tester, container);
+
+    expect(find.textContaining('no columns to map'), findsNothing);
+    expect(find.textContaining('0 of 0 columns mapped'), findsNothing);
+    expect(find.byIcon(Icons.error_outline), findsNothing);
   });
 }

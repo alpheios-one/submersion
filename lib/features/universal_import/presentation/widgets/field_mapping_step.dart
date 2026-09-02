@@ -104,6 +104,12 @@ class _FieldMappingStepState extends ConsumerState<FieldMappingStep> {
     // produced the reported "Column Mapping / 0 of 0 columns mapped" dead end,
     // so say what happened instead.
     if (headers.isEmpty) {
+      // ...unless nothing went wrong. A non-CSV file never has csvHeaders, and
+      // the wizard skips this step once a payload exists -- but PageView
+      // builds and mounts every page it animates over, so a successful UDDF
+      // import renders this step during the sweep to review. Stay silent for
+      // that frame rather than flashing an error at a working import.
+      if (state.payload != null) return const SizedBox.shrink();
       return _NoColumnsNotice(error: state.error);
     }
 
