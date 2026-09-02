@@ -461,6 +461,40 @@ void main() {
     });
   });
 
+  group('clear during a download', () {
+    test('discards the running download instead of orphaning it', () async {
+      // The running download owns a store with no row yet, so nothing in the
+      // clear loop would see it, and the reset would delete the store out from
+      // under it. Left unhandled, that download then finishes and records a
+      // region for tiles the clear had already removed.
+      final downloads = container.read(downloadProgressProvider.notifier);
+      final running = downloads.downloadRegion(
+        name: 'Cozumel',
+        minLat: 20,
+        maxLat: 21,
+        minLng: -87,
+        maxLng: -86,
+        minZoom: 8,
+        maxZoom: 12,
+        tileLayerOptions: tileLayer,
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .clearAllCache();
+      await running;
+
+      expect(await repository.getAllRegions(), isEmpty);
+      expect(
+        cache.calls.where((c) => c.startsWith('discard:')),
+        hasLength(1),
+        reason: 'the interrupted download gives up its own store',
+      );
+      expect(cache.calls.where((c) => c.startsWith('measure:')), isEmpty);
+    });
+  });
+
   group('partial clear', () {
     test('keeps only the regions whose tiles are still there', () async {
       // A row whose tiles are gone is worse than no row: the page would offer

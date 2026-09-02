@@ -517,7 +517,8 @@ class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
           trailing: IconButton(
             icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
             tooltip: context.l10n.maps_offline_deleteRegion(region.name),
-            onPressed: () => _confirmDeleteRegion(context, region),
+            onPressed: () =>
+                _confirmDeleteRegion(context, region, regionStoreIds),
           ),
           onTap: () => _showRegionDetails(context, units, region, size),
         ),
@@ -620,21 +621,18 @@ class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
   Future<void> _confirmDeleteRegion(
     BuildContext context,
     CachedRegion region,
+    Set<String>? regionStoreIds,
   ) async {
-    // Read rather than watch: the dialog has to state whether deleting will
-    // actually free anything, and a region whose tiles are commingled in the
-    // shared store frees nothing at all.
-    Set<String> regionStoreIds;
-    try {
-      regionStoreIds = await ref.read(regionStoreIdsProvider.future);
-    } catch (e, st) {
-      // Unprovable is not the same as reclaimable: fall back to the message
-      // that promises nothing rather than to one that promises bytes back.
-      _log.warning('Could not read region tile stores: $e', stackTrace: st);
-      regionStoreIds = const {};
-    }
-    if (!context.mounted) return;
-    final ownsTiles = regionStoreIds.contains(region.id);
+    // The same answer the list is already showing, rather than a fresh read.
+    // Awaiting the tile cache here would leave the button doing nothing
+    // visible for as long as the backend took, and it would let the dialog
+    // contradict the size printed on the row behind it.
+    //
+    // Null means the answer has not arrived yet, which is not proof that the
+    // region owns its tiles: falling back to the message that promises
+    // nothing is the direction that cannot mislead. It under-promises for the
+    // moment or two before the store list resolves, and never the reverse.
+    final ownsTiles = regionStoreIds?.contains(region.id) ?? false;
 
     final confirmed = await showDialog<bool>(
       context: context,

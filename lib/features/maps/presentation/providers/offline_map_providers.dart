@@ -412,6 +412,14 @@ class CachedRegionsNotifier
     StackTrace? firstStackTrace;
 
     try {
+      // A running download owns a store with no row yet, so the loop below
+      // would walk straight past it and the reset would then delete the store
+      // out from under it. Cancelling through the download notifier, rather
+      // than the service, is what makes the difference: it marks the download
+      // cancelled, so it discards itself instead of finishing and recording a
+      // region whose tiles this clear had already removed.
+      await _ref.read(downloadProgressProvider.notifier).cancelDownload();
+
       for (final region in await _repository.getAllRegions()) {
         try {
           await _cacheService.deleteRegionTiles(region.id);

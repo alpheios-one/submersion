@@ -60,6 +60,9 @@ class _UnreadableTileCache implements TileCacheService {
       throw StateError('tile cache unavailable');
 
   @override
+  Future<void> deleteRegionTiles(String regionId) async {}
+
+  @override
   Future<int> pruneOrphanRegionStores({
     required Set<String> knownRegionIds,
   }) async => 0;
