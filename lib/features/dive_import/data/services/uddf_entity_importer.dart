@@ -1397,7 +1397,12 @@ class UddfEntityImporter {
       ..sort((a, b) {
         final aTime = items[a]['dateTime'] as DateTime? ?? now;
         final bTime = items[b]['dateTime'] as DateTime? ?? now;
-        return aTime.compareTo(bTime);
+        final byTime = aTime.compareTo(bTime);
+        // Dives sharing a timestamp keep the order the file lists them in.
+        // List.sort is only stable below its insertion-sort threshold (ties
+        // start reordering around 40 elements), and a logbook of dives
+        // entered by hand arrives with a whole day of them at midnight.
+        return byTime != 0 ? byTime : a.compareTo(b);
       });
 
     // Auto-assign dive numbers starting from the next available number,

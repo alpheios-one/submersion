@@ -445,6 +445,41 @@ void main() {
       expect(dives.firstWhere((d) => d.maxDepth == 18.0).diveNumber, 1);
       expect(dives.firstWhere((d) => d.maxDepth == 12.0).diveNumber, 2);
     });
+
+    test('numbers dives sharing a timestamp in file order', () async {
+      // A logbook of dives entered by hand carries no times, so a whole day
+      // of them ties at midnight. List.sort only preserves input order below
+      // its insertion-sort threshold, so the batch has to be big enough to
+      // reach the quicksort path (ties reorder from around 40 elements).
+      const undatedCount = 60;
+      final data = UddfImportResult(
+        dives: [
+          {'dateTime': DateTime.utc(2020, 3, 4, 9, 0), 'maxDepth': 1000.0},
+          for (var i = 0; i < undatedCount; i++) {'maxDepth': i.toDouble()},
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: UddfImportSelections(
+          dives: {for (var i = 0; i <= undatedCount; i++) i},
+        ),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final dives = verify(
+        mockDiveRepo.createDive(captureAny),
+      ).captured.cast<Dive>();
+      expect(dives.firstWhere((d) => d.maxDepth == 1000.0).diveNumber, 1);
+      for (var i = 0; i < undatedCount; i++) {
+        expect(
+          dives.firstWhere((d) => d.maxDepth == i.toDouble()).diveNumber,
+          i + 2,
+          reason: 'undated dive at file position $i',
+        );
+      }
+    });
   });
 
   group('Import dives (deco dive type default)', () {
