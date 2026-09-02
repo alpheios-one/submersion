@@ -544,7 +544,21 @@ class TileCacheService {
 
       return controller.stream;
     } catch (_) {
+      // Everything this call set, unset. A failed setup that left
+      // _activeDownloadId behind would leave the service believing a download
+      // was running: the next cancel would address an instance that never
+      // existed, and isDownloadPaused would answer for it.
       _inFlightRegionIds.remove(regionId);
+      final controller = _activeDownloadController;
+      if (controller != null && !controller.isClosed) {
+        unawaited(controller.close());
+      }
+      _activeDownloadId = null;
+      _activeDownloadRegionId = null;
+      _activeDownloadStore = null;
+      _activeDownloadController = null;
+      await _activeDownloadSubscription?.cancel();
+      _activeDownloadSubscription = null;
       rethrow;
     }
     // coverage:ignore-end

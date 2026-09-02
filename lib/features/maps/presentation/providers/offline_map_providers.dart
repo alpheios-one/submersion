@@ -394,23 +394,48 @@ class CachedRegionsNotifier
   }
 
   /// Clear all cached tiles and regions.
+  ///
+  /// Region by region, so that a partial failure leaves a coherent state
+  /// rather than a plausible-looking lie. Clearing the tiles wholesale first
+  /// and the rows afterwards meant that a failure between the two left rows
+  /// describing regions whose tiles were already gone: the page would offer
+  /// them as regions, report their size as unmeasurable, and warn that
+  /// deleting them would not reclaim anything, when in fact there was nothing
+  /// left to reclaim.
+  ///
+  /// Each region is removed the same way a single delete removes one, tiles
+  /// before row, so whatever survives a failure is exactly the set whose bytes
+  /// are still on disk. The shared stores are reset afterwards, which also
+  /// takes any region store no row was pointing at.
   Future<void> clearAllCache() async {
-    try {
-      // Clear tiles from cache service
-      await _cacheService.clearCache();
+    Object? firstError;
+    StackTrace? firstStackTrace;
 
-      // Get all regions and delete them
-      final regions = await _repository.getAllRegions();
-      for (final region in regions) {
-        await _repository.deleteRegion(region.id);
+    try {
+      for (final region in await _repository.getAllRegions()) {
+        try {
+          await _cacheService.deleteRegionTiles(region.id);
+          await _repository.deleteRegion(region.id);
+        } catch (e, st) {
+          // Kept, not thrown: one locked store must not strand every other
+          // region's bytes, which is the whole point of clearing.
+          firstError ??= e;
+          firstStackTrace ??= st;
+        }
       }
 
-      // Reload
+      await _cacheService.clearCache();
+
       await _loadRegions();
       _ref.invalidate(cacheStatsProvider);
       _ref.invalidate(regionStoreIdsProvider);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      firstError ??= e;
+      firstStackTrace ??= st;
+    }
+
+    if (firstError != null) {
+      state = AsyncValue.error(firstError, firstStackTrace ?? StackTrace.empty);
     }
   }
 }

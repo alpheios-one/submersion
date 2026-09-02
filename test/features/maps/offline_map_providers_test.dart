@@ -24,6 +24,10 @@ class _FakeTileCache implements TileCacheService {
 
   int measuredBytes = 0;
   Object? deleteTilesError;
+
+  /// Regions whose tile deletion fails, for asserting that a partial clear
+  /// keeps exactly the rows whose bytes are still there.
+  final Set<String> undeletableRegionIds = {};
   Object? downloadError;
   Object? clearCacheError;
 
@@ -75,6 +79,9 @@ class _FakeTileCache implements TileCacheService {
     calls.add('deleteTiles:$regionId');
     final error = deleteTilesError;
     if (error != null) throw error;
+    if (undeletableRegionIds.contains(regionId)) {
+      throw StateError('store for $regionId is locked');
+    }
   }
 
   @override
@@ -423,9 +430,10 @@ void main() {
   });
 
   group('clear all failure', () {
-    test('keeps the rows when the tiles could not all be cleared', () async {
-      // Same invariant as a single delete: rows are the only handle on the
-      // bytes, so they outlive a clear that did not finish.
+    test('drops the rows whose tiles did go, and still reports', () async {
+      // The shared-store reset failing says nothing about a region whose own
+      // tiles were deleted successfully. Keeping its row would describe bytes
+      // that are not there; the failure is reported all the same.
       await repository.createRegion(
         id: 'a',
         name: 'Cozumel',
@@ -438,13 +446,53 @@ void main() {
         tileCount: 10,
         sizeBytes: 1024,
       );
-      cache.clearCacheError = StateError('one store is locked');
+      cache.clearCacheError = StateError('the browse store is locked');
 
       await container
           .read(cachedRegionsNotifierProvider.notifier)
           .clearAllCache();
 
-      expect(await repository.getAllRegions(), hasLength(1));
+      expect(await repository.getAllRegions(), isEmpty);
+      expect(
+        container.read(cachedRegionsNotifierProvider).hasError,
+        isTrue,
+        reason: 'a clear that did not clear everything must say so',
+      );
+    });
+  });
+
+  group('partial clear', () {
+    test('keeps only the regions whose tiles are still there', () async {
+      // A row whose tiles are gone is worse than no row: the page would offer
+      // it as a region, call its size unmeasurable, and warn that deleting it
+      // frees nothing, when there is nothing left to free.
+      for (final id in ['gone', 'stuck']) {
+        await repository.createRegion(
+          id: id,
+          name: 'Region $id',
+          minLat: 20,
+          maxLat: 21,
+          minLng: -87,
+          maxLng: -86,
+          minZoom: 8,
+          maxZoom: 12,
+          tileCount: 10,
+          sizeBytes: 1024,
+        );
+      }
+      cache.undeletableRegionIds.add('stuck');
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .clearAllCache();
+
+      final left = await repository.getAllRegions();
+      expect(left.map((r) => r.id), ['stuck']);
+      expect(
+        container.read(cachedRegionsNotifierProvider).hasError,
+        isTrue,
+        reason: 'a clear that did not clear everything must say so',
+      );
     });
   });
 
