@@ -23583,6 +23583,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. BMI גבוה יותר בדרך כלל אומר יותר רקמה צפה ומעט יותר משקולות.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'הרכב גוף';
+
+  @override
   String get tools_weight_breakdownTitle => 'כיצד זה חושב';
 
   @override
@@ -23600,6 +23608,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'גובה (אופציונלי)';
+
+  @override
   String get tools_weight_noGear =>
       'הוסף את הציוד שאיתו תצלול כדי להתאים אישית את החיזוי.';
 
@@ -23614,6 +23625,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'שמור משקל בפרופיל';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'מוערך לפי BMI';
 
   @override
   String get tools_weight_source_measured => 'נמדד מהצלילות שלך';

@@ -22925,6 +22925,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi。BMI 越高通常意味着浮力组织越多，需要的配重略多。';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => '身体成分';
+
+  @override
   String get tools_weight_breakdownTitle => '计算方式';
 
   @override
@@ -22942,6 +22950,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => '身高（可选）';
+
+  @override
   String get tools_weight_noGear => '添加计划使用的装备以获得个性化预测。';
 
   @override
@@ -22955,6 +22966,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => '将体重保存到个人资料';
+
+  @override
+  String get tools_weight_source_bodyComposition => '根据 BMI 估算';
 
   @override
   String get tools_weight_source_measured => '根据您的潜水测得';

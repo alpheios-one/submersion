@@ -24086,6 +24086,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. A magasabb BMI általában több felhajtóerejű szövetet és kicsit több ólmot jelent.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Testösszetétel';
+
+  @override
   String get tools_weight_breakdownTitle => 'Hogyan számoltuk ki';
 
   @override
@@ -24103,6 +24111,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Magasság (opcionális)';
+
+  @override
   String get tools_weight_noGear =>
       'Add hozzá a merüléshez tervezett felszerelést az előrejelzés személyre szabásához.';
 
@@ -24117,6 +24128,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Súly mentése a profilba';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'BMI alapján becsülve';
 
   @override
   String get tools_weight_source_measured => 'a merüléseidből mérve';

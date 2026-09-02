@@ -39747,6 +39747,18 @@ abstract class AppLocalizations {
   /// **'Based on {count} logged dives'**
   String tools_weight_basedOnDives(int count);
 
+  /// No description provided for @tools_weight_bmiHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI {bmi}. A higher BMI usually means more buoyant tissue and a little more lead.'**
+  String tools_weight_bmiHelper(String bmi);
+
+  /// No description provided for @tools_weight_bmiTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Body composition'**
+  String get tools_weight_bmiTerm;
+
   /// No description provided for @tools_weight_breakdownTitle.
   ///
   /// In en, this message translates to:
@@ -39777,6 +39789,12 @@ abstract class AppLocalizations {
   /// **'{delta} vs previous rig'**
   String tools_weight_deltaVsPrevious(String delta);
 
+  /// No description provided for @tools_weight_heightOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (optional)'**
+  String get tools_weight_heightOptional;
+
   /// No description provided for @tools_weight_noGear.
   ///
   /// In en, this message translates to:
@@ -39806,6 +39824,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save weight to profile'**
   String get tools_weight_saveToProfile;
+
+  /// No description provided for @tools_weight_source_bodyComposition.
+  ///
+  /// In en, this message translates to:
+  /// **'estimated from BMI'**
+  String get tools_weight_source_bodyComposition;
 
   /// No description provided for @tools_weight_source_measured.
   ///

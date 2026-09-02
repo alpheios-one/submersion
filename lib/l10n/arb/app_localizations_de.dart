@@ -24139,6 +24139,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. Ein höherer BMI bedeutet meist mehr auftriebsstarkes Gewebe und etwas mehr Blei.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Körperzusammensetzung';
+
+  @override
   String get tools_weight_breakdownTitle => 'So wurde das berechnet';
 
   @override
@@ -24157,6 +24165,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Größe (optional)';
+
+  @override
   String get tools_weight_noGear =>
       'Füge die geplante Ausrüstung hinzu, um die Vorhersage zu personalisieren.';
 
@@ -24171,6 +24182,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Gewicht im Profil speichern';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'aus dem BMI geschätzt';
 
   @override
   String get tools_weight_source_measured => 'aus deinen Tauchgängen gemessen';

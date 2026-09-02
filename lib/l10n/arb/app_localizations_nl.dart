@@ -24002,6 +24002,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. Een hogere BMI betekent meestal meer drijvend weefsel en iets meer lood.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Lichaamssamenstelling';
+
+  @override
   String get tools_weight_breakdownTitle => 'Hoe dit is berekend';
 
   @override
@@ -24019,6 +24027,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Lengte (optioneel)';
+
+  @override
   String get tools_weight_noGear =>
       'Voeg de uitrusting toe waarmee je gaat duiken om de voorspelling te personaliseren.';
 
@@ -24033,6 +24044,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Gewicht opslaan in profiel';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'geschat op basis van BMI';
 
   @override
   String get tools_weight_source_measured => 'gemeten uit je duiken';
