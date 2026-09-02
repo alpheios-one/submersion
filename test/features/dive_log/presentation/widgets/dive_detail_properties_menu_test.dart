@@ -59,17 +59,33 @@ Future<void> _openMenu(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Taps a menu entry, scrolling the menu to it first.
+/// The section list's own scrollable, inside the menu.
+Finder _sectionList() => find.descendant(
+  of: find.byType(ReorderableListView),
+  matching: find.byType(Scrollable),
+);
+
+/// Taps a menu entry, scrolling to it first.
 ///
-/// The menu is capped in height and every section has an entry, so the ones
-/// further down start out scrolled off.
+/// The section list shows a handful of rows and builds the rest lazily, so
+/// an entry further down has to be scrolled into existence before it can be
+/// found; the fixed entries around the list only need to be scrolled into
+/// view.
 Future<void> _tapMenuItem(WidgetTester tester, String label) async {
   final item = find.text(label);
-  await tester.ensureVisible(item);
+  if (item.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(item, 48, scrollable: _sectionList());
+  } else {
+    await tester.ensureVisible(item);
+  }
   await tester.pumpAndSettle();
   await tester.tap(item);
   await tester.pumpAndSettle();
 }
+
+List<DiveDetailSectionId> _order(AppSettings settings) => [
+  for (final section in settings.diveDetailSections) section.id,
+];
 
 void main() {
   group('DiveDetailPropertiesMenu', () {
@@ -191,10 +207,7 @@ void main() {
       await _tapMenuItem(tester, 'Show all sections');
 
       expect(notifier.state.diveDetailSections.every((s) => s.visible), isTrue);
-      expect(
-        notifier.state.diveDetailSections.map((s) => s.id),
-        DiveDetailSectionId.values.reversed,
-      );
+      expect(_order(notifier.state), DiveDetailSectionId.values.reversed);
     });
 
     testWidgets('gauge dives are not offered the gas and deco sections', (
@@ -212,6 +225,122 @@ void main() {
       expect(find.text('Cylinders'), findsNothing);
       // The profile chart is exactly what a gauge does record.
       expect(find.text('Dive Profile'), findsOneWidget);
+    });
+
+    // The gauge menu never lists the gas and deco sections, so "show all"
+    // there must not switch them on behind the diver's back: they would only
+    // surface on the next non-gauge dive, as a change nobody asked for.
+    testWidgets('on a gauge dive, "show all" leaves the unlisted sections be', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(600, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final custom = [
+        for (final id in DiveDetailSectionId.values)
+          DiveDetailSectionConfig(
+            id: id,
+            visible: !id.hiddenInGaugeMode && id != DiveDetailSectionId.notes,
+          ),
+      ];
+      final notifier = _FakeSettingsNotifier(
+        AppSettings(diveDetailSections: custom),
+      );
+      await tester.pumpWidget(_harness(notifier, isGauge: true));
+      await _openMenu(tester);
+
+      await _tapMenuItem(tester, 'Show all sections');
+
+      final sections = notifier.state.diveDetailSections;
+      expect(
+        sections.firstWhere((s) => s.id == DiveDetailSectionId.notes).visible,
+        isTrue,
+      );
+      expect(
+        sections.where((s) => s.id.hiddenInGaugeMode).every((s) => !s.visible),
+        isTrue,
+      );
+    });
+
+    group('reordering', () {
+      testWidgets('the sections sit in a reorderable list with handles', (
+        tester,
+      ) async {
+        await tester.binding.setSurfaceSize(const Size(600, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final notifier = _FakeSettingsNotifier(const AppSettings());
+        await tester.pumpWidget(_harness(notifier));
+        await _openMenu(tester);
+
+        expect(find.byType(ReorderableListView), findsOneWidget);
+        expect(find.byIcon(Icons.drag_handle), findsWidgets);
+      });
+
+      testWidgets('a drop writes the new order to settings', (tester) async {
+        await tester.binding.setSurfaceSize(const Size(600, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final notifier = _FakeSettingsNotifier(const AppSettings());
+        await tester.pumpWidget(_harness(notifier));
+        await _openMenu(tester);
+
+        final before = _order(notifier.state);
+        tester
+            .widget<ReorderableListView>(find.byType(ReorderableListView))
+            .onReorderItem!(0, 1);
+        await tester.pumpAndSettle();
+
+        final after = _order(notifier.state);
+        expect(after[0], before[1]);
+        expect(after[1], before[0]);
+        expect(after.sublist(2), before.sublist(2));
+      });
+
+      // On a gauge dive the list is a subset of the saved order, so a drop
+      // index is not a saved-list index; the sections the menu does not list
+      // must keep their places.
+      testWidgets('sections the menu does not list keep their place', (
+        tester,
+      ) async {
+        await tester.binding.setSurfaceSize(const Size(600, 1600));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        final notifier = _FakeSettingsNotifier(const AppSettings());
+        await tester.pumpWidget(_harness(notifier, isGauge: true));
+        await _openMenu(tester);
+
+        final before = _order(notifier.state);
+        final listed = [
+          for (final id in before)
+            if (!id.hiddenInGaugeMode) id,
+        ];
+        tester
+            .widget<ReorderableListView>(find.byType(ReorderableListView))
+            .onReorderItem!(0, listed.length - 1);
+        await tester.pumpAndSettle();
+
+        final after = _order(notifier.state);
+        expect(after.toSet(), before.toSet());
+        // The moved section now trails every other listed one.
+        final listedAfter = [
+          for (final id in after)
+            if (!id.hiddenInGaugeMode) id,
+        ];
+        expect(listedAfter.last, listed.first);
+        expect(listedAfter.sublist(0, listed.length - 1), listed.sublist(1));
+        // The unlisted ones sit where they did relative to their neighbours.
+        expect(
+          [
+            for (final id in after)
+              if (id.hiddenInGaugeMode) id,
+          ],
+          [
+            for (final id in before)
+              if (id.hiddenInGaugeMode) id,
+          ],
+        );
+      });
     });
   });
 }

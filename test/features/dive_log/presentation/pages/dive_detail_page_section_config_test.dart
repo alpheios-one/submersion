@@ -1144,10 +1144,10 @@ void main() {
     });
   });
 
-  group('DiveDetailPage list layout reordering', () {
-    testWidgets('the folded sections sit in a reorderable list', (
-      tester,
-    ) async {
+  group('DiveDetailPage list layout rows', () {
+    // Reordering lives in the display-options menu, so the rows stay a single
+    // tap target each.
+    testWidgets('the folded rows carry no drag handles', (tester) async {
       final settings = _settingsWithVisibleSections([
         DiveDetailSectionId.notes,
         DiveDetailSectionId.tags,
@@ -1158,14 +1158,27 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(ReorderableListView), findsOneWidget);
-      expect(find.byIcon(Icons.drag_handle), findsNWidgets(2));
+      expect(find.byType(DiveSectionFold), findsNWidgets(2));
+      expect(find.byType(ReorderableListView), findsNothing);
+      expect(find.byIcon(Icons.drag_handle), findsNothing);
     });
+  });
 
-    testWidgets('the detailed layout has no drag handles', (tester) async {
+  group('DiveDetailPage section spacing', () {
+    Finder cardAround(String text) =>
+        find.ancestor(of: find.text(text), matching: find.byType(Card)).first;
+
+    // One gap, placed once: a section that also spaced itself used to sit
+    // twice as far from its neighbour as the sections that did not.
+    testWidgets('detailed sections sit exactly one section gap apart', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       final settings = _settingsWithVisibleSections([
-        DiveDetailSectionId.notes,
         DiveDetailSectionId.tags,
+        DiveDetailSectionId.notes,
       ]);
 
       await tester.pumpWidget(
@@ -1173,89 +1186,88 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(ReorderableListView), findsNothing);
-      expect(find.byIcon(Icons.drag_handle), findsNothing);
+      final tags = cardAround('Night Dive');
+      final notes = cardAround('Great dive, saw a lot of fish.');
+      expect(
+        tester.getTopLeft(notes).dy - tester.getBottomLeft(tags).dy,
+        DiveDetailLayout.detailed.sectionGap,
+      );
     });
 
-    testWidgets('a drop writes the new order to settings', (tester) async {
-      final notifier = _MockSettingsNotifier(
-        _settingsWithVisibleSections([
-          DiveDetailSectionId.notes,
-          DiveDetailSectionId.tags,
-        ], layout: DiveDetailLayout.list),
-      );
+    testWidgets('list rows sit flush against each other', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final settings = _settingsWithVisibleSections([
+        DiveDetailSectionId.tags,
+        DiveDetailSectionId.notes,
+      ], layout: DiveDetailLayout.list);
 
       await tester.pumpWidget(
-        _buildTestWidget(
-          dive: _diveWithContent,
-          settings: notifier.state,
-          notifier: notifier,
-        ),
+        _buildTestWidget(dive: _diveWithContent, settings: settings),
       );
       await tester.pumpAndSettle();
 
-      // Tags precedes Notes in the default order, so row 0 is Tags.
-      final before = notifier.state.diveDetailSections
-          .map((section) => section.id)
-          .toList();
+      final folds = find.byType(DiveSectionFold);
       expect(
-        before.indexOf(DiveDetailSectionId.tags),
-        lessThan(before.indexOf(DiveDetailSectionId.notes)),
+        tester.getTopLeft(folds.at(1)).dy,
+        tester.getBottomLeft(folds.at(0)).dy,
       );
-
-      final list = tester.widget<ReorderableListView>(
-        find.byType(ReorderableListView),
-      );
-      list.onReorderItem!(0, 1);
-      await tester.pumpAndSettle();
-
-      final after = notifier.state.diveDetailSections
-          .map((section) => section.id)
-          .toList();
-      expect(
-        after.indexOf(DiveDetailSectionId.tags),
-        greaterThan(after.indexOf(DiveDetailSectionId.notes)),
-      );
-      // Nothing is lost or duplicated by a move.
-      expect(after.length, before.length);
-      expect(after.toSet(), before.toSet());
     });
+  });
 
-    // The rendered rows are a subset of the saved order, so a drop must not
-    // disturb the sections the page never showed.
-    testWidgets('sections the page does not show keep their place', (
+  group('DiveDetailPage app bar actions', () {
+    // MediaQuery follows the view, not the test surface, so the window width
+    // the app bar reads has to be set on the view itself.
+    void setWindowWidth(WidgetTester tester, double width) {
+      tester.view.physicalSize = Size(width, 2000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+    }
+
+    Finder favoriteInBar() => find.descendant(
+      of: find.byType(AppBar),
+      matching: find.byIcon(Icons.favorite_border),
+    );
+
+    // Six action icons leave a phone-width app bar no room for its title, so
+    // the favorite toggle moves into the overflow menu there.
+    testWidgets('on a phone-width window, favorite lives in the overflow', (
       tester,
     ) async {
-      final notifier = _MockSettingsNotifier(
-        _settingsWithVisibleSections([
-          DiveDetailSectionId.notes,
-          DiveDetailSectionId.tags,
-        ], layout: DiveDetailLayout.list),
-      );
-      final hiddenBefore = notifier.state.diveDetailSections
-          .where((section) => !section.visible)
-          .map((section) => section.id)
-          .toList();
+      setWindowWidth(tester, 560);
+      final settings = _settingsWithVisibleSections([
+        DiveDetailSectionId.notes,
+      ]);
 
       await tester.pumpWidget(
-        _buildTestWidget(
-          dive: _diveWithContent,
-          settings: notifier.state,
-          notifier: notifier,
-        ),
+        _buildTestWidget(dive: _diveWithContent, settings: settings),
       );
       await tester.pumpAndSettle();
 
-      tester
-          .widget<ReorderableListView>(find.byType(ReorderableListView))
-          .onReorderItem!(0, 1);
+      expect(favoriteInBar(), findsNothing);
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Add to favorites'), findsOneWidget);
+    });
+
+    testWidgets('on a wide window, favorite stays in the bar', (tester) async {
+      setWindowWidth(tester, 900);
+      final settings = _settingsWithVisibleSections([
+        DiveDetailSectionId.notes,
+      ]);
+
+      await tester.pumpWidget(
+        _buildTestWidget(dive: _diveWithContent, settings: settings),
+      );
       await tester.pumpAndSettle();
 
-      final hiddenAfter = notifier.state.diveDetailSections
-          .where((section) => !section.visible)
-          .map((section) => section.id)
-          .toList();
-      expect(hiddenAfter, hiddenBefore);
+      expect(favoriteInBar(), findsOneWidget);
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      expect(find.text('Add to favorites'), findsNothing);
     });
   });
 }

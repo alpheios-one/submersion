@@ -119,4 +119,59 @@ void main() {
       expect(find.byType(IntrinsicHeight), findsNothing);
     });
   });
+
+  // A stretch pair's cards fill the height the row hands them, with Expanded
+  // children inside; stacked, there is no height to hand out and they need a
+  // natural-height stand-in.
+  group('stacked variants', () {
+    Widget variantHost({required double width}) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: width,
+              child: const ResponsiveSectionPair(
+                first: Text('ROW FIRST'),
+                second: Text('ROW SECOND'),
+                stackedFirst: Text('STACKED FIRST'),
+                stackedSecond: Text('STACKED SECOND'),
+                minRowWidth: 600,
+                stretch: true,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('in a row, the row cards show', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(variantHost(width: 700));
+      await tester.pumpAndSettle();
+
+      expect(find.text('ROW FIRST'), findsOneWidget);
+      expect(find.text('ROW SECOND'), findsOneWidget);
+      expect(find.text('STACKED FIRST'), findsNothing);
+      expect(find.text('STACKED SECOND'), findsNothing);
+    });
+
+    testWidgets('stacked, the stand-ins show instead', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(variantHost(width: 400));
+      await tester.pumpAndSettle();
+
+      expect(find.text('STACKED FIRST'), findsOneWidget);
+      expect(find.text('STACKED SECOND'), findsOneWidget);
+      expect(find.text('ROW FIRST'), findsNothing);
+      expect(find.text('ROW SECOND'), findsNothing);
+      expect(
+        tester.getCenter(find.text('STACKED FIRST')).dy,
+        lessThan(tester.getCenter(find.text('STACKED SECOND')).dy),
+      );
+    });
+  });
 }

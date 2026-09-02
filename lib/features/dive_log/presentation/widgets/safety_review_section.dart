@@ -20,7 +20,18 @@ import 'package:submersion/l10n/l10n_extension.dart';
 class SafetyReviewSection extends ConsumerStatefulWidget {
   final String diveId;
 
-  const SafetyReviewSection({required this.diveId, super.key});
+  /// Space above the section when it renders.
+  ///
+  /// Owned here rather than by the page's section builder so the section
+  /// occupies no space at all when it renders nothing. The list layout, which
+  /// folds every section behind its own header row, passes zero.
+  final double topPadding;
+
+  const SafetyReviewSection({
+    required this.diveId,
+    this.topPadding = 24,
+    super.key,
+  });
 
   @override
   ConsumerState<SafetyReviewSection> createState() =>
@@ -54,10 +65,8 @@ class _SafetyReviewSectionState extends ConsumerState<SafetyReviewSection> {
       selectedSafetyFindingProvider(widget.diveId),
     );
 
-    // Top spacing lives here (not in the section builder) so the section
-    // occupies no space at all when it renders nothing.
     return Padding(
-      padding: const EdgeInsets.only(top: 24),
+      padding: EdgeInsets.only(top: widget.topPadding),
       child: CollapsibleSection(
         title: l10n.safetyReview_sectionTitle,
         icon: Icons.health_and_safety_outlined,

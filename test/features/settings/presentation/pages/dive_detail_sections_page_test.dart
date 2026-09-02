@@ -332,9 +332,11 @@ void main() {
       expect(displayNames.first, 'Cylinders');
     });
 
-    // The dive page's drag handles write through the same saved order, so a
-    // reorder made there has to show up here.
-    testWidgets('lists the order a dive page drag produced', (tester) async {
+    // The dive page's display-options menu writes through the same saved
+    // order, so a reorder made there has to show up here.
+    testWidgets('lists the order a display-options drag produced', (
+      tester,
+    ) async {
       const first = DiveDetailSectionId.profile;
       const second = DiveDetailSectionId.decoStatus;
       final reordered = DiveDetailSectionConfig.moveRenderedSection(

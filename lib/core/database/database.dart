@@ -1875,7 +1875,8 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   // Dive detail section order and visibility (v56) — JSON array
   TextColumn get diveDetailSections => text().nullable()();
-  // Dive detail page layout: detailed | compact | list (v184)
+  // Dive detail page layout: detailed | list (v184). A stored "compact",
+  // from before that layout was dropped, reads back as detailed.
   TextColumn get diveDetailLayout => text().nullable()();
   // Table view profile panel default visibility (v61)
   BoolColumn get showProfilePanelInTableView =>
@@ -4720,7 +4721,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// v184: diver_settings.dive_detail_layout, the dive detail page's layout
-  /// choice (detailed/compact/list). Idempotent so it is safe to call from
+  /// choice (detailed/list; a stored "compact" from before that layout was
+  /// dropped reads back as detailed). Idempotent so it is safe to call from
   /// both onUpgrade and the beforeOpen backstop.
   Future<void> _assertDiveDetailLayoutColumn() async {
     final cols = await customSelect(

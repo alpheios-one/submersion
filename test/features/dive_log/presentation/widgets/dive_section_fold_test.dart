@@ -9,7 +9,6 @@ void main() {
     required bool isExpanded,
     required ValueChanged<bool> onToggle,
     VoidCallback? onBuildContent,
-    int? reorderIndex,
   }) {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -20,7 +19,6 @@ void main() {
           icon: Icons.notes,
           isExpanded: isExpanded,
           onToggle: onToggle,
-          reorderIndex: reorderIndex,
           contentBuilder: (context) {
             onBuildContent?.call();
             return const Text('CONTENT');
@@ -80,6 +78,15 @@ void main() {
     expect(find.byType(Divider), findsOneWidget);
   });
 
+  // Reordering lives in the display-options menu, so the header stays one
+  // tap target with one affordance.
+  testWidgets('carries no drag handle', (tester) async {
+    await tester.pumpWidget(host(isExpanded: false, onToggle: (_) {}));
+
+    expect(find.byIcon(Icons.drag_handle), findsNothing);
+    expect(find.byType(ReorderableDragStartListener), findsNothing);
+  });
+
   testWidgets('announces the action it will take to screen readers', (
     tester,
   ) async {
@@ -99,44 +106,5 @@ void main() {
     );
 
     handle.dispose();
-  });
-
-  group('drag handle', () {
-    testWidgets('there is none without a reorder index', (tester) async {
-      await tester.pumpWidget(host(isExpanded: false, onToggle: (_) {}));
-
-      expect(find.byIcon(Icons.drag_handle), findsNothing);
-      expect(find.byType(ReorderableDragStartListener), findsNothing);
-    });
-
-    testWidgets('a reorder index adds one', (tester) async {
-      await tester.pumpWidget(
-        host(isExpanded: false, onToggle: (_) {}, reorderIndex: 3),
-      );
-
-      expect(find.byIcon(Icons.drag_handle), findsOneWidget);
-      final listener = tester.widget<ReorderableDragStartListener>(
-        find.byType(ReorderableDragStartListener),
-      );
-      expect(listener.index, 3);
-    });
-
-    // The handle drags; it must not double as a fold toggle, or a missed
-    // grab silently opens the section.
-    testWidgets('tapping the handle does not toggle the fold', (tester) async {
-      final toggles = <bool>[];
-      await tester.pumpWidget(
-        host(isExpanded: false, onToggle: toggles.add, reorderIndex: 0),
-      );
-
-      await tester.tap(find.byIcon(Icons.drag_handle));
-      await tester.pumpAndSettle();
-      expect(toggles, isEmpty);
-
-      // The rest of the row still toggles.
-      await tester.tap(find.text('Notes'));
-      await tester.pumpAndSettle();
-      expect(toggles, [true]);
-    });
   });
 }
