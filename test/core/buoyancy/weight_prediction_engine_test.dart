@@ -356,6 +356,28 @@ void main() {
       );
     });
 
+    test('an implausible fit height subtracts nothing and is forgotten', () {
+      final model = fitWithHeight(300);
+      expect(model.heightCm, isNull);
+      expect(model.bodyCompositionCalibrated, isFalse);
+      expect(
+        model.predict(rigWithHeight(160)).terms.any((t) => t.label == 'bmi'),
+        isFalse,
+      );
+    });
+
+    test('a fit height without a body weight is forgotten too', () {
+      final model = WeightPredictionEngine.fit(
+        observations: [for (var i = 0; i < 20; i++) obs(index: i)],
+        gearById: gearById,
+        bodyWeightKg: null,
+        heightCm: 175,
+        now: now,
+      );
+      expect(model.heightCm, isNull);
+      expect(model.bodyCompositionCalibrated, isFalse);
+    });
+
     test('the term needs a real body weight, never the default', () {
       final model = WeightPredictionEngine.fit(
         observations: const [],

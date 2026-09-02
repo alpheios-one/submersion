@@ -132,12 +132,19 @@ class WeightPredictionEngine {
   }) {
     final effectiveNow = now ?? DateTime.now();
     final bodyMass = bodyWeightKg ?? BuoyancyPhysics.defaultBodyMassKg;
-    final bodyCompositionKg = bodyWeightKg == null
-        ? 0.0
-        : BodyComposition.leadTermKg(
+    // The stored height must mean "a term was subtracted": an implausible
+    // height, or a height without a real body weight, subtracts nothing and
+    // is forgotten so predict cannot add a term the fit never removed.
+    final subtractsBodyComposition =
+        bodyWeightKg != null &&
+        BodyComposition.bmi(weightKg: bodyWeightKg, heightCm: heightCm) != null;
+    final fitHeightCm = subtractsBodyComposition ? heightCm : null;
+    final bodyCompositionKg = subtractsBodyComposition
+        ? BodyComposition.leadTermKg(
             bodyMassKg: bodyWeightKg,
-            heightCm: heightCm,
-          );
+            heightCm: fitHeightCm,
+          )
+        : 0.0;
 
     // Collect the distinct gear features seen in history.
     final featuresById = <String, GearFeature>{};
@@ -238,7 +245,7 @@ class WeightPredictionEngine {
       supportingDives: supportingDives,
       residualStdKg: residualStd,
       bodyWeightKg: bodyWeightKg,
-      heightCm: heightCm,
+      heightCm: fitHeightCm,
     );
   }
 
@@ -318,7 +325,8 @@ class FittedWeightModel {
   final double residualStdKg;
   final double? bodyWeightKg;
 
-  /// Height the model was fitted with; the fallback for rigs that omit it.
+  /// Height the model was fitted with, kept only when the fit actually
+  /// subtracted a body-composition term; the fallback for rigs that omit it.
   final double? heightCm;
 
   /// Whether [predict] may add a body-composition term. True when the fit
