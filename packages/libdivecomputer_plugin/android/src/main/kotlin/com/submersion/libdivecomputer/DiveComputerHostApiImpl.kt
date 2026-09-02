@@ -454,6 +454,12 @@ class DiveComputerHostApiImpl(
         }
         NativeLogger.d(TAG, "LDC", "nativeDownloadRun returned: $result")
 
+        // Capture the status that explains the failure BEFORE tearing the
+        // stream down, as the connect path above does: close() disconnects,
+        // and the resulting callback can overwrite it with a fresh (benign)
+        // status, which would silently skip the stale-bond repair below.
+        val downloadDisconnectStatus = bleStream.lastDisconnectStatus
+
         // The native side closes the iostream, and with it this GATT client,
         // on every path libdivecomputer returns through; this call is then a
         // no-op. It is here for the path that never reaches that close: the
@@ -471,10 +477,9 @@ class DiveComputerHostApiImpl(
             // encryption keys (GATT status 5), the bond is stale. Remove
             // it so that a fresh pairing can be negotiated on retry.
             if (!isRetry &&
-                bleStream.lastDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
+                downloadDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
             ) {
                 NativeLogger.w(TAG, "BLE", "Auth failure (GATT status 5), removing stale bond and retrying")
-                bleStream.close()
                 if (bleStream.removeBond()) {
                     activeBleStream = null
                     LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
