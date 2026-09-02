@@ -11326,6 +11326,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'attrezzatura $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Nessuna $filterText';
   }
@@ -11333,6 +11338,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Nessuna attrezzatura con questo stato';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Nessuna attrezzatura in questa categoria';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11347,10 +11356,34 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_list_filterAll => 'Tutta l\'attrezzatura';
 
   @override
-  String get equipment_list_filterLabel => 'Filtro:';
+  String get equipment_list_filterServiceDue => 'Manutenzione prevista';
 
   @override
-  String get equipment_list_filterServiceDue => 'Manutenzione prevista';
+  String get equipment_list_typeFilterAll => 'Tutti i tipi';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filtra attrezzatura';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Cancella';
+
+  @override
+  String get equipment_filter_title => 'Filtra attrezzatura';
+
+  @override
+  String get equipment_filter_clearAll => 'Cancella tutto';
+
+  @override
+  String get equipment_filter_apply => 'Applica filtri';
+
+  @override
+  String get equipment_filter_cancel => 'Annulla';
+
+  @override
+  String get equipment_filter_section_status => 'Stato';
+
+  @override
+  String get equipment_filter_section_category => 'Categoria';
 
   @override
   String get equipment_list_retryButton => 'Riprova';

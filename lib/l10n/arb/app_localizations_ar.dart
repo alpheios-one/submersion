@@ -11129,6 +11129,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'معدات $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'لا توجد $filterText';
   }
@@ -11136,6 +11141,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'لا توجد معدات بهذه الحالة';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'لا توجد معدات في هذه الفئة';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11150,10 +11159,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_list_filterAll => 'جميع المعدات';
 
   @override
-  String get equipment_list_filterLabel => 'تصفية:';
+  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
 
   @override
-  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
+  String get equipment_list_typeFilterAll => 'جميع الأنواع';
+
+  @override
+  String get equipment_list_filterTooltip => 'تصفية المعدات';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'مسح';
+
+  @override
+  String get equipment_filter_title => 'تصفية المعدات';
+
+  @override
+  String get equipment_filter_clearAll => 'مسح الكل';
+
+  @override
+  String get equipment_filter_apply => 'تطبيق الفلاتر';
+
+  @override
+  String get equipment_filter_cancel => 'إلغاء';
+
+  @override
+  String get equipment_filter_section_status => 'الحالة';
+
+  @override
+  String get equipment_filter_section_category => 'الفئة';
 
   @override
   String get equipment_list_retryButton => 'إعادة المحاولة';

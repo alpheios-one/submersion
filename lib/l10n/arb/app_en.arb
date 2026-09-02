@@ -6407,13 +6407,23 @@
   "equipment_list_emptyState_filterText_equipment": "equipment",
   "equipment_list_emptyState_filterText_serviceDue": "equipment needing service",
   "equipment_list_emptyState_filterText_status": "{status} equipment",
+  "equipment_list_emptyState_filterText_type": "{type} equipment",
   "equipment_list_emptyState_noEquipment": "No {filterText}",
   "equipment_list_emptyState_noStatusMatch": "No equipment with this status",
+  "equipment_list_emptyState_noTypeMatch": "No equipment in this category",
   "equipment_list_emptyState_serviceDueUpToDate": "All your equipment is up to date on service!",
   "equipment_list_errorLoading": "Error loading equipment: {error}",
   "equipment_list_filterAll": "All Equipment",
-  "equipment_list_filterLabel": "Filter:",
   "equipment_list_filterServiceDue": "Service Due",
+  "equipment_list_typeFilterAll": "All Types",
+  "equipment_list_filterTooltip": "Filter equipment",
+  "equipment_list_activeFilter_clear": "Clear",
+  "equipment_filter_title": "Filter Equipment",
+  "equipment_filter_clearAll": "Clear All",
+  "equipment_filter_apply": "Apply Filters",
+  "equipment_filter_cancel": "Cancel",
+  "equipment_filter_section_status": "Status",
+  "equipment_filter_section_category": "Category",
   "equipment_list_retryButton": "Retry",
   "equipment_list_searchTooltip": "Search Equipment",
   "equipment_list_setsTooltip": "Equipment Sets",
@@ -6741,6 +6751,14 @@
       }
     }
   },
+  "@equipment_list_emptyState_filterText_type": {
+    "description": "Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. \"Wetsuit equipment\"",
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
   "@equipment_list_emptyState_noEquipment": {
     "placeholders": {
       "filterText": {
@@ -6761,6 +6779,12 @@
         "type": "int"
       }
     }
+  },
+  "@equipment_list_emptyState_noTypeMatch": {
+    "description": "Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items"
+  },
+  "@equipment_list_typeFilterAll": {
+    "description": "Label of the chip that clears the category filter and shows equipment of every type"
   },
   "@equipment_list_tile_daysCount": {
     "placeholders": {
