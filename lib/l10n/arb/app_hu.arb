@@ -10291,6 +10291,8 @@
   "settings_cloudSync_progress_pulling": "Változások letöltése...",
   "settings_cloudSync_progress_publishing": "Változások közzététele...",
   "settings_cloudSync_progress_uploadingLibrary": "Könyvtár feltöltése ({uploaded} / {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Könyvtár letöltése ({downloaded} / {total})",
+  "settings_cloudSync_progress_importingLibrary": "Könyvtár importálása ({percent}%)",
   "settings_cloudSync_result_noProvider": "Nincs beállítva felhőszolgáltató",
   "settings_cloudSync_result_notAuthenticated": "Nincs hitelesítve a felhőszolgáltatónál",
   "settings_cloudSync_result_timedOut": "A szinkronizálás túllépte az időkorlátot",

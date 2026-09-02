@@ -10291,6 +10291,8 @@
   "settings_cloudSync_progress_pulling": "מושך שינויים...",
   "settings_cloudSync_progress_publishing": "מפרסם שינויים...",
   "settings_cloudSync_progress_uploadingLibrary": "מעלה את הספרייה ({uploaded} מתוך {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "מוריד את הספרייה ({downloaded} מתוך {total})",
+  "settings_cloudSync_progress_importingLibrary": "מייבא את הספרייה ({percent}%)",
   "settings_cloudSync_result_noProvider": "לא הוגדר ספק ענן",
   "settings_cloudSync_result_notAuthenticated": "אין אימות מול ספק הענן",
   "settings_cloudSync_result_timedOut": "תם הזמן המוקצב לסנכרון",

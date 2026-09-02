@@ -10291,6 +10291,8 @@
   "settings_cloudSync_progress_pulling": "正在拉取更改...",
   "settings_cloudSync_progress_publishing": "正在发布更改...",
   "settings_cloudSync_progress_uploadingLibrary": "正在上传资料库（{uploaded}/{total}）",
+  "settings_cloudSync_progress_downloadingLibrary": "正在下载资料库（{downloaded}/{total}）",
+  "settings_cloudSync_progress_importingLibrary": "正在导入资料库（{percent}%）",
   "settings_cloudSync_result_noProvider": "未配置云服务商",
   "settings_cloudSync_result_notAuthenticated": "未通过云服务商的身份验证",
   "settings_cloudSync_result_timedOut": "同步超时",

@@ -13,9 +13,11 @@ import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.da
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/conflict_reference.dart';
+import 'package:submersion/core/services/sync/changeset_log/base_apply_progress.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_json_stream_reader.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_parse_client.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
+import 'package:submersion/core/services/sync/changeset_log/byte_progress_stream.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_codec.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
@@ -325,8 +327,16 @@ class SyncService {
   /// Test seam: apply a base from a local file through the streaming merge.
   @visibleForTesting
   Future<({int recordsApplied, int conflictsFound, int recordsFailed})>
-  debugApplyBaseFile(String filePath, {DateTime? lastSync}) async {
-    final r = await _applyRemoteBaseFile(filePath, lastSync);
+  debugApplyBaseFile(
+    String filePath, {
+    DateTime? lastSync,
+    void Function(double fraction)? onProgress,
+  }) async {
+    final r = await _applyRemoteBaseFile(
+      filePath,
+      lastSync,
+      onProgress: onProgress,
+    );
     return (
       recordsApplied: r.recordsApplied,
       conflictsFound: r.conflictsFound,
@@ -607,8 +617,32 @@ class SyncService {
           conflictsFound += r.conflictsFound;
           recordsFailed += r.recordsFailed;
         },
+        // A peer's base can run to hundreds of megabytes and take minutes
+        // to download and import. Spread it across the pull's share of the
+        // bar (0.4 to 0.8) so the user sees it advancing instead of reading a
+        // motionless bar as a hang and killing the app, which restarts the
+        // whole adoption from part 0 (issue #1421).
+        onBaseDownloadProgress: (manifest, downloaded, total) =>
+            _reportProgress(
+              SyncPhase.downloading,
+              0.4 + 0.15 * (downloaded / total),
+              _l10n.settings_cloudSync_progress_downloadingLibrary(
+                downloaded,
+                total,
+              ),
+            ),
         applyBaseFile: (path, manifest) async {
-          final r = await _applyRemoteBaseFile(path, lastSyncTime);
+          final r = await _applyRemoteBaseFile(
+            path,
+            lastSyncTime,
+            onProgress: (fraction) => _reportProgress(
+              SyncPhase.downloading,
+              0.55 + 0.25 * fraction,
+              _l10n.settings_cloudSync_progress_importingLibrary(
+                (fraction * 100).round(),
+              ),
+            ),
+          );
           recordsSynced += r.recordsApplied;
           conflictsFound += r.conflictsFound;
           recordsFailed += r.recordsFailed;
@@ -1646,24 +1680,54 @@ class SyncService {
   /// main isolate in BasePartFileSink.assemble -- folding it in is a deferred
   /// follow-up) and falls back to the inline path on any worker failure, so a
   /// broken isolate degrades to old behaviour and never fails or corrupts sync.
+  ///
+  /// [onProgress] receives a 0.0 to 1.0 fraction spanning the three passes
+  /// (each pass is one third), with a final 1.0 once the transaction commits.
   Future<_MergeResult> _applyRemoteBaseFile(
     String filePath,
-    DateTime? localLastSync,
-  ) async {
+    DateTime? localLastSync, {
+    void Function(double fraction)? onProgress,
+  }) async {
+    final totalBytes = await File(filePath).length();
+    final stopwatch = Stopwatch()..start();
+    _log.info('Applying peer base: $totalBytes bytes');
+    final progress = BaseApplyProgress(totalBytes, onProgress);
     BaseParseClient? client;
+    _MergeResult result;
     try {
       client = await baseParseClientSpawn(filePath);
-      return await _applyRemoteBaseFileViaWorker(client, localLastSync);
+      client.onProgress = progress.bytes;
+      result = await _applyRemoteBaseFileViaWorker(
+        client,
+        localLastSync,
+        progress,
+      );
     } catch (e, st) {
       _log.warning(
         'Base-apply worker failed; falling back to inline',
         error: e,
         stackTrace: st,
       );
-      return _applyRemoteBaseFileInline(filePath, localLastSync);
+      // Kill the (possibly wedged, memory-hungry) worker BEFORE the inline
+      // passes start competing with it for memory and file I/O.
+      await client?.dispose();
+      client = null;
+      progress.restart();
+      result = await _applyRemoteBaseFileInline(
+        filePath,
+        localLastSync,
+        progress,
+      );
     } finally {
       await client?.dispose();
     }
+    progress.done();
+    _log.info(
+      'Peer base applied in ${stopwatch.elapsed.inSeconds}s: '
+      '${result.recordsApplied} applied, ${result.conflictsFound} conflicts, '
+      '${result.recordsFailed} failed',
+    );
+    return result;
   }
 
   /// Worker-backed base apply: the file read + JSON parse run in [client]'s
@@ -1674,6 +1738,7 @@ class SyncService {
   Future<_MergeResult> _applyRemoteBaseFileViaWorker(
     BaseParseClient client,
     DateTime? localLastSync,
+    BaseApplyProgress progress,
   ) async {
     final lastSyncMs = localLastSync?.millisecondsSinceEpoch;
 
@@ -1702,6 +1767,7 @@ class SyncService {
         if (parentTypes.contains(table) || deletionIds.containsKey(table))
           table,
     };
+    progress.beginPass(1);
     client.startDataRows(pass2Tables);
     List<({String table, Map<String, dynamic> row})>? p2batch;
     while ((p2batch = await client.nextDataBatch()) != null) {
@@ -1782,6 +1848,7 @@ class SyncService {
         batch = <Map<String, dynamic>>[];
       }
 
+      progress.beginPass(2);
       client.startDataRows(_baseApplyEntityFlags.keys.toSet());
       List<({String table, Map<String, dynamic> row})>? p3batch;
       while ((p3batch = await client.nextDataBatch()) != null) {
@@ -1823,15 +1890,20 @@ class SyncService {
   Future<_MergeResult> _applyRemoteBaseFileInline(
     String filePath,
     DateTime? localLastSync,
+    BaseApplyProgress progress,
   ) async {
     final file = File(filePath);
     final lastSyncMs = localLastSync?.millisecondsSinceEpoch;
+    // The inline parse blocks the UI isolate, so its heartbeats are what
+    // keep the bar moving; the fallback runs the whole file three times.
+    Stream<List<int>> openWithProgress() =>
+        withByteProgress(file.openRead(), onProgress: progress.consumed);
 
     // ---- Pass 1: exportedAt + deletions ----
     var baseExportedAt = 0;
     final deletions = <String, List<SyncDeletion>>{};
     await BaseJsonStreamReader().parse(
-      file.openRead(),
+      openWithProgress(),
       onScalar: (key, raw) async {
         if (key == 'exportedAt') {
           baseExportedAt = (jsonDecode(utf8.decode(raw)) as num?)?.toInt() ?? 0;
@@ -1866,8 +1938,9 @@ class SyncService {
     };
     final parentUpdatedAt = <String, Map<String, int>>{};
     final contradictedByEntity = <String, Set<String>>{};
+    progress.beginPass(1);
     await BaseJsonStreamReader().parse(
-      file.openRead(),
+      openWithProgress(),
       wantRows: (section, table) =>
           section == 'data' &&
           _baseApplyEntityFlags.containsKey(table) &&
@@ -1954,8 +2027,9 @@ class SyncService {
         batch = <Map<String, dynamic>>[];
       }
 
+      progress.beginPass(2);
       await BaseJsonStreamReader().parse(
-        file.openRead(),
+        openWithProgress(),
         wantRows: (section, table) =>
             section == 'data' && _baseApplyEntityFlags.containsKey(table),
         onRow: (section, table, rowBytes) async {
