@@ -1,14 +1,17 @@
 // TEMPORARY - DEBUG ONLY, remove before upstream PR.
 //
-// Investigates the suspected root cause behind Bug 6/7/9 (two real,
+// Investigated the suspected root cause behind Bug 6/7/9 (two real,
 // independently-meaningful dive sites at Walensee reportedly render a
-// pixel-identical 3D mesh): [BathymetryRepository] shares one cached grid
-// across every coordinate inside its 0.02 degree quantized cell (roughly
-// 2.2 km x 1.5 km at Swiss latitudes — wider than some lakes), so two sites
-// closer together than that receive the exact same fetch by design. This
-// module recomputes, read-only and without any network call, the same
-// coordinate/cache-key derivation the production pipeline performs, so that
-// derivation is visible in the running app without a debugger.
+// pixel-identical 3D mesh): [BathymetryRepository] used to share one cached
+// grid across every coordinate inside its 0.02 degree quantized cell
+// (roughly 2.2 km x 1.5 km at Swiss latitudes — wider than some lakes), so
+// two sites closer together than that received the exact same fetch by
+// design. Bug 10 made that quantization source-specific (see
+// [BathymetryRepository.quantumDegFor]): inside a swissBATHY3D lake the raw
+// coordinate is used as-is instead. This module recomputes, read-only and
+// without any network call, the same coordinate/cache-key derivation the
+// production pipeline performs, so that derivation is visible in the
+// running app without a debugger.
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
@@ -39,9 +42,15 @@ class SwissBathyDebugInfo {
   final String siteName;
   final GeoPoint siteCoordinate;
 
-  /// The 0.02 degree cell [BathymetryRepository.quantize] derives from
-  /// [siteCoordinate] — the outer grid cache's actual sharing granularity.
+  /// The cell [BathymetryRepository.quantize] derives from [siteCoordinate]
+  /// — the outer grid cache's actual sharing granularity. Equals
+  /// [siteCoordinate] itself when [quantumDeg] is 0 (no coalescing).
   final ({double lat, double lon}) quantizedCell;
+
+  /// The cache granularity actually applied to [siteCoordinate], per
+  /// [BathymetryRepository.quantumDegFor]: 0 means no quantization (inside
+  /// a swissBATHY3D lake), otherwise the standard 0.02 degree cell.
+  final double quantumDeg;
 
   /// [BathymetryRepository.keyFor]'s cache key for [siteCoordinate]. Two
   /// sites with an identical value here share one cached [BathymetryGrid]
@@ -72,6 +81,7 @@ class SwissBathyDebugInfo {
     required this.siteName,
     required this.siteCoordinate,
     required this.quantizedCell,
+    required this.quantumDeg,
     required this.outerCacheKey,
     required this.fetchCenter,
     required this.insideSwissLakeCoverage,
@@ -90,12 +100,12 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
   required String siteName,
   required GeoPoint center,
 }) async {
+  final quantum = BathymetryRepository.quantumDegFor(center);
   final cell = BathymetryRepository.quantize(center);
   final outerKey = BathymetryRepository.keyFor(center);
-  final fetchCenter = GeoPoint(
-    cell.lat + BathymetryRepository.quantumDeg / 2,
-    cell.lon + BathymetryRepository.quantumDeg / 2,
-  );
+  final fetchCenter = quantum > 0
+      ? GeoPoint(cell.lat + quantum / 2, cell.lon + quantum / 2)
+      : center;
 
   final lake = findSwissLake(fetchCenter);
   if (lake == null) {
@@ -104,6 +114,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
       siteName: siteName,
       siteCoordinate: center,
       quantizedCell: cell,
+      quantumDeg: quantum,
       outerCacheKey: outerKey,
       fetchCenter: fetchCenter,
       insideSwissLakeCoverage: false,
@@ -173,6 +184,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
     siteName: siteName,
     siteCoordinate: center,
     quantizedCell: cell,
+    quantumDeg: quantum,
     outerCacheKey: outerKey,
     fetchCenter: fetchCenter,
     insideSwissLakeCoverage: true,
@@ -212,13 +224,17 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
       '${info.siteCoordinate.latitude}, ${info.siteCoordinate.longitude}',
     )
     ..writeln(
-      'quantized cell (${BathymetryRepository.quantumDeg}°): '
+      'quantized cell (${info.quantumDeg}°'
+      '${info.quantumDeg <= 0 ? ", i.e. unquantized/raw" : ""}): '
       '${info.quantizedCell.lat}, ${info.quantizedCell.lon}',
     )
     ..writeln('outer grid cache key: ${info.outerCacheKey}')
     ..writeln(
-      'fetch center (cell center, NOT the site coordinate): '
-      '${info.fetchCenter.latitude}, ${info.fetchCenter.longitude}',
+      info.quantumDeg <= 0
+          ? 'fetch center (the site coordinate itself, unquantized): '
+                '${info.fetchCenter.latitude}, ${info.fetchCenter.longitude}'
+          : 'fetch center (cell center, NOT the site coordinate): '
+                '${info.fetchCenter.latitude}, ${info.fetchCenter.longitude}',
     );
   if (!info.insideSwissLakeCoverage) {
     buf.write('outside known Swiss lake coverage (findSwissLake -> null)');
