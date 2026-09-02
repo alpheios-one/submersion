@@ -326,4 +326,28 @@ void main() {
     expect(result.retiredPeerIds, isEmpty);
     expect(result.retiredPeerHasFiles, isFalse);
   });
+
+  test(
+    'reports base download progress per part, naming the peer manifest',
+    () async {
+      await DiveRepository().createDive(
+        createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+      );
+      final peerId = await publishAsPeer();
+
+      final seen = <(String, int, int)>[];
+      await reader.pull(
+        provider: provider,
+        selfDeviceId: 'progress-reader',
+        folderId: folder,
+        apply: spyApply,
+        applyBaseFile: spyApplyBaseFile(applied),
+        onBaseDownloadProgress: (manifest, downloaded, total) =>
+            seen.add((manifest.deviceId, downloaded, total)),
+      );
+
+      // A tiny library publishes as a single part, so exactly one tick.
+      expect(seen, [(peerId, 1, 1)]);
+    },
+  );
 }

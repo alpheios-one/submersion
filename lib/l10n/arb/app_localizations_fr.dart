@@ -11358,6 +11358,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'équipement $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Aucun $filterText';
   }
@@ -11365,6 +11370,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Aucun equipement avec ce statut';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Aucun équipement dans cette catégorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11379,10 +11388,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_list_filterAll => 'Tout l\'equipement';
 
   @override
-  String get equipment_list_filterLabel => 'Filtre :';
+  String get equipment_list_filterServiceDue => 'Revision due';
 
   @override
-  String get equipment_list_filterServiceDue => 'Revision due';
+  String get equipment_list_typeFilterAll => 'Tous les types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filtrer l\'equipement';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Effacer';
+
+  @override
+  String get equipment_filter_title => 'Filtrer l\'equipement';
+
+  @override
+  String get equipment_filter_clearAll => 'Tout effacer';
+
+  @override
+  String get equipment_filter_apply => 'Appliquer les filtres';
+
+  @override
+  String get equipment_filter_cancel => 'Annuler';
+
+  @override
+  String get equipment_filter_section_status => 'Statut';
+
+  @override
+  String get equipment_filter_section_category => 'Catégorie';
 
   @override
   String get equipment_list_retryButton => 'Reessayer';
@@ -35327,6 +35360,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
     return 'Envoi de la bibliothèque ($uploaded sur $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Téléchargement de la bibliothèque ($downloaded sur $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importation de la bibliothèque ($percent %)';
   }
 
   @override

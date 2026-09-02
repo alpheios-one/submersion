@@ -16,6 +16,12 @@ import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 /// so the merge stays the single source of truth.
 typedef ApplyPayload = Future<void> Function(SyncPayload payload);
 
+/// Progress of a peer base download: [downloaded] of [total] parts have landed
+/// for the base named by [manifest]. Lets the caller keep the progress bar
+/// moving through a multi-hundred-MB adoption (issue #1421).
+typedef BaseDownloadProgress =
+    void Function(SyncManifest manifest, int downloaded, int total);
+
 /// Applies a base that has been streamed to a local temp [filePath]. The real
 /// implementation streams the file through the merge in bounded memory; see
 /// SyncService._applyRemoteBaseFile.
@@ -105,6 +111,7 @@ class ChangesetReader {
     String? currentEpochId,
     int localSchemaVersion = AppDatabase.currentSchemaVersion,
     List<CloudFileInfo>? preListedFiles,
+    BaseDownloadProgress? onBaseDownloadProgress,
   }) async {
     final providerId = provider.providerId;
     // [preListedFiles] lets the caller reuse a listing it just made (the
@@ -208,20 +215,47 @@ class ChangesetReader {
         // Cold-start, or lapped by the peer's compaction: adopt the base.
         final baseSeq = manifest.baseSeq;
         if (baseSeq != null && lastApplied < baseSeq) {
+          // A base adoption can run for minutes on a large library, so log
+          // its shape and timing: a debug log that goes silent here is
+          // otherwise indistinguishable from a hang.
+          _log.info(
+            'Adopting base seq $baseSeq from peer $peerId'
+            '${peerName != null ? ' ($peerName)' : ''}: '
+            '${manifest.basePartCount ?? 0} parts, '
+            '${manifest.baseBytes ?? 0} bytes '
+            '(cursor at $lastApplied, head ${manifest.headSeq})',
+          );
+          final stopwatch = Stopwatch()..start();
           final path = await _fetchBaseToFile(
             provider,
             peerId,
             manifest,
             byName,
+            onPartDownloaded: onBaseDownloadProgress == null
+                ? null
+                : (downloaded, total) =>
+                      onBaseDownloadProgress(manifest, downloaded, total),
           );
           if (path == null) {
+            _log.warning(
+              'Base seq $baseSeq from peer $peerId is incomplete or corrupt; '
+              'will retry next sync',
+            );
             continue; // missing or corrupt base -> transient, retry next sync
           }
+          _log.info(
+            'Base seq $baseSeq from peer $peerId assembled in '
+            '${stopwatch.elapsed.inSeconds}s; applying',
+          );
           try {
             await applyBaseFile(path, manifest);
           } finally {
             await _baseSink.deleteQuietly(path);
           }
+          _log.info(
+            'Base seq $baseSeq from peer $peerId applied '
+            '(${stopwatch.elapsed.inSeconds}s total)',
+          );
           payloadsApplied++;
           appliedThrough = baseSeq;
           baseSeqApplied = baseSeq;
@@ -320,8 +354,9 @@ class ChangesetReader {
     CloudStorageProvider provider,
     String peerId,
     SyncManifest manifest,
-    Map<String, CloudFileInfo> byName,
-  ) {
+    Map<String, CloudFileInfo> byName, {
+    void Function(int downloaded, int total)? onPartDownloaded,
+  }) {
     final baseSeq = manifest.baseSeq!;
     final partCount = manifest.basePartCount ?? 0;
     // A manifest that names a base (baseSeq set) but no parts is malformed --
@@ -339,6 +374,7 @@ class ChangesetReader {
         if (pf == null) return null;
         return provider.downloadFile(pf.id);
       },
+      onPartDownloaded: onPartDownloaded,
     );
   }
 }

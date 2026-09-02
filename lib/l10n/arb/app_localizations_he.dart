@@ -11064,12 +11064,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'ציוד $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'אין $filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => 'אין ציוד עם סטטוס זה';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => 'אין ציוד בקטגוריה זו';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11084,10 +11092,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_list_filterAll => 'כל הציוד';
 
   @override
-  String get equipment_list_filterLabel => 'סנן:';
+  String get equipment_list_filterServiceDue => 'טיפול נדרש';
 
   @override
-  String get equipment_list_filterServiceDue => 'טיפול נדרש';
+  String get equipment_list_typeFilterAll => 'כל הסוגים';
+
+  @override
+  String get equipment_list_filterTooltip => 'סינון ציוד';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'נקה';
+
+  @override
+  String get equipment_filter_title => 'סנן ציוד';
+
+  @override
+  String get equipment_filter_clearAll => 'נקה הכל';
+
+  @override
+  String get equipment_filter_apply => 'החל מסננים';
+
+  @override
+  String get equipment_filter_cancel => 'ביטול';
+
+  @override
+  String get equipment_filter_section_status => 'סטטוס';
+
+  @override
+  String get equipment_filter_section_category => 'קטגוריה';
 
   @override
   String get equipment_list_retryButton => 'נסה שוב';
@@ -34536,6 +34568,19 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
     return 'מעלה את הספרייה ($uploaded מתוך $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'מוריד את הספרייה ($downloaded מתוך $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'מייבא את הספרייה ($percent%)';
   }
 
   @override

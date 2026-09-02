@@ -11289,6 +11289,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type felszerelés';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Nincs $filterText';
   }
@@ -11296,6 +11301,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Nincs ilyen allapotu felszereles';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Nincs felszerelés ebben a kategóriában';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11310,10 +11319,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_list_filterAll => 'Osszes felszereles';
 
   @override
-  String get equipment_list_filterLabel => 'Szuro:';
+  String get equipment_list_filterServiceDue => 'Szerviz esedek';
 
   @override
-  String get equipment_list_filterServiceDue => 'Szerviz esedek';
+  String get equipment_list_typeFilterAll => 'Összes típus';
+
+  @override
+  String get equipment_list_filterTooltip => 'Felszereles szurese';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Torles';
+
+  @override
+  String get equipment_filter_title => 'Felszereles szurese';
+
+  @override
+  String get equipment_filter_clearAll => 'Osszes torlese';
+
+  @override
+  String get equipment_filter_apply => 'Szurok alkalmazasa';
+
+  @override
+  String get equipment_filter_cancel => 'Megse';
+
+  @override
+  String get equipment_filter_section_status => 'Allapot';
+
+  @override
+  String get equipment_filter_section_category => 'Kategória';
 
   @override
   String get equipment_list_retryButton => 'Ujra';
@@ -35078,6 +35111,19 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
     return 'Könyvtár feltöltése ($uploaded / $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Könyvtár letöltése ($downloaded / $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Könyvtár importálása ($percent%)';
   }
 
   @override

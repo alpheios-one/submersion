@@ -10805,12 +10805,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10824,10 +10832,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
+  String get equipment_list_filterServiceDue => '需要维护';
 
   @override
-  String get equipment_list_filterServiceDue => '需要维护';
+  String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';
@@ -33153,6 +33185,19 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total) {
     return '正在上传资料库（$uploaded/$total）';
+  }
+
+  @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return '正在下载资料库（$downloaded/$total）';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return '正在导入资料库（$percent%）';
   }
 
   @override
