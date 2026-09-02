@@ -37,6 +37,14 @@ void main() {
     },
   );
 
+  test('latestDiverHeightProvider skips implausible stored heights', () async {
+    final c = containerWith([
+      entry('w2', DateTime(2026, 7, 1), heightCm: 1750),
+      entry('w1', DateTime(2026, 6, 1), heightCm: 175),
+    ]);
+    expect(await c.read(latestDiverHeightProvider.future), 175);
+  });
+
   test(
     'latestDiverHeightProvider is null when no entry records a height',
     () async {

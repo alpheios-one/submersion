@@ -321,6 +321,15 @@ class FittedWeightModel {
   /// Height the model was fitted with; the fallback for rigs that omit it.
   final double? heightCm;
 
+  /// Whether [predict] may add a body-composition term. True when the fit
+  /// subtracted one (fitted with a height) or had no observations to
+  /// subtract from, so the coefficients are still the priors. A model
+  /// calibrated on history WITHOUT a height has already absorbed the diver's
+  /// real body composition into the intercept; adding the term on top would
+  /// double count it.
+  bool get bodyCompositionCalibrated =>
+      heightCm != null || supportingDives == 0;
+
   const FittedWeightModel._({
     required this.personalCoefficient,
     required this.coefficientsById,
@@ -350,7 +359,8 @@ class FittedWeightModel {
     // carry a different body than the calibration did.
     final knownBodyMass = rig.bodyWeightKg ?? bodyWeightKg;
     final height = rig.heightCm ?? heightCm;
-    if (knownBodyMass != null &&
+    if (bodyCompositionCalibrated &&
+        knownBodyMass != null &&
         BodyComposition.bmi(weightKg: knownBodyMass, heightCm: height) !=
             null) {
       terms.add(

@@ -337,6 +337,25 @@ void main() {
       expect(at160 - at175, closeTo(0.985, 0.05));
     });
 
+    test('a model calibrated on history without a height ignores a rig '
+        'height: the intercept already holds the body', () {
+      final model = fitWithHeight(null);
+      expect(model.bodyCompositionCalibrated, isFalse);
+      final prediction = model.predict(rigWithHeight(160));
+      expect(prediction.terms.any((t) => t.label == 'bmi'), isFalse);
+      expect(prediction.totalKg, closeTo(8.0, 0.5));
+    });
+
+    test('a model with no observations applies a rig height: nothing was '
+        'subtracted, so nothing double counts', () {
+      final model = fit(const []);
+      expect(model.bodyCompositionCalibrated, isTrue);
+      expect(
+        model.predict(rigWithHeight(160)).terms.any((t) => t.label == 'bmi'),
+        isTrue,
+      );
+    });
+
     test('the term needs a real body weight, never the default', () {
       final model = WeightPredictionEngine.fit(
         observations: const [],

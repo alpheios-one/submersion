@@ -140,10 +140,12 @@ class BuoyancyTwinAssembler {
       ),
     );
 
-    // Same guard as predict: a real body weight, never the default.
+    // Same guards as predict: a real body weight, never the default, and
+    // only when the calibration can carry the term without double counting.
     final knownBodyMass = bodyWeightKg ?? model.bodyWeightKg;
     final height = heightCm ?? model.heightCm;
-    if (knownBodyMass != null &&
+    if (model.bodyCompositionCalibrated &&
+        knownBodyMass != null &&
         BodyComposition.bmi(weightKg: knownBodyMass, heightCm: height) !=
             null) {
       staticTerms.add(
