@@ -36,7 +36,7 @@ class ChartZoomControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isZoomed = zoomLevel > 1.0;
+    final isZoomed = zoomLevel > minZoom;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

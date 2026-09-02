@@ -17,10 +17,10 @@ Widget host(Widget child) => MaterialApp(
   ),
 );
 
-Widget controls(double zoomLevel) => ChartZoomControls(
+Widget controls(double zoomLevel, {double minZoom = 1}) => ChartZoomControls(
   keyPrefix: 'test',
   zoomLevel: zoomLevel,
-  minZoom: 1,
+  minZoom: minZoom,
   maxZoom: 8,
   onZoomIn: () {},
   onZoomOut: () {},
@@ -35,6 +35,16 @@ void main() {
     expect(byName('zoom-reset'), findsNothing);
 
     await tester.pumpWidget(host(controls(2)));
+    expect(byName('zoom-reset'), findsOneWidget);
+  });
+
+  testWidgets('the configured minimum is the unzoomed baseline', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host(controls(2, minZoom: 2)));
+    expect(byName('zoom-reset'), findsNothing);
+
+    await tester.pumpWidget(host(controls(3, minZoom: 2)));
     expect(byName('zoom-reset'), findsOneWidget);
   });
 
