@@ -135,6 +135,9 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
   }) async {
     final regionId = _uuid.v4();
     _activeRegionId = regionId;
+    // A cancellation belongs to the download it was aimed at. Clearing it here
+    // means a stale one can never be read as a cancellation of this download.
+    _cancelledRegionId = null;
     try {
       state = state.copyWith(
         isDownloading: true,
@@ -211,6 +214,9 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
       // Whatever failed, the store must not outlive the attempt.
       await _discardQuietly(regionId);
       state = state.copyWith(isDownloading: false, error: e.toString());
+    } finally {
+      // Nothing is downloading now, so there is nothing left to cancel.
+      _activeRegionId = null;
     }
   }
 

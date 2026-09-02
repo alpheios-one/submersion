@@ -599,8 +599,15 @@ class TileCacheService {
       inFlightRegionIds: _inFlightRegionIds,
     );
     for (final storeName in orphans) {
-      await FMTCStore(storeName).manage.delete();
-      _log.info('Deleted orphaned region tile store $storeName');
+      // Per store, so one locked or corrupt store cannot stop the others from
+      // being reclaimed. The loop order is stable, so an aborting sweep would
+      // hide every orphan behind the same failing one on every future run.
+      try {
+        await FMTCStore(storeName).manage.delete();
+        _log.info('Deleted orphaned region tile store $storeName');
+      } catch (e) {
+        _log.warning('Could not delete orphaned region store $storeName: $e');
+      }
     }
     // coverage:ignore-end
   }

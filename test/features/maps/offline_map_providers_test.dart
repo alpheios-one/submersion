@@ -16,7 +16,10 @@ import '../../helpers/test_database.dart';
 /// backend, which `flutter test` has no way to stand up.
 class _FakeTileCache implements TileCacheService {
   final calls = <String>[];
-  final StreamController<TileDownloadProgress> progress =
+
+  /// The controller backing the most recent download. Recreated per call, so
+  /// a test can run a second download after cancelling the first.
+  StreamController<TileDownloadProgress> progress =
       StreamController<TileDownloadProgress>();
 
   int measuredBytes = 0;
@@ -38,6 +41,9 @@ class _FakeTileCache implements TileCacheService {
     calls.add('download:$regionId');
     final error = downloadError;
     if (error != null) throw error;
+    if (progress.isClosed) {
+      progress = StreamController<TileDownloadProgress>();
+    }
     return progress.stream;
   }
 
@@ -203,6 +209,40 @@ void main() {
         reason: 'the partial store must go, or its tiles are unreachable',
       );
       expect(cache.calls.where((c) => c.startsWith('measure:')), isEmpty);
+    });
+
+    test('cancelling one download does not cancel the next', () async {
+      // The cancellation is keyed to the region it was aimed at. If it were a
+      // bare flag, or the id outlived its download, the next download would
+      // discard its own tiles and record nothing.
+      final notifier = container.read(downloadProgressProvider.notifier);
+      final first = notifier.downloadRegion(
+        name: 'Cozumel',
+        minLat: 20,
+        maxLat: 21,
+        minLng: -87,
+        maxLng: -86,
+        minZoom: 8,
+        maxZoom: 12,
+        tileLayerOptions: tileLayer,
+      );
+      await Future<void>.delayed(Duration.zero);
+      await notifier.cancelDownload();
+      await first;
+
+      expect(await repository.getAllRegions(), isEmpty);
+
+      cache.measuredBytes = 5 * 1024 * 1024;
+      await downloadOneRegion(tiles: 12);
+
+      final regions = await repository.getAllRegions();
+      expect(regions, hasLength(1));
+      expect(regions.single.sizeBytes, 5 * 1024 * 1024);
+      expect(
+        cache.calls.where((c) => c.startsWith('discard:')),
+        hasLength(1),
+        reason: 'only the cancelled download discards its store',
+      );
     });
 
     test('a failed download leaves no store behind', () async {
