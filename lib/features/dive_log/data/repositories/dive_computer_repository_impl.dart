@@ -9,6 +9,7 @@ import 'package:submersion/core/database/database.dart'
         AppDatabase,
         DiveComputersCompanion,
         DiveDataSourcesCompanion,
+        DiveDiveTypesCompanion,
         DiveProfileEventsCompanion,
         DivesCompanion,
         DiveTanksCompanion,
@@ -16,6 +17,7 @@ import 'package:submersion/core/database/database.dart'
         DiveProfileEvent;
 import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
+import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
@@ -1160,6 +1162,41 @@ class DiveComputerRepository {
         // not bottom time. Calculate bottom time from the profile.
         final bottomTimeSeconds = _calculateBottomTimeFromPoints(points);
 
+        // Downloaded profiles carry no dive type, so every dive used to land
+        // on 'recreational', including dives whose samples show mandatory
+        // deco (ceiling, deco stops, exhausted NDL). Default those to the
+        // built-in 'technical' type instead.
+        //
+        // _mapEventTypeString is a display mapping and is lossy: it collapses
+        // libdivecomputer's 'deepstop' onto 'decoStopStart' and
+        // 'ceiling_safetystop' onto 'decoViolation'. Both of those raw events
+        // are precautionary rather than proof of a mandatory deco obligation
+        // (a deep stop, and breaching a *safety* stop ceiling), so they are
+        // filtered out before detection, mirroring the decoType: 3 exclusion
+        // already applied to samples. The mapping itself stays untouched so
+        // the persisted profile events and their icons are unchanged.
+        final decoEventMaps = events
+            ?.where((e) => !_nonDecoEventTypes.contains(e.type))
+            .map((e) => _mapEventTypeString(e.type))
+            .whereType<String>()
+            .map((type) => {'eventType': type})
+            .toList();
+        final diveTypeId =
+            DecoDiveDetector.isDecoDive(
+              samples: points.map(
+                (p) => DecoDiveSample(
+                  depth: p.depth,
+                  ndl: p.ndl,
+                  ceiling: p.ceiling,
+                  decoType: p.decoType,
+                  tts: p.tts,
+                ),
+              ),
+              eventMaps: decoEventMaps,
+            )
+            ? 'technical'
+            : 'recreational';
+
         await _db
             .into(_db.dives)
             .insert(
@@ -1189,6 +1226,7 @@ class DiveComputerRepository {
                 decoAlgorithm: Value(decoAlgorithm),
                 decoConservatism: Value(decoConservatism),
                 diveMode: Value(diveMode.code),
+                diveType: Value(diveTypeId),
                 createdAt: Value(now),
                 updatedAt: Value(now),
                 entryLatitude: Value(entryLatitude),
@@ -1197,6 +1235,23 @@ class DiveComputerRepository {
                 exitLongitude: Value(exitLongitude),
               ),
             );
+
+        final diveTypeRowId = _uuid.v4();
+        await _db
+            .into(_db.diveDiveTypes)
+            .insert(
+              DiveDiveTypesCompanion(
+                id: Value(diveTypeRowId),
+                diveId: Value(diveId),
+                diveTypeId: Value(diveTypeId),
+                createdAt: Value(now),
+              ),
+            );
+        await _syncRepository.markRecordPending(
+          entityType: 'diveDiveTypes',
+          recordId: diveTypeRowId,
+          localUpdatedAt: now,
+        );
 
         await _syncRepository.markRecordPending(
           entityType: 'dives',
@@ -1974,6 +2029,14 @@ class DiveComputerRepository {
         (timestamp: point.timestamp, depth: point.depth),
     ]);
   }
+
+  /// Raw libdivecomputer event types that [_mapEventTypeString] folds into a
+  /// deco-flavoured label for display, but which do not by themselves prove a
+  /// decompression obligation. See the deco-default block in [importProfile].
+  static const Set<String> _nonDecoEventTypes = {
+    'deepstop',
+    'ceiling_safetystop',
+  };
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.
   ///
