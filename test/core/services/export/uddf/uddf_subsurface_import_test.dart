@@ -213,6 +213,27 @@ void main() {
       },
     );
 
+    test('dates a trip with no location from the date in its name', () async {
+      // Subsurface names a trip "<location><NBSP><date>", so a trip with no
+      // location is just the separator and the date. Dart counts U+00A0 as
+      // whitespace, so the name arrives as the bare date once trimmed.
+      const noLocation = '''<uddf version="3.2.0">
+  <divetrip>
+    <trip id="tripB">
+      <name>&#160;2019-11-02</name>
+    </trip>
+  </divetrip>
+</uddf>''';
+
+      final result = await service.importAllDataFromUddf(noLocation);
+
+      final trip = result.trips.single;
+      expect(trip['name'], '2019-11-02');
+      expect(trip['location'], isNull);
+      expect(trip['startDate'], DateTime(2019, 11, 2));
+      expect(trip['endDate'], DateTime(2019, 11, 2));
+    });
+
     test('still reads a divetrip that is itself the trip', () async {
       final result = await service.importAllDataFromUddf(_submersionUddf);
 

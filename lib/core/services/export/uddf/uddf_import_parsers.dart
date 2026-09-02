@@ -48,9 +48,12 @@ class UddfImportParsers {
   static final RegExp _zeroFractionPattern = RegExp(r'^([+-]?\d+)\.0*$');
 
   // A trip name of the form "<location><non-breaking space><ISO date>", which
-  // is how Subsurface's UDDF exporter names a trip.
+  // is how Subsurface's UDDF exporter names a trip. The location half is
+  // optional: a trip with no location exports as just the separator and the
+  // date, and Dart counts U+00A0 as whitespace, so by the time the name has
+  // been read and trimmed the separator is gone and only the date is left.
   static final RegExp _tripNamePattern = RegExp(
-    r'^(.*)\u00A0(\d{4}-\d{2}-\d{2})$',
+    r'^(?:(.*)\u00A0)?(\d{4}-\d{2}-\d{2})$',
   );
 
   /// Parses a UDDF integer-semantics value, tolerating the float
@@ -289,6 +292,12 @@ class UddfImportParsers {
     return GasMix(o2: o2, he: he);
   }
 
+  /// Trailing timezone info on a UDDF datetime: a "Z", or an offset such as
+  /// "+02:00" or "-05:00".
+  static final RegExp _timeZoneSuffixPattern = RegExp(
+    r'[Z+\-](?=\d{2}:\d{2}$)|Z$',
+  );
+
   /// A date carrying no time, optionally followed by the "T" separator that
   /// an exporter leaves dangling when the time is unknown.
   static final RegExp _dateWithoutTimePattern = RegExp(
@@ -313,7 +322,7 @@ class UddfImportParsers {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return null;
     // Strip any trailing timezone info (Z, +HH:MM, -HH:MM, etc.)
-    final bare = trimmed.split(RegExp(r'[Z+\-](?=\d{2}:\d{2}$)|Z$')).first;
+    final bare = trimmed.split(_timeZoneSuffixPattern).first;
     final dt =
         DateTime.tryParse(bare) ??
         DateTime.tryParse(
@@ -436,26 +445,27 @@ class UddfImportParsers {
     final trip = <String, dynamic>{};
 
     final tripPart = tripElement.findElements('trippart').firstOrNull;
+    // getElementText already trims, but the name is matched against a
+    // pattern below, so trim once here and use that value throughout.
     final rawName =
-        getElementText(tripElement, 'name') ??
-        (tripPart == null ? null : getElementText(tripPart, 'name')) ??
-        '';
+        (getElementText(tripElement, 'name') ??
+                (tripPart == null ? null : getElementText(tripPart, 'name')) ??
+                '')
+            .trim();
 
     // Subsurface has no trip-name field of its own, so its exporter builds
     // one as "<location>\u00A0<start date>". Recovering the two halves keeps
     // the trip out of the library named after a date, and gives it a date to
     // fall back on when no dive of the trip was imported.
     String? locationFromName;
-    var name = rawName.trim();
+    var name = rawName;
     final nameParts = _tripNamePattern.firstMatch(rawName);
     if (nameParts != null) {
-      final location = nameParts.group(1)!.trim();
+      final location = nameParts.group(1)?.trim();
       final nameDate = DateTime.tryParse(nameParts.group(2)!);
       if (nameDate != null) {
         trip['nameDate'] = nameDate;
-        if (location.isEmpty) {
-          name = nameParts.group(2)!;
-        } else {
+        if (location != null && location.isNotEmpty) {
           name = location;
           locationFromName = location;
         }

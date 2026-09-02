@@ -484,29 +484,37 @@ class UddfFullImportService {
     List<Map<String, dynamic>> trips,
     List<Map<String, dynamic>> dives,
   ) {
-    for (final trip in trips) {
-      if (trip['startDate'] != null && trip['endDate'] != null) continue;
+    final undatedTrips = trips
+        .where((trip) => trip['startDate'] == null || trip['endDate'] == null)
+        .toList();
+    if (undatedTrips.isEmpty) return;
 
+    // One pass over the dives, so a large logbook does not pay for a scan per
+    // trip.
+    final ranges = <String, ({DateTime earliest, DateTime latest})>{};
+    for (final dive in dives) {
+      final tripRef = dive['tripRef'] as String?;
+      final diveDateTime = dive['dateTime'] as DateTime?;
+      if (tripRef == null || diveDateTime == null) continue;
+      final range = ranges[tripRef];
+      ranges[tripRef] = range == null
+          ? (earliest: diveDateTime, latest: diveDateTime)
+          : (
+              earliest: diveDateTime.isBefore(range.earliest)
+                  ? diveDateTime
+                  : range.earliest,
+              latest: diveDateTime.isAfter(range.latest)
+                  ? diveDateTime
+                  : range.latest,
+            );
+    }
+
+    for (final trip in undatedTrips) {
       final uddfId = trip['uddfId'] as String?;
-      DateTime? earliest;
-      DateTime? latest;
-      if (uddfId != null) {
-        for (final dive in dives) {
-          if (dive['tripRef'] != uddfId) continue;
-          final diveDateTime = dive['dateTime'] as DateTime?;
-          if (diveDateTime == null) continue;
-          if (earliest == null || diveDateTime.isBefore(earliest)) {
-            earliest = diveDateTime;
-          }
-          if (latest == null || diveDateTime.isAfter(latest)) {
-            latest = diveDateTime;
-          }
-        }
-      }
-
+      final range = uddfId == null ? null : ranges[uddfId];
       final nameDate = trip['nameDate'] as DateTime?;
-      final start = earliest ?? nameDate;
-      final end = latest ?? nameDate;
+      final start = range?.earliest ?? nameDate;
+      final end = range?.latest ?? nameDate;
       // Trip dates are calendar days in the diver's own frame, while dive
       // datetimes are wall clocks flagged UTC, so carry the components across
       // rather than the instant.
