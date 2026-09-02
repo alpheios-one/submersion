@@ -989,8 +989,9 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// Photos are keyed by their source file's basename; a file's photos are
   /// attached only when that file produced exactly one imported dive (the
   /// DiveCloud shape) so a multi-dive file never duplicates photos across
-  /// its dives. Attach failures are swallowed: the dive import already
-  /// succeeded and a failed photo copy must not fail the wizard.
+  /// its dives. Attach failures are logged and skipped, never thrown: the
+  /// dive import already succeeded and a failed photo must not fail the
+  /// wizard.
   ///
   /// Returns the number of photos attached.
   static Future<int> attachImportedPhotos({
@@ -1042,8 +1043,11 @@ class UniversalAdapter implements ImportSourceAdapter {
         try {
           await attach(File(photoPath), diveId, takenAt);
           attachedCount++;
-        } catch (_) {
-          // Best-effort: see doc comment.
+        } catch (e) {
+          // Best-effort: see doc comment. Logged, because this path now
+          // writes into a folder the user chose, and a photo that never
+          // arrived there should be diagnosable.
+          _log.warning('Failed to attach bundled photo $photoPath: $e');
         }
       }
     }
