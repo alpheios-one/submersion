@@ -759,10 +759,6 @@ class ProfileAnalysisService {
           )
         : null;
 
-    final pointO2Fractions = ocGasMetrics?.o2Fractions;
-    final pointN2Fractions = ocGasMetrics?.n2Fractions;
-    final pointHeFractions = ocGasMetrics?.heFractions;
-
     // A measured ppO2 curve (from O2 cells/setpoint) takes priority for
     // rebreather dives: it reflects the actual loop ppO2, unlike the setpoint
     // (which may be absent for imported dives) or the OC depth x FO2 fallback.
@@ -928,6 +924,36 @@ class ProfileAnalysisService {
       }
     }
 
+    // Per-sample breathed fractions for the gas display curves. OC: the
+    // recorded tank/switch schedule. CCR: the loop itself (issue #579), the
+    // same model the engine loads tissues with: inspired inert = ambient -
+    // loop ppO2, split by the diluent's He:N2 ratio. The loop ppO2 is the
+    // displayed ppO2 curve so the ppN2/density overlays agree with it. With
+    // no setpoint segments the loop cannot be modeled and the legacy
+    // first-tank fractions stand.
+    final ccrLoopFractions = diveMode == DiveMode.ccr && gasSegments != null
+        ? _calculateCcrLoopFractions(
+            depths: depths,
+            timestamps: timestamps,
+            gasSegments: gasSegments,
+            loopPpO2Curve: ppO2Curve,
+          )
+        : null;
+    final pointO2Fractions =
+        ocGasMetrics?.o2Fractions ?? ccrLoopFractions?.o2Fractions;
+    final pointN2Fractions =
+        ocGasMetrics?.n2Fractions ?? ccrLoopFractions?.n2Fractions;
+    final pointHeFractions =
+        ocGasMetrics?.heFractions ?? ccrLoopFractions?.heFractions;
+    // MOD is a property of the gas, not of depth, and the chart draws it as a
+    // flat reference that moves only on a gas switch. On a CCR that gas is the
+    // diluent (the mix the diver can flush to or bail out on), not the
+    // depth-varying effective loop fraction.
+    final modO2Fractions =
+        ocGasMetrics?.o2Fractions ??
+        ccrLoopFractions?.diluentO2Fractions ??
+        List.filled(depths.length, o2Fraction);
+
     // Calculate additional gas/deco curves
     final ppN2Curve = pointN2Fractions != null
         ? _calculatePpCurve(depths, pointN2Fractions)
@@ -939,9 +965,7 @@ class ProfileAnalysisService {
         : heFraction > 0
         ? _calculatePpCurve(depths, List.filled(depths.length, heFraction))
         : null;
-    final modCurve = _calculateModCurve(
-      pointO2Fractions ?? List.filled(depths.length, o2Fraction),
-    );
+    final modCurve = _calculateModCurve(modO2Fractions);
     final densityCurve = _calculateDensityCurve(
       depths: depths,
       o2Fractions: pointO2Fractions ?? List.filled(depths.length, o2Fraction),
@@ -1834,6 +1858,64 @@ class ProfileAnalysisService {
       ),
       cnsCurve: cnsCurve,
       otuCurve: otuCurve,
+    );
+  }
+
+  /// Effective breathed fractions on a CCR loop at each sample, plus the
+  /// diluent O2 fraction for the MOD line.
+  ///
+  /// Mirrors the engine's `ClosedCircuit.inspiredAt` without the water-vapor
+  /// term, so the curves stay on the same ambient-pressure basis as the OC
+  /// partial pressures and the displayed loop ppO2. The loop ppO2 clamps to
+  /// ambient (the loop cannot exceed it near the surface) and a sample with no
+  /// loop ppO2 information falls back to breathing the diluent open-circuit
+  /// rather than reporting a hypoxic loop.
+  ({
+    List<double> o2Fractions,
+    List<double> n2Fractions,
+    List<double> heFractions,
+    List<double> diluentO2Fractions,
+  })
+  _calculateCcrLoopFractions({
+    required List<double> depths,
+    required List<int> timestamps,
+    required List<ProfileGasSegment> gasSegments,
+    required List<double> loopPpO2Curve,
+  }) {
+    final o2Fractions = <double>[];
+    final n2Fractions = <double>[];
+    final heFractions = <double>[];
+    final diluentO2Fractions = <double>[];
+
+    for (int i = 0; i < depths.length; i++) {
+      final diluent = _activeGasSegmentAtTimestamp(timestamps[i], gasSegments);
+      final diluentFN2 = diluent.fN2.clamp(0.0, 1.0);
+      final diluentFHe = diluent.fHe.clamp(0.0, 1.0);
+      final diluentInert = (diluentFN2 + diluentFHe).clamp(0.0, 1.0);
+      diluentO2Fractions.add(1.0 - diluentInert);
+
+      final ambientPressure = 1.0 + (depths[i] / 10.0);
+      final loopPpO2 = i < loopPpO2Curve.length ? loopPpO2Curve[i] : 0.0;
+      if (loopPpO2 <= 0 || diluentInert <= 0) {
+        o2Fractions.add(1.0 - diluentInert);
+        n2Fractions.add(diluentFN2);
+        heFractions.add(diluentFHe);
+        continue;
+      }
+
+      final pO2 = math.min(loopPpO2, ambientPressure);
+      final inertFraction = (ambientPressure - pO2) / ambientPressure;
+      final n2Share = diluentFN2 / diluentInert;
+      o2Fractions.add(pO2 / ambientPressure);
+      n2Fractions.add(inertFraction * n2Share);
+      heFractions.add(inertFraction * (1.0 - n2Share));
+    }
+
+    return (
+      o2Fractions: o2Fractions,
+      n2Fractions: n2Fractions,
+      heFractions: heFractions,
+      diluentO2Fractions: diluentO2Fractions,
     );
   }
 
