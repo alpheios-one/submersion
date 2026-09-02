@@ -6,11 +6,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_gallery_page.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_media_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../../media/presentation/support/media_widget_harness.dart';
+
+/// Records markVerified calls and refuses every other member.
+class _CapturingRepository implements MediaRepository {
+  final List<({String id, bool isOrphaned})> writes = [];
+
+  @override
+  Future<void> markVerified(
+    String id, {
+    required bool isOrphaned,
+    required DateTime verifiedAt,
+  }) async => writes.add((id: id, isOrphaned: isOrphaned));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not stubbed');
+}
 
 void main() {
   group('TripGalleryPage', () {
@@ -324,49 +345,56 @@ void main() {
       expect(delegate.crossAxisCount, 4);
     });
 
-    testWidgets(
-      'orphaned media renders distinct error tile (broken_image_outlined)',
-      (tester) async {
-        final testDive = Dive(
-          id: 'dive-1',
-          dateTime: DateTime(2024, 1, 15, 10, 30),
-          diveNumber: 1,
-        );
+    testWidgets('orphaned media still renders through MediaItemView', (
+      tester,
+    ) async {
+      // The orphan flag is a persisted claim that may be stale or may have
+      // been written by another device; the tile lets the resolver chain
+      // decide instead of drawing a broken tile from the flag (#1409).
+      final testDive = Dive(
+        id: 'dive-1',
+        dateTime: DateTime(2024, 1, 15, 10, 30),
+        diveNumber: 1,
+      );
 
-        final orphanedMedia = MediaItem(
-          id: 'media-orphan',
-          diveId: 'dive-1',
-          mediaType: MediaType.photo,
-          takenAt: DateTime(2024, 1, 15, 10, 45),
-          platformAssetId: 'asset-orphan',
-          isOrphaned: true,
-          createdAt: DateTime(2024, 1, 15),
-          updatedAt: DateTime(2024, 1, 15),
-        );
+      final orphanedMedia = MediaItem(
+        id: 'media-orphan',
+        diveId: 'dive-1',
+        mediaType: MediaType.photo,
+        takenAt: DateTime(2024, 1, 15, 10, 45),
+        platformAssetId: 'asset-orphan',
+        isOrphaned: true,
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      );
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              mediaForTripProvider('test-trip').overrideWith((ref) {
-                return Future.value({
-                  testDive: [orphanedMedia],
-                });
-              }),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: TripGalleryPage(tripId: 'test-trip'),
-            ),
+      final repository = _CapturingRepository();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mediaForTripProvider('test-trip').overrideWith((ref) {
+              return Future.value({
+                testDive: [orphanedMedia],
+              });
+            }),
+            mediaResolverOverride(),
+            mediaRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripGalleryPage(tripId: 'test-trip'),
           ),
-        );
+        ),
+      );
 
-        await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
 
-        // Orphaned items render the broken_image_outlined icon, distinct from
-        // the regular MediaItemView+UnavailableMediaPlaceholder error tile.
-        expect(find.byIcon(Icons.broken_image_outlined), findsOneWidget);
-      },
-    );
+      expect(find.byType(MediaItemView), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
+      // The resolver produced bytes, so the stale flag is corrected.
+      expect(repository.writes, [(id: 'media-orphan', isOrphaned: false)]);
+    });
   });
 }
