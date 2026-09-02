@@ -219,6 +219,11 @@ class DiveComputerHostApiImpl(
                     TAG, "LDC",
                     "download crashed: ${t.javaClass.simpleName}: ${t.message}"
                 )
+                // Do not leave a GATT client registered behind the crash: its
+                // notification subscription would survive into the next
+                // attempt and double every packet (issue #285).
+                activeBleStream?.close()
+                activeBleStream = null
                 reportError(
                     "download_error",
                     "Download failed unexpectedly (${t.javaClass.simpleName})."
@@ -448,6 +453,15 @@ class DiveComputerHostApiImpl(
             -999
         }
         NativeLogger.d(TAG, "LDC", "nativeDownloadRun returned: $result")
+
+        // The native side closes the iostream, and with it this GATT client,
+        // on every path libdivecomputer returns through; this call is then a
+        // no-op. It is here for the path that never reaches that close: the
+        // JNI call throwing. A client left registered after a failed attempt
+        // keeps its notification subscription in the Bluetooth stack, so the
+        // next attempt against the same computer sees every packet delivered
+        // twice (issue #285, Android trace). close() is idempotent.
+        bleStream.close()
 
         // Report completion or error.
         if (result == 0) {
