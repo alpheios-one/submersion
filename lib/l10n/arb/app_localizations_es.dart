@@ -14893,18 +14893,55 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_diveDetailSections_fixedSections =>
-      'Secciones fijas: Encabezado, Grafico de Perfil de Inmersion';
+      'Seccion fija: Encabezado';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'Secciones configurables (arrastra para reordenar)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'Estado Deco / Carga de Tejidos';
+  String get diveDetailSection_profile_name => 'Perfil de buceo';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, techo, mapa de calor de tejidos, toxicidad de O2';
+  String get diveDetailSection_profile_description =>
+      'Gráfico de profundidad/tiempo, reproducción, selección de rango';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'Estado de deco';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, techo, paradas, toxicidad de O2';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'Carga tisular';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'Saturación por compartimento y mapa de calor';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip =>
+      'Opciones de visualización';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'Diseño';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'Secciones';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll =>
+      'Mostrar todas las secciones';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'Reordenar secciones…';
+
+  @override
+  String get diveDetailLayout_detailed => 'Detallada';
+
+  @override
+  String get diveDetailLayout_list => 'Lista';
 
   @override
   String get diveDetailSection_safetyReview_name => 'Revisión de seguridad';

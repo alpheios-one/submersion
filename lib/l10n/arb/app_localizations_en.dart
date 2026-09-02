@@ -14653,18 +14653,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_diveDetailSections_fixedSections =>
-      'Fixed sections: Header, Dive Profile Chart';
+      'Fixed section: Header';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'Configurable sections (drag to reorder)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'Deco Status / Tissue Loading';
+  String get diveDetailSection_profile_name => 'Dive Profile';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, ceiling, tissue heat map, O2 toxicity';
+  String get diveDetailSection_profile_description =>
+      'Depth/time chart, playback, range selection';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'Deco Status';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, ceiling, stops, O2 toxicity';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'Tissue Loading';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'Per-compartment saturation and heat map';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'Display options';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'Layout';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'Sections';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'Show all sections';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'Reorder sections...';
+
+  @override
+  String get diveDetailLayout_detailed => 'Detailed';
+
+  @override
+  String get diveDetailLayout_list => 'List';
 
   @override
   String get diveDetailSection_safetyReview_name => 'Safety Review';

@@ -1875,6 +1875,8 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   // Dive detail section order and visibility (v56) — JSON array
   TextColumn get diveDetailSections => text().nullable()();
+  // Dive detail page layout: detailed | compact | list (v184)
+  TextColumn get diveDetailLayout => text().nullable()();
   // Table view profile panel default visibility (v61)
   BoolColumn get showProfilePanelInTableView =>
       boolean().withDefault(const Constant(true))();
@@ -3332,7 +3334,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 183;
+  static const int currentSchemaVersion = 184;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3765,6 +3767,7 @@ class AppDatabase extends _$AppDatabase {
     // a parallel branch's rung never ran ours and the beforeOpen backstop
     // only runs AFTER onUpgrade: by then the rows would be gone.
     183,
+    184,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4712,6 +4715,21 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         "ALTER TABLE diver_settings ADD COLUMN no_fly_preset TEXT "
         "NOT NULL DEFAULT 'standard'",
+      );
+    }
+  }
+
+  /// v184: diver_settings.dive_detail_layout, the dive detail page's layout
+  /// choice (detailed/compact/list). Idempotent so it is safe to call from
+  /// both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertDiveDetailLayoutColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (cols.isNotEmpty && !names.contains('dive_detail_layout')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN dive_detail_layout TEXT',
       );
     }
   }
@@ -9770,6 +9788,13 @@ class AppDatabase extends _$AppDatabase {
           }
         }
         if (from < 183) await reportProgress();
+        // v184: diver_settings.dive_detail_layout. Column-only rung, no
+        // backfill: a null reads back as the detailed layout, which is what
+        // every existing diver was already getting.
+        if (from < 184) {
+          await _assertDiveDetailLayoutColumn();
+        }
+        if (from < 184) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -10026,6 +10051,12 @@ class AppDatabase extends _$AppDatabase {
         // that arrives by restore or sync-adopt never runs onUpgrade, and
         // every read of a diver or buddy row would throw without the column.
         await _assertProfilePhotoColumns();
+
+        // v184 backstop: re-assert diver_settings.dive_detail_layout. Every
+        // settings read selects the whole row, so a database that skipped the
+        // rung would throw on the first read instead of falling back to the
+        // default layout.
+        await _assertDiveDetailLayoutColumn();
         // v182 backstop: re-assert the packed profile series tables, then
         // pack any dive that still has legacy rows and no series row. A
         // schema-version collision with a parallel branch skips the rung on

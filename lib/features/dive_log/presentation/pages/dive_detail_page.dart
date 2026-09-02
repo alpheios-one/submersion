@@ -8,6 +8,7 @@ import 'package:intl/intl.dart' show DateFormat;
 import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_section_pairs.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -90,6 +91,8 @@ import 'package:submersion/features/dive_log/presentation/widgets/playback_contr
 import 'package:submersion/features/dive_log/presentation/widgets/playback_stats_panel.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_selection_overlay.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_stats_panel.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_detail_properties_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_section_fold.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/responsive_section_pair.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/sac_volume_hint.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
@@ -350,18 +353,56 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required UnitFormatter units,
     required AsyncValue<List<DiveDataSource>> computerReadingsAsync,
     required AppSettings settings,
+    required DiveDetailLayout layout,
   }) {
+    // Each section owns the gap above its own content, because a section that
+    // renders nothing must not leave a gap behind. The list layout folds
+    // every section into a divider-separated row instead, and wants none.
+    final gap = layout.foldsSections ? 0.0 : layout.sectionGap;
     return {
-      DiveDetailSectionId.decoO2: () {
+      DiveDetailSectionId.profile: () {
+        if (dive.profile.isEmpty) return [];
+        // No gap of its own: by default the chart butts against the header,
+        // whose own trailing gap separates them. _buildOrderedSections adds
+        // one when the diver has ordered the chart somewhere else.
+        return [_buildProfileSection(context, ref, dive)];
+      },
+      DiveDetailSectionId.decoStatus: () {
         if (dive.profile.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           Consumer(
             builder: (context, ref, _) {
               final selectedPointIndex = ref.watch(
                 profileTrackingIndexProvider(diveId),
               );
-              return _buildDecoO2Panel(context, ref, dive, selectedPointIndex);
+              return _decoStatusColumn(
+                context,
+                ref,
+                dive,
+                selectedPointIndex,
+                stretch: false,
+              );
+            },
+          ),
+        ];
+      },
+      DiveDetailSectionId.tissueLoading: () {
+        if (dive.profile.isEmpty) return [];
+        return [
+          SizedBox(height: gap),
+          Consumer(
+            builder: (context, ref, _) {
+              final selectedPointIndex = ref.watch(
+                profileTrackingIndexProvider(diveId),
+              );
+              return _tissueLoadingCard(
+                context,
+                ref,
+                dive,
+                selectedPointIndex,
+                expand: false,
+              );
             },
           ),
         ];
@@ -378,7 +419,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.sacSegments: () {
         if (dive.profile.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           Consumer(
             builder: (context, ref, _) {
               final selectedPointIndex = ref.watch(
@@ -402,7 +443,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.environment: () {
         if (!_hasEnvironmentData(dive)) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildEnvironmentSection(context, dive, units),
         ];
       },
@@ -416,14 +457,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             siteAltitude: dive.site?.altitude,
           )) {
             return [
-              const SizedBox(height: 24),
+              SizedBox(height: gap),
               _buildAltitudeMismatchNote(context, dive),
             ];
           }
           return [];
         }
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildAltitudeSection(context, ref, dive),
         ];
       },
@@ -437,47 +478,41 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.surfaceGps: () {
         if (!_hasSurfaceGps(dive)) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _surfaceGpsCard(dive, computerReadingsAsync, settings),
         ];
       },
       DiveDetailSectionId.weights: () {
         if (!_hasWeights(dive)) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildWeightSection(context, dive, units),
         ];
       },
       DiveDetailSectionId.buoyancy: () {
         if (dive.tanks.isEmpty && !_hasExposureSuit(dive)) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           BuoyancySection(diveId: dive.id, units: units),
         ];
       },
       DiveDetailSectionId.tanks: () {
         if (dive.tanks.isEmpty) return [];
-        return [
-          const SizedBox(height: 24),
-          _cylindersCard(dive, units, settings),
-        ];
+        return [SizedBox(height: gap), _cylindersCard(dive, units, settings)];
       },
       DiveDetailSectionId.buddies: () {
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildBuddiesSection(context, ref, dive),
         ];
       },
       DiveDetailSectionId.signatures: () {
-        return [
-          const SizedBox(height: 24),
-          _signaturesColumn(context, ref, dive),
-        ];
+        return [SizedBox(height: gap), _signaturesColumn(context, ref, dive)];
       },
       DiveDetailSectionId.equipment: () {
         if (dive.equipment.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildEquipmentSection(context, ref, dive),
         ];
       },
@@ -486,28 +521,25 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         return [_buildSightingsSection(context, ref)];
       },
       DiveDetailSectionId.media: () {
-        return [
-          const SizedBox(height: 24),
-          _buildMediaSection(context, ref, dive),
-        ];
+        return [SizedBox(height: gap), _buildMediaSection(context, ref, dive)];
       },
       DiveDetailSectionId.tags: () {
         if (dive.tags.isEmpty) return [];
-        return [const SizedBox(height: 24), _buildTagsSection(context, dive)];
+        return [SizedBox(height: gap), _buildTagsSection(context, dive)];
       },
       DiveDetailSectionId.notes: () {
-        return [const SizedBox(height: 24), _buildNotesSection(context, dive)];
+        return [SizedBox(height: gap), _buildNotesSection(context, dive)];
       },
       DiveDetailSectionId.customFields: () {
         if (dive.customFields.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           _buildCustomFieldsSection(context, dive),
         ];
       },
       DiveDetailSectionId.dataSources: () {
         return [
-          const SizedBox(height: 24),
+          SizedBox(height: gap),
           Consumer(
             builder: (context, ref, _) {
               final viewedSourceId = ref.watch(
@@ -669,6 +701,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required UnitFormatter units,
     required AsyncValue<List<DiveDataSource>> computerReadingsAsync,
     required AppSettings settings,
+    required DiveDetailLayout layout,
     required Map<DiveDetailSectionId, List<Widget> Function()> builders,
   }) {
     // Visible sections in configured order, minus gauge-hidden ones.
@@ -678,16 +711,24 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           section.id,
     ];
     final visibleIds = visible.toSet();
+    final unfolded = {
+      for (final section in settings.diveDetailSections)
+        if (section.expanded) section.id,
+    };
 
     final children = <Widget>[];
     final consumed = <DiveDetailSectionId>{};
+    // The list layout's folded rows, kept apart from [children] because they
+    // are reordered as a group rather than laid out one after another.
+    final folds = <Widget>[];
+    final foldIds = <DiveDetailSectionId>[];
 
     for (final id in visible) {
       // The trailing half of a pair already rendered at the leading half's
       // slot.
       if (consumed.contains(id)) continue;
 
-      final pair = diveDetailSectionPairFor(id);
+      final pair = layout.pairsSections ? diveDetailSectionPairFor(id) : null;
       if (pair != null && visibleIds.contains(pair.partnerOf(id)!)) {
         final cards = _buildPairCards(
           pair,
@@ -699,25 +740,127 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           settings: settings,
         );
         if (cards != null) {
-          // The row takes the leading gap of the slot it lands in, which is
-          // this half's -- not necessarily the pair's left half, since the
-          // diver may have ordered the right half first. Details is the one
-          // section that emits no gap of its own (it butts against the
-          // profile chart).
-          if (id != DiveDetailSectionId.details) {
-            children.add(const SizedBox(height: 24));
-          }
+          _addSectionGap(children, id, layout);
           children.add(
-            ResponsiveSectionPair(first: cards.$1, second: cards.$2),
+            ResponsiveSectionPair(
+              first: cards.$1,
+              second: cards.$2,
+              minRowWidth: pair.minRowWidth,
+              stackGap: layout.sectionGap,
+              stretch: pair.stretch,
+            ),
           );
           consumed.addAll([pair.left, pair.right]);
           continue;
         }
       }
 
-      children.addAll(builders[id]?.call() ?? const []);
+      final content = builders[id]?.call() ?? const <Widget>[];
+      if (content.isEmpty) continue;
+      if (layout.foldsSections) {
+        folds.add(
+          _foldSection(
+            context,
+            ref,
+            id,
+            content,
+            isExpanded: unfolded.contains(id),
+            reorderIndex: folds.length,
+          ),
+        );
+        foldIds.add(id);
+        continue;
+      }
+      _addSectionGap(children, id, layout);
+      children.addAll(content);
+    }
+    if (layout.foldsSections) {
+      return folds.isEmpty
+          ? const []
+          : [_reorderableFolds(ref, settings, foldIds, folds)];
     }
     return children;
+  }
+
+  /// The folded rows as one draggable list.
+  ///
+  /// A drop writes straight through to the diver's saved section order, so
+  /// the settings page and every other dive pick the new order up too. The
+  /// list never scrolls itself -- the page it sits in does.
+  Widget _reorderableFolds(
+    WidgetRef ref,
+    AppSettings settings,
+    List<DiveDetailSectionId> ids,
+    List<Widget> folds,
+  ) {
+    return ReorderableListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      buildDefaultDragHandles: false,
+      itemCount: folds.length,
+      itemBuilder: (context, index) => folds[index],
+      onReorderItem: (oldIndex, newIndex) {
+        ref
+            .read(settingsProvider.notifier)
+            .setDiveDetailSections(
+              DiveDetailSectionConfig.moveRenderedSection(
+                settings.diveDetailSections,
+                ids,
+                oldIndex,
+                newIndex,
+              ),
+            );
+      },
+    );
+  }
+
+  /// Adds the gap [id] needs above itself, for the sections that emit none.
+  ///
+  /// The dive profile chart and the Details card carry no leading gap of
+  /// their own: by default they butt against the header and the chart
+  /// respectively, each of which already provides the separation. Ordered
+  /// anywhere else -- or rendered as half of a pair, which takes the gap of
+  /// whichever half the diver put first -- they need it back.
+  void _addSectionGap(
+    List<Widget> children,
+    DiveDetailSectionId id,
+    DiveDetailLayout layout,
+  ) {
+    const gapless = {DiveDetailSectionId.profile, DiveDetailSectionId.details};
+    if (gapless.contains(id) && children.isEmpty) return;
+    children.add(SizedBox(height: layout.sectionGap));
+  }
+
+  /// [content] behind a folded header row, for the list layout.
+  /// One folded row for [id] in the list layout.
+  ///
+  /// [isExpanded] comes from the diver's saved section list and the toggle
+  /// writes straight back to it, so a dive reopens the way it was left
+  /// instead of folding itself again.
+  Widget _foldSection(
+    BuildContext context,
+    WidgetRef ref,
+    DiveDetailSectionId id,
+    List<Widget> content, {
+    required bool isExpanded,
+    required int reorderIndex,
+  }) {
+    return DiveSectionFold(
+      key: ValueKey('diveSectionFold_${id.name}'),
+      title: id.localizedDisplayName(context.l10n),
+      icon: id.icon,
+      isExpanded: isExpanded,
+      reorderIndex: reorderIndex,
+      onToggle: (expanded) => ref
+          .read(settingsProvider.notifier)
+          .setDiveDetailSectionExpanded(id, expanded),
+      contentBuilder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: content,
+      ),
+    );
   }
 
   /// The two bare cards for [pair] in left-then-right order, or null when
@@ -738,6 +881,32 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required AppSettings settings,
   }) {
     switch (pair.left) {
+      case DiveDetailSectionId.decoStatus:
+        if (dive.profile.isEmpty) return null;
+        // Each half watches the tracking index in its own Consumer so
+        // hovering the profile chart rebuilds the two cards rather than the
+        // whole page, exactly as the combined panel did.
+        return (
+          Consumer(
+            builder: (context, ref, _) => _decoStatusColumn(
+              context,
+              ref,
+              dive,
+              ref.watch(profileTrackingIndexProvider(dive.id)),
+              stretch: true,
+            ),
+          ),
+          Consumer(
+            builder: (context, ref, _) => _tissueLoadingCard(
+              context,
+              ref,
+              dive,
+              ref.watch(profileTrackingIndexProvider(dive.id)),
+              expand: true,
+            ),
+          ),
+        );
+
       case DiveDetailSectionId.details:
         if (!_hasEnvironmentData(dive)) return null;
         return (
@@ -837,6 +1006,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .watch(preDiveSessionForDiveProvider(dive.id))
         .value;
 
+    final layout = settings.diveDetailLayout;
+
     final builders = _sectionBuilders(
       context: context,
       ref: ref,
@@ -844,11 +1015,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       units: units,
       computerReadingsAsync: computerReadingsAsync,
       settings: settings,
+      layout: layout,
     );
 
     final body = SingleChildScrollView(
       controller: DetailScrollController.maybeOf(context),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(layout.pagePadding),
       child: RepaintBoundary(
         key: _pageExportKey,
         child: Column(
@@ -879,14 +1051,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            // Fixed: Dive Profile Chart
-            if (dive.profile.isNotEmpty)
-              _buildProfileSection(context, ref, dive),
-            // Configurable sections in user-defined order, with two adjacent
-            // card pairs (Details+Conditions, Buddies+Signatures) laid out
-            // side by side when the pane is wide enough. Gauge dives hide
-            // gas/deco sections (deco/O2 tox, SAC segments, cylinders).
+            SizedBox(height: layout.headerGap),
+            // Configurable sections in user-defined order -- the dive profile
+            // chart among them -- with the card pairs (Deco+Tissue,
+            // Details+Conditions, Cylinders+Weights, Buddies+Signatures) laid
+            // out side by side when the pane is wide enough. Gauge dives hide
+            // gas/deco sections (deco status, tissue loading, SAC segments,
+            // cylinders). The list layout folds each section to a header row.
             ..._buildOrderedSections(
               context: context,
               ref: ref,
@@ -894,6 +1065,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               units: units,
               computerReadingsAsync: computerReadingsAsync,
               settings: settings,
+              layout: layout,
               builders: builders,
             ),
             const SizedBox(height: 32),
@@ -917,6 +1089,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       appBar: AppBar(
         title: Text(context.l10n.diveLog_detail_appBar),
         actions: [
+          DiveDetailPropertiesMenu(isGauge: dive.isGauge),
           DiveNavButtons(diveId: diveId, onNavigate: _navigateToDive),
           IconButton(
             icon: Icon(
@@ -1094,6 +1267,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   ],
                 ),
               ),
+              DiveDetailPropertiesMenu(isGauge: dive.isGauge),
               DiveNavButtons(diveId: dive.id, onNavigate: _navigateToDive),
               // Favorite toggle
               IconButton(
@@ -2236,7 +2410,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     return '$minutes:${secs.toString().padLeft(2, '0')}';
   }
 
-  Widget _buildDecoO2Panel(
+  /// The three cards the deco/tissue panel is made of, or null when the dive
+  /// has no usable profile analysis.
+  ///
+  /// Built together from one analysis read so the deco status, the O2
+  /// exposure and the tissue heat map stay three views of the same instant,
+  /// even though the diver can show, hide and order Deco Status and Tissue
+  /// Loading separately.
+  ({Widget deco, Widget o2, Widget Function({bool expand}) tissue})?
+  _decoPanelCards(
     BuildContext context,
     WidgetRef ref,
     Dive dive,
@@ -2255,8 +2437,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Retain the last usable analysis for THIS dive and fall back to it when the
     // provider momentarily yields null/empty (e.g. a mid-sync empty-profile
     // read), so a single transient null doesn't blink the cards out. A dive that
-    // has genuinely never produced an analysis falls through to the
-    // SizedBox.shrink below and correctly shows nothing.
+    // has genuinely never produced an analysis falls through to the null below
+    // and correctly shows nothing.
     if (isUsable) {
       _lastDecoPanelAnalysis = current;
       _lastDecoPanelAnalysisDiveId = dive.id;
@@ -2268,9 +2450,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               : null);
 
     // Don't show if no analysis is, or ever was, available for this dive.
-    if (analysis == null || analysis.decoStatuses.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (analysis == null || analysis.decoStatuses.isEmpty) return null;
 
     // Use selected point or default to final status
     final index =
@@ -2288,13 +2468,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           )
         : null;
 
-    Widget buildTissueCard({bool expandVisualization = false}) {
+    Widget buildTissueCard({bool expand = false}) {
       return CompactTissueLoadingCard(
         status: status,
         decoStatuses: analysis.decoStatuses,
         selectedIndex: selectedPointIndex,
         subtitle: timeSubtitle,
-        expandVisualization: expandVisualization,
+        expandVisualization: expand,
         onHeatMapHover: (index) {
           ref.read(profileTrackingIndexProvider(diveId).notifier).state = index;
         },
@@ -2339,43 +2519,45 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       weeklyOtu: weeklyOtu,
     );
 
-    // Use LayoutBuilder to respond to actual panel width, not screen width.
-    // This handles both phone screens and narrow master-detail panes.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          // Narrow: stack vertically at full width
-          return Column(
-            children: [
-              buildTissueCard(),
-              const SizedBox(height: 8),
-              decoCard,
-              const SizedBox(height: 8),
-              o2Card,
-            ],
-          );
-        }
-        // Wide: two-column layout
-        return IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Expanded(child: decoCard),
-                    const SizedBox(height: 8),
-                    o2Card,
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: buildTissueCard(expandVisualization: true)),
-            ],
-          ),
-        );
-      },
+    return (deco: decoCard, o2: o2Card, tissue: buildTissueCard);
+  }
+
+  /// The Deco Status section: the deco card with the O2 exposure card beneath
+  /// it, the arrangement the two have always had.
+  ///
+  /// [stretch] fills the height the parent gives the column, which the
+  /// Deco Status / Tissue Loading pair relies on to keep both of its columns
+  /// the same height.
+  Widget _decoStatusColumn(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    int? selectedPointIndex, {
+    required bool stretch,
+  }) {
+    final cards = _decoPanelCards(context, ref, dive, selectedPointIndex);
+    if (cards == null) return const SizedBox.shrink();
+    return Column(
+      mainAxisSize: stretch ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        if (stretch) Expanded(child: cards.deco) else cards.deco,
+        const SizedBox(height: 8),
+        cards.o2,
+      ],
     );
+  }
+
+  /// The Tissue Loading section: the heat map / stacked-area card on its own.
+  Widget _tissueLoadingCard(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    int? selectedPointIndex, {
+    required bool expand,
+  }) {
+    final cards = _decoPanelCards(context, ref, dive, selectedPointIndex);
+    if (cards == null) return const SizedBox.shrink();
+    return cards.tissue(expand: expand);
   }
 
   Widget _buildSacSegmentsSection(
