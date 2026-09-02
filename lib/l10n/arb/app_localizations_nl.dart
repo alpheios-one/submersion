@@ -11241,6 +11241,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type-uitrusting';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Geen $filterText';
   }
@@ -11248,6 +11253,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Geen uitrusting met deze status';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Geen uitrusting in deze categorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11262,10 +11271,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_list_filterAll => 'Alle uitrusting';
 
   @override
-  String get equipment_list_filterLabel => 'Filter:';
+  String get equipment_list_filterServiceDue => 'Service nodig';
 
   @override
-  String get equipment_list_filterServiceDue => 'Service nodig';
+  String get equipment_list_typeFilterAll => 'Alle types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Uitrusting filteren';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Wissen';
+
+  @override
+  String get equipment_filter_title => 'Uitrusting filteren';
+
+  @override
+  String get equipment_filter_clearAll => 'Alles wissen';
+
+  @override
+  String get equipment_filter_apply => 'Filters toepassen';
+
+  @override
+  String get equipment_filter_cancel => 'Annuleren';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Categorie';
 
   @override
   String get equipment_list_retryButton => 'Opnieuw proberen';
