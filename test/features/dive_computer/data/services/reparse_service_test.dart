@@ -2249,6 +2249,45 @@ void main() {
       expect(events[6].severity, 'alert');
     });
 
+    test('rbt and airtime events re-parse as lowGas warnings', () async {
+      // Before the event-code table was corrected, libdivecomputer's RBT code
+      // arrived as 'ascent' and its AIRTIME code as 'PO2', so neither name
+      // ever reached this mapping. Both mean the gas supply is running short.
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      final parsed = makeParsedDive(
+        events: [
+          pigeon.DiveEvent(timeSeconds: 60, type: 'rbt'),
+          pigeon.DiveEvent(timeSeconds: 120, type: 'airtime'),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final events =
+          await (db.select(db.diveProfileEvents)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      expect(events.map((e) => e.eventType), ['lowGas', 'lowGas']);
+      expect(events.map((e) => e.severity), ['warning', 'warning']);
+    });
+
     test('unknown event types are not inserted', () async {
       await insertDive('dive-1');
       await insertComputer('comp-1');
