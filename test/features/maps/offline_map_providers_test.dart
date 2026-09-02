@@ -21,6 +21,7 @@ class _FakeTileCache implements TileCacheService {
 
   int measuredBytes = 0;
   Object? deleteTilesError;
+  Object? downloadError;
   Set<String> regionStoreIds = {};
 
   @override
@@ -35,6 +36,8 @@ class _FakeTileCache implements TileCacheService {
     bool skipExistingTiles = true,
   }) async {
     calls.add('download:$regionId');
+    final error = downloadError;
+    if (error != null) throw error;
     return progress.stream;
   }
 
@@ -200,6 +203,63 @@ void main() {
         reason: 'the partial store must go, or its tiles are unreachable',
       );
       expect(cache.calls.where((c) => c.startsWith('measure:')), isEmpty);
+    });
+  });
+
+  group('download', () {
+    test('a failed download leaves no store behind', () async {
+      // The store is created before the first tile arrives, so a download that
+      // throws anywhere after that would strand it holding tiles no region
+      // could reach.
+      cache.downloadError = StateError('tile server unreachable');
+
+      final notifier = container.read(downloadProgressProvider.notifier);
+      await notifier.downloadRegion(
+        name: 'Cozumel',
+        minLat: 20,
+        maxLat: 21,
+        minLng: -87,
+        maxLng: -86,
+        minZoom: 8,
+        maxZoom: 12,
+        tileLayerOptions: tileLayer,
+      );
+
+      expect(await repository.getAllRegions(), isEmpty);
+      expect(cache.calls.where((c) => c.startsWith('discard:')), hasLength(1));
+      expect(
+        container.read(downloadProgressProvider).error,
+        contains('tile server unreachable'),
+        reason:
+            'the diver must see why the download failed, not why the '
+            'cleanup after it did',
+      );
+    });
+  });
+
+  group('clear all', () {
+    test('drops every region row and all of their tiles', () async {
+      for (final id in ['a', 'b']) {
+        await repository.createRegion(
+          id: id,
+          name: 'Region $id',
+          minLat: 20,
+          maxLat: 21,
+          minLng: -87,
+          maxLng: -86,
+          minZoom: 8,
+          maxZoom: 12,
+          tileCount: 10,
+          sizeBytes: 1024,
+        );
+      }
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .clearAllCache();
+
+      expect(cache.calls, contains('clearCache'));
+      expect(await repository.getAllRegions(), isEmpty);
     });
   });
 

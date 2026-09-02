@@ -50,6 +50,23 @@ class _FakeRepository implements OfflineMapRepository {
       throw UnimplementedError('${invocation.memberName} should not be called');
 }
 
+/// A tile cache that cannot say which regions own their tiles, which must read
+/// as unprovable rather than as proven either way.
+class _UnreadableTileCache implements TileCacheService {
+  @override
+  Future<Set<String>> getRegionStoreIds() async =>
+      throw StateError('tile cache unavailable');
+
+  @override
+  Future<void> pruneOrphanRegionStores({
+    required Set<String> knownRegionIds,
+  }) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} should not be called');
+}
+
 /// A tile cache whose tile removal fails, which is the case the page has to
 /// report rather than silently leave the region in place.
 class _FailingTileCache implements TileCacheService {
@@ -199,5 +216,70 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.textContaining('store is locked'), findsOneWidget);
     expect(repository.regions, hasLength(1));
+  });
+
+  testWidgets('the details sheet shows the same resolved size as the list', (
+    tester,
+  ) async {
+    // The sheet is the second place a size is rendered, so a regression there
+    // would put the fabricated figure back in front of the diver.
+    await pumpPage(
+      tester,
+      regions: [_region(id: 'legacy', name: 'Bonaire')],
+      regionStoreIds: const {},
+    );
+
+    await tester.tap(find.text('Bonaire'));
+    await tester.pump();
+    await tester.pump();
+
+    // The bounds block only exists in the sheet, so this proves it opened
+    // rather than matching the list tile behind it.
+    expect(find.textContaining('SW:'), findsOneWidget);
+    expect(find.textContaining('17.6 MB'), findsNothing);
+    expect(find.textContaining('Unknown'), findsWidgets);
+  });
+
+  testWidgets('a cache that cannot be read promises nothing', (tester) async {
+    // Unprovable is not the same as reclaimable: the prompt must not offer
+    // bytes back on the strength of a lookup that failed.
+    final base = await getBaseOverrides();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          cachedRegionsProvider.overrideWith(
+            (ref) async => [_region(id: 'owns', name: 'Cozumel')],
+          ),
+          tileCacheServiceProvider.overrideWithValue(_UnreadableTileCache()),
+          cacheStatsProvider.overrideWith(
+            (ref) async => const CacheStats(
+              tileCount: 900,
+              sizeKiB: 8000,
+              hits: 10,
+              misses: 2,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: OfflineMapsPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.textContaining('Unknown'), findsWidgets);
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.textContaining('will not reclaim storage'), findsOneWidget);
+    expect(find.textContaining('free up'), findsNothing);
   });
 }
