@@ -317,7 +317,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     } catch (e, stackTrace) {
       _log.error(
         'Device info persist failed for ${computer.displayName}',
-        category: LogCategory.libdc,
+        category: LogCategory.database,
         error: e,
         stackTrace: stackTrace,
       );

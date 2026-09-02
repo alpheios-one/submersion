@@ -87,10 +87,11 @@ pigeon.DiscoveredDevice _advert(
   String address, {
   String vendor = 'Shearwater',
   String product = 'Petrel 3',
+  int model = 10,
 }) => pigeon.DiscoveredDevice(
   vendor: vendor,
   product: product,
-  model: 10,
+  model: model,
   address: address,
   name: product,
   transport: pigeon.TransportType.ble,
@@ -388,7 +389,12 @@ void main() {
       await tester.pump();
 
       h.service.onDeviceDiscovered(
-        _advert(freshAddress, vendor: 'Ratio', product: 'iX3M 2021 GPS Fancy'),
+        _advert(
+          freshAddress,
+          vendor: 'Ratio',
+          product: 'iX3M 2021 GPS Fancy',
+          model: 96,
+        ),
       );
       await tester.pump(
         DcAdapterDownloadStep.knownDeviceScanTimeout +
