@@ -10,6 +10,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// Fails the test if [condition] is still false after [maxFrames], so a state
 /// that is never reached surfaces as an explicit failure rather than an
 /// assertion that passes for the wrong reason.
+///
+/// [maxFrames] must be at least 1: one frame is always pumped, so a smaller
+/// budget could not be honoured.
 Future<void> pumpUntil(
   WidgetTester tester,
   bool Function() condition, {
@@ -17,6 +20,10 @@ Future<void> pumpUntil(
   Duration interval = const Duration(milliseconds: 10),
   String? reason,
 }) async {
+  assert(
+    maxFrames >= 1,
+    'pumpUntil always pumps one frame; maxFrames must be >= 1',
+  );
   // Always pump at least one frame before believing [condition]. A provider
   // state such as `isReloading` becomes true the instant the reload is
   // scheduled, before the widgets that read it have rebuilt: returning then
