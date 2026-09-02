@@ -70,17 +70,32 @@ class UddfFullImportService {
       }
     }
 
-    // Parse trips (UDDF standard divetrip elements)
+    // Parse trips. Submersion writes one <divetrip> per trip, carrying the
+    // trip's fields directly; UDDF 3.2 and Subsurface's exporter instead wrap
+    // <trip> children in a single <divetrip> container. Reading only the
+    // outer element turned a whole Subsurface trip list into one nameless
+    // trip, which the entity importer then skipped (#239).
     final trips = <Map<String, dynamic>>[];
     final tripMap = <String, Map<String, dynamic>>{};
-    for (final tripElement in uddfElement.findElements('divetrip')) {
-      final tripData = UddfImportParsers.parseTrip(tripElement);
-      final tripId = tripElement.getAttribute('id');
-      if (tripId != null) {
-        tripData['uddfId'] = tripId;
-        tripMap[tripId] = tripData;
+    for (final diveTripElement in uddfElement.findElements('divetrip')) {
+      final nestedTrips = diveTripElement.findElements('trip').toList();
+      final tripElements = nestedTrips.isEmpty
+          ? [diveTripElement]
+          : nestedTrips;
+      for (final tripElement in tripElements) {
+        final tripData = UddfImportParsers.parseTrip(tripElement);
+        // Subsurface writes an empty <divetrip/> even when the logbook has no
+        // trips at all. Carrying that through as a nameless trip made the
+        // import preview offer a trip the entity importer then skipped.
+        final tripName = tripData['name'] as String?;
+        if (tripName == null || tripName.isEmpty) continue;
+        final tripId = tripElement.getAttribute('id');
+        if (tripId != null) {
+          tripData['uddfId'] = tripId;
+          tripMap[tripId] = tripData;
+        }
+        trips.add(tripData);
       }
-      trips.add(tripData);
     }
 
     // Parse gas definitions
@@ -434,6 +449,8 @@ class UddfFullImportService {
       }
     }
 
+    _applyTripDateRanges(trips, dives);
+
     return UddfImportResult(
       dives: dives,
       sites: sites,
@@ -454,6 +471,52 @@ class UddfFullImportService {
       equipmentSets: equipmentSets,
       courses: courses,
     );
+  }
+
+  /// Fills in a trip's date range from the dives that belong to it.
+  ///
+  /// Only Submersion's own export writes `<dateoftrip>`. A Subsurface trip
+  /// carries no dates at all, and an undated trip lands in the library dated
+  /// the day of the import. The trip's dives cover the same days, so derive
+  /// the range from them, falling back to the date Subsurface embeds in the
+  /// trip name when none of its dives were imported.
+  void _applyTripDateRanges(
+    List<Map<String, dynamic>> trips,
+    List<Map<String, dynamic>> dives,
+  ) {
+    for (final trip in trips) {
+      if (trip['startDate'] != null && trip['endDate'] != null) continue;
+
+      final uddfId = trip['uddfId'] as String?;
+      DateTime? earliest;
+      DateTime? latest;
+      if (uddfId != null) {
+        for (final dive in dives) {
+          if (dive['tripRef'] != uddfId) continue;
+          final diveDateTime = dive['dateTime'] as DateTime?;
+          if (diveDateTime == null) continue;
+          if (earliest == null || diveDateTime.isBefore(earliest)) {
+            earliest = diveDateTime;
+          }
+          if (latest == null || diveDateTime.isAfter(latest)) {
+            latest = diveDateTime;
+          }
+        }
+      }
+
+      final nameDate = trip['nameDate'] as DateTime?;
+      final start = earliest ?? nameDate;
+      final end = latest ?? nameDate;
+      // Trip dates are calendar days in the diver's own frame, while dive
+      // datetimes are wall clocks flagged UTC, so carry the components across
+      // rather than the instant.
+      if (trip['startDate'] == null && start != null) {
+        trip['startDate'] = DateTime(start.year, start.month, start.day);
+      }
+      if (trip['endDate'] == null && end != null) {
+        trip['endDate'] = DateTime(end.year, end.month, end.day);
+      }
+    }
   }
 
   Map<String, dynamic> _parseFullSite(XmlElement siteElement) {
@@ -605,6 +668,17 @@ class UddfFullImportService {
         if (altitudeMeters != null && altitudeMeters > 0) {
           diveData['altitude'] = altitudeMeters;
         }
+      }
+
+      // Subsurface points a dive at its trip with <tripmembership>, and its
+      // generated trip ids carry none of the prefixes the <link> handling
+      // below keys on.
+      final tripMembershipRef = beforeElement
+          .findElements('tripmembership')
+          .firstOrNull
+          ?.getAttribute('ref');
+      if (tripMembershipRef != null && tripMembershipRef.isNotEmpty) {
+        diveData['tripRef'] = tripMembershipRef;
       }
 
       // Extract link references for trip, dive center, and buddies

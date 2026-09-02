@@ -412,6 +412,41 @@ void main() {
     });
   });
 
+  group('Import dives (auto numbering)', () {
+    setUp(() {
+      when(
+        mockDiveRepo.createDive(any),
+      ).thenAnswer((inv) async => inv.positionalArguments[0] as Dive);
+      when(mockDiveRepo.saveComputerReading(any)).thenAnswer((_) async {});
+    });
+
+    test('numbers an undated dive by the date it is stored with', () async {
+      // A dive whose datetime could not be parsed is stored at the import
+      // clock, which makes it the most recent dive in the batch. Numbering
+      // used to sort it as if it were dated year zero and hand it the lowest
+      // number, contradicting the date written to the row (#239).
+      final data = UddfImportResult(
+        dives: [
+          {'maxDepth': 12.0},
+          {'dateTime': DateTime.utc(2020, 3, 4, 9, 0), 'maxDepth': 18.0},
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(dives: {0, 1}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final dives = verify(
+        mockDiveRepo.createDive(captureAny),
+      ).captured.cast<Dive>();
+      expect(dives.firstWhere((d) => d.maxDepth == 18.0).diveNumber, 1);
+      expect(dives.firstWhere((d) => d.maxDepth == 12.0).diveNumber, 2);
+    });
+  });
+
   group('Import dives (deco dive type default)', () {
     setUp(() {
       when(

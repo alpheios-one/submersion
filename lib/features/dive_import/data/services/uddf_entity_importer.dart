@@ -1389,11 +1389,14 @@ class UddfEntityImporter {
     final diveIdByIndex = <int, String>{};
     final inlineBuddyIds = <String>{};
 
-    // Sort selected indices by dateTime (oldest first) for sequential numbering.
+    // Sort selected indices by dateTime (oldest first) for sequential
+    // numbering. An undated dive is stored at [now] further down, so it has
+    // to sort as [now] here too: keying it as year zero handed the newest
+    // row in the batch the lowest dive number (#239).
     final sortedSelected = selected.toList()
       ..sort((a, b) {
-        final aTime = items[a]['dateTime'] as DateTime? ?? DateTime(0);
-        final bTime = items[b]['dateTime'] as DateTime? ?? DateTime(0);
+        final aTime = items[a]['dateTime'] as DateTime? ?? now;
+        final bTime = items[b]['dateTime'] as DateTime? ?? now;
         return aTime.compareTo(bTime);
       });
 
