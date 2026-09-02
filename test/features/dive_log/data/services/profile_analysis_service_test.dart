@@ -1089,6 +1089,19 @@ void main() {
       expect(analysis.modCurve![2], 0.0);
     });
 
+    test('a sample with no loop ppO2 breathes the diluent open-circuit', () {
+      // A zero in the resolved curve means the loop ppO2 is unknown at that
+      // sample. Treating it as a real 0 bar would report a hypoxic loop with
+      // all of ambient as inert gas; instead the sample falls back to the
+      // diluent's open-circuit fractions.
+      final ppO2Curve = List<double>.filled(depths.length, 1.3)..[2] = 0.0;
+      final analysis = analyzeLoop(ppO2Curve: ppO2Curve);
+      // Air diluent at 44 m: 5.4 x 0.79.
+      expect(analysis.ppN2Curve![2], closeTo(5.4 * 0.79, 0.001));
+      // The neighbouring samples still follow the loop.
+      expect(analysis.ppN2Curve![3], closeTo(4.1, 0.001));
+    });
+
     test('no loop information keeps the legacy first-tank curves', () {
       final analysis = analyzeLoop(gasSegments: null);
       // No setpoint segments and no measured ppO2: the loop cannot be
