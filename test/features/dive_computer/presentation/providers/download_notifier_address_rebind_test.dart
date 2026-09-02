@@ -1,0 +1,187 @@
+import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart'
+    hide DiscoveredDevice;
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
+import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
+
+@GenerateMocks([DiveComputerRepository, DiveComputerService])
+import 'download_notifier_address_rebind_test.mocks.dart';
+
+const _staleAddress = 'CBB1EC06-5D7C-4F20-7A6C-98BBB2F8F631';
+const _freshAddress = 'C4E774E2-7D1F-DB41-EBD3-69D345D782F3';
+
+DiveComputer _savedComputer({
+  String? serialNumber = '074691',
+  String? bluetoothAddress = _staleAddress,
+}) {
+  final now = DateTime(2026, 8, 31);
+  return DiveComputer(
+    id: 'dc-1',
+    diverId: 'diver-1',
+    name: 'Ratio iX3M 2021 GPS Fancy',
+    manufacturer: 'Ratio',
+    model: 'iX3M 2021 GPS Fancy',
+    serialNumber: serialNumber,
+    firmwareVersion: '5.0.0',
+    connectionType: 'bluetooth',
+    bluetoothAddress: bluetoothAddress,
+    createdAt: now,
+    updatedAt: now,
+  );
+}
+
+DiscoveredDevice _device(
+  String address, {
+  DeviceConnectionType connectionType = DeviceConnectionType.ble,
+}) => DiscoveredDevice(
+  id: address,
+  name: 'RATIO-074691',
+  connectionType: connectionType,
+  address: address,
+  recognizedModel: const DeviceModel(
+    id: 'ratio_ix3m',
+    manufacturer: 'Ratio',
+    model: 'iX3M 2021 GPS Fancy',
+    connectionTypes: [DeviceConnectionType.ble],
+    dcModel: 96,
+  ),
+  discoveredAt: DateTime(2026, 8, 31),
+);
+
+void main() {
+  late MockDiveComputerRepository repository;
+  late MockDiveComputerService service;
+  late StreamController<DownloadEvent> events;
+  late DownloadNotifier notifier;
+
+  setUp(() {
+    repository = MockDiveComputerRepository();
+    service = MockDiveComputerService();
+    events = StreamController<DownloadEvent>.broadcast();
+    when(service.downloadEvents).thenAnswer((_) => events.stream);
+    when(
+      service.startDownload(any, fingerprint: anyNamed('fingerprint')),
+    ).thenAnswer((_) async {});
+    when(repository.updateComputer(any)).thenAnswer((_) async {});
+    notifier = DownloadNotifier(service: service, repository: repository);
+  });
+
+  tearDown(() async {
+    notifier.dispose();
+    await events.close();
+  });
+
+  Future<DiveComputer?> completeDownload({
+    required DiveComputer computer,
+    required DiscoveredDevice device,
+    String? serialNumber = '074691',
+    String? firmwareVersion = '5.0.0',
+  }) async {
+    await notifier.startDownload(device, computer: computer);
+    events.add(
+      DownloadCompleteEvent(
+        0,
+        serialNumber: serialNumber,
+        firmwareVersion: firmwareVersion,
+      ),
+    );
+    await pumpEventQueue();
+    final captured = verify(repository.updateComputer(captureAny)).captured;
+    return captured.isEmpty ? null : captured.last as DiveComputer;
+  }
+
+  // Issue #1423: the address stored for a saved Bluetooth computer is a
+  // host-local identifier that can change (iOS mints a new CoreBluetooth
+  // identifier when the peripheral's address rotates). Once a download has
+  // completed from a device under a different address, that address is the
+  // one worth remembering.
+  group('DownloadNotifier stored address rebind', () {
+    test('persists the address the download actually used', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(),
+        device: _device(_freshAddress),
+      );
+      expect(saved?.bluetoothAddress, _freshAddress);
+      expect(saved?.serialNumber, '074691');
+      expect(saved?.firmwareVersion, '5.0.0');
+    });
+
+    test('rebinds even when no serial or firmware was reported', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(),
+        device: _device(_freshAddress),
+        serialNumber: null,
+        firmwareVersion: null,
+      );
+      expect(saved?.bluetoothAddress, _freshAddress);
+      expect(saved?.serialNumber, '074691');
+    });
+
+    test('fills in a missing stored address', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(bluetoothAddress: null),
+        device: _device(_freshAddress),
+      );
+      expect(saved?.bluetoothAddress, _freshAddress);
+    });
+
+    test('leaves the address alone when it already matches', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(),
+        device: _device(_staleAddress.toLowerCase()),
+      );
+      expect(saved?.bluetoothAddress, _staleAddress);
+    });
+
+    test(
+      'keeps the stored address when the reported serial names another unit',
+      () async {
+        // The same-model fallback can only pick a device by model. A serial
+        // that disagrees with the saved one means this download came from a
+        // different physical computer; do not point the saved entry at it.
+        final saved = await completeDownload(
+          computer: _savedComputer(),
+          device: _device(_freshAddress),
+          serialNumber: '999999',
+        );
+        expect(saved?.bluetoothAddress, _staleAddress);
+      },
+    );
+
+    test('rebinds when the saved computer has no serial yet', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(serialNumber: null),
+        device: _device(_freshAddress),
+        serialNumber: '074691',
+      );
+      expect(saved?.bluetoothAddress, _freshAddress);
+      expect(saved?.serialNumber, '074691');
+    });
+
+    test('never writes a USB port as a Bluetooth address', () async {
+      final saved = await completeDownload(
+        computer: _savedComputer(),
+        device: _device(
+          '/dev/ttyUSB0',
+          connectionType: DeviceConnectionType.usb,
+        ),
+      );
+      expect(saved?.bluetoothAddress, _staleAddress);
+    });
+
+    test('does nothing without a computer to update', () async {
+      await notifier.startDownload(_device(_freshAddress));
+      events.add(
+        DownloadCompleteEvent(0, serialNumber: '074691', firmwareVersion: null),
+      );
+      await pumpEventQueue();
+      verifyNever(repository.updateComputer(any));
+    });
+  });
+}

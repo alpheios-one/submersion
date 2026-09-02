@@ -149,6 +149,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
 
   // Stored for device info persistence after download completes.
   DiveComputer? _computer;
+  DiscoveredDevice? _device;
 
   /// Reads the diver's surfacing-pressure preference at the moment a dive
   /// arrives (issue #1092). A getter rather than a value so a settings change
@@ -188,6 +189,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     DiveComputer? computer,
   }) async {
     _computer = computer;
+    _device = device;
 
     try {
       state = state.copyWith(
@@ -290,8 +292,9 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     }
   }
 
-  /// Persist device info (serial number, firmware version) on the computer
-  /// record after a successful download.
+  /// Persist device info (serial number, firmware version) and the Bluetooth
+  /// address the download actually used on the computer record after a
+  /// successful download.
   Future<void> _persistDeviceInfo(
     String? serialNumber,
     String? firmwareVersion,
@@ -300,17 +303,65 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     if (computer == null) return;
 
     try {
-      if (serialNumber != null || firmwareVersion != null) {
-        final updated = computer.copyWith(
-          serialNumber: serialNumber ?? computer.serialNumber,
-          firmwareVersion: firmwareVersion ?? computer.firmwareVersion,
-        );
-        await _repository.updateComputer(updated);
-        _computer = updated;
+      final address = _addressToRebind(computer, serialNumber);
+      if (serialNumber == null && firmwareVersion == null && address == null) {
+        return;
       }
+      final updated = computer.copyWith(
+        serialNumber: serialNumber ?? computer.serialNumber,
+        firmwareVersion: firmwareVersion ?? computer.firmwareVersion,
+        bluetoothAddress: address ?? computer.bluetoothAddress,
+      );
+      await _repository.updateComputer(updated);
+      _computer = updated;
     } catch (e) {
       debugPrint('[DownloadNotifier] Device info persist failed: $e');
     }
+  }
+
+  /// The address to store for [computer] after downloading from [_device],
+  /// or null when the stored one should stay.
+  ///
+  /// A stored Bluetooth address is host-local and can go stale (issue #1423:
+  /// iOS mints a new CoreBluetooth identifier when the computer rotates its
+  /// address), so a completed download is the moment to remember the address
+  /// that worked. The saved-computer flow may have picked the device by make
+  /// and model alone, so a reported serial that disagrees with the stored one
+  /// means another physical computer answered; the stored address is then
+  /// left pointing at the diver's own unit.
+  String? _addressToRebind(DiveComputer computer, String? serialNumber) {
+    final device = _device;
+    if (device == null) return null;
+    final isBluetooth =
+        device.connectionType == DeviceConnectionType.ble ||
+        device.connectionType == DeviceConnectionType.bluetoothClassic;
+    if (!isBluetooth) return null;
+
+    final stored = computer.bluetoothAddress;
+    if (stored != null && bluetoothAddressesMatch(stored, device.address)) {
+      return null;
+    }
+
+    final storedSerial = computer.serialNumber?.trim() ?? '';
+    final reportedSerial = serialNumber?.trim() ?? '';
+    if (storedSerial.isNotEmpty &&
+        reportedSerial.isNotEmpty &&
+        storedSerial != reportedSerial) {
+      _log.warning(
+        'Downloaded from ${device.name} (${device.address}) with serial '
+        '$reportedSerial, but ${computer.displayName} is serial '
+        '$storedSerial; keeping its stored address $stored',
+        category: LogCategory.bluetooth,
+      );
+      return null;
+    }
+
+    _log.info(
+      'Rebinding ${computer.displayName} from address $stored to '
+      '${device.address}',
+      category: LogCategory.bluetooth,
+    );
+    return device.address;
   }
 
   /// Submit a PIN code for BLE authentication.

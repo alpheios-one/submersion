@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
+import 'package:submersion/features/dive_computer/domain/services/known_computer_reacquisition.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/widgets/download_step_widget.dart';
@@ -279,7 +282,8 @@ class DcAdapterDownloadStep extends ConsumerStatefulWidget {
   final DiveComputer? knownComputer;
 
   /// How long a saved-computer download scans for the computer's stored
-  /// address before falling back to a direct connect with that address.
+  /// address before settling for the only device of the same model, or
+  /// failing that, a direct connect with the stored address.
   /// Matches the first resolve attempt of the macOS/iOS native resolver.
   static const knownDeviceScanTimeout = Duration(seconds: 15);
 
@@ -289,6 +293,10 @@ class DcAdapterDownloadStep extends ConsumerStatefulWidget {
 }
 
 class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
+  static final LoggerService _log = LoggerService.forClass(
+    DcAdapterDownloadStep,
+  );
+
   bool _captured = false;
   bool _computerResolved = false;
   bool _searchingForKnownDevice = false;
@@ -316,8 +324,16 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
   /// Connecting straight to a stored address fails on Android and Windows
   /// unless the stack has recently seen the device advertise, which is why
   /// the scan-and-download flow worked for the same computer while the
-  /// saved entry did not. If the scan does not see the address, the step
-  /// falls back to the stored address exactly as before.
+  /// saved entry did not.
+  ///
+  /// The stored address is host-local and can go stale: iOS mints a new
+  /// CoreBluetooth identifier when a computer rotates its Bluetooth address,
+  /// after which nothing ever advertises the stored one (issue #1423). So
+  /// when the scan times out without seeing it, the step downloads from the
+  /// only device recognized as the same make and model, if there is exactly
+  /// one; a successful download then rewrites the stored address. With no
+  /// such device, or more than one, the step falls back to the stored
+  /// address exactly as before.
   Future<void> _reacquireKnownDevice(DiveComputer computer) async {
     if (!mounted) return;
     final address = computer.bluetoothAddress;
@@ -345,16 +361,37 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
     }
 
     setState(() => _searchingForKnownDevice = true);
-    final device = await notifier.scanForAddress(
+    var device = await notifier.scanForAddress(
       address,
       timeout: DcAdapterDownloadStep.knownDeviceScanTimeout,
     );
+    if (device == null && mounted) {
+      device = _sameModelFallback(computer, address);
+    }
     if (device != null) notifier.selectDevice(device);
     if (!mounted) return;
     setState(() {
       _searchingForKnownDevice = false;
       _computerResolved = true;
     });
+  }
+
+  /// The one device of [computer]'s make and model the scan saw while the
+  /// stored [address] stayed silent, or null.
+  DiscoveredDevice? _sameModelFallback(DiveComputer computer, String address) {
+    final device = sameModelFallbackDevice(
+      computer: computer,
+      discovered: ref.read(discoveryNotifierProvider).discoveredDevices,
+    );
+    if (device != null) {
+      _log.info(
+        'Stored address $address for ${computer.displayName} did not '
+        'advertise; downloading from the only ${device.displayName} seen, '
+        '${device.name} (${device.address})',
+        category: LogCategory.bluetooth,
+      );
+    }
+    return device;
   }
 
   Future<void> _resolveComputer() async {

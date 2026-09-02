@@ -83,12 +83,16 @@ DiveComputer _savedComputer({
   );
 }
 
-pigeon.DiscoveredDevice _advert(String address) => pigeon.DiscoveredDevice(
-  vendor: 'Shearwater',
-  product: 'Petrel 3',
+pigeon.DiscoveredDevice _advert(
+  String address, {
+  String vendor = 'Shearwater',
+  String product = 'Petrel 3',
+}) => pigeon.DiscoveredDevice(
+  vendor: vendor,
+  product: product,
   model: 10,
   address: address,
-  name: 'Petrel 3',
+  name: product,
   transport: pigeon.TransportType.ble,
 );
 
@@ -310,6 +314,87 @@ void main() {
 
       expect(h.hostApi.calls, ['startDownload']);
       expect(h.hostApi.downloads.single.address, '/dev/ttyUSB0');
+    });
+  });
+
+  // Issue #1423: a saved Ratio iX3M on iPhone stopped downloading after its
+  // CoreBluetooth identifier (the stored "address") changed. The scan saw the
+  // computer under its new identifier, but only an exact address match was
+  // accepted, so the download fell back to the stale identifier and the
+  // native resolver spent 35 s scanning for something nothing advertises.
+  group('DcAdapterDownloadStep same-model fallback', () {
+    const freshAddress = 'C4E774E2-7D1F-DB41-EBD3-69D345D782F3';
+
+    testWidgets(
+      'adopts the only device of the saved model when the stored address '
+      'never advertises',
+      (tester) async {
+        final h = _Harness();
+        await tester.pumpWidget(h.build(_savedComputer()));
+        await tester.pump();
+        expect(h.hostApi.calls, ['startDiscovery']);
+
+        h.service.onDeviceDiscovered(_advert(freshAddress));
+        await tester.pump();
+        // An exact address match still has the whole timeout to appear; the
+        // fallback only applies once the scan gives up on the stored one.
+        expect(h.hostApi.calls, ['startDiscovery']);
+
+        await tester.pump(
+          DcAdapterDownloadStep.knownDeviceScanTimeout +
+              const Duration(seconds: 1),
+        );
+        await _settle(tester);
+
+        expect(h.hostApi.calls, [
+          'startDiscovery',
+          'stopDiscovery',
+          'startDownload',
+        ]);
+        final sent = h.hostApi.downloads.single;
+        expect(sent.address, freshAddress);
+        expect(sent.vendor, 'Shearwater');
+        expect(sent.product, 'Petrel 3');
+        expect(_selectedDevice(tester)?.address, freshAddress);
+      },
+    );
+
+    testWidgets('keeps the stored address when two devices of the saved model '
+        'advertise', (tester) async {
+      final h = _Harness();
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+
+      h.service.onDeviceDiscovered(_advert(freshAddress));
+      h.service.onDeviceDiscovered(_advert('11:22:33:44:55:66'));
+      await tester.pump(
+        DcAdapterDownloadStep.knownDeviceScanTimeout +
+            const Duration(seconds: 1),
+      );
+      await _settle(tester);
+
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
+    });
+
+    testWidgets('keeps the stored address when only another model advertises', (
+      tester,
+    ) async {
+      final h = _Harness();
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+
+      h.service.onDeviceDiscovered(
+        _advert(freshAddress, vendor: 'Ratio', product: 'iX3M 2021 GPS Fancy'),
+      );
+      await tester.pump(
+        DcAdapterDownloadStep.knownDeviceScanTimeout +
+            const Duration(seconds: 1),
+      );
+      await _settle(tester);
+
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
     });
   });
 }
