@@ -1,5 +1,6 @@
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 
 /// A saved target mix, e.g. 10/70. Pressure is deliberately not part of a
 /// template: blenders reuse a mix across cylinders and fill pressures.
@@ -84,6 +85,9 @@ class BlenderPreferences {
     required this.model,
     required this.billedFills,
     required this.billedTo,
+    this.flushFeeEnabled = false,
+    this.flushFeeMode = FlushFeeMode.perInvoice,
+    this.flushFeeGases = defaultFlushFeeGases,
   });
 
   /// Enough to keep a synced blob small. Nobody blends 50 distinct mixes.
@@ -123,6 +127,15 @@ class BlenderPreferences {
   /// a fill station fills other people's cylinders.
   final String billedTo;
 
+  /// Whether a hose-purge flat fee is charged at all.
+  final bool flushFeeEnabled;
+
+  /// How often [flushFeeEnabled] adds its lines to the bill.
+  final FlushFeeMode flushFeeMode;
+
+  /// One entry per [FlushFeeGasKind], in that enum's order.
+  final List<FlushFeeGasSetting> flushFeeGases;
+
   /// Lives beside [BilledFill] itself; re-exposed here because the JSON read
   /// path enforces it.
   static const int maxBilledFills = kMaxBilledFills;
@@ -151,6 +164,9 @@ class BlenderPreferences {
     BlendGasModel? model,
     List<BilledFill>? billedFills,
     String? billedTo,
+    bool? flushFeeEnabled,
+    FlushFeeMode? flushFeeMode,
+    List<FlushFeeGasSetting>? flushFeeGases,
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
@@ -167,6 +183,9 @@ class BlenderPreferences {
         .take(maxBilledFills)
         .toList(),
     billedTo: billedTo ?? this.billedTo,
+    flushFeeEnabled: flushFeeEnabled ?? this.flushFeeEnabled,
+    flushFeeMode: flushFeeMode ?? this.flushFeeMode,
+    flushFeeGases: flushFeeGases ?? this.flushFeeGases,
   );
 
   Map<String, dynamic> toJson() => {
@@ -179,6 +198,9 @@ class BlenderPreferences {
     'model': model.name,
     'billedFills': billedFills.map((f) => f.toJson()).toList(),
     'billedTo': billedTo,
+    'flushFeeEnabled': flushFeeEnabled,
+    'flushFeeMode': flushFeeMode.name,
+    'flushFeeGases': flushFeeGases.map((g) => g.toJson()).toList(),
   };
 
   /// Every field falls back independently, so one corrupt entry never costs
@@ -214,6 +236,17 @@ class BlenderPreferences {
 
     final billedTo = json['billedTo'];
 
+    final rawFlushGases = json['flushFeeGases'];
+    final flushGases = [
+      for (var i = 0; i < 3; i++)
+        FlushFeeGasSetting.fromJson(
+          rawFlushGases is List && i < rawFlushGases.length
+              ? rawFlushGases[i]
+              : null,
+          defaultVolumeLiters: 20,
+        ),
+    ];
+
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
@@ -228,6 +261,11 @@ class BlenderPreferences {
       ),
       billedFills: fills,
       billedTo: billedTo is String ? billedTo : '',
+      flushFeeEnabled: json['flushFeeEnabled'] == true,
+      flushFeeMode: FlushFeeMode.fromName(
+        json['flushFeeMode'] is String ? json['flushFeeMode'] as String : null,
+      ),
+      flushFeeGases: flushGases,
     );
   }
 }

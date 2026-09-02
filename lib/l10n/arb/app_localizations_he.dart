@@ -12104,6 +12104,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'שמור את המילוי הזה';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'גבה עמלה על שטיפת צינור המילוי';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'פעם אחת לחשבונית';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => 'פעם אחת לכל מילוי';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'נפח שטיפה';
+
+  @override
   String get gasCalculators_blender_billed => 'חיוב';
 
   @override

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 
 void main() {
   group('MixTemplate', () {
@@ -38,6 +39,17 @@ void main() {
       expect(prefs.cylinderWaterLiters, 12);
       expect(prefs.model, BlendGasModel.zFactor);
     });
+
+    test('the flush fee starts off, once per bill, unpriced', () {
+      final prefs = BlenderPreferences.defaults(cylinderWaterLiters: 12);
+      expect(prefs.flushFeeEnabled, isFalse);
+      expect(prefs.flushFeeMode, FlushFeeMode.perInvoice);
+      expect(prefs.flushFeeGases, hasLength(3));
+      expect(
+        prefs.flushFeeGases.map((g) => g.pricePer100),
+        everyElement(isNull),
+      );
+    });
   });
 
   group('JSON', () {
@@ -51,6 +63,13 @@ void main() {
             settledTempC: 25,
             cylinderWaterLiters: 3,
             model: BlendGasModel.vanDerWaals,
+            flushFeeEnabled: true,
+            flushFeeMode: FlushFeeMode.perFill,
+            flushFeeGases: const [
+              FlushFeeGasSetting(volumeLiters: 20, pricePer100: 5),
+              FlushFeeGasSetting(volumeLiters: 25, pricePer100: 12),
+              FlushFeeGasSetting(volumeLiters: 15),
+            ],
           );
       final decoded = BlenderPreferences.fromJson(
         jsonDecode(jsonEncode(prefs.toJson())) as Map<String, dynamic>,
@@ -62,6 +81,12 @@ void main() {
       expect(decoded.settledTempC, 25);
       expect(decoded.cylinderWaterLiters, 3);
       expect(decoded.model, BlendGasModel.vanDerWaals);
+      expect(decoded.flushFeeEnabled, isTrue);
+      expect(decoded.flushFeeMode, FlushFeeMode.perFill);
+      expect(decoded.flushFeeGases[0].volumeLiters, 20);
+      expect(decoded.flushFeeGases[0].pricePer100, 5);
+      expect(decoded.flushFeeGases[1].pricePer100, 12);
+      expect(decoded.flushFeeGases[2].pricePer100, isNull);
     });
 
     test('an emptied template list survives the round trip', () {
@@ -85,6 +110,9 @@ void main() {
       expect(decoded.currencyCode, 'CHF');
       expect(decoded.fillTempC, kReferenceTempC);
       expect(decoded.model, BlendGasModel.zFactor);
+      expect(decoded.flushFeeEnabled, isFalse);
+      expect(decoded.flushFeeMode, FlushFeeMode.perInvoice);
+      expect(decoded.flushFeeGases, hasLength(3));
     });
 
     test('an impossible template is dropped on read', () {

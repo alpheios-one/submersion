@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Decimals a blender's pressure is worth carrying, by unit.
@@ -40,3 +42,47 @@ String formatPreciseMix(BuildContext context, GasMix m) {
 /// point so the call sites read as what they mean.
 String formatPreciseGasName(BuildContext context, GasMix m) =>
     formatPreciseMix(context, m);
+
+/// The label to print for a flush-fee gas identity.
+String flushFeeGasLabel(BuildContext context, FlushFeeGasKind kind) =>
+    switch (kind) {
+      FlushFeeGasKind.o2 => context.l10n.gasCalculators_blender_o2,
+      FlushFeeGasKind.he => context.l10n.gasCalculators_blender_helium,
+      FlushFeeGasKind.air => context.l10n.gasCalculators_blender_air,
+    };
+
+/// Cubic feet in a litre, matching `VolumeUnit.convert`.
+///
+/// Storage is canonical: litres for volumes, currency per 100 litres for
+/// prices. Every conversion to and from the diver's unit happens at the text
+/// field, and nowhere else. A second, separately maintained copy of this
+/// conversion is what let the volume column convert twice while the price
+/// never converted at all (PR #1215 review), so every blender widget that
+/// converts a volume or a price shares these functions rather than keeping
+/// its own.
+const double blenderCubicFeetPerLiter = 0.0353147;
+
+bool blenderUsesMetricVolume(AppSettings s) =>
+    s.volumeUnit == VolumeUnit.liters;
+
+/// Litres to the diver's volume unit, for seeding a display field.
+double blenderDisplayVolume(double liters, AppSettings s) =>
+    blenderUsesMetricVolume(s) ? liters : liters * blenderCubicFeetPerLiter;
+
+/// Inverse of [blenderDisplayVolume]: the diver's unit back to litres.
+double blenderLitersFromDisplay(double shown, AppSettings s) =>
+    blenderUsesMetricVolume(s) ? shown : shown / blenderCubicFeetPerLiter;
+
+/// A price per 100 litres, shown as a price per 100 of the diver's unit.
+///
+/// Gas priced at 7.99 per 100 cu ft is 0.28 per 100 L: the same gas, the
+/// same money, a unit that is 28 times larger. Storing the entered number
+/// without this conversion charged a cubic-foot diver 28 times over.
+double blenderDisplayPricePer100(double per100Liters, AppSettings s) =>
+    blenderUsesMetricVolume(s)
+    ? per100Liters
+    : per100Liters / blenderCubicFeetPerLiter;
+
+/// Inverse of [blenderDisplayPricePer100].
+double blenderPricePer100FromDisplay(double shown, AppSettings s) =>
+    blenderUsesMetricVolume(s) ? shown : shown * blenderCubicFeetPerLiter;

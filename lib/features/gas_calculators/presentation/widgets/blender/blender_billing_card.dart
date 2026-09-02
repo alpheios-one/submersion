@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
-
-/// Cubic feet in a litre, matching `VolumeUnit.convert`.
-///
-/// Storage is canonical: litres for volumes, currency per 100 litres for
-/// prices. Every conversion to and from the diver's unit happens at the text
-/// field, and nowhere else. Adding a second conversion path is what let the
-/// volume column convert twice while the price never converted at all
-/// (PR #1215 review).
-const double _cubicFeetPerLiter = 0.0353147;
 
 /// What the blend costs at the fill station's prices.
 ///
@@ -38,6 +29,8 @@ class BlenderBillingCard extends ConsumerStatefulWidget {
 class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   late final TextEditingController _cylinder;
   late final List<TextEditingController> _prices;
+  late final List<TextEditingController> _flushVolumes;
+  late final List<TextEditingController> _flushPrices;
 
   @override
   void initState() {
@@ -45,14 +38,37 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     final settings = ref.read(settingsProvider);
     final liters = ref.read(blenderCylinderLitersProvider);
     _cylinder = TextEditingController(
-      text: formatRoundedForInput(_toDisplayVolume(liters, settings), 2),
+      text: formatRoundedForInput(blenderDisplayVolume(liters, settings), 2),
     );
     _prices = [
       for (final p in ref.read(blenderGasPricesProvider))
         TextEditingController(
           text: p == null
               ? ''
-              : formatRoundedForInput(_toDisplayPrice(p, settings), 2),
+              : formatRoundedForInput(
+                  blenderDisplayPricePer100(p, settings),
+                  2,
+                ),
+        ),
+    ];
+    _flushVolumes = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: formatRoundedForInput(
+            blenderDisplayVolume(g.volumeLiters, settings),
+            2,
+          ),
+        ),
+    ];
+    _flushPrices = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: g.pricePer100 == null
+              ? ''
+              : formatRoundedForInput(
+                  blenderDisplayPricePer100(g.pricePer100!, settings),
+                  2,
+                ),
         ),
     ];
   }
@@ -63,28 +79,14 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     for (final c in _prices) {
       c.dispose();
     }
+    for (final c in _flushVolumes) {
+      c.dispose();
+    }
+    for (final c in _flushPrices) {
+      c.dispose();
+    }
     super.dispose();
   }
-
-  static bool _metric(AppSettings s) => s.volumeUnit == VolumeUnit.liters;
-
-  /// Litres to the diver's volume unit, for seeding the cylinder field.
-  static double _toDisplayVolume(double liters, AppSettings s) =>
-      _metric(s) ? liters : liters * _cubicFeetPerLiter;
-
-  static double _toLiters(double shown, AppSettings s) =>
-      _metric(s) ? shown : shown / _cubicFeetPerLiter;
-
-  /// A price per 100 litres, shown as a price per 100 of the diver's unit.
-  ///
-  /// Gas priced at 7.99 per 100 cu ft is 0.28 per 100 L: the same gas, the
-  /// same money, a unit that is 28 times larger. Storing the entered number
-  /// without this conversion charged a cubic-foot diver 28 times over.
-  static double _toDisplayPrice(double per100Liters, AppSettings s) =>
-      _metric(s) ? per100Liters : per100Liters / _cubicFeetPerLiter;
-
-  static double _toPricePer100Liters(double shown, AppSettings s) =>
-      _metric(s) ? shown : shown * _cubicFeetPerLiter;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +134,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               if (slot > 0) const SizedBox(height: 12),
               _priceField(context, slot, units),
             ],
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            _flushFeeSettings(context, settings, units),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
               for (final line in billing.lines)
@@ -212,8 +218,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               border: const OutlineInputBorder(),
             ),
             onChanged: (v) =>
-                ref.read(blenderCylinderLitersProvider.notifier).state =
-                    _toLiters(parseUserDecimal(v) ?? 0, settings),
+                ref
+                    .read(blenderCylinderLitersProvider.notifier)
+                    .state = blenderLitersFromDisplay(
+                  parseUserDecimal(v) ?? 0,
+                  settings,
+                ),
             onEditingComplete: () => saveBlenderPreferences(ref),
             onSubmitted: (_) => saveBlenderPreferences(ref),
           ),
@@ -242,7 +252,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             ref.read(blenderCylinderLitersProvider.notifier).state =
                 choice.waterVolumeLiters;
             _cylinder.text = formatRoundedForInput(
-              _toDisplayVolume(choice.waterVolumeLiters, settings),
+              blenderDisplayVolume(choice.waterVolumeLiters, settings),
               2,
             );
             saveBlenderPreferences(ref);
@@ -313,7 +323,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         ref.read(blenderGasPricesProvider.notifier).state = [
           for (final c in _prices)
             switch (parseUserDecimal(c.text)) {
-              final double entered => _toPricePer100Liters(entered, settings),
+              final double entered => blenderPricePer100FromDisplay(
+                entered,
+                settings,
+              ),
               null => null,
             },
         ];
@@ -398,5 +411,142 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         ),
       ],
     );
+  }
+
+  /// The hose-purge flat fee: whether it is charged, how often it appears on
+  /// the bill, and each gas's default volume and price. The bill itself
+  /// reads these gases from [BlenderInvoiceCard], which keeps its own
+  /// editable liter field seeded from the same setting (issue #1335).
+  Widget _flushFeeSettings(
+    BuildContext context,
+    AppSettings settings,
+    UnitFormatter units,
+  ) {
+    final enabled = ref.watch(blenderFlushFeeEnabledProvider);
+    final mode = ref.watch(blenderFlushFeeModeProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          key: const Key('blender-flush-fee-enabled'),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          title: Text(context.l10n.gasCalculators_blender_flushFeeEnable),
+          value: enabled,
+          onChanged: (value) {
+            ref.read(blenderFlushFeeEnabledProvider.notifier).state = value;
+            saveBlenderPreferences(ref);
+          },
+        ),
+        if (enabled) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SegmentedButton<FlushFeeMode>(
+              key: const Key('blender-flush-fee-mode'),
+              segments: [
+                ButtonSegment(
+                  value: FlushFeeMode.perInvoice,
+                  label: Text(
+                    context.l10n.gasCalculators_blender_flushFeeModePerInvoice,
+                  ),
+                ),
+                ButtonSegment(
+                  value: FlushFeeMode.perFill,
+                  label: Text(
+                    context.l10n.gasCalculators_blender_flushFeeModePerFill,
+                  ),
+                ),
+              ],
+              selected: {mode},
+              onSelectionChanged: (selection) {
+                ref.read(blenderFlushFeeModeProvider.notifier).state =
+                    selection.first;
+                saveBlenderPreferences(ref);
+              },
+            ),
+          ),
+          for (var i = 0; i < FlushFeeGasKind.values.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            _flushFeeGasRow(context, i, settings, units),
+          ],
+        ],
+      ],
+    );
+  }
+
+  Widget _flushFeeGasRow(
+    BuildContext context,
+    int index,
+    AppSettings settings,
+    UnitFormatter units,
+  ) {
+    final kind = FlushFeeGasKind.values[index];
+    final label = flushFeeGasLabel(context, kind);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: TextField(
+            key: Key('blender-flush-fee-volume-${kind.name}'),
+            controller: _flushVolumes[index],
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            decoration: InputDecoration(
+              labelText:
+                  '$label '
+                  '${context.l10n.gasCalculators_blender_flushFeeVolume} '
+                  '(${units.volumeSymbol})',
+              isDense: true,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (_) => _saveFlushFeeGases(settings),
+            onEditingComplete: () => saveBlenderPreferences(ref),
+            onSubmitted: (_) => saveBlenderPreferences(ref),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            key: Key('blender-flush-fee-price-${kind.name}'),
+            controller: _flushPrices[index],
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            decoration: InputDecoration(
+              labelText:
+                  '$label '
+                  '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
+              isDense: true,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (_) => _saveFlushFeeGases(settings),
+            onEditingComplete: () => saveBlenderPreferences(ref),
+            onSubmitted: (_) => saveBlenderPreferences(ref),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _saveFlushFeeGases(AppSettings settings) {
+    ref.read(blenderFlushFeeGasesProvider.notifier).state = [
+      for (var i = 0; i < FlushFeeGasKind.values.length; i++)
+        FlushFeeGasSetting(
+          volumeLiters: blenderLitersFromDisplay(
+            parseUserDecimal(_flushVolumes[i].text) ?? 0,
+            settings,
+          ),
+          pricePer100: switch (parseUserDecimal(_flushPrices[i].text)) {
+            final double entered => blenderPricePer100FromDisplay(
+              entered,
+              settings,
+            ),
+            null => null,
+          },
+        ),
+    ];
   }
 }

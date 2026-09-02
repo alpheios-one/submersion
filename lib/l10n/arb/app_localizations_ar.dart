@@ -12184,6 +12184,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'حفظ هذه التعبئة';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'فرض رسوم لتنظيف خرطوم التعبئة';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'مرة واحدة لكل فاتورة';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'مرة واحدة لكل تعبئة';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'حجم التنظيف';
+
+  @override
   String get gasCalculators_blender_billed => 'الفاتورة';
 
   @override
