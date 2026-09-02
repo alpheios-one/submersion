@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/map_tile_config.dart';
@@ -6,10 +7,12 @@ import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
+import 'package:submersion/features/bathymetry/presentation/swiss_bathy_debug_info.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/site_scape/presentation/site_feature_info_sheet.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
@@ -60,6 +63,12 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     SceneOverlay.features,
   };
   bool _chartMode = false;
+
+  // TEMPORARY - DEBUG ONLY, remove before upstream PR: backs the expandable
+  // diagnostic panel in [_sourceChip], investigating Bug 6/7/9 (two real
+  // Walensee sites reportedly rendering a pixel-identical mesh).
+  bool _debugExpanded = false;
+  Future<SwissBathyDebugInfo>? _debugFuture;
 
   @override
   void dispose() {
@@ -304,28 +313,108 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   }
 
   Widget _sourceChip(String sourceId, double resolutionMeters) {
+    // TEMPORARY - DEBUG ONLY, remove before upstream PR: site.location is
+    // already resolved by this point (siteSeascapeProvider awaited it to
+    // reach SiteSeascapeReady), so re-watching it here is a cache hit, not
+    // an extra load.
+    final site = ref.watch(siteProvider(widget.siteId)).valueOrNull;
+    final center = site?.location;
     return Align(
       alignment: Alignment.topLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.info_outline, size: 14),
-            const SizedBox(width: 4),
-            Text(
-              context.l10n.dive3d_seascape_seafloorSource(
-                bathymetrySourceDisplayName(sourceId),
-                resolutionMeters.round().toString(),
+      child: GestureDetector(
+        onTap: () => setState(() {
+          _debugExpanded = !_debugExpanded;
+          if (_debugExpanded && center != null) {
+            _debugFuture = buildSwissBathyDebugInfo(
+              siteId: widget.siteId,
+              siteName: site?.name ?? widget.siteId,
+              center: center,
+            );
+          }
+        }),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 360),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.info_outline, size: 14),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      context.l10n.dive3d_seascape_seafloorSource(
+                        bathymetrySourceDisplayName(sourceId),
+                        resolutionMeters.round().toString(),
+                      ),
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                ],
               ),
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
+              // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+              if (_debugExpanded) _debugPanel(),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+  Widget _debugPanel() {
+    final future = _debugFuture;
+    if (future == null) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 4),
+        child: Text(
+          'debug: site coordinate not loaded yet',
+          style: TextStyle(fontSize: 10),
+        ),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: FutureBuilder<SwissBathyDebugInfo>(
+        future: future,
+        builder: (context, snapshot) {
+          final info = snapshot.data;
+          if (info == null) {
+            return const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            );
+          }
+          final text = formatSwissBathyDebugInfo(info);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SelectableText(
+                text,
+                style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  key: const ValueKey('swissBathyDebugCopyButton'),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: const Icon(Icons.copy, size: 14),
+                  onPressed: () => Clipboard.setData(ClipboardData(text: text)),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
