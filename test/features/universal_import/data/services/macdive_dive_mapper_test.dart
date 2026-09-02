@@ -731,6 +731,24 @@ void main() {
         expect(point.containsKey('ceiling'), isFalse);
       });
 
+      test('fractional sample times round to the nearest second', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 22.0, 0),
+              (2.4, 1.0, 200.0, 99, 0.21, 22.0, 0),
+              (7.6, 2.0, 200.0, 99, 0.21, 22.0, 0),
+            ]),
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final stamps = (dive['profile'] as List).map(
+          (p) => (p as Map)['timestamp'],
+        );
+        expect(stamps, [0, 2, 8]);
+      });
+
       test('zero readings are omitted rather than charted', () async {
         final payload = await MacDiveDiveMapper.toPayload(
           _samplesLogbook(

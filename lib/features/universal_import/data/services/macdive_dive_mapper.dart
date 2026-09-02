@@ -335,13 +335,15 @@ class MacDiveDiveMapper {
   /// the column in the diver's display unit, like the tank columns, so they
   /// go through [converter]; depth and temperature are already SI. A zero
   /// pressure, ppO2 or heart rate is MacDive's "no reading" and is left out
-  /// rather than charted as a real value.
+  /// rather than charted as a real value. Profile points carry whole seconds
+  /// app-wide, so a fractional sample time (none exist in the reference
+  /// library) lands on its nearest second rather than the one before it.
   static Map<String, dynamic> _samplePoint(
     MacDiveSqliteSample s,
     MacDiveUnitConverter converter,
   ) {
     final point = <String, dynamic>{
-      'timestamp': s.time.inSeconds,
+      'timestamp': (s.time.inMilliseconds / 1000).round(),
       'depth': s.depthMeters,
     };
     if (s.temperatureCelsius != null) {

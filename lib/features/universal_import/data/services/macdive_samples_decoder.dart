@@ -20,10 +20,9 @@ import 'package:submersion/features/universal_import/data/services/tea_block_cip
 ///
 /// The body decrypts under [cipher], whose key is a constant in the MacDive
 /// binary, to a run of fixed-width little-endian records followed by zero
-/// padding and, in
-/// the last four bytes of the buffer, the byte length of the record run.
-/// Every record starts with `time` and `depth` as 32-bit floats and then
-/// carries one 4-byte field per set options bit, in the fixed order
+/// padding and, in the last four bytes of the buffer, the byte length of the
+/// record run. Every record starts with `time` and `depth` as 32-bit floats
+/// and then carries one 4-byte field per set options bit, in the fixed order
 /// [_fieldOrder] lists (which is not bit order).
 ///
 /// Version 1 predates the encryption: the same 4-byte version word, then
@@ -70,6 +69,14 @@ class MacDiveSamplesDecoder {
     optionTts,
   ];
 
+  /// The fields MacDive stores as 32-bit integers; every other field is a
+  /// 32-bit float.
+  static const Set<int> _integerFields = {
+    optionHeartRate,
+    optionNdt,
+    optionTts,
+  };
+
   static const int _headerLength = 8;
   static const int _baseRecordLength = 8;
   static const int _fieldLength = 4;
@@ -112,47 +119,26 @@ class MacDiveSamplesDecoder {
       final time = reader.float();
       final depth = reader.float();
       if (!time.isFinite || !depth.isFinite) return null;
-      double? pressure;
-      double? pressure2;
-      int? heartRate;
-      int? ndt;
-      double? ppO2;
-      double? temperature;
-      double? nextStop;
-      int? tts;
-      for (final field in _fieldOrder) {
-        if ((options & field) == 0) continue;
-        switch (field) {
-          case optionPressure:
-            pressure = reader.float();
-          case optionPressure2:
-            pressure2 = reader.float();
-          case optionHeartRate:
-            heartRate = reader.int32();
-          case optionNdt:
-            ndt = reader.int32();
-          case optionPpO2:
-            ppO2 = reader.float();
-          case optionTemperature:
-            temperature = reader.float();
-          case optionNextStopDepth:
-            nextStop = reader.float();
-          case optionTts:
-            tts = reader.int32();
-        }
-      }
+      // Optional fields, keyed by their option bit, read in emission order.
+      final values = <int, num>{
+        for (final field in _fieldOrder)
+          if ((options & field) != 0)
+            field: _integerFields.contains(field)
+                ? reader.int32()
+                : reader.float(),
+      };
       samples.add(
         MacDiveSqliteSample(
           time: _duration(time),
           depthMeters: depth,
-          pressure: pressure,
-          pressure2: pressure2,
-          heartRate: heartRate,
-          ndtMinutes: ndt,
-          ppO2: ppO2,
-          temperatureCelsius: temperature,
-          nextStopDepthMeters: nextStop,
-          ttsMinutes: tts,
+          pressure: values[optionPressure] as double?,
+          pressure2: values[optionPressure2] as double?,
+          heartRate: values[optionHeartRate] as int?,
+          ndtMinutes: values[optionNdt] as int?,
+          ppO2: values[optionPpO2] as double?,
+          temperatureCelsius: values[optionTemperature] as double?,
+          nextStopDepthMeters: values[optionNextStopDepth] as double?,
+          ttsMinutes: values[optionTts] as int?,
         ),
       );
     }
