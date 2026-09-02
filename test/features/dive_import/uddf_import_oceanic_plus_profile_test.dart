@@ -41,9 +41,9 @@ const _expectedDiveCount = 9;
 /// Oceanic+ records one sample every 15 seconds.
 const _sampleCadenceSeconds = 15;
 
-/// The shortest dive in the fixture has 99 samples; anything below this means
-/// samples were dropped rather than merely reordered.
-const _minSamplesPerDive = 50;
+/// Sample count of the shortest dive in the fixture. A profile shorter than
+/// this had samples dropped, not merely reordered.
+const _minSamplesPerDive = 99;
 
 /// Fixed clock for rows the test creates itself.
 final _fixedNow = DateTime.utc(2024, 1, 15, 12);
@@ -83,7 +83,11 @@ Future<String> _createTestDiver() async {
 /// i * 15 s. This is the exact shape that collapsed to all zeros before the
 /// lenient integer parser landed.
 void _expectFullCadence(List<int> timestamps, {required String reason}) {
-  expect(timestamps.length, greaterThan(_minSamplesPerDive), reason: reason);
+  expect(
+    timestamps.length,
+    greaterThanOrEqualTo(_minSamplesPerDive),
+    reason: reason,
+  );
   expect(
     timestamps,
     List<int>.generate(timestamps.length, (i) => i * _sampleCadenceSeconds),
