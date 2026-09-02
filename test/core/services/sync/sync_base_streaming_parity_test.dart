@@ -312,4 +312,63 @@ void main() {
       expect(counts.recordsFailed, 0);
     },
   );
+
+  group('base apply progress', () {
+    Future<List<double>> applyWithProgress(SyncService svc) async {
+      await _seedRichLibrary();
+      final payload = await SyncDataSerializer().exportData(
+        deviceId: 'peer',
+        deletions: await SyncRepository().getAllDeletions(),
+      );
+      await tearDownTestDatabase();
+      await setUpTestDatabase();
+      final tmpDir = await Directory.systemTemp.createTemp('parity_progress');
+      final tmp = File('${tmpDir.path}/base.json');
+      await tmp.writeAsBytes(
+        utf8.encode(SyncDataSerializer().serializePayload(payload)),
+      );
+      final seen = <double>[];
+      await svc.debugApplyBaseFile(tmp.path, onProgress: seen.add);
+      await tmpDir.delete(recursive: true);
+      return seen;
+    }
+
+    void expectMonotonicToOne(List<double> seen) {
+      expect(seen, isNotEmpty, reason: 'a base apply must report progress');
+      for (var i = 1; i < seen.length; i++) {
+        expect(
+          seen[i],
+          greaterThanOrEqualTo(seen[i - 1]),
+          reason: 'progress must never move backwards',
+        );
+      }
+      expect(seen.first, greaterThanOrEqualTo(0.0));
+      expect(seen.last, 1.0);
+    }
+
+    test('the worker path reports monotonic progress ending at 1.0', () async {
+      final seen = await applyWithProgress(
+        SyncService(
+          syncRepository: SyncRepository(),
+          serializer: SyncDataSerializer(),
+        ),
+      );
+      expectMonotonicToOne(seen);
+    });
+
+    test(
+      'the inline fallback reports monotonic progress ending at 1.0',
+      () async {
+        final seen = await applyWithProgress(
+          SyncService(
+              syncRepository: SyncRepository(),
+              serializer: SyncDataSerializer(),
+            )
+            ..baseParseClientSpawn = (_) async =>
+                throw StateError('forced failure'),
+        );
+        expectMonotonicToOne(seen);
+      },
+    );
+  });
 }
