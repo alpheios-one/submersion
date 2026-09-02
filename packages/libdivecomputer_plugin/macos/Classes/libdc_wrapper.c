@@ -271,8 +271,9 @@ int libdc_descriptor_match(const char *name, unsigned int transport,
         return 0;
     }
 
-    // A name belonging to a device libdivecomputer cannot download must not be
-    // claimed by a descriptor that merely prefix-matches it. See issue #123.
+    // Some advertised names identify hardware libdivecomputer has no support
+    // for. Reject those up front, so that no descriptor can claim one on a
+    // loose prefix match. See issue #123.
     if ((transport & LIBDC_TRANSPORT_BLE) && is_suunto_ng_ble_name(name)) {
         return 0;
     }
