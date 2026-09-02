@@ -15,6 +15,7 @@ import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/shared/widgets/table_mode_layout/table_mode_layout.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_field.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_filter_sheet.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_list_content.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_set_list_content.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_summary_widget.dart';
@@ -123,6 +124,19 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
             ),
           ),
           appBarActions: [
+            // Table mode has no app bar of its own inside the content, so the
+            // filter panel is reachable only from here.
+            IconButton(
+              key: const ValueKey('equipment_filter_button'),
+              icon: Badge(
+                isLabelVisible: ref
+                    .watch(equipmentFilterProvider)
+                    .hasActiveFilters,
+                child: const Icon(Icons.filter_list, size: 20),
+              ),
+              tooltip: context.l10n.equipment_list_filterTooltip,
+              onPressed: () => showEquipmentFilterSheet(context, ref),
+            ),
             IconButton(
               icon: const Icon(Icons.search, size: 20),
               tooltip: context.l10n.equipment_list_searchTooltip,

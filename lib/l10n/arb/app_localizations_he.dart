@@ -11089,13 +11089,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_list_filterAll => 'כל הציוד';
 
   @override
-  String get equipment_list_filterLabel => 'סנן:';
-
-  @override
   String get equipment_list_filterServiceDue => 'טיפול נדרש';
 
   @override
   String get equipment_list_typeFilterAll => 'כל הסוגים';
+
+  @override
+  String get equipment_list_filterTooltip => 'סינון ציוד';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'נקה';
+
+  @override
+  String get equipment_filter_title => 'סנן ציוד';
+
+  @override
+  String get equipment_filter_clearAll => 'נקה הכל';
+
+  @override
+  String get equipment_filter_apply => 'החל מסננים';
+
+  @override
+  String get equipment_filter_cancel => 'ביטול';
+
+  @override
+  String get equipment_filter_section_status => 'סטטוס';
+
+  @override
+  String get equipment_filter_section_category => 'קטגוריה';
 
   @override
   String get equipment_list_retryButton => 'נסה שוב';

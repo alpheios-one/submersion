@@ -26,13 +26,12 @@ import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_field.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_filter_state.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/dense_equipment_list_tile.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_filter_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
-
-/// Special filter value for computed "service due" items
-const String _serviceDueFilter = '_service_due_';
 
 /// Content widget for the equipment list, used in master-detail layout.
 class EquipmentListContent extends ConsumerStatefulWidget {
@@ -67,18 +66,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   final ScrollController _scrollController = ScrollController();
   String? _lastScrolledToId;
   bool _selectionFromList = false;
-  Object? _selectedFilter;
-
-  /// One-click category filter (#1274). Applied client-side on top of the
-  /// status filter, so both compose with AND semantics.
-  EquipmentType? _selectedType;
-
-  /// Narrow [equipment] to the selected category, if one is chosen.
-  List<EquipmentItem> _applyTypeFilter(List<EquipmentItem> equipment) {
-    final type = _selectedType;
-    if (type == null) return equipment;
-    return equipment.where((e) => e.type == type).toList();
-  }
 
   @override
   void dispose() {
@@ -138,14 +125,13 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   /// reads activeEquipmentProvider, so invalidating only the status family
   /// would leave pull-to-refresh and error-retry showing stale rows.
   void _invalidateCurrentProvider(WidgetRef ref) {
-    if (_selectedFilter == _serviceDueFilter) {
+    final filter = ref.read(equipmentFilterProvider);
+    if (filter.serviceDueOnly) {
       ref.invalidate(serviceDueEquipmentProvider);
-    } else if (_selectedFilter == null) {
+    } else if (filter.status == null) {
       ref.invalidate(activeEquipmentProvider);
     } else {
-      ref.invalidate(
-        equipmentByStatusProvider(_selectedFilter as EquipmentStatus),
-      );
+      ref.invalidate(equipmentByStatusProvider(filter.status!));
     }
   }
 
@@ -164,29 +150,24 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               const <String, ServiceClockStatus>{})
         : const <String, ServiceClockStatus>{};
 
+    final filter = ref.watch(equipmentFilterProvider);
+
     final AsyncValue<List<EquipmentItem>> equipmentAsync;
-    if (_selectedFilter == _serviceDueFilter) {
+    if (filter.serviceDueOnly) {
       equipmentAsync = ref.watch(serviceDueEquipmentProvider);
-    } else if (_selectedFilter == null) {
+    } else if (filter.status == null) {
       // The default view hides retired gear; the Retired status filter is
       // the way to see it (#636).
       equipmentAsync = ref.watch(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus;
-      equipmentAsync = ref.watch(equipmentByStatusProvider(status));
+      equipmentAsync = ref.watch(equipmentByStatusProvider(filter.status!));
     }
-
-    // Category chips are derived from the pre-category list, so the row keeps
-    // offering the other categories while one of them is selected.
-    final availableTypes = _availableTypes(
-      equipmentAsync.value ?? const <EquipmentItem>[],
-    );
 
     // Table mode uses a dedicated scaffold with column configuration support.
     if (viewMode == ListViewMode.table) {
       final sortedAsync = equipmentAsync.whenData(
         (equipment) => applyEquipmentSorting(
-          _applyTypeFilter(equipment),
+          filter.applyType(equipment),
           sort,
           serviceUrgency: serviceUrgency,
         ),
@@ -194,7 +175,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       return _buildTableModeScaffold(
         context,
         sortedAsync,
-        availableTypes,
+        filter,
         hadItemsBeforeTypeFilter:
             (equipmentAsync.value ?? const <EquipmentItem>[]).isNotEmpty,
       );
@@ -203,7 +184,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     // The visible list depends on which status filter is active, so derive
     // selectable ids from the same branch the list renders.
     final sortedVisible = applyEquipmentSorting(
-      _applyTypeFilter(equipmentAsync.value ?? const <EquipmentItem>[]),
+      filter.applyType(equipmentAsync.value ?? const <EquipmentItem>[]),
       sort,
       serviceUrgency: serviceUrgency,
     );
@@ -219,7 +200,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       return equipmentAsync.when(
         data: (equipment) {
           final sorted = applyEquipmentSorting(
-            _applyTypeFilter(equipment),
+            filter.applyType(equipment),
             sort,
             serviceUrgency: serviceUrgency,
           );
@@ -248,8 +229,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                   ? _buildSelectionBar(sortedVisible, SelectionBarShell.pane)
                   : _buildCompactAppBar(context),
               if (widget.headerExtension != null) widget.headerExtension!,
-              _buildFilterChips(context),
-              _buildTypeFilterChips(context, availableTypes),
+              if (filter.hasActiveFilters)
+                _buildActiveFiltersBar(context, filter),
               Expanded(child: buildContent()),
             ],
           ),
@@ -271,6 +252,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                     title: context.l10n.equipment_appBar_title,
                   ),
                   actions: [
+                    _buildFilterAction(context, filter),
                     IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.equipment_list_searchTooltip,
@@ -328,8 +310,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                 ),
           body: Column(
             children: [
-              _buildFilterChips(context),
-              _buildTypeFilterChips(context, availableTypes),
+              if (filter.hasActiveFilters)
+                _buildActiveFiltersBar(context, filter),
               Expanded(child: buildContent()),
             ],
           ),
@@ -478,7 +460,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   Widget _buildTableModeScaffold(
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
-    List<EquipmentType> availableTypes, {
+    EquipmentFilterState filter, {
     required bool hadItemsBeforeTypeFilter,
   }) {
     final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
@@ -513,8 +495,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               )
             else
               SelectionEntryBar(controller: _selection),
-            _buildFilterChips(context),
-            _buildTypeFilterChips(context, availableTypes),
+            if (filter.hasActiveFilters)
+              _buildActiveFiltersBar(context, filter),
             Expanded(
               child: _buildTableView(
                 context,
@@ -604,6 +586,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
+          _buildFilterAction(
+            context,
+            ref.watch(equipmentFilterProvider),
+            iconSize: 20,
+          ),
           IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.equipment_list_searchTooltip,
@@ -676,120 +663,92 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     );
   }
 
-  Widget _buildFilterChips(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Icon(
-            Icons.filter_list,
-            size: 20,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            context.l10n.equipment_list_filterLabel,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.outline.withValues(alpha: 0.5),
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: DropdownButton<Object?>(
-                key: const ValueKey('equipment_status_filter_dropdown'),
-                value: _selectedFilter,
-                underline: const SizedBox(),
-                focusColor: Colors.transparent,
-                isExpanded: true,
-                items: [
-                  DropdownMenuItem<Object?>(
-                    value: null,
-                    child: Text(context.l10n.equipment_list_filterAll),
-                  ),
-                  DropdownMenuItem<Object?>(
-                    value: _serviceDueFilter,
-                    child: Text(context.l10n.equipment_list_filterServiceDue),
-                  ),
-                  ...EquipmentStatus.values
-                      .where((status) => status != EquipmentStatus.needsService)
-                      .map((status) {
-                        return DropdownMenuItem<Object?>(
-                          value: status,
-                          child: Text(status.displayName),
-                        );
-                      }),
-                ],
-                onChanged: (value) {
-                  setState(() => _selectedFilter = value);
-                },
-              ),
-            ),
-          ),
-        ],
+  /// The top-bar entry point to the filter panel, badged while anything is
+  /// narrowed -- the same affordance the dive and site lists use.
+  Widget _buildFilterAction(
+    BuildContext context,
+    EquipmentFilterState filter, {
+    double? iconSize,
+  }) {
+    return IconButton(
+      key: const ValueKey('equipment_filter_button'),
+      icon: Badge(
+        isLabelVisible: filter.hasActiveFilters,
+        child: Icon(Icons.filter_list, size: iconSize),
       ),
+      tooltip: context.l10n.equipment_list_filterTooltip,
+      onPressed: () => showEquipmentFilterSheet(context, ref),
     );
   }
 
-  /// Categories offered as chips: every type present in [equipment] (in enum
-  /// order), plus the selected type even when nothing matches it anymore, so
-  /// the filter always stays visible and clearable.
-  List<EquipmentType> _availableTypes(List<EquipmentItem> equipment) {
-    final present = equipment.map((e) => e.type).toSet();
-    final selected = _selectedType;
-    if (selected != null) present.add(selected);
-    return EquipmentType.values.where(present.contains).toList();
-  }
-
-  /// One-click category filter (#1274): a horizontally scrollable chip row,
-  /// same idiom as the course list. Hidden when the gear is all one type
-  /// (nothing to narrow).
-  Widget _buildTypeFilterChips(
+  /// Shown above the list only while a filter is on: the panel hides what is
+  /// active, so this bar is what says so -- and what makes each axis
+  /// removable without reopening the panel.
+  Widget _buildActiveFiltersBar(
     BuildContext context,
-    List<EquipmentType> availableTypes,
+    EquipmentFilterState filter,
   ) {
-    // Keep the row whenever a category is selected -- even if the status
-    // filter left nothing to show -- so "All Types" stays reachable and the
-    // filter never gets stuck (it is only clearable from this row).
-    if (availableTypes.length < 2 && _selectedType == null) {
-      return const SizedBox.shrink();
-    }
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
+        ),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            FilterChip(
-              label: Text(context.l10n.equipment_list_typeFilterAll),
-              selected: _selectedType == null,
-              onSelected: (selected) {
-                if (selected) setState(() => _selectedType = null);
+            ActionChip(
+              key: const ValueKey('equipment_activeFilter_clearAll'),
+              avatar: const Icon(Icons.clear_all, size: 18),
+              label: Text(context.l10n.equipment_list_activeFilter_clear),
+              onPressed: () {
+                ref.read(equipmentFilterProvider.notifier).state =
+                    const EquipmentFilterState();
               },
             ),
-            for (final type in availableTypes) ...[
-              const SizedBox(width: 8),
-              FilterChip(
-                avatar: Icon(equipmentTypeIcon(type), size: 18),
-                label: Text(type.displayName),
-                selected: _selectedType == type,
-                onSelected: (selected) {
-                  setState(() => _selectedType = selected ? type : null);
-                },
+            const SizedBox(width: 8),
+            if (filter.serviceDueOnly)
+              _buildActiveFilterChip(
+                context.l10n.equipment_list_filterServiceDue,
+                () => ref.read(equipmentFilterProvider.notifier).state = filter
+                    .copyWith(clearStatus: true),
               ),
-            ],
+            if (filter.status != null)
+              _buildActiveFilterChip(
+                filter.status!.displayName,
+                () => ref.read(equipmentFilterProvider.notifier).state = filter
+                    .copyWith(clearStatus: true),
+              ),
+            if (filter.type != null)
+              _buildActiveFilterChip(
+                filter.type!.displayName,
+                () => ref.read(equipmentFilterProvider.notifier).state = filter
+                    .copyWith(clearType: true),
+                icon: equipmentTypeIcon(filter.type!),
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActiveFilterChip(
+    String label,
+    VoidCallback onDeleted, {
+    IconData? icon,
+  }) {
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: 8),
+      child: InputChip(
+        avatar: icon == null ? null : Icon(icon, size: 18),
+        label: Text(label),
+        onDeleted: onDeleted,
+        deleteIconColor: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );
   }
@@ -857,23 +816,25 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     WidgetRef ref, {
     required bool hadItemsBeforeTypeFilter,
   }) {
+    final filter = ref.watch(equipmentFilterProvider);
+
     // Blame the category only when it actually narrowed something away; if
     // the status-filtered source was already empty, the status (or the lack
     // of any gear) is the real cause and the wording should say so.
-    final blameCategory = _selectedType != null && hadItemsBeforeTypeFilter;
+    final blameCategory = filter.type != null && hadItemsBeforeTypeFilter;
 
     String filterText;
     if (blameCategory) {
       filterText = context.l10n.equipment_list_emptyState_filterText_type(
-        _selectedType!.displayName,
+        filter.type!.displayName,
       );
-    } else if (_selectedFilter == null) {
-      filterText = context.l10n.equipment_list_emptyState_filterText_equipment;
-    } else if (_selectedFilter == _serviceDueFilter) {
+    } else if (filter.serviceDueOnly) {
       filterText = context.l10n.equipment_list_emptyState_filterText_serviceDue;
+    } else if (filter.status == null) {
+      filterText = context.l10n.equipment_list_emptyState_filterText_equipment;
     } else {
       filterText = context.l10n.equipment_list_emptyState_filterText_status(
-        (_selectedFilter as EquipmentStatus).displayName.toLowerCase(),
+        filter.status!.displayName.toLowerCase(),
       );
     }
 
@@ -895,17 +856,17 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           Text(
             blameCategory
                 ? context.l10n.equipment_list_emptyState_noTypeMatch
-                : _selectedFilter == null
-                ? context.l10n.equipment_list_emptyState_addPrompt
-                : _selectedFilter == _serviceDueFilter
+                : filter.serviceDueOnly
                 ? context.l10n.equipment_list_emptyState_serviceDueUpToDate
-                : context.l10n.equipment_list_emptyState_noStatusMatch,
+                : filter.status != null
+                ? context.l10n.equipment_list_emptyState_noStatusMatch
+                : context.l10n.equipment_list_emptyState_addPrompt,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
-          if (_selectedFilter == null && _selectedType == null) ...[
+          if (!filter.hasActiveFilters) ...[
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () {

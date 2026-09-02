@@ -11316,13 +11316,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_list_filterAll => 'Osszes felszereles';
 
   @override
-  String get equipment_list_filterLabel => 'Szuro:';
-
-  @override
   String get equipment_list_filterServiceDue => 'Szerviz esedek';
 
   @override
   String get equipment_list_typeFilterAll => 'Összes típus';
+
+  @override
+  String get equipment_list_filterTooltip => 'Felszereles szurese';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Torles';
+
+  @override
+  String get equipment_filter_title => 'Felszereles szurese';
+
+  @override
+  String get equipment_filter_clearAll => 'Osszes torlese';
+
+  @override
+  String get equipment_filter_apply => 'Szurok alkalmazasa';
+
+  @override
+  String get equipment_filter_cancel => 'Megse';
+
+  @override
+  String get equipment_filter_section_status => 'Allapot';
+
+  @override
+  String get equipment_filter_section_category => 'Kategória';
 
   @override
   String get equipment_list_retryButton => 'Ujra';

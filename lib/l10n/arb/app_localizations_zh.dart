@@ -10829,13 +10829,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
-
-  @override
   String get equipment_list_filterServiceDue => '需要维护';
 
   @override
   String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';

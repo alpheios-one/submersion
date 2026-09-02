@@ -19214,12 +19214,6 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// No description provided for @equipment_list_filterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter:'**
-  String get equipment_list_filterLabel;
-
   /// No description provided for @equipment_list_filterServiceDue.
   ///
   /// In en, this message translates to:
@@ -19231,6 +19225,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All Types'**
   String get equipment_list_typeFilterAll;
+
+  /// No description provided for @equipment_list_filterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter equipment'**
+  String get equipment_list_filterTooltip;
+
+  /// No description provided for @equipment_list_activeFilter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get equipment_list_activeFilter_clear;
+
+  /// No description provided for @equipment_filter_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Equipment'**
+  String get equipment_filter_title;
+
+  /// No description provided for @equipment_filter_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get equipment_filter_clearAll;
+
+  /// No description provided for @equipment_filter_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get equipment_filter_apply;
+
+  /// No description provided for @equipment_filter_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get equipment_filter_cancel;
+
+  /// No description provided for @equipment_filter_section_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_filter_section_category;
 
   /// No description provided for @equipment_list_retryButton.
   ///

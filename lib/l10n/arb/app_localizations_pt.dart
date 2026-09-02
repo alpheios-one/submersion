@@ -11347,13 +11347,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_list_filterAll => 'Todos os Equipamentos';
 
   @override
-  String get equipment_list_filterLabel => 'Filtro:';
-
-  @override
   String get equipment_list_filterServiceDue => 'Manutencao Pendente';
 
   @override
   String get equipment_list_typeFilterAll => 'Todos os Tipos';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filtrar equipamento';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Limpar';
+
+  @override
+  String get equipment_filter_title => 'Filtrar Equipamento';
+
+  @override
+  String get equipment_filter_clearAll => 'Limpar Tudo';
+
+  @override
+  String get equipment_filter_apply => 'Aplicar Filtros';
+
+  @override
+  String get equipment_filter_cancel => 'Cancelar';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Categoria';
 
   @override
   String get equipment_list_retryButton => 'Tentar Novamente';
