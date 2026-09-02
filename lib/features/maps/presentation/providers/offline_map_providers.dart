@@ -159,6 +159,19 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
         options: tileLayerOptions,
       );
 
+      // Cancelling during setup used to be a cancel in name only. The
+      // progress card is on screen from the moment this method starts, so the
+      // diver can press cancel while the store is still being created, and at
+      // that point there is no download instance for the service to cancel.
+      // The download would then run to completion, invisibly, and only be
+      // thrown away at the end: every tile fetched, every byte of it wasted.
+      // Now the download is cancelled as soon as there is something to cancel.
+      if (_cancelledRegionId == regionId) {
+        await _cacheService.discardRegionDownload(regionId);
+        state = const DownloadState();
+        return;
+      }
+
       int downloadedTiles = 0;
 
       await for (final progress in stream) {

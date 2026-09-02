@@ -26,6 +26,16 @@ class _FakeTileCache implements TileCacheService {
   Object? deleteTilesError;
   Object? downloadError;
   Object? clearCacheError;
+
+  /// When set, [downloadRegion] waits on this before handing back its stream,
+  /// standing in for the store creation the real service awaits there.
+  Completer<void>? setupGate;
+
+  /// Whether a download instance exists yet. The real service has nothing to
+  /// cancel until `startForeground` has run, and cancelling before that is a
+  /// no-op there too; without modelling that, a test cannot tell an early
+  /// cancellation from a late one.
+  bool downloadStarted = false;
   Set<String> regionStoreIds = {};
 
   @override
@@ -40,11 +50,14 @@ class _FakeTileCache implements TileCacheService {
     bool skipExistingTiles = true,
   }) async {
     calls.add('download:$regionId');
+    final gate = setupGate;
+    if (gate != null) await gate.future;
     final error = downloadError;
     if (error != null) throw error;
     if (progress.isClosed) {
       progress = StreamController<TileDownloadProgress>();
     }
+    downloadStarted = true;
     return progress.stream;
   }
 
@@ -90,7 +103,12 @@ class _FakeTileCache implements TileCacheService {
   @override
   Future<void> cancelDownload() async {
     calls.add('cancel');
-    await progress.close();
+    // Nothing to cancel until the download has started, exactly as in the
+    // service, where the instance id is not assigned until then.
+    if (!downloadStarted) return;
+    // Not awaited: close() on a controller nobody listened to completes only
+    // once a subscriber drains it.
+    if (!progress.isClosed) unawaited(progress.close());
   }
 
   @override
@@ -250,6 +268,58 @@ void main() {
         reason: 'only the cancelled download discards its store',
       );
     });
+
+    test(
+      'cancelling during setup stops the download then, not at the end',
+      () async {
+        // The progress card is up while the store is still being created, so
+        // cancel is reachable before there is any download instance to cancel.
+        // Left unhandled, the whole region downloads and is then discarded.
+        cache.setupGate = Completer<void>();
+
+        final notifier = container.read(downloadProgressProvider.notifier);
+        final done = notifier.downloadRegion(
+          name: 'Cozumel',
+          minLat: 20,
+          maxLat: 21,
+          minLng: -87,
+          maxLng: -86,
+          minZoom: 8,
+          maxZoom: 12,
+          tileLayerOptions: tileLayer,
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        // Nothing has started, so this reaches the service as a no-op and the
+        // progress stream stays open, exactly as it would in the app.
+        await notifier.cancelDownload();
+        cache.setupGate!.complete();
+        await Future<void>.delayed(Duration.zero);
+
+        // Asserted while the stream is still open, which is the only moment
+        // the two behaviours differ: without the check the loop is subscribed
+        // here and the region downloads in full before being thrown away.
+        expect(
+          cache.progress.hasListener,
+          isFalse,
+          reason: 'the cancelled download is abandoned, not drained to the end',
+        );
+
+        unawaited(cache.progress.close());
+        await done;
+
+        expect(await repository.getAllRegions(), isEmpty);
+        expect(
+          cache.calls.where((c) => c.startsWith('discard:')),
+          hasLength(1),
+        );
+        expect(
+          cache.calls.where((c) => c.startsWith('measure:')),
+          isEmpty,
+          reason: 'nothing was kept, so nothing should have been measured',
+        );
+      },
+    );
 
     test('a failed download leaves no store behind', () async {
       // The store is created before the first tile arrives, so a download that
