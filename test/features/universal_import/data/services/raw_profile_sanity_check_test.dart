@@ -120,6 +120,56 @@ void main() {
       );
     });
 
+    test('rejects a non-finite depth', () {
+      // NaN compares false against everything, so a NaN depth slides past the
+      // lower bound, never becomes the running maximum, and never trips the
+      // upper bound either. Without an explicit finiteness check it reaches
+      // the profile as a sample depth of NaN.
+      expect(
+        RawProfileSanityCheck.accepts(
+          _parsed(samples: [_sample(0, 0.0), _sample(60, double.nan)]),
+        ),
+        isFalse,
+      );
+      expect(
+        RawProfileSanityCheck.accepts(
+          _parsed(maxDepthMeters: double.nan, samples: [_sample(0, 5.0)]),
+        ),
+        isFalse,
+      );
+      // Infinity propagates through comparisons correctly, so the ordinary
+      // bounds already catch it. Pinned so a future rewrite of those bounds
+      // cannot quietly lose it.
+      for (final value in [double.infinity, double.negativeInfinity]) {
+        expect(
+          RawProfileSanityCheck.accepts(
+            _parsed(samples: [_sample(0, 0.0), _sample(60, value)]),
+          ),
+          isFalse,
+          reason: 'should reject $value',
+        );
+      }
+    });
+
+    test('a non-finite recorded scalar cannot reject anything', () {
+      // Same rule as a missing one: it carries no information, so it must not
+      // be allowed to veto an otherwise sound parse.
+      expect(
+        RawProfileSanityCheck.accepts(
+          _plausibleDive(),
+          recordedMaxDepthMeters: double.nan,
+        ),
+        isTrue,
+      );
+      expect(
+        RawProfileSanityCheck.accepts(
+          _plausibleDive(),
+          recordedMaxDepthMeters: double.infinity,
+        ),
+        isTrue,
+      );
+    });
+
     test('rejects a depth far below the surface sign', () {
       expect(
         RawProfileSanityCheck.accepts(

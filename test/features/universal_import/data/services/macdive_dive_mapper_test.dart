@@ -540,6 +540,51 @@ void main() {
       expect(payload.warnings, isEmpty);
     });
 
+    test('a parser error on one model falls through to the next', () async {
+      // libdivecomputer rejecting one model of an ambiguous name is a normal
+      // result, not a reason to give up on the dive.
+      final models = <int>[];
+      final payload = await MacDiveDiveMapper.toPayload(
+        _suuntoRawDataLogbook(
+          computer: 'Suunto Zoop Novo',
+          raw: _suuntoFixture,
+        ),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (vendor, product, model, data) async {
+          models.add(model);
+          if (model == 0x1E) {
+            throw PlatformException(code: 'PARSE_ERROR', message: 'bad header');
+          }
+          return _parsedDive(
+            samples: [pigeon.ProfileSample(timeSeconds: 0, depthMeters: 12.0)],
+          );
+        },
+      );
+
+      expect(models, [0x1E, 0x1F]);
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      expect(dives.single.containsKey('profile'), isTrue);
+      expect(payload.warnings, isEmpty);
+    });
+
+    test('an unsupported-platform error stops the whole import', () async {
+      // Unlike a parse error, this says the channel itself cannot serve us, so
+      // trying the next model - or the next dive - cannot help.
+      var calls = 0;
+      final payload = await MacDiveDiveMapper.toPayload(
+        _rawDataLogbook(),
+        fetchDescriptors: _fakeDescriptors,
+        parseRaw: (v, p, m, d) async {
+          calls++;
+          throw PlatformException(code: 'UNSUPPORTED', message: 'no parser');
+        },
+      );
+
+      expect(calls, 1, reason: 'must not retry once the channel is out');
+      expect(payload.warnings, hasLength(1));
+      expect(payload.warnings.single.message, contains('this platform'));
+    });
+
     test('an implausible parse is rejected rather than attached', () async {
       // Dropping the allowlist means the parser is now offered bytes it may
       // not own. A structurally valid series that no dive could produce must
@@ -601,6 +646,8 @@ void main() {
       // that as "every one of your dives is undecodable" would be wrong.
       for (final fetch in <MacDiveDescriptorFetchFn>[
         () async => throw MissingPluginException('no channel'),
+        () async => throw PlatformException(code: 'UNSUPPORTED'),
+        () async => throw StateError('something else entirely'),
         () async => [],
       ]) {
         final payload = await MacDiveDiveMapper.toPayload(

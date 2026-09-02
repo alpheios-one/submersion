@@ -63,6 +63,13 @@ class RawProfileSanityCheck {
     // filled in. This is the failure mode a zeroed dive presents as.
     if (parsed.samples.isEmpty) return false;
 
+    // NaN has to be rejected explicitly rather than left to the bounds below.
+    // Every comparison against it is false, so a NaN depth would slip past the
+    // lower bound, never become the running maximum, and never trip the upper
+    // bound either, arriving in the profile as a sample depth of NaN. Infinity
+    // needs no special case - it propagates through the bounds correctly.
+    if (!parsed.maxDepthMeters.isFinite) return false;
+
     var deepest = parsed.maxDepthMeters;
     var previousTime = -1;
     for (final s in parsed.samples) {
@@ -71,14 +78,16 @@ class RawProfileSanityCheck {
       // Bytes read in the wrong format are not.
       if (s.timeSeconds < 0 || s.timeSeconds < previousTime) return false;
       previousTime = s.timeSeconds;
+      if (!s.depthMeters.isFinite) return false;
       if (s.depthMeters < _minPlausibleDepthMeters) return false;
       if (s.depthMeters > deepest) deepest = s.depthMeters;
     }
 
     if (deepest > maxPlausibleDepthMeters) return false;
 
+    // Cannot go negative: the samples are non-empty and every negative time
+    // already returned above, so `previousTime` is at least 0 by here.
     final durationSeconds = math.max(parsed.durationSeconds, previousTime);
-    if (durationSeconds < 0) return false;
     if (durationSeconds > maxPlausibleDuration.inSeconds) return false;
 
     if (!_withinGross(
@@ -100,14 +109,17 @@ class RawProfileSanityCheck {
   }
 
   /// True unless [parsed] and [recorded] disagree by more than a factor of
-  /// [_grossFactor]. A missing or non-positive value on either side carries no
-  /// information, so it cannot reject anything.
+  /// [_grossFactor]. A missing, non-positive or non-finite value on either
+  /// side carries no information, so it cannot reject anything. [parsed] is
+  /// already known finite by the time this runs; [recorded] comes from the
+  /// source app and is checked here.
   static bool _withinGross({
     required double parsed,
     required double? recorded,
     required double floor,
   }) {
-    if (recorded == null || recorded <= 0 || parsed <= 0) return true;
+    if (recorded == null || !recorded.isFinite || recorded <= 0) return true;
+    if (parsed <= 0) return true;
     if (parsed > recorded * _grossFactor + floor) return false;
     if (parsed * _grossFactor + floor < recorded) return false;
     return true;

@@ -135,6 +135,47 @@ void main() {
       expect(const DiveComputerDescriptorIndex.empty().isEmpty, isTrue);
     });
 
+    test('DiveComputerModel compares by value', () {
+      // Callers hold these in lists and compare them; identity equality would
+      // make "did we already try this model" quietly wrong.
+      const a = DiveComputerModel(
+        vendor: 'Suunto',
+        product: 'Zoop Novo',
+        model: 0x1E,
+      );
+      const b = DiveComputerModel(
+        vendor: 'Suunto',
+        product: 'Zoop Novo',
+        model: 0x1E,
+      );
+      const differentModel = DiveComputerModel(
+        vendor: 'Suunto',
+        product: 'Zoop Novo',
+        model: 0x1F,
+      );
+      const differentProduct = DiveComputerModel(
+        vendor: 'Suunto',
+        product: 'D5',
+        model: 0x1E,
+      );
+      const differentVendor = DiveComputerModel(
+        vendor: 'Mares',
+        product: 'Zoop Novo',
+        model: 0x1E,
+      );
+
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(differentModel));
+      expect(a, isNot(differentProduct));
+      expect(a, isNot(differentVendor));
+      expect(a, isNot('Suunto Zoop Novo'));
+      // The model number is hex everywhere else it appears (descriptor.c, the
+      // docs), so a decimal toString would be needless friction when reading a
+      // failure.
+      expect(a.toString(), 'Suunto Zoop Novo (0x1e)');
+    });
+
     test('skips descriptors with a blank vendor or product', () {
       final index = DiveComputerDescriptorIndex.fromDescriptors([
         _d('', 'Teric', 1),

@@ -76,9 +76,10 @@ class DiveComputerDescriptorIndex {
     for (final d in descriptors) {
       final vendor = d.vendor.trim();
       final product = d.product.trim();
+      // Both are non-empty after trimming, so the normalised key cannot be
+      // empty either.
       if (vendor.isEmpty || product.isEmpty) continue;
       final key = normalize('$vendor $product');
-      if (key.isEmpty) continue;
       byKey
           .putIfAbsent(key, () => <DiveComputerModel>[])
           .add(
