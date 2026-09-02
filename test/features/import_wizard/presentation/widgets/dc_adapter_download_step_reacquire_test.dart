@@ -317,11 +317,14 @@ void main() {
     });
   });
 
-  // Issue #1423: a saved Ratio iX3M on iPhone stopped downloading after its
-  // CoreBluetooth identifier (the stored "address") changed. The scan saw the
-  // computer under its new identifier, but only an exact address match was
-  // accepted, so the download fell back to the stale identifier and the
-  // native resolver spent 35 s scanning for something nothing advertises.
+  // Issue #1423 was reported with a Ratio iX3M on iPhone: the computer
+  // stopped downloading after its CoreBluetooth identifier (the stored
+  // "address") changed. The scan saw the computer under its new identifier,
+  // but only an exact address match was accepted, so the download fell back
+  // to the stale identifier and the native resolver spent 35 s scanning for
+  // something nothing advertises. The mechanism does not depend on the
+  // model, so these tests reuse this file's saved Petrel 3 fixture; only the
+  // addresses below are the ones from the report.
   group('DcAdapterDownloadStep same-model fallback', () {
     const freshAddress = 'C4E774E2-7D1F-DB41-EBD3-69D345D782F3';
 
