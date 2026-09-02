@@ -19,3 +19,15 @@ double litersToDisplayVolume(double liters, AppSettings settings) =>
 /// The diver's volume unit back to litres, for storing a volume field.
 double displayVolumeToLiters(double shown, AppSettings settings) =>
     isMetricVolume(settings) ? shown : shown / cubicFeetPerLiter;
+
+/// A price per 100 litres, shown as a price per 100 of the diver's unit.
+///
+/// Gas priced at 7.99 per 100 cu ft is 0.28 per 100 L: the same gas, the same
+/// money, a unit that is 28 times larger. Storing the entered number without
+/// this conversion charged a cubic-foot diver 28 times over.
+double pricePer100LitersToDisplay(double per100Liters, AppSettings settings) =>
+    isMetricVolume(settings) ? per100Liters : per100Liters / cubicFeetPerLiter;
+
+/// The diver's displayed price back to a price per 100 litres, for storing.
+double displayToPricePer100Liters(double shown, AppSettings settings) =>
+    isMetricVolume(settings) ? shown : shown * cubicFeetPerLiter;

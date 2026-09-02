@@ -22,6 +22,9 @@ class BlenderMixRow extends StatelessWidget {
     required this.pressureSymbol,
     this.onSave,
     this.errorText,
+    this.priceController,
+    this.priceLabel,
+    this.onPriceChanged,
   });
 
   static const double _stackBelow = 420;
@@ -50,6 +53,13 @@ class BlenderMixRow extends StatelessWidget {
   /// no single field to pin the message to.
   final String? errorText;
 
+  /// A price field for this row's gas, shown below the O2/He fields when set
+  /// (Eric's PR #1359 review point 3: the price belongs next to the gas it
+  /// prices, not in a separate card at the other end of the page).
+  final TextEditingController? priceController;
+  final String? priceLabel;
+  final ValueChanged<String>? onPriceChanged;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -65,8 +75,9 @@ class BlenderMixRow extends StatelessWidget {
           ],
         );
 
+        final Widget mixRow;
         if (stacked) {
-          return Row(
+          mixRow = Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (leading != null) _leadingLabel(context),
@@ -82,23 +93,56 @@ class BlenderMixRow extends StatelessWidget {
               ),
             ],
           );
+        } else {
+          mixRow = Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (leading != null) _leadingLabel(context),
+              if (pressureController != null) ...[
+                Expanded(flex: 4, child: _pressureField(context)),
+                const SizedBox(width: 8),
+              ],
+              Expanded(flex: 3, child: _o2Field(context)),
+              const SizedBox(width: 8),
+              Expanded(flex: 3, child: _heField(context)),
+            ],
+          );
         }
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        if (priceController == null) return mixRow;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (leading != null) _leadingLabel(context),
-            if (pressureController != null) ...[
-              Expanded(flex: 4, child: _pressureField(context)),
-              const SizedBox(width: 8),
-            ],
-            Expanded(flex: 3, child: _o2Field(context)),
-            const SizedBox(width: 8),
-            Expanded(flex: 3, child: _heField(context)),
+            mixRow,
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                // Lines the price field up under O2 rather than under the
+                // leading label, matching where the mix row's own fields
+                // start.
+                if (leading != null)
+                  SizedBox(width: (leadingWidth ?? _labelWidth(context)) + 8),
+                Expanded(child: _priceField(context)),
+              ],
+            ),
           ],
         );
       },
     );
+  }
+
+  double _labelWidth(BuildContext context) {
+    final painter = TextPainter(
+      text: TextSpan(
+        text: leading,
+        style: Theme.of(context).textTheme.titleSmall,
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    return painter.width;
   }
 
   Widget _leadingLabel(BuildContext context) => Padding(
@@ -126,6 +170,24 @@ class BlenderMixRow extends StatelessWidget {
     label: '${context.l10n.gasCalculators_blender_he} (%)',
     onChanged: (_) => onMix(),
   );
+
+  /// Unlike [_field], this never shows [errorText]: an invalid O2/He mix has
+  /// nothing to do with the price the row's gas costs.
+  Widget _priceField(BuildContext context) {
+    return TextField(
+      controller: priceController,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+      decoration: InputDecoration(
+        labelText: priceLabel,
+        isDense: true,
+        border: const OutlineInputBorder(),
+      ),
+      onChanged: onPriceChanged,
+      onEditingComplete: onSave,
+      onSubmitted: onSave == null ? null : (_) => onSave!(),
+    );
+  }
 
   Widget _field({
     required TextEditingController controller,

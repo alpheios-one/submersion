@@ -6,8 +6,6 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
-import '../../support/fake_app_settings_repository.dart';
-
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _TestSettingsNotifier(super.settings);
@@ -55,24 +53,6 @@ Future<WidgetRef> _pump(
 }
 
 void main() {
-  testWidgets('a stored price seeds the field, converted for display', (
-    tester,
-  ) async {
-    // A blank box (the default) skips the conversion entirely (issue #1215's
-    // original bug); a stored price has to go through it on the very first
-    // frame, before any diver edit.
-    await _pump(
-      tester,
-      overrides: [
-        blenderGasPricesProvider.overrideWith(
-          (ref) => const [12.5, null, null],
-        ),
-      ],
-    );
-
-    expect(find.widgetWithText(TextField, '12.5'), findsOneWidget);
-  });
-
   testWidgets(
     'the currency display follows the diver default and is read-only',
     (tester) async {
@@ -86,17 +66,14 @@ void main() {
     },
   );
 
-  testWidgets('submitting a price field saves the preferences', (tester) async {
-    final repo = FakeAppSettingsRepository();
-    await _pump(
-      tester,
-      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
-    );
+  testWidgets(
+    'the card no longer carries the fill-gas prices, only the currency',
+    (tester) async {
+      // Eric's PR #1359 review point 3: the prices moved next to their
+      // fill-gas fields on BlenderFillGasesCard.
+      await _pump(tester);
 
-    await tester.enterText(find.byType(TextField).first, '9.5');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
-    await tester.pumpAndSettle();
-
-    expect(repo.blenderPreferences?.gasPrices[0], closeTo(9.5, 0.001));
-  });
+      expect(find.byType(TextField), findsNothing);
+    },
+  );
 }

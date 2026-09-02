@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_field_parsing.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -9,6 +10,7 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_mix_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -18,14 +20,21 @@ class BlenderFillGasesCard extends ConsumerWidget {
     super.key,
     required this.o2Controllers,
     required this.heControllers,
+    required this.priceControllers,
   });
 
   final List<TextEditingController> o2Controllers;
   final List<TextEditingController> heControllers;
 
+  /// Price per 100 litres for each bank, positional against
+  /// [blenderGasPricesProvider] (Eric's PR #1359 review point 3: the price
+  /// sits next to the gas it prices rather than in a separate card).
+  final List<TextEditingController> priceControllers;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final units = UnitFormatter(ref.watch(settingsProvider));
+    final settings = ref.watch(settingsProvider);
+    final units = UnitFormatter(settings);
     final providers = [
       blenderFillGas1Provider,
       blenderFillGas2Provider,
@@ -73,12 +82,30 @@ class BlenderFillGasesCard extends ConsumerWidget {
                 errorText: isValidGasMix(gases[i])
                     ? null
                     : context.l10n.gasCalculators_blender_error_invalidMix,
+                priceController: priceControllers[i],
+                priceLabel: context.l10n.gasCalculators_blender_unitPrice(
+                  units.volumeSymbol,
+                ),
+                onPriceChanged: (_) => _onPriceChanged(ref, settings),
               ),
             ],
           ],
         ),
       ),
     );
+  }
+
+  /// Rebuilds the whole positional price list from every row's controller,
+  /// the same "read every field, write the whole list" shape
+  /// [BlenderDefaultsCard] used before the prices moved here.
+  void _onPriceChanged(WidgetRef ref, AppSettings settings) {
+    ref.read(blenderGasPricesProvider.notifier).state = [
+      for (final c in priceControllers)
+        switch (parseUserDecimal(c.text)) {
+          final double entered => displayToPricePer100Liters(entered, settings),
+          null => null,
+        },
+    ];
   }
 }
 

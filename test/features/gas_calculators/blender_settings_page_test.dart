@@ -7,7 +7,6 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -191,7 +190,9 @@ void main() {
 
       // Fill gas 1 is 50% O2 in storage and 100% in the defaults.
       expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 0), '50');
-      expect(_fieldText(tester, find.byType(BlenderDefaultsCard), 0), '1.5');
+      // Row order is O2, He, then price (Eric's PR #1359 review point 3), so
+      // the first row's price field is the third field on the card.
+      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 2), '1.5');
       expect(find.text('21/35'), findsOneWidget);
     });
 
@@ -208,10 +209,11 @@ void main() {
       await tester.enterText(
         find
             .descendant(
-              of: find.byType(BlenderDefaultsCard),
+              of: find.byType(BlenderFillGasesCard),
               matching: find.byType(TextField),
             )
-            .first,
+            // The first row's price field: O2 and He are indices 0 and 1.
+            .at(2),
         '2.25',
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);

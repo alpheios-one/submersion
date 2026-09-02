@@ -137,4 +137,43 @@ void main() {
 
     expect(find.text("A gas mix's O₂ + He cannot exceed 100%."), findsWidgets);
   });
+
+  testWidgets('a stored price seeds its row field, converted for display', (
+    tester,
+  ) async {
+    // Eric's PR #1359 review point 3: the price used to live on
+    // BlenderDefaultsCard; it now sits directly below its own fill-gas row.
+    await _pump(
+      tester,
+      overrides: [
+        blenderGasPricesProvider.overrideWith(
+          (ref) => const [12.5, null, null],
+        ),
+      ],
+    );
+
+    expect(find.widgetWithText(TextField, '12.5'), findsOneWidget);
+  });
+
+  testWidgets('submitting a fill-gas row price field saves the preferences', (
+    tester,
+  ) async {
+    final repo = FakeAppSettingsRepository();
+    await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+
+    // Row order is O2, He, then price, so the first row's price field is the
+    // third TextField on the card.
+    final priceField = find.byWidgetPredicate(
+      (w) =>
+          w is TextField && (w.decoration?.labelText ?? '').contains('Price'),
+    );
+    await tester.enterText(priceField.first, '9.5');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(repo.blenderPreferences?.gasPrices[0], closeTo(9.5, 0.001));
+  });
 }

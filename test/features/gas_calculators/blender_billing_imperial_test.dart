@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -26,8 +26,9 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 /// Cubic feet per litre, as `VolumeUnit.convert` uses.
 const double _cuftPerLiter = 0.0353147;
 
-/// The price fields moved from [BlenderBillingCard] to [BlenderDefaultsCard]
-/// behind the settings gear (issue #1335); this is the settings surface now.
+/// The price fields moved from [BlenderBillingCard] to the fill-gas rows on
+/// [BlenderSettingsPage] (issue #1335, then Eric's PR #1359 review point 3);
+/// this is the settings surface now.
 Future<WidgetRef> _pumpDefaults(WidgetTester tester, VolumeUnit unit) async {
   await tester.binding.setSurfaceSize(const Size(900, 2000));
   addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -50,15 +51,11 @@ Future<WidgetRef> _pumpDefaults(WidgetTester tester, VolumeUnit unit) async {
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Consumer(
-              builder: (context, ref, _) {
-                captured = ref;
-                return const BlenderDefaultsCard();
-              },
-            ),
-          ),
+        home: Consumer(
+          builder: (context, ref, _) {
+            captured = ref;
+            return const BlenderSettingsPage();
+          },
         ),
       ),
     ),
