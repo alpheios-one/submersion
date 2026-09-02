@@ -9,6 +9,7 @@ import 'package:submersion/features/universal_import/data/models/import_options.
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/parsers/import_parser.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_media_entries.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_xml_models.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_xml_reader.dart';
@@ -242,6 +243,9 @@ class MacDiveXmlParser implements ImportParser {
 
     final entities = <ImportEntityType, List<Map<String, dynamic>>>{};
     if (diveMaps.isNotEmpty) entities[ImportEntityType.dives] = diveMaps;
+    // Photo references become media entries for the wizard's Photos step.
+    final mediaMaps = macDiveMediaEntriesFromXmlDives(logbook.dives);
+    if (mediaMaps.isNotEmpty) entities[ImportEntityType.media] = mediaMaps;
     if (sitesByName.isNotEmpty) {
       entities[ImportEntityType.sites] = sitesByName.values.toList();
     }

@@ -9,20 +9,35 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Wizard step for locating the photos a logbook references.
+/// Wizard step that settles where an import's photos come from and go to.
 ///
-/// Subsurface stores an absolute path from the exporting machine, so the
-/// import cannot find the files on its own. This step collects a folder to
-/// resolve them against and reports what matched before anything is written.
+/// Two kinds of photo can be in play, and each asks its own question:
 ///
-/// Only shown when the parsed payload actually references photos; see
+/// - Photos the logbook *references* by path (Subsurface, MacDive). The
+///   import cannot find those files on its own, so this step collects a
+///   folder to resolve them against and reports what matched. Matches are
+///   linked in place.
+/// - Photos *bundled* inside an imported archive (a DiveCloud ZIP). Their
+///   only home is a temp folder the wizard deletes, so this step asks where
+///   to save them. They are written there and linked from there; nothing is
+///   ever filed inside the app's own storage.
+///
+/// Only shown when the import actually carries photos; see
 /// [universalAdapterNoPhotosProvider], which auto-advances past it otherwise.
 class PhotoFolderStep extends ConsumerWidget {
-  const PhotoFolderStep({super.key, this.pickFolderOverride});
+  const PhotoFolderStep({
+    super.key,
+    this.pickFolderOverride,
+    this.pickDestinationOverride,
+  });
 
-  /// Test seam for the platform directory picker.
+  /// Test seam for the platform directory picker (referenced photos).
   @visibleForTesting
   final Future<String?> Function()? pickFolderOverride;
+
+  /// Test seam for the platform directory picker (bundled photos).
+  @visibleForTesting
+  final Future<String?> Function()? pickDestinationOverride;
 
   /// A recursive folder scan needs real filesystem paths, which Android's SAF
   /// does not reliably provide and iOS does not expose at all.
@@ -44,71 +59,107 @@ class PhotoFolderStep extends ConsumerWidget {
         .resolvePhotosIn(path);
   }
 
+  Future<void> _pickDestination(WidgetRef ref) async {
+    final path =
+        await (pickDestinationOverride?.call() ??
+            FilePicker.getDirectoryPath());
+    if (path == null) return;
+    ref
+        .read(universalImportNotifierProvider.notifier)
+        .chooseBundledPhotoFolder(path);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final state = ref.watch(universalImportNotifierProvider);
-    final pictureCount = state.payload
-        ?.entitiesOf(ImportEntityType.media)
-        .length;
+    final referencedCount =
+        state.payload?.entitiesOf(ImportEntityType.media).length ?? 0;
+    final bundledCount = state.photoPathsByBaseName.values.fold<int>(
+      0,
+      (sum, paths) => sum + paths.length,
+    );
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.photo_library_outlined),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.importWizard_photos_foundCount(pictureCount ?? 0),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          if (!_canPickFolder)
-            Text(l10n.importWizard_photos_mobileUnsupported)
-          else if (state.isLoading)
-            Row(
-              children: [
-                const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                const SizedBox(width: 12),
-                Text(l10n.importWizard_photos_scanning),
-              ],
-            )
-          else ...[
-            FilledButton.icon(
-              onPressed: () => _pick(ref),
-              icon: const Icon(Icons.folder_open),
-              label: Text(l10n.importWizard_photos_chooseFolder),
+          if (referencedCount > 0) ...[
+            _Heading(
+              icon: Icons.photo_library_outlined,
+              text: l10n.importWizard_photos_foundCount(referencedCount),
             ),
-            if (state.photoFolderPath != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                state.photoFolderPath!,
-                style: Theme.of(context).textTheme.bodySmall,
+            const SizedBox(height: 24),
+            if (!_canPickFolder)
+              Text(l10n.importWizard_photos_mobileUnsupported)
+            else if (state.isLoading)
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(l10n.importWizard_photos_scanning),
+                ],
+              )
+            else ...[
+              FilledButton.icon(
+                onPressed: () => _pick(ref),
+                icon: const Icon(Icons.folder_open),
+                label: Text(l10n.importWizard_photos_chooseFolder),
               ),
-            ],
-            if (state.photoResolution != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                l10n.importWizard_photos_matchSummary(
-                  state.photoResolution!.matchedCount,
-                  state.photoResolution!.filenameOnlyCount,
-                  state.photoResolution!.notFoundCount,
+              if (state.photoFolderPath != null) ...[
+                const SizedBox(height: 12),
+                Text(state.photoFolderPath!, style: theme.textTheme.bodySmall),
+              ],
+              if (state.photoResolution != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  l10n.importWizard_photos_matchSummary(
+                    state.photoResolution!.matchedCount,
+                    state.photoResolution!.filenameOnlyCount,
+                    state.photoResolution!.notFoundCount,
+                  ),
                 ),
+              ],
+            ],
+            const SizedBox(height: 24),
+          ],
+          if (bundledCount > 0) ...[
+            _Heading(
+              icon: Icons.archive_outlined,
+              text: l10n.importWizard_photos_bundledCount(bundledCount),
+            ),
+            const SizedBox(height: 24),
+            // The mobile limitation is stated once; a referenced section
+            // above has already said it.
+            if (!_canPickFolder && referencedCount == 0)
+              Text(l10n.importWizard_photos_mobileUnsupported)
+            else if (_canPickFolder) ...[
+              FilledButton.icon(
+                onPressed: () => _pickDestination(ref),
+                icon: const Icon(Icons.drive_folder_upload_outlined),
+                label: Text(l10n.importWizard_photos_chooseDestination),
+              ),
+              if (state.bundledPhotoFolderPath != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  state.bundledPhotoFolderPath!,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+              const SizedBox(height: 12),
+              Text(
+                l10n.importWizard_photos_destinationNote,
+                style: theme.textTheme.bodySmall,
               ),
             ],
+            const SizedBox(height: 24),
           ],
-          const SizedBox(height: 24),
           TextButton(
             onPressed: () =>
                 ref.read(universalImportNotifierProvider.notifier).skipPhotos(),
@@ -116,6 +167,26 @@ class PhotoFolderStep extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _Heading extends StatelessWidget {
+  const _Heading({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(text, style: Theme.of(context).textTheme.titleMedium),
+        ),
+      ],
     );
   }
 }

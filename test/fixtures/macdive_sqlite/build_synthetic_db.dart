@@ -27,20 +27,24 @@ import 'package:sqlite3/sqlite3.dart';
 /// query — it is NOT complete (e.g. full Core Data Z_METADATA /
 /// Z_PRIMARYKEY / Z_MODELCACHE tables are omitted since the reader
 /// doesn't query them).
-File buildSyntheticMacDiveDb(String path) {
+///
+/// [includeDiveImages] controls whether the `ZDIVEIMAGE` table exists at
+/// all: older MacDive libraries and some exports omit it, and the reader
+/// must treat that as "no photos" rather than as a broken file.
+File buildSyntheticMacDiveDb(String path, {bool includeDiveImages = true}) {
   final f = File(path);
   if (f.existsSync()) f.deleteSync();
   final db = sqlite3.open(path);
   try {
-    _createSchema(db);
-    _insertFixtureRows(db);
+    _createSchema(db, includeDiveImages: includeDiveImages);
+    _insertFixtureRows(db, includeDiveImages: includeDiveImages);
   } finally {
     db.close();
   }
   return f;
 }
 
-void _createSchema(Database db) {
+void _createSchema(Database db, {required bool includeDiveImages}) {
   db.execute('''
     CREATE TABLE ZDIVE (
       Z_PK INTEGER PRIMARY KEY, Z_ENT INTEGER, Z_OPT INTEGER,
@@ -199,9 +203,17 @@ void _createSchema(Database db) {
       ZIDENTIFIER VARCHAR, ZALL VARCHAR
     )
   ''');
+  if (!includeDiveImages) return;
+  db.execute('''
+    CREATE TABLE ZDIVEIMAGE (
+      Z_PK INTEGER PRIMARY KEY, Z_ENT INTEGER, Z_OPT INTEGER,
+      ZPOSITION INTEGER, ZRELATIONSHIPDIVE INTEGER,
+      ZCAPTION VARCHAR, ZORIGINALPATH VARCHAR, ZPATH VARCHAR, ZUUID VARCHAR
+    )
+  ''');
 }
 
-void _insertFixtureRows(Database db) {
+void _insertFixtureRows(Database db, {required bool includeDiveImages}) {
   // ---- sites ----
   db.execute('''
     INSERT INTO ZDIVESITE (Z_PK, ZNAME, ZCOUNTRY, ZLOCATION,
@@ -351,5 +363,20 @@ void _insertFixtureRows(Database db) {
   db.execute('''
     INSERT INTO ZMETADATA (Z_PK, ZIDENTIFIER, ZALL)
     VALUES (1, 'SystemOfUnits', 'Metric')
+  ''');
+
+  // ---- dive images ---- Dive 1 gets 2 photos; dive 2 gets 1; dive 3 none.
+  if (!includeDiveImages) return;
+  db.execute('''
+    INSERT INTO ZDIVEIMAGE (
+      Z_PK, ZPOSITION, ZRELATIONSHIPDIVE,
+      ZCAPTION, ZPATH, ZORIGINALPATH, ZUUID
+    ) VALUES
+      (1, 0, 1, 'Shark!', '/Users/test/Pictures/Diving/shark.jpg',
+       '/old/Pictures/shark.jpg', 'img-uuid-1'),
+      (2, 1, 1, NULL, '/Users/test/Pictures/Diving/turtle.jpg',
+       NULL, 'img-uuid-2'),
+      (3, 0, 2, 'Reef', '/Users/test/Pictures/Diving/reef.jpg',
+       NULL, 'img-uuid-3')
   ''');
 }

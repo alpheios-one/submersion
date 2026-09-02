@@ -81,6 +81,7 @@ class MacDiveDbReader {
         final diveTypes = _readDiveTypes(db);
         final diveLogs = _readDiveLogs(db);
         final divers = _readDivers(db);
+        final diveImages = _readDiveImages(db);
         final tankAndGases = _readTankAndGases(db);
         final dives = _readDives(db);
 
@@ -139,6 +140,7 @@ class MacDiveDbReader {
           diveToDiveTypePks: diveToDiveTypePks,
           diveLogsByPk: {for (final l in diveLogs) l.pk: l},
           diversByPk: {for (final d in divers) d.pk: d},
+          diveImages: diveImages,
         );
       } finally {
         db.close();
@@ -376,6 +378,24 @@ class MacDiveDbReader {
         firstName: _str(r['ZFIRSTNAME']),
         lastName: _str(r['ZLASTNAME']),
         email: _str(r['ZEMAILADDRESS']),
+      ),
+    );
+  }
+
+  /// `ZDIVEIMAGE` is absent from some libraries, so this goes through
+  /// [_selectOrEmpty] like the other optional tables: no table, no photos.
+  static List<MacDiveRawDiveImage> _readDiveImages(Database db) {
+    return _selectOrEmpty<MacDiveRawDiveImage>(
+      db,
+      'SELECT * FROM ZDIVEIMAGE',
+      (r) => MacDiveRawDiveImage(
+        pk: r['Z_PK'] as int,
+        uuid: _str(r['ZUUID']) ?? '',
+        diveFk: (r['ZRELATIONSHIPDIVE'] as int?) ?? 0,
+        position: (r['ZPOSITION'] as int?) ?? 0,
+        caption: _str(r['ZCAPTION']),
+        path: _str(r['ZPATH']),
+        originalPath: _str(r['ZORIGINALPATH']),
       ),
     );
   }

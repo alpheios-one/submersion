@@ -19213,6 +19213,25 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'import de photos nécessite un dossier sur le disque de cet appareil. Lancez cet import sur un ordinateur pour les inclure. Les plongées et les sites s\'importent normalement.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos incluses dans l\'archive',
+      one: '1 photo incluse dans l\'archive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Choisir où enregistrer les photos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'Les photos sont enregistrées dans ce dossier et liées depuis celui-ci. Submersion n\'en conserve jamais de copie.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -440,12 +440,20 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
   }
 
-  /// Proceeds without photos.
+  /// Records where photos bundled in an imported archive should be saved.
+  /// They are written there at import time and linked in place.
+  void chooseBundledPhotoFolder(String path) {
+    state = state.copyWith(bundledPhotoFolderPath: path, photosSkipped: false);
+  }
+
+  /// Proceeds without photos: neither the logbook's referenced photos nor
+  /// any bundled in an archive are imported.
   void skipPhotos() {
     state = state.copyWith(
       photosSkipped: true,
       clearPhotoResolution: true,
       clearPhotoFolderPath: true,
+      clearBundledPhotoFolderPath: true,
     );
   }
 

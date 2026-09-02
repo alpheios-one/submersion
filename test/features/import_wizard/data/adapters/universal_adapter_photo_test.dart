@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
+import 'package:submersion/features/dive_import/domain/services/dive_matcher.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
+import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
 import 'package:submersion/features/universal_import/data/models/detection_result.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/picked_import_file.dart';
@@ -124,7 +126,15 @@ void main() {
   });
   group('attachResolvedPhotos', () {
     test('attaches each resolved photo to its own dive', () async {
-      final attached = <({String path, String diveId, DateTime? takenAt})>[];
+      final attached =
+          <
+            ({
+              String path,
+              String diveId,
+              DateTime? takenAt,
+              DateTime? diveStart,
+            })
+          >[];
 
       final count = await UniversalAdapter.attachResolvedPhotos(
         media: [
@@ -149,8 +159,13 @@ void main() {
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
           {'dateTime': DateTime.utc(2025, 1, 16, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
-          attached.add((path: file.path, diveId: diveId, takenAt: takenAt));
+        attach: (photo) async {
+          attached.add((
+            path: photo.file.path,
+            diveId: photo.diveId,
+            takenAt: photo.takenAt,
+            diveStart: photo.diveStart,
+          ));
         },
       );
 
@@ -159,8 +174,10 @@ void main() {
       final byDive = {for (final a in attached) a.diveId: a};
       // Dive start plus the 3:20 offset.
       expect(byDive['dive-a']!.takenAt, DateTime.utc(2025, 1, 15, 10, 3, 20));
-      // No offset: falls back to the dive's own start.
-      expect(byDive['dive-b']!.takenAt, DateTime.utc(2025, 1, 16, 10));
+      // No offset: no asserted time, the linker decides between EXIF and
+      // the dive start it is handed.
+      expect(byDive['dive-b']!.takenAt, isNull);
+      expect(byDive['dive-b']!.diveStart, DateTime.utc(2025, 1, 16, 10));
     });
 
     test('applies a negative offset before the dive start', () async {
@@ -176,8 +193,8 @@ void main() {
         dives: [
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
-          seen = takenAt;
+        attach: (photo) async {
+          seen = photo.takenAt;
         },
       );
 
@@ -197,7 +214,7 @@ void main() {
         dives: [
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
+        attach: (photo) async {
           attachCalls++;
         },
       );
@@ -218,8 +235,8 @@ void main() {
         dives: [
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
-          if (file.path.endsWith('b.jpg')) {
+        attach: (photo) async {
+          if (photo.file.path.endsWith('b.jpg')) {
             throw const FileSystemException('copy failed');
           }
         },
@@ -248,9 +265,9 @@ void main() {
         dives: [
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
-          seenLatitude = latitude;
-          seenLongitude = longitude;
+        attach: (photo) async {
+          seenLatitude = photo.latitude;
+          seenLongitude = photo.longitude;
         },
       );
 
@@ -273,8 +290,8 @@ void main() {
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
         selectedIndices: const {0},
-        attach: (file, diveId, takenAt, latitude, longitude) async {
-          attached.add(file.path);
+        attach: (photo) async {
+          attached.add(photo.file.path);
         },
       );
 
@@ -296,7 +313,7 @@ void main() {
         dives: [
           {'dateTime': DateTime.utc(2025, 1, 15, 10)},
         ],
-        attach: (file, diveId, takenAt, latitude, longitude) async {
+        attach: (photo) async {
           attachCalls++;
         },
       );
@@ -320,7 +337,7 @@ void main() {
           dives: [
             {'dateTime': DateTime.utc(2025, 1, 15, 10)},
           ],
-          attach: (file, diveId, takenAt, latitude, longitude) async {
+          attach: (photo) async {
             attachCalls++;
           },
         );
@@ -329,5 +346,70 @@ void main() {
         expect(attachCalls, 0);
       },
     );
+    test('passes a trimmed caption through and drops a blank one', () async {
+      final captions = <String?>[];
+
+      await UniversalAdapter.attachResolvedPhotos(
+        media: [
+          {'filename': '/p/a.jpg', 'caption': '  Shark!  ', '_diveIndex': 0},
+          {'filename': '/p/b.jpg', 'caption': '   ', '_diveIndex': 0},
+          {'filename': '/p/c.jpg', '_diveIndex': 0},
+        ],
+        resolvedPathByIndex: const {
+          0: '/x/a.jpg',
+          1: '/x/b.jpg',
+          2: '/x/c.jpg',
+        },
+        diveIdByIndex: const {0: 'dive-a'},
+        removedDiveIds: const {},
+        dives: [
+          {'dateTime': DateTime.utc(2025, 1, 15, 10)},
+        ],
+        attach: (photo) async => captions.add(photo.caption),
+      );
+
+      expect(captions, ['Shark!', null, null]);
+    });
+  });
+
+  group('photoTargetDiveIds', () {
+    DiveMatchResult match(String id) =>
+        DiveMatchResult(diveId: id, score: 0.9, timeDifferenceMs: 0);
+
+    test('imported dives keep the id the importer created', () {
+      final targets = UniversalAdapter.photoTargetDiveIds(
+        diveIdByIndex: const {0: 'new-a'},
+        matchResults: {0: match('existing-a')},
+        duplicateActions: const {0: DuplicateAction.importAsNew},
+      );
+      expect(targets, {0: 'new-a'});
+    });
+
+    test('a skipped duplicate targets the existing dive it matched', () {
+      final targets = UniversalAdapter.photoTargetDiveIds(
+        diveIdByIndex: const {1: 'new-b'},
+        matchResults: {0: match('existing-a'), 1: match('existing-b')},
+        duplicateActions: const {0: DuplicateAction.skip},
+      );
+      expect(targets, {0: 'existing-a', 1: 'new-b'});
+    });
+
+    test('an undecided duplicate also targets the existing dive', () {
+      final targets = UniversalAdapter.photoTargetDiveIds(
+        diveIdByIndex: const {},
+        matchResults: {0: match('existing-a')},
+        duplicateActions: const {},
+      );
+      expect(targets, {0: 'existing-a'});
+    });
+
+    test('a consolidated duplicate is left to removedDiveIds', () {
+      final targets = UniversalAdapter.photoTargetDiveIds(
+        diveIdByIndex: const {},
+        matchResults: {0: match('existing-a')},
+        duplicateActions: const {0: DuplicateAction.consolidate},
+      );
+      expect(targets, isEmpty);
+    });
   });
 }

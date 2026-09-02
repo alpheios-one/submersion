@@ -19145,6 +19145,25 @@ class AppLocalizationsEs extends AppLocalizations {
       'Importar fotos requiere una carpeta en el disco de este dispositivo. Ejecuta esta importación en un ordenador para incluirlas. Las inmersiones y los puntos de buceo se importan con normalidad.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos incluidas en el archivo',
+      one: '1 foto incluida en el archivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Elegir dónde guardar las fotos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'Las fotos se guardan en esta carpeta y se enlazan desde allí. Submersion nunca conserva una copia propia.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

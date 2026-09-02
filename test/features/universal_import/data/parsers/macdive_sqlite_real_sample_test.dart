@@ -102,6 +102,24 @@ void main() {
       );
     });
 
+    test('photos: 260 of 261 ZDIVEIMAGE rows become media entries', () async {
+      final payload = await const MacDiveSqliteParser().parse(bytes);
+      final media = payload.entitiesOf(ImportEntityType.media);
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      // One row in the sample has a NULL ZRELATIONSHIPDIVE: a photo MacDive
+      // itself no longer shows on any dive, so it has nowhere to land.
+      expect(media.length, 260);
+      for (final m in media) {
+        expect(m['_diveIndex'], inInclusiveRange(0, dives.length - 1));
+        expect((m['filename'] as String).isNotEmpty, isTrue);
+      }
+      // MacDive copies photos into its own library under a UUID name, so
+      // ZPATH is a bare filename: the Photos step must resolve it by name
+      // against the picked folder, not by re-rooting a path.
+      final bare = media.where((m) => !(m['filename'] as String).contains('/'));
+      expect(bare, isNotEmpty);
+    });
+
     test('at least one dive has tagRefs populated', () async {
       final payload = await const MacDiveSqliteParser().parse(bytes);
       final dives = payload.entitiesOf(ImportEntityType.dives);

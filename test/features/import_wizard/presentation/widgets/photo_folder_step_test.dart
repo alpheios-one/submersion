@@ -67,6 +67,16 @@ void main() {
     );
   }
 
+  void seedBundled(int count) {
+    final notifier = container.read(universalImportNotifierProvider.notifier);
+    notifier.state = notifier.state.copyWith(
+      payload: const ImportPayload(entities: {}),
+      photoPathsByBaseName: {
+        'dive1': [for (var i = 0; i < count; i++) '/tmp/x/p$i.jpg'],
+      },
+    );
+  }
+
   Widget host(Widget child) {
     return UncontrolledProviderScope(
       container: container,
@@ -186,6 +196,84 @@ void main() {
       );
       // The count is still stated, so nothing is silently dropped.
       expect(find.text('1 photo referenced in this logbook'), findsOneWidget);
+    });
+  });
+
+  testWidgets('shows the bundled count and asks where to save them', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(3);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('3 photos bundled in the archive'), findsOneWidget);
+      expect(find.text('Choose where to save photos...'), findsOneWidget);
+      expect(find.textContaining('never keeps its own copy'), findsOneWidget);
+      // No referenced photos, so no folder-to-resolve question.
+      expect(find.text('Choose photo folder...'), findsNothing);
+    });
+  });
+
+  testWidgets('picking a destination records it on the state', (tester) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(1);
+
+      await tester.pumpWidget(
+        host(
+          PhotoFolderStep(
+            pickDestinationOverride: () async => '/Users/eric/Pictures/Dives',
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Choose where to save photos...'));
+      await tester.pump();
+
+      expect(find.text('/Users/eric/Pictures/Dives'), findsOneWidget);
+      expect(
+        container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
+        '/Users/eric/Pictures/Dives',
+      );
+    });
+  });
+
+  testWidgets('skipping clears a chosen destination', (tester) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(1);
+      container
+          .read(universalImportNotifierProvider.notifier)
+          .chooseBundledPhotoFolder('/x');
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      await tester.tap(find.text('Skip photos'));
+      await tester.pump();
+
+      final state = container.read(universalImportNotifierProvider);
+      expect(state.photosSkipped, isTrue);
+      expect(state.bundledPhotoFolderPath, isNull);
+    });
+  });
+
+  testWidgets('states the mobile limitation once for bundled photos', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.iOS, () async {
+      seedBundled(2);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('Choose where to save photos...'), findsNothing);
+      expect(
+        find.textContaining('Run this import on a computer'),
+        findsOneWidget,
+      );
+      expect(find.text('2 photos bundled in the archive'), findsOneWidget);
     });
   });
 }

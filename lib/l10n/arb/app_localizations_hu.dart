@@ -19073,6 +19073,25 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fényképek importálásához az eszköz lemezén lévő mappa szükséges. Futtasd ezt az importálást számítógépen, hogy a fényképek is bekerüljenek. A merülések és a merülőhelyek normálisan importálódnak.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó az archívumban',
+      one: '1 fotó az archívumban',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Válassza ki, hová mentse a fotókat...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'A fotók ebbe a mappába kerülnek, és onnan lesznek hivatkozva. A Submersion soha nem tart saját másolatot.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

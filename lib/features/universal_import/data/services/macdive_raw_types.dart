@@ -407,6 +407,38 @@ class MacDiveRawDiver {
   }
 }
 
+/// A row from MacDive's `ZDIVEIMAGE` table: a photo reference attached to
+/// a dive. The image bytes live on the filesystem; this row carries only
+/// the reference.
+class MacDiveRawDiveImage {
+  final int pk;
+  final String uuid;
+  final int diveFk;
+  final int position;
+  final String? caption;
+
+  /// MacDive's current location for the photo (`ZPATH`). In practice a
+  /// bare filename (a UUID plus extension) inside MacDive's own image
+  /// folder, because MacDive copies every photo it is given into its
+  /// library; an absolute path when the row predates that behaviour.
+  final String? path;
+
+  /// Where the photo lived when MacDive first imported it
+  /// (`ZORIGINALPATH`). Absolute on the machine that ran MacDive, and
+  /// populated for only a minority of rows.
+  final String? originalPath;
+
+  const MacDiveRawDiveImage({
+    required this.pk,
+    required this.uuid,
+    required this.diveFk,
+    this.position = 0,
+    this.caption,
+    this.path,
+    this.originalPath,
+  });
+}
+
 /// Top-level container returned by [MacDiveDbReader.readAll]. Holds all
 /// tables keyed for lookup plus the junction tables as dive_pk → list
 /// of foreign PKs. The mapper walks this graph to build ImportPayload.
@@ -423,6 +455,7 @@ class MacDiveRawLogbook {
   final List<MacDiveRawCertification> certifications;
   final List<MacDiveRawServiceRecord> serviceRecords;
   final List<MacDiveRawEvent> events;
+  final List<MacDiveRawDiveImage> diveImages;
   final Map<int, List<int>> diveToBuddyPks;
   final Map<int, List<int>> diveToTagPks;
   final Map<int, List<int>> diveToGearPks;
@@ -458,5 +491,6 @@ class MacDiveRawLogbook {
     this.diveToDiveTypePks = const {},
     this.diveLogsByPk = const {},
     this.diversByPk = const {},
+    this.diveImages = const [],
   });
 }

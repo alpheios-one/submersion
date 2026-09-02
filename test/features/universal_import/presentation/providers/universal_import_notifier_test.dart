@@ -1520,6 +1520,37 @@ void main() {
         },
       );
 
+      test('bundled archive photos shut the gate until a folder is chosen', () {
+        notifier.state = notifier.state.copyWith(
+          payload: const ImportPayload(entities: {}),
+          photoPathsByBaseName: {
+            'dive1': ['/tmp/zip/a.jpg'],
+          },
+        );
+        expect(container.read(universalAdapterNoPhotosProvider), isFalse);
+        expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
+
+        notifier.chooseBundledPhotoFolder('/Users/eric/Pictures');
+        expect(notifier.state.bundledPhotoFolderPath, '/Users/eric/Pictures');
+        expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
+      });
+
+      test('skipping opens the gate and forgets the bundled folder', () {
+        notifier.state = notifier.state.copyWith(
+          payload: payloadWithOnePicture('/p/a.jpg'),
+          photoPathsByBaseName: {
+            'dive1': ['/tmp/zip/a.jpg'],
+          },
+        );
+        notifier.chooseBundledPhotoFolder('/x');
+        // Referenced photos are still unresolved, so the gate stays shut.
+        expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
+
+        notifier.skipPhotos();
+        expect(notifier.state.bundledPhotoFolderPath, isNull);
+        expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
+      });
+
       test(
         'a missing folder resolves to zero matches without throwing',
         () async {
