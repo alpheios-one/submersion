@@ -77,17 +77,6 @@ final List<NavDestination> kNavDestinations = List.unmodifiable([
     selectedIcon: Icons.photo_library,
     label: (l10n) => l10n.nav_media,
   ),
-  // Species sits with Media: both are records of what a dive turned up,
-  // rather than the logistics entities that follow. Material has no fish
-  // glyph, so this borrows MDI's and reuses it for the selected state the
-  // way `gps-log` reuses its icon.
-  NavDestination(
-    id: 'species',
-    route: '/species',
-    icon: MdiIcons.fish,
-    selectedIcon: MdiIcons.fish,
-    label: (l10n) => l10n.nav_species,
-  ),
   NavDestination(
     id: 'equipment',
     route: '/equipment',
@@ -123,6 +112,17 @@ final List<NavDestination> kNavDestinations = List.unmodifiable([
     selectedIcon: Icons.school,
     label: (l10n) => l10n.nav_courses,
     subtitle: (l10n) => l10n.nav_coursesSubtitle,
+  ),
+  // Species closes the logging-and-training run that precedes the analysis
+  // surfaces: it is a record of what dives turned up, so it reads last before
+  // Statistics. Material has no fish glyph, so this borrows MDI's and reuses
+  // it for the selected state the way `gps-log` reuses its icon.
+  NavDestination(
+    id: 'species',
+    route: '/species',
+    icon: MdiIcons.fish,
+    selectedIcon: MdiIcons.fish,
+    label: (l10n) => l10n.nav_species,
   ),
   NavDestination(
     id: 'statistics',
