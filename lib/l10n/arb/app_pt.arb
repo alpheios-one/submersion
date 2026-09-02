@@ -10301,6 +10301,8 @@
   "settings_cloudSync_progress_pulling": "Baixando alterações...",
   "settings_cloudSync_progress_publishing": "Publicando alterações...",
   "settings_cloudSync_progress_uploadingLibrary": "Enviando a biblioteca ({uploaded} de {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Baixando a biblioteca ({downloaded} de {total})",
+  "settings_cloudSync_progress_importingLibrary": "Importando a biblioteca ({percent}%)",
   "settings_cloudSync_result_noProvider": "Nenhum provedor de nuvem configurado",
   "settings_cloudSync_result_notAuthenticated": "Sem autenticação no provedor de nuvem",
   "settings_cloudSync_result_timedOut": "Tempo esgotado na sincronização",

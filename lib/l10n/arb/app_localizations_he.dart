@@ -34552,6 +34552,19 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'מוריד את הספרייה ($downloaded מתוך $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'מייבא את הספרייה ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider => 'לא הוגדר ספק ענן';
 
   @override

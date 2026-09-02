@@ -149,6 +149,37 @@ target_include_directories(test_shearwater_common_download PRIVATE
     ${CONFIG_DIR}
 )
 
+# Regression test for issue #285: the Scubapro G2 HUD download over BLE. The
+# uwatec_smart driver keeps `transferred - 1` bytes of every read as payload
+# and cannot re-frame a read carrying several notifications (G2 firmware 1.4+
+# no longer puts a length in the first byte), so the transport's
+# one-notification-per-read guarantee is load-bearing. The test replays the
+# HUD's real handshake through the #included driver over a scripted BLE
+# iostream: packet-preserving reads complete the download, coalesced reads
+# fail with PROTOCOL (the macOS -8), and a lost notification times out after
+# the last packet (the Android -7). Leaf dependencies only; device.c symbols
+# are stubbed in the test for the same reason as test_hw_ostc3_read.
+add_executable(test_uwatec_smart_ble_download
+    test_uwatec_smart_ble_download.c
+    ${LIBDC_DIR}/src/iostream.c
+    ${LIBDC_DIR}/src/custom.c
+    ${LIBDC_DIR}/src/array.c
+    ${LIBDC_DIR}/src/buffer.c
+    ${LIBDC_DIR}/src/context.c
+    ${LIBDC_DIR}/src/common.c
+    ${LIBDC_DIR}/src/platform.c
+    # datetime.c: the dump stamps the clock event with dc_datetime_now.
+    ${LIBDC_DIR}/src/datetime.c
+    # checksum.c: the #included driver's IrDA path (not exercised) links it.
+    ${LIBDC_DIR}/src/checksum.c
+)
+target_include_directories(test_uwatec_smart_ble_download PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${CONFIG_DIR}
+)
+
 # test_parse_raw_dive requires the full libdivecomputer + wrapper linked in.
 # Use the Windows config on Windows, macOS config otherwise.
 if(WIN32)
@@ -234,6 +265,7 @@ add_test(NAME test_usbhid_descriptor_match COMMAND test_usbhid_descriptor_match)
 add_test(NAME test_hw_ostc3_read COMMAND test_hw_ostc3_read)
 add_test(NAME test_shearwater_petrel_foreach COMMAND test_shearwater_petrel_foreach)
 add_test(NAME test_shearwater_common_download COMMAND test_shearwater_common_download)
+add_test(NAME test_uwatec_smart_ble_download COMMAND test_uwatec_smart_ble_download)
 add_test(NAME test_parse_raw_dive COMMAND test_parse_raw_dive
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )

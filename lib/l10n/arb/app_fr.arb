@@ -10301,6 +10301,8 @@
   "settings_cloudSync_progress_pulling": "Récupération des modifications...",
   "settings_cloudSync_progress_publishing": "Publication des modifications...",
   "settings_cloudSync_progress_uploadingLibrary": "Envoi de la bibliothèque ({uploaded} sur {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Téléchargement de la bibliothèque ({downloaded} sur {total})",
+  "settings_cloudSync_progress_importingLibrary": "Importation de la bibliothèque ({percent} %)",
   "settings_cloudSync_result_noProvider": "Aucun fournisseur cloud configuré",
   "settings_cloudSync_result_notAuthenticated": "Non authentifié auprès du fournisseur cloud",
   "settings_cloudSync_result_timedOut": "Délai de synchronisation dépassé",

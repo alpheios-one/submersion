@@ -34713,6 +34713,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Downloading library ($downloaded of $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importing library ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'No cloud provider configured';
 
