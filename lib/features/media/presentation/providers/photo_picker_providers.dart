@@ -11,6 +11,7 @@ import 'package:submersion/features/media/data/services/photo_picker_service.dar
 import 'package:submersion/features/media/data/services/photo_picker_service_desktop.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service_mobile.dart';
 import 'package:submersion/features/media/presentation/providers/media_byte_retention.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_enqueue_provider.dart';
 
@@ -262,7 +263,7 @@ final mediaImportServiceProvider = Provider<MediaImportService>((ref) {
 /// import wizard for photos a logbook referenced by path.
 final localFileLinkServiceProvider = Provider<LocalFileLinkService>((ref) {
   return LocalFileLinkService(
-    mediaRepository: MediaRepository(),
+    mediaRepository: ref.watch(mediaRepositoryProvider),
     handles: LocalFileHandleFactory(
       platform: ref.watch(localMediaPlatformProvider),
       bookmarkStorage: ref.watch(localBookmarkStorageProvider),
