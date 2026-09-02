@@ -311,9 +311,15 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
         ? primarySource
         : dataSources.where((s) => s.id == activeSourceId).firstOrNull ??
               primarySource;
-    final activeProfile = activeSource == null
-        ? null
-        : sourceProfiles[activeSource.id];
+    // Attribution (activeComputerId) and the drawn points come from the same
+    // provider result so they can never disagree; the direct lookup only
+    // serves single-source dives, where the provider yields null.
+    final resolvedActive = ref.watch(
+      activeSourceProfileProvider(widget.diveId),
+    );
+    final activeProfile =
+        resolvedActive ??
+        (activeSource == null ? null : sourceProfiles[activeSource.id]);
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -324,9 +330,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     // and photo pins scaled to it drift off the visible span (#1167).
     // activeSourceProfileProvider is the one rule for this, shared with the
     // detail page and the dive-list panel (#543).
-    final chartProfile =
-        ref.watch(activeSourceProfileProvider(widget.diveId))?.points ??
-        dive.profile;
+    final chartProfile = resolvedActive?.points ?? dive.profile;
 
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]

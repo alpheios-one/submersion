@@ -1722,15 +1722,18 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       for (final (index, s) in dataSources.indexed) s.id: sourceColorAt(index),
     };
 
-    // The active source's profile, for attribution (activeComputerId) and
-    // the overlay set below.
-    final activeProfile = activeSource == null
-        ? null
-        : sourceProfiles[activeSource.id];
     // The chart's main series: the active source's own points on a
     // multi-source dive; dive.profile otherwise (identical for the primary).
     // activeSourceProfileProvider is the one rule for this, shared with the
     // dive-list panel and the selected-point lookups further down (#543).
+    // Attribution (activeComputerId) reads the SAME result, so the drawn
+    // points and the computer they are credited to can never disagree; the
+    // direct lookup only serves single-source dives, where the provider
+    // yields null and dive.profile is drawn.
+    final resolvedActive = ref.watch(activeSourceProfileProvider(dive.id));
+    final activeProfile =
+        resolvedActive ??
+        (activeSource == null ? null : sourceProfiles[activeSource.id]);
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -1739,8 +1742,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and a range extent that runs past its end (#1167).
-    final chartProfile =
-        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
+    final chartProfile = resolvedActive?.points ?? dive.profile;
 
     // Keep the playback and range extents on the drawn series.
     //

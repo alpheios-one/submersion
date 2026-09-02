@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -83,6 +84,25 @@ Dive _makeDiveNoProfile({String id = 'dive-no-profile'}) {
     weights: const [],
     tags: const [],
   );
+}
+
+/// Pumps until the rendered [DiveProfileChart] draws [expected], or gives up
+/// after a bounded number of frames so a regression fails on the assertion
+/// that follows rather than hanging. `pumpAndSettle` is not used: the chart
+/// hosts implicit animations that can keep a frame scheduled.
+Future<void> _pumpUntilChartProfile(
+  WidgetTester tester,
+  List<DiveProfilePoint> expected,
+) async {
+  for (var i = 0; i < 20; i++) {
+    await tester.pump(const Duration(milliseconds: 10));
+    final charts = tester.widgetList<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    if (charts.length == 1 && listEquals(charts.single.profile, expected)) {
+      return;
+    }
+  }
 }
 
 Widget _buildPanel({
@@ -907,10 +927,10 @@ void main() {
           ),
         );
         // dive, data sources and source profiles each resolve on their own
-        // tick, and the derived provider rebuilds the panel one frame later.
-        await tester.pump();
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
+        // tick, and the derived provider rebuilds the panel one frame later;
+        // settle on the chart actually showing the resolved series rather
+        // than on an assumed frame count.
+        await _pumpUntilChartProfile(tester, perdix);
 
         final chart = tester.widget<DiveProfileChart>(
           find.byType(DiveProfileChart),
@@ -946,9 +966,7 @@ void main() {
           analysis: _makeAnalysis(),
         ),
       );
-      await tester.pump();
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
+      await _pumpUntilChartProfile(tester, dive.profile);
 
       final chart = tester.widget<DiveProfileChart>(
         find.byType(DiveProfileChart),
