@@ -46,9 +46,10 @@ void main() {
       testApp(
         overrides: [
           ...overrides,
-          // Deterministic gates: not Apple, no Dropbox key.
+          // Deterministic gates: not Apple, no Dropbox key, no Drive.
           isApplePlatformProvider.overrideWithValue(false),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
         ],
         child: Builder(
           builder: (context) {
@@ -83,6 +84,7 @@ void main() {
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
         ],
         child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
       ),
@@ -91,8 +93,62 @@ void main() {
 
     expect(find.text('iCloud'), findsNothing);
     expect(find.text('Dropbox'), findsNothing);
+    expect(find.text('Google Drive'), findsNothing);
     expect(find.text('S3'), findsOneWidget);
     expect(find.text('Not connected'), findsOneWidget);
+  });
+
+  testWidgets('Google Drive card renders when the build supports it', (
+    tester,
+  ) async {
+    // The wizard used to offer only iCloud, Dropbox and S3, so a first-run
+    // user could not pick Google Drive even though Cloud Sync settings has
+    // offered it all along.
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => true),
+        ],
+        child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Google Drive'), findsOneWidget);
+    final tile = tester.widget<ListTile>(
+      find.ancestor(
+        of: find.text('Google Drive'),
+        matching: find.byType(ListTile),
+      ),
+    );
+    expect(tile.onTap, isNotNull);
+  });
+
+  testWidgets('Google Drive card is hidden on a build without OAuth config', (
+    tester,
+  ) async {
+    // Desktop builds without the committed Desktop-app OAuth client cannot
+    // authenticate, so the card is hidden rather than offered and broken --
+    // the same treatment the wizard already gives an unconfigured Dropbox.
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          ...overrides,
+          isApplePlatformProvider.overrideWithValue(false),
+          dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
+        ],
+        child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Google Drive'), findsNothing);
   });
 
   testWidgets('tapping S3 opens the config page via the root navigator', (
@@ -108,6 +164,7 @@ void main() {
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
           // Simulate S3 having been activated on the config page so the
           // post-return handler records it in the draft.
           selectedCloudProviderTypeProvider.overrideWith(
@@ -147,6 +204,7 @@ void main() {
             ...overrides,
             isApplePlatformProvider.overrideWithValue(false),
             dropboxConfiguredProvider.overrideWithValue(false),
+            googleDriveAvailableProvider.overrideWith((ref) async => false),
             selectedCloudProviderTypeProvider.overrideWith((ref) => entry.key),
           ],
           child: const BackupSyncStep(mode: SetupWizardMode.settings),
@@ -174,6 +232,7 @@ void main() {
           ...overrides,
           isApplePlatformProvider.overrideWithValue(false),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
           syncInitializerProvider.overrideWithValue(_FakeSyncInit()),
           syncStateProvider.overrideWith((ref) => _FakeSyncNotifier()),
         ],
@@ -222,6 +281,7 @@ void main() {
             (ref) async => ICloudAvailability.available,
           ),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
         ],
         child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
       ),
@@ -245,6 +305,7 @@ void main() {
             (ref) async => ICloudAvailability.unsupported,
           ),
           dropboxConfiguredProvider.overrideWithValue(false),
+          googleDriveAvailableProvider.overrideWith((ref) async => false),
         ],
         child: const BackupSyncStep(mode: SetupWizardMode.firstRun),
       ),

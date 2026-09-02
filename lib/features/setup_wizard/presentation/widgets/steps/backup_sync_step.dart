@@ -7,6 +7,7 @@ import 'package:submersion/core/services/cloud_storage/icloud_native_service.dar
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/cloud_provider_authenticate.dart';
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/features/setup_wizard/domain/setup_wizard_models.dart';
 import 'package:submersion/features/setup_wizard/presentation/providers/setup_wizard_providers.dart';
@@ -44,10 +45,15 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
         ref.invalidate(dropboxAuthDataProvider);
         if (connected != true) return;
       }
+      if (!mounted) return;
       // Activation contract mirrored from CloudSyncPage._selectProvider.
       ref.read(selectedCloudProviderTypeProvider.notifier).state = type;
       final instance = cloudProviderInstanceFor(type);
-      await instance.authenticate();
+      // Desktop Google Drive authenticates through the system browser, which
+      // can take as long as the user does. The shared helper keeps a
+      // cancellable wait dialog up so the wizard does not sit frozen with no
+      // way out; every other provider and platform authenticates directly.
+      await authenticateWithBrowserWait(context, instance, type);
       await ref.read(syncInitializerProvider).saveProvider(type);
       ref.read(syncStateProvider.notifier).refreshState();
       notifier.setConnectedProvider(type);
@@ -116,6 +122,13 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
     final iCloudAvailable =
         isApple && iCloudAvailability != ICloudAvailability.unsupported;
     final dropboxConfigured = ref.watch(dropboxConfiguredProvider);
+    // Google Drive is offered wherever it can actually authenticate. On a
+    // desktop build without the Desktop-app OAuth client compiled in it is
+    // hidden rather than shown broken, the same treatment an unconfigured
+    // Dropbox already gets. Read through .value so a provider reload does
+    // not flash the card away.
+    final googleDriveAvailable =
+        ref.watch(googleDriveAvailableProvider).value ?? false;
 
     // The draft holds the connected provider in both modes: seeded from the
     // active provider on settings re-entry, set by the connect flow at first
@@ -245,6 +258,15 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
                     l10n.settings_cloudSync_provider_icloud_unsupportedSubtitle,
                   ),
                 ),
+              ),
+            if (googleDriveAvailable)
+              _providerCard(
+                theme: theme,
+                icon: Icons.add_to_drive,
+                name: 'Google Drive',
+                onTap: _connecting
+                    ? null
+                    : () => _connect(CloudProviderType.googledrive),
               ),
             if (dropboxConfigured)
               _providerCard(
