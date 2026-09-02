@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "Nog geen sjablonen. Sla een doelmengsel op om het hier opnieuw te gebruiken.",
   "gasCalculators_blender_templateDelete": "{mix} verwijderen",
   "gasCalculators_blender_templateAdd": "Sjabloon toevoegen",
+  "gasCalculators_blender_templateAdjust": "Waarden aanpassen",
   "gasCalculators_blender_billing": "Kosten",
   "gasCalculators_blender_cylinderVolume": "Waterinhoud van de fles",
   "gasCalculators_blender_cylinderPresets": "Voorinstellingen",

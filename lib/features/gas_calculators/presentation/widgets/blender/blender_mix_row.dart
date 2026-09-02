@@ -13,6 +13,7 @@ class BlenderMixRow extends StatelessWidget {
   const BlenderMixRow({
     super.key,
     this.leading,
+    this.leadingWidth,
     this.pressureController,
     this.onPressure,
     required this.o2Controller,
@@ -26,6 +27,12 @@ class BlenderMixRow extends StatelessWidget {
   static const double _stackBelow = 420;
 
   final String? leading;
+
+  /// A shared width for [leading] across a set of rows, so the O2/He fields
+  /// line up regardless of how long each row's gas name happens to be.
+  /// Natural (text-sized) width when null.
+  final double? leadingWidth;
+
   final TextEditingController? pressureController;
   final ValueChanged<String>? onPressure;
   final TextEditingController o2Controller;
@@ -96,7 +103,10 @@ class BlenderMixRow extends StatelessWidget {
 
   Widget _leadingLabel(BuildContext context) => Padding(
     padding: const EdgeInsets.only(right: 8, bottom: 14),
-    child: Text(leading!, style: Theme.of(context).textTheme.titleSmall),
+    child: SizedBox(
+      width: leadingWidth,
+      child: Text(leading!, style: Theme.of(context).textTheme.titleSmall),
+    ),
   );
 
   Widget _pressureField(BuildContext context) => _field(

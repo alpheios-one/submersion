@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "אין עדיין תבניות. שמור תערובת יעד כדי להשתמש בה כאן שוב.",
   "gasCalculators_blender_templateDelete": "מחק {mix}",
   "gasCalculators_blender_templateAdd": "הוסף תבנית",
+  "gasCalculators_blender_templateAdjust": "התאם ערכים",
   "gasCalculators_blender_billing": "עלות",
   "gasCalculators_blender_cylinderVolume": "נפח המים של הבלון",
   "gasCalculators_blender_cylinderPresets": "הגדרות מוכנות",

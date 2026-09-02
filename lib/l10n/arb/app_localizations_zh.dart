@@ -11758,6 +11758,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => '添加模板';
 
   @override
+  String get gasCalculators_blender_templateAdjust => '调整数值';
+
+  @override
   String get gasCalculators_blender_billing => '费用';
 
   @override

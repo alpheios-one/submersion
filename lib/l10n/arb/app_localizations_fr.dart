@@ -12380,6 +12380,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Ajouter un modèle';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Ajuster les valeurs';
+
+  @override
   String get gasCalculators_blender_billing => 'Coût';
 
   @override

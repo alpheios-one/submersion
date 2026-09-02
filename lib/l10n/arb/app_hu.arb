@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "Még nincs sablon. Ments el egy cél keveréket, hogy itt újra használhasd.",
   "gasCalculators_blender_templateDelete": "{mix} törlése",
   "gasCalculators_blender_templateAdd": "Sablon hozzáadása",
+  "gasCalculators_blender_templateAdjust": "Értékek módosítása",
   "gasCalculators_blender_billing": "Költség",
   "gasCalculators_blender_cylinderVolume": "A palack víztérfogata",
   "gasCalculators_blender_cylinderPresets": "Előbeállítások",

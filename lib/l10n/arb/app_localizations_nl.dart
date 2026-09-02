@@ -12249,6 +12249,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Sjabloon toevoegen';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Waarden aanpassen';
+
+  @override
   String get gasCalculators_blender_billing => 'Kosten';
 
   @override

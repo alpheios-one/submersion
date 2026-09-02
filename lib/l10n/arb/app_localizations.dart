@@ -20900,6 +20900,12 @@ abstract class AppLocalizations {
   /// **'Add template'**
   String get gasCalculators_blender_templateAdd;
 
+  /// No description provided for @gasCalculators_blender_templateAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust values'**
+  String get gasCalculators_blender_templateAdjust;
+
   /// No description provided for @gasCalculators_blender_billing.
   ///
   /// In en, this message translates to:

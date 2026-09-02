@@ -35,6 +35,13 @@ class BlenderFillGasesCard extends ConsumerWidget {
     // currently holds, so it has to rebuild the moment O2 or He changes
     // rather than only on the next mix/save.
     final gases = [for (final p in providers) ref.watch(p)];
+    final labels = [for (final g in gases) formatPreciseGasName(context, g)];
+    // Sized to the widest label of the three: "Helium" would otherwise claim
+    // more of the row than "Air" or "O₂", pushing that row's O2/He fields out
+    // of line with the other two.
+    final leadingWidth = labels
+        .map((l) => _labelWidth(context, l))
+        .reduce((a, b) => a > b ? a : b);
 
     return Card(
       child: Padding(
@@ -47,7 +54,8 @@ class BlenderFillGasesCard extends ConsumerWidget {
               if (i > 0) const SizedBox(height: 12),
               BlenderMixRow(
                 pressureSymbol: units.pressureSymbol,
-                leading: formatPreciseGasName(context, gases[i]),
+                leading: labels[i],
+                leadingWidth: leadingWidth,
                 o2Controller: o2Controllers[i],
                 heController: heControllers[i],
                 // A blank box keeps the value it had. See mixPercentOrKeep.
@@ -72,4 +80,15 @@ class BlenderFillGasesCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The rendered width of [text] in the row's leading-label style, at the
+/// device's current text scale.
+double _labelWidth(BuildContext context, String text) {
+  final painter = TextPainter(
+    text: TextSpan(text: text, style: Theme.of(context).textTheme.titleSmall),
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  )..layout();
+  return painter.width;
 }

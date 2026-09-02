@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "Ainda sem modelos. Guarda uma mistura alvo para a reutilizares aqui.",
   "gasCalculators_blender_templateDelete": "Eliminar {mix}",
   "gasCalculators_blender_templateAdd": "Adicionar modelo",
+  "gasCalculators_blender_templateAdjust": "Ajustar valores",
   "gasCalculators_blender_billing": "Custo",
   "gasCalculators_blender_cylinderVolume": "Volume de água do cilindro",
   "gasCalculators_blender_cylinderPresets": "Predefinições",

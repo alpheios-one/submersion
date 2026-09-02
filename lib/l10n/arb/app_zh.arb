@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "还没有模板。保存一个目标混合气即可在此重复使用。",
   "gasCalculators_blender_templateDelete": "删除 {mix}",
   "gasCalculators_blender_templateAdd": "添加模板",
+  "gasCalculators_blender_templateAdjust": "调整数值",
   "gasCalculators_blender_billing": "费用",
   "gasCalculators_blender_cylinderVolume": "气瓶水容积",
   "gasCalculators_blender_cylinderPresets": "预设",

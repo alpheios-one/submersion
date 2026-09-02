@@ -12342,6 +12342,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Adicionar modelo';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Ajustar valores';
+
+  @override
   String get gasCalculators_blender_billing => 'Custo';
 
   @override

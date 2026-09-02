@@ -7018,6 +7018,7 @@
   "gasCalculators_blender_templateNone": "No templates yet. Save a target mix to reuse it here.",
   "gasCalculators_blender_templateDelete": "Delete {mix}",
   "gasCalculators_blender_templateAdd": "Add template",
+  "gasCalculators_blender_templateAdjust": "Adjust values",
   "gasCalculators_blender_billing": "Cost",
   "gasCalculators_blender_cylinderVolume": "Cylinder water capacity",
   "gasCalculators_blender_cylinderPresets": "Presets",

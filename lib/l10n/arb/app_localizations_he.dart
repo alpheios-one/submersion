@@ -12041,6 +12041,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'הוסף תבנית';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'התאם ערכים';
+
+  @override
   String get gasCalculators_blender_billing => 'עלות';
 
   @override

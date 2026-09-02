@@ -12301,6 +12301,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Sablon hozzáadása';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Értékek módosítása';
+
+  @override
   String get gasCalculators_blender_billing => 'Költség';
 
   @override

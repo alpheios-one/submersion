@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -84,6 +85,29 @@ void main() {
       expect(find.text('1.'), findsNothing);
     },
   );
+
+  testWidgets("the O2/He fields line up regardless of each row's label width", (
+    tester,
+  ) async {
+    // App-test feedback after PR #1359: "Helium" (row 2's default label) is
+    // wider than "O₂" or "Air", and an unconstrained label pushed that
+    // row's fields out of line with the other two.
+    await _pump(tester);
+
+    final o2Fields = find.descendant(
+      of: find.byType(BlenderFillGasesCard),
+      matching: find.byWidgetPredicate(
+        (w) =>
+            w is TextField && (w.decoration?.labelText ?? '').startsWith('O'),
+      ),
+    );
+    expect(o2Fields, findsNWidgets(3));
+    final lefts = [
+      for (var i = 0; i < 3; i++) tester.getTopLeft(o2Fields.at(i)).dx,
+    ];
+
+    expect(lefts.toSet(), hasLength(1));
+  });
 
   testWidgets('a fill-gas label updates as its O2/He fields change', (
     tester,

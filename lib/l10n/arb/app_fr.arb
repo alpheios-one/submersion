@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "Aucun modèle pour l'instant. Enregistrez un mélange cible pour le réutiliser ici.",
   "gasCalculators_blender_templateDelete": "Supprimer {mix}",
   "gasCalculators_blender_templateAdd": "Ajouter un modèle",
+  "gasCalculators_blender_templateAdjust": "Ajuster les valeurs",
   "gasCalculators_blender_billing": "Coût",
   "gasCalculators_blender_cylinderVolume": "Volume d'eau du bloc",
   "gasCalculators_blender_cylinderPresets": "Préréglages",

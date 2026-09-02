@@ -12121,6 +12121,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'إضافة قالب';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'ضبط القيم';
+
+  @override
   String get gasCalculators_blender_billing => 'التكلفة';
 
   @override

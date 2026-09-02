@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "Noch keine Vorlagen. Speichere eine Zielmischung, um sie hier wiederzuverwenden.",
   "gasCalculators_blender_templateDelete": "{mix} löschen",
   "gasCalculators_blender_templateAdd": "Vorlage hinzufügen",
+  "gasCalculators_blender_templateAdjust": "Werte anpassen",
   "gasCalculators_blender_billing": "Kosten",
   "gasCalculators_blender_cylinderVolume": "Wasservolumen der Flasche",
   "gasCalculators_blender_cylinderPresets": "Voreinstellungen",

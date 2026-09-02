@@ -80,6 +80,7 @@
   "gasCalculators_blender_templateNone": "لا توجد قوالب بعد. احفظ خليطًا مستهدفًا لإعادة استخدامه هنا.",
   "gasCalculators_blender_templateDelete": "حذف {mix}",
   "gasCalculators_blender_templateAdd": "إضافة قالب",
+  "gasCalculators_blender_templateAdjust": "ضبط القيم",
   "gasCalculators_blender_billing": "التكلفة",
   "gasCalculators_blender_cylinderVolume": "السعة المائية للأسطوانة",
   "gasCalculators_blender_cylinderPresets": "الإعدادات المسبقة",
