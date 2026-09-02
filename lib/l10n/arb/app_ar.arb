@@ -10291,6 +10291,8 @@
   "settings_cloudSync_progress_pulling": "جارٍ سحب التغييرات...",
   "settings_cloudSync_progress_publishing": "جارٍ نشر التغييرات...",
   "settings_cloudSync_progress_uploadingLibrary": "جارٍ رفع المكتبة ({uploaded} من {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "جارٍ تنزيل المكتبة ({downloaded} من {total})",
+  "settings_cloudSync_progress_importingLibrary": "جارٍ استيراد المكتبة ({percent}%)",
   "settings_cloudSync_result_noProvider": "لم يتم إعداد أي مزود تخزين سحابي",
   "settings_cloudSync_result_notAuthenticated": "لم تتم المصادقة مع مزود التخزين السحابي",
   "settings_cloudSync_result_timedOut": "انتهت مهلة المزامنة",

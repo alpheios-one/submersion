@@ -10291,6 +10291,8 @@
   "settings_cloudSync_progress_pulling": "Recupero delle modifiche...",
   "settings_cloudSync_progress_publishing": "Pubblicazione delle modifiche...",
   "settings_cloudSync_progress_uploadingLibrary": "Caricamento della libreria ({uploaded} di {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Download della libreria ({downloaded} di {total})",
+  "settings_cloudSync_progress_importingLibrary": "Importazione della libreria ({percent}%)",
   "settings_cloudSync_result_noProvider": "Nessun provider cloud configurato",
   "settings_cloudSync_result_notAuthenticated": "Non autenticato con il provider cloud",
   "settings_cloudSync_result_timedOut": "Sincronizzazione scaduta per timeout",

@@ -21114,6 +21114,8 @@
   "settings_cloudSync_progress_pulling": "Pulling changes...",
   "settings_cloudSync_progress_publishing": "Publishing changes...",
   "settings_cloudSync_progress_uploadingLibrary": "Uploading library ({uploaded} of {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Downloading library ({downloaded} of {total})",
+  "settings_cloudSync_progress_importingLibrary": "Importing library ({percent}%)",
   "settings_cloudSync_result_noProvider": "No cloud provider configured",
   "settings_cloudSync_result_notAuthenticated": "Not authenticated with cloud provider",
   "settings_cloudSync_result_timedOut": "Sync timed out",
@@ -21309,6 +21311,23 @@
         "type": "int"
       },
       "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_progress_downloadingLibrary": {
+    "placeholders": {
+      "downloaded": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_progress_importingLibrary": {
+    "placeholders": {
+      "percent": {
         "type": "int"
       }
     }

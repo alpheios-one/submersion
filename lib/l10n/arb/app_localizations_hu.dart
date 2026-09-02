@@ -35062,6 +35062,19 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Könyvtár letöltése ($downloaded / $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Könyvtár importálása ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'Nincs beállítva felhőszolgáltató';
 
