@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -11,25 +10,8 @@ import 'package:submersion/features/media/presentation/widgets/unavailable_media
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../support/capturing_media_repository.dart';
 import '../support/media_widget_harness.dart';
-
-/// Records markVerified calls and refuses every other member, so a write the
-/// tile was not supposed to cause shows up as a failure rather than as a
-/// silently accepted no-op.
-class _CapturingRepository implements MediaRepository {
-  final List<({String id, bool isOrphaned})> writes = [];
-
-  @override
-  Future<void> markVerified(
-    String id, {
-    required bool isOrphaned,
-    required DateTime verifiedAt,
-  }) async => writes.add((id: id, isOrphaned: isOrphaned));
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not stubbed');
-}
 
 void main() {
   testWidgets('MediaEmptyState renders icon and message', (tester) async {
@@ -93,14 +75,20 @@ void main() {
       // chain (origin, then media store) try anyway, so a photo the flag
       // calls missing draws its thumbnail whenever anything can serve it
       // (#1409).
-      final repository = _CapturingRepository();
+      final repository = CapturingMediaRepository();
       await pumpTile(
         tester,
         item: testMediaItem(isOrphaned: true),
         overrides: [mediaRepositoryProvider.overrideWithValue(repository)],
       );
       expect(find.byType(MediaItemView), findsOneWidget);
-      expect(find.byType(Image), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(MediaItemView),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
       // Bytes came from the row's own source, so the stale flag is corrected
       // in place instead of staying red until the viewer happens to open.

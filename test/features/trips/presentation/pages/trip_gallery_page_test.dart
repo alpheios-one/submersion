@@ -6,32 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
-import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/unavailable_media_placeholder.dart';
 import 'package:submersion/features/trips/presentation/pages/trip_gallery_page.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_media_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
+import '../../../media/presentation/support/capturing_media_repository.dart';
 import '../../../media/presentation/support/media_widget_harness.dart';
-
-/// Records markVerified calls and refuses every other member.
-class _CapturingRepository implements MediaRepository {
-  final List<({String id, bool isOrphaned})> writes = [];
-
-  @override
-  Future<void> markVerified(
-    String id, {
-    required bool isOrphaned,
-    required DateTime verifiedAt,
-  }) async => writes.add((id: id, isOrphaned: isOrphaned));
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not stubbed');
-}
 
 void main() {
   group('TripGalleryPage', () {
@@ -368,7 +355,7 @@ void main() {
         updatedAt: DateTime(2024, 1, 15),
       );
 
-      final repository = _CapturingRepository();
+      final repository = CapturingMediaRepository();
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -391,20 +378,89 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(MediaItemView), findsOneWidget);
-      expect(find.byType(Image), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(MediaItemView),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
       expect(find.byIcon(Icons.broken_image_outlined), findsNothing);
       // The label must not read the stale flag either: a screen reader
       // should never hear "missing" over a thumbnail that just rendered.
+      final l10n = tester.element(find.byType(TripGalleryPage)).l10n;
       expect(
         find.byWidgetPredicate(
           (w) =>
               w is Semantics &&
-              w.properties.label == 'Photo thumbnail. Tap to view full screen',
+              w.properties.label == l10n.trips_gallery_thumbnail_photo,
         ),
         findsOneWidget,
       );
       // The resolver produced bytes, so the stale flag is corrected.
       expect(repository.writes, [(id: 'media-orphan', isOrphaned: false)]);
+    });
+
+    testWidgets('an item nothing can serve announces the missing reason', (
+      tester,
+    ) async {
+      // The tile's own label is availability-agnostic, so the placeholder
+      // has to be what tells a screen reader the photo is not here.
+      final testDive = Dive(
+        id: 'dive-1',
+        dateTime: DateTime(2024, 1, 15, 10, 30),
+        diveNumber: 1,
+      );
+
+      final missingMedia = MediaItem(
+        id: 'media-missing',
+        diveId: 'dive-1',
+        mediaType: MediaType.photo,
+        takenAt: DateTime(2024, 1, 15, 10, 45),
+        platformAssetId: 'asset-missing',
+        isOrphaned: true,
+        createdAt: DateTime(2024, 1, 15),
+        updatedAt: DateTime(2024, 1, 15),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mediaForTripProvider('test-trip').overrideWith((ref) {
+              return Future.value({
+                testDive: [missingMedia],
+              });
+            }),
+            mediaResolverOverride(
+              resolverData: const UnavailableData(
+                kind: UnavailableKind.notFound,
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripGalleryPage(tripId: 'test-trip'),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final l10n = tester.element(find.byType(TripGalleryPage)).l10n;
+      expect(find.byType(UnavailableMediaPlaceholder), findsOneWidget);
+      expect(
+        find.text(l10n.media_unavailablePlaceholder_fileNotFound),
+        findsOneWidget,
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Semantics &&
+              w.properties.label == l10n.trips_gallery_thumbnail_photo,
+        ),
+        findsOneWidget,
+      );
     });
   });
 }
