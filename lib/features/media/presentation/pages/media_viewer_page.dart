@@ -16,6 +16,7 @@ import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/services/lightroom/lightroom_api_client.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
@@ -396,8 +397,14 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             final activeProfile = activeSource == null
                 ? null
                 : sourceProfiles[activeSource.id];
-            final perdixProfile =
-                (dataSources.length >= 2 && activeProfile != null)
+            // Sources that never overlap in time are consecutive halves of
+            // one dive a Combine stitched together, not alternative
+            // recordings of it: the face reads the whole dive, not the
+            // active half (#1451). Mirrors the detail and fullscreen pages.
+            final isMultiSource =
+                dataSources.length >= 2 &&
+                !sourceProfilesAreSequential(sourceProfiles.values);
+            final perdixProfile = (isMultiSource && activeProfile != null)
                 ? activeProfile.points
                 : dive?.profile ?? const [];
             // Rebuilt only on page-level setState (page swipes, toggles),

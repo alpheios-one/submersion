@@ -1703,7 +1703,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ref.watch(diveDataSourcesProvider(dive.id)).valueOrNull ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
-    final isMultiSource = dataSources.length >= 2;
+    // Per-source rendering exists because two computers recording one dive
+    // disagree sample by sample (#543). Sources that never overlap in time
+    // are the halves of a split dive a Combine stitched together, and
+    // drawing one of those means hiding the rest of the dive (#1451), so
+    // they get the ordinary single-series treatment instead. Profiles that
+    // have not loaded yet carry no spans, so the sequential test answers
+    // false and the first build behaves exactly as it does today.
+    final isMultiSource =
+        dataSources.length >= 2 &&
+        !sourceProfilesAreSequential(sourceProfiles.values);
 
     final activeSourceId = ref.watch(activeDiveSourceProvider(dive.id));
     final overlayIds = ref.watch(overlaySourcesProvider(dive.id));

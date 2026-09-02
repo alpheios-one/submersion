@@ -239,6 +239,33 @@ class DiveMergeService {
       // series row's sourceId closes that gap (#1149): each carried row keeps
       // its own id here and the copied samples point at it, so the strands
       // stay separable without a lossy write.
+
+      // Each carried row's slot among its OWN segment's sources (#1451).
+      // Read-side canonicalization collapses rows sharing a slot into one
+      // display source, so the two halves of one physical dive stop being
+      // offered as switchable alternatives -- the state that made the chart
+      // draw only the active half. Ordered like every canonical read
+      // (primary first, then oldest), so a consolidated segment's primary
+      // computer always takes slot 0 and its folded-in computer slot 1, and
+      // the two segments' strands line up rather than crossing over.
+      //
+      // Overwrites any slot the row already carried: combining a dive that
+      // was itself combined re-slots every row against THIS merge, which is
+      // what keeps the result one dive rather than a growing chip per merge.
+      final mergeSlotByRowId = <String, int>{};
+      for (final segment
+          in snapshot.dataSourceRows.map((r) => r.diveId).toSet()) {
+        final rows =
+            snapshot.dataSourceRows.where((r) => r.diveId == segment).toList()
+              ..sort((a, b) {
+                if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
+                final byCreated = a.createdAt.compareTo(b.createdAt);
+                return byCreated != 0 ? byCreated : a.id.compareTo(b.id);
+              });
+        for (final (slot, row) in rows.indexed) {
+          mergeSlotByRowId[row.id] = slot;
+        }
+      }
       for (final row in snapshot.dataSourceRows) {
         await _db
             .into(_db.diveDataSources)
@@ -249,6 +276,7 @@ class DiveMergeService {
                     id: Value(mergedSourceIds[row.id]!),
                     diveId: Value(mergedId),
                     isPrimary: const Value(false),
+                    mergeSourceSlot: Value(mergeSlotByRowId[row.id]),
                   ),
             );
       }

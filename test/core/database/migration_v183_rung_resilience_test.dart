@@ -44,7 +44,10 @@ void main() {
         addTearDown(db.close);
 
         await expectLater(db.customSelect('SELECT 1').get(), completes);
-        expect(scalar(raw, 'PRAGMA user_version'), 183);
+        expect(
+          scalar(raw, 'PRAGMA user_version'),
+          AppDatabase.currentSchemaVersion,
+        );
         // The pack itself ran, so no samples are stranded by the failure.
         expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profile_series'), 4);
       },
