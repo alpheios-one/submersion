@@ -13676,10 +13676,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tauchdaten in Foto geschrieben';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Tauchdaten in Video geschrieben';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Fehler beim Laden der Fotos: $error';
   }
@@ -13871,6 +13867,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => 'Tauchdaten in Foto schreiben';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'Tauchdaten können nur in Fotos geschrieben werden, nicht in Videos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

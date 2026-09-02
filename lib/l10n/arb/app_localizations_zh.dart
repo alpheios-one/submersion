@@ -13034,9 +13034,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_photoViewer_diveDataWrittenToPhoto => '潜水数据已写入照片';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo => '潜水数据已写入视频';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return '加载照片出错：$error';
   }
@@ -13215,6 +13212,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => '写入潜水数据到照片';
+
+  @override
+  String get media_writeMetadata_videoUnsupported => '潜水数据只能写入照片，不能写入视频。';
 
   @override
   String get media_writeMetadata_warningPhotoText => '这将修改原始照片。';

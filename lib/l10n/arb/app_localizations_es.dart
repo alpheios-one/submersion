@@ -13676,10 +13676,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Datos de inmersion escritos en la foto';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Datos de inmersion escritos en el video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Error al cargar fotos: $error';
   }
@@ -13872,6 +13868,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get media_writeMetadata_titlePhoto =>
       'Escribir datos de inmersion en la foto';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'Los datos de buceo solo se pueden escribir en fotos, no en vídeos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

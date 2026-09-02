@@ -13463,10 +13463,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Dive data written to photo';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Dive data written to video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Error loading photos: $error';
   }
@@ -13650,6 +13646,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => 'Write Dive Data to Photo';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'Dive data can only be written to photos, not videos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

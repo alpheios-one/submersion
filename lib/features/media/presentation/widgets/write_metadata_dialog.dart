@@ -11,7 +11,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Shows a preview of the metadata that will be written and warns about the
 /// modification. Videos are not offered: writing to one meant replacing the
 /// asset and deleting the original, which Submersion never does (issue #1472).
-class WriteMetadataDialog extends StatefulWidget {
+class WriteMetadataDialog extends StatelessWidget {
   final MediaItem item;
   final AppSettings settings;
   final String? siteName;
@@ -24,21 +24,13 @@ class WriteMetadataDialog extends StatefulWidget {
   });
 
   @override
-  State<WriteMetadataDialog> createState() => _WriteMetadataDialogState();
-}
-
-class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
-  @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final enrichment = widget.item.enrichment;
-    final formatter = UnitFormatter(widget.settings);
+    final enrichment = item.enrichment;
+    final formatter = UnitFormatter(settings);
 
-    final metadata = DiveMediaMetadata.fromMediaItem(
-      widget.item,
-      siteName: widget.siteName,
-    );
+    final metadata = DiveMediaMetadata.fromMediaItem(item, siteName: siteName);
 
     return AlertDialog(
       title: Text(context.l10n.media_writeMetadata_titlePhoto),
@@ -87,15 +79,14 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
                   ],
 
                   // GPS
-                  if (widget.item.latitude != null &&
-                      widget.item.longitude != null) ...[
+                  if (item.latitude != null && item.longitude != null) ...[
                     const SizedBox(height: 8),
                     _MetadataRow(
                       icon: Icons.location_on,
                       label: context.l10n.media_writeMetadata_gpsLabel,
                       value: formatter.formatCoordinates(
-                        widget.item.latitude,
-                        widget.item.longitude,
+                        item.latitude,
+                        item.longitude,
                       ),
                     ),
                   ],
@@ -111,13 +102,12 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
                   ],
 
                   // Site name
-                  if (widget.siteName != null &&
-                      widget.siteName!.isNotEmpty) ...[
+                  if (siteName != null && siteName!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _MetadataRow(
                       icon: Icons.place,
                       label: context.l10n.media_writeMetadata_siteLabel,
-                      value: widget.siteName!,
+                      value: siteName!,
                     ),
                   ],
 
@@ -139,7 +129,7 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
 
             const SizedBox(height: 16),
 
-            _buildWarningSection(colorScheme, textTheme),
+            _buildWarningSection(context, colorScheme, textTheme),
           ],
         ),
       ),
@@ -158,7 +148,11 @@ class _WriteMetadataDialogState extends State<WriteMetadataDialog> {
     );
   }
 
-  Widget _buildWarningSection(ColorScheme colorScheme, TextTheme textTheme) {
+  Widget _buildWarningSection(
+    BuildContext context,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(

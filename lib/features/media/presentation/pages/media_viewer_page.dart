@@ -743,11 +743,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       debugPrint('[MediaViewerPage] About to show success/error message...');
       if (success) {
         debugPrint('[MediaViewerPage] Calling _showSuccess...');
-        _showSuccess(
-          isVideo
-              ? l10n.media_photoViewer_diveDataWrittenToVideo
-              : l10n.media_photoViewer_diveDataWrittenToPhoto,
-        );
+        // Only photos get here: the service refuses a video before the
+        // platform channel.
+        _showSuccess(l10n.media_photoViewer_diveDataWrittenToPhoto);
         debugPrint('[MediaViewerPage] _showSuccess completed');
 
         // Invalidate the image cache so the photo reloads with updated metadata
@@ -764,11 +762,13 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       dismissLoadingDialog();
       // The service's messages are English-only; substitute a translation for
       // the codes we have one for and fall back to its text otherwise.
-      _showError(
-        e.code == metadataWriteLivePhotoUnsupportedCode
-            ? l10n.media_writeMetadata_livePhotoUnsupported
-            : e.message,
-      );
+      _showError(switch (e.code) {
+        metadataWriteLivePhotoUnsupportedCode =>
+          l10n.media_writeMetadata_livePhotoUnsupported,
+        metadataWriteVideoUnsupportedCode =>
+          l10n.media_writeMetadata_videoUnsupported,
+        _ => e.message,
+      });
     } catch (e) {
       debugPrint('[MediaViewerPage] Exception: $e');
       dismissLoadingDialog();

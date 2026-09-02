@@ -13586,10 +13586,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Duikgegevens naar foto geschreven';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Duikgegevens naar video geschreven';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Fout bij laden van foto\'s: $error';
   }
@@ -13779,6 +13775,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get media_writeMetadata_titlePhoto =>
       'Duikgegevens naar foto schrijven';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'Duikgegevens kunnen alleen naar foto\'s worden geschreven, niet naar video\'s.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

@@ -7837,7 +7837,6 @@
   "media_photoViewer_cannotWriteMetadata": "Cannot write metadata - media not linked to library",
   "media_photoViewer_closeTooltip": "Close photo viewer",
   "media_photoViewer_diveDataWrittenToPhoto": "Dive data written to photo",
-  "media_photoViewer_diveDataWrittenToVideo": "Dive data written to video",
   "media_photoViewer_errorLoadingPhotos": "Error loading photos: {error}",
   "media_photoViewer_failedToLoadImage": "Failed to load image",
   "media_photoViewer_failedToLoadVideo": "Failed to load video",
@@ -7890,6 +7889,7 @@
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",
   "media_writeMetadata_titlePhoto": "Write Dive Data to Photo",
+  "media_writeMetadata_videoUnsupported": "Dive data can only be written to photos, not videos.",
   "media_writeMetadata_warningPhotoText": "This will modify the original photo.",
   "media_writeMetadata_writeButton": "Write",
   "@media_diveMediaSection_selectedCount": {

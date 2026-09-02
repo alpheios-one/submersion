@@ -13438,10 +13438,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'تمت كتابة بيانات الغوصة على الصورة';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'تمت كتابة بيانات الغوصة على الفيديو';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'خطأ في تحميل الصور: $error';
   }
@@ -13626,6 +13622,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => 'كتابة بيانات الغوصة على الصورة';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'لا يمكن كتابة بيانات الغوص إلا في الصور، وليس في مقاطع الفيديو.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

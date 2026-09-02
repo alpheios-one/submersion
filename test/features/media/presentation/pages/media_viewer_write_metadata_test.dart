@@ -263,4 +263,27 @@ void main() {
     expect(find.textContaining('Live Photos'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
   }, skip: !_metadataWriteSupported);
+
+  testWidgets('a native video refusal is translated, not shown raw', (
+    tester,
+  ) async {
+    // Reachable when an item stored as a photo turns out to be a video in the
+    // library: the native handlers check the real media type, not the flag
+    // Dart sent, so the refusal can arrive even though the action is hidden
+    // for anything already known to be a video (issue #1472).
+    handler = (_) async => throw PlatformException(
+      code: metadataWriteVideoUnsupportedCode,
+      message: 'Writing metadata to a video is not supported.',
+    );
+    await pump(tester, item());
+    await openDialog(tester);
+    await confirmWrite(tester);
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(
+      find.text('Dive data can only be written to photos, not videos.'),
+      findsOneWidget,
+    );
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  }, skip: !_metadataWriteSupported);
 }

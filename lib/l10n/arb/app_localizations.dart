@@ -22766,12 +22766,6 @@ abstract class AppLocalizations {
   /// **'Dive data written to photo'**
   String get media_photoViewer_diveDataWrittenToPhoto;
 
-  /// No description provided for @media_photoViewer_diveDataWrittenToVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive data written to video'**
-  String get media_photoViewer_diveDataWrittenToVideo;
-
   /// No description provided for @media_photoViewer_errorLoadingPhotos.
   ///
   /// In en, this message translates to:
@@ -23083,6 +23077,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Write Dive Data to Photo'**
   String get media_writeMetadata_titlePhoto;
+
+  /// No description provided for @media_writeMetadata_videoUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive data can only be written to photos, not videos.'**
+  String get media_writeMetadata_videoUnsupported;
 
   /// No description provided for @media_writeMetadata_warningPhotoText.
   ///

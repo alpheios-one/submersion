@@ -13346,10 +13346,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'נתוני צלילה נכתבו לתמונה';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'נתוני צלילה נכתבו לסרטון';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'שגיאה בטעינת תמונות: $error';
   }
@@ -13533,6 +13529,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => 'כתוב נתוני צלילה לתמונה';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      '‏ניתן לכתוב נתוני צלילה רק לתמונות, לא לסרטונים.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

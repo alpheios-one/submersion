@@ -13689,10 +13689,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Dados do mergulho gravados na foto';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Dados do mergulho gravados no video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Erro ao carregar fotos: $error';
   }
@@ -13885,6 +13881,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get media_writeMetadata_titlePhoto =>
       'Gravar Dados do Mergulho na Foto';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'Os dados do mergulho só podem ser escritos em fotografias, não em vídeos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>

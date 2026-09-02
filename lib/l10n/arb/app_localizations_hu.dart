@@ -13639,10 +13639,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Merülesi adatok irva a fotora';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Merülesi adatok irva a videora';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Hiba a fotok betoltesekor: $error';
   }
@@ -13834,6 +13830,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_writeMetadata_titlePhoto => 'Merülesi adatok irasa a fotora';
+
+  @override
+  String get media_writeMetadata_videoUnsupported =>
+      'A merülési adatok csak fényképekbe írhatók, videókba nem.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
