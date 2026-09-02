@@ -41,6 +41,7 @@ import 'package:submersion/features/universal_import/data/services/shearwater_db
 import 'package:submersion/features/universal_import/data/services/surfacing_pressure_normalizer.dart';
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
+import 'package:submersion/features/universal_import/domain/services/bundled_photo_exporter.dart';
 import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
 import 'package:submersion/core/services/files/picked_file_materializer.dart';
@@ -442,8 +443,17 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
   /// Records where photos bundled in an imported archive should be saved.
   /// They are written there at import time and linked in place.
-  void chooseBundledPhotoFolder(String path) {
+  ///
+  /// Returns false, recording nothing, when the folder cannot be written
+  /// to, so the user hears about a read-only pick now rather than finding
+  /// the photos missing after the import.
+  bool chooseBundledPhotoFolder(String path) {
+    if (!folderAcceptsWrites(path)) {
+      _log.warning('Bundled photo folder is not writable: $path');
+      return false;
+    }
     state = state.copyWith(bundledPhotoFolderPath: path, photosSkipped: false);
+    return true;
   }
 
   /// Proceeds without photos: neither the logbook's referenced photos nor

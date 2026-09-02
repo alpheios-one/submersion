@@ -37,6 +37,28 @@ Future<String> exportBundledPhoto({
   return copied.path;
 }
 
+/// Whether photos can actually be written under [dir]: the folder is
+/// created if needed and a probe file is written and removed. Synchronous
+/// so a picker callback can refuse a read-only choice on the spot instead
+/// of letting every export fail after the import has already run.
+bool folderAcceptsWrites(String dir) {
+  try {
+    final directory = Directory(dir);
+    directory.createSync(recursive: true);
+    final probe = File(
+      p.join(
+        dir,
+        '.submersion_write_probe_${DateTime.now().microsecondsSinceEpoch}',
+      ),
+    );
+    probe.writeAsBytesSync(const [0]);
+    probe.deleteSync();
+    return true;
+  } on FileSystemException {
+    return false;
+  }
+}
+
 /// Compares two files in fixed-size chunks so memory stays bounded no
 /// matter how large the photo is.
 Future<bool> _sameBytes(File a, File b) async {

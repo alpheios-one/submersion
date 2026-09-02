@@ -5578,6 +5578,7 @@
   "importWizard_photos_bundledCount": "{count, plural, one{1 fotó az archívumban} other{{count} fotó az archívumban}}",
   "importWizard_photos_chooseDestination": "Válassza ki, hová mentse a fotókat...",
   "importWizard_photos_destinationNote": "A fotók ebbe a mappába kerülnek, és onnan lesznek hivatkozva. A Submersion soha nem tart saját másolatot.",
+  "importWizard_photos_destinationUnwritable": "Ebbe a mappába nem lehet írni. Válasszon másikat.",
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 régebbi merülés kihagyva — már szerepel a naplódban} other{{count} régebbi merülés kihagyva — már szerepel a naplódban}}",
   "tags_hint_addTags": "Címkék hozzáadása...",
   "tags_manage_bulkDeleteMessage": "Ezek a címkék eltávolításra kerülnek összesen {diveCount, plural, =0{0 merülésből} =1{1 merülésből} other{{diveCount} merülésből}}. Ez nem vonható vissza.",

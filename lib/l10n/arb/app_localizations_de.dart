@@ -19145,6 +19145,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Fotos werden in diesem Ordner gespeichert und von dort verknüpft. Submersion behält keine eigene Kopie.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'In diesen Ordner kann nicht geschrieben werden. Wählen Sie einen anderen.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

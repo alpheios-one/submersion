@@ -5651,6 +5651,7 @@
   "importWizard_photos_bundledCount": "{count, plural, one{1 foto incluida en el archivo} other{{count} fotos incluidas en el archivo}}",
   "importWizard_photos_chooseDestination": "Elegir dónde guardar las fotos...",
   "importWizard_photos_destinationNote": "Las fotos se guardan en esta carpeta y se enlazan desde allí. Submersion nunca conserva una copia propia.",
+  "importWizard_photos_destinationUnwritable": "No se puede escribir en esa carpeta. Elige otra.",
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 inmersión antigua omitida — ya está en tu registro} other{{count} inmersiones antiguas omitidas — ya están en tu registro}}",
   "tags_hint_addTags": "Agregar etiquetas...",
   "tags_manage_bulkDeleteMessage": "Estas etiquetas se eliminaran de {diveCount, plural, =0{0 inmersiones} =1{1 inmersion} other{{diveCount} inmersiones}} en total. Esta accion no se puede deshacer.",

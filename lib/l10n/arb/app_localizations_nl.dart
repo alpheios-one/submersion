@@ -19028,6 +19028,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'De foto\'s worden in deze map opgeslagen en van daaruit gekoppeld. Submersion bewaart nooit een eigen kopie.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'In die map kan niet worden geschreven. Kies een andere.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

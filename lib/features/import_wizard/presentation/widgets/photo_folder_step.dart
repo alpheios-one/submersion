@@ -59,14 +59,22 @@ class PhotoFolderStep extends ConsumerWidget {
         .resolvePhotosIn(path);
   }
 
-  Future<void> _pickDestination(WidgetRef ref) async {
+  Future<void> _pickDestination(BuildContext context, WidgetRef ref) async {
     final path =
         await (pickDestinationOverride?.call() ??
             FilePicker.getDirectoryPath());
     if (path == null) return;
-    ref
+    final accepted = ref
         .read(universalImportNotifierProvider.notifier)
         .chooseBundledPhotoFolder(path);
+    if (accepted || !context.mounted) return;
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.importWizard_photos_destinationUnwritable),
+        ),
+      );
   }
 
   @override
@@ -141,7 +149,7 @@ class PhotoFolderStep extends ConsumerWidget {
               Text(l10n.importWizard_photos_mobileUnsupported)
             else if (_canPickFolder) ...[
               FilledButton.icon(
-                onPressed: () => _pickDestination(ref),
+                onPressed: () => _pickDestination(context, ref),
                 icon: const Icon(Icons.drive_folder_upload_outlined),
                 label: Text(l10n.importWizard_photos_chooseDestination),
               ),

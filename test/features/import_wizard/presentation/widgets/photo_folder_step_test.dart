@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
@@ -217,25 +219,23 @@ void main() {
   });
 
   testWidgets('picking a destination records it on the state', (tester) async {
+    final dest = Directory.systemTemp.createTempSync('photo_step_dest_');
+    addTearDown(() => dest.deleteSync(recursive: true));
     await withPlatform(TargetPlatform.macOS, () async {
       seedBundled(1);
 
       await tester.pumpWidget(
-        host(
-          PhotoFolderStep(
-            pickDestinationOverride: () async => '/Users/eric/Pictures/Dives',
-          ),
-        ),
+        host(PhotoFolderStep(pickDestinationOverride: () async => dest.path)),
       );
       await tester.pump();
 
       await tester.tap(find.text('Choose where to save photos...'));
       await tester.pump();
 
-      expect(find.text('/Users/eric/Pictures/Dives'), findsOneWidget);
+      expect(find.text(dest.path), findsOneWidget);
       expect(
         container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
-        '/Users/eric/Pictures/Dives',
+        dest.path,
       );
     });
   });
@@ -243,9 +243,8 @@ void main() {
   testWidgets('skipping clears a chosen destination', (tester) async {
     await withPlatform(TargetPlatform.macOS, () async {
       seedBundled(1);
-      container
-          .read(universalImportNotifierProvider.notifier)
-          .chooseBundledPhotoFolder('/x');
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(bundledPhotoFolderPath: '/x');
 
       await tester.pumpWidget(host(const PhotoFolderStep()));
       await tester.pump();
@@ -290,6 +289,42 @@ void main() {
 
       expect(find.text('Scanning folder...'), findsOneWidget);
       expect(find.text('Choose photo folder...'), findsNothing);
+    });
+  });
+
+  testWidgets('a read-only destination is refused with a message', (
+    tester,
+  ) async {
+    if (Platform.isWindows) {
+      markTestSkipped('POSIX permission bits are not honoured on Windows');
+      return;
+    }
+    final dest = Directory.systemTemp.createTempSync('photo_step_ro_');
+    Process.runSync('chmod', ['000', dest.path]);
+    addTearDown(() {
+      Process.runSync('chmod', ['755', dest.path]);
+      dest.deleteSync(recursive: true);
+    });
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(1);
+
+      await tester.pumpWidget(
+        host(PhotoFolderStep(pickDestinationOverride: () async => dest.path)),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Choose where to save photos...'));
+      await tester.pump();
+
+      final state = container.read(universalImportNotifierProvider);
+      if (state.bundledPhotoFolderPath != null) {
+        markTestSkipped('running with permissions that bypass chmod');
+        return;
+      }
+      expect(
+        find.text("That folder can't be written to. Choose another one."),
+        findsOneWidget,
+      );
     });
   });
 }

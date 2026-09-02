@@ -5651,6 +5651,7 @@
   "importWizard_photos_bundledCount": "{count, plural, one{1 Foto im Archiv enthalten} other{{count} Fotos im Archiv enthalten}}",
   "importWizard_photos_chooseDestination": "Speicherort für Fotos wählen...",
   "importWizard_photos_destinationNote": "Die Fotos werden in diesem Ordner gespeichert und von dort verknüpft. Submersion behält keine eigene Kopie.",
+  "importWizard_photos_destinationUnwritable": "In diesen Ordner kann nicht geschrieben werden. Wählen Sie einen anderen.",
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 älterer Tauchgang übersprungen — bereits in deinem Logbuch} other{{count} ältere Tauchgänge übersprungen — bereits in deinem Logbuch}}",
   "tags_hint_addTags": "Tags hinzufügen...",
   "tags_manage_bulkDeleteMessage": "Diese Tags werden von insgesamt {diveCount, plural, =0{0 Tauchgängen} =1{1 Tauchgang} other{{diveCount} Tauchgängen}} entfernt. Dies kann nicht rückgängig gemacht werden.",

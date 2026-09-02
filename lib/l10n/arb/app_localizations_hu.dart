@@ -19125,6 +19125,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fotók ebbe a mappába kerülnek, és onnan lesznek hivatkozva. A Submersion soha nem tart saját másolatot.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Ebbe a mappába nem lehet írni. Válasszon másikat.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

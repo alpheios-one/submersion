@@ -19265,6 +19265,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les photos sont enregistrées dans ce dossier et liées depuis celui-ci. Submersion n\'en conserve jamais de copie.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Impossible d\'écrire dans ce dossier. Choisissez-en un autre.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

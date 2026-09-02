@@ -5651,6 +5651,7 @@
   "importWizard_photos_bundledCount": "{count, plural, one{1 foto in het archief} other{{count} foto's in het archief}}",
   "importWizard_photos_chooseDestination": "Kies waar de foto's worden opgeslagen...",
   "importWizard_photos_destinationNote": "De foto's worden in deze map opgeslagen en van daaruit gekoppeld. Submersion bewaart nooit een eigen kopie.",
+  "importWizard_photos_destinationUnwritable": "In die map kan niet worden geschreven. Kies een andere.",
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 oudere duik overgeslagen — al in je logboek} other{{count} oudere duiken overgeslagen — al in je logboek}}",
   "tags_hint_addTags": "Tags toevoegen...",
   "tags_manage_bulkDeleteMessage": "Deze tags worden verwijderd van in totaal {diveCount, plural, =0{0 duiken} =1{1 duik} other{{diveCount} duiken}}. Dit kan niet ongedaan worden gemaakt.",

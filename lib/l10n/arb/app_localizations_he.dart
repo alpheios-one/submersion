@@ -18689,6 +18689,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'התמונות נשמרות בתיקייה זו ומקושרות משם. Submersion לעולם אינו שומר עותק משלו.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'לא ניתן לכתוב לתיקייה זו. בחרו תיקייה אחרת.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

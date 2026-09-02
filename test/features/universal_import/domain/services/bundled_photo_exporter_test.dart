@@ -103,4 +103,28 @@ void main() {
       expect(dest.listSync().length, 2);
     },
   );
+
+  group('folderAcceptsWrites', () {
+    test('a writable folder is accepted and left without a probe file', () {
+      final dir = p.join(tmp.path, 'new', 'nested');
+      expect(folderAcceptsWrites(dir), isTrue);
+      expect(Directory(dir).listSync(), isEmpty);
+    });
+
+    test('a read-only folder is refused', () {
+      if (Platform.isWindows) {
+        markTestSkipped('POSIX permission bits are not honoured on Windows');
+        return;
+      }
+      final dir = Directory(p.join(tmp.path, 'readonly'))..createSync();
+      Process.runSync('chmod', ['000', dir.path]);
+      addTearDown(() => Process.runSync('chmod', ['755', dir.path]));
+      if (folderAcceptsWrites(dir.path)) {
+        // Root ignores permission bits; nothing to assert then.
+        markTestSkipped('running with permissions that bypass chmod');
+        return;
+      }
+      expect(folderAcceptsWrites(dir.path), isFalse);
+    });
+  });
 }

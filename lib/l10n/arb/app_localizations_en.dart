@@ -18853,6 +18853,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'That folder can\'t be written to. Choose another one.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

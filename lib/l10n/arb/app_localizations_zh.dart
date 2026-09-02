@@ -18179,6 +18179,9 @@ class AppLocalizationsZh extends AppLocalizations {
       '照片将保存到此文件夹并从此处链接。Submersion 绝不会保留自己的副本。';
 
   @override
+  String get importWizard_photos_destinationUnwritable => '无法写入该文件夹。请选择其他文件夹。';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

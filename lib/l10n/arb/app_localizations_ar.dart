@@ -18829,6 +18829,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تُحفظ الصور في هذا المجلد ويتم ربطها من هناك. لا يحتفظ Submersion بنسخة خاصة به أبدًا.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'لا يمكن الكتابة في هذا المجلد. اختر مجلدًا آخر.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

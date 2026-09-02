@@ -19194,6 +19194,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'As fotos são guardadas nesta pasta e ligadas a partir daí. O Submersion nunca guarda uma cópia própria.';
 
   @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Não é possível escrever nessa pasta. Escolha outra.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
