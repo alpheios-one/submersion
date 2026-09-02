@@ -233,8 +233,15 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
       await _discardQuietly(regionId);
       state = state.copyWith(isDownloading: false, error: e.toString());
     } finally {
-      // Nothing is downloading now, so there is nothing left to cancel.
-      _activeRegionId = null;
+      // Only if this download is still the current one. A superseded download
+      // finishes after the one that replaced it started, and clearing the slot
+      // unconditionally would hand the newer download an empty one: the next
+      // cancel would mark nothing, so that download would stop transferring
+      // and then record a region for the tiles it had, which is the phantom
+      // region this branch exists to prevent.
+      if (_activeRegionId == regionId) {
+        _activeRegionId = null;
+      }
     }
   }
 

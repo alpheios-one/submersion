@@ -373,6 +373,54 @@ void main() {
       expect(cache.calls.where((c) => c.startsWith('discard:')), hasLength(1));
     });
 
+    test(
+      'cancel still works on the download that superseded another',
+      () async {
+        // The superseded download finishes after the new one has started. If it
+        // clears the active slot on its way out, the new download becomes
+        // uncancellable: cancel marks nothing, the transfer stops anyway, and a
+        // region is recorded for whatever had arrived.
+        final notifier = container.read(downloadProgressProvider.notifier);
+        final first = notifier.downloadRegion(
+          name: 'Cozumel',
+          minLat: 20,
+          maxLat: 21,
+          minLng: -87,
+          maxLng: -86,
+          minZoom: 8,
+          maxZoom: 12,
+          tileLayerOptions: tileLayer,
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        final second = notifier.downloadRegion(
+          name: 'Bonaire',
+          minLat: 12,
+          maxLat: 13,
+          minLng: -69,
+          maxLng: -68,
+          minZoom: 8,
+          maxZoom: 12,
+          tileLayerOptions: tileLayer,
+        );
+        await first;
+        await Future<void>.delayed(Duration.zero);
+
+        await notifier.cancelDownload();
+        await second;
+
+        expect(
+          await repository.getAllRegions(),
+          isEmpty,
+          reason: 'neither download was kept, so neither is a region',
+        );
+        expect(
+          cache.calls.where((c) => c.startsWith('discard:')),
+          hasLength(2),
+        );
+      },
+    );
+
     test('a failed download leaves no store behind', () async {
       // The store is created before the first tile arrives, so a download that
       // throws anywhere after that would strand it holding tiles no region
