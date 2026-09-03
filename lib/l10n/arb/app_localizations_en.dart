@@ -4424,42 +4424,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Merge undone';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Merging dive at $time into this dive.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirm merge';
-
-  @override
-  String get diveLog_mergeDialog_empty => 'No other dives found on this day.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error loading dives: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Merge';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Next';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Select a dive from the same day to merge as an additional computer.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Merge with another dive';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'What this does';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Select which computer\'s profile to edit from.';
 
@@ -22479,6 +22443,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Delete \"$name\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22569,6 +22538,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Size';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Unknown';
 
   @override
   String get maps_offline_tiles => 'Tiles';
@@ -33376,14 +33348,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Video thumbnail. Tap to view full screen';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Photo thumbnail, missing from device. Tap to view full screen';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Video thumbnail, missing from device. Tap to view full screen';
 
   @override
   String get trips_photos_thumbnail_photo =>

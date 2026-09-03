@@ -300,7 +300,7 @@ void main() {
       expect(tank.containsKey('workingPressureBar'), isFalse);
       // gasMix must be a `GasMix` object, not a Map — UddfEntityImporter does
       // `t['gasMix'] as GasMix?` and a Map cast would throw at runtime.
-      // MacDive stores oxygen as a fraction (0.32); GasMix.o2 is a percent.
+      // MacDive stores oxygen as a whole percent (32.0), matching GasMix.o2.
       expect(tank['gasMix'], isA<GasMix>());
       final gasMix = tank['gasMix'] as GasMix;
       expect(gasMix.o2, closeTo(32.0, 0.01));

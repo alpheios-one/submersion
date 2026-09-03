@@ -91,6 +91,124 @@ void main() {
     });
   });
 
+  // Issue #1403: deleting a region used to free nothing, because FMTC can only
+  // delete a whole store and every region shared one. Giving each downloaded
+  // region its own store is what makes deletion expressible at all.
+  group('per-region stores', () {
+    test('a region store name is derived from the region id', () {
+      expect(
+        TileCacheService.regionStoreName('abc-123'),
+        'submersion_region_abc-123',
+      );
+      expect(
+        TileCacheService.regionIdFromStoreName('submersion_region_abc-123'),
+        'abc-123',
+      );
+    });
+
+    test('the shared stores are never read as region stores', () {
+      // A prefix collision here would make the orphan sweep delete every
+      // legacy tile in the app.
+      for (final shared in const [
+        'submersion_tiles',
+        'submersion_tiles_browse',
+      ]) {
+        expect(TileCacheService.regionIdFromStoreName(shared), isNull);
+      }
+      expect(
+        TileCacheService.regionIdFromStoreName('submersion_region_'),
+        isNull,
+        reason: 'an empty id is not a region',
+      );
+    });
+
+    test('browsing reads other stores and never writes them', () {
+      // The single most important assertion in this file. If unspecified
+      // stores ever became writable, panning the map would grow every
+      // downloaded region without bound and its measured size would drift.
+      expect(TileCacheService.otherStoresStrategy, BrowseStoreStrategy.read);
+    });
+
+    test('totals count this app\'s stores and no others', () {
+      // The FMTC root is shared, and the totals sit next to a button that only
+      // clears these. Counting a store that button cannot touch would put
+      // bytes on screen that nothing on the page can free.
+      for (final ours in const [
+        'submersion_tiles',
+        'submersion_tiles_browse',
+        'submersion_region_abc',
+      ]) {
+        expect(TileCacheService.isOwnStoreName(ours), isTrue, reason: ours);
+      }
+      for (final theirs in const [
+        'someone_elses_store',
+        'submersion_region_',
+        'tiles',
+      ]) {
+        expect(
+          TileCacheService.isOwnStoreName(theirs),
+          isFalse,
+          reason: theirs,
+        );
+      }
+    });
+
+    test('orphan selection keeps every store it cannot prove is garbage', () {
+      final orphans = TileCacheService.orphanRegionStores(
+        availableStores: const [
+          'submersion_tiles',
+          'submersion_tiles_browse',
+          'submersion_region_kept',
+          'submersion_region_downloading',
+          'submersion_region_orphan',
+          'someone_elses_store',
+        ],
+        knownRegionIds: {'kept'},
+        inFlightRegionIds: {'downloading'},
+      );
+
+      expect(orphans, {'submersion_region_orphan'});
+    });
+
+    test('cache totals do not decay as regions are added', () {
+      // FMTC records a miss against every store it was allowed to read, so a
+      // sum would multiply one uncached tile by the number of stores and drive
+      // the reported hit rate to nothing as a diver downloads regions.
+      final stats = TileCacheService.aggregateCacheStats(const [
+        (size: 100.0, length: 10, hits: 4, misses: 200),
+        (size: 50.0, length: 5, hits: 1, misses: 200),
+        (size: 25.0, length: 2, hits: 0, misses: 30),
+      ]);
+
+      expect(stats.tileCount, 17);
+      expect(stats.sizeKiB, 175.0);
+      expect(stats.hits, 5);
+      expect(stats.misses, 200);
+    });
+
+    test('an empty cache reports nothing rather than dividing by zero', () {
+      final stats = TileCacheService.aggregateCacheStats(const []);
+
+      expect(stats.tileCount, 0);
+      expect(stats.misses, 0);
+      expect(stats.hitRate, 0);
+    });
+
+    test('orphan selection never returns a shared or foreign store', () {
+      final orphans = TileCacheService.orphanRegionStores(
+        availableStores: const [
+          'submersion_tiles',
+          'submersion_tiles_browse',
+          'someone_elses_store',
+        ],
+        knownRegionIds: const {},
+        inFlightRegionIds: const {},
+      );
+
+      expect(orphans, isEmpty);
+    });
+  });
+
   group('TileCacheService.handleTileError', () {
     // Returns the next LogEntry emitted on the shared logger stream while
     // [action] runs. The subscription is established before [action] so the

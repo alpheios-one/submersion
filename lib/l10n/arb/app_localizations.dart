@@ -7520,66 +7520,6 @@ abstract class AppLocalizations {
   /// **'Merge undone'**
   String get diveLog_consolidate_undone;
 
-  /// No description provided for @diveLog_mergeDialog_confirmSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Merging dive at {time} into this dive.'**
-  String diveLog_mergeDialog_confirmSubtitle(String time);
-
-  /// No description provided for @diveLog_mergeDialog_confirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm merge'**
-  String get diveLog_mergeDialog_confirmTitle;
-
-  /// No description provided for @diveLog_mergeDialog_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No other dives found on this day.'**
-  String get diveLog_mergeDialog_empty;
-
-  /// No description provided for @diveLog_mergeDialog_explanation.
-  ///
-  /// In en, this message translates to:
-  /// **'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.'**
-  String get diveLog_mergeDialog_explanation;
-
-  /// No description provided for @diveLog_mergeDialog_loadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading dives: {error}'**
-  String diveLog_mergeDialog_loadError(String error);
-
-  /// No description provided for @diveLog_mergeDialog_merge.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge'**
-  String get diveLog_mergeDialog_merge;
-
-  /// No description provided for @diveLog_mergeDialog_next.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get diveLog_mergeDialog_next;
-
-  /// No description provided for @diveLog_mergeDialog_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a dive from the same day to merge as an additional computer.'**
-  String get diveLog_mergeDialog_subtitle;
-
-  /// No description provided for @diveLog_mergeDialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge with another dive'**
-  String get diveLog_mergeDialog_title;
-
-  /// No description provided for @diveLog_mergeDialog_whatThisDoes.
-  ///
-  /// In en, this message translates to:
-  /// **'What this does'**
-  String get diveLog_mergeDialog_whatThisDoes;
-
   /// Description of the computer profile selection sheet
   ///
   /// In en, this message translates to:
@@ -37658,6 +37598,12 @@ abstract class AppLocalizations {
   /// **'Delete {name} region'**
   String maps_offline_deleteRegion(Object name);
 
+  /// Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.'**
+  String maps_offline_deleteRegionLegacyMessage(Object name);
+
   /// No description provided for @maps_offline_deleteRegionMessage.
   ///
   /// In en, this message translates to:
@@ -37784,6 +37730,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Size'**
   String get maps_offline_size;
+
+  /// Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as "25.0 MB".
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get maps_offline_sizeUnknown;
 
   /// No description provided for @maps_offline_tiles.
   ///
@@ -55918,18 +55870,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Video thumbnail. Tap to view full screen'**
   String get trips_gallery_thumbnail_video;
-
-  /// No description provided for @trips_gallery_thumbnail_photoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_photoMissing;
-
-  /// No description provided for @trips_gallery_thumbnail_videoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Video thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_videoMissing;
 
   /// No description provided for @trips_photos_thumbnail_photo.
   ///

@@ -4525,43 +4525,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Fusion annulée';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'La plongée de $time sera fusionnée avec cette plongée.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmer la fusion';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Aucune autre plongée trouvée ce jour-là.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Le profil, les blocs, les pressions, les événements, les tags, les binômes et les observations de cette plongée seront intégrés à cette plongée en tant qu\'ordinateur supplémentaire. Cette action peut être annulée avec « Dissocier l\'ordinateur ».';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Erreur lors du chargement des plongées : $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Fusionner';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Suivant';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Sélectionnez une plongée du même jour à fusionner en tant qu\'ordinateur supplémentaire.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Fusionner avec une autre plongée';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Ce que cela fait';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Sélectionnez le profil d\'ordinateur à partir duquel modifier.';
 
@@ -22951,6 +22914,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Supprimer \"$name\" ?\n\nCette région a été téléchargée avec une version antérieure : ses tuiles sont stockées avec celles d\'autres régions et ne peuvent pas être libérées séparément. La supprimer ne récupérera pas d\'espace de stockage.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -23042,6 +23010,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Taille';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Inconnue';
 
   @override
   String get maps_offline_tiles => 'Tuiles';
@@ -33961,14 +33932,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Miniature de vidéo. Appuyez pour voir en plein écran';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Miniature de photo, absente de l’appareil. Appuyez pour voir en plein écran';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Miniature de vidéo, absente de l’appareil. Appuyez pour voir en plein écran';
 
   @override
   String get trips_photos_thumbnail_photo =>

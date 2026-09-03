@@ -4508,43 +4508,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Unione annullata';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'L\'immersione delle $time verrà unita a questa immersione.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Conferma unione';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Nessun\'altra immersione trovata in questo giorno.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Il profilo, le bombole, le pressioni, gli eventi, i tag, i compagni e gli avvistamenti di questa immersione verranno incorporati in questa immersione come fonte di un computer aggiuntivo. Questa azione può essere annullata con \'Scollega computer\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Errore durante il caricamento delle immersioni: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Unisci';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Avanti';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Seleziona un\'immersione dello stesso giorno da unire come computer aggiuntivo.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Unisci a un\'altra immersione';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Cosa fa questa azione';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Seleziona da quale profilo del computer modificare.';
 
@@ -22866,6 +22829,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Eliminare \"$name\"?\n\nQuesta regione è stata scaricata con una versione precedente, quindi i suoi tile sono memorizzati insieme a quelli di altre regioni e non possono essere liberati singolarmente. Eliminarla non recupererà spazio.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22956,6 +22924,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Dimensione';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Sconosciuta';
 
   @override
   String get maps_offline_tiles => 'Tile';
@@ -33873,14 +33844,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Miniatura video. Tocca per visualizzare a schermo intero';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Miniatura foto, assente dal dispositivo. Tocca per visualizzare a schermo intero';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Miniatura video, assente dal dispositivo. Tocca per visualizzare a schermo intero';
 
   @override
   String get trips_photos_thumbnail_photo =>

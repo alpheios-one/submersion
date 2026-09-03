@@ -226,6 +226,14 @@ typedef struct {
     unsigned int usage;        // dc_usage_t (0=none, 1=oxygen, 2=diluent, 3=sidemount)
 } libdc_tank_t;
 
+// Name of a libdivecomputer sample event type (parser_sample_event_t), in
+// the spelling the Dart layer switches on ("ascent", "ceiling", ...). This is
+// the single table every platform binding must use: the per-platform copies
+// it replaced had all skipped SAMPLE_EVENT_RBT, shifting every later code by
+// one so ascent-rate alarms were reported as ceiling breaches. Returns
+// "unknown" for codes outside the enum. Statically allocated (do not free).
+const char *libdc_event_type_name(unsigned int type);
+
 #define LIBDC_MAX_EVENTS 256
 
 typedef struct {

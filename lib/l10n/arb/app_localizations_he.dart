@@ -4393,42 +4393,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_consolidate_undone => 'המיזוג בוטל';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'הצלילה בשעה $time תמוזג לתוך צלילה זו.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'אישור מיזוג';
-
-  @override
-  String get diveLog_mergeDialog_empty => 'לא נמצאו צלילות נוספות ביום זה.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'הפרופיל, הבלונים, הלחצים, האירועים, התגיות, השותפים והתצפיות של צלילה זו ימוזגו לתוך צלילה זו כמקור מחשב נוסף. ניתן לבטל פעולה זו באמצעות \'ביטול קישור מחשב\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'שגיאה בטעינת הצלילות: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'מיזוג';
-
-  @override
-  String get diveLog_mergeDialog_next => 'הבא';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'בחר צלילה מאותו היום למיזוג כמחשב נוסף.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'מיזוג עם צלילה אחרת';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'מה זה עושה';
-
-  @override
   String get diveLog_computerSheet_description =>
       'בחר מאיזה פרופיל מחשב לערוך.';
 
@@ -22292,6 +22256,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'למחוק את \"$name\"?\n\nאזור זה הורד בגרסה קודמת, ולכן האריחים שלו מאוחסנים יחד עם אלה של אזורים אחרים ולא ניתן לפנות אותם בנפרד. מחיקתו לא תפנה שטח אחסון.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22382,6 +22351,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'גודל';
+
+  @override
+  String get maps_offline_sizeUnknown => 'לא ידוע';
 
   @override
   String get maps_offline_tiles => 'אריחים';
@@ -33207,14 +33179,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'תמונה ממוזערת של סרטון. הקש לצפייה במסך מלא';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'תמונה ממוזערת של תמונה, חסרה במכשיר. הקש לצפייה במסך מלא';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'תמונה ממוזערת של סרטון, חסר במכשיר. הקש לצפייה במסך מלא';
 
   @override
   String get trips_photos_thumbnail_photo =>

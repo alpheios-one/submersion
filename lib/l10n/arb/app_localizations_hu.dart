@@ -4492,43 +4492,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Összevonás visszavonva';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'A(z) $time időpontban indult merülés összevonásra kerül ezzel a merüléssel.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Összevonás megerősítése';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Nem található más merülés ezen a napon.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Ennek a merülésnek a profilja, palackjai, nyomásai, eseményei, cimkéi, búvártársai és megfigyelései bekerülnek ebbe a merülésbe mint további számítógépes forrás. Ez a művelet visszavonható a „Számítógép leválasztása” funkcióval.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Hiba a merülések betöltésekor: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Összevonás';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Tovább';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Válassz egy merülést ugyanarról a napról, hogy további számítógépként vond össze.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Összevonás egy másik merüléssel';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Mit csinál ez';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Válaszd ki, melyik számítógép profiljából szerkesztesz.';
 
@@ -22792,6 +22755,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Törli a(z) \"$name\" régiót?\n\nEzt a régiót egy korábbi verzió töltötte le, ezért a csempéi más régiókéval együtt tárolódnak, és nem szabadíthatók fel külön. A törlése nem szabadít fel tárhelyet.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22882,6 +22850,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Meret';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Ismeretlen';
 
   @override
   String get maps_offline_tiles => 'Csempek';
@@ -33720,14 +33691,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Videó indexkép. Koppints a teljes képernyős megtekintéshez';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez';
 
   @override
   String get trips_photos_thumbnail_photo =>

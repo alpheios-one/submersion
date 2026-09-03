@@ -4510,43 +4510,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Fusión deshecha';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Se fusionará la inmersión de las $time con esta inmersión.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmar fusión';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'No se encontraron otras inmersiones en este día.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'El perfil, los tanques, las presiones, los eventos, las etiquetas, los compañeros y los avistamientos de esta inmersión se incorporarán a esta inmersión como un ordenador adicional. Esta acción se puede revertir con \'Desvincular ordenador\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error al cargar las inmersiones: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Fusionar';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Siguiente';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Selecciona una inmersión del mismo día para fusionarla como ordenador adicional.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Fusionar con otra inmersión';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Qué hace esto';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Selecciona desde qué perfil de ordenador editar.';
 
@@ -22886,6 +22849,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '¿Eliminar \"$name\"?\n\nEsta región se descargó con una versión anterior, por lo que sus teselas se almacenan junto con las de otras regiones y no se pueden liberar por separado. Eliminarla no recuperará almacenamiento.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22976,6 +22944,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Tamano';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Desconocido';
 
   @override
   String get maps_offline_tiles => 'Teselas';
@@ -33905,14 +33876,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Miniatura de vídeo. Toca para ver en pantalla completa';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Miniatura de foto, no está en el dispositivo. Toca para ver en pantalla completa';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Miniatura de vídeo, no está en el dispositivo. Toca para ver en pantalla completa';
 
   @override
   String get trips_photos_thumbnail_photo =>
