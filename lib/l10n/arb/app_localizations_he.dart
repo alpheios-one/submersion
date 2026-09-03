@@ -35397,4 +35397,86 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה.';
+
+  @override
+  String get diveComputer_merge_title => 'מיזוג מחשבי צלילה';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count רשומות יהפכו לאחת. הצלילות, הפרופילים והיסטוריית ההורדות יעברו לרשומה שתשמור. שאר הרשומות יימחקו.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'לשמור רשומה זו';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'מספר סידורי $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'אין מספר סידורי';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יעברו לרשומה שתישמר.',
+      one: 'צלילה אחת תעבור לרשומה שתישמר.',
+      zero: 'לא משויכות צלילות לרשומות האחרות.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'רשומות אלו מדווחות על מספרים סידוריים שונים. ייתכן שמדובר במחשבים שונים.';
+
+  @override
+  String get diveComputer_merge_action => 'מיזוג';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count רשומות מוזגו לתוך $name',
+      one: 'רשומה אחת מוזגה לתוך $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'לא ניתן למזג את המחשבים: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'מיזוג מחשבים';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'מיזוג עם מחשב אחר';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'מיזוג עם';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty => 'אין מחשבים אחרים למיזוג.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'אותו מספר סידורי';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name מדווח על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר פעמיים.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count רשומות שמורות נוספות מדווחות על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר יותר מפעם אחת.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'מיזוג';
 }

@@ -35959,4 +35959,88 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'A fénykép kiválasztásához névjegy-hozzáférési engedély szükséges.';
+
+  @override
+  String get diveComputer_merge_title => 'Buvarszamitogepek osszevonasa';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count bejegyzesbol egy lesz. A merulesek, profilok es a letoltesi elozmenyek a megtartott bejegyzeshez kerulnek. A tobbi bejegyzes torlodik.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Ezt a bejegyzest megtartom';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Sorozatszam: $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Nincs sorozatszam';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merules kerul at a megtartott bejegyzeshez.',
+      one: '1 merules kerul at a megtartott bejegyzeshez.',
+      zero: 'A tobbi bejegyzeshez nem tartozik merules.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Ezek a bejegyzesek eltero sorozatszamot jeleznek. Lehet, hogy kulonbozo keszulekek.';
+
+  @override
+  String get diveComputer_merge_action => 'Osszevonas';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bejegyzes osszevonva ide: $name',
+      one: '1 bejegyzes osszevonva ide: $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'A szamitogepek osszevonasa nem sikerult: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip =>
+      'Szamitogepek osszevonasa';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Osszevonas masik szamitogeppel';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Osszevonas ezzel';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Nincs masik szamitogep, amivel ossze lehetne vonni.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'Azonos sorozatszam';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep ketszer van elmentve.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count masik mentett rekord ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep tobbszor van elmentve.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Osszevonas';
 }

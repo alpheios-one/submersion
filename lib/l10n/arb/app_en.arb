@@ -21883,5 +21883,75 @@
   "profilePhoto_error_tooLarge": "That image is too large to use. Try a smaller one.",
   "profilePhoto_error_undecodable": "That file could not be read as an image.",
   "profilePhoto_error_contactNoPhoto": "That contact does not have a photo.",
-  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo."
+  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo.",
+  "diveComputer_merge_title": "Merge Dive Computers",
+  "diveComputer_merge_intro": "{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.",
+  "@diveComputer_merge_intro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_merge_keepLabel": "Keep this record",
+  "diveComputer_merge_serialLabel": "Serial {serial}",
+  "@diveComputer_merge_serialLabel": {
+    "placeholders": {
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_merge_noSerial": "No serial number",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{No dives are attached to the other records.} =1{1 dive will move to the record you keep.} other{{count} dives will move to the record you keep.}}",
+  "@diveComputer_merge_affectedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_merge_serialMismatchWarning": "These records report different serial numbers. They may be different physical computers.",
+  "diveComputer_merge_action": "Merge",
+  "diveComputer_merge_snackbar": "{count, plural, =1{1 record merged into {name}} other{{count} records merged into {name}}}",
+  "@diveComputer_merge_snackbar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_merge_failed": "Could not merge computers: {error}",
+  "@diveComputer_merge_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_list_selection_mergeTooltip": "Merge computers",
+  "diveComputer_detail_mergeMenu": "Merge with another computer",
+  "diveComputer_detail_mergePickerTitle": "Merge with",
+  "diveComputer_detail_mergePickerEmpty": "There are no other computers to merge with.",
+  "diveComputer_detail_mergePickerSameSerial": "Same serial number",
+  "diveComputer_detail_duplicateBanner": "{name} reports the same serial number. It may be this computer saved twice.",
+  "@diveComputer_detail_duplicateBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_detail_duplicateBannerMultiple": "{count} other saved records report the same serial number. They may be this computer saved more than once.",
+  "@diveComputer_detail_duplicateBannerMultiple": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_detail_duplicateBannerAction": "Merge"
 }

@@ -36125,4 +36125,88 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'É necessária permissão de contactos para escolher uma foto.';
+
+  @override
+  String get diveComputer_merge_title => 'Mesclar computadores de mergulho';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count registros se tornarão um. Mergulhos, perfis e histórico de download passam para o registro que você mantiver. Os outros registros são excluídos.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Manter este registro';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Número de série $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Sem número de série';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos passarão para o registro mantido.',
+      one: '1 mergulho passará para o registro mantido.',
+      zero: 'Nenhum mergulho está vinculado aos outros registros.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Estes registros informam números de série diferentes. Podem ser computadores físicos diferentes.';
+
+  @override
+  String get diveComputer_merge_action => 'Mesclar';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count registros mesclados em $name',
+      one: '1 registro mesclado em $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Não foi possível mesclar os computadores: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Mesclar computadores';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Mesclar com outro computador';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Mesclar com';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Não há outros computadores para mesclar.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Mesmo número de série';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name informa o mesmo número de série. Pode ser este computador salvo duas vezes.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'Outros $count registros salvos informam o mesmo número de série. Pode ser este computador salvo mais de uma vez.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Mesclar';
 }

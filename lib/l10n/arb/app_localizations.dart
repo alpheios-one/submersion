@@ -59307,6 +59307,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contacts permission is required to choose a photo.'**
   String get profilePhoto_error_contactPermission;
+
+  /// No description provided for @diveComputer_merge_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Dive Computers'**
+  String get diveComputer_merge_title;
+
+  /// No description provided for @diveComputer_merge_intro.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.'**
+  String diveComputer_merge_intro(int count);
+
+  /// No description provided for @diveComputer_merge_keepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this record'**
+  String get diveComputer_merge_keepLabel;
+
+  /// No description provided for @diveComputer_merge_serialLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial {serial}'**
+  String diveComputer_merge_serialLabel(String serial);
+
+  /// No description provided for @diveComputer_merge_noSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'No serial number'**
+  String get diveComputer_merge_noSerial;
+
+  /// No description provided for @diveComputer_merge_affectedDives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives are attached to the other records.} =1{1 dive will move to the record you keep.} other{{count} dives will move to the record you keep.}}'**
+  String diveComputer_merge_affectedDives(int count);
+
+  /// No description provided for @diveComputer_merge_serialMismatchWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These records report different serial numbers. They may be different physical computers.'**
+  String get diveComputer_merge_serialMismatchWarning;
+
+  /// No description provided for @diveComputer_merge_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_merge_action;
+
+  /// No description provided for @diveComputer_merge_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 record merged into {name}} other{{count} records merged into {name}}}'**
+  String diveComputer_merge_snackbar(int count, String name);
+
+  /// No description provided for @diveComputer_merge_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not merge computers: {error}'**
+  String diveComputer_merge_failed(String error);
+
+  /// No description provided for @diveComputer_list_selection_mergeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge computers'**
+  String get diveComputer_list_selection_mergeTooltip;
+
+  /// No description provided for @diveComputer_detail_mergeMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with another computer'**
+  String get diveComputer_detail_mergeMenu;
+
+  /// No description provided for @diveComputer_detail_mergePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with'**
+  String get diveComputer_detail_mergePickerTitle;
+
+  /// No description provided for @diveComputer_detail_mergePickerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no other computers to merge with.'**
+  String get diveComputer_detail_mergePickerEmpty;
+
+  /// No description provided for @diveComputer_detail_mergePickerSameSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Same serial number'**
+  String get diveComputer_detail_mergePickerSameSerial;
+
+  /// No description provided for @diveComputer_detail_duplicateBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} reports the same serial number. It may be this computer saved twice.'**
+  String diveComputer_detail_duplicateBanner(String name);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerMultiple.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} other saved records report the same serial number. They may be this computer saved more than once.'**
+  String diveComputer_detail_duplicateBannerMultiple(int count);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_detail_duplicateBannerAction;
 }
 
 class _AppLocalizationsDelegate

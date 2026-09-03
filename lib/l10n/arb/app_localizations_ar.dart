@@ -35753,4 +35753,87 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة.';
+
+  @override
+  String get diveComputer_merge_title => 'دمج أجهزة كمبيوتر الغوص';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return 'ستصبح $count سجلات سجلاً واحداً. تنتقل الغطسات والملفات وسجل التنزيل إلى السجل الذي تحتفظ به، وتُحذف السجلات الأخرى.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'الاحتفاظ بهذا السجل';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'الرقم التسلسلي $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'لا يوجد رقم تسلسلي';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستنتقل $count غطسات إلى السجل المحتفظ به.',
+      one: 'ستنتقل غطسة واحدة إلى السجل المحتفظ به.',
+      zero: 'لا توجد غطسات مرتبطة بالسجلات الأخرى.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'تُبلغ هذه السجلات عن أرقام تسلسلية مختلفة. قد تكون أجهزة مختلفة.';
+
+  @override
+  String get diveComputer_merge_action => 'دمج';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم دمج $count سجلات في $name',
+      one: 'تم دمج سجل واحد في $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'تعذّر دمج أجهزة الكمبيوتر: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'دمج أجهزة الكمبيوتر';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'الدمج مع جهاز كمبيوتر آخر';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'الدمج مع';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'لا توجد أجهزة كمبيوتر أخرى للدمج معها.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'نفس الرقم التسلسلي';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return 'يُبلغ $name عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً مرتين.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'تُبلغ $count سجلات محفوظة أخرى عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً أكثر من مرة.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'دمج';
 }

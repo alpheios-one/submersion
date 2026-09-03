@@ -35559,4 +35559,87 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'Contacts permission is required to choose a photo.';
+
+  @override
+  String get diveComputer_merge_title => 'Merge Dive Computers';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Keep this record';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Serial $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'No serial number';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives will move to the record you keep.',
+      one: '1 dive will move to the record you keep.',
+      zero: 'No dives are attached to the other records.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'These records report different serial numbers. They may be different physical computers.';
+
+  @override
+  String get diveComputer_merge_action => 'Merge';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records merged into $name',
+      one: '1 record merged into $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Could not merge computers: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Merge computers';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Merge with another computer';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Merge with';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'There are no other computers to merge with.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'Same serial number';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name reports the same serial number. It may be this computer saved twice.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count other saved records report the same serial number. They may be this computer saved more than once.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Merge';
 }

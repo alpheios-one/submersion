@@ -36045,4 +36045,90 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'Für die Auswahl eines Fotos wird die Kontaktberechtigung benötigt.';
+
+  @override
+  String get diveComputer_merge_title => 'Tauchcomputer zusammenführen';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count Einträge werden zu einem. Tauchgänge, Profile und Download-Verlauf wandern zu dem Eintrag, den du behältst. Die anderen Einträge werden gelöscht.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Diesen Eintrag behalten';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Seriennummer $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Keine Seriennummer';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge wandern zu dem Eintrag, den du behältst.',
+      one: '1 Tauchgang wandert zu dem Eintrag, den du behältst.',
+      zero: 'Den anderen Einträgen sind keine Tauchgänge zugeordnet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Diese Einträge melden unterschiedliche Seriennummern. Es könnten verschiedene Geräte sein.';
+
+  @override
+  String get diveComputer_merge_action => 'Zusammenführen';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Einträge in $name zusammengeführt',
+      one: '1 Eintrag in $name zusammengeführt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Computer konnten nicht zusammengeführt werden: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip =>
+      'Computer zusammenführen';
+
+  @override
+  String get diveComputer_detail_mergeMenu =>
+      'Mit anderem Computer zusammenführen';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Zusammenführen mit';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Es gibt keine anderen Computer zum Zusammenführen.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Gleiche Seriennummer';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name meldet dieselbe Seriennummer. Möglicherweise ist dieser Computer doppelt gespeichert.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count andere gespeicherte Einträge melden dieselbe Seriennummer. Möglicherweise ist dieser Computer mehrfach gespeichert.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Zusammenführen';
 }

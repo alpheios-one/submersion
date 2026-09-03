@@ -33981,4 +33981,85 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
+
+  @override
+  String get diveComputer_merge_title => '合并潜水电脑';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count 条记录将合并为一条。潜水、剖面和下载历史会移到你保留的记录中，其余记录将被删除。';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => '保留此记录';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return '序列号 $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => '无序列号';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水将移到保留的记录中。',
+      one: '1 次潜水将移到保留的记录中。',
+      zero: '其他记录没有关联的潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning => '这些记录的序列号不同，可能是不同的设备。';
+
+  @override
+  String get diveComputer_merge_action => '合并';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已将 $count 条记录合并到 $name',
+      one: '已将 1 条记录合并到 $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return '无法合并潜水电脑：$error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => '合并潜水电脑';
+
+  @override
+  String get diveComputer_detail_mergeMenu => '与其他潜水电脑合并';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => '合并到';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty => '没有其他可合并的潜水电脑。';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => '序列号相同';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name 的序列号与此相同，可能是同一台潜水电脑被保存了两次。';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '另有 $count 条已保存记录的序列号与此相同，可能是同一台潜水电脑被保存了多次。';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => '合并';
 }
