@@ -2321,7 +2321,11 @@ matching that file's existing heading structure and tab style.
 - [ ] **Step 3: Verify no em-dashes crept in**
 
 ```bash
-grep -n "—" README.md docs/guide/installation.md && echo "FOUND EM-DASHES" || echo "clean"
+# The pattern is built from UTF-8 bytes rather than written literally, so this
+# file does not itself contain the character it forbids.
+EMDASH=$(printf '\xe2\x80\x94')
+grep -n "$EMDASH" README.md docs/guide/installation.md \
+  && echo "FOUND EM-DASHES" || echo "clean"
 ```
 
 Expected: `clean`.
