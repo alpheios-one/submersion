@@ -4,7 +4,9 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/gas_template_display.dart';
 import 'package:submersion/core/constants/gas_templates.dart';
+import 'package:submersion/core/constants/tank_preset_display.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/number_input.dart';
@@ -468,11 +470,16 @@ class _TankEditorState extends ConsumerState<TankEditor> {
                       ),
                     ),
                   ),
-                  // Built-in presets
+                  // Built-in presets. Their stored displayName is the stable
+                  // English identifier that exports and sync carry, so the
+                  // localized label is resolved here at render time.
                   ...builtInPresets.map(
                     (preset) => DropdownMenuItem(
                       value: preset,
-                      child: Text(preset.displayName),
+                      child: Text(
+                        builtInTankPresetName(context.l10n, preset.name) ??
+                            preset.displayName,
+                      ),
                     ),
                   ),
                 ],
@@ -675,7 +682,7 @@ class _TankEditorState extends ConsumerState<TankEditor> {
     final isSelected = currentO2 == template.o2 && currentHe == template.he;
 
     return FilterChip(
-      label: Text(template.displayName),
+      label: Text(template.localizedDisplayName(context.l10n)),
       selected: isSelected,
       onSelected: (_) => _applyGasTemplate(template),
     );

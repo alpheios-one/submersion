@@ -7,34 +7,9 @@
 #include <string.h>
 
 const char* map_event_type(unsigned int type) {
-    switch (type) {
-        case 0: return "none";
-        case 1: return "deco";
-        case 2: return "ascent";
-        case 3: return "ceiling";
-        case 4: return "workload";
-        case 5: return "transmitter";
-        case 6: return "violation";
-        case 7: return "bookmark";
-        case 8: return "surface";
-        case 9: return "safetystop";
-        case 10: return "gaschange";
-        case 11: return "safetystop_voluntary";
-        case 12: return "safetystop_mandatory";
-        case 13: return "deepstop";
-        case 14: return "ceiling_safetystop";
-        case 15: return "floor";
-        case 16: return "divetime";
-        case 17: return "maxdepth";
-        case 18: return "OLF";
-        case 19: return "PO2";
-        case 20: return "airtime";
-        case 21: return "rgbm";
-        case 22: return "heading";
-        case 23: return "tissuelevel";
-        case 24: return "gaschange2";
-        default: return "unknown";
-    }
+    // One shared table for every platform; see libdc_event_type_name in
+    // libdc_wrapper.h for why this is no longer a local switch.
+    return libdc_event_type_name(type);
 }
 
 LibdivecomputerPluginParsedDive* convert_parsed_dive(

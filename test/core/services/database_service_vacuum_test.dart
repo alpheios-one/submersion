@@ -160,19 +160,19 @@ void main() {
       );
       await DatabaseService.instance.close(strict: true);
 
-      expect(storedVersionOnDisk(), 183);
+      expect(storedVersionOnDisk(), AppDatabase.currentSchemaVersion);
       // Only VACUUM returns the dropped table's pages to the filesystem; a
       // plain DROP leaves them on the freelist.
       expect(freelistOnDisk(), 0);
     },
   );
 
-  test('a file stamped 183 whose legacy table the BACKSTOP drops is '
-      'VACUUMed', () async {
+  test('a file stamped at the current version whose legacy table the BACKSTOP '
+      'drops is VACUUMed', () async {
     // The v183 rung is explicitly allowed to skip its drop: its own pack
     // threw, the series table's foreign-key parents were absent, or the
-    // residue count found rows no series covered. The file is stamped 183
-    // either way, and the beforeOpen backstop drops the tables on the first
+    // residue count found rows no series covered. The file is stamped at the
+    // current version either way, and the beforeOpen backstop drops the tables on the first
     // later open whose pack succeeds. That open has no pending ladder, so a
     // reclamation keyed on the stored version never runs for it, and there
     // is no other VACUUM of the live database anywhere in the app: the
@@ -207,7 +207,7 @@ void main() {
       raw.execute('COMMIT');
       stmt.close();
       // Already at the current version, so there is no ladder to run.
-      raw.execute('PRAGMA user_version = 183');
+      raw.execute('PRAGMA user_version = ${AppDatabase.currentSchemaVersion}');
     });
 
     expect(freelistOnDisk(), 0);
@@ -225,7 +225,7 @@ void main() {
     );
   });
 
-  test('a file already at 183 is not VACUUMed', () async {
+  test('a file already at the current version is not VACUUMed', () async {
     await seedFile((raw) {
       // A freelist the open must leave alone: pages freed by a bulk delete
       // in a scratch table, with no pending migration to trigger the VACUUM.

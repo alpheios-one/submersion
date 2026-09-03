@@ -362,12 +362,15 @@ gets its own worktree and its own PR.
    once-per-process reclaim (`mediaTransferQueueReclaimProvider`,
    `lib/features/media_store/presentation/providers/media_store_providers.dart:107`).
 
-Also worth fixing here, found during exploration and not in the audit: deleting
-an offline region removes the `cached_regions` row but no tiles
-(`offline_map_providers.dart:263`, whose doc comment claims otherwise), and the
-per-region `sizeBytes` shown in the UI is a fabricated estimate,
-`downloadedTiles * 20 * 1024` (`offline_map_providers.dart:143`), not a
-measurement.
+Also found during exploration and not in the audit: deleting an offline region
+removed the `cached_regions` row but no tiles, and the per-region `sizeBytes`
+shown in the UI was a fabricated estimate, `downloadedTiles * 20 * 1024`, not a
+measurement. Both moved to issue #1403 and were fixed there rather than in this
+program, because neither could be corrected in place: FMTC 10 deletes a whole
+store or tiles older than a date and nothing in between, so a region only
+becomes deletable, and measurable, by being a store of its own. Regions
+downloaded before that change keep the old behaviour, since there is no way to
+tell after the fact which tile in `submersion_tiles` belonged to which region.
 
 ### Slice C: scratch-file sweep
 

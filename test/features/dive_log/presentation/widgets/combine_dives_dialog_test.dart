@@ -7,13 +7,14 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_service.dart';
-import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/combine_dives_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../../../helpers/fake_dive_consolidation_service.dart';
 
 /// Builds a bare-bones dive at [entry] with a [runtimeMin]-minute runtime.
 /// Mirrors the `dive()` helper from dive_merge_builder_test.dart.
@@ -79,54 +80,6 @@ class _ThrowingMergeService implements DiveMergeService {
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-/// Fake [DiveConsolidationService] that records `apply`/`undo` calls so
-/// tests can assert on the wiring contract without touching a real database.
-/// Mirrors the fake in merge_dive_dialog_test.dart (the apply-failure path is
-/// already covered there, since both dialogs share `runDiveConsolidation`).
-class _FakeDiveConsolidationService extends DiveConsolidationService {
-  _FakeDiveConsolidationService() : super(DiveRepository());
-
-  String? capturedTargetDiveId;
-  List<String>? capturedSecondaryDiveIds;
-  DiveMergeSnapshot? undoneSnapshot;
-
-  final DiveMergeSnapshot outcomeSnapshot = const DiveMergeSnapshot(
-    mergedDiveId: 'a',
-    diveRows: [],
-    tankRows: [],
-    weightRows: [],
-    customFieldRows: [],
-    equipmentRows: [],
-    diveTypeRows: [],
-    tagRows: [],
-    buddyRows: [],
-    sightingRows: [],
-    eventRows: [],
-    gasSwitchRows: [],
-    dataSourceRows: [],
-    tideRows: [],
-    mediaDiveIds: {},
-  );
-
-  @override
-  Future<DiveConsolidationOutcome> apply({
-    required String targetDiveId,
-    required List<String> secondaryDiveIds,
-  }) async {
-    capturedTargetDiveId = targetDiveId;
-    capturedSecondaryDiveIds = secondaryDiveIds;
-    return DiveConsolidationOutcome(
-      targetDiveId: targetDiveId,
-      snapshot: outcomeSnapshot,
-    );
-  }
-
-  @override
-  Future<void> undo(DiveMergeSnapshot snapshot) async {
-    undoneSnapshot = snapshot;
-  }
 }
 
 /// Minimal SettingsNotifier override that returns default AppSettings.
@@ -368,7 +321,7 @@ void main() {
       'confirming calls DiveConsolidationService.apply with the selected '
       'primary as target and shows an Undo snackbar',
       (tester) async {
-        final service = _FakeDiveConsolidationService();
+        final service = FakeDiveConsolidationService(mergedDiveId: 'a');
         await pumpCombineDialog(
           tester,
           dives: consolidatableDives(),
@@ -396,7 +349,7 @@ void main() {
       'picking the later dive as primary calls apply with that dive as '
       'target',
       (tester) async {
-        final service = _FakeDiveConsolidationService();
+        final service = FakeDiveConsolidationService(mergedDiveId: 'a');
         await pumpCombineDialog(
           tester,
           dives: consolidatableDives(),

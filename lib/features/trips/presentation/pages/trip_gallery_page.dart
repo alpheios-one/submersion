@@ -364,16 +364,14 @@ class _GridThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     final l10n = context.l10n;
-    final semanticsLabel = item.isOrphaned
-        ? (item.isVideo
-              ? l10n.trips_gallery_thumbnail_videoMissing
-              : l10n.trips_gallery_thumbnail_photoMissing)
-        : (item.isVideo
-              ? l10n.trips_gallery_thumbnail_video
-              : l10n.trips_gallery_thumbnail_photo);
+    // Availability-agnostic on purpose: the tile always tries to render the
+    // photo, so a label that read the orphan flag would announce "missing"
+    // over a thumbnail the resolver chain just served. When nothing can serve
+    // the row, UnavailableMediaPlaceholder carries its own reason text.
+    final semanticsLabel = item.isVideo
+        ? l10n.trips_gallery_thumbnail_video
+        : l10n.trips_gallery_thumbnail_photo;
 
     return Semantics(
       button: true,
@@ -385,26 +383,17 @@ class _GridThumbnail extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Orphaned items show a distinct error tile; all other items
-              // route through MediaItemView which dispatches to the correct
-              // resolver and shows UnavailableMediaPlaceholder for missing assets.
-              if (item.isOrphaned)
-                Container(
-                  color: colorScheme.errorContainer,
-                  child: Center(
-                    child: Icon(
-                      Icons.broken_image_outlined,
-                      color: colorScheme.onErrorContainer,
-                    ),
-                  ),
-                )
-              else
-                MediaItemView(
-                  item: item,
-                  thumbnail: true,
-                  targetSize: const Size(200, 200),
-                  fit: BoxFit.cover,
-                ),
+              // Every row renders through MediaItemView, orphaned or not:
+              // the flag is a persisted claim that may be stale or written
+              // by a device that never had the file, and the resolver chain
+              // (origin, then media store) can still serve the photo. See
+              // MediaThumbnailTile for the full reasoning (#1409).
+              MediaItemView(
+                item: item,
+                thumbnail: true,
+                targetSize: const Size(200, 200),
+                fit: BoxFit.cover,
+              ),
 
               // Video icon (top-right)
               if (item.isVideo)
