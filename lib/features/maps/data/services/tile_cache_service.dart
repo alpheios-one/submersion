@@ -512,6 +512,13 @@ class TileCacheService {
       final streams = regionStore.download.startForeground(
         region: downloadableRegion,
         parallelThreads: parallelThreads,
+        // Skips nothing in practice, and cannot: it consults only the store
+        // being written, and that store is new every time. While every region
+        // shared one store, a download overlapping an earlier one reused its
+        // tiles; now the overlap is fetched from the tile server again and
+        // held twice. That is the price of being able to delete one region's
+        // tiles at all, which FMTC can only do by deleting a whole store, and
+        // it is why an overlapping tile counts once per region that holds it.
         skipExistingTiles: skipExistingTiles,
         instanceId: _activeDownloadId!,
       );
@@ -591,6 +598,20 @@ class TileCacheService {
   /// with every other legacy region's in [_offlineStoreName] and cannot be
   /// separated. Only "Clear all cache" reclaims those.
   Future<void> deleteRegionTiles(String regionId) async {
+    // A cache that never opened has no store to delete, and the region's row
+    // has to stay removable. Startup carries on after an initialize() failure
+    // with only a log line, and deleting a region now removes its tiles before
+    // its row, so throwing here would make every region undeletable for the
+    // rest of the session, a legacy region that owns no store included.
+    // Anything actually on disk keeps until the sweep reclaims it on a later
+    // run, once the cache does open.
+    if (!_initialized) {
+      _inFlightRegionIds.remove(regionId);
+      _log.warning(
+        'Tile cache never initialized; region $regionId has no store to delete',
+      );
+      return;
+    }
     // coverage:ignore-start
     _ensureInitialized();
     final store = FMTCStore(regionStoreName(regionId));
@@ -651,22 +672,33 @@ class TileCacheService {
 
   /// Delete region stores that no longer belong to any region.
   ///
-  /// [knownRegionIds] must be every region currently recorded; anything else
-  /// carrying the region prefix is unreachable and is deleted. Stores that are
-  /// not ours are never touched.
+  /// [readKnownRegionIds] must yield every region currently recorded; anything
+  /// else carrying the region prefix is unreachable and is deleted. Stores that
+  /// are not ours are never touched.
+  ///
+  /// It is a callback rather than a set because the order of the reads decides
+  /// whether this is safe. A download that finishes while the sweep is running
+  /// writes its row and only then releases its in-flight mark, so the rows
+  /// must be read after that mark has been pinned: read the other way round,
+  /// the sweep sees neither and deletes the store of a region that exists,
+  /// leaving a row with a size and no tiles.
   ///
   /// Returns how many stores it deleted, so a caller showing storage totals
   /// knows whether they still describe what is on disk.
   Future<int> pruneOrphanRegionStores({
-    required Set<String> knownRegionIds,
+    required Future<Set<String>> Function() readKnownRegionIds,
   }) async {
     // coverage:ignore-start
     _ensureInitialized();
     final available = await FMTCRoot.stats.storesAvailable;
+    // Copied, not aliased: the live set keeps changing, and passing it through
+    // would have it read after the rows below rather than before them.
+    final inFlightRegionIds = Set<String>.of(_inFlightRegionIds);
+    final knownRegionIds = await readKnownRegionIds();
     final orphans = orphanRegionStores(
       availableStores: available.map((s) => s.storeName),
       knownRegionIds: knownRegionIds,
-      inFlightRegionIds: _inFlightRegionIds,
+      inFlightRegionIds: inFlightRegionIds,
     );
     var deleted = 0;
     for (final storeName in orphans) {

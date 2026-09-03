@@ -717,6 +717,15 @@ class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
 
     if (confirmed == true) {
       await ref.read(cachedRegionsNotifierProvider.notifier).clearAllCache();
+
+      // The clear goes region by region, so a locked store leaves that region
+      // behind while the rest go. Without a message that reads as "Clear all"
+      // quietly declining to clear all.
+      final error = ref.read(cachedRegionsNotifierProvider).error;
+      if (error == null || !context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.maps_offline_error('$error'))),
+      );
     }
   }
 }
