@@ -93,7 +93,8 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     }
     _logManualConsentUrl(url);
     throw const CloudStorageException(
-      'No browser accepted the Google consent URL.',
+      'No browser accepted the Google consent URL. Open the URL logged just '
+      'above this error to finish connecting by hand.',
     );
   }
 

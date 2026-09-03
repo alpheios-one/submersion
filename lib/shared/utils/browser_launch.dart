@@ -88,9 +88,14 @@ Future<bool> openInBrowser(
     final executable = opener.first;
     try {
       if (await run(executable, [...opener.skip(1), url])) return true;
-    } on ProcessException {
+    } on ProcessException catch (e) {
       // Process.start throws rather than returning non-zero when the
       // executable is absent, which is routine: no desktop ships all four.
+      // Logged rather than swallowed, because the same exception carries
+      // EACCES and ENOEXEC, and silence would make those undiagnosable. The
+      // message distinguishes them ("No such file or directory" vs
+      // "Permission denied") without us branching on a platform errno.
+      _log.warning('Browser opener $executable unavailable: ${e.message}');
     } on Exception catch (e) {
       _log.warning('Browser opener $executable failed: $e');
     }
