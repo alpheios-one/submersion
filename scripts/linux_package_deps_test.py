@@ -28,18 +28,21 @@ SONAME_MAP = {
     "libgtk-3.so.0": {
         "apt": "libgtk-3-0",
         "rpm": "libgtk-3.so.0()(64bit)",
+        "dnf": "gtk3",
         "pacman": "gtk3",
         "zypper": "gtk3",
     },
     "libc.so.6": {
         "apt": "libc6",
         "rpm": "libc.so.6()(64bit)",
+        "dnf": "glibc",
         "pacman": "glibc",
         "zypper": "glibc",
     },
     "libglib-2.0.so.0": {
         "apt": "libglib2.0-0",
         "rpm": "libglib-2.0.so.0()(64bit)",
+        "dnf": "glib2",
         "pacman": "glib2",
         "zypper": "libglib-2_0-0",
     },
@@ -112,7 +115,7 @@ class LoadMapTest(unittest.TestCase):
             "libstdc++.so.6",
         ):
             self.assertIn(soname, shipped)
-            for column in ("apt", "rpm", "pacman", "zypper"):
+            for column in ("apt", "rpm", "dnf", "pacman", "zypper"):
                 self.assertTrue(shipped[soname][column])
 
 

@@ -708,11 +708,23 @@ jobs:
             --package "Submersion-${TAG_NAME}-Linux-x86_64.rpm" \
             -C staging-rpm usr
 
+      # Runs after the package trees are staged, so these extras reach the
+      # tarball only. A tarball user has no package manager doing the work,
+      # so the archive carries its own installer and dependency map.
       - name: Create tarball
         env:
           TAG_NAME: ${{ inputs.version-tag }}
         run: |
-          cd build/linux/x64/release/bundle
+          set -euo pipefail
+          BUNDLE=build/linux/x64/release/bundle
+          cp scripts/release/linux_tarball_extras/install.sh "$BUNDLE/"
+          cp scripts/release/linux_tarball_extras/uninstall.sh "$BUNDLE/"
+          chmod +x "$BUNDLE/install.sh" "$BUNDLE/uninstall.sh"
+          cp scripts/data/linux_soname_map.json "$BUNDLE/deps.json"
+          python3 scripts/gen_udev_rules.py \
+            packages/libdivecomputer_plugin/third_party/libdivecomputer/src/descriptor.c \
+            > "$BUNDLE/60-submersion-divecomputers.rules"
+          cd "$BUNDLE"
           tar czf "$GITHUB_WORKSPACE/Submersion-${TAG_NAME}-Linux.tar.gz" .
 
       - name: Upload Linux artifacts
