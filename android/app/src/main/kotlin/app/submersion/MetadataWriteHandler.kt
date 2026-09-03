@@ -75,14 +75,25 @@ class MetadataWriteHandler(
                 return
             }
 
-            val contentUri =
-                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
-
             // Trust MediaStore over the caller. writePhotoMetadata opens the
             // asset "rw" and hands the descriptor to ExifInterface, so a video
             // that reached it would be written into. Proceed only for
             // something MediaStore itself calls an image.
-            val mimeType = appContext.contentResolver.getType(contentUri)
+            //
+            // Ask through the Files collection, not Images. Images is a view
+            // over MediaProvider's files table filtered to media_type=IMAGE, so
+            // a video's id appended to it resolves to no row and getType
+            // returns null: the mislabelled video this check exists to catch
+            // would report ASSET_NOT_FOUND rather than VIDEO_UNSUPPORTED. Files
+            // is the unfiltered view, so it answers for an id from any
+            // collection, which is what the iOS and macOS twins get for free
+            // from PHAsset.fetchAssets(withLocalIdentifiers:).
+            //
+            // The volume is spelled out rather than using MediaStore
+            // .VOLUME_EXTERNAL, which is API 29 and this module's minSdk is 26.
+            val filesUri =
+                ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), mediaId)
+            val mimeType = appContext.contentResolver.getType(filesUri)
             if (mimeType == null) {
                 result.error("ASSET_NOT_FOUND", "Photo not found with ID: $assetId", null)
                 return
@@ -93,6 +104,13 @@ class MetadataWriteHandler(
                 result.error(code, "Writing metadata to $mimeType is not supported.", null)
                 return
             }
+
+            // Write through the Images collection. MediaProvider derives
+            // media_type from the MIME type, so anything it reports as image/*
+            // is in that collection, and the narrower URI keeps the descriptor
+            // this opens scoped to the images the app is allowed to touch.
+            val contentUri =
+                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
 
             writePhotoMetadata(contentUri, metadata, description, result)
         } catch (e: Exception) {
