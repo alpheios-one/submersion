@@ -124,7 +124,7 @@ Widget _buildPanel({
   List<DiveDataSource> sources = const [],
   Map<String, SourceProfile> sourceProfiles = const {},
   ProfileAnalysis? activeSourceAnalysis,
-  List<dynamic> extraOverrides = const [],
+  List<Override> extraOverrides = const [],
 }) {
   return testApp(
     overrides: [

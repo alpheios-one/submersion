@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
@@ -184,6 +184,55 @@ void main() {
     expect(profile!.sourceId, 'src-a');
     expect(profile.computerId, 'dc-a');
     expect(profile.points, isEmpty);
+  });
+
+  test('a reload of the data sources keeps a consolidated dive classified as '
+      'multi-source, never falling back to dive.profile', () async {
+    // A DEPENDENCY-driven reload, which is how this happens in the app: the
+    // data sources watch the dive detail change tick, so any write behind the
+    // chart (the first-view safety review, a media write, a dive edit) puts
+    // them back into loading with their previous value retained. The
+    // distinction matters: AsyncValue.when defaults to
+    // skipLoadingOnRefresh: true but skipLoadingOnReload: false, so a getter
+    // built on `when` keeps the value through container.refresh and drops it
+    // here. Read that way the dive looks single-source for the frame, and
+    // callers draw dive.profile: on a consolidated dive, the merged union and
+    // the #543 sawtooth.
+    final tick = StateProvider<int>((ref) => 0);
+    final container = ProviderContainer(
+      overrides: [
+        diveDataSourcesProvider(diveId).overrideWith((ref) {
+          ref.watch(tick);
+          return Future.value(twoSources);
+        }),
+        sourceProfilesProvider(
+          diveId,
+        ).overrideWith((ref) => Future.value(twoProfiles)),
+      ],
+    );
+    addTearDown(container.dispose);
+    container.listen(activeSourceProfileProvider(diveId), (_, _) {});
+    await container.read(diveDataSourcesProvider(diveId).future);
+    await container.read(sourceProfilesProvider(diveId).future);
+    expect(
+      container.read(activeSourceProfileProvider(diveId))?.sourceId,
+      'src-a',
+      reason: 'baseline: the resolved state draws the primary',
+    );
+
+    container.read(tick.notifier).state = 1;
+    final reloading = container.read(diveDataSourcesProvider(diveId));
+    expect(reloading.isReloading, isTrue, reason: 'the reload window is open');
+    expect(reloading.hasValue, isTrue, reason: 'the previous value is kept');
+
+    final duringReload = container.read(activeSourceProfileProvider(diveId));
+    expect(
+      duringReload,
+      isNotNull,
+      reason: 'null here draws the merged union for a frame (#543)',
+    );
+    expect(duringReload!.sourceId, 'src-a');
+    expect(duringReload.points, pointsA);
   });
 
   test('resolves to null while the data sources are still loading', () async {

@@ -19,10 +19,15 @@ final overlaySourcesProvider = StateProvider.autoDispose
 
 /// The series the profile chart draws for [diveId] on a multi-source dive:
 /// the active source's own profile, or the primary's when nothing is
-/// selected (or the selection went stale after a split). Null on a
-/// single-source dive and while the data sources are still loading, so
-/// callers fall back to `dive.profile`, which is identical to the primary's
-/// series there.
+/// selected (or the selection went stale after a split).
+///
+/// Null in exactly two cases, both of which send callers to `dive.profile`:
+/// - a single-source dive, where `dive.profile` IS that source's series;
+/// - before the data sources have loaded at all, where "multi-source" cannot
+///   yet be known and `dive.profile` may still be the merged union for a
+///   frame.
+///
+/// A RELOAD is not one of those cases: see the reads below.
 ///
 /// Once the dive is known to have two or more sources this never returns
 /// null: while the per-source profiles are still loading (or the resolved
@@ -37,12 +42,23 @@ final overlaySourcesProvider = StateProvider.autoDispose
 /// surface that draws it renders a full-band sawtooth (#543).
 final activeSourceProfileProvider = Provider.autoDispose
     .family<SourceProfile?, String>((ref, diveId) {
+      // AsyncValue.value, not the valueOrNull polyfill. The polyfill is built
+      // on `when`, whose defaults are skipLoadingOnRefresh: true but
+      // skipLoadingOnReload: FALSE, so it drops to null whenever a dependency
+      // changes. Both reads here reload on the dive detail change tick (the
+      // first-view safety review write, a media write, any dive edit), and a
+      // null there made a consolidated dive look single-source for that
+      // frame: this provider returned null, callers drew `dive.profile`, and
+      // the merged union flashed its sawtooth back onto the chart (#543).
+      // .value retains the previous value across a reload and still yields
+      // null (rather than throwing) on an error with nothing cached, so the
+      // fall-back behaviour on failure is unchanged.
       final dataSources =
-          ref.watch(diveDataSourcesProvider(diveId)).valueOrNull ??
+          ref.watch(diveDataSourcesProvider(diveId)).value ??
           const <DiveDataSource>[];
       if (dataSources.length < 2) return null;
       final sourceProfiles =
-          ref.watch(sourceProfilesProvider(diveId)).valueOrNull ??
+          ref.watch(sourceProfilesProvider(diveId)).value ??
           const <String, SourceProfile>{};
       final activeSourceId = ref.watch(activeDiveSourceProvider(diveId));
       final primary =
