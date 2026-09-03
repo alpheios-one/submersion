@@ -770,7 +770,7 @@ void main() {
     });
 
     test('re-slots against the new merge when a combined dive is combined '
-        'again', () async {
+        'again, without splitting the strand it arrives as', () async {
       await seedDive('a', entry: DateTime.utc(2026, 7, 1, 9));
       await seedDive('b', entry: DateTime.utc(2026, 7, 1, 10));
       final first = await service.apply(['a', 'b']);
@@ -782,11 +782,56 @@ void main() {
       final rows = await (db.select(
         db.diveDataSources,
       )..where((t) => t.diveId.equals(mergedId))).get();
-      expect(rows, hasLength(3));
-      // Segment one contributed two rows; the primary-then-oldest ordering
-      // that decides their slots is the same one every canonical read uses.
-      expect(rows.map((r) => r.mergeSourceSlot).toList()..sort(), [0, 0, 1]);
-      expect(await diveRepo.getDataSources(mergedId), hasLength(2));
+      expect(rows, hasLength(3), reason: 'every segment keeps its provenance');
+      // The first segment arrives already collapsed to ONE strand, so both
+      // of its rows have to take the same new slot. Numbering rows rather
+      // than strands would hand them slots 0 and 1 while the third segment
+      // took slot 0 again, splitting one dive back into two chips whose
+      // spans interleave -- #1451 all over again, one combine later.
+      expect(rows.map((r) => r.mergeSourceSlot).toSet(), {0});
+      expect(await diveRepo.getDataSources(mergedId), hasLength(1));
+      expect(await diveRepo.hasMultipleDataSources(mergedId), isFalse);
+
+      final profiles = await diveRepo.getProfilesByDataSource(mergedId);
+      expect(profiles, hasLength(1));
+      final merged = await diveRepo.getDiveById(mergedId);
+      expect(
+        profiles.values.single.points.map((p) => p.timestamp).toList(),
+        merged!.profile.map((p) => p.timestamp).toList(),
+        reason: 'the middle segment is not stranded behind a second chip',
+      );
     });
+
+    test(
+      'a segment that carries two computers keeps one strand per computer',
+      () async {
+        // Consolidate-then-combine: re-slotting by strand must not flatten two
+        // computers into one chip the way it collapses one computer's halves.
+        // seedDive's computerId stamps the profile series only, so the source
+        // rows are attributed here.
+        await seedDive('a', entry: DateTime.utc(2026, 7, 1, 9));
+        await seedDive('b', entry: DateTime.utc(2026, 7, 1, 10));
+        for (final (sourceId, computerId) in const [
+          ('src-a', 'comp-1'),
+          ('src-b', 'comp-2'),
+        ]) {
+          await (db.update(db.diveDataSources)
+                ..where((t) => t.id.equals(sourceId)))
+              .write(DiveDataSourcesCompanion(computerId: Value(computerId)));
+        }
+
+        final merged = (await service.apply(['a', 'b'])).mergedDive.id;
+
+        final rows = await (db.select(
+          db.diveDataSources,
+        )..where((t) => t.diveId.equals(merged))).get();
+        expect(rows.map((r) => r.computerId).toSet(), {'comp-1', 'comp-2'});
+        expect(
+          await diveRepo.getDataSources(merged),
+          hasLength(2),
+          reason: 'computerId still wins over the slot',
+        );
+      },
+    );
   });
 }

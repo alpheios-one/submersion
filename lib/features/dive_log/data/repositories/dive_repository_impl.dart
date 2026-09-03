@@ -14,6 +14,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/data/services/data_source_strand.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample_point.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
@@ -1002,16 +1003,12 @@ class DiveRepository {
     final seenStrands = <String>{};
     final result = <DiveDataSourcesData>[];
     for (final row in rows) {
-      // Namespaced so a computer id can never be mistaken for a slot key.
-      // computerId wins when both are set: a merge-carried row still belongs
-      // to its computer's strand, and collapsing on it keeps a merged dive's
-      // rows in one chip with any later same-computer source.
-      final strand = switch ((row.computerId, row.mergeSourceSlot)) {
-        (final String id, _) => 'computer:$id',
-        (null, final int slot) => 'mergeSlot:$slot',
-        (null, null) => null,
-      };
-      if (strand == null || seenStrands.add(strand)) result.add(row);
+      final strand = dataSourceStrandKey(
+        rowId: row.id,
+        computerId: row.computerId,
+        mergeSourceSlot: row.mergeSourceSlot,
+      );
+      if (seenStrands.add(strand)) result.add(row);
     }
     return result;
   }
@@ -6196,12 +6193,21 @@ class DiveRepository {
 
   /// Return true if a dive has readings from 2 or more sources.
   ///
-  /// Counts distinct canonical strands rather than raw rows, by the same rule
-  /// [_canonicalDataSourceRows] applies: computer_id when there is one, else
+  /// Counts distinct canonical strands rather than raw rows, mirroring
+  /// [dataSourceStrandKey] in SQL: computer_id when there is one, else
   /// merge_source_slot for a row a sequential Combine carried here, else the
   /// row's own id (unique, so such a row is always its own strand). The two
   /// rows a Combine leaves behind therefore count as one, whether or not the
   /// segments came from a computer download (issue #1451).
+  ///
+  /// Deliberately the collapse rule alone, without the disjoint-span test the
+  /// profile surfaces add on top of it (`usesPerSourceRendering`). That test
+  /// exists because drawing one source on a 2D chart HIDES the others, which
+  /// is wrong for consecutive halves. This count's only caller is the 3D
+  /// page's dive/computers switcher, whose computers scene overlays every
+  /// strand at once, so nothing is hidden and two strands still have
+  /// something to compare -- two computers that each recorded half a dive
+  /// included.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
       final result = await _db
