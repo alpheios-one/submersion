@@ -256,6 +256,12 @@ class _DiveProfilePanelContentState
     // AsyncValue.value, not the valueOrNull polyfill: it keeps the previous
     // value across a provider reload so the chart does not drop a series for
     // a frame when a background write ticks the dive.
+    //
+    // That retention cannot cross a source switch: the analysis is keyed by
+    // source, so switching moves to a different family instance, which starts
+    // with no value. The outgoing source's curves are therefore never paired
+    // with the incoming source's series. Retention is scoped to a reload of
+    // ONE source's own analysis, where the series is the same one.
     final analysis = ref
         .watch(
           sourceProfileAnalysisProvider((

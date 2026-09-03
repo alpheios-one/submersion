@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:submersion/features/dive_log/data/services/profile_analysis_serv
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
@@ -120,6 +124,7 @@ Widget _buildPanel({
   List<DiveDataSource> sources = const [],
   Map<String, SourceProfile> sourceProfiles = const {},
   ProfileAnalysis? activeSourceAnalysis,
+  List<dynamic> extraOverrides = const [],
 }) {
   return testApp(
     overrides: [
@@ -159,6 +164,7 @@ Widget _buildPanel({
         tankPressuresProvider(
           highlightedDiveId,
         ).overrideWith((ref) => Future.value({})),
+      ...extraOverrides,
     ],
     child: const SizedBox(height: 350, width: 600, child: DiveProfilePanel()),
   );
@@ -952,6 +958,122 @@ void main() {
         expect(chart.profile.map((p) => p.temperature).toSet(), {15.0});
       },
     );
+
+    testWidgets('switching the active source draws no analysis until the new '
+        "source's own analysis resolves", (tester) async {
+      // The panel keys its analysis on the active source, so switching
+      // sources moves it to a DIFFERENT family instance rather than
+      // reloading the current one. AsyncValue.value retains a previous
+      // value only within one instance, so the incoming source starts with
+      // no value and the outgoing source's curves are never paired with the
+      // newly drawn series. This pins that: the alternative (curves held
+      // across the switch) would index a 7-point ceiling into a 61-point
+      // profile.
+      const diveId = 'consolidated-switch';
+      final now = DateTime(2026, 7, 13);
+      final perdix = List.generate(
+        7,
+        (i) => DiveProfilePoint(
+          timestamp: i * 10,
+          depth: i < 4 ? i * 3.0 : (6 - i) * 3.0,
+          temperature: 15.0,
+        ),
+      );
+      final garmin = List.generate(
+        61,
+        (i) => DiveProfilePoint(
+          timestamp: i,
+          depth: i < 31 ? i * 0.3 : (60 - i) * 0.3,
+          temperature: 16.5,
+        ),
+      );
+      final merged = [...perdix, ...garmin]
+        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      final dive = _makeDiveWithProfile(id: diveId, profile: merged);
+      final sources = [
+        DiveDataSource(
+          id: 'src-perdix',
+          diveId: diveId,
+          computerId: 'dc-perdix',
+          isPrimary: true,
+          importedAt: now,
+          createdAt: now,
+        ),
+        DiveDataSource(
+          id: 'src-garmin',
+          diveId: diveId,
+          computerId: 'dc-garmin',
+          isPrimary: false,
+          importedAt: now,
+          createdAt: now,
+        ),
+      ];
+      final profiles = {
+        'src-perdix': SourceProfile(
+          sourceId: 'src-perdix',
+          computerId: 'dc-perdix',
+          isEdited: false,
+          points: perdix,
+        ),
+        'src-garmin': SourceProfile(
+          sourceId: 'src-garmin',
+          computerId: 'dc-garmin',
+          isEdited: false,
+          points: garmin,
+        ),
+      };
+
+      // Held open for the whole test: the Garmin analysis stays loading, so
+      // any curve the chart draws after the switch could only be the
+      // Perdix analysis retained across it.
+      final garminAnalysis = Completer<ProfileAnalysis?>();
+      addTearDown(() {
+        if (!garminAnalysis.isCompleted) garminAnalysis.complete(null);
+      });
+
+      await tester.pumpWidget(
+        _buildPanel(
+          highlightedDiveId: diveId,
+          diveToReturn: dive,
+          sources: sources,
+          sourceProfiles: profiles,
+          activeSourceAnalysis: _makeAnalysis(profileLength: perdix.length),
+          extraOverrides: [
+            sourceProfileAnalysisProvider((
+              diveId: diveId,
+              sourceId: 'src-garmin',
+            )).overrideWith((ref) => garminAnalysis.future),
+          ],
+        ),
+      );
+      await _pumpUntilChartProfile(tester, perdix);
+      expect(
+        tester
+            .widget<DiveProfileChart>(find.byType(DiveProfileChart))
+            .ceilingCurve,
+        hasLength(perdix.length),
+        reason: 'the primary starts with its own analysis drawn',
+      );
+
+      ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfilePanel)),
+      ).read(activeDiveSourceProvider(diveId).notifier).state = 'src-garmin';
+      await _pumpUntilChartProfile(tester, garmin);
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.profile, garmin);
+      expect(chart.activeComputerId, 'dc-garmin');
+      expect(
+        chart.ceilingCurve,
+        isNull,
+        reason:
+            "the Perdix analysis must not survive onto the Garmin series; "
+            'a 7-point ceiling drawn against 61 points would misplace every '
+            'overlay',
+      );
+    });
 
     testWidgets('a single-source dive still draws dive.profile', (
       tester,
