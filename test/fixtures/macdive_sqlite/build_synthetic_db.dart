@@ -230,8 +230,8 @@ void _insertFixtureRows(Database db) {
   // ---- gas mixes ----
   db.execute('''
     INSERT INTO ZGAS (Z_PK, ZNAME, ZOXYGEN, ZHELIUM, ZUUID) VALUES
-      (1, 'EAN32', 0.32, 0, 'gas-uuid-1'),
-      (2, 'EAN80', 0.80, 0, 'gas-uuid-2')
+      (1, 'EAN32', 32.0, 0, 'gas-uuid-1'),
+      (2, 'EAN80', 80.0, 0, 'gas-uuid-2')
   ''');
 
   // ---- tanks ----
