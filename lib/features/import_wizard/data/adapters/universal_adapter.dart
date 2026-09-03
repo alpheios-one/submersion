@@ -667,10 +667,10 @@ class UniversalAdapter implements ImportSourceAdapter {
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
         files: notifierState.files,
         singleFileName: notifierState.fileName,
-        attach: (file, diveId, takenAt) => linker.linkBundled(
+        attach: (file, diveId, diveStart) => linker.linkBundled(
           file: file,
           diveId: diveId,
-          takenAt: takenAt,
+          diveStart: diveStart,
           destinationDir: bundledFolder,
         ),
       );
@@ -989,14 +989,18 @@ class UniversalAdapter implements ImportSourceAdapter {
   // Helpers — photo attachment
   // ---------------------------------------------------------------------------
 
-  /// Attaches ZIP-bundled photos to newly created dives.
+  /// Attaches ZIP-bundled photos to the dives their source file produced.
+  ///
+  /// [diveIdByIndex] is a target map, not strictly a map of newly created
+  /// dives: a duplicate the user skipped or consolidated resolves to the
+  /// existing dive it matched (see [photoTargetDiveIds]), so a bundled
+  /// photo can land on a dive that was already in the log.
   ///
   /// Photos are keyed by their source file's basename; a file's photos are
-  /// attached only when that file produced exactly one imported dive (the
-  /// DiveCloud shape) so a multi-dive file never duplicates photos across
-  /// its dives. Attach failures are logged and skipped, never thrown: the
-  /// dive import already succeeded and a failed photo must not fail the
-  /// wizard.
+  /// attached only when that file produced exactly one dive (the DiveCloud
+  /// shape) so a multi-dive file never duplicates photos across its dives.
+  /// Attach failures are logged and skipped, never thrown: the dive import
+  /// already succeeded and a failed photo must not fail the wizard.
   ///
   /// Returns the number of photos attached.
   static Future<int> attachImportedPhotos({
@@ -1006,7 +1010,11 @@ class UniversalAdapter implements ImportSourceAdapter {
     required List<Map<String, dynamic>> dives,
     required List<PickedImportFile> files,
     required String? singleFileName,
-    required Future<void> Function(File file, String diveId, DateTime? takenAt)
+    required Future<void> Function(
+      File file,
+      String diveId,
+      DateTime? diveStart,
+    )
     attach,
   }) async {
     if (photoPathsByBaseName.isEmpty || diveIdByIndex.isEmpty) return 0;
@@ -1043,10 +1051,12 @@ class UniversalAdapter implements ImportSourceAdapter {
       if (photos == null || entry.value.length != 1) continue;
       final diveIndex = entry.value.single.key;
       final diveId = entry.value.single.value;
-      final takenAt = dives[diveIndex]['dateTime'] as DateTime?;
+      // The dive's own start, which is a fallback for the photo's capture
+      // time and not a capture time itself: an archive carries no offset.
+      final diveStart = dives[diveIndex]['dateTime'] as DateTime?;
       for (final photoPath in photos) {
         try {
-          await attach(File(photoPath), diveId, takenAt);
+          await attach(File(photoPath), diveId, diveStart);
           attachedCount++;
         } catch (e) {
           // Best-effort: see doc comment. Logged, because this path now

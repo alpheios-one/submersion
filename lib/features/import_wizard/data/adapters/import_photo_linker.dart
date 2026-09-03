@@ -25,17 +25,20 @@ class ImportPhotoLinker {
   /// A photo extracted from an archive: written into [destinationDir] under
   /// its own name first, because the extracted copy lives in a temp folder
   /// the wizard deletes, then linked from its new home.
+  /// [diveStart] is the owning dive's start time, the last-resort capture
+  /// time: an archive records no per-photo offset, so this is a fallback
+  /// and never an asserted capture time.
   Future<void> linkBundled({
     required File file,
     required String diveId,
-    required DateTime? takenAt,
+    required DateTime? diveStart,
     required String destinationDir,
   }) async {
     final path = await exportBundledPhoto(
       source: file,
       destinationDir: destinationDir,
     );
-    await _link(path: path, diveId: diveId, fallbackTakenAt: takenAt);
+    await _link(path: path, diveId: diveId, fallbackTakenAt: diveStart);
   }
 
   /// A photo the logbook referenced by path, resolved on this device: it

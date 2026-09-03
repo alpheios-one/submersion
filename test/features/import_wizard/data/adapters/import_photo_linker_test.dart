@@ -121,7 +121,7 @@ void main() {
       await linker.linkBundled(
         file: extracted,
         diveId: 'dive-1',
-        takenAt: DateTime.utc(2025, 1, 15, 10),
+        diveStart: DateTime.utc(2025, 1, 15, 10),
         destinationDir: dest,
       );
 
