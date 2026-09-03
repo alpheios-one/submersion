@@ -628,6 +628,86 @@ jobs:
         # app (issue #1129).
         run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
+      - name: Install packaging tools
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            ruby ruby-dev build-essential rpm python3-pil
+          gem install --no-document fpm
+
+      # Staged before the tarball step, so the installer scripts the tarball
+      # carries never leak into the package trees.
+      - name: Stage package trees
+        env:
+          TAG_NAME: ${{ inputs.version-tag }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+          echo "PKG_VERSION=$VERSION" >> "$GITHUB_ENV"
+          for method in deb rpm; do
+            python3 scripts/release/stage_linux_package.py \
+              build/linux/x64/release/bundle \
+              "staging-$method" \
+              --version "$VERSION" \
+              --install-method "$method"
+          done
+
+      - name: Derive runtime dependencies
+        run: |
+          set -euo pipefail
+          python3 scripts/linux_package_deps.py \
+            build/linux/x64/release/bundle --format deb > deps-deb.txt
+          python3 scripts/linux_package_deps.py \
+            build/linux/x64/release/bundle --format rpm > deps-rpm.txt
+          echo "--- deb dependencies ---"; cat deps-deb.txt
+          echo "--- rpm dependencies ---"; cat deps-rpm.txt
+
+      - name: Build .deb and .rpm
+        env:
+          TAG_NAME: ${{ inputs.version-tag }}
+        run: |
+          set -euo pipefail
+          common_args=(
+            --name submersion
+            --version "$PKG_VERSION"
+            --license GPL-3.0
+            --maintainer "Submersion <dev@submersion.app>"
+            --url "https://submersion.app"
+            --description "An open-source dive logging application for scuba divers."
+            --input-type dir
+          )
+
+          # ffmpeg and gnome-keyring are weak dependencies on purpose. ffmpeg
+          # is absent from stock Fedora (it lives in RPM Fusion), so a hard
+          # requirement would make the package uninstallable there, and the
+          # app already degrades gracefully without it. gnome-keyring supplies
+          # the Secret Service that flutter_secure_storage_linux needs, which
+          # is present on GNOME and KDE but not on minimal window managers.
+          deb_depends=()
+          while read -r dep; do
+            [ -n "$dep" ] && deb_depends+=(--depends "$dep")
+          done < deps-deb.txt
+          fpm "${common_args[@]}" \
+            --output-type deb \
+            --architecture amd64 \
+            "${deb_depends[@]}" \
+            --deb-recommends ffmpeg \
+            --deb-recommends gnome-keyring \
+            --package "Submersion-${TAG_NAME}-Linux-amd64.deb" \
+            -C staging-deb usr
+
+          rpm_depends=()
+          while read -r dep; do
+            [ -n "$dep" ] && rpm_depends+=(--depends "$dep")
+          done < deps-rpm.txt
+          fpm "${common_args[@]}" \
+            --output-type rpm \
+            --architecture x86_64 \
+            "${rpm_depends[@]}" \
+            --rpm-tag "Recommends: ffmpeg" \
+            --rpm-tag "Recommends: gnome-keyring" \
+            --package "Submersion-${TAG_NAME}-Linux-x86_64.rpm" \
+            -C staging-rpm usr
+
       - name: Create tarball
         env:
           TAG_NAME: ${{ inputs.version-tag }}
@@ -635,11 +715,14 @@ jobs:
           cd build/linux/x64/release/bundle
           tar czf "$GITHUB_WORKSPACE/Submersion-${TAG_NAME}-Linux.tar.gz" .
 
-      - name: Upload Linux artifact
+      - name: Upload Linux artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: linux-tar
-          path: Submersion-*.tar.gz
+          name: linux-packages
+          path: |
+            Submersion-*.tar.gz
+            Submersion-*.deb
+            Submersion-*.rpm
           retention-days: 5
 
   # ============================================================================
