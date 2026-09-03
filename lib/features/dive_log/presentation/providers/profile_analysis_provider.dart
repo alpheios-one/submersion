@@ -431,10 +431,17 @@ ProfileAnalysisService _resolveAnalysisService(
   MetricDataSource gtrSource = MetricDataSource.calculated,
   RebreatherPpO2? rebreatherPpO2,
 }) {
-  final hasComputerNdl = profile.any((p) => p.ndl != null);
-  final hasComputerCeiling = profile.any((p) => p.ceiling != null);
-  // TTS=0 is a sentinel from dive computers that don't track TTS;
-  // treat it as unavailable so we fall back to calculated values.
+  // A zero is not a reading. Computers that do not measure one of these
+  // still leave a zero in every sample, so a series that is zero from end to
+  // end counts as unreported and the calculated curve stands. TTS has always
+  // been read that way; the Cressi Leonardo forces the same rule on the other
+  // two, because it logs its deco obligation as a single bit and no numbers,
+  // leaving a stop depth of zero through a stop and a no-stop time of zero
+  // for the rest of the dive.
+  final hasComputerNdl = profile.any((p) => p.ndl != null && p.ndl! > 0);
+  final hasComputerCeiling = profile.any(
+    (p) => p.ceiling != null && p.ceiling! > 0,
+  );
   final hasComputerTts = profile.any((p) => p.tts != null && p.tts! > 0);
   final hasComputerCns = profile.any((p) => p.cns != null);
   // Air-integrated computers log their own GTR (libdc RBT, stored in

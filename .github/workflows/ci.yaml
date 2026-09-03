@@ -1194,6 +1194,82 @@ jobs:
   # `changes` is likewise listed: on a docs/CI-only change it reports code=false
   # and the whole pipeline SKIPS (an accepted green), but if the detector itself
   # FAILS we must not silently skip-then-green, so its failure must reach here.
+  # A submodule pointer is a single sha with no file diff, so a pull request
+  # that moves libdivecomputer backwards reverts every fork commit in between
+  # while showing a reviewer nothing at all to look at. PR #342 sat with a
+  # pointer that would have silently undone two shipped driver fixes. Nothing
+  # else in the pipeline can catch this: the app still builds, and the reverted
+  # commits are drivers no CI job exercises.
+  #
+  # The invariant is one-directional on purpose. The pointer may run AHEAD of
+  # the fork's submersion-patches tip (a patch is pushed to the fork before the
+  # app pull request that adopts it merges), and it may stand still. It may
+  # never contain less than the base branch already contains.
+  submodule-pointer:
+    name: libdivecomputer pointer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: The libdivecomputer pointer must not go backwards
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          sub=packages/libdivecomputer_plugin/third_party/libdivecomputer
+          if [ "$EVENT" = "pull_request" ]; then
+            base="$PR_BASE"; head="$PR_HEAD"
+          else
+            base="$PUSH_BEFORE"; head="$PUSH_AFTER"
+          fi
+          if [ -z "$base" ] || ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
+            echo "Base commit unavailable ('$base'); nothing to compare against."
+            exit 0
+          fi
+
+          base_link="$(git rev-parse --verify --quiet "${base}:${sub}" || true)"
+          head_link="$(git rev-parse --verify "${head}:${sub}")"
+          if [ -z "$base_link" ]; then
+            echo "The submodule is new on this branch; nothing to compare against."
+            exit 0
+          fi
+          if [ "$base_link" = "$head_link" ]; then
+            echo "Pointer unchanged at $head_link."
+            exit 0
+          fi
+
+          # The base pointer may be unreachable from the shallow submodule
+          # clone, and either end may live on a branch this checkout never
+          # fetched, so take the whole fork before deciding.
+          git -C "$sub" fetch --quiet --tags origin '+refs/heads/*:refs/remotes/origin/*'
+
+          for sha in "$base_link" "$head_link"; do
+            if ! git -C "$sub" cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              echo "::error::libdivecomputer commit $sha is not reachable in $(git config -f .gitmodules submodule.${sub}.url). Push the branch it lives on before merging."
+              exit 1
+            fi
+          done
+
+          if git -C "$sub" merge-base --is-ancestor "$base_link" "$head_link"; then
+            echo "Pointer moves forward: $base_link -> $head_link"
+            exit 0
+          fi
+
+          echo "The libdivecomputer pointer moves to a commit that does not contain the base branch's."
+          echo "Base: $base_link"
+          echo "Head: $head_link"
+          echo "These commits are on the base pointer and would be reverted:"
+          git -C "$sub" log --oneline "${head_link}..${base_link}"
+          echo "::error::libdivecomputer pointer would revert the commits listed above. Rebase the submodule branch onto the current submersion-patches tip and update the pointer."
+          exit 1
+
   ci-success:
     name: CI Success
     if: always()
@@ -1209,6 +1285,7 @@ jobs:
       - build-android
       - build-linux
       - build-windows
+      - submodule-pointer
     runs-on: ubuntu-latest
     steps:
       - name: Verify all required jobs succeeded

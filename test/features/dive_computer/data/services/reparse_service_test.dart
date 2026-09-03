@@ -2249,6 +2249,62 @@ void main() {
       expect(events[6].severity, 'alert');
     });
 
+    test(
+      'a deco event carrying the END flag re-parses as decoStopEnd',
+      () async {
+        // libdivecomputer reports both ends of a stop as SAMPLE_EVENT_DECOSTOP
+        // and separates them with SAMPLE_FLAGS_BEGIN (1) / SAMPLE_FLAGS_END (2),
+        // which the platform bindings pass through in the event data map. The
+        // Cressi Leonardo is the first computer whose parser reports the pair
+        // (PR #342); without the flag both ends persisted as a stop starting.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        final parsed = makeParsedDive(
+          events: [
+            pigeon.DiveEvent(
+              timeSeconds: 200,
+              type: 'deco',
+              data: {'flags': '1', 'value': '0'},
+            ),
+            pigeon.DiveEvent(
+              timeSeconds: 400,
+              type: 'deco',
+              data: {'flags': '2', 'value': '0'},
+            ),
+            pigeon.DiveEvent(timeSeconds: 600, type: 'deco'),
+          ],
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: parsed,
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final events =
+            await (db.select(db.diveProfileEvents)
+                  ..where((t) => t.diveId.equals('dive-1'))
+                  ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+                .get();
+        expect(events.map((e) => e.eventType).toList(), [
+          'decoStopStart',
+          'decoStopEnd',
+          'decoStopStart',
+        ]);
+      },
+    );
+
     test('rbt and airtime events re-parse as lowGas warnings', () async {
       // Before the event-code table was corrected, libdivecomputer's RBT code
       // arrived as 'ascent' and its AIRTIME code as 'PO2', so neither name
