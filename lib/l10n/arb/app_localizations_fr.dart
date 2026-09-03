@@ -7737,7 +7737,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Cette plongée a été combinée à partir de $count plongées. Le profil, les événements, les blocs et les changements de gaz de chacune retournent dans leur propre plongée. Les binômes, les tags, le matériel, les médias, les notes et le numéro de plongée restent sur cette plongée.';
+    return 'Cette plongée a été combinée à partir de $count plongées. Le profil, les événements, les blocs et les changements de gaz de chacune retournent dans leur propre plongée. Le reste du carnet, dont les binômes, les tags, le matériel, les médias, les notes et le numéro de plongée, reste sur cette plongée.';
   }
 
   @override

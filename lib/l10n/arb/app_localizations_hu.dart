@@ -7684,7 +7684,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Ez a merülés $count merülésből lett összevonva. Mindegyik profilja, eseményei, palackjai és gázváltásai visszakerülnek a saját merülésükbe. A búvártársak, a cimkék, a felszerelés, a médiafájlok, a jegyzetek és a merülés száma ezen a merülésen maradnak.';
+    return 'Ez a merülés $count merülésből lett összevonva. Mindegyik profilja, eseményei, palackjai és gázváltásai visszakerülnek a saját merülésükbe. A naplóbejegyzés többi része, köztük a búvártársak, a cimkék, a felszerelés, a médiafájlok, a jegyzetek és a merülés száma, ezen a merülésen marad.';
   }
 
   @override

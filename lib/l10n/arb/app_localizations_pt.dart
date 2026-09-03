@@ -7707,7 +7707,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Este mergulho foi combinado a partir de $count mergulhos. O perfil, os eventos, os cilindros e as trocas de gás de cada um voltam para o seu próprio mergulho. Parceiros, tags, equipamentos, mídia, notas e o número do mergulho permanecem neste mergulho.';
+    return 'Este mergulho foi combinado a partir de $count mergulhos. O perfil, os eventos, os cilindros e as trocas de gás de cada um voltam para o seu próprio mergulho. O restante do registro, incluindo parceiros, tags, equipamentos, mídia, notas e o número do mergulho, permanece neste mergulho.';
   }
 
   @override

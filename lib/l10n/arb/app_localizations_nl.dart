@@ -7646,7 +7646,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Deze duik is samengevoegd uit $count duiken. Het profiel, de gebeurtenissen, de flessen en de gaswissels van elke duik gaan terug naar hun eigen duik. Buddy\'s, tags, uitrusting, media, notities en het duiknummer blijven bij deze duik.';
+    return 'Deze duik is samengevoegd uit $count duiken. Het profiel, de gebeurtenissen, de flessen en de gaswissels van elke duik gaan terug naar hun eigen duik. De rest van de logboekvermelding, waaronder buddy\'s, tags, uitrusting, media, notities en het duiknummer, blijft bij deze duik.';
   }
 
   @override

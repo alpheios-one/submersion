@@ -2548,7 +2548,7 @@
   "diveLog_sources_splitFailed": "Splitsen mislukt",
   "diveLog_sources_menu_separate": "Samengevoegde duiken scheiden",
   "diveLog_sources_separateDialog_title": "Samengevoegde duiken scheiden?",
-  "diveLog_sources_separateDialog_body": "Deze duik is samengevoegd uit {count} duiken. Het profiel, de gebeurtenissen, de flessen en de gaswissels van elke duik gaan terug naar hun eigen duik. Buddy's, tags, uitrusting, media, notities en het duiknummer blijven bij deze duik.",
+  "diveLog_sources_separateDialog_body": "Deze duik is samengevoegd uit {count} duiken. Het profiel, de gebeurtenissen, de flessen en de gaswissels van elke duik gaan terug naar hun eigen duik. De rest van de logboekvermelding, waaronder buddy's, tags, uitrusting, media, notities en het duiknummer, blijft bij deze duik.",
   "diveLog_sources_separateDialog_confirm": "Scheiden",
   "diveLog_sources_separateDone": "{count, plural, =1{1 duik hersteld} other{{count} duiken hersteld}}",
   "diveLog_sources_separateFailed": "Kon deze duik niet scheiden",

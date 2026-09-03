@@ -4057,7 +4057,7 @@
   "diveLog_sources_splitFailed": "Split failed",
   "diveLog_sources_menu_separate": "Separate combined dives",
   "diveLog_sources_separateDialog_title": "Separate combined dives?",
-  "diveLog_sources_separateDialog_body": "This dive was combined from {count} dives. Each one's profile, events, tanks and gas switches move back to its own dive. Buddies, tags, equipment, media, notes and the dive number stay on this dive.",
+  "diveLog_sources_separateDialog_body": "This dive was combined from {count} dives. Each one's profile, events, tanks and gas switches move back to its own dive. The rest of the logbook entry, including buddies, tags, equipment, media, notes and the dive number, stays on this dive.",
   "@diveLog_sources_separateDialog_body": {"placeholders": {"count": {"type": "int"}}},
   "diveLog_sources_separateDialog_confirm": "Separate",
   "diveLog_sources_separateDone": "{count, plural, =1{1 dive restored} other{{count} dives restored}}",

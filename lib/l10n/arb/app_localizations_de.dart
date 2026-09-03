@@ -7700,7 +7700,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Dieser Tauchgang wurde aus $count Tauchgängen kombiniert. Profil, Ereignisse, Flaschen und Gaswechsel jedes einzelnen wandern zurück in seinen eigenen Tauchgang. Tauchpartner, Tags, Ausrüstung, Medien, Notizen und die Tauchgangsnummer bleiben bei diesem Tauchgang.';
+    return 'Dieser Tauchgang wurde aus $count Tauchgängen kombiniert. Profil, Ereignisse, Flaschen und Gaswechsel jedes einzelnen wandern zurück in seinen eigenen Tauchgang. Der Rest des Logbucheintrags, darunter Tauchpartner, Tags, Ausrüstung, Medien, Notizen und die Tauchgangsnummer, bleibt bei diesem Tauchgang.';
   }
 
   @override

@@ -7335,7 +7335,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return '本次潜水由 $count 次潜水合并而成。每次潜水的剖面、事件、气瓶和换气记录都会回到各自的潜水中。潜伴、标签、装备、媒体、备注和潜水编号仍保留在本次潜水中。';
+    return '本次潜水由 $count 次潜水合并而成。每次潜水的剖面、事件、气瓶和换气记录都会回到各自的潜水中。日志条目的其余部分，包括潜伴、标签、装备、媒体、备注和潜水编号，仍保留在本次潜水中。';
   }
 
   @override

@@ -12932,7 +12932,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_sources_separateDialog_body.
   ///
   /// In en, this message translates to:
-  /// **'This dive was combined from {count} dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. Buddies, tags, equipment, media, notes and the dive number stay on this dive.'**
+  /// **'This dive was combined from {count} dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. The rest of the logbook entry, including buddies, tags, equipment, media, notes and the dive number, stays on this dive.'**
   String diveLog_sources_separateDialog_body(int count);
 
   /// No description provided for @diveLog_sources_separateDialog_confirm.

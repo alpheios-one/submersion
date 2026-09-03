@@ -7706,7 +7706,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Esta inmersión se combinó a partir de $count inmersiones. El perfil, los eventos, los tanques y los cambios de gas de cada una vuelven a su propia inmersión. Los compañeros, las etiquetas, el equipo, los archivos multimedia, las notas y el número de inmersión permanecen en esta inmersión.';
+    return 'Esta inmersión se combinó a partir de $count inmersiones. El perfil, los eventos, los tanques y los cambios de gas de cada una vuelven a su propia inmersión. El resto de la entrada del cuaderno, incluidos los compañeros, las etiquetas, el equipo, los archivos multimedia, las notas y el número de inmersión, permanece en esta inmersión.';
   }
 
   @override

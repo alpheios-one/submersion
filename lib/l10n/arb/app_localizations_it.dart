@@ -7707,7 +7707,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String diveLog_sources_separateDialog_body(int count) {
-    return 'Questa immersione è stata unita da $count immersioni. Il profilo, gli eventi, le bombole e i cambi gas di ciascuna tornano nella propria immersione. Compagni, tag, attrezzatura, media, note e il numero dell\'immersione restano su questa immersione.';
+    return 'Questa immersione è stata unita da $count immersioni. Il profilo, gli eventi, le bombole e i cambi gas di ciascuna tornano nella propria immersione. Il resto della voce di logbook, compresi compagni, tag, attrezzatura, media, note e il numero dell\'immersione, resta su questa immersione.';
   }
 
   @override

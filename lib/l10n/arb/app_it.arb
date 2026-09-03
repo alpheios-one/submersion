@@ -2475,7 +2475,7 @@
   "diveLog_sources_splitFailed": "Divisione non riuscita",
   "diveLog_sources_menu_separate": "Separa le immersioni unite",
   "diveLog_sources_separateDialog_title": "Separare le immersioni unite?",
-  "diveLog_sources_separateDialog_body": "Questa immersione è stata unita da {count} immersioni. Il profilo, gli eventi, le bombole e i cambi gas di ciascuna tornano nella propria immersione. Compagni, tag, attrezzatura, media, note e il numero dell'immersione restano su questa immersione.",
+  "diveLog_sources_separateDialog_body": "Questa immersione è stata unita da {count} immersioni. Il profilo, gli eventi, le bombole e i cambi gas di ciascuna tornano nella propria immersione. Il resto della voce di logbook, compresi compagni, tag, attrezzatura, media, note e il numero dell'immersione, resta su questa immersione.",
   "diveLog_sources_separateDialog_confirm": "Separa",
   "diveLog_sources_separateDone": "{count, plural, =1{1 immersione ripristinata} other{{count} immersioni ripristinate}}",
   "diveLog_sources_separateFailed": "Impossibile separare questa immersione",
