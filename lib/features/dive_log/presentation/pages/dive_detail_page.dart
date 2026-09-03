@@ -518,8 +518,25 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               // it can be pulled back apart (issue #1504). Read separately
               // from the source count: the halves of a combined import
               // collapse to a single display source (#1451).
+              //
+              // Read through the built-in AsyncValue.value, not the
+              // valueOrNull polyfill. The two agree on every rebuild this
+              // provider takes today: invalidateSelfWhen on the analysis tick
+              // and the outright invalidate after a separation are both
+              // self-invalidates, and the polyfill is `when`, which defaults
+              // skipLoadingOnRefresh: true, so a refresh keeps the previous
+              // count either way.
+              //
+              // They diverge on a RELOAD, the rebuild a changed dependency
+              // forces, where `when` takes its loading branch and valueOrNull
+              // answers null. Nothing reloads this provider yet: it watches
+              // only singletons that never rebuild. `.value` is what keeps the
+              // read correct if that changes, since `valueOrNull ?? 0` would
+              // read as "never combined" for a frame and blink the Separate
+              // action out of the section. _buildProfileSection reads the same
+              // way, and there the reload path is already live (#1468).
               final segmentCount =
-                  ref.watch(diveSegmentCountProvider(dive.id)).valueOrNull ?? 0;
+                  ref.watch(diveSegmentCountProvider(dive.id)).value ?? 0;
               return DataSourcesSection(
                 dataSources: dataSources,
                 diveCreatedAt: dive.dateTime,
