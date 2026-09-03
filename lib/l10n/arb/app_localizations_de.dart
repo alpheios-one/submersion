@@ -7692,6 +7692,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Aufteilen fehlgeschlagen';
 
   @override
+  String get diveLog_sources_menu_separate => 'Kombinierte Tauchgänge trennen';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Kombinierte Tauchgänge trennen?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Dieser Tauchgang wurde aus $count Tauchgängen kombiniert. Profil, Ereignisse, Flaschen und Gaswechsel jedes einzelnen wandern zurück in seinen eigenen Tauchgang. Tauchpartner, Tags, Ausrüstung, Medien, Notizen und die Tauchgangsnummer bleiben bei diesem Tauchgang.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Trennen';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge wiederhergestellt',
+      one: '1 Tauchgang wiederhergestellt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'Dieser Tauchgang konnte nicht getrennt werden';
+
+  @override
   String get divePlanner_action_addTank => 'Flasche hinzufügen';
 
   @override

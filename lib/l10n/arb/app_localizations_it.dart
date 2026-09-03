@@ -7699,6 +7699,36 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Divisione non riuscita';
 
   @override
+  String get diveLog_sources_menu_separate => 'Separa le immersioni unite';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Separare le immersioni unite?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Questa immersione è stata unita da $count immersioni. Il profilo, gli eventi, le bombole e i cambi gas di ciascuna tornano nella propria immersione. Compagni, tag, attrezzatura, media, note e il numero dell\'immersione restano su questa immersione.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separa';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni ripristinate',
+      one: '1 immersione ripristinata',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'Impossibile separare questa immersione';
+
+  @override
   String get divePlanner_action_addTank => 'Aggiungi Bombola';
 
   @override

@@ -7558,6 +7558,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Split failed';
 
   @override
+  String get diveLog_sources_menu_separate => 'Separate combined dives';
+
+  @override
+  String get diveLog_sources_separateDialog_title => 'Separate combined dives?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'This dive was combined from $count dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. Buddies, tags, equipment, media, notes and the dive number stay on this dive.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separate';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives restored',
+      one: '1 dive restored',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => 'Could not separate this dive';
+
+  @override
   String get divePlanner_action_addTank => 'Add Tank';
 
   @override

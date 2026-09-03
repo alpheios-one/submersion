@@ -12917,6 +12917,42 @@ abstract class AppLocalizations {
   /// **'Split failed'**
   String get diveLog_sources_splitFailed;
 
+  /// No description provided for @diveLog_sources_menu_separate.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate combined dives'**
+  String get diveLog_sources_menu_separate;
+
+  /// No description provided for @diveLog_sources_separateDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate combined dives?'**
+  String get diveLog_sources_separateDialog_title;
+
+  /// No description provided for @diveLog_sources_separateDialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive was combined from {count} dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. Buddies, tags, equipment, media, notes and the dive number stay on this dive.'**
+  String diveLog_sources_separateDialog_body(int count);
+
+  /// No description provided for @diveLog_sources_separateDialog_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate'**
+  String get diveLog_sources_separateDialog_confirm;
+
+  /// No description provided for @diveLog_sources_separateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive restored} other{{count} dives restored}}'**
+  String diveLog_sources_separateDone(int count);
+
+  /// No description provided for @diveLog_sources_separateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not separate this dive'**
+  String get diveLog_sources_separateFailed;
+
   /// No description provided for @divePlanner_action_addTank.
   ///
   /// In en, this message translates to:

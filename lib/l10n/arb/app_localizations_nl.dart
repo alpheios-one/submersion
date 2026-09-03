@@ -7638,6 +7638,35 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Splitsen mislukt';
 
   @override
+  String get diveLog_sources_menu_separate => 'Samengevoegde duiken scheiden';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Samengevoegde duiken scheiden?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Deze duik is samengevoegd uit $count duiken. Het profiel, de gebeurtenissen, de flessen en de gaswissels van elke duik gaan terug naar hun eigen duik. Buddy\'s, tags, uitrusting, media, notities en het duiknummer blijven bij deze duik.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Scheiden';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken hersteld',
+      one: '1 duik hersteld',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => 'Kon deze duik niet scheiden';
+
+  @override
   String get divePlanner_action_addTank => 'Fles toevoegen';
 
   @override
