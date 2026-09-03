@@ -7744,6 +7744,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Échec de la scission';
 
   @override
+  String get diveLog_sources_menu_separate => 'Séparer les plongées combinées';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Séparer les plongées combinées ?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Cette plongée a été combinée à partir de $count plongées. Le profil, les événements, les blocs et les changements de gaz de chacune retournent dans leur propre plongée. Le reste du carnet, dont les binômes, les tags, le matériel, les médias, les notes et le numéro de plongée, reste sur cette plongée.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Séparer';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées restaurées',
+      one: '1 plongée restaurée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'Impossible de séparer cette plongée';
+
+  @override
   String get divePlanner_action_addTank => 'Ajouter une bouteille';
 
   @override

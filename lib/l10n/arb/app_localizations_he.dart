@@ -7518,6 +7518,36 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'הפיצול נכשל';
 
   @override
+  String get diveLog_sources_menu_separate => 'הפרדת צלילות ממוזגות';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'להפריד את הצלילות הממוזגות?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'הצלילה הזו מוזגה מ-$count צלילות. הפרופיל, האירועים, הבלונים והחלפות הגז של כל אחת יחזרו לצלילה שלה. שאר רשומת היומן, ובכללה השותפים, התגיות, הציוד, המדיה, ההערות ומספר הצלילה, תישאר בצלילה הזו.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'הפרדה';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות שוחזרו',
+      one: 'צלילה אחת שוחזרה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'לא ניתן היה להפריד את הצלילה הזו';
+
+  @override
   String get divePlanner_action_addTank => 'הוסף מיכל';
 
   @override

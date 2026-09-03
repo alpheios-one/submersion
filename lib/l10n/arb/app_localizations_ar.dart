@@ -7558,6 +7558,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'فشل الفصل';
 
   @override
+  String get diveLog_sources_menu_separate => 'فصل الغوصات المدمجة';
+
+  @override
+  String get diveLog_sources_separateDialog_title => 'فصل الغوصات المدمجة؟';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'تم دمج هذه الغوصة من $count غوصات. يعود ملف كل غوصة وأحداثها وأسطواناتها وتبديلات الغاز إلى غوصتها الخاصة. أما بقية بيانات السجل، بما فيها رفقاء الغوص والوسوم والمعدات والوسائط والملاحظات ورقم الغوصة، فتبقى في هذه الغوصة.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'فصل';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت استعادة $count غوصات',
+      one: 'تمت استعادة غوصة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => 'تعذّر فصل هذه الغوصة';
+
+  @override
   String get divePlanner_action_addTank => 'إضافة أسطوانة';
 
   @override

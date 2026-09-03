@@ -7713,6 +7713,36 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Error al separar';
 
   @override
+  String get diveLog_sources_menu_separate => 'Separar inmersiones combinadas';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      '¿Separar las inmersiones combinadas?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Esta inmersión se combinó a partir de $count inmersiones. El perfil, los eventos, los tanques y los cambios de gas de cada una vuelven a su propia inmersión. El resto de la entrada del cuaderno, incluidos los compañeros, las etiquetas, el equipo, los archivos multimedia, las notas y el número de inmersión, permanece en esta inmersión.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separar';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones restauradas',
+      one: '1 inmersión restaurada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'No se pudo separar esta inmersión';
+
+  @override
   String get divePlanner_action_addTank => 'Agregar Botella';
 
   @override

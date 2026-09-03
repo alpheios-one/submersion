@@ -7341,6 +7341,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_sources_splitFailed => '拆分失败';
 
   @override
+  String get diveLog_sources_menu_separate => '拆分合并的潜水';
+
+  @override
+  String get diveLog_sources_separateDialog_title => '要拆分合并的潜水吗？';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return '本次潜水由 $count 次潜水合并而成。每次潜水的剖面、事件、气瓶和换气记录都会回到各自的潜水中。日志条目的其余部分，包括潜伴、标签、装备、媒体、备注和潜水编号，仍保留在本次潜水中。';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => '拆分';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已恢复 $count 次潜水',
+      one: '已恢复 $count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => '无法拆分这次潜水';
+
+  @override
   String get divePlanner_action_addTank => '添加气瓶';
 
   @override

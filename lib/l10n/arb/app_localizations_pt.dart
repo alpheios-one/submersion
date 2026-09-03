@@ -7714,6 +7714,36 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'Falha ao dividir';
 
   @override
+  String get diveLog_sources_menu_separate => 'Separar mergulhos combinados';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Separar os mergulhos combinados?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Este mergulho foi combinado a partir de $count mergulhos. O perfil, os eventos, os cilindros e as trocas de gás de cada um voltam para o seu próprio mergulho. O restante do registro, incluindo parceiros, tags, equipamentos, mídia, notas e o número do mergulho, permanece neste mergulho.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separar';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos restaurados',
+      one: '1 mergulho restaurado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'Não foi possível separar este mergulho';
+
+  @override
   String get divePlanner_action_addTank => 'Adicionar Cilindro';
 
   @override

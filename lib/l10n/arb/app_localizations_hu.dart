@@ -7690,6 +7690,37 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'A szétválasztás sikertelen';
 
   @override
+  String get diveLog_sources_menu_separate =>
+      'Összevont merülések szétválasztása';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'Szétválasztja az összevont merüléseket?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Ez a merülés $count merülésből lett összevonva. Mindegyik profilja, eseményei, palackjai és gázváltásai visszakerülnek a saját merülésükbe. A naplóbejegyzés többi része, köztük a búvártársak, a cimkék, a felszerelés, a médiafájlok, a jegyzetek és a merülés száma, ezen a merülésen marad.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Szétválasztás';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés helyreállítva',
+      one: '1 merülés helyreállítva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'Nem sikerült szétválasztani ezt a merülést';
+
+  @override
   String get divePlanner_action_addTank => 'Palack hozzáadása';
 
   @override

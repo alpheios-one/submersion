@@ -665,6 +665,45 @@ class ProfileSeriesRepository {
     return ids.length;
   }
 
+  /// Where each series of [diveId] sits on the timeline, without its blob.
+  ///
+  /// [getRowsForDives] selects whole rows, so it reads every packed sample
+  /// blob off disk even when the caller only wants the summary scalars beside
+  /// them. This projects to the four columns a span needs, for callers on a
+  /// UI path: `diveSegmentCountProvider` asks on every dive-detail open
+  /// whether the dive can be separated (issue #1504), and a dive's samples
+  /// are the most expensive thing it owns.
+  ///
+  /// Ordered like [getIdentitiesForDive], earliest first then by id.
+  Future<
+    List<({String id, String? sourceId, int startTimestamp, int endTimestamp})>
+  >
+  getSpansForDive(String diveId) async {
+    final rows =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([
+                _db.diveProfileSeries.id,
+                _db.diveProfileSeries.sourceId,
+                _db.diveProfileSeries.startTimestamp,
+                _db.diveProfileSeries.endTimestamp,
+              ])
+              ..where(_db.diveProfileSeries.diveId.equals(diveId))
+              ..orderBy([
+                OrderingTerm.asc(_db.diveProfileSeries.startTimestamp),
+                OrderingTerm.asc(_db.diveProfileSeries.id),
+              ]))
+            .get();
+    return [
+      for (final r in rows)
+        (
+          id: r.read(_db.diveProfileSeries.id)!,
+          sourceId: r.read(_db.diveProfileSeries.sourceId),
+          startTimestamp: r.read(_db.diveProfileSeries.startTimestamp)!,
+          endTimestamp: r.read(_db.diveProfileSeries.endTimestamp)!,
+        ),
+    ];
+  }
+
   /// Raw rows of every series of [diveIds], undecoded, for snapshots that
   /// restore them verbatim through [restoreSeriesRow].
   Future<List<DiveProfileSeriesRow>> getRowsForDives(
