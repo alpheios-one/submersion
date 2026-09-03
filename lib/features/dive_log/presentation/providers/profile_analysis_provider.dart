@@ -1187,7 +1187,17 @@ final sourceProfileAnalysisProvider =
         final primaryId =
             sources.where((s) => s.isPrimary).map((s) => s.id).firstOrNull ??
             sources.first.id;
-        final effectiveSourceId = key.sourceId ?? primaryId;
+        // A stale id (the selection outliving its source row, e.g. right
+        // after a split) resolves to the primary, exactly as
+        // activeSourceProfileProvider resolves the chart's series, so the
+        // analysis is never computed over a different series than the one
+        // drawn. Falling through to the dive-level analysis here would pair
+        // merged-length curves with the primary's bucket (#543).
+        final requested = key.sourceId;
+        final effectiveSourceId =
+            requested != null && sources.any((s) => s.id == requested)
+            ? requested
+            : primaryId;
         final dive = await ref.watch(analysisDiveProvider(key.diveId).future);
         if (dive == null) return null;
         final profiles = await ref.watch(
