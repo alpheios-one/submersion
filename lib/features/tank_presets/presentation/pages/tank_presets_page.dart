@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/constants/tank_preset_display.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -148,7 +149,9 @@ class TankPresetsPage extends ConsumerWidget {
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).colorScheme.primary,
       ),
-      title: Text(preset.displayName),
+      title: Text(
+        builtInTankPresetName(context.l10n, preset.name) ?? preset.displayName,
+      ),
       subtitle: Text(
         '$volumeStr • $pressureStr • ${preset.material.displayName}',
       ),
