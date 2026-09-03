@@ -20798,7 +20798,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'A deteção de duplicados não pôde ser executada, por isso nada abaixo está assinalado como já existente no seu registo. Verifique a lista antes de importar.';
+      'A deteção de duplicados não pôde ser executada, por isso nada nesta lista está assinalado como já existente no seu registo. Verifique-a antes de importar.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

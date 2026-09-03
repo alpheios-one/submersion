@@ -19709,7 +19709,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      '重复检测未能运行，因此下方没有任何条目被标记为日志中已存在。导入前请先核对列表。';
+      '重复检测未能运行，因此此列表中没有任何条目被标记为日志中已存在。导入前请先核对列表。';
 
   @override
   String get universalImport_error_noColumnsToMap =>

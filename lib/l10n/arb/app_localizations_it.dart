@@ -20795,7 +20795,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'Non è stato possibile eseguire il rilevamento dei duplicati, quindi nulla qui sotto è contrassegnato come già presente nel tuo registro. Controlla l\'elenco prima di importare.';
+      'Non è stato possibile eseguire il rilevamento dei duplicati, quindi nulla in questo elenco è contrassegnato come già presente nel tuo registro. Controllalo prima di importare.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

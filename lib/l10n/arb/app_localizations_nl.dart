@@ -20627,7 +20627,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'Duplicaatdetectie kon niet worden uitgevoerd, dus niets hieronder is gemarkeerd als al aanwezig in je logboek. Controleer de lijst voordat je importeert.';
+      'Duplicaatdetectie kon niet worden uitgevoerd, dus niets in deze lijst is gemarkeerd als al aanwezig in je logboek. Controleer de lijst voordat je importeert.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

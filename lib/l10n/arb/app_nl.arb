@@ -6153,7 +6153,7 @@
   "universalImport_summary_fileParseFailed": "Lezen mislukt",
   "universalImport_description_supportedFormats": "Selecteer een duiklogboekbestand om te importeren. Ondersteunde formaten zijn CSV, UDDF, Subsurface XML en Garmin FIT.",
   "universalImport_error_unsupportedFormat": "Dit formaat wordt nog niet ondersteund. Exporteer als UDDF of CSV.",
-  "universalImport_error_duplicateCheckFailed": "Duplicaatdetectie kon niet worden uitgevoerd, dus niets hieronder is gemarkeerd als al aanwezig in je logboek. Controleer de lijst voordat je importeert.",
+  "universalImport_error_duplicateCheckFailed": "Duplicaatdetectie kon niet worden uitgevoerd, dus niets in deze lijst is gemarkeerd als al aanwezig in je logboek. Controleer de lijst voordat je importeert.",
   "universalImport_error_noColumnsToMap": "Dit bestand heeft geen kolommen om toe te wijzen. Ga terug en selecteer het bestand opnieuw, of kies een andere bron.",
   "universalImport_error_stepFailed": "Importeren kon niet doorgaan: {details}",
   "universalImport_label_columnMapping": "Kolomtoewijzing",

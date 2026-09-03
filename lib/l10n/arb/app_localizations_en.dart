@@ -20440,7 +20440,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'Duplicate detection could not run, so nothing below is marked as already in your logbook. Check the list before importing.';
+      'Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

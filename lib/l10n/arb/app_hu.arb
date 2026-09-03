@@ -6080,7 +6080,7 @@
   "universalImport_summary_fileParseFailed": "Beolvasás sikertelen",
   "universalImport_description_supportedFormats": "Válassz egy merülési napló fájlt az importáláshoz. Támogatott formátumok: CSV, UDDF, Subsurface XML és Garmin FIT.",
   "universalImport_error_unsupportedFormat": "Ez a formátum még nem támogatott. Exportálj UDDF vagy CSV formátumban.",
-  "universalImport_error_duplicateCheckFailed": "A duplikátumkeresés nem futott le, ezért az alábbiak közül semmi nincs megjelölve úgy, hogy már szerepel a naplóban. Importálás előtt ellenőrizd a listát.",
+  "universalImport_error_duplicateCheckFailed": "A duplikátumkeresés nem futott le, ezért ebben a listában semmi nincs megjelölve úgy, hogy már szerepel a naplóban. Importálás előtt ellenőrizd a listát.",
   "universalImport_error_noColumnsToMap": "Ebben a fájlban nincsenek megfeleltethető oszlopok. Lépj vissza, és válaszd ki újra a fájlt, vagy válassz másik forrást.",
   "universalImport_error_stepFailed": "Az importálás nem folytatható: {details}",
   "universalImport_label_columnMapping": "Oszlop leképezés",

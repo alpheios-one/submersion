@@ -20877,7 +20877,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'La détection des doublons n\'a pas pu s\'exécuter : rien ci-dessous n\'est signalé comme déjà présent dans votre carnet. Vérifiez la liste avant d\'importer.';
+      'La détection des doublons n\'a pas pu s\'exécuter : rien dans cette liste n\'est signalé comme déjà présent dans votre carnet. Vérifiez-la avant d\'importer.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

@@ -20415,7 +20415,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'تعذّر تشغيل كشف التكرارات، لذلك لم يُوسم أي عنصر أدناه بأنه موجود مسبقًا في سجلك. راجع القائمة قبل الاستيراد.';
+      'تعذّر تشغيل كشف التكرارات، لذلك لم يُوسم أي عنصر في هذه القائمة بأنه موجود مسبقًا في سجلك. راجع القائمة قبل الاستيراد.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

@@ -20810,7 +20810,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'No se pudo ejecutar la detección de duplicados, por lo que nada de lo siguiente está marcado como ya presente en tu cuaderno. Revisa la lista antes de importar.';
+      'No se pudo ejecutar la detección de duplicados, por lo que nada de esta lista está marcado como ya presente en tu cuaderno. Revísala antes de importar.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

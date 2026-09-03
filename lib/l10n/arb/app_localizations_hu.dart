@@ -20728,7 +20728,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'A duplikátumkeresés nem futott le, ezért az alábbiak közül semmi nincs megjelölve úgy, hogy már szerepel a naplóban. Importálás előtt ellenőrizd a listát.';
+      'A duplikátumkeresés nem futott le, ezért ebben a listában semmi nincs megjelölve úgy, hogy már szerepel a naplóban. Importálás előtt ellenőrizd a listát.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

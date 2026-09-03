@@ -34319,7 +34319,7 @@ abstract class AppLocalizations {
   /// Warning on the review step when duplicate detection failed and the incoming rows were left unmarked
   ///
   /// In en, this message translates to:
-  /// **'Duplicate detection could not run, so nothing below is marked as already in your logbook. Check the list before importing.'**
+  /// **'Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.'**
   String get universalImport_error_duplicateCheckFailed;
 
   /// Shown on the column mapping step when the file produced no columns to map

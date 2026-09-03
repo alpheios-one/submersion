@@ -6153,7 +6153,7 @@
   "universalImport_summary_fileParseFailed": "Lesen fehlgeschlagen",
   "universalImport_description_supportedFormats": "Wählen Sie eine Tauchprotokoll-Datei zum Importieren aus. Unterstützte Formate sind CSV, UDDF, Subsurface XML und Garmin FIT.",
   "universalImport_error_unsupportedFormat": "Dieses Format wird noch nicht unterstützt. Bitte exportieren Sie als UDDF oder CSV.",
-  "universalImport_error_duplicateCheckFailed": "Die Duplikaterkennung konnte nicht ausgeführt werden. Daher ist unten nichts als bereits im Logbuch vorhanden markiert. Prüfen Sie die Liste vor dem Import.",
+  "universalImport_error_duplicateCheckFailed": "Die Duplikaterkennung konnte nicht ausgeführt werden. Daher ist in dieser Liste nichts als bereits im Logbuch vorhanden markiert. Prüfen Sie sie vor dem Import.",
   "universalImport_error_noColumnsToMap": "Diese Datei enthält keine zuzuordnenden Spalten. Gehen Sie zurück und wählen Sie die Datei erneut oder eine andere Quelle.",
   "universalImport_error_stepFailed": "Import konnte nicht fortgesetzt werden: {details}",
   "universalImport_label_columnMapping": "Spaltenzuordnung",

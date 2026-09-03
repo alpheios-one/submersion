@@ -20748,7 +20748,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'Die Duplikaterkennung konnte nicht ausgeführt werden. Daher ist unten nichts als bereits im Logbuch vorhanden markiert. Prüfen Sie die Liste vor dem Import.';
+      'Die Duplikaterkennung konnte nicht ausgeführt werden. Daher ist in dieser Liste nichts als bereits im Logbuch vorhanden markiert. Prüfen Sie sie vor dem Import.';
 
   @override
   String get universalImport_error_noColumnsToMap =>

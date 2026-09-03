@@ -20269,7 +20269,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get universalImport_error_duplicateCheckFailed =>
-      'לא ניתן היה להריץ זיהוי כפילויות, ולכן שום פריט למטה אינו מסומן כקיים כבר ביומן. בדוק את הרשימה לפני הייבוא.';
+      'לא ניתן היה להריץ זיהוי כפילויות, ולכן שום פריט ברשימה הזו אינו מסומן כקיים כבר ביומן. בדוק את הרשימה לפני הייבוא.';
 
   @override
   String get universalImport_error_noColumnsToMap =>
