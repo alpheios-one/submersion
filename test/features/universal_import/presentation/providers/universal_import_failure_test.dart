@@ -137,6 +137,42 @@ void main() {
       expect(notifier.state.currentStep, ImportWizardStep.fieldMapping);
     });
 
+    test('carries the parser\'s own complaint through verbatim', () async {
+      // Every parser in the registry handles its own errors and returns an
+      // empty payload carrying a warning, rather than throwing (checked
+      // against shearwaterDb, macdiveSqlite, fit and danDl7 on garbage bytes
+      // as well as this one). So the message the user ends up reading is the
+      // parser's, and it must not be flattened into a generic one on the way
+      // out: "Expected a single root element at 1:25" tells them their file
+      // is truncated, where "could not be imported" tells them nothing.
+      final notifier = await _notifier();
+      notifier.state = notifier.state.copyWith(
+        detectionResult: const DetectionResult(
+          format: ImportFormat.subsurfaceXml,
+          sourceApp: SourceApp.subsurface,
+          confidence: 0.9,
+        ),
+        files: [_file(_bytes('not valid xml at all {{{'))],
+      );
+
+      await expectLater(
+        notifier.confirmSource(
+          overrideApp: SourceApp.subsurface,
+          overrideFormat: ImportFormat.subsurfaceXml,
+        ),
+        throwsA(
+          isA<ImportStepFailure>().having(
+            (e) => e.message,
+            'message',
+            contains('Failed to parse XML'),
+          ),
+        ),
+      );
+      expect(notifier.state.error, contains('Failed to parse XML'));
+      expect(notifier.state.payload, isNull);
+      expect(notifier.state.isLoading, isFalse);
+    });
+
     test('reports the failure when the picked file carries no bytes', () async {
       final notifier = await _notifier();
       notifier.state = notifier.state.copyWith(

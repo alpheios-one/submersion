@@ -96,6 +96,35 @@ void main() {
     expect(find.text('Max Depth'), findsOneWidget);
   });
 
+  testWidgets('a CSV whose re-parse failed shows the reason above the editor', (
+    tester,
+  ) async {
+    // Editing a mapping clears the payload, so tapping Next re-parses. When
+    // that fails the user stays here, and the columns are still worth showing
+    // -- the mapping is what they came to fix.
+    final container = await _container();
+    container.read(universalImportNotifierProvider.notifier).state = container
+        .read(universalImportNotifierProvider)
+        .copyWith(
+          detectionResult: const DetectionResult(
+            format: ImportFormat.csv,
+            confidence: 0.9,
+            csvHeaders: ['Date', 'Max Depth'],
+          ),
+          options: const ImportOptions(
+            sourceApp: SourceApp.generic,
+            format: ImportFormat.csv,
+          ),
+          error: 'Failed to parse file: FormatException',
+        );
+
+    await _pump(tester, container);
+
+    expect(find.text('Failed to parse file: FormatException'), findsOneWidget);
+    expect(find.text('Column Mapping'), findsOneWidget);
+    expect(find.text('Date'), findsOneWidget);
+  });
+
   testWidgets('says nothing while a successful non-CSV import skips past', (
     tester,
   ) async {
