@@ -56,10 +56,11 @@ const _log = LoggerService('BrowserLaunch');
 /// a browser -- the OAuth dialogs -- must offer the URL some other way rather
 /// than trusting this result.
 ///
-/// On Linux a launcher exception is absorbed into the fallback chain, because
-/// that is simply how `url_launcher_linux` says "no handler" (it throws a
-/// [PlatformException] rather than returning false). Elsewhere it is rethrown
-/// so callers keep the platform's own message.
+/// On Linux a launcher `Exception` is absorbed into the fallback chain,
+/// because that is simply how `url_launcher_linux` says "no handler" (it
+/// throws a `PlatformException` rather than returning false). Elsewhere it is
+/// rethrown so callers keep the platform's own message. An `Error` always
+/// propagates: that is a bug here, not a verdict on the user's desktop.
 Future<bool> openInBrowser(
   Uri uri, {
   UrlLaunch? launch,
@@ -69,7 +70,13 @@ Future<bool> openInBrowser(
   final isLinux = onLinux ?? Platform.isLinux;
   try {
     if (await (launch ?? _launchExternally)(uri)) return true;
-  } catch (e) {
+  } on Exception catch (e) {
+    // Exception, not everything: an `Error` is a bug in our own code, and
+    // absorbing it would report the user's desktop as broken and send us
+    // shelling out for no reason. The boundary is deliberately wider than
+    // PlatformException, though -- a MissingPluginException (the Linux
+    // plugin never registered) is equally "url_launcher cannot help here",
+    // and equally rescuable by the chain below.
     if (!isLinux) rethrow;
     _log.warning('url_launcher could not open a browser: $e');
   }
@@ -84,7 +91,7 @@ Future<bool> openInBrowser(
     } on ProcessException {
       // Process.start throws rather than returning non-zero when the
       // executable is absent, which is routine: no desktop ships all four.
-    } catch (e) {
+    } on Exception catch (e) {
       _log.warning('Browser opener $executable failed: $e');
     }
   }

@@ -160,6 +160,37 @@ void main() {
       expect(spawned.map((c) => c.first), ['xdg-open', 'gio', 'x-www-browser']);
     });
 
+    test('absorbs a MissingPluginException, which is how a Linux build with '
+        'the plugin unregistered fails', () async {
+      // Not a PlatformException, but still "url_launcher cannot help here",
+      // and precisely a case the shell chain can rescue.
+      final opened = await openInBrowser(
+        uri,
+        onLinux: true,
+        launch: (_) async => throw MissingPluginException('no impl'),
+        spawn: (_, _) async => true,
+      );
+      expect(opened, isTrue);
+    });
+
+    test(
+      'lets an Error out instead of logging it as a launch failure',
+      () async {
+        // Absorbing the platform's Exceptions is the point of the fallback;
+        // swallowing an Error would turn a bug in our own code into a warning
+        // about the user's desktop, and send us shelling out for no reason.
+        await expectLater(
+          openInBrowser(
+            uri,
+            onLinux: true,
+            launch: (_) async => throw StateError('bug in our code'),
+            spawn: (_, _) async => true,
+          ),
+          throwsA(isA<StateError>()),
+        );
+      },
+    );
+
     test('stops at the first opener that takes the URL', () async {
       final spawned = <List<String>>[];
       await openInBrowser(
@@ -232,12 +263,27 @@ void main() {
       () async {
         // A browser started as our child writes to the inherited pipe; without
         // the drain it wedges at the 64KB buffer and never opens anything.
+        //
+        // The return value alone would prove nothing here: a wedged child is
+        // still running when settleWindow fires, onTimeout yields 0, and the
+        // call returns true regardless. So the child touches a marker AFTER
+        // its 200KB write, and the marker's absence is the deterministic
+        // signal that it blocked -- no wall-clock assertion to go flaky when
+        // the runner is loaded.
+        final dir = await Directory.systemTemp.createTemp('browser_launch_');
+        addTearDown(() => dir.delete(recursive: true));
+        final marker = File('${dir.path}/wrote-everything');
+
+        final opened = await spawnBrowserOpener('/bin/sh', [
+          '-c',
+          'yes submersion | head -c 200000; touch "${marker.path}"',
+        ], settleWindow: const Duration(seconds: 5));
+
+        expect(opened, isTrue);
         expect(
-          await spawnBrowserOpener('/bin/sh', [
-            '-c',
-            'yes submersion | head -c 200000',
-          ], settleWindow: const Duration(seconds: 5)),
+          marker.existsSync(),
           isTrue,
+          reason: 'the child must run past its 200KB write, not wedge at 64KB',
         );
       },
     );
