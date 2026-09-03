@@ -13674,10 +13674,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Dati immersione scritti nella foto';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Dati immersione scritti nel video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Errore nel caricamento delle foto: $error';
   }
@@ -13848,18 +13844,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'I seguenti metadati verranno scritti nella foto:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'I seguenti metadati verranno scritti nel video:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Tempo di immersione';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'Mantieni video originale';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13880,16 +13868,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scrivi dati immersione nella foto';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'Scrivi dati immersione nel video';
+  String get media_writeMetadata_videoUnsupported =>
+      'I dati dell\'immersione possono essere scritti solo nelle foto, non nei video.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
       'Questa operazione modificherà la foto originale.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'Verrà creato un nuovo video con i metadati. I metadati del video non possono essere modificati in loco.';
 
   @override
   String get media_writeMetadata_writeButton => 'Scrivi';

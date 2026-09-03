@@ -22736,12 +22736,6 @@ abstract class AppLocalizations {
   /// **'Dive data written to photo'**
   String get media_photoViewer_diveDataWrittenToPhoto;
 
-  /// No description provided for @media_photoViewer_diveDataWrittenToVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive data written to video'**
-  String get media_photoViewer_diveDataWrittenToVideo;
-
   /// No description provided for @media_photoViewer_errorLoadingPhotos.
   ///
   /// In en, this message translates to:
@@ -23012,12 +23006,6 @@ abstract class AppLocalizations {
   /// **'The following metadata will be written to the photo:'**
   String get media_writeMetadata_descriptionPhoto;
 
-  /// No description provided for @media_writeMetadata_descriptionVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'The following metadata will be written to the video:'**
-  String get media_writeMetadata_descriptionVideo;
-
   /// No description provided for @media_writeMetadata_diveTimeLabel.
   ///
   /// In en, this message translates to:
@@ -23029,12 +23017,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS'**
   String get media_writeMetadata_gpsLabel;
-
-  /// No description provided for @media_writeMetadata_keepOriginalVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep original video'**
-  String get media_writeMetadata_keepOriginalVideo;
 
   /// No description provided for @media_writeMetadata_livePhotoUnsupported.
   ///
@@ -23066,23 +23048,17 @@ abstract class AppLocalizations {
   /// **'Write Dive Data to Photo'**
   String get media_writeMetadata_titlePhoto;
 
-  /// No description provided for @media_writeMetadata_titleVideo.
+  /// No description provided for @media_writeMetadata_videoUnsupported.
   ///
   /// In en, this message translates to:
-  /// **'Write Dive Data to Video'**
-  String get media_writeMetadata_titleVideo;
+  /// **'Dive data can only be written to photos, not videos.'**
+  String get media_writeMetadata_videoUnsupported;
 
   /// No description provided for @media_writeMetadata_warningPhotoText.
   ///
   /// In en, this message translates to:
   /// **'This will modify the original photo.'**
   String get media_writeMetadata_warningPhotoText;
-
-  /// No description provided for @media_writeMetadata_warningVideoText.
-  ///
-  /// In en, this message translates to:
-  /// **'A new video will be created with the metadata. Video metadata cannot be modified in-place.'**
-  String get media_writeMetadata_warningVideoText;
 
   /// No description provided for @media_writeMetadata_writeButton.
   ///
