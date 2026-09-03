@@ -107,9 +107,10 @@ void main() {
   ) async {
     final ref = await _pump(tester);
 
-    expect(ref.read(blenderFillGas1Provider), const GasMix(o2: 100));
-    expect(ref.read(blenderFillGas2Provider), const GasMix(o2: 0, he: 100));
-    expect(ref.read(blenderFillGas3Provider), const GasMix(o2: 21));
+    final gases = ref.read(blenderOrderedFillGasesProvider);
+    expect(gases[0], const GasMix(o2: 100));
+    expect(gases[1], const GasMix(o2: 0, he: 100));
+    expect(gases[2], const GasMix(o2: 21));
   });
 
   testWidgets('a nitrox target skips the helium source in the defaults', (

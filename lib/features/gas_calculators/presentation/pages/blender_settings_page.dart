@@ -45,8 +45,7 @@ class _BlenderSettingsBody extends ConsumerStatefulWidget {
 }
 
 class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
-  late final List<TextEditingController> _gasO2;
-  late final List<TextEditingController> _gasHe;
+  late final TextEditingController _topupO2;
   late final List<TextEditingController> _gasPrices;
 
   @override
@@ -54,20 +53,9 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
     super.initState();
     String n(double v) => formatDecimalForInput(v);
 
-    final g1 = ref.read(blenderFillGas1Provider);
-    final g2 = ref.read(blenderFillGas2Provider);
-    final g3 = ref.read(blenderFillGas3Provider);
-
-    _gasO2 = [
-      TextEditingController(text: n(g1.o2)),
-      TextEditingController(text: n(g2.o2)),
-      TextEditingController(text: n(g3.o2)),
-    ];
-    _gasHe = [
-      TextEditingController(text: n(g1.he)),
-      TextEditingController(text: n(g2.he)),
-      TextEditingController(text: n(g3.he)),
-    ];
+    _topupO2 = TextEditingController(
+      text: n(ref.read(blenderTopupO2PercentProvider)),
+    );
 
     final settings = ref.read(settingsProvider);
     _gasPrices = [
@@ -85,7 +73,8 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
 
   @override
   void dispose() {
-    for (final c in [..._gasO2, ..._gasHe, ..._gasPrices]) {
+    _topupO2.dispose();
+    for (final c in _gasPrices) {
       c.dispose();
     }
     super.dispose();
@@ -106,8 +95,7 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 BlenderFillGasesCard(
-                  o2Controllers: _gasO2,
-                  heControllers: _gasHe,
+                  topupO2Controller: _topupO2,
                   priceControllers: _gasPrices,
                 ),
                 const SizedBox(height: 16),

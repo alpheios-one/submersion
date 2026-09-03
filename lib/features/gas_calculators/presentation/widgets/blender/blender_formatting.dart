@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
-import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Decimals a blender's pressure is worth carrying, by unit.
@@ -42,10 +42,10 @@ String formatPreciseMix(BuildContext context, GasMix m) {
 String formatPreciseGasName(BuildContext context, GasMix m) =>
     formatPreciseMix(context, m);
 
-/// The label to print for a flush-fee gas identity.
-String flushFeeGasLabel(BuildContext context, FlushFeeGasKind kind) =>
-    switch (kind) {
-      FlushFeeGasKind.o2 => context.l10n.gasCalculators_blender_o2,
-      FlushFeeGasKind.he => context.l10n.gasCalculators_blender_helium,
-      FlushFeeGasKind.air => context.l10n.gasCalculators_blender_air,
+/// The label to print for a fill-gas role.
+String blenderGasRoleLabel(BuildContext context, BlenderGasRole role) =>
+    switch (role) {
+      BlenderGasRole.o2 => context.l10n.gasCalculators_blender_o2,
+      BlenderGasRole.he => context.l10n.gasCalculators_blender_helium,
+      BlenderGasRole.topup => context.l10n.gasCalculators_blender_topup,
     };

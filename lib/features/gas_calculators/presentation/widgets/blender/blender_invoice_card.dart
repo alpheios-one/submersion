@@ -10,6 +10,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
@@ -116,6 +117,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
       showFlush: showFlush,
       flushMultiplier: flushMultiplier,
       flushGases: flushGases,
+      gasPrices: ref.watch(blenderGasPricesProvider),
     );
 
     // Seed the name from the logbook, once, and only when the diver has not
@@ -160,7 +162,24 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                 )
               else ...[
                 if (showFlush) ...[
-                  for (var i = 0; i < FlushFeeGasKind.values.length; i++)
+                  // Names the billing mode in effect, so a diver reading the
+                  // bill can tell at a glance whether the flush fee below was
+                  // charged once for the whole invoice or once per fill,
+                  // rather than having to reopen the Cost card to check.
+                  Text(
+                    flushMode == FlushFeeMode.perInvoice
+                        ? context
+                              .l10n
+                              .gasCalculators_blender_flushFeeModePerInvoice
+                        : context
+                              .l10n
+                              .gasCalculators_blender_flushFeeModePerFill,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  for (var i = 0; i < BlenderGasRole.values.length; i++)
                     _flushFeeLine(
                       context,
                       i,
@@ -303,30 +322,27 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   }
 
   /// The gas tariff, so it can be checked at a glance without switching to
-  /// the "Cost" card. Zipped by bank index against the gas *currently*
-  /// configured for that bank, matching how the price fields there are
-  /// labelled - not by grouping historical invoice lines, which may have
-  /// been filled from a bank since reconfigured to a different gas
-  /// (PR #1215 review).
+  /// the "Cost" card. Zipped by role against the gas that role *currently*
+  /// holds, matching how the price fields there are labelled - not by
+  /// grouping historical invoice lines, which may have been filled under a
+  /// fill order since reconfigured (PR #1215 review). Keying by role rather
+  /// than by bank position keeps this correct however the fill order is
+  /// arranged (issue #42).
   Widget _tariffSummary(
     BuildContext context,
     AppSettings settings,
     String currency,
   ) {
-    final gases = [
-      ref.watch(blenderFillGas1Provider),
-      ref.watch(blenderFillGas2Provider),
-      ref.watch(blenderFillGas3Provider),
-    ];
+    final topupO2 = ref.watch(blenderTopupO2PercentProvider);
     final prices = ref.watch(blenderGasPricesProvider);
     final units = UnitFormatter(settings);
     final parts = <String>[];
-    for (var i = 0; i < gases.length; i++) {
-      final price = i < prices.length ? prices[i] : null;
+    for (final role in BlenderGasRole.values) {
+      final price = prices[role.index];
       if (price == null) continue;
       final display = pricePer100LitersToDisplay(price, settings);
       parts.add(
-        '${formatPreciseGasName(context, gases[i])} '
+        '${formatPreciseGasName(context, gasForRole(role, topupO2))} '
         '${formatMoney(display, currency)}/100${units.volumeSymbol}',
       );
     }
@@ -353,19 +369,15 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     BilledTotal total,
   ) {
     final settings = ref.read(settingsProvider);
-    final gases = [
-      ref.read(blenderFillGas1Provider),
-      ref.read(blenderFillGas2Provider),
-      ref.read(blenderFillGas3Provider),
-    ];
+    final topupO2 = ref.read(blenderTopupO2PercentProvider);
     final prices = ref.read(blenderGasPricesProvider);
     final tariffParts = <String>[];
-    for (var i = 0; i < gases.length; i++) {
-      final price = i < prices.length ? prices[i] : null;
+    for (final role in BlenderGasRole.values) {
+      final price = prices[role.index];
       if (price == null) continue;
       final display = pricePer100LitersToDisplay(price, settings);
       tariffParts.add(
-        '${formatPreciseGasName(context, gases[i])} '
+        '${formatPreciseGasName(context, gasForRole(role, topupO2))} '
         '${formatMoney(display, currency)}/100${units.volumeSymbol}',
       );
     }
@@ -423,9 +435,10 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     UnitFormatter units,
     AppSettings settings,
   ) {
-    final kind = FlushFeeGasKind.values[index];
-    final label = flushFeeGasLabel(context, kind);
-    final cost = flushFeeCost(gas.volumeLiters * multiplier, gas.pricePer100);
+    final role = BlenderGasRole.values[index];
+    final label = blenderGasRoleLabel(context, role);
+    final price = ref.watch(blenderGasPricesProvider)[role.index];
+    final cost = flushFeeCost(gas.volumeLiters * multiplier, price);
     final style = Theme.of(context).textTheme.bodyMedium;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -442,7 +455,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
           SizedBox(
             width: 72,
             child: TextField(
-              key: Key('blender-flush-fee-liters-${kind.name}'),
+              key: Key('blender-flush-fee-liters-${role.name}'),
               controller: _flushVolumes[index],
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -575,15 +588,17 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     required bool showFlush,
     required int flushMultiplier,
     required List<FlushFeeGasSetting> flushGases,
+    required List<double?> gasPrices,
   }) {
     final fillsTotal = totalOf(fills);
     var flushAmount = 0.0;
     var flushComplete = true;
     if (showFlush) {
-      for (final g in flushGases) {
+      for (var i = 0; i < flushGases.length; i++) {
+        final price = i < gasPrices.length ? gasPrices[i] : null;
         final cost = flushFeeCost(
-          g.volumeLiters * flushMultiplier,
-          g.pricePer100,
+          flushGases[i].volumeLiters * flushMultiplier,
+          price,
         );
         if (cost == null) {
           flushComplete = false;
@@ -689,6 +704,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
       showFlush: showFlush,
       flushMultiplier: flushMultiplier,
       flushGases: flushGases,
+      gasPrices: ref.read(blenderGasPricesProvider),
     );
     final archived = ArchivedInvoice(
       id: DateTime.now().microsecondsSinceEpoch.toString(),

@@ -12180,6 +12180,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_helium => 'Elio';
 
   @override
+  String get gasCalculators_blender_topup => 'Rabbocco';
+
+  @override
+  String get gasCalculators_blender_purity => 'Purezza';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return 'Sposta $gas in alto';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return 'Sposta $gas in basso';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'Procedura di riempimento';
 
   @override

@@ -11878,6 +11878,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_helium => 'הליום';
 
   @override
+  String get gasCalculators_blender_topup => 'גז השלמה';
+
+  @override
+  String get gasCalculators_blender_purity => 'טוהר';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return 'הזז את $gas למעלה';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return 'הזז את $gas למטה';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'סדר המילוי';
 
   @override

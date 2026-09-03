@@ -11975,6 +11975,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_helium => 'Helium';
 
   @override
+  String get gasCalculators_blender_topup => 'Topup';
+
+  @override
+  String get gasCalculators_blender_purity => 'Purity';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return 'Move $gas up';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return 'Move $gas down';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'Fill procedure';
 
   @override

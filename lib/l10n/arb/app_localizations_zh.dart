@@ -11602,6 +11602,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_helium => '氦气';
 
   @override
+  String get gasCalculators_blender_topup => '补充气';
+
+  @override
+  String get gasCalculators_blender_purity => '纯度';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return '将$gas上移';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return '将$gas下移';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => '充填步骤';
 
   @override

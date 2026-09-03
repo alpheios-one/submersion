@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
@@ -50,9 +51,8 @@ void main() {
       expect(prefs.startMix, const GasMix(o2: 21));
       expect(prefs.targetPressureBar, 200.0);
       expect(prefs.targetMix, const GasMix(o2: 32));
-      expect(prefs.fillGas1, const GasMix(o2: 100));
-      expect(prefs.fillGas2, const GasMix(o2: 0, he: 100));
-      expect(prefs.fillGas3, const GasMix(o2: 21));
+      expect(prefs.topupO2Percent, 21.0);
+      expect(prefs.fillOrder, kDefaultBlenderFillOrder);
     });
 
     test('the flush fee starts off, once per bill, unpriced', () {
@@ -60,10 +60,7 @@ void main() {
       expect(prefs.flushFeeEnabled, isFalse);
       expect(prefs.flushFeeMode, FlushFeeMode.perInvoice);
       expect(prefs.flushFeeGases, hasLength(3));
-      expect(
-        prefs.flushFeeGases.map((g) => g.pricePer100),
-        everyElement(isNull),
-      );
+      expect(prefs.gasPrices, everyElement(isNull));
     });
   });
 
@@ -81,14 +78,17 @@ void main() {
             startMix: const GasMix(o2: 14.5, he: 57.2),
             targetPressureBar: 220,
             targetMix: const GasMix(o2: 15, he: 55),
-            fillGas1: const GasMix(o2: 99.5),
-            fillGas2: const GasMix(o2: 0, he: 99),
-            fillGas3: const GasMix(o2: 20.9),
+            topupO2Percent: 32,
+            fillOrder: const [
+              BlenderGasRole.he,
+              BlenderGasRole.topup,
+              BlenderGasRole.o2,
+            ],
             flushFeeEnabled: true,
             flushFeeMode: FlushFeeMode.perFill,
             flushFeeGases: const [
-              FlushFeeGasSetting(volumeLiters: 20, pricePer100: 5),
-              FlushFeeGasSetting(volumeLiters: 25, pricePer100: 12),
+              FlushFeeGasSetting(volumeLiters: 20),
+              FlushFeeGasSetting(volumeLiters: 25),
               FlushFeeGasSetting(volumeLiters: 15),
             ],
           );
@@ -105,15 +105,37 @@ void main() {
       expect(decoded.startMix, const GasMix(o2: 14.5, he: 57.2));
       expect(decoded.targetPressureBar, 220);
       expect(decoded.targetMix, const GasMix(o2: 15, he: 55));
-      expect(decoded.fillGas1, const GasMix(o2: 99.5));
-      expect(decoded.fillGas2, const GasMix(o2: 0, he: 99));
-      expect(decoded.fillGas3, const GasMix(o2: 20.9));
+      expect(decoded.topupO2Percent, 32);
+      expect(decoded.fillOrder, [
+        BlenderGasRole.he,
+        BlenderGasRole.topup,
+        BlenderGasRole.o2,
+      ]);
       expect(decoded.flushFeeEnabled, isTrue);
       expect(decoded.flushFeeMode, FlushFeeMode.perFill);
       expect(decoded.flushFeeGases[0].volumeLiters, 20);
-      expect(decoded.flushFeeGases[0].pricePer100, 5);
-      expect(decoded.flushFeeGases[1].pricePer100, 12);
-      expect(decoded.flushFeeGases[2].pricePer100, isNull);
+      expect(decoded.flushFeeGases[1].volumeLiters, 25);
+      expect(decoded.flushFeeGases[2].volumeLiters, 15);
+    });
+
+    test('migrates a pre-issue-#42 blob: position becomes the default fill '
+        'order, and the old bank-3 mix becomes the topup fraction', () {
+      final decoded = BlenderPreferences.fromJson({
+        'gasPrices': [2.55, 7.99, 0.01],
+        'fillGas1': {'o2': 100, 'he': 0},
+        'fillGas2': {'o2': 0, 'he': 100},
+        'fillGas3': {'o2': 32, 'he': 0},
+      });
+      expect(decoded.fillOrder, kDefaultBlenderFillOrder);
+      expect(decoded.topupO2Percent, 32);
+      expect(decoded.gasPrices, [2.55, 7.99, 0.01]);
+    });
+
+    test('a corrupt fill order falls back to the default', () {
+      final decoded = BlenderPreferences.fromJson({
+        'fillOrder': ['o2', 'o2', 'topup'],
+      });
+      expect(decoded.fillOrder, kDefaultBlenderFillOrder);
     });
 
     test('a malformed mix falls back per field', () {

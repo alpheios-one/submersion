@@ -603,13 +603,16 @@ void main() {
     testWidgets(
       'once enabled and priced, a bill-once line appears even with nothing filled yet',
       (tester) async {
-        await _pump(tester);
+        final ref = await _pump(tester);
         await tester.tap(find.byKey(const Key('blender-flush-fee-enabled')));
         await tester.pumpAndSettle();
-        await tester.enterText(
-          find.byKey(const Key('blender-flush-fee-price-o2')),
-          '7.5',
-        );
+        // Issue #42: the flush fee's price is no longer entered here -- it
+        // is read from the same role-keyed price used to cost a fill.
+        ref.read(blenderGasPricesProvider.notifier).state = const [
+          7.5,
+          null,
+          null,
+        ];
         await tester.pumpAndSettle();
 
         // The default purge volume is 20 L, so 20 / 100 * 7.5 = 1.50.
@@ -628,10 +631,10 @@ void main() {
       ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
       ref.read(blenderFlushFeeModeProvider.notifier).state =
           FlushFeeMode.perFill;
-      ref.read(blenderFlushFeeGasesProvider.notifier).state = const [
-        FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5),
-        FlushFeeGasSetting(volumeLiters: 20),
-        FlushFeeGasSetting(volumeLiters: 20),
+      ref.read(blenderGasPricesProvider.notifier).state = const [
+        7.5,
+        null,
+        null,
       ];
       await tester.pumpAndSettle();
       expect(
@@ -655,10 +658,10 @@ void main() {
     ) async {
       final ref = await _pump(tester);
       ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
-      ref.read(blenderFlushFeeGasesProvider.notifier).state = const [
-        FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5),
-        FlushFeeGasSetting(volumeLiters: 20),
-        FlushFeeGasSetting(volumeLiters: 20),
+      ref.read(blenderGasPricesProvider.notifier).state = const [
+        7.5,
+        null,
+        null,
       ];
       await tester.pumpAndSettle();
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -51,98 +51,48 @@ Future<WidgetRef> _pump(
 }
 
 void main() {
-  testWidgets('submitting a fill-gas row saves the preferences', (
+  testWidgets('rows are labelled by role, not by bank number', (tester) async {
+    // Issue #42: banks are identities (oxygen, helium, topup) rather than
+    // positions, and the defaults fill oxygen, then helium, then topup.
+    await _pump(tester);
+
+    expect(find.text('O₂'), findsOneWidget);
+    expect(find.text('Helium'), findsOneWidget);
+    expect(find.text('Topup'), findsOneWidget);
+    expect(find.text('1.'), findsNothing);
+  });
+
+  testWidgets('the oxygen and helium roles show their fixed purity', (
     tester,
   ) async {
-    // Issue #1335: fill gases now persist across restarts too, the same as
-    // the cylinder and target fill.
+    // Issue #42: only the topup role's oxygen fraction is editable; oxygen
+    // and helium are always 100% pure.
+    await _pump(tester);
+
+    expect(find.text('100 %'), findsNWidgets(2));
+  });
+
+  testWidgets('submitting the topup O2 field saves the preferences', (
+    tester,
+  ) async {
     final repo = FakeAppSettingsRepository();
     final ref = await _pump(
       tester,
       overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
     );
 
-    // The first fill-gas row's O2 field: no pressure column on this card, so
-    // O2 is the very first field.
-    await tester.enterText(find.byType(TextField).first, '95');
+    await tester.enterText(find.byKey(const Key('blender-topup-o2')), '32');
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    expect(ref.read(blenderFillGas1Provider).o2, closeTo(95, 0.001));
-    expect(repo.blenderPreferences?.fillGas1.o2, closeTo(95, 0.001));
+    expect(ref.read(blenderTopupO2PercentProvider), closeTo(32, 0.001));
+    expect(repo.blenderPreferences?.topupO2Percent, closeTo(32, 0.001));
   });
 
-  testWidgets(
-    'fill-gas rows are labelled by the computed gas name, not a number',
-    (tester) async {
-      // PR #1359 review point 1: "1./2./3." told a diver nothing about what
-      // each bank actually holds. The defaults are O2, helium, then air.
-      await _pump(tester);
-
-      expect(find.text('O₂'), findsOneWidget);
-      expect(find.text('Helium'), findsOneWidget);
-      expect(find.text('Air'), findsOneWidget);
-      expect(find.text('1.'), findsNothing);
-    },
-  );
-
-  testWidgets("the O2/He fields line up regardless of each row's label width", (
-    tester,
-  ) async {
-    // App-test feedback after PR #1359: "Helium" (row 2's default label) is
-    // wider than "O₂" or "Air", and an unconstrained label pushed that
-    // row's fields out of line with the other two.
-    await _pump(tester);
-
-    final o2Fields = find.descendant(
-      of: find.byType(BlenderFillGasesCard),
-      matching: find.byWidgetPredicate(
-        (w) =>
-            w is TextField && (w.decoration?.labelText ?? '').startsWith('O'),
-      ),
-    );
-    expect(o2Fields, findsNWidgets(3));
-    final lefts = [
-      for (var i = 0; i < 3; i++) tester.getTopLeft(o2Fields.at(i)).dx,
-    ];
-
-    expect(lefts.toSet(), hasLength(1));
-  });
-
-  testWidgets('a fill-gas label updates as its O2/He fields change', (
-    tester,
-  ) async {
-    await _pump(tester);
-
-    await tester.enterText(find.byType(TextField).first, '32');
-    await tester.pumpAndSettle();
-
-    expect(find.text('EAN32'), findsOneWidget);
-    expect(find.text('O₂'), findsNothing);
-  });
-
-  testWidgets('an invalid fill-gas mix is flagged inline on the row', (
-    tester,
-  ) async {
-    // PR #1359 review point 2: computeBlend throws the same
-    // BlendError.invalidMix, but until now that only surfaced back on the
-    // calculator page -- a navigation away from the field that caused it.
-    await _pump(tester);
-
-    final heFields = find.byWidgetPredicate(
-      (w) => w is TextField && (w.decoration?.labelText ?? '').startsWith('He'),
-    );
-    await tester.enterText(heFields.first, '150');
-    await tester.pumpAndSettle();
-
-    expect(find.text("A gas mix's O₂ + He cannot exceed 100%."), findsWidgets);
-  });
-
-  testWidgets('a stored price seeds its row field, converted for display', (
-    tester,
-  ) async {
-    // Eric's PR #1359 review point 3: the price used to live on
-    // BlenderDefaultsCard; it now sits directly below its own fill-gas row.
+  testWidgets('a stored price seeds its role row field, converted for '
+      'display', (tester) async {
+    // Eric's PR #1359 review point 3: the price sits directly below its
+    // own fill-gas row, keyed by role (issue #42) so it survives a reorder.
     await _pump(
       tester,
       overrides: [
@@ -155,7 +105,7 @@ void main() {
     expect(find.widgetWithText(TextField, '12.5'), findsOneWidget);
   });
 
-  testWidgets('submitting a fill-gas row price field saves the preferences', (
+  testWidgets('submitting a role row price field saves the preferences', (
     tester,
   ) async {
     final repo = FakeAppSettingsRepository();
@@ -164,16 +114,74 @@ void main() {
       overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
     );
 
-    // Row order is O2, He, then price, so the first row's price field is the
-    // third TextField on the card.
-    final priceField = find.byWidgetPredicate(
-      (w) =>
-          w is TextField && (w.decoration?.labelText ?? '').contains('Price'),
+    await tester.enterText(
+      find.byKey(const Key('blender-gas-price-o2')),
+      '9.5',
     );
-    await tester.enterText(priceField.first, '9.5');
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
-    expect(repo.blenderPreferences?.gasPrices[0], closeTo(9.5, 0.001));
+    expect(
+      repo.blenderPreferences?.gasPrices[BlenderGasRole.o2.index],
+      closeTo(9.5, 0.001),
+    );
+  });
+
+  testWidgets('the up/down arrows reorder the fill roles, not drag', (
+    tester,
+  ) async {
+    final repo = FakeAppSettingsRepository();
+    final ref = await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+
+    expect(ref.read(blenderFillOrderProvider), kDefaultBlenderFillOrder);
+    // The default order is oxygen first, so its up arrow is disabled.
+    final o2Up = tester.widget<IconButton>(
+      find.byKey(const Key('blender-gas-move-up-o2')),
+    );
+    expect(o2Up.onPressed, isNull);
+
+    await tester.tap(find.byKey(const Key('blender-gas-move-down-o2')));
+    await tester.pumpAndSettle();
+
+    expect(ref.read(blenderFillOrderProvider), [
+      BlenderGasRole.he,
+      BlenderGasRole.o2,
+      BlenderGasRole.topup,
+    ]);
+    expect(repo.blenderPreferences?.fillOrder, [
+      BlenderGasRole.he,
+      BlenderGasRole.o2,
+      BlenderGasRole.topup,
+    ]);
+  });
+
+  testWidgets('a role keeps its own price after being reordered', (
+    tester,
+  ) async {
+    // Issue #42: the price belongs to the role's identity, not to the row
+    // position, so moving a role must not move its price to another role.
+    final ref = await _pump(
+      tester,
+      overrides: [
+        blenderGasPricesProvider.overrideWith(
+          (ref) => const [12.5, null, null],
+        ),
+      ],
+    );
+
+    ref.read(blenderFillOrderProvider.notifier).state = [
+      BlenderGasRole.he,
+      BlenderGasRole.o2,
+      BlenderGasRole.topup,
+    ];
+    await tester.pumpAndSettle();
+
+    final o2Price = tester.widget<TextField>(
+      find.byKey(const Key('blender-gas-price-o2')),
+    );
+    expect(o2Price.controller?.text, '12.5');
   });
 }

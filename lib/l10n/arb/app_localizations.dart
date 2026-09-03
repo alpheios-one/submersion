@@ -20650,6 +20650,30 @@ abstract class AppLocalizations {
   /// **'Helium'**
   String get gasCalculators_blender_helium;
 
+  /// No description provided for @gasCalculators_blender_topup.
+  ///
+  /// In en, this message translates to:
+  /// **'Topup'**
+  String get gasCalculators_blender_topup;
+
+  /// No description provided for @gasCalculators_blender_purity.
+  ///
+  /// In en, this message translates to:
+  /// **'Purity'**
+  String get gasCalculators_blender_purity;
+
+  /// Accessibility label for the move-up button on a fill-gas role row.
+  ///
+  /// In en, this message translates to:
+  /// **'Move {gas} up'**
+  String gasCalculators_blender_moveGasUp(String gas);
+
+  /// Accessibility label for the move-down button on a fill-gas role row.
+  ///
+  /// In en, this message translates to:
+  /// **'Move {gas} down'**
+  String gasCalculators_blender_moveGasDown(String gas);
+
   /// No description provided for @gasCalculators_blender_procedure.
   ///
   /// In en, this message translates to:

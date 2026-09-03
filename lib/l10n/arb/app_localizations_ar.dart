@@ -11957,6 +11957,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_helium => 'هيليوم';
 
   @override
+  String get gasCalculators_blender_topup => 'غاز التعبئة الإضافية';
+
+  @override
+  String get gasCalculators_blender_purity => 'النقاء';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return 'نقل $gas للأعلى';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return 'نقل $gas للأسفل';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'خطوات التعبئة';
 
   @override

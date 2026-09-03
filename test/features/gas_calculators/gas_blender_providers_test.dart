@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
@@ -46,10 +47,6 @@ void main() {
       o2: 18,
       he: 45,
     );
-    container.read(blenderFillGas2Provider.notifier).state = const GasMix(
-      o2: 0,
-      he: 100,
-    );
     final warm = container.read(blenderResultProvider).result!;
 
     container.read(blenderFillTempProvider.notifier).state = 5;
@@ -77,9 +74,10 @@ void main() {
 
   test('billing follows the current cylinder and prices', () {
     container.read(blenderCylinderLitersProvider.notifier).state = 12;
-    // Prices are indexed by configured bank. The default EAN32 target skips
-    // the helium bank, so its two steps draw on banks 0 and 2, and pricing
-    // bank 1 does nothing for this blend.
+    // Prices are indexed by role (o2, he, topup). The default EAN32 target
+    // skips the helium role, so its two steps draw on the o2 and topup
+    // roles -- fill-order positions 0 and 2 in the default order -- and
+    // pricing the helium role does nothing for this blend.
     container.read(blenderGasPricesProvider.notifier).state = const [
       2.0,
       50.0,
@@ -134,9 +132,12 @@ void main() {
               startMix: const GasMix(o2: 14.5, he: 57.2),
               targetPressureBar: 220,
               targetMix: const GasMix(o2: 15, he: 55),
-              fillGas1: const GasMix(o2: 99.5),
-              fillGas2: const GasMix(o2: 0, he: 99),
-              fillGas3: const GasMix(o2: 20.9),
+              topupO2Percent: 20.9,
+              fillOrder: const [
+                BlenderGasRole.he,
+                BlenderGasRole.topup,
+                BlenderGasRole.o2,
+              ],
             );
       final loaderContainer = containerWithRepo(repo);
       addTearDown(loaderContainer.dispose);
@@ -154,18 +155,12 @@ void main() {
         loaderContainer.read(blenderTargetMixProvider),
         const GasMix(o2: 15, he: 55),
       );
-      expect(
-        loaderContainer.read(blenderFillGas1Provider),
-        const GasMix(o2: 99.5),
-      );
-      expect(
-        loaderContainer.read(blenderFillGas2Provider),
-        const GasMix(o2: 0, he: 99),
-      );
-      expect(
-        loaderContainer.read(blenderFillGas3Provider),
-        const GasMix(o2: 20.9),
-      );
+      expect(loaderContainer.read(blenderTopupO2PercentProvider), 20.9);
+      expect(loaderContainer.read(blenderFillOrderProvider), [
+        BlenderGasRole.he,
+        BlenderGasRole.topup,
+        BlenderGasRole.o2,
+      ]);
       // Bumped so the text-editing controllers, which hold their own text
       // rather than reading a provider, re-seed from the freshly loaded
       // values instead of showing stale defaults.

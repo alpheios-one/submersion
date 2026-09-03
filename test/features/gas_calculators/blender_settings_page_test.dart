@@ -59,9 +59,7 @@ BlenderPreferences _storedPreferences() => const BlenderPreferences(
   startMix: GasMix(o2: 28),
   targetPressureBar: 232,
   targetMix: GasMix(o2: 18, he: 45),
-  fillGas1: GasMix(o2: 50),
-  fillGas2: GasMix(o2: 0, he: 80),
-  fillGas3: GasMix(o2: 21),
+  topupO2Percent: 32,
 );
 
 /// Opens the settings page on its own route, the way Settings > Manage > Data
@@ -188,11 +186,14 @@ void main() {
         ..blenderPreferences = _storedPreferences();
       await _pumpSettingsPageAlone(tester, repository);
 
-      // Fill gas 1 is 50% O2 in storage and 100% in the defaults.
-      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 0), '50');
-      // Row order is O2, He, then price (Eric's PR #1359 review point 3), so
-      // the first row's price field is the third field on the card.
-      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 2), '1.5');
+      // O2 and He are fixed purity and show no TextField (issue #42); the
+      // only editable mix field is the topup role's O2 fraction, seeded from
+      // storage at 32% rather than the default 21%.
+      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 2), '32');
+      // The O2 role's price is the first TextField on the card: its fixed
+      // purity is an InputDecorator, not a TextField, so only its price
+      // field counts.
+      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 0), '1.5');
       expect(find.text('21/35'), findsOneWidget);
     });
 
@@ -212,8 +213,9 @@ void main() {
               of: find.byType(BlenderFillGasesCard),
               matching: find.byType(TextField),
             )
-            // The first row's price field: O2 and He are indices 0 and 1.
-            .at(2),
+            // The O2 role's price field: the fixed O2/He rows show no
+            // TextField, so this is the first one on the card.
+            .at(0),
         '2.25',
       );
       await tester.testTextInput.receiveAction(TextInputAction.done);

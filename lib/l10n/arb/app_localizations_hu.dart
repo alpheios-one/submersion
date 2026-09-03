@@ -12137,6 +12137,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_helium => 'Hélium';
 
   @override
+  String get gasCalculators_blender_topup => 'Feltöltő gáz';
+
+  @override
+  String get gasCalculators_blender_purity => 'Tisztaság';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return '$gas mozgatása felfelé';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return '$gas mozgatása lefelé';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'Töltési sorrend';
 
   @override

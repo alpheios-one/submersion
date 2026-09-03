@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
@@ -27,19 +28,38 @@ final blenderTargetMixProvider = StateProvider<GasMix>(
   (ref) => const GasMix(o2: 32),
 );
 
-/// Fill gases, applied in this order. The default O2 -> helium -> air is the
-/// order a fill station works in: helium is decanted while the cylinder is
-/// still low, and the compressor tops off with air last. A helium-free target
-/// skips the helium source and blends O2 with air.
-final blenderFillGas1Provider = StateProvider<GasMix>(
-  (ref) => const GasMix(o2: 100),
+/// The order the three fill-gas roles are applied in. See [BlenderGasRole];
+/// the default O2 -> helium -> topup is the order a fill station works in:
+/// helium is decanted while the cylinder is still low, and the compressor
+/// tops off with the topup gas last. A helium-free target skips the helium
+/// source and blends O2 with the topup gas.
+final blenderFillOrderProvider = StateProvider<List<BlenderGasRole>>(
+  (ref) => kDefaultBlenderFillOrder,
 );
-final blenderFillGas2Provider = StateProvider<GasMix>(
-  (ref) => const GasMix(o2: 0, he: 100),
-);
-final blenderFillGas3Provider = StateProvider<GasMix>(
-  (ref) => const GasMix(o2: 21),
-);
+
+/// The topup role's oxygen fraction. The oxygen and helium roles are fixed at
+/// 100% purity; only the topup role's mix is configurable (issue #42).
+final blenderTopupO2PercentProvider = StateProvider<double>((ref) => 21.0);
+
+/// The three fill gases resolved from [blenderFillOrderProvider] and
+/// [blenderTopupO2PercentProvider], in solve order.
+final blenderOrderedFillGasesProvider = Provider<List<GasMix>>((ref) {
+  final order = ref.watch(blenderFillOrderProvider);
+  final topupO2 = ref.watch(blenderTopupO2PercentProvider);
+  return [for (final role in order) gasForRole(role, topupO2)];
+});
+
+/// [blenderGasPricesProvider], reordered to match
+/// [blenderOrderedFillGasesProvider] so a blend step's positional
+/// [BlendStep.fillGasIndex] still points at the right role's price however
+/// the fill order is arranged (issue #42; formerly the documented #1215 bank-
+/// skip bug's positional-index hazard, avoided here by never indexing
+/// [blenderGasPricesProvider] itself by anything but role).
+final blenderOrderedGasPricesProvider = Provider<List<double?>>((ref) {
+  final order = ref.watch(blenderFillOrderProvider);
+  final prices = ref.watch(blenderGasPricesProvider);
+  return [for (final role in order) prices[role.index]];
+});
 
 /// Cylinder temperature while filling, in Celsius.
 final blenderFillTempProvider = StateProvider<double>((ref) => kReferenceTempC);
@@ -54,7 +74,9 @@ final blenderGasModelProvider = StateProvider<BlendGasModel>(
   (ref) => BlendGasModel.zFactor,
 );
 
-/// Price per 100 litres of free gas, positional against the three fill gases.
+/// Price per 100 litres of free gas, one entry per [BlenderGasRole] in that
+/// enum's order. See [blenderOrderedGasPricesProvider] for the fill-order
+/// projection the solver and billing actually consume.
 final blenderGasPricesProvider = StateProvider<List<double?>>(
   (ref) => const [null, null, null],
 );
@@ -94,7 +116,7 @@ final blenderFlushFeeModeProvider = StateProvider<FlushFeeMode>(
   (ref) => FlushFeeMode.perInvoice,
 );
 
-/// One entry per [FlushFeeGasKind], in that enum's order.
+/// One entry per [BlenderGasRole], in that enum's order.
 final blenderFlushFeeGasesProvider = StateProvider<List<FlushFeeGasSetting>>(
   (ref) => defaultFlushFeeGases,
 );
@@ -169,6 +191,7 @@ class BlenderOutcome {
 /// throwing when the requested blend is impossible.
 final blenderResultProvider = Provider<BlenderOutcome>((ref) {
   try {
+    final gases = ref.watch(blenderOrderedFillGasesProvider);
     return BlenderOutcome(
       result: computeBlend(
         GasBlenderInputs(
@@ -176,9 +199,9 @@ final blenderResultProvider = Provider<BlenderOutcome>((ref) {
           start: ref.watch(blenderStartMixProvider),
           targetPressureBar: ref.watch(blenderTargetPressureProvider),
           target: ref.watch(blenderTargetMixProvider),
-          fillGas1: ref.watch(blenderFillGas1Provider),
-          fillGas2: ref.watch(blenderFillGas2Provider),
-          fillGas3: ref.watch(blenderFillGas3Provider),
+          fillGas1: gases[0],
+          fillGas2: gases[1],
+          fillGas3: gases[2],
           model: ref.watch(blenderGasModelProvider),
           fillTempC: ref.watch(blenderFillTempProvider),
           settledTempC: ref.watch(blenderSettledTempProvider),
@@ -199,7 +222,7 @@ final blenderBillingProvider = Provider<BillingResult>((ref) {
   return computeBlendCost(
     blend: blend,
     waterLiters: ref.watch(blenderCylinderLitersProvider),
-    pricesPer100: ref.watch(blenderGasPricesProvider),
+    pricesPer100: ref.watch(blenderOrderedGasPricesProvider),
   );
 });
 
@@ -235,9 +258,9 @@ final blenderPreferencesLoaderProvider = FutureProvider<void>((ref) async {
   ref.read(blenderTargetPressureProvider.notifier).state =
       stored.targetPressureBar;
   ref.read(blenderTargetMixProvider.notifier).state = stored.targetMix;
-  ref.read(blenderFillGas1Provider.notifier).state = stored.fillGas1;
-  ref.read(blenderFillGas2Provider.notifier).state = stored.fillGas2;
-  ref.read(blenderFillGas3Provider.notifier).state = stored.fillGas3;
+  ref.read(blenderTopupO2PercentProvider.notifier).state =
+      stored.topupO2Percent;
+  ref.read(blenderFillOrderProvider.notifier).state = stored.fillOrder;
   ref.read(blenderFlushFeeEnabledProvider.notifier).state =
       stored.flushFeeEnabled;
   ref.read(blenderFlushFeeModeProvider.notifier).state = stored.flushFeeMode;
@@ -282,9 +305,8 @@ Future<void> saveBlenderPreferences(WidgetRef ref) async {
             startMix: ref.read(blenderStartMixProvider),
             targetPressureBar: ref.read(blenderTargetPressureProvider),
             targetMix: ref.read(blenderTargetMixProvider),
-            fillGas1: ref.read(blenderFillGas1Provider),
-            fillGas2: ref.read(blenderFillGas2Provider),
-            fillGas3: ref.read(blenderFillGas3Provider),
+            topupO2Percent: ref.read(blenderTopupO2PercentProvider),
+            fillOrder: ref.read(blenderFillOrderProvider),
             flushFeeEnabled: ref.read(blenderFlushFeeEnabledProvider),
             flushFeeMode: ref.read(blenderFlushFeeModeProvider),
             flushFeeGases: ref.read(blenderFlushFeeGasesProvider),
@@ -312,12 +334,8 @@ void resetGasBlender(WidgetRef ref) {
   ref.read(blenderStartMixProvider.notifier).state = const GasMix(o2: 21);
   ref.read(blenderTargetPressureProvider.notifier).state = 200.0;
   ref.read(blenderTargetMixProvider.notifier).state = const GasMix(o2: 32);
-  ref.read(blenderFillGas1Provider.notifier).state = const GasMix(o2: 100);
-  ref.read(blenderFillGas2Provider.notifier).state = const GasMix(
-    o2: 0,
-    he: 100,
-  );
-  ref.read(blenderFillGas3Provider.notifier).state = const GasMix(o2: 21);
+  ref.read(blenderTopupO2PercentProvider.notifier).state = 21.0;
+  ref.read(blenderFillOrderProvider.notifier).state = kDefaultBlenderFillOrder;
   ref.read(blenderFillTempProvider.notifier).state = kReferenceTempC;
   ref.read(blenderSettledTempProvider.notifier).state = kReferenceTempC;
   ref.read(blenderGasModelProvider.notifier).state = BlendGasModel.zFactor;
@@ -332,14 +350,9 @@ void resetGasBlenderIn(ProviderContainer container) {
   container.read(blenderTargetMixProvider.notifier).state = const GasMix(
     o2: 32,
   );
-  container.read(blenderFillGas1Provider.notifier).state = const GasMix(
-    o2: 100,
-  );
-  container.read(blenderFillGas2Provider.notifier).state = const GasMix(
-    o2: 0,
-    he: 100,
-  );
-  container.read(blenderFillGas3Provider.notifier).state = const GasMix(o2: 21);
+  container.read(blenderTopupO2PercentProvider.notifier).state = 21.0;
+  container.read(blenderFillOrderProvider.notifier).state =
+      kDefaultBlenderFillOrder;
   container.read(blenderFillTempProvider.notifier).state = kReferenceTempC;
   container.read(blenderSettledTempProvider.notifier).state = kReferenceTempC;
   container.read(blenderGasModelProvider.notifier).state =

@@ -12165,6 +12165,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_blender_helium => 'Helio';
 
   @override
+  String get gasCalculators_blender_topup => 'Recarga';
+
+  @override
+  String get gasCalculators_blender_purity => 'Pureza';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return 'Subir $gas';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return 'Bajar $gas';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'Procedimiento de llenado';
 
   @override
