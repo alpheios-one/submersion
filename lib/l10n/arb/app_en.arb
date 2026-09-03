@@ -15663,6 +15663,15 @@
       }
     }
   },
+  "tools_weight_bmiHelper": "BMI {bmi}. A higher BMI usually means more buoyant tissue and a little more lead.",
+  "@tools_weight_bmiHelper": {
+    "placeholders": {
+      "bmi": {
+        "type": "String"
+      }
+    }
+  },
+  "tools_weight_bmiTerm": "Body composition",
   "tools_weight_breakdownTitle": "How this was calculated",
   "tools_weight_confidence_high": "High confidence",
   "tools_weight_confidence_low": "Low confidence - estimate",
@@ -15675,11 +15684,13 @@
       }
     }
   },
+  "tools_weight_heightOptional": "Height (optional)",
   "tools_weight_noGear": "Add the gear you plan to dive to personalize the prediction.",
   "tools_weight_personalTerm": "Personal baseline",
   "tools_weight_placementTitle": "Suggested placement",
   "tools_weight_predictedWeight": "Predicted weight",
   "tools_weight_saveToProfile": "Save weight to profile",
+  "tools_weight_source_bodyComposition": "estimated from BMI",
   "tools_weight_source_measured": "measured from your dives",
   "tools_weight_source_physics": "physics",
   "tools_weight_source_typeDefault": "default estimate",

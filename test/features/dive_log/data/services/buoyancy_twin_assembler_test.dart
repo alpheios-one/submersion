@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
+import 'package:submersion/core/buoyancy/weight_observation.dart';
 import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/data/services/buoyancy_twin_assembler.dart';
@@ -403,6 +405,68 @@ void main() {
 
       expect(input.suit.kind, TwinSuitKind.drysuit);
       expect(input.suit.anchorKg, closeTo(9.0, 1e-9));
+    });
+  });
+
+  group('BuoyancyTwinAssembler.composeRigTerms body composition', () {
+    RigTerms compose(FittedWeightModel model, {double? heightCm}) =>
+        BuoyancyTwinAssembler.composeRigTerms(
+          items: const [wetsuit],
+          tanks: const [],
+          model: model,
+          waterType: WaterType.salt,
+          bodyWeightKg: 80,
+          heightCm: heightCm,
+        );
+
+    test('mirrors the engine bmi term when a height is given', () {
+      final rig = compose(emptyModel(), heightCm: 165);
+      final term = rig.staticTerms.singleWhere((t) => t.label == 'bmi');
+      expect(
+        term.kg,
+        closeTo(
+          BodyComposition.leadTermKg(bodyMassKg: 80, heightCm: 165),
+          1e-9,
+        ),
+      );
+      expect(term.source, TermSource.bodyComposition);
+    });
+
+    test('falls back to the height the model was fitted with', () {
+      final model = WeightPredictionEngine.fit(
+        observations: const [],
+        gearById: (_) => null,
+        bodyWeightKg: 75,
+        heightCm: 160,
+      );
+      final rig = compose(model);
+      expect(rig.staticTerms.any((t) => t.label == 'bmi'), isTrue);
+    });
+
+    test('omits the term when the model was calibrated on history without '
+        'a height', () {
+      final model = WeightPredictionEngine.fit(
+        observations: [
+          for (var i = 0; i < 5; i++)
+            WeightObservation(
+              diveId: 'd$i',
+              diveDateTime: DateTime(2026, 1, 1 + i),
+              waterType: WaterType.salt,
+              carriedKg: 8,
+              equipmentIds: const [],
+              tanks: const [],
+            ),
+        ],
+        gearById: (_) => null,
+        bodyWeightKg: 80,
+      );
+      final rig = compose(model, heightCm: 165);
+      expect(rig.staticTerms.any((t) => t.label == 'bmi'), isFalse);
+    });
+
+    test('omits the term without any height', () {
+      final rig = compose(emptyModel());
+      expect(rig.staticTerms.any((t) => t.label == 'bmi'), isFalse);
     });
   });
 }

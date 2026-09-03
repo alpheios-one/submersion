@@ -24142,6 +24142,14 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'IMC $bmi. Un IMC più alto di solito significa più tessuto galleggiante e un po\' più di zavorra.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Composizione corporea';
+
+  @override
   String get tools_weight_breakdownTitle => 'Come è stato calcolato';
 
   @override
@@ -24159,6 +24167,9 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Altezza (opzionale)';
+
+  @override
   String get tools_weight_noGear =>
       'Aggiungi l\'attrezzatura con cui ti immergerai per personalizzare la previsione.';
 
@@ -24173,6 +24184,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Salva il peso nel profilo';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'stimato dall\'IMC';
 
   @override
   String get tools_weight_source_measured => 'misurato dalle tue immersioni';

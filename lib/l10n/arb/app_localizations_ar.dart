@@ -23704,6 +23704,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'مؤشر كتلة الجسم $bmi. عادة ما يعني ارتفاع مؤشر كتلة الجسم أنسجة أكثر طفوا وقليلا من الرصاص الإضافي.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'تكوين الجسم';
+
+  @override
   String get tools_weight_breakdownTitle => 'كيف تم الحساب';
 
   @override
@@ -23721,6 +23729,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'الطول (اختياري)';
+
+  @override
   String get tools_weight_noGear =>
       'أضف المعدات التي تخطط للغوص بها لتخصيص التنبؤ.';
 
@@ -23735,6 +23746,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'حفظ الوزن في الملف الشخصي';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'مقدر من مؤشر كتلة الجسم';
 
   @override
   String get tools_weight_source_measured => 'مقاس من غوصاتك';

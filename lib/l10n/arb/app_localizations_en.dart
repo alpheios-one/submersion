@@ -23732,6 +23732,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. A higher BMI usually means more buoyant tissue and a little more lead.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Body composition';
+
+  @override
   String get tools_weight_breakdownTitle => 'How this was calculated';
 
   @override
@@ -23749,6 +23757,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Height (optional)';
+
+  @override
   String get tools_weight_noGear =>
       'Add the gear you plan to dive to personalize the prediction.';
 
@@ -23763,6 +23774,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Save weight to profile';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'estimated from BMI';
 
   @override
   String get tools_weight_source_measured => 'measured from your dives';
