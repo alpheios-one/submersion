@@ -234,8 +234,7 @@ class DiveUncombineService {
           diveId: diveId,
           diveRow: diveRow,
           keptLead: sourceById[segments.first.sourceIds.first],
-          keptSpanSeconds:
-              segments.first.endSeconds - segments.first.startSeconds,
+          keptSegment: segments.first,
           keptSummary: _summaryOf([
             for (final s in await _profileSeries.getSeriesForDive(diveId))
               ...s.samples,
@@ -592,7 +591,7 @@ class DiveUncombineService {
     required Dive diveRow,
     required DiveDataSourcesData? keptLead,
     required _ProfileSummary? keptSummary,
-    required int keptSpanSeconds,
+    required UncombineSegment keptSegment,
     required int now,
   }) async {
     var update = DivesCompanion(updatedAt: Value(now));
@@ -609,15 +608,22 @@ class DiveUncombineService {
           keptLead.duration ?? keptSummary?.bottomTime ?? diveRow.bottomTime,
         ),
         waterTemp: Value(keptLead.waterTemp ?? diveRow.waterTemp),
+        // Both fall back to where the kept segment actually ends, never to
+        // the combined dive's own end. Falling back to diveRow.exitTime left
+        // a dive claiming an exit an hour after a runtime that had already
+        // been corrected to its own half -- and every provenance row an
+        // import writes carries an exit time, so the inconsistent branch was
+        // the one only legacy rows take.
         exitTime: Value(
-          keptLead.exitTime?.millisecondsSinceEpoch ?? diveRow.exitTime,
+          keptLead.exitTime?.millisecondsSinceEpoch ??
+              _shiftedMs(diveRow, keptSegment.endSeconds),
         ),
         // As on a restored dive: without this the surviving dive keeps the
         // whole combine's runtime after the later segments have left it.
         runtime: Value(
           keptLead.exitTime != null && keptLead.entryTime != null
               ? keptLead.exitTime!.difference(keptLead.entryTime!).inSeconds
-              : keptSpanSeconds,
+              : keptSegment.endSeconds - keptSegment.startSeconds,
         ),
         cnsEnd: Value(keptLead.cns ?? diveRow.cnsEnd),
         decoAlgorithm: Value(keptLead.decoAlgorithm ?? diveRow.decoAlgorithm),

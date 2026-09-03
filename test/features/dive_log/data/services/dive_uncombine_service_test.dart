@@ -400,6 +400,22 @@ void main() {
       expect(merged.runtime, greaterThan(4000));
       expect(kept.runtime, 1800);
       expect(restored.runtime, 1200);
+
+      // The timestamps have to agree with those runtimes. The seeded
+      // provenance rows carry no exit time, which is the shape
+      // backfillPrimaryDataSource mints for a legacy dive, and the surviving
+      // dive used to fall back to the COMBINED dive's exit: an exit an hour
+      // after a runtime that had already been corrected to its own half.
+      for (final dive in [kept, restored]) {
+        expect(dive.entryTime, isNotNull);
+        expect(dive.exitTime, isNotNull);
+        expect(
+          (dive.exitTime! - dive.entryTime!) ~/ 1000,
+          dive.runtime,
+          reason: 'exit - entry must match runtime on ${dive.id}',
+        );
+      }
+      expect(kept.exitTime, lessThan(merged.exitTime!));
     });
 
     test('summarises each restored dive from its own samples', () async {
