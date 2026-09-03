@@ -69,6 +69,20 @@ class MapSonamesTest(unittest.TestCase):
         )
         self.assertEqual(result, sorted(result))
 
+    def test_excluded_soname_contributes_no_dependency(self):
+        # libjvm.so is reachable from the bundle but never loaded on Linux;
+        # declaring it would put a JRE on every user's machine.
+        soname_map = dict(SONAME_MAP)
+        soname_map["libjvm.so"] = {"exclude": "never loaded on Linux"}
+        result = deps.map_sonames(
+            {"libc.so.6", "libjvm.so"}, soname_map, "apt"
+        )
+        self.assertEqual(result, ["libc6"])
+
+    def test_excluded_soname_is_not_treated_as_unmapped(self):
+        soname_map = {"libjvm.so": {"exclude": "never loaded on Linux"}}
+        self.assertEqual(deps.map_sonames({"libjvm.so"}, soname_map, "rpm"), [])
+
     def test_unmapped_soname_is_a_hard_failure(self):
         with self.assertRaises(SystemExit) as caught:
             deps.map_sonames({"libwebkit2gtk-4.0.so.37"}, SONAME_MAP, "apt")
@@ -113,10 +127,29 @@ class LoadMapTest(unittest.TestCase):
             "libsoup-3.0.so.0",
             "libsecret-1.so.0",
             "libstdc++.so.6",
+            "libepoxy.so.0",
+            "libfontconfig.so.1",
+            "ld-linux-x86-64.so.2",
         ):
             self.assertIn(soname, shipped)
             for column in ("apt", "rpm", "dnf", "pacman", "zypper"):
                 self.assertTrue(shipped[soname][column])
+
+    def test_every_shipped_entry_is_either_mapped_or_explicitly_excluded(self):
+        # A half-filled entry would emit an empty dependency token, which fpm
+        # accepts and which then makes the package undeployable.
+        shipped = deps.load_map(deps.DEFAULT_MAP)
+        for soname, entry in shipped.items():
+            with self.subTest(soname=soname):
+                if entry.get("exclude"):
+                    self.assertTrue(entry["exclude"].strip())
+                    continue
+                for column in ("apt", "rpm", "dnf", "pacman", "zypper"):
+                    self.assertTrue(entry.get(column), soname)
+
+    def test_libjvm_is_excluded_rather_than_mapped_to_a_jre(self):
+        shipped = deps.load_map(deps.DEFAULT_MAP)
+        self.assertIn("exclude", shipped["libjvm.so"])
 
 
 if __name__ == "__main__":

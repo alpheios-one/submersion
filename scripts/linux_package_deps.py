@@ -94,6 +94,11 @@ def map_sonames(sonames, soname_map, column):
 
     Exits rather than dropping anything it cannot map: a silently omitted
     dependency is a package that installs and then fails to launch.
+
+    An entry carrying "exclude" is known and deliberately not a dependency.
+    That is not the same as being absent: absent still fails the build. The
+    case this exists for is libjvm.so, which libjni.so links but which is never
+    loaded on Linux, and which would otherwise pull a JRE onto every machine.
     """
     unmapped = sorted(name for name in sonames if name not in soname_map)
     if unmapped:
@@ -101,9 +106,16 @@ def map_sonames(sonames, soname_map, column):
             "linux_package_deps: unmapped soname(s): %s\n"
             "Add them to scripts/data/linux_soname_map.json. An unmapped "
             "library means the package would install without declaring "
-            "something it needs." % ", ".join(unmapped)
+            "something it needs. If a soname is reachable but never loaded, "
+            "give it an \"exclude\" entry saying why." % ", ".join(unmapped)
         )
-    return sorted({soname_map[name][column] for name in sonames})
+    return sorted(
+        {
+            soname_map[name][column]
+            for name in sonames
+            if not soname_map[name].get("exclude")
+        }
+    )
 
 
 def main(argv=None):

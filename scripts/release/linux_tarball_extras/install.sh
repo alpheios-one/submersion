@@ -26,6 +26,31 @@ print(entry.get(column, "") if entry else "")
 PY
 }
 
+drop_excluded() {
+  # Filter sonames the map marks as deliberately not dependencies.
+  #
+  # libjni.so links libjvm.so, so ldd reports it missing on any machine
+  # without a JRE, which is nearly all of them. Without this, every user
+  # would be told a library is missing that they neither need nor can
+  # usefully install: the jni plugin is bundled but never loaded on Linux.
+  # The script is passed with -c rather than a heredoc: a heredoc would take
+  # over stdin, leaving the piped soname list unreadable, and this function
+  # would then drop every library rather than only the excluded ones.
+  python3 -c '
+import json
+import sys
+
+try:
+    with open(sys.argv[1], encoding="utf-8") as handle:
+        data = json.load(handle)
+except (OSError, ValueError):
+    data = {}
+for soname in sys.stdin.read().split():
+    if not (data.get(soname) or {}).get("exclude"):
+        print(soname)
+' "$1"
+}
+
 install_command_for() {
   # install_command_for <manager> <packages> -> the command the user runs
   case "$1" in
@@ -89,6 +114,7 @@ preflight() {
       ldd "$target" 2>/dev/null | awk '/not found/ {print $1}' || true
     done | sort -u
   )"
+  missing="$(printf '%s\n' "$missing" | drop_excluded "$here/deps.json")"
 
   if [ -z "$missing" ]; then
     echo "All shared libraries resolve."

@@ -127,6 +127,29 @@ mkdir -p "$empty"
 assert_eq "$(preflight_targets "$empty")" "" \
   "returns nothing when there is no binary, so preflight can report it"
 
+# An excluded soname must not be reported as a missing library. libjni.so
+# links libjvm.so, so ldd reports it missing on any machine without a JRE,
+# which would otherwise alarm nearly every tarball user about a library the
+# app never loads.
+cat > "$WORKDIR/deps-excl.json" <<'JSON'
+{
+  "libgtk-3.so.0": {"apt": "libgtk-3-0", "rpm": "x", "dnf": "gtk3", "pacman": "gtk3", "zypper": "libgtk-3-0"},
+  "libjvm.so": {"exclude": "bundled but never loaded on Linux"}
+}
+JSON
+
+assert_eq "$(printf 'libjvm.so\n' | drop_excluded "$WORKDIR/deps-excl.json")" "" \
+  "drops an excluded soname from the missing list"
+
+assert_eq "$(printf 'libgtk-3.so.0\n' | drop_excluded "$WORKDIR/deps-excl.json")" \
+  "libgtk-3.so.0" "keeps a genuinely missing library"
+
+assert_eq "$(printf 'libgtk-3.so.0\nlibjvm.so\n' | drop_excluded "$WORKDIR/deps-excl.json")" \
+  "libgtk-3.so.0" "keeps the real one and drops the excluded one together"
+
+assert_eq "$(printf 'libgtk-3.so.0\n' | drop_excluded "$WORKDIR/missing.json")" \
+  "libgtk-3.so.0" "keeps everything when the map is unreadable"
+
 if [ "$FAILURES" -gt 0 ]; then
   echo "$FAILURES test(s) failed"
   exit 1
