@@ -113,7 +113,20 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
   Future<void> _copyLink() async {
     final uri = _pendingAuthorizeUri();
     if (uri == null) return;
-    await Clipboard.setData(ClipboardData(text: uri.toString()));
+    try {
+      await Clipboard.setData(ClipboardData(text: uri.toString()));
+    } on Exception catch (e) {
+      // A platform-channel call, so it can throw. Letting that escape the
+      // button handler would hand a dead button to the one user who needs
+      // this most: the one whose browser never opened.
+      _log.warning('Could not copy the authorize link: $e');
+      if (!mounted) return;
+      setState(
+        () => _errorText =
+            context.l10n.settings_cloudSync_dropbox_connect_copyFailed,
+      );
+      return;
+    }
     if (!mounted) return;
     setState(() {
       _linkCopied = true;

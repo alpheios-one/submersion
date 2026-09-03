@@ -13,6 +13,7 @@ import 'package:submersion/core/services/cloud_storage/dropbox_storage_provider.
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../support/clipboard_recorder.dart';
 import '../../../../support/fake_keychain_storage.dart';
 
 void main() {
@@ -22,21 +23,6 @@ void main() {
   const browserError =
       'Could not open your browser. Use Copy link and paste the address '
       'into your browser.';
-
-  /// Records Clipboard.setData without touching a real pasteboard.
-  List<MethodCall> recordClipboard(WidgetTester tester) {
-    final calls = <MethodCall>[];
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-          calls.add(call);
-          return null;
-        });
-    addTearDown(
-      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, null),
-    );
-    return calls;
-  }
 
   DropboxStorageProvider provider(MockClient mock) {
     final auth = DropboxAuthManager(
@@ -80,6 +66,10 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -173,15 +163,14 @@ void main() {
     // A Linux desktop whose GIO handler is stale reports a SUCCESSFUL
     // launch and shows nothing, so no error state can be relied on to
     // reveal this affordance -- it is always present.
-    final calls = recordClipboard(tester);
+    final calls = recordClipboardCalls();
     final opened = <Uri>[];
     await pumpDialog(tester, provider(happyMock()), opened: opened);
 
     await tester.tap(find.text('Copy link'));
     await tester.pumpAndSettle();
 
-    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
-    expect((setData.arguments as Map)['text'], opened.single.toString());
+    expect(copiedText(calls), opened.single.toString());
     expect(
       find.text('Link copied. Paste it into your browser to authorize.'),
       findsOneWidget,
@@ -190,7 +179,7 @@ void main() {
 
   testWidgets('Copy link copies the same URL the browser was given, so the '
       'pasted code still matches the pending PKCE verifier', (tester) async {
-    final calls = recordClipboard(tester);
+    final calls = recordClipboardCalls();
     final opened = <Uri>[];
     await pumpDialog(
       tester,
@@ -203,11 +192,41 @@ void main() {
     await tester.tap(find.text('Copy link'));
     await tester.pumpAndSettle();
 
-    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
-    expect((setData.arguments as Map)['text'], opened.single.toString());
+    expect(copiedText(calls), opened.single.toString());
     // The copy confirmation replaces the failure: the user has what they
     // need, and leaving both up reads as two contradictory statuses.
     expect(find.text(browserError), findsNothing);
+  });
+
+  testWidgets('a clipboard that refuses the copy says so instead of throwing '
+      'out of the button handler', (tester) async {
+    // Clipboard.setData is a platform-channel call. An escaping exception
+    // would leave a dead button in front of the one user who needs it most:
+    // the one whose browser never opened.
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
+          if (call.method == 'Clipboard.setData') {
+            throw PlatformException(code: 'clipboard unavailable');
+          }
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+
+    await pumpDialog(tester, provider(happyMock()));
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Could not copy the link.'), findsOneWidget);
+    expect(
+      find.text('Link copied. Paste it into your browser to authorize.'),
+      findsNothing,
+    );
+    // Still usable: the code field and Connect are untouched.
+    expect(find.text('Connect Dropbox'), findsOneWidget);
   });
 
   testWidgets('empty code shows validation error and does not close', (

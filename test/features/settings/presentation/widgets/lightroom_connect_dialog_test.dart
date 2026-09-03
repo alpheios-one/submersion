@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +8,7 @@ import 'package:submersion/core/services/lightroom/lightroom_auth_store.dart';
 import 'package:submersion/features/settings/presentation/widgets/lightroom_connect_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../support/clipboard_recorder.dart';
 import '../../../../support/fake_keychain_storage.dart';
 
 void main() {
@@ -37,6 +37,10 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -135,6 +139,10 @@ void main() {
     var openResult = false;
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -179,16 +187,7 @@ void main() {
   testWidgets('Copy link puts the authorize URL on the clipboard', (
     tester,
   ) async {
-    final calls = <MethodCall>[];
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-          calls.add(call);
-          return null;
-        });
-    addTearDown(
-      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, null),
-    );
+    final calls = recordClipboardCalls();
 
     final opened = <Uri>[];
     await pumpDialog(tester, manager(happyMock()), opened: opened);
@@ -196,8 +195,7 @@ void main() {
     await tester.tap(find.text('Copy link'));
     await tester.pumpAndSettle();
 
-    final setData = calls.firstWhere((c) => c.method == 'Clipboard.setData');
-    expect((setData.arguments as Map)['text'], opened.single.toString());
+    expect(copiedText(calls), opened.single.toString());
     expect(
       find.text('Link copied. Paste it into your browser to authorize.'),
       findsOneWidget,
@@ -210,6 +208,10 @@ void main() {
     final opened = <Uri>[];
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

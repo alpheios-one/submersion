@@ -85,12 +85,26 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
   /// discarded result would leave the loopback wait looking like a hang with
   /// nothing in the log to explain it.
   Future<void> _launchConsentPage(String url) async {
-    if (!await _launchBrowser(url)) {
-      throw const CloudStorageException(
-        'No browser accepted the Google consent URL.',
-      );
+    try {
+      if (await _launchBrowser(url)) return;
+    } on Exception {
+      _logManualConsentUrl(url);
+      rethrow;
     }
+    _logManualConsentUrl(url);
+    throw const CloudStorageException(
+      'No browser accepted the Google consent URL.',
+    );
   }
+
+  /// Logs the consent URL as the manual way out of a failed launch.
+  ///
+  /// Only on failure: the URL carries the PKCE challenge and the state
+  /// parameter, so it has no business in the log of a flow that worked, where
+  /// it would be a very long line nobody reads and a needless copy of the
+  /// request's one-time secrets.
+  void _logManualConsentUrl(String url) =>
+      _log.warning('Open this URL to finish Google consent: $url');
 
   /// openid + email are included so the id_token carries the account email
   /// for the settings tile subtitle; drive.appdata is the only Drive scope.
@@ -134,10 +148,9 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
       final credentials = await _obtainConsent(_clientId, scopes, base, (url) {
         // The loopback flow then parks on the redirect until the browser
         // comes back with a code, so a launch that failed reads as a hang.
-        // The URL goes to the log either way: on a desktop with no working
-        // https scheme handler (see openInBrowser) that log line is the only
-        // way to finish consent by hand.
-        _log.info('Google consent URL: $url');
+        // _launchConsentPage logs the URL if that happens: on a desktop with
+        // no working https scheme handler (see openInBrowser) that log line
+        // is the only way to finish consent by hand.
         logFailure(
           _launchConsentPage(url),
           DesktopOAuthAuthenticator,

@@ -101,22 +101,27 @@ void main() {
   );
 
   group('consent browser hand-off', () {
-    test('logs the consent URL so a desktop with no working browser can '
-        'still finish by hand', () async {
-      final captured = <LogEntry>[];
-      final sub = LoggerService.logStream.listen(captured.add);
-      addTearDown(sub.cancel);
+    test(
+      'keeps the consent URL out of the log when the browser opened',
+      () async {
+        // The URL carries the PKCE challenge and the state parameter. On the
+        // happy path it is a very long line nobody reads and a needless copy
+        // of the request's one-time secrets.
+        final captured = <LogEntry>[];
+        final sub = LoggerService.logStream.listen(captured.add);
+        addTearDown(sub.cancel);
 
-      await authenticator(
-        consentResult: creds(refreshToken: 'rt'),
-      ).authenticate();
-      await pumpEventQueue();
+        await authenticator(
+          consentResult: creds(refreshToken: 'rt'),
+        ).authenticate();
+        await pumpEventQueue();
 
-      expect(
-        captured.where((e) => e.message.contains('Google consent URL')),
-        isNotEmpty,
-      );
-    });
+        expect(
+          captured.where((e) => e.message.contains('accounts.google.com')),
+          isEmpty,
+        );
+      },
+    );
 
     test('a browser that never opens is logged, not swallowed', () async {
       // openInBrowser reports "nothing took the URL" by returning false, not
@@ -140,6 +145,12 @@ void main() {
         ),
         isNotEmpty,
         reason: 'a false return must reach the log like a thrown failure does',
+      );
+      // And the URL itself, which is the only way to finish consent by hand
+      // on a desktop that cannot open a browser at all.
+      expect(
+        captured.where((e) => e.message.contains('accounts.google.com')),
+        isNotEmpty,
       );
     });
   });
