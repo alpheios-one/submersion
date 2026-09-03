@@ -42,7 +42,12 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
     for (var i = 0; i < dives.length; i++) dives[i].pk: i,
   };
 
-  final keyed = <({int diveIndex, int position, Map<String, dynamic> entry})>[];
+  // The primary key is carried so the sort has a tiebreaker: MacDive
+  // leaves ZPOSITION null for nearly every row, and Dart's sort is only
+  // stable up to 32 elements, so without one a dive with many photos comes
+  // out shuffled.
+  final keyed =
+      <({int diveIndex, int position, int pk, Map<String, dynamic> entry})>[];
   for (final image in images) {
     final diveIndex = diveIndexByPk[image.diveFk];
     if (diveIndex == null) continue;
@@ -51,6 +56,7 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
     keyed.add((
       diveIndex: diveIndex,
       position: image.position,
+      pk: image.pk,
       entry: macDiveMediaEntry(
         filename: filename,
         diveIndex: diveIndex,
@@ -60,7 +66,9 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
   }
   keyed.sort((a, b) {
     final byDive = a.diveIndex.compareTo(b.diveIndex);
-    return byDive != 0 ? byDive : a.position.compareTo(b.position);
+    if (byDive != 0) return byDive;
+    final byPosition = a.position.compareTo(b.position);
+    return byPosition != 0 ? byPosition : a.pk.compareTo(b.pk);
   });
   return [for (final k in keyed) k.entry];
 }

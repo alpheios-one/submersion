@@ -122,4 +122,32 @@ void main() {
       expect(media.single['filename'], '/orig/only.jpg');
     },
   );
+
+  test('photos with no recorded position keep MacDive row order', () async {
+    // Dart's sort is only stable up to 32 elements, and MacDive leaves
+    // ZPOSITION null for almost every row (259 of 261 in the real sample),
+    // so without a tiebreaker a dive with many photos shuffles.
+    const count = 40;
+    final payload = await MacDiveDiveMapper.toPayload(
+      _logbook(
+        dives: const [MacDiveRawDive(pk: 1, uuid: 'dive-uuid-1')],
+        images: [
+          for (var i = 0; i < count; i++)
+            MacDiveRawDiveImage(
+              pk: i + 1,
+              uuid: 'img-$i',
+              diveFk: 1,
+              path: 'photo_$i.jpg',
+            ),
+        ],
+      ),
+    );
+
+    final media = payload.entitiesOf(ImportEntityType.media);
+    expect(media, hasLength(count));
+    expect(
+      [for (final m in media) m['filename']],
+      [for (var i = 0; i < count; i++) 'photo_$i.jpg'],
+    );
+  });
 }

@@ -104,6 +104,35 @@ void main() {
     },
   );
 
+  test('a directory holding the photo name is stepped over', () async {
+    final src = await source('a.jpg', [1, 2, 3]);
+    await Directory(p.join(dest.path, 'a.jpg')).create(recursive: true);
+
+    final out = await exportBundledPhoto(
+      source: src,
+      destinationDir: dest.path,
+    );
+
+    expect(out, p.join(dest.path, 'a_1.jpg'));
+    expect(await File(out).readAsBytes(), [1, 2, 3]);
+  });
+
+  test('a dangling symlink holding the photo name is stepped over', () async {
+    final src = await source('a.jpg', [1, 2, 3]);
+    await dest.create(recursive: true);
+    await Link(
+      p.join(dest.path, 'a.jpg'),
+    ).create(p.join(dest.path, 'nothing-here.jpg'));
+
+    final out = await exportBundledPhoto(
+      source: src,
+      destinationDir: dest.path,
+    );
+
+    expect(out, p.join(dest.path, 'a_1.jpg'));
+    expect(await File(out).readAsBytes(), [1, 2, 3]);
+  });
+
   group('folderAcceptsWrites', () {
     test('a writable folder is accepted and left without a probe file', () {
       final dir = p.join(tmp.path, 'new', 'nested');

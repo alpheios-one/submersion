@@ -26,14 +26,22 @@ Future<String> exportBundledPhoto({
   final stem = p.basenameWithoutExtension(name);
   final ext = p.extension(name);
 
-  var candidate = File(p.join(dir.path, name));
+  var candidate = p.join(dir.path, name);
   var counter = 1;
-  while (candidate.existsSync()) {
-    if (await _sameBytes(candidate, source)) return candidate.path;
-    candidate = File(p.join(dir.path, '${stem}_${counter++}$ext'));
+  while (true) {
+    // Anything at all occupying the name blocks it, not just a file: a
+    // directory or a symlink there would make the copy throw, or be
+    // written through, and the photo would be lost to a log line.
+    final type = FileSystemEntity.typeSync(candidate, followLinks: false);
+    if (type == FileSystemEntityType.notFound) break;
+    if (type == FileSystemEntityType.file &&
+        await _sameBytes(File(candidate), source)) {
+      return candidate;
+    }
+    candidate = p.join(dir.path, '${stem}_${counter++}$ext');
   }
 
-  final copied = await source.copy(candidate.path);
+  final copied = await source.copy(candidate);
   return copied.path;
 }
 
@@ -64,20 +72,23 @@ bool folderAcceptsWrites(String dir) {
 Future<bool> _sameBytes(File a, File b) async {
   if (await a.length() != await b.length()) return false;
   final readerA = await a.open();
-  final readerB = await b.open();
   try {
-    while (true) {
-      final chunkA = await readerA.read(_compareChunkBytes);
-      final chunkB = await readerB.read(_compareChunkBytes);
-      if (chunkA.length != chunkB.length) return false;
-      if (chunkA.isEmpty) return true;
-      for (var i = 0; i < chunkA.length; i++) {
-        if (chunkA[i] != chunkB[i]) return false;
+    final readerB = await b.open();
+    try {
+      while (true) {
+        final chunkA = await readerA.read(_compareChunkBytes);
+        final chunkB = await readerB.read(_compareChunkBytes);
+        if (chunkA.length != chunkB.length) return false;
+        if (chunkA.isEmpty) return true;
+        for (var i = 0; i < chunkA.length; i++) {
+          if (chunkA[i] != chunkB[i]) return false;
+        }
       }
+    } finally {
+      await readerB.close();
     }
   } finally {
     await readerA.close();
-    await readerB.close();
   }
 }
 

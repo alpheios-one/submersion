@@ -8,6 +8,7 @@ import 'package:submersion/features/media/data/services/local_file_handle_factor
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
+import 'package:submersion/features/media/domain/value_objects/taken_at_source.dart';
 
 /// Reads capture metadata for a file about to be linked. Null when the file
 /// cannot be read; the link still happens, with the caller's fallbacks.
@@ -51,14 +52,32 @@ class LocalFileLinkService {
   Future<Set<String>> linkedPathsForDive(String diveId) =>
       _mediaRepository.getLinkedLocalPathsForDive(diveId);
 
+  /// The metadata time, but only when it came from the file's own capture
+  /// record.
+  ///
+  /// The extractor's cascade never yields null for a readable file: with
+  /// no capture record it returns the file's modification time. For a
+  /// photo just written out of an archive that is the moment of the copy,
+  /// so taking it blindly would stamp today's date on a photo whose dive
+  /// start is known and correct.
+  static DateTime? _capturedAt(MediaSourceMetadata? metadata) {
+    if (metadata == null) return null;
+    return switch (metadata.takenAtSource) {
+      TakenAtSource.nativeExif ||
+      TakenAtSource.containerMetadata => metadata.takenAt,
+      _ => null,
+    };
+  }
+
   /// Links [path] to [diveId], or returns null when [linkedPaths] already
   /// holds the path so a re-run of the same import never double-links.
   /// Throws a [FileSystemException] when nothing exists at [path].
   ///
   /// [takenAt] is a capture time the source asserted (a logbook's own
-  /// offset from dive start); it wins over the file's EXIF time, which wins
-  /// over [fallbackTakenAt] (typically the dive start), which wins over
-  /// now. [latitude] and [longitude] follow the same rule against EXIF.
+  /// offset from dive start); it wins over the file's own capture record,
+  /// which wins over [fallbackTakenAt] (typically the dive start), which
+  /// wins over a filesystem timestamp, which wins over now. [latitude] and
+  /// [longitude] follow the same rule against EXIF.
   Future<MediaItem?> linkFileForDive({
     required String path,
     required String diveId,
@@ -105,7 +124,12 @@ class LocalFileLinkService {
       localPath: handle.localPath,
       bookmarkRef: handle.bookmarkRef,
       caption: caption,
-      takenAt: takenAt ?? metadata?.takenAt ?? fallbackTakenAt ?? now,
+      takenAt:
+          takenAt ??
+          _capturedAt(metadata) ??
+          fallbackTakenAt ??
+          metadata?.takenAt ??
+          now,
       latitude: latitude ?? metadata?.latitude,
       longitude: longitude ?? metadata?.longitude,
       width: metadata?.width,

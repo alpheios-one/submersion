@@ -12,6 +12,7 @@ import 'package:submersion/features/media/data/services/local_media_platform.dar
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_metadata.dart';
+import 'package:submersion/features/media/domain/value_objects/taken_at_source.dart';
 
 import 'local_file_link_service_test.mocks.dart';
 
@@ -127,6 +128,7 @@ void main() {
     final exif = MediaSourceMetadata(
       mimeType: 'image/jpeg',
       takenAt: DateTime.utc(2025, 1, 15, 10, 30),
+      takenAtSource: TakenAtSource.nativeExif,
       latitude: 1.5,
       longitude: 2.5,
       width: 4000,
@@ -158,6 +160,68 @@ void main() {
     expect(saved[1].width, 4000);
     expect(saved[1].height, 3000);
   });
+
+  test('a filesystem-derived time loses to the dive start', () async {
+    // ExifExtractor never returns a null takenAt: with no capture record
+    // it hands back the file's mtime, which for a photo just copied out of
+    // an archive is the moment of the copy.
+    await service(
+      metadata: MediaSourceMetadata(
+        mimeType: 'image/jpeg',
+        takenAt: DateTime.utc(2026, 9, 3, 4),
+        takenAtSource: TakenAtSource.fileModifiedTime,
+      ),
+    ).linkFileForDive(
+      path: photo('a.jpg'),
+      diveId: 'dive-1',
+      linkedPaths: {},
+      fallbackTakenAt: DateTime.utc(2025, 1, 15, 10),
+    );
+
+    final saved =
+        verify(repo.createMedia(captureAny)).captured.single as MediaItem;
+    expect(saved.takenAt, DateTime.utc(2025, 1, 15, 10));
+  });
+
+  test('container metadata is trusted like EXIF', () async {
+    await service(
+      metadata: MediaSourceMetadata(
+        mimeType: 'video/mp4',
+        takenAt: DateTime.utc(2025, 1, 15, 10, 30),
+        takenAtSource: TakenAtSource.containerMetadata,
+      ),
+    ).linkFileForDive(
+      path: photo('a.mp4'),
+      diveId: 'dive-1',
+      linkedPaths: {},
+      fallbackTakenAt: DateTime.utc(2025, 1, 15, 10),
+    );
+
+    final saved =
+        verify(repo.createMedia(captureAny)).captured.single as MediaItem;
+    expect(saved.takenAt, DateTime.utc(2025, 1, 15, 10, 30));
+  });
+
+  test(
+    'a filesystem time still beats nothing when no dive start is given',
+    () async {
+      await service(
+        metadata: MediaSourceMetadata(
+          mimeType: 'image/jpeg',
+          takenAt: DateTime.utc(2026, 9, 3, 4),
+          takenAtSource: TakenAtSource.fileModifiedTime,
+        ),
+      ).linkFileForDive(
+        path: photo('a.jpg'),
+        diveId: 'dive-1',
+        linkedPaths: {},
+      );
+
+      final saved =
+          verify(repo.createMedia(captureAny)).captured.single as MediaItem;
+      expect(saved.takenAt, DateTime.utc(2026, 9, 3, 4));
+    },
+  );
 
   test('a video mime type makes a video row', () async {
     await service(

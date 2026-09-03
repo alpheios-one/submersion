@@ -403,13 +403,15 @@ void main() {
       expect(targets, {0: 'existing-a'});
     });
 
-    test('a consolidated duplicate is left to removedDiveIds', () {
+    test('a consolidated duplicate targets the dive it folds into', () {
+      // The imported dive is folded away and lands in removedDiveIds, so
+      // its photos have to follow the fold to the surviving dive.
       final targets = UniversalAdapter.photoTargetDiveIds(
-        diveIdByIndex: const {},
+        diveIdByIndex: const {0: 'imported-a'},
         matchResults: {0: match('existing-a')},
         duplicateActions: const {0: DuplicateAction.consolidate},
       );
-      expect(targets, isEmpty);
+      expect(targets, {0: 'existing-a'});
     });
   });
 }

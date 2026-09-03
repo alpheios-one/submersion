@@ -644,6 +644,17 @@ class UniversalAdapter implements ImportSourceAdapter {
     // folder the user chose in the Photos step and then linked from there;
     // no destination means the user skipped them. Nothing is ever filed
     // inside the app's own storage.
+    // Both attach paths aim at the same dives: whichever dive each source
+    // index actually ended up on, including the existing dive behind a
+    // skipped or consolidated duplicate.
+    final photoDiveIds = photoTargetDiveIds(
+      diveIdByIndex: result.diveIdByIndex,
+      matchResults:
+          bundle.groups[wizard.ImportEntityType.dives]?.matchResults ??
+          const {},
+      duplicateActions: diveActions,
+    );
+
     final bundledFolder = notifierState.bundledPhotoFolderPath;
     var attachedPhotos = 0;
     if (bundledFolder != null &&
@@ -651,7 +662,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       final linker = ImportPhotoLinker(_ref.read(localFileLinkServiceProvider));
       final attached = await attachImportedPhotos(
         photoPathsByBaseName: notifierState.photoPathsByBaseName,
-        diveIdByIndex: result.diveIdByIndex,
+        diveIdByIndex: photoDiveIds,
         removedDiveIds: removedDiveIds,
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
         files: notifierState.files,
@@ -683,13 +694,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       final attached = await attachResolvedPhotos(
         media: payload.entitiesOf(ui.ImportEntityType.media),
         resolvedPathByIndex: resolution.resolvedPathByIndex,
-        diveIdByIndex: photoTargetDiveIds(
-          diveIdByIndex: result.diveIdByIndex,
-          matchResults:
-              bundle.groups[wizard.ImportEntityType.dives]?.matchResults ??
-              const {},
-          duplicateActions: diveActions,
-        ),
+        diveIdByIndex: photoDiveIds,
         removedDiveIds: removedDiveIds,
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
         selectedIndices: selections[wizard.ImportEntityType.media],
@@ -1063,12 +1068,12 @@ class UniversalAdapter implements ImportSourceAdapter {
 
   /// The dive each payload index's photos should land on.
   ///
-  /// Imported dives map to the id the importer created. A dive the user
-  /// skipped as a duplicate (or left undecided, which the wizard does not
-  /// let through today) maps to the existing dive it matched, so its photos
-  /// are not silently lost: the linker's path dedupe keeps a repeat import
-  /// from doubling them up. Consolidated dives keep their imported id here
-  /// and are dropped later via `removedDiveIds`, as before.
+  /// Imported dives map to the id the importer created. Both duplicate
+  /// outcomes that do not leave a standalone dive behind map to the
+  /// existing dive instead, so their photos are never silently lost: a
+  /// skipped duplicate imports nothing at all, and a consolidated one is
+  /// folded into the match and then removed. The linker's path dedupe
+  /// keeps a repeat import from doubling any of them up.
   @visibleForTesting
   static Map<int, String> photoTargetDiveIds({
     required Map<int, String> diveIdByIndex,
@@ -1077,10 +1082,17 @@ class UniversalAdapter implements ImportSourceAdapter {
   }) {
     final targets = Map<int, String>.of(diveIdByIndex);
     for (final entry in matchResults.entries) {
-      if (targets.containsKey(entry.key)) continue;
       final action = duplicateActions[entry.key];
-      if (action == null || action == DuplicateAction.skip) {
+      if (action == DuplicateAction.consolidate) {
+        // The imported dive is about to be folded into the match and put
+        // in removedDiveIds, so its photos have to follow the fold.
         targets[entry.key] = entry.value.diveId;
+      } else if (action == null || action == DuplicateAction.skip) {
+        // Skip imports no dive, so without this the photos have nowhere to
+        // land. An undecided duplicate is not reachable today (the wizard
+        // gates advancement on pending decisions), but dropping photos
+        // silently is the exact defect this exists to prevent.
+        targets.putIfAbsent(entry.key, () => entry.value.diveId);
       }
     }
     return targets;
