@@ -4278,41 +4278,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_consolidate_undone => '已撤消合并';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return '$time 的潜水将合并到此次潜水中。';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => '确认合并';
-
-  @override
-  String get diveLog_mergeDialog_empty => '当天未找到其他潜水记录。';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      '此次潜水的剖面、气瓶、压力、事件、标签、潜伴和目击记录将作为附加电脑来源合并到此次潜水中。此操作可通过“取消关联电脑”撤消。';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return '加载潜水记录时出错：$error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => '合并';
-
-  @override
-  String get diveLog_mergeDialog_next => '下一步';
-
-  @override
-  String get diveLog_mergeDialog_subtitle => '选择同一天的一次潜水，将其作为附加电脑合并。';
-
-  @override
-  String get diveLog_mergeDialog_title => '与另一次潜水合并';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => '这将执行以下操作';
-
-  @override
   String get diveLog_computerSheet_description => '选择要从哪台电脑的轮廓开始编辑。';
 
   @override

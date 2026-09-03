@@ -7520,66 +7520,6 @@ abstract class AppLocalizations {
   /// **'Merge undone'**
   String get diveLog_consolidate_undone;
 
-  /// No description provided for @diveLog_mergeDialog_confirmSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Merging dive at {time} into this dive.'**
-  String diveLog_mergeDialog_confirmSubtitle(String time);
-
-  /// No description provided for @diveLog_mergeDialog_confirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm merge'**
-  String get diveLog_mergeDialog_confirmTitle;
-
-  /// No description provided for @diveLog_mergeDialog_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No other dives found on this day.'**
-  String get diveLog_mergeDialog_empty;
-
-  /// No description provided for @diveLog_mergeDialog_explanation.
-  ///
-  /// In en, this message translates to:
-  /// **'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.'**
-  String get diveLog_mergeDialog_explanation;
-
-  /// No description provided for @diveLog_mergeDialog_loadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading dives: {error}'**
-  String diveLog_mergeDialog_loadError(String error);
-
-  /// No description provided for @diveLog_mergeDialog_merge.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge'**
-  String get diveLog_mergeDialog_merge;
-
-  /// No description provided for @diveLog_mergeDialog_next.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get diveLog_mergeDialog_next;
-
-  /// No description provided for @diveLog_mergeDialog_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a dive from the same day to merge as an additional computer.'**
-  String get diveLog_mergeDialog_subtitle;
-
-  /// No description provided for @diveLog_mergeDialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge with another dive'**
-  String get diveLog_mergeDialog_title;
-
-  /// No description provided for @diveLog_mergeDialog_whatThisDoes.
-  ///
-  /// In en, this message translates to:
-  /// **'What this does'**
-  String get diveLog_mergeDialog_whatThisDoes;
-
   /// Description of the computer profile selection sheet
   ///
   /// In en, this message translates to:

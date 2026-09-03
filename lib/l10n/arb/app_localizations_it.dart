@@ -4508,43 +4508,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Unione annullata';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'L\'immersione delle $time verrà unita a questa immersione.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Conferma unione';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Nessun\'altra immersione trovata in questo giorno.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Il profilo, le bombole, le pressioni, gli eventi, i tag, i compagni e gli avvistamenti di questa immersione verranno incorporati in questa immersione come fonte di un computer aggiuntivo. Questa azione può essere annullata con \'Scollega computer\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Errore durante il caricamento delle immersioni: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Unisci';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Avanti';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Seleziona un\'immersione dello stesso giorno da unire come computer aggiuntivo.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Unisci a un\'altra immersione';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Cosa fa questa azione';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Seleziona da quale profilo del computer modificare.';
 

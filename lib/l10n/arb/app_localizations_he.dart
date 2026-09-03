@@ -4393,42 +4393,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_consolidate_undone => 'המיזוג בוטל';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'הצלילה בשעה $time תמוזג לתוך צלילה זו.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'אישור מיזוג';
-
-  @override
-  String get diveLog_mergeDialog_empty => 'לא נמצאו צלילות נוספות ביום זה.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'הפרופיל, הבלונים, הלחצים, האירועים, התגיות, השותפים והתצפיות של צלילה זו ימוזגו לתוך צלילה זו כמקור מחשב נוסף. ניתן לבטל פעולה זו באמצעות \'ביטול קישור מחשב\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'שגיאה בטעינת הצלילות: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'מיזוג';
-
-  @override
-  String get diveLog_mergeDialog_next => 'הבא';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'בחר צלילה מאותו היום למיזוג כמחשב נוסף.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'מיזוג עם צלילה אחרת';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'מה זה עושה';
-
-  @override
   String get diveLog_computerSheet_description =>
       'בחר מאיזה פרופיל מחשב לערוך.';
 
