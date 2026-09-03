@@ -10,6 +10,7 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/parsers/macdive_sqlite_parser.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_db_reader.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_samples_decoder.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_xml_models.dart'
     show MacDiveUnitSystem;
@@ -194,24 +195,70 @@ void main() {
         hasLength(267),
         reason: 'sample DB has 217 Teric + 50 Tern',
       );
-      // Every one of them has ZRAWDATA, which is why ZSAMPLES staying
-      // encrypted costs us nothing.
+      // Every one of them has ZRAWDATA as well as ZSAMPLES, so the raw path
+      // is tried first for all 267 and the samples only ever back it up.
       expect(
         shearwater.where((d) => d.rawDataBlob?.isNotEmpty ?? false),
         hasLength(267),
       );
+      expect(
+        shearwater.where((d) => d.samplesBlob?.isNotEmpty ?? false),
+        hasLength(267),
+      );
+    });
+
+    test('every ZSAMPLES blob in the library decodes', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final withSamples = logbook.dives
+          .where((d) => d.samplesBlob?.isNotEmpty ?? false)
+          .toList();
+      expect(withSamples, hasLength(350));
+
+      var nonEmpty = 0;
+      var nonMonotonic = 0;
+      for (final d in withSamples) {
+        final samples = MacDiveSamplesDecoder.decode(d.samplesBlob!);
+        expect(samples, isNotNull, reason: 'dive ${d.uuid} failed to decode');
+        if (samples!.isEmpty) continue;
+        nonEmpty++;
+        // The decoded series has to be the profile MacDive drew: its deepest
+        // point agrees with the stored max depth (the diver's own corrections
+        // account for the slack) and every depth is a real one.
+        final deepest = samples
+            .map((s) => s.depthMeters)
+            .reduce((a, b) => a > b ? a : b);
+        if (d.maxDepth != null) {
+          expect(
+            deepest,
+            closeTo(d.maxDepth!, 3.0),
+            reason: 'dive ${d.uuid} decoded deepest $deepest m',
+          );
+        }
+        expect(samples.every((s) => s.depthMeters >= 0), isTrue);
+        for (var i = 1; i < samples.length; i++) {
+          if (samples[i].time < samples[i - 1].time) {
+            nonMonotonic++;
+            break;
+          }
+        }
+      }
+      // Two dives store an empty sample array.
+      expect(nonEmpty, 348);
+      // One dive in the library really does run backwards for a sample; the
+      // decoder reports what MacDive stored rather than repairing it.
+      expect(nonMonotonic, lessThanOrEqualTo(1));
     });
 
     test('decoded profile samples carry timestamp and depth', () async {
       final payload = await const MacDiveSqliteParser().parse(bytes);
       final withProfiles = payload
           .entitiesOf(ImportEntityType.dives)
-          .where((d) => (d['profile'] as List?)?.isNotEmpty ?? false);
+          .where((d) => (d['profile'] as List?)?.isNotEmpty ?? false)
+          .toList();
 
-      // The parse channel is not registered in a unit-test host, so nothing
-      // decodes here; the byte-level guarantee is covered by the
-      // decompression test below.
-      if (withProfiles.isEmpty) return;
+      // The parse channel is not registered in a unit-test host, so every
+      // profile here came from ZSAMPLES: 350 blobs less the two empty ones.
+      expect(withProfiles, hasLength(348));
 
       final firstPoint =
           (withProfiles.first['profile'] as List).first as Map<String, dynamic>;
@@ -220,64 +267,41 @@ void main() {
       expect(firstPoint['timestamp'], 0);
     });
 
-    test('dives without raw data omit the profile key entirely', () async {
-      final payload = await const MacDiveSqliteParser().parse(bytes);
-      final nonShearwater = payload
-          .entitiesOf(ImportEntityType.dives)
-          .where(
-            (d) => !((d['diveComputerModel'] as String?) ?? '').startsWith(
-              'Shearwater',
-            ),
-          )
-          .toList();
-
-      expect(
-        nonShearwater,
-        isNotEmpty,
-        reason: 'sample DB has Oceanic and manual-entry dives',
-      );
-      for (final dive in nonShearwater) {
-        // Matches macdive_xml_parser: omit the key rather than emit an empty
-        // list, so downstream can tell "no samples" from "zero-length dive".
-        expect(dive.containsKey('profile'), isFalse);
-      }
-    });
-
     test(
-      'warning count bounded: <5% of Shearwater dives emit decode warnings',
+      'dives with no samples in either column omit the profile key',
       () async {
+        final logbook = await MacDiveDbReader.readAll(bytes);
+        final noBytes = logbook.dives
+            .where(
+              (d) =>
+                  !(d.samplesBlob?.isNotEmpty ?? false) &&
+                  !(d.rawDataBlob?.isNotEmpty ?? false),
+            )
+            .map((d) => d.uuid)
+            .toSet();
+        expect(noBytes, hasLength(190), reason: '540 dives, 350 with samples');
+
         final payload = await const MacDiveSqliteParser().parse(bytes);
-        final dives = payload.entitiesOf(ImportEntityType.dives);
-
-        final shearwaterDives = dives.where((d) {
-          final computer = (d['diveComputerModel'] as String?) ?? '';
-          return computer.startsWith('Shearwater');
-        }).toList();
-
-        // Filter warnings to decode-failure warnings only (not info messages
-        // about FFI unavailability, which is a single aggregate warning).
-        final decodeFailures = payload.warnings.where(
-          (w) =>
-              w.severity == ImportWarningSeverity.warning &&
-              w.message.contains('Profile decode failed'),
-        );
-
-        // When FFI is completely unavailable all Shearwater profiles are empty
-        // and the failure warnings dominate. Distinguish the "FFI broken"
-        // case (all dives failed) from a real regression (a handful failed).
-        if (decodeFailures.length >= shearwaterDives.length) {
-          // 100% failure = no plugin registered; not a regression, skip.
-          return;
+        for (final dive in payload.entitiesOf(ImportEntityType.dives)) {
+          if (!noBytes.contains(dive['sourceUuid'])) continue;
+          // Matches macdive_xml_parser: omit the key rather than emit an empty
+          // list, so downstream can tell "no samples" from "zero-length dive".
+          expect(dive.containsKey('profile'), isFalse);
         }
-
-        expect(
-          decodeFailures.length,
-          lessThan(shearwaterDives.length ~/ 20),
-          reason:
-              'decode-failure warnings should be well under 5% of the Shearwater dive set',
-        );
       },
     );
+
+    test('no dive is reported as undecodable', () async {
+      // With ZSAMPLES readable there is nothing left for the XML export to
+      // rescue, on any platform.
+      final payload = await const MacDiveSqliteParser().parse(bytes);
+      expect(
+        payload.warnings.where(
+          (w) => w.message.contains('decode') || w.message.contains('profile'),
+        ),
+        isEmpty,
+      );
+    });
 
     test('metadata records source and units', () async {
       final payload = await const MacDiveSqliteParser().parse(bytes);
