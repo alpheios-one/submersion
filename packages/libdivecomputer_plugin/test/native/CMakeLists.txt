@@ -52,6 +52,25 @@ target_include_directories(test_descriptor_match_integration PRIVATE
     ${CONFIG_DIR}
 )
 
+# Integration test: the USB HID descriptor queries (issue #1271). Links the
+# real descriptor table so dc_descriptor_filter's vendor/product id lists are
+# the ones under test, not a copy of them. Same minimal source set as the
+# matcher integration test above.
+add_executable(test_usbhid_descriptor_match
+    test_usbhid_descriptor_match.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${LIBDC_DIR}/src/descriptor.c
+    ${LIBDC_DIR}/src/iterator.c
+    ${LIBDC_DIR}/src/array.c
+    ${LIBDC_DIR}/src/platform.c
+    ${LIBDC_DIR}/src/version.c
+)
+target_include_directories(test_usbhid_descriptor_match PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${CONFIG_DIR}
+)
+
 # Regression test for issue #280: hw_ostc3_read must accumulate the bytes each
 # read actually returns, not assume every dc_iostream_read filled the full
 # request (false for the one-notification-per-read BLE transport). The test
@@ -130,6 +149,37 @@ target_include_directories(test_shearwater_common_download PRIVATE
     ${CONFIG_DIR}
 )
 
+# Regression test for issue #285: the Scubapro G2 HUD download over BLE. The
+# uwatec_smart driver keeps `transferred - 1` bytes of every read as payload
+# and cannot re-frame a read carrying several notifications (G2 firmware 1.4+
+# no longer puts a length in the first byte), so the transport's
+# one-notification-per-read guarantee is load-bearing. The test replays the
+# HUD's real handshake through the #included driver over a scripted BLE
+# iostream: packet-preserving reads complete the download, coalesced reads
+# fail with PROTOCOL (the macOS -8), and a lost notification times out after
+# the last packet (the Android -7). Leaf dependencies only; device.c symbols
+# are stubbed in the test for the same reason as test_hw_ostc3_read.
+add_executable(test_uwatec_smart_ble_download
+    test_uwatec_smart_ble_download.c
+    ${LIBDC_DIR}/src/iostream.c
+    ${LIBDC_DIR}/src/custom.c
+    ${LIBDC_DIR}/src/array.c
+    ${LIBDC_DIR}/src/buffer.c
+    ${LIBDC_DIR}/src/context.c
+    ${LIBDC_DIR}/src/common.c
+    ${LIBDC_DIR}/src/platform.c
+    # datetime.c: the dump stamps the clock event with dc_datetime_now.
+    ${LIBDC_DIR}/src/datetime.c
+    # checksum.c: the #included driver's IrDA path (not exercised) links it.
+    ${LIBDC_DIR}/src/checksum.c
+)
+target_include_directories(test_uwatec_smart_ble_download PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${CONFIG_DIR}
+)
+
 # test_parse_raw_dive requires the full libdivecomputer + wrapper linked in.
 # Use the Windows config on Windows, macOS config otherwise.
 if(WIN32)
@@ -164,6 +214,26 @@ target_compile_definitions(test_parse_raw_dive PRIVATE HAVE_CONFIG_H)
 if(WIN32)
     target_compile_definitions(test_parse_raw_dive PRIVATE _CRT_SECURE_NO_WARNINGS)
     target_link_libraries(test_parse_raw_dive PRIVATE SetupAPI.lib ws2_32.lib)
+endif()
+
+# The event-name table is shared by every platform binding, so it is tested
+# against the libdivecomputer enum symbols here rather than per platform.
+add_executable(test_event_type_names
+    test_event_type_names.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${WRAPPER_DIR}/libdc_download.c
+    ${LIBDC_ALL_SOURCES}
+)
+target_include_directories(test_event_type_names PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${PLATFORM_CONFIG_DIR}
+)
+target_compile_definitions(test_event_type_names PRIVATE HAVE_CONFIG_H)
+if(WIN32)
+    target_compile_definitions(test_event_type_names PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_link_libraries(test_event_type_names PRIVATE SetupAPI.lib ws2_32.lib)
 endif()
 
 # Regression test for issue #810: the Shearwater parser must report the raw O2
@@ -211,9 +281,12 @@ add_test(NAME test_dive_converter COMMAND test_dive_converter)
 add_test(NAME test_serial_callbacks COMMAND test_serial_callbacks)
 add_test(NAME test_descriptor_matcher COMMAND test_descriptor_matcher)
 add_test(NAME test_descriptor_match_integration COMMAND test_descriptor_match_integration)
+add_test(NAME test_usbhid_descriptor_match COMMAND test_usbhid_descriptor_match)
 add_test(NAME test_hw_ostc3_read COMMAND test_hw_ostc3_read)
 add_test(NAME test_shearwater_petrel_foreach COMMAND test_shearwater_petrel_foreach)
 add_test(NAME test_shearwater_common_download COMMAND test_shearwater_common_download)
+add_test(NAME test_uwatec_smart_ble_download COMMAND test_uwatec_smart_ble_download)
+add_test(NAME test_event_type_names COMMAND test_event_type_names)
 add_test(NAME test_parse_raw_dive COMMAND test_parse_raw_dive
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )

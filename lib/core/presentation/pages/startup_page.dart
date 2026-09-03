@@ -6,12 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/app.dart' show resolveAppLocale;
 import 'package:submersion/app.dart';
+import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/services/storage/scratch_sweep.dart';
+import 'package:submersion/core/services/sync/changeset_log/local_only_tombstone_gc.dart';
+import 'package:submersion/core/services/sync/changeset_log/peer_cursor_store.dart';
+import 'package:submersion/core/services/sync/changeset_log/publish_state_store.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
@@ -47,6 +53,7 @@ import 'package:submersion/features/backup/domain/entities/backup_type.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
@@ -665,6 +672,17 @@ class _StartupWrapperState extends State<StartupWrapper>
     await timeStartupStep('tileCache', () async {
       try {
         await TileCacheService.instance.initialize();
+        // Age-sweep the browse cache. Not awaited: it is an indexed delete
+        // that nothing downstream depends on, and blocking first frame on
+        // housekeeping is how a splash screen grows a 20-second hang. Scoped
+        // to the browse store, so a downloaded offline region is never swept.
+        unawaited(
+          TileCacheService.instance
+              .removeOldTiles(TileCacheService.browseTileMaxAge)
+              .catchError((Object e) {
+                debugPrint('Browse tile age sweep failed (will retry): $e');
+              }),
+        );
       } catch (e) {
         debugPrint('Warning: Tile cache initialization failed: $e');
       }
@@ -672,7 +690,11 @@ class _StartupWrapperState extends State<StartupWrapper>
 
     await timeStartupStep('speciesSeed', () async {
       final speciesRepository = SpeciesRepository();
-      await speciesRepository.seedBuiltInSpecies();
+      await speciesRepository.seedBuiltInSpecies(
+        versionStore: PrefsBuiltInSpeciesSeedVersionStore(
+          await SharedPreferences.getInstance(),
+        ),
+      );
     });
 
     // Unlinked-media sweep, every launch. Fire-and-forget: it must not delay
@@ -700,6 +722,55 @@ class _StartupWrapperState extends State<StartupWrapper>
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
         );
+      }
+    }());
+
+    // Tombstone GC for a library that never syncs, every launch. The cloud
+    // path runs GC at the tail of a successful sync, which a device with no
+    // provider never reaches, so its deletion log otherwise grows forever.
+    // Gated on there being no trace of a prior sync: a device that synced
+    // and then went local-only still owes its peers those tombstones. Same
+    // fire-and-forget shape as the media sweep above, for the same reasons.
+    unawaited(() async {
+      try {
+        final db = DatabaseService.instance.database;
+        await LocalOnlyTombstoneGc(
+          syncRepository: SyncRepository(database: db),
+          peerCursors: PeerCursorStore(db),
+          publishStates: PublishStateStore(db),
+        ).run();
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Local-only tombstone GC failed (will retry): $e\n$stackTrace',
+        );
+      }
+    }());
+
+    // Scratch-file sweep, at most once a day. Unlike the media sweep above,
+    // whose probe is one indexed SELECT, this walks the filesystem, so it
+    // carries a stamp rather than running unguarded on every launch. Same
+    // fire-and-forget shape: housekeeping must never delay first frame, and
+    // a failure is a whole launch away from its retry.
+    unawaited(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final stampMs = prefs.getInt(kScratchSweepStampKey);
+        final lastSweptAt = stampMs == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(stampMs);
+        final now = DateTime.now();
+        if (!shouldSweepScratch(lastSweptAt: lastSweptAt, now: now)) return;
+
+        await StorageScratchSweep(
+          temporaryDirectory: getTemporaryDirectory,
+          supportDirectory: getApplicationSupportDirectory,
+        ).run(now: now);
+
+        // Stamped after the pass, so a sweep that throws part way retries
+        // tomorrow rather than being recorded as done.
+        await prefs.setInt(kScratchSweepStampKey, now.millisecondsSinceEpoch);
+      } catch (e, stackTrace) {
+        debugPrint('Scratch sweep failed (will retry): $e\n$stackTrace');
       }
     }());
     // coverage:ignore-end

@@ -94,6 +94,7 @@ class MacDiveXmlReader {
       gear: _parseGear(el),
       gases: _parseGases(el, c),
       samples: _parseSamples(el, c),
+      photos: _parsePhotos(el),
     );
   }
 
@@ -200,6 +201,31 @@ class MacDiveXmlReader {
           );
         })
         .toList(growable: false);
+  }
+
+  // ---- photos ----
+
+  static List<MacDiveXmlPhoto> _parsePhotos(XmlElement dive) {
+    final container = dive.findElements('photos').firstOrNull;
+    if (container == null) return const [];
+    var index = 0;
+    final out = <MacDiveXmlPhoto>[];
+    for (final photo in container.findElements('photo')) {
+      final path = photo.findElements('path').firstOrNull?.innerText.trim();
+      // A pathless entry still occupies its slot so the positions of the
+      // photos after it match what MacDive displayed.
+      if (path != null && path.isNotEmpty) {
+        out.add(
+          MacDiveXmlPhoto(
+            path: path,
+            caption: _text(photo, 'caption'),
+            position: index,
+          ),
+        );
+      }
+      index++;
+    }
+    return out;
   }
 
   // ---- helpers ----

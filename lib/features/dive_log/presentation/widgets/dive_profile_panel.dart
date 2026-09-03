@@ -240,19 +240,13 @@ class _DiveProfilePanelContentState
   }
 
   Widget _buildProfileContent(BuildContext context, Dive dive) {
-    final analysis = ref
-        .watch(profileAnalysisProvider(widget.diveId))
-        .valueOrNull;
-    final gasSwitches = ref
-        .watch(gasSwitchesProvider(widget.diveId))
-        .valueOrNull;
-    final tankPressures = ref
-        .watch(tankPressuresProvider(widget.diveId))
-        .valueOrNull;
+    final analysis = ref.watch(profileAnalysisProvider(widget.diveId)).value;
+    final gasSwitches = ref.watch(gasSwitchesProvider(widget.diveId)).value;
+    final tankPressures = ref.watch(tankPressuresProvider(widget.diveId)).value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(widget.diveId))
-        .valueOrNull;
+        .value;
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final colorScheme = Theme.of(context).colorScheme;
@@ -389,6 +383,7 @@ class _DiveProfilePanelContentState
                   surfaceGfCurve: analysis?.surfaceGfCurve,
                   meanDepthCurve: analysis?.meanDepthCurve,
                   ttsCurve: analysis?.ttsCurve,
+                  gtrCurve: analysis?.gtrCurve,
                   cnsCurve: analysis?.cnsCurve,
                   otuCurve: analysis?.otuCurve,
                   markers: markers,

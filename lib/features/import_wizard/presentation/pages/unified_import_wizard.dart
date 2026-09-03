@@ -3,27 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
-import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
-import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
-import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
-import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
-import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
-import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/services/import_provider_invalidator.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/domain/services/step_skip_calculator.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
-import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_progress_step.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_summary_step.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/review_step.dart';
@@ -33,7 +24,17 @@ import 'package:submersion/shared/widgets/wizard/wizard_step_indicator.dart';
 ///
 /// Accepts an [ImportSourceAdapter] and orchestrates the full import flow:
 /// acquisition steps (source-specific), review, import progress, and summary.
-class UnifiedImportWizard extends StatelessWidget {
+///
+/// The adapter is a per-session object: it accumulates acquisition state
+/// (a dive computer download, a picked file) that the later steps consume.
+/// The wizard therefore pins the adapter it is first built with and keeps
+/// using it even if an ancestor rebuilds this widget with a different
+/// instance. Route builders create their adapter in `build`, so a provider
+/// re-emitting mid-session (the dive computer download route watches the
+/// computer record, which the download itself writes on completion) would
+/// otherwise swap in a fresh, empty adapter between the download and the
+/// Review step.
+class UnifiedImportWizard extends StatefulWidget {
   const UnifiedImportWizard({
     super.key,
     required this.adapter,
@@ -41,6 +42,8 @@ class UnifiedImportWizard extends StatelessWidget {
     this.notifierFactoryOverride,
   });
 
+  /// The adapter this widget was built with. The session adapter is the one
+  /// the wizard was FIRST built with; see the class doc.
   final ImportSourceAdapter adapter;
 
   /// Optional starting page for widget tests that need to exercise behavior
@@ -58,20 +61,30 @@ class UnifiedImportWizard extends StatelessWidget {
   final ImportWizardNotifier Function(Ref ref)? notifierFactoryOverride;
 
   @override
+  State<UnifiedImportWizard> createState() => _UnifiedImportWizardState();
+}
+
+class _UnifiedImportWizardState extends State<UnifiedImportWizard> {
+  /// The session adapter, captured once. Deliberately not refreshed in
+  /// didUpdateWidget: a replacement instance carries none of the state the
+  /// acquisition steps already committed to this one.
+  late final ImportSourceAdapter _adapter = widget.adapter;
+
+  @override
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
         importWizardNotifierProvider.overrideWith(
-          notifierFactoryOverride ??
+          widget.notifierFactoryOverride ??
               (ref) => ImportWizardNotifier(
-                adapter,
+                _adapter,
                 tagRepository: ref.read(tagRepositoryProvider),
               ),
         ),
       ],
       child: _UnifiedImportWizardBody(
-        adapter: adapter,
-        initialPageOverride: initialPageOverride,
+        adapter: _adapter,
+        initialPageOverride: widget.initialPageOverride,
       ),
     );
   }
@@ -97,6 +110,13 @@ class _UnifiedImportWizardBodyState
   int _currentPage = 0;
   bool _navigatingForward = true;
   bool _resetComplete = false;
+
+  /// True while [_onNext] is building the bundle or animating to the next
+  /// page. An acquisition step's auto-advance re-arms on every rebuild while
+  /// its page is still current, and [_currentPage] only moves once the page
+  /// animation completes, so a rebuild in that window would otherwise run
+  /// the whole advance (bundle build included) a second time.
+  bool _advancing = false;
 
   List<WizardStepDef> get _acquisitionSteps => widget.adapter.acquisitionSteps;
   int get _reviewIndex => _acquisitionSteps.length;
@@ -182,6 +202,16 @@ class _UnifiedImportWizardBodyState
   }
 
   Future<void> _onNext() async {
+    if (_advancing) return;
+    _advancing = true;
+    try {
+      await _advance();
+    } finally {
+      _advancing = false;
+    }
+  }
+
+  Future<void> _advance() async {
     _navigatingForward = true;
     if (_currentPage < _reviewIndex) {
       // Let the current step commit any pending state before we leave it.
@@ -243,60 +273,23 @@ class _UnifiedImportWizardBodyState
     final result = ref.read(importWizardNotifierProvider).importResult;
     if (result == null) return;
 
-    // Always refresh the computers list — ensureComputer() may have created
-    // a new record even when all dives were skipped.
-    if (widget.adapter.sourceType == ImportSourceType.diveComputer) {
+    // Always refresh the computers list -- ensureComputer() (or
+    // SuuntoCloudAdapter's/GarminCloudAdapter's per-dive computer
+    // resolution) may have created a new record even when all dives were
+    // skipped.
+    if (widget.adapter.sourceType == ImportSourceType.diveComputer ||
+        widget.adapter.sourceType == ImportSourceType.suuntoCloud ||
+        widget.adapter.sourceType == ImportSourceType.garminCloud) {
       ref.invalidate(allDiveComputersProvider);
     }
 
-    for (final type in result.importedCounts.keys) {
-      if ((result.importedCounts[type] ?? 0) <= 0) continue;
-      switch (type) {
-        case ImportEntityType.dives:
-          ref.invalidate(diveListNotifierProvider);
-          ref.invalidate(paginatedDiveListProvider);
-          ref.invalidate(divesProvider);
-          ref.invalidate(diveStatisticsProvider);
-          ref.invalidate(diveRecordsProvider);
-          ref.invalidate(allDiveComputersProvider);
-          ref.invalidate(nextDiveNumberProvider);
-          // Dives link to sites, buddies, trips, etc. — their counts/lists
-          // may change even when those entities weren't imported.
-          ref.invalidate(sitesWithCountsProvider);
-          ref.invalidate(siteListNotifierProvider);
-        case ImportEntityType.sites:
-          ref.invalidate(sitesProvider);
-          ref.invalidate(sitesWithCountsProvider);
-          ref.invalidate(siteListNotifierProvider);
-        case ImportEntityType.buddies:
-          ref.invalidate(allBuddiesProvider);
-        case ImportEntityType.equipment:
-          ref.invalidate(allEquipmentProvider);
-          ref.invalidate(activeEquipmentProvider);
-          ref.invalidate(retiredEquipmentProvider);
-          ref.invalidate(serviceDueEquipmentProvider);
-          ref.invalidate(equipmentListNotifierProvider);
-        case ImportEntityType.equipmentSets:
-          ref.invalidate(equipmentSetsProvider);
-        case ImportEntityType.trips:
-          ref.invalidate(allTripsProvider);
-        case ImportEntityType.diveCenters:
-          ref.invalidate(allDiveCentersProvider);
-        case ImportEntityType.certifications:
-          ref.invalidate(allCertificationsProvider);
-        case ImportEntityType.courses:
-          ref.invalidate(allCoursesProvider);
-        case ImportEntityType.tags:
-          ref.invalidate(tagsProvider);
-        case ImportEntityType.diveTypes:
-          ref.invalidate(diveTypesProvider);
-        case ImportEntityType.media:
-          // Photos land on dives that may already be on screen.
-          ref.invalidate(mediaForDiveProvider);
-          ref.invalidate(mediaCountForDiveProvider);
-          ref.invalidate(mediaListNotifierProvider);
-      }
-    }
+    invalidateImportRelatedProviders(
+      (provider) => ref.invalidate(provider),
+      result.importedCounts.entries
+          .where((e) => e.value > 0)
+          .map((e) => e.key)
+          .toSet(),
+    );
   }
 
   void _close() {

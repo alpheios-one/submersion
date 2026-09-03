@@ -72,4 +72,15 @@ void main() {
     expect(cursor!.lastSeqApplied, 2);
     expect(cursor.appliedHlcHigh, '00000000000010:000000:p1');
   });
+
+  test(
+    'hasAny is false on an empty table and true once any cursor exists',
+    () async {
+      expect(await store.hasAny(), isFalse);
+      await store.upsert(peerDeviceId: 'p1', provider: 's3', lastSeqApplied: 1);
+      expect(await store.hasAny(), isTrue);
+      await store.resetForProvider('s3');
+      expect(await store.hasAny(), isFalse);
+    },
+  );
 }

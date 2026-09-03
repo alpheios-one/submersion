@@ -13,6 +13,7 @@ import 'package:submersion/features/dive_sites/data/services/dive_site_api_servi
 import 'package:submersion/features/dive_sites/domain/constants/site_field.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/dive_sites/domain/entities/site_dive_statistics.dart';
 import 'package:submersion/features/dive_sites/domain/models/entry_exit_suggestion.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
@@ -235,11 +236,11 @@ final sortedSitesWithCountsProvider =
       final sitesAsync = ref.watch(filteredSitesWithCountsProvider);
       final sort = ref.watch(siteSortProvider);
 
-      return sitesAsync.whenData((sites) => _applySiteSorting(sites, sort));
+      return sitesAsync.whenData((sites) => applySiteSorting(sites, sort));
     });
 
 /// Apply sorting to a list of sites
-List<SiteWithDiveCount> _applySiteSorting(
+List<SiteWithDiveCount> applySiteSorting(
   List<SiteWithDiveCount> sites,
   SortState<SiteSortField> sort,
 ) {
@@ -264,6 +265,27 @@ List<SiteWithDiveCount> _applySiteSorting(
           comparison = (a.site.maxDepth ?? 0).compareTo(b.site.maxDepth ?? 0);
         case SiteSortField.diveCount:
           comparison = a.diveCount.compareTo(b.diveCount);
+        case SiteSortField.lastDived:
+          // Sites never dived always sort last regardless of direction, and
+          // ties (including the never-dived group) always break A->Z for
+          // determinism, independent of direction. Both cases return early,
+          // before the direction inversion below, so neither is flipped.
+          final aDate = a.lastDivedAt;
+          final bDate = b.lastDivedAt;
+          if (aDate == null || bDate == null) {
+            if (aDate == null && bDate == null) {
+              return a.site.name.toLowerCase().compareTo(
+                b.site.name.toLowerCase(),
+              );
+            }
+            return aDate == null ? 1 : -1;
+          }
+          comparison = aDate.compareTo(bDate);
+          if (comparison == 0) {
+            return a.site.name.toLowerCase().compareTo(
+              b.site.name.toLowerCase(),
+            );
+          }
       }
 
       if (invertForText) {
@@ -349,6 +371,28 @@ final siteEntryExitSuggestionProvider =
             : EntryMethod.values.asNameMap()[top.exitMethod],
         count: top.count,
       );
+    });
+
+/// Auto-computed dive statistics (depth range, duration, first/last dive) for
+/// the dives logged at [siteId] (submersion-app/submersion#1018, #1038).
+///
+/// Distinct from the manually entered [domain.DiveSite.minDepth]/`maxDepth`
+/// shown in the "Depth Range" card - this is derived from the dives
+/// themselves and never written back to the site row.
+///
+/// Takes the dives tick for the same reason [siteEntryExitSuggestionProvider]
+/// does: site merges, bulk edits, and sync pulls change which dives belong to
+/// a site without touching the site row itself.
+final siteDiveStatisticsProvider =
+    FutureProvider.family<SiteDiveStatistics, String>((ref, siteId) async {
+      final diveRepository = ref.watch(diveRepositoryProvider);
+      ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
+      final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+      if (diverId == null) return SiteDiveStatistics.empty;
+
+      final stats = ref.watch(statisticsRepositoryProvider);
+      return stats.getSiteDiveStatistics(siteId: siteId, diverId: diverId);
     });
 
 /// Site list notifier for mutations

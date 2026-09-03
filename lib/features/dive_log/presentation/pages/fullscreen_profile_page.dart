@@ -314,6 +314,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     final activeProfile = activeSource == null
         ? null
         : sourceProfiles[activeSource.id];
+    // Same rule as the detail page: sources that never overlap in time are
+    // consecutive halves of one dive, not alternative recordings of it, so
+    // they are drawn as one series rather than one-at-a-time (#1451).
+    final isMultiSource = usesPerSourceRendering(
+      dataSources,
+      sourceProfiles.values,
+    );
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -322,7 +329,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and photo pins scaled to it drift off the visible span (#1167).
-    final chartProfile = (dataSources.length >= 2 && activeProfile != null)
+    final chartProfile = (isMultiSource && activeProfile != null)
         ? activeProfile.points
         : dive.profile;
 
@@ -437,6 +444,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                           surfaceGfCurve: analysis?.surfaceGfCurve,
                           meanDepthCurve: analysis?.meanDepthCurve,
                           ttsCurve: analysis?.ttsCurve,
+                          gtrCurve: analysis?.gtrCurve,
                           cnsCurve: analysis?.cnsCurve,
                           otuCurve: analysis?.otuCurve,
                           tankVolume: dive.tanks
@@ -562,7 +570,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                 ),
                 // Source switching and overlay comparison, mirroring the
                 // detail page (management actions stay on the detail page).
-                if (dataSources.length >= 2)
+                if (isMultiSource)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: SourceBar(

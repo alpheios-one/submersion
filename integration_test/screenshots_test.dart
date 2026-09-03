@@ -464,6 +464,7 @@ void main() {
         await _tapBottomNavItem(tester, Icons.more_horiz_outlined);
         await _settle(tester);
         final equipmentText = find.text('Equipment');
+        await _scrollMoreSheetTo(tester, equipmentText);
         if (equipmentText.evaluate().isNotEmpty) {
           await tester.tap(equipmentText.first);
           await _settle(tester);
@@ -485,6 +486,7 @@ void main() {
         await _tapBottomNavItem(tester, Icons.more_horiz_outlined);
         await _settle(tester);
         final statisticsText = find.text('Statistics');
+        await _scrollMoreSheetTo(tester, statisticsText);
         if (statisticsText.evaluate().isNotEmpty) {
           await tester.tap(statisticsText.first);
           await _settle(tester);
@@ -508,6 +510,7 @@ void main() {
         await _tapBottomNavItem(tester, Icons.more_horiz_outlined);
         await _settle(tester);
         final recordsInMore = find.text('Records');
+        await _scrollMoreSheetTo(tester, recordsInMore);
         if (recordsInMore.evaluate().isNotEmpty) {
           await tester.tap(recordsInMore.first);
           await _settle(tester);
@@ -539,7 +542,9 @@ void main() {
     Future<void> openNavCustomization(WidgetTester tester) async {
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await _settle(tester);
-      await tester.tap(find.widgetWithText(ListTile, 'Settings').first);
+      final settingsTile = find.widgetWithText(ListTile, 'Settings');
+      await _scrollMoreSheetTo(tester, settingsTile);
+      await tester.tap(settingsTile.first);
       await _settle(tester);
       await tester.tap(find.widgetWithText(ListTile, 'Appearance').first);
       await _settle(tester);
@@ -661,6 +666,25 @@ Future<void> _enableProfileToggles(WidgetTester tester) async {
     await tester.tap(consumptionToggle.first);
     await _settle(tester);
   }
+}
+
+/// Scrolls the open "More" overflow sheet until [target] is on screen.
+///
+/// The sheet is capped at a fraction of the screen height (issue #1480), so
+/// destinations past the fold are not built until the list scrolls. Gives up
+/// quietly: every caller already guards on whether the target turned up.
+Future<void> _scrollMoreSheetTo(WidgetTester tester, Finder target) async {
+  final sheetList = find.descendant(
+    of: find.byType(BottomSheet),
+    matching: find.byType(Scrollable),
+  );
+  if (sheetList.evaluate().isEmpty) return;
+  try {
+    await tester.scrollUntilVisible(target, 120, scrollable: sheetList.first);
+  } on StateError {
+    // Not in this sheet at all; the caller's isNotEmpty check handles it.
+  }
+  await _settle(tester);
 }
 
 /// Taps a bottom navigation item by its icon.

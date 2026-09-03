@@ -16,6 +16,7 @@ import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/services/lightroom/lightroom_api_client.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
@@ -37,6 +38,8 @@ import 'package:submersion/features/media/presentation/widgets/perdix_overlay/pe
 import 'package:submersion/features/media/presentation/widgets/write_metadata_dialog.dart';
 import 'package:submersion/features/media/presentation/widgets/mini_dive_profile_overlay.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/media_species_chips_row.dart';
+import 'package:submersion/features/media/presentation/widgets/media_species_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/set_media_time_dialog.dart';
 import 'package:submersion/features/media_store/presentation/widgets/media_reupload_button.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -394,8 +397,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             final activeProfile = activeSource == null
                 ? null
                 : sourceProfiles[activeSource.id];
-            final perdixProfile =
-                (dataSources.length >= 2 && activeProfile != null)
+            // Sources that never overlap in time are consecutive halves of
+            // one dive a Combine stitched together, not alternative
+            // recordings of it: the face reads the whole dive, not the
+            // active half (#1451). Mirrors the detail and fullscreen pages.
+            final isMultiSource = usesPerSourceRendering(
+              dataSources,
+              sourceProfiles.values,
+            );
+            final perdixProfile = (isMultiSource && activeProfile != null)
                 ? activeProfile.points
                 : dive?.profile ?? const [];
             // Rebuilt only on page-level setState (page swipes, toggles),
@@ -478,6 +488,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onShare: (anchor) =>
                         _shareCurrentPhoto(currentItem, anchor),
                     onWriteMetadata: () => _writeMetadataToPhoto(currentItem),
+                    onTagSpecies: () =>
+                        showMediaSpeciesSheet(context, currentItem),
                     // The viewer is deliberately NOT popped first: leaving it
                     // on the stack is what lets Back return the user to the
                     // photo they launched from, with its page index, zoom and
@@ -1329,6 +1341,7 @@ class _TopOverlay extends StatelessWidget {
   final VoidCallback onClose;
   final void Function(Rect? anchor) onShare;
   final VoidCallback onWriteMetadata;
+  final VoidCallback onTagSpecies;
   final bool hasEnrichment;
 
   /// Whether the Perdix overlay toggle is shown (media synced to a profile).
@@ -1352,6 +1365,7 @@ class _TopOverlay extends StatelessWidget {
     required this.onClose,
     required this.onShare,
     required this.onWriteMetadata,
+    required this.onTagSpecies,
     required this.hasEnrichment,
     required this.showPerdixToggle,
     required this.perdixEnabled,
@@ -1434,6 +1448,12 @@ class _TopOverlay extends StatelessWidget {
                     tooltip: context.l10n.media_lightroom_openInLightroom,
                     onPressed: onOpenInLightroom,
                   ),
+                IconButton(
+                  key: const ValueKey('viewer_species'),
+                  icon: const Icon(Icons.sell_outlined, color: Colors.white),
+                  tooltip: context.l10n.media_species_actionTooltip,
+                  onPressed: onTagSpecies,
+                ),
                 IconButton(
                   icon: const Icon(Icons.info_outline, color: Colors.white),
                   tooltip: context.l10n.media_info_title,
@@ -1540,6 +1560,7 @@ class _BottomMetadataOverlay extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                 ],
+                MediaSpeciesChipsRow(mediaId: item.id),
                 // Metadata row
                 Row(
                   children: [

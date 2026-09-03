@@ -19,6 +19,7 @@ void main() {
       ('dive-centers', '/dive-centers'),
       ('certifications', '/certifications'),
       ('courses', '/courses'),
+      ('species', '/species'),
       ('statistics', '/statistics'),
       ('planning', '/planning'),
       ('transfer', '/transfer'),
