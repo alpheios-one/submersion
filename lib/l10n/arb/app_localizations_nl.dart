@@ -14754,18 +14754,53 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_diveDetailSections_fixedSections =>
-      'Vaste secties: koptekst, duikprofielgrafiek';
+      'Vaste sectie: koptekst';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'Configureerbare secties (sleep om te herordenen)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'Deco-status / weefselbelasting';
+  String get diveDetailSection_profile_name => 'Duikprofiel';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, plafond, weefsel-heatmap, O2-toxiciteit';
+  String get diveDetailSection_profile_description =>
+      'Diepte-/tijdgrafiek, afspelen, bereikselectie';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'Decostatus';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, plafond, stops, O2-toxiciteit';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'Weefselbelasting';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'Verzadiging per compartiment en heatmap';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'Weergaveopties';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'Lay-out';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'Secties';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'Alle secties tonen';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'Secties herschikken…';
+
+  @override
+  String get diveDetailLayout_detailed => 'Gedetailleerd';
+
+  @override
+  String get diveDetailLayout_list => 'Lijst';
 
   @override
   String get diveDetailSection_safetyReview_name => 'Veiligheidscontrole';

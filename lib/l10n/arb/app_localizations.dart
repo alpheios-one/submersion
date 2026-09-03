@@ -24767,7 +24767,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_diveDetailSections_fixedSections.
   ///
   /// In en, this message translates to:
-  /// **'Fixed sections: Header, Dive Profile Chart'**
+  /// **'Fixed section: Header'**
   String get settings_diveDetailSections_fixedSections;
 
   /// No description provided for @settings_diveDetailSections_configurableSections.
@@ -24776,17 +24776,83 @@ abstract class AppLocalizations {
   /// **'Configurable sections (drag to reorder)'**
   String get settings_diveDetailSections_configurableSections;
 
-  /// No description provided for @diveDetailSection_decoO2_name.
+  /// No description provided for @diveDetailSection_profile_name.
   ///
   /// In en, this message translates to:
-  /// **'Deco Status / Tissue Loading'**
-  String get diveDetailSection_decoO2_name;
+  /// **'Dive Profile'**
+  String get diveDetailSection_profile_name;
 
-  /// No description provided for @diveDetailSection_decoO2_description.
+  /// No description provided for @diveDetailSection_profile_description.
   ///
   /// In en, this message translates to:
-  /// **'NDL, ceiling, tissue heat map, O2 toxicity'**
-  String get diveDetailSection_decoO2_description;
+  /// **'Depth/time chart, playback, range selection'**
+  String get diveDetailSection_profile_description;
+
+  /// No description provided for @diveDetailSection_decoStatus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco Status'**
+  String get diveDetailSection_decoStatus_name;
+
+  /// No description provided for @diveDetailSection_decoStatus_description.
+  ///
+  /// In en, this message translates to:
+  /// **'NDL, ceiling, stops, O2 toxicity'**
+  String get diveDetailSection_decoStatus_description;
+
+  /// No description provided for @diveDetailSection_tissueLoading_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tissue Loading'**
+  String get diveDetailSection_tissueLoading_name;
+
+  /// No description provided for @diveDetailSection_tissueLoading_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-compartment saturation and heat map'**
+  String get diveDetailSection_tissueLoading_description;
+
+  /// No description provided for @diveLog_detail_displayOptions_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Display options'**
+  String get diveLog_detail_displayOptions_tooltip;
+
+  /// No description provided for @diveLog_detail_displayOptions_layout.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get diveLog_detail_displayOptions_layout;
+
+  /// No description provided for @diveLog_detail_displayOptions_sections.
+  ///
+  /// In en, this message translates to:
+  /// **'Sections'**
+  String get diveLog_detail_displayOptions_sections;
+
+  /// No description provided for @diveLog_detail_displayOptions_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sections'**
+  String get diveLog_detail_displayOptions_showAll;
+
+  /// No description provided for @diveLog_detail_displayOptions_reorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder sections...'**
+  String get diveLog_detail_displayOptions_reorder;
+
+  /// No description provided for @diveDetailLayout_detailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed'**
+  String get diveDetailLayout_detailed;
+
+  /// No description provided for @diveDetailLayout_list.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get diveDetailLayout_list;
 
   /// No description provided for @diveDetailSection_safetyReview_name.
   ///

@@ -14154,17 +14154,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_diveDetailSections_resetToDefault => '恢复默认';
 
   @override
-  String get settings_diveDetailSections_fixedSections => '固定区块：头部信息、潜水轮廓图';
+  String get settings_diveDetailSections_fixedSections => '固定区块：头部信息';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       '可配置区块（拖动以重新排序）';
 
   @override
-  String get diveDetailSection_decoO2_name => '减压状态 / 组织负荷';
+  String get diveDetailSection_profile_name => '潜水曲线';
 
   @override
-  String get diveDetailSection_decoO2_description => '免减压极限、上限深度、组织热力图、氧气毒性';
+  String get diveDetailSection_profile_description => '深度/时间图表、回放、区间选择';
+
+  @override
+  String get diveDetailSection_decoStatus_name => '减压状态';
+
+  @override
+  String get diveDetailSection_decoStatus_description => '免减压极限、上限深度、减压停留、氧气毒性';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => '组织负荷';
+
+  @override
+  String get diveDetailSection_tissueLoading_description => '各组织仓饱和度与热力图';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => '显示选项';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => '布局';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => '分区';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => '显示所有分区';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => '重新排序分区…';
+
+  @override
+  String get diveDetailLayout_detailed => '详细';
+
+  @override
+  String get diveDetailLayout_list => '列表';
 
   @override
   String get diveDetailSection_safetyReview_name => '安全回顾';

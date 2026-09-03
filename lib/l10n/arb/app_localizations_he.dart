@@ -14499,19 +14499,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_diveDetailSections_resetToDefault => 'איפוס לברירת מחדל';
 
   @override
-  String get settings_diveDetailSections_fixedSections =>
-      'סעיפים קבועים: כותרת, תרשים פרופיל צלילה';
+  String get settings_diveDetailSections_fixedSections => 'סעיף קבוע: כותרת';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'סעיפים הניתנים להגדרה (גרור לסידור מחדש)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'סטטוס דקו / עומס רקמות';
+  String get diveDetailSection_profile_name => 'פרופיל הצלילה';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, תקרה, מפת חום של רקמות, רעילות O2';
+  String get diveDetailSection_profile_description =>
+      'גרף עומק/זמן, נגינה, בחירת טווח';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'סטטוס דקו';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, תקרה, עצירות, רעילות O2';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'עומס רקמות';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'רוויה לפי תא ומפת חום';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'אפשרויות תצוגה';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'פריסה';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'מקטעים';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'הצג את כל המקטעים';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'שינוי סדר המקטעים…';
+
+  @override
+  String get diveDetailLayout_detailed => 'מפורט';
+
+  @override
+  String get diveDetailLayout_list => 'רשימה';
 
   @override
   String get diveDetailSection_safetyReview_name => 'סקירת בטיחות';
