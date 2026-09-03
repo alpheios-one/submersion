@@ -182,11 +182,21 @@ fi
 # is imported by 378 test files -- the biggest hub in the repo -- so doing this
 # on every push would bump those mtimes and force a pointless recompile.
 #
-# Compares against the WORKING TREE, not HEAD: an ARB edit and its regenerated
-# output that are both still uncommitted pass, while a stale pair fails whether
-# or not it has been committed. Runs BEFORE the parallel stage rather than
-# inside it, because rewriting these files underneath a concurrent
-# `flutter analyze` would let it read a half-written source.
+# The verdict is HEAD-relative, like CI's, because HEAD is what gets pushed.
+# Regenerate, then read `git status` for the three states that tells apart:
+#
+#   generated dirty, ARBs clean -> HEAD's committed ARBs do not produce HEAD's
+#     committed output. Definitively stale: block. Covers both "forgot to run
+#     gen-l10n" and "ran it but committed only the ARB".
+#   generated dirty, ARBs dirty -> the output was regenerated from sources HEAD
+#     does not have, so it says nothing about the commits being pushed. Warn and
+#     let it through rather than block a developer mid-ARB-edit from pushing
+#     unrelated commits; CI still checks the pushed tree.
+#   nothing dirty -> HEAD is self-consistent.
+#
+# Runs BEFORE the parallel stage rather than inside it, because rewriting these
+# files underneath a concurrent `flutter analyze` would let it read a
+# half-written source.
 l10n_touched=0
 if [ "$range_resolved" = "0" ]; then
     # Push range unknown: check rather than guess. It costs about 3s.
@@ -202,11 +212,14 @@ fi
 l10n_failed=0
 if [ "$l10n_touched" = "1" ]; then
     echo "🌍 Verifying generated localizations match the ARB files..."
+    # Snapshot with -p so the mtimes can be put back when nothing drifted:
+    # gen-l10n rewrites all 12 files regardless, and letting that bump the
+    # mtime of the repo's biggest import hub would throw away an already-warm
+    # compile before this hook's own test stage runs.
     l10n_before=$(mktemp -d)
-    l10n_after=$(mktemp -d)
     l10n_log=$(mktemp)
     set +e
-    cp lib/l10n/arb/app_localizations*.dart "$l10n_before/" 2>/dev/null
+    cp -p lib/l10n/arb/app_localizations*.dart "$l10n_before/" 2>/dev/null
     flutter gen-l10n > "$l10n_log" 2>&1
     l10n_status=$?
     set -e
@@ -215,26 +228,29 @@ if [ "$l10n_touched" = "1" ]; then
         cat "$l10n_log"
         l10n_failed=1
     else
-        cp lib/l10n/arb/app_localizations*.dart "$l10n_after/" 2>/dev/null || true
-        stale=""
-        for f in "$l10n_after"/*.dart; do
-            [ -e "$f" ] || continue
-            base=$(basename "$f")
-            if [ ! -f "$l10n_before/$base" ] || ! cmp -s "$f" "$l10n_before/$base"; then
-                stale="${stale}   lib/l10n/arb/${base}"$'\n'
-            fi
-        done
-        if [ -n "$stale" ]; then
-            echo "❌ Generated localizations were stale! These did not match their ARBs:"
-            printf '%s' "$stale"
-            echo "   They have been REGENERATED IN PLACE. Review and commit them,"
-            echo "   then push again."
-            l10n_failed=1
-        else
+        # --porcelain, not `git diff`: a brand-new locale whose generated file
+        # was never added is untracked, which a diff cannot see at all.
+        stale=$(git status --porcelain -- 'lib/l10n/arb/app_localizations*.dart')
+        arbs_dirty=$(git status --porcelain -- 'lib/l10n/arb/*.arb')
+        if [ -z "$stale" ]; then
+            # Byte-identical to HEAD, so this only restores the mtimes.
+            cp -p "$l10n_before"/*.dart lib/l10n/arb/ 2>/dev/null || true
             echo "✅ Generated localizations are up to date"
+        elif [ -n "$arbs_dirty" ]; then
+            echo "⚠️  Uncommitted ARB edits, so the pushed commits cannot be"
+            echo "   verified here. Regenerating from the working tree changed:"
+            printf '%s\n' "$stale" | sed 's/^/   /'
+            echo "   Commit these alongside the ARBs. CI checks the pushed tree."
+        else
+            echo "❌ Generated localizations are stale!"
+            printf '%s\n' "$stale" | sed 's/^/   /'
+            echo "   The ARBs are committed, but the committed generated output"
+            echo "   is not what they produce. gen-l10n has REGENERATED these in"
+            echo "   place: review and commit them, then push again."
+            l10n_failed=1
         fi
     fi
-    rm -rf "$l10n_before" "$l10n_after"
+    rm -rf "$l10n_before"
     rm -f "$l10n_log"
     echo ""
 fi
