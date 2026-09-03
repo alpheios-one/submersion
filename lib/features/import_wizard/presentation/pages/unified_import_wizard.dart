@@ -239,30 +239,31 @@ class _UnifiedImportWizardBodyState
     }
     try {
       await _advance();
-    } on ImportStepFailure catch (e) {
-      // The step told us what went wrong in words meant for the user.
-      _showAdvanceError(e.message);
     } catch (e, stackTrace) {
+      // An ImportStepFailure carries text the step wrote for the user.
       // Anything else -- a database read the duplicate check made, a parser
-      // blowing up on an unexpected shape. Before this, the future returned by
-      // _onNext was dropped on the floor by the Next button's VoidCallback, so
-      // the throw surfaced nowhere at all and the button simply looked dead.
-      _log.error(
-        'Import wizard could not advance',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      if (mounted) {
-        _showAdvanceError(context.l10n.universalImport_error_stepFailed('$e'));
+      // blowing up on an unexpected shape -- is unexpected, so log it and
+      // wrap it. Before this, the future returned by _onNext was dropped on
+      // the floor by the Next button's VoidCallback, so either kind of throw
+      // surfaced nowhere at all and the button simply looked dead.
+      if (e is! ImportStepFailure) {
+        _log.error(
+          'Import wizard could not advance',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
+      // One guard for both paths: it keeps setState off a disposed State and
+      // is what makes the context read below safe after the await.
+      if (!mounted) return;
+      setState(() {
+        _advanceError = e is ImportStepFailure
+            ? e.message
+            : context.l10n.universalImport_error_stepFailed('$e');
+      });
     } finally {
       _advancing = false;
     }
-  }
-
-  void _showAdvanceError(String message) {
-    if (!mounted) return;
-    setState(() => _advanceError = message);
   }
 
   Future<void> _advance() async {
