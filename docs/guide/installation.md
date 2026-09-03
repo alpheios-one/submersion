@@ -22,6 +22,52 @@ To build from source, you'll need:
 - **Android Studio** (for Android builds)
 - **Visual Studio** with C++ tools (for Windows builds)
 
+## Install on Linux
+
+Linux releases ship as native packages as well as a tarball. The packages
+resolve their own dependencies, register a desktop entry and icon, and install
+udev rules so dive computers connected by USB are reachable without any group
+membership or `usermod` step.
+
+<!-- tabs:start -->
+
+#### **Debian / Ubuntu / Mint**
+
+Download `Submersion-<version>-Linux-amd64.deb` from the
+[Releases page](https://github.com/submersion-app/submersion/releases):
+
+```bash
+sudo apt install ./Submersion-*-Linux-amd64.deb
+```
+
+#### **Fedora / RHEL / openSUSE**
+
+Download `Submersion-<version>-Linux-x86_64.rpm`:
+
+```bash
+sudo dnf install ./Submersion-*-Linux-x86_64.rpm
+```
+
+#### **Other distros (tarball)**
+
+```bash
+tar xzf Submersion-*-Linux.tar.gz
+./install.sh
+```
+
+`install.sh` reports any missing shared libraries with the exact command to
+install them for your package manager, installs a desktop entry and icon under
+`~/.local/share`, and links the binary into `~/.local/bin`. It prints the
+command to install the udev rules, which needs root. `./uninstall.sh` reverses
+all of it and leaves your dive log data alone.
+
+<!-- tabs:end -->
+
+Video compression is optional and uses `ffmpeg` if it is on your `PATH`. The
+packages recommend it rather than requiring it, because Fedora ships `ffmpeg`
+only through RPM Fusion. Without it, videos are uploaded at their original
+size.
+
 ## Install from Source
 
 ### 1. Clone the Repository
