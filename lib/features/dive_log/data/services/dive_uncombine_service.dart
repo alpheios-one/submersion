@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
@@ -83,6 +84,7 @@ class DiveUncombineService {
   final _sync = SyncRepository();
   final _profileSeries = ProfileSeriesRepository();
   final _tankSeries = TankPressureSeriesRepository();
+  final _log = LoggerService.forClass(DiveUncombineService);
 
   AppDatabase get _db => DatabaseService.instance.database;
 
@@ -114,11 +116,10 @@ class DiveUncombineService {
   /// [UnreadableSeriesException] when any of the dive's series fails to
   /// decode. All-or-nothing: one transaction, full rollback on any failure.
   Future<List<String>> separate({required String diveId}) async {
-    // Every series has to decode before anything moves. A series the reads
-    // answer with null (an unreadable blob) is invisible to the grouping
-    // below, so its samples would neither move nor be trimmed while the tank
-    // beneath it was cloned away. Split, merge and consolidate open with the
-    // same guard.
+    // Every series has to decode before anything moves. A series that reads
+    // as null (an unreadable blob) is invisible to the grouping below, so its
+    // samples would neither move nor be trimmed while the tank beneath it was
+    // cloned away. Split, merge and consolidate open with the same guard.
     final unreadable = [
       ...await _profileSeries.unreadableSeriesIds([diveId]),
       ...await _tankSeries.unreadableSeriesIds([diveId]),
@@ -143,77 +144,92 @@ class DiveUncombineService {
     final newDiveIds = <String>[];
     final now = DateTime.now().millisecondsSinceEpoch;
 
-    await _db.transaction(() async {
-      // Read inside the transaction: a read outside is a torn one, deciding
-      // what moves from a snapshot another writer can change before the
-      // moves are applied.
-      final allSeries = await _profileSeries.getSeriesForDive(diveId);
-      final allPressures = await _tankSeries.getSeriesForDive(diveId);
-      final allTanks = await (_db.select(
-        _db.diveTanks,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      final allEvents = await (_db.select(
-        _db.diveProfileEvents,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      final allSwitches = await (_db.select(
-        _db.gasSwitches,
-      )..where((t) => t.diveId.equals(diveId))).get();
-      final gaps = MergeGapFill.readFrom(allEvents);
+    // The whole write is one transaction, so a failure anywhere rolls the
+    // separation back and the user is told it did not happen. That is the
+    // right outcome and a silent one: log what actually broke before the
+    // caller turns it into a snackbar, because nothing about the resulting
+    // database says a separation was ever attempted.
+    try {
+      await _db.transaction(() async {
+        // Read inside the transaction: a read outside is a torn one, deciding
+        // what moves from a snapshot another writer can change before the
+        // moves are applied.
+        final allSeries = await _profileSeries.getSeriesForDive(diveId);
+        final allPressures = await _tankSeries.getSeriesForDive(diveId);
+        final allTanks = await (_db.select(
+          _db.diveTanks,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        final allEvents = await (_db.select(
+          _db.diveProfileEvents,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        final allSwitches = await (_db.select(
+          _db.gasSwitches,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        final gaps = MergeGapFill.readFrom(allEvents);
 
-      for (final segment in segments.skip(1)) {
-        newDiveIds.add(
-          await _restoreSegment(
-            segment: segment,
-            diveId: diveId,
-            diveRow: diveRow,
-            sourceById: sourceById,
-            allSeries: allSeries,
-            allPressures: allPressures,
-            allTanks: allTanks,
-            allEvents: allEvents,
-            allSwitches: allSwitches,
-            gaps: gaps,
-            now: now,
-          ),
-        );
-      }
-
-      // The original dive keeps the first segment. Trim the surface fill the
-      // merge synthesized across every gap and drop the markers bracketing
-      // them: with the later segments gone there is no gap left to bridge,
-      // and an untrimmed series draws the dive with a long flat tail.
-      if (gaps.isNotEmpty) {
-        for (final s in await _profileSeries.getSeriesForDive(diveId)) {
-          final trimmed = gaps.trim(s.samples);
-          if (trimmed.length == s.samples.length) continue;
-          await _profileSeries.deleteByIds([s.id]);
-          if (trimmed.isEmpty) continue;
-          await _profileSeries.insertSeries(
-            diveId: diveId,
-            computerId: s.computerId,
-            sourceId: s.sourceId,
-            isPrimary: s.isPrimary,
-            samples: trimmed,
-            now: now,
+        for (final segment in segments.skip(1)) {
+          newDiveIds.add(
+            await _restoreSegment(
+              segment: segment,
+              diveId: diveId,
+              diveRow: diveRow,
+              sourceById: sourceById,
+              allSeries: allSeries,
+              allPressures: allPressures,
+              allTanks: allTanks,
+              allEvents: allEvents,
+              allSwitches: allSwitches,
+              gaps: gaps,
+              now: now,
+            ),
           );
         }
-        await _deleteEvents(allEvents.where(gaps.isMarker).toList());
-      }
 
-      // Refresh the original dive's summary from the segment it kept, and
-      // touch it so sync carries the separation. Read after the trim so the
-      // fallback describes the profile the dive is left with.
-      await _refreshKeptDive(
-        diveId: diveId,
-        diveRow: diveRow,
-        keptLead: sourceById[segments.first.sourceIds.first],
-        keptSummary: _summaryOf([
-          for (final s in await _profileSeries.getSeriesForDive(diveId))
-            ...s.samples,
-        ]),
-        now: now,
+        // The original dive keeps the first segment. Trim the surface fill the
+        // merge synthesized across every gap and drop the markers bracketing
+        // them: with the later segments gone there is no gap left to bridge,
+        // and an untrimmed series draws the dive with a long flat tail.
+        if (gaps.isNotEmpty) {
+          for (final s in await _profileSeries.getSeriesForDive(diveId)) {
+            final trimmed = gaps.trim(s.samples);
+            if (trimmed.length == s.samples.length) continue;
+            await _profileSeries.deleteByIds([s.id]);
+            if (trimmed.isEmpty) continue;
+            await _profileSeries.insertSeries(
+              diveId: diveId,
+              computerId: s.computerId,
+              sourceId: s.sourceId,
+              isPrimary: s.isPrimary,
+              samples: trimmed,
+              now: now,
+            );
+          }
+          await _deleteEvents(allEvents.where(gaps.isMarker).toList());
+        }
+
+        // Refresh the original dive's summary from the segment it kept, and
+        // touch it so sync carries the separation. Read after the trim so the
+        // fallback describes the profile the dive is left with.
+        await _refreshKeptDive(
+          diveId: diveId,
+          diveRow: diveRow,
+          keptLead: sourceById[segments.first.sourceIds.first],
+          keptSummary: _summaryOf([
+            for (final s in await _profileSeries.getSeriesForDive(diveId))
+              ...s.samples,
+          ]),
+          now: now,
+        );
+      });
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to separate combined dive: $diveId '
+        '(${segments.length} segments)',
+        error: e,
+        stackTrace: stackTrace,
       );
-    });
+      rethrow;
+    }
 
     SyncEventBus.notifyLocalChange();
     return newDiveIds;
