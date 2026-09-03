@@ -4514,44 +4514,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Zusammenführung rückgängig gemacht';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Der Tauchgang um $time wird mit diesem Tauchgang zusammengeführt.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Zusammenführung bestätigen';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Keine weiteren Tauchgänge an diesem Tag gefunden.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Das Profil, die Flaschen, Drücke, Ereignisse, Tags, Tauchpartner und Sichtungen dieses Tauchgangs werden als zusätzliche Computerquelle in diesen Tauchgang eingefügt. Diese Aktion kann mit „Computer trennen“ rückgängig gemacht werden.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Fehler beim Laden der Tauchgänge: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Zusammenführen';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Weiter';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Wähle einen Tauchgang vom selben Tag aus, um ihn als zusätzlichen Computer zusammenzuführen.';
-
-  @override
-  String get diveLog_mergeDialog_title =>
-      'Mit einem anderen Tauchgang zusammenführen';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Was das bewirkt';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Wähle, von welchem Computerprofil aus bearbeitet wird.';
 
@@ -11319,6 +11281,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type-Ausrüstung';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Keine $filterText';
   }
@@ -11326,6 +11293,10 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Keine Ausrüstung mit diesem Status';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Keine Ausrüstung in dieser Kategorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11340,10 +11311,34 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_list_filterAll => 'Gesamte Ausrüstung';
 
   @override
-  String get equipment_list_filterLabel => 'Filter:';
+  String get equipment_list_filterServiceDue => 'Wartung fällig';
 
   @override
-  String get equipment_list_filterServiceDue => 'Wartung fällig';
+  String get equipment_list_typeFilterAll => 'Alle Typen';
+
+  @override
+  String get equipment_list_filterTooltip => 'Ausrüstung filtern';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Löschen';
+
+  @override
+  String get equipment_filter_title => 'Ausrüstung filtern';
+
+  @override
+  String get equipment_filter_clearAll => 'Alle löschen';
+
+  @override
+  String get equipment_filter_apply => 'Filter anwenden';
+
+  @override
+  String get equipment_filter_cancel => 'Abbrechen';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Kategorie';
 
   @override
   String get equipment_list_retryButton => 'Erneut versuchen';
@@ -22753,6 +22748,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '\"$name\" löschen?\n\nDiese Region wurde mit einer früheren Version heruntergeladen. Ihre Kacheln liegen zusammen mit denen anderer Regionen und lassen sich nicht einzeln freigeben. Das Löschen gibt keinen Speicherplatz frei.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22843,6 +22843,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Größe';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Unbekannt';
 
   @override
   String get maps_offline_tiles => 'Kacheln';
@@ -35143,6 +35146,19 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Bibliothek wird heruntergeladen ($downloaded von $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Bibliothek wird importiert ($percent %)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'Kein Cloud-Anbieter konfiguriert';
 
@@ -35773,6 +35789,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Tauchgänge werden aufgelistet…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge werden aufgelistet… (bisher $count gefunden)',
+      one: 'Tauchgänge werden aufgelistet… (bisher 1 gefunden)',
+      zero: 'Tauchgänge werden aufgelistet…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'Tauchgang $current von $total wird geladen…';
   }
@@ -35783,6 +35811,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Wiederholen';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Mehr laden';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35810,6 +35841,116 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'Bei Garmin Connect anmelden';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Melde dich mit deinem Garmin Connect-Konto an, um deine Tauchgänge direkt zu importieren. Dein Passwort wird nie gespeichert, nur die daraus entstehende Sitzung.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'E-Mail';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'E-Mail ist erforderlich';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Passwort';
+
+  @override
+  String get garminConnect_signIn_passwordRequired =>
+      'Passwort ist erforderlich';
+
+  @override
+  String get garminConnect_signIn_button => 'Anmelden';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Anmeldung läuft…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Angemeldet als $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Verifizierung erforderlich';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Gib den Bestätigungscode ein, der an $method gesendet wurde.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Bestätigungscode';
+
+  @override
+  String get garminConnect_mfa_codeRequired =>
+      'Bestätigungscode ist erforderlich';
+
+  @override
+  String get garminConnect_mfa_button => 'Bestätigen';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Bestätigung läuft…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Tauchgänge werden aufgelistet…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tauchgänge werden aufgelistet… (bisher $count gefunden)',
+      one: 'Tauchgänge werden aufgelistet… (bisher 1 gefunden)',
+      zero: 'Tauchgänge werden aufgelistet…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Tauchgang $current von $total wird geladen…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle =>
+      'Tauchgänge konnten nicht geladen werden';
+
+  @override
+  String get garminConnect_fetch_retry => 'Wiederholen';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Mehr laden';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge gefunden',
+      one: '1 Tauchgang gefunden',
+      zero: 'Keine Tauchgänge gefunden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Tauchgänge konnten nicht konvertiert werden und wurden übersprungen.',
+      one:
+          '1 Tauchgang konnte nicht konvertiert werden und wurde übersprungen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Alle laden';
+
+  @override
   String get importWizard_review_sortTooltip => 'Sortieren';
 
   @override
@@ -35827,6 +35968,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Tauchgänge aus deiner Suunto-App / deinem app.suunto.com-Konto importieren';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Tauchgänge aus deinem Garmin Connect-Konto importieren';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';

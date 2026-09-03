@@ -1117,11 +1117,14 @@ void main() {
       await tester.tap(find.text(cancelLabel));
       await tester.pumpAndSettle();
 
-      // Dialog gone, selection cleared (no connected check icon), and the
-      // connection-failed snackbar shown.
+      // Dialog gone and the selection cleared (no connected check icon).
+      // No error is shown: cancelling is a decision, not a failure, so the
+      // helper raises CloudAuthCancelled and the page rolls back quietly
+      // rather than surfacing a red connection-failed snackbar carrying an
+      // untranslated English fragment.
       expect(find.text('Continue in your browser'), findsNothing);
       expect(find.byIcon(Icons.check_circle), findsNothing);
-      expect(find.textContaining('connection failed'), findsOneWidget);
+      expect(find.textContaining('connection failed'), findsNothing);
 
       // The abandoned flow's eventual error must be swallowed; nothing
       // may surface after the user has already cancelled.

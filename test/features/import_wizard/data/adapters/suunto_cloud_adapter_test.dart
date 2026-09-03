@@ -31,6 +31,7 @@ SuuntoParsedDive makeParsedDive({
   double maxDepth = 18.5,
   String? deviceName = 'Suunto Ocean',
   String? serialNumber = 'SN-1',
+  String? firmwareVersion,
 }) {
   return SuuntoParsedDive(
     dive: DownloadedDive(
@@ -41,6 +42,7 @@ SuuntoParsedDive makeParsedDive({
     ),
     deviceName: deviceName,
     serialNumber: serialNumber,
+    firmwareVersion: firmwareVersion,
   );
 }
 
@@ -169,6 +171,50 @@ void main() {
 
       verify(mockComputerRepo.createComputer(any)).called(2);
     });
+
+    test(
+      'falls back to Suunto when the device name is present but blank',
+      () async {
+        adapter.setParsedDives([
+          makeParsedDive(deviceName: '   ', serialNumber: null),
+        ]);
+
+        await adapter.buildBundle();
+
+        // A blank name is the same thing as a missing one, but `?.trim()`
+        // yields '' rather than null, so a plain `?? 'Suunto'` never fires and
+        // the computer is registered with an empty name.
+        final created =
+            verify(mockComputerRepo.createComputer(captureAny)).captured.single
+                as DiveComputer;
+        expect(created.name, 'Suunto');
+        expect(created.model, 'Suunto');
+      },
+    );
+
+    test(
+      'stores a blank serial and firmware as null rather than \'\'',
+      () async {
+        // Unlike the Garmin side, these come straight out of the cloud JSON
+        // (`device['SerialNumber']`), so a present-but-empty string is a shape
+        // the API can genuinely hand back.
+        adapter.setParsedDives([
+          makeParsedDive(
+            deviceName: 'Suunto Ocean',
+            serialNumber: '',
+            firmwareVersion: '   ',
+          ),
+        ]);
+
+        await adapter.buildBundle();
+
+        final created =
+            verify(mockComputerRepo.createComputer(captureAny)).captured.single
+                as DiveComputer;
+        expect(created.serialNumber, isNull);
+        expect(created.firmwareVersion, isNull);
+      },
+    );
   });
 
   group('checkDuplicates()', () {
@@ -584,7 +630,11 @@ void main() {
       final steps = adapter.acquisitionSteps;
 
       expect(steps.map((s) => s.label), ['Sign In', 'Fetch']);
-      expect(steps.every((s) => s.autoAdvance), isTrue);
+      // Sign In auto-advances the instant a session is established, but
+      // Fetch does not: it lets the diver choose when to move on (via Load
+      // More / Next) instead of auto-advancing off the newest page alone.
+      expect(steps[0].autoAdvance, isTrue);
+      expect(steps[1].autoAdvance, isFalse);
     });
 
     test('setClient exposes the authenticated client to the fetch step', () {

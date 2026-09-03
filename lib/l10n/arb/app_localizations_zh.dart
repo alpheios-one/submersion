@@ -4278,41 +4278,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_consolidate_undone => '已撤消合并';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return '$time 的潜水将合并到此次潜水中。';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => '确认合并';
-
-  @override
-  String get diveLog_mergeDialog_empty => '当天未找到其他潜水记录。';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      '此次潜水的剖面、气瓶、压力、事件、标签、潜伴和目击记录将作为附加电脑来源合并到此次潜水中。此操作可通过“取消关联电脑”撤消。';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return '加载潜水记录时出错：$error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => '合并';
-
-  @override
-  String get diveLog_mergeDialog_next => '下一步';
-
-  @override
-  String get diveLog_mergeDialog_subtitle => '选择同一天的一次潜水，将其作为附加电脑合并。';
-
-  @override
-  String get diveLog_mergeDialog_title => '与另一次潜水合并';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => '这将执行以下操作';
-
-  @override
   String get diveLog_computerSheet_description => '选择要从哪台电脑的轮廓开始编辑。';
 
   @override
@@ -10805,12 +10770,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10824,10 +10797,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
+  String get equipment_list_filterServiceDue => '需要维护';
 
   @override
-  String get equipment_list_filterServiceDue => '需要维护';
+  String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';
@@ -21622,6 +21619,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '删除 \"$name\" 吗？\n\n此区域由早期版本下载，其瓦片与其他区域的瓦片存储在一起，无法单独释放。删除不会回收存储空间。';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -21711,6 +21713,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get maps_offline_size => '尺寸';
+
+  @override
+  String get maps_offline_sizeUnknown => '未知';
 
   @override
   String get maps_offline_tiles => '瓦片';
@@ -33138,6 +33143,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return '正在下载资料库（$downloaded/$total）';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return '正在导入资料库（$percent%）';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider => '未配置云服务商';
 
   @override
@@ -33725,6 +33743,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get suuntoCloud_fetch_listing => '正在列出潜水记录…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return '正在获取第 $current 次潜水，共 $total 次…';
   }
@@ -33734,6 +33764,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => '重试';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => '加载更多';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -33759,6 +33792,111 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => '登录 Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      '使用您的 Garmin Connect 账户登录，即可直接导入潜水记录。您的密码不会被保存，仅缓存由此生成的会话。';
+
+  @override
+  String get garminConnect_signIn_emailLabel => '电子邮件';
+
+  @override
+  String get garminConnect_signIn_emailRequired => '请输入电子邮件';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => '密码';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => '请输入密码';
+
+  @override
+  String get garminConnect_signIn_button => '登录';
+
+  @override
+  String get garminConnect_signIn_signingIn => '正在登录…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return '已登录为 $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => '需要验证';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return '请输入发送到您 $method 的验证码。';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => '验证码';
+
+  @override
+  String get garminConnect_mfa_codeRequired => '请输入验证码';
+
+  @override
+  String get garminConnect_mfa_button => '验证';
+
+  @override
+  String get garminConnect_mfa_submitting => '正在验证…';
+
+  @override
+  String get garminConnect_fetch_listing => '正在列出潜水记录…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return '正在获取第 $current 次潜水，共 $total 次…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => '无法获取潜水记录';
+
+  @override
+  String get garminConnect_fetch_retry => '重试';
+
+  @override
+  String get garminConnect_fetch_loadMore => '加载更多';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '找到 $count 次潜水',
+      one: '找到 1 次潜水',
+      zero: '未找到潜水记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水无法转换，已跳过。',
+      one: '有 1 次潜水无法转换，已跳过。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => '加载全部';
+
+  @override
   String get importWizard_review_sortTooltip => '排序';
 
   @override
@@ -33776,6 +33914,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       '从您的 Suunto 应用或 app.suunto.com 账户导入潜水记录';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      '从您的 Garmin Connect 账户导入潜水记录';
 
   @override
   String get transfer_section_cloudTitle => '云端';

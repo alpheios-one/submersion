@@ -362,12 +362,15 @@ gets its own worktree and its own PR.
    once-per-process reclaim (`mediaTransferQueueReclaimProvider`,
    `lib/features/media_store/presentation/providers/media_store_providers.dart:107`).
 
-Also worth fixing here, found during exploration and not in the audit: deleting
-an offline region removes the `cached_regions` row but no tiles
-(`offline_map_providers.dart:263`, whose doc comment claims otherwise), and the
-per-region `sizeBytes` shown in the UI is a fabricated estimate,
-`downloadedTiles * 20 * 1024` (`offline_map_providers.dart:143`), not a
-measurement.
+Also found during exploration and not in the audit: deleting an offline region
+removed the `cached_regions` row but no tiles, and the per-region `sizeBytes`
+shown in the UI was a fabricated estimate, `downloadedTiles * 20 * 1024`, not a
+measurement. Both moved to issue #1403 and were fixed there rather than in this
+program, because neither could be corrected in place: FMTC 10 deletes a whole
+store or tiles older than a date and nothing in between, so a region only
+becomes deletable, and measurable, by being a store of its own. Regions
+downloaded before that change keep the old behaviour, since there is no way to
+tell after the fact which tile in `submersion_tiles` belonged to which region.
 
 ### Slice C: scratch-file sweep
 
@@ -432,15 +435,44 @@ Backup retention counts are out of scope here; they belong to issue #1376.
 ### Slice E: tombstone GC for local-only libraries
 
 Reach `clearAcknowledgedDeletions` when sync is not configured, using the
-existing `SyncLiveness.gcFloorMillis` 30-day floor and the existing
-`TombstoneGcDecision.unbounded()`.
+existing `SyncLiveness.gcFloorMillis` 30-day floor and a null horizon, which
+is the `TombstoneGcDecision.unbounded()` branch the cloud path already takes
+when no live peer constrains GC. A never-synced device is that case with an
+empty fleet, so no new deletion logic is needed, only a second caller.
 
 The gate must be precise. A device that has never synced can safely purge
 tombstones, because a peer joining later adopts a full base publish rather than
 replaying our log. A device that *has* synced and then went local-only must not
 purge, because peers still need its tombstones to converge. So the condition is
-"no provider configured and no prior sync has ever occurred", evidenced by the
-absence of peer cursors, not merely "sync is currently off".
+"no provider configured and no prior sync has ever occurred", not merely "sync
+is currently off".
+
+"No prior sync" is evidenced by the absence of four durable signals, any one
+of which blocks GC:
+
+| Signal | Why it is read |
+| --- | --- |
+| `sync_metadata.lastSyncTimestamp` | Set at the tail of every successful sync; sign-out does not clear it |
+| any `sync_peer_cursors` row | This device consumed a peer's log |
+| any `local_publish_states` row | This device published or adopted a base. A single-device cloud library has no peers and so no peer cursor; this row is the only transport-side trace it ever synced |
+| `sync_metadata.lastAcceptedEpochId` | Survives the user-facing Reset Sync State, which wipes the other three |
+
+Peer cursors alone, as first drafted, were too weak: a single-device cloud
+library leaves none, so a signed-out device could have purged tombstones its
+cloud log still owed a later joiner.
+
+Implementation: `LocalOnlyTombstoneGc` in
+`lib/core/services/sync/changeset_log/`, in the `MediaOrphanBacklogSweep`
+shape (constructed inline in `startup_page.dart`, `unawaited`, swallow and
+log). Runs every launch; the probe is one metadata read and two indexed
+existence checks. `SyncHistoryEvidence` separates the signals from the
+decision so the gate is a pure function under test.
+
+Known residual, accepted: a user who runs Reset Sync State and then signs out
+erases all four signals, so a reconnect more than 30 days later could
+resurrect rows deleted in between. That pair of actions is already a deliberate
+cold start of the sync transport, and the status quo for every other user is a
+log that never shrinks.
 
 This is the whole of item 6. Item 6b is a separate issue.
 

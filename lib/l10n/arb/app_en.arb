@@ -2689,30 +2689,6 @@
   "diveLog_consolidate_snackbar": "Dive merged as an additional computer.",
   "diveLog_consolidate_undoError": "Couldn't undo the merge.",
   "diveLog_consolidate_undone": "Merge undone",
-  "diveLog_mergeDialog_confirmSubtitle": "Merging dive at {time} into this dive.",
-  "@diveLog_mergeDialog_confirmSubtitle": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "diveLog_mergeDialog_confirmTitle": "Confirm merge",
-  "diveLog_mergeDialog_empty": "No other dives found on this day.",
-  "diveLog_mergeDialog_explanation": "This dive's profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with 'Unlink computer'.",
-  "diveLog_mergeDialog_loadError": "Error loading dives: {error}",
-  "@diveLog_mergeDialog_loadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "diveLog_mergeDialog_merge": "Merge",
-  "diveLog_mergeDialog_next": "Next",
-  "diveLog_mergeDialog_subtitle": "Select a dive from the same day to merge as an additional computer.",
-  "diveLog_mergeDialog_title": "Merge with another dive",
-  "diveLog_mergeDialog_whatThisDoes": "What this does",
   "diveLog_computerSheet_description": "Select which computer's profile to edit from.",
   "@diveLog_computerSheet_description": {
     "description": "Description of the computer profile selection sheet"
@@ -6407,13 +6383,23 @@
   "equipment_list_emptyState_filterText_equipment": "equipment",
   "equipment_list_emptyState_filterText_serviceDue": "equipment needing service",
   "equipment_list_emptyState_filterText_status": "{status} equipment",
+  "equipment_list_emptyState_filterText_type": "{type} equipment",
   "equipment_list_emptyState_noEquipment": "No {filterText}",
   "equipment_list_emptyState_noStatusMatch": "No equipment with this status",
+  "equipment_list_emptyState_noTypeMatch": "No equipment in this category",
   "equipment_list_emptyState_serviceDueUpToDate": "All your equipment is up to date on service!",
   "equipment_list_errorLoading": "Error loading equipment: {error}",
   "equipment_list_filterAll": "All Equipment",
-  "equipment_list_filterLabel": "Filter:",
   "equipment_list_filterServiceDue": "Service Due",
+  "equipment_list_typeFilterAll": "All Types",
+  "equipment_list_filterTooltip": "Filter equipment",
+  "equipment_list_activeFilter_clear": "Clear",
+  "equipment_filter_title": "Filter Equipment",
+  "equipment_filter_clearAll": "Clear All",
+  "equipment_filter_apply": "Apply Filters",
+  "equipment_filter_cancel": "Cancel",
+  "equipment_filter_section_status": "Status",
+  "equipment_filter_section_category": "Category",
   "equipment_list_retryButton": "Retry",
   "equipment_list_searchTooltip": "Search Equipment",
   "equipment_list_setsTooltip": "Equipment Sets",
@@ -6741,6 +6727,14 @@
       }
     }
   },
+  "@equipment_list_emptyState_filterText_type": {
+    "description": "Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. \"Wetsuit equipment\"",
+    "placeholders": {
+      "type": {
+        "type": "Object"
+      }
+    }
+  },
   "@equipment_list_emptyState_noEquipment": {
     "placeholders": {
       "filterText": {
@@ -6761,6 +6755,12 @@
         "type": "int"
       }
     }
+  },
+  "@equipment_list_emptyState_noTypeMatch": {
+    "description": "Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items"
+  },
+  "@equipment_list_typeFilterAll": {
+    "description": "Label of the chip that clears the category filter and shows equipment of every type"
   },
   "@equipment_list_tile_daysCount": {
     "placeholders": {
@@ -14620,6 +14620,15 @@
       }
     }
   },
+  "maps_offline_deleteRegionLegacyMessage": "Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions' and cannot be freed on their own. Deleting it will not reclaim storage.",
+  "@maps_offline_deleteRegionLegacyMessage": {
+    "description": "Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "maps_offline_deleteRegionMessage": "Delete \"{name}\" and its {count} cached tiles?\n\nThis will free up {size} of storage.",
   "@maps_offline_deleteRegionMessage": {
     "placeholders": {
@@ -14734,6 +14743,10 @@
     }
   },
   "maps_offline_size": "Size",
+  "maps_offline_sizeUnknown": "Unknown",
+  "@maps_offline_sizeUnknown": {
+    "description": "Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as \"25.0 MB\"."
+  },
   "maps_offline_tiles": "Tiles",
   "maps_offline_tilesPerSecond": "{rate} tiles/sec",
   "@maps_offline_tilesPerSecond": {
@@ -21114,6 +21127,8 @@
   "settings_cloudSync_progress_pulling": "Pulling changes...",
   "settings_cloudSync_progress_publishing": "Publishing changes...",
   "settings_cloudSync_progress_uploadingLibrary": "Uploading library ({uploaded} of {total})",
+  "settings_cloudSync_progress_downloadingLibrary": "Downloading library ({downloaded} of {total})",
+  "settings_cloudSync_progress_importingLibrary": "Importing library ({percent}%)",
   "settings_cloudSync_result_noProvider": "No cloud provider configured",
   "settings_cloudSync_result_notAuthenticated": "Not authenticated with cloud provider",
   "settings_cloudSync_result_timedOut": "Sync timed out",
@@ -21309,6 +21324,23 @@
         "type": "int"
       },
       "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_progress_downloadingLibrary": {
+    "placeholders": {
+      "downloaded": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@settings_cloudSync_progress_importingLibrary": {
+    "placeholders": {
+      "percent": {
         "type": "int"
       }
     }
@@ -21717,9 +21749,11 @@
   "suuntoCloud_signIn_signingIn": "Signing in…",
   "suuntoCloud_signIn_signedInAs": "Signed in as {email}",
   "suuntoCloud_fetch_listing": "Listing dives…",
+  "suuntoCloud_fetch_listingFound": "{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}",
   "suuntoCloud_fetch_fetchingDiveOf": "Fetching dive {current} of {total}…",
   "suuntoCloud_fetch_failedTitle": "Could not fetch dives",
   "suuntoCloud_fetch_retry": "Try Again",
+  "suuntoCloud_fetch_loadMore": "Load More",
   "suuntoCloud_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
   "suuntoCloud_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
   "@suuntoCloud_signIn_signedInAs": {
@@ -21727,6 +21761,14 @@
     "placeholders": {
       "email": {
         "type": "String"
+      }
+    }
+  },
+  "@suuntoCloud_fetch_listingFound": {
+    "description": "Progress line while paging through the Suunto cloud's workout list, showing the running dive count found so far.",
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },
@@ -21757,12 +21799,92 @@
       }
     }
   },
+  "garminConnect_signIn_title": "Sign in to Garmin Connect",
+  "garminConnect_signIn_description": "Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.",
+  "garminConnect_signIn_emailLabel": "Email",
+  "garminConnect_signIn_emailRequired": "Email is required",
+  "garminConnect_signIn_passwordLabel": "Password",
+  "garminConnect_signIn_passwordRequired": "Password is required",
+  "garminConnect_signIn_button": "Sign In",
+  "garminConnect_signIn_signingIn": "Signing in…",
+  "garminConnect_signIn_signedInAs": "Signed in as {email}",
+  "garminConnect_mfa_title": "Verification Required",
+  "garminConnect_mfa_description": "Enter the verification code sent to your {method}.",
+  "garminConnect_mfa_codeLabel": "Verification Code",
+  "garminConnect_mfa_codeRequired": "Verification code is required",
+  "garminConnect_mfa_button": "Verify",
+  "garminConnect_mfa_submitting": "Verifying…",
+  "garminConnect_fetch_listing": "Listing dives…",
+  "garminConnect_fetch_listingFound": "{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}",
+  "garminConnect_fetch_fetchingDiveOf": "Fetching dive {current} of {total}…",
+  "garminConnect_fetch_failedTitle": "Could not fetch dives",
+  "garminConnect_fetch_retry": "Try Again",
+  "garminConnect_fetch_loadMore": "Load More",
+  "garminConnect_fetch_foundDives": "{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}",
+  "garminConnect_fetch_someFailed": "{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}",
+  "garminConnect_fetch_fetchAll": "Fetch All",
+  "@garminConnect_fetch_fetchAll": {
+    "description": "Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time."
+  },
+  "@garminConnect_signIn_signedInAs": {
+    "description": "Success state on the Garmin Connect sign-in step, once a session is established.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "@garminConnect_fetch_listingFound": {
+    "description": "Progress line while paging through Garmin Connect's activity list, showing the running dive count found so far.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@garminConnect_mfa_description": {
+    "description": "Instructions on the Garmin Connect MFA step, naming where the code was sent.",
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "@garminConnect_fetch_fetchingDiveOf": {
+    "description": "Progress line while downloading each dive from Garmin Connect.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "@garminConnect_fetch_foundDives": {
+    "description": "Result headline after fetching dives from Garmin Connect.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@garminConnect_fetch_someFailed": {
+    "description": "Shown when one or more fetched Garmin Connect dives could not be converted and were skipped.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "importWizard_review_sortTooltip": "Sort",
   "importWizard_review_sortByDate": "Date",
   "importWizard_review_sortByDepth": "Depth",
   "importWizard_review_sortByDuration": "Time",
   "transfer_importCloud_suuntoTitle": "Suunto",
   "transfer_importCloud_suuntoSubtitle": "Import dives from your Suunto app / app.suunto.com account",
+  "transfer_importCloud_garminTitle": "Garmin",
+  "transfer_importCloud_garminSubtitle": "Import dives from your Garmin Connect account",
   "transfer_section_cloudTitle": "Cloud",
   "transfer_section_cloudSubtitle": "Import from cloud",
   "settings_storageUsage_appBar_title": "Storage Usage",

@@ -4,10 +4,12 @@
 
 `ZSAMPLES` remains NO-GO (AES-encrypted with a per-dive key, documented below) but is now moot: every Shearwater dive that has `ZSAMPLES` also has `ZRAWDATA`.
 
+**Second correction (see "Update 2026-09-01" below):** the per-model tables both earlier updates produced are gone. `ZCOMPUTER` is now resolved against libdivecomputer's own descriptor list, so any model it supports is attempted and the result is sanity-checked rather than trusted. Read that section before adding anything model-specific here.
+
 **Correction (see "Update 2026-08-29" below):** the claim in the previous paragraph that "non-Shearwater dives have neither [`ZSAMPLES` nor `ZRAWDATA`] and still need MacDive's XML export" was never actually tested against Suunto computers — the investigation corpus contained none. It turns out at least three Suunto models (EON Steel, EON Steel Black, Cobra) do populate `ZRAWDATA`, and unlike Shearwater's, theirs needs no decompression at all.
 
 The 2026-04-24 "ZRAWDATA pivot invalidated" section below is **historically inaccurate** and is retained only to show how the wrong conclusion was reached.
-**Date:** 2026-04-23 (initial), 2026-04-24 (ZRAWDATA invalidation), 2026-08-09 (ZRAWDATA solved), 2026-08-29 (Suunto ZRAWDATA confirmed)
+**Date:** 2026-04-23 (initial), 2026-04-24 (ZRAWDATA invalidation), 2026-08-09 (ZRAWDATA solved), 2026-08-29 (Suunto ZRAWDATA confirmed), 2026-09-01 (model allowlist removed)
 **Author:** Eric Griffin
 **Spec:** `docs/superpowers/specs/2026-04-23-macdive-sqlite-profile-decoding-design.md`
 **Plan:** `docs/superpowers/plans/2026-04-23-macdive-zsamples-phase-1-spike.md`
@@ -493,4 +495,132 @@ Confirmed by model (against real MacDive `ZRAWDATA`, not just the vendor name):
 
 Implemented in `MacDiveDiveMapper._suuntoVendorProduct` / `_attachProfile` (`lib/features/universal_import/data/services/macdive_dive_mapper.dart`): the mapper now branches on vendor, running `ShearwaterRawDecompressor` only for Shearwater and passing every other recognized vendor's bytes straight to `parse`. See [submersion-app/submersion#1399](https://github.com/submersion-app/submersion/issues/1399) and the fix PR.
 
-**Not yet validated:** other Suunto models likely follow the same uncompressed-native-format pattern (Suunto's own product line shares firmware lineage), but no real `ZRAWDATA` from any other Suunto model has been confirmed. Computers outside the three above still fall through to the "no `ZRAWDATA`" warning path — a future contributor with real data from another Suunto model should add it to `_suuntoVendorProduct` only after confirming its `ZRAWDATA` parses cleanly, per the caller-facing trap noted above (a failed native parse can silently return a zeroed dive rather than an error).
+**Superseded by the 2026-09-01 update below:** `_suuntoVendorProduct` no longer exists, and no table entry is needed to support another model. The paragraph is kept for the reasoning it records.
+
+**Not yet validated (as of 2026-08-29):** other Suunto models likely follow the same uncompressed-native-format pattern (Suunto's own product line shares firmware lineage), but no real `ZRAWDATA` from any other Suunto model has been confirmed. Computers outside the three above still fall through to the "no `ZRAWDATA`" warning path — a future contributor with real data from another Suunto model should add it to `_suuntoVendorProduct` only after confirming its `ZRAWDATA` parses cleanly, per the caller-facing trap noted above (a failed native parse can silently return a zeroed dive rather than an error).
+
+## Update 2026-09-01: the model allowlist is gone
+
+Two rounds of this feature landed as one-model-at-a-time table entries: #961
+added Shearwater, #1400 added three Suunto models. Both were correct about the
+bytes and wrong about the scope, because both recorded a *data* limit ("we only
+had blobs for these") as a *format* limit ("only these have usable
+`ZRAWDATA`"). A user with a Suunto D5, a Mares Puck, or an Oceanic Geo hit the
+warning path with a perfectly decodable blob sitting in the database. #1436
+removed the tables rather than adding a third entry.
+
+### What resolution does now
+
+`ZDIVE.ZCOMPUTER` is matched against libdivecomputer's own descriptor list,
+read once per import through `DiveComputerHostApi.getDeviceDescriptors()` and
+indexed by `DiveComputerDescriptorIndex`
+(`lib/features/universal_import/data/services/dive_computer_descriptor_index.dart`).
+Every model the vendored submodule supports is a candidate, and the set grows
+on its own when the submodule advances.
+
+Matching rules, in order:
+
+1. Case and whitespace are ignored, the same tolerance the native BLE-name
+   matcher applies (`strcasecmp_nospace` in `libdc_wrapper.c`), so "Puck4"
+   matches the product "Puck 4".
+2. The name is matched a whole token at a time from the front, longest first,
+   so "Suunto EON Steel Black" prefers its own descriptor over the shorter
+   "Suunto EON Steel", and a decorated name falls back to the longest known
+   prefix.
+3. A name matching nothing resolves to nothing. This is load-bearing:
+   "Oceanic Matrix Master" pairs a real libdivecomputer vendor with a product
+   that does not exist there, and "No Computer" is not a device at all.
+
+The #1400 note that Suunto has "no prefix convention to strip" was not quite
+right. All three of its entries were exactly `"Suunto " + <libdivecomputer
+product>`, the same shape as `"Shearwater Teric"`; the convention was already
+general, which is why one matcher now covers both.
+
+### Ambiguous product names
+
+libdivecomputer declares seven `(vendor, product)` pairs more than once, with
+different model numbers:
+
+| Vendor | Product | Models |
+|---|---|---|
+| Aeris | Elite T3 | 0x4259, 0x4455 |
+| Aeris | Epic | 0x4257, 0x4453 |
+| Aqualung | i100 | 0x464E, 0x4745 |
+| Aqualung | i200C | 0x4649, 0x4749 |
+| Oceanic | OC1 | 0x434E, 0x4449, 0x4451 |
+| Suunto | Zoop Novo | 0x1E, 0x1F |
+| Uwatec | Aladin 2G | 0x13, 0x15 |
+
+Each set sits within one family, so the parser is the same either way, but the
+model number reaches the parser and can steer header layout. The mapper tries
+each candidate in declaration order and keeps the first whose parse passes the
+sanity check below. Passing a real model number also means
+`find_descriptor`'s `model == 0` wildcard (`libdc_download.c`) is no longer
+load-bearing for this path.
+
+### The parse is checked, not trusted
+
+Attempting any recognised model makes a structurally plausible parse of the
+wrong bytes a live possibility, which the "caller-facing trap" above already
+warned about in its narrower form. `RawProfileSanityCheck`
+(`lib/features/universal_import/data/services/raw_profile_sanity_check.dart`)
+gates every result: samples must exist, sample times must be non-negative and
+non-decreasing, depth must sit within (-3 m, 350 m], duration within 24 h, and
+the parsed depth and duration must not contradict MacDive's own scalars for
+the same dive by more than a factor of five.
+
+That last tolerance is deliberately gross. MacDive routinely omits its units
+row, so a whole logbook can be read as feet when it is metres (#912) - a 3.28x
+error in the recorded scalar that says nothing about whether the raw bytes
+decoded correctly. A tighter bound would discard good profiles to catch bad
+ones that the absolute limits already catch. The two sides of that comparison
+are not symmetric: a recorded value of zero is MacDive saying it has no figure
+and cannot reject anything, while a parsed depth of zero is libdivecomputer
+asserting the diver never left the surface, which against a recorded 30 m dive
+is exactly the wrong-format parse this check exists to catch. A rejected parse falls back to
+exactly the behaviour an unrecognised computer already had: it counts toward
+one aggregated warning pointing at MacDive's XML export.
+
+### Vendor pre-passes
+
+Shearwater remains the only vendor whose `ZRAWDATA` needs work before the
+parser sees it, and it is the exception rather than the rule: libdivecomputer
+decompresses inside its own device layer (`shearwater_common.c:550` and `:567`),
+so any host that downloads through libdivecomputer ends up holding native
+bytes. MacDive storing the compressed stream tells us its Shearwater download
+path is its own. The transform is now a vendor-keyed entry in
+`MacDiveDiveMapper._rawPrePasses`, so a second such vendor is one line.
+
+### Correcting the per-computer presence table
+
+The table under "Per-computer presence" is still accurate as a count, but the
+conclusion drawn from it was not. Presence of `ZRAWDATA` tracks **how the dive
+entered MacDive** - a native download versus manual entry or a file import -
+not which vendor made the computer. The corpus happened to contain Shearwater
+dives that MacDive downloaded and Oceanic dives that it did not, and that
+coincidence read as a vendor rule for two releases running.
+
+### Confirming a new family
+
+The generic path means no code change is needed to support another computer.
+What is still worth doing, when someone has real data, is proving a family
+decodes:
+
+1. Pull one `ZRAWDATA` blob for the dive:
+   `sqlite3 MacDive.sqlite "SELECT writefile('blob.bin', ZRAWDATA) FROM ZDIVE WHERE Z_PK = <pk>;"`
+2. Feed it to `libdc_parse_raw_dive` with the vendor, product and model the
+   descriptor list gives for that `ZCOMPUTER` string. The native harness in
+   `packages/libdivecomputer_plugin/test/native/test_parse_raw_dive.c` is the
+   template; `fixtures/dive1_raw.bin` shows the shape.
+3. Check the result against what MacDive shows for the dive: max depth,
+   duration and sample count, not just a zero return code.
+4. Commit the blob as a fixture with an assertion on real decoded values.
+   Anonymise it first if it carries a serial number.
+
+**Still missing:** no anonymised Suunto `ZRAWDATA` exists in this repository,
+so the #1400 tests continue to stub `parseRaw` and prove byte pass-through and
+name resolution rather than a real decode. The Shearwater path does have real
+bytes (`shearwater_raw_decompressor_test.dart` pins the Dart port against a
+blob generated from the 540-dive corpus). A contributor with a real Suunto
+database can close that gap by following the recipe above; it needs data, not
+a design change.

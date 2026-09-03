@@ -1661,6 +1661,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   Widget _buildProfileSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Every async chart input below is read through the built-in
+    // AsyncValue.value, which keeps the previous value while a provider
+    // reloads. The valueOrNull polyfill returns null during a reload, and
+    // these providers reload behind any detail change tick (the first-view
+    // safety review write included): the chart would drop its overlays and
+    // estimated pressure series for a frame, then draw them again.
+    //
     // Get profile analysis (async to avoid blocking UI with Buhlmann computation)
     final analysis = ref
         .watch(
@@ -1669,7 +1676,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             sourceId: ref.watch(activeDiveSourceProvider(dive.id)),
           )),
         )
-        .valueOrNull;
+        .value;
 
     // Get marker settings
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
@@ -1682,11 +1689,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Get per-tank pressure data for multi-tank visualization
     final tankPressuresAsync = ref.watch(tankPressuresProvider(dive.id));
-    final tankPressures = tankPressuresAsync.valueOrNull;
+    final tankPressures = tankPressuresAsync.value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(dive.id))
-        .valueOrNull;
+        .value;
 
     // Get playback state
     final playbackState = ref.watch(playbackProvider(dive.id));
@@ -1697,10 +1704,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Profiles grouped by owning data source, plus the active-source and
     // overlay view state driving the whole page.
     final sourceProfiles =
-        ref.watch(sourceProfilesProvider(dive.id)).valueOrNull ??
+        ref.watch(sourceProfilesProvider(dive.id)).value ??
         const <String, SourceProfile>{};
     final dataSources =
-        ref.watch(diveDataSourcesProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(diveDataSourcesProvider(dive.id)).value ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
     final isMultiSource = dataSources.length >= 2;
@@ -1788,7 +1795,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
 
     final photoMedia =
-        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(mediaForDiveProvider(dive.id)).value ?? const [];
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]
         : photoMarkersFromMedia(
@@ -1804,7 +1811,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // ghosted next to the actual logged profile.
     final plannedOverlay = ref
         .watch(plannedProfileOverlayProvider(dive.id))
-        .valueOrNull;
+        .value;
     final overlays = <ChartSourceOverlay>[
       for (final id in overlayIds)
         if (id != activeSource?.id &&
@@ -2044,14 +2051,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             estimatedTankPressures?.pressures ?? tankPressures,
                         estimatedTankIds:
                             estimatedTankPressures?.estimatedTankIds,
-                        gasSwitches: gasSwitchesAsync.valueOrNull,
+                        gasSwitches: gasSwitchesAsync.value,
                         gasSegments:
                             (dive.tanks.isEmpty || chartProfile.isEmpty)
                             ? null
                             : buildGasUsageSegments(
                                 tanks: dive.tanks,
-                                gasSwitches:
-                                    gasSwitchesAsync.valueOrNull ?? const [],
+                                gasSwitches: gasSwitchesAsync.value ?? const [],
                                 diveDurationSeconds:
                                     chartProfile.last.timestamp,
                                 firstSampleSeconds:
@@ -3311,11 +3317,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_avgDepth,
                 units.formatDepth(dive.avgDepth),
               ),
-            if (dive.waterType != null)
+            // Effective, so a dive that never had a water type of its own
+            // still shows the one its site carries (issue #1427).
+            if (dive.effectiveWaterType != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.waterType!.displayName,
+                dive.effectiveWaterType!.displayName,
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(
@@ -3400,7 +3408,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
   }
 
@@ -3478,7 +3486,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
 
     return Card(
@@ -3614,11 +3622,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_swellHeight,
                   units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
-              if (dive.entryMethod != null)
+              // Effective, so a dive that never had an entry method of its
+              // own still shows the one its site carries (issue #1427).
+              if (dive.effectiveEntryMethod != null)
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_entryMethod,
-                  dive.entryMethod!.localizedName(context.l10n),
+                  dive.effectiveEntryMethod!.localizedName(context.l10n),
                 ),
               if (dive.exitMethod != null)
                 _buildDetailRow(
