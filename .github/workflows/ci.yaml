@@ -1072,10 +1072,21 @@ jobs:
             --deb "packages/Submersion-ci-Linux-amd64.deb" \
             --rpm "packages/Submersion-ci-Linux-x86_64.rpm"
 
+      # The .deb is verified against the runner's own Ubuntu release rather
+      # than an older distro. This job builds on ubuntu-latest, so its binary
+      # requires that runner's glibc, and installing it on debian:12
+      # (glibc 2.36) fails with "GLIBC_2.38 not found" no matter how correct
+      # the packaging is. build-all.yml builds inside an ubuntu:22.04
+      # container and is where installation on older distros is proven.
+      #
+      # The tag is derived from the runner rather than pinned, so this keeps
+      # matching when GitHub moves ubuntu-latest to the next release.
       - name: Verify the packages install in clean containers
         run: |
           set -euo pipefail
-          for image in debian:12 fedora:latest; do
+          UBUNTU_TAG="ubuntu:$(. /etc/os-release && echo "$VERSION_ID")"
+          echo "runner is $UBUNTU_TAG"
+          for image in "$UBUNTU_TAG" fedora:latest; do
             echo "=== $image ==="
             docker run --rm \
               -v "$PWD/packages:/p" \
