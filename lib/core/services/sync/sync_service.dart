@@ -2937,9 +2937,9 @@ class SyncService {
   /// `ResumableBasePublishStore._orphanGrace`, for the same reason.
   static const Duration _tempFileGrace = Duration(minutes: 5);
 
-  /// Best-effort sweep of leftover streaming-base temp files (base export
-  /// base export `ssv1_base_*.json` and assembled `ssv1_*.base` / `ssv1_adopt_*`
-  /// parts) from the app temp dir. Every sync temp file is prefixed `ssv1_`, so
+  /// Best-effort sweep of leftover streaming-base temp files (base exports
+  /// `ssv1_base_*.json` and assembled `ssv1_*.base` / `ssv1_adopt_*` parts)
+  /// from the app temp dir. Every sync temp file is prefixed `ssv1_`, so
   /// the sweep matches ONLY that prefix -- never an unrelated app temp file
   /// (the dir is a shared, general-purpose temp location). Failure is logged
   /// and ignored; a stale temp file is harmless.
