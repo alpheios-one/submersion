@@ -113,7 +113,7 @@ class DiveUncombineService {
     if (diveRow == null) return const [];
     return _segmentsOf(
       rows: rows,
-      seriesRows: await _profileSeries.getRowsForDives([diveId]),
+      seriesRows: await _profileSeries.getSpansForDive(diveId),
       diveRow: diveRow,
       gaps: await _gapsOf(diveId),
     );
@@ -177,7 +177,7 @@ class DiveUncombineService {
 
         final segments = _segmentsOf(
           rows: sourceRows,
-          seriesRows: await _profileSeries.getRowsForDives([diveId]),
+          seriesRows: await _profileSeries.getSpansForDive(diveId),
           diveRow: diveRow,
           gaps: gaps,
         );
@@ -687,13 +687,17 @@ class DiveUncombineService {
   /// Groups [rows] into segments, spanning each by its own profile series and
   /// falling back to its recorded entry/exit times.
   ///
-  /// Reads the spans off `dive_profile_series`' `start_timestamp` /
-  /// `end_timestamp` summary columns rather than decoding the packed blobs:
-  /// this runs on every dive-detail open to decide whether to offer the
-  /// action, and a dive's samples are the most expensive thing it owns.
+  /// Takes spans from `ProfileSeriesRepository.getSpansForDive`, which
+  /// projects to the summary columns instead of selecting whole rows: this
+  /// runs on every dive-detail open to decide whether to offer the action,
+  /// and reading the packed blobs to look at the scalars beside them would
+  /// put a dive's most expensive data on a UI path for nothing.
   List<UncombineSegment> _segmentsOf({
     required List<DiveDataSourcesData> rows,
-    required List<DiveProfileSeriesRow> seriesRows,
+    required List<
+      ({String id, String? sourceId, int startTimestamp, int endTimestamp})
+    >
+    seriesRows,
     required Dive diveRow,
     required MergeGapFill gaps,
   }) {
