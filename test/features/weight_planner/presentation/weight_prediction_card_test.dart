@@ -28,6 +28,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(
             prediction: prediction,
@@ -55,6 +56,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(prediction: prediction, units: units),
         ),
@@ -87,6 +89,7 @@ void main() {
     );
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(prediction: lowPrediction, units: units),
         ),
@@ -114,6 +117,7 @@ void main() {
     );
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(prediction: bmiPrediction, units: units),
         ),
