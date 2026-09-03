@@ -30,6 +30,42 @@ class _SourceConfirmationStepState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // A parse that failed on the way out of this step leaves its reason
+          // here. The wizard stays put in that case, so this is where the user
+          // is standing and where the reason has to appear.
+          if (state.error != null) ...[
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ExcludeSemantics(
+                    child: Icon(
+                      Icons.error_outline,
+                      size: 20,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      state.error!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // File info
           if (state.fileName != null) ...[
             Text(

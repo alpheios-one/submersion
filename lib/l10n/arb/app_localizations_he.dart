@@ -20266,6 +20266,19 @@ class AppLocalizationsHe extends AppLocalizations {
       'פורמט זה אינו נתמך עדיין. נא לייצא כ-UDDF או CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'לא ניתן היה להריץ זיהוי כפילויות, ולכן שום פריט ברשימה הזו אינו מסומן כקיים כבר ביומן. בדוק את הרשימה לפני הייבוא.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'לקובץ הזה אין עמודות למיפוי. חזור אחורה ובחר את הקובץ שוב, או בחר מקור אחר.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'לא ניתן להמשיך בייבוא: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'מיפוי עמודות';
 
   @override

@@ -20873,6 +20873,19 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce format n\'est pas encore pris en charge. Veuillez exporter en UDDF ou CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'La détection des doublons n\'a pas pu s\'exécuter : rien dans cette liste n\'est signalé comme déjà présent dans votre carnet. Vérifiez-la avant d\'importer.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Ce fichier ne contient aucune colonne à associer. Revenez en arrière et sélectionnez à nouveau le fichier, ou choisissez une autre source.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'L\'importation n\'a pas pu continuer : $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Mappage des colonnes';
 
   @override

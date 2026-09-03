@@ -20745,6 +20745,19 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieses Format wird noch nicht unterstützt. Bitte exportieren Sie als UDDF oder CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'Die Duplikaterkennung konnte nicht ausgeführt werden. Daher ist in dieser Liste nichts als bereits im Logbuch vorhanden markiert. Prüfen Sie sie vor dem Import.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Diese Datei enthält keine zuzuordnenden Spalten. Gehen Sie zurück und wählen Sie die Datei erneut oder eine andere Quelle.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'Import konnte nicht fortgesetzt werden: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Spaltenzuordnung';
 
   @override

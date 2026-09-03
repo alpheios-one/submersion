@@ -20806,6 +20806,19 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este formato aún no es compatible. Por favor exporta como UDDF o CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'No se pudo ejecutar la detección de duplicados, por lo que nada de esta lista está marcado como ya presente en tu cuaderno. Revísala antes de importar.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Este archivo no tiene columnas que asignar. Vuelve atrás y selecciona el archivo de nuevo, o elige otra fuente.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'No se pudo continuar la importación: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Mapeo de Columnas';
 
   @override

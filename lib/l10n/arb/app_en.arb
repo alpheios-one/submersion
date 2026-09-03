@@ -12555,6 +12555,9 @@
   "universalImport_description_supportedFormats": "Select a dive log file to import. Supported formats include CSV, UDDF, Subsurface XML, Garmin FIT, and Shearwater Cloud databases.",
   "universalImport_dive_decideAction": "Decide",
   "universalImport_error_unsupportedFormat": "This format is not yet supported. Please export as UDDF or CSV.",
+  "universalImport_error_duplicateCheckFailed": "Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.",
+  "universalImport_error_noColumnsToMap": "This file has no columns to map. Go back and select the file again, or choose a different source.",
+  "universalImport_error_stepFailed": "Import could not continue: {details}",
   "universalImport_label_columnMapping": "Column Mapping",
   "universalImport_label_columnsMapped": "{mapped} of {total} columns mapped",
   "universalImport_label_consolidate": "Consolidate",
@@ -12756,6 +12759,21 @@
   },
   "@universalImport_error_unsupportedFormat": {
     "description": "Error message shown when the detected file format is not supported"
+  },
+  "@universalImport_error_duplicateCheckFailed": {
+    "description": "Warning on the review step when duplicate detection failed and the incoming rows were left unmarked"
+  },
+  "@universalImport_error_noColumnsToMap": {
+    "description": "Shown on the column mapping step when the file produced no columns to map"
+  },
+  "@universalImport_error_stepFailed": {
+    "description": "Error shown when the import wizard could not advance past the current step",
+    "placeholders": {
+      "details": {
+        "type": "Object",
+        "example": "FormatException: unexpected end of input"
+      }
+    }
   },
   "@universalImport_label_columnMapping": {
     "description": "Title for the CSV column mapping step"

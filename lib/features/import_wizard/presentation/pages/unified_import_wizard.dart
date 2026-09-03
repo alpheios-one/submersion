@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -11,6 +12,7 @@ import 'package:submersion/features/import_wizard/data/services/import_provider_
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/domain/services/step_skip_calculator.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
@@ -118,6 +120,17 @@ class _UnifiedImportWizardBodyState
   /// the whole advance (bundle build included) a second time.
   bool _advancing = false;
 
+  /// Why the last Next tap did not move the wizard on, shown above the bottom
+  /// bar until the next attempt. Null while nothing has failed.
+  String? _advanceError;
+
+  /// True once duplicate detection threw and the review list was built without
+  /// it. Surfaced on the review step so nobody re-imports a dive believing the
+  /// wizard checked.
+  bool _duplicateCheckFailed = false;
+
+  static const _log = LoggerService('UnifiedImportWizard');
+
   List<WizardStepDef> get _acquisitionSteps => widget.adapter.acquisitionSteps;
   int get _reviewIndex => _acquisitionSteps.length;
   int get _importIndex => _acquisitionSteps.length + 1;
@@ -197,15 +210,54 @@ class _UnifiedImportWizardBodyState
       );
     }
     if (mounted) {
-      setState(() => _currentPage = page);
+      setState(() {
+        _currentPage = page;
+        // The banner belongs to the attempt that failed, not to the step the
+        // user has since moved to.
+        _advanceError = null;
+      });
     }
   }
 
   Future<void> _onNext() async {
     if (_advancing) return;
     _advancing = true;
+    if (_advanceError != null || _duplicateCheckFailed) {
+      setState(() {
+        _advanceError = null;
+        _duplicateCheckFailed = false;
+      });
+    }
     try {
       await _advance();
+    } catch (e, stackTrace) {
+      // An ImportStepFailure carries text the step wrote for the user.
+      // Anything else -- a database read the duplicate check made, a parser
+      // blowing up on an unexpected shape -- is unexpected, so log it and
+      // wrap it. Before this, the future returned by _onNext was dropped on
+      // the floor by the Next button's VoidCallback, so either kind of throw
+      // surfaced nowhere at all and the button simply looked dead.
+      if (e is! ImportStepFailure) {
+        _log.error(
+          'Import wizard could not advance',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+      // One guard for both paths: it keeps setState off a disposed State and
+      // is what makes the context read below safe after the await.
+      if (!mounted) return;
+      setState(() {
+        _advanceError = e is ImportStepFailure
+            ? e.message
+            : context.l10n.universalImport_error_stepFailed('$e');
+        // Hand the step back to the user. _AcquisitionStepPage re-arms
+        // auto-advance on every build where its page is current, is still
+        // navigating forward and canAutoAdvance reads true -- and showing this
+        // error is itself a rebuild, so a failing auto-advance step would
+        // re-run its own work on every frame and never let go.
+        _navigatingForward = false;
+      });
     } finally {
       _advancing = false;
     }
@@ -242,7 +294,22 @@ class _UnifiedImportWizardBodyState
       if (nextPage >= _reviewIndex) {
         final bundle = await widget.adapter.buildBundle();
         if (!mounted) return;
-        final checkedBundle = await widget.adapter.checkDuplicates(bundle);
+        // Duplicate detection reads the whole existing library and is only an
+        // advisory overlay on the review list. Letting it throw here used to
+        // abandon the advance entirely, which is what a large or unhappy
+        // library looked like from the outside: Next did nothing, forever.
+        ImportBundle checkedBundle;
+        try {
+          checkedBundle = await widget.adapter.checkDuplicates(bundle);
+        } catch (e, stackTrace) {
+          _log.error(
+            'Duplicate detection failed; continuing without it',
+            error: e,
+            stackTrace: stackTrace,
+          );
+          checkedBundle = bundle;
+          _duplicateCheckFailed = true;
+        }
         if (!mounted) return;
         ref
             .read(importWizardNotifierProvider.notifier)
@@ -421,7 +488,13 @@ class _UnifiedImportWizardBodyState
                     isCurrentPage: _currentPage == i,
                     navigatingForward: _navigatingForward,
                     resetComplete: _resetComplete,
-                    onAutoAdvance: () => _onNext(),
+                    // Re-checked at fire time, not just at arming time: the
+                    // post-frame callback may have been scheduled a frame
+                    // before a failure (or a Back tap) took the wizard out of
+                    // forward navigation, and it carries no such check itself.
+                    onAutoAdvance: () {
+                      if (_navigatingForward) _onNext();
+                    },
                   ),
                 ),
                 ReviewStep(
@@ -439,6 +512,18 @@ class _UnifiedImportWizardBodyState
               ],
             ),
           ),
+          if (_advanceError != null && _currentPage < _reviewIndex)
+            _WizardMessage(
+              message: _advanceError!,
+              icon: Icons.error_outline,
+              isError: true,
+            ),
+          if (_duplicateCheckFailed && _currentPage == _reviewIndex)
+            _WizardMessage(
+              message: context.l10n.universalImport_error_duplicateCheckFailed,
+              icon: Icons.warning_amber_outlined,
+              isError: false,
+            ),
           if (showBottomBar) _buildBottomBar(),
         ],
       ),
@@ -479,6 +564,51 @@ class _UnifiedImportWizardBodyState
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Inline message strip shown between the step content and the bottom bar
+// ---------------------------------------------------------------------------
+
+class _WizardMessage extends StatelessWidget {
+  const _WizardMessage({
+    required this.message,
+    required this.icon,
+    required this.isError,
+  });
+
+  final String message;
+  final IconData icon;
+  final bool isError;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foreground = isError
+        ? theme.colorScheme.onErrorContainer
+        : theme.colorScheme.onTertiaryContainer;
+
+    return Container(
+      width: double.infinity,
+      color: isError
+          ? theme.colorScheme.errorContainer
+          : theme.colorScheme.tertiaryContainer,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ExcludeSemantics(child: Icon(icon, size: 20, color: foreground)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(color: foreground),
+            ),
+          ),
+        ],
       ),
     );
   }
