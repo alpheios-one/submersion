@@ -9749,12 +9749,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get divers_edit_updateButton => 'Actualizar buceador';
 
   @override
-  String get divers_list_activeBadge => 'Activo';
-
-  @override
-  String get divers_list_addDiverButton => 'Agregar buceador';
-
-  @override
   String get divers_list_addDiverTooltip =>
       'Agregar un nuevo perfil de buceador';
 
@@ -9794,28 +9788,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'Ver buceador $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Buceador activo';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Otros buceadores';
-
-  @override
-  String get divers_summary_overviewTitle => 'Resumen';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Acciones rapidas';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Selecciona un buceador de la lista para ver detalles';
-
-  @override
-  String get divers_summary_title => 'Perfiles de buceadores';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Total de buceadores';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -16701,26 +16673,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_import_cancelling => 'Cancelando...';
 
   @override
-  String get settings_import_dialog_title => 'Importando datos';
-
-  @override
-  String get settings_import_doNotClose =>
-      'Por favor, no cierres la aplicacion';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current de $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Importando companeros...';
 
   @override
   String get settings_import_phase_certifications =>
       'Importando certificaciones...';
-
-  @override
-  String get settings_import_phase_complete => 'Finalizando...';
 
   @override
   String get settings_import_phase_diveCenters =>
@@ -16741,9 +16698,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Importando conjuntos de equipos...';
 
   @override
-  String get settings_import_phase_parsing => 'Analizando archivo...';
-
-  @override
   String get settings_import_phase_preparing => 'Preparando...';
 
   @override
@@ -16760,20 +16714,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current de $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Progreso de importacion: $percent por ciento';
-  }
 
   @override
   String get settings_language_appBar_title => 'Idioma';
@@ -21067,11 +21007,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Alternar selección para $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count marcados como $action';
   }
@@ -21798,29 +21733,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'Codigo PIN requerido';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Conectar';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Introduce el PIN de 4 a 6 digitos mostrado en tu dispositivo';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Consulta la pantalla de tu ordenador de buceo para ver el codigo PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Consulta la pantalla de tu $deviceName para ver el codigo PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'Entrada de codigo PIN, de 4 a 6 digitos';
-
-  @override
-  String get diveComputer_pinEntry_title => 'Introducir codigo PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
