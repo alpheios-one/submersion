@@ -56,6 +56,21 @@ class MacDiveSamplesDecoder {
   /// tests bits 0 to 7 and nothing above.
   static const int _optionMask = 0xFF;
 
+  /// Ranges the integer fields must fall inside to be kept.
+  ///
+  /// Time and depth being plausible does not make the rest of a record so: a
+  /// stride wrong by one field shifts every later read, and an int32 built
+  /// from unrelated bytes is typically huge or negative. Unlike a bad time or
+  /// depth these do not condemn the blob, because the same thing happens for
+  /// an ordinary bad reading, but they must not reach the mapper - which
+  /// multiplies [MacDiveSqliteSample.ndtMinutes] and
+  /// [MacDiveSqliteSample.ttsMinutes] into seconds with no sign check of its
+  /// own. Zero stays a value here; "no reading" is the mapper's judgement to
+  /// make.
+  static const int _maxHeartRateBpm = 300;
+  static final int _maxFieldMinutes =
+      RawProfileSanityCheck.maxPlausibleDuration.inMinutes;
+
   static const int _headerLength = 8;
   static const int _baseRecordLength = 8;
   static const int _fieldLength = 4;
@@ -66,9 +81,10 @@ class MacDiveSamplesDecoder {
   /// An empty list means MacDive stored a profile with no samples.
   ///
   /// Time and depth must be finite, and inside [_plausible]'s bounds, for the
-  /// blob to be accepted at all. An optional field that is not finite is
-  /// dropped from its sample instead: that is a bad reading inside a profile
-  /// MacDive still displays, not a sign the blob is foreign.
+  /// blob to be accepted at all. An optional field that is not finite, or an
+  /// integer field outside the range its quantity can take, is dropped from
+  /// its sample instead: that is a bad reading inside a profile MacDive still
+  /// displays, not a sign the blob is foreign.
   static List<MacDiveSqliteSample>? decode(Uint8List blob) {
     if (blob.length < 4) return null;
     final version = ByteData.sublistView(blob).getUint32(0, Endian.little);
@@ -108,12 +124,12 @@ class MacDiveSamplesDecoder {
       // is set.
       final pressure = record.optionalFloat(optionPressure);
       final pressure2 = record.optionalFloat(optionPressure2);
-      final heartRate = record.optionalInt32(optionHeartRate);
-      final ndt = record.optionalInt32(optionNdt);
+      final heartRate = record.optionalInt32(optionHeartRate, _maxHeartRateBpm);
+      final ndt = record.optionalInt32(optionNdt, _maxFieldMinutes);
       final ppO2 = record.optionalFloat(optionPpO2);
       final temperature = record.optionalFloat(optionTemperature);
       final nextStop = record.optionalFloat(optionNextStopDepth);
-      final tts = record.optionalInt32(optionTts);
+      final tts = record.optionalInt32(optionTts, _maxFieldMinutes);
       samples.add(
         MacDiveSqliteSample(
           time: _duration(time),
@@ -155,7 +171,7 @@ class MacDiveSamplesDecoder {
           time: _duration(time),
           depthMeters: depth,
           pressure: record.finiteFloat(),
-          ndtMinutes: record.int32(),
+          ndtMinutes: record.boundedInt32(_maxFieldMinutes),
           ppO2: record.finiteFloat(),
           temperatureCelsius: record.finiteFloat(),
         ),
@@ -226,6 +242,13 @@ class _RecordReader {
     return v;
   }
 
+  /// An int that is null when it falls outside 0 to [max], the counterpart of
+  /// [finiteFloat] for the integer fields.
+  int? boundedInt32(int max) {
+    final v = int32();
+    return v >= 0 && v <= max ? v : null;
+  }
+
   /// A float that is null when it is not a number MacDive could have shown.
   double? finiteFloat() {
     final v = float();
@@ -236,6 +259,8 @@ class _RecordReader {
   double? optionalFloat(int bit) =>
       (_options & bit) != 0 ? finiteFloat() : null;
 
-  /// Reads an int only when [bit] is set in the record's options word.
-  int? optionalInt32(int bit) => (_options & bit) != 0 ? int32() : null;
+  /// Reads an int only when [bit] is set in the record's options word,
+  /// keeping it only when it falls inside 0 to [max].
+  int? optionalInt32(int bit, int max) =>
+      (_options & bit) != 0 ? boundedInt32(max) : null;
 }

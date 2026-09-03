@@ -103,9 +103,15 @@ class MacDiveUnitInference {
   /// that carry a `ZSAMPLES` blob, or null when none of them holds one.
   ///
   /// Returns as soon as a reading can only be psi: no later reading can move
-  /// the answer, and stopping saves decrypting the rest of the library. A
-  /// blob the decoder rejects is skipped rather than ending the scan, since
-  /// one unreadable dive says nothing about the units of the others.
+  /// the answer, and stopping saves decrypting the rest of the library.
+  ///
+  /// A blob the decoder rejects does not end the scan, since one unreadable
+  /// dive says nothing about the units of the others, but it does count
+  /// against [sampleScanDiveLimit]. The limit bounds decryption work, not
+  /// useful readings: any blob that gets past the cheap header checks is
+  /// rejected only after its body has been decrypted, so an unreadable dive
+  /// costs what a readable one costs. Counting only successful decodes would
+  /// leave a library of unreadable blobs with no bound at all.
   static double? _maxSamplePressure(MacDiveRawLogbook logbook) {
     double? highest;
     var scanned = 0;

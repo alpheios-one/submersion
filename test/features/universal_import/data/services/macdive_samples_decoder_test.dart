@@ -185,6 +185,40 @@ void main() {
       expect(s.ttsMinutes, isNull);
     });
 
+    test('an out-of-range integer field is dropped, not fatal', () {
+      // The same treatment a non-finite float gets. A record whose time and
+      // depth still look like a dive keeps its sample and loses the bad
+      // field, rather than costing the profile MacDive draws - but a negative
+      // NDT must not reach the mapper, which multiplies it into an `ndl` of
+      // seconds without a sign check of its own.
+      final blob = _encode([
+        [0.0, 0.0, 30],
+        [10.0, 5.5, -2000000000],
+        [20.0, 12.25, 999999],
+      ], options: MacDiveSamplesDecoder.optionNdt);
+      final samples = MacDiveSamplesDecoder.decode(blob)!;
+      expect(samples.map((s) => s.depthMeters), [0.0, 5.5, 12.25]);
+      expect(samples.map((s) => s.ndtMinutes), [30, null, null]);
+    });
+
+    test('an implausible heart rate is dropped', () {
+      final blob = _encode([
+        [0.0, 0.0, 70],
+        [10.0, 5.5, 40000],
+      ], options: MacDiveSamplesDecoder.optionHeartRate);
+      final samples = MacDiveSamplesDecoder.decode(blob)!;
+      expect(samples.map((s) => s.heartRate), [70, null]);
+    });
+
+    test('an out-of-range TTS is dropped', () {
+      final blob = _encode([
+        [0.0, 0.0, 5],
+        [10.0, 5.5, -1],
+      ], options: MacDiveSamplesDecoder.optionTts);
+      final samples = MacDiveSamplesDecoder.decode(blob)!;
+      expect(samples.map((s) => s.ttsMinutes), [5, null]);
+    });
+
     test('a slightly negative surface depth is kept', () {
       // Pressure-sensor drift at the surface, the same allowance the raw
       // path makes. The plausibility bounds must not cost a real sample.
@@ -325,17 +359,25 @@ void main() {
   });
 }
 
-/// Encodes float-only records the way MacDive's encoder does: pack each
-/// record's 32-bit floats back to back, pad to a block boundary, append a
-/// block whose last word is the byte length of the packed run, then TEA-ECB
-/// the lot under the app key. Every record must have the same width.
-Uint8List _encode(List<List<double>> records, {required int options}) {
+/// Encodes records the way MacDive's encoder does: pack each record's 32-bit
+/// fields back to back, pad to a block boundary, append a block whose last
+/// word is the byte length of the packed run, then TEA-ECB the lot under the
+/// app key. Every record must have the same width. A `double` is written as a
+/// float and an `int` as an int32, matching the field types the options bits
+/// select.
+Uint8List _encode(List<List<num>> records, {required int options}) {
   final width = records.isEmpty ? 0 : records.first.length * 4;
   final packed = Uint8List(records.length * width);
   final data = ByteData.sublistView(packed);
   for (var i = 0; i < records.length; i++) {
     for (var j = 0; j < records[i].length; j++) {
-      data.setFloat32(i * width + j * 4, records[i][j], Endian.little);
+      final value = records[i][j];
+      final offset = i * width + j * 4;
+      if (value is int) {
+        data.setInt32(offset, value, Endian.little);
+      } else {
+        data.setFloat32(offset, value.toDouble(), Endian.little);
+      }
     }
   }
   final blocks = (packed.length + 7) ~/ 8 + 1;
