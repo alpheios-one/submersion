@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/async_value_extensions.dart';
+import 'package:submersion/core/providers/ref_invalidate_on_change.dart';
 
 /// `valueOrNull` and the built-in `AsyncValue.value` are not interchangeable,
 /// and the difference is narrower than it looks.
@@ -70,6 +71,40 @@ void main() {
     // as "this dive was never combined", so the action disappears.
     expect(reloading.value ?? 0, 2);
     expect(reloading.valueOrNull ?? 0, 0);
+
+    next.complete(3);
+  });
+
+  // The tick that actually drives diveSegmentCountProvider: a repository
+  // change stream feeding invalidateSelfWhen, which calls invalidateSelf.
+  // That is a refresh rather than a reload, so both getters keep the previous
+  // count. Pinned because the opposite is the intuitive reading, and it is what
+  // made the dive-detail read look like a live flicker when it is not (#1504).
+  test('an invalidateSelfWhen tick refreshes, so both getters hold', () async {
+    final ticks = StreamController<void>.broadcast();
+    addTearDown(ticks.close);
+    final selfInvalidating = FutureProvider<int>((ref) {
+      ref.invalidateSelfWhen(ticks.stream);
+      return next.future;
+    });
+
+    container.listen(selfInvalidating, (_, _) {});
+    next.complete(2);
+    expect(await container.read(selfInvalidating.future), 2);
+
+    next = Completer<int>();
+    ticks.add(null);
+    await Future<void>.delayed(Duration.zero);
+
+    final rebuilding = container.read(selfInvalidating);
+    expect(rebuilding.isLoading, isTrue);
+    expect(
+      rebuilding.isReloading,
+      isFalse,
+      reason: 'invalidateSelf is a refresh, not a dependency-driven reload',
+    );
+    expect(rebuilding.value, 2);
+    expect(rebuilding.valueOrNull, 2);
 
     next.complete(3);
   });
