@@ -4492,43 +4492,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Összevonás visszavonva';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'A(z) $time időpontban indult merülés összevonásra kerül ezzel a merüléssel.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Összevonás megerősítése';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Nem található más merülés ezen a napon.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Ennek a merülésnek a profilja, palackjai, nyomásai, eseményei, cimkéi, búvártársai és megfigyelései bekerülnek ebbe a merülésbe mint további számítógépes forrás. Ez a művelet visszavonható a „Számítógép leválasztása” funkcióval.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Hiba a merülések betöltésekor: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Összevonás';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Tovább';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Válassz egy merülést ugyanarról a napról, hogy további számítógépként vond össze.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Összevonás egy másik merüléssel';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Mit csinál ez';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Válaszd ki, melyik számítógép profiljából szerkesztesz.';
 
@@ -11289,6 +11252,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type felszerelés';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Nincs $filterText';
   }
@@ -11296,6 +11264,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Nincs ilyen allapotu felszereles';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Nincs felszerelés ebben a kategóriában';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11310,10 +11282,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_list_filterAll => 'Osszes felszereles';
 
   @override
-  String get equipment_list_filterLabel => 'Szuro:';
+  String get equipment_list_filterServiceDue => 'Szerviz esedek';
 
   @override
-  String get equipment_list_filterServiceDue => 'Szerviz esedek';
+  String get equipment_list_typeFilterAll => 'Összes típus';
+
+  @override
+  String get equipment_list_filterTooltip => 'Felszereles szurese';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Torles';
+
+  @override
+  String get equipment_filter_title => 'Felszereles szurese';
+
+  @override
+  String get equipment_filter_clearAll => 'Osszes torlese';
+
+  @override
+  String get equipment_filter_apply => 'Szurok alkalmazasa';
+
+  @override
+  String get equipment_filter_cancel => 'Megse';
+
+  @override
+  String get equipment_filter_section_status => 'Allapot';
+
+  @override
+  String get equipment_filter_section_category => 'Kategória';
 
   @override
   String get equipment_list_retryButton => 'Ujra';
@@ -22722,6 +22718,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Törli a(z) \"$name\" régiót?\n\nEzt a régiót egy korábbi verzió töltötte le, ezért a csempéi más régiókéval együtt tárolódnak, és nem szabadíthatók fel külön. A törlése nem szabadít fel tárhelyet.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22812,6 +22813,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Meret';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Ismeretlen';
 
   @override
   String get maps_offline_tiles => 'Csempek';
@@ -35062,6 +35066,19 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Könyvtár letöltése ($downloaded / $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Könyvtár importálása ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'Nincs beállítva felhőszolgáltató';
 
@@ -35687,6 +35704,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Merülések listázása…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Merülések listázása… (eddig $count található)',
+      one: 'Merülések listázása… (eddig 1 található)',
+      zero: 'Merülések listázása…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return '$total merülésből a(z) $current letöltése…';
   }
@@ -35697,6 +35726,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Újra';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Továbbiak betöltése';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35722,6 +35754,116 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title =>
+      'Bejelentkezés a Garmin Connect fiókba';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Jelentkezz be a Garmin Connect fiókoddal, hogy közvetlenül importáld a merüléseidet. A jelszavadat soha nem tároljuk, csak a létrejövő munkamenetet.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get garminConnect_signIn_emailRequired =>
+      'Az e-mail cím megadása kötelező';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Jelszó';
+
+  @override
+  String get garminConnect_signIn_passwordRequired =>
+      'A jelszó megadása kötelező';
+
+  @override
+  String get garminConnect_signIn_button => 'Bejelentkezés';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Bejelentkezés…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Bejelentkezve mint $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Ellenőrzés szükséges';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Add meg a(z) $method címre küldött ellenőrző kódot.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Ellenőrző kód';
+
+  @override
+  String get garminConnect_mfa_codeRequired =>
+      'Az ellenőrző kód megadása kötelező';
+
+  @override
+  String get garminConnect_mfa_button => 'Ellenőrzés';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Ellenőrzés…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Merülések listázása…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Merülések listázása… (eddig $count található)',
+      one: 'Merülések listázása… (eddig 1 található)',
+      zero: 'Merülések listázása…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return '$total merülésből a(z) $current letöltése…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle =>
+      'Nem sikerült letölteni a merüléseket';
+
+  @override
+  String get garminConnect_fetch_retry => 'Újra';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Továbbiak betöltése';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés található',
+      one: '1 merülés található',
+      zero: 'Nem található merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülést nem sikerült konvertálni, ezért kimaradtak.',
+      one: '1 merülést nem sikerült konvertálni, ezért kimaradt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Összes betöltése';
+
+  @override
   String get importWizard_review_sortTooltip => 'Rendezés';
 
   @override
@@ -35739,6 +35881,13 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Merulesek importalasa a Suunto alkalmazasbol vagy az app.suunto.com fiokbol';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Merülések importálása a Garmin Connect fiókból';
 
   @override
   String get transfer_section_cloudTitle => 'Felho';

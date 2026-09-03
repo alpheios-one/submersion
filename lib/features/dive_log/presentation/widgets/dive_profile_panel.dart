@@ -253,6 +253,9 @@ class _DiveProfilePanelContentState
       activeSourceProfileProvider(widget.diveId),
     );
     final chartProfile = activeSourceProfile?.points ?? dive.profile;
+    // AsyncValue.value, not the valueOrNull polyfill: it keeps the previous
+    // value across a provider reload so the chart does not drop a series for
+    // a frame when a background write ticks the dive.
     final analysis = ref
         .watch(
           sourceProfileAnalysisProvider((
@@ -260,17 +263,13 @@ class _DiveProfilePanelContentState
             sourceId: ref.watch(activeDiveSourceProvider(widget.diveId)),
           )),
         )
-        .valueOrNull;
-    final gasSwitches = ref
-        .watch(gasSwitchesProvider(widget.diveId))
-        .valueOrNull;
-    final tankPressures = ref
-        .watch(tankPressuresProvider(widget.diveId))
-        .valueOrNull;
+        .value;
+    final gasSwitches = ref.watch(gasSwitchesProvider(widget.diveId)).value;
+    final tankPressures = ref.watch(tankPressuresProvider(widget.diveId)).value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(widget.diveId))
-        .valueOrNull;
+        .value;
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final colorScheme = Theme.of(context).colorScheme;

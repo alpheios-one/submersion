@@ -213,9 +213,68 @@ static const char *ble_alias_product(const char *name) {
     return NULL;
 }
 
+// Some BLE names belong to a device libdivecomputer does not support, yet are
+// still claimed by a descriptor whose filter is too loose. Claiming one is
+// worse than ignoring it: the download wizard announces a "Recognized Device"
+// and promises the download will work, and the connect then fails because the
+// app is speaking the wrong vendor's protocol.
+//
+// Issue #123: a Suunto Ocean advertises "S19 <4 hex> LE". dc_filter_oceans
+// prefix-matches the two characters "S1" with strncasecmp, so the Oceans S1
+// descriptor swallowed the watch. The two are unrelated: the Ocean is on
+// Suunto's next-generation smartwatch platform, whose dive-download protocol
+// has never been captured, let alone implemented, in libdivecomputer.
+//
+// The rejection is keyed on the whole advertised shape rather than on the
+// looser "S1" prefix on the libdivecomputer side. The Oceans S1's own
+// advertised name is documented nowhere: not in libdivecomputer, not in
+// Subsurface, not in the S1 manual, which pairs by QR code. Tightening that
+// prefix would be a guess against a discontinued product, and a wrong guess
+// there silently hides working hardware.
+//
+// Across two scans five minutes apart the same watch advertised "S19 1DFC LE"
+// and then "S19 700B LE" from two different MAC addresses, so the hex group is
+// a rotating privacy identifier and "S19" is the stable model code.
+//
+// Every character outside the rotating group is pinned, including the "9".
+// A sibling model on the same platform would carry a different code and would
+// collide with the same "S1" prefix, but suppressing a name nobody has
+// captured is the same guess this fix exists to avoid, and its cost is worse:
+// hiding a device is harder to diagnose than mislabelling one. Add a model
+// code here only with a real advertised name behind it, from a log.
+static int is_suunto_ng_ble_name(const char *name) {
+    // "S19 hhhh LE"
+    static const size_t kLength = 11;
+
+    if (name == NULL || strlen(name) != kLength) {
+        return 0;
+    }
+    if (toupper((unsigned char)name[0]) != 'S' || name[1] != '1' ||
+        name[2] != '9') {
+        return 0;
+    }
+    if (name[3] != ' ' || name[8] != ' ') {
+        return 0;
+    }
+    for (size_t i = 4; i < 8; i++) {
+        if (!isxdigit((unsigned char)name[i])) {
+            return 0;
+        }
+    }
+    return toupper((unsigned char)name[9]) == 'L' &&
+           toupper((unsigned char)name[10]) == 'E';
+}
+
 int libdc_descriptor_match(const char *name, unsigned int transport,
                            libdc_descriptor_info_t *info) {
     if (name == NULL || info == NULL) {
+        return 0;
+    }
+
+    // Some advertised names identify hardware libdivecomputer has no support
+    // for. Reject those up front, so that no descriptor can claim one on a
+    // loose prefix match. See issue #123.
+    if ((transport & LIBDC_TRANSPORT_BLE) && is_suunto_ng_ble_name(name)) {
         return 0;
     }
 

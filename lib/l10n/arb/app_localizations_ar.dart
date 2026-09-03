@@ -4419,43 +4419,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_consolidate_undone => 'تم التراجع عن الدمج';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'سيتم دمج الغوصة في الساعة $time مع هذه الغوصة.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'تأكيد الدمج';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'لم يتم العثور على غوصات أخرى في هذا اليوم.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'سيتم دمج ملف هذه الغوصة والأسطوانات والضغوط والأحداث والوسوم ورفقاء الغوص والمشاهدات في هذه الغوصة كمصدر كمبيوتر إضافي. يمكن التراجع عن هذا الإجراء باستخدام \'إلغاء ربط الكمبيوتر\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'خطأ في تحميل الغوصات: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'دمج';
-
-  @override
-  String get diveLog_mergeDialog_next => 'التالي';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'اختر غوصة من نفس اليوم لدمجها كجهاز كمبيوتر إضافي.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'دمج مع غوصة أخرى';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'ما الذي يفعله هذا';
-
-  @override
   String get diveLog_computerSheet_description =>
       'اختر ملف أي كمبيوتر تريد التحرير منه.';
 
@@ -11129,6 +11092,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'معدات $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'لا توجد $filterText';
   }
@@ -11136,6 +11104,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'لا توجد معدات بهذه الحالة';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'لا توجد معدات في هذه الفئة';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11150,10 +11122,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_list_filterAll => 'جميع المعدات';
 
   @override
-  String get equipment_list_filterLabel => 'تصفية:';
+  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
 
   @override
-  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
+  String get equipment_list_typeFilterAll => 'جميع الأنواع';
+
+  @override
+  String get equipment_list_filterTooltip => 'تصفية المعدات';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'مسح';
+
+  @override
+  String get equipment_filter_title => 'تصفية المعدات';
+
+  @override
+  String get equipment_filter_clearAll => 'مسح الكل';
+
+  @override
+  String get equipment_filter_apply => 'تطبيق الفلاتر';
+
+  @override
+  String get equipment_filter_cancel => 'إلغاء';
+
+  @override
+  String get equipment_filter_section_status => 'الحالة';
+
+  @override
+  String get equipment_filter_section_category => 'الفئة';
 
   @override
   String get equipment_list_retryButton => 'إعادة المحاولة';
@@ -22390,6 +22386,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'حذف \"$name\"؟\n\nتم تنزيل هذه المنطقة بإصدار سابق، لذا تُخزَّن بلاطاتها مع بلاطات مناطق أخرى ولا يمكن تحريرها بمفردها. لن يؤدي حذفها إلى استعادة مساحة تخزين.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22480,6 +22481,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'الحجم';
+
+  @override
+  String get maps_offline_sizeUnknown => 'غير معروف';
 
   @override
   String get maps_offline_tiles => 'البلاطات';
@@ -34868,6 +34872,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'جارٍ تنزيل المكتبة ($downloaded من $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'جارٍ استيراد المكتبة ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'لم يتم إعداد أي مزود تخزين سحابي';
 
@@ -35489,6 +35506,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'جارٍ سرد الغوصات…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'جارٍ سرد الغوصات… (تم العثور على $count غوصة حتى الآن)',
+      one: 'جارٍ سرد الغوصات… (تم العثور على غوصة واحدة حتى الآن)',
+      zero: 'جارٍ سرد الغوصات…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'جلب الغوصة $current من $total…';
   }
@@ -35498,6 +35527,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'تحميل المزيد';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35523,6 +35555,111 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'تسجيل الدخول إلى Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'سجّل الدخول بحساب Garmin Connect الخاص بك لاستيراد غوصاتك مباشرة. لا يتم تخزين كلمة المرور مطلقًا، بل يتم تخزين الجلسة الناتجة فقط.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'البريد الإلكتروني مطلوب';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'كلمة المرور';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'كلمة المرور مطلوبة';
+
+  @override
+  String get garminConnect_signIn_button => 'تسجيل الدخول';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'جارٍ تسجيل الدخول…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'تم تسجيل الدخول باسم $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'التحقق مطلوب';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'أدخل رمز التحقق المُرسل إلى $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'رمز التحقق';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'رمز التحقق مطلوب';
+
+  @override
+  String get garminConnect_mfa_button => 'تحقّق';
+
+  @override
+  String get garminConnect_mfa_submitting => 'جارٍ التحقق…';
+
+  @override
+  String get garminConnect_fetch_listing => 'جارٍ سرد الغوصات…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'جارٍ سرد الغوصات… (تم العثور على $count غوصة حتى الآن)',
+      one: 'جارٍ سرد الغوصات… (تم العثور على غوصة واحدة حتى الآن)',
+      zero: 'جارٍ سرد الغوصات…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'جلب الغوصة $current من $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'تعذّر جلب الغوصات';
+
+  @override
+  String get garminConnect_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'تحميل المزيد';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count غوصة',
+      one: 'تم العثور على غوصة واحدة',
+      zero: 'لم يتم العثور على غوصات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'تحميل الكل';
+
+  @override
   String get importWizard_review_sortTooltip => 'ترتيب';
 
   @override
@@ -35540,6 +35677,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'استيراد الغوصات من تطبيق Suunto أو حساب app.suunto.com';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'استيراد الغوصات من حساب Garmin Connect الخاص بك';
 
   @override
   String get transfer_section_cloudTitle => 'السحابة';

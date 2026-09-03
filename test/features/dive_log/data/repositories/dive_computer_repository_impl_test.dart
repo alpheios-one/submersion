@@ -902,6 +902,44 @@ void main() {
       expect(await diveTypeIdsFor(diveId), ['technical']);
     });
 
+    test('rbt and airtime events are stored as lowGas warnings and do not '
+        'make the dive technical', () async {
+      // Before the event-code table was corrected, libdivecomputer's RBT code
+      // arrived as 'ascent' and its AIRTIME code as 'PO2', so neither name
+      // ever reached this mapping. Both mean the gas supply is running short.
+      final computerId = await insertComputer();
+      final entryTime = DateTime(2026, 4, 1, 11, 55);
+
+      final diveId = await repository.importProfile(
+        computerId: computerId,
+        profileStartTime: entryTime,
+        points: const [
+          ProfilePointData(timestamp: 0, depth: 1.0, ndl: 3600),
+          ProfilePointData(timestamp: 600, depth: 18.0, ndl: 1200),
+        ],
+        durationSeconds: 1800,
+        maxDepth: 18.0,
+        events: const [
+          EventData(timestamp: 600, type: 'rbt'),
+          EventData(timestamp: 900, type: 'airtime'),
+        ],
+        forceNew: true,
+      );
+
+      final events =
+          await (db.select(db.diveProfileEvents)
+                ..where((t) => t.diveId.equals(diveId))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      expect(events.map((e) => e.eventType), ['lowGas', 'lowGas']);
+      expect(events.map((e) => e.severity), ['warning', 'warning']);
+
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.diveType, 'recreational');
+    });
+
     test('a no-deco profile defaults the dive type to recreational', () async {
       final computerId = await insertComputer();
       final entryTime = DateTime(2026, 4, 1, 12, 0);

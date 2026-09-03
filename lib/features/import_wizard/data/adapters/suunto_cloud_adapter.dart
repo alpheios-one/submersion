@@ -19,6 +19,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
+import 'package:submersion/features/import_wizard/data/adapters/cloud_computer_identity.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_cancellation_token.dart';
@@ -187,7 +188,12 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
       builder: (context) =>
           SuuntoCloudFetchStep(client: _client, onDivesFetched: setParsedDives),
       canAdvance: suuntoCloudDivesFetchedProvider,
-      autoAdvance: true,
+      // Not auto-advance: the fetch step lets the diver move on as soon as
+      // the newest page of dives is ready without waiting for the rest of a
+      // large account's history, via an explicit Load More button. Auto-
+      // advancing on that same canAdvance flip would whisk the diver away
+      // the instant it turns true, before they ever see that button.
+      autoAdvance: false,
     ),
   ];
 
@@ -423,11 +429,10 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
     }
   }
 
-  String _computerCacheKey(SuuntoParsedDive parsed) {
-    final serial = parsed.serialNumber?.trim();
-    if (serial != null && serial.isNotEmpty) return serial;
-    return parsed.deviceName?.trim() ?? 'Suunto';
-  }
+  String _computerCacheKey(SuuntoParsedDive parsed) =>
+      normalizedIdentityPart(parsed.serialNumber) ??
+      normalizedIdentityPart(parsed.deviceName) ??
+      'Suunto';
 
   DiveComputer? _computerFor(SuuntoParsedDive parsed) =>
       _computersByKey[_computerCacheKey(parsed)];
@@ -441,10 +446,10 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
     final cached = _computersByKey[cacheKey];
     if (cached != null) return cached;
 
-    final model = parsed.deviceName?.trim() ?? 'Suunto';
-    final serial = parsed.serialNumber?.trim();
+    final model = normalizedIdentityPart(parsed.deviceName) ?? 'Suunto';
+    final serial = normalizedIdentityPart(parsed.serialNumber);
 
-    if (serial != null && serial.isNotEmpty) {
+    if (serial != null) {
       final existing = await _computerRepository.findByHardwareIdentity(
         manufacturer: 'Suunto',
         model: model,
@@ -466,7 +471,7 @@ class SuuntoCloudAdapter implements ImportSourceAdapter {
         model: model,
       ).copyWith(
         serialNumber: serial,
-        firmwareVersion: parsed.firmwareVersion,
+        firmwareVersion: normalizedIdentityPart(parsed.firmwareVersion),
         connectionType: 'cloud',
       ),
     );

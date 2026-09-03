@@ -4525,43 +4525,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Fusion annulée';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'La plongée de $time sera fusionnée avec cette plongée.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmer la fusion';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Aucune autre plongée trouvée ce jour-là.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Le profil, les blocs, les pressions, les événements, les tags, les binômes et les observations de cette plongée seront intégrés à cette plongée en tant qu\'ordinateur supplémentaire. Cette action peut être annulée avec « Dissocier l\'ordinateur ».';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Erreur lors du chargement des plongées : $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Fusionner';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Suivant';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Sélectionnez une plongée du même jour à fusionner en tant qu\'ordinateur supplémentaire.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Fusionner avec une autre plongée';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Ce que cela fait';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Sélectionnez le profil d\'ordinateur à partir duquel modifier.';
 
@@ -11358,6 +11321,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'équipement $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Aucun $filterText';
   }
@@ -11365,6 +11333,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Aucun equipement avec ce statut';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Aucun équipement dans cette catégorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11379,10 +11351,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_list_filterAll => 'Tout l\'equipement';
 
   @override
-  String get equipment_list_filterLabel => 'Filtre :';
+  String get equipment_list_filterServiceDue => 'Revision due';
 
   @override
-  String get equipment_list_filterServiceDue => 'Revision due';
+  String get equipment_list_typeFilterAll => 'Tous les types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filtrer l\'equipement';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Effacer';
+
+  @override
+  String get equipment_filter_title => 'Filtrer l\'equipement';
+
+  @override
+  String get equipment_filter_clearAll => 'Tout effacer';
+
+  @override
+  String get equipment_filter_apply => 'Appliquer les filtres';
+
+  @override
+  String get equipment_filter_cancel => 'Annuler';
+
+  @override
+  String get equipment_filter_section_status => 'Statut';
+
+  @override
+  String get equipment_filter_section_category => 'Catégorie';
 
   @override
   String get equipment_list_retryButton => 'Reessayer';
@@ -22882,6 +22878,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Supprimer \"$name\" ?\n\nCette région a été téléchargée avec une version antérieure : ses tuiles sont stockées avec celles d\'autres régions et ne peuvent pas être libérées séparément. La supprimer ne récupérera pas d\'espace de stockage.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22973,6 +22974,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Taille';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Inconnue';
 
   @override
   String get maps_offline_tiles => 'Tuiles';
@@ -35311,6 +35315,19 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Téléchargement de la bibliothèque ($downloaded sur $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importation de la bibliothèque ($percent %)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'Aucun fournisseur cloud configuré';
 
@@ -35940,6 +35957,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Liste des plongées…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Liste des plongées… ($count trouvées jusqu\'à présent)',
+      one: 'Liste des plongées… (1 trouvée jusqu\'à présent)',
+      zero: 'Liste des plongées…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'Récupération de la plongée $current sur $total…';
   }
@@ -35950,6 +35979,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Réessayer';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Charger plus';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35976,6 +36008,115 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'Se connecter à Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Connectez-vous avec votre compte Garmin Connect pour importer vos plongées directement. Votre mot de passe n\'est jamais conservé : seule la session obtenue est mise en cache.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'L\'e-mail est requis';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Mot de passe';
+
+  @override
+  String get garminConnect_signIn_passwordRequired =>
+      'Le mot de passe est requis';
+
+  @override
+  String get garminConnect_signIn_button => 'Se connecter';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Connexion…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Connecté en tant que $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Vérification requise';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Saisissez le code de vérification envoyé à $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Code de vérification';
+
+  @override
+  String get garminConnect_mfa_codeRequired =>
+      'Le code de vérification est requis';
+
+  @override
+  String get garminConnect_mfa_button => 'Vérifier';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Vérification…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Liste des plongées…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Liste des plongées… ($count trouvées jusqu\'à présent)',
+      one: 'Liste des plongées… (1 trouvée jusqu\'à présent)',
+      zero: 'Liste des plongées…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Récupération de la plongée $current sur $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle =>
+      'Impossible de récupérer les plongées';
+
+  @override
+  String get garminConnect_fetch_retry => 'Réessayer';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Charger plus';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées trouvées',
+      one: '1 plongée trouvée',
+      zero: 'Aucune plongée trouvée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count plongées n\'ont pas pu être converties et ont été ignorées.',
+      one: '1 plongée n\'a pas pu être convertie et a été ignorée.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Tout charger';
+
+  @override
   String get importWizard_review_sortTooltip => 'Trier';
 
   @override
@@ -35993,6 +36134,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Importer les plongees depuis votre application Suunto ou votre compte app.suunto.com';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Importer les plongées depuis votre compte Garmin Connect';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';

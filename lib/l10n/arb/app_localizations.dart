@@ -7520,66 +7520,6 @@ abstract class AppLocalizations {
   /// **'Merge undone'**
   String get diveLog_consolidate_undone;
 
-  /// No description provided for @diveLog_mergeDialog_confirmSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Merging dive at {time} into this dive.'**
-  String diveLog_mergeDialog_confirmSubtitle(String time);
-
-  /// No description provided for @diveLog_mergeDialog_confirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm merge'**
-  String get diveLog_mergeDialog_confirmTitle;
-
-  /// No description provided for @diveLog_mergeDialog_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No other dives found on this day.'**
-  String get diveLog_mergeDialog_empty;
-
-  /// No description provided for @diveLog_mergeDialog_explanation.
-  ///
-  /// In en, this message translates to:
-  /// **'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.'**
-  String get diveLog_mergeDialog_explanation;
-
-  /// No description provided for @diveLog_mergeDialog_loadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading dives: {error}'**
-  String diveLog_mergeDialog_loadError(String error);
-
-  /// No description provided for @diveLog_mergeDialog_merge.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge'**
-  String get diveLog_mergeDialog_merge;
-
-  /// No description provided for @diveLog_mergeDialog_next.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get diveLog_mergeDialog_next;
-
-  /// No description provided for @diveLog_mergeDialog_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a dive from the same day to merge as an additional computer.'**
-  String get diveLog_mergeDialog_subtitle;
-
-  /// No description provided for @diveLog_mergeDialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge with another dive'**
-  String get diveLog_mergeDialog_title;
-
-  /// No description provided for @diveLog_mergeDialog_whatThisDoes.
-  ///
-  /// In en, this message translates to:
-  /// **'What this does'**
-  String get diveLog_mergeDialog_whatThisDoes;
-
   /// Description of the computer profile selection sheet
   ///
   /// In en, this message translates to:
@@ -19178,6 +19118,12 @@ abstract class AppLocalizations {
   /// **'{status} equipment'**
   String equipment_list_emptyState_filterText_status(Object status);
 
+  /// Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. "Wetsuit equipment"
+  ///
+  /// In en, this message translates to:
+  /// **'{type} equipment'**
+  String equipment_list_emptyState_filterText_type(Object type);
+
   /// No description provided for @equipment_list_emptyState_noEquipment.
   ///
   /// In en, this message translates to:
@@ -19189,6 +19135,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
+
+  /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment in this category'**
+  String get equipment_list_emptyState_noTypeMatch;
 
   /// No description provided for @equipment_list_emptyState_serviceDueUpToDate.
   ///
@@ -19208,17 +19160,65 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// No description provided for @equipment_list_filterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter:'**
-  String get equipment_list_filterLabel;
-
   /// No description provided for @equipment_list_filterServiceDue.
   ///
   /// In en, this message translates to:
   /// **'Service Due'**
   String get equipment_list_filterServiceDue;
+
+  /// Label of the chip that clears the category filter and shows equipment of every type
+  ///
+  /// In en, this message translates to:
+  /// **'All Types'**
+  String get equipment_list_typeFilterAll;
+
+  /// No description provided for @equipment_list_filterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter equipment'**
+  String get equipment_list_filterTooltip;
+
+  /// No description provided for @equipment_list_activeFilter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get equipment_list_activeFilter_clear;
+
+  /// No description provided for @equipment_filter_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Equipment'**
+  String get equipment_filter_title;
+
+  /// No description provided for @equipment_filter_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get equipment_filter_clearAll;
+
+  /// No description provided for @equipment_filter_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get equipment_filter_apply;
+
+  /// No description provided for @equipment_filter_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get equipment_filter_cancel;
+
+  /// No description provided for @equipment_filter_section_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_filter_section_category;
 
   /// No description provided for @equipment_list_retryButton.
   ///
@@ -37532,6 +37532,12 @@ abstract class AppLocalizations {
   /// **'Delete {name} region'**
   String maps_offline_deleteRegion(Object name);
 
+  /// Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.'**
+  String maps_offline_deleteRegionLegacyMessage(Object name);
+
   /// No description provided for @maps_offline_deleteRegionMessage.
   ///
   /// In en, this message translates to:
@@ -37658,6 +37664,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Size'**
   String get maps_offline_size;
+
+  /// Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as "25.0 MB".
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get maps_offline_sizeUnknown;
 
   /// No description provided for @maps_offline_tiles.
   ///
@@ -57881,6 +57893,21 @@ abstract class AppLocalizations {
   /// **'Uploading library ({uploaded} of {total})'**
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total);
 
+  /// No description provided for @settings_cloudSync_progress_downloadingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading library ({downloaded} of {total})'**
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  );
+
+  /// No description provided for @settings_cloudSync_progress_importingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing library ({percent}%)'**
+  String settings_cloudSync_progress_importingLibrary(int percent);
+
   /// No description provided for @settings_cloudSync_result_noProvider.
   ///
   /// In en, this message translates to:
@@ -58925,6 +58952,12 @@ abstract class AppLocalizations {
   /// **'Listing dives…'**
   String get suuntoCloud_fetch_listing;
 
+  /// Progress line while paging through the Suunto cloud's workout list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String suuntoCloud_fetch_listingFound(int count);
+
   /// Progress line while downloading each dive from the Suunto cloud.
   ///
   /// In en, this message translates to:
@@ -58943,6 +58976,12 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get suuntoCloud_fetch_retry;
 
+  /// No description provided for @suuntoCloud_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get suuntoCloud_fetch_loadMore;
+
   /// Result headline after fetching dives from the Suunto cloud.
   ///
   /// In en, this message translates to:
@@ -58954,6 +58993,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
   String suuntoCloud_fetch_someFailed(int count);
+
+  /// No description provided for @garminConnect_signIn_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Garmin Connect'**
+  String get garminConnect_signIn_title;
+
+  /// No description provided for @garminConnect_signIn_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  String get garminConnect_signIn_description;
+
+  /// No description provided for @garminConnect_signIn_emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get garminConnect_signIn_emailLabel;
+
+  /// No description provided for @garminConnect_signIn_emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get garminConnect_signIn_emailRequired;
+
+  /// No description provided for @garminConnect_signIn_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get garminConnect_signIn_passwordLabel;
+
+  /// No description provided for @garminConnect_signIn_passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get garminConnect_signIn_passwordRequired;
+
+  /// No description provided for @garminConnect_signIn_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get garminConnect_signIn_button;
+
+  /// No description provided for @garminConnect_signIn_signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get garminConnect_signIn_signingIn;
+
+  /// Success state on the Garmin Connect sign-in step, once a session is established.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String garminConnect_signIn_signedInAs(String email);
+
+  /// No description provided for @garminConnect_mfa_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Required'**
+  String get garminConnect_mfa_title;
+
+  /// Instructions on the Garmin Connect MFA step, naming where the code was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code sent to your {method}.'**
+  String garminConnect_mfa_description(String method);
+
+  /// No description provided for @garminConnect_mfa_codeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get garminConnect_mfa_codeLabel;
+
+  /// No description provided for @garminConnect_mfa_codeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code is required'**
+  String get garminConnect_mfa_codeRequired;
+
+  /// No description provided for @garminConnect_mfa_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get garminConnect_mfa_button;
+
+  /// No description provided for @garminConnect_mfa_submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying…'**
+  String get garminConnect_mfa_submitting;
+
+  /// No description provided for @garminConnect_fetch_listing.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing dives…'**
+  String get garminConnect_fetch_listing;
+
+  /// Progress line while paging through Garmin Connect's activity list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String garminConnect_fetch_listingFound(int count);
+
+  /// Progress line while downloading each dive from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dive {current} of {total}…'**
+  String garminConnect_fetch_fetchingDiveOf(int current, int total);
+
+  /// No description provided for @garminConnect_fetch_failedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch dives'**
+  String get garminConnect_fetch_failedTitle;
+
+  /// No description provided for @garminConnect_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get garminConnect_fetch_retry;
+
+  /// No description provided for @garminConnect_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get garminConnect_fetch_loadMore;
+
+  /// Result headline after fetching dives from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
+  String garminConnect_fetch_foundDives(int count);
+
+  /// Shown when one or more fetched Garmin Connect dives could not be converted and were skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
+  String garminConnect_fetch_someFailed(int count);
+
+  /// Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch All'**
+  String get garminConnect_fetch_fetchAll;
 
   /// No description provided for @importWizard_review_sortTooltip.
   ///
@@ -58990,6 +59173,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import dives from your Suunto app / app.suunto.com account'**
   String get transfer_importCloud_suuntoSubtitle;
+
+  /// No description provided for @transfer_importCloud_garminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Garmin'**
+  String get transfer_importCloud_garminTitle;
+
+  /// No description provided for @transfer_importCloud_garminSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import dives from your Garmin Connect account'**
+  String get transfer_importCloud_garminSubtitle;
 
   /// No description provided for @transfer_section_cloudTitle.
   ///

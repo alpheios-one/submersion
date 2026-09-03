@@ -37,10 +37,14 @@ class BaseJsonStreamReader {
   String? _section;
   String? _table;
 
-  final BytesBuilder _key = BytesBuilder(copy: false);
+  // Copying builders on purpose: the non-copying BytesBuilder allocates a
+  // one-element list per addByte, which on a multi-hundred-MB base is one
+  // allocation per captured byte. The copying builder writes into a grown
+  // buffer instead (issue #1421).
+  final BytesBuilder _key = BytesBuilder();
   bool _keyEscaped = false;
 
-  final BytesBuilder _cap = BytesBuilder(copy: false);
+  final BytesBuilder _cap = BytesBuilder();
   int _capDepth = 0;
   bool _capInString = false;
   bool _capEscaped = false;
@@ -75,7 +79,28 @@ class BaseJsonStreamReader {
     _want = wantRows ?? (_, _) => true;
 
     await for (final chunk in bytes) {
-      for (final c in chunk) {
+      final data = chunk is Uint8List ? chunk : Uint8List.fromList(chunk);
+      final n = data.length;
+      var i = 0;
+      while (i < n) {
+        // Fast path: inside a string body nothing but a quote or a backslash
+        // can change state, so take the whole run in one slice instead of one
+        // state-machine step per byte. Blob-bearing rows are almost entirely
+        // string body, and a skipped table's bytes are not copied at all.
+        if (_inStringBody) {
+          var j = i;
+          while (j < n) {
+            final b = data[j];
+            if (b == _quote || b == _backslash) break;
+            j++;
+          }
+          if (j > i && _capKind != _Cap.skip) {
+            _cap.add(Uint8List.sublistView(data, i, j));
+          }
+          i = j;
+          if (i >= n) break;
+        }
+        final c = data[i++];
         var consumed = false;
         while (!consumed) {
           final r = _consume(c);
@@ -108,6 +133,19 @@ class BaseJsonStreamReader {
         '(empty or truncated document)',
       );
     }
+  }
+
+  bool get _inStringBody =>
+      (_state == _S.capture ||
+          _state == _S.captureArray ||
+          _state == _S.captureSection) &&
+      _capInString &&
+      !_capEscaped;
+
+  /// Appends a captured byte unless this capture is being skipped, in which
+  /// case nothing is retained (the bytes are discarded at finish anyway).
+  void _capAdd(int c) {
+    if (_capKind != _Cap.skip) _cap.addByte(c);
   }
 
   _Step _consume(int c) {
@@ -256,7 +294,7 @@ class BaseJsonStreamReader {
 
   _Step _captureByte(int c) {
     if (_capInString) {
-      _cap.addByte(c);
+      _capAdd(c);
       if (_capEscaped) {
         _capEscaped = false;
       } else if (c == _backslash) {
@@ -270,13 +308,13 @@ class BaseJsonStreamReader {
     if (c == _quote) {
       _capStarted = true;
       _capInString = true;
-      _cap.addByte(c);
+      _capAdd(c);
       return const _Step(true);
     }
     if (c == _lbrace || c == _lbracket) {
       _capStarted = true;
       _capDepth++;
-      _cap.addByte(c);
+      _capAdd(c);
       return const _Step(true);
     }
     if (c == _rbrace || c == _rbracket) {
@@ -286,7 +324,7 @@ class BaseJsonStreamReader {
         return _finishCapture(consume: false);
       }
       _capDepth--;
-      _cap.addByte(c);
+      _capAdd(c);
       if (_capDepth == 0) return _finishCapture(consume: true);
       return const _Step(true);
     }
@@ -303,14 +341,13 @@ class BaseJsonStreamReader {
       return const _Step(true); // leading/interior structural whitespace
     }
     _capStarted = true;
-    _cap.addByte(c);
+    _capAdd(c);
     return const _Step(true);
   }
 
   _Step _finishCapture({required bool consume}) {
     final kind = _capKind;
     final bytes = (kind == _Cap.skip) ? null : _cap.takeBytes();
-    if (kind == _Cap.skip) _cap.clear();
 
     // Transition to the parent state.
     if (_state == _S.capture) {

@@ -13,7 +13,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/app.dart' show resolveAppLocale;
 import 'package:submersion/app.dart';
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/storage/scratch_sweep.dart';
+import 'package:submersion/core/services/sync/changeset_log/local_only_tombstone_gc.dart';
+import 'package:submersion/core/services/sync/changeset_log/peer_cursor_store.dart';
+import 'package:submersion/core/services/sync/changeset_log/publish_state_store.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
@@ -717,6 +721,27 @@ class _StartupWrapperState extends State<StartupWrapper>
       } catch (e, stackTrace) {
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
+        );
+      }
+    }());
+
+    // Tombstone GC for a library that never syncs, every launch. The cloud
+    // path runs GC at the tail of a successful sync, which a device with no
+    // provider never reaches, so its deletion log otherwise grows forever.
+    // Gated on there being no trace of a prior sync: a device that synced
+    // and then went local-only still owes its peers those tombstones. Same
+    // fire-and-forget shape as the media sweep above, for the same reasons.
+    unawaited(() async {
+      try {
+        final db = DatabaseService.instance.database;
+        await LocalOnlyTombstoneGc(
+          syncRepository: SyncRepository(database: db),
+          peerCursors: PeerCursorStore(db),
+          publishStates: PublishStateStore(db),
+        ).run();
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Local-only tombstone GC failed (will retry): $e\n$stackTrace',
         );
       }
     }());

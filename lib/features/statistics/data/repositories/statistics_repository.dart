@@ -1181,6 +1181,12 @@ class StatisticsRepository {
 
   /// Get water type distribution (salt/fresh).
   ///
+  /// Buckets each dive by its *effective* water type: the value on the dive
+  /// when it has one, otherwise the one on its site (issue #1427). Dives
+  /// logged before the site's water type was filled in, and imports that never
+  /// carried the field, would otherwise sit outside the chart even though the
+  /// app knows what water they were in. Mirrors `Dive.effectiveWaterType`.
+  ///
   /// Emits the stored WaterType enum name as a stable key; the presentation
   /// layer translates it (see `waterTypeDistributionLabel`).
   Future<List<DistributionSegment>> getWaterTypeDistribution({
@@ -1188,16 +1194,29 @@ class StatisticsRepository {
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      // Qualified: dive_sites carries a diver_id of its own, so the bare
+      // column name is ambiguous once the site is joined in.
+      final diverFilter = diverId != null ? 'AND dives.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
+      // The fallback is resolved in a subquery so the outer GROUP BY names one
+      // unambiguous column rather than repeating the COALESCE, matching the
+      // shape the visibility distribution above already uses.
       final results = await _db.customSelect('''
         SELECT
           water_type,
           COUNT(*) AS count
-        FROM dives
-        WHERE water_type IS NOT NULL AND water_type != '' $diverFilter ${df.clause}
+        FROM (
+          SELECT COALESCE(
+            NULLIF(dives.water_type, ''),
+            NULLIF(dive_sites.water_type, '')
+          ) AS water_type
+          FROM dives
+          LEFT JOIN dive_sites ON dive_sites.id = dives.site_id
+          WHERE 1 = 1 $diverFilter ${df.clause}
+        )
+        WHERE water_type IS NOT NULL
         GROUP BY water_type
         ORDER BY count DESC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -1228,6 +1247,13 @@ class StatisticsRepository {
 
   /// Get entry method distribution.
   ///
+  /// Buckets each dive by its *effective* entry method: the value on the dive
+  /// when it has one, otherwise the one on its site (issue #1427). The site's
+  /// entry method is snapped onto a dive when the site is assigned (#1104),
+  /// so dives logged or imported before that, and dives whose site gained an
+  /// entry method later, would otherwise sit outside the chart. Mirrors
+  /// `Dive.effectiveEntryMethod`, and the water type distribution above.
+  ///
   /// Emits the stored EntryMethod enum name as a stable key; the
   /// presentation layer translates it (see `entryMethodDistributionLabel`).
   Future<List<DistributionSegment>> getEntryMethodDistribution({
@@ -1235,16 +1261,28 @@ class StatisticsRepository {
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
-      final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
+      // Qualified: dive_sites carries a diver_id of its own, so the bare
+      // column name is ambiguous once the site is joined in.
+      final diverFilter = diverId != null ? 'AND dives.diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
+      // The fallback is resolved in a subquery so the outer GROUP BY names one
+      // unambiguous column rather than repeating the COALESCE.
       final results = await _db.customSelect('''
         SELECT
           entry_method,
           COUNT(*) AS count
-        FROM dives
-        WHERE entry_method IS NOT NULL AND entry_method != '' $diverFilter ${df.clause}
+        FROM (
+          SELECT COALESCE(
+            NULLIF(dives.entry_method, ''),
+            NULLIF(dive_sites.entry_method, '')
+          ) AS entry_method
+          FROM dives
+          LEFT JOIN dive_sites ON dive_sites.id = dives.site_id
+          WHERE 1 = 1 $diverFilter ${df.clause}
+        )
+        WHERE entry_method IS NOT NULL
         GROUP BY entry_method
         ORDER BY count DESC
         ''', variables: params.map((p) => Variable(p)).toList()).get();
@@ -1282,6 +1320,12 @@ class StatisticsRepository {
   /// for values the diver never actually set. Rows with no entry method carry
   /// no information and are excluded; a null exit method is meaningful and is
   /// carried through as null.
+  ///
+  /// Deliberately reads the stored `entry_method`, NOT the site fallback the
+  /// entry method distribution applies (issue #1427). This query is what the
+  /// site suggests its own entry method from, so folding that site value back
+  /// in would let a single dive that recorded nothing echo the site's answer
+  /// back as evidence for it.
   Future<List<EntryExitPairCount>> getEntryExitMethodPairsForSite({
     required String siteId,
     String? diverId,
