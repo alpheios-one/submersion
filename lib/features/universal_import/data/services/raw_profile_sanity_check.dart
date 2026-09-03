@@ -33,7 +33,7 @@ class RawProfileSanityCheck {
   /// Computers occasionally log a slightly negative depth at the surface from
   /// pressure-sensor drift. Anything past this is a sign bit read out of the
   /// wrong field.
-  static const _minPlausibleDepthMeters = -3.0;
+  static const minPlausibleDepthMeters = -3.0;
 
   /// How far the parsed values may diverge from what the source app recorded
   /// for the same dive before the parse is rejected.
@@ -79,7 +79,7 @@ class RawProfileSanityCheck {
       if (s.timeSeconds < 0 || s.timeSeconds < previousTime) return false;
       previousTime = s.timeSeconds;
       if (!s.depthMeters.isFinite) return false;
-      if (s.depthMeters < _minPlausibleDepthMeters) return false;
+      if (s.depthMeters < minPlausibleDepthMeters) return false;
       if (s.depthMeters > deepest) deepest = s.depthMeters;
     }
 

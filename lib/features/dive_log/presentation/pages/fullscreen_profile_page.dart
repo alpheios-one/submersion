@@ -313,13 +313,23 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
               primarySource;
     // Attribution (activeComputerId) and the drawn points come from the same
     // provider result so they can never disagree; the direct lookup only
-    // serves single-source dives, where the provider yields null.
+    // serves the dives where the provider yields null (single-source, and the
+    // sequential halves of a Combine).
     final resolvedActive = ref.watch(
       activeSourceProfileProvider(widget.diveId),
     );
     final activeProfile =
         resolvedActive ??
         (activeSource == null ? null : sourceProfiles[activeSource.id]);
+    // Same rule as the detail page: sources that never overlap in time are
+    // consecutive halves of one dive, not alternative recordings of it, so
+    // they are drawn as one series rather than one-at-a-time (#1451). Drives
+    // the source switcher below; the drawn series comes from the provider,
+    // which applies this same rule internally.
+    final isMultiSource = usesPerSourceRendering(
+      dataSources,
+      sourceProfiles.values,
+    );
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -569,7 +579,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                 ),
                 // Source switching and overlay comparison, mirroring the
                 // detail page (management actions stay on the detail page).
-                if (dataSources.length >= 2)
+                if (isMultiSource)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: SourceBar(

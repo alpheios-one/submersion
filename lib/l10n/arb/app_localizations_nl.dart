@@ -9639,12 +9639,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get divers_edit_updateButton => 'Duiker bijwerken';
 
   @override
-  String get divers_list_activeBadge => 'Actief';
-
-  @override
-  String get divers_list_addDiverButton => 'Duiker toevoegen';
-
-  @override
   String get divers_list_addDiverTooltip => 'Nieuw duikersprofiel toevoegen';
 
   @override
@@ -9683,28 +9677,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'Duiker $name bekijken';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Actieve duiker';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Andere duikers';
-
-  @override
-  String get divers_summary_overviewTitle => 'Overzicht';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Snelle acties';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Selecteer een duiker uit de lijst om details te bekijken';
-
-  @override
-  String get divers_summary_title => 'Duikersprofielen';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Totaal duikers';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -16534,25 +16506,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_import_cancelling => 'Bezig met annuleren...';
 
   @override
-  String get settings_import_dialog_title => 'Gegevens importeren';
-
-  @override
-  String get settings_import_doNotClose => 'Sluit de app niet';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current van $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Buddy\'s importeren...';
 
   @override
   String get settings_import_phase_certifications =>
       'Certificeringen importeren...';
-
-  @override
-  String get settings_import_phase_complete => 'Afronden...';
 
   @override
   String get settings_import_phase_diveCenters => 'Duikcentra importeren...';
@@ -16571,9 +16529,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Uitrustingssets importeren...';
 
   @override
-  String get settings_import_phase_parsing => 'Bestand verwerken...';
-
-  @override
   String get settings_import_phase_preparing => 'Voorbereiden...';
 
   @override
@@ -16590,20 +16545,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current van $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Importvoortgang: $percent procent';
-  }
 
   @override
   String get settings_language_appBar_title => 'Taal';
@@ -18972,6 +18913,29 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voor het importeren van foto\'s is een map op de schijf van dit apparaat nodig. Voer deze import uit op een computer om ze mee te nemen. Duiken en duikstekken worden normaal geïmporteerd.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto\'s in het archief',
+      one: '1 foto in het archief',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Kies waar de foto\'s worden opgeslagen...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'De foto\'s worden in deze map opgeslagen en van daaruit gekoppeld. Submersion bewaart nooit een eigen kopie.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'In die map kan niet worden geschreven. Kies een andere.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20847,11 +20811,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Selectie wisselen voor $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count gemarkeerd als $action';
   }
@@ -21572,29 +21531,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'Pincode vereist';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Verbinden';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Voer de 4 tot 6 cijferige pincode in die op je apparaat wordt getoond';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Kijk op het scherm van je duikcomputer voor de pincode.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Kijk op het scherm van je $deviceName voor de pincode.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'Pincode-invoer, 4 tot 6 cijfers';
-
-  @override
-  String get diveComputer_pinEntry_title => 'Pincode invoeren';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -33579,14 +33515,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Videominiatuur. Tik om volledig scherm te bekijken';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
 
   @override
   String get trips_photos_thumbnail_photo =>

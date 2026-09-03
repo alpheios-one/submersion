@@ -21,9 +21,13 @@ final overlaySourcesProvider = StateProvider.autoDispose
 /// the active source's own profile, or the primary's when nothing is
 /// selected (or the selection went stale after a split).
 ///
-/// Null in exactly two cases, both of which send callers to `dive.profile`:
+/// Null in exactly three cases, all of which send callers to `dive.profile`:
 /// - a single-source dive, where `dive.profile` IS that source's series;
-/// - before the data sources have loaded at all, where "multi-source" cannot
+/// - sources that never overlap in time, which are the consecutive halves of
+///   one dive a Combine stitched together rather than rival recordings of it,
+///   so the whole merged series is the dive and drawing one source would hide
+///   the rest (#1451);
+/// - before the data sources have loaded at all, where the arrangement cannot
 ///   yet be known and `dive.profile` may still be the merged union for a
 ///   frame.
 ///
@@ -56,10 +60,17 @@ final activeSourceProfileProvider = Provider.autoDispose
       final dataSources =
           ref.watch(diveDataSourcesProvider(diveId)).value ??
           const <DiveDataSource>[];
-      if (dataSources.length < 2) return null;
       final sourceProfiles =
           ref.watch(sourceProfilesProvider(diveId)).value ??
           const <String, SourceProfile>{};
+      // usesPerSourceRendering, not a source count: it is the rule every
+      // profile surface shares, and it excludes the sequential halves of a
+      // Combine (#1451). Profiles that have not loaded yet carry no spans, so
+      // this reads true on the first build and the branch below draws the
+      // resolved source's empty placeholder rather than flashing the union.
+      if (!usesPerSourceRendering(dataSources, sourceProfiles.values)) {
+        return null;
+      }
       final activeSourceId = ref.watch(activeDiveSourceProvider(diveId));
       final primary =
           dataSources.where((s) => s.isPrimary).firstOrNull ??

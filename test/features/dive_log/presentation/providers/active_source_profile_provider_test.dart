@@ -235,6 +235,62 @@ void main() {
     expect(duringReload.points, pointsA);
   });
 
+  test('sequential sources (a Combine\'s halves) resolve to null so callers '
+      'draw the whole stitched dive', () async {
+    // #1451: several sources that never overlap in time are consecutive
+    // halves of ONE dive, not alternative recordings of it. Drawing the
+    // active one hides the rest of the dive, so the whole merged series is
+    // the right answer there and this provider must stand aside. The
+    // shared rule is usesPerSourceRendering, not a source count.
+    final container = await containerWith(
+      sources: twoSources,
+      profiles: {
+        'src-a': const SourceProfile(
+          sourceId: 'src-a',
+          computerId: 'dc-a',
+          isEdited: false,
+          points: [
+            DiveProfilePoint(timestamp: 0, depth: 0.0),
+            DiveProfilePoint(timestamp: 600, depth: 20.0),
+          ],
+        ),
+        // Starts where the first half ended: disjoint, so sequential.
+        'src-b': const SourceProfile(
+          sourceId: 'src-b',
+          computerId: null,
+          isEdited: false,
+          points: [
+            DiveProfilePoint(timestamp: 600, depth: 20.0),
+            DiveProfilePoint(timestamp: 1200, depth: 0.0),
+          ],
+        ),
+      },
+    );
+
+    expect(
+      container.read(activeSourceProfileProvider(diveId)),
+      isNull,
+      reason:
+          'a non-null result here would draw one half and hide the other '
+          '(#1451)',
+    );
+  });
+
+  test('overlapping sources still resolve to the active source', () async {
+    // The #543 case, kept explicit next to the sequential one: two computers
+    // recording the SAME stretch of dive disagree sample by sample, so the
+    // union sawtooths and one source must win.
+    final container = await containerWith(
+      sources: twoSources,
+      profiles: twoProfiles,
+    );
+
+    expect(
+      container.read(activeSourceProfileProvider(diveId))?.points,
+      pointsA,
+    );
+  });
+
   test('resolves to null while the data sources are still loading', () async {
     final container = await containerWith(
       sources: twoSources,

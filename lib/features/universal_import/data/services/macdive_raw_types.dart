@@ -12,8 +12,10 @@ class MacDiveRawDive {
   /// since 2001-01-01 UTC. The reader converts to a Dart UTC [DateTime].
   final DateTime? rawDate;
 
-  /// NSTimeZone bplist from `ZTIMEZONE`. Decoded by [BPlistDecoder] when
-  /// the mapper needs the zone name to reconstruct local time.
+  /// NSTimeZone bplist from `ZTIMEZONE`. Carried but not yet decoded: the
+  /// mapper emits `rawDate` as absolute UTC, matching the M2 XML parser.
+  /// `BPlistDecoder` in `lib/core/utils/bplist/` can read this payload and is
+  /// waiting on the cross-parser move to the wall-time-as-UTC convention.
   final Uint8List? timezoneBplist;
 
   /// Max depth in raw MacDive units (depends on `ZMETADATA.SystemOfUnits`).
@@ -407,6 +409,53 @@ class MacDiveRawDiver {
   }
 }
 
+/// A row from MacDive's `ZDIVEIMAGE` table: a photo reference attached to
+/// a dive. The image bytes live on the filesystem; this row carries only
+/// the reference.
+class MacDiveRawDiveImage {
+  final int pk;
+
+  /// MacDive's own id for the photo (`ZUUID`), or null when it recorded
+  /// none. Nothing keys off it today; it is carried because a photo the
+  /// source names is easier to trace through a support conversation than
+  /// one identified only by a row number.
+  final String? uuid;
+
+  /// The dive this photo hangs off (`ZRELATIONSHIPDIVE`), or null when the
+  /// row names none. Null is kept rather than folded into a row number so
+  /// an unattached photo is dropped on its own terms instead of matching
+  /// whichever dive happens to hold that key.
+  final int? diveFk;
+
+  /// MacDive's display order within the dive (`ZPOSITION`), or null when
+  /// it recorded none, which is the overwhelmingly common case: 259 of the
+  /// 261 rows in the reference library are null. Null means "no recorded
+  /// place", which is not the same as place zero.
+  final int? position;
+  final String? caption;
+
+  /// MacDive's current location for the photo (`ZPATH`). In practice a
+  /// bare filename (a UUID plus extension) inside MacDive's own image
+  /// folder, because MacDive copies every photo it is given into its
+  /// library; an absolute path when the row predates that behaviour.
+  final String? path;
+
+  /// Where the photo lived when MacDive first imported it
+  /// (`ZORIGINALPATH`). Absolute on the machine that ran MacDive, and
+  /// populated for only a minority of rows.
+  final String? originalPath;
+
+  const MacDiveRawDiveImage({
+    required this.pk,
+    required this.diveFk,
+    this.uuid,
+    this.position,
+    this.caption,
+    this.path,
+    this.originalPath,
+  });
+}
+
 /// Top-level container returned by [MacDiveDbReader.readAll]. Holds all
 /// tables keyed for lookup plus the junction tables as dive_pk → list
 /// of foreign PKs. The mapper walks this graph to build ImportPayload.
@@ -423,6 +472,7 @@ class MacDiveRawLogbook {
   final List<MacDiveRawCertification> certifications;
   final List<MacDiveRawServiceRecord> serviceRecords;
   final List<MacDiveRawEvent> events;
+  final List<MacDiveRawDiveImage> diveImages;
   final Map<int, List<int>> diveToBuddyPks;
   final Map<int, List<int>> diveToTagPks;
   final Map<int, List<int>> diveToGearPks;
@@ -458,5 +508,6 @@ class MacDiveRawLogbook {
     this.diveToDiveTypePks = const {},
     this.diveLogsByPk = const {},
     this.diversByPk = const {},
+    this.diveImages = const [],
   });
 }

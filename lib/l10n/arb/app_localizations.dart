@@ -16292,18 +16292,6 @@ abstract class AppLocalizations {
   /// **'Update Diver'**
   String get divers_edit_updateButton;
 
-  /// No description provided for @divers_list_activeBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Active'**
-  String get divers_list_activeBadge;
-
-  /// No description provided for @divers_list_addDiverButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Diver'**
-  String get divers_list_addDiverButton;
-
   /// No description provided for @divers_list_addDiverTooltip.
   ///
   /// In en, this message translates to:
@@ -16369,48 +16357,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View diver {name}'**
   String divers_list_viewDiverLabel(Object name);
-
-  /// No description provided for @divers_summary_activeDiverTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Active Diver'**
-  String get divers_summary_activeDiverTitle;
-
-  /// No description provided for @divers_summary_otherDiversTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Other Divers'**
-  String get divers_summary_otherDiversTitle;
-
-  /// No description provided for @divers_summary_overviewTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Overview'**
-  String get divers_summary_overviewTitle;
-
-  /// No description provided for @divers_summary_quickActionsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Actions'**
-  String get divers_summary_quickActionsTitle;
-
-  /// No description provided for @divers_summary_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a diver from the list to view details'**
-  String get divers_summary_subtitle;
-
-  /// No description provided for @divers_summary_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Diver Profiles'**
-  String get divers_summary_title;
-
-  /// No description provided for @divers_summary_totalDiversLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Divers'**
-  String get divers_summary_totalDiversLabel;
 
   /// No description provided for @divers_detail_deleteDialogConfirmHint.
   ///
@@ -27581,24 +27527,6 @@ abstract class AppLocalizations {
   /// **'Cancelling...'**
   String get settings_import_cancelling;
 
-  /// No description provided for @settings_import_dialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Importing Data'**
-  String get settings_import_dialog_title;
-
-  /// No description provided for @settings_import_doNotClose.
-  ///
-  /// In en, this message translates to:
-  /// **'Please do not close the app'**
-  String get settings_import_doNotClose;
-
-  /// No description provided for @settings_import_itemCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{current} of {total}'**
-  String settings_import_itemCount(Object current, Object total);
-
   /// No description provided for @settings_import_phase_buddies.
   ///
   /// In en, this message translates to:
@@ -27610,12 +27538,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing certifications...'**
   String get settings_import_phase_certifications;
-
-  /// No description provided for @settings_import_phase_complete.
-  ///
-  /// In en, this message translates to:
-  /// **'Finalizing...'**
-  String get settings_import_phase_complete;
 
   /// No description provided for @settings_import_phase_diveCenters.
   ///
@@ -27646,12 +27568,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing equipment sets...'**
   String get settings_import_phase_equipmentSets;
-
-  /// No description provided for @settings_import_phase_parsing.
-  ///
-  /// In en, this message translates to:
-  /// **'Parsing file...'**
-  String get settings_import_phase_parsing;
 
   /// No description provided for @settings_import_phase_preparing.
   ///
@@ -27688,22 +27604,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applying tags...'**
   String get settings_import_phase_applyingTags;
-
-  /// No description provided for @settings_import_progressLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{phase}, {current} of {total}'**
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  );
-
-  /// No description provided for @settings_import_progressPercent.
-  ///
-  /// In en, this message translates to:
-  /// **'Import progress: {percent} percent'**
-  String settings_import_progressPercent(Object percent);
 
   /// No description provided for @settings_language_appBar_title.
   ///
@@ -31610,6 +31510,30 @@ abstract class AppLocalizations {
   /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
   String get importWizard_photos_mobileUnsupported;
 
+  /// Count of photos bundled inside an imported ZIP archive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}'**
+  String importWizard_photos_bundledCount(int count);
+
+  /// Button that opens a folder picker for where bundled archive photos are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where to save photos...'**
+  String get importWizard_photos_chooseDestination;
+
+  /// Explains that bundled photos are written to the chosen folder and linked, never stored inside the app
+  ///
+  /// In en, this message translates to:
+  /// **'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.'**
+  String get importWizard_photos_destinationNote;
+
+  /// Snackbar shown when the folder chosen for bundled archive photos cannot be written to
+  ///
+  /// In en, this message translates to:
+  /// **'That folder can\'t be written to. Choose another one.'**
+  String get importWizard_photos_destinationUnwritable;
+
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
   /// In en, this message translates to:
@@ -34672,12 +34596,6 @@ abstract class AppLocalizations {
   /// **'Source uncertain: {description}'**
   String universalImport_semantics_sourceUncertain(Object description);
 
-  /// Accessibility label for toggling selection of an import entity
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle selection for {name}'**
-  String universalImport_semantics_toggleSelection(Object name);
-
   /// Snackbar shown after a bulk action resolves multiple pending duplicates, confirming the count and action
   ///
   /// In en, this message translates to:
@@ -35868,42 +35786,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PIN Code Required'**
   String get diveComputer_pinCode_title;
-
-  /// No description provided for @diveComputer_pinEntry_connectButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get diveComputer_pinEntry_connectButton;
-
-  /// No description provided for @diveComputer_pinEntry_helperText.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the 4-6 digit PIN shown on your device'**
-  String get diveComputer_pinEntry_helperText;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsGeneric.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your dive computer display for the PIN code.'**
-  String get diveComputer_pinEntry_instructionsGeneric;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsWithDevice.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your {deviceName} display for the PIN code.'**
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName);
-
-  /// No description provided for @diveComputer_pinEntry_semanticLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'PIN code entry, 4 to 6 digits'**
-  String get diveComputer_pinEntry_semanticLabel;
-
-  /// No description provided for @diveComputer_pinEntry_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter PIN Code'**
-  String get diveComputer_pinEntry_title;
 
   /// No description provided for @diveComputer_scan_bluetoothSemanticLabel.
   ///
@@ -55804,18 +55686,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Video thumbnail. Tap to view full screen'**
   String get trips_gallery_thumbnail_video;
-
-  /// No description provided for @trips_gallery_thumbnail_photoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_photoMissing;
-
-  /// No description provided for @trips_gallery_thumbnail_videoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Video thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_videoMissing;
 
   /// No description provided for @trips_photos_thumbnail_photo.
   ///

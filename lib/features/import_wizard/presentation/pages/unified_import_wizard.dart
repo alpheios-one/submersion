@@ -3,27 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
-import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
-import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
-import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
-import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
-import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
-import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/services/import_provider_invalidator.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/adapters/import_source_adapter.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/domain/services/step_skip_calculator.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
-import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_progress_step.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_summary_step.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/review_step.dart';
@@ -282,7 +273,7 @@ class _UnifiedImportWizardBodyState
     final result = ref.read(importWizardNotifierProvider).importResult;
     if (result == null) return;
 
-    // Always refresh the computers list — ensureComputer() (or
+    // Always refresh the computers list -- ensureComputer() (or
     // SuuntoCloudAdapter's/GarminCloudAdapter's per-dive computer
     // resolution) may have created a new record even when all dives were
     // skipped.
@@ -292,54 +283,13 @@ class _UnifiedImportWizardBodyState
       ref.invalidate(allDiveComputersProvider);
     }
 
-    for (final type in result.importedCounts.keys) {
-      if ((result.importedCounts[type] ?? 0) <= 0) continue;
-      switch (type) {
-        case ImportEntityType.dives:
-          ref.invalidate(diveListNotifierProvider);
-          ref.invalidate(paginatedDiveListProvider);
-          ref.invalidate(divesProvider);
-          ref.invalidate(diveStatisticsProvider);
-          ref.invalidate(diveRecordsProvider);
-          ref.invalidate(allDiveComputersProvider);
-          ref.invalidate(nextDiveNumberProvider);
-          // Dives link to sites, buddies, trips, etc. — their counts/lists
-          // may change even when those entities weren't imported.
-          ref.invalidate(sitesWithCountsProvider);
-          ref.invalidate(siteListNotifierProvider);
-        case ImportEntityType.sites:
-          ref.invalidate(sitesProvider);
-          ref.invalidate(sitesWithCountsProvider);
-          ref.invalidate(siteListNotifierProvider);
-        case ImportEntityType.buddies:
-          ref.invalidate(allBuddiesProvider);
-        case ImportEntityType.equipment:
-          ref.invalidate(allEquipmentProvider);
-          ref.invalidate(activeEquipmentProvider);
-          ref.invalidate(retiredEquipmentProvider);
-          ref.invalidate(serviceDueEquipmentProvider);
-          ref.invalidate(equipmentListNotifierProvider);
-        case ImportEntityType.equipmentSets:
-          ref.invalidate(equipmentSetsProvider);
-        case ImportEntityType.trips:
-          ref.invalidate(allTripsProvider);
-        case ImportEntityType.diveCenters:
-          ref.invalidate(allDiveCentersProvider);
-        case ImportEntityType.certifications:
-          ref.invalidate(allCertificationsProvider);
-        case ImportEntityType.courses:
-          ref.invalidate(allCoursesProvider);
-        case ImportEntityType.tags:
-          ref.invalidate(tagsProvider);
-        case ImportEntityType.diveTypes:
-          ref.invalidate(diveTypesProvider);
-        case ImportEntityType.media:
-          // Photos land on dives that may already be on screen.
-          ref.invalidate(mediaForDiveProvider);
-          ref.invalidate(mediaCountForDiveProvider);
-          ref.invalidate(mediaListNotifierProvider);
-      }
-    }
+    invalidateImportRelatedProviders(
+      (provider) => ref.invalidate(provider),
+      result.importedCounts.entries
+          .where((e) => e.value > 0)
+          .map((e) => e.key)
+          .toSet(),
+    );
   }
 
   void _close() {

@@ -8,6 +8,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/data/services/data_source_strand.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
@@ -239,6 +240,47 @@ class DiveMergeService {
       // series row's sourceId closes that gap (#1149): each carried row keeps
       // its own id here and the copied samples point at it, so the strands
       // stay separable without a lossy write.
+
+      // Each carried row's slot among its OWN segment's STRANDS (#1451).
+      // Read-side canonicalization collapses rows sharing a slot into one
+      // display source, so the two halves of one physical dive stop being
+      // offered as switchable alternatives -- the state that made the chart
+      // draw only the active half. Strands are ordered like every canonical
+      // read (primary first, then oldest), so a consolidated segment's
+      // primary computer always takes slot 0 and its folded-in computer slot
+      // 1, and the two segments' strands line up rather than crossing over.
+      //
+      // Numbered per strand rather than per row, because a segment can arrive
+      // already collapsed: combining A+B and then combining that result with
+      // C hands this pass a segment whose two rows deliberately share a slot.
+      // Indexing rows would split them to 0 and 1 while C took 0 again, so
+      // the dive would show two chips whose spans interleave -- #1451 again,
+      // one combine later, with the middle segment hidden behind a chip.
+      //
+      // Overwrites whatever slot a row already carried: the incoming slot
+      // names a strand within the OLD dive, and only its grouping survives.
+      final rowsBySegment = <String, List<DiveDataSourcesData>>{};
+      for (final row in snapshot.dataSourceRows) {
+        (rowsBySegment[row.diveId] ??= <DiveDataSourcesData>[]).add(row);
+      }
+      final mergeSlotByRowId = <String, int>{};
+      for (final rows in rowsBySegment.values) {
+        rows.sort((a, b) {
+          if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
+          final byCreated = a.createdAt.compareTo(b.createdAt);
+          return byCreated != 0 ? byCreated : a.id.compareTo(b.id);
+        });
+        final slotByStrand = <String, int>{};
+        for (final row in rows) {
+          final strand = dataSourceStrandKey(
+            rowId: row.id,
+            computerId: row.computerId,
+            mergeSourceSlot: row.mergeSourceSlot,
+          );
+          mergeSlotByRowId[row.id] = slotByStrand[strand] ??=
+              slotByStrand.length;
+        }
+      }
       for (final row in snapshot.dataSourceRows) {
         await _db
             .into(_db.diveDataSources)
@@ -249,17 +291,19 @@ class DiveMergeService {
                     id: Value(mergedSourceIds[row.id]!),
                     diveId: Value(mergedId),
                     isPrimary: const Value(false),
+                    mergeSourceSlot: Value(mergeSlotByRowId[row.id]),
                   ),
             );
       }
 
+      // Reuses the grouping above, so the fallback owner is picked from a
+      // segment already in canonical order: with no primary row it lands on
+      // the oldest rather than on whatever order the snapshot query returned.
       String? mergedSourceIdFor(String diveId, String? sourceId) {
         final mapped = mergedSourceIds[sourceId];
         if (mapped != null) return mapped;
-        final segment = snapshot.dataSourceRows
-            .where((r) => r.diveId == diveId)
-            .toList();
-        if (segment.isEmpty) return null;
+        final segment = rowsBySegment[diveId];
+        if (segment == null || segment.isEmpty) return null;
         final owner = segment.firstWhere(
           (r) => r.isPrimary,
           orElse: () => segment.first,

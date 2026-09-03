@@ -44,6 +44,8 @@ import 'package:submersion/features/media/presentation/providers/photo_picker_pr
 import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/import_notice_grouper.dart';
+import 'package:submersion/features/import_wizard/data/adapters/import_photo_linker.dart';
+import 'package:submersion/features/import_wizard/data/adapters/resolved_photo_attachment.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
@@ -102,26 +104,48 @@ final _universalAdapterMappingAutoAdvanceProvider = Provider<bool>((ref) {
   return false;
 });
 
-/// True when the parsed payload references no photos at all.
+/// Whether an archive actually bundled photos.
+///
+/// Keyed by source file basename, so a key alone does not mean a photo:
+/// asking the map for keys rather than contents would put the Photos step
+/// in front of the user, and demand a destination folder, for nothing.
+bool _hasBundledPhotos(Map<String, List<String>> byBaseName) =>
+    byBaseName.values.any((paths) => paths.isNotEmpty);
+
+/// True when the import carries no photos at all: the parsed payload
+/// references none and no imported archive bundled any.
 ///
 /// Used as the Photos step's auto-advance condition, so the step is invisible
-/// for every import that has nothing to resolve.
+/// for every import that has nothing to ask about.
 final universalAdapterNoPhotosProvider = Provider<bool>((ref) {
   final payload = ref.watch(
     universalImportNotifierProvider.select((s) => s.payload),
   );
-  return (payload?.entitiesOf(ui.ImportEntityType.media) ?? const []).isEmpty;
+  final bundled = ref.watch(
+    universalImportNotifierProvider.select((s) => s.photoPathsByBaseName),
+  );
+  final referenced = payload?.entitiesOf(ui.ImportEntityType.media) ?? const [];
+  return referenced.isEmpty && !_hasBundledPhotos(bundled);
 });
 
 /// True when the Photos step has nothing left to ask.
 ///
 /// Deliberately looser than [universalAdapterNoPhotosProvider]: a user who
-/// picked a folder or chose to skip may advance, but the step is never
-/// auto-advanced past a decision they have not made.
+/// answered each question the import poses (a folder to resolve referenced
+/// photos against, a folder to save bundled photos into) or chose to skip
+/// may advance, but the step is never auto-advanced past a decision they
+/// have not made.
 final universalAdapterPhotosReadyProvider = Provider<bool>((ref) {
   if (ref.watch(universalAdapterNoPhotosProvider)) return true;
   final state = ref.watch(universalImportNotifierProvider);
-  return state.photosSkipped || state.photoResolution != null;
+  if (state.photosSkipped) return true;
+  final referenced =
+      state.payload?.entitiesOf(ui.ImportEntityType.media) ?? const [];
+  final referencedReady = referenced.isEmpty || state.photoResolution != null;
+  final bundledReady =
+      !_hasBundledPhotos(state.photoPathsByBaseName) ||
+      state.bundledPhotoFolderPath != null;
+  return referencedReady && bundledReady;
 });
 
 /// Import source adapter for universal file imports (CSV, Subsurface XML,
@@ -623,52 +647,91 @@ class UniversalAdapter implements ImportSourceAdapter {
     }
 
     // Attach ZIP-bundled photos to the dives that survived import (skipping
-    // any that were folded away by consolidation).
-    final attachedPhotos = await attachImportedPhotos(
-      photoPathsByBaseName: notifierState.photoPathsByBaseName,
+    // any that were folded away by consolidation). The extracted copies live
+    // in a temp folder the wizard deletes, so each is first written into the
+    // folder the user chose in the Photos step and then linked from there;
+    // no destination means the user skipped them. Nothing is ever filed
+    // inside the app's own storage.
+    // Both attach paths aim at the same dives: whichever dive each source
+    // index actually ended up on, including the existing dive behind a
+    // skipped or consolidated duplicate.
+    final photoDiveIds = photoTargetDiveIds(
       diveIdByIndex: result.diveIdByIndex,
-      removedDiveIds: removedDiveIds,
-      dives: payload.entitiesOf(ui.ImportEntityType.dives),
-      files: notifierState.files,
-      singleFileName: notifierState.fileName,
-      attach: (file, diveId, takenAt) async {
-        await _ref
-            .read(mediaImportServiceProvider)
-            .importLocalFileForDive(
-              sourceFile: file,
-              diveId: diveId,
-              takenAt: takenAt,
-            );
-      },
+      matchResults:
+          bundle.groups[wizard.ImportEntityType.dives]?.matchResults ??
+          const {},
+      duplicateActions: diveActions,
     );
+
+    // A target that is not the dive this import created is an existing
+    // dive behind a skipped or consolidated duplicate. Its own start is
+    // what a photo with no capture time of its own should fall back to,
+    // and it can sit up to the duplicate matcher's window away from the
+    // start the discarded duplicate recorded.
+    final diveStartById = <String, DateTime>{};
+    for (final entry in photoDiveIds.entries) {
+      final targetId = entry.value;
+      if (result.diveIdByIndex[entry.key] == targetId) continue;
+      try {
+        final existing = await repos.diveRepository.getDiveById(targetId);
+        if (existing != null) diveStartById[targetId] = existing.dateTime;
+      } catch (e) {
+        // A lookup failure only costs the photo a better fallback.
+        _log.warning('Could not read dive $targetId for a photo time: $e');
+      }
+    }
+
+    final bundledFolder = notifierState.bundledPhotoFolderPath;
+    var attachedPhotos = 0;
+    if (bundledFolder != null &&
+        _hasBundledPhotos(notifierState.photoPathsByBaseName)) {
+      final linker = ImportPhotoLinker(_ref.read(localFileLinkServiceProvider));
+      final attached = await attachImportedPhotos(
+        photoPathsByBaseName: notifierState.photoPathsByBaseName,
+        diveIdByIndex: photoDiveIds,
+        removedDiveIds: removedDiveIds,
+        dives: payload.entitiesOf(ui.ImportEntityType.dives),
+        diveStartById: diveStartById,
+        files: notifierState.files,
+        singleFileName: notifierState.fileName,
+        attach: (file, diveId, diveStart) => linker.linkBundled(
+          file: file,
+          diveId: diveId,
+          diveStart: diveStart,
+          destinationDir: bundledFolder,
+        ),
+      );
+      attachedPhotos = attached - linker.alreadyLinked;
+    }
 
     // Attach photos the logbook referenced by absolute path, resolved against
     // the folder picked in the Photos step. This and the ZIP path above cover
     // different sources and cannot double-count: a ZIP sidecar and a
     // <picture> reference never describe the same file.
+    //
+    // These are linked in place, never copied: the user keeps the photos
+    // wherever they already are, and the row stores the same handle the
+    // Files tab would. A dive the user skipped as a duplicate still gets
+    // its photos, on the existing dive it matched, so re-importing a
+    // logbook is the way to add its photos to dives imported earlier.
     final resolution = notifierState.photoResolution;
-    final resolvedPhotos = resolution == null
-        ? 0
-        : await attachResolvedPhotos(
-            media: payload.entitiesOf(ui.ImportEntityType.media),
-            resolvedPathByIndex: resolution.resolvedPathByIndex,
-            diveIdByIndex: result.diveIdByIndex,
-            removedDiveIds: removedDiveIds,
-            dives: payload.entitiesOf(ui.ImportEntityType.dives),
-            selectedIndices: selections[wizard.ImportEntityType.media],
-            attach: (file, diveId, takenAt, latitude, longitude) async {
-              await _ref
-                  .read(mediaImportServiceProvider)
-                  .importLocalFileForDive(
-                    sourceFile: file,
-                    diveId: diveId,
-                    takenAt: takenAt,
-                    latitude: latitude,
-                    longitude: longitude,
-                    subdirectory: 'imported_photos',
-                  );
-            },
-          );
+    var resolvedPhotos = 0;
+    if (resolution != null) {
+      final linker = ImportPhotoLinker(_ref.read(localFileLinkServiceProvider));
+      final attached = await attachResolvedPhotos(
+        media: payload.entitiesOf(ui.ImportEntityType.media),
+        resolvedPathByIndex: resolution.resolvedPathByIndex,
+        diveIdByIndex: photoDiveIds,
+        removedDiveIds: removedDiveIds,
+        dives: payload.entitiesOf(ui.ImportEntityType.dives),
+        diveStartById: diveStartById,
+        selectedIndices: selections[wizard.ImportEntityType.media],
+        attach: linker.linkResolved,
+      );
+      // Already-linked photos are successful no-ops to the attach loop;
+      // keep them out of the summary's attached count.
+      resolvedPhotos = attached - linker.alreadyLinked;
+    }
 
     // `importer.import` counted folded/removed dives as imported; subtract only
     // the dives that were ACTUALLY removed (folded, or compensating-deleted).
@@ -954,13 +1017,18 @@ class UniversalAdapter implements ImportSourceAdapter {
   // Helpers — photo attachment
   // ---------------------------------------------------------------------------
 
-  /// Attaches ZIP-bundled photos to newly created dives.
+  /// Attaches ZIP-bundled photos to the dives their source file produced.
+  ///
+  /// [diveIdByIndex] is a target map, not strictly a map of newly created
+  /// dives: a duplicate the user skipped or consolidated resolves to the
+  /// existing dive it matched (see [photoTargetDiveIds]), so a bundled
+  /// photo can land on a dive that was already in the log.
   ///
   /// Photos are keyed by their source file's basename; a file's photos are
-  /// attached only when that file produced exactly one imported dive (the
-  /// DiveCloud shape) so a multi-dive file never duplicates photos across
-  /// its dives. Attach failures are swallowed: the dive import already
-  /// succeeded and a failed photo copy must not fail the wizard.
+  /// attached only when that file produced exactly one dive (the DiveCloud
+  /// shape) so a multi-dive file never duplicates photos across its dives.
+  /// Attach failures are logged and skipped, never thrown: the dive import
+  /// already succeeded and a failed photo must not fail the wizard.
   ///
   /// Returns the number of photos attached.
   static Future<int> attachImportedPhotos({
@@ -968,9 +1036,14 @@ class UniversalAdapter implements ImportSourceAdapter {
     required Map<int, String> diveIdByIndex,
     required Set<String> removedDiveIds,
     required List<Map<String, dynamic>> dives,
+    Map<String, DateTime> diveStartById = const {},
     required List<PickedImportFile> files,
     required String? singleFileName,
-    required Future<void> Function(File file, String diveId, DateTime? takenAt)
+    required Future<void> Function(
+      File file,
+      String diveId,
+      DateTime? diveStart,
+    )
     attach,
   }) async {
     if (photoPathsByBaseName.isEmpty || diveIdByIndex.isEmpty) return 0;
@@ -1007,13 +1080,21 @@ class UniversalAdapter implements ImportSourceAdapter {
       if (photos == null || entry.value.length != 1) continue;
       final diveIndex = entry.value.single.key;
       final diveId = entry.value.single.value;
-      final takenAt = dives[diveIndex]['dateTime'] as DateTime?;
+      // The dive's own start, which is a fallback for the photo's capture
+      // time and not a capture time itself: an archive carries no offset.
+      // A photo routed to an existing dive takes that dive's start, not the
+      // start recorded by the duplicate the user chose not to keep.
+      final diveStart =
+          diveStartById[diveId] ?? dives[diveIndex]['dateTime'] as DateTime?;
       for (final photoPath in photos) {
         try {
-          await attach(File(photoPath), diveId, takenAt);
+          await attach(File(photoPath), diveId, diveStart);
           attachedCount++;
-        } catch (_) {
-          // Best-effort: see doc comment.
+        } catch (e) {
+          // Best-effort: see doc comment. Logged, because this path now
+          // writes into a folder the user chose, and a photo that never
+          // arrived there should be diagnosable.
+          _log.warning('Failed to attach bundled photo $photoPath: $e');
         }
       }
     }
@@ -1022,6 +1103,43 @@ class UniversalAdapter implements ImportSourceAdapter {
 
   /// Attaches resolved photos to the dives that survived import.
   ///
+  static String? _captionOf(Map<String, dynamic> picture) {
+    final caption = (picture['caption'] as String?)?.trim();
+    return caption == null || caption.isEmpty ? null : caption;
+  }
+
+  /// The dive each payload index's photos should land on.
+  ///
+  /// Imported dives map to the id the importer created. Both duplicate
+  /// outcomes that do not leave a standalone dive behind map to the
+  /// existing dive instead, so their photos are never silently lost: a
+  /// skipped duplicate imports nothing at all, and a consolidated one is
+  /// folded into the match and then removed. The linker's path dedupe
+  /// keeps a repeat import from doubling any of them up.
+  @visibleForTesting
+  static Map<int, String> photoTargetDiveIds({
+    required Map<int, String> diveIdByIndex,
+    required Map<int, DiveMatchResult> matchResults,
+    required Map<int, DuplicateAction> duplicateActions,
+  }) {
+    final targets = Map<int, String>.of(diveIdByIndex);
+    for (final entry in matchResults.entries) {
+      final action = duplicateActions[entry.key];
+      if (action == DuplicateAction.consolidate) {
+        // The imported dive is about to be folded into the match and put
+        // in removedDiveIds, so its photos have to follow the fold.
+        targets[entry.key] = entry.value.diveId;
+      } else if (action == null || action == DuplicateAction.skip) {
+        // Skip imports no dive, so without this the photos have nowhere to
+        // land. An undecided duplicate is not reachable today (the wizard
+        // gates advancement on pending decisions), but dropping photos
+        // silently is the exact defect this exists to prevent.
+        targets.putIfAbsent(entry.key, () => entry.value.diveId);
+      }
+    }
+    return targets;
+  }
+
   /// Each payload media entry names its dive by `_diveIndex`, so unlike
   /// [attachImportedPhotos] this needs no one-dive-per-file rule: a
   /// multi-dive logbook attaches each photo to exactly the dive that
@@ -1030,7 +1148,7 @@ class UniversalAdapter implements ImportSourceAdapter {
   /// [selectedIndices] is the review step's selection for the media group;
   /// null means every resolved photo is attached.
   ///
-  /// A copy failure is counted and skipped rather than thrown: the dive
+  /// A link failure is counted and skipped rather than thrown: the dive
   /// import has already succeeded and must not be undone by a photo. Unlike
   /// [attachImportedPhotos] the failure is not silent, because the caller
   /// reports the shortfall against the resolved count.
@@ -1042,15 +1160,9 @@ class UniversalAdapter implements ImportSourceAdapter {
     required Map<int, String> diveIdByIndex,
     required Set<String> removedDiveIds,
     required List<Map<String, dynamic>> dives,
+    Map<String, DateTime> diveStartById = const {},
     Set<int>? selectedIndices,
-    required Future<void> Function(
-      File file,
-      String diveId,
-      DateTime? takenAt,
-      double? latitude,
-      double? longitude,
-    )
-    attach,
+    required Future<void> Function(ResolvedPhotoAttachment photo) attach,
   }) async {
     var attachedCount = 0;
 
@@ -1069,24 +1181,34 @@ class UniversalAdapter implements ImportSourceAdapter {
       final diveId = diveIdByIndex[diveIndex];
       if (diveId == null || removedDiveIds.contains(diveId)) continue;
 
+      // Only a source-recorded offset makes an asserted capture time; a
+      // source with none leaves takenAt null so the linker may prefer the
+      // file's own EXIF time over the dive start.
+      DateTime? diveStart;
       DateTime? takenAt;
       if (diveIndex >= 0 && diveIndex < dives.length) {
-        final start = dives[diveIndex]['dateTime'] as DateTime?;
+        // The source's own recorded start drives the offset, because the
+        // offset was recorded against it. The fallback capture time, on the
+        // other hand, describes the dive the photo actually lands on.
+        final sourceStart = dives[diveIndex]['dateTime'] as DateTime?;
+        diveStart = diveStartById[diveId] ?? sourceStart;
         final offsetSeconds = picture['offsetSeconds'];
-        takenAt = start == null
-            ? null
-            : (offsetSeconds is int
-                  ? start.add(Duration(seconds: offsetSeconds))
-                  : start);
+        if (sourceStart != null && offsetSeconds is int) {
+          takenAt = sourceStart.add(Duration(seconds: offsetSeconds));
+        }
       }
 
       try {
         await attach(
-          File(entry.value),
-          diveId,
-          takenAt,
-          asDoubleOrNull(picture['latitude']),
-          asDoubleOrNull(picture['longitude']),
+          ResolvedPhotoAttachment(
+            file: File(entry.value),
+            diveId: diveId,
+            takenAt: takenAt,
+            diveStart: diveStart,
+            latitude: asDoubleOrNull(picture['latitude']),
+            longitude: asDoubleOrNull(picture['longitude']),
+            caption: _captionOf(picture),
+          ),
         );
         attachedCount++;
       } catch (e) {

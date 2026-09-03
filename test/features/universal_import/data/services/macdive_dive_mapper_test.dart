@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,6 +11,8 @@ import 'package:submersion/features/universal_import/data/models/import_warning.
 import 'package:submersion/features/universal_import/data/services/macdive_db_reader.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_dive_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_raw_types.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_samples_decoder.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 
 import '../../../../fixtures/macdive_sqlite/build_synthetic_db.dart';
 
@@ -300,7 +303,7 @@ void main() {
       expect(tank.containsKey('workingPressureBar'), isFalse);
       // gasMix must be a `GasMix` object, not a Map — UddfEntityImporter does
       // `t['gasMix'] as GasMix?` and a Map cast would throw at runtime.
-      // MacDive stores oxygen as a fraction (0.32); GasMix.o2 is a percent.
+      // MacDive stores oxygen as a whole percent (32.0), matching GasMix.o2.
       expect(tank['gasMix'], isA<GasMix>());
       final gasMix = tank['gasMix'] as GasMix;
       expect(gasMix.o2, closeTo(32.0, 0.01));
@@ -685,43 +688,396 @@ void main() {
       );
     });
 
-    test(
-      'ZSAMPLES without ZRAWDATA warns about the unreadable format',
-      () async {
+    group('ZSAMPLES', () {
+      test('a dive with only ZSAMPLES gets its profile from them', () async {
+        // The 83 "(no computer)" dives of the reference library, and every
+        // dive from a computer MacDive did not download through
+        // libdivecomputer: no raw bytes, only MacDive's own samples.
         final payload = await MacDiveDiveMapper.toPayload(
-          MacDiveRawLogbook(
-            dives: [
-              MacDiveRawDive(
-                pk: 1,
-                uuid: 'dive-1',
-                computer: 'Oceanic Matrix Master',
-                samplesBlob: Uint8List.fromList(List.filled(64, 0x42)),
-              ),
+          _samplesLogbook(
+            computer: 'Oceanic Matrix Master',
+            samples: _zsamples([
+              (0.0, 0.0, 3000.0, 99, 0.21, 27.5, 0),
+              (10.0, 5.5, 2980.0, 60, 0.32, 26.0, 1),
+            ]),
+            unitsPreference: 'Imperial',
+          ),
+          fetchDescriptors: () async =>
+              fail('nothing to resolve without raw bytes'),
+        );
+
+        expect(payload.warnings, isEmpty);
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final profile = dive['profile'] as List;
+        expect(profile, hasLength(2));
+        final point = profile[1] as Map<String, dynamic>;
+        expect(point['timestamp'], 10);
+        expect(point['depth'], closeTo(5.5, 1e-6));
+        expect(point['temperature'], closeTo(26.0, 1e-6));
+        // Sample pressures follow the display unit like the tank columns do:
+        // 2980 psi, not 2980 bar (#912 all over again otherwise).
+        final pressures = point['allTankPressures'] as List;
+        expect(pressures, hasLength(1));
+        expect(
+          (pressures.single as Map)['pressure'],
+          closeTo(2980 * 0.0689476, 1e-3),
+        );
+        expect((pressures.single as Map)['tankIndex'], 0);
+        expect(point['ppO2'], closeTo(0.32, 1e-6));
+        // Minutes in the column, seconds in the profile point, as the XML
+        // path already does for ndl.
+        expect(point['ndl'], 60 * 60);
+        expect(point['tts'], 60);
+        expect(point.containsKey('heartRate'), isFalse);
+        expect(point.containsKey('ceiling'), isFalse);
+      });
+
+      test('fractional sample times round to the nearest second', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 22.0, 0),
+              (2.4, 1.0, 200.0, 99, 0.21, 22.0, 0),
+              (7.6, 2.0, 200.0, 99, 0.21, 22.0, 0),
+            ]),
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final stamps = (dive['profile'] as List).map(
+          (p) => (p as Map)['timestamp'],
+        );
+        expect(stamps, [0, 2, 8]);
+        // Runtime is rounded the same way, so it agrees with the last point.
+        expect(dive['runtime'], const Duration(seconds: 8));
+      });
+
+      test('zero readings are omitted rather than charted', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([(0.0, 0.0, 0.0, 99, 0.0, 22.0, 0)]),
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final point = (dive['profile'] as List).single as Map<String, dynamic>;
+        expect(point.containsKey('allTankPressures'), isFalse);
+        expect(point.containsKey('ppO2'), isFalse);
+        expect(point['temperature'], 22.0);
+      });
+
+      test('samples fill scalar gaps but never override MacDive', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 24.0, 0),
+              (600.0, 18.0, 150.0, 20, 0.6, 21.0, 0),
+              (900.0, 3.0, 120.0, 40, 0.27, 23.0, 0),
+            ]),
+            maxDepth: 18.4,
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive['maxDepth'], 18.4, reason: 'MacDive scalar wins');
+        expect(dive['waterTemp'], 21.0);
+        expect(dive['runtime'], const Duration(seconds: 900));
+      });
+
+      test('runtime is the latest stamp, not the last record', () async {
+        // The reference library holds one dive whose samples step backwards
+        // once; the decoder passes that through, so the mapper must not
+        // trust record order for the dive's length.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 24.0, 0),
+              (900.0, 3.0, 120.0, 40, 0.27, 23.0, 0),
+              (600.0, 18.0, 150.0, 20, 0.6, 21.0, 0),
+            ]),
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive['runtime'], const Duration(seconds: 900));
+        // Stored order is kept: a restarted clock after a surfacing is a
+        // second descent, and sorting would interleave the two segments.
+        final stamps = (dive['profile'] as List).map(
+          (p) => (p as Map)['timestamp'],
+        );
+        expect(stamps, [0, 900, 600]);
+      });
+
+      test('a rejected raw parse falls back to ZSAMPLES silently', () async {
+        // Shearwater dives in the reference library have both columns. A raw
+        // parse the sanity check throws out used to cost the dive its profile
+        // and earn a warning; now the samples cover it.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 24.0, 0),
+              (60.0, 12.0, 190.0, 50, 0.46, 22.0, 0),
+            ]),
+          ),
+          fetchDescriptors: _fakeDescriptors,
+          parseRaw: (v, p, m, d) async => _parsedDive(
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 600, depthMeters: 4000.0),
             ],
-            sitesByPk: const {},
-            buddiesByPk: const {},
-            tagsByPk: const {},
-            gearByPk: const {},
-            tanksByPk: const {},
-            gasesByPk: const {},
-            tankAndGases: const [],
-            crittersByPk: const {},
-            certifications: const [],
-            serviceRecords: const [],
-            events: const [],
-            diveToBuddyPks: const {},
-            diveToTagPks: const {},
-            diveToGearPks: const {},
-            diveToCritterPks: const {},
-            unitsPreference: 'Metric',
+          ),
+        );
+
+        expect(payload.warnings, isEmpty);
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final profile = dive['profile'] as List;
+        expect(profile, hasLength(2));
+        expect((profile.last as Map)['depth'], closeTo(12.0, 1e-6));
+      });
+
+      test('a successful raw parse still takes precedence', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: _zsamples([(0.0, 0.0, 200.0, 99, 0.21, 24.0, 0)]),
+          ),
+          fetchDescriptors: _fakeDescriptors,
+          parseRaw: (v, p, m, d) async => _parsedDive(
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 30, depthMeters: 7.0),
+            ],
+          ),
+        );
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive['profile'], hasLength(2));
+      });
+
+      test('without a platform channel ZSAMPLES still decode', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: _zsamples([
+              (0.0, 0.0, 200.0, 99, 0.21, 24.0, 0),
+              (60.0, 12.0, 190.0, 50, 0.46, 22.0, 0),
+            ]),
+          ),
+          fetchDescriptors: () async => throw MissingPluginException('none'),
+        );
+        expect(payload.warnings, isEmpty);
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive['profile'], hasLength(2));
+      });
+
+      test('an empty sample array is not a failure', () async {
+        // MacDive stores a header-only blob for a dive with no samples.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(computer: 'Manual', samples: _zsamples(const [])),
+        );
+        expect(payload.warnings, isEmpty);
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        expect(dive.containsKey('profile'), isFalse);
+      });
+
+      test(
+        'without a channel, unreadable samples still get the XML hint',
+        () async {
+          // Two dives without a profile for two different reasons: one whose
+          // samples were read and rejected (the XML export can rescue it) and
+          // one whose only bytes are a raw download this platform cannot try.
+          // Lumping both under "this platform" would hide the remedy for the
+          // first, so each cause gets its own warning.
+          final logbook = _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: Uint8List.fromList(List.filled(64, 0x42)),
+          );
+          final payload = await MacDiveDiveMapper.toPayload(
+            MacDiveRawLogbook(
+              dives: [
+                ...logbook.dives,
+                MacDiveRawDive(
+                  pk: 2,
+                  uuid: 'dive-2',
+                  computer: 'Shearwater Teric',
+                  rawDataBlob: _compressedFixture,
+                ),
+              ],
+              sitesByPk: const {},
+              buddiesByPk: const {},
+              tagsByPk: const {},
+              gearByPk: const {},
+              tanksByPk: const {},
+              gasesByPk: const {},
+              tankAndGases: const [],
+              crittersByPk: const {},
+              certifications: const [],
+              serviceRecords: const [],
+              events: const [],
+              diveToBuddyPks: const {},
+              diveToTagPks: const {},
+              diveToGearPks: const {},
+              diveToCritterPks: const {},
+              unitsPreference: 'Metric',
+            ),
+            fetchDescriptors: () async => throw MissingPluginException('none'),
+          );
+
+          expect(payload.warnings, hasLength(2));
+          final messages = payload.warnings.map((w) => w.message).toList();
+          expect(
+            messages.where((m) => m.startsWith('1 dive') && m.contains('XML')),
+            hasLength(1),
+          );
+          expect(
+            messages.where(
+              (m) => m.startsWith('1 dive') && m.contains('this platform'),
+            ),
+            hasLength(1),
+          );
+        },
+      );
+
+      test('an empty sample array beside a failed raw parse warns', () async {
+        // MacDive drawing no profile is only the whole story when ZSAMPLES
+        // was the dive's only source. Here the raw download was there too and
+        // its parse was thrown out, so the dive lost a profile the XML export
+        // can still rescue - and reporting nothing would hide that.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Shearwater Teric',
+            raw: _compressedFixture,
+            samples: _zsamples(const []),
+          ),
+          fetchDescriptors: _fakeDescriptors,
+          parseRaw: (v, p, m, d) async => _parsedDive(
+            samples: [
+              pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
+              pigeon.ProfileSample(timeSeconds: 600, depthMeters: 4000.0),
+            ],
           ),
         );
 
         expect(payload.warnings, hasLength(1));
         expect(payload.warnings.single.message, contains('1 dive'));
-        expect(payload.warnings.single.message, contains('cannot read'));
-      },
-    );
+        expect(payload.warnings.single.message, contains('XML'));
+      });
+
+      test(
+        'an empty sample array without a channel blames the platform',
+        () async {
+          // Same dive, but the raw bytes were never attempted. An XML export
+          // would not help: MacDive has no profile of its own to export.
+          final payload = await MacDiveDiveMapper.toPayload(
+            _samplesLogbook(
+              computer: 'Shearwater Teric',
+              raw: _compressedFixture,
+              samples: _zsamples(const []),
+            ),
+            fetchDescriptors: () async => throw MissingPluginException('none'),
+          );
+
+          expect(payload.warnings, hasLength(1));
+          expect(payload.warnings.single.message, contains('this platform'));
+        },
+      );
+
+      test(
+        'sample pressures set the unit for a cylinder-less library',
+        () async {
+          // No units row and no cylinder rows, so the sample pressures are the
+          // only witness there is. Charting 3000 psi as 3000 bar is #912.
+          final payload = await MacDiveDiveMapper.toPayload(
+            _samplesLogbook(
+              computer: 'Manual',
+              samples: _zsamples([(0.0, 0.0, 3000.0, 99, 0.21, 27.5, 0)]),
+              unitsPreference: null,
+            ),
+          );
+
+          expect(payload.metadata['units'], 'imperial');
+          final dive = payload.entitiesOf(ImportEntityType.dives).single;
+          final point =
+              (dive['profile'] as List).single as Map<String, dynamic>;
+          final pressure = (point['allTankPressures'] as List).single as Map;
+          expect(pressure['pressure'], closeTo(3000 * 0.0689476, 1e-3));
+        },
+      );
+
+      test('a pressure with no unit to place it in is dropped', () async {
+        // The inference scan is bounded, so a library whose only pressures
+        // sit past the limit still resolves to unknown. Passing those through
+        // would chart psi as bar; leaving them out costs a channel the dive
+        // did not have before ZSAMPLES were readable at all.
+        final blobs = [
+          for (var i = 0; i <= MacDiveUnitInference.sampleScanDiveLimit; i++)
+            _zsamples([
+              (
+                0.0,
+                3.0,
+                i < MacDiveUnitInference.sampleScanDiveLimit ? 0.0 : 3000.0,
+                99,
+                0.21,
+                24.0,
+                0,
+              ),
+            ]),
+        ];
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesOnlyLogbook(blobs),
+        );
+
+        expect(payload.metadata['units'], 'unknown');
+        final dives = payload.entitiesOf(ImportEntityType.dives);
+        final last = (dives.last['profile'] as List).single as Map;
+        expect(last.containsKey('allTankPressures'), isFalse);
+        // Everything that does not depend on the unit still arrives.
+        expect(last['depth'], closeTo(3.0, 1e-6));
+        expect(last['temperature'], closeTo(24.0, 1e-6));
+      });
+
+      test('heart rate and ceiling reach the profile point', () async {
+        // The Teric options word every other test here uses carries neither,
+        // so these two channels - the ones ZSAMPLES can supply that MacDive's
+        // own XML export cannot - had no test asserting they arrive.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamplesPulseAndStop([
+              (0.0, 0.0, 70, 0.0),
+              (60.0, 30.0, 75, 3.0),
+            ]),
+          ),
+        );
+
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final profile = dive['profile'] as List;
+        final descent = profile.last as Map<String, dynamic>;
+        expect(descent['heartRate'], 75);
+        expect(descent['ceiling'], closeTo(3.0, 1e-6));
+        // A zero next stop is MacDive's "no reading", not a stop at the
+        // surface, so it stays out the way a zero pressure does.
+        expect((profile.first as Map).containsKey('ceiling'), isFalse);
+        expect((profile.first as Map)['heartRate'], 70);
+      });
+
+      test('unreadable ZSAMPLES count toward the aggregated warning', () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Oceanic Matrix Master',
+            samples: Uint8List.fromList(List.filled(64, 0x42)),
+          ),
+        );
+
+        expect(payload.warnings, hasLength(1));
+        expect(payload.warnings.single.message, contains('1 dive'));
+        expect(payload.warnings.single.message.toLowerCase(), contains('xml'));
+      });
+    });
 
     test('no warning when logbook has no ZRAWDATA', () async {
       const logbook = MacDiveRawLogbook(
@@ -869,6 +1225,157 @@ MacDiveRawLogbook _suuntoRawDataLogbook({
     diveToCritterPks: const {},
     unitsPreference: 'Metric',
   );
+}
+
+/// One dive on [computer] carrying [samples] as its `ZSAMPLES` and,
+/// optionally, [raw] as its `ZRAWDATA`.
+MacDiveRawLogbook _samplesLogbook({
+  required String computer,
+  required Uint8List samples,
+  Uint8List? raw,
+  double? maxDepth,
+  String? unitsPreference = 'Metric',
+}) {
+  return MacDiveRawLogbook(
+    dives: [
+      MacDiveRawDive(
+        pk: 1,
+        uuid: 'dive-1',
+        computer: computer,
+        maxDepth: maxDepth,
+        samplesBlob: samples,
+        rawDataBlob: raw,
+      ),
+    ],
+    sitesByPk: const {},
+    buddiesByPk: const {},
+    tagsByPk: const {},
+    gearByPk: const {},
+    tanksByPk: const {},
+    gasesByPk: const {},
+    tankAndGases: const [],
+    crittersByPk: const {},
+    certifications: const [],
+    serviceRecords: const [],
+    events: const [],
+    diveToBuddyPks: const {},
+    diveToTagPks: const {},
+    diveToGearPks: const {},
+    diveToCritterPks: const {},
+    unitsPreference: unitsPreference,
+  );
+}
+
+/// A samples-only logbook of one dive per entry in [samples], with no
+/// cylinder rows, for exercising what the unit inference makes of the sample
+/// pressures themselves.
+MacDiveRawLogbook _samplesOnlyLogbook(
+  List<Uint8List> samples, {
+  String? unitsPreference,
+}) {
+  return MacDiveRawLogbook(
+    dives: [
+      for (final (index, blob) in samples.indexed)
+        MacDiveRawDive(
+          pk: index + 1,
+          uuid: 'dive-${index + 1}',
+          computer: 'Manual',
+          samplesBlob: blob,
+        ),
+    ],
+    sitesByPk: const {},
+    buddiesByPk: const {},
+    tagsByPk: const {},
+    gearByPk: const {},
+    tanksByPk: const {},
+    gasesByPk: const {},
+    tankAndGases: const [],
+    crittersByPk: const {},
+    certifications: const [],
+    serviceRecords: const [],
+    events: const [],
+    diveToBuddyPks: const {},
+    diveToTagPks: const {},
+    diveToGearPks: const {},
+    diveToCritterPks: const {},
+    unitsPreference: unitsPreference,
+  );
+}
+
+/// Encodes a `ZSAMPLES` blob the way MacDive does for a Shearwater Teric:
+/// version 4, options 0x9D (pressure, NDT, ppO2, temperature, TTS), records
+/// packed little-endian, padded to a TEA block, a trailing block carrying
+/// the byte length, and the whole body TEA-ECB encrypted under the app key.
+/// Each record is (time s, depth m, pressure, ndt min, ppO2, temp C, tts min).
+Uint8List _zsamples(
+  List<(double, double, double, int, double, double, int)> records,
+) {
+  const options =
+      MacDiveSamplesDecoder.optionPressure |
+      MacDiveSamplesDecoder.optionNdt |
+      MacDiveSamplesDecoder.optionPpO2 |
+      MacDiveSamplesDecoder.optionTemperature |
+      MacDiveSamplesDecoder.optionTts;
+  const stride = 28;
+  final packed = Uint8List(records.length * stride);
+  final data = ByteData.sublistView(packed);
+  for (var i = 0; i < records.length; i++) {
+    final (time, depth, pressure, ndt, ppO2, temp, tts) = records[i];
+    data
+      ..setFloat32(i * stride, time, Endian.little)
+      ..setFloat32(i * stride + 4, depth, Endian.little)
+      ..setFloat32(i * stride + 8, pressure, Endian.little)
+      ..setInt32(i * stride + 12, ndt, Endian.little)
+      ..setFloat32(i * stride + 16, ppO2, Endian.little)
+      ..setFloat32(i * stride + 20, temp, Endian.little)
+      ..setInt32(i * stride + 24, tts, Endian.little);
+  }
+  final blocks = (packed.length + 7) ~/ 8 + 1;
+  final plain = Uint8List(blocks * 8)..setRange(0, packed.length, packed);
+  ByteData.sublistView(
+    plain,
+  ).setUint32(plain.length - 4, packed.length, Endian.little);
+
+  const cipher = MacDiveSamplesDecoder.cipher;
+  final blob = Uint8List(8 + plain.length);
+  ByteData.sublistView(blob)
+    ..setUint32(0, 4, Endian.little)
+    ..setUint32(4, options, Endian.little);
+  blob.setRange(8, blob.length, cipher.encrypt(plain));
+  return blob;
+}
+
+/// A `ZSAMPLES` blob carrying only heart rate and next-stop depth, the two
+/// optional fields no other fixture here sets. Records are
+/// (time s, depth m, bpm, next stop m); in the encoder's emission order heart
+/// rate precedes next-stop depth, so the stride is 16.
+Uint8List _zsamplesPulseAndStop(List<(double, double, int, double)> records) {
+  const options =
+      MacDiveSamplesDecoder.optionHeartRate |
+      MacDiveSamplesDecoder.optionNextStopDepth;
+  const stride = 16;
+  final packed = Uint8List(records.length * stride);
+  final data = ByteData.sublistView(packed);
+  for (var i = 0; i < records.length; i++) {
+    final (time, depth, heartRate, nextStop) = records[i];
+    data
+      ..setFloat32(i * stride, time, Endian.little)
+      ..setFloat32(i * stride + 4, depth, Endian.little)
+      ..setInt32(i * stride + 8, heartRate, Endian.little)
+      ..setFloat32(i * stride + 12, nextStop, Endian.little);
+  }
+  final plain = Uint8List(((packed.length + 7) ~/ 8 + 1) * 8)
+    ..setRange(0, packed.length, packed);
+  ByteData.sublistView(
+    plain,
+  ).setUint32(plain.length - 4, packed.length, Endian.little);
+
+  final blob = Uint8List(8 + plain.length);
+  ByteData.sublistView(blob)
+    ..setUint32(0, 4, Endian.little)
+    ..setUint32(4, options, Endian.little);
+  blob.setRange(8, blob.length, MacDiveSamplesDecoder.cipher.encrypt(plain));
+  return blob;
 }
 
 /// Two dives carrying a real compressed blob plus one manual dive with none.

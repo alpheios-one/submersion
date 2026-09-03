@@ -9477,12 +9477,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divers_edit_updateButton => 'עדכן צולל';
 
   @override
-  String get divers_list_activeBadge => 'פעיל';
-
-  @override
-  String get divers_list_addDiverButton => 'הוסף צולל';
-
-  @override
   String get divers_list_addDiverTooltip => 'הוסף פרופיל צולל חדש';
 
   @override
@@ -9521,27 +9515,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'הצג צולל $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'צולל פעיל';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'צוללים אחרים';
-
-  @override
-  String get divers_summary_overviewTitle => 'סקירה כללית';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'פעולות מהירות';
-
-  @override
-  String get divers_summary_subtitle => 'בחר צולל מהרשימה כדי לצפות בפרטים';
-
-  @override
-  String get divers_summary_title => 'פרופילי צוללים';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'סה\"כ צוללים';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -16246,24 +16219,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_import_cancelling => 'מבטל...';
 
   @override
-  String get settings_import_dialog_title => 'ייבוא נתונים';
-
-  @override
-  String get settings_import_doNotClose => 'נא לא לסגור את האפליקציה';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current מתוך $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'מייבא חברי צלילה...';
 
   @override
   String get settings_import_phase_certifications => 'מייבא הסמכות...';
-
-  @override
-  String get settings_import_phase_complete => 'מסיים...';
 
   @override
   String get settings_import_phase_diveCenters => 'מייבא מרכזי צלילה...';
@@ -16279,9 +16238,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_import_phase_equipmentSets => 'מייבא ערכות ציוד...';
-
-  @override
-  String get settings_import_phase_parsing => 'מנתח קובץ...';
 
   @override
   String get settings_import_phase_preparing => 'מכין...';
@@ -16300,20 +16256,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current מתוך $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'התקדמות ייבוא: $percent אחוז';
-  }
 
   @override
   String get settings_language_appBar_title => 'שפה';
@@ -18634,6 +18576,29 @@ class AppLocalizationsHe extends AppLocalizations {
       'ייבוא תמונות מחייב תיקייה בדיסק של המכשיר הזה. הרץ את הייבוא במחשב כדי לכלול אותן. צלילות ואתרים מיובאים כרגיל.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות כלולות בארכיון',
+      one: 'תמונה אחת כלולה בארכיון',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'בחרו היכן לשמור את התמונות...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'התמונות נשמרות בתיקייה זו ומקושרות משם. Submersion לעולם אינו שומר עותק משלו.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'לא ניתן לכתוב לתיקייה זו. בחרו תיקייה אחרת.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20483,11 +20448,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'החלף בחירה עבור $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count סומנו כ-$action';
   }
@@ -21192,29 +21152,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'נדרש קוד PIN';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'התחבר';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'הזן את ה-PIN בן 4-6 הספרות המוצג במכשיר';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'בדוק את תצוגת מחשב הצלילה לקבלת קוד ה-PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'בדוק את תצוגת $deviceName לקבלת קוד ה-PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'הזנת קוד PIN, 4 עד 6 ספרות';
-
-  @override
-  String get diveComputer_pinEntry_title => 'הזן קוד PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -33145,14 +33082,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'תמונה ממוזערת של סרטון. הקש לצפייה במסך מלא';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'תמונה ממוזערת של תמונה, חסרה במכשיר. הקש לצפייה במסך מלא';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'תמונה ממוזערת של סרטון, חסר במכשיר. הקש לצפייה במסך מלא';
 
   @override
   String get trips_photos_thumbnail_photo =>

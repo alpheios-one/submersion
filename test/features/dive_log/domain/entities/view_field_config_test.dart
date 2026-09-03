@@ -31,6 +31,17 @@ void main() {
       expect(restored.isPinned, isTrue);
     });
 
+    test('fromJson resolves the legacy sacRate name to sac', () {
+      // Layouts saved before SAC and RMV were split (discussions #354, #803)
+      // still carry the old name, and one can arrive by sync at any time.
+      final config = TableColumnConfig.fromJson({
+        'field': 'sacRate',
+        'width': 100.0,
+        'isPinned': false,
+      });
+      expect(config.field, equals(DiveField.sac));
+    });
+
     test('fromJson falls back to diveNumber for unknown field name', () {
       final json = {'field': 'unknownField', 'width': 100.0, 'isPinned': false};
       final restored = TableColumnConfig.fromJson(json);
@@ -140,6 +151,15 @@ void main() {
       expect(config.sortAscending, isTrue);
     });
 
+    test('fromJson resolves a legacy sortField name', () {
+      final config = TableViewConfig.fromJson({
+        'columns': <dynamic>[],
+        'sortField': 'sacRate',
+        'sortAscending': true,
+      });
+      expect(config.sortField, equals(DiveField.sac));
+    });
+
     test('fromJson handles unknown sortField name gracefully', () {
       final json = {
         'columns': [
@@ -216,6 +236,12 @@ void main() {
       expect(slot.field, equals(DiveField.maxDepth));
     });
 
+    test('fromJson resolves the legacy sacRate name to sac', () {
+      final json = {'slotId': 'stat1', 'field': 'sacRate'};
+      final slot = CardSlotConfig.fromJson(json);
+      expect(slot.field, equals(DiveField.sac));
+    });
+
     test('fromJson falls back to diveNumber for unknown field', () {
       final json = {'slotId': 'stat1', 'field': 'unknownField'};
       final slot = CardSlotConfig.fromJson(json);
@@ -277,6 +303,16 @@ void main() {
       };
       final config = CardViewConfig.fromJson(json);
       expect(config.extraFields, isEmpty);
+    });
+
+    test('fromJson resolves a legacy extra field name', () {
+      final json = {
+        'mode': 'compact',
+        'slots': <dynamic>[],
+        'extraFields': ['sacRate'],
+      };
+      final config = CardViewConfig.fromJson(json);
+      expect(config.extraFields, equals([DiveField.sac]));
     });
 
     test('fromJson filters out unknown extra field names', () {
