@@ -49,7 +49,9 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
   final keyed =
       <({int diveIndex, int? position, int pk, Map<String, dynamic> entry})>[];
   for (final image in images) {
-    final diveIndex = diveIndexByPk[image.diveFk];
+    final diveFk = image.diveFk;
+    // No dive, or a dive not in this logbook: the photo has nowhere to go.
+    final diveIndex = diveFk == null ? null : diveIndexByPk[diveFk];
     if (diveIndex == null) continue;
     final filename = _firstNonEmpty(image.path, image.originalPath);
     if (filename == null) continue;

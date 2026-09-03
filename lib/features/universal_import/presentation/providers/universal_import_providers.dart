@@ -62,13 +62,21 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     ZipExpansionService zipExpansionService = const ZipExpansionService(),
     GarminDeviceDetector garminDeviceDetector = const GarminDeviceDetector(),
     FitParserService fitParserService = const FitParserService(),
-  }) : _batchParseService = batchParseService,
+    Future<bool> Function(String path) folderWriteProbe = folderAcceptsWrites,
+  }) : _folderWriteProbe = folderWriteProbe,
+       _batchParseService = batchParseService,
        _zipExpansion = zipExpansionService,
        _garminDetector = garminDeviceDetector,
        _fitParser = fitParserService,
        super(const UniversalImportState());
 
   final Ref _ref;
+
+  /// Injectable so a widget test can answer the writability question
+  /// without real filesystem work: `testWidgets` runs in a fake-async
+  /// zone that never completes real IO, so an awaited probe would park
+  /// forever.
+  final Future<bool> Function(String path) _folderWriteProbe;
 
   /// Injectable so tests can drive deterministic batch-parse outcomes
   /// (progress, cancellation) without real file timing.
@@ -460,8 +468,8 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   /// Returns false, recording nothing, when the folder cannot be written
   /// to, so the user hears about a read-only pick now rather than finding
   /// the photos missing after the import.
-  bool chooseBundledPhotoFolder(String path) {
-    if (!folderAcceptsWrites(path)) {
+  Future<bool> chooseBundledPhotoFolder(String path) async {
+    if (!await _folderWriteProbe(path)) {
       _log.warning('Bundled photo folder is not writable: $path');
       return false;
     }

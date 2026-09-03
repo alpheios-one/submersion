@@ -46,22 +46,25 @@ Future<String> exportBundledPhoto({
 }
 
 /// Whether photos can actually be written under [dir]: the folder is
-/// created if needed and a probe file is written and removed. Synchronous
-/// so a picker callback can refuse a read-only choice on the spot instead
-/// of letting every export fail after the import has already run.
-bool folderAcceptsWrites(String dir) {
+/// created if needed and a probe file is written and removed.
+///
+/// Asked from a picker callback so a read-only choice is refused on the
+/// spot rather than letting every export fail after the import has already
+/// run. Asynchronous because the chosen folder can sit on a slow network
+/// mount, and this runs on the thread drawing the wizard.
+Future<bool> folderAcceptsWrites(String dir) async {
   try {
     final directory = Directory(dir);
-    directory.createSync(recursive: true);
+    await directory.create(recursive: true);
     final probe = File(
       p.join(
         dir,
         '.submersion_write_probe_${DateTime.now().microsecondsSinceEpoch}',
       ),
     );
-    probe.writeAsBytesSync(const [0]);
+    await probe.writeAsBytes(const [0]);
     try {
-      probe.deleteSync();
+      await probe.delete();
     } on FileSystemException {
       // The write is the question being asked; a folder that plainly
       // accepts one must not be condemned because the cleanup lost a race

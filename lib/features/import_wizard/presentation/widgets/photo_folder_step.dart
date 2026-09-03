@@ -64,7 +64,7 @@ class PhotoFolderStep extends ConsumerWidget {
         await (pickDestinationOverride?.call() ??
             FilePicker.getDirectoryPath());
     if (path == null) return;
-    final accepted = ref
+    final accepted = await ref
         .read(universalImportNotifierProvider.notifier)
         .chooseBundledPhotoFolder(path);
     if (accepted || !context.mounted) return;
@@ -100,9 +100,7 @@ class PhotoFolderStep extends ConsumerWidget {
               text: l10n.importWizard_photos_foundCount(referencedCount),
             ),
             const SizedBox(height: 24),
-            if (!_canPickFolder)
-              Text(l10n.importWizard_photos_mobileUnsupported)
-            else if (state.isLoading)
+            if (state.isLoading && _canPickFolder)
               Row(
                 children: [
                   const SizedBox(
@@ -114,7 +112,7 @@ class PhotoFolderStep extends ConsumerWidget {
                   Text(l10n.importWizard_photos_scanning),
                 ],
               )
-            else ...[
+            else if (_canPickFolder) ...[
               FilledButton.icon(
                 onPressed: () => _pick(ref),
                 icon: const Icon(Icons.folder_open),
@@ -143,11 +141,7 @@ class PhotoFolderStep extends ConsumerWidget {
               text: l10n.importWizard_photos_bundledCount(bundledCount),
             ),
             const SizedBox(height: 24),
-            // The mobile limitation is stated once; a referenced section
-            // above has already said it.
-            if (!_canPickFolder && referencedCount == 0)
-              Text(l10n.importWizard_photos_mobileUnsupported)
-            else if (_canPickFolder) ...[
+            if (_canPickFolder) ...[
               FilledButton.icon(
                 onPressed: () => _pickDestination(context, ref),
                 icon: const Icon(Icons.drive_folder_upload_outlined),
@@ -166,6 +160,13 @@ class PhotoFolderStep extends ConsumerWidget {
                 style: theme.textTheme.bodySmall,
               ),
             ],
+            const SizedBox(height: 24),
+          ],
+          // One explanation, covering whichever sections are listed above:
+          // neither kind of photo can be located without a folder, and
+          // repeating that under each heading only adds noise.
+          if (!_canPickFolder) ...[
+            Text(l10n.importWizard_photos_mobileUnsupported),
             const SizedBox(height: 24),
           ],
           TextButton(

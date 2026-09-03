@@ -391,7 +391,7 @@ class MacDiveDbReader {
       (r) => MacDiveRawDiveImage(
         pk: r['Z_PK'] as int,
         uuid: _str(r['ZUUID']),
-        diveFk: (r['ZRELATIONSHIPDIVE'] as int?) ?? 0,
+        diveFk: r['ZRELATIONSHIPDIVE'] as int?,
         position: r['ZPOSITION'] as int?,
         caption: _str(r['ZCAPTION']),
         path: _str(r['ZPATH']),

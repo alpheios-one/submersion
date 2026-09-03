@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/material.dart';
@@ -21,14 +19,34 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// is seeded directly so the widget's rendering is what is under test.
 void main() {
   late ProviderContainer container;
+  late SharedPreferences prefs;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     container = ProviderContainer(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
     );
   });
+
+  /// Rebuilds the container with the folder-writability probe answering
+  /// [writable]. The real probe touches the filesystem, and a `testWidgets`
+  /// body never completes real IO, so an injected answer is the only way to
+  /// drive the picker path here.
+  void answerProbe(bool writable) {
+    container.dispose();
+    container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        universalImportNotifierProvider.overrideWith(
+          (ref) => UniversalImportNotifier(
+            ref,
+            folderWriteProbe: (_) async => writable,
+          ),
+        ),
+      ],
+    );
+  }
 
   tearDown(() {
     container.dispose();
@@ -219,23 +237,23 @@ void main() {
   });
 
   testWidgets('picking a destination records it on the state', (tester) async {
-    final dest = Directory.systemTemp.createTempSync('photo_step_dest_');
-    addTearDown(() => dest.deleteSync(recursive: true));
+    const dest = '/Users/eric/Pictures/Dives';
     await withPlatform(TargetPlatform.macOS, () async {
+      answerProbe(true);
       seedBundled(1);
 
       await tester.pumpWidget(
-        host(PhotoFolderStep(pickDestinationOverride: () async => dest.path)),
+        host(PhotoFolderStep(pickDestinationOverride: () async => dest)),
       );
       await tester.pump();
 
       await tester.tap(find.text('Choose where to save photos...'));
       await tester.pump();
 
-      expect(find.text(dest.path), findsOneWidget);
+      expect(find.text(dest), findsOneWidget);
       expect(
         container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
-        dest.path,
+        dest,
       );
     });
   });
@@ -292,39 +310,66 @@ void main() {
     });
   });
 
-  testWidgets('a read-only destination is refused with a message', (
+  testWidgets('an unwritable destination is refused with a message', (
     tester,
   ) async {
-    if (Platform.isWindows) {
-      markTestSkipped('POSIX permission bits are not honoured on Windows');
-      return;
-    }
-    final dest = Directory.systemTemp.createTempSync('photo_step_ro_');
-    Process.runSync('chmod', ['000', dest.path]);
-    addTearDown(() {
-      Process.runSync('chmod', ['755', dest.path]);
-      dest.deleteSync(recursive: true);
-    });
     await withPlatform(TargetPlatform.macOS, () async {
+      answerProbe(false);
       seedBundled(1);
 
       await tester.pumpWidget(
-        host(PhotoFolderStep(pickDestinationOverride: () async => dest.path)),
+        host(const PhotoFolderStep(pickDestinationOverride: _pickUnwritable)),
       );
       await tester.pump();
 
       await tester.tap(find.text('Choose where to save photos...'));
       await tester.pump();
 
-      final state = container.read(universalImportNotifierProvider);
-      if (state.bundledPhotoFolderPath != null) {
-        markTestSkipped('running with permissions that bypass chmod');
-        return;
-      }
+      expect(
+        container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
+        isNull,
+      );
       expect(
         find.text("That folder can't be written to. Choose another one."),
         findsOneWidget,
       );
     });
   });
+
+  testWidgets('mobile explains the limitation once for both kinds', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.iOS, () async {
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(
+        payload: ImportPayload(
+          entities: {
+            ImportEntityType.dives: [
+              {'uddfId': 'd0', 'dateTime': DateTime(2025, 1, 15)},
+            ],
+            ImportEntityType.media: [
+              {'filename': '/p/a.jpg', '_diveIndex': 0},
+            ],
+          },
+        ),
+        photoPathsByBaseName: const {
+          'dive1': ['/tmp/x/p0.jpg'],
+        },
+      );
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      // Both counts are stated, so nothing is silently dropped, and the
+      // explanation appears once rather than under each heading.
+      expect(find.text('1 photo referenced in this logbook'), findsOneWidget);
+      expect(find.text('1 photo bundled in the archive'), findsOneWidget);
+      expect(
+        find.textContaining('Run this import on a computer'),
+        findsOneWidget,
+      );
+    });
+  });
 }
+
+Future<String?> _pickUnwritable() async => '/somewhere/read-only';

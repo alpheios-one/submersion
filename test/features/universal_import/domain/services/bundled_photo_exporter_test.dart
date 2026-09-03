@@ -134,20 +134,23 @@ void main() {
   });
 
   group('folderAcceptsWrites', () {
-    test('a writable folder is accepted and left without a probe file', () {
-      final dir = p.join(tmp.path, 'new', 'nested');
-      expect(folderAcceptsWrites(dir), isTrue);
-      expect(Directory(dir).listSync(), isEmpty);
-    });
+    test(
+      'a writable folder is accepted and left without a probe file',
+      () async {
+        final dir = p.join(tmp.path, 'new', 'nested');
+        expect(await folderAcceptsWrites(dir), isTrue);
+        expect(Directory(dir).listSync(), isEmpty);
+      },
+    );
 
-    test('an unusable path is refused rather than thrown from', () {
+    test('an unusable path is refused rather than thrown from', () async {
       // A NUL byte makes dart:io throw ArgumentError, not a
       // FileSystemException; the question being asked is still just
       // "can photos go here", and the answer is still no.
-      expect(folderAcceptsWrites('${tmp.path}/bad\u0000name'), isFalse);
+      expect(await folderAcceptsWrites('${tmp.path}/bad\u0000name'), isFalse);
     });
 
-    test('a read-only folder is refused', () {
+    test('a read-only folder is refused', () async {
       if (Platform.isWindows) {
         markTestSkipped('POSIX permission bits are not honoured on Windows');
         return;
@@ -155,12 +158,12 @@ void main() {
       final dir = Directory(p.join(tmp.path, 'readonly'))..createSync();
       Process.runSync('chmod', ['000', dir.path]);
       addTearDown(() => Process.runSync('chmod', ['755', dir.path]));
-      if (folderAcceptsWrites(dir.path)) {
+      if (await folderAcceptsWrites(dir.path)) {
         // Root ignores permission bits; nothing to assert then.
         markTestSkipped('running with permissions that bypass chmod');
         return;
       }
-      expect(folderAcceptsWrites(dir.path), isFalse);
+      expect(await folderAcceptsWrites(dir.path), isFalse);
     });
   });
 }

@@ -418,7 +418,12 @@ class MacDiveRawDiveImage {
   /// source names is easier to trace through a support conversation than
   /// one identified only by a row number.
   final String? uuid;
-  final int diveFk;
+
+  /// The dive this photo hangs off (`ZRELATIONSHIPDIVE`), or null when the
+  /// row names none. Null is kept rather than folded into a row number so
+  /// an unattached photo is dropped on its own terms instead of matching
+  /// whichever dive happens to hold that key.
+  final int? diveFk;
 
   /// MacDive's display order within the dive (`ZPOSITION`), or null when
   /// it recorded none, which is the overwhelmingly common case: 259 of the

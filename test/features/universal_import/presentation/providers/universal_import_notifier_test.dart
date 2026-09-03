@@ -1522,22 +1522,25 @@ void main() {
         },
       );
 
-      test('bundled archive photos shut the gate until a folder is chosen', () {
-        final dir = Directory.systemTemp.createTempSync('bundled_dest_');
-        addTearDown(() => dir.deleteSync(recursive: true));
-        notifier.state = notifier.state.copyWith(
-          payload: const ImportPayload(entities: {}),
-          photoPathsByBaseName: {
-            'dive1': ['/tmp/zip/a.jpg'],
-          },
-        );
-        expect(container.read(universalAdapterNoPhotosProvider), isFalse);
-        expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
+      test(
+        'bundled archive photos shut the gate until a folder is chosen',
+        () async {
+          final dir = Directory.systemTemp.createTempSync('bundled_dest_');
+          addTearDown(() => dir.deleteSync(recursive: true));
+          notifier.state = notifier.state.copyWith(
+            payload: const ImportPayload(entities: {}),
+            photoPathsByBaseName: {
+              'dive1': ['/tmp/zip/a.jpg'],
+            },
+          );
+          expect(container.read(universalAdapterNoPhotosProvider), isFalse);
+          expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
 
-        expect(notifier.chooseBundledPhotoFolder(dir.path), isTrue);
-        expect(notifier.state.bundledPhotoFolderPath, dir.path);
-        expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
-      });
+          expect(await notifier.chooseBundledPhotoFolder(dir.path), isTrue);
+          expect(notifier.state.bundledPhotoFolderPath, dir.path);
+          expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
+        },
+      );
 
       test('a base name carrying no photos leaves the gate open', () {
         notifier.state = notifier.state.copyWith(
@@ -1548,33 +1551,38 @@ void main() {
         expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
       });
 
-      test('an unwritable bundled folder is refused and not recorded', () {
-        if (Platform.isWindows) {
-          markTestSkipped('POSIX permission bits are not honoured on Windows');
-          return;
-        }
-        final dir = Directory.systemTemp.createTempSync('bundled_ro_');
-        Process.runSync('chmod', ['000', dir.path]);
-        addTearDown(() {
-          Process.runSync('chmod', ['755', dir.path]);
-          dir.deleteSync(recursive: true);
-        });
-        notifier.state = notifier.state.copyWith(
-          photoPathsByBaseName: {
-            'dive1': ['/tmp/zip/a.jpg'],
-          },
-        );
+      test(
+        'an unwritable bundled folder is refused and not recorded',
+        () async {
+          if (Platform.isWindows) {
+            markTestSkipped(
+              'POSIX permission bits are not honoured on Windows',
+            );
+            return;
+          }
+          final dir = Directory.systemTemp.createTempSync('bundled_ro_');
+          Process.runSync('chmod', ['000', dir.path]);
+          addTearDown(() {
+            Process.runSync('chmod', ['755', dir.path]);
+            dir.deleteSync(recursive: true);
+          });
+          notifier.state = notifier.state.copyWith(
+            photoPathsByBaseName: {
+              'dive1': ['/tmp/zip/a.jpg'],
+            },
+          );
 
-        final accepted = notifier.chooseBundledPhotoFolder(dir.path);
-        if (accepted) {
-          markTestSkipped('running with permissions that bypass chmod');
-          return;
-        }
-        expect(notifier.state.bundledPhotoFolderPath, isNull);
-        expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
-      });
+          final accepted = await notifier.chooseBundledPhotoFolder(dir.path);
+          if (accepted) {
+            markTestSkipped('running with permissions that bypass chmod');
+            return;
+          }
+          expect(notifier.state.bundledPhotoFolderPath, isNull);
+          expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
+        },
+      );
 
-      test('skipping opens the gate and forgets the bundled folder', () {
+      test('skipping opens the gate and forgets the bundled folder', () async {
         notifier.state = notifier.state.copyWith(
           payload: payloadWithOnePicture('/p/a.jpg'),
           photoPathsByBaseName: {
@@ -1583,7 +1591,7 @@ void main() {
         );
         final dir = Directory.systemTemp.createTempSync('bundled_skip_');
         addTearDown(() => dir.deleteSync(recursive: true));
-        expect(notifier.chooseBundledPhotoFolder(dir.path), isTrue);
+        expect(await notifier.chooseBundledPhotoFolder(dir.path), isTrue);
         // Referenced photos are still unresolved, so the gate stays shut.
         expect(container.read(universalAdapterPhotosReadyProvider), isFalse);
 
@@ -1592,7 +1600,7 @@ void main() {
         expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
       });
 
-      test('a new file pick forgets every earlier photo decision', () {
+      test('a new file pick forgets every earlier photo decision', () async {
         final dir = Directory.systemTemp.createTempSync('bundled_stale_');
         addTearDown(() => dir.deleteSync(recursive: true));
         notifier.state = notifier.state.copyWith(
@@ -1604,7 +1612,7 @@ void main() {
           photoResolution: const ImportMediaResolution.empty(),
           photosSkipped: true,
         );
-        expect(notifier.chooseBundledPhotoFolder(dir.path), isTrue);
+        expect(await notifier.chooseBundledPhotoFolder(dir.path), isTrue);
 
         // pickFiles and pickFolder reach this hook without the full reset
         // loadFileFromBytes performs, so a decision left here would make
