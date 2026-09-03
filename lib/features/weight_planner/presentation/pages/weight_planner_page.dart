@@ -331,13 +331,23 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     // Whole centimetres or whole inches need no locale formatting.
     final latestHeight = ref.watch(latestDiverHeightProvider).valueOrNull;
     if (!_heightSeeded && latestHeight != null) {
+      // The seed is a one-shot chance, consumed whether or not it is used:
+      // the provider can resolve after the diver has started typing (the
+      // prediction card is still loading while it does), and a late seed
+      // must not clobber an in-progress edit.
       _heightSeeded = true;
-      if (units.heightIsMetric) {
-        _heightCmController.text = '${latestHeight.round()}';
-      } else {
-        final split = units.cmToFeetInches(latestHeight);
-        _heightFeetController.text = '${split.feet}';
-        _heightInchesController.text = '${split.inches}';
+      final fieldsAreEmpty = units.heightIsMetric
+          ? _heightCmController.text.isEmpty
+          : _heightFeetController.text.isEmpty &&
+                _heightInchesController.text.isEmpty;
+      if (fieldsAreEmpty) {
+        if (units.heightIsMetric) {
+          _heightCmController.text = '${latestHeight.round()}';
+        } else {
+          final split = units.cmToFeetInches(latestHeight);
+          _heightFeetController.text = '${split.feet}';
+          _heightInchesController.text = '${split.inches}';
+        }
       }
     }
     // Start with one tank once presets load.

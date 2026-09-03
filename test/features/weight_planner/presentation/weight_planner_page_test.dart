@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
@@ -70,7 +72,9 @@ void main() {
     List<dynamic> extraOverrides = const [],
     DiverWeightEntry? latestWeight,
     double? latestHeight,
+    Future<double?>? latestHeightFuture,
     AppSettings? settings,
+    bool settle = true,
   }) async {
     final base = await getBaseOverrides(
       settingsNotifier: settings == null
@@ -93,7 +97,11 @@ void main() {
           latestDiverWeightProvider.overrideWith(
             (ref) async => latestWeight ?? entry,
           ),
-          latestDiverHeightProvider.overrideWith((ref) async => latestHeight),
+          latestDiverHeightProvider.overrideWith(
+            (ref) async => latestHeightFuture == null
+                ? latestHeight
+                : await latestHeightFuture,
+          ),
           tankPresetsProvider.overrideWith(
             (ref) async => [
               TankPresetEntity.fromBuiltIn(TankPresets.al80),
@@ -105,7 +113,16 @@ void main() {
         child: const WeightPlannerPage(),
       ),
     );
-    await tester.pumpAndSettle();
+    if (settle) {
+      await tester.pumpAndSettle();
+    } else {
+      // A deliberately pending provider leaves the prediction card showing a
+      // spinner, which never settles; pump enough frames for the providers
+      // that do resolve to deliver.
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 10));
+      }
+    }
   }
 
   String? predictedText(WidgetTester tester) {
@@ -378,6 +395,30 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byTooltip('Save weight to profile'), findsOneWidget);
+    });
+
+    testWidgets('a late profile height does not overwrite what the diver '
+        'has already typed', (tester) async {
+      final pending = Completer<double?>();
+      await pumpPage(tester, latestHeightFuture: pending.future, settle: false);
+
+      // The diver types before the profile height arrives. The prediction
+      // card still shows its spinner, so settle is not available yet.
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Height (optional)'),
+        '190',
+      );
+      await tester.pump();
+      expect(find.textContaining('BMI 22.2'), findsOneWidget);
+
+      pending.complete(165.0);
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(
+        find.widgetWithText(TextField, 'Height (optional)'),
+      );
+      expect(field.controller?.text, '190');
+      expect(find.textContaining('BMI 22.2'), findsOneWidget);
     });
 
     testWidgets('save-to-profile stores the entered height', (tester) async {
