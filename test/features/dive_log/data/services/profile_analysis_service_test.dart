@@ -946,4 +946,168 @@ void main() {
       },
     );
   });
+
+  group('CCR display curves come from the loop (issue #579)', () {
+    // Same dive as #455: 44 m on an air-diluent loop at setpoint 1.3 with an
+    // EAN40 first tank. At 44 m (5.4 bar) the loop's inspired inert gas is
+    // 5.4 - 1.3 = 4.1 bar, all nitrogen for an air diluent.
+    const depths = [0.0, 44.0, 44.0, 44.0, 44.0, 0.0];
+    const timestamps = [0, 180, 900, 1800, 2400, 2700];
+    const airDiluent = [
+      ProfileGasSegment(startTimestamp: 0, fN2: 0.79, setpoint: 1.3),
+    ];
+
+    ProfileAnalysis analyzeLoop({
+      List<ProfileGasSegment>? gasSegments = airDiluent,
+      List<double>? ppO2Curve,
+      double o2Fraction = 0.40,
+      double heFraction = 0.0,
+    }) {
+      return ProfileAnalysisService(gfLow: 0.45, gfHigh: 0.75).analyze(
+        diveId: 'ccr-display',
+        depths: depths,
+        timestamps: timestamps,
+        o2Fraction: o2Fraction,
+        heFraction: heFraction,
+        diveMode: DiveMode.ccr,
+        setpointHigh: 1.3,
+        gasSegments: gasSegments,
+        rebreatherPpO2Curve: ppO2Curve,
+      );
+    }
+
+    test('ppN2 is ambient minus loop ppO2, not first-tank fN2 x ambient', () {
+      final analysis = analyzeLoop(
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // Loop: 5.4 - 1.3 = 4.1 bar. First-tank EAN40 would give 5.4 x 0.60.
+      expect(analysis.ppN2Curve![2], closeTo(4.1, 0.001));
+    });
+
+    test('ppN2 follows the measured loop ppO2, not the segment setpoint', () {
+      final analysis = analyzeLoop(
+        ppO2Curve: List<double>.filled(depths.length, 1.1),
+      );
+      expect(analysis.ppN2Curve![2], closeTo(4.3, 0.001));
+    });
+
+    test('ppN2 uses the setpoint when no loop ppO2 was measured', () {
+      final analysis = analyzeLoop();
+      expect(analysis.ppN2Curve![2], closeTo(4.1, 0.001));
+    });
+
+    test('ppN2 is zero at the surface when the setpoint exceeds ambient', () {
+      final analysis = analyzeLoop(
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // The loop cannot hold 1.3 bar at 1.0 bar ambient: ppO2 clamps to
+      // ambient and no inert gas is inspired.
+      expect(analysis.ppN2Curve![0], closeTo(0.0, 0.001));
+    });
+
+    test('gas density weighs the loop partial pressures', () {
+      final analysis = analyzeLoop(
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // (1.3 x 32 + 4.1 x 28) / 24.04 g/L at 44 m.
+      expect(analysis.densityCurve![2], closeTo(6.506, 0.001));
+      // Pure O2 loop at the surface: 32 / 24.04.
+      expect(analysis.densityCurve![0], closeTo(1.331, 0.001));
+    });
+
+    test('MOD is the diluent MOD, not the first tank MOD', () {
+      final analysis = analyzeLoop(
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // Air diluent at ppO2 1.4: (1.4 / 0.21 - 1) x 10. EAN40 would be 25 m.
+      expect(analysis.modCurve![2], closeTo(56.667, 0.01));
+      expect(analysis.modCurve![0], closeTo(56.667, 0.01));
+    });
+
+    test('trimix diluent splits the inert gas by its He:N2 ratio', () {
+      final analysis = analyzeLoop(
+        gasSegments: const [
+          ProfileGasSegment(
+            startTimestamp: 0,
+            fN2: 0.37,
+            fHe: 0.45,
+            setpoint: 1.3,
+          ),
+        ],
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+        o2Fraction: 0.18,
+        heFraction: 0.45,
+      );
+      // 4.1 bar inert split 0.37:0.45.
+      expect(analysis.ppN2Curve![2], closeTo(1.85, 0.001));
+      expect(analysis.ppHeCurve![2], closeTo(2.25, 0.001));
+      // (1.3 x 32 + 1.85 x 28 + 2.25 x 4) / 24.04 g/L.
+      expect(analysis.densityCurve![2], closeTo(4.260, 0.001));
+      // Diluent 18/45 MOD at ppO2 1.4.
+      expect(analysis.modCurve![2], closeTo(67.778, 0.01));
+    });
+
+    test('a diluent switch moves the MOD and inert split at the switch', () {
+      final analysis = analyzeLoop(
+        gasSegments: const [
+          ProfileGasSegment(startTimestamp: 0, fN2: 0.79, setpoint: 1.3),
+          ProfileGasSegment(
+            startTimestamp: 1800,
+            fN2: 0.37,
+            fHe: 0.45,
+            setpoint: 1.3,
+          ),
+        ],
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      expect(analysis.ppN2Curve![2], closeTo(4.1, 0.001));
+      expect(analysis.ppHeCurve![2], closeTo(0.0, 0.001));
+      expect(analysis.modCurve![2], closeTo(56.667, 0.01));
+      expect(analysis.ppN2Curve![3], closeTo(1.85, 0.001));
+      expect(analysis.ppHeCurve![3], closeTo(2.25, 0.001));
+      expect(analysis.modCurve![3], closeTo(67.778, 0.01));
+    });
+
+    test('an over-full diluent is renormalized, keeping its He:N2 ratio', () {
+      // Import noise can hand us inert fractions summing past 1. The split
+      // must still follow the recorded He:N2 ratio (0.8:0.4) rather than the
+      // clipped one, and the diluent has no O2 left for a MOD.
+      final analysis = analyzeLoop(
+        gasSegments: const [
+          ProfileGasSegment(
+            startTimestamp: 0,
+            fN2: 0.8,
+            fHe: 0.4,
+            setpoint: 1.3,
+          ),
+        ],
+        ppO2Curve: List<double>.filled(depths.length, 1.3),
+      );
+      // 4.1 bar inert split 2:1.
+      expect(analysis.ppN2Curve![2], closeTo(4.1 * 2 / 3, 0.001));
+      expect(analysis.ppHeCurve![2], closeTo(4.1 / 3, 0.001));
+      expect(analysis.modCurve![2], 0.0);
+    });
+
+    test('a sample with no loop ppO2 breathes the diluent open-circuit', () {
+      // A zero in the resolved curve means the loop ppO2 is unknown at that
+      // sample. Treating it as a real 0 bar would report a hypoxic loop with
+      // all of ambient as inert gas; instead the sample falls back to the
+      // diluent's open-circuit fractions.
+      final ppO2Curve = List<double>.filled(depths.length, 1.3)..[2] = 0.0;
+      final analysis = analyzeLoop(ppO2Curve: ppO2Curve);
+      // Air diluent at 44 m: 5.4 x 0.79.
+      expect(analysis.ppN2Curve![2], closeTo(5.4 * 0.79, 0.001));
+      // The neighbouring samples still follow the loop.
+      expect(analysis.ppN2Curve![3], closeTo(4.1, 0.001));
+    });
+
+    test('no loop information keeps the legacy first-tank curves', () {
+      final analysis = analyzeLoop(gasSegments: null);
+      // No setpoint segments and no measured ppO2: the loop cannot be
+      // modeled, so the display falls back to the first tank as before.
+      expect(analysis.ppN2Curve![2], closeTo(5.4 * 0.60, 0.001));
+      expect(analysis.modCurve![2], closeTo(25.0, 0.01));
+    });
+  });
 }
