@@ -33977,5 +33977,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '另有 $count 条已保存记录的序列号与此相同，可能是同一台潜水电脑被保存了多次。';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => '合并';
 }

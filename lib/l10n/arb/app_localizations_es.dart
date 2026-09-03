@@ -36156,5 +36156,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'Otros $count registros guardados indican el mismo número de serie. Puede que este ordenador esté guardado más de una vez.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Combinar';
 }

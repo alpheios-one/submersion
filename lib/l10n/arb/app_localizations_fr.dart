@@ -36213,5 +36213,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count autres enregistrements indiquent le même numéro de série. Cet ordinateur est peut-être enregistré plusieurs fois.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Fusionner';
 }

@@ -82,24 +82,25 @@ bool _isLater(DateTime? a, DateTime? b) {
 ///
 /// Identity fields (id, name, owner) stay the survivor's. Blank descriptive
 /// fields are filled from the first duplicate that has them. Dive counts add
-/// up, favorite status is kept if any record had it, the newest download wins
-/// together with its fingerprint (the two travel as a pair: a fingerprint is
-/// the cursor of the download that produced it), and distinct notes are
-/// appended.
+/// up, favorite status is kept if any record had it, the newest download wins,
+/// and distinct notes are appended.
+///
+/// `lastDiveFingerprint` is picked by download recency rather than by list
+/// order: it is the cursor the next incremental download resumes from, so it
+/// has to come from the most recent download that actually recorded one. A
+/// record can hold a `lastDownload` with no fingerprint (the two are written
+/// separately), and taking the survivor's stale cursor in that case would
+/// resume from the wrong dive.
 DiveComputer mergedDiveComputer(
   DiveComputer survivor,
   List<DiveComputer> duplicates,
 ) {
-  final newest = duplicates.fold<DiveComputer>(
-    survivor,
+  final records = [survivor, ...duplicates];
+  final newest = records.reduce(
     (best, candidate) =>
         _isLater(candidate.lastDownload, best.lastDownload) ? candidate : best,
   );
-  final fingerprint = _firstNonBlank([
-    newest.lastDiveFingerprint,
-    survivor.lastDiveFingerprint,
-    ...duplicates.map((d) => d.lastDiveFingerprint),
-  ]);
+  final fingerprint = _newestFingerprint(records);
 
   return survivor.copyWith(
     manufacturer: _firstNonBlank([
@@ -136,6 +137,22 @@ DiveComputer mergedDiveComputer(
     isFavorite: survivor.isFavorite || duplicates.any((d) => d.isFavorite),
     notes: _mergedNotes(survivor.notes, duplicates.map((d) => d.notes)),
   );
+}
+
+/// The `lastDiveFingerprint` of the most recently downloaded record that has
+/// one. Records without a fingerprint are skipped rather than shadowing an
+/// older record's cursor, and ties keep the earliest entry, which is the
+/// survivor.
+String? _newestFingerprint(List<DiveComputer> records) {
+  DiveComputer? best;
+  for (final record in records) {
+    final fingerprint = record.lastDiveFingerprint;
+    if (fingerprint == null || fingerprint.trim().isEmpty) continue;
+    if (best == null || _isLater(record.lastDownload, best.lastDownload)) {
+      best = record;
+    }
+  }
+  return best?.lastDiveFingerprint;
 }
 
 String? _firstNonBlank(Iterable<String?> values) {

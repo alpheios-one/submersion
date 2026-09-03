@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Nincs masik szamitogep, amivel ossze lehetne vonni.",
   "diveComputer_detail_mergePickerSameSerial": "Azonos sorozatszam",
   "diveComputer_detail_duplicateBanner": "{name} ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep ketszer van elmentve.",
+  "diveComputer_detail_duplicateBannerMultiple": "{count} masik mentett rekord ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep tobbszor van elmentve.",
   "diveComputer_detail_duplicateBannerAction": "Osszevonas"
 }

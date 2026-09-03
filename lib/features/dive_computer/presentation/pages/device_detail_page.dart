@@ -141,7 +141,15 @@ class DeviceDetailPage extends ConsumerWidget {
     if (duplicates.isEmpty) return const SizedBox.shrink();
 
     final colorScheme = Theme.of(context).colorScheme;
-    final names = duplicates.map((d) => d.displayName).join(', ');
+    // One duplicate is named; several are counted. Joining names into the
+    // singular message reads as "A, B reports the same serial number".
+    final message = duplicates.length == 1
+        ? context.l10n.diveComputer_detail_duplicateBanner(
+            duplicates.first.displayName,
+          )
+        : context.l10n.diveComputer_detail_duplicateBannerMultiple(
+            duplicates.length,
+          );
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Card(
@@ -159,7 +167,7 @@ class DeviceDetailPage extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      context.l10n.diveComputer_detail_duplicateBanner(names),
+                      message,
                       style: TextStyle(color: colorScheme.onTertiaryContainer),
                     ),
                   ),

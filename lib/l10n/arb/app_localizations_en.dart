@@ -35561,5 +35561,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count other saved records report the same serial number. They may be this computer saved more than once.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Merge';
 }

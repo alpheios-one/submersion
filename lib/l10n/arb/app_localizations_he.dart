@@ -35398,5 +35398,10 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count רשומות שמורות נוספות מדווחות על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר יותר מפעם אחת.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'מיזוג';
 }

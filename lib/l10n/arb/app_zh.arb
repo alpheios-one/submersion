@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "没有其他可合并的潜水电脑。",
   "diveComputer_detail_mergePickerSameSerial": "序列号相同",
   "diveComputer_detail_duplicateBanner": "{name} 的序列号与此相同，可能是同一台潜水电脑被保存了两次。",
+  "diveComputer_detail_duplicateBannerMultiple": "另有 {count} 条已保存记录的序列号与此相同，可能是同一台潜水电脑被保存了多次。",
   "diveComputer_detail_duplicateBannerAction": "合并"
 }

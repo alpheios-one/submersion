@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Aucun autre ordinateur avec lequel fusionner.",
   "diveComputer_detail_mergePickerSameSerial": "Même numéro de série",
   "diveComputer_detail_duplicateBanner": "{name} indique le même numéro de série. Cet ordinateur est peut-être enregistré deux fois.",
+  "diveComputer_detail_duplicateBannerMultiple": "{count} autres enregistrements indiquent le même numéro de série. Cet ordinateur est peut-être enregistré plusieurs fois.",
   "diveComputer_detail_duplicateBannerAction": "Fusionner"
 }

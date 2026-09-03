@@ -128,6 +128,23 @@ void main() {
       );
     });
 
+    testWidgets('counts the records instead of listing names', (tester) async {
+      // The singular message reads "{name} reports...", so joining two names
+      // into it would render "ssss, ipad reports the same serial number".
+      final petrel = _computer(id: 'a', name: 'Petrel 3', diveCount: 21);
+      final ssss = _computer(id: 'b', name: 'ssss', diveCount: 2);
+      final ipad = _computer(id: 'c', name: 'ipad', diveCount: 1);
+
+      await pumpDetail(tester, computer: petrel, all: [petrel, ssss, ipad]);
+
+      expect(find.byKey(const ValueKey('duplicate_banner')), findsOneWidget);
+      expect(
+        find.textContaining('2 other saved records report the same serial'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('ssss, ipad'), findsNothing);
+    });
+
     testWidgets('stays hidden when no other record matches', (tester) async {
       final petrel = _computer(id: 'a', name: 'Petrel 3');
       final other = _computer(id: 'b', name: 'Perdix', serialNumber: '7');

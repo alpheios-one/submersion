@@ -281,6 +281,11 @@ class TankPressureSeriesRepository {
 
   /// Moves every series of [fromComputerIds] onto [toComputerId] and restamps
   /// each, for a dive computer merge (#645). Returns the number touched.
+  ///
+  /// Notifies nothing: `_setComputer` here never touches the sync bus (unlike
+  /// its profile-series twin, which takes a `notify` switch for this reason).
+  /// The merge runs this inside its own transaction and notifies once after
+  /// commit, so a notification here would publish uncommitted rows.
   Future<int> repointComputer(
     List<String> fromComputerIds,
     String toComputerId, {

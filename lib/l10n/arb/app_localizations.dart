@@ -59339,6 +59339,12 @@ abstract class AppLocalizations {
   /// **'{name} reports the same serial number. It may be this computer saved twice.'**
   String diveComputer_detail_duplicateBanner(String name);
 
+  /// No description provided for @diveComputer_detail_duplicateBannerMultiple.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} other saved records report the same serial number. They may be this computer saved more than once.'**
+  String diveComputer_detail_duplicateBannerMultiple(int count);
+
   /// No description provided for @diveComputer_detail_duplicateBannerAction.
   ///
   /// In en, this message translates to:

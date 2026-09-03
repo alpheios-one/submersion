@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "No hay otros ordenadores con los que combinar.",
   "diveComputer_detail_mergePickerSameSerial": "Mismo número de serie",
   "diveComputer_detail_duplicateBanner": "{name} indica el mismo número de serie. Puede que este ordenador esté guardado dos veces.",
+  "diveComputer_detail_duplicateBannerMultiple": "Otros {count} registros guardados indican el mismo número de serie. Puede que este ordenador esté guardado más de una vez.",
   "diveComputer_detail_duplicateBannerAction": "Combinar"
 }

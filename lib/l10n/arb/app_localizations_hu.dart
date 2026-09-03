@@ -35958,5 +35958,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count masik mentett rekord ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep tobbszor van elmentve.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Osszevonas';
 }

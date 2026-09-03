@@ -21866,5 +21866,13 @@
       }
     }
   },
+  "diveComputer_detail_duplicateBannerMultiple": "{count} other saved records report the same serial number. They may be this computer saved more than once.",
+  "@diveComputer_detail_duplicateBannerMultiple": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveComputer_detail_duplicateBannerAction": "Merge"
 }

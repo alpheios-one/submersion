@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Er zijn geen andere computers om mee samen te voegen.",
   "diveComputer_detail_mergePickerSameSerial": "Zelfde serienummer",
   "diveComputer_detail_duplicateBanner": "{name} meldt hetzelfde serienummer. Mogelijk is deze computer twee keer opgeslagen.",
+  "diveComputer_detail_duplicateBannerMultiple": "{count} andere opgeslagen records melden hetzelfde serienummer. Mogelijk is deze computer meer dan één keer opgeslagen.",
   "diveComputer_detail_duplicateBannerAction": "Samenvoegen"
 }

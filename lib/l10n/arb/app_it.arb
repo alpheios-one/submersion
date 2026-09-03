@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Non ci sono altri computer con cui unire.",
   "diveComputer_detail_mergePickerSameSerial": "Stesso numero di serie",
   "diveComputer_detail_duplicateBanner": "{name} riporta lo stesso numero di serie. Potrebbe essere questo computer salvato due volte.",
+  "diveComputer_detail_duplicateBannerMultiple": "Altri {count} record salvati riportano lo stesso numero di serie. Potrebbe essere questo computer salvato più di una volta.",
   "diveComputer_detail_duplicateBannerAction": "Unisci"
 }

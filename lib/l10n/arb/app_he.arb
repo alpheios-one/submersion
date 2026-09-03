@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "אין מחשבים אחרים למיזוג.",
   "diveComputer_detail_mergePickerSameSerial": "אותו מספר סידורי",
   "diveComputer_detail_duplicateBanner": "{name} מדווח על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר פעמיים.",
+  "diveComputer_detail_duplicateBannerMultiple": "{count} רשומות שמורות נוספות מדווחות על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר יותר מפעם אחת.",
   "diveComputer_detail_duplicateBannerAction": "מיזוג"
 }

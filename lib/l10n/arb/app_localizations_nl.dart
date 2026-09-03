@@ -35871,5 +35871,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count andere opgeslagen records melden hetzelfde serienummer. Mogelijk is deze computer meer dan één keer opgeslagen.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Samenvoegen';
 }

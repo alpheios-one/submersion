@@ -36047,5 +36047,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count andere gespeicherte Einträge melden dieselbe Seriennummer. Möglicherweise ist dieser Computer mehrfach gespeichert.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Zusammenführen';
 }

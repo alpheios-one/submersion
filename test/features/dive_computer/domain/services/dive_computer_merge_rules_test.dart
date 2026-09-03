@@ -271,6 +271,52 @@ void main() {
       },
     );
 
+    test(
+      'takes the newest recorded fingerprint when the newest download has none',
+      () {
+        // lastDownload and lastDiveFingerprint are written separately, so the
+        // most recently downloaded record can hold no cursor at all. Falling
+        // back to the survivor's would resume the next incremental download
+        // from January and re-fetch everything the February record already had.
+        final survivor = _computer(
+          id: 'a',
+          lastDownload: DateTime(2026, 1, 1),
+          lastDiveFingerprint: 'january',
+        );
+        final duplicates = [
+          _computer(
+            id: 'b',
+            lastDownload: DateTime(2026, 2, 1),
+            lastDiveFingerprint: 'february',
+          ),
+          _computer(id: 'c', lastDownload: DateTime(2026, 3, 1)),
+        ];
+
+        final merged = mergedDiveComputer(survivor, duplicates);
+
+        expect(merged.lastDownload, DateTime(2026, 3, 1));
+        expect(merged.lastDiveFingerprint, 'february');
+      },
+    );
+
+    test('ignores a blank fingerprint on the most recent download', () {
+      final survivor = _computer(
+        id: 'a',
+        lastDownload: DateTime(2026, 1, 1),
+        lastDiveFingerprint: 'january',
+      );
+      final duplicate = _computer(
+        id: 'b',
+        lastDownload: DateTime(2026, 2, 1),
+        lastDiveFingerprint: '   ',
+      );
+
+      expect(
+        mergedDiveComputer(survivor, [duplicate]).lastDiveFingerprint,
+        'january',
+      );
+    });
+
     test('appends distinct non-blank notes from duplicates', () {
       final survivor = _computer(id: 'a', notes: 'Primary');
       final dupes = [

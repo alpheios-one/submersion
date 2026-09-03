@@ -36111,5 +36111,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'Altri $count record salvati riportano lo stesso numero di serie. Potrebbe essere questo computer salvato più di una volta.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'Unisci';
 }

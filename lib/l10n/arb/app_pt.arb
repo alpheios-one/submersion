@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Não há outros computadores para mesclar.",
   "diveComputer_detail_mergePickerSameSerial": "Mesmo número de série",
   "diveComputer_detail_duplicateBanner": "{name} informa o mesmo número de série. Pode ser este computador salvo duas vezes.",
+  "diveComputer_detail_duplicateBannerMultiple": "Outros {count} registros salvos informam o mesmo número de série. Pode ser este computador salvo mais de uma vez.",
   "diveComputer_detail_duplicateBannerAction": "Mesclar"
 }

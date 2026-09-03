@@ -35756,5 +35756,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'تُبلغ $count سجلات محفوظة أخرى عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً أكثر من مرة.';
+  }
+
+  @override
   String get diveComputer_detail_duplicateBannerAction => 'دمج';
 }

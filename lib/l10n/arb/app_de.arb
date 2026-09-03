@@ -10536,5 +10536,6 @@
   "diveComputer_detail_mergePickerEmpty": "Es gibt keine anderen Computer zum Zusammenführen.",
   "diveComputer_detail_mergePickerSameSerial": "Gleiche Seriennummer",
   "diveComputer_detail_duplicateBanner": "{name} meldet dieselbe Seriennummer. Möglicherweise ist dieser Computer doppelt gespeichert.",
+  "diveComputer_detail_duplicateBannerMultiple": "{count} andere gespeicherte Einträge melden dieselbe Seriennummer. Möglicherweise ist dieser Computer mehrfach gespeichert.",
   "diveComputer_detail_duplicateBannerAction": "Zusammenführen"
 }
