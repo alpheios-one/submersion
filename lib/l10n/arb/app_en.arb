@@ -5686,8 +5686,6 @@
   "divers_edit_selectInsuranceExpiryTooltip": "Select insurance expiry date",
   "divers_edit_selectMedicalClearanceTooltip": "Select medical clearance date",
   "divers_edit_updateButton": "Update Diver",
-  "divers_list_activeBadge": "Active",
-  "divers_list_addDiverButton": "Add Diver",
   "divers_list_addDiverTooltip": "Add a new diver profile",
   "divers_list_appBarTitle": "Diver Profiles",
   "divers_list_compactTitle": "Divers",
@@ -5699,13 +5697,6 @@
   "divers_list_loadingStats": "Loading...",
   "divers_list_retryButton": "Retry",
   "divers_list_viewDiverLabel": "View diver {name}",
-  "divers_summary_activeDiverTitle": "Active Diver",
-  "divers_summary_otherDiversTitle": "Other Divers",
-  "divers_summary_overviewTitle": "Overview",
-  "divers_summary_quickActionsTitle": "Quick Actions",
-  "divers_summary_subtitle": "Select a diver from the list to view details",
-  "divers_summary_title": "Diver Profiles",
-  "divers_summary_totalDiversLabel": "Total Divers",
   "@divers_detail_deleteDialogContent": {
     "placeholders": {
       "name": {
@@ -9795,26 +9786,19 @@
   "settings_gfPreset_medium_name": "Medium",
   "settings_import_cancelButton": "Cancel import",
   "settings_import_cancelling": "Cancelling...",
-  "settings_import_dialog_title": "Importing Data",
-  "settings_import_doNotClose": "Please do not close the app",
-  "settings_import_itemCount": "{current} of {total}",
   "settings_import_phase_buddies": "Importing buddies...",
   "settings_import_phase_certifications": "Importing certifications...",
-  "settings_import_phase_complete": "Finalizing...",
   "settings_import_phase_diveCenters": "Importing dive centers...",
   "settings_import_phase_diveTypes": "Importing dive types...",
   "settings_import_phase_dives": "Importing dives...",
   "settings_import_phase_equipment": "Importing equipment...",
   "settings_import_phase_equipmentSets": "Importing equipment sets...",
-  "settings_import_phase_parsing": "Parsing file...",
   "settings_import_phase_preparing": "Preparing...",
   "settings_import_phase_sites": "Importing dive sites...",
   "settings_import_phase_tags": "Importing tags...",
   "settings_import_phase_trips": "Importing trips...",
   "settings_import_phase_courses": "Importing courses...",
   "settings_import_phase_applyingTags": "Applying tags...",
-  "settings_import_progressLabel": "{phase}, {current} of {total}",
-  "settings_import_progressPercent": "Import progress: {percent} percent",
   "settings_language_appBar_title": "Language",
   "settings_language_selected": "Selected",
   "settings_language_systemDefault": "System Default",
@@ -10426,36 +10410,6 @@
   },
   "@settings_decompression_cnsMethodSourceSubsurface": {
     "description": "Tappable link label for the Subsurface source implementation. Keep 'Subsurface', 'CNS' and the file name 'divelist.cpp' as written; translate only the descriptor 'implementation'."
-  },
-  "@settings_import_itemCount": {
-    "placeholders": {
-      "current": {
-        "type": "Object"
-      },
-      "total": {
-        "type": "Object"
-      }
-    }
-  },
-  "@settings_import_progressLabel": {
-    "placeholders": {
-      "phase": {
-        "type": "Object"
-      },
-      "current": {
-        "type": "Object"
-      },
-      "total": {
-        "type": "Object"
-      }
-    }
-  },
-  "@settings_import_progressPercent": {
-    "placeholders": {
-      "percent": {
-        "type": "Object"
-      }
-    }
   },
   "@settings_notifications_days": {
     "placeholders": {
@@ -11678,6 +11632,27 @@
   "@importWizard_photos_mobileUnsupported": {
     "description": "Shown on mobile, where a photo folder cannot be picked"
   },
+  "importWizard_photos_bundledCount": "{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}",
+  "@importWizard_photos_bundledCount": {
+    "description": "Count of photos bundled inside an imported ZIP archive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseDestination": "Choose where to save photos...",
+  "@importWizard_photos_chooseDestination": {
+    "description": "Button that opens a folder picker for where bundled archive photos are saved"
+  },
+  "importWizard_photos_destinationNote": "The photos are saved to this folder and linked from there. Submersion never keeps its own copy.",
+  "@importWizard_photos_destinationNote": {
+    "description": "Explains that bundled photos are written to the chosen folder and linked, never stored inside the app"
+  },
+  "importWizard_photos_destinationUnwritable": "That folder can't be written to. Choose another one.",
+  "@importWizard_photos_destinationUnwritable": {
+    "description": "Snackbar shown when the folder chosen for bundled archive photos cannot be written to"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",
@@ -12620,7 +12595,6 @@
   "universalImport_semantics_probableDuplicate": "Probable duplicate",
   "universalImport_semantics_sourceDetected": "Source detected: {description}",
   "universalImport_semantics_sourceUncertain": "Source uncertain: {description}",
-  "universalImport_semantics_toggleSelection": "Toggle selection for {name}",
   "universalImport_snackbar_bulkMarkedAs": "{count} marked as {action}",
   "universalImport_snackbar_markedAs": "Marked as {action}",
   "universalImport_step_import": "Import",
@@ -13075,15 +13049,6 @@
       "description": {
         "type": "Object",
         "example": "Could not determine source application"
-      }
-    }
-  },
-  "@universalImport_semantics_toggleSelection": {
-    "description": "Accessibility label for toggling selection of an import entity",
-    "placeholders": {
-      "name": {
-        "type": "Object",
-        "example": "Dive #42"
       }
     }
   },
@@ -13968,19 +13933,6 @@
   "diveComputer_pinCode_label": "PIN Code",
   "diveComputer_pinCode_submit": "Submit",
   "diveComputer_pinCode_title": "PIN Code Required",
-  "diveComputer_pinEntry_connectButton": "Connect",
-  "diveComputer_pinEntry_helperText": "Enter the 4-6 digit PIN shown on your device",
-  "diveComputer_pinEntry_instructionsGeneric": "Check your dive computer display for the PIN code.",
-  "diveComputer_pinEntry_instructionsWithDevice": "Check your {deviceName} display for the PIN code.",
-  "@diveComputer_pinEntry_instructionsWithDevice": {
-    "placeholders": {
-      "deviceName": {
-        "type": "String"
-      }
-    }
-  },
-  "diveComputer_pinEntry_semanticLabel": "PIN code entry, 4 to 6 digits",
-  "diveComputer_pinEntry_title": "Enter PIN Code",
   "diveComputer_scan_bluetoothSemanticLabel": "Bluetooth device: {name}",
   "@diveComputer_scan_bluetoothSemanticLabel": {
     "placeholders": {

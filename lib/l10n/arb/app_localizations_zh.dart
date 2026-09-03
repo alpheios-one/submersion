@@ -9250,12 +9250,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divers_edit_updateButton => '更新潜水员';
 
   @override
-  String get divers_list_activeBadge => '活跃';
-
-  @override
-  String get divers_list_addDiverButton => '添加潜水员';
-
-  @override
   String get divers_list_addDiverTooltip => '添加新的潜水员档案';
 
   @override
@@ -9293,27 +9287,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return '查看潜水员 $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => '当前潜水员';
-
-  @override
-  String get divers_summary_otherDiversTitle => '其他潜水员';
-
-  @override
-  String get divers_summary_overviewTitle => '概览';
-
-  @override
-  String get divers_summary_quickActionsTitle => '快捷操作';
-
-  @override
-  String get divers_summary_subtitle => '从列表中选择潜水员以查看详情';
-
-  @override
-  String get divers_summary_title => '潜水员档案';
-
-  @override
-  String get divers_summary_totalDiversLabel => '潜水员总数';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -15837,24 +15810,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_import_cancelling => '正在取消...';
 
   @override
-  String get settings_import_dialog_title => '正在导入数据';
-
-  @override
-  String get settings_import_doNotClose => '请不要关闭应用';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current/$total';
-  }
-
-  @override
   String get settings_import_phase_buddies => '正在导入潜伴...';
 
   @override
   String get settings_import_phase_certifications => '正在导入证书...';
-
-  @override
-  String get settings_import_phase_complete => '正在完成...';
 
   @override
   String get settings_import_phase_diveCenters => '正在导入潜水中心...';
@@ -15870,9 +15829,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_import_phase_equipmentSets => '正在导入装备套装...';
-
-  @override
-  String get settings_import_phase_parsing => '正在解析文件...';
 
   @override
   String get settings_import_phase_preparing => '准备中...';
@@ -15891,20 +15847,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => '正在应用标签...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase，$current/$total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return '导入进度：$percent%';
-  }
 
   @override
   String get settings_language_appBar_title => '语言';
@@ -18126,6 +18068,27 @@ class AppLocalizationsZh extends AppLocalizations {
       '导入照片需要此设备磁盘上的文件夹。请在电脑上运行此导入以包含照片。潜水记录和潜点会正常导入。';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '压缩包中包含 $count 张照片',
+      one: '压缩包中包含 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination => '选择照片保存位置...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      '照片将保存到此文件夹并从此处链接。Submersion 绝不会保留自己的副本。';
+
+  @override
+  String get importWizard_photos_destinationUnwritable => '无法写入该文件夹。请选择其他文件夹。';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19919,11 +19882,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return '切换 $name 的选择';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count 已标记为 $action';
   }
@@ -20610,26 +20568,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => '需要 PIN 码';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => '连接';
-
-  @override
-  String get diveComputer_pinEntry_helperText => '输入设备上显示的 4 到 6 位数字 PIN 码';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric => '查看潜水电脑显示屏上的 PIN 码。';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return '查看 $deviceName 显示屏上的 PIN 码。';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel => 'PIN 码输入,4 到 6 位数字';
-
-  @override
-  String get diveComputer_pinEntry_title => '输入 PIN 码';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {

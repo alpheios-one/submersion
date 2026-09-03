@@ -9553,12 +9553,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divers_edit_updateButton => 'Update Diver';
 
   @override
-  String get divers_list_activeBadge => 'Active';
-
-  @override
-  String get divers_list_addDiverButton => 'Add Diver';
-
-  @override
   String get divers_list_addDiverTooltip => 'Add a new diver profile';
 
   @override
@@ -9597,28 +9591,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'View diver $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Active Diver';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Other Divers';
-
-  @override
-  String get divers_summary_overviewTitle => 'Overview';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Quick Actions';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Select a diver from the list to view details';
-
-  @override
-  String get divers_summary_title => 'Diver Profiles';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Total Divers';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -16384,25 +16356,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_import_cancelling => 'Cancelling...';
 
   @override
-  String get settings_import_dialog_title => 'Importing Data';
-
-  @override
-  String get settings_import_doNotClose => 'Please do not close the app';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current of $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Importing buddies...';
 
   @override
   String get settings_import_phase_certifications =>
       'Importing certifications...';
-
-  @override
-  String get settings_import_phase_complete => 'Finalizing...';
 
   @override
   String get settings_import_phase_diveCenters => 'Importing dive centers...';
@@ -16421,9 +16379,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Importing equipment sets...';
 
   @override
-  String get settings_import_phase_parsing => 'Parsing file...';
-
-  @override
   String get settings_import_phase_preparing => 'Preparing...';
 
   @override
@@ -16440,20 +16395,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current of $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Import progress: $percent percent';
-  }
 
   @override
   String get settings_language_appBar_title => 'Language';
@@ -18798,6 +18739,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos bundled in the archive',
+      one: '1 photo bundled in the archive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Choose where to save photos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'That folder can\'t be written to. Choose another one.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20657,11 +20621,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Toggle selection for $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count marked as $action';
   }
@@ -21371,29 +21330,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'PIN Code Required';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Connect';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Enter the 4-6 digit PIN shown on your device';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Check your dive computer display for the PIN code.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Check your $deviceName display for the PIN code.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'PIN code entry, 4 to 6 digits';
-
-  @override
-  String get diveComputer_pinEntry_title => 'Enter PIN Code';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
