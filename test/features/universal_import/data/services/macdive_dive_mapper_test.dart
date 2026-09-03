@@ -1040,6 +1040,31 @@ void main() {
         expect(last['temperature'], closeTo(24.0, 1e-6));
       });
 
+      test('heart rate and ceiling reach the profile point', () async {
+        // The Teric options word every other test here uses carries neither,
+        // so these two channels - the ones ZSAMPLES can supply that MacDive's
+        // own XML export cannot - had no test asserting they arrive.
+        final payload = await MacDiveDiveMapper.toPayload(
+          _samplesLogbook(
+            computer: 'Manual',
+            samples: _zsamplesPulseAndStop([
+              (0.0, 0.0, 70, 0.0),
+              (60.0, 30.0, 75, 3.0),
+            ]),
+          ),
+        );
+
+        final dive = payload.entitiesOf(ImportEntityType.dives).single;
+        final profile = dive['profile'] as List;
+        final descent = profile.last as Map<String, dynamic>;
+        expect(descent['heartRate'], 75);
+        expect(descent['ceiling'], closeTo(3.0, 1e-6));
+        // A zero next stop is MacDive's "no reading", not a stop at the
+        // surface, so it stays out the way a zero pressure does.
+        expect((profile.first as Map).containsKey('ceiling'), isFalse);
+        expect((profile.first as Map)['heartRate'], 70);
+      });
+
       test('unreadable ZSAMPLES count toward the aggregated warning', () async {
         final payload = await MacDiveDiveMapper.toPayload(
           _samplesLogbook(
@@ -1317,6 +1342,39 @@ Uint8List _zsamples(
     ..setUint32(0, 4, Endian.little)
     ..setUint32(4, options, Endian.little);
   blob.setRange(8, blob.length, cipher.encrypt(plain));
+  return blob;
+}
+
+/// A `ZSAMPLES` blob carrying only heart rate and next-stop depth, the two
+/// optional fields no other fixture here sets. Records are
+/// (time s, depth m, bpm, next stop m); in the encoder's emission order heart
+/// rate precedes next-stop depth, so the stride is 16.
+Uint8List _zsamplesPulseAndStop(List<(double, double, int, double)> records) {
+  const options =
+      MacDiveSamplesDecoder.optionHeartRate |
+      MacDiveSamplesDecoder.optionNextStopDepth;
+  const stride = 16;
+  final packed = Uint8List(records.length * stride);
+  final data = ByteData.sublistView(packed);
+  for (var i = 0; i < records.length; i++) {
+    final (time, depth, heartRate, nextStop) = records[i];
+    data
+      ..setFloat32(i * stride, time, Endian.little)
+      ..setFloat32(i * stride + 4, depth, Endian.little)
+      ..setInt32(i * stride + 8, heartRate, Endian.little)
+      ..setFloat32(i * stride + 12, nextStop, Endian.little);
+  }
+  final plain = Uint8List(((packed.length + 7) ~/ 8 + 1) * 8)
+    ..setRange(0, packed.length, packed);
+  ByteData.sublistView(
+    plain,
+  ).setUint32(plain.length - 4, packed.length, Endian.little);
+
+  final blob = Uint8List(8 + plain.length);
+  ByteData.sublistView(blob)
+    ..setUint32(0, 4, Endian.little)
+    ..setUint32(4, options, Endian.little);
+  blob.setRange(8, blob.length, MacDiveSamplesDecoder.cipher.encrypt(plain));
   return blob;
 }
 
