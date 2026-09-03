@@ -6223,7 +6223,7 @@ class DiveRepository {
       return (result.data['cnt'] as int) >= 2;
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to check multiple computers for dive: $diveId',
+        'Failed to count data source strands for dive: $diveId',
         error: e,
         stackTrace: stackTrace,
       );
