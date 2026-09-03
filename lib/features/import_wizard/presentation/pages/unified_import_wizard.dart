@@ -260,6 +260,12 @@ class _UnifiedImportWizardBodyState
         _advanceError = e is ImportStepFailure
             ? e.message
             : context.l10n.universalImport_error_stepFailed('$e');
+        // Hand the step back to the user. _AcquisitionStepPage re-arms
+        // auto-advance on every build where its page is current, is still
+        // navigating forward and canAutoAdvance reads true -- and showing this
+        // error is itself a rebuild, so a failing auto-advance step would
+        // re-run its own work on every frame and never let go.
+        _navigatingForward = false;
       });
     } finally {
       _advancing = false;
@@ -532,7 +538,13 @@ class _UnifiedImportWizardBodyState
                     isCurrentPage: _currentPage == i,
                     navigatingForward: _navigatingForward,
                     resetComplete: _resetComplete,
-                    onAutoAdvance: () => _onNext(),
+                    // Re-checked at fire time, not just at arming time: the
+                    // post-frame callback may have been scheduled a frame
+                    // before a failure (or a Back tap) took the wizard out of
+                    // forward navigation, and it carries no such check itself.
+                    onAutoAdvance: () {
+                      if (_navigatingForward) _onNext();
+                    },
                   ),
                 ),
                 ReviewStep(
