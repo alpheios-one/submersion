@@ -168,6 +168,16 @@ Future<NavSpy> pumpStrip(
   return spy;
 }
 
+/// Every chip label currently in the strip, in render order. The finder
+/// walks the tree depth-first, which is the order the Wrap lays its
+/// children out, so this is what the diver reads left to right.
+List<String> chipLabels(WidgetTester tester) => tester
+    .widgetList<Text>(
+      find.descendant(of: find.byType(Wrap), matching: find.byType(Text)),
+    )
+    .map((t) => t.data!)
+    .toList();
+
 /// Taps the chip whose label is [label] and settles.
 Future<void> tapChip(WidgetTester tester, String label) async {
   await tester.tap(
@@ -1024,6 +1034,313 @@ void main() {
       }
       await pumpStrip(tester, _emptyGauges, settingsNotifier: settingsNotifier);
       expect(find.byType(Wrap), findsNothing);
+    });
+  });
+
+  group('alert ordering', () {
+    testWidgets('alert chips lead, everything else keeps source order', (
+      tester,
+    ) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Teric',
+              EquipmentType.computer,
+              ServiceClockSeverity.ok,
+            ),
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+            ),
+          ],
+          hasGear: true,
+          insurance: const DiverInsurance(provider: 'DAN'),
+          noFlyStatus: null,
+          daysSinceLastDive: 12,
+        ),
+      );
+      // The overdue regulator jumps the queue; every other chip, including
+      // the warn-tone backup chip, stays in the order the strip declares.
+      expect(chipLabels(tester), [
+        'Regulator overdue',
+        'Teric OK',
+        'Insurance OK',
+        'No-fly 0:00',
+        'Last dive 12d ago',
+        'No backup yet',
+      ]);
+    });
+
+    testWidgets('several alerts keep their relative order', (tester) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+            ),
+          ],
+          hasGear: true,
+          insurance: DiverInsurance(
+            provider: 'DAN',
+            expiryDate: DateTime(2020, 1, 1),
+          ),
+          noFlyStatus: null,
+          daysSinceLastDive: 12,
+        ),
+      );
+      expect(chipLabels(tester).take(2), [
+        'Regulator overdue',
+        'Insurance expired',
+      ]);
+    });
+  });
+
+  group('hardened safety chips', () {
+    /// Hides every chip type, so each test proves the chip renders purely
+    /// because it is a hardened alert rather than because it slipped past.
+    Future<MockSettingsNotifier> allHidden() async {
+      final settingsNotifier = MockSettingsNotifier();
+      for (final type in HomeChipType.values) {
+        await settingsNotifier.setHomeChipEnabled(type.name, false);
+      }
+      return settingsNotifier;
+    }
+
+    testWidgets('overdue gear renders with gear chips hidden', (tester) async {
+      final spy = await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+              id: 'reg-1',
+            ),
+            _gearGauge(
+              'BCD',
+              EquipmentType.bcd,
+              ServiceClockSeverity.dueSoon,
+              dueDate: DateTime.now().add(const Duration(days: 20, hours: 1)),
+            ),
+            _gearGauge(
+              'Teric',
+              EquipmentType.computer,
+              ServiceClockSeverity.ok,
+            ),
+          ],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      // Only the lapsed item survives: due-soon and OK gear are ordinary
+      // chips the diver is allowed to hide.
+      expect(chipLabels(tester), ['Regulator overdue']);
+
+      await tapChip(tester, 'Regulator overdue');
+      expect(spy.location, '/equipment/reg-1');
+    });
+
+    testWidgets('expired insurance renders with insurance hidden', (
+      tester,
+    ) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: DiverInsurance(
+            provider: 'DAN',
+            expiryDate: DateTime(2020, 1, 1),
+          ),
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      expect(chipLabels(tester), ['Insurance expired']);
+    });
+
+    testWidgets('a valid policy still hides when insurance is hidden', (
+      tester,
+    ) async {
+      await pumpStrip(
+        tester,
+        const DashboardGauges(
+          gearGauges: [],
+          hasGear: true,
+          insurance: DiverInsurance(provider: 'DAN'),
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      expect(find.byType(Wrap), findsNothing);
+    });
+
+    testWidgets('a missing policy is not treated as an alert', (tester) async {
+      // No insurance on file is a neutral chip, not a safety fact, so
+      // hiding the type must silence it.
+      await pumpStrip(
+        tester,
+        _emptyGauges,
+        settingsNotifier: await allHidden(),
+      );
+      expect(find.byType(Wrap), findsNothing);
+    });
+
+    testWidgets('a shut flight window renders with the type hidden', (
+      tester,
+    ) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+          flightWindow: FlightWindowStatus(
+            state: FlightWindowState.closed,
+            flightAt: DateTime.utc(2126, 8, 10, 9),
+            deadline: DateTime.utc(2126, 8, 9, 15),
+            category: NoFlyCategory.repetitive,
+            interval: const Duration(hours: 18),
+          ),
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      expect(chipLabels(tester), ['No more diving before flight']);
+    });
+
+    testWidgets('an open flight window still hides when the type is hidden', (
+      tester,
+    ) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+          flightWindow: FlightWindowStatus(
+            state: FlightWindowState.open,
+            flightAt: DateTime.utc(2126, 8, 10, 9),
+            deadline: DateTime.utc(2126, 8, 9, 15),
+            category: NoFlyCategory.repetitive,
+            interval: const Duration(hours: 18),
+          ),
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      expect(find.byType(Wrap), findsNothing);
+    });
+
+    testWidgets('red currency and backup chips stay hideable', (tester) async {
+      // Both go alert-tone at these thresholds, and both are habit nags
+      // rather than dive-safety gates, so hiding them must still work.
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: 400,
+          lastBackupTime: DateTime.now().subtract(const Duration(days: 45)),
+        ),
+        settingsNotifier: await allHidden(),
+      );
+      expect(find.byType(Wrap), findsNothing);
+    });
+  });
+
+  group('overdue overflow chip', () {
+    testWidgets('renders the count and opens the equipment list', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+            ),
+          ],
+          gearOverdueOverflow: 3,
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+      );
+      expect(find.text('+3 more overdue'), findsOneWidget);
+
+      // It names no single item, so it falls back to the list.
+      await tapChip(tester, '+3 more overdue');
+      expect(spy.location, '/equipment');
+    });
+
+    testWidgets('is absent when nothing overflowed', (tester) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+            ),
+          ],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+      );
+      expect(find.textContaining('more overdue'), findsNothing);
+    });
+
+    testWidgets('survives gear chips being hidden', (tester) async {
+      final settingsNotifier = MockSettingsNotifier();
+      await settingsNotifier.setHomeChipEnabled('gear', false);
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge(
+              'Regulator',
+              EquipmentType.regulator,
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1),
+            ),
+          ],
+          gearOverdueOverflow: 2,
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+        settingsNotifier: settingsNotifier,
+      );
+      expect(find.text('+2 more overdue'), findsOneWidget);
     });
   });
 

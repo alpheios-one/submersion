@@ -5429,6 +5429,12 @@ abstract class AppLocalizations {
   /// **'{name} overdue'**
   String dashboard_gauges_gearOverdue(String name);
 
+  /// No description provided for @dashboard_gauges_gearOverdueMore.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more overdue'**
+  String dashboard_gauges_gearOverdueMore(int count);
+
   /// No description provided for @dashboard_gauges_insuranceOk.
   ///
   /// In en, this message translates to:
@@ -5788,12 +5794,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status unavailable - tap to retry'**
   String get dashboard_gauges_retry;
-
-  /// No description provided for @dashboard_urgent_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Needs attention'**
-  String get dashboard_urgent_title;
 
   /// No description provided for @dashboard_media_title.
   ///
