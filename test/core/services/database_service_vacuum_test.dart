@@ -160,15 +160,15 @@ void main() {
       );
       await DatabaseService.instance.close(strict: true);
 
-      expect(storedVersionOnDisk(), 183);
+      expect(storedVersionOnDisk(), AppDatabase.currentSchemaVersion);
       // Only VACUUM returns the dropped table's pages to the filesystem; a
       // plain DROP leaves them on the freelist.
       expect(freelistOnDisk(), 0);
     },
   );
 
-  test('a file stamped 183 whose legacy table the BACKSTOP drops is '
-      'VACUUMed', () async {
+  test('a file stamped at the current version whose legacy table the '
+      'BACKSTOP drops is VACUUMed', () async {
     // The v183 rung is explicitly allowed to skip its drop: its own pack
     // threw, the series table's foreign-key parents were absent, or the
     // residue count found rows no series covered. The file is stamped 183
@@ -207,7 +207,7 @@ void main() {
       raw.execute('COMMIT');
       stmt.close();
       // Already at the current version, so there is no ladder to run.
-      raw.execute('PRAGMA user_version = 183');
+      raw.execute('PRAGMA user_version = ${AppDatabase.currentSchemaVersion}');
     });
 
     expect(freelistOnDisk(), 0);

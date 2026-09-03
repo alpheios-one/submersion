@@ -157,7 +157,7 @@ void main() {
         final version = await second
             .customSelect('PRAGMA user_version')
             .getSingle();
-        expect(version.data.values.first, 183);
+        expect(version.data.values.first, AppDatabase.currentSchemaVersion);
       },
     );
 
