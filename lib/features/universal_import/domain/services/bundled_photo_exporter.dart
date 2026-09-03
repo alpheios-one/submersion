@@ -32,7 +32,7 @@ Future<String> exportBundledPhoto({
     // Anything at all occupying the name blocks it, not just a file: a
     // directory or a symlink there would make the copy throw, or be
     // written through, and the photo would be lost to a log line.
-    final type = FileSystemEntity.typeSync(candidate, followLinks: false);
+    final type = await FileSystemEntity.type(candidate, followLinks: false);
     if (type == FileSystemEntityType.notFound) break;
     if (type == FileSystemEntityType.file &&
         await _sameBytes(File(candidate), source)) {
