@@ -4419,43 +4419,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_consolidate_undone => 'تم التراجع عن الدمج';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'سيتم دمج الغوصة في الساعة $time مع هذه الغوصة.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'تأكيد الدمج';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'لم يتم العثور على غوصات أخرى في هذا اليوم.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'سيتم دمج ملف هذه الغوصة والأسطوانات والضغوط والأحداث والوسوم ورفقاء الغوص والمشاهدات في هذه الغوصة كمصدر كمبيوتر إضافي. يمكن التراجع عن هذا الإجراء باستخدام \'إلغاء ربط الكمبيوتر\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'خطأ في تحميل الغوصات: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'دمج';
-
-  @override
-  String get diveLog_mergeDialog_next => 'التالي';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'اختر غوصة من نفس اليوم لدمجها كجهاز كمبيوتر إضافي.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'دمج مع غوصة أخرى';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'ما الذي يفعله هذا';
-
-  @override
   String get diveLog_computerSheet_description =>
       'اختر ملف أي كمبيوتر تريد التحرير منه.';
 
@@ -22423,6 +22386,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'حذف \"$name\"؟\n\nتم تنزيل هذه المنطقة بإصدار سابق، لذا تُخزَّن بلاطاتها مع بلاطات مناطق أخرى ولا يمكن تحريرها بمفردها. لن يؤدي حذفها إلى استعادة مساحة تخزين.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22513,6 +22481,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'الحجم';
+
+  @override
+  String get maps_offline_sizeUnknown => 'غير معروف';
 
   @override
   String get maps_offline_tiles => 'البلاطات';
@@ -33510,14 +33481,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'صورة مصغّرة لفيديو. انقر للعرض بملء الشاشة';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'صورة مصغّرة لصورة، مفقودة من الجهاز. انقر للعرض بملء الشاشة';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'صورة مصغّرة لفيديو، مفقود من الجهاز. انقر للعرض بملء الشاشة';
 
   @override
   String get trips_photos_thumbnail_photo =>

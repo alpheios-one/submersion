@@ -21,6 +21,8 @@ import 'package:submersion/features/media/presentation/providers/media_resolver_
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../support/capturing_media_repository.dart';
+
 /// A 1x1 transparent PNG, so Image.memory has something it can decode.
 final Uint8List _png = base64Decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
@@ -51,24 +53,6 @@ class _FixedResolver implements MediaSourceResolver {
 
   @override
   Future<VerifyResult> verify(MediaItem item) async => VerifyResult.available;
-}
-
-/// Records markVerified calls and refuses every other member, so a write the
-/// reconciler was not supposed to make shows up as a failure rather than as
-/// a silently accepted no-op.
-class _CapturingRepository implements MediaRepository {
-  final List<({String id, bool isOrphaned})> writes = [];
-
-  @override
-  Future<void> markVerified(
-    String id, {
-    required bool isOrphaned,
-    required DateTime verifiedAt,
-  }) async => writes.add((id: id, isOrphaned: isOrphaned));
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnimplementedError('${invocation.memberName} is not stubbed');
 }
 
 /// Stands in for the store runtime so the fallback can SUCCEED, which is the
@@ -175,7 +159,7 @@ Future<void> _pump(
 
 void main() {
   testWidgets('a notFound resolution orphans the row', (tester) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -189,7 +173,7 @@ void main() {
   testWidgets('a successful resolution clears a stale orphan flag', (
     tester,
   ) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -205,7 +189,7 @@ void main() {
     // The steady state. Every MediaRepository write calls markRecordPending,
     // so a write here would queue one pending sync row per thumbnail that
     // scrolled into view.
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -219,7 +203,7 @@ void main() {
   // A revoked photo permission makes EVERY gallery tile fail at once, so a
   // write on this path would orphan a whole library and sync the claim.
   testWidgets('an accessDenied resolution never orphans', (tester) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -233,7 +217,7 @@ void main() {
   // The availability work's own constraint: a fetch that outlived its time
   // budget must not permanently mark a diver's photo dead.
   testWidgets('a stillFetching resolution never orphans', (tester) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -252,7 +236,7 @@ void main() {
   testWidgets('a store fallback covering a dead origin still orphans', (
     tester,
   ) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -270,7 +254,7 @@ void main() {
   testWidgets('a store fallback that finds nothing still orphans', (
     tester,
   ) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -288,7 +272,7 @@ void main() {
   ) async {
     // accessDenied still means nothing was learned, whether or not the cloud
     // covered for it.
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,
@@ -306,7 +290,7 @@ void main() {
   testWidgets('an already-orphaned row that stays missing writes nothing', (
     tester,
   ) async {
-    final repository = _CapturingRepository();
+    final repository = CapturingMediaRepository();
 
     await _pump(
       tester,

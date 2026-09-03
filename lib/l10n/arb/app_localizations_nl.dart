@@ -4473,43 +4473,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Samenvoeging ongedaan gemaakt';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'De duik om $time wordt samengevoegd met deze duik.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Samenvoegen bevestigen';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Geen andere duiken gevonden op deze dag.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Het profiel, de flessen, drukken, gebeurtenissen, tags, buddy\'s en waarnemingen van deze duik worden samengevoegd in deze duik als extra computerbron. Deze actie kan ongedaan worden gemaakt met \'Computer loskoppelen\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Fout bij het laden van duiken: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Samenvoegen';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Volgende';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Selecteer een duik van dezelfde dag om samen te voegen als extra computer.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Samenvoegen met een andere duik';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Wat dit doet';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Kies vanaf welk computerprofiel je wilt bewerken.';
 
@@ -22650,6 +22613,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '\"$name\" verwijderen?\n\nDeze regio is met een eerdere versie gedownload, dus de tegels staan samen met die van andere regio\'s opgeslagen en kunnen niet afzonderlijk worden vrijgemaakt. Verwijderen maakt geen opslagruimte vrij.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22740,6 +22708,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Grootte';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Onbekend';
 
   @override
   String get maps_offline_tiles => 'Tegels';
@@ -33635,14 +33606,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Videominiatuur. Tik om volledig scherm te bekijken';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
 
   @override
   String get trips_photos_thumbnail_photo =>

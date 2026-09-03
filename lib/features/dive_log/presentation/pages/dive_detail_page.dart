@@ -854,6 +854,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The site suggestion sits above the header card, never inside
+            // it. Embedded mode has its own copy under the toolbar (which
+            // stays put while the body scrolls), so only the standalone page
+            // renders one here; otherwise the banner would appear twice.
+            // Collapses to nothing when there is no suggestion, so no
+            // spacing of its own is needed.
+            if (!widget.embedded)
+              SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
             // Fixed: Header
             Consumer(
               builder: (context, ref, _) {
@@ -1417,7 +1425,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               );
             },
           ),
-          SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -3317,11 +3324,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_avgDepth,
                 units.formatDepth(dive.avgDepth),
               ),
-            if (dive.waterType != null)
+            // Effective, so a dive that never had a water type of its own
+            // still shows the one its site carries (issue #1427).
+            if (dive.effectiveWaterType != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.waterType!.displayName,
+                dive.effectiveWaterType!.displayName,
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(
@@ -3406,7 +3415,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
   }
 
@@ -3484,7 +3493,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
 
     return Card(
@@ -3620,11 +3629,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_swellHeight,
                   units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
-              if (dive.entryMethod != null)
+              // Effective, so a dive that never had an entry method of its
+              // own still shows the one its site carries (issue #1427).
+              if (dive.effectiveEntryMethod != null)
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_entryMethod,
-                  dive.entryMethod!.localizedName(context.l10n),
+                  dive.effectiveEntryMethod!.localizedName(context.l10n),
                 ),
               if (dive.exitMethod != null)
                 _buildDetailRow(

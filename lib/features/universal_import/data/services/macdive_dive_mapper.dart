@@ -830,9 +830,13 @@ class MacDiveDiveMapper {
           entry['runtime'] = Duration(seconds: t.duration!.round());
         }
         if (t.supplyType != null) entry['supplyType'] = t.supplyType;
+        // MacDive's ZGAS.ZOXYGEN/ZHELIUM store whole percent (32.0 for
+        // EAN32), not a 0-1 fraction - confirmed against a real MacDive
+        // database, where every gas row (including "Trimix 21/35" at
+        // ZOXYGEN=21.0/ZHELIUM=35.0) matches its percent-based name exactly.
         entry['gasMix'] = GasMix(
-          o2: (gas?.oxygen ?? 0.21) * 100.0,
-          he: (gas?.helium ?? 0.0) * 100.0,
+          o2: gas?.oxygen ?? 21.0,
+          he: gas?.helium ?? 0.0,
         );
         tanks.add(entry);
       }

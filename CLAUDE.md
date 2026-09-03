@@ -24,8 +24,9 @@ else in one, run:
 
 ## Git Hooks
 
-Pre-push hooks live in the `hooks/` directory and run format, analyze, and test
-checks. They are not active until you point git at them.
+Pre-push hooks live in the `hooks/` directory and run format, analyze,
+generated-l10n staleness, and test checks. They are not active until you point
+git at them.
 
 **Setup:** Run `git config core.hooksPath hooks` (or use `./scripts/setup.sh`)
 

@@ -4514,44 +4514,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Zusammenführung rückgängig gemacht';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Der Tauchgang um $time wird mit diesem Tauchgang zusammengeführt.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Zusammenführung bestätigen';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'Keine weiteren Tauchgänge an diesem Tag gefunden.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'Das Profil, die Flaschen, Drücke, Ereignisse, Tags, Tauchpartner und Sichtungen dieses Tauchgangs werden als zusätzliche Computerquelle in diesen Tauchgang eingefügt. Diese Aktion kann mit „Computer trennen“ rückgängig gemacht werden.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Fehler beim Laden der Tauchgänge: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Zusammenführen';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Weiter';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Wähle einen Tauchgang vom selben Tag aus, um ihn als zusätzlichen Computer zusammenzuführen.';
-
-  @override
-  String get diveLog_mergeDialog_title =>
-      'Mit einem anderen Tauchgang zusammenführen';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Was das bewirkt';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Wähle, von welchem Computerprofil aus bearbeitet wird.';
 
@@ -22786,6 +22748,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '\"$name\" löschen?\n\nDiese Region wurde mit einer früheren Version heruntergeladen. Ihre Kacheln liegen zusammen mit denen anderer Regionen und lassen sich nicht einzeln freigeben. Das Löschen gibt keinen Speicherplatz frei.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22876,6 +22843,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Größe';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Unbekannt';
 
   @override
   String get maps_offline_tiles => 'Kacheln';
@@ -33791,14 +33761,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Videovorschau. Tippen, um im Vollbild anzuzeigen';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videovorschau, auf dem Gerät nicht vorhanden. Tippen, um im Vollbild anzuzeigen';
 
   @override
   String get trips_photos_thumbnail_photo =>

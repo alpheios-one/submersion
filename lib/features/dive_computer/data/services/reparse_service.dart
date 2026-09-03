@@ -911,6 +911,11 @@ class ReparseService {
         return 'decoViolation';
       case 'PO2':
         return 'ppO2High';
+      case 'rbt':
+      case 'airtime':
+        // Remaining bottom time (Uwatec) and air time (Suunto) alarms both
+        // mean the gas supply is running short at the current rate.
+        return 'lowGas';
       default:
         return null;
     }
@@ -923,6 +928,7 @@ class ReparseService {
       case 'ppO2High':
         return 'alert';
       case 'ascentRateWarning':
+      case 'lowGas':
         return 'warning';
       default:
         return 'info';
