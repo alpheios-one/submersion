@@ -603,6 +603,21 @@ class SiteTest(unittest.TestCase):
         # An unpinned key would let any key in the system trusted set sign
         # updates for this repository.
         self.assertIn("signed-by=/usr/share/keyrings/submersion.gpg", text)
+
+    def test_setup_script_rejects_an_unknown_channel(self):
+        # The channel lands in an apt source line and a sed replacement;
+        # rejecting it outright turns a malformed enrollment into an error.
+        ...
+
+    def test_setup_script_never_pipes_curl_into_tee(self):
+        # POSIX sh has no pipefail, so a failed download in a pipeline would
+        # write an empty file and still report success.
+        self.assertNotIn("| sudo tee", text)
+
+    def test_setup_script_handles_zypper_before_dnf(self):
+        # openSUSE ships zypper and not dnf; checking dnf first would send
+        # those users to the tarball branch.
+        self.assertLess(text.index("command -v zypper"), text.index("command -v dnf"))
 ```
 
 - [ ] **Step 2: Run the test to verify it fails**
@@ -621,31 +636,63 @@ readable enough that a cautious user can audit it before running:
 #   sudo rm -f /etc/apt/sources.list.d/submersion.list \
 #              /usr/share/keyrings/submersion.gpg
 #   sudo rm -f /etc/yum.repos.d/submersion.repo
+#   sudo rm -f /etc/zypp/repos.d/submersion.repo
 set -eu
 
 CHANNEL="${1:-stable}"
+case "$CHANNEL" in
+  stable | beta) ;;
+  *)
+    echo "Unknown channel: $CHANNEL (expected stable or beta)" >&2
+    exit 2
+    ;;
+esac
+
 BASE="https://packages.submersion.app"
 
+# Downloaded to a file, then installed, rather than piped into sudo tee.
+# POSIX sh has no pipefail, so a pipeline reports the exit status of its last
+# command: curl could fail on a network error or a 404 while tee still
+# succeeded, writing an empty keyring and leaving the script to print
+# "Enrolled" over a repository that can never verify.
+tmpdir=$(mktemp -d)
+trap 'rm -rf "$tmpdir"' EXIT
+
 if command -v apt-get > /dev/null 2>&1; then
-  curl -fsSL "$BASE/submersion.gpg" \
-    | sudo tee /usr/share/keyrings/submersion.gpg > /dev/null
-  echo "deb [signed-by=/usr/share/keyrings/submersion.gpg] $BASE/apt $CHANNEL main" \
-    | sudo tee /etc/apt/sources.list.d/submersion.list > /dev/null
+  curl -fsSL "$BASE/submersion.gpg" -o "$tmpdir/submersion.gpg"
+  sudo install -m 644 "$tmpdir/submersion.gpg" \
+    /usr/share/keyrings/submersion.gpg
+  printf 'deb [signed-by=/usr/share/keyrings/submersion.gpg] %s/apt %s main\n' \
+    "$BASE" "$CHANNEL" > "$tmpdir/submersion.list"
+  sudo install -m 644 "$tmpdir/submersion.list" \
+    /etc/apt/sources.list.d/submersion.list
   sudo apt-get update
   echo "Enrolled. Install with: sudo apt install submersion"
+# zypper before dnf: openSUSE can have both, but zypper owns the package
+# database there, and openSUSE does not ship dnf by default. Checking dnf
+# first would send openSUSE users to the tarball branch.
+elif command -v zypper > /dev/null 2>&1; then
+  curl -fsSL "$BASE/submersion.repo" -o "$tmpdir/repo.in"
+  sed "s/@CHANNEL@/$CHANNEL/" "$tmpdir/repo.in" > "$tmpdir/submersion.repo"
+  sudo install -m 644 "$tmpdir/submersion.repo" \
+    /etc/zypp/repos.d/submersion.repo
+  echo "Enrolled. Install with: sudo zypper install submersion"
 elif command -v dnf > /dev/null 2>&1; then
-  curl -fsSL "$BASE/submersion.repo" \
-    | sed "s/@CHANNEL@/$CHANNEL/" \
-    | sudo tee /etc/yum.repos.d/submersion.repo > /dev/null
+  curl -fsSL "$BASE/submersion.repo" -o "$tmpdir/repo.in"
+  sed "s/@CHANNEL@/$CHANNEL/" "$tmpdir/repo.in" > "$tmpdir/submersion.repo"
+  sudo install -m 644 "$tmpdir/submersion.repo" \
+    /etc/yum.repos.d/submersion.repo
   echo "Enrolled. Install with: sudo dnf install submersion"
 else
-  echo "No apt or dnf found. Use the tarball from GitHub Releases." >&2
+  echo "No apt, zypper, or dnf found. Use the tarball from GitHub Releases." >&2
   exit 1
 fi
 ```
 
 `submersion.repo` uses `@CHANNEL@` for the same substitution, sets
 `gpgcheck=1`, `repo_gpgcheck=1`, and `gpgkey=https://packages.submersion.app/submersion.gpg`.
+The same file serves dnf and zypper, which read the same INI format from
+`/etc/yum.repos.d` and `/etc/zypp/repos.d` respectively.
 
 `index.html` is a plain page explaining what the site is, with the manual
 enrollment commands, so someone who lands on the domain is not staring at a 404.
