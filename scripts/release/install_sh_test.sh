@@ -150,6 +150,19 @@ assert_eq "$(printf 'libgtk-3.so.0\nlibjvm.so\n' | drop_excluded "$WORKDIR/deps-
 assert_eq "$(printf 'libgtk-3.so.0\n' | drop_excluded "$WORKDIR/missing.json")" \
   "libgtk-3.so.0" "keeps everything when the map is unreadable"
 
+# Several sonames map to one package, so the suggested command must not
+# repeat it.
+assert_eq "$(printf 'libglib2.0-0 libglib2.0-0 libgtk-3-0 libglib2.0-0' | dedupe_words)" \
+  "libglib2.0-0 libgtk-3-0" "collapses repeated package names"
+
+assert_eq "$(printf ' libgtk-3-0  libgtk-3-0 ' | dedupe_words)" \
+  "libgtk-3-0" "tolerates leading, trailing, and repeated spaces"
+
+assert_eq "$(printf '' | dedupe_words)" "" "returns empty for empty input"
+
+assert_eq "$(printf 'zlib1g libgtk-3-0' | dedupe_words)" \
+  "libgtk-3-0 zlib1g" "sorts so the command is stable between runs"
+
 if [ "$FAILURES" -gt 0 ]; then
   echo "$FAILURES test(s) failed"
   exit 1

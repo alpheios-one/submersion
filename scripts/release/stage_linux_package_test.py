@@ -116,6 +116,46 @@ class TreeLayoutTest(unittest.TestCase):
             self.assertEqual(handle.read().strip(), "deb")
 
 
+class ReproducibleDateTest(unittest.TestCase):
+    """SOURCE_DATE_EPOCH keeps two builds of one commit byte-identical."""
+
+    def tearDown(self):
+        os.environ.pop("SOURCE_DATE_EPOCH", None)
+
+    def test_source_date_epoch_is_honoured(self):
+        os.environ["SOURCE_DATE_EPOCH"] = "1788393600"  # 2026-09-03T00:00:00Z
+        self.assertEqual(stage.build_date(), "2026-09-03")
+
+    def test_source_date_epoch_is_read_as_utc_not_local_time(self):
+        # 1788393600 is 2026-09-03T00:00:00Z. Interpreted in a timezone behind
+        # UTC it would render as the 2nd, so two builders in different
+        # timezones would produce different packages from one commit.
+        os.environ["SOURCE_DATE_EPOCH"] = "1788393600"
+        self.assertEqual(stage.build_date(), "2026-09-03")
+
+    def test_falls_back_to_today_when_unset(self):
+        os.environ.pop("SOURCE_DATE_EPOCH", None)
+        self.assertRegex(stage.build_date(), r"^\d{4}-\d{2}-\d{2}$")
+
+    def test_a_malformed_epoch_is_rejected_rather_than_ignored(self):
+        # Silently falling back would make a build that meant to be
+        # reproducible quietly stop being so.
+        os.environ["SOURCE_DATE_EPOCH"] = "not-a-number"
+        with self.assertRaises(SystemExit):
+            stage.build_date()
+
+    def test_metainfo_uses_the_pinned_date(self):
+        os.environ["SOURCE_DATE_EPOCH"] = "1788393600"
+        with tempfile.TemporaryDirectory() as tmp:
+            bundle = make_bundle(os.path.join(tmp, "bundle"))
+            staging = os.path.join(tmp, "staging")
+            stage.build_tree(bundle, staging, version="1.0.0.1", install_method="deb")
+            with open(
+                os.path.join(staging, "usr/share/metainfo/app.submersion.metainfo.xml")
+            ) as handle:
+                self.assertIn('date="2026-09-03"', handle.read())
+
+
 class InstallMethodTest(unittest.TestCase):
     def test_rpm_marker_says_rpm(self):
         with tempfile.TemporaryDirectory() as tmp:

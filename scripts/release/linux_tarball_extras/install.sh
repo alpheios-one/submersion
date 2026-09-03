@@ -51,6 +51,16 @@ for soname in sys.stdin.read().split():
 ' "$1"
 }
 
+dedupe_words() {
+  # Collapse a whitespace-separated list to sorted, unique, space-joined words.
+  #
+  # Several sonames commonly map to one package: libglib-2.0.so.0,
+  # libgobject-2.0.so.0, libgio-2.0.so.0 and libgmodule-2.0.so.0 all map to
+  # libglib2.0-0, so a naive append prints it four times in the command handed
+  # to the user.
+  tr ' ' '\n' | sed '/^$/d' | sort -u | tr '\n' ' ' | sed 's/ *$//'
+}
+
 install_command_for() {
   # install_command_for <manager> <packages> -> the command the user runs
   case "$1" in
@@ -131,8 +141,10 @@ preflight() {
     fi
   done
 
+  packages="$(printf '%s' "$packages" | dedupe_words)"
+
   if [ -n "$packages" ]; then
-    command="$(install_command_for "$manager" "${packages# }")"
+    command="$(install_command_for "$manager" "$packages")"
     if [ -n "$command" ]; then
       echo ""
       echo "Install them with:"

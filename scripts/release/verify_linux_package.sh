@@ -6,7 +6,7 @@
 # through the real package manager is the point: it proves every declared
 # dependency is resolvable on a stock system, which the tar.gz could never
 # demonstrate.
-set -eux
+set -euxo pipefail
 
 RULES=/usr/lib/udev/rules.d/60-submersion-divecomputers.rules
 
@@ -34,7 +34,15 @@ if grep -q "plugdev" "$RULES"; then
 fi
 
 # No unresolved shared libraries after a real dependency install.
-if ldd /usr/lib/submersion/submersion | grep "not found"; then
+#
+# ldd's output is captured first rather than piped straight into grep. In an
+# "if ldd ... | grep" form, ldd failing outright (wrong path, not executable,
+# not an ELF file) makes grep find nothing, the condition false, and the check
+# pass without having examined anything. Note that pipefail does not save this
+# either: a failed pipeline in an if condition is simply false. Under set -e
+# the assignment itself aborts, so an ldd that cannot run is a build failure.
+LDD_OUTPUT=$(ldd /usr/lib/submersion/submersion)
+if printf '%s\n' "$LDD_OUTPUT" | grep "not found"; then
   echo "unresolved shared libraries after install"
   exit 1
 fi

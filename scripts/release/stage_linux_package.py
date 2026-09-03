@@ -79,6 +79,36 @@ METAINFO = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
+def build_date():
+    """The date stamped into the AppStream metadata.
+
+    Honours SOURCE_DATE_EPOCH, the reproducible-builds convention, so two
+    builds of the same commit produce byte-identical packages. Without it the
+    metadata carries the wall-clock date, and a rebuild of an old tag would
+    differ from the package that shipped.
+
+    Read as UTC deliberately: interpreted in local time, two builders in
+    different timezones would stamp different dates from one commit, which is
+    exactly what the convention exists to prevent.
+    """
+    epoch = os.environ.get("SOURCE_DATE_EPOCH")
+    if not epoch:
+        return datetime.date.today().isoformat()
+    try:
+        seconds = int(epoch)
+    except ValueError:
+        sys.exit(
+            "stage_linux_package: SOURCE_DATE_EPOCH is not an integer: %r. "
+            "Ignoring it would silently make a build that meant to be "
+            "reproducible stop being so." % epoch
+        )
+    return (
+        datetime.datetime.fromtimestamp(seconds, datetime.timezone.utc)
+        .date()
+        .isoformat()
+    )
+
+
 def _write(path, text, mode=0o644):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as handle:
@@ -145,10 +175,7 @@ def build_tree(bundle_root, staging, version, install_method, date=None):
     )
     _write(
         os.path.join(staging, "usr/share/metainfo/app.submersion.metainfo.xml"),
-        METAINFO.format(
-            version=version,
-            date=date or datetime.date.today().isoformat(),
-        ),
+        METAINFO.format(version=version, date=date or build_date()),
     )
     _write(os.path.join(app_dir, "INSTALL_METHOD"), install_method + "\n")
     _stage_icons(staging)
