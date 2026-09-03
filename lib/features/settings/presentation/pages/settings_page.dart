@@ -2333,6 +2333,16 @@ class _ManageSectionContent extends StatelessWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
+                  leading: const Icon(Icons.gas_meter),
+                  title: Text(context.l10n.settings_section_trimixMixer_title),
+                  subtitle: Text(
+                    context.l10n.settings_section_trimixMixer_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/settings/trimix-mixer'),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Icon(Icons.build_circle_outlined),
                   title: Text(context.l10n.settings_manage_serviceTypes),
                   subtitle: Text(

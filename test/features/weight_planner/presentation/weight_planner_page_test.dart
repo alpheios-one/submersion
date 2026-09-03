@@ -14,7 +14,6 @@ import 'package:submersion/features/equipment/domain/entities/equipment_set.dart
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
-import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
 import 'package:submersion/features/weight_planner/presentation/providers/weight_planner_providers.dart';
 
@@ -68,7 +67,12 @@ void main() {
     List<dynamic> extraOverrides = const [],
     DiverWeightEntry? latestWeight,
   }) async {
-    final base = await getBaseOverrides();
+    final base = await getBaseOverrides(
+      tankPresets: [
+        TankPresetEntity.fromBuiltIn(TankPresets.al80),
+        TankPresetEntity.fromBuiltIn(TankPresets.steel12),
+      ],
+    );
     await tester.pumpWidget(
       testApp(
         locale: const Locale('en'),
@@ -84,12 +88,6 @@ void main() {
           ),
           latestDiverWeightProvider.overrideWith(
             (ref) async => latestWeight ?? entry,
-          ),
-          tankPresetsProvider.overrideWith(
-            (ref) async => [
-              TankPresetEntity.fromBuiltIn(TankPresets.al80),
-              TankPresetEntity.fromBuiltIn(TankPresets.steel12),
-            ],
           ),
           ...extraOverrides,
         ],

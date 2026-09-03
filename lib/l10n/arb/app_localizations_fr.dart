@@ -12384,6 +12384,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Ajouter un modèle';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Ajuster les valeurs';
+
+  @override
   String get gasCalculators_blender_billing => 'Coût';
 
   @override
@@ -12401,6 +12404,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_currency => 'Devise';
 
   @override
+  String get gasCalculators_blender_currencyFollowsUnits =>
+      'Suit Reglages > Unites > Devise par défaut';
+
+  @override
+  String get gasCalculators_blender_manageCylinderSizes =>
+      'Gérer les tailles de blocs';
+
+  @override
   String get gasCalculators_blender_costTotal => 'Total';
 
   @override
@@ -12415,7 +12426,34 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Enregistrer ce remplissage';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Facturer des frais pour purger le tuyau de remplissage';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Une fois par facture';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'Une fois par remplissage';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Volume de purge';
+
+  @override
   String get gasCalculators_blender_billed => 'Facturé';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Facture du $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit =>
+      'Modifier la date de facture';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Tarif actuel';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12434,14 +12472,32 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Montant';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Vider';
+  String get gasCalculators_blender_export => 'Exporter';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Vider la facture ?';
+  String get gasCalculators_blender_exportPdf => 'Exporter en PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Cela supprime les $count remplissages enregistrés.';
+  String get gasCalculators_blender_exportImage => 'Exporter en image';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exporter en Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Échec de l\'export : $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Payer';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'Marquer la facture comme payée ?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Cela archive les $count remplissages enregistrés et démarre une nouvelle facture.';
   }
 
   @override
@@ -12465,6 +12521,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Archives des factures';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filtrer par date';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Aucune facture payée pour l\'instant.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Aucune facture sur cette période.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count remplissages';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incomplet';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Sans titre';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Facture introuvable.';
+
+  @override
+  String get gasCalculators_blender_defaults =>
+      'Réglages par défaut et facturation';
 
   @override
   String get gasCalculators_tab_mod => 'MOD';
@@ -25647,6 +25736,13 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_section_security_subtitle =>
       'Verrouillage de l\'app et chiffrement de la base de données';
+
+  @override
+  String get settings_section_trimixMixer_title => 'Mélangeur trimix';
+
+  @override
+  String get settings_section_trimixMixer_subtitle =>
+      'Gaz de remplissage, conditions & réglages par défaut de facturation';
 
   @override
   String get settings_security_appLock => 'Verrouillage de l\'app';

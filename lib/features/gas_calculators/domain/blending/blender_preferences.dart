@@ -1,5 +1,8 @@
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 
 /// A saved target mix, e.g. 10/70. Pressure is deliberately not part of a
 /// template: blenders reuse a mix across cylinders and fill pressures.
@@ -77,13 +80,24 @@ class BlenderPreferences {
   const BlenderPreferences({
     required this.templates,
     required this.gasPrices,
-    required this.currencyCode,
     required this.fillTempC,
     required this.settledTempC,
     required this.cylinderWaterLiters,
     required this.model,
     required this.billedFills,
     required this.billedTo,
+    required this.startPressureBar,
+    required this.startMix,
+    required this.targetPressureBar,
+    required this.targetMix,
+    required this.fillGas1,
+    required this.fillGas2,
+    required this.fillGas3,
+    this.flushFeeEnabled = false,
+    this.flushFeeMode = FlushFeeMode.perInvoice,
+    this.flushFeeGases = defaultFlushFeeGases,
+    this.billedDate,
+    this.archivedInvoices = const [],
   });
 
   /// Enough to keep a synced blob small. Nobody blends 50 distinct mixes.
@@ -106,9 +120,6 @@ class BlenderPreferences {
   /// slots. Null means the diver has not priced that gas.
   final List<double?> gasPrices;
 
-  /// Null inherits the diver's `defaultCurrency` setting.
-  final String? currencyCode;
-
   final double fillTempC;
   final double settledTempC;
   final double cylinderWaterLiters;
@@ -123,42 +134,89 @@ class BlenderPreferences {
   /// a fill station fills other people's cylinders.
   final String billedTo;
 
+  /// Whether a hose-purge flat fee is charged at all.
+  final bool flushFeeEnabled;
+
+  /// How often [flushFeeEnabled] adds its lines to the bill.
+  final FlushFeeMode flushFeeMode;
+
+  /// One entry per [FlushFeeGasKind], in that enum's order.
+  final List<FlushFeeGasSetting> flushFeeGases;
+
+  /// When the running bill started. Null means "not set yet", which the
+  /// invoice card reads as today: the date is editable from the moment a
+  /// bill is open, not only once it is paid.
+  final DateTime? billedDate;
+
+  /// Bills already paid and archived, oldest first. See [ArchivedInvoice].
+  final List<ArchivedInvoice> archivedInvoices;
+
   /// Lives beside [BilledFill] itself; re-exposed here because the JSON read
   /// path enforces it.
   static const int maxBilledFills = kMaxBilledFills;
+
+  /// The starting cylinder pressure and mix, the target fill, and the three
+  /// fill gases -- the last-entered values issue #1335 asks to remember
+  /// across sessions. Matches the hard-coded defaults the state providers in
+  /// `gas_blender_providers.dart` used before persistence existed, so a first
+  /// run behaves exactly as it always has.
+  final double startPressureBar;
+  final GasMix startMix;
+  final double targetPressureBar;
+  final GasMix targetMix;
+  final GasMix fillGas1;
+  final GasMix fillGas2;
+  final GasMix fillGas3;
+
+  /// Lives beside [ArchivedInvoice] itself; re-exposed here for the same
+  /// reason as [maxBilledFills].
+  static const int maxArchivedInvoices = kMaxArchivedInvoices;
 
   factory BlenderPreferences.defaults({required double cylinderWaterLiters}) =>
       BlenderPreferences(
         templates: seedTemplates,
         gasPrices: const [null, null, null],
-        currencyCode: null,
         fillTempC: kReferenceTempC,
         settledTempC: kReferenceTempC,
         cylinderWaterLiters: cylinderWaterLiters,
         model: BlendGasModel.zFactor,
         billedFills: const [],
         billedTo: '',
+        startPressureBar: 0.0,
+        startMix: const GasMix(o2: 21),
+        targetPressureBar: 200.0,
+        targetMix: const GasMix(o2: 32),
+        fillGas1: const GasMix(o2: 100),
+        fillGas2: const GasMix(o2: 0, he: 100),
+        fillGas3: const GasMix(o2: 21),
+        billedDate: null,
+        archivedInvoices: const [],
       );
 
   BlenderPreferences copyWith({
     List<MixTemplate>? templates,
     List<double?>? gasPrices,
-    String? currencyCode,
-    bool clearCurrencyCode = false,
     double? fillTempC,
     double? settledTempC,
     double? cylinderWaterLiters,
     BlendGasModel? model,
     List<BilledFill>? billedFills,
     String? billedTo,
+    double? startPressureBar,
+    GasMix? startMix,
+    double? targetPressureBar,
+    GasMix? targetMix,
+    GasMix? fillGas1,
+    GasMix? fillGas2,
+    GasMix? fillGas3,
+    bool? flushFeeEnabled,
+    FlushFeeMode? flushFeeMode,
+    List<FlushFeeGasSetting>? flushFeeGases,
+    DateTime? billedDate,
+    List<ArchivedInvoice>? archivedInvoices,
   }) => BlenderPreferences(
     templates: (templates ?? this.templates).take(maxTemplates).toList(),
     gasPrices: gasPrices ?? this.gasPrices,
-    // clearCurrencyCode is how it gets removed: null is meaningful here
-    // (inherit the diver's default) and `??` cannot express it.
-    currencyCode: clearCurrencyCode
-        ? null
-        : (currencyCode ?? this.currencyCode),
     fillTempC: fillTempC ?? this.fillTempC,
     settledTempC: settledTempC ?? this.settledTempC,
     cylinderWaterLiters: cylinderWaterLiters ?? this.cylinderWaterLiters,
@@ -167,18 +225,43 @@ class BlenderPreferences {
         .take(maxBilledFills)
         .toList(),
     billedTo: billedTo ?? this.billedTo,
+    startPressureBar: startPressureBar ?? this.startPressureBar,
+    startMix: startMix ?? this.startMix,
+    targetPressureBar: targetPressureBar ?? this.targetPressureBar,
+    targetMix: targetMix ?? this.targetMix,
+    fillGas1: fillGas1 ?? this.fillGas1,
+    fillGas2: fillGas2 ?? this.fillGas2,
+    fillGas3: fillGas3 ?? this.fillGas3,
+    flushFeeEnabled: flushFeeEnabled ?? this.flushFeeEnabled,
+    flushFeeMode: flushFeeMode ?? this.flushFeeMode,
+    flushFeeGases: flushFeeGases ?? this.flushFeeGases,
+    billedDate: billedDate ?? this.billedDate,
+    archivedInvoices: (archivedInvoices ?? this.archivedInvoices)
+        .take(maxArchivedInvoices)
+        .toList(),
   );
 
   Map<String, dynamic> toJson() => {
     'templates': templates.map((t) => t.toJson()).toList(),
     'gasPrices': gasPrices,
-    'currencyCode': currencyCode,
     'fillTempC': fillTempC,
     'settledTempC': settledTempC,
     'cylinderWaterLiters': cylinderWaterLiters,
     'model': model.name,
     'billedFills': billedFills.map((f) => f.toJson()).toList(),
     'billedTo': billedTo,
+    'startPressureBar': startPressureBar,
+    'startMix': _gasMixToJson(startMix),
+    'targetPressureBar': targetPressureBar,
+    'targetMix': _gasMixToJson(targetMix),
+    'fillGas1': _gasMixToJson(fillGas1),
+    'fillGas2': _gasMixToJson(fillGas2),
+    'fillGas3': _gasMixToJson(fillGas3),
+    'flushFeeEnabled': flushFeeEnabled,
+    'flushFeeMode': flushFeeMode.name,
+    'flushFeeGases': flushFeeGases.map((g) => g.toJson()).toList(),
+    if (billedDate != null) 'billedDate': billedDate!.toIso8601String(),
+    'archivedInvoices': archivedInvoices.map((a) => a.toJson()).toList(),
   };
 
   /// Every field falls back independently, so one corrupt entry never costs
@@ -201,8 +284,6 @@ class BlenderPreferences {
       }
     }
 
-    final currency = json['currencyCode'];
-
     final rawFills = json['billedFills'];
     final fills = rawFills is List
         ? rawFills
@@ -214,12 +295,34 @@ class BlenderPreferences {
 
     final billedTo = json['billedTo'];
 
+    final rawFlushGases = json['flushFeeGases'];
+    final flushGases = [
+      for (var i = 0; i < 3; i++)
+        FlushFeeGasSetting.fromJson(
+          rawFlushGases is List && i < rawFlushGases.length
+              ? rawFlushGases[i]
+              : null,
+          defaultVolumeLiters: 20,
+        ),
+    ];
+
+    final billedDateRaw = json['billedDate'];
+    final billedDate = billedDateRaw is String
+        ? DateTime.tryParse(billedDateRaw)
+        : null;
+
+    final rawArchived = json['archivedInvoices'];
+    final archivedInvoices = rawArchived is List
+        ? rawArchived
+              .map(ArchivedInvoice.fromJson)
+              .whereType<ArchivedInvoice>()
+              .take(maxArchivedInvoices)
+              .toList()
+        : <ArchivedInvoice>[];
+
     return BlenderPreferences(
       templates: templates,
       gasPrices: prices,
-      currencyCode: currency is String && currency.trim().isNotEmpty
-          ? currency.trim().toUpperCase()
-          : null,
       fillTempC: _toDouble(json['fillTempC']) ?? kReferenceTempC,
       settledTempC: _toDouble(json['settledTempC']) ?? kReferenceTempC,
       cylinderWaterLiters: _toDouble(json['cylinderWaterLiters']) ?? 12.0,
@@ -228,6 +331,21 @@ class BlenderPreferences {
       ),
       billedFills: fills,
       billedTo: billedTo is String ? billedTo : '',
+      startPressureBar: _toDouble(json['startPressureBar']) ?? 0.0,
+      startMix: _gasMixFromJson(json['startMix']) ?? const GasMix(o2: 21),
+      targetPressureBar: _toDouble(json['targetPressureBar']) ?? 200.0,
+      targetMix: _gasMixFromJson(json['targetMix']) ?? const GasMix(o2: 32),
+      fillGas1: _gasMixFromJson(json['fillGas1']) ?? const GasMix(o2: 100),
+      fillGas2:
+          _gasMixFromJson(json['fillGas2']) ?? const GasMix(o2: 0, he: 100),
+      fillGas3: _gasMixFromJson(json['fillGas3']) ?? const GasMix(o2: 21),
+      flushFeeEnabled: json['flushFeeEnabled'] == true,
+      flushFeeMode: FlushFeeMode.fromName(
+        json['flushFeeMode'] is String ? json['flushFeeMode'] as String : null,
+      ),
+      flushFeeGases: flushGases,
+      billedDate: billedDate,
+      archivedInvoices: archivedInvoices,
     );
   }
 }
@@ -235,4 +353,16 @@ class BlenderPreferences {
 double? _toDouble(Object? value) {
   if (value is num) return value.toDouble();
   return null;
+}
+
+Map<String, double> _gasMixToJson(GasMix mix) => {'o2': mix.o2, 'he': mix.he};
+
+/// Falls back per-field like every other read here, so a partly corrupt mix
+/// still yields something rather than discarding the whole entry.
+GasMix? _gasMixFromJson(Object? json) {
+  if (json is! Map) return null;
+  final o2 = _toDouble(json['o2']);
+  final he = _toDouble(json['he']);
+  if (o2 == null || he == null) return null;
+  return GasMix(o2: o2, he: he);
 }
