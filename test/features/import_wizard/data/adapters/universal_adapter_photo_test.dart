@@ -372,6 +372,79 @@ void main() {
     });
   });
 
+  group('diveStartById', () {
+    test(
+      'a photo on an existing dive falls back to that dive\'s start',
+      () async {
+        DateTime? seenFallback;
+        DateTime? seenTakenAt;
+
+        await UniversalAdapter.attachResolvedPhotos(
+          media: [
+            {'filename': '/p/a.jpg', 'offsetSeconds': 60, '_diveIndex': 0},
+          ],
+          resolvedPathByIndex: const {0: '/x/a.jpg'},
+          diveIdByIndex: const {0: 'existing-a'},
+          removedDiveIds: const {},
+          dives: [
+            {'dateTime': DateTime.utc(2025, 1, 15, 10)},
+          ],
+          diveStartById: {'existing-a': DateTime.utc(2025, 1, 15, 10, 12)},
+          attach: (photo) async {
+            seenFallback = photo.diveStart;
+            seenTakenAt = photo.takenAt;
+          },
+        );
+
+        // The fallback describes the dive the photo lands on...
+        expect(seenFallback, DateTime.utc(2025, 1, 15, 10, 12));
+        // ...while the offset still applies to the start it was recorded
+        // against, in the file being imported.
+        expect(seenTakenAt, DateTime.utc(2025, 1, 15, 10, 1));
+      },
+    );
+
+    test('bundled photos take the existing dive start too', () async {
+      DateTime? seen;
+
+      await UniversalAdapter.attachImportedPhotos(
+        photoPathsByBaseName: const {
+          'dive1': ['/tmp/zip/a.jpg'],
+        },
+        diveIdByIndex: const {0: 'existing-a'},
+        removedDiveIds: const {},
+        dives: [
+          {'dateTime': DateTime.utc(2025, 1, 15, 10), '_sourceFileId': 'f0'},
+        ],
+        diveStartById: {'existing-a': DateTime.utc(2025, 1, 15, 10, 12)},
+        files: [_file('dive1.zxu')],
+        singleFileName: null,
+        attach: (file, diveId, diveStart) async => seen = diveStart,
+      );
+
+      expect(seen, DateTime.utc(2025, 1, 15, 10, 12));
+    });
+
+    test('without an override the payload start is used', () async {
+      DateTime? seen;
+
+      await UniversalAdapter.attachResolvedPhotos(
+        media: [
+          {'filename': '/p/a.jpg', '_diveIndex': 0},
+        ],
+        resolvedPathByIndex: const {0: '/x/a.jpg'},
+        diveIdByIndex: const {0: 'new-a'},
+        removedDiveIds: const {},
+        dives: [
+          {'dateTime': DateTime.utc(2025, 1, 15, 10)},
+        ],
+        attach: (photo) async => seen = photo.diveStart,
+      );
+
+      expect(seen, DateTime.utc(2025, 1, 15, 10));
+    });
+  });
+
   group('photoTargetDiveIds', () {
     DiveMatchResult match(String id) =>
         DiveMatchResult(diveId: id, score: 0.9, timeDifferenceMs: 0);

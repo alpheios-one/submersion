@@ -663,6 +663,24 @@ class UniversalAdapter implements ImportSourceAdapter {
       duplicateActions: diveActions,
     );
 
+    // A target that is not the dive this import created is an existing
+    // dive behind a skipped or consolidated duplicate. Its own start is
+    // what a photo with no capture time of its own should fall back to,
+    // and it can sit up to the duplicate matcher's window away from the
+    // start the discarded duplicate recorded.
+    final diveStartById = <String, DateTime>{};
+    for (final entry in photoDiveIds.entries) {
+      final targetId = entry.value;
+      if (result.diveIdByIndex[entry.key] == targetId) continue;
+      try {
+        final existing = await repos.diveRepository.getDiveById(targetId);
+        if (existing != null) diveStartById[targetId] = existing.dateTime;
+      } catch (e) {
+        // A lookup failure only costs the photo a better fallback.
+        _log.warning('Could not read dive $targetId for a photo time: $e');
+      }
+    }
+
     final bundledFolder = notifierState.bundledPhotoFolderPath;
     var attachedPhotos = 0;
     if (bundledFolder != null &&
@@ -673,6 +691,7 @@ class UniversalAdapter implements ImportSourceAdapter {
         diveIdByIndex: photoDiveIds,
         removedDiveIds: removedDiveIds,
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
+        diveStartById: diveStartById,
         files: notifierState.files,
         singleFileName: notifierState.fileName,
         attach: (file, diveId, diveStart) => linker.linkBundled(
@@ -705,6 +724,7 @@ class UniversalAdapter implements ImportSourceAdapter {
         diveIdByIndex: photoDiveIds,
         removedDiveIds: removedDiveIds,
         dives: payload.entitiesOf(ui.ImportEntityType.dives),
+        diveStartById: diveStartById,
         selectedIndices: selections[wizard.ImportEntityType.media],
         attach: linker.linkResolved,
       );
@@ -1016,6 +1036,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     required Map<int, String> diveIdByIndex,
     required Set<String> removedDiveIds,
     required List<Map<String, dynamic>> dives,
+    Map<String, DateTime> diveStartById = const {},
     required List<PickedImportFile> files,
     required String? singleFileName,
     required Future<void> Function(
@@ -1061,7 +1082,10 @@ class UniversalAdapter implements ImportSourceAdapter {
       final diveId = entry.value.single.value;
       // The dive's own start, which is a fallback for the photo's capture
       // time and not a capture time itself: an archive carries no offset.
-      final diveStart = dives[diveIndex]['dateTime'] as DateTime?;
+      // A photo routed to an existing dive takes that dive's start, not the
+      // start recorded by the duplicate the user chose not to keep.
+      final diveStart =
+          diveStartById[diveId] ?? dives[diveIndex]['dateTime'] as DateTime?;
       for (final photoPath in photos) {
         try {
           await attach(File(photoPath), diveId, diveStart);
@@ -1136,6 +1160,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     required Map<int, String> diveIdByIndex,
     required Set<String> removedDiveIds,
     required List<Map<String, dynamic>> dives,
+    Map<String, DateTime> diveStartById = const {},
     Set<int>? selectedIndices,
     required Future<void> Function(ResolvedPhotoAttachment photo) attach,
   }) async {
@@ -1162,10 +1187,14 @@ class UniversalAdapter implements ImportSourceAdapter {
       DateTime? diveStart;
       DateTime? takenAt;
       if (diveIndex >= 0 && diveIndex < dives.length) {
-        diveStart = dives[diveIndex]['dateTime'] as DateTime?;
+        // The source's own recorded start drives the offset, because the
+        // offset was recorded against it. The fallback capture time, on the
+        // other hand, describes the dive the photo actually lands on.
+        final sourceStart = dives[diveIndex]['dateTime'] as DateTime?;
+        diveStart = diveStartById[diveId] ?? sourceStart;
         final offsetSeconds = picture['offsetSeconds'];
-        if (diveStart != null && offsetSeconds is int) {
-          takenAt = diveStart.add(Duration(seconds: offsetSeconds));
+        if (sourceStart != null && offsetSeconds is int) {
+          takenAt = sourceStart.add(Duration(seconds: offsetSeconds));
         }
       }
 
