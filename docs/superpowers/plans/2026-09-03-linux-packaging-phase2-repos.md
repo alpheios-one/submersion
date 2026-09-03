@@ -115,7 +115,12 @@ secret material or create public infrastructure, so a person performs them.
 - [ ] **Step 1: Generate the key offline**
 
 ```bash
-gpg --batch --passphrase "$(openssl rand -base64 32 | tee /tmp/repo-pass)" \
+# tr -d before tee: command substitution strips the trailing newline from the
+# argument, but tee would write it into the file whose contents become the
+# LINUX_REPO_GPG_PASSPHRASE secret. The stored passphrase would then not match
+# the one the key was created with, and every signing step would fail.
+openssl rand -base64 32 | tr -d '\n' > /tmp/repo-pass
+gpg --batch --passphrase "$(cat /tmp/repo-pass)" \
   --quick-generate-key "Submersion Package Signing <dev@submersion.app>" \
   rsa4096 sign never
 KEYID=$(gpg --list-keys --with-colons dev@submersion.app | awk -F: '/^pub/{print $5; exit}')
@@ -709,7 +714,9 @@ jobs:
       - name: Import the signing key
         env:
           KEY: ${{ secrets.LINUX_REPO_GPG_PRIVATE_KEY }}
-        run: echo "$KEY" | gpg --batch --import
+        # printf rather than echo: armored key material is multi-line, and
+        # printf's behavior does not vary with the shell's echo semantics.
+        run: printf '%s\n' "$KEY" | gpg --batch --import
 
       - name: Sign the APT metadata
         env:
@@ -752,7 +759,16 @@ jobs:
               > /etc/apt/sources.list.d/submersion.list
             apt-get update -o Dir::Etc::sourcelist=/etc/apt/sources.list.d/submersion.list \
               -o Dir::Etc::sourceparts=/dev/null
-            apt-cache policy submersion | grep -q Candidate
+            # "Candidate: (none)" is what apt prints when the package is
+            # not installable, and it contains the word Candidate, so a bare
+            # grep for it passes on a broken repository. Assert the candidate
+            # is real, then prove the dependencies resolve.
+            apt-cache policy submersion | tee /tmp/policy
+            if grep -q "Candidate: (none)" /tmp/policy; then
+              echo "repository offers no installable candidate"
+              exit 1
+            fi
+            apt-get install -y --dry-run submersion
           '
 
       - uses: actions/upload-pages-artifact@v3
@@ -927,7 +943,10 @@ when installed directly, and give the two-line removal.
 - [ ] **Step 2: Verify no em-dashes**
 
 ```bash
-grep -n "—" README.md docs/guide/installation.md \
+# The pattern is built from UTF-8 bytes rather than written literally, so this
+# file does not itself contain the character it forbids.
+EMDASH=$(printf '\xe2\x80\x94')
+grep -n "$EMDASH" README.md docs/guide/installation.md \
   docs/developer/release-secrets-setup.md && echo "FOUND" || echo "clean"
 ```
 
