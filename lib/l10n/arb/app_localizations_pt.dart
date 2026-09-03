@@ -19079,6 +19079,29 @@ class AppLocalizationsPt extends AppLocalizations {
       'Importar fotos requer uma pasta no disco deste dispositivo. Execute esta importação num computador para as incluir. Os mergulhos e locais são importados normalmente.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos incluídas no arquivo',
+      one: '1 foto incluída no arquivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Escolher onde guardar as fotos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'As fotos são guardadas nesta pasta e ligadas a partir daí. O Submersion nunca guarda uma cópia própria.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Não é possível escrever nessa pasta. Escolha outra.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -18716,6 +18716,28 @@ class AppLocalizationsAr extends AppLocalizations {
       'يتطلب استيراد الصور مجلدًا على قرص هذا الجهاز. شغّل هذا الاستيراد على جهاز كمبيوتر لتضمينها. تُستورد الغطسات والمواقع بشكل طبيعي.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صور مضمّنة في الأرشيف',
+      one: 'صورة واحدة مضمّنة في الأرشيف',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination => 'اختر مكان حفظ الصور...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'تُحفظ الصور في هذا المجلد ويتم ربطها من هناك. لا يحتفظ Submersion بنسخة خاصة به أبدًا.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'لا يمكن الكتابة في هذا المجلد. اختر مجلدًا آخر.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -11632,6 +11632,27 @@
   "@importWizard_photos_mobileUnsupported": {
     "description": "Shown on mobile, where a photo folder cannot be picked"
   },
+  "importWizard_photos_bundledCount": "{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}",
+  "@importWizard_photos_bundledCount": {
+    "description": "Count of photos bundled inside an imported ZIP archive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseDestination": "Choose where to save photos...",
+  "@importWizard_photos_chooseDestination": {
+    "description": "Button that opens a folder picker for where bundled archive photos are saved"
+  },
+  "importWizard_photos_destinationNote": "The photos are saved to this folder and linked from there. Submersion never keeps its own copy.",
+  "@importWizard_photos_destinationNote": {
+    "description": "Explains that bundled photos are written to the chosen folder and linked, never stored inside the app"
+  },
+  "importWizard_photos_destinationUnwritable": "That folder can't be written to. Choose another one.",
+  "@importWizard_photos_destinationUnwritable": {
+    "description": "Snackbar shown when the folder chosen for bundled archive photos cannot be written to"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",

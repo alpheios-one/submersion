@@ -31510,6 +31510,30 @@ abstract class AppLocalizations {
   /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
   String get importWizard_photos_mobileUnsupported;
 
+  /// Count of photos bundled inside an imported ZIP archive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}'**
+  String importWizard_photos_bundledCount(int count);
+
+  /// Button that opens a folder picker for where bundled archive photos are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where to save photos...'**
+  String get importWizard_photos_chooseDestination;
+
+  /// Explains that bundled photos are written to the chosen folder and linked, never stored inside the app
+  ///
+  /// In en, this message translates to:
+  /// **'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.'**
+  String get importWizard_photos_destinationNote;
+
+  /// Snackbar shown when the folder chosen for bundled archive photos cannot be written to
+  ///
+  /// In en, this message translates to:
+  /// **'That folder can\'t be written to. Choose another one.'**
+  String get importWizard_photos_destinationUnwritable;
+
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
   /// In en, this message translates to:

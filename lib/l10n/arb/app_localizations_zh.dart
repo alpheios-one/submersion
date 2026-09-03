@@ -18068,6 +18068,27 @@ class AppLocalizationsZh extends AppLocalizations {
       '导入照片需要此设备磁盘上的文件夹。请在电脑上运行此导入以包含照片。潜水记录和潜点会正常导入。';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '压缩包中包含 $count 张照片',
+      one: '压缩包中包含 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination => '选择照片保存位置...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      '照片将保存到此文件夹并从此处链接。Submersion 绝不会保留自己的副本。';
+
+  @override
+  String get importWizard_photos_destinationUnwritable => '无法写入该文件夹。请选择其他文件夹。';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

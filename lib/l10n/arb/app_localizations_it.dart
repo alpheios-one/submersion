@@ -19074,6 +19074,29 @@ class AppLocalizationsIt extends AppLocalizations {
       'L\'importazione delle foto richiede una cartella sul disco di questo dispositivo. Esegui questa importazione su un computer per includerle. Immersioni e siti vengono importati normalmente.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto incluse nell\'archivio',
+      one: '1 foto inclusa nell\'archivio',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Scegli dove salvare le foto...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'Le foto vengono salvate in questa cartella e collegate da lì. Submersion non conserva mai una copia propria.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Impossibile scrivere in questa cartella. Scegline un\'altra.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -10,6 +10,7 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/services/dive_computer_descriptor_index.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_media_entries.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_converter.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
@@ -258,8 +259,16 @@ class MacDiveDiveMapper {
       );
     }
 
+    // Photo references ride along as media entries; the wizard's Photos
+    // step resolves them against a user-picked folder after parsing.
+    final mediaMaps = macDiveMediaEntriesFromImages(
+      dives: logbook.dives,
+      images: logbook.diveImages,
+    );
+
     final entities = <ImportEntityType, List<Map<String, dynamic>>>{};
     if (diveMaps.isNotEmpty) entities[ImportEntityType.dives] = diveMaps;
+    if (mediaMaps.isNotEmpty) entities[ImportEntityType.media] = mediaMaps;
     if (siteMaps.isNotEmpty) entities[ImportEntityType.sites] = siteMaps;
     if (buddyMaps.isNotEmpty) entities[ImportEntityType.buddies] = buddyMaps;
     if (tagMapsWithDivers.isNotEmpty) {

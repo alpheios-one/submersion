@@ -18739,6 +18739,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos bundled in the archive',
+      one: '1 photo bundled in the archive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Choose where to save photos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'That folder can\'t be written to. Choose another one.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
