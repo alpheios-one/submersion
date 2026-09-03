@@ -40,12 +40,20 @@ Download `Submersion-<version>-Linux-amd64.deb` from the
 sudo apt install ./Submersion-*-Linux-amd64.deb
 ```
 
-#### **Fedora / RHEL / openSUSE**
+#### **Fedora / RHEL**
 
 Download `Submersion-<version>-Linux-x86_64.rpm`:
 
 ```bash
 sudo dnf install ./Submersion-*-Linux-x86_64.rpm
+```
+
+#### **openSUSE**
+
+The same `.rpm`. openSUSE ships zypper rather than dnf:
+
+```bash
+sudo zypper install ./Submersion-*-Linux-x86_64.rpm
 ```
 
 #### **Other distros (tarball)**

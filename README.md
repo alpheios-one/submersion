@@ -343,12 +343,20 @@ Download `Submersion-<version>-Linux-amd64.deb` from
 sudo apt install ./Submersion-*-Linux-amd64.deb
 ```
 
-**Fedora, RHEL, openSUSE**
+**Fedora and RHEL**
 
 Download `Submersion-<version>-Linux-x86_64.rpm`, then:
 
 ```bash
 sudo dnf install ./Submersion-*-Linux-x86_64.rpm
+```
+
+**openSUSE**
+
+The same `.rpm`, installed with zypper, which openSUSE ships instead of dnf:
+
+```bash
+sudo zypper install ./Submersion-*-Linux-x86_64.rpm
 ```
 
 Both packages install a desktop entry, icons, and udev rules that let dive

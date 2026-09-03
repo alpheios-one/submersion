@@ -71,6 +71,35 @@ assert_eq "$(install_command_for unknown "gtk3")" \
 assert_eq "$(map_soname "$WORKDIR/deps.json" "libgtk-3.so.0" dnf)" \
   "gtk3" "maps a soname to a human-readable dnf package name"
 
+# detect_manager probes PATH, so a temporary directory of stub executables
+# stands in for a distro.
+stub_path() {
+  local dir="$WORKDIR/bin-$1"
+  mkdir -p "$dir"
+  shift
+  for name in "$@"; do
+    printf '#!/bin/sh\n' > "$dir/$name"
+    chmod +x "$dir/$name"
+  done
+  echo "$dir"
+}
+
+opensuse="$(stub_path opensuse zypper dnf)"
+assert_eq "$(PATH="$opensuse" detect_manager)" "zypper" \
+  "prefers zypper over dnf when both exist (openSUSE)"
+
+fedora="$(stub_path fedora dnf)"
+assert_eq "$(PATH="$fedora" detect_manager)" "dnf" \
+  "detects dnf on a host without zypper (Fedora)"
+
+debian="$(stub_path debian apt)"
+assert_eq "$(PATH="$debian" detect_manager)" "apt" \
+  "detects apt on a Debian-family host"
+
+arch="$(stub_path arch pacman)"
+assert_eq "$(PATH="$arch" detect_manager)" "pacman" \
+  "detects pacman on an Arch host"
+
 if [ "$FAILURES" -gt 0 ]; then
   echo "$FAILURES test(s) failed"
   exit 1

@@ -39,7 +39,10 @@ install_command_for() {
 
 detect_manager() {
   local manager
-  for manager in apt dnf pacman zypper; do
+  # zypper before dnf: openSUSE can have dnf installed alongside zypper, but
+  # zypper owns the package database there. Checking dnf first would hand an
+  # openSUSE user the wrong command.
+  for manager in apt zypper dnf pacman; do
     if command -v "$manager" > /dev/null 2>&1; then
       echo "$manager"
       return

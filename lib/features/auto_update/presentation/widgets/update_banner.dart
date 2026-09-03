@@ -46,7 +46,7 @@ class _UpdateBannerState extends ConsumerState<UpdateBanner> {
       ),
       actions: [
         UpdateBannerActions(
-          installMethod: ref.watch(linuxInstallMethodProvider),
+          upgradeCommand: ref.watch(linuxUpgradeCommandProvider),
           downloadUrl: downloadUrl,
           onDownload: _openDownload,
           onDismiss: () => setState(() => _dismissed = true),

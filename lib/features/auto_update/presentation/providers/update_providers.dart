@@ -10,6 +10,7 @@ import 'package:submersion/features/auto_update/data/services/linux_install_meth
 import 'package:submersion/features/auto_update/data/services/sparkle_update_service.dart';
 import 'package:submersion/features/auto_update/data/services/update_service.dart';
 import 'package:submersion/features/auto_update/domain/entities/linux_install_method.dart';
+import 'package:submersion/features/auto_update/domain/linux_upgrade_command.dart';
 import 'package:submersion/features/auto_update/domain/entities/release_channel.dart';
 import 'package:submersion/features/auto_update/domain/entities/update_channel.dart';
 import 'package:submersion/features/auto_update/domain/entities/update_status.dart';
@@ -61,6 +62,15 @@ final linuxInstallMethodProvider = Provider<LinuxInstallMethod>((ref) {
   return LinuxInstallMethodReader(
     executablePath: Platform.resolvedExecutable,
   ).read();
+});
+
+/// The package-manager command that upgrades this install, or null when no
+/// package manager owns it (a tarball install, or any non-Linux platform).
+final linuxUpgradeCommandProvider = Provider<String?>((ref) {
+  return resolveUpgradeCommand(
+    ref.watch(linuxInstallMethodProvider),
+    exists: (path) => File(path).existsSync(),
+  );
 });
 
 /// Update preferences provider.
