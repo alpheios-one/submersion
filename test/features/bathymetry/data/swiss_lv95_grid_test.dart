@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
+import 'package:submersion/features/bathymetry/data/sources/esri_ascii_parser.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lv95_grid.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 
@@ -88,6 +89,110 @@ nodata_value -9999
       );
       expect(grid.depthAt(0, 0), closeTo(406.1 - 410.0, 1e-9));
       expect(grid.depthAt(0, 0), lessThan(0));
+    });
+  });
+
+  group('extractRawEsriSubgrid', () {
+    // Regression tests for Bug 13: a live STAC check found a single
+    // swissBATHY3D asset can cover an entire lake rather than one 1-km
+    // tile, so every tile coordinate within a lake resolved to the same
+    // asset and (before this function existed) cached that whole grid
+    // verbatim -- identical content regardless of which tile was actually
+    // requested. This slices out just the cells belonging to a requested
+    // tile's own LV95 bounding box.
+    RawEsriGrid wideRaw() {
+      // Three adjacent 1-km-wide (10 cells @ 100 m) columns of tiles, each
+      // with its own distinct, easily distinguishable value.
+      const cellsPerTile = 10;
+      String row(double value) => List.filled(cellsPerTile, value).join(' ');
+      final buffer = StringBuffer()
+        ..writeln('ncols ${cellsPerTile * 3}')
+        ..writeln('nrows $cellsPerTile')
+        ..writeln('xllcorner 2685000')
+        ..writeln('yllcorner 1240000')
+        ..writeln('cellsize 100')
+        ..writeln('nodata_value -9999');
+      final dataRow = '${row(100.0)} ${row(150.0)} ${row(200.0)}';
+      for (var r = 0; r < cellsPerTile; r++) {
+        buffer.writeln(dataRow);
+      }
+      return EsriAsciiGridParser.parseRaw(buffer.toString());
+    }
+
+    test('extracts only the requested tile\'s own cells, not its neighbors '
+        'or the whole asset', () {
+      final raw = wideRaw();
+
+      final west = extractRawEsriSubgrid(
+        raw,
+        minEasting: 2685000,
+        maxEasting: 2686000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+      final east = extractRawEsriSubgrid(
+        raw,
+        minEasting: 2687000,
+        maxEasting: 2688000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+
+      expect(west.ncols, 10);
+      expect(west.nrows, 10);
+      expect(west.values, everyElement(100.0));
+      expect(east.ncols, 10);
+      expect(east.nrows, 10);
+      expect(east.values, everyElement(200.0));
+
+      // The two tiles are far apart in the source asset and must not share
+      // any content -- the exact Bug 13 symptom this guards against.
+      expect(west.values, isNot(east.values));
+    });
+
+    test(
+      'the extracted subgrid\'s origin shifts to the tile\'s own corner',
+      () {
+        final raw = wideRaw();
+        final middle = extractRawEsriSubgrid(
+          raw,
+          minEasting: 2686000,
+          maxEasting: 2687000,
+          minNorthing: 1240000,
+          maxNorthing: 1241000,
+        )!;
+        expect(middle.xll, 2686000);
+        expect(middle.yll, 1240000);
+        expect(middle.values, everyElement(150.0));
+      },
+    );
+
+    test('a box entirely outside the source asset returns null, a genuine '
+        'gap rather than fabricated data', () {
+      final raw = wideRaw();
+      final outside = extractRawEsriSubgrid(
+        raw,
+        minEasting: 2695000,
+        maxEasting: 2696000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      );
+      expect(outside, isNull);
+    });
+
+    test('a box only partially overlapping the source asset is clamped to '
+        'the available cells', () {
+      final raw = wideRaw();
+      final clipped = extractRawEsriSubgrid(
+        raw,
+        minEasting: 2684500, // 500 m before the asset starts
+        maxEasting: 2685500,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+      // Only the [2685000, 2685500) half actually overlaps the asset.
+      expect(clipped.ncols, 5);
+      expect(clipped.values, everyElement(100.0));
     });
   });
 }

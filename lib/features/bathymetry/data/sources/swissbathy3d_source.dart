@@ -5,6 +5,7 @@ import 'package:archive/archive.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:submersion/core/utils/lv95_transform.dart';
+import 'package:submersion/features/bathymetry/data/sources/esri_ascii_parser.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lv95_grid.dart';
@@ -25,8 +26,18 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// Covers only the ~20 lakes in [swissLakeLevels] (a coordinate elsewhere in
 /// Switzerland is dry land, out of scope for a bathymetry source). Each
 /// covered coordinate maps to exactly one LV95 1-km tile, cached by
-/// [SwissBathyTileCacheRepository] so a tile is fetched and parsed at most
+/// [SwissBathyTileCacheRepository] so a tile's data is downloaded at most
 /// once, per the OGD fair-use requirement.
+///
+/// A single STAC asset is not necessarily scoped to one 1-km tile — a live
+/// check found swisstopo instead publishes one asset per LAKE (e.g. all of
+/// Walensee in one "swissbathy3d_walensee" zip). [_fetchTile] downloads and
+/// parses that raw grid once per asset href (shared across every tile
+/// coordinate that resolves to it, via [fetch]'s `sharedRawGrids`) and then
+/// slices out just the requested tile's own cells with
+/// [extractRawEsriSubgrid] before caching — without that slicing step, every
+/// tile in the same lake would cache and stitch the exact same whole-lake
+/// grid regardless of its own coordinates.
 class SwissBathy3dSource implements BathymetrySource {
   static const String sourceId = 'swissbathy3d';
   static const double tileSizeMeters = 1000;
@@ -103,15 +114,15 @@ class SwissBathy3dSource implements BathymetrySource {
     ];
 
     // Distinct 1-km tile coordinates can legitimately resolve to the exact
-    // same STAC asset href (observed in production: a wide span's tile
-    // range came back with an identical href across many of its bboxes,
-    // per the per-tile diagnostic panel) -- memoized per fetch() call so
-    // that shared asset's zip is downloaded over the network exactly once,
-    // not once per tile coordinate that happens to resolve to it. This
-    // does not change what each tile key ends up caching (still correctly
-    // whatever the server resolved for it), only how many times the exact
-    // same bytes are re-fetched, per the OGD fair-use requirement.
-    final sharedDownloads = <String, Future<Uint8List>>{};
+    // same STAC asset href -- confirmed live: swisstopo publishes one asset
+    // per LAKE, not per tile, so every tile coordinate within a lake shares
+    // one href. Memoized per fetch() call on the fully PARSED raw grid (not
+    // just the downloaded bytes) so that shared, potentially lake-sized
+    // ESRI ASCII grid is downloaded and parsed over the network exactly
+    // once, not once per tile coordinate that happens to resolve to it.
+    // Each tile still gets its own, location-correct slice of that shared
+    // raw grid via extractRawEsriSubgrid in _fetchTile.
+    final sharedRawGrids = <String, Future<RawEsriGrid?>>{};
 
     // Bounded concurrency, not strictly sequential nor unbounded: up to
     // maxConcurrentTileRequests tiles in flight at once. Each is
@@ -123,12 +134,7 @@ class SwissBathy3dSource implements BathymetrySource {
       coord,
     ) async {
       try {
-        return await _fetchTile(
-          coord.tileE,
-          coord.tileN,
-          lake,
-          sharedDownloads,
-        );
+        return await _fetchTile(coord.tileE, coord.tileN, lake, sharedRawGrids);
       } on BathymetryFetchException {
         // One tile's transient failure (network timeout, a bad STAC
         // response) must not sink the whole stitched fetch when
@@ -159,15 +165,18 @@ class SwissBathy3dSource implements BathymetrySource {
   /// STAC response) still throw and are never cached, so the caller falls
   /// through to the next resolver tier and retries on the next visit.
   ///
-  /// [sharedDownloads] memoizes the zip download by asset href across every
-  /// tile in the same [fetch] call — see that method's doc — so two tile
-  /// coordinates resolving to the same href share one network round trip
-  /// instead of each downloading and parsing it independently.
+  /// [sharedRawGrids] memoizes the downloaded-and-parsed raw grid by asset
+  /// href across every tile in the same [fetch] call — see that method's
+  /// doc — so two tile coordinates resolving to the same href (the common
+  /// case: one asset per lake, not per tile) share one network round trip
+  /// and one ESRI ASCII parse instead of each downloading and parsing it
+  /// independently. [extractRawEsriSubgrid] then slices out just this
+  /// tile's own cells before it is cached and returned.
   Future<BathymetryGrid?> _fetchTile(
     int tileE,
     int tileN,
     SwissLakeLevel lake,
-    Map<String, Future<Uint8List>> sharedDownloads,
+    Map<String, Future<RawEsriGrid?>> sharedRawGrids,
   ) async {
     final tileKey = '${tileE}_$tileN';
 
@@ -192,37 +201,59 @@ class SwissBathy3dSource implements BathymetrySource {
     }
 
     final resolvedAsset = asset;
-    final Uint8List zipBytes;
+    final RawEsriGrid? fullRaw;
     try {
-      zipBytes = await sharedDownloads.putIfAbsent(
+      fullRaw = await sharedRawGrids.putIfAbsent(
         resolvedAsset.href,
-        () => _stac.downloadBytes(resolvedAsset.href),
+        () => _downloadAndParseRaw(resolvedAsset.href),
       );
     } on SwissStacException catch (e) {
       throw BathymetryFetchException('swissBATHY3D fetch failed: $e');
+    } on FormatException catch (e) {
+      throw BathymetryFetchException('swissBATHY3D grid parse failed: $e');
     }
 
-    final gridText = _extractGridText(zipBytes);
-    if (gridText == null) {
+    if (fullRaw == null) {
       // Deterministic for this tile: caching it avoids re-downloading the
       // same zip on every future visit to the same coordinate.
       await _tileCache.writeEmpty(tileKey);
       return null;
     }
 
-    final BathymetryGrid grid;
-    try {
-      grid = parseSwissLv95Grid(
-        gridText,
-        sourceId: sourceId,
-        fetchedAt: DateTime.now(),
-        referenceLevelMeters: lake.meanLevelMeters,
-      );
-    } on FormatException catch (e) {
-      throw BathymetryFetchException('swissBATHY3D grid parse failed: $e');
+    final subRaw = extractRawEsriSubgrid(
+      fullRaw,
+      minEasting: tileE * tileSizeMeters,
+      maxEasting: (tileE + 1) * tileSizeMeters,
+      minNorthing: tileN * tileSizeMeters,
+      maxNorthing: (tileN + 1) * tileSizeMeters,
+    );
+    if (subRaw == null) {
+      // The resolved asset does not actually extend over this tile's own
+      // footprint (e.g. a shoreline tile just outside a lake-shaped asset's
+      // real extent) — a genuine gap, not an error.
+      await _tileCache.writeEmpty(tileKey);
+      return null;
     }
+
+    final grid = parseSwissLv95RawGrid(
+      subRaw,
+      sourceId: sourceId,
+      fetchedAt: DateTime.now(),
+      referenceLevelMeters: lake.meanLevelMeters,
+    );
     await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
     return grid;
+  }
+
+  /// Downloads and parses the raw ESRI ASCII grid at [href] (potentially an
+  /// entire lake's worth of cells), or null when the zip contains no
+  /// `.asc`/`.grd` entry. Shared across every tile coordinate that resolves
+  /// to the same href — see [_fetchTile]'s and [fetch]'s docs.
+  Future<RawEsriGrid?> _downloadAndParseRaw(String href) async {
+    final zipBytes = await _stac.downloadBytes(href);
+    final gridText = _extractGridText(zipBytes);
+    if (gridText == null) return null;
+    return EsriAsciiGridParser.parseRaw(gridText);
   }
 
   static bool _isStale(DateTime? checkedAt) {
@@ -287,14 +318,24 @@ class SwissBathy3dSource implements BathymetrySource {
     }
 
     try {
-      final zipBytes = await _stac.downloadBytes(asset.href);
-      final gridText = _extractGridText(zipBytes);
-      if (gridText == null) {
+      final fullRaw = await _downloadAndParseRaw(asset.href);
+      if (fullRaw == null) {
         await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
         return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
       }
-      final grid = parseSwissLv95Grid(
-        gridText,
+      final subRaw = extractRawEsriSubgrid(
+        fullRaw,
+        minEasting: tileE * tileSizeMeters,
+        maxEasting: (tileE + 1) * tileSizeMeters,
+        minNorthing: tileN * tileSizeMeters,
+        maxNorthing: (tileN + 1) * tileSizeMeters,
+      );
+      if (subRaw == null) {
+        await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
+        return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
+      }
+      final grid = parseSwissLv95RawGrid(
+        subRaw,
         sourceId: sourceId,
         fetchedAt: DateTime.now(),
         referenceLevelMeters: lake.meanLevelMeters,

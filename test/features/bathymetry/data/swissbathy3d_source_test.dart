@@ -299,6 +299,95 @@ nodata_value -9999
       expect(grid.sourceId, 'swissbathy3d');
     });
 
+    test(
+      'a single lake-wide asset is sliced per tile instead of caching the '
+      'exact same whole-lake content under every tile it spans (Bug 13)',
+      () async {
+        // Regression test for the real Bug 13 symptom: a live STAC check
+        // found swissBATHY3D publishes one asset per LAKE, not per 1-km
+        // tile (already established by the Bug 12 fix's shared-href
+        // dedup) -- e.g. all of Walensee in a single
+        // "swissbathy3d_walensee" zip. Without slicing that shared raw
+        // grid per tile, every tile coordinate within the lake cached and
+        // returned the exact same whole-lake content regardless of its
+        // own coordinates, which is why distant, genuinely different dive
+        // sites on the same lake rendered identical meshes.
+        //
+        // The mocked asset spans three adjacent tiles with distinct,
+        // tile-specific values; fetching the west and east tiles must
+        // each recover only their own tile-sized slice, not the whole
+        // three-tile asset and not each other's content.
+        const cellsPerTile = 10;
+        String row(double value) => List.filled(cellsPerTile, value).join(' ');
+        final buffer = StringBuffer()
+          ..writeln('ncols ${cellsPerTile * 3}')
+          ..writeln('nrows $cellsPerTile')
+          ..writeln('xllcorner 2685000')
+          ..writeln('yllcorner 1240000')
+          ..writeln('cellsize 100')
+          ..writeln('nodata_value -9999');
+        final dataRow = '${row(100.0)} ${row(150.0)} ${row(200.0)}';
+        for (var r = 0; r < cellsPerTile; r++) {
+          buffer.writeln(dataRow);
+        }
+        final wideGrid = buffer.toString();
+
+        var downloadCalls = 0;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    // Wide enough to overlap every tile bbox this test
+                    // queries -- mirrors a genuinely lake-scale asset.
+                    'bbox': [8.0, 46.0, 10.0, 48.0],
+                    'assets': {
+                      'grid': {'href': 'https://example.org/lake_wide.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          downloadCalls++;
+          return http.Response.bytes(_zipOf('lake.asc', wideGrid), 200);
+        });
+
+        final west = Lv95Transform.toWgs84(2685500, 1240500); // tile 2685
+        final east = Lv95Transform.toWgs84(2687500, 1240500); // tile 2687
+
+        final westGrid = await source.fetch(
+          GeoPoint(west.latitude, west.longitude),
+          spanMeters: 100,
+        );
+        final eastGrid = await source.fetch(
+          GeoPoint(east.latitude, east.longitude),
+          spanMeters: 100,
+        );
+
+        // Separate fetch() calls each download their own copy (tile-level
+        // caching, not asset-level -- see the dedicated Bug 12 test above
+        // for within-one-fetch() sharing); what matters here is content.
+        expect(downloadCalls, 2);
+
+        // Each fetch recovered just its own 1-km tile's cells, not the
+        // whole three-tile-wide asset.
+        expect(westGrid.rows, cellsPerTile);
+        expect(westGrid.cols, cellsPerTile);
+        expect(eastGrid.rows, cellsPerTile);
+        expect(eastGrid.cols, cellsPerTile);
+
+        const referenceLevel = 406.1; // Zürichsee
+        expect(westGrid.depthAt(0, 0), closeTo(referenceLevel - 100.0, 1e-9));
+        expect(eastGrid.depthAt(0, 0), closeTo(referenceLevel - 200.0, 1e-9));
+        // The exact Bug 13 symptom this guards against: two distinct,
+        // far-apart tiles must not end up with identical content.
+        expect(westGrid.depthAt(0, 0), isNot(eastGrid.depthAt(0, 0)));
+      },
+    );
+
     test('the query coordinate stays inside the stitched mosaic\'s rendered '
         'bounds, at realistic tile resolution and tile count', () async {
       // The 3D scene always places the dive site marker at (0,0) in a
@@ -762,11 +851,15 @@ nodata_value -9999
     test(
       'a stale cached tile is re-downloaded when the source version changed',
       () async {
+        // xllcorner/yllcorner match zurichseePoint's own tile (2685_1240,
+        // see gridBody's fixture header) so the re-downloaded grid still
+        // overlaps the requested tile's LV95 bounding box and is not
+        // discarded as a genuine "no overlap" gap by extractRawEsriSubgrid.
         const updatedGrid = '''
 ncols 2
 nrows 2
 xllcorner 2685000
-yllcorner 1245000
+yllcorner 1240000
 cellsize 500
 nodata_value -9999
 500.0 500.0
@@ -975,11 +1068,15 @@ nodata_value -9999
     });
 
     test('re-downloads a cached tile whose version actually changed', () async {
+      // xllcorner/yllcorner match zurichseePoint's own tile (2685_1240, see
+      // gridBody's fixture header) so the re-downloaded grid still overlaps
+      // the requested tile's LV95 bounding box instead of being discarded
+      // as a genuine "no overlap" gap by extractRawEsriSubgrid.
       const updatedGrid = '''
 ncols 2
 nrows 2
 xllcorner 2685000
-yllcorner 1245000
+yllcorner 1240000
 cellsize 500
 nodata_value -9999
 500.0 500.0
@@ -1074,6 +1171,30 @@ nodata_value -9999
         // its own tile's boundary, so spanMeters: 100 stays single-tile).
         const bodenseePoint = GeoPoint(47.55, 9.20);
 
+        // Each point needs its own tile-positioned grid body -- since
+        // extractRawEsriSubgrid now requires the downloaded content to
+        // actually overlap the requested tile's LV95 bounding box, reusing
+        // gridBody (positioned only near Zürichsee) for bodenseePoint would
+        // extract to a gap instead of data.
+        String tileGridFor(GeoPoint point) {
+          final lv95 = Lv95Transform.fromWgs84(point.latitude, point.longitude);
+          final tileE = (lv95.easting / 1000).floor() * 1000;
+          final tileN = (lv95.northing / 1000).floor() * 1000;
+          return '''
+ncols 2
+nrows 2
+xllcorner $tileE
+yllcorner $tileN
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+        }
+
+        final zurichGrid = tileGridFor(zurichseePoint);
+        final bodenseeGrid = tileGridFor(bodenseePoint);
+
         var itemCalls = 0;
         var downloadCalls = 0;
         final source = buildSource((req) async {
@@ -1083,14 +1204,19 @@ nodata_value -9999
             // (whichever tile the sweep checks first) finds no change,
             // call 4 (the other tile) fails transiently.
             if (itemCalls <= 3) {
+              final bbox = _requestedBbox(req);
+              final centerLon = (bbox[0] + bbox[2]) / 2;
+              final href = centerLon < 9.0
+                  ? 'https://example.org/zurich_tile.zip'
+                  : 'https://example.org/bodensee_tile.zip';
               return http.Response(
                 jsonEncode({
                   'features': [
                     {
-                      'bbox': _requestedBbox(req),
+                      'bbox': bbox,
                       'properties': {'datetime': '2023-01-01T00:00:00Z'},
                       'assets': {
-                        'grid': {'href': 'https://example.org/tile_grid.zip'},
+                        'grid': {'href': href},
                       },
                     },
                   ],
@@ -1101,7 +1227,10 @@ nodata_value -9999
             return http.Response('server error', 500);
           }
           downloadCalls++;
-          return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+          final body = req.url.path.endsWith('zurich_tile.zip')
+              ? zurichGrid
+              : bodenseeGrid;
+          return http.Response.bytes(_zipOf('tile.asc', body), 200);
         });
 
         await source.fetch(zurichseePoint, spanMeters: 100);
@@ -1134,6 +1263,52 @@ nodata_value -9999
           GeoPoint(47.14, 9.20), // Walensee
         ];
 
+        // Each point needs its own tile-positioned grid body -- since
+        // extractRawEsriSubgrid now requires the downloaded content to
+        // actually overlap the requested tile's LV95 bounding box, a
+        // single shared body (positioned near just one of these five
+        // lakes) would extract to a gap for the other four.
+        String tileGridFor(GeoPoint point) {
+          final lv95 = Lv95Transform.fromWgs84(point.latitude, point.longitude);
+          final tileE = (lv95.easting / 1000).floor() * 1000;
+          final tileN = (lv95.northing / 1000).floor() * 1000;
+          return '''
+ncols 2
+nrows 2
+xllcorner $tileE
+yllcorner $tileN
+cellsize 500
+nodata_value -9999
+400.0 400.0
+400.0 400.0
+''';
+        }
+
+        final gridsByFilename = {
+          for (var i = 0; i < points.length; i++)
+            'tile_$i.zip': tileGridFor(points[i]),
+        };
+
+        // Nearest-point match so the mock can tell which of the five
+        // widely-separated lakes a request's bbox belongs to, without
+        // depending on the exact epsilon-buffered bbox math.
+        int nearestPointIndex(List<double> bbox) {
+          final centerLat = (bbox[1] + bbox[3]) / 2;
+          final centerLon = (bbox[0] + bbox[2]) / 2;
+          var bestIndex = 0;
+          var bestDist = double.infinity;
+          for (var i = 0; i < points.length; i++) {
+            final d =
+                (points[i].latitude - centerLat).abs() +
+                (points[i].longitude - centerLon).abs();
+            if (d < bestDist) {
+              bestDist = d;
+              bestIndex = i;
+            }
+          }
+          return bestIndex;
+        }
+
         var itemCalls = 0;
         var gatingEnabled = false;
         // Once true, later requests (the tile picked up after the first
@@ -1157,14 +1332,16 @@ nodata_value -9999
               await gate.future;
               active -= 1;
             }
+            final bbox = _requestedBbox(req);
+            final index = nearestPointIndex(bbox);
             return http.Response(
               jsonEncode({
                 'features': [
                   {
-                    'bbox': _requestedBbox(req),
+                    'bbox': bbox,
                     'properties': {'datetime': '2023-01-01T00:00:00Z'},
                     'assets': {
-                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                      'grid': {'href': 'https://example.org/tile_$index.zip'},
                     },
                   },
                 ],
@@ -1172,7 +1349,11 @@ nodata_value -9999
               200,
             );
           }
-          return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+          final filename = req.url.pathSegments.last;
+          return http.Response.bytes(
+            _zipOf('tile.asc', gridsByFilename[filename]!),
+            200,
+          );
         });
 
         // Sequential, un-gated setup: cache one tile per lake.
