@@ -243,17 +243,28 @@ class EquipmentRepository {
       // must not rethrow and make the caller treat the whole create as failed
       // (which could prompt a retry and duplicate the item). The clocks can be
       // added manually later; log and continue.
+      // Each step is caught on its own so one failing does not skip the
+      // other, and so the log names the step that actually failed.
       try {
         await ServiceScheduleRepository().autoAttachForEquipment(
           equipmentId: id,
           type: equipment.type,
           diverId: equipment.diverId,
         );
-        await _attachLegacyIntervalClock(id, equipment);
       } catch (e, stackTrace) {
         _log.error(
           'Auto-attach of default service clocks failed for equipment $id; '
           'the equipment was still created',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+      try {
+        await _attachLegacyIntervalClock(id, equipment);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Mirroring the legacy service interval onto the ledger failed for '
+          'equipment $id; the equipment was still created',
           error: e,
           stackTrace: stackTrace,
         );
