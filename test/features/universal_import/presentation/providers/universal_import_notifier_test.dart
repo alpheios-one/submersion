@@ -14,6 +14,8 @@ import 'package:submersion/features/universal_import/data/models/import_payload.
 import 'package:submersion/features/universal_import/data/parsers/macdive_sqlite_parser.dart';
 import 'package:submersion/features/universal_import/data/parsers/macdive_xml_parser.dart';
 import 'package:submersion/features/import_wizard/data/adapters/universal_adapter.dart';
+import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
+import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 
 import '../../../../fixtures/macdive_sqlite/build_synthetic_db.dart';
@@ -1579,6 +1581,33 @@ void main() {
         notifier.skipPhotos();
         expect(notifier.state.bundledPhotoFolderPath, isNull);
         expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
+      });
+
+      test('a new file pick forgets every earlier photo decision', () {
+        final dir = Directory.systemTemp.createTempSync('bundled_stale_');
+        addTearDown(() => dir.deleteSync(recursive: true));
+        notifier.state = notifier.state.copyWith(
+          payload: payloadWithOnePicture('/p/a.jpg'),
+          photoPathsByBaseName: {
+            'dive1': ['/tmp/zip/a.jpg'],
+          },
+          photoFolderPath: '/old/photos',
+          photoResolution: const ImportMediaResolution.empty(),
+          photosSkipped: true,
+        );
+        expect(notifier.chooseBundledPhotoFolder(dir.path), isTrue);
+
+        // pickFiles and pickFolder reach this hook without the full reset
+        // loadFileFromBytes performs, so a decision left here would make
+        // a new archive's photos land in the old folder unasked.
+        notifier.applyExpansionExtras(const ArchiveExpansion(filePaths: []));
+
+        final state = notifier.state;
+        expect(state.bundledPhotoFolderPath, isNull);
+        expect(state.photoFolderPath, isNull);
+        expect(state.photoResolution, isNull);
+        expect(state.photosSkipped, isFalse);
+        expect(state.photoPathsByBaseName, isEmpty);
       });
 
       test(
