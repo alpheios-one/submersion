@@ -102,11 +102,18 @@ class _FakeTileCache implements TileCacheService {
 
   int prunedStores = 0;
 
+  /// Runs after the sweep has listed the stores and before it reads the region
+  /// rows, standing in for a download that finishes while the sweep is in
+  /// flight. The row it writes must still count as known.
+  Future<void> Function()? beforeReadingRegions;
+
   @override
   Future<int> pruneOrphanRegionStores({
-    required Set<String> knownRegionIds,
+    required Future<Set<String>> Function() readKnownRegionIds,
   }) async {
-    calls.add('prune:${knownRegionIds.join(",")}');
+    await beforeReadingRegions?.call();
+    final known = (await readKnownRegionIds()).toList()..sort();
+    calls.add('prune:${known.join(",")}');
     return prunedStores;
   }
 
@@ -119,6 +126,14 @@ class _FakeTileCache implements TileCacheService {
     // Not awaited: close() on a controller nobody listened to completes only
     // once a subscriber drains it.
     if (!progress.isClosed) unawaited(progress.close());
+  }
+
+  int statsReads = 0;
+
+  @override
+  Future<CacheStats> getCacheStats() async {
+    statsReads++;
+    return const CacheStats(tileCount: 0, sizeKiB: 0, hits: 0, misses: 0);
   }
 
   @override
@@ -652,6 +667,147 @@ void main() {
           .pruneOrphanStores();
 
       expect(reclaimed, 3);
+    });
+
+    test('a region recorded while the sweep runs is not swept', () async {
+      // The rows are read after the store list, never before it. A download
+      // that finishes inside that window has already written its row and
+      // dropped its in-flight mark, so a snapshot taken up front would show
+      // neither, and the sweep would delete the store of a region that exists.
+      cache.beforeReadingRegions = () async {
+        await repository.createRegion(
+          id: 'just-finished',
+          name: 'Bonaire',
+          minLat: 12,
+          maxLat: 13,
+          minLng: -69,
+          maxLng: -68,
+          minZoom: 8,
+          maxZoom: 12,
+          tileCount: 40,
+          sizeBytes: 4096,
+        );
+      };
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .pruneOrphanStores();
+
+      expect(cache.calls, contains('prune:just-finished'));
+    });
+  });
+
+  group('superseded download', () {
+    Future<void> start(DownloadProgressNotifier notifier, String name) =>
+        notifier.downloadRegion(
+          name: name,
+          minLat: 20,
+          maxLat: 21,
+          minLng: -87,
+          maxLng: -86,
+          minZoom: 8,
+          maxZoom: 12,
+          tileLayerOptions: tileLayer,
+        );
+
+    test('leaves the download that replaced it on screen', () async {
+      // The progress card is gated on isDownloading. A superseded download
+      // finishes after the one that replaced it started, and blanking the
+      // shared state on its way out left the diver watching a download with
+      // no progress bar and no way to cancel it until it ended.
+      final notifier = container.read(downloadProgressProvider.notifier);
+      final first = start(notifier, 'Cozumel');
+      await Future<void>.delayed(Duration.zero);
+      final second = start(notifier, 'Bonaire');
+      await first;
+      await Future<void>.delayed(Duration.zero);
+
+      final state = container.read(downloadProgressProvider);
+      expect(state.isDownloading, isTrue);
+      expect(state.regionName, 'Bonaire');
+      expect(state.error, isNull);
+
+      await notifier.cancelDownload();
+      await second;
+    });
+
+    test('a third download does not strand the first as a region', () async {
+      // Only one cancelled region used to be remembered, so a third download
+      // displaced the first one's mark. The first then fell through to its
+      // success path and recorded a region for the handful of tiles it had,
+      // which is the phantom region the cancel path exists to prevent.
+      final notifier = container.read(downloadProgressProvider.notifier);
+      final first = start(notifier, 'Cozumel');
+      await Future<void>.delayed(Duration.zero);
+      // Not awaited between the two: downloadRegion marks the download it
+      // supersedes synchronously, before its first await, so back-to-back
+      // starts are what displace the first one's mark while it is still in
+      // its loop. Letting the first one settle in between hides the bug.
+      final second = start(notifier, 'Bonaire');
+      final third = start(notifier, 'Roatan');
+      await first;
+      await second;
+      await Future<void>.delayed(Duration.zero);
+
+      cache.progress.add(
+        const TileDownloadProgress(
+          downloadedTiles: 25,
+          totalTiles: 25,
+          failedTiles: 0,
+          tilesPerSecond: 10,
+          isComplete: true,
+        ),
+      );
+      await cache.progress.close();
+      await third;
+
+      final regions = await repository.getAllRegions();
+      expect(regions.map((r) => r.name), ['Roatan']);
+    });
+  });
+
+  group('clear all reporting', () {
+    Future<void> seed(String id, String name) => repository.createRegion(
+      id: id,
+      name: name,
+      minLat: 20,
+      maxLat: 21,
+      minLng: -87,
+      maxLng: -86,
+      minZoom: 8,
+      maxZoom: 12,
+      tileCount: 10,
+      sizeBytes: 1024,
+    );
+
+    test('a failed shared-store reset still refreshes the totals', () async {
+      // The throw used to jump straight past the reload and both
+      // invalidations, so the storage card kept describing bytes that the loop
+      // above had already freed. The rows going is exactly why it has to be
+      // re-measured, whether or not the reset that followed them worked.
+      await seed('a', 'Cozumel');
+      cache.clearCacheError = StateError('the browse store is locked');
+
+      final sub = container.listen(cacheStatsProvider, (_, _) {});
+      await container.read(cacheStatsProvider.future);
+      final measurementsBefore = cache.statsReads;
+
+      await container
+          .read(cachedRegionsNotifierProvider.notifier)
+          .clearAllCache();
+      await container.read(cacheStatsProvider.future);
+
+      expect(
+        cache.statsReads,
+        greaterThan(measurementsBefore),
+        reason: 'the totals on screen were measured before the rows went',
+      );
+      expect(
+        container.read(cachedRegionsNotifierProvider).hasError,
+        isTrue,
+        reason: 'a clear that did not clear everything still has to say so',
+      );
+      sub.close();
     });
   });
 }

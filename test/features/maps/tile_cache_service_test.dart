@@ -322,6 +322,26 @@ void main() {
       expect(entry.message, contains('cause=_ThrowingToString'));
     });
   });
+
+  group('a cache that never initialized', () {
+    // The app runs on regardless: startup swallows an initialize() failure
+    // with a log line, so every FMTC-backed call throws for the rest of the
+    // session. Deleting a region removes its tiles before its row, so a throw
+    // here would leave the diver unable to delete any region at all, legacy
+    // ones included, where there is no store and nothing to free.
+    test('has no region tiles to delete, rather than an error', () async {
+      await expectLater(
+        TileCacheService.instance.deleteRegionTiles('any-region'),
+        completes,
+      );
+    });
+
+    test('still refuses the calls that need a live store', () {
+      // The no-op above is scoped to tile deletion. Anything that would hand
+      // back a store must keep failing loudly.
+      expect(() => TileCacheService.instance.store, throwsStateError);
+    });
+  });
 }
 
 /// A cause whose `toString` throws, used to verify
