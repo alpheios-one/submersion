@@ -72,8 +72,23 @@ class SwissStacClient {
     this.baseUrl = 'https://data.geo.admin.ch/api/stac/v1',
   }) : _client = client ?? http.Client();
 
-  /// Finds the best asset among the items intersecting [bbox] (WGS84:
-  /// [minLon, minLat, maxLon, maxLat]) in [collectionId].
+  /// The best single asset for [bbox] — the first of [findAssetCandidates],
+  /// or null when none match. Most callers only need one candidate; see
+  /// [findAssetCandidates]'s doc for why some need every plausible one.
+  Future<SwissBathyAsset?> findAsset({
+    required String collectionId,
+    required List<double> bbox,
+  }) async {
+    final candidates = await findAssetCandidates(
+      collectionId: collectionId,
+      bbox: bbox,
+    );
+    return candidates.isEmpty ? null : candidates.first;
+  }
+
+  /// Finds every plausible asset among the items intersecting [bbox]
+  /// (WGS84: [minLon, minLat, maxLon, maxLat]) in [collectionId], in the
+  /// order the server returned them.
   ///
   /// The `bbox` query parameter asks the server to filter spatially, but
   /// this was never confirmed against the live API (see the class doc), and
@@ -86,12 +101,19 @@ class SwissStacClient {
   /// [bbox] here; a feature whose footprint does not actually overlap the
   /// request is skipped rather than trusted.
   ///
-  /// Returns null when the collection exists but no item/asset covers the
-  /// box — a definitive "no tile here", safe to cache as a negative result.
-  /// Throws [SwissStacCollectionNotFoundException] when [collectionId]
-  /// itself does not exist, [SwissStacException] on any other transient
-  /// failure.
-  Future<SwissBathyAsset?> findAsset({
+  /// Returning every match rather than just the first lets a caller fall
+  /// through to the next candidate when the first one's actual downloaded
+  /// content turns out not to cover the requested ground after all — a
+  /// declared item `bbox` can be coarser or simply wrong relative to its own
+  /// raster's real footprint, which [_featureOverlaps] alone cannot detect
+  /// (it only has the server's word for it, not the pixels).
+  ///
+  /// Returns an empty list when the collection exists but no item/asset
+  /// covers the box — a definitive "no tile here", safe to cache as a
+  /// negative result once every candidate has been tried. Throws
+  /// [SwissStacCollectionNotFoundException] when [collectionId] itself does
+  /// not exist, [SwissStacException] on any other transient failure.
+  Future<List<SwissBathyAsset>> findAssetCandidates({
     required String collectionId,
     required List<double> bbox,
   }) async {
@@ -120,6 +142,7 @@ class SwissStacClient {
       throw SwissStacException('STAC items response not JSON: $e');
     }
     final features = body['features'] as List<dynamic>? ?? const [];
+    final candidates = <SwissBathyAsset>[];
     for (final feature in features) {
       final featureMap = feature as Map<String, dynamic>;
       if (!_featureOverlaps(featureMap, bbox)) continue;
@@ -128,13 +151,15 @@ class SwissStacClient {
       final picked = _pickAsset(assets);
       if (picked == null) continue;
       final properties = featureMap['properties'] as Map<String, dynamic>?;
-      return SwissBathyAsset(
-        href: picked.href,
-        format: picked.format,
-        datetime: _itemDatetime(properties),
+      candidates.add(
+        SwissBathyAsset(
+          href: picked.href,
+          format: picked.format,
+          datetime: _itemDatetime(properties),
+        ),
       );
     }
-    return null;
+    return candidates;
   }
 
   /// Whether STAC item [featureMap]'s own `bbox` genuinely overlaps the

@@ -297,6 +297,111 @@ void main() {
     });
   });
 
+  group('SwissStacClient.findAssetCandidates', () {
+    test(
+      'returns every bbox-overlapping feature, not just the first',
+      () async {
+        final client = SwissStacClient(
+          client: MockClient(
+            (_) async => http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': overlappingBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/first.zip'},
+                    },
+                  },
+                  {
+                    'bbox': overlappingBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/second.zip'},
+                    },
+                  },
+                  {
+                    // Decoy: does not overlap, must be excluded.
+                    'bbox': decoyBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/decoy.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            ),
+          ),
+        );
+        final candidates = await client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        );
+        expect(candidates.map((a) => a.href), [
+          'https://example.org/first.zip',
+          'https://example.org/second.zip',
+        ]);
+      },
+    );
+
+    test(
+      'returns an empty list rather than null when nothing overlaps',
+      () async {
+        final client = SwissStacClient(
+          client: MockClient(
+            (_) async => http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': decoyBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/decoy.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            ),
+          ),
+        );
+        final candidates = await client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        );
+        expect(candidates, isEmpty);
+      },
+    );
+
+    test('findAsset still returns just the first candidate', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/first.zip'},
+                  },
+                },
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/second.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final asset = await client.findAsset(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(asset!.href, 'https://example.org/first.zip');
+    });
+  });
+
   group('SwissStacClient.downloadBytes', () {
     test('returns the response bytes on 200', () async {
       final client = SwissStacClient(

@@ -399,6 +399,141 @@ nodata_value -9999
       },
     );
 
+    test('falls through to the next STAC candidate when the first one\'s '
+        'declared bbox overlaps but its actual downloaded content does not '
+        '(Bug 14)', () async {
+      // Regression test for the real Bug 14 symptom, reported after the
+      // Bug 13 fix: almost every tile in a wide-span fetch came back as
+      // "no swissBATHY3D tile here" even though the coordinate was
+      // confirmed, by a live STAC check, to sit kilometers inside a
+      // lake-wide item's own declared bbox. extractRawEsriSubgrid's row/
+      // col math itself checks out against the real coordinates (see the
+      // class doc), so the actual defect is one layer up: findAsset()
+      // trusted the FIRST feature whose declared bbox merely claimed to
+      // overlap, and never checked whether its real, downloaded raster
+      // (its own xllcorner/yllcorner/ncols/nrows) covered the tile at
+      // all. A declared bbox can be coarser -- or simply wrong -- than
+      // the file it labels.
+      //
+      // Here the STAC response lists two candidates for the requested
+      // tile's bbox: the first "claims" to overlap but its real content
+      // sits far away (a decoy, like the wrong-tile symptom that inspired
+      // Bug 6's bbox check -- except this time the item's own declared
+      // bbox is the thing lying, not the server's spatial filter). The
+      // second candidate's real content genuinely covers the tile. The
+      // fetch must recover the second candidate's data, not treat the
+      // first's mismatch as a definitive "no tile here".
+      const decoyGrid = '''
+ncols 4
+nrows 4
+xllcorner 2900000
+yllcorner 1400000
+cellsize 100
+nodata_value -9999
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+''';
+
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          final requestedBbox = _requestedBbox(req);
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  // Declares overlap with the query, but its real
+                  // content (above) sits nowhere near it.
+                  'bbox': requestedBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/decoy.zip'},
+                  },
+                },
+                {
+                  'bbox': requestedBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/real.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        if (req.url.path.endsWith('decoy.zip')) {
+          return http.Response.bytes(_zipOf('tile.asc', decoyGrid), 200);
+        }
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      expect(itemCalls, 1);
+      expect(grid.sourceId, 'swissbathy3d');
+      expect(grid.rows, 4);
+      expect(grid.cols, 4);
+      const referenceLevel = 406.1; // Zürichsee
+      // gridBody's cell (0, 0) resolves to 408.0 once the parser's south-
+      // first row flip is applied to the fixture's data lines; what
+      // matters here is that it is the fixture's real content, not the
+      // decoy's uniform 1.0 everywhere.
+      expect(grid.depthAt(0, 0), closeTo(referenceLevel - 408.0, 1e-9));
+    });
+
+    test('treats the tile as a genuine gap only once every candidate\'s real '
+        'content has been checked and none of them overlap (Bug 14)', () async {
+      const decoyGrid = '''
+ncols 4
+nrows 4
+xllcorner 2900000
+yllcorner 1400000
+cellsize 100
+nodata_value -9999
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+''';
+
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          final requestedBbox = _requestedBbox(req);
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': requestedBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/decoy1.zip'},
+                  },
+                },
+                {
+                  'bbox': requestedBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/decoy2.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', decoyGrid), 200);
+      });
+
+      await expectLater(
+        source.fetch(zurichseePoint, spanMeters: 100),
+        throwsA(isA<BathymetryFetchException>()),
+      );
+      // Both candidates' real content was checked before giving up.
+      expect(downloadCalls, 2);
+    });
+
     test('the query coordinate stays inside the stitched mosaic\'s rendered '
         'bounds, at realistic tile resolution and tile count', () async {
       // The 3D scene always places the dive site marker at (0,0) in a

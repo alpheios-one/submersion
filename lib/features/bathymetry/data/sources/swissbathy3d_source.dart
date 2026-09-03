@@ -38,6 +38,16 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// [extractRawEsriSubgrid] before caching — without that slicing step, every
 /// tile in the same lake would cache and stitch the exact same whole-lake
 /// grid regardless of its own coordinates.
+///
+/// A STAC item's declared `bbox` overlapping a tile's query is not proof its
+/// actual raster does too (the declared bbox can be coarser, or simply
+/// wrong, relative to the file's own header) — trusting only the first
+/// bbox-plausible candidate meant one such candidate could silently starve
+/// every tile query it happened to satisfy, well within a lake's real
+/// coverage. [_firstOverlappingCandidate] tries every candidate STAC
+/// returned for a tile's bbox, in order, and keeps the first whose
+/// downloaded content genuinely slices a non-empty [extractRawEsriSubgrid]
+/// result — only when none do is the tile treated as a real gap.
 class SwissBathy3dSource implements BathymetrySource {
   static const String sourceId = 'swissbathy3d';
   static const double tileSizeMeters = 1000;
@@ -170,8 +180,11 @@ class SwissBathy3dSource implements BathymetrySource {
   /// doc — so two tile coordinates resolving to the same href (the common
   /// case: one asset per lake, not per tile) share one network round trip
   /// and one ESRI ASCII parse instead of each downloading and parsing it
-  /// independently. [extractRawEsriSubgrid] then slices out just this
-  /// tile's own cells before it is cached and returned.
+  /// independently. [_firstOverlappingCandidate] then slices out just this
+  /// tile's own cells before it is cached and returned, trying every
+  /// candidate STAC returned for this bbox (not just the first) in case an
+  /// earlier one's declared bbox overlapped but its actual content did not
+  /// — see that method's doc.
   Future<BathymetryGrid?> _fetchTile(
     int tileE,
     int tileN,
@@ -187,62 +200,83 @@ class SwissBathy3dSource implements BathymetrySource {
     }
     if (await _tileCache.hasCachedAnswer(tileKey)) return null;
 
-    final SwissBathyAsset? asset;
+    final List<SwissBathyAsset> candidates;
+    final ({SwissBathyAsset asset, RawEsriGrid subRaw})? resolved;
     try {
-      asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
+      candidates = await _findAssetCandidates(_tileBboxWgs84(tileE, tileN));
+      resolved = await _firstOverlappingCandidate(
+        tileE,
+        tileN,
+        candidates,
+        (href) =>
+            sharedRawGrids.putIfAbsent(href, () => _downloadAndParseRaw(href)),
+      );
     } on SwissStacException catch (e) {
       // Transient: network error, HTTP failure, unparseable STAC response.
       // Must not be cached — the next visit should retry.
-      throw BathymetryFetchException('swissBATHY3D fetch failed: $e');
-    }
-    if (asset == null) {
-      await _tileCache.writeEmpty(tileKey);
-      return null;
-    }
-
-    final resolvedAsset = asset;
-    final RawEsriGrid? fullRaw;
-    try {
-      fullRaw = await sharedRawGrids.putIfAbsent(
-        resolvedAsset.href,
-        () => _downloadAndParseRaw(resolvedAsset.href),
-      );
-    } on SwissStacException catch (e) {
       throw BathymetryFetchException('swissBATHY3D fetch failed: $e');
     } on FormatException catch (e) {
       throw BathymetryFetchException('swissBATHY3D grid parse failed: $e');
     }
 
-    if (fullRaw == null) {
-      // Deterministic for this tile: caching it avoids re-downloading the
-      // same zip on every future visit to the same coordinate.
-      await _tileCache.writeEmpty(tileKey);
-      return null;
-    }
-
-    final subRaw = extractRawEsriSubgrid(
-      fullRaw,
-      minEasting: tileE * tileSizeMeters,
-      maxEasting: (tileE + 1) * tileSizeMeters,
-      minNorthing: tileN * tileSizeMeters,
-      maxNorthing: (tileN + 1) * tileSizeMeters,
-    );
-    if (subRaw == null) {
-      // The resolved asset does not actually extend over this tile's own
-      // footprint (e.g. a shoreline tile just outside a lake-shaped asset's
-      // real extent) — a genuine gap, not an error.
+    if (resolved == null) {
+      // Either no candidate at all, or none of them actually cover this
+      // tile once their real content was checked — deterministic for this
+      // tile, so caching it avoids repeating the same lookup (and any
+      // shared-href downloads) on every future visit to this coordinate.
       await _tileCache.writeEmpty(tileKey);
       return null;
     }
 
     final grid = parseSwissLv95RawGrid(
-      subRaw,
+      resolved.subRaw,
       sourceId: sourceId,
       fetchedAt: DateTime.now(),
       referenceLevelMeters: lake.meanLevelMeters,
     );
-    await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
+    await _tileCache.writeOk(
+      tileKey,
+      grid,
+      sourceDatetime: resolved.asset.datetime,
+    );
     return grid;
+  }
+
+  /// Tries each of [candidates] in order — downloading (via [download]) and
+  /// slicing out ([tileE], [tileN])'s own cells with
+  /// [extractRawEsriSubgrid] — and returns the first whose actual content
+  /// genuinely overlaps the tile, or null when none do.
+  ///
+  /// A STAC item's declared `bbox` overlapping the query
+  /// ([SwissStacClient.findAssetCandidates]'s filter) is only the server's
+  /// word for it; it can be coarser or simply wrong relative to its own
+  /// raster's real footprint, which only [extractRawEsriSubgrid] — reading
+  /// the downloaded grid's own `xllcorner`/`yllcorner`/`ncols`/`nrows` —
+  /// can actually confirm. Trusting the first bbox-plausible candidate
+  /// alone meant one wrong-but-plausible candidate silently starved every
+  /// tile query it happened to satisfy, surfacing as widespread "no tile
+  /// here" gaps despite genuine coverage.
+  Future<({SwissBathyAsset asset, RawEsriGrid subRaw})?>
+  _firstOverlappingCandidate(
+    int tileE,
+    int tileN,
+    List<SwissBathyAsset> candidates,
+    Future<RawEsriGrid?> Function(String href) download,
+  ) async {
+    for (final asset in candidates) {
+      final fullRaw = await download(asset.href);
+      if (fullRaw == null) continue;
+      final subRaw = extractRawEsriSubgrid(
+        fullRaw,
+        minEasting: tileE * tileSizeMeters,
+        maxEasting: (tileE + 1) * tileSizeMeters,
+        minNorthing: tileN * tileSizeMeters,
+        maxNorthing: (tileN + 1) * tileSizeMeters,
+      );
+      if (subRaw == null) continue;
+      return (asset: asset, subRaw: subRaw);
+    }
+    return null;
   }
 
   /// Downloads and parses the raw ESRI ASCII grid at [href] (potentially an
@@ -297,9 +331,9 @@ class SwissBathy3dSource implements BathymetrySource {
     SwissLakeLevel lake,
     SwissBathyTileCacheEntry cached,
   ) async {
-    final SwissBathyAsset? asset;
+    final List<SwissBathyAsset> candidates;
     try {
-      asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
+      candidates = await _findAssetCandidates(_tileBboxWgs84(tileE, tileN));
     } on SwissStacException {
       // metadata lookup failed -- retry on next check
       return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
@@ -308,6 +342,11 @@ class SwissBathy3dSource implements BathymetrySource {
       return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     }
 
+    // The first candidate's datetime is enough for the cheap staleness
+    // check itself -- it only decides whether a real download is worth
+    // doing at all. Which candidate's content actually covers this tile is
+    // resolved below, only once a download has been judged necessary.
+    final asset = candidates.isEmpty ? null : candidates.first;
     if (asset == null || asset.datetime == cached.sourceDatetime) {
       // No newer survey published (a null item lookup is treated the same
       // way: nothing to update, not "delete this known-good tile") -- just
@@ -318,29 +357,29 @@ class SwissBathy3dSource implements BathymetrySource {
     }
 
     try {
-      final fullRaw = await _downloadAndParseRaw(asset.href);
-      if (fullRaw == null) {
-        await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
-        return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
-      }
-      final subRaw = extractRawEsriSubgrid(
-        fullRaw,
-        minEasting: tileE * tileSizeMeters,
-        maxEasting: (tileE + 1) * tileSizeMeters,
-        minNorthing: tileN * tileSizeMeters,
-        maxNorthing: (tileN + 1) * tileSizeMeters,
+      final resolved = await _firstOverlappingCandidate(
+        tileE,
+        tileN,
+        candidates,
+        _downloadAndParseRaw,
       );
-      if (subRaw == null) {
+      if (resolved == null) {
+        // None of the candidates' actual content covers this tile --
+        // nothing usable to update to, so just record the check happened.
         await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
         return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
       }
       final grid = parseSwissLv95RawGrid(
-        subRaw,
+        resolved.subRaw,
         sourceId: sourceId,
         fetchedAt: DateTime.now(),
         referenceLevelMeters: lake.meanLevelMeters,
       );
-      await _tileCache.writeOk(tileKey, grid, sourceDatetime: asset.datetime);
+      await _tileCache.writeOk(
+        tileKey,
+        grid,
+        sourceDatetime: resolved.asset.datetime,
+      );
       return (grid: grid, outcome: _TileCheckOutcome.updated);
     } on SwissStacException {
       return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
@@ -484,11 +523,14 @@ class SwissBathy3dSource implements BathymetrySource {
 
   /// Tries each candidate collection ID in turn, falling through to the
   /// next on a confirmed 404 (wrong ID) rather than failing outright.
-  Future<SwissBathyAsset?> _findAsset(List<double> bbox) async {
+  Future<List<SwissBathyAsset>> _findAssetCandidates(List<double> bbox) async {
     SwissStacCollectionNotFoundException? lastNotFound;
     for (final collectionId in SwissStacClient.collectionIds) {
       try {
-        return await _stac.findAsset(collectionId: collectionId, bbox: bbox);
+        return await _stac.findAssetCandidates(
+          collectionId: collectionId,
+          bbox: bbox,
+        );
       } on SwissStacCollectionNotFoundException catch (e) {
         lastNotFound = e;
       }
