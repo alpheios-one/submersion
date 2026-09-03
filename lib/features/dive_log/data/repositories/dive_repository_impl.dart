@@ -14,6 +14,7 @@ import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/data/services/data_source_strand.dart';
 import 'package:submersion/features/dive_log/domain/codecs/profile_sample_point.dart';
 import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.dart'
     as domain;
@@ -965,20 +966,31 @@ class DiveRepository {
   }
 
   /// Collapses [rows] so at most one dive_data_sources row survives per
-  /// non-null computerId, keeping the first row encountered -- since every
-  /// caller queries in `desc(isPrimary), asc(createdAt)` order, that's the
-  /// primary if one exists, else the earliest-created. Rows with a null
-  /// computerId (manual entries, edited profiles) are never deduped; there
-  /// is nothing to collide on.
+  /// strand, keeping the first row encountered -- since every caller queries
+  /// in `desc(isPrimary), asc(createdAt)` order, that's the primary if one
+  /// exists, else the earliest-created.
   ///
-  /// A same-computer sequential merge (DiveMergeService.apply, step 10)
-  /// carries over every original dive's data source row as provenance; when
-  /// both originals were logged by the same physical computer, that
-  /// produces two rows sharing one computerId on the merged dive. Without
-  /// this, getProfilesByDataSource's computerId -> sourceId lookup collides
-  /// and silently misroutes every profile point to whichever row is
-  /// iterated last, and getDataSources shows a second, empty, selectable
-  /// chip for the row that lost the collision.
+  /// A row's strand is its computerId when it has one, else its
+  /// mergeSourceSlot when a sequential Combine carried it here, else nothing
+  /// at all: a manual entry or an edited profile has neither, so there is
+  /// nothing for it to collide on and it always survives.
+  ///
+  /// A sequential merge (DiveMergeService.apply, step 10) carries over every
+  /// original dive's data source row as provenance, so a merged dive holds
+  /// one row per combined segment. When both originals were logged by the
+  /// same physical computer those rows share a computerId; without this,
+  /// getProfilesByDataSource's computerId -> sourceId lookup collides and
+  /// silently misroutes every profile point to whichever row is iterated
+  /// last, and getDataSources shows a second, empty, selectable chip for the
+  /// row that lost the collision.
+  ///
+  /// Segments imported from a file or a cloud service carry no computerId at
+  /// all, so before v184 nothing collapsed them: the merged dive reported two
+  /// sources, and the detail chart's multi-source branch drew only the active
+  /// half of the dive (issue #1451). mergeSourceSlot closes that gap. It is
+  /// the row's position among its own segment's sources, so two segments each
+  /// contributing one source share slot 0 and collapse, while a dive that was
+  /// consolidated before it was combined keeps one surviving row per computer.
   ///
   /// Canonicalizing on READ is deliberate, not a stopgap for a bad write
   /// (#1045): the row that loses here still owns the only copy of its half's
@@ -988,16 +1000,15 @@ class DiveRepository {
   List<DiveDataSourcesData> _canonicalDataSourceRows(
     List<DiveDataSourcesData> rows,
   ) {
-    final seenComputers = <String>{};
+    final seenStrands = <String>{};
     final result = <DiveDataSourcesData>[];
     for (final row in rows) {
-      final computerId = row.computerId;
-      if (computerId == null) {
-        result.add(row);
-        continue;
-      }
-      if (!seenComputers.add(computerId)) continue;
-      result.add(row);
+      final strand = dataSourceStrandKey(
+        rowId: row.id,
+        computerId: row.computerId,
+        mergeSourceSlot: row.mergeSourceSlot,
+      );
+      if (seenStrands.add(strand)) result.add(row);
     }
     return result;
   }
@@ -6180,18 +6191,31 @@ class DiveRepository {
     }
   }
 
-  /// Return true if a dive has readings from 2 or more computers.
+  /// Return true if a dive has readings from 2 or more sources.
   ///
-  /// Counts distinct canonical sources rather than raw rows -- two rows
-  /// sharing a computer_id (the shape a same-computer sequential merge
-  /// produces) collapse to one, matching [_canonicalDataSourceRows]. A row
-  /// with no computer_id is always its own canonical source, since [id] is
-  /// unique per row.
+  /// Counts distinct canonical strands rather than raw rows, mirroring
+  /// [dataSourceStrandKey] in SQL: computer_id when there is one, else
+  /// merge_source_slot for a row a sequential Combine carried here, else the
+  /// row's own id (unique, so such a row is always its own strand). The two
+  /// rows a Combine leaves behind therefore count as one, whether or not the
+  /// segments came from a computer download (issue #1451).
+  ///
+  /// Deliberately the collapse rule alone, without the disjoint-span test the
+  /// profile surfaces add on top of it (`usesPerSourceRendering`). That test
+  /// exists because drawing one source on a 2D chart HIDES the others, which
+  /// is wrong for consecutive halves. This count's only caller is the 3D
+  /// page's dive/computers switcher, whose computers scene overlays every
+  /// strand at once, so nothing is hidden and two strands still have
+  /// something to compare -- two computers that each recorded half a dive
+  /// included.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
       final result = await _db
           .customSelect(
-            'SELECT COUNT(DISTINCT COALESCE(computer_id, id)) as cnt '
+            'SELECT COUNT(DISTINCT COALESCE('
+            "'computer:' || computer_id, "
+            "'mergeSlot:' || merge_source_slot, "
+            "'row:' || id)) as cnt "
             'FROM dive_data_sources WHERE dive_id = ?',
             variables: [Variable(diveId)],
           )
@@ -6199,7 +6223,7 @@ class DiveRepository {
       return (result.data['cnt'] as int) >= 2;
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to check multiple computers for dive: $diveId',
+        'Failed to count data source strands for dive: $diveId',
         error: e,
         stackTrace: stackTrace,
       );

@@ -116,6 +116,30 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @settings_oauth_connect_browserFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open your browser. Use Copy link and paste the address into your browser.'**
+  String get settings_oauth_connect_browserFailed;
+
+  /// No description provided for @settings_oauth_connect_copyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the link.'**
+  String get settings_oauth_connect_copyFailed;
+
+  /// No description provided for @settings_oauth_connect_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_oauth_connect_copyLink;
+
+  /// No description provided for @settings_oauth_connect_linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied. Paste it into your browser to authorize.'**
+  String get settings_oauth_connect_linkCopied;
+
   /// No description provided for @universalImport_action_importFromGarmin.
   ///
   /// In en, this message translates to:
@@ -5429,6 +5453,12 @@ abstract class AppLocalizations {
   /// **'{name} overdue'**
   String dashboard_gauges_gearOverdue(String name);
 
+  /// No description provided for @dashboard_gauges_gearOverdueMore.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more overdue'**
+  String dashboard_gauges_gearOverdueMore(int count);
+
   /// No description provided for @dashboard_gauges_insuranceOk.
   ///
   /// In en, this message translates to:
@@ -5788,12 +5818,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status unavailable - tap to retry'**
   String get dashboard_gauges_retry;
-
-  /// No description provided for @dashboard_urgent_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Needs attention'**
-  String get dashboard_urgent_title;
 
   /// No description provided for @dashboard_media_title.
   ///
@@ -16292,18 +16316,6 @@ abstract class AppLocalizations {
   /// **'Update Diver'**
   String get divers_edit_updateButton;
 
-  /// No description provided for @divers_list_activeBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Active'**
-  String get divers_list_activeBadge;
-
-  /// No description provided for @divers_list_addDiverButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Diver'**
-  String get divers_list_addDiverButton;
-
   /// No description provided for @divers_list_addDiverTooltip.
   ///
   /// In en, this message translates to:
@@ -16369,48 +16381,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View diver {name}'**
   String divers_list_viewDiverLabel(Object name);
-
-  /// No description provided for @divers_summary_activeDiverTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Active Diver'**
-  String get divers_summary_activeDiverTitle;
-
-  /// No description provided for @divers_summary_otherDiversTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Other Divers'**
-  String get divers_summary_otherDiversTitle;
-
-  /// No description provided for @divers_summary_overviewTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Overview'**
-  String get divers_summary_overviewTitle;
-
-  /// No description provided for @divers_summary_quickActionsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Actions'**
-  String get divers_summary_quickActionsTitle;
-
-  /// No description provided for @divers_summary_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a diver from the list to view details'**
-  String get divers_summary_subtitle;
-
-  /// No description provided for @divers_summary_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Diver Profiles'**
-  String get divers_summary_title;
-
-  /// No description provided for @divers_summary_totalDiversLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Divers'**
-  String get divers_summary_totalDiversLabel;
 
   /// No description provided for @divers_detail_deleteDialogConfirmHint.
   ///
@@ -26417,12 +26387,6 @@ abstract class AppLocalizations {
   /// **'Dropbox account'**
   String get settings_cloudSync_dropbox_account_title;
 
-  /// No description provided for @settings_cloudSync_dropbox_connect_browserFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open your browser. Try the Reopen browser button.'**
-  String get settings_cloudSync_dropbox_connect_browserFailed;
-
   /// No description provided for @settings_cloudSync_dropbox_connect_codeLabel.
   ///
   /// In en, this message translates to:
@@ -27647,24 +27611,6 @@ abstract class AppLocalizations {
   /// **'Cancelling...'**
   String get settings_import_cancelling;
 
-  /// No description provided for @settings_import_dialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Importing Data'**
-  String get settings_import_dialog_title;
-
-  /// No description provided for @settings_import_doNotClose.
-  ///
-  /// In en, this message translates to:
-  /// **'Please do not close the app'**
-  String get settings_import_doNotClose;
-
-  /// No description provided for @settings_import_itemCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{current} of {total}'**
-  String settings_import_itemCount(Object current, Object total);
-
   /// No description provided for @settings_import_phase_buddies.
   ///
   /// In en, this message translates to:
@@ -27676,12 +27622,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing certifications...'**
   String get settings_import_phase_certifications;
-
-  /// No description provided for @settings_import_phase_complete.
-  ///
-  /// In en, this message translates to:
-  /// **'Finalizing...'**
-  String get settings_import_phase_complete;
 
   /// No description provided for @settings_import_phase_diveCenters.
   ///
@@ -27712,12 +27652,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing equipment sets...'**
   String get settings_import_phase_equipmentSets;
-
-  /// No description provided for @settings_import_phase_parsing.
-  ///
-  /// In en, this message translates to:
-  /// **'Parsing file...'**
-  String get settings_import_phase_parsing;
 
   /// No description provided for @settings_import_phase_preparing.
   ///
@@ -27754,22 +27688,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applying tags...'**
   String get settings_import_phase_applyingTags;
-
-  /// No description provided for @settings_import_progressLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{phase}, {current} of {total}'**
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  );
-
-  /// No description provided for @settings_import_progressPercent.
-  ///
-  /// In en, this message translates to:
-  /// **'Import progress: {percent} percent'**
-  String settings_import_progressPercent(Object percent);
 
   /// No description provided for @settings_language_appBar_title.
   ///
@@ -31676,6 +31594,30 @@ abstract class AppLocalizations {
   /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
   String get importWizard_photos_mobileUnsupported;
 
+  /// Count of photos bundled inside an imported ZIP archive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}'**
+  String importWizard_photos_bundledCount(int count);
+
+  /// Button that opens a folder picker for where bundled archive photos are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where to save photos...'**
+  String get importWizard_photos_chooseDestination;
+
+  /// Explains that bundled photos are written to the chosen folder and linked, never stored inside the app
+  ///
+  /// In en, this message translates to:
+  /// **'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.'**
+  String get importWizard_photos_destinationNote;
+
+  /// Snackbar shown when the folder chosen for bundled archive photos cannot be written to
+  ///
+  /// In en, this message translates to:
+  /// **'That folder can\'t be written to. Choose another one.'**
+  String get importWizard_photos_destinationUnwritable;
+
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
   /// In en, this message translates to:
@@ -34738,12 +34680,6 @@ abstract class AppLocalizations {
   /// **'Source uncertain: {description}'**
   String universalImport_semantics_sourceUncertain(Object description);
 
-  /// Accessibility label for toggling selection of an import entity
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle selection for {name}'**
-  String universalImport_semantics_toggleSelection(Object name);
-
   /// Snackbar shown after a bulk action resolves multiple pending duplicates, confirming the count and action
   ///
   /// In en, this message translates to:
@@ -35934,42 +35870,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PIN Code Required'**
   String get diveComputer_pinCode_title;
-
-  /// No description provided for @diveComputer_pinEntry_connectButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get diveComputer_pinEntry_connectButton;
-
-  /// No description provided for @diveComputer_pinEntry_helperText.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the 4-6 digit PIN shown on your device'**
-  String get diveComputer_pinEntry_helperText;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsGeneric.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your dive computer display for the PIN code.'**
-  String get diveComputer_pinEntry_instructionsGeneric;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsWithDevice.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your {deviceName} display for the PIN code.'**
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName);
-
-  /// No description provided for @diveComputer_pinEntry_semanticLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'PIN code entry, 4 to 6 digits'**
-  String get diveComputer_pinEntry_semanticLabel;
-
-  /// No description provided for @diveComputer_pinEntry_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter PIN Code'**
-  String get diveComputer_pinEntry_title;
 
   /// No description provided for @diveComputer_scan_bluetoothSemanticLabel.
   ///
@@ -39825,6 +39725,18 @@ abstract class AppLocalizations {
   /// **'Based on {count} logged dives'**
   String tools_weight_basedOnDives(int count);
 
+  /// No description provided for @tools_weight_bmiHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI {bmi}. A higher BMI usually means more buoyant tissue and a little more lead.'**
+  String tools_weight_bmiHelper(String bmi);
+
+  /// No description provided for @tools_weight_bmiTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Body composition'**
+  String get tools_weight_bmiTerm;
+
   /// No description provided for @tools_weight_breakdownTitle.
   ///
   /// In en, this message translates to:
@@ -39855,6 +39767,12 @@ abstract class AppLocalizations {
   /// **'{delta} vs previous rig'**
   String tools_weight_deltaVsPrevious(String delta);
 
+  /// No description provided for @tools_weight_heightOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (optional)'**
+  String get tools_weight_heightOptional;
+
   /// No description provided for @tools_weight_noGear.
   ///
   /// In en, this message translates to:
@@ -39884,6 +39802,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save weight to profile'**
   String get tools_weight_saveToProfile;
+
+  /// No description provided for @tools_weight_source_bodyComposition.
+  ///
+  /// In en, this message translates to:
+  /// **'estimated from BMI'**
+  String get tools_weight_source_bodyComposition;
 
   /// No description provided for @tools_weight_source_measured.
   ///
@@ -59491,6 +59415,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contacts permission is required to choose a photo.'**
   String get profilePhoto_error_contactPermission;
+
+  /// No description provided for @diveComputer_merge_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Dive Computers'**
+  String get diveComputer_merge_title;
+
+  /// No description provided for @diveComputer_merge_intro.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.'**
+  String diveComputer_merge_intro(int count);
+
+  /// No description provided for @diveComputer_merge_keepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this record'**
+  String get diveComputer_merge_keepLabel;
+
+  /// No description provided for @diveComputer_merge_serialLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial {serial}'**
+  String diveComputer_merge_serialLabel(String serial);
+
+  /// No description provided for @diveComputer_merge_noSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'No serial number'**
+  String get diveComputer_merge_noSerial;
+
+  /// No description provided for @diveComputer_merge_affectedDives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives are attached to the other records.} =1{1 dive will move to the record you keep.} other{{count} dives will move to the record you keep.}}'**
+  String diveComputer_merge_affectedDives(int count);
+
+  /// No description provided for @diveComputer_merge_serialMismatchWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These records report different serial numbers. They may be different physical computers.'**
+  String get diveComputer_merge_serialMismatchWarning;
+
+  /// No description provided for @diveComputer_merge_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_merge_action;
+
+  /// No description provided for @diveComputer_merge_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 record merged into {name}} other{{count} records merged into {name}}}'**
+  String diveComputer_merge_snackbar(int count, String name);
+
+  /// No description provided for @diveComputer_merge_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not merge computers: {error}'**
+  String diveComputer_merge_failed(String error);
+
+  /// No description provided for @diveComputer_list_selection_mergeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge computers'**
+  String get diveComputer_list_selection_mergeTooltip;
+
+  /// No description provided for @diveComputer_detail_mergeMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with another computer'**
+  String get diveComputer_detail_mergeMenu;
+
+  /// No description provided for @diveComputer_detail_mergePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with'**
+  String get diveComputer_detail_mergePickerTitle;
+
+  /// No description provided for @diveComputer_detail_mergePickerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no other computers to merge with.'**
+  String get diveComputer_detail_mergePickerEmpty;
+
+  /// No description provided for @diveComputer_detail_mergePickerSameSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Same serial number'**
+  String get diveComputer_detail_mergePickerSameSerial;
+
+  /// No description provided for @diveComputer_detail_duplicateBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} reports the same serial number. It may be this computer saved twice.'**
+  String diveComputer_detail_duplicateBanner(String name);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerMultiple.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} other saved records report the same serial number. They may be this computer saved more than once.'**
+  String diveComputer_detail_duplicateBannerMultiple(int count);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_detail_duplicateBannerAction;
 }
 
 class _AppLocalizationsDelegate

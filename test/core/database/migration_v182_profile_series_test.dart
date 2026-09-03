@@ -157,6 +157,7 @@ void main() {
         final version = await second
             .customSelect('PRAGMA user_version')
             .getSingle();
+        // The ladder ran to the end, whatever the end currently is.
         expect(version.data.values.first, AppDatabase.currentSchemaVersion);
       },
     );

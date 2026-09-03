@@ -1,6 +1,8 @@
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/dive_computer/domain/services/dive_computer_merge_rules.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_computer_merge_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
@@ -10,6 +12,12 @@ import 'package:submersion/core/utils/log_failure.dart';
 final diveComputerRepositoryProvider = Provider<DiveComputerRepository>((ref) {
   return DiveComputerRepository();
 });
+
+/// Repository provider for folding duplicate dive computer records together.
+final diveComputerMergeRepositoryProvider =
+    Provider<DiveComputerMergeRepository>((ref) {
+      return DiveComputerMergeRepository();
+    });
 
 /// All dive computers
 final allDiveComputersProvider = FutureProvider<List<DiveComputer>>((
@@ -48,6 +56,21 @@ final diveComputerByIdProvider = FutureProvider.family<DiveComputer?, String>((
   ref.invalidateSelfWhen(repository.watchComputersChanges());
   return repository.getComputerById(id);
 });
+
+/// Other saved computers that look like the same physical device as [id]:
+/// a shared serial number with a compatible manufacturer and model (#645).
+///
+/// Empty when the computer is unknown or has no serial number to compare on.
+final possibleDuplicateComputersProvider =
+    FutureProvider.family<List<DiveComputer>, String>((ref, id) async {
+      final computers = await ref.watch(allDiveComputersProvider.future);
+      for (final computer in computers) {
+        if (computer.id == id) {
+          return duplicateCandidatesFor(computer, computers);
+        }
+      }
+      return const [];
+    });
 
 /// Get the favorite (primary) dive computer
 final favoriteDiveComputerProvider = FutureProvider<DiveComputer?>((ref) async {
@@ -220,6 +243,29 @@ class DiveComputerNotifier
     final validatedId = await _ref.read(validatedCurrentDiverIdProvider.future);
     await _repository.setFavoriteComputer(id, diverId: validatedId);
     await _load();
+  }
+
+  /// Folds [duplicateIds] into [survivorId] and refreshes every computer
+  /// provider. Dive-side providers are the caller's to invalidate: this file
+  /// is imported by the dive providers, so it cannot import them back.
+  Future<DiveComputerMergeResult> merge({
+    required String survivorId,
+    required List<String> duplicateIds,
+  }) async {
+    final result = await _ref
+        .read(diveComputerMergeRepositoryProvider)
+        .mergeComputers(survivorId: survivorId, duplicateIds: duplicateIds);
+    await _load();
+    _ref.invalidate(allDiveComputersProvider);
+    _ref.invalidate(favoriteDiveComputerProvider);
+    _ref.invalidate(possibleDuplicateComputersProvider);
+    _ref.invalidate(computersForDiveProvider);
+    _ref.invalidate(primaryComputerIdProvider);
+    _ref.invalidate(diveComputerByIdProvider(survivorId));
+    for (final id in result.mergedComputerIds) {
+      _ref.invalidate(diveComputerByIdProvider(id));
+    }
+    return result;
   }
 }
 

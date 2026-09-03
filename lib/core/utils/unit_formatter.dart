@@ -323,10 +323,15 @@ class UnitFormatter {
   String formatHeight(double? cm) {
     if (cm == null) return '--';
     if (heightIsMetric) return '${cm.round()} cm';
+    final split = cmToFeetInches(cm);
+    return '${split.feet}\' ${split.inches}"';
+  }
+
+  /// Split a stored height (centimeters) into whole feet and inches,
+  /// rounding to the nearest inch and carrying 12 inches into the next foot.
+  ({int feet, int inches}) cmToFeetInches(double cm) {
     final totalInches = (cm / _cmPerInch).round();
-    final feet = totalInches ~/ 12;
-    final inches = totalInches % 12;
-    return '$feet\' $inches"';
+    return (feet: totalInches ~/ 12, inches: totalInches % 12);
   }
 
   /// Build a stored height (centimeters) from imperial feet and inches.

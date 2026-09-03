@@ -1875,7 +1875,7 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   // Dive detail section order and visibility (v56) — JSON array
   TextColumn get diveDetailSections => text().nullable()();
-  // Dive detail page layout: detailed | list (v184). A stored "compact",
+  // Dive detail page layout: detailed | list (v185). A stored "compact",
   // from before that layout was dropped, reads back as detailed.
   TextColumn get diveDetailLayout => text().nullable()();
   // Table view profile panel default visibility (v61)
@@ -2607,6 +2607,27 @@ class DiveDataSources extends Table {
   /// time base", which is every source that was never consolidated.
   IntColumn get timeOffsetSeconds => integer().nullable()();
 
+  /// This row's position among its own original dive's data sources at the
+  /// moment a sequential Combine carried it here (issue #1451). Null on every
+  /// row a merge never carried, which is every row on an ordinary dive.
+  ///
+  /// `DiveMergeService.apply` copies each combined segment's
+  /// `dive_data_sources` rows onto the merged dive as provenance, because
+  /// each is the sole surviving copy of its half's rawData / rawFingerprint /
+  /// sourceUuid. Two halves of one physical dive therefore arrive as two
+  /// rows, and the display used to offer them as two switchable sources: the
+  /// chart then drew only the active half. The rows are the same strand seen
+  /// in two consecutive slices, not two competing recordings, so
+  /// `_canonicalDataSourceRows` collapses rows sharing a slot into one
+  /// display source. The rows themselves stay in the table untouched.
+  ///
+  /// A slot rather than a plain flag so a dive that was consolidated (two
+  /// computers, slots 0 and 1 in each segment) and only then combined still
+  /// shows one chip per computer instead of flattening both strands into one.
+  /// Segments whose sources carry no computerId have nothing else to
+  /// distinguish their strands by, which is exactly the case that was broken.
+  IntColumn get mergeSourceSlot => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3335,7 +3356,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 184;
+  static const int currentSchemaVersion = 185;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3768,7 +3789,18 @@ class AppDatabase extends _$AppDatabase {
     // a parallel branch's rung never ran ours and the beforeOpen backstop
     // only runs AFTER onUpgrade: by then the rows would be gone.
     183,
+    // v184 (issue #1451): dive_data_sources.merge_source_slot, the marker a
+    // sequential Combine stamps on the provenance rows it carries so the
+    // display can collapse the halves of one dive back into one source.
+    // Backfilled for dives combined before this rung shipped.
     184,
+    // v185 (issue #1476): diver_settings.dive_detail_layout, the dive detail
+    // page's layout choice. Column-only rung, no backfill: a null reads back
+    // as the detailed layout, which is what every existing diver was already
+    // getting. Numbered 185 because PR #1451 took 184 while this branch was
+    // open; the column is nullable and additive either way, so the
+    // compatibility floor stays at 183.
+    185,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4720,7 +4752,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// v184: diver_settings.dive_detail_layout, the dive detail page's layout
+  /// v185: diver_settings.dive_detail_layout, the dive detail page's layout
   /// choice (detailed/list; a stored "compact" from before that layout was
   /// dropped reads back as detailed). Idempotent so it is safe to call from
   /// both onUpgrade and the beforeOpen backstop.
@@ -5870,9 +5902,9 @@ class AppDatabase extends _$AppDatabase {
   /// diver's layout at the lane they were seeing. Runs after
   /// [_assertGasConsumptionDisplayColumn] so the lane names are final.
   ///
-  /// Never called from beforeOpen: DiveFieldAdapter.fieldFromName aliases
-  /// sacRate to sac for layouts that arrive later by sync, and re-running
-  /// this on every open would rewrite rows the diver has since changed. No
+  /// Never called from beforeOpen: diveFieldFromName aliases sacRate to sac
+  /// for layouts that arrive later by sync, and re-running this on every
+  /// open would rewrite rows the diver has since changed. No
   /// HLC bump: every device applies the same deterministic rewrite to its
   /// own rows, so there is nothing to push.
   Future<void> _rewriteLegacySacRateLayouts() async {
@@ -5982,6 +6014,107 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE dive_data_sources ADD COLUMN time_offset_seconds INTEGER',
       );
     }
+  }
+
+  /// Idempotent DDL for the v184 dive_data_sources.merge_source_slot column
+  /// (issue #1451). Same dual-call contract (onUpgrade + beforeOpen backstop)
+  /// as the other column-assert helpers. Nullable with no default, so every
+  /// pre-existing row reads back as "not carried by a merge".
+  Future<void> _assertDataSourceMergeSlotColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('merge_source_slot')) {
+      await customStatement(
+        'ALTER TABLE dive_data_sources ADD COLUMN merge_source_slot INTEGER',
+      );
+    }
+  }
+
+  /// Stamp `merge_source_slot = 0` on the provenance rows of dives that were
+  /// combined before v184 shipped, so their halves collapse to one display
+  /// source the way a post-v184 combine does (issue #1451).
+  ///
+  /// Nothing recorded the marker at the time, so the rows have to be
+  /// recognized by shape. A dive qualifies only when all three hold:
+  ///
+  ///  - it has two or more `dive_data_sources` rows, and
+  ///  - none of them is primary. Every importer writes its own row with
+  ///    `is_primary = 1` (dive_import_service, uddf_entity_importer,
+  ///    saveComputerReading) and a consolidation leaves the target's primary
+  ///    row alone, so "no primary at all" is the signature of
+  ///    `DiveMergeService.apply`, which writes every carried row
+  ///    `isPrimary: false`, and
+  ///  - every row has an entry and an exit time, and no two of those spans
+  ///    overlap, and
+  ///  - no row carries a non-zero `time_offset_seconds`.
+  ///
+  /// The span test is what makes this safe. Combined halves are consecutive
+  /// slices of one timeline, so their spans are disjoint; two computers
+  /// recording one dive cover the same minutes, so theirs overlap. Without
+  /// it, a consolidation whose target row was never marked primary would
+  /// collapse to a single chip and the chart would go back to drawing the
+  /// interleaved union of both computers (issue #543). A dive whose rows
+  /// carry no entry/exit times cannot be classified either way and is left
+  /// alone: it keeps exactly today's behavior.
+  ///
+  /// The offset test closes the one hole in that reasoning.
+  /// `DiveConsolidationService` shifts a folded-in dive's SAMPLES by
+  /// `time_offset_seconds` but copies its `entry_time`/`exit_time` over
+  /// verbatim, so a secondary whose clock was badly out has a stored span
+  /// that misses the target's even though the two cover the same minutes.
+  /// The span test would read that as a Combine. A non-zero offset is the
+  /// trace consolidation leaves and a Combine never writes, so requiring
+  /// zero across the dive rules that shape out. It costs a few false
+  /// negatives -- a pre-v184 dive that was consolidated and then combined is
+  /// now skipped -- and a skipped dive simply keeps today's display, which
+  /// is the safe direction to be wrong in for a one-shot write over user
+  /// data.
+  ///
+  /// Runs once on the v184 rung, not from the beforeOpen backstop: it writes
+  /// rows rather than asserting DDL, and every merge performed after the
+  /// upgrade stamps its own slots.
+  ///
+  /// Guarded on the columns it reads, like every other migration helper here.
+  /// A database whose `dive_data_sources` a parallel branch shaped without
+  /// entry/exit times must still open: the classification has no input there,
+  /// so skipping is the same answer as running.
+  Future<void> _backfillMergeSourceSlots() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    const required = {
+      'dive_id',
+      'is_primary',
+      'entry_time',
+      'exit_time',
+      'time_offset_seconds',
+      'merge_source_slot',
+    };
+    if (!names.containsAll(required)) return;
+    await customStatement(
+      'UPDATE dive_data_sources SET merge_source_slot = 0 '
+      'WHERE merge_source_slot IS NULL '
+      'AND dive_id IN ('
+      '  SELECT dive_id FROM dive_data_sources'
+      '  GROUP BY dive_id'
+      '  HAVING COUNT(*) >= 2'
+      '     AND SUM(CASE WHEN is_primary THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN entry_time IS NULL OR exit_time IS NULL'
+      '                  THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN COALESCE(time_offset_seconds, 0) <> 0'
+      '                  THEN 1 ELSE 0 END) = 0'
+      ') '
+      'AND dive_id NOT IN ('
+      '  SELECT a.dive_id FROM dive_data_sources a'
+      '  JOIN dive_data_sources b'
+      '    ON b.dive_id = a.dive_id AND b.id <> a.id'
+      '  WHERE a.entry_time < b.exit_time AND b.entry_time < a.exit_time'
+      ')',
+    );
   }
 
   /// Site-level entry/exit method columns on dive_sites (issue #1104).
@@ -9790,13 +9923,21 @@ class AppDatabase extends _$AppDatabase {
           }
         }
         if (from < 183) await reportProgress();
-        // v184: diver_settings.dive_detail_layout. Column-only rung, no
-        // backfill: a null reads back as the detailed layout, which is what
-        // every existing diver was already getting.
+        // v184: the marker a sequential Combine stamps on the provenance
+        // rows it carries, plus a backfill for dives combined before it
+        // existed (issue #1451).
         if (from < 184) {
-          await _assertDiveDetailLayoutColumn();
+          await _assertDataSourceMergeSlotColumn();
+          await _backfillMergeSourceSlots();
         }
         if (from < 184) await reportProgress();
+        // v185: diver_settings.dive_detail_layout. Column-only rung, no
+        // backfill: a null reads back as the detailed layout, which is what
+        // every existing diver was already getting.
+        if (from < 185) {
+          await _assertDiveDetailLayoutColumn();
+        }
+        if (from < 185) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9976,6 +10117,12 @@ class AppDatabase extends _$AppDatabase {
         // Reading a consolidated dive's sources throws without it.
         await _assertDataSourceTimeOffsetColumn();
 
+        // v184 backstop: re-assert the merge provenance marker (issue
+        // #1451; same parallel-branch version-collision self-heal).
+        // Reading any dive's sources throws without it. Only the column is
+        // re-asserted here; the one-shot backfill belongs to the rung.
+        await _assertDataSourceMergeSlotColumn();
+
         // v160 backstop: re-assert service_kinds.default_category. A device
         // that reached 160 or higher through a parallel branch never enters
         // the `from < 160` block above, and the seed SQL below is
@@ -10054,7 +10201,7 @@ class AppDatabase extends _$AppDatabase {
         // every read of a diver or buddy row would throw without the column.
         await _assertProfilePhotoColumns();
 
-        // v184 backstop: re-assert diver_settings.dive_detail_layout. Every
+        // v185 backstop: re-assert diver_settings.dive_detail_layout. Every
         // settings read selects the whole row, so a database that skipped the
         // rung would throw on the first read instead of falling back to the
         // default layout.

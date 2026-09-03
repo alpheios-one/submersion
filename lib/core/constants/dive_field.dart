@@ -138,6 +138,30 @@ enum DiveField {
   }
 }
 
+/// Field names that saved layouts may still carry, mapped to the field that
+/// replaced them.
+///
+/// Saved layouts persist [DiveField.name] verbatim. The v170 migration
+/// rewrites the layouts already on the device, but a layout synced from an
+/// older build arrives after that migration has run, so these aliases are
+/// permanent rather than a migration-window convenience.
+const Map<String, DiveField> _legacyDiveFieldNames = {
+  // Split into sac and rmv (discussions #354, #803).
+  'sacRate': DiveField.sac,
+};
+
+/// Resolves a persisted [DiveField.name], honouring names that were renamed
+/// after a layout was saved. Returns null when the name is not recognized at
+/// all, leaving the fallback to the caller.
+DiveField? diveFieldFromName(String name) {
+  final legacy = _legacyDiveFieldNames[name];
+  if (legacy != null) return legacy;
+  for (final field in DiveField.values) {
+    if (field.name == name) return field;
+  }
+  return null;
+}
+
 extension DiveFieldMetadata on DiveField {
   /// The category this field belongs to.
   DiveFieldCategory get category {

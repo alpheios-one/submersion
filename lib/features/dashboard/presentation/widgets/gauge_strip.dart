@@ -48,7 +48,7 @@ class GaugeStrip extends ConsumerWidget {
           label: context.l10n.dashboard_gauges_retry,
           tone: _Tone.neutral,
           onTap: () => ref.invalidate(dashboardGaugesProvider),
-        ),
+        ).widget,
       ),
     );
   }
@@ -63,10 +63,15 @@ class GaugeStrip extends ConsumerWidget {
     Set<String> hidden,
   ) {
     final l10n = context.l10n;
-    final chips = <Widget>[];
+    final chips = <_Chip>[];
 
-    if (_shown(hidden, HomeChipType.gear)) {
-      if (!g.hasGear) {
+    // Gear, insurance and the flight window are hardened: an alert-tone chip
+    // from any of the three is a dive-safety fact, so it renders even when
+    // the diver has hidden that chip type. Everything they say when they are
+    // not red stays hideable like any other chip.
+    final gearShown = _shown(hidden, HomeChipType.gear);
+    if (!g.hasGear) {
+      if (gearShown) {
         chips.add(
           _chip(
             context,
@@ -76,49 +81,81 @@ class GaugeStrip extends ConsumerWidget {
             onTap: () => context.push('/equipment/new'),
           ),
         );
-      } else {
-        for (final gauge in g.gearGauges) {
-          final (label, tone) = switch (gauge.status.severity) {
-            ServiceClockSeverity.overdue => (
-              l10n.dashboard_gauges_gearOverdue(gauge.itemName),
-              _Tone.alert,
+      }
+    } else {
+      for (final gauge in g.gearGauges) {
+        final (label, tone) = switch (gauge.status.severity) {
+          ServiceClockSeverity.overdue => (
+            l10n.dashboard_gauges_gearOverdue(gauge.itemName),
+            _Tone.alert,
+          ),
+          ServiceClockSeverity.dueSoon => (
+            l10n.dashboard_gauges_gearDueIn(
+              gauge.itemName,
+              gauge.status.daysUntilDue ?? 0,
             ),
-            ServiceClockSeverity.dueSoon => (
-              l10n.dashboard_gauges_gearDueIn(
-                gauge.itemName,
-                gauge.status.daysUntilDue ?? 0,
-              ),
-              _Tone.warn,
-            ),
-            ServiceClockSeverity.ok => (
-              l10n.dashboard_gauges_gearOk(gauge.itemName),
-              _Tone.ok,
-            ),
-          };
-          chips.add(
-            _chip(
-              context,
-              icon: Icons.build_outlined,
-              label: label,
-              tone: tone,
-              // The chip names one item, so open that item rather than the
-              // list the diver would then have to search.
-              onTap: () => context.push('/equipment/${gauge.itemId}'),
-            ),
-          );
-        }
+            _Tone.warn,
+          ),
+          ServiceClockSeverity.ok => (
+            l10n.dashboard_gauges_gearOk(gauge.itemName),
+            _Tone.ok,
+          ),
+        };
+        if (!gearShown && tone != _Tone.alert) continue;
+        chips.add(
+          _chip(
+            context,
+            icon: Icons.build_outlined,
+            label: label,
+            tone: tone,
+            // The chip names one item, so open that item rather than the
+            // list the diver would then have to search.
+            onTap: () => context.push('/equipment/${gauge.itemId}'),
+          ),
+        );
+      }
+      // Overdue items beyond the per-item cap collapse into one chip, so a
+      // diver with a shelf of lapsed gear gets a count instead of a strip
+      // made entirely of regulators. It names nothing, so it opens the list.
+      if (g.gearOverdueOverflow > 0) {
+        chips.add(
+          _chip(
+            context,
+            icon: Icons.build_outlined,
+            label: l10n.dashboard_gauges_gearOverdueMore(g.gearOverdueOverflow),
+            tone: _Tone.alert,
+            onTap: () => context.push('/equipment'),
+          ),
+        );
       }
     }
 
-    if (_shown(hidden, HomeChipType.insurance)) {
-      final insurance = g.insurance;
-      // Emptiness keys off the provider, not the expiry date: expiry is
-      // optional on InsuranceEditPage, so a DAN policy recorded without a
-      // renewal date is a complete record. This matches
-      // DiverInsurance.isValid and the diver profile hub. Both isExpired and
-      // isExpiringSoon return false when expiryDate is null, so such a policy
-      // falls through to the OK branch.
-      if (insurance == null || (insurance.provider?.isEmpty ?? true)) {
+    final insurance = g.insurance;
+    // Emptiness keys off the provider, not the expiry date: expiry is
+    // optional on InsuranceEditPage, so a DAN policy recorded without a
+    // renewal date is a complete record. This matches
+    // DiverInsurance.isValid and the diver profile hub. Both isExpired and
+    // isExpiringSoon return false when expiryDate is null, so such a policy
+    // falls through to the OK branch.
+    //
+    // Narrowed to a nullable local rather than a bool so the branches below
+    // get null promotion on the policy itself.
+    final policy = insurance != null && !(insurance.provider?.isEmpty ?? true)
+        ? insurance
+        : null;
+    if (policy != null && policy.isExpired) {
+      // Hardened: an expired policy renders even with the chip type hidden.
+      chips.add(
+        _chip(
+          context,
+          icon: Icons.health_and_safety_outlined,
+          label: l10n.dashboard_gauges_insuranceExpired,
+          tone: _Tone.alert,
+          onTap: () => context.push('/settings/diver-profile/insurance'),
+        ),
+      );
+    } else if (_shown(hidden, HomeChipType.insurance)) {
+      if (policy == null) {
         chips.add(
           _chip(
             context,
@@ -128,17 +165,7 @@ class GaugeStrip extends ConsumerWidget {
             onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
-      } else if (insurance.isExpired) {
-        chips.add(
-          _chip(
-            context,
-            icon: Icons.health_and_safety_outlined,
-            label: l10n.dashboard_gauges_insuranceExpired,
-            tone: _Tone.alert,
-            onTap: () => context.push('/settings/diver-profile/insurance'),
-          ),
-        );
-      } else if (insurance.isExpiringSoon) {
+      } else if (policy.isExpiringSoon) {
         chips.add(
           _chip(
             context,
@@ -146,7 +173,7 @@ class GaugeStrip extends ConsumerWidget {
             label: l10n.dashboard_gauges_insuranceExpires(
               DateFormat.yMMMd(
                 Localizations.localeOf(context).toString(),
-              ).format(insurance.expiryDate!),
+              ).format(policy.expiryDate!),
             ),
             tone: _Tone.warn,
             onTap: () => context.push('/settings/diver-profile/insurance'),
@@ -195,11 +222,11 @@ class GaugeStrip extends ConsumerWidget {
       }
     }
 
-    if (_shown(hidden, HomeChipType.flightWindow)) {
-      final flight = g.flightWindow;
-      if (flight != null) {
-        switch (flight.state) {
-          case FlightWindowState.open:
+    final flight = g.flightWindow;
+    if (flight != null) {
+      switch (flight.state) {
+        case FlightWindowState.open:
+          if (_shown(hidden, HomeChipType.flightWindow)) {
             final remaining = flight.remaining(NoFlyService.wallClockNowUtc());
             chips.add(
               _chip(
@@ -213,18 +240,20 @@ class GaugeStrip extends ConsumerWidget {
                 onTap: () => context.push(_noFlyRoute),
               ),
             );
-          case FlightWindowState.closed:
-          case FlightWindowState.conflict:
-            chips.add(
-              _chip(
-                context,
-                icon: Icons.flight_takeoff_outlined,
-                label: l10n.dashboard_gauges_flightWindowClosed,
-                tone: _Tone.alert,
-                onTap: () => context.push(_noFlyRoute),
-              ),
-            );
-        }
+          }
+        case FlightWindowState.closed:
+        case FlightWindowState.conflict:
+          // Hardened: a shut flight window means the diver should not be
+          // diving before their flight, so it is not theirs to hide.
+          chips.add(
+            _chip(
+              context,
+              icon: Icons.flight_takeoff_outlined,
+              label: l10n.dashboard_gauges_flightWindowClosed,
+              tone: _Tone.alert,
+              onTap: () => context.push(_noFlyRoute),
+            ),
+          );
       }
     }
 
@@ -411,13 +440,30 @@ class GaugeStrip extends ConsumerWidget {
     }
 
     if (chips.isEmpty) return const SizedBox.shrink();
-    return Wrap(spacing: 8, runSpacing: 8, children: chips);
+    // Alert chips lead the strip, so a lapsed regulator is the first thing
+    // read rather than something the diver has to find among the OK chips.
+    // Tagging with the source index keeps the sort stable: everything that
+    // is not an alert stays in the declaration order above.
+    final ordered = [for (var i = 0; i < chips.length; i++) (i, chips[i])]
+      ..sort((a, b) {
+        final byTone = _alertFirst(a.$2.tone) - _alertFirst(b.$2.tone);
+        return byTone != 0 ? byTone : a.$1 - b.$1;
+      });
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [for (final entry in ordered) entry.$2.widget],
+    );
   }
 
   /// [onTap] is required: an InkWell with a null callback looks identical to
   /// a live chip, so an un-wired chip is invisible to the user and to the
   /// compiler alike. Every chip must name a destination that explains it.
-  Widget _chip(
+  ///
+  /// Returns the tone alongside the widget so [_buildStrip] can order alert
+  /// chips first. Rendering to a bare Widget here would throw the severity
+  /// away at exactly the point the caller still needs it.
+  _Chip _chip(
     BuildContext context, {
     required IconData icon,
     required String label,
@@ -435,7 +481,7 @@ class GaugeStrip extends ConsumerWidget {
         scheme.onSurfaceVariant,
       ),
     };
-    return InkWell(
+    final widget = InkWell(
       onTap: onTap,
       onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(999),
@@ -460,7 +506,16 @@ class GaugeStrip extends ConsumerWidget {
         ),
       ),
     );
+    return (tone: tone, widget: widget);
   }
 }
 
+/// A built chip that still knows its severity, so the strip can order
+/// alert chips ahead of the rest.
+typedef _Chip = ({_Tone tone, Widget widget});
+
 enum _Tone { neutral, ok, warn, alert }
+
+/// Sort key placing alert chips first and leaving every other tone equal,
+/// so a stable sort preserves the declaration order among them.
+int _alertFirst(_Tone tone) => tone == _Tone.alert ? 0 : 1;

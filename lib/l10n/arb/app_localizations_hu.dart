@@ -9,6 +9,21 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.';
+
+  @override
+  String get settings_oauth_connect_copyFailed =>
+      'Nem sikerült másolni a linket.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Link másolása';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Link másolva. Illeszd be a böngésződbe az engedélyezéshez.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Importálás Garmin eszközről';
 
@@ -3180,6 +3195,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count további lejárt';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'Biztosítás rendben';
 
   @override
@@ -3396,9 +3416,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get dashboard_gauges_retry =>
       'Az állapot nem érhető el - koppints az újrapróbáláshoz';
-
-  @override
-  String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
   String get dashboard_media_title => 'Legutóbbi médiaelemek';
@@ -9686,12 +9703,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get divers_edit_updateButton => 'Merülo frissitese';
 
   @override
-  String get divers_list_activeBadge => 'Aktiv';
-
-  @override
-  String get divers_list_addDiverButton => 'Merülo hozzaadasa';
-
-  @override
   String get divers_list_addDiverTooltip => 'Uj merülo profil hozzaadasa';
 
   @override
@@ -9731,28 +9742,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return '$name merülo megtekintese';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Aktiv merülo';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Tobbi merülo';
-
-  @override
-  String get divers_summary_overviewTitle => 'Attekintes';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Gyorsmuveletek';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Valasszon egy merülot a listabol a reszletek megtekintésehez';
-
-  @override
-  String get divers_summary_title => 'Merülo profilok';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Osszes merülo';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -15898,10 +15887,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_dropbox_account_title => 'Dropbox-fiók';
 
   @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Nem sikerült megnyitni a böngészőt. Próbáld a Böngésző újranyitása gombot.';
-
-  @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
       'Engedélyezési kód';
 
@@ -16645,25 +16630,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_import_cancelling => 'Megszakitas...';
 
   @override
-  String get settings_import_dialog_title => 'Adatok importalasa';
-
-  @override
-  String get settings_import_doNotClose => 'Kerem, ne zarja be az alkalmazast';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current / $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Merülopartnerek importalasa...';
 
   @override
   String get settings_import_phase_certifications =>
       'Tanusitványok importalasa...';
-
-  @override
-  String get settings_import_phase_complete => 'Befejez...';
 
   @override
   String get settings_import_phase_diveCenters =>
@@ -16684,9 +16655,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Felszereles szettek importalasa...';
 
   @override
-  String get settings_import_phase_parsing => 'Fajl elemzese...';
-
-  @override
   String get settings_import_phase_preparing => 'Elokeszites...';
 
   @override
@@ -16703,20 +16671,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current / $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Importalas haladasa: $percent szazalek';
-  }
 
   @override
   String get settings_language_appBar_title => 'Nyelv';
@@ -19106,6 +19060,29 @@ class AppLocalizationsHu extends AppLocalizations {
       'A fényképek importálásához az eszköz lemezén lévő mappa szükséges. Futtasd ezt az importálást számítógépen, hogy a fényképek is bekerüljenek. A merülések és a merülőhelyek normálisan importálódnak.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotó az archívumban',
+      one: '1 fotó az archívumban',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Válassza ki, hová mentse a fotókat...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'A fotók ebbe a mappába kerülnek, és onnan lesznek hivatkozva. A Submersion soha nem tart saját másolatot.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'Ebbe a mappába nem lehet írni. Válasszon másikat.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20983,11 +20960,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Kijelölés váltása: $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count megjelolve mint $action';
   }
@@ -21710,29 +21682,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'PIN-kod szukseges';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Csatlakozas';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Add meg az eszkozon megjelenitett 4-6 jegyu PIN-kodot';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Ellenorizd a merulo szamitogep kijelzojet a PIN-kodhoz.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Ellenorizd a(z) $deviceName kijelzojet a PIN-kodhoz.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'PIN-kod bevitel, 4-6 szamjegy';
-
-  @override
-  String get diveComputer_pinEntry_title => 'PIN-kod megadasa';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -24127,6 +24076,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. A magasabb BMI általában több felhajtóerejű szövetet és kicsit több ólmot jelent.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Testösszetétel';
+
+  @override
   String get tools_weight_breakdownTitle => 'Hogyan számoltuk ki';
 
   @override
@@ -24144,6 +24101,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Magasság (opcionális)';
+
+  @override
   String get tools_weight_noGear =>
       'Add hozzá a merüléshez tervezett felszerelést az előrejelzés személyre szabásához.';
 
@@ -24158,6 +24118,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Súly mentése a profilba';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'BMI alapján becsülve';
 
   @override
   String get tools_weight_source_measured => 'a merüléseidből mérve';
@@ -36058,4 +36021,88 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'A fénykép kiválasztásához névjegy-hozzáférési engedély szükséges.';
+
+  @override
+  String get diveComputer_merge_title => 'Buvarszamitogepek osszevonasa';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count bejegyzesbol egy lesz. A merulesek, profilok es a letoltesi elozmenyek a megtartott bejegyzeshez kerulnek. A tobbi bejegyzes torlodik.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Ezt a bejegyzest megtartom';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Sorozatszam: $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Nincs sorozatszam';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merules kerul at a megtartott bejegyzeshez.',
+      one: '1 merules kerul at a megtartott bejegyzeshez.',
+      zero: 'A tobbi bejegyzeshez nem tartozik merules.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Ezek a bejegyzesek eltero sorozatszamot jeleznek. Lehet, hogy kulonbozo keszulekek.';
+
+  @override
+  String get diveComputer_merge_action => 'Osszevonas';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bejegyzes osszevonva ide: $name',
+      one: '1 bejegyzes osszevonva ide: $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'A szamitogepek osszevonasa nem sikerult: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip =>
+      'Szamitogepek osszevonasa';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Osszevonas masik szamitogeppel';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Osszevonas ezzel';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'Nincs masik szamitogep, amivel ossze lehetne vonni.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'Azonos sorozatszam';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep ketszer van elmentve.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count masik mentett rekord ugyanazt a sorozatszamot jelzi. Lehet, hogy ez a szamitogep tobbszor van elmentve.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Osszevonas';
 }

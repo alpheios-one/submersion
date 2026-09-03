@@ -4,11 +4,15 @@ import 'dart:typed_data';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/enrichment_service.dart';
+import 'package:submersion/features/media/data/services/local_file_handle_factory.dart';
+import 'package:submersion/features/media/data/services/local_file_link_service.dart';
 import 'package:submersion/features/media/data/services/media_import_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service_desktop.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service_mobile.dart';
 import 'package:submersion/features/media/presentation/providers/media_byte_retention.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_enqueue_provider.dart';
 
 /// Provider for the platform-appropriate PhotoPickerService.
@@ -251,6 +255,20 @@ final mediaImportServiceProvider = Provider<MediaImportService>((ref) {
   return MediaImportService(
     mediaRepository: MediaRepository(),
     enrichmentService: ref.watch(enrichmentServiceProvider),
+    onMediaCreated: ref.watch(mediaStoreEnqueueProvider),
+  );
+});
+
+/// Links files in place as `localFile` rows (no byte copy). Used by the
+/// import wizard for photos a logbook referenced by path.
+final localFileLinkServiceProvider = Provider<LocalFileLinkService>((ref) {
+  return LocalFileLinkService(
+    mediaRepository: ref.watch(mediaRepositoryProvider),
+    handles: LocalFileHandleFactory(
+      platform: ref.watch(localMediaPlatformProvider),
+      bookmarkStorage: ref.watch(localBookmarkStorageProvider),
+    ),
+    readMetadata: ref.watch(exifExtractorProvider).extract,
     onMediaCreated: ref.watch(mediaStoreEnqueueProvider),
   );
 });

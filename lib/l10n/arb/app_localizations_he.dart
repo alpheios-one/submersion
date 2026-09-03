@@ -9,6 +9,20 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'לא ניתן להעתיק את הקישור.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'העתקת קישור';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'הקישור הועתק. הדבק אותו בדפדפן שלך כדי לאשר.';
+
+  @override
   String get universalImport_action_importFromGarmin => 'ייבוא מהתקן Garmin';
 
   @override
@@ -3108,6 +3122,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count נוספים באיחור';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'ביטוח תקין';
 
   @override
@@ -3318,9 +3337,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dashboard_gauges_retry => 'הסטטוס אינו זמין - הקש לניסיון חוזר';
-
-  @override
-  String get dashboard_urgent_title => 'דורש תשומת לב';
 
   @override
   String get dashboard_media_title => 'מדיה אחרונה';
@@ -9477,12 +9493,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divers_edit_updateButton => 'עדכן צולל';
 
   @override
-  String get divers_list_activeBadge => 'פעיל';
-
-  @override
-  String get divers_list_addDiverButton => 'הוסף צולל';
-
-  @override
   String get divers_list_addDiverTooltip => 'הוסף פרופיל צולל חדש';
 
   @override
@@ -9521,27 +9531,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'הצג צולל $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'צולל פעיל';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'צוללים אחרים';
-
-  @override
-  String get divers_summary_overviewTitle => 'סקירה כללית';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'פעולות מהירות';
-
-  @override
-  String get divers_summary_subtitle => 'בחר צולל מהרשימה כדי לצפות בפרטים';
-
-  @override
-  String get divers_summary_title => 'פרופילי צוללים';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'סה\"כ צוללים';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -15559,10 +15548,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_dropbox_account_title => 'חשבון Dropbox';
 
   @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'לא ניתן לפתוח את הדפדפן. נסה את כפתור פתח מחדש את הדפדפן.';
-
-  @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'קוד הרשאה';
 
   @override
@@ -16280,24 +16265,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_import_cancelling => 'מבטל...';
 
   @override
-  String get settings_import_dialog_title => 'ייבוא נתונים';
-
-  @override
-  String get settings_import_doNotClose => 'נא לא לסגור את האפליקציה';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current מתוך $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'מייבא חברי צלילה...';
 
   @override
   String get settings_import_phase_certifications => 'מייבא הסמכות...';
-
-  @override
-  String get settings_import_phase_complete => 'מסיים...';
 
   @override
   String get settings_import_phase_diveCenters => 'מייבא מרכזי צלילה...';
@@ -16313,9 +16284,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_import_phase_equipmentSets => 'מייבא ערכות ציוד...';
-
-  @override
-  String get settings_import_phase_parsing => 'מנתח קובץ...';
 
   @override
   String get settings_import_phase_preparing => 'מכין...';
@@ -16334,20 +16302,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current מתוך $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'התקדמות ייבוא: $percent אחוז';
-  }
 
   @override
   String get settings_language_appBar_title => 'שפה';
@@ -18668,6 +18622,29 @@ class AppLocalizationsHe extends AppLocalizations {
       'ייבוא תמונות מחייב תיקייה בדיסק של המכשיר הזה. הרץ את הייבוא במחשב כדי לכלול אותן. צלילות ואתרים מיובאים כרגיל.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count תמונות כלולות בארכיון',
+      one: 'תמונה אחת כלולה בארכיון',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'בחרו היכן לשמור את התמונות...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'התמונות נשמרות בתיקייה זו ומקושרות משם. Submersion לעולם אינו שומר עותק משלו.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'לא ניתן לכתוב לתיקייה זו. בחרו תיקייה אחרת.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -20517,11 +20494,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'החלף בחירה עבור $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count סומנו כ-$action';
   }
@@ -21226,29 +21198,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'נדרש קוד PIN';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'התחבר';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'הזן את ה-PIN בן 4-6 הספרות המוצג במכשיר';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'בדוק את תצוגת מחשב הצלילה לקבלת קוד ה-PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'בדוק את תצוגת $deviceName לקבלת קוד ה-PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'הזנת קוד PIN, 4 עד 6 ספרות';
-
-  @override
-  String get diveComputer_pinEntry_title => 'הזן קוד PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -23621,6 +23570,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. BMI גבוה יותר בדרך כלל אומר יותר רקמה צפה ומעט יותר משקולות.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'הרכב גוף';
+
+  @override
   String get tools_weight_breakdownTitle => 'כיצד זה חושב';
 
   @override
@@ -23638,6 +23595,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'גובה (אופציונלי)';
+
+  @override
   String get tools_weight_noGear =>
       'הוסף את הציוד שאיתו תצלול כדי להתאים אישית את החיזוי.';
 
@@ -23652,6 +23612,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'שמור משקל בפרופיל';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'מוערך לפי BMI';
 
   @override
   String get tools_weight_source_measured => 'נמדד מהצלילות שלך';
@@ -35492,4 +35455,86 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה.';
+
+  @override
+  String get diveComputer_merge_title => 'מיזוג מחשבי צלילה';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count רשומות יהפכו לאחת. הצלילות, הפרופילים והיסטוריית ההורדות יעברו לרשומה שתשמור. שאר הרשומות יימחקו.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'לשמור רשומה זו';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'מספר סידורי $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'אין מספר סידורי';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יעברו לרשומה שתישמר.',
+      one: 'צלילה אחת תעבור לרשומה שתישמר.',
+      zero: 'לא משויכות צלילות לרשומות האחרות.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'רשומות אלו מדווחות על מספרים סידוריים שונים. ייתכן שמדובר במחשבים שונים.';
+
+  @override
+  String get diveComputer_merge_action => 'מיזוג';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count רשומות מוזגו לתוך $name',
+      one: 'רשומה אחת מוזגה לתוך $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'לא ניתן למזג את המחשבים: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'מיזוג מחשבים';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'מיזוג עם מחשב אחר';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'מיזוג עם';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty => 'אין מחשבים אחרים למיזוג.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'אותו מספר סידורי';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name מדווח על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר פעמיים.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count רשומות שמורות נוספות מדווחות על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר יותר מפעם אחת.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'מיזוג';
 }

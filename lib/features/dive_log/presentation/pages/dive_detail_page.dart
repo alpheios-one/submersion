@@ -978,6 +978,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The site suggestion sits above the header card, never inside
+            // it. Embedded mode has its own copy under the toolbar (which
+            // stays put while the body scrolls), so only the standalone page
+            // renders one here; otherwise the banner would appear twice.
+            // Collapses to nothing when there is no suggestion, so no
+            // spacing of its own is needed.
+            if (!widget.embedded)
+              SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
             // Fixed: Header
             Consumer(
               builder: (context, ref, _) {
@@ -1567,7 +1575,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               );
             },
           ),
-          SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1860,7 +1867,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ref.watch(diveDataSourcesProvider(dive.id)).value ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
-    final isMultiSource = dataSources.length >= 2;
+    // Per-source rendering exists because two computers recording one dive
+    // disagree sample by sample (#543); the halves of a split dive a Combine
+    // stitched together are not that, and drawing one of those would hide the
+    // rest of the dive (#1451). Profiles that have not loaded yet carry no
+    // spans, so this stays true on the first build, exactly as it does today.
+    final isMultiSource = usesPerSourceRendering(
+      dataSources,
+      sourceProfiles.values,
+    );
 
     final activeSourceId = ref.watch(activeDiveSourceProvider(dive.id));
     final overlayIds = ref.watch(overlaySourcesProvider(dive.id));
@@ -2291,6 +2306,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             ),
             // Sources bar: tap a chip to make that source drive the whole
             // page; the eye overlays a source on the chart for comparison.
+            // Both of those are per-source RENDERING, which is why the bar
+            // follows usesPerSourceRendering rather than the source count:
+            // on a dive whose sources are consecutive halves there is no
+            // "other source" to switch to or overlay, only the rest of the
+            // same dive. Set primary and Split do not disappear with it --
+            // the Data Sources section carries its own copy of both, gated
+            // on the source count alone (data_sources_section.dart).
             if (isMultiSource)
               SourceBar(
                 sources: [
