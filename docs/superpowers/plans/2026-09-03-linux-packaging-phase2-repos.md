@@ -120,11 +120,27 @@ secret material or create public infrastructure, so a person performs them.
 # LINUX_REPO_GPG_PASSPHRASE secret. The stored passphrase would then not match
 # the one the key was created with, and every signing step would fail.
 openssl rand -base64 32 | tr -d '\n' > /tmp/repo-pass
-gpg --batch --passphrase "$(cat /tmp/repo-pass)" \
+chmod 600 /tmp/repo-pass
+
+# --pinentry-mode loopback is required on GnuPG 2.1+ for --passphrase to be
+# honoured at all; without it gpg ignores the option and tries to prompt
+# through pinentry, which has nowhere to prompt in a scripted context. The
+# signing steps in Task 6 pass the same flag for the same reason.
+#
+# --passphrase-file rather than --passphrase: a passphrase given on the command
+# line is visible to every user on the machine through ps.
+gpg --batch --pinentry-mode loopback --passphrase-file /tmp/repo-pass \
   --quick-generate-key "Submersion Package Signing <dev@submersion.app>" \
   rsa4096 sign never
+
 KEYID=$(gpg --list-keys --with-colons dev@submersion.app | awk -F: '/^pub/{print $5; exit}')
-gpg --armor --export-secret-keys "$KEYID" > /tmp/repo-private.asc
+
+# Exporting a passphrase-protected secret key needs the same treatment: it
+# decrypts the key, so it prompts exactly as generation does.
+gpg --batch --pinentry-mode loopback --passphrase-file /tmp/repo-pass \
+  --armor --export-secret-keys "$KEYID" > /tmp/repo-private.asc
+
+# The public half needs no passphrase.
 gpg --export "$KEYID" > /tmp/submersion.gpg    # dearmored, for signed-by=
 ```
 
