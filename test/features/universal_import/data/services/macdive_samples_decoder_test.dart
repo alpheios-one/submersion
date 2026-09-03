@@ -185,6 +185,16 @@ void main() {
       expect(s.ttsMinutes, isNull);
     });
 
+    test('a slightly negative surface depth is kept', () {
+      // Pressure-sensor drift at the surface, the same allowance the raw
+      // path makes. The plausibility bounds must not cost a real sample.
+      final blob = _encode([
+        [0.0, -1.0],
+        [10.0, 5.0],
+      ], options: 0);
+      expect(MacDiveSamplesDecoder.decode(blob), hasLength(2));
+    });
+
     group('rejects', () {
       test('a blob too short to carry a version', () {
         expect(MacDiveSamplesDecoder.decode(Uint8List(3)), isNull);
@@ -261,6 +271,45 @@ void main() {
           [0.0, 0.0],
           [double.nan, 3.0],
         ], options: 0);
+        expect(MacDiveSamplesDecoder.decode(blob), isNull);
+      });
+
+      test('a time or depth outside anything a dive contains', () {
+        // The structural checks cannot catch a stride that is wrong in a way
+        // that still divides the run - a future record layout stamped with a
+        // version this decoder claims, or an options bit above the low byte
+        // that a newer encoder does emit a field for. Misaligned floats read
+        // as values no dive holds, and without a bound they reach the profile
+        // and seed the dive's max depth. The huge time is its own hazard:
+        // `double.round()` saturates at the int64 limit rather than throwing,
+        // so it would multiply out into a *negative* Duration.
+        for (final record in <List<double>>[
+          [0.0, 5000.0],
+          [0.0, -50.0],
+          [-5.0, 3.0],
+          [1e30, 3.0],
+        ]) {
+          final blob = _encode([
+            [0.0, 0.0],
+            record,
+          ], options: 0);
+          expect(
+            MacDiveSamplesDecoder.decode(blob),
+            isNull,
+            reason: 'record $record',
+          );
+        }
+      });
+
+      test('a version 1 record outside the plausible bounds', () {
+        // The unencrypted layout gets the same gate: whole records are its
+        // only structural guarantee, so a foreign blob whose length happens
+        // to divide by 24 has nothing else standing in its way.
+        final blob = Uint8List(4 + 24);
+        final data = ByteData.sublistView(blob);
+        data.setUint32(0, 1, Endian.little);
+        data.setFloat32(4, 0.0, Endian.little);
+        data.setFloat32(8, 5000.0, Endian.little);
         expect(MacDiveSamplesDecoder.decode(blob), isNull);
       });
 

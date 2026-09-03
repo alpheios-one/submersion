@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:submersion/features/universal_import/data/services/macdive_sqlite_sample.dart';
+import 'package:submersion/features/universal_import/data/services/raw_profile_sanity_check.dart';
 import 'package:submersion/features/universal_import/data/services/tea_block_cipher.dart';
 
 /// Decodes MacDive's `ZDIVE.ZSAMPLES` column, the profile MacDive itself
@@ -64,10 +65,10 @@ class MacDiveSamplesDecoder {
   /// corrupt or foreign column never turns into a plausible-looking profile.
   /// An empty list means MacDive stored a profile with no samples.
   ///
-  /// Time and depth must be finite for the blob to be accepted at all. An
-  /// optional field that is not finite is dropped from its sample instead:
-  /// that is a bad reading inside a profile MacDive still displays, not a
-  /// sign the blob is foreign.
+  /// Time and depth must be finite, and inside [_plausible]'s bounds, for the
+  /// blob to be accepted at all. An optional field that is not finite is
+  /// dropped from its sample instead: that is a bad reading inside a profile
+  /// MacDive still displays, not a sign the blob is foreign.
   static List<MacDiveSqliteSample>? decode(Uint8List blob) {
     if (blob.length < 4) return null;
     final version = ByteData.sublistView(blob).getUint32(0, Endian.little);
@@ -101,7 +102,7 @@ class MacDiveSamplesDecoder {
       final record = _RecordReader(plainData, offset, options);
       final time = record.float();
       final depth = record.float();
-      if (!time.isFinite || !depth.isFinite) return null;
+      if (!_plausible(time, depth)) return null;
       // The optional fields, in the order MacDive's encoder emits them,
       // straight from the disassembly. Each read advances only when its bit
       // is set.
@@ -148,7 +149,7 @@ class MacDiveSamplesDecoder {
       final record = _RecordReader(data, offset, 0);
       final time = record.float();
       final depth = record.float();
-      if (!time.isFinite || !depth.isFinite) return null;
+      if (!_plausible(time, depth)) return null;
       samples.add(
         MacDiveSqliteSample(
           time: _duration(time),
@@ -163,6 +164,35 @@ class MacDiveSamplesDecoder {
     return samples;
   }
 
+  /// Whether a record's time and depth are values MacDive could have drawn,
+  /// judged by the same bounds [RawProfileSanityCheck] applies to the raw
+  /// path so the two profile sources agree on what counts as nonsense.
+  ///
+  /// The structural checks above cannot stand alone. They pass any blob whose
+  /// version word is in range and whose record run divides by the stride the
+  /// options word implies, and a stride can be wrong while still dividing:
+  /// a future record layout stamped with a version this decoder claims, or an
+  /// options bit above [_optionMask] that a newer encoder emits a field for.
+  /// Fields read at the wrong offset are floats built from unrelated bytes,
+  /// so they land far outside these bounds rather than near them, which is
+  /// what lets a coarse gate reject them.
+  ///
+  /// The upper bound on time is load-bearing beyond plausibility: Dart's
+  /// [double.round] saturates at the int64 limit instead of throwing, so
+  /// without it [_duration] turns a huge finite time into a *negative*
+  /// Duration rather than failing.
+  static bool _plausible(double time, double depth) {
+    if (!time.isFinite || !depth.isFinite) return false;
+    if (time < 0 ||
+        time > RawProfileSanityCheck.maxPlausibleDuration.inSeconds) {
+      return false;
+    }
+    return depth >= RawProfileSanityCheck.minPlausibleDepthMeters &&
+        depth <= RawProfileSanityCheck.maxPlausibleDepthMeters;
+  }
+
+  /// Safe against overflow only because [_plausible] has already bounded
+  /// [seconds].
   static Duration _duration(double seconds) =>
       Duration(milliseconds: (seconds * 1000).round());
 

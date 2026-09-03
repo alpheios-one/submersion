@@ -16,6 +16,8 @@ import 'package:submersion/features/universal_import/data/services/macdive_sqlit
 import 'package:submersion/features/universal_import/data/services/macdive_unit_converter.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_xml_models.dart'
+    show MacDiveUnitSystem;
 import 'package:submersion/features/universal_import/data/services/parsed_dive_profile_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/raw_profile_sanity_check.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_raw_decompressor.dart';
@@ -38,6 +40,24 @@ typedef MacDiveDescriptorFetchFn =
 /// A transform applied to `ZRAWDATA` before libdivecomputer sees it, returning
 /// null when the bytes are not in the form this vendor's transform expects.
 typedef MacDiveRawPrePass = Uint8List? Function(Uint8List raw);
+
+/// What reading a dive's `ZSAMPLES` column produced.
+///
+/// The distinction the caller needs is between MacDive having no profile for
+/// a dive and MacDive having one this decoder could not read: only the second
+/// is worth telling the user about, and only when the dive has no other
+/// source left.
+enum _SamplesOutcome {
+  /// Profile points were decoded and attached.
+  attached,
+
+  /// The column is absent, or decoded cleanly to zero samples. Either way
+  /// MacDive itself draws no profile for this dive.
+  none,
+
+  /// The column holds bytes this decoder rejected.
+  unreadable,
+}
 
 /// Maps a [MacDiveRawLogbook] (raw SQLite rows read by [MacDiveDbReader])
 /// into a unified [ImportPayload] the rest of the import pipeline consumes
@@ -180,9 +200,21 @@ class MacDiveDiveMapper {
       }
       // Whatever kept the raw download from producing a profile, MacDive's
       // own copy of the samples is still there to read.
-      if (!attached) attached = _attachSamples(d, map, converter);
+      var samples = _SamplesOutcome.none;
+      if (!attached) {
+        samples = _attachSamples(d, map, converter);
+        attached = samples == _SamplesOutcome.attached;
+      }
       if (!attached && _hasProfileBytes(d)) {
-        if (!ffiAvailable && _hasRawProfile(d) && !_hasSamples(d)) {
+        if (samples == _SamplesOutcome.none && !_hasRawProfile(d)) {
+          // MacDive drew no profile for this dive and there was no other
+          // column to try. Nothing was lost, so there is nothing to report.
+        } else if (!ffiAvailable &&
+            _hasRawProfile(d) &&
+            samples == _SamplesOutcome.none) {
+          // The raw download was the only source that could have produced a
+          // profile, and this platform could not attempt it. An XML export
+          // would not help: MacDive has no samples of its own to export.
           platformBlocked++;
         } else {
           unreadable++;
@@ -314,19 +346,22 @@ class MacDiveDiveMapper {
   static bool _hasProfileBytes(MacDiveRawDive d) =>
       _hasRawProfile(d) || _hasSamples(d);
 
-  /// Decodes [d]'s `ZSAMPLES` into profile samples on [map]. Returns false
-  /// when the column is absent or unreadable. An empty sample array is a
-  /// successful decode of a dive MacDive itself shows no profile for, so it
-  /// returns true and attaches nothing.
-  static bool _attachSamples(
+  /// Decodes [d]'s `ZSAMPLES` into profile samples on [map].
+  ///
+  /// An empty sample array is a successful decode of a dive MacDive itself
+  /// shows no profile for, which is why it is [_SamplesOutcome.none] rather
+  /// than a failure - but it is not the same as having a profile, and the
+  /// caller has to know the difference for a dive whose raw download also
+  /// failed.
+  static _SamplesOutcome _attachSamples(
     MacDiveRawDive d,
     Map<String, dynamic> map,
     MacDiveUnitConverter converter,
   ) {
-    if (!_hasSamples(d)) return false;
+    if (!_hasSamples(d)) return _SamplesOutcome.none;
     final samples = MacDiveSamplesDecoder.decode(d.samplesBlob!);
-    if (samples == null) return false;
-    if (samples.isEmpty) return true;
+    if (samples == null) return _SamplesOutcome.unreadable;
+    if (samples.isEmpty) return _SamplesOutcome.none;
 
     map['profile'] = [for (final s in samples) _samplePoint(s, converter)];
 
@@ -350,7 +385,7 @@ class MacDiveDiveMapper {
     if (end > Duration.zero) {
       map['runtime'] ??= Duration(seconds: _wholeSeconds(end));
     }
-    return true;
+    return _SamplesOutcome.attached;
   }
 
   /// Sample times to the nearest whole second, the resolution profile points
@@ -360,7 +395,8 @@ class MacDiveDiveMapper {
   /// One profile point in the shape `UddfEntityImporter` reads, matching the
   /// keys `MacDiveXmlParser` emits for the same fields. Pressures come out of
   /// the column in the diver's display unit, like the tank columns, so they
-  /// go through [converter]; depth and temperature are already SI. A zero
+  /// go through [converter] and are dropped outright when it has no unit
+  /// system to convert from; depth and temperature are already SI. A zero
   /// pressure, ppO2 or heart rate is MacDive's "no reading" and is left out
   /// rather than charted as a real value. Profile points carry whole seconds
   /// app-wide, so a fractional sample time (none exist in the reference
@@ -376,10 +412,18 @@ class MacDiveDiveMapper {
     if (s.temperatureCelsius != null) {
       point['temperature'] = s.temperatureCelsius;
     }
+    // A pressure with no unit system to place it in is worse than no
+    // pressure: passing psi through as bar is #912 on a new column, and a
+    // charted number carries no hint that it might be wrong. MacDive's
+    // sample pressures are themselves a witness the inference reads
+    // ([MacDiveUnitInference]), so unknown here means a library whose only
+    // pressures sit past the end of that bounded scan.
+    final placeable = converter.units != MacDiveUnitSystem.unknown;
     final pressures = <Map<String, dynamic>>[
-      for (final (index, raw) in [s.pressure, s.pressure2].indexed)
-        if (raw != null && raw > 0)
-          {'pressure': converter.pressureToBar(raw), 'tankIndex': index},
+      if (placeable)
+        for (final (index, raw) in [s.pressure, s.pressure2].indexed)
+          if (raw != null && raw > 0)
+            {'pressure': converter.pressureToBar(raw), 'tankIndex': index},
     ];
     if (pressures.isNotEmpty) point['allTankPressures'] = pressures;
     if (s.ppO2 != null && s.ppO2! > 0) point['ppO2'] = s.ppO2;

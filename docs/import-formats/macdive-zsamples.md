@@ -714,6 +714,34 @@ pressure follows the display unit like `ZTANKANDGAS.ZAIRSTART` does, so the
 same `MacDiveUnitConverter.coreData` handles both. A zero pressure, ppO2 or
 heart rate is MacDive's "no reading".
 
+Following the display unit means these pressures inherit #912 whole: a library
+with no `SystemOfUnits` row resolves by inference, and a library that also
+records no cylinders used to give the inference nothing to work with, so psi
+passed through as bar. The sample pressures are themselves a strong witness
+(the same 600 ceiling separates 200-300 bar from 2400-3500 psi), so
+`MacDiveUnitInference` reads them as its last tier, after the cylinder columns
+that cost nothing to look at. Decoding costs a TEA pass per dive, so the scan
+stops at `sampleScanDiveLimit` dives or at the first reading that can only be
+psi. That bound leaves `unknown` reachable for a library whose only pressures
+sit past it, and there `_samplePoint` drops the pressure channel rather than
+charting a number it cannot place - the dive keeps every other channel, and
+before ZSAMPLES were readable it had none of them.
+
+### Failing closed
+
+The structural checks (version word in range, body a whole number of cipher
+blocks, a length trailer inside the buffer and divisible by the stride) do not
+prove the stride itself is right. A future record layout stamped with a
+version this decoder claims, or an options bit above the low byte that a newer
+encoder emits a field for, would misalign every read while still dividing the
+run. Fields read at the wrong offset are floats built from unrelated bytes, so
+the decoder also holds each record's time and depth to the bounds
+`RawProfileSanityCheck` applies on the raw path (-3 to 350 m, 0 to 24 h) and
+returns null for the whole blob otherwise. The upper bound on time does double
+duty: Dart's `double.round()` saturates at the int64 limit instead of throwing,
+so an unbounded huge time would multiply out into a negative `Duration` rather
+than an obviously wrong one.
+
 Version 1 has no options word and no encryption: after the 4-byte version
 come 24-byte records of time, depth, pressure (f32), NDT (i32), ppO2 (f32)
 and temperature (f32). No version 1 blob exists in the reference library; the
@@ -755,6 +783,14 @@ than cross-checked against ground truth.
   without the native channel. The "MacDive format Submersion cannot read"
   warning is gone; only a dive with unreadable bytes in both columns is
   reported.
+
+  It reports a `_SamplesOutcome` rather than a bool because an empty sample
+  array is MacDive saying it drew no profile, which is the whole story only
+  when `ZSAMPLES` was the dive's only source. A dive whose raw parse was
+  rejected and whose `ZSAMPLES` is empty still lost a profile, and it is
+  counted: toward the platform warning when the native channel was never
+  reachable (an XML export cannot rescue what MacDive never drew), toward the
+  XML-export warning otherwise.
 
 The ratio of the two columns in the reference library: 267 dives have both,
 83 have only `ZSAMPLES`, and 190 have neither. Those 83 were the entire
