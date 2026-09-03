@@ -104,6 +104,14 @@ final _universalAdapterMappingAutoAdvanceProvider = Provider<bool>((ref) {
   return false;
 });
 
+/// Whether an archive actually bundled photos.
+///
+/// Keyed by source file basename, so a key alone does not mean a photo:
+/// asking the map for keys rather than contents would put the Photos step
+/// in front of the user, and demand a destination folder, for nothing.
+bool _hasBundledPhotos(Map<String, List<String>> byBaseName) =>
+    byBaseName.values.any((paths) => paths.isNotEmpty);
+
 /// True when the import carries no photos at all: the parsed payload
 /// references none and no imported archive bundled any.
 ///
@@ -117,7 +125,7 @@ final universalAdapterNoPhotosProvider = Provider<bool>((ref) {
     universalImportNotifierProvider.select((s) => s.photoPathsByBaseName),
   );
   final referenced = payload?.entitiesOf(ui.ImportEntityType.media) ?? const [];
-  return referenced.isEmpty && bundled.isEmpty;
+  return referenced.isEmpty && !_hasBundledPhotos(bundled);
 });
 
 /// True when the Photos step has nothing left to ask.
@@ -135,7 +143,7 @@ final universalAdapterPhotosReadyProvider = Provider<bool>((ref) {
       state.payload?.entitiesOf(ui.ImportEntityType.media) ?? const [];
   final referencedReady = referenced.isEmpty || state.photoResolution != null;
   final bundledReady =
-      state.photoPathsByBaseName.isEmpty ||
+      !_hasBundledPhotos(state.photoPathsByBaseName) ||
       state.bundledPhotoFolderPath != null;
   return referencedReady && bundledReady;
 });
@@ -658,7 +666,7 @@ class UniversalAdapter implements ImportSourceAdapter {
     final bundledFolder = notifierState.bundledPhotoFolderPath;
     var attachedPhotos = 0;
     if (bundledFolder != null &&
-        notifierState.photoPathsByBaseName.isNotEmpty) {
+        _hasBundledPhotos(notifierState.photoPathsByBaseName)) {
       final linker = ImportPhotoLinker(_ref.read(localFileLinkServiceProvider));
       final attached = await attachImportedPhotos(
         photoPathsByBaseName: notifierState.photoPathsByBaseName,

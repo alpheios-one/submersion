@@ -390,7 +390,7 @@ class MacDiveDbReader {
       'SELECT * FROM ZDIVEIMAGE',
       (r) => MacDiveRawDiveImage(
         pk: r['Z_PK'] as int,
-        uuid: _str(r['ZUUID']) ?? '',
+        uuid: _str(r['ZUUID']),
         diveFk: (r['ZRELATIONSHIPDIVE'] as int?) ?? 0,
         position: r['ZPOSITION'] as int?,
         caption: _str(r['ZCAPTION']),

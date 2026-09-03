@@ -129,6 +129,14 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
   final LocalBookmarkStorage bookmarkStorage;
   final LocalMediaPlatform platform;
 
+  /// Shared by every file this notifier persists: the factory holds only
+  /// its dependencies and the platform's handle policy, so one instance
+  /// keeps that policy in a single place.
+  late final LocalFileHandleFactory _handles = LocalFileHandleFactory(
+    platform: platform,
+    bookmarkStorage: bookmarkStorage,
+  );
+
   /// Invoked after every successful createMedia so the media store can
   /// enqueue an upload. Null when no store is configured. Mirrors
   /// [MediaImportService.onMediaCreated]; without it, Files-tab imports
@@ -339,10 +347,7 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     // [ExtractedFile.file] is a dart:io File, so its path is always a
     // filesystem path; the factory decides per platform whether that path
     // is kept as-is or backed by a security-scoped bookmark.
-    final handle = await LocalFileHandleFactory(
-      platform: platform,
-      bookmarkStorage: bookmarkStorage,
-    ).create(file.file.path);
+    final handle = await _handles.create(file.file.path);
 
     final now = DateTime.now();
     final item = MediaItem(

@@ -1539,6 +1539,15 @@ void main() {
         expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
       });
 
+      test('a base name carrying no photos leaves the gate open', () {
+        notifier.state = notifier.state.copyWith(
+          payload: const ImportPayload(entities: {}),
+          photoPathsByBaseName: const {'dive1': []},
+        );
+        expect(container.read(universalAdapterNoPhotosProvider), isTrue);
+        expect(container.read(universalAdapterPhotosReadyProvider), isTrue);
+      });
+
       test('an unwritable bundled folder is refused and not recorded', () {
         if (Platform.isWindows) {
           markTestSkipped('POSIX permission bits are not honoured on Windows');

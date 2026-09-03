@@ -412,7 +412,12 @@ class MacDiveRawDiver {
 /// the reference.
 class MacDiveRawDiveImage {
   final int pk;
-  final String uuid;
+
+  /// MacDive's own id for the photo (`ZUUID`), or null when it recorded
+  /// none. Nothing keys off it today; it is carried because a photo the
+  /// source names is easier to trace through a support conversation than
+  /// one identified only by a row number.
+  final String? uuid;
   final int diveFk;
 
   /// MacDive's display order within the dive (`ZPOSITION`), or null when
@@ -435,8 +440,8 @@ class MacDiveRawDiveImage {
 
   const MacDiveRawDiveImage({
     required this.pk,
-    required this.uuid,
     required this.diveFk,
+    this.uuid,
     this.position,
     this.caption,
     this.path,

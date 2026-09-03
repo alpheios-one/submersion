@@ -140,6 +140,13 @@ void main() {
       expect(Directory(dir).listSync(), isEmpty);
     });
 
+    test('an unusable path is refused rather than thrown from', () {
+      // A NUL byte makes dart:io throw ArgumentError, not a
+      // FileSystemException; the question being asked is still just
+      // "can photos go here", and the answer is still no.
+      expect(folderAcceptsWrites('${tmp.path}/bad\u0000name'), isFalse);
+    });
+
     test('a read-only folder is refused', () {
       if (Platform.isWindows) {
         markTestSkipped('POSIX permission bits are not honoured on Windows');

@@ -68,7 +68,11 @@ bool folderAcceptsWrites(String dir) {
       // with something holding the file open.
     }
     return true;
-  } on FileSystemException {
+  } catch (_) {
+    // Deliberately every failure, not just FileSystemException: an
+    // unusable path throws ArgumentError before the filesystem is even
+    // consulted, and the question being asked is only whether photos can
+    // go here.
     return false;
   }
 }

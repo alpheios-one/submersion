@@ -122,7 +122,7 @@ class LocalFileLinkService {
     // can vanish between the wizard resolving it and the import committing,
     // and the attach loop counts a thrown link as a failure it can report.
     final file = File(path);
-    if (!file.existsSync()) {
+    if (!await file.exists()) {
       throw FileSystemException('Photo not found', path);
     }
 
