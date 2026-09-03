@@ -98,7 +98,8 @@ class DiveComputerMergeRepository {
 
   /// The gear twin the survivor holds after the merge: its own, else the
   /// first one a duplicate has. Mirrors `mergedDiveComputer`, which fills the
-  /// survivor's blank `equipmentId` from the first duplicate that has one.
+  /// survivor's blank `equipmentId` from the first duplicate that has one,
+  /// verbatim: it is a foreign key and has to match `equipment.id` exactly.
   String? _adoptedTwinId(
     String survivorId,
     List<String> duplicateIds,

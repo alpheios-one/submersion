@@ -317,6 +317,42 @@ void main() {
       );
     });
 
+    test('trims the descriptive fields it adopts', () {
+      // A file import can register padded values. The survivor should not
+      // inherit the padding along with the value, and the identity rules
+      // compare through normalizeComputerIdentityPart, so the padded serial
+      // still matched as a duplicate before reaching here.
+      final survivor = _computer(
+        id: 'a',
+        manufacturer: '  ',
+        model: '',
+        serialNumber: null,
+      );
+      final duplicate = _computer(
+        id: 'b',
+        manufacturer: '  Shearwater ',
+        model: ' Petrel 3',
+        serialNumber: ' 3101949313 ',
+        firmwareVersion: ' 93 ',
+      );
+
+      final merged = mergedDiveComputer(survivor, [duplicate]);
+
+      expect(merged.manufacturer, 'Shearwater');
+      expect(merged.model, 'Petrel 3');
+      expect(merged.serialNumber, '3101949313');
+      expect(merged.firmwareVersion, '93');
+    });
+
+    test('keeps the adopted gear twin id verbatim', () {
+      // equipmentId is a foreign key into equipment.id, so it has to match
+      // the stored row exactly rather than be normalised on the way through.
+      final survivor = _computer(id: 'a', equipmentId: null);
+      final duplicate = _computer(id: 'b', equipmentId: ' gear-b ');
+
+      expect(mergedDiveComputer(survivor, [duplicate]).equipmentId, ' gear-b ');
+    });
+
     test('appends distinct non-blank notes from duplicates', () {
       final survivor = _computer(id: 'a', notes: 'Primary');
       final dupes = [

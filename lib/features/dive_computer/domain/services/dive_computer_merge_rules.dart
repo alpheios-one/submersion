@@ -124,7 +124,7 @@ DiveComputer mergedDiveComputer(
       survivor.bluetoothAddress,
       ...duplicates.map((d) => d.bluetoothAddress),
     ]),
-    equipmentId: _firstNonBlank([
+    equipmentId: _firstNonBlankId([
       survivor.equipmentId,
       ...duplicates.map((d) => d.equipmentId),
     ]),
@@ -155,7 +155,23 @@ String? _newestFingerprint(List<DiveComputer> records) {
   return best?.lastDiveFingerprint;
 }
 
+/// The first value that is not blank, trimmed. A record can carry padding
+/// from a file import, and the survivor should not inherit it along with the
+/// value; the identity rules compare through [normalizeComputerIdentityPart],
+/// so a padded serial matched here would be stored padded and displayed that
+/// way. Mirrors [_mergedNotes], which trims for the same reason.
 String? _firstNonBlank(Iterable<String?> values) {
+  for (final value in values) {
+    final trimmed = value?.trim();
+    if (trimmed != null && trimmed.isNotEmpty) return trimmed;
+  }
+  return null;
+}
+
+/// The first value that is not blank, verbatim. For `equipmentId`, which is a
+/// foreign key into `equipment.id` and has to match the stored row exactly;
+/// the repository picks the merged gear twin the same way.
+String? _firstNonBlankId(Iterable<String?> values) {
   for (final value in values) {
     if (value != null && value.trim().isNotEmpty) return value;
   }
