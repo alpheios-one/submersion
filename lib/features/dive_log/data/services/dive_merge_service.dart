@@ -252,16 +252,17 @@ class DiveMergeService {
       // Overwrites any slot the row already carried: combining a dive that
       // was itself combined re-slots every row against THIS merge, which is
       // what keeps the result one dive rather than a growing chip per merge.
+      final rowsBySegment = <String, List<DiveDataSourcesData>>{};
+      for (final row in snapshot.dataSourceRows) {
+        (rowsBySegment[row.diveId] ??= <DiveDataSourcesData>[]).add(row);
+      }
       final mergeSlotByRowId = <String, int>{};
-      for (final segment
-          in snapshot.dataSourceRows.map((r) => r.diveId).toSet()) {
-        final rows =
-            snapshot.dataSourceRows.where((r) => r.diveId == segment).toList()
-              ..sort((a, b) {
-                if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
-                final byCreated = a.createdAt.compareTo(b.createdAt);
-                return byCreated != 0 ? byCreated : a.id.compareTo(b.id);
-              });
+      for (final rows in rowsBySegment.values) {
+        rows.sort((a, b) {
+          if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
+          final byCreated = a.createdAt.compareTo(b.createdAt);
+          return byCreated != 0 ? byCreated : a.id.compareTo(b.id);
+        });
         for (final (slot, row) in rows.indexed) {
           mergeSlotByRowId[row.id] = slot;
         }
@@ -281,13 +282,14 @@ class DiveMergeService {
             );
       }
 
+      // Reuses the grouping above, so the fallback owner is picked from a
+      // segment already in canonical order: with no primary row it lands on
+      // the oldest rather than on whatever order the snapshot query returned.
       String? mergedSourceIdFor(String diveId, String? sourceId) {
         final mapped = mergedSourceIds[sourceId];
         if (mapped != null) return mapped;
-        final segment = snapshot.dataSourceRows
-            .where((r) => r.diveId == diveId)
-            .toList();
-        if (segment.isEmpty) return null;
+        final segment = rowsBySegment[diveId];
+        if (segment == null || segment.isEmpty) return null;
         final owner = segment.firstWhere(
           (r) => r.isPrimary,
           orElse: () => segment.first,
