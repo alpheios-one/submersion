@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.",
+  "settings_oauth_connect_copyFailed": "Nem sikerült másolni a linket.",
+  "settings_oauth_connect_copyLink": "Link másolása",
+  "settings_oauth_connect_linkCopied": "Link másolva. Illeszd be a böngésződbe az engedélyezéshez.",
   "universalImport_action_importFromGarmin": "Importálás Garmin eszközről",
   "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Mentés előre beállításként",
@@ -4653,7 +4657,6 @@
   "settings_cloudSync_provider_connectedTo": "Csatlakoztatva: {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} csatlakozas sikertelen: {error}",
   "settings_cloudSync_dropbox_account_title": "Dropbox-fiók",
-  "settings_cloudSync_dropbox_connect_browserFailed": "Nem sikerült megnyitni a böngészőt. Próbáld a Böngésző újranyitása gombot.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Engedélyezési kód",
   "settings_cloudSync_dropbox_connect_emptyCode": "Add meg a böngésződben megjelenő engedélyezési kódot",
   "settings_cloudSync_dropbox_connect_failed": "Nem sikerült csatlakozni a Dropboxhoz: {error}",

@@ -9,6 +9,19 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      '无法打开浏览器。请使用“复制链接”，并将地址粘贴到浏览器中。';
+
+  @override
+  String get settings_oauth_connect_copyFailed => '无法复制链接。';
+
+  @override
+  String get settings_oauth_connect_copyLink => '复制链接';
+
+  @override
+  String get settings_oauth_connect_linkCopied => '链接已复制。请粘贴到浏览器中进行授权。';
+
+  @override
   String get universalImport_action_importFromGarmin => '从 Garmin 设备导入';
 
   @override
@@ -15108,10 +15121,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Dropbox 账户';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      '无法打开浏览器。请尝试“重新打开浏览器”按钮。';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => '授权码';

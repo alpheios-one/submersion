@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "Kan de browser niet openen. Gebruik Link kopiëren en plak het adres in je browser.",
+  "settings_oauth_connect_copyFailed": "Kan de link niet kopiëren.",
+  "settings_oauth_connect_copyLink": "Link kopiëren",
+  "settings_oauth_connect_linkCopied": "Link gekopieerd. Plak hem in je browser om toegang te verlenen.",
   "universalImport_action_importFromGarmin": "Importeren vanaf Garmin-apparaat",
   "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Als voorinstelling opslaan",
@@ -4726,7 +4730,6 @@
   "settings_cloudSync_provider_connectedTo": "Verbonden met {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Verbinding met {providerName} mislukt: {error}",
   "settings_cloudSync_dropbox_account_title": "Dropbox-account",
-  "settings_cloudSync_dropbox_connect_browserFailed": "Kan de browser niet openen. Probeer de knop Browser opnieuw openen.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Autorisatiecode",
   "settings_cloudSync_dropbox_connect_emptyCode": "Voer de autorisatiecode in die in je browser wordt weergegeven",
   "settings_cloudSync_dropbox_connect_failed": "Kan geen verbinding maken met Dropbox: {error}",

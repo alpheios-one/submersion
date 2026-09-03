@@ -116,6 +116,30 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @settings_oauth_connect_browserFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open your browser. Use Copy link and paste the address into your browser.'**
+  String get settings_oauth_connect_browserFailed;
+
+  /// No description provided for @settings_oauth_connect_copyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the link.'**
+  String get settings_oauth_connect_copyFailed;
+
+  /// No description provided for @settings_oauth_connect_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_oauth_connect_copyLink;
+
+  /// No description provided for @settings_oauth_connect_linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied. Paste it into your browser to authorize.'**
+  String get settings_oauth_connect_linkCopied;
+
   /// No description provided for @universalImport_action_importFromGarmin.
   ///
   /// In en, this message translates to:
@@ -26296,12 +26320,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dropbox account'**
   String get settings_cloudSync_dropbox_account_title;
-
-  /// No description provided for @settings_cloudSync_dropbox_connect_browserFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open your browser. Try the Reopen browser button.'**
-  String get settings_cloudSync_dropbox_connect_browserFailed;
 
   /// No description provided for @settings_cloudSync_dropbox_connect_codeLabel.
   ///

@@ -9,6 +9,21 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'Der Browser konnte nicht geöffnet werden. Verwenden Sie „Link kopieren“ und fügen Sie die Adresse in Ihren Browser ein.';
+
+  @override
+  String get settings_oauth_connect_copyFailed =>
+      'Der Link konnte nicht kopiert werden.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Link kopieren';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Link kopiert. Fügen Sie ihn zum Autorisieren in Ihren Browser ein.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Von Garmin-Gerät importieren';
 
@@ -15869,10 +15884,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Dropbox-Konto';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Der Browser konnte nicht geöffnet werden. Versuchen Sie die Schaltfläche „Browser erneut öffnen“.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>

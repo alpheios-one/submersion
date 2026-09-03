@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.",
+  "settings_oauth_connect_copyFailed": "تعذر نسخ الرابط.",
+  "settings_oauth_connect_copyLink": "نسخ الرابط",
+  "settings_oauth_connect_linkCopied": "تم نسخ الرابط. الصقه في متصفحك للتفويض.",
   "universalImport_action_importFromGarmin": "استيراد من جهاز Garmin",
   "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "حفظ كإعداد مسبق",
@@ -4726,7 +4730,6 @@
   "settings_cloudSync_provider_connectedTo": "متصل بـ {providerName}",
   "settings_cloudSync_provider_connectionFailed": "فشل الاتصال بـ {providerName}: {error}",
   "settings_cloudSync_dropbox_account_title": "حساب Dropbox",
-  "settings_cloudSync_dropbox_connect_browserFailed": "تعذر فتح المتصفح. جرب زر إعادة فتح المتصفح.",
   "settings_cloudSync_dropbox_connect_codeLabel": "رمز التفويض",
   "settings_cloudSync_dropbox_connect_emptyCode": "أدخل رمز التفويض الظاهر في متصفحك",
   "settings_cloudSync_dropbox_connect_failed": "فشل الاتصال بـ Dropbox: {error}",

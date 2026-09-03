@@ -9,6 +9,21 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.';
+
+  @override
+  String get settings_oauth_connect_copyFailed =>
+      'Nem sikerült másolni a linket.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Link másolása';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Link másolva. Illeszd be a böngésződbe az engedélyezéshez.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Importálás Garmin eszközről';
 
@@ -15833,10 +15848,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Dropbox-fiók';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Nem sikerült megnyitni a böngészőt. Próbáld a Böngésző újranyitása gombot.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>

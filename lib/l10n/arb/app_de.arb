@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "Der Browser konnte nicht geöffnet werden. Verwenden Sie „Link kopieren“ und fügen Sie die Adresse in Ihren Browser ein.",
+  "settings_oauth_connect_copyFailed": "Der Link konnte nicht kopiert werden.",
+  "settings_oauth_connect_copyLink": "Link kopieren",
+  "settings_oauth_connect_linkCopied": "Link kopiert. Fügen Sie ihn zum Autorisieren in Ihren Browser ein.",
   "universalImport_action_importFromGarmin": "Von Garmin-Gerät importieren",
   "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Als Vorlage speichern",
@@ -4726,7 +4730,6 @@
   "settings_cloudSync_provider_connectedTo": "Verbunden mit {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Verbindung zu {providerName} fehlgeschlagen: {error}",
   "settings_cloudSync_dropbox_account_title": "Dropbox-Konto",
-  "settings_cloudSync_dropbox_connect_browserFailed": "Der Browser konnte nicht geöffnet werden. Versuchen Sie die Schaltfläche „Browser erneut öffnen“.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Autorisierungscode",
   "settings_cloudSync_dropbox_connect_emptyCode": "Geben Sie den in Ihrem Browser angezeigten Autorisierungscode ein",
   "settings_cloudSync_dropbox_connect_failed": "Verbindung zu Dropbox fehlgeschlagen: {error}",

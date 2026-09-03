@@ -9,6 +9,20 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'تعذر نسخ الرابط.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'نسخ الرابط';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'تم نسخ الرابط. الصقه في متصفحك للتفويض.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'استيراد من جهاز Garmin';
 
@@ -15610,10 +15624,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'حساب Dropbox';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'تعذر فتح المتصفح. جرب زر إعادة فتح المتصفح.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'رمز التفويض';

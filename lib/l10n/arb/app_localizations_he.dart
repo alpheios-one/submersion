@@ -9,6 +9,20 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'לא ניתן להעתיק את הקישור.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'העתקת קישור';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'הקישור הועתק. הדבק אותו בדפדפן שלך כדי לאשר.';
+
+  @override
   String get universalImport_action_importFromGarmin => 'ייבוא מהתקן Garmin';
 
   @override
@@ -15498,10 +15512,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'חשבון Dropbox';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'לא ניתן לפתוח את הדפדפן. נסה את כפתור פתח מחדש את הדפדפן.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'קוד הרשאה';
