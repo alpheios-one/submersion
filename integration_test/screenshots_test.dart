@@ -668,9 +668,6 @@ Future<void> _enableProfileToggles(WidgetTester tester) async {
   }
 }
 
-/// Taps a bottom navigation item by its icon.
-/// Uses position filtering to ensure we tap the icon in the bottom navigation
-/// area, not icons with the same IconData elsewhere (e.g., app bar menus).
 /// Scrolls the open "More" overflow sheet until [target] is on screen.
 ///
 /// The sheet is capped at a fraction of the screen height (issue #1480), so
@@ -690,6 +687,9 @@ Future<void> _scrollMoreSheetTo(WidgetTester tester, Finder target) async {
   await _settle(tester);
 }
 
+/// Taps a bottom navigation item by its icon.
+/// Uses position filtering to ensure we tap the icon in the bottom navigation
+/// area, not icons with the same IconData elsewhere (e.g., app bar menus).
 Future<void> _tapBottomNavItem(WidgetTester tester, IconData icon) async {
   // Get the screen height to identify bottom navigation area
   final screenSize = tester.view.physicalSize / tester.view.devicePixelRatio;
