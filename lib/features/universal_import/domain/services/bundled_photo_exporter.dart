@@ -60,7 +60,13 @@ bool folderAcceptsWrites(String dir) {
       ),
     );
     probe.writeAsBytesSync(const [0]);
-    probe.deleteSync();
+    try {
+      probe.deleteSync();
+    } on FileSystemException {
+      // The write is the question being asked; a folder that plainly
+      // accepts one must not be condemned because the cleanup lost a race
+      // with something holding the file open.
+    }
     return true;
   } on FileSystemException {
     return false;

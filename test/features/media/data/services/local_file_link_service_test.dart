@@ -236,6 +236,31 @@ void main() {
     expect(saved.mediaType, MediaType.video);
   });
 
+  test('an unreadable video is still typed as a video', () async {
+    // Metadata extraction is where the mime type comes from; when it
+    // fails there is nothing left but the extension, and calling a video
+    // a photo gives it a row that never plays and never gets a thumbnail.
+    await service(metadataThrows: true).linkFileForDive(
+      path: photo('clip.MOV'),
+      diveId: 'dive-1',
+      linkedPaths: {},
+    );
+
+    final saved =
+        verify(repo.createMedia(captureAny)).captured.single as MediaItem;
+    expect(saved.mediaType, MediaType.video);
+  });
+
+  test('an unreadable photo stays a photo', () async {
+    await service(
+      metadataThrows: true,
+    ).linkFileForDive(path: photo('a.jpg'), diveId: 'dive-1', linkedPaths: {});
+
+    final saved =
+        verify(repo.createMedia(captureAny)).captured.single as MediaItem;
+    expect(saved.mediaType, MediaType.photo);
+  });
+
   test('unreadable metadata does not block the link', () async {
     final item = await service(metadataThrows: true).linkFileForDive(
       path: photo('a.jpg'),

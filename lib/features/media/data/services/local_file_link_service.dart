@@ -52,6 +52,32 @@ class LocalFileLinkService {
   Future<Set<String>> linkedPathsForDive(String diveId) =>
       _mediaRepository.getLinkedLocalPathsForDive(diveId);
 
+  /// Video extensions the app can hold. Only consulted when the metadata
+  /// read gave us no mime type to go on.
+  static const _videoExtensions = {
+    '.mp4',
+    '.mov',
+    '.m4v',
+    '.avi',
+    '.mkv',
+    '.webm',
+  };
+
+  /// Photo or video, from the mime type when there is one and from the
+  /// extension when there is not.
+  ///
+  /// Metadata extraction is what supplies the mime type, so an unreadable
+  /// file leaves none. Defaulting that to a photo would give a video a row
+  /// that never plays and never gets a thumbnail.
+  static MediaType _mediaTypeFor(String path, MediaSourceMetadata? metadata) {
+    final mimeType = metadata?.mimeType ?? '';
+    if (mimeType.startsWith('video/')) return MediaType.video;
+    if (mimeType.startsWith('image/')) return MediaType.photo;
+    return _videoExtensions.contains(p.extension(path).toLowerCase())
+        ? MediaType.video
+        : MediaType.photo;
+  }
+
   /// The metadata time, but only when it came from the file's own capture
   /// record.
   ///
@@ -111,14 +137,11 @@ class LocalFileLinkService {
 
     final handle = await _handles.create(path);
     final now = DateTime.now();
-    final mimeType = metadata?.mimeType ?? '';
     final item = MediaItem(
       // Empty id triggers UUID generation in MediaRepository.createMedia.
       id: '',
       diveId: diveId,
-      mediaType: mimeType.startsWith('video/')
-          ? MediaType.video
-          : MediaType.photo,
+      mediaType: _mediaTypeFor(path, metadata),
       sourceType: MediaSourceType.localFile,
       originalFilename: p.basename(path),
       localPath: handle.localPath,
