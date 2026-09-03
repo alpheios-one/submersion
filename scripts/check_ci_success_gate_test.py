@@ -65,6 +65,20 @@ GREEN_INLINE_NEEDS = GREEN.replace(
 
 RED_NO_GATE_JOB = GREEN.replace("  ci-success:\n", "  something-else:\n")
 
+# Trailing comments are valid YAML and carry no meaning. A parser that stops
+# recognising a key because someone annotated it turns a comment edit into a
+# CI failure, so every key this guard matches has to tolerate them.
+GREEN_COMMENTED_KEYS = (
+    GREEN.replace("jobs:\n", "jobs:  # the pipeline\n")
+    .replace("    needs:\n", "    needs:  # every job below\n")
+    .replace("      - analyze\n", "      - analyze  # lint and format\n")
+)
+
+GREEN_COMMENTED_INLINE_NEEDS = GREEN_INLINE_NEEDS.replace(
+    "    needs: [changes, analyze, script-tests]\n",
+    "    needs: [changes, analyze, script-tests]  # every job below\n",
+)
+
 RED_GATE_WITHOUT_NEEDS = """\
 jobs:
   analyze:
@@ -98,6 +112,24 @@ class ParserTests(unittest.TestCase):
     def test_needs_is_none_when_gate_has_no_needs(self):
         self.assertIsNone(guard.gate_needs(RED_GATE_WITHOUT_NEEDS))
 
+    def test_trailing_comments_do_not_hide_jobs_key(self):
+        self.assertEqual(
+            guard.job_ids(GREEN_COMMENTED_KEYS),
+            ["changes", "analyze", "script-tests", "pr-number", "ci-success"],
+        )
+
+    def test_trailing_comments_do_not_hide_block_needs(self):
+        self.assertEqual(
+            guard.gate_needs(GREEN_COMMENTED_KEYS),
+            ["changes", "analyze", "script-tests"],
+        )
+
+    def test_trailing_comments_do_not_hide_inline_needs(self):
+        self.assertEqual(
+            guard.gate_needs(GREEN_COMMENTED_INLINE_NEEDS),
+            ["changes", "analyze", "script-tests"],
+        )
+
 
 class GuardTests(unittest.TestCase):
     def test_green_has_no_violations(self):
@@ -105,6 +137,11 @@ class GuardTests(unittest.TestCase):
 
     def test_inline_needs_green_has_no_violations(self):
         self.assertEqual(guard.find_violations(GREEN_INLINE_NEEDS), [])
+
+    def test_commented_keys_have_no_violations(self):
+        # Annotating a key must not be reported as "the gate has no needs".
+        self.assertEqual(guard.find_violations(GREEN_COMMENTED_KEYS), [])
+        self.assertEqual(guard.find_violations(GREEN_COMMENTED_INLINE_NEEDS), [])
 
     def test_ungated_job_is_flagged(self):
         violations = guard.find_violations(RED_UNGATED_JOB)

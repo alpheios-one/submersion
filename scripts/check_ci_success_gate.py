@@ -36,11 +36,18 @@ GATE_JOB = "ci-success"
 #              costs a coverage annotation, not correctness.
 EXEMPT_JOBS = frozenset({"pr-number"})
 
-_JOBS_KEY = re.compile(r"^jobs:\s*$")
-_JOB_ID = re.compile(r"^  ([A-Za-z0-9_-]+):\s*(?:#.*)?$")
-_NEEDS_BLOCK = re.compile(r"^    needs:\s*$")
-_NEEDS_INLINE = re.compile(r"^    needs:\s*\[(.*)\]\s*$")
-_NEEDS_ITEM = re.compile(r"^      - ([A-Za-z0-9_-]+)\s*(?:#.*)?$")
+# Every pattern tolerates a trailing `# comment`: comments are valid YAML and
+# carry no meaning, so a parser that stopped recognising an annotated key would
+# turn a comment edit into a CI failure.
+_COMMENT = r"\s*(?:#.*)?$"
+
+_JOBS_KEY = re.compile(r"^jobs:" + _COMMENT)
+_JOB_ID = re.compile(r"^  ([A-Za-z0-9_-]+):" + _COMMENT)
+_NEEDS_BLOCK = re.compile(r"^    needs:" + _COMMENT)
+# `[^]]*` rather than `.*` so a trailing comment cannot be swallowed into the
+# captured list by greedy matching.
+_NEEDS_INLINE = re.compile(r"^    needs:\s*\[([^\]]*)\]" + _COMMENT)
+_NEEDS_ITEM = re.compile(r"^      - ([A-Za-z0-9_-]+)" + _COMMENT)
 
 
 def _job_lines(text):
