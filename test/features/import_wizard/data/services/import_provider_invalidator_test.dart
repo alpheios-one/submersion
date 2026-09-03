@@ -80,7 +80,9 @@ void main() {
       expect(recorded, contains(allEquipmentProvider));
       expect(recorded, contains(activeEquipmentProvider));
       expect(recorded, contains(retiredEquipmentProvider));
-      expect(recorded, contains(serviceDueEquipmentProvider));
+      // The service-due list derives from this base evaluation; invalidating
+      // the leaf would replay cached clock verdicts.
+      expect(recorded, contains(activeEquipmentClocksProvider));
       expect(recorded, contains(equipmentListNotifierProvider));
     });
 
