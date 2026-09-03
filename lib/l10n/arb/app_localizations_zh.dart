@@ -31844,12 +31844,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_gallery_thumbnail_video => '视频缩略图。点按以全屏查看';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing => '照片缩略图，设备上已缺失。点按以全屏查看';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing => '视频缩略图，设备上已缺失。点按以全屏查看';
-
-  @override
   String get trips_photos_thumbnail_photo => '照片缩略图。点按以打开图库';
 
   @override

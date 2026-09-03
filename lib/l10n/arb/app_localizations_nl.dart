@@ -33581,14 +33581,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Videominiatuur. Tik om volledig scherm te bekijken';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videominiatuur, ontbreekt op het apparaat. Tik om volledig scherm te bekijken';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Fotominiatuur. Tik om de galerij te openen';
 

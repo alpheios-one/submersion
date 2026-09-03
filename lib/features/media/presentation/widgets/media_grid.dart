@@ -53,9 +53,16 @@ class MediaEmptyState extends StatelessWidget {
 /// Purely visual thumbnail content for media items.
 ///
 /// Tap, long-press, and drag gestures are handled by the enclosing grid.
-/// Decides the orphaned-placeholder treatment itself so every consumer
-/// gets it for free; badges (store transfer, video, document extension,
-/// depth) self-hide when their data is absent.
+/// Badges (store transfer, video, document extension, depth) self-hide when
+/// their data is absent.
+///
+/// Every row, orphaned or not, renders through [MediaItemView]. The orphan
+/// flag is a persisted claim from an earlier verification, and the device
+/// that wrote it may be one that never had the file, so drawing a broken
+/// tile from the flag alone hid photos the resolver chain could still serve:
+/// the row's own source on the device that imported it, or the media store's
+/// copy anywhere else (#1409). Health stays visible through the status badge,
+/// and a row nothing can serve still ends in the missing-file placeholder.
 class MediaThumbnailTile extends StatelessWidget {
   final MediaItem item;
   final AppSettings settings;
@@ -84,20 +91,16 @@ class MediaThumbnailTile extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Thumbnail or placeholder.
-            // Orphaned items show a distinct error tile; all other items
-            // route through MediaItemView which dispatches to the correct
-            // resolver for the item's sourceType (gallery, signature, etc.)
-            // and renders UnavailableMediaPlaceholder for missing assets.
-            if (item.isOrphaned)
-              const OrphanedMediaPlaceholder()
-            else
-              MediaItemView(
-                item: item,
-                thumbnail: true,
-                targetSize: const Size(200, 200),
-                fit: BoxFit.cover,
-              ),
+            // Thumbnail or placeholder. MediaItemView dispatches to the
+            // resolver for the item's sourceType, falls back to the media
+            // store, and renders UnavailableMediaPlaceholder when neither
+            // can produce bytes.
+            MediaItemView(
+              item: item,
+              thumbnail: true,
+              targetSize: const Size(200, 200),
+              fit: BoxFit.cover,
+            ),
 
             // Dimming overlay for unselected items in selection mode
             if (isSelectionMode && !isSelected)
@@ -213,26 +216,6 @@ class MediaThumbnailTile extends StatelessWidget {
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Placeholder shown for orphaned media (file no longer exists)
-class OrphanedMediaPlaceholder extends StatelessWidget {
-  const OrphanedMediaPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      color: colorScheme.errorContainer,
-      child: Center(
-        child: Icon(
-          Icons.broken_image_outlined,
-          color: colorScheme.onErrorContainer,
         ),
       ),
     );

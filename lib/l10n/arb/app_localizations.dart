@@ -55805,18 +55805,6 @@ abstract class AppLocalizations {
   /// **'Video thumbnail. Tap to view full screen'**
   String get trips_gallery_thumbnail_video;
 
-  /// No description provided for @trips_gallery_thumbnail_photoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_photoMissing;
-
-  /// No description provided for @trips_gallery_thumbnail_videoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Video thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_videoMissing;
-
   /// No description provided for @trips_photos_thumbnail_photo.
   ///
   /// In en, this message translates to:

@@ -9951,8 +9951,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Miniatura foto. Tocca per visualizzare a schermo intero",
   "trips_gallery_thumbnail_video": "Miniatura video. Tocca per visualizzare a schermo intero",
-  "trips_gallery_thumbnail_photoMissing": "Miniatura foto, assente dal dispositivo. Tocca per visualizzare a schermo intero",
-  "trips_gallery_thumbnail_videoMissing": "Miniatura video, assente dal dispositivo. Tocca per visualizzare a schermo intero",
   "trips_photos_thumbnail_photo": "Miniatura foto. Tocca per aprire la galleria",
   "trips_photos_thumbnail_video": "Miniatura video. Tocca per aprire la galleria",
   "trips_picker_suggestedSemantics": "Viaggio suggerito: {name}. Tocca per usarlo",

@@ -9951,8 +9951,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Fotó indexkép. Koppints a teljes képernyős megtekintéshez",
   "trips_gallery_thumbnail_video": "Videó indexkép. Koppints a teljes képernyős megtekintéshez",
-  "trips_gallery_thumbnail_photoMissing": "Fotó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez",
-  "trips_gallery_thumbnail_videoMissing": "Videó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez",
   "trips_photos_thumbnail_photo": "Fotó indexkép. Koppints a galéria megnyitásához",
   "trips_photos_thumbnail_video": "Videó indexkép. Koppints a galéria megnyitásához",
   "trips_picker_suggestedSemantics": "Javasolt út: {name}. Koppints a használatához",

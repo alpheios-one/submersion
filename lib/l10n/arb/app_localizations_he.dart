@@ -33147,14 +33147,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'תמונה ממוזערת של סרטון. הקש לצפייה במסך מלא';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'תמונה ממוזערת של תמונה, חסרה במכשיר. הקש לצפייה במסך מלא';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'תמונה ממוזערת של סרטון, חסר במכשיר. הקש לצפייה במסך מלא';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'תמונה ממוזערת של תמונה. הקש לפתיחת הגלריה';
 

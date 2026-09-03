@@ -33656,14 +33656,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Videó indexkép. Koppints a teljes képernyős megtekintéshez';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Fotó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Videó indexkép, hiányzik az eszközről. Koppints a teljes képernyős megtekintéshez';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Fotó indexkép. Koppints a galéria megnyitásához';
 

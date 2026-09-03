@@ -9951,8 +9951,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "תמונה ממוזערת של תמונה. הקש לצפייה במסך מלא",
   "trips_gallery_thumbnail_video": "תמונה ממוזערת של סרטון. הקש לצפייה במסך מלא",
-  "trips_gallery_thumbnail_photoMissing": "תמונה ממוזערת של תמונה, חסרה במכשיר. הקש לצפייה במסך מלא",
-  "trips_gallery_thumbnail_videoMissing": "תמונה ממוזערת של סרטון, חסר במכשיר. הקש לצפייה במסך מלא",
   "trips_photos_thumbnail_photo": "תמונה ממוזערת של תמונה. הקש לפתיחת הגלריה",
   "trips_photos_thumbnail_video": "תמונה ממוזערת של סרטון. הקש לפתיחת הגלריה",
   "trips_picker_suggestedSemantics": "טיול מוצע: {name}. הקש לשימוש",

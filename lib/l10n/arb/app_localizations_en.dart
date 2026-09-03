@@ -33315,14 +33315,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Video thumbnail. Tap to view full screen';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Photo thumbnail, missing from device. Tap to view full screen';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Video thumbnail, missing from device. Tap to view full screen';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Photo thumbnail. Tap to open gallery';
 

@@ -33456,14 +33456,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'صورة مصغّرة لفيديو. انقر للعرض بملء الشاشة';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'صورة مصغّرة لصورة، مفقودة من الجهاز. انقر للعرض بملء الشاشة';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'صورة مصغّرة لفيديو، مفقود من الجهاز. انقر للعرض بملء الشاشة';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'صورة مصغّرة لصورة. انقر لفتح المعرض';
 
