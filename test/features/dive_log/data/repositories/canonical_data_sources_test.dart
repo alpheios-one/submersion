@@ -128,4 +128,97 @@ void main() {
       expect(sources.map((s) => s.id).toList(), ['src-a', 'src-b']);
     },
   );
+
+  // Issue #1451: a Combine of two file/cloud imports carries two provenance
+  // rows with no computerId to collide on. Before merge_source_slot existed
+  // they stayed two selectable sources, and the chart drew only one half of
+  // the dive.
+  test('getDataSources collapses merge provenance rows that share a slot, '
+      'even with no computerId', () async {
+    for (final (id, day) in [('src-first', 1), ('src-second', 2)]) {
+      await db
+          .into(db.diveDataSources)
+          .insert(
+            DiveDataSourcesCompanion(
+              id: Value(id),
+              diveId: const Value('dive-1'),
+              isPrimary: const Value(false),
+              mergeSourceSlot: const Value(0),
+              importedAt: Value(DateTime(2026, 1, day)),
+              createdAt: Value(DateTime(2026, 1, day)),
+            ),
+          );
+    }
+
+    final sources = await repository.getDataSources('dive-1');
+
+    expect(sources.map((s) => s.id).toList(), ['src-first']);
+    expect(await repository.hasMultipleDataSources('dive-1'), isFalse);
+  });
+
+  test('getDataSources keeps one source per slot, so a consolidated dive that '
+      'was then combined still shows both computers', () async {
+    // Two segments, each contributing a primary (slot 0) and a folded-in
+    // secondary (slot 1). Four rows, two strands.
+    var day = 1;
+    for (final slot in [0, 1, 0, 1]) {
+      await db
+          .into(db.diveDataSources)
+          .insert(
+            DiveDataSourcesCompanion(
+              id: Value('src-$day'),
+              diveId: const Value('dive-1'),
+              isPrimary: const Value(false),
+              mergeSourceSlot: Value(slot),
+              importedAt: Value(DateTime(2026, 1, day)),
+              createdAt: Value(DateTime(2026, 1, day)),
+            ),
+          );
+      day++;
+    }
+
+    final sources = await repository.getDataSources('dive-1');
+
+    expect(sources.map((s) => s.id).toList(), ['src-1', 'src-2']);
+    expect(await repository.hasMultipleDataSources('dive-1'), isTrue);
+  });
+
+  test(
+    'a slot never collapses a row against a source that has a computer',
+    () async {
+      // A merged dive later consolidated with a computer download: the carried
+      // halves are one strand, the download is its own.
+      for (final (id, day) in [('src-half-a', 1), ('src-half-b', 2)]) {
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion(
+                id: Value(id),
+                diveId: const Value('dive-1'),
+                isPrimary: const Value(false),
+                mergeSourceSlot: const Value(0),
+                importedAt: Value(DateTime(2026, 1, day)),
+                createdAt: Value(DateTime(2026, 1, day)),
+              ),
+            );
+      }
+      await db
+          .into(db.diveDataSources)
+          .insert(
+            DiveDataSourcesCompanion(
+              id: const Value('src-computer'),
+              diveId: const Value('dive-1'),
+              computerId: const Value('dc-a'),
+              isPrimary: const Value(false),
+              importedAt: Value(DateTime(2026, 1, 3)),
+              createdAt: Value(DateTime(2026, 1, 3)),
+            ),
+          );
+
+      final sources = await repository.getDataSources('dive-1');
+
+      expect(sources.map((s) => s.id).toList(), ['src-half-a', 'src-computer']);
+      expect(await repository.hasMultipleDataSources('dive-1'), isTrue);
+    },
+  );
 }

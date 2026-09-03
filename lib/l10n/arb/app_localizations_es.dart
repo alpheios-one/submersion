@@ -4510,43 +4510,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Fusión deshecha';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Se fusionará la inmersión de las $time con esta inmersión.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirmar fusión';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'No se encontraron otras inmersiones en este día.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'El perfil, los tanques, las presiones, los eventos, las etiquetas, los compañeros y los avistamientos de esta inmersión se incorporarán a esta inmersión como un ordenador adicional. Esta acción se puede revertir con \'Desvincular ordenador\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error al cargar las inmersiones: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Fusionar';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Siguiente';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Selecciona una inmersión del mismo día para fusionarla como ordenador adicional.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Fusionar con otra inmersión';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'Qué hace esto';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Selecciona desde qué perfil de ordenador editar.';
 
@@ -9749,12 +9712,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get divers_edit_updateButton => 'Actualizar buceador';
 
   @override
-  String get divers_list_activeBadge => 'Activo';
-
-  @override
-  String get divers_list_addDiverButton => 'Agregar buceador';
-
-  @override
   String get divers_list_addDiverTooltip =>
       'Agregar un nuevo perfil de buceador';
 
@@ -9794,28 +9751,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'Ver buceador $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Buceador activo';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Otros buceadores';
-
-  @override
-  String get divers_summary_overviewTitle => 'Resumen';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Acciones rapidas';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Selecciona un buceador de la lista para ver detalles';
-
-  @override
-  String get divers_summary_title => 'Perfiles de buceadores';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Total de buceadores';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -11317,6 +11252,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'equipo de tipo $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'No hay $filterText';
   }
@@ -11324,6 +11264,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'No hay equipo con este estado';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'No hay equipo en esta categoría';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11338,10 +11282,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get equipment_list_filterAll => 'Todo el equipo';
 
   @override
-  String get equipment_list_filterLabel => 'Filtro:';
+  String get equipment_list_filterServiceDue => 'Servicio pendiente';
 
   @override
-  String get equipment_list_filterServiceDue => 'Servicio pendiente';
+  String get equipment_list_typeFilterAll => 'Todos los tipos';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filtrar equipo';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Borrar';
+
+  @override
+  String get equipment_filter_title => 'Filtrar equipo';
+
+  @override
+  String get equipment_filter_clearAll => 'Borrar todo';
+
+  @override
+  String get equipment_filter_apply => 'Aplicar filtros';
+
+  @override
+  String get equipment_filter_cancel => 'Cancelar';
+
+  @override
+  String get equipment_filter_section_status => 'Estado';
+
+  @override
+  String get equipment_filter_section_category => 'Categoría';
 
   @override
   String get equipment_list_retryButton => 'Reintentar';
@@ -16668,26 +16636,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_import_cancelling => 'Cancelando...';
 
   @override
-  String get settings_import_dialog_title => 'Importando datos';
-
-  @override
-  String get settings_import_doNotClose =>
-      'Por favor, no cierres la aplicacion';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current de $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Importando companeros...';
 
   @override
   String get settings_import_phase_certifications =>
       'Importando certificaciones...';
-
-  @override
-  String get settings_import_phase_complete => 'Finalizando...';
 
   @override
   String get settings_import_phase_diveCenters =>
@@ -16708,9 +16661,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Importando conjuntos de equipos...';
 
   @override
-  String get settings_import_phase_parsing => 'Analizando archivo...';
-
-  @override
   String get settings_import_phase_preparing => 'Preparando...';
 
   @override
@@ -16727,20 +16677,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current de $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Progreso de importacion: $percent por ciento';
-  }
 
   @override
   String get settings_language_appBar_title => 'Idioma';
@@ -19145,6 +19081,29 @@ class AppLocalizationsEs extends AppLocalizations {
       'Importar fotos requiere una carpeta en el disco de este dispositivo. Ejecuta esta importación en un ordenador para incluirlas. Las inmersiones y los puntos de buceo se importan con normalidad.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fotos incluidas en el archivo',
+      one: '1 foto incluida en el archivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Elegir dónde guardar las fotos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'Las fotos se guardan en esta carpeta y se enlazan desde allí. Submersion nunca conserva una copia propia.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'No se puede escribir en esa carpeta. Elige otra.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -21047,11 +21006,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Alternar selección para $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count marcados como $action';
   }
@@ -21778,29 +21732,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'Codigo PIN requerido';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Conectar';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Introduce el PIN de 4 a 6 digitos mostrado en tu dispositivo';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Consulta la pantalla de tu ordenador de buceo para ver el codigo PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Consulta la pantalla de tu $deviceName para ver el codigo PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'Entrada de codigo PIN, de 4 a 6 digitos';
-
-  @override
-  String get diveComputer_pinEntry_title => 'Introducir codigo PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -22829,6 +22760,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '¿Eliminar \"$name\"?\n\nEsta región se descargó con una versión anterior, por lo que sus teselas se almacenan junto con las de otras regiones y no se pueden liberar por separado. Eliminarla no recuperará almacenamiento.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22919,6 +22855,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Tamano';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Desconocido';
 
   @override
   String get maps_offline_tiles => 'Teselas';
@@ -33848,14 +33787,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get trips_gallery_thumbnail_video =>
       'Miniatura de vídeo. Toca para ver en pantalla completa';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Miniatura de foto, no está en el dispositivo. Toca para ver en pantalla completa';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Miniatura de vídeo, no está en el dispositivo. Toca para ver en pantalla completa';
 
   @override
   String get trips_photos_thumbnail_photo =>

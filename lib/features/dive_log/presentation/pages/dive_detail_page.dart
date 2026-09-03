@@ -854,6 +854,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The site suggestion sits above the header card, never inside
+            // it. Embedded mode has its own copy under the toolbar (which
+            // stays put while the body scrolls), so only the standalone page
+            // renders one here; otherwise the banner would appear twice.
+            // Collapses to nothing when there is no suggestion, so no
+            // spacing of its own is needed.
+            if (!widget.embedded)
+              SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
             // Fixed: Header
             Consumer(
               builder: (context, ref, _) {
@@ -1417,7 +1425,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               );
             },
           ),
-          SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -1661,6 +1668,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   Widget _buildProfileSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Every async chart input below is read through the built-in
+    // AsyncValue.value, which keeps the previous value while a provider
+    // reloads. The valueOrNull polyfill returns null during a reload, and
+    // these providers reload behind any detail change tick (the first-view
+    // safety review write included): the chart would drop its overlays and
+    // estimated pressure series for a frame, then draw them again.
+    //
     // Get profile analysis (async to avoid blocking UI with Buhlmann computation)
     final analysis = ref
         .watch(
@@ -1669,7 +1683,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             sourceId: ref.watch(activeDiveSourceProvider(dive.id)),
           )),
         )
-        .valueOrNull;
+        .value;
 
     // Get marker settings
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
@@ -1682,11 +1696,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Get per-tank pressure data for multi-tank visualization
     final tankPressuresAsync = ref.watch(tankPressuresProvider(dive.id));
-    final tankPressures = tankPressuresAsync.valueOrNull;
+    final tankPressures = tankPressuresAsync.value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(dive.id))
-        .valueOrNull;
+        .value;
 
     // Get playback state
     final playbackState = ref.watch(playbackProvider(dive.id));
@@ -1697,13 +1711,21 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Profiles grouped by owning data source, plus the active-source and
     // overlay view state driving the whole page.
     final sourceProfiles =
-        ref.watch(sourceProfilesProvider(dive.id)).valueOrNull ??
+        ref.watch(sourceProfilesProvider(dive.id)).value ??
         const <String, SourceProfile>{};
     final dataSources =
-        ref.watch(diveDataSourcesProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(diveDataSourcesProvider(dive.id)).value ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
-    final isMultiSource = dataSources.length >= 2;
+    // Per-source rendering exists because two computers recording one dive
+    // disagree sample by sample (#543); the halves of a split dive a Combine
+    // stitched together are not that, and drawing one of those would hide the
+    // rest of the dive (#1451). Profiles that have not loaded yet carry no
+    // spans, so this stays true on the first build, exactly as it does today.
+    final isMultiSource = usesPerSourceRendering(
+      dataSources,
+      sourceProfiles.values,
+    );
 
     final activeSourceId = ref.watch(activeDiveSourceProvider(dive.id));
     final overlayIds = ref.watch(overlaySourcesProvider(dive.id));
@@ -1788,7 +1810,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
 
     final photoMedia =
-        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(mediaForDiveProvider(dive.id)).value ?? const [];
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]
         : photoMarkersFromMedia(
@@ -1804,7 +1826,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // ghosted next to the actual logged profile.
     final plannedOverlay = ref
         .watch(plannedProfileOverlayProvider(dive.id))
-        .valueOrNull;
+        .value;
     final overlays = <ChartSourceOverlay>[
       for (final id in overlayIds)
         if (id != activeSource?.id &&
@@ -2044,14 +2066,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             estimatedTankPressures?.pressures ?? tankPressures,
                         estimatedTankIds:
                             estimatedTankPressures?.estimatedTankIds,
-                        gasSwitches: gasSwitchesAsync.valueOrNull,
+                        gasSwitches: gasSwitchesAsync.value,
                         gasSegments:
                             (dive.tanks.isEmpty || chartProfile.isEmpty)
                             ? null
                             : buildGasUsageSegments(
                                 tanks: dive.tanks,
-                                gasSwitches:
-                                    gasSwitchesAsync.valueOrNull ?? const [],
+                                gasSwitches: gasSwitchesAsync.value ?? const [],
                                 diveDurationSeconds:
                                     chartProfile.last.timestamp,
                                 firstSampleSeconds:
@@ -2135,6 +2156,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             ),
             // Sources bar: tap a chip to make that source drive the whole
             // page; the eye overlays a source on the chart for comparison.
+            // Both of those are per-source RENDERING, which is why the bar
+            // follows usesPerSourceRendering rather than the source count:
+            // on a dive whose sources are consecutive halves there is no
+            // "other source" to switch to or overlay, only the rest of the
+            // same dive. Set primary and Split do not disappear with it --
+            // the Data Sources section carries its own copy of both, gated
+            // on the source count alone (data_sources_section.dart).
             if (isMultiSource)
               SourceBar(
                 sources: [
@@ -3311,11 +3339,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_avgDepth,
                 units.formatDepth(dive.avgDepth),
               ),
-            if (dive.waterType != null)
+            // Effective, so a dive that never had a water type of its own
+            // still shows the one its site carries (issue #1427).
+            if (dive.effectiveWaterType != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.waterType!.displayName,
+                dive.effectiveWaterType!.displayName,
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(
@@ -3400,7 +3430,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
   }
 
@@ -3478,7 +3508,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
 
     return Card(
@@ -3614,11 +3644,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_swellHeight,
                   units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
-              if (dive.entryMethod != null)
+              // Effective, so a dive that never had an entry method of its
+              // own still shows the one its site carries (issue #1427).
+              if (dive.effectiveEntryMethod != null)
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_entryMethod,
-                  dive.entryMethod!.localizedName(context.l10n),
+                  dive.effectiveEntryMethod!.localizedName(context.l10n),
                 ),
               if (dive.exitMethod != null)
                 _buildDetailRow(

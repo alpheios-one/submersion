@@ -4278,41 +4278,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_consolidate_undone => '已撤消合并';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return '$time 的潜水将合并到此次潜水中。';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => '确认合并';
-
-  @override
-  String get diveLog_mergeDialog_empty => '当天未找到其他潜水记录。';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      '此次潜水的剖面、气瓶、压力、事件、标签、潜伴和目击记录将作为附加电脑来源合并到此次潜水中。此操作可通过“取消关联电脑”撤消。';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return '加载潜水记录时出错：$error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => '合并';
-
-  @override
-  String get diveLog_mergeDialog_next => '下一步';
-
-  @override
-  String get diveLog_mergeDialog_subtitle => '选择同一天的一次潜水，将其作为附加电脑合并。';
-
-  @override
-  String get diveLog_mergeDialog_title => '与另一次潜水合并';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => '这将执行以下操作';
-
-  @override
   String get diveLog_computerSheet_description => '选择要从哪台电脑的轮廓开始编辑。';
 
   @override
@@ -9285,12 +9250,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divers_edit_updateButton => '更新潜水员';
 
   @override
-  String get divers_list_activeBadge => '活跃';
-
-  @override
-  String get divers_list_addDiverButton => '添加潜水员';
-
-  @override
   String get divers_list_addDiverTooltip => '添加新的潜水员档案';
 
   @override
@@ -9328,27 +9287,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return '查看潜水员 $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => '当前潜水员';
-
-  @override
-  String get divers_summary_otherDiversTitle => '其他潜水员';
-
-  @override
-  String get divers_summary_overviewTitle => '概览';
-
-  @override
-  String get divers_summary_quickActionsTitle => '快捷操作';
-
-  @override
-  String get divers_summary_subtitle => '从列表中选择潜水员以查看详情';
-
-  @override
-  String get divers_summary_title => '潜水员档案';
-
-  @override
-  String get divers_summary_totalDiversLabel => '潜水员总数';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -10805,12 +10743,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10824,10 +10770,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
+  String get equipment_list_filterServiceDue => '需要维护';
 
   @override
-  String get equipment_list_filterServiceDue => '需要维护';
+  String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';
@@ -15840,24 +15810,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_import_cancelling => '正在取消...';
 
   @override
-  String get settings_import_dialog_title => '正在导入数据';
-
-  @override
-  String get settings_import_doNotClose => '请不要关闭应用';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current/$total';
-  }
-
-  @override
   String get settings_import_phase_buddies => '正在导入潜伴...';
 
   @override
   String get settings_import_phase_certifications => '正在导入证书...';
-
-  @override
-  String get settings_import_phase_complete => '正在完成...';
 
   @override
   String get settings_import_phase_diveCenters => '正在导入潜水中心...';
@@ -15873,9 +15829,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_import_phase_equipmentSets => '正在导入装备套装...';
-
-  @override
-  String get settings_import_phase_parsing => '正在解析文件...';
 
   @override
   String get settings_import_phase_preparing => '准备中...';
@@ -15894,20 +15847,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => '正在应用标签...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase，$current/$total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return '导入进度：$percent%';
-  }
 
   @override
   String get settings_language_appBar_title => '语言';
@@ -18129,6 +18068,27 @@ class AppLocalizationsZh extends AppLocalizations {
       '导入照片需要此设备磁盘上的文件夹。请在电脑上运行此导入以包含照片。潜水记录和潜点会正常导入。';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '压缩包中包含 $count 张照片',
+      one: '压缩包中包含 1 张照片',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination => '选择照片保存位置...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      '照片将保存到此文件夹并从此处链接。Submersion 绝不会保留自己的副本。';
+
+  @override
+  String get importWizard_photos_destinationUnwritable => '无法写入该文件夹。请选择其他文件夹。';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19935,11 +19895,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return '切换 $name 的选择';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return '$count 已标记为 $action';
   }
@@ -20626,26 +20581,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => '需要 PIN 码';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => '连接';
-
-  @override
-  String get diveComputer_pinEntry_helperText => '输入设备上显示的 4 到 6 位数字 PIN 码';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric => '查看潜水电脑显示屏上的 PIN 码。';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return '查看 $deviceName 显示屏上的 PIN 码。';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel => 'PIN 码输入,4 到 6 位数字';
-
-  @override
-  String get diveComputer_pinEntry_title => '输入 PIN 码';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -21635,6 +21570,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '删除 \"$name\" 吗？\n\n此区域由早期版本下载，其瓦片与其他区域的瓦片存储在一起，无法单独释放。删除不会回收存储空间。';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -21724,6 +21664,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get maps_offline_size => '尺寸';
+
+  @override
+  String get maps_offline_sizeUnknown => '未知';
 
   @override
   String get maps_offline_tiles => '瓦片';
@@ -31850,12 +31793,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trips_gallery_thumbnail_video => '视频缩略图。点按以全屏查看';
-
-  @override
-  String get trips_gallery_thumbnail_photoMissing => '照片缩略图，设备上已缺失。点按以全屏查看';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing => '视频缩略图，设备上已缺失。点按以全屏查看';
 
   @override
   String get trips_photos_thumbnail_photo => '照片缩略图。点按以打开图库';

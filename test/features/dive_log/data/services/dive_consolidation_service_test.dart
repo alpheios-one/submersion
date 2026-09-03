@@ -108,6 +108,7 @@ void main() {
     required String diveId,
     String? computerId,
     bool isPrimary = true,
+    int? mergeSourceSlot,
     Uint8List? rawData,
     Uint8List? rawFingerprint,
     String? descriptorVendor,
@@ -125,6 +126,7 @@ void main() {
           ).copyWith(
             isPrimary: Value(isPrimary),
             computerId: Value(computerId),
+            mergeSourceSlot: Value(mergeSourceSlot),
             rawData: Value(rawData),
             rawFingerprint: Value(rawFingerprint),
             descriptorVendor: Value(descriptorVendor),
@@ -1281,6 +1283,88 @@ void main() {
       // computerId (null means "the dive's primary source"); only tanks,
       // pressures and events get stamped with the primary computer.
       expect(await profileTimestamps(), [0, 60, 120]);
+    });
+  });
+
+  group('merge slots compose across consolidation (#1451)', () {
+    /// The shape DiveMergeService.apply leaves behind: the segments' own
+    /// provenance rows, none primary, all sharing slot 0. createDive mints a
+    /// primary source of its own, which a real combine would never leave on
+    /// the merged dive, so it goes first.
+    Future<void> seedCombinedDive(String id, {required DateTime entry}) async {
+      await seedDive(id, entry: entry);
+      await (db.delete(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(id))).go();
+      for (final n in [1, 2]) {
+        await seedDataSource(
+          'src-$id$n',
+          diveId: id,
+          isPrimary: false,
+          mergeSourceSlot: 0,
+        );
+      }
+    }
+
+    test('a folded-in combined dive keeps its own strand', () async {
+      // Both dives were combined from halves before this consolidation, so
+      // both carry slot 0 on every row. Copied over verbatim, all four rows
+      // would read as one strand and the target would show a single chip.
+      await seedCombinedDive('t', entry: DateTime.utc(2026, 7, 1, 9));
+      await seedCombinedDive('s', entry: DateTime.utc(2026, 7, 1, 9));
+
+      await service.apply(targetDiveId: 't', secondaryDiveIds: ['s']);
+
+      final rows = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals('t'))).get();
+      // The target's own two rows keep slot 0; the folded-in dive's land on
+      // slot 1 instead of colliding with them.
+      expect(rows.map((r) => r.mergeSourceSlot).nonNulls.toList()..sort(), [
+        0,
+        0,
+        1,
+        1,
+      ]);
+      // Three chips: each lineage collapses to one, plus the primary row
+      // backfillPrimaryDataSource mints for a target that has none (a merged
+      // dive never has one). Without the rebase the two lineages would read
+      // as one strand and there would be two.
+      final canonical = await diveRepo.getDataSources('t');
+      expect(canonical, hasLength(3));
+      // One survivor per slot, plus the unmarked backfilled primary. Copied
+      // rows are minted with fresh ids, so identify them by slot.
+      final canonicalIds = canonical.map((c) => c.id).toSet();
+      expect(
+        rows
+            .where((r) => canonicalIds.contains(r.id))
+            .map((r) => r.mergeSourceSlot)
+            .toSet(),
+        {0, 1, null},
+      );
+    });
+
+    test('a secondary with no slots of its own is left alone', () async {
+      await seedCombinedDive('t', entry: DateTime.utc(2026, 7, 1, 9));
+      await seedDive('s', entry: DateTime.utc(2026, 7, 1, 9));
+      await (db.delete(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals('s'))).go();
+      await seedDataSource('src-s', diveId: 's', computerId: 'comp-s');
+
+      await service.apply(targetDiveId: 't', secondaryDiveIds: ['s']);
+
+      final rows = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals('t'))).get();
+      // A source that was never carried by a merge stays unmarked: the
+      // rebase only moves slots that exist.
+      expect(
+        rows.where((r) => r.computerId == 'comp-s').single.mergeSourceSlot,
+        isNull,
+      );
+      expect(rows.map((r) => r.mergeSourceSlot).nonNulls.toList(), [0, 0]);
+      expect(await diveRepo.getDataSources('t'), hasLength(3));
     });
   });
 }

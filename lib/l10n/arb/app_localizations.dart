@@ -7520,66 +7520,6 @@ abstract class AppLocalizations {
   /// **'Merge undone'**
   String get diveLog_consolidate_undone;
 
-  /// No description provided for @diveLog_mergeDialog_confirmSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Merging dive at {time} into this dive.'**
-  String diveLog_mergeDialog_confirmSubtitle(String time);
-
-  /// No description provided for @diveLog_mergeDialog_confirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm merge'**
-  String get diveLog_mergeDialog_confirmTitle;
-
-  /// No description provided for @diveLog_mergeDialog_empty.
-  ///
-  /// In en, this message translates to:
-  /// **'No other dives found on this day.'**
-  String get diveLog_mergeDialog_empty;
-
-  /// No description provided for @diveLog_mergeDialog_explanation.
-  ///
-  /// In en, this message translates to:
-  /// **'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.'**
-  String get diveLog_mergeDialog_explanation;
-
-  /// No description provided for @diveLog_mergeDialog_loadError.
-  ///
-  /// In en, this message translates to:
-  /// **'Error loading dives: {error}'**
-  String diveLog_mergeDialog_loadError(String error);
-
-  /// No description provided for @diveLog_mergeDialog_merge.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge'**
-  String get diveLog_mergeDialog_merge;
-
-  /// No description provided for @diveLog_mergeDialog_next.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get diveLog_mergeDialog_next;
-
-  /// No description provided for @diveLog_mergeDialog_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a dive from the same day to merge as an additional computer.'**
-  String get diveLog_mergeDialog_subtitle;
-
-  /// No description provided for @diveLog_mergeDialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Merge with another dive'**
-  String get diveLog_mergeDialog_title;
-
-  /// No description provided for @diveLog_mergeDialog_whatThisDoes.
-  ///
-  /// In en, this message translates to:
-  /// **'What this does'**
-  String get diveLog_mergeDialog_whatThisDoes;
-
   /// Description of the computer profile selection sheet
   ///
   /// In en, this message translates to:
@@ -16352,18 +16292,6 @@ abstract class AppLocalizations {
   /// **'Update Diver'**
   String get divers_edit_updateButton;
 
-  /// No description provided for @divers_list_activeBadge.
-  ///
-  /// In en, this message translates to:
-  /// **'Active'**
-  String get divers_list_activeBadge;
-
-  /// No description provided for @divers_list_addDiverButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Diver'**
-  String get divers_list_addDiverButton;
-
   /// No description provided for @divers_list_addDiverTooltip.
   ///
   /// In en, this message translates to:
@@ -16429,48 +16357,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View diver {name}'**
   String divers_list_viewDiverLabel(Object name);
-
-  /// No description provided for @divers_summary_activeDiverTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Active Diver'**
-  String get divers_summary_activeDiverTitle;
-
-  /// No description provided for @divers_summary_otherDiversTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Other Divers'**
-  String get divers_summary_otherDiversTitle;
-
-  /// No description provided for @divers_summary_overviewTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Overview'**
-  String get divers_summary_overviewTitle;
-
-  /// No description provided for @divers_summary_quickActionsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Quick Actions'**
-  String get divers_summary_quickActionsTitle;
-
-  /// No description provided for @divers_summary_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Select a diver from the list to view details'**
-  String get divers_summary_subtitle;
-
-  /// No description provided for @divers_summary_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Diver Profiles'**
-  String get divers_summary_title;
-
-  /// No description provided for @divers_summary_totalDiversLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Total Divers'**
-  String get divers_summary_totalDiversLabel;
 
   /// No description provided for @divers_detail_deleteDialogConfirmHint.
   ///
@@ -19178,6 +19064,12 @@ abstract class AppLocalizations {
   /// **'{status} equipment'**
   String equipment_list_emptyState_filterText_status(Object status);
 
+  /// Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. "Wetsuit equipment"
+  ///
+  /// In en, this message translates to:
+  /// **'{type} equipment'**
+  String equipment_list_emptyState_filterText_type(Object type);
+
   /// No description provided for @equipment_list_emptyState_noEquipment.
   ///
   /// In en, this message translates to:
@@ -19189,6 +19081,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
+
+  /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment in this category'**
+  String get equipment_list_emptyState_noTypeMatch;
 
   /// No description provided for @equipment_list_emptyState_serviceDueUpToDate.
   ///
@@ -19208,17 +19106,65 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// No description provided for @equipment_list_filterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter:'**
-  String get equipment_list_filterLabel;
-
   /// No description provided for @equipment_list_filterServiceDue.
   ///
   /// In en, this message translates to:
   /// **'Service Due'**
   String get equipment_list_filterServiceDue;
+
+  /// Label of the chip that clears the category filter and shows equipment of every type
+  ///
+  /// In en, this message translates to:
+  /// **'All Types'**
+  String get equipment_list_typeFilterAll;
+
+  /// No description provided for @equipment_list_filterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter equipment'**
+  String get equipment_list_filterTooltip;
+
+  /// No description provided for @equipment_list_activeFilter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get equipment_list_activeFilter_clear;
+
+  /// No description provided for @equipment_filter_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Equipment'**
+  String get equipment_filter_title;
+
+  /// No description provided for @equipment_filter_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get equipment_filter_clearAll;
+
+  /// No description provided for @equipment_filter_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get equipment_filter_apply;
+
+  /// No description provided for @equipment_filter_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get equipment_filter_cancel;
+
+  /// No description provided for @equipment_filter_section_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_filter_section_category;
 
   /// No description provided for @equipment_list_retryButton.
   ///
@@ -27581,24 +27527,6 @@ abstract class AppLocalizations {
   /// **'Cancelling...'**
   String get settings_import_cancelling;
 
-  /// No description provided for @settings_import_dialog_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Importing Data'**
-  String get settings_import_dialog_title;
-
-  /// No description provided for @settings_import_doNotClose.
-  ///
-  /// In en, this message translates to:
-  /// **'Please do not close the app'**
-  String get settings_import_doNotClose;
-
-  /// No description provided for @settings_import_itemCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{current} of {total}'**
-  String settings_import_itemCount(Object current, Object total);
-
   /// No description provided for @settings_import_phase_buddies.
   ///
   /// In en, this message translates to:
@@ -27610,12 +27538,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing certifications...'**
   String get settings_import_phase_certifications;
-
-  /// No description provided for @settings_import_phase_complete.
-  ///
-  /// In en, this message translates to:
-  /// **'Finalizing...'**
-  String get settings_import_phase_complete;
 
   /// No description provided for @settings_import_phase_diveCenters.
   ///
@@ -27646,12 +27568,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Importing equipment sets...'**
   String get settings_import_phase_equipmentSets;
-
-  /// No description provided for @settings_import_phase_parsing.
-  ///
-  /// In en, this message translates to:
-  /// **'Parsing file...'**
-  String get settings_import_phase_parsing;
 
   /// No description provided for @settings_import_phase_preparing.
   ///
@@ -27688,22 +27604,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applying tags...'**
   String get settings_import_phase_applyingTags;
-
-  /// No description provided for @settings_import_progressLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{phase}, {current} of {total}'**
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  );
-
-  /// No description provided for @settings_import_progressPercent.
-  ///
-  /// In en, this message translates to:
-  /// **'Import progress: {percent} percent'**
-  String settings_import_progressPercent(Object percent);
 
   /// No description provided for @settings_language_appBar_title.
   ///
@@ -31610,6 +31510,30 @@ abstract class AppLocalizations {
   /// **'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.'**
   String get importWizard_photos_mobileUnsupported;
 
+  /// Count of photos bundled inside an imported ZIP archive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}'**
+  String importWizard_photos_bundledCount(int count);
+
+  /// Button that opens a folder picker for where bundled archive photos are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where to save photos...'**
+  String get importWizard_photos_chooseDestination;
+
+  /// Explains that bundled photos are written to the chosen folder and linked, never stored inside the app
+  ///
+  /// In en, this message translates to:
+  /// **'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.'**
+  String get importWizard_photos_destinationNote;
+
+  /// Snackbar shown when the folder chosen for bundled archive photos cannot be written to
+  ///
+  /// In en, this message translates to:
+  /// **'That folder can\'t be written to. Choose another one.'**
+  String get importWizard_photos_destinationUnwritable;
+
   /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
   ///
   /// In en, this message translates to:
@@ -34690,12 +34614,6 @@ abstract class AppLocalizations {
   /// **'Source uncertain: {description}'**
   String universalImport_semantics_sourceUncertain(Object description);
 
-  /// Accessibility label for toggling selection of an import entity
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle selection for {name}'**
-  String universalImport_semantics_toggleSelection(Object name);
-
   /// Snackbar shown after a bulk action resolves multiple pending duplicates, confirming the count and action
   ///
   /// In en, this message translates to:
@@ -35886,42 +35804,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'PIN Code Required'**
   String get diveComputer_pinCode_title;
-
-  /// No description provided for @diveComputer_pinEntry_connectButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get diveComputer_pinEntry_connectButton;
-
-  /// No description provided for @diveComputer_pinEntry_helperText.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter the 4-6 digit PIN shown on your device'**
-  String get diveComputer_pinEntry_helperText;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsGeneric.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your dive computer display for the PIN code.'**
-  String get diveComputer_pinEntry_instructionsGeneric;
-
-  /// No description provided for @diveComputer_pinEntry_instructionsWithDevice.
-  ///
-  /// In en, this message translates to:
-  /// **'Check your {deviceName} display for the PIN code.'**
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName);
-
-  /// No description provided for @diveComputer_pinEntry_semanticLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'PIN code entry, 4 to 6 digits'**
-  String get diveComputer_pinEntry_semanticLabel;
-
-  /// No description provided for @diveComputer_pinEntry_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter PIN Code'**
-  String get diveComputer_pinEntry_title;
 
   /// No description provided for @diveComputer_scan_bluetoothSemanticLabel.
   ///
@@ -37550,6 +37432,12 @@ abstract class AppLocalizations {
   /// **'Delete {name} region'**
   String maps_offline_deleteRegion(Object name);
 
+  /// Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.'**
+  String maps_offline_deleteRegionLegacyMessage(Object name);
+
   /// No description provided for @maps_offline_deleteRegionMessage.
   ///
   /// In en, this message translates to:
@@ -37676,6 +37564,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Size'**
   String get maps_offline_size;
+
+  /// Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as "25.0 MB".
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get maps_offline_sizeUnknown;
 
   /// No description provided for @maps_offline_tiles.
   ///
@@ -55810,18 +55704,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Video thumbnail. Tap to view full screen'**
   String get trips_gallery_thumbnail_video;
-
-  /// No description provided for @trips_gallery_thumbnail_photoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Photo thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_photoMissing;
-
-  /// No description provided for @trips_gallery_thumbnail_videoMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Video thumbnail, missing from device. Tap to view full screen'**
-  String get trips_gallery_thumbnail_videoMissing;
 
   /// No description provided for @trips_photos_thumbnail_photo.
   ///

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/domain/entities/cached_region.dart';
@@ -14,14 +17,58 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Displays cache statistics, active download progress, and a list of
 /// downloaded regions. Allows users to delete individual regions or
 /// clear all cached map data.
-class OfflineMapsPage extends ConsumerWidget {
+class OfflineMapsPage extends ConsumerStatefulWidget {
   const OfflineMapsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OfflineMapsPage> createState() => _OfflineMapsPageState();
+}
+
+class _OfflineMapsPageState extends ConsumerState<OfflineMapsPage> {
+  static final LoggerService _log = LoggerService.forClass(OfflineMapsPage);
+
+  @override
+  void initState() {
+    super.initState();
+    // A region store whose region row is gone holds tiles nothing in the app
+    // can reach, which is the leak this page's delete button exists to
+    // prevent. Opening this page is the moment the app both knows every
+    // region that exists and is about to report storage, so the sweep runs
+    // here rather than needing a startup maintenance host, which this app has
+    // twice tried and abandoned. Not awaited: nothing on screen depends on it.
+    unawaited(_pruneOrphanStores());
+  }
+
+  Future<void> _pruneOrphanStores() async {
+    try {
+      final reclaimed = await ref
+          .read(cachedRegionsNotifierProvider.notifier)
+          .pruneOrphanStores();
+      // The totals on screen were measured before the sweep ran, so they still
+      // count bytes that are now gone. Only when something was actually
+      // deleted, to avoid a second round of backend reads on every open.
+      if (reclaimed > 0 && mounted) {
+        ref.invalidate(cacheStatsProvider);
+      }
+    } catch (e, st) {
+      // Housekeeping: a failure here leaves the tiles where they were and is
+      // retried the next time the page opens, so it must not reach the diver.
+      _log.warning('Orphaned region store sweep failed: $e', stackTrace: st);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final regionsAsync = ref.watch(cachedRegionsProvider);
     final cacheStatsAsync = ref.watch(cacheStatsProvider);
     final downloadState = ref.watch(downloadProgressProvider);
+    // Which regions own their tiles is a question only the tile cache can
+    // answer: null until it resolves, and empty if it cannot answer at all,
+    // so a region is never claimed to own tiles that were never proven.
+    final regionStoreIdsAsync = ref.watch(regionStoreIdsProvider);
+    final regionStoreIds = regionStoreIdsAsync.hasError
+        ? const <String>{}
+        : regionStoreIdsAsync.valueOrNull;
 
     return Scaffold(
       appBar: AppBar(
@@ -30,7 +77,7 @@ class OfflineMapsPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.delete_sweep),
             tooltip: context.l10n.maps_offline_clearAllCache,
-            onPressed: () => _showClearCacheDialog(context, ref),
+            onPressed: () => _showClearCacheDialog(context),
           ),
         ],
       ),
@@ -102,7 +149,9 @@ class OfflineMapsPage extends ConsumerWidget {
                   ? _buildEmptyState(context)
                   : Column(
                       children: regions
-                          .map((r) => _buildRegionTile(context, ref, r))
+                          .map(
+                            (r) => _buildRegionTile(context, r, regionStoreIds),
+                          )
                           .toList(),
                     ),
               loading: () => const Center(
@@ -407,19 +456,43 @@ class OfflineMapsPage extends ConsumerWidget {
     );
   }
 
+  /// The size to show for [region].
+  ///
+  /// A region that owns its tiles reports a size measured from its own store.
+  /// A region downloaded before per-region stores carries a size that was
+  /// never measured (a flat 20 KiB per tile that had never read the cache),
+  /// and its tiles cannot be told apart from any other legacy region's, so
+  /// there is nothing honest to show but "unknown".
+  ///
+  /// [regionStoreIds] is null while that list is still loading, which is
+  /// neither answer yet and says so in words: this string is read aloud by
+  /// screen readers as part of the tile's label, so a bare ellipsis would be
+  /// both unlocalized and meaningless to hear.
+  String _sizeLabel(
+    BuildContext context,
+    CachedRegion region,
+    Set<String>? regionStoreIds,
+  ) {
+    if (regionStoreIds == null) return context.l10n.common_label_loading;
+    return regionStoreIds.contains(region.id)
+        ? region.formattedSize
+        : context.l10n.maps_offline_sizeUnknown;
+  }
+
   Widget _buildRegionTile(
     BuildContext context,
-    WidgetRef ref,
     CachedRegion region,
+    Set<String>? regionStoreIds,
   ) {
     final theme = Theme.of(context);
     final units = UnitFormatter(ref.watch(settingsProvider));
+    final size = _sizeLabel(context, region, regionStoreIds);
 
     return Semantics(
       label: listItemLabel(
         title: region.name,
         subtitle: context.l10n.maps_offline_regionSubtitle(
-          region.formattedSize,
+          size,
           region.tileCount,
           region.minZoom,
           region.maxZoom,
@@ -435,7 +508,7 @@ class OfflineMapsPage extends ConsumerWidget {
           title: Text(region.name),
           subtitle: Text(
             context.l10n.maps_offline_regionInfo(
-              region.formattedSize,
+              size,
               region.tileCount,
               region.minZoom,
               region.maxZoom,
@@ -444,9 +517,10 @@ class OfflineMapsPage extends ConsumerWidget {
           trailing: IconButton(
             icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
             tooltip: context.l10n.maps_offline_deleteRegion(region.name),
-            onPressed: () => _confirmDeleteRegion(context, ref, region),
+            onPressed: () =>
+                _confirmDeleteRegion(context, region, regionStoreIds),
           ),
-          onTap: () => _showRegionDetails(context, units, region),
+          onTap: () => _showRegionDetails(context, units, region, size),
         ),
       ),
     );
@@ -456,6 +530,7 @@ class OfflineMapsPage extends ConsumerWidget {
     BuildContext context,
     UnitFormatter units,
     CachedRegion region,
+    String size,
   ) {
     final theme = Theme.of(context);
 
@@ -469,11 +544,7 @@ class OfflineMapsPage extends ConsumerWidget {
           children: [
             Text(region.name, style: theme.textTheme.headlineSmall),
             const SizedBox(height: 16),
-            _buildDetailRow(
-              context,
-              context.l10n.maps_offline_size,
-              region.formattedSize,
-            ),
+            _buildDetailRow(context, context.l10n.maps_offline_size, size),
             _buildDetailRow(
               context,
               context.l10n.maps_offline_tiles,
@@ -549,19 +620,34 @@ class OfflineMapsPage extends ConsumerWidget {
 
   Future<void> _confirmDeleteRegion(
     BuildContext context,
-    WidgetRef ref,
     CachedRegion region,
+    Set<String>? regionStoreIds,
   ) async {
+    // The same answer the list is already showing, rather than a fresh read.
+    // Awaiting the tile cache here would leave the button doing nothing
+    // visible for as long as the backend took, and it would let the dialog
+    // contradict the size printed on the row behind it.
+    //
+    // Null means the answer has not arrived yet, which is not proof that the
+    // region owns its tiles: falling back to the message that promises
+    // nothing is the direction that cannot mislead. It under-promises for the
+    // moment or two before the store list resolves, and never the reverse.
+    final ownsTiles = regionStoreIds?.contains(region.id) ?? false;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(context.l10n.maps_offline_deleteRegionTitle),
         content: Text(
-          context.l10n.maps_offline_deleteRegionMessage(
-            region.name,
-            region.tileCount,
-            region.formattedSize,
-          ),
+          ownsTiles
+              ? context.l10n.maps_offline_deleteRegionMessage(
+                  region.name,
+                  region.tileCount,
+                  region.formattedSize,
+                )
+              : context.l10n.maps_offline_deleteRegionLegacyMessage(
+                  region.name,
+                ),
         ),
         actions: [
           TextButton(
@@ -579,17 +665,23 @@ class OfflineMapsPage extends ConsumerWidget {
       ),
     );
 
-    if (confirmed == true) {
-      await ref
-          .read(cachedRegionsNotifierProvider.notifier)
-          .deleteRegion(region.id);
-    }
+    if (confirmed != true) return;
+
+    await ref
+        .read(cachedRegionsNotifierProvider.notifier)
+        .deleteRegion(region.id);
+
+    // A delete that could not remove the tiles leaves the region in the list
+    // on purpose, so that the bytes stay reachable. Without a message that
+    // reads as the delete button simply not working.
+    final error = ref.read(cachedRegionsNotifierProvider).error;
+    if (error == null || !context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.maps_offline_error('$error'))),
+    );
   }
 
-  Future<void> _showClearCacheDialog(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  Future<void> _showClearCacheDialog(BuildContext context) async {
     final cacheStats = ref.read(cacheStatsProvider);
 
     final statsText = cacheStats.whenOrNull(

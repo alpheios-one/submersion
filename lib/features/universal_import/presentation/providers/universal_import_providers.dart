@@ -42,6 +42,7 @@ import 'package:submersion/features/universal_import/data/services/shearwater_db
 import 'package:submersion/features/universal_import/data/services/surfacing_pressure_normalizer.dart';
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
+import 'package:submersion/features/universal_import/domain/services/bundled_photo_exporter.dart';
 import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
 import 'package:submersion/core/services/files/picked_file_materializer.dart';
@@ -62,13 +63,21 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     ZipExpansionService zipExpansionService = const ZipExpansionService(),
     GarminDeviceDetector garminDeviceDetector = const GarminDeviceDetector(),
     FitParserService fitParserService = const FitParserService(),
-  }) : _batchParseService = batchParseService,
+    Future<bool> Function(String path) folderWriteProbe = folderAcceptsWrites,
+  }) : _folderWriteProbe = folderWriteProbe,
+       _batchParseService = batchParseService,
        _zipExpansion = zipExpansionService,
        _garminDetector = garminDeviceDetector,
        _fitParser = fitParserService,
        super(const UniversalImportState());
 
   final Ref _ref;
+
+  /// Injectable so a widget test can answer the writability question
+  /// without real filesystem work: `testWidgets` runs in a fake-async
+  /// zone that never completes real IO, so an awaited probe would park
+  /// forever.
+  final Future<bool> Function(String path) _folderWriteProbe;
 
   /// Injectable so tests can drive deterministic batch-parse outcomes
   /// (progress, cancellation) without real file timing.
@@ -142,15 +151,28 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   /// non-ZIP import (pickFiles/pickFolder do not fully reset state) and its
   /// photos could be misattached to the new dives. Temp dirs superseded by
   /// this expansion are deleted so extracted data does not accumulate.
-  void _applyExpansionExtras(ArchiveExpansion expansion) {
+  ///
+  /// Public only so a test can drive it: the picker entry points that need
+  /// it most go through the static file picker and cannot be exercised.
+  @visibleForTesting
+  void applyExpansionExtras(ArchiveExpansion expansion) {
     final superseded = [
       for (final dir in state.zipTempDirPaths)
         if (!expansion.tempDirPaths.contains(dir)) dir,
     ];
+    // Every photo decision belongs to the selection that prompted it. A
+    // fresh pick drops them all, or a destination chosen for one archive
+    // would silently receive the next archive's photos, and a resolution
+    // or skip from an earlier logbook would open the Photos step's gate
+    // for a new one that has not been looked at.
     state = state.copyWith(
       photoPathsByBaseName: expansion.photoPathsByBaseName,
       unmatchedPhotoCount: expansion.unmatchedPhotoPaths.length,
       zipTempDirPaths: expansion.tempDirPaths,
+      clearBundledPhotoFolderPath: true,
+      clearPhotoFolderPath: true,
+      clearPhotoResolution: true,
+      photosSkipped: false,
     );
     _deleteTempDirs(superseded);
   }
@@ -212,7 +234,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     try {
       if (ZipExpansionService.isZipBytes(bytes)) {
         final expansion = await _zipExpansion.expandZipBytes(bytes, fileName);
-        _applyExpansionExtras(expansion);
+        applyExpansionExtras(expansion);
         if (expansion.filePaths.isEmpty) {
           state = state.copyWith(
             isLoading: false,
@@ -305,7 +327,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
         for (final f in await materializePickedFiles(result)) f.path,
       ];
       final expansion = await _zipExpansion.expandAll(pickedPaths);
-      _applyExpansionExtras(expansion);
+      applyExpansionExtras(expansion);
 
       if (expansion.filePaths.isEmpty) {
         state = state.copyWith(
@@ -391,7 +413,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     state = const UniversalImportState().copyWith(isLoading: true);
     _deleteTempDirs(staleTempDirs);
     final expansion = await _zipExpansion.expandAll(paths);
-    _applyExpansionExtras(expansion);
+    applyExpansionExtras(expansion);
     if (expansion.filePaths.isEmpty) {
       state = state.copyWith(
         isLoading: false,
@@ -441,12 +463,29 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
   }
 
-  /// Proceeds without photos.
+  /// Records where photos bundled in an imported archive should be saved.
+  /// They are written there at import time and linked in place.
+  ///
+  /// Returns false, recording nothing, when the folder cannot be written
+  /// to, so the user hears about a read-only pick now rather than finding
+  /// the photos missing after the import.
+  Future<bool> chooseBundledPhotoFolder(String path) async {
+    if (!await _folderWriteProbe(path)) {
+      _log.warning('Bundled photo folder is not writable: $path');
+      return false;
+    }
+    state = state.copyWith(bundledPhotoFolderPath: path, photosSkipped: false);
+    return true;
+  }
+
+  /// Proceeds without photos: neither the logbook's referenced photos nor
+  /// any bundled in an archive are imported.
   void skipPhotos() {
     state = state.copyWith(
       photosSkipped: true,
       clearPhotoResolution: true,
       clearPhotoFolderPath: true,
+      clearBundledPhotoFolderPath: true,
     );
   }
 
@@ -477,7 +516,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       // Folder scans surface ZIPs (DiveCloud exports); expand them so
       // members flow through the batch like directly picked files.
       final expansion = await _zipExpansion.expandAll(paths);
-      _applyExpansionExtras(expansion);
+      applyExpansionExtras(expansion);
       final expandedPaths = expansion.filePaths;
 
       if (expandedPaths.isEmpty) {

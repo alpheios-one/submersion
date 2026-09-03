@@ -34,8 +34,6 @@ SyncCleanupProgress cleanupPhase(
 /// reports real counts, refuses to be dismissed, and says out loud that the app
 /// must stay open.
 ///
-/// Modelled on [ImportProgressDialog], which solves the same problem for
-/// UDDF/CSV import.
 class SyncMaintenanceProgressDialog extends StatelessWidget {
   const SyncMaintenanceProgressDialog({
     super.key,
