@@ -712,7 +712,7 @@ class DiveComputerHostApiImpl(
             if (e[1] == 0L) return@mapNotNull null  // skip EVENT_NONE
             DiveEvent(
                 timeSeconds = e[0] / 1000,
-                type = mapEventType(e[1].toInt()),
+                type = libdcEventTypeName(e[1].toInt()),
                 data = mapOf("flags" to e[2].toString(), "value" to e[3].toString())
             )
         }
@@ -868,34 +868,5 @@ class DiveComputerHostApiImpl(
                 "latest version."
         )
         return false
-    }
-
-    private fun mapEventType(type: Int): String = when (type) {
-        0 -> "none"
-        1 -> "deco"
-        2 -> "ascent"
-        3 -> "ceiling"
-        4 -> "workload"
-        5 -> "transmitter"
-        6 -> "violation"
-        7 -> "bookmark"
-        8 -> "surface"
-        9 -> "safetystop"
-        10 -> "gaschange"
-        11 -> "safetystop_voluntary"
-        12 -> "safetystop_mandatory"
-        13 -> "deepstop"
-        14 -> "ceiling_safetystop"
-        15 -> "floor"
-        16 -> "divetime"
-        17 -> "maxdepth"
-        18 -> "OLF"
-        19 -> "PO2"
-        20 -> "airtime"
-        21 -> "rgbm"
-        22 -> "heading"
-        23 -> "tissuelevel"
-        24 -> "gaschange2"
-        else -> "unknown_$type"
     }
 }
