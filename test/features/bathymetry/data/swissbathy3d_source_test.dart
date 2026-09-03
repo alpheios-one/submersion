@@ -36,8 +36,19 @@ void main() {
   final gridBody = File(
     'test/fixtures/bathymetry/swissbathy3d_sample.asc',
   ).readAsStringSync();
-  // Inside Zürichsee's bounding box (see swiss_lake_levels.dart).
-  const zurichseePoint = GeoPoint(47.25, 8.65);
+  // The fixture's own tile center (xllcorner/yllcorner 2685000/1240000,
+  // cellsize 100 in swissbathy3d_sample.asc -> tile 2685_1240), and still
+  // inside Zürichsee's bounding box (see swiss_lake_levels.dart). Tile
+  // position used not to matter here -- any point inside the lake's bbox
+  // sufficed while fetch() returned the whole downloaded grid regardless of
+  // where it was requested (the Bug 13 symptom); now that
+  // extractRawEsriSubgrid enforces real LV95 overlap, this must resolve to
+  // the fixture's actual tile or every fetch below would find no overlap.
+  final zurichseeTileCenter = Lv95Transform.toWgs84(2685500, 1240500);
+  final zurichseePoint = GeoPoint(
+    zurichseeTileCenter.latitude,
+    zurichseeTileCenter.longitude,
+  );
   const alpsPoint = GeoPoint(46.55, 7.98); // not near any listed lake
 
   late LocalCacheDatabase db;
@@ -396,7 +407,7 @@ nodata_value -9999
       // enuBounds), so the terrain mesh built from a stitched mosaic must
       // actually enclose that coordinate -- otherwise the marker renders
       // outside the mesh it is supposed to sit on.
-      const center = zurichseePoint;
+      final center = zurichseePoint;
       final centerLv95 = Lv95Transform.fromWgs84(
         center.latitude,
         center.longitude,
