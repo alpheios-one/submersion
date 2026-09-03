@@ -1046,6 +1046,43 @@ jobs:
         # positive control that the check is not vacuously passing.
         run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
+      # Packaging runs here as well as in build-all.yml because build-all.yml
+      # is workflow_call-only: nothing a pull request triggers ever invokes it,
+      # so without this the packaging path would be unverifiable until after a
+      # merge, when a break already blocks the beta pipeline. Both workflows
+      # call the same scripts, so they cannot drift.
+      #
+      # This job runs on ubuntu-latest, not the ubuntu:22.04 container
+      # build-all.yml uses, so it covers packaging mechanics and dependency
+      # resolution but NOT the glibc floor. build-all.yml remains the only
+      # check on the floor itself.
+      - name: Install packaging tools
+        run: |
+          sudo apt-get install -y ruby ruby-dev build-essential rpm python3-pil binutils
+          sudo gem install --no-document fpm
+
+      - name: Build .deb and .rpm
+        run: |
+          set -euo pipefail
+          mkdir -p packages
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+/./')
+          scripts/release/build_linux_packages.sh \
+            --bundle build/linux/x64/release/bundle \
+            --version "$VERSION" \
+            --deb "packages/Submersion-ci-Linux-amd64.deb" \
+            --rpm "packages/Submersion-ci-Linux-x86_64.rpm"
+
+      - name: Verify the packages install in clean containers
+        run: |
+          set -euo pipefail
+          for image in debian:12 fedora:latest; do
+            echo "=== $image ==="
+            docker run --rm \
+              -v "$PWD/packages:/p" \
+              -v "$PWD/scripts/release/verify_linux_package.sh:/verify.sh:ro" \
+              "$image" bash /verify.sh
+          done
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v7
         if: >

@@ -636,77 +636,18 @@ jobs:
 
       # Staged before the tarball step, so the installer scripts the tarball
       # carries never leak into the package trees.
-      - name: Stage package trees
-        env:
-          TAG_NAME: ${{ inputs.version-tag }}
-        run: |
-          set -euo pipefail
-          VERSION="${TAG_NAME#v}"
-          echo "PKG_VERSION=$VERSION" >> "$GITHUB_ENV"
-          for method in deb rpm; do
-            python3 scripts/release/stage_linux_package.py \
-              build/linux/x64/release/bundle \
-              "staging-$method" \
-              --version "$VERSION" \
-              --install-method "$method"
-          done
-
-      - name: Derive runtime dependencies
-        run: |
-          set -euo pipefail
-          python3 scripts/linux_package_deps.py \
-            build/linux/x64/release/bundle --format deb > deps-deb.txt
-          python3 scripts/linux_package_deps.py \
-            build/linux/x64/release/bundle --format rpm > deps-rpm.txt
-          echo "--- deb dependencies ---"; cat deps-deb.txt
-          echo "--- rpm dependencies ---"; cat deps-rpm.txt
-
+      # Shared with ci.yaml's build-linux job so the two cannot drift.
       - name: Build .deb and .rpm
         env:
           TAG_NAME: ${{ inputs.version-tag }}
         run: |
           set -euo pipefail
-          common_args=(
-            --name submersion
-            --version "$PKG_VERSION"
-            --license GPL-3.0
-            --maintainer "Submersion <dev@submersion.app>"
-            --url "https://submersion.app"
-            --description "An open-source dive logging application for scuba divers."
-            --input-type dir
-          )
-
-          # ffmpeg and gnome-keyring are weak dependencies on purpose. ffmpeg
-          # is absent from stock Fedora (it lives in RPM Fusion), so a hard
-          # requirement would make the package uninstallable there, and the
-          # app already degrades gracefully without it. gnome-keyring supplies
-          # the Secret Service that flutter_secure_storage_linux needs, which
-          # is present on GNOME and KDE but not on minimal window managers.
-          deb_depends=()
-          while read -r dep; do
-            [ -n "$dep" ] && deb_depends+=(--depends "$dep")
-          done < deps-deb.txt
-          fpm "${common_args[@]}" \
-            --output-type deb \
-            --architecture amd64 \
-            "${deb_depends[@]}" \
-            --deb-recommends ffmpeg \
-            --deb-recommends gnome-keyring \
-            --package "Submersion-${TAG_NAME}-Linux-amd64.deb" \
-            -C staging-deb usr
-
-          rpm_depends=()
-          while read -r dep; do
-            [ -n "$dep" ] && rpm_depends+=(--depends "$dep")
-          done < deps-rpm.txt
-          fpm "${common_args[@]}" \
-            --output-type rpm \
-            --architecture x86_64 \
-            "${rpm_depends[@]}" \
-            --rpm-tag "Recommends: ffmpeg" \
-            --rpm-tag "Recommends: gnome-keyring" \
-            --package "Submersion-${TAG_NAME}-Linux-x86_64.rpm" \
-            -C staging-rpm usr
+          VERSION="${TAG_NAME#v}"
+          scripts/release/build_linux_packages.sh \
+            --bundle build/linux/x64/release/bundle \
+            --version "$VERSION" \
+            --deb "Submersion-${TAG_NAME}-Linux-amd64.deb" \
+            --rpm "Submersion-${TAG_NAME}-Linux-x86_64.rpm"
 
       # Runs after the package trees are staged, so these extras reach the
       # tarball only. A tarball user has no package manager doing the work,
@@ -755,6 +696,14 @@ jobs:
             format: rpm
 
     steps:
+      # Checkout first: actions/checkout cleans the workspace by default, so
+      # downloading the artifact before it would delete the download.
+      - name: Check out the verification script
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/release/verify_linux_package.sh
+          sparse-checkout-cone-mode: false
+
       - name: Download Linux packages
         uses: actions/download-artifact@v8
         with:
@@ -767,40 +716,10 @@ jobs:
       - name: Install and run in a clean ${{ matrix.image }}
         run: |
           set -euo pipefail
-          docker run --rm -v "$PWD/packages:/p" ${{ matrix.image }} bash -c '
-            set -eux
-            if command -v apt-get > /dev/null; then
-              apt-get update -qq
-              DEBIAN_FRONTEND=noninteractive apt-get install -y /p/Submersion-*.deb
-            else
-              dnf install -y /p/Submersion-*.rpm
-            fi
-
-            # The binary answers --version before GTK initializes, so this
-            # needs no display server.
-            /usr/bin/submersion --version
-
-            test -f /usr/share/applications/app.submersion.desktop
-            test -f /usr/share/metainfo/app.submersion.metainfo.xml
-            test -f /usr/lib/udev/rules.d/60-submersion-divecomputers.rules
-            test -f /usr/share/icons/hicolor/256x256/apps/app.submersion.png
-
-            # A GROUP-based rule would silently fail on Fedora, which has no
-            # plugdev group.
-            RULES=/usr/lib/udev/rules.d/60-submersion-divecomputers.rules
-            grep -q "uaccess" "$RULES"
-            if grep -q "plugdev" "$RULES"; then
-              echo "udev rules fell back to group-based access"
-              exit 1
-            fi
-
-            # No unresolved shared libraries after a real dependency install.
-            if ldd /usr/lib/submersion/submersion | grep "not found"; then
-              echo "unresolved shared libraries after install"
-              exit 1
-            fi
-            echo "package verified"
-          '
+          docker run --rm \
+            -v "$PWD/packages:/p" \
+            -v "$PWD/scripts/release/verify_linux_package.sh:/verify.sh:ro" \
+            ${{ matrix.image }} bash /verify.sh
 
   # ============================================================================
   # Android Build

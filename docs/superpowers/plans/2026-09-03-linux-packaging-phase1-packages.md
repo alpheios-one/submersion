@@ -2335,6 +2335,70 @@ git commit -m "docs: document the Linux install paths"
 
 ---
 
+### Task 13: Cover packaging on every pull request (added during execution)
+
+`build-all.yml` is `workflow_call`-only, and nothing a pull request triggers
+invokes it: `ci.yaml` runs on push and pull_request but has its own
+`build-linux` job that never calls it. So every change to the release build
+path, this one included, was unverifiable until after a merge, at which point a
+break fails `verify-linux-packages`, fails `build-all`, fails `beta.yml`'s build
+job, and publishes no beta that cycle.
+
+This task closes that gap by extracting the packaging into scripts both
+workflows call, then adding the same coverage to `ci.yaml`.
+
+**Files:**
+- Create: `scripts/release/build_linux_packages.sh`
+- Create: `scripts/release/verify_linux_package.sh`
+- Modify: `.github/workflows/build-all.yml` (call the shared scripts)
+- Modify: `.github/workflows/ci.yaml` (packaging plus container verification)
+
+**Scope limit, stated so it is not assumed away:** `ci.yaml`'s `build-linux`
+runs on `ubuntu-latest`, not the `ubuntu:22.04` container. It therefore covers
+packaging mechanics, dependency derivation, and installability, but **not** the
+glibc floor. `build-all.yml` remains the only check on the floor itself.
+
+- [x] **Step 1: Extract the packaging into a shared script**
+
+`scripts/release/build_linux_packages.sh` takes `--bundle`, `--version`,
+`--deb`, `--rpm`, and an optional `--staging-root`, then stages both trees,
+derives both dependency lists, and runs fpm twice. Portable to bash 3.2 so it
+runs on a developer's macOS shell as well as in CI.
+
+- [x] **Step 2: Extract the in-container assertions**
+
+`scripts/release/verify_linux_package.sh` runs inside the container, installs
+whatever package it finds in `/p` with the native package manager, and asserts
+`--version`, the desktop entry, metainfo, udev rules with `uaccess` and without
+`plugdev`, the icon, and no unresolved libraries.
+
+- [x] **Step 3: Point build-all.yml at both scripts**
+
+Its three packaging steps collapse to one call, and the verify job mounts the
+script into the container. Checkout must precede `download-artifact` in that
+job: `actions/checkout` cleans the workspace by default and would otherwise
+delete the downloaded packages.
+
+- [x] **Step 4: Add the same coverage to ci.yaml's build-linux**
+
+After the existing native-asset check: install fpm and rpm, build both packages
+at the pubspec version, and run the verification script in `debian:12` and
+`fedora:latest`.
+
+- [x] **Step 5: Verify locally as far as a macOS host allows**
+
+```bash
+shellcheck scripts/release/build_linux_packages.sh scripts/release/verify_linux_package.sh
+TMP=$(mktemp -d); mkdir -p "$TMP/bundle/lib"; echo bin > "$TMP/bundle/submersion"
+bash scripts/release/build_linux_packages.sh --bundle "$TMP/bundle" \
+  --version 1.7.7.124 --deb "$TMP/o.deb" --rpm "$TMP/o.rpm" --staging-root "$TMP"
+```
+
+Expected: staging completes, then it stops at `readelf not found`, which is the
+correct actionable error on a host without binutils.
+
+---
+
 ## Final Verification
 
 - [ ] **Run the full Python test suite**
