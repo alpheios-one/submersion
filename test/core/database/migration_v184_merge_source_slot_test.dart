@@ -31,7 +31,8 @@ void main() {
             imported_at INTEGER NOT NULL,
             created_at INTEGER NOT NULL,
             entry_time INTEGER,
-            exit_time INTEGER
+            exit_time INTEGER,
+            time_offset_seconds INTEGER
           )
         ''');
         seed(rawDb);
@@ -47,12 +48,22 @@ void main() {
     String? computerId,
     int? entry,
     int? exit,
+    int? timeOffsetSeconds,
   }) {
     rawDb.execute(
       'INSERT INTO dive_data_sources '
       '(id, dive_id, computer_id, is_primary, imported_at, created_at, '
-      'entry_time, exit_time) VALUES (?, ?, ?, ?, 0, 0, ?, ?)',
-      [id, diveId, computerId, isPrimary ? 1 : 0, entry, exit],
+      'entry_time, exit_time, time_offset_seconds) '
+      'VALUES (?, ?, ?, ?, 0, 0, ?, ?, ?)',
+      [
+        id,
+        diveId,
+        computerId,
+        isPrimary ? 1 : 0,
+        entry,
+        exit,
+        timeOffsetSeconds,
+      ],
     );
   }
 
@@ -123,6 +134,32 @@ void main() {
           computerId: 'dc-b',
           entry: 60,
           exit: 3500,
+        );
+      }),
+    );
+    addTearDown(db.close);
+
+    expect(await slots(db), {'src-a': null, 'src-b': null});
+  });
+
+  test('leaves a consolidation whose clocks disagree alone (#543)', () async {
+    final db = AppDatabase(
+      setupDb((rawDb) {
+        rawDb.execute("INSERT INTO dives (id) VALUES ('shifted')");
+        // Two recordings of the same dive, no computer to collide on, and a
+        // secondary whose clock was two hours out. Consolidation shifts the
+        // SAMPLES by time_offset_seconds but copies entry_time/exit_time
+        // verbatim, so the stored spans do not overlap even though the two
+        // rows cover the same minutes. The disjointness test alone would
+        // read that as a Combine and collapse both to one chip.
+        insertSource(rawDb, 'src-a', 'shifted', entry: 0, exit: 3600);
+        insertSource(
+          rawDb,
+          'src-b',
+          'shifted',
+          entry: 7200,
+          exit: 10800,
+          timeOffsetSeconds: -7200,
         );
       }),
     );

@@ -6022,9 +6022,10 @@ class AppDatabase extends _$AppDatabase {
   ///    `DiveMergeService.apply`, which writes every carried row
   ///    `isPrimary: false`, and
   ///  - every row has an entry and an exit time, and no two of those spans
-  ///    overlap.
+  ///    overlap, and
+  ///  - no row carries a non-zero `time_offset_seconds`.
   ///
-  /// The last test is what makes this safe. Combined halves are consecutive
+  /// The span test is what makes this safe. Combined halves are consecutive
   /// slices of one timeline, so their spans are disjoint; two computers
   /// recording one dive cover the same minutes, so theirs overlap. Without
   /// it, a consolidation whose target row was never marked primary would
@@ -6032,6 +6033,19 @@ class AppDatabase extends _$AppDatabase {
   /// interleaved union of both computers (issue #543). A dive whose rows
   /// carry no entry/exit times cannot be classified either way and is left
   /// alone: it keeps exactly today's behavior.
+  ///
+  /// The offset test closes the one hole in that reasoning.
+  /// `DiveConsolidationService` shifts a folded-in dive's SAMPLES by
+  /// `time_offset_seconds` but copies its `entry_time`/`exit_time` over
+  /// verbatim, so a secondary whose clock was badly out has a stored span
+  /// that misses the target's even though the two cover the same minutes.
+  /// The span test would read that as a Combine. A non-zero offset is the
+  /// trace consolidation leaves and a Combine never writes, so requiring
+  /// zero across the dive rules that shape out. It costs a few false
+  /// negatives -- a pre-v184 dive that was consolidated and then combined is
+  /// now skipped -- and a skipped dive simply keeps today's display, which
+  /// is the safe direction to be wrong in for a one-shot write over user
+  /// data.
   ///
   /// Runs once on the v184 rung, not from the beforeOpen backstop: it writes
   /// rows rather than asserting DDL, and every merge performed after the
@@ -6051,6 +6065,7 @@ class AppDatabase extends _$AppDatabase {
       'is_primary',
       'entry_time',
       'exit_time',
+      'time_offset_seconds',
       'merge_source_slot',
     };
     if (!names.containsAll(required)) return;
@@ -6063,6 +6078,8 @@ class AppDatabase extends _$AppDatabase {
       '  HAVING COUNT(*) >= 2'
       '     AND SUM(CASE WHEN is_primary THEN 1 ELSE 0 END) = 0'
       '     AND SUM(CASE WHEN entry_time IS NULL OR exit_time IS NULL'
+      '                  THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN COALESCE(time_offset_seconds, 0) <> 0'
       '                  THEN 1 ELSE 0 END) = 0'
       ') '
       'AND dive_id NOT IN ('
