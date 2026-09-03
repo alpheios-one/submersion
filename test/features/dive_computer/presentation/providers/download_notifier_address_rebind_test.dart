@@ -17,12 +17,13 @@ const _staleAddress = 'CBB1EC06-5D7C-4F20-7A6C-98BBB2F8F631';
 const _freshAddress = 'C4E774E2-7D1F-DB41-EBD3-69D345D782F3';
 
 DiveComputer _savedComputer({
+  String id = 'dc-1',
   String? serialNumber = '074691',
   String? bluetoothAddress = _staleAddress,
 }) {
   final now = DateTime(2026, 8, 31);
   return DiveComputer(
-    id: 'dc-1',
+    id: id,
     diverId: 'diver-1',
     name: 'Ratio iX3M 2021 GPS Fancy',
     manufacturer: 'Ratio',
@@ -206,5 +207,64 @@ void main() {
       expect(updates, isEmpty);
       verifyNever(repository.updateComputer(any));
     });
+
+    // The completion handler fires the persist without awaiting it, so the
+    // write can still be in flight when the next download starts. Refreshing
+    // the tracked record after the write would point it back at the computer
+    // that just finished, and the newer download would then persist its
+    // serial and address onto that record instead of its own.
+    test(
+      'a persist finishing late does not capture the next download',
+      () async {
+        const secondStaleAddress = 'A1B2C3D4-0000-4000-8000-000000000001';
+        const secondFreshAddress = 'A1B2C3D4-0000-4000-8000-000000000002';
+        final firstWrite = Completer<void>();
+        when(repository.updateComputer(any)).thenAnswer((invocation) async {
+          updates.add(invocation.positionalArguments.first as DiveComputer);
+          if (updates.length == 1) await firstWrite.future;
+        });
+
+        await notifier.startDownload(
+          _device(_freshAddress),
+          computer: _savedComputer(),
+        );
+        events.add(
+          DownloadCompleteEvent(
+            0,
+            serialNumber: '074691',
+            firmwareVersion: '5.0.0',
+          ),
+        );
+        await pumpEventQueue();
+        expect(updates.single.id, 'dc-1');
+
+        // A second computer starts downloading while that write is parked.
+        await notifier.startDownload(
+          _device(secondFreshAddress),
+          computer: _savedComputer(
+            id: 'dc-2',
+            serialNumber: '999999',
+            bluetoothAddress: secondStaleAddress,
+          ),
+        );
+        firstWrite.complete();
+        await pumpEventQueue();
+
+        events.add(
+          DownloadCompleteEvent(
+            0,
+            serialNumber: '999999',
+            firmwareVersion: '5.0.0',
+          ),
+        );
+        await pumpEventQueue();
+
+        // Its own record is rebound. Unguarded, the tracked record is the
+        // first computer, whose stored serial 074691 contradicts the reported
+        // 999999, so the second download persists nothing at all.
+        expect(updates.last.id, 'dc-2');
+        expect(updates.last.bluetoothAddress, secondFreshAddress);
+      },
+    );
   });
 }

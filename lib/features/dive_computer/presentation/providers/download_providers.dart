@@ -335,7 +335,14 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         bluetoothAddress: address ?? computer.bluetoothAddress,
       );
       await _repository.updateComputer(updated);
-      _computer = updated;
+      // Nothing awaits this method: it is fired from the completion event so
+      // the UI is not held behind a write. A startDownload for another
+      // computer can therefore land while the write is in flight, and
+      // refreshing the field unconditionally would point it back at this
+      // record, leaving the newer download to persist its serial and address
+      // onto the wrong one. Only the call that still owns the field may
+      // refresh it.
+      if (identical(_computer, computer)) _computer = updated;
     } catch (e, stackTrace) {
       _log.error(
         'Device info persist failed for ${computer.displayName}',
