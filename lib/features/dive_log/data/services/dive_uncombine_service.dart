@@ -60,13 +60,26 @@ class UncombineSegment {
 /// **What comes back and what does not.** Each segment's profile samples,
 /// tank pressures, profile events and gas switches return to their own dive,
 /// re-based so the restored dive starts at zero again, with the synthesized
-/// surface fill that bridged the gaps dropped. The logbook entry does not
-/// come apart: Combine unions buddies, tags, equipment, weights, sightings,
-/// custom fields, media and notes with no record of which dive each came
-/// from, so all of that stays on the original dive along with the dive
-/// number. Restored dives inherit the site (both halves happened in one
-/// place) and nothing else. Tanks are cloned rather than moved, because they
-/// are the dive's gas plan and every segment was breathing them.
+/// surface fill that bridged the gaps dropped.
+///
+/// The logbook entry does not come apart. Combine unions it with no record of
+/// which dive each value came from, so all of it stays on the original dive:
+/// the linked rows (buddies, tags, equipment, weights, sightings, custom
+/// fields, media) and equally the scalars on the dive row itself -- name,
+/// number, notes, buddy, divemaster, diver role, boat, operator, dive centre,
+/// trip, course, rating, favourite, weighting, statistics exclusions and
+/// import provenance. Copying the dive row wholesale and clearing only a
+/// couple of those quietly duplicated the rest onto every restored dive,
+/// which is not what the confirmation dialog promises.
+///
+/// What carries is what describes the dive itself rather than the log of it:
+/// its timings, depths and temperatures, the deco and CCR settings it was run
+/// on, the water and weather it happened in, the computer that recorded it,
+/// and its site -- both halves happened in one place. Timings and surface
+/// fixes are taken per segment, so a restored half reports its own runtime
+/// and its own GPS rather than the whole combine's. Tanks are cloned rather
+/// than moved, because they are the dive's gas plan and every segment was
+/// breathing them.
 ///
 /// Mirrors the split and consolidation services' sync discipline: one
 /// transaction, per-row tombstones for every moved row (the original dive
@@ -221,6 +234,8 @@ class DiveUncombineService {
           diveId: diveId,
           diveRow: diveRow,
           keptLead: sourceById[segments.first.sourceIds.first],
+          keptSpanSeconds:
+              segments.first.endSeconds - segments.first.startSeconds,
           keptSummary: _summaryOf([
             for (final s in await _profileSeries.getSeriesForDive(diveId))
               ...s.samples,
@@ -298,8 +313,60 @@ class DiveUncombineService {
                   lead.exitTime?.millisecondsSinceEpoch ??
                       _shiftedMs(diveRow, segment.endSeconds),
                 ),
+                // The logbook entry does not come apart. Combine unions all
+                // of this with no record of which dive each value came from,
+                // so it stays on the surviving dive rather than being
+                // duplicated onto every restored one -- copying the row
+                // wholesale silently contradicted that, handing each
+                // restored dive the combined dive's buddy, rating, trip and
+                // weighting. What carries is what describes the dive itself:
+                // its timings and depths, the water it happened in, the
+                // computer that recorded it, and its site.
                 diveNumber: const Value(null),
+                name: const Value(null),
                 notes: const Value(''),
+                buddy: const Value(null),
+                diveMaster: const Value(null),
+                diverRole: const Value(null),
+                boatName: const Value(null),
+                boatCaptain: const Value(null),
+                diveOperator: const Value(null),
+                rating: const Value(null),
+                isFavorite: const Value(false),
+                diveCenterId: const Value(null),
+                tripId: const Value(null),
+                courseId: const Value(null),
+                weightAmount: const Value(null),
+                weightType: const Value(null),
+                weightingFeedback: const Value(null),
+                weightingFeedbackKg: const Value(null),
+                // A deliberate exclusion is a judgement about the record the
+                // user was looking at, not about halves they had not seen.
+                // Restoring one silently excluded from statistics would hide
+                // it with nothing on screen to explain why.
+                excludedFromStats: const Value(false),
+                excludedFromGasStats: const Value(false),
+                // Import provenance belongs to the dive that was imported.
+                // The restored dive's own dive_data_sources rows carry the
+                // file name, fingerprint and source uuid that matter.
+                importSource: const Value(null),
+                importId: const Value(null),
+                importVersion: const Value(null),
+                siteSuggestionDismissedAt: const Value(null),
+                // Runtime is the segment's own span. Left alone it kept the
+                // whole combine's, the same defect as bottom time below.
+                runtime: Value(
+                  lead.exitTime != null && lead.entryTime != null
+                      ? lead.exitTime!.difference(lead.entryTime!).inSeconds
+                      : segment.endSeconds - segment.startSeconds,
+                ),
+                // Surface fixes are per-source, so a restored half takes its
+                // own rather than inheriting the fix of the half that
+                // happens to start the combined dive.
+                entryLatitude: Value(lead.entryLatitude),
+                entryLongitude: Value(lead.entryLongitude),
+                exitLatitude: Value(lead.exitLatitude),
+                exitLongitude: Value(lead.exitLongitude),
                 computerId: Value(lead.computerId),
                 diveComputerModel: Value(lead.computerModel),
                 diveComputerSerial: Value(lead.computerSerial),
@@ -525,6 +592,7 @@ class DiveUncombineService {
     required Dive diveRow,
     required DiveDataSourcesData? keptLead,
     required _ProfileSummary? keptSummary,
+    required int keptSpanSeconds,
     required int now,
   }) async {
     var update = DivesCompanion(updatedAt: Value(now));
@@ -543,6 +611,13 @@ class DiveUncombineService {
         waterTemp: Value(keptLead.waterTemp ?? diveRow.waterTemp),
         exitTime: Value(
           keptLead.exitTime?.millisecondsSinceEpoch ?? diveRow.exitTime,
+        ),
+        // As on a restored dive: without this the surviving dive keeps the
+        // whole combine's runtime after the later segments have left it.
+        runtime: Value(
+          keptLead.exitTime != null && keptLead.entryTime != null
+              ? keptLead.exitTime!.difference(keptLead.entryTime!).inSeconds
+              : keptSpanSeconds,
         ),
         cnsEnd: Value(keptLead.cns ?? diveRow.cnsEnd),
         decoAlgorithm: Value(keptLead.decoAlgorithm ?? diveRow.decoAlgorithm),

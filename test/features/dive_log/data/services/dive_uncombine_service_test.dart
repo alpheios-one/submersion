@@ -306,6 +306,102 @@ void main() {
       }
     });
 
+    test('leaves the logbook entry on the surviving dive', () async {
+      // The confirmation dialog promises buddies, tags, equipment, media,
+      // notes and the dive number stay put. Restored dives are created by
+      // copying the combined dive's row, so every logbook scalar on it was
+      // duplicated onto them until this was pinned: the restored half
+      // claimed the same buddy, divemaster, rating, trip and weighting.
+      final mergedId = await mergeTwoImports();
+      await (db.update(db.dives)..where((t) => t.id.equals(mergedId))).write(
+        const DivesCompanion(
+          name: Value('Blue Hole, second half'),
+          diveNumber: Value(412),
+          buddy: Value('Sam'),
+          diveMaster: Value('Alex'),
+          diverRole: Value('role-guide'),
+          boatName: Value('Sea Wolf'),
+          boatCaptain: Value('Robin'),
+          diveOperator: Value('Reef Divers'),
+          rating: Value(5),
+          isFavorite: Value(true),
+          tripId: Value('trip-1'),
+          courseId: Value('course-1'),
+          diveCenterId: Value('centre-1'),
+          weightAmount: Value(6.5),
+          weightType: Value('integrated'),
+          excludedFromStats: Value(true),
+          excludedFromGasStats: Value(true),
+          importSource: Value('garmin'),
+          importId: Value('import-1'),
+          notes: Value('Two halves of one dive.'),
+          siteId: Value('site-1'),
+          waterType: Value('salt'),
+          visibilityMeters: Value(18),
+        ),
+      );
+
+      final restoredId = (await service.separate(diveId: mergedId)).single;
+
+      final dives = await db.select(db.dives).get();
+      final restored = dives.firstWhere((d) => d.id == restoredId);
+      final kept = dives.firstWhere((d) => d.id == mergedId);
+
+      // None of the logbook entry follows.
+      expect(restored.name, isNull);
+      expect(restored.diveNumber, isNull);
+      expect(restored.buddy, isNull);
+      expect(restored.diveMaster, isNull);
+      expect(restored.diverRole, isNull);
+      expect(restored.boatName, isNull);
+      expect(restored.boatCaptain, isNull);
+      expect(restored.diveOperator, isNull);
+      expect(restored.rating, isNull);
+      expect(restored.isFavorite, isFalse);
+      expect(restored.tripId, isNull);
+      expect(restored.courseId, isNull);
+      expect(restored.diveCenterId, isNull);
+      expect(restored.weightAmount, isNull);
+      expect(restored.weightType, isNull);
+      expect(restored.importSource, isNull);
+      expect(restored.importId, isNull);
+      expect(restored.notes, '');
+      // A restored dive must not be silently hidden from statistics.
+      expect(restored.excludedFromStats, isFalse);
+      expect(restored.excludedFromGasStats, isFalse);
+
+      // What describes the dive itself does follow: the site and the water
+      // it happened in are true of both halves.
+      expect(restored.siteId, 'site-1');
+      expect(restored.waterType, 'salt');
+      expect(restored.visibilityMeters, 18);
+
+      // And the surviving dive keeps all of it.
+      expect(kept.buddy, 'Sam');
+      expect(kept.diveNumber, 412);
+      expect(kept.rating, 5);
+      expect(kept.tripId, 'trip-1');
+      expect(kept.notes, 'Two halves of one dive.');
+    });
+
+    test('gives each dive its own runtime, not the combined total', () async {
+      final mergedId = await mergeTwoImports();
+      final merged = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(mergedId))).getSingle();
+
+      final restoredId = (await service.separate(diveId: mergedId)).single;
+
+      final dives = await db.select(db.dives).get();
+      final restored = dives.firstWhere((d) => d.id == restoredId);
+      final kept = dives.firstWhere((d) => d.id == mergedId);
+      // a spans 0..1800 s and b 3600..4800 s on the combined timeline, so
+      // the combine runs 4800 s and neither half may keep that.
+      expect(merged.runtime, greaterThan(4000));
+      expect(kept.runtime, 1800);
+      expect(restored.runtime, 1200);
+    });
+
     test('summarises each restored dive from its own samples', () async {
       // backfillPrimaryDataSource mints a provenance row from the dive it
       // found, so a legacy dive with no bottom_time carries none here. The
