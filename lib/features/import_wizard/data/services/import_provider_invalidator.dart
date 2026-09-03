@@ -65,7 +65,8 @@ void invalidateImportRelatedProviders(
         invalidate(allEquipmentProvider);
         invalidate(activeEquipmentProvider);
         invalidate(retiredEquipmentProvider);
-        invalidate(serviceDueEquipmentProvider);
+        // Base clock evaluation: the service-due list derives from it.
+        invalidate(activeEquipmentClocksProvider);
         invalidate(equipmentListNotifierProvider);
 
       case ImportEntityType.equipmentSets:

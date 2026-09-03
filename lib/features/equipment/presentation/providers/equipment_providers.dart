@@ -237,16 +237,25 @@ final equipmentTripIdsProvider = FutureProvider.family<List<String>, String>((
   return repository.getTripIdsForEquipment(equipmentId);
 });
 
-/// Equipment with service due provider
+/// Active gear with at least one service clock due soon or overdue, worst
+/// first.
+///
+/// Reads the service ledger (schedules + records + usage, via
+/// [dueClocksProvider]), the same source as the row badges and the dashboard
+/// card. It must not go back to the legacy `EquipmentItem.isServiceDue`
+/// getter: that reads `serviceIntervalDays`, a column the v122/v131
+/// migrations copied into the ledger and no in-app editor writes any more, so
+/// the Service Due filter always came back empty while the badges said
+/// overdue.
 final serviceDueEquipmentProvider = FutureProvider<List<EquipmentItem>>((
   ref,
 ) async {
-  final repository = ref.watch(equipmentRepositoryProvider);
-  final validatedDiverId = await ref.watch(
-    validatedCurrentDiverIdProvider.future,
-  );
-  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
-  return repository.getEquipmentWithServiceDue(diverId: validatedDiverId);
+  final due = await ref.watch(dueClocksProvider.future);
+  final items = <String, EquipmentItem>{};
+  for (final clock in due) {
+    items.putIfAbsent(clock.item.id, () => clock.item);
+  }
+  return items.values.toList();
 });
 
 /// Equipment search provider
@@ -320,7 +329,9 @@ class EquipmentListNotifier
     _ref.invalidate(activeEquipmentProvider);
     _ref.invalidate(retiredEquipmentProvider);
     _ref.invalidate(allEquipmentProvider);
-    _ref.invalidate(serviceDueEquipmentProvider);
+    // The service-due list derives from the clock evaluation, which caches per
+    // item; invalidating the leaf alone would replay the cached verdicts.
+    _ref.invalidate(activeEquipmentClocksProvider);
     // Invalidate all status filters
     for (final status in EquipmentStatus.values) {
       _ref.invalidate(equipmentByStatusProvider(status));
@@ -456,7 +467,9 @@ class ServiceRecordNotifier
     _ref.invalidate(equipmentItemProvider(equipmentId));
     // A new record of kind X resets clock X: re-evaluate clocks and lists.
     _ref.invalidate(serviceClockStatusesProvider(equipmentId));
-    _ref.invalidate(dueClocksProvider);
+    // The base evaluation, not the derived lists: dueClocksProvider and the
+    // service-due list would otherwise rebuild off its cached verdicts.
+    _ref.invalidate(activeEquipmentClocksProvider);
   }
 
   Future<ServiceRecord> addRecord(ServiceRecord record) async {
