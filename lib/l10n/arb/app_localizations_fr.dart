@@ -34046,7 +34046,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String autoUpdate_banner_packageManagerHint(String command) {
-    return 'Mettre a jour avec : $command';
+    return 'Mettre à jour avec : $command';
   }
 
   @override

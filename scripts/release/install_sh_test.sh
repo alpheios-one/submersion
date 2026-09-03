@@ -100,6 +100,33 @@ arch="$(stub_path arch pacman)"
 assert_eq "$(PATH="$arch" detect_manager)" "pacman" \
   "detects pacman on an Arch host"
 
+# preflight_targets decides what gets checked. When it returns nothing useful
+# the installer must say so rather than reporting that every library resolves,
+# which is what the previous lib/*.so* glob did when it failed to expand.
+bundle="$WORKDIR/bundle"
+mkdir -p "$bundle/lib"
+: > "$bundle/submersion"
+: > "$bundle/lib/libsqlcipher.so"
+: > "$bundle/lib/libpdfium.so.1"
+: > "$bundle/lib/notes.txt"
+
+assert_eq "$(preflight_targets "$bundle" | wc -l | tr -d ' ')" "3" \
+  "collects the binary and both shared libraries"
+
+assert_eq "$(preflight_targets "$bundle" | grep -c 'notes.txt')" "0" \
+  "ignores non-library files in lib/"
+
+nolib="$WORKDIR/nolib"
+mkdir -p "$nolib"
+: > "$nolib/submersion"
+assert_eq "$(preflight_targets "$nolib" | wc -l | tr -d ' ')" "1" \
+  "returns just the binary when lib/ is absent"
+
+empty="$WORKDIR/empty"
+mkdir -p "$empty"
+assert_eq "$(preflight_targets "$empty")" "" \
+  "returns nothing when there is no binary, so preflight can report it"
+
 if [ "$FAILURES" -gt 0 ]; then
   echo "$FAILURES test(s) failed"
   exit 1

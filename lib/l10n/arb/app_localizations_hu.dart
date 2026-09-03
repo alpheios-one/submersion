@@ -33804,7 +33804,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String autoUpdate_banner_packageManagerHint(String command) {
-    return 'Frissites: $command';
+    return 'Frissítés: $command';
   }
 
   @override

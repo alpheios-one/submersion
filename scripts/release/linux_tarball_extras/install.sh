@@ -51,13 +51,44 @@ detect_manager() {
   echo ""
 }
 
+preflight_targets() {
+  # One path per line: the binary plus every bundled shared library.
+  #
+  # Built explicitly rather than with a "$here"/lib/*.so* glob. An unmatched
+  # glob passes its literal pattern to ldd, which then fails; because
+  # preflight is called guarded by ||, set -e is suppressed and the failure
+  # leaves `missing` empty, so the installer reports "All shared libraries
+  # resolve" without having checked a single one.
+  local here="$1"
+  [ -f "$here/submersion" ] && echo "$here/submersion"
+  if [ -d "$here/lib" ]; then
+    find "$here/lib" -maxdepth 1 -type f -name '*.so*' 2>/dev/null | sort
+  fi
+}
+
 preflight() {
   # Turns a loader error into the exact command that fixes it.
   local here="$1"
-  local manager missing packages command package soname
+  local manager missing packages command package soname targets
   manager="$(detect_manager)"
-  missing="$(ldd "$here/submersion" "$here"/lib/*.so* 2>/dev/null \
-    | awk '/not found/ {print $1}' | sort -u)"
+
+  targets="$(preflight_targets "$here")"
+  if [ -z "$targets" ]; then
+    echo "No Submersion binary found here. Run install.sh from inside the"
+    echo "unpacked tarball."
+    return 1
+  fi
+
+  if ! command -v ldd > /dev/null 2>&1; then
+    echo "ldd is not available, so shared libraries were not checked."
+    return 0
+  fi
+
+  missing="$(
+    printf '%s\n' "$targets" | while IFS= read -r target; do
+      ldd "$target" 2>/dev/null | awk '/not found/ {print $1}' || true
+    done | sort -u
+  )"
 
   if [ -z "$missing" ]; then
     echo "All shared libraries resolve."
