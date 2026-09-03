@@ -276,6 +276,28 @@ if(WIN32)
     target_link_libraries(test_multi_transmitter_pressure PRIVATE SetupAPI.lib ws2_32.lib)
 endif()
 
+# Regression test for issue #1481: since APOS5 firmware 5.2.11 the Ratio iX3M 2
+# packs tank data into the high bits of the sample record type, and the parser
+# skipped every record whose type was not literally 0, so dives imported as
+# 0 m / 0 min. Goes through the wrapper so the whole parse path is covered.
+add_executable(test_ratio_ix3m2_record_type
+    test_ratio_ix3m2_record_type.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${WRAPPER_DIR}/libdc_download.c
+    ${LIBDC_ALL_SOURCES}
+)
+target_include_directories(test_ratio_ix3m2_record_type PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${PLATFORM_CONFIG_DIR}
+)
+target_compile_definitions(test_ratio_ix3m2_record_type PRIVATE HAVE_CONFIG_H)
+if(WIN32)
+    target_compile_definitions(test_ratio_ix3m2_record_type PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_link_libraries(test_ratio_ix3m2_record_type PRIVATE SetupAPI.lib ws2_32.lib)
+endif()
+
 enable_testing()
 add_test(NAME test_dive_converter COMMAND test_dive_converter)
 add_test(NAME test_serial_callbacks COMMAND test_serial_callbacks)
@@ -296,3 +318,4 @@ add_test(NAME test_multi_transmitter_pressure COMMAND test_multi_transmitter_pre
 add_test(NAME test_shearwater_o2_millivolt COMMAND test_shearwater_o2_millivolt
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+add_test(NAME test_ratio_ix3m2_record_type COMMAND test_ratio_ix3m2_record_type)
