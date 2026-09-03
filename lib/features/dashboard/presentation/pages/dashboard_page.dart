@@ -153,7 +153,13 @@ bool _hasSafetyAlert(DashboardGauges g) {
       insurance != null &&
       !(insurance.provider?.isEmpty ?? true) &&
       insurance.isExpired;
-  return g.gearGauges.any(
+  // Overflow counts as overdue gear in its own right. With the shipped caps
+  // it can only be positive alongside a shown overdue gauge, so this clause
+  // is currently redundant; it is here so the guard states the same rule
+  // GaugeStrip does (an alert-tone "+N more overdue" chip), rather than
+  // depending on the cap values to keep the two in agreement.
+  return g.gearOverdueOverflow > 0 ||
+      g.gearGauges.any(
         (gauge) => gauge.status.severity == ServiceClockSeverity.overdue,
       ) ||
       expiredPolicy ||

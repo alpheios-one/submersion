@@ -342,6 +342,32 @@ void main() {
     expect(find.byType(GaugeStrip), findsOneWidget);
   });
 
+  testWidgets('overdue overflow alone forces the gauge strip back on', (
+    tester,
+  ) async {
+    // Pins the guard to GaugeStrip's own alert definition rather than to the
+    // cap values: the strip renders an alert-tone "+N more overdue" chip
+    // whenever the overflow is positive, so the page must force the strip
+    // open in that state even with no overdue gauge in the shown list.
+    await pumpDashboard(
+      tester,
+      gauges: const DashboardGauges(
+        gearGauges: [],
+        gearOverdueOverflow: 2,
+        hasGear: true,
+        insurance: null,
+        noFlyStatus: null,
+        daysSinceLastDive: null,
+      ),
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
+      ),
+    );
+
+    expect(find.byType(GaugeStrip), findsOneWidget);
+    expect(find.text('+2 more overdue'), findsOneWidget);
+  });
+
   testWidgets('hiding the gauge strip works when no alert is live', (
     tester,
   ) async {
