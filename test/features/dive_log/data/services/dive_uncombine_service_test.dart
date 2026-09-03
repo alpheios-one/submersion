@@ -9,6 +9,7 @@ import 'package:submersion/features/dive_log/data/services/dive_uncombine_servic
 import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
+import 'package:submersion/features/dive_log/domain/services/unreadable_series_exception.dart';
 
 import '../../../../helpers/test_database.dart';
 
@@ -336,6 +337,26 @@ void main() {
       // a: samples 0/900/1800 at depths 0/10/0, threshold 6 m.
       expect(kept.maxDepth, 10);
       expect(kept.bottomTime, 900);
+    });
+
+    test('refuses a dive whose series cannot be decoded', () async {
+      // Reads answer an undecodable blob with null, so such a series is
+      // invisible to the grouping: its samples would neither move nor be
+      // trimmed while the tank beneath it was cloned away. The guard runs
+      // inside the transaction with every other read, so nothing is written
+      // before it fires.
+      final mergedId = await mergeTwoImports();
+      final row = (await profileSeries.getRowsForDives([mergedId])).first;
+      await db.customStatement(
+        'UPDATE dive_profile_series SET samples = ? WHERE id = ?',
+        [Uint8List.fromList(row.samples)..[3] ^= 0xFF, row.id],
+      );
+
+      await expectLater(
+        service.separate(diveId: mergedId),
+        throwsA(isA<UnreadableSeriesException>()),
+      );
+      expect(await db.select(db.dives).get(), hasLength(1));
     });
 
     test('refuses a dive that reads as one segment', () async {

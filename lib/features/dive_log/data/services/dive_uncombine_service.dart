@@ -116,33 +116,9 @@ class DiveUncombineService {
   /// [UnreadableSeriesException] when any of the dive's series fails to
   /// decode. All-or-nothing: one transaction, full rollback on any failure.
   Future<List<String>> separate({required String diveId}) async {
-    // Every series has to decode before anything moves. A series that reads
-    // as null (an unreadable blob) is invisible to the grouping below, so its
-    // samples would neither move nor be trimmed while the tank beneath it was
-    // cloned away. Split, merge and consolidate open with the same guard.
-    final unreadable = [
-      ...await _profileSeries.unreadableSeriesIds([diveId]),
-      ...await _tankSeries.unreadableSeriesIds([diveId]),
-    ];
-    if (unreadable.isNotEmpty) throw UnreadableSeriesException(unreadable);
-
-    final diveRow = await (_db.select(
-      _db.dives,
-    )..where((t) => t.id.equals(diveId))).getSingle();
-    final sourceRows = await _sourceRows(diveId);
-    final segments = _segmentsOf(
-      rows: sourceRows,
-      seriesRows: await _profileSeries.getRowsForDives([diveId]),
-      diveRow: diveRow,
-      gaps: await _gapsOf(diveId),
-    );
-    if (segments.length < 2) {
-      throw ArgumentError('dive $diveId does not read as a combined dive');
-    }
-
-    final sourceById = {for (final row in sourceRows) row.id: row};
     final newDiveIds = <String>[];
     final now = DateTime.now().millisecondsSinceEpoch;
+    var segmentCount = 0;
 
     // The whole write is one transaction, so a failure anywhere rolls the
     // separation back and the user is told it did not happen. That is the
@@ -151,9 +127,28 @@ class DiveUncombineService {
     // database says a separation was ever attempted.
     try {
       await _db.transaction(() async {
-        // Read inside the transaction: a read outside is a torn one, deciding
-        // what moves from a snapshot another writer can change before the
-        // moves are applied.
+        // EVERY read is inside the transaction, the plan included. A read
+        // outside is a torn one, deciding what moves from a snapshot another
+        // writer can change before the moves are applied -- and the segment
+        // plan is the most consequential of those decisions, since it names
+        // which provenance rows leave the dive. Both guards below are reads
+        // too, so they belong in here with the rest.
+        //
+        // Every series has to decode before anything moves. A series that
+        // reads as null (an unreadable blob) is invisible to the grouping
+        // below, so its samples would neither move nor be trimmed while the
+        // tank beneath it was cloned away. Split, merge and consolidate open
+        // with the same guard.
+        final unreadable = [
+          ...await _profileSeries.unreadableSeriesIds([diveId]),
+          ...await _tankSeries.unreadableSeriesIds([diveId]),
+        ];
+        if (unreadable.isNotEmpty) throw UnreadableSeriesException(unreadable);
+
+        final diveRow = await (_db.select(
+          _db.dives,
+        )..where((t) => t.id.equals(diveId))).getSingle();
+        final sourceRows = await _sourceRows(diveId);
         final allSeries = await _profileSeries.getSeriesForDive(diveId);
         final allPressures = await _tankSeries.getSeriesForDive(diveId);
         final allTanks = await (_db.select(
@@ -166,6 +161,18 @@ class DiveUncombineService {
           _db.gasSwitches,
         )..where((t) => t.diveId.equals(diveId))).get();
         final gaps = MergeGapFill.readFrom(allEvents);
+
+        final segments = _segmentsOf(
+          rows: sourceRows,
+          seriesRows: await _profileSeries.getRowsForDives([diveId]),
+          diveRow: diveRow,
+          gaps: gaps,
+        );
+        segmentCount = segments.length;
+        if (segments.length < 2) {
+          throw ArgumentError('dive $diveId does not read as a combined dive');
+        }
+        final sourceById = {for (final row in sourceRows) row.id: row};
 
         for (final segment in segments.skip(1)) {
           newDiveIds.add(
@@ -224,7 +231,7 @@ class DiveUncombineService {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to separate combined dive: $diveId '
-        '(${segments.length} segments)',
+        '($segmentCount segments)',
         error: e,
         stackTrace: stackTrace,
       );
