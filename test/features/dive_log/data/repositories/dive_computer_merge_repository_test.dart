@@ -590,6 +590,8 @@ void main() {
     test('counts each dive once across every referencing table', () async {
       await insertComputer(id: 'a');
       await insertComputer(id: 'b');
+      // A third record so the a-and-b case has a survivor outside the pair.
+      await insertComputer(id: 'c');
       await insertDive('d1', computerId: 'b');
       await insertDive('d2', computerId: 'a');
       await insertDive('d3');
@@ -598,9 +600,105 @@ void main() {
       await insertTank('t', diveId: 'd3');
       await insertTankSeries('ts3', diveId: 'd3', tankId: 't', computerId: 'b');
 
-      expect(await repository.countAffectedDives(['b']), 2);
-      expect(await repository.countAffectedDives(['a', 'b']), 3);
-      expect(await repository.countAffectedDives(const []), 0);
+      expect(
+        await repository.countAffectedDives(
+          survivorId: 'a',
+          duplicateIds: ['b'],
+        ),
+        2,
+      );
+      expect(
+        await repository.countAffectedDives(
+          survivorId: 'c',
+          duplicateIds: ['a', 'b'],
+        ),
+        3,
+      );
+      expect(
+        await repository.countAffectedDives(
+          survivorId: 'a',
+          duplicateIds: const [],
+        ),
+        0,
+      );
+      // The survivor is never one of the duplicates it absorbs.
+      expect(
+        await repository.countAffectedDives(
+          survivorId: 'a',
+          duplicateIds: ['a'],
+        ),
+        0,
+      );
+    });
+
+    test(
+      'counts a dive that references a duplicate through gear only',
+      () async {
+        await insertEquipment('gear-a');
+        await insertEquipment('gear-b');
+        await insertComputer(id: 'a', equipmentId: 'gear-a');
+        await insertComputer(id: 'b', equipmentId: 'gear-b');
+        // d1 carries no computer_id anywhere: the duplicate reaches it solely
+        // through the gear twin the merge is about to repoint.
+        await insertDive('d1');
+        await linkDiveEquipment('d1', 'gear-b');
+
+        final preview = await repository.countAffectedDives(
+          survivorId: 'a',
+          duplicateIds: ['b'],
+        );
+        final result = await repository.mergeComputers(
+          survivorId: 'a',
+          duplicateIds: ['b'],
+        );
+
+        expect(preview, 1);
+        expect(result.movedDiveCount, preview);
+      },
+    );
+
+    test('does not count gear links the survivor already holds', () async {
+      await insertEquipment('gear');
+      await insertComputer(id: 'a', equipmentId: 'gear');
+      await insertComputer(id: 'b', equipmentId: 'gear');
+      await insertDive('d1');
+      await linkDiveEquipment('d1', 'gear');
+
+      // Both records share one twin, the common case when the identity
+      // resolver matched them by serial. Nothing moves.
+      expect(
+        await repository.countAffectedDives(
+          survivorId: 'a',
+          duplicateIds: ['b'],
+        ),
+        0,
+      );
+    });
+
+    test('counts gear links against the twin the survivor adopts', () async {
+      await insertEquipment('gear-b');
+      await insertEquipment('gear-c');
+      await insertComputer(id: 'a', equipmentId: null);
+      await insertComputer(id: 'b', equipmentId: 'gear-b');
+      await insertComputer(id: 'c', equipmentId: 'gear-c');
+      await insertDive('d1');
+      await insertDive('d2');
+      await linkDiveEquipment('d1', 'gear-b');
+      await linkDiveEquipment('d2', 'gear-c');
+
+      // The survivor has no twin, so it adopts gear-b from the first
+      // duplicate. Only gear-c's links move.
+      final preview = await repository.countAffectedDives(
+        survivorId: 'a',
+        duplicateIds: ['b', 'c'],
+      );
+      final result = await repository.mergeComputers(
+        survivorId: 'a',
+        duplicateIds: ['b', 'c'],
+      );
+
+      expect(preview, 1);
+      expect(result.movedDiveCount, preview);
     });
   });
 }

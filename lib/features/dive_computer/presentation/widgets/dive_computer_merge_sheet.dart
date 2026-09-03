@@ -60,18 +60,21 @@ class _DiveComputerMergeSheetState
   void _reloadAffectedDives() {
     _affectedDives = null;
     logFailure(
-      _loadAffectedDives(_duplicateIds),
+      _loadAffectedDives(_survivorId, _duplicateIds),
       _DiveComputerMergeSheetState,
       'count affected dives',
     );
   }
 
-  Future<void> _loadAffectedDives(List<String> duplicateIds) async {
+  Future<void> _loadAffectedDives(
+    String survivorId,
+    List<String> duplicateIds,
+  ) async {
     final count = await ref
         .read(diveComputerMergeRepositoryProvider)
-        .countAffectedDives(duplicateIds);
+        .countAffectedDives(survivorId: survivorId, duplicateIds: duplicateIds);
     // The survivor may have changed while the count was in flight.
-    if (mounted && _duplicateIds.join(',') == duplicateIds.join(',')) {
+    if (mounted && survivorId == _survivorId) {
       setState(() => _affectedDives = count);
     }
   }

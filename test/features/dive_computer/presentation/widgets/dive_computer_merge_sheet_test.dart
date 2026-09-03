@@ -31,10 +31,15 @@ DiveComputer _computer({
 /// Stands in for the database-backed count.
 class _FakeMergeRepository implements DiveComputerMergeRepository {
   final requested = <List<String>>[];
+  final requestedSurvivors = <String>[];
 
   @override
-  Future<int> countAffectedDives(List<String> computerIds) async {
-    requested.add(computerIds);
+  Future<int> countAffectedDives({
+    required String survivorId,
+    required List<String> duplicateIds,
+  }) async {
+    requestedSurvivors.add(survivorId);
+    requested.add(duplicateIds);
     return 5;
   }
 
@@ -151,8 +156,10 @@ void main() {
         find.text('5 dives will move to the record you keep.'),
         findsOneWidget,
       );
-      // The count is for the records that will be folded in, not the survivor.
+      // The count is for the records that will be folded in, not the survivor,
+      // and the survivor goes with it: it decides which gear links move.
       expect(mergeRepository.requested.last, ['a']);
+      expect(mergeRepository.requestedSurvivors.last, 'b');
       expect(
         find.text('Shearwater Petrel 3 · Serial 3101949313 · 21 dives'),
         findsOneWidget,
@@ -213,6 +220,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('merge_keep_b')));
       await tester.pumpAndSettle();
       expect(mergeRepository.requested.last, ['a']);
+      expect(mergeRepository.requestedSurvivors.last, 'b');
 
       await tester.tap(find.byKey(const ValueKey('merge_confirm')));
       await tester.pumpAndSettle();

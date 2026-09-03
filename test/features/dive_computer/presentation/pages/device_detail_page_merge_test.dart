@@ -33,7 +33,10 @@ DiveComputer _computer({
 
 class _FakeMergeRepository implements DiveComputerMergeRepository {
   @override
-  Future<int> countAffectedDives(List<String> computerIds) async => 2;
+  Future<int> countAffectedDives({
+    required String survivorId,
+    required List<String> duplicateIds,
+  }) async => 2;
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;

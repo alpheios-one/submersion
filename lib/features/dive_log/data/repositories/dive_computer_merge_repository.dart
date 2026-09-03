@@ -58,10 +58,85 @@ class DiveComputerMergeRepository {
 
   db.AppDatabase get _db => DatabaseService.instance.database;
 
-  /// Distinct dives that reference any of [computerIds] through any table.
-  Future<int> countAffectedDives(List<String> computerIds) async {
-    if (computerIds.isEmpty) return 0;
-    return (await _affectedDiveIds(computerIds)).length;
+  /// Distinct dives a merge of [duplicateIds] into [survivorId] would move.
+  ///
+  /// Takes the survivor because gear links are counted the way the merge
+  /// moves them: a dive can reference a duplicate through its gear twin
+  /// alone, and whether that link moves depends on which twin the survivor
+  /// ends up with.
+  Future<int> countAffectedDives({
+    required String survivorId,
+    required List<String> duplicateIds,
+  }) async {
+    final duplicates = _duplicatesToMerge(survivorId, duplicateIds);
+    if (duplicates.isEmpty) return 0;
+
+    final rows = await (_db.select(
+      _db.diveComputers,
+    )..where((t) => t.id.isIn([survivorId, ...duplicates]))).get();
+    final byId = {for (final row in rows) row.id: row};
+
+    final ids = await _affectedDiveIds(duplicates);
+    ids.addAll(
+      await _gearLinkedDiveIds(
+        survivorTwinId: _adoptedTwinId(survivorId, duplicates, byId),
+        duplicateTwinIds: {for (final id in duplicates) ?byId[id]?.equipmentId},
+      ),
+    );
+    return ids.length;
+  }
+
+  /// The duplicates a merge actually folds in: [duplicateIds] without the
+  /// survivor and without repeats, in the order given.
+  List<String> _duplicatesToMerge(
+    String survivorId,
+    List<String> duplicateIds,
+  ) => duplicateIds
+      .where((id) => id != survivorId)
+      .toSet()
+      .toList(growable: false);
+
+  /// The gear twin the survivor holds after the merge: its own, else the
+  /// first one a duplicate has. Mirrors `mergedDiveComputer`, which fills the
+  /// survivor's blank `equipmentId` from the first duplicate that has one.
+  String? _adoptedTwinId(
+    String survivorId,
+    List<String> duplicateIds,
+    Map<String, db.DiveComputer> byId,
+  ) {
+    for (final id in [survivorId, ...duplicateIds]) {
+      final twin = byId[id]?.equipmentId;
+      if (twin != null && twin.trim().isNotEmpty) return twin;
+    }
+    return null;
+  }
+
+  /// The duplicate twins whose dive links move onto [survivorTwinId]. A twin
+  /// the survivor already holds keeps its links where they are.
+  List<String> _twinsToMove(
+    String? survivorTwinId,
+    Set<String> duplicateTwinIds,
+  ) => survivorTwinId == null
+      ? const []
+      : duplicateTwinIds
+            .where((id) => id != survivorTwinId)
+            .toList(growable: false);
+
+  /// Dives that reference a duplicate through its gear twin alone. These
+  /// carry no `computer_id` of their own, so [_affectedDiveIds] cannot see
+  /// them, but [_repointGearLinks] moves and restamps them.
+  Future<Set<String>> _gearLinkedDiveIds({
+    required String? survivorTwinId,
+    required Set<String> duplicateTwinIds,
+  }) async {
+    final fromTwins = _twinsToMove(survivorTwinId, duplicateTwinIds);
+    if (fromTwins.isEmpty) return {};
+    final rows =
+        await (_db.selectOnly(_db.diveEquipment)
+              ..addColumns([_db.diveEquipment.diveId])
+              ..where(_db.diveEquipment.equipmentId.isIn(fromTwins)))
+            .get();
+    return {for (final row in rows) row.read(_db.diveEquipment.diveId)!};
   }
 
   /// Folds [duplicateIds] into [survivorId].
@@ -72,10 +147,7 @@ class DiveComputerMergeRepository {
     required String survivorId,
     required List<String> duplicateIds,
   }) async {
-    final duplicates = duplicateIds
-        .where((id) => id != survivorId)
-        .toSet()
-        .toList(growable: false);
+    final duplicates = _duplicatesToMerge(survivorId, duplicateIds);
     if (duplicates.isEmpty) {
       throw ArgumentError.value(
         duplicateIds,
@@ -312,12 +384,12 @@ class DiveComputerMergeRepository {
   }) async {
     final touched = <String>{};
     if (survivorTwinId == null) return touched;
-    final fromTwins = duplicateTwinIds.where((id) => id != survivorTwinId);
+    final fromTwins = _twinsToMove(survivorTwinId, duplicateTwinIds);
     if (fromTwins.isEmpty) return touched;
 
     final links = await (_db.select(
       _db.diveEquipment,
-    )..where((t) => t.equipmentId.isIn(fromTwins.toList()))).get();
+    )..where((t) => t.equipmentId.isIn(fromTwins))).get();
     if (links.isEmpty) return touched;
 
     final alreadyLinked =
