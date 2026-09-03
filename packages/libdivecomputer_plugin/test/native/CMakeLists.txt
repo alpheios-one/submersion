@@ -298,6 +298,28 @@ if(WIN32)
     target_link_libraries(test_ratio_ix3m2_record_type PRIVATE SetupAPI.lib ws2_32.lib)
 endif()
 
+# PR #342: the Cressi Leonardo logs a deco obligation in bit 11 of each sample
+# word and grades its ascent rate 0-3, of which only level 3 sounds the alarm.
+# Goes through the wrapper, because what the parser may leave unreported
+# depends on the wrapper carrying deco state forward across samples.
+add_executable(test_cressi_leonardo_deco
+    test_cressi_leonardo_deco.c
+    ${WRAPPER_DIR}/libdc_wrapper.c
+    ${WRAPPER_DIR}/libdc_download.c
+    ${LIBDC_ALL_SOURCES}
+)
+target_include_directories(test_cressi_leonardo_deco PRIVATE
+    ${WRAPPER_DIR}
+    ${LIBDC_DIR}/include
+    ${LIBDC_DIR}/src
+    ${PLATFORM_CONFIG_DIR}
+)
+target_compile_definitions(test_cressi_leonardo_deco PRIVATE HAVE_CONFIG_H)
+if(WIN32)
+    target_compile_definitions(test_cressi_leonardo_deco PRIVATE _CRT_SECURE_NO_WARNINGS)
+    target_link_libraries(test_cressi_leonardo_deco PRIVATE SetupAPI.lib ws2_32.lib)
+endif()
+
 enable_testing()
 add_test(NAME test_dive_converter COMMAND test_dive_converter)
 add_test(NAME test_serial_callbacks COMMAND test_serial_callbacks)
@@ -319,3 +341,4 @@ add_test(NAME test_shearwater_o2_millivolt COMMAND test_shearwater_o2_millivolt
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 )
 add_test(NAME test_ratio_ix3m2_record_type COMMAND test_ratio_ix3m2_record_type)
+add_test(NAME test_cressi_leonardo_deco COMMAND test_cressi_leonardo_deco)
