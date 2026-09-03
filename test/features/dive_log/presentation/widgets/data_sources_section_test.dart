@@ -1357,6 +1357,7 @@ void main() {
     testWidgets('hides Separate when onSeparate is null', (tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           child: SingleChildScrollView(
             child: DataSourcesSection(
               dataSources: [_makeSource()],
@@ -1382,6 +1383,7 @@ void main() {
 
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           child: SingleChildScrollView(
             child: DataSourcesSection(
               dataSources: [_makeSource(computerId: null)],
@@ -1406,6 +1408,7 @@ void main() {
         'dive', (tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           child: SingleChildScrollView(
             child: DataSourcesSection(
               dataSources: [
