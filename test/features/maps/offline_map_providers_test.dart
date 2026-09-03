@@ -117,12 +117,20 @@ class _FakeTileCache implements TileCacheService {
     return prunedStores;
   }
 
+  /// Holds the cancellation open partway through, modelling the service: it
+  /// awaits the download instance's own cancel before it cancels the
+  /// subscription and closes the controller, so a tick can still arrive in
+  /// between and reach a caller that is still in its `await for`.
+  Completer<void>? cancelGate;
+
   @override
   Future<void> cancelDownload() async {
     calls.add('cancel');
     // Nothing to cancel until the download has started, exactly as in the
     // service, where the instance id is not assigned until then.
     if (!downloadStarted) return;
+    final gate = cancelGate;
+    if (gate != null) await gate.future;
     // Not awaited: close() on a controller nobody listened to completes only
     // once a subscriber drains it.
     if (!progress.isClosed) unawaited(progress.close());
@@ -727,6 +735,50 @@ void main() {
       expect(state.regionName, 'Bonaire');
       expect(state.error, isNull);
 
+      await notifier.cancelDownload();
+      await second;
+    });
+
+    test('stops writing progress once it has been replaced', () async {
+      // Cancelling is not instant: the service cancels the download instance
+      // and only then cancels the subscription, so a superseded download can
+      // emit a tick or two on the way out. Written to the shared card those
+      // numbers land under the new download's name, and the diver reads the
+      // abandoned region's tile counts as the progress of the one they just
+      // started.
+      final notifier = container.read(downloadProgressProvider.notifier);
+      final first = start(notifier, 'Cozumel');
+      await Future<void>.delayed(Duration.zero);
+
+      cache.cancelGate = Completer<void>();
+      final second = start(notifier, 'Bonaire');
+      await Future<void>.delayed(Duration.zero);
+
+      // The first download's stream is still open, and it is no longer the one
+      // on screen.
+      cache.progress.add(
+        const TileDownloadProgress(
+          downloadedTiles: 999,
+          totalTiles: 1000,
+          failedTiles: 7,
+          tilesPerSecond: 42,
+          isComplete: false,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      final state = container.read(downloadProgressProvider);
+      expect(state.regionName, 'Bonaire');
+      expect(
+        state.downloadedTiles,
+        0,
+        reason: "the abandoned region's tiles are not the new one's progress",
+      );
+      expect(state.totalTiles, 0);
+      expect(state.failedTiles, 0);
+
+      cache.cancelGate!.complete();
+      await first;
       await notifier.cancelDownload();
       await second;
     });

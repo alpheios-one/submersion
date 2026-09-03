@@ -188,13 +188,20 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
       await for (final progress in stream) {
         downloadedTiles = progress.downloadedTiles;
 
-        state = state.copyWith(
-          progress: progress.percentComplete,
-          downloadedTiles: progress.downloadedTiles,
-          totalTiles: progress.totalTiles,
-          failedTiles: progress.failedTiles,
-          tilesPerSecond: progress.tilesPerSecond,
-        );
+        // Cancelling is not instant: the service cancels the download instance
+        // and only then cancels the subscription, so a superseded download
+        // emits a tick or two on the way out. Those numbers describe a region
+        // the diver has moved on from, and on the shared card they appear
+        // under the new download's name.
+        if (_isCurrent(regionId)) {
+          state = state.copyWith(
+            progress: progress.percentComplete,
+            downloadedTiles: progress.downloadedTiles,
+            totalTiles: progress.totalTiles,
+            failedTiles: progress.failedTiles,
+            tilesPerSecond: progress.tilesPerSecond,
+          );
+        }
       }
 
       if (_cancelledRegionIds.contains(regionId)) {
