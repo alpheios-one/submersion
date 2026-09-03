@@ -26423,6 +26423,12 @@ abstract class AppLocalizations {
   /// **'Authorization code'**
   String get settings_cloudSync_dropbox_connect_codeLabel;
 
+  /// No description provided for @settings_cloudSync_dropbox_connect_copyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the link.'**
+  String get settings_cloudSync_dropbox_connect_copyFailed;
+
   /// No description provided for @settings_cloudSync_dropbox_connect_copyLink.
   ///
   /// In en, this message translates to:

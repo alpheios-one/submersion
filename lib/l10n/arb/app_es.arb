@@ -4745,6 +4745,7 @@
   "settings_cloudSync_dropbox_account_title": "Cuenta de Dropbox",
   "settings_cloudSync_dropbox_connect_browserFailed": "No se pudo abrir el navegador. Usa Copiar enlace y pega la dirección en tu navegador.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Código de autorización",
+  "settings_cloudSync_dropbox_connect_copyFailed": "No se pudo copiar el enlace.",
   "settings_cloudSync_dropbox_connect_copyLink": "Copiar enlace",
   "settings_cloudSync_dropbox_connect_emptyCode": "Introduce el código de autorización que aparece en tu navegador",
   "settings_cloudSync_dropbox_connect_failed": "No se pudo conectar con Dropbox: {error}",

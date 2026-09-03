@@ -4749,6 +4749,7 @@
   "settings_cloudSync_dropbox_account_title": "חשבון Dropbox",
   "settings_cloudSync_dropbox_connect_browserFailed": "לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.",
   "settings_cloudSync_dropbox_connect_codeLabel": "קוד הרשאה",
+  "settings_cloudSync_dropbox_connect_copyFailed": "לא ניתן להעתיק את הקישור.",
   "settings_cloudSync_dropbox_connect_copyLink": "העתקת קישור",
   "settings_cloudSync_dropbox_connect_emptyCode": "הזן את קוד ההרשאה המוצג בדפדפן שלך",
   "settings_cloudSync_dropbox_connect_failed": "החיבור אל Dropbox נכשל: {error}",

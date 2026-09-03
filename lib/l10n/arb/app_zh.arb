@@ -4909,6 +4909,7 @@
   "settings_cloudSync_dropbox_account_title": "Dropbox 账户",
   "settings_cloudSync_dropbox_connect_browserFailed": "无法打开浏览器。请使用“复制链接”，并将地址粘贴到浏览器中。",
   "settings_cloudSync_dropbox_connect_codeLabel": "授权码",
+  "settings_cloudSync_dropbox_connect_copyFailed": "无法复制链接。",
   "settings_cloudSync_dropbox_connect_copyLink": "复制链接",
   "settings_cloudSync_dropbox_connect_emptyCode": "输入浏览器中显示的授权码",
   "settings_cloudSync_dropbox_connect_failed": "无法连接到 Dropbox：{error}",

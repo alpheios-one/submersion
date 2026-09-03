@@ -4745,6 +4745,7 @@
   "settings_cloudSync_dropbox_account_title": "حساب Dropbox",
   "settings_cloudSync_dropbox_connect_browserFailed": "تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.",
   "settings_cloudSync_dropbox_connect_codeLabel": "رمز التفويض",
+  "settings_cloudSync_dropbox_connect_copyFailed": "تعذر نسخ الرابط.",
   "settings_cloudSync_dropbox_connect_copyLink": "نسخ الرابط",
   "settings_cloudSync_dropbox_connect_emptyCode": "أدخل رمز التفويض الظاهر في متصفحك",
   "settings_cloudSync_dropbox_connect_failed": "فشل الاتصال بـ Dropbox: {error}",

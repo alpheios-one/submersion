@@ -9616,6 +9616,7 @@
   "settings_cloudSync_dropbox_account_title": "Dropbox account",
   "settings_cloudSync_dropbox_connect_browserFailed": "Could not open your browser. Use Copy link and paste the address into your browser.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Authorization code",
+  "settings_cloudSync_dropbox_connect_copyFailed": "Could not copy the link.",
   "settings_cloudSync_dropbox_connect_copyLink": "Copy link",
   "settings_cloudSync_dropbox_connect_emptyCode": "Enter the authorization code shown in your browser",
   "settings_cloudSync_dropbox_connect_failed": "Could not connect to Dropbox: {error}",

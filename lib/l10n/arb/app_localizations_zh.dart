@@ -15177,6 +15177,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_dropbox_connect_codeLabel => '授权码';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed => '无法复制链接。';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => '复制链接';
 
   @override

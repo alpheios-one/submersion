@@ -15568,6 +15568,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_dropbox_connect_codeLabel => 'קוד הרשאה';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed =>
+      'לא ניתן להעתיק את הקישור.';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => 'העתקת קישור';
 
   @override

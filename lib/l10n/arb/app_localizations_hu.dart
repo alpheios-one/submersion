@@ -15906,6 +15906,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Engedélyezési kód';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed =>
+      'Nem sikerült másolni a linket.';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => 'Link másolása';
 
   @override

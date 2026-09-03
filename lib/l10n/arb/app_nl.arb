@@ -4745,6 +4745,7 @@
   "settings_cloudSync_dropbox_account_title": "Dropbox-account",
   "settings_cloudSync_dropbox_connect_browserFailed": "Kan de browser niet openen. Gebruik Link kopiëren en plak het adres in je browser.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Autorisatiecode",
+  "settings_cloudSync_dropbox_connect_copyFailed": "Kan de link niet kopiëren.",
   "settings_cloudSync_dropbox_connect_copyLink": "Link kopiëren",
   "settings_cloudSync_dropbox_connect_emptyCode": "Voer de autorisatiecode in die in je browser wordt weergegeven",
   "settings_cloudSync_dropbox_connect_failed": "Kan geen verbinding maken met Dropbox: {error}",

@@ -15845,6 +15845,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_dropbox_connect_codeLabel => 'Autorisatiecode';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed =>
+      'Kan de link niet kopiëren.';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => 'Link kopiëren';
 
   @override

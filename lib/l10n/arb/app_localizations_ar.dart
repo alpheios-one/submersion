@@ -15681,6 +15681,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_dropbox_connect_codeLabel => 'رمز التفويض';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed =>
+      'تعذر نسخ الرابط.';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => 'نسخ الرابط';
 
   @override

@@ -4745,6 +4745,7 @@
   "settings_cloudSync_dropbox_account_title": "Dropbox-Konto",
   "settings_cloudSync_dropbox_connect_browserFailed": "Der Browser konnte nicht geöffnet werden. Verwenden Sie „Link kopieren“ und fügen Sie die Adresse in Ihren Browser ein.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Autorisierungscode",
+  "settings_cloudSync_dropbox_connect_copyFailed": "Der Link konnte nicht kopiert werden.",
   "settings_cloudSync_dropbox_connect_copyLink": "Link kopieren",
   "settings_cloudSync_dropbox_connect_emptyCode": "Geben Sie den in Ihrem Browser angezeigten Autorisierungscode ein",
   "settings_cloudSync_dropbox_connect_failed": "Verbindung zu Dropbox fehlgeschlagen: {error}",

@@ -15962,6 +15962,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Código de autorización';
 
   @override
+  String get settings_cloudSync_dropbox_connect_copyFailed =>
+      'No se pudo copiar el enlace.';
+
+  @override
   String get settings_cloudSync_dropbox_connect_copyLink => 'Copiar enlace';
 
   @override
