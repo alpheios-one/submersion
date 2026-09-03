@@ -9,6 +9,7 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_archive_section.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_procedure_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -155,6 +156,8 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
               const BlenderBillingCard(),
               const SizedBox(height: 16),
               const BlenderInvoiceCard(),
+              const SizedBox(height: 16),
+              const BlenderInvoiceArchiveSection(),
             ],
           ),
         ),
