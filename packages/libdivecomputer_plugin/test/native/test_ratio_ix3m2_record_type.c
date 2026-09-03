@@ -117,6 +117,17 @@ static unsigned char *build_dive(unsigned int firmware,
     return data;
 }
 
+/* libdc_parse_raw_dive fills a caller-owned struct, so its two heap members
+   (samples and events, the only ones the wrapper allocates) are released
+   individually. libdc_parsed_dive_free() cannot be used here: it also frees the
+   struct itself, which is fine for a heap dive and undefined for this one. */
+static void release(libdc_parsed_dive_t *dive) {
+    free(dive->samples);
+    free(dive->events);
+    dive->samples = NULL;
+    dive->events = NULL;
+}
+
 static void parse(unsigned int firmware, const idive_record_t *records,
                   unsigned int count, libdc_parsed_dive_t *dive) {
     unsigned int size = 0;
@@ -162,11 +173,7 @@ static void test_apos5_samples_are_not_skipped(void) {
     assert(fabs(dive.max_depth - 30.0) < 0.001);
     assert(dive.duration == 50);
 
-    /* libdc_parse_raw_dive fills a caller-owned struct: free its arrays, not it.
-       libdc_parsed_dive_free() also frees the struct, so it is only for heap
-       allocations. */
-    free(dive.samples);
-    free(dive.events);
+    release(&dive);
     printf("PASS: test_apos5_samples_are_not_skipped\n");
 }
 
@@ -185,11 +192,7 @@ static void test_legacy_firmware_still_parses(void) {
     assert(fabs(dive.max_depth - 30.0) < 0.001);
     assert(dive.duration == 50);
 
-    /* libdc_parse_raw_dive fills a caller-owned struct: free its arrays, not it.
-       libdc_parsed_dive_free() also frees the struct, so it is only for heap
-       allocations. */
-    free(dive.samples);
-    free(dive.events);
+    release(&dive);
     printf("PASS: test_legacy_firmware_still_parses\n");
 }
 
@@ -218,11 +221,7 @@ static void test_info_record_still_yields_gps(void) {
     assert(fabs(dive.entry_latitude - 51.23) < 0.0001);
     assert(fabs(dive.entry_longitude - 4.412) < 0.0001);
 
-    /* libdc_parse_raw_dive fills a caller-owned struct: free its arrays, not it.
-       libdc_parsed_dive_free() also frees the struct, so it is only for heap
-       allocations. */
-    free(dive.samples);
-    free(dive.events);
+    release(&dive);
     printf("PASS: test_info_record_still_yields_gps\n");
 }
 
@@ -247,11 +246,7 @@ static void test_high_pressure_bit_extends_tank_pressure(void) {
     assert(fabs(dive.samples[0].tank_pressure[0] - 300.0) < 0.001);
     assert(fabs(dive.samples[4].tank_pressure[0] - 260.0) < 0.001);
 
-    /* libdc_parse_raw_dive fills a caller-owned struct: free its arrays, not it.
-       libdc_parsed_dive_free() also frees the struct, so it is only for heap
-       allocations. */
-    free(dive.samples);
-    free(dive.events);
+    release(&dive);
     printf("PASS: test_high_pressure_bit_extends_tank_pressure\n");
 }
 
