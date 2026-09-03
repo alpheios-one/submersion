@@ -3205,6 +3205,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count autres en retard';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'Assurance OK';
 
   @override
@@ -3422,9 +3427,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dashboard_gauges_retry =>
       'Statut indisponible - touchez pour réessayer';
-
-  @override
-  String get dashboard_urgent_title => 'Attention requise';
 
   @override
   String get dashboard_media_title => 'Médias récents';

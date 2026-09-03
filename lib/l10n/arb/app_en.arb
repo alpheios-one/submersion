@@ -1959,6 +1959,14 @@
       }
     }
   },
+  "dashboard_gauges_gearOverdueMore": "+{count} more overdue",
+  "@dashboard_gauges_gearOverdueMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboard_gauges_insuranceOk": "Insurance OK",
   "dashboard_gauges_insuranceExpires": "Insurance expires {date}",
   "@dashboard_gauges_insuranceExpires": {
@@ -2111,7 +2119,6 @@
     }
   },
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
-  "dashboard_urgent_title": "Needs attention",
   "dashboard_media_title": "Recent media",
   "dashboard_recentSites_title": "Recent sites",
   "dashboard_yearInReview_title": "This year",

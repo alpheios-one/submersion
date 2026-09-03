@@ -138,7 +138,7 @@ void main() {
           _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
         ]),
       ]);
-      expect(result.map((g) => g.itemName), ['Dated', 'Undated']);
+      expect(result.gauges.map((g) => g.itemName), ['Dated', 'Undated']);
     });
 
     test('drops types whose worst clock is ok', () {
@@ -150,7 +150,7 @@ void main() {
           _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
         ]),
       ]);
-      expect(result.map((g) => g.itemName), ['BCD']);
+      expect(result.gauges.map((g) => g.itemName), ['BCD']);
     });
 
     test('sorts overdue before due-soon, then earliest due date', () {
@@ -165,7 +165,7 @@ void main() {
           _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
         ]),
       ]);
-      expect(result.map((g) => g.itemName), [
+      expect(result.gauges.map((g) => g.itemName), [
         'Overdue',
         'Soon-early',
         'Soon-late',
@@ -192,8 +192,8 @@ void main() {
             ),
           ]),
       ]);
-      expect(result, hasLength(6));
-      expect(result.first.itemName, 'Item 0');
+      expect(result.gauges, hasLength(6));
+      expect(result.gauges.first.itemName, 'Item 0');
     });
 
     test('all-ok gear yields empty list', () {
@@ -202,7 +202,112 @@ void main() {
           _status(ServiceClockSeverity.ok),
         ]),
       ]);
-      expect(result, isEmpty);
+      expect(result.gauges, isEmpty);
+      expect(result.overdueOverflow, 0);
+    });
+
+    test('lists every overdue item, not just the worst of its type', () {
+      // Four lapsed regulators are four things the diver has to service.
+      // Collapsing them per type would name one and silently drop three.
+      final result = dueGearGauges([
+        for (var i = 0; i < 4; i++)
+          _clocks(_item('Reg $i', EquipmentType.regulator), [
+            _status(
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1 + i),
+            ),
+          ]),
+      ]);
+      expect(result.gauges.map((g) => g.itemName), [
+        'Reg 0',
+        'Reg 1',
+        'Reg 2',
+        'Reg 3',
+      ]);
+      expect(result.overdueOverflow, 0);
+    });
+
+    test('due-soon clocks still collapse to the worst per type', () {
+      final result = dueGearGauges([
+        _clocks(_item('Reg early', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+        _clocks(_item('Reg late', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 9)),
+        ]),
+      ]);
+      expect(result.gauges.map((g) => g.itemName), ['Reg early']);
+    });
+
+    test('caps overdue items and reports the overflow', () {
+      final result = dueGearGauges([
+        for (var i = 0; i < 7; i++)
+          _clocks(_item('Reg $i', EquipmentType.regulator), [
+            _status(
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1 + i),
+            ),
+          ]),
+      ]);
+      expect(result.gauges.map((g) => g.itemName), [
+        'Reg 0',
+        'Reg 1',
+        'Reg 2',
+        'Reg 3',
+      ]);
+      expect(result.overdueOverflow, 3);
+    });
+
+    test('overdue items take precedence over due-soon for the total cap', () {
+      final result = dueGearGauges([
+        for (var i = 0; i < 4; i++)
+          _clocks(_item('Overdue $i', EquipmentType.regulator), [
+            _status(
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1 + i),
+            ),
+          ]),
+        _clocks(_item('Soon BCD', EquipmentType.bcd), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+        _clocks(_item('Soon computer', EquipmentType.computer), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 2)),
+        ]),
+        _clocks(_item('Soon light', EquipmentType.light), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 3)),
+        ]),
+      ]);
+      // cap of 6: four overdue chips claim their slots first, leaving two
+      // for the due-soon chips.
+      expect(result.gauges, hasLength(6));
+      expect(result.gauges.map((g) => g.itemName).skip(4), [
+        'Soon BCD',
+        'Soon computer',
+      ]);
+    });
+
+    test('an overdue item suppresses the due-soon chip for its type', () {
+      final result = dueGearGauges([
+        _clocks(_item('Reg overdue', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.overdue, dueDate: DateTime(2026, 6, 1)),
+        ]),
+        _clocks(_item('Reg soon', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.gauges.map((g) => g.itemName), ['Reg overdue']);
+    });
+
+    test('an item with several clocks contributes its worst clock once', () {
+      final result = dueGearGauges([
+        _clocks(_item('Reg', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.overdue, dueDate: DateTime(2026, 6, 1)),
+          _status(ServiceClockSeverity.overdue, dueDate: DateTime(2026, 5, 1)),
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.gauges, hasLength(1));
+      expect(result.gauges.single.status.dueDate, DateTime(2026, 5, 1));
     });
   });
 }

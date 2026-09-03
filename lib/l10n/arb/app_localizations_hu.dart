@@ -3180,6 +3180,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count további lejárt';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'Biztosítás rendben';
 
   @override
@@ -3396,9 +3401,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get dashboard_gauges_retry =>
       'Az állapot nem érhető el - koppints az újrapróbáláshoz';
-
-  @override
-  String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
   String get dashboard_media_title => 'Legutóbbi médiaelemek';

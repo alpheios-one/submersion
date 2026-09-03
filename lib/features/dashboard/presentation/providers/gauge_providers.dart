@@ -59,6 +59,11 @@ class GearGauge {
 /// Always-on status values for the dashboard gauge strip.
 class DashboardGauges {
   final List<GearGauge> gearGauges;
+
+  /// Overdue gear items that did not fit in [gearGauges], surfaced as a
+  /// single "+N more overdue" chip rather than being dropped.
+  final int gearOverdueOverflow;
+
   final bool hasGear;
   final DiverInsurance? insurance;
   final NoFlyStatus? noFlyStatus;
@@ -96,6 +101,7 @@ class DashboardGauges {
 
   const DashboardGauges({
     required this.gearGauges,
+    this.gearOverdueOverflow = 0,
     required this.hasGear,
     required this.insurance,
     required this.noFlyStatus,
@@ -153,25 +159,85 @@ List<GearGauge> worstGaugePerType(List<EquipmentClocks> clocks) {
   return best.values.toList();
 }
 
-/// Gear chips actually shown on the strip: only types whose worst clock
-/// is due soon or overdue, worst first (overdue before due-soon, then
-/// earliest due date, undated last), capped at [cap].
-List<GearGauge> dueGearGauges(List<EquipmentClocks> clocks, {int cap = 6}) {
-  final due = worstGaugePerType(
-    clocks,
-  ).where((g) => g.status.severity != ServiceClockSeverity.ok).toList();
-  due.sort((a, b) {
-    final bySeverity =
-        _severityRank(b.status.severity) - _severityRank(a.status.severity);
-    if (bySeverity != 0) return bySeverity;
-    final ad = a.status.dueDate;
-    final bd = b.status.dueDate;
-    if (ad == null && bd == null) return 0;
-    if (ad == null) return 1;
-    if (bd == null) return -1;
-    return ad.compareTo(bd);
-  });
-  return due.take(cap).toList();
+/// Orders gauges of equal severity by urgency: earliest dueDate first,
+/// undated last.
+int _byDueDate(GearGauge a, GearGauge b) {
+  final ad = a.status.dueDate;
+  final bd = b.status.dueDate;
+  if (ad == null && bd == null) return 0;
+  if (ad == null) return 1;
+  if (bd == null) return -1;
+  return ad.compareTo(bd);
+}
+
+/// The worst clock on one item, or null if the item has no clocks.
+ServiceClockStatus? _worstStatus(List<ServiceClockStatus> statuses) {
+  ServiceClockStatus? worst;
+  for (final status in statuses) {
+    if (worst == null) {
+      worst = status;
+      continue;
+    }
+    final rankNew = _severityRank(status.severity);
+    final rankCur = _severityRank(worst.severity);
+    if (rankNew > rankCur) {
+      worst = status;
+    } else if (rankNew == rankCur) {
+      final newDue = status.dueDate;
+      final curDue = worst.dueDate;
+      if (newDue != null && (curDue == null || newDue.isBefore(curDue))) {
+        worst = status;
+      }
+    }
+  }
+  return worst;
+}
+
+/// Gear chips actually shown on the strip, overdue first then due soon,
+/// earliest due date first within each group and undated last.
+///
+/// Overdue clocks are listed per ITEM, not per type: four lapsed regulators
+/// are four things the diver has to service, and the per-type collapse would
+/// name one and silently drop the rest. Due-soon clocks keep the collapse,
+/// which holds the strip down to one chip per type in the common case where
+/// nothing is actually lapsed. An overdue item makes its whole type overdue,
+/// so that type contributes no due-soon chip.
+///
+/// Overdue chips claim slots from [cap] before due-soon chips do, and are
+/// themselves bounded by [overdueCap]; the returned `overdueOverflow` counts
+/// the overdue items that did not fit, for the caller's "+N more" chip.
+({List<GearGauge> gauges, int overdueOverflow}) dueGearGauges(
+  List<EquipmentClocks> clocks, {
+  int cap = 6,
+  int overdueCap = 4,
+}) {
+  final overdue = <GearGauge>[];
+  for (final entry in clocks) {
+    final worst = _worstStatus(entry.statuses);
+    if (worst?.severity != ServiceClockSeverity.overdue) continue;
+    overdue.add(
+      GearGauge(
+        type: entry.item.type,
+        itemId: entry.item.id,
+        itemName: entry.item.name,
+        status: worst!,
+      ),
+    );
+  }
+  overdue.sort(_byDueDate);
+
+  final dueSoon =
+      worstGaugePerType(clocks)
+          .where((g) => g.status.severity == ServiceClockSeverity.dueSoon)
+          .toList()
+        ..sort(_byDueDate);
+
+  final shownOverdue = overdue.take(overdueCap).toList();
+  final remaining = cap - shownOverdue.length;
+  return (
+    gauges: [...shownOverdue, if (remaining > 0) ...dueSoon.take(remaining)],
+    overdueOverflow: overdue.length - shownOverdue.length,
+  );
 }
 
 /// The next trip whose start date is still ahead, or null.
@@ -210,8 +276,11 @@ final dashboardGaugesProvider = FutureProvider<DashboardGauges>((ref) async {
       .where((c) => c.progress.totalCount > 0)
       .firstOrNull;
 
+  final gear = dueGearGauges(clocks);
+
   return DashboardGauges(
-    gearGauges: dueGearGauges(clocks),
+    gearGauges: gear.gauges,
+    gearOverdueOverflow: gear.overdueOverflow,
     hasGear: clocks.isNotEmpty,
     insurance: diver?.insurance,
     noFlyStatus: noFly,
