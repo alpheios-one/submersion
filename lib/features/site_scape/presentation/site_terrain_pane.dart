@@ -208,7 +208,12 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                       top: 56,
                       left: 8,
                       right: 8,
-                      child: _sourceChip(sourceId, resolutionMeters, scene),
+                      child: _sourceChip(
+                        sourceId,
+                        resolutionMeters,
+                        scene,
+                        grid,
+                      ),
                     ),
                     // The legend describes the depth ramp; a photographed
                     // surface has no ramp to explain. It sits LEFT because the
@@ -313,7 +318,12 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     );
   }
 
-  Widget _sourceChip(String sourceId, double resolutionMeters, Scene3d scene) {
+  Widget _sourceChip(
+    String sourceId,
+    double resolutionMeters,
+    Scene3d scene,
+    BathymetryGrid grid,
+  ) {
     // TEMPORARY - DEBUG ONLY, remove before upstream PR: site.location is
     // already resolved by this point (siteSeascapeProvider awaited it to
     // reach SiteSeascapeReady), so re-watching it here is a cache hit, not
@@ -361,7 +371,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                 ],
               ),
               // TEMPORARY - DEBUG ONLY, remove before upstream PR.
-              if (_debugExpanded) _debugPanel(scene),
+              if (_debugExpanded) _debugPanel(scene, grid),
             ],
           ),
         ),
@@ -370,16 +380,23 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   }
 
   // TEMPORARY - DEBUG ONLY, remove before upstream PR.
-  Widget _debugPanel(Scene3d scene) {
+  Widget _debugPanel(Scene3d scene, BathymetryGrid grid) {
     // TEMPORARY - DEBUG ONLY, remove before upstream PR: the render-layer
     // fingerprint needs no network/cache lookups (unlike the fetch-layer
     // panel below), so it is available synchronously off the mesh that is
     // already on screen — read at build time, not behind a FutureBuilder.
+    // The grid fingerprint is the same story: [grid] is the exact object
+    // SiteSeascapeGeometryService.buildWithLabels() was called with (see
+    // site_seascape_providers.dart), so this needs no re-fetch either —
+    // one layer upstream of the render fingerprint above it in the text.
     final renderFingerprint = buildSwissBathyRenderFingerprint(
       siteId: widget.siteId,
       mesh: scene.layers.first.mesh,
     );
-    final renderText = formatSwissBathyRenderFingerprint(renderFingerprint);
+    final gridFingerprint = buildSwissBathyGridFingerprint(grid);
+    final renderText =
+        '${formatSwissBathyGridFingerprint(gridFingerprint)}\n'
+        '${formatSwissBathyRenderFingerprint(renderFingerprint)}';
     final future = _debugFuture;
     if (future == null) {
       return Padding(

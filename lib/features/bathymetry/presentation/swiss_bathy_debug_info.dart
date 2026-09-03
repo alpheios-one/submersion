@@ -23,6 +23,7 @@ import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cac
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
@@ -300,6 +301,17 @@ DateTime? swissBathyDebugLastBuiltAtFor(String siteId) =>
 /// needed to tell "two sites really did render the same triangles" apart
 /// from "the mesh differs but happens to look the same" without shipping
 /// the whole array.
+///
+/// [MeshData.positions] is a flat xyz triplet buffer, but in this codebase's
+/// scene frame ([BathymetryTerrainBuilder.build]) the VERTICAL axis a diver
+/// reads as depth is the middle component (`positions[vi + 1]`, scene Y —
+/// `projection.yOf(depth)`), not the third one: the third component is
+/// scene Z, `projection.zOf(north)`, a HORIZONTAL axis. [depthHash] and
+/// [horizontalHash] split on that real axis assignment (not on a naive
+/// "every third value starting at 2" reading of "xyz"), so they actually
+/// test the Bug-11 hypothesis that two sites' identical-looking renders
+/// might share depth/color values while differing only in the horizontal
+/// placement of those values.
 class SwissBathyRenderFingerprint {
   final String siteId;
   final int vertexCount;
@@ -310,6 +322,18 @@ class SwissBathyRenderFingerprint {
   /// the same [vertexCount] but a different [hash] are proof the meshes
   /// differ even if the first/last samples happen to match.
   final int hash;
+
+  /// FNV-1a over ONLY the depth/vertical component of every vertex
+  /// (`positions[vi + 1]`, scene Y). If this matches across two sites while
+  /// [horizontalHash] differs, the two renders use the same depth/color
+  /// values at different horizontal positions — exactly the "identical
+  /// noise pattern, different footprint" symptom Bug 11 describes.
+  final int depthHash;
+
+  /// FNV-1a over ONLY the horizontal components of every vertex
+  /// (`positions[vi]` scene X / east and `positions[vi + 2]` scene Z /
+  /// north, interleaved in that order). The complement of [depthHash].
+  final int horizontalHash;
   final DateTime? lastBuiltAt;
 
   const SwissBathyRenderFingerprint({
@@ -318,6 +342,8 @@ class SwissBathyRenderFingerprint {
     required this.firstPositions,
     required this.lastPositions,
     required this.hash,
+    required this.depthHash,
+    required this.horizontalHash,
     required this.lastBuiltAt,
   });
 }
@@ -337,19 +363,112 @@ SwissBathyRenderFingerprint buildSwissBathyRenderFingerprint({
     vertexCount: mesh.vertexCount,
     firstPositions: positions.sublist(0, firstCount).toList(),
     lastPositions: positions.sublist(lastStart).toList(),
-    hash: _fnv1aHash(positions),
+    hash: _fnv1aHashBytes(_bytesOf(positions)),
+    depthHash: _fnv1aHashBytes(
+      _bytesOf(_extractPositionComponent(positions, 1)),
+    ),
+    horizontalHash: _fnv1aHashBytes(
+      _bytesOf(_extractHorizontalComponents(positions)),
+    ),
     lastBuiltAt: swissBathyDebugLastBuiltAtFor(siteId),
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. FNV-1a folded over
-/// the buffer's raw bytes rather than its double values, so it is exact
-/// (no rounding/formatting loss) and cheap enough to run on a tap.
-int _fnv1aHash(Float32List values) {
-  final bytes = values.buffer.asUint8List(
-    values.offsetInBytes,
-    values.lengthInBytes,
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Pulls the single
+/// component at [offset] (0 = scene X/east, 1 = scene Y/depth, 2 = scene
+/// Z/north — see [SwissBathyRenderFingerprint]'s doc for why 1, not 2, is
+/// the depth axis) out of every xyz triplet in [positions].
+Float32List _extractPositionComponent(Float32List positions, int offset) {
+  final count = positions.length ~/ 3;
+  final out = Float32List(count);
+  for (var i = 0; i < count; i++) {
+    out[i] = positions[i * 3 + offset];
+  }
+  return out;
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Pulls both horizontal
+/// components (scene X/east, scene Z/north) out of every xyz triplet in
+/// [positions], interleaved as [x0, z0, x1, z1, ...] — the complement of
+/// [_extractPositionComponent] at offset 1.
+Float32List _extractHorizontalComponents(Float32List positions) {
+  final count = positions.length ~/ 3;
+  final out = Float32List(count * 2);
+  for (var i = 0; i < count; i++) {
+    out[i * 2] = positions[i * 3];
+    out[i * 2 + 1] = positions[i * 3 + 2];
+  }
+  return out;
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. A cheap fingerprint
+/// (hash plus min/max/null-count) of the raw [BathymetryGrid]
+/// [SiteSeascapeGeometryService.buildWithLabels] receives as input — the
+/// grid [SwissBathy3dSource.fetch] returned (stitched across tiles, when
+/// the site's span touched more than one), BEFORE any terrain-mesh
+/// projection. Sits one layer upstream of [SwissBathyRenderFingerprint]: if
+/// two sites' grid fingerprints already match here, the bug is in the fetch
+/// layer or something feeding [SiteSeascapeInput.grid] a shared instance —
+/// not in the depth/color mapping done while building the mesh.
+class SwissBathyGridFingerprint {
+  final int rows;
+  final int cols;
+  final double? minDepth;
+  final double? maxDepth;
+  final int nullCount;
+
+  /// FNV-1a over every cell's raw depth (LN02-derived meters, `null` cells
+  /// folded in as a fixed NaN bit pattern so a run of nodata still moves
+  /// the hash instead of being silently skipped).
+  final int hash;
+
+  const SwissBathyGridFingerprint({
+    required this.rows,
+    required this.cols,
+    required this.minDepth,
+    required this.maxDepth,
+    required this.nullCount,
+    required this.hash,
+  });
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// [SwissBathyGridFingerprint] for [grid] — read-only, no re-fetch.
+SwissBathyGridFingerprint buildSwissBathyGridFingerprint(BathymetryGrid grid) {
+  double? minDepth;
+  double? maxDepth;
+  var nullCount = 0;
+  final cells = Float64List(grid.depthsMeters.length);
+  for (var i = 0; i < grid.depthsMeters.length; i++) {
+    final d = grid.depthsMeters[i];
+    if (d == null) {
+      nullCount++;
+      cells[i] = double.nan;
+      continue;
+    }
+    cells[i] = d;
+    if (minDepth == null || d < minDepth) minDepth = d;
+    if (maxDepth == null || d > maxDepth) maxDepth = d;
+  }
+  return SwissBathyGridFingerprint(
+    rows: grid.rows,
+    cols: grid.cols,
+    minDepth: minDepth,
+    maxDepth: maxDepth,
+    nullCount: nullCount,
+    hash: _fnv1aHashBytes(_bytesOf(cells)),
   );
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Raw bytes backing a
+/// typed-data view, for hashing without any double->string rounding loss.
+Uint8List _bytesOf(TypedData values) =>
+    values.buffer.asUint8List(values.offsetInBytes, values.lengthInBytes);
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. FNV-1a folded over
+/// raw bytes rather than the source double values, so it is exact (no
+/// rounding/formatting loss) and cheap enough to run on a tap.
+int _fnv1aHashBytes(Uint8List bytes) {
   var hash = 0x811c9dc5;
   for (final b in bytes) {
     hash ^= b;
@@ -368,9 +487,33 @@ String formatSwissBathyRenderFingerprint(SwissBathyRenderFingerprint fp) {
     ..writeln('positions[0:3]: ${fp.firstPositions}')
     ..writeln('positions[-3:]: ${fp.lastPositions}')
     ..writeln('positions hash (fnv1a32): 0x${fp.hash.toRadixString(16)}')
+    ..writeln(
+      'depth-only hash (scene Y, positions[vi+1]) (fnv1a32): '
+      '0x${fp.depthHash.toRadixString(16)}',
+    )
+    ..writeln(
+      'horizontal-only hash (scene X+Z, positions[vi]+positions[vi+2]) '
+      '(fnv1a32): 0x${fp.horizontalHash.toRadixString(16)}',
+    )
     ..write(
       'buildWithLabels() last ran for this site: '
       '${fp.lastBuiltAt?.toIso8601String() ?? "not recorded yet"}',
     );
+  return buf.toString();
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// [SwissBathyGridFingerprint] as plain, copy-pasteable text, appended
+/// below [formatSwissBathyRenderFingerprint]'s output.
+String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
+  final buf = StringBuffer()
+    ..writeln('--- raw stitched grid (temporary) ---')
+    ..writeln('rows x cols: ${fp.rows} x ${fp.cols}')
+    ..writeln(
+      'depth min/max: ${fp.minDepth?.toStringAsFixed(2) ?? "n/a"} / '
+      '${fp.maxDepth?.toStringAsFixed(2) ?? "n/a"}',
+    )
+    ..writeln('nodata cells: ${fp.nullCount} / ${fp.rows * fp.cols}')
+    ..write('grid depths hash (fnv1a32): 0x${fp.hash.toRadixString(16)}');
   return buf.toString();
 }
