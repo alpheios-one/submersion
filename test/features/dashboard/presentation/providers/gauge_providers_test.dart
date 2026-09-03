@@ -141,6 +141,20 @@ void main() {
       expect(result.gauges.map((g) => g.itemName), ['Dated', 'Undated']);
     });
 
+    test('dated clocks sort first whichever side they start on', () {
+      // Mirrors the case above with the inputs swapped, so the comparator is
+      // exercised from both directions rather than only one.
+      final result = dueGearGauges([
+        _clocks(_item('Dated', EquipmentType.bcd), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+        _clocks(_item('Undated', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon),
+        ]),
+      ]);
+      expect(result.gauges.map((g) => g.itemName), ['Dated', 'Undated']);
+    });
+
     test('drops types whose worst clock is ok', () {
       final result = dueGearGauges([
         _clocks(_item('Reg', EquipmentType.regulator), [
@@ -296,6 +310,22 @@ void main() {
         ]),
       ]);
       expect(result.gauges.map((g) => g.itemName), ['Reg overdue']);
+    });
+
+    test('a cap tighter than the overdue cap still bounds the whole list', () {
+      // cap is the advertised bound on the result, so it has to bound the
+      // overdue slice too, and the items it excludes count as overflow.
+      final result = dueGearGauges([
+        for (var i = 0; i < 5; i++)
+          _clocks(_item('Reg $i', EquipmentType.regulator), [
+            _status(
+              ServiceClockSeverity.overdue,
+              dueDate: DateTime(2026, 6, 1 + i),
+            ),
+          ]),
+      ], cap: 2);
+      expect(result.gauges.map((g) => g.itemName), ['Reg 0', 'Reg 1']);
+      expect(result.overdueOverflow, 3);
     });
 
     test('an item with several clocks contributes its worst clock once', () {

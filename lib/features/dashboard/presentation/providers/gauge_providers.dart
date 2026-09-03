@@ -232,7 +232,11 @@ ServiceClockStatus? _worstStatus(List<ServiceClockStatus> statuses) {
           .toList()
         ..sort(_byDueDate);
 
-  final shownOverdue = overdue.take(overdueCap).toList();
+  // [cap] bounds the whole list, so it also bounds the overdue slice: a
+  // caller passing a cap tighter than [overdueCap] must still get at most
+  // [cap] chips back, and [remaining] must never go negative.
+  final effectiveOverdueCap = overdueCap < cap ? overdueCap : cap;
+  final shownOverdue = overdue.take(effectiveOverdueCap).toList();
   final remaining = cap - shownOverdue.length;
   return (
     gauges: [...shownOverdue, if (remaining > 0) ...dueSoon.take(remaining)],

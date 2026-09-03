@@ -19,6 +19,10 @@ import 'package:submersion/features/dashboard/presentation/widgets/quick_actions
 import 'package:submersion/features/dashboard/presentation/widgets/recent_dives_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_sites_map_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/year_in_review_card.dart';
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
+import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -42,6 +46,41 @@ final _expiredInsuranceGauges = DashboardGauges(
   gearGauges: const [],
   hasGear: false,
   insurance: DiverInsurance(provider: 'DAN', expiryDate: DateTime(2020, 1, 1)),
+  noFlyStatus: null,
+  daysSinceLastDive: null,
+);
+
+/// The other way into the same override: a lapsed service clock rather than
+/// an expired policy.
+final _overdueGearGauges = DashboardGauges(
+  gearGauges: [
+    GearGauge(
+      type: EquipmentType.regulator,
+      itemId: 'reg-1',
+      itemName: 'Regulator',
+      status: ServiceClockStatus(
+        schedule: ServiceSchedule(
+          id: 'schedule',
+          equipmentId: 'reg-1',
+          serviceKindId: 'kind',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+        kind: ServiceKind(
+          id: 'kind',
+          name: 'Annual service',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+        anchor: DateTime(2026, 1, 1),
+        dueDate: DateTime(2026, 6, 1),
+        severity: ServiceClockSeverity.overdue,
+        now: DateTime(2026, 9, 1),
+      ),
+    ),
+  ],
+  hasGear: true,
+  insurance: null,
   noFlyStatus: null,
   daysSinceLastDive: null,
 );
@@ -287,6 +326,20 @@ void main() {
     final heroY = tester.getTopLeft(find.byType(HeroHeader)).dy;
     final stripY = tester.getTopLeft(find.byType(GaugeStrip)).dy;
     expect(heroY, lessThan(stripY));
+  });
+
+  testWidgets('overdue gear also forces the gauge strip back on', (
+    tester,
+  ) async {
+    await pumpDashboard(
+      tester,
+      gauges: _overdueGearGauges,
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
+      ),
+    );
+
+    expect(find.byType(GaugeStrip), findsOneWidget);
   });
 
   testWidgets('hiding the gauge strip works when no alert is live', (
