@@ -5,11 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis_auth/auth_io.dart' as gauth;
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/desktop_oauth_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
 import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
+import 'package:submersion/core/services/logger_service.dart';
 
 class _MemoryTokenStore implements GoogleDriveTokenStore {
   gauth.AccessCredentials? stored;
@@ -79,6 +81,7 @@ void main() {
   DesktopOAuthAuthenticator authenticator({
     gauth.AccessCredentials? consentResult,
     List<_FakeRefreshingClient>? builtClients,
+    bool browserOpens = true,
   }) => DesktopOAuthAuthenticator(
     tokenStore: store,
     obtainConsent: (clientId, scopes, client, prompt) async {
@@ -94,8 +97,52 @@ void main() {
       return fake;
     },
     baseClientFactory: baseClient,
-    launchBrowser: (url) async {},
+    launchBrowser: (url) async => browserOpens,
   );
+
+  group('consent browser hand-off', () {
+    test('logs the consent URL so a desktop with no working browser can '
+        'still finish by hand', () async {
+      final captured = <LogEntry>[];
+      final sub = LoggerService.logStream.listen(captured.add);
+      addTearDown(sub.cancel);
+
+      await authenticator(
+        consentResult: creds(refreshToken: 'rt'),
+      ).authenticate();
+      await pumpEventQueue();
+
+      expect(
+        captured.where((e) => e.message.contains('Google consent URL')),
+        isNotEmpty,
+      );
+    });
+
+    test('a browser that never opens is logged, not swallowed', () async {
+      // openInBrowser reports "nothing took the URL" by returning false, not
+      // by throwing, and the loopback flow then parks on the redirect. With
+      // the result discarded this read as a hang with nothing in the log.
+      final captured = <LogEntry>[];
+      final sub = LoggerService.logStream.listen(captured.add);
+      addTearDown(sub.cancel);
+
+      await authenticator(
+        consentResult: creds(refreshToken: 'rt'),
+        browserOpens: false,
+      ).authenticate();
+      await pumpEventQueue();
+
+      expect(
+        captured.where(
+          (e) =>
+              e.level == LogLevel.error &&
+              e.message.contains('open the Google consent page'),
+        ),
+        isNotEmpty,
+        reason: 'a false return must reach the log like a thrown failure does',
+      );
+    });
+  });
 
   group('client credentials', () {
     // Google rejects the token exchange for Desktop-app clients with
@@ -114,7 +161,7 @@ void main() {
         buildClient: (clientId, credentials, base) =>
             _FakeRefreshingClient(credentials),
         baseClientFactory: baseClient,
-        launchBrowser: (url) async {},
+        launchBrowser: (url) async => true,
       );
       await auth.authenticate();
       return seen;
@@ -156,7 +203,7 @@ void main() {
         capturedBase = base;
         return _FakeRefreshingClient(credentials);
       },
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
 
     expect(await auth.attemptSilentAuth(), isTrue);
@@ -231,7 +278,7 @@ void main() {
       buildClient: (clientId, credentials, base) =>
           _FakeRefreshingClient(credentials),
       baseClientFactory: baseClient,
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
 
     expect(auth.authenticate(), throwsA(isA<CloudStorageException>()));
@@ -278,7 +325,7 @@ void main() {
           _FakeRefreshingClient(credentials),
       baseClientFactory: () =>
           MockClient((request) async => throw Exception('offline')),
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
     await auth.attemptSilentAuth();
 

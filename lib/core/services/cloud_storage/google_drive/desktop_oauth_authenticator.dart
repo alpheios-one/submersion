@@ -51,7 +51,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     ObtainConsentCredentials? obtainConsent,
     BuildRefreshingClient? buildClient,
     http.Client Function()? baseClientFactory,
-    Future<void> Function(String url)? launchBrowser,
+    Future<bool> Function(String url)? launchBrowser,
     String? clientSecret,
   }) : _clientSecret =
            clientSecret ?? GoogleDriveClientConfig.desktopClientSecret,
@@ -75,8 +75,21 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
 
   /// Hands the consent URL to the browser, with the Linux fallback chain
   /// url_launcher alone does not provide.
-  static Future<void> _openConsentPage(String url) async {
-    await openInBrowser(Uri.parse(url));
+  static Future<bool> _openConsentPage(String url) =>
+      openInBrowser(Uri.parse(url));
+
+  /// Opens the consent page, turning "nothing took the URL" into a throw.
+  ///
+  /// [openInBrowser] reports that by returning false rather than throwing --
+  /// exactly the no-scheme-handler case this flow has to survive -- so a
+  /// discarded result would leave the loopback wait looking like a hang with
+  /// nothing in the log to explain it.
+  Future<void> _launchConsentPage(String url) async {
+    if (!await _launchBrowser(url)) {
+      throw const CloudStorageException(
+        'No browser accepted the Google consent URL.',
+      );
+    }
   }
 
   /// openid + email are included so the id_token carries the account email
@@ -94,7 +107,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
   final ObtainConsentCredentials _obtainConsent;
   final BuildRefreshingClient _buildClient;
   final http.Client Function() _baseClientFactory;
-  final Future<void> Function(String url) _launchBrowser;
+  final Future<bool> Function(String url) _launchBrowser;
 
   gauth.AutoRefreshingAuthClient? _authClient;
   StreamSubscription<gauth.AccessCredentials>? _updateSubscription;
@@ -126,7 +139,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
         // way to finish consent by hand.
         _log.info('Google consent URL: $url');
         logFailure(
-          _launchBrowser(url),
+          _launchConsentPage(url),
           DesktopOAuthAuthenticator,
           'open the Google consent page',
         );

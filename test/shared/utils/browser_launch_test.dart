@@ -177,8 +177,9 @@ void main() {
 
   // Real processes, not doubles: this is the one part of the fallback that
   // has to behave correctly against a live OS, and the unit suite runs on a
-  // Linux runner, which is the platform the chain exists for. Every command
-  // here is POSIX and present on both the CI image and a dev Mac.
+  // Linux runner, which is the platform the chain exists for. The commands
+  // are POSIX, so the group is skipped on a Windows dev machine -- where the
+  // Linux chain never runs anyway.
   group('spawnBrowserOpener', () {
     const settle = Duration(milliseconds: 100);
 
@@ -240,7 +241,7 @@ void main() {
         );
       },
     );
-  });
+  }, skip: Platform.isWindows ? 'POSIX opener commands' : false);
 
   test('linuxBrowserOpeners documents the chain the fallback walks', () {
     expect(linuxBrowserOpeners, [
