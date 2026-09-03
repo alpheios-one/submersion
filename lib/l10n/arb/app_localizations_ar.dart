@@ -9536,12 +9536,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divers_edit_updateButton => 'تحديث الغواص';
 
   @override
-  String get divers_list_activeBadge => 'نشط';
-
-  @override
-  String get divers_list_addDiverButton => 'إضافة غواص';
-
-  @override
   String get divers_list_addDiverTooltip => 'إضافة ملف غواص جديد';
 
   @override
@@ -9580,27 +9574,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'عرض الغواص $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'الغواص النشط';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'غواصون آخرون';
-
-  @override
-  String get divers_summary_overviewTitle => 'نظرة عامة';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'إجراءات سريعة';
-
-  @override
-  String get divers_summary_subtitle => 'اختر غواصًا من القائمة لعرض التفاصيل';
-
-  @override
-  String get divers_summary_title => 'ملفات الغواصين';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'إجمالي الغواصين';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -16364,24 +16337,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_import_cancelling => 'جارٍ الإلغاء...';
 
   @override
-  String get settings_import_dialog_title => 'جارٍ استيراد البيانات';
-
-  @override
-  String get settings_import_doNotClose => 'يرجى عدم إغلاق التطبيق';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current من $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'جارٍ استيراد الرفاق...';
 
   @override
   String get settings_import_phase_certifications => 'جارٍ استيراد الشهادات...';
-
-  @override
-  String get settings_import_phase_complete => 'جارٍ الإنهاء...';
 
   @override
   String get settings_import_phase_diveCenters => 'جارٍ استيراد مراكز الغوص...';
@@ -16400,9 +16359,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ استيراد مجموعات المعدات...';
 
   @override
-  String get settings_import_phase_parsing => 'جارٍ تحليل الملف...';
-
-  @override
   String get settings_import_phase_preparing => 'جارٍ التحضير...';
 
   @override
@@ -16419,20 +16375,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase، $current من $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'تقدم الاستيراد: $percent بالمئة';
-  }
 
   @override
   String get settings_language_appBar_title => 'اللغة';
@@ -20630,11 +20572,6 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'تبديل التحديد لـ $name';
-  }
-
-  @override
   String universalImport_snackbar_bulkMarkedAs(int count, String action) {
     return 'تم تحديد $count بـ $action';
   }
@@ -21344,29 +21281,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'رمز PIN مطلوب';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'اتصال';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'أدخل رمز PIN المكون من 4 إلى 6 أرقام المعروض على جهازك';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'تحقق من شاشة كمبيوتر الغوص لرؤية رمز PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'تحقق من شاشة $deviceName لرؤية رمز PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'إدخال رمز PIN، من 4 إلى 6 أرقام';
-
-  @override
-  String get diveComputer_pinEntry_title => 'أدخل رمز PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {

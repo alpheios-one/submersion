@@ -12,8 +12,10 @@ class MacDiveRawDive {
   /// since 2001-01-01 UTC. The reader converts to a Dart UTC [DateTime].
   final DateTime? rawDate;
 
-  /// NSTimeZone bplist from `ZTIMEZONE`. Decoded by [BPlistDecoder] when
-  /// the mapper needs the zone name to reconstruct local time.
+  /// NSTimeZone bplist from `ZTIMEZONE`. Carried but not yet decoded: the
+  /// mapper emits `rawDate` as absolute UTC, matching the M2 XML parser.
+  /// `BPlistDecoder` in `lib/core/utils/bplist/` can read this payload and is
+  /// waiting on the cross-parser move to the wall-time-as-UTC convention.
   final Uint8List? timezoneBplist;
 
   /// Max depth in raw MacDive units (depends on `ZMETADATA.SystemOfUnits`).

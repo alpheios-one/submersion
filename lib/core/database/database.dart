@@ -5850,9 +5850,9 @@ class AppDatabase extends _$AppDatabase {
   /// diver's layout at the lane they were seeing. Runs after
   /// [_assertGasConsumptionDisplayColumn] so the lane names are final.
   ///
-  /// Never called from beforeOpen: DiveFieldAdapter.fieldFromName aliases
-  /// sacRate to sac for layouts that arrive later by sync, and re-running
-  /// this on every open would rewrite rows the diver has since changed. No
+  /// Never called from beforeOpen: diveFieldFromName aliases sacRate to sac
+  /// for layouts that arrive later by sync, and re-running this on every
+  /// open would rewrite rows the diver has since changed. No
   /// HLC bump: every device applies the same deterministic rewrite to its
   /// own rows, so there is nothing to push.
   Future<void> _rewriteLegacySacRateLayouts() async {
