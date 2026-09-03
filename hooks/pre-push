@@ -175,7 +175,8 @@ fi
 # exactly what ships. An ARB edit that skipped gen-l10n, or a generated file
 # hand-resolved during a merge (they conflict often, since every locale changes
 # together), otherwise reaches main with the stale string intact. CI asserts the
-# same thing in Analyze & Format; here it is a second cheaper.
+# same thing in Analyze & Format; this hook is the cheaper second check that
+# catches it before the push rather than after.
 #
 # Only runs when the push touches lib/l10n/. gen-l10n rewrites all 12 files
 # unconditionally, even when the bytes are identical, and app_localizations.dart
@@ -183,7 +184,7 @@ fi
 # on every push would bump those mtimes and force a pointless recompile.
 #
 # The verdict is HEAD-relative, like CI's, because HEAD is what gets pushed.
-# Regenerate, then read `git status` for the three states that tells apart:
+# Regenerate, then read `git status`, which tells these three states apart:
 #
 #   generated dirty, ARBs clean -> HEAD's committed ARBs do not produce HEAD's
 #     committed output. Definitively stale: block. Covers both "forgot to run
