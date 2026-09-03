@@ -407,11 +407,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     );
   }
 
-  /// One structured flush-fee line: the gas, its editable purge volume, and
-  /// what that volume costs at the configured rate. Derived from settings
-  /// rather than stored in [blenderBilledFillsProvider] — nothing in that
-  /// append-only list is "first" by construction, so a fee meant to sit once
-  /// at the top of the bill has to live outside it (issue #1335).
+  /// One structured flush-fee line: the gas, its purge volume, and what that
+  /// volume costs at the configured rate. Derived from settings rather than
+  /// stored in [blenderBilledFillsProvider] — nothing in that append-only
+  /// list is "first" by construction, so a fee meant to sit once at the top
+  /// of the bill has to live outside it (issue #1335).
   Widget _flushFeeLine(
     BuildContext context,
     int index,
@@ -438,10 +438,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
               style: style,
             ),
           ),
-          // Read-only: this role's flush volume is entered once, on the Cost
-          // card (blender_billing_card.dart), and shown here as text rather
-          // than a second, easily-drifting entry point for the same number
-          // (issue #42).
+          // Read-only: this role's flush volume is entered once, on the Fill
+          // gases settings card (blender_fill_gases_card.dart), next to its
+          // price, and shown here as text rather than a second,
+          // easily-drifting entry point for the same number (issue #42
+          // follow-up).
           SizedBox(
             width: 72,
             child: InputDecorator(

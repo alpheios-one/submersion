@@ -186,10 +186,13 @@ void main() {
         ..blenderPreferences = _storedPreferences();
       await _pumpSettingsPageAlone(tester, repository);
 
-      // O2 and He are fixed purity and show no TextField (issue #42); the
-      // only editable mix field is the topup role's O2 fraction, seeded from
-      // storage at 32% rather than the default 21%.
-      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 2), '32');
+      // Each role row contributes up to three TextFields in order (mix,
+      // price, purge volume); O2 and He show no mix TextField since their
+      // purity is fixed (issue #42), so the sequence is: O2 price (0), O2
+      // purge volume (1), He price (2), He purge volume (3), topup O2 (4),
+      // topup price (5), topup purge volume (6). The topup role's O2
+      // fraction is seeded from storage at 32% rather than the default 21%.
+      expect(_fieldText(tester, find.byType(BlenderFillGasesCard), 4), '32');
       // The O2 role's price is the first TextField on the card: its fixed
       // purity is an InputDecorator, not a TextField, so only its price
       // field counts.

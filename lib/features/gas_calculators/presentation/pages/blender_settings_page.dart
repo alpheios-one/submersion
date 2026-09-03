@@ -47,6 +47,7 @@ class _BlenderSettingsBody extends ConsumerStatefulWidget {
 class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
   late final TextEditingController _topupO2;
   late final List<TextEditingController> _gasPrices;
+  late final List<TextEditingController> _flushVolumes;
 
   @override
   void initState() {
@@ -69,12 +70,24 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                 ),
         ),
     ];
+    _flushVolumes = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: formatRoundedForInput(
+            litersToDisplayVolume(g.volumeLiters, settings),
+            2,
+          ),
+        ),
+    ];
   }
 
   @override
   void dispose() {
     _topupO2.dispose();
     for (final c in _gasPrices) {
+      c.dispose();
+    }
+    for (final c in _flushVolumes) {
       c.dispose();
     }
     super.dispose();
@@ -97,6 +110,7 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                 BlenderFillGasesCard(
                   topupO2Controller: _topupO2,
                   priceControllers: _gasPrices,
+                  flushVolumeControllers: _flushVolumes,
                 ),
                 const SizedBox(height: 16),
                 const BlenderConditionsCard(),

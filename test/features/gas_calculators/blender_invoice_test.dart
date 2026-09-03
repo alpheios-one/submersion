@@ -654,11 +654,12 @@ void main() {
     });
 
     testWidgets(
-      'editing the purge volume on the Cost card re-prices the invoice line',
+      'changing the purge volume setting re-prices the invoice line',
       (tester) async {
         // Issue #42 follow-up: the invoice line's volume is read-only,
-        // sourced from the same setting the Cost card's field writes to
-        // (blender-flush-fee-volume-o2), not a second entry point.
+        // sourced from the same setting the Fill gases settings card's
+        // field writes to (blender-flush-fee-volume-o2, on
+        // BlenderSettingsPage), not a second entry point.
         final ref = await _pump(tester);
         ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
         ref.read(blenderGasPricesProvider.notifier).state = const [
@@ -668,18 +669,15 @@ void main() {
         ];
         await tester.pumpAndSettle();
 
-        await tester.enterText(
-          find.byKey(const Key('blender-flush-fee-volume-o2')),
-          '40',
-        );
+        ref.read(blenderFlushFeeGasesProvider.notifier).state = const [
+          FlushFeeGasSetting(volumeLiters: 40),
+          FlushFeeGasSetting(volumeLiters: 20),
+          FlushFeeGasSetting(volumeLiters: 20),
+        ];
         await tester.pumpAndSettle();
 
         // 40 / 100 * 7.5 = 3.00.
         expect(find.textContaining('3.00'), findsWidgets);
-        expect(
-          ref.read(blenderFlushFeeGasesProvider)[0].volumeLiters,
-          closeTo(40, 0.001),
-        );
       },
     );
 

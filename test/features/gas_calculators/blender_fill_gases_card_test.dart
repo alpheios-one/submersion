@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -183,5 +184,85 @@ void main() {
       find.byKey(const Key('blender-gas-price-o2')),
     );
     expect(o2Price.controller?.text, '12.5');
+  });
+
+  testWidgets('a stored flush volume seeds its role row field, converted for '
+      'display', (tester) async {
+    // Issue #42 follow-up: the purge volume moved here from the Cost card,
+    // keyed by role so it survives a reorder like the price does.
+    await _pump(
+      tester,
+      overrides: [
+        blenderFlushFeeGasesProvider.overrideWith(
+          (ref) => const [
+            FlushFeeGasSetting(volumeLiters: 40),
+            FlushFeeGasSetting(volumeLiters: 20),
+            FlushFeeGasSetting(volumeLiters: 20),
+          ],
+        ),
+      ],
+    );
+
+    expect(find.widgetWithText(TextField, '40'), findsOneWidget);
+  });
+
+  testWidgets('submitting a role row flush volume field saves the '
+      'preferences', (tester) async {
+    final repo = FakeAppSettingsRepository();
+    final ref = await _pump(
+      tester,
+      overrides: [appSettingsRepositoryProvider.overrideWithValue(repo)],
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('blender-flush-fee-volume-o2')),
+      '40',
+    );
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(
+      ref
+          .read(blenderFlushFeeGasesProvider)[BlenderGasRole.o2.index]
+          .volumeLiters,
+      closeTo(40, 0.001),
+    );
+    expect(
+      repo
+          .blenderPreferences
+          ?.flushFeeGases[BlenderGasRole.o2.index]
+          .volumeLiters,
+      closeTo(40, 0.001),
+    );
+  });
+
+  testWidgets('a role keeps its own flush volume after being reordered', (
+    tester,
+  ) async {
+    // Issue #42 follow-up: same reordering guarantee as the price.
+    final ref = await _pump(
+      tester,
+      overrides: [
+        blenderFlushFeeGasesProvider.overrideWith(
+          (ref) => const [
+            FlushFeeGasSetting(volumeLiters: 40),
+            FlushFeeGasSetting(volumeLiters: 20),
+            FlushFeeGasSetting(volumeLiters: 20),
+          ],
+        ),
+      ],
+    );
+
+    ref.read(blenderFillOrderProvider.notifier).state = [
+      BlenderGasRole.he,
+      BlenderGasRole.o2,
+      BlenderGasRole.topup,
+    ];
+    await tester.pumpAndSettle();
+
+    final o2Volume = tester.widget<TextField>(
+      find.byKey(const Key('blender-flush-fee-volume-o2')),
+    );
+    expect(o2Volume.controller?.text, '40');
   });
 }

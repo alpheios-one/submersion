@@ -54,7 +54,6 @@ class BlenderBillingCard extends ConsumerStatefulWidget {
 
 class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   late final TextEditingController _cylinder;
-  late final List<TextEditingController> _flushVolumes;
 
   @override
   void initState() {
@@ -64,23 +63,11 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     _cylinder = TextEditingController(
       text: formatRoundedForInput(litersToDisplayVolume(liters, settings), 2),
     );
-    _flushVolumes = [
-      for (final g in ref.read(blenderFlushFeeGasesProvider))
-        TextEditingController(
-          text: formatRoundedForInput(
-            litersToDisplayVolume(g.volumeLiters, settings),
-            2,
-          ),
-        ),
-    ];
   }
 
   @override
   void dispose() {
     _cylinder.dispose();
-    for (final c in _flushVolumes) {
-      c.dispose();
-    }
     super.dispose();
   }
 
@@ -374,9 +361,10 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   }
 
   /// The hose-purge flat fee: whether it is charged, how often it appears on
-  /// the bill, and each gas's default volume and price. The bill itself
-  /// reads these gases from [BlenderInvoiceCard], which keeps its own
-  /// editable liter field seeded from the same setting (issue #1335).
+  /// the bill, and each gas's volume and price, both entered on the Fill
+  /// gases settings card and shown here as read-only text (issue #42
+  /// follow-up). The bill itself reads the same setting for its own,
+  /// likewise read-only, line.
   Widget _flushFeeSettings(
     BuildContext context,
     AppSettings settings,
@@ -444,17 +432,20 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     final role = BlenderGasRole.values[index];
     final label = blenderGasRoleLabel(context, role);
     final price = ref.watch(blenderGasPricesProvider)[index];
+    final volumeLiters = ref
+        .watch(blenderFlushFeeGasesProvider)[index]
+        .volumeLiters;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Read-only: this role's purge volume is entered once, next to its
+        // bank on the Fill gases settings (issue #42 follow-up), and shown
+        // here as text rather than a second, easily-drifting entry point for
+        // the same number -- the same treatment already given to the price
+        // below.
         Expanded(
-          child: TextField(
+          child: InputDecorator(
             key: Key('blender-flush-fee-volume-${role.name}'),
-            controller: _flushVolumes[index],
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
             decoration: InputDecoration(
               labelText:
                   '$label '
@@ -463,9 +454,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               isDense: true,
               border: const OutlineInputBorder(),
             ),
-            onChanged: (_) => _saveFlushFeeGases(settings),
-            onEditingComplete: () => saveBlenderPreferences(ref),
-            onSubmitted: (_) => saveBlenderPreferences(ref),
+            child: Text(
+              formatRoundedForInput(
+                litersToDisplayVolume(volumeLiters, settings),
+                2,
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -494,17 +488,5 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         ),
       ],
     );
-  }
-
-  void _saveFlushFeeGases(AppSettings settings) {
-    ref.read(blenderFlushFeeGasesProvider.notifier).state = [
-      for (var i = 0; i < BlenderGasRole.values.length; i++)
-        FlushFeeGasSetting(
-          volumeLiters: displayVolumeToLiters(
-            parseUserDecimal(_flushVolumes[i].text) ?? 0,
-            settings,
-          ),
-        ),
-    ];
   }
 }
