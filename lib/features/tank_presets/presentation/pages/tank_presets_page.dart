@@ -149,8 +149,15 @@ class TankPresetsPage extends ConsumerWidget {
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).colorScheme.primary,
       ),
+      // Only seeded rows resolve through the built-in translation table. A
+      // custom preset can slug onto a built-in name (nothing rejects a diver
+      // creating their own "AL80"), and its displayName is the diver's, not
+      // an identifier to be relabelled.
       title: Text(
-        builtInTankPresetName(context.l10n, preset.name) ?? preset.displayName,
+        preset.isBuiltIn
+            ? builtInTankPresetName(context.l10n, preset.name) ??
+                  preset.displayName
+            : preset.displayName,
       ),
       subtitle: Text(
         '$volumeStr • $pressureStr • ${preset.material.displayName}',
