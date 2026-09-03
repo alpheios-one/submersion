@@ -33,10 +33,29 @@ class SwissBathyTileDebugInfo {
   final bool cached;
   final DateTime? checkedAt;
 
+  /// The key [SwissBathyTileCacheRepository] actually used to look this tile
+  /// up (its `read`/`writeOk` argument). Always equal to [tileKey] today —
+  /// the repository has no separate transformation step between the two —
+  /// but shown explicitly, not assumed, since a mismatch here would be a
+  /// direct explanation for two different tile ranges resolving to the same
+  /// cached content.
+  final String lookupKey;
+
+  /// A fingerprint of THIS tile's own raw, individually-cached grid (before
+  /// [SwissBathy3dSource._stitchTiles] merges it with any neighbor), or null
+  /// when [cached] is false. Reuses [SwissBathyGridFingerprint] — the same
+  /// hash this module already applies to the post-stitch grid — one layer
+  /// further upstream: if two DIFFERENT tile keys (different physical 1-km
+  /// squares) carry the SAME [rawFingerprint], the corruption is already in
+  /// the tile cache itself, not introduced by stitching.
+  final SwissBathyGridFingerprint? rawFingerprint;
+
   const SwissBathyTileDebugInfo({
     required this.tileKey,
     required this.cached,
     this.checkedAt,
+    required this.lookupKey,
+    this.rawFingerprint,
   });
 }
 
@@ -154,16 +173,27 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
       final tileKey = '${e}_$n';
       var cached = false;
       DateTime? checkedAt;
+      SwissBathyGridFingerprint? rawFingerprint;
       if (tileCache != null) {
+        // Same read-only lookup SwissBathy3dSource._fetchTile performs
+        // before ever stitching this tile into a larger grid — the
+        // repository's read/write argument IS the tile key itself (no
+        // separate key derivation to diverge from it), so lookupKey below
+        // is always tileKey, shown explicitly rather than assumed.
         final entry = await tileCache.read(tileKey);
         cached = entry != null;
         checkedAt = entry?.checkedAt;
+        if (entry != null) {
+          rawFingerprint = buildSwissBathyGridFingerprint(entry.grid);
+        }
       }
       tiles.add(
         SwissBathyTileDebugInfo(
           tileKey: tileKey,
           cached: cached,
           checkedAt: checkedAt,
+          lookupKey: tileKey,
+          rawFingerprint: rawFingerprint,
         ),
       );
     }
@@ -252,8 +282,19 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
   buf.writeln('tiles requested (${info.tiles.length}):');
   for (final tile in info.tiles) {
     final checked = tile.checkedAt == null ? '' : ', checked ${tile.checkedAt}';
+    final lookupNote = tile.lookupKey == tile.tileKey
+        ? ''
+        : ' [lookup key differs: ${tile.lookupKey}]';
+    final raw = tile.rawFingerprint;
+    final rawNote = raw == null
+        ? ''
+        : ' | raw tile: ${raw.rows}x${raw.cols}, '
+              'depth ${raw.minDepth?.toStringAsFixed(2) ?? "n/a"}/'
+              '${raw.maxDepth?.toStringAsFixed(2) ?? "n/a"}, '
+              'hash=0x${raw.hash.toRadixString(16)}';
     buf.writeln(
-      '  ${tile.tileKey}: ${tile.cached ? "cached" : "not cached"}$checked',
+      '  ${tile.tileKey}: ${tile.cached ? "cached" : "not cached"}'
+      '$checked$lookupNote$rawNote',
     );
   }
   if (info.firstTileStacUrl != null) {
