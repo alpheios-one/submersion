@@ -28,6 +28,12 @@ DEFAULT_WORKFLOW = ".github/workflows/ci.yaml"
 # The job that aggregates the others; the one to mark required in protection.
 GATE_JOB = "ci-success"
 
+# This script. The gate job must run it, not merely some gated job: a guard
+# that runs only inside a job listed in `needs` cannot report its own
+# de-gating, because removing that job from `needs` also makes the guard's
+# failure advisory. Running it in the gate closes that loop.
+GUARD_SCRIPT = "check_ci_success_gate.py"
+
 # Jobs deliberately outside the gate. Keep this as short as possible: every
 # entry is a job whose failure cannot block a merge.
 #
@@ -104,6 +110,19 @@ def gate_needs(text):
     return None
 
 
+def gate_runs_guard(text):
+    """Return True if the gate job itself invokes this guard.
+
+    Scoped to the gate job's own body on purpose: finding the script anywhere
+    in the file would be satisfied by running it in a merely gated job, which
+    is the arrangement this check exists to reject.
+    """
+    for job_id, body in _job_lines(text):
+        if job_id == GATE_JOB:
+            return any(GUARD_SCRIPT in line for line in body)
+    return False
+
+
 def find_violations(text):
     """Return a list of violation strings; empty == every job is gated."""
     jobs = job_ids(text)
@@ -118,6 +137,12 @@ def find_violations(text):
         ]
 
     violations = []
+    if not gate_runs_guard(text):
+        violations.append(
+            f"{GATE_JOB} does not run {GUARD_SCRIPT} -- running it only in a "
+            "gated job means removing that job from needs would silence this "
+            "guard along with it"
+        )
     for job_id in jobs:
         if job_id == GATE_JOB or job_id in EXEMPT_JOBS or job_id in needs:
             continue

@@ -1319,6 +1319,18 @@ jobs:
       - submodule-pointer
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Check CI aggregation gate
+        # Deliberately duplicated from script-tests, which runs the same guard
+        # for a faster signal. This copy is the enforcing one: a guard that
+        # runs only inside a gated job cannot report its own de-gating, since
+        # dropping that job from `needs` below would make its failure advisory
+        # too. Running it here, in the one job branch protection requires,
+        # closes that loop. Ordered before the results check so a de-gated
+        # pipeline reports the cause rather than a downstream symptom.
+        run: python3 scripts/check_ci_success_gate.py
+
       - name: Verify all required jobs succeeded
         run: |
           results="${{ join(needs.*.result, ' ') }}"

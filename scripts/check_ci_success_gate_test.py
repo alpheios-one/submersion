@@ -46,6 +46,9 @@ jobs:
       - analyze
       - script-tests
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: python3 scripts/check_ci_success_gate.py
 """
 
 # script-tests exists but never reaches the gate: it can fail while the required
@@ -86,7 +89,17 @@ jobs:
   ci-success:
     name: CI Success
     runs-on: ubuntu-latest
+    steps:
+      - run: python3 scripts/check_ci_success_gate.py
 """
+
+# The guard runs only in a gated job, never in the gate itself. Dropping that
+# job from `needs` would then make the guard advisory, so it could no longer
+# report its own de-gating: exactly the self-concealing failure it exists to
+# prevent. The gate has to run it too.
+RED_GATE_DOES_NOT_RUN_GUARD = GREEN.replace(
+    "      - run: python3 scripts/check_ci_success_gate.py\n", ""
+)
 
 
 class ParserTests(unittest.TestCase):
@@ -137,6 +150,35 @@ class GuardTests(unittest.TestCase):
 
     def test_inline_needs_green_has_no_violations(self):
         self.assertEqual(guard.find_violations(GREEN_INLINE_NEEDS), [])
+
+    def test_gate_that_does_not_run_the_guard_is_flagged(self):
+        violations = guard.find_violations(RED_GATE_DOES_NOT_RUN_GUARD)
+        self.assertTrue(
+            any(guard.GUARD_SCRIPT in v for v in violations),
+            f"expected a violation naming {guard.GUARD_SCRIPT}: {violations}",
+        )
+
+    def test_gate_runs_guard_detects_the_step(self):
+        self.assertTrue(guard.gate_runs_guard(GREEN))
+        self.assertFalse(guard.gate_runs_guard(RED_GATE_DOES_NOT_RUN_GUARD))
+
+    def test_guard_step_in_another_job_does_not_satisfy_the_gate(self):
+        # Running it only in a gated job is the arrangement that cannot survive
+        # a needs-list edit, so it must not count as the gate running it.
+        text = RED_GATE_DOES_NOT_RUN_GUARD.replace(
+            """  script-tests:
+    name: Script Tests
+    runs-on: ubuntu-latest
+""",
+            """  script-tests:
+    name: Script Tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: python3 scripts/check_ci_success_gate.py
+""",
+        )
+        self.assertIn("check_ci_success_gate.py", text)
+        self.assertFalse(guard.gate_runs_guard(text))
 
     def test_commented_keys_have_no_violations(self):
         # Annotating a key must not be reported as "the gate has no needs".
