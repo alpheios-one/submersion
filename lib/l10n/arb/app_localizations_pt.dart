@@ -9,6 +9,21 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'Não foi possível abrir o navegador. Use Copiar link e cole o endereço no navegador.';
+
+  @override
+  String get settings_oauth_connect_copyFailed =>
+      'Não foi possível copiar o link.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Copiar link';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Link copiado. Cole-o no navegador para autorizar.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Importar do dispositivo Garmin';
 
@@ -15959,19 +15974,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_cloudSync_dropbox_account_title => 'Conta do Dropbox';
 
   @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Não foi possível abrir o navegador. Use Copiar link e cole o endereço no navegador.';
-
-  @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
       'Código de autorização';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_copyFailed =>
-      'Não foi possível copiar o link.';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_copyLink => 'Copiar link';
 
   @override
   String get settings_cloudSync_dropbox_connect_emptyCode =>
@@ -15985,10 +15989,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_cloudSync_dropbox_connect_instructions =>
       'Seu navegador abriu uma página de autorização do Dropbox. Aprove o acesso e cole aqui o código exibido pelo Dropbox.';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_linkCopied =>
-      'Link copiado. Cole-o no navegador para autorizar.';
 
   @override
   String get settings_cloudSync_dropbox_connect_reopenBrowser =>

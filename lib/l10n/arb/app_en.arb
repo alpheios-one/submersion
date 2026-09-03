@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "Could not open your browser. Use Copy link and paste the address into your browser.",
+  "settings_oauth_connect_copyFailed": "Could not copy the link.",
+  "settings_oauth_connect_copyLink": "Copy link",
+  "settings_oauth_connect_linkCopied": "Link copied. Paste it into your browser to authorize.",
   "universalImport_action_importFromGarmin": "Import from Garmin Device",
   "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
   "@diveLog_edit_flightWindowWarning": {
@@ -9614,14 +9618,10 @@
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} connection failed: {error}",
   "settings_cloudSync_dropbox_account_title": "Dropbox account",
-  "settings_cloudSync_dropbox_connect_browserFailed": "Could not open your browser. Use Copy link and paste the address into your browser.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Authorization code",
-  "settings_cloudSync_dropbox_connect_copyFailed": "Could not copy the link.",
-  "settings_cloudSync_dropbox_connect_copyLink": "Copy link",
   "settings_cloudSync_dropbox_connect_emptyCode": "Enter the authorization code shown in your browser",
   "settings_cloudSync_dropbox_connect_failed": "Could not connect to Dropbox: {error}",
   "settings_cloudSync_dropbox_connect_instructions": "Your browser opened a Dropbox authorization page. Approve access, then paste the code Dropbox shows you here.",
-  "settings_cloudSync_dropbox_connect_linkCopied": "Link copied. Paste it into your browser to authorize.",
   "settings_cloudSync_dropbox_connect_reopenBrowser": "Reopen browser",
   "settings_cloudSync_dropbox_connect_submit": "Connect",
   "settings_cloudSync_dropbox_connect_title": "Connect Dropbox",

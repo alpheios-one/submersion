@@ -105,7 +105,7 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
     setState(
       () => _errorText = opened
           ? null
-          : context.l10n.settings_cloudSync_dropbox_connect_browserFailed,
+          : context.l10n.settings_oauth_connect_browserFailed,
     );
   }
 
@@ -122,8 +122,7 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
       _log.warning('Could not copy the authorize link: $e');
       if (!mounted) return;
       setState(
-        () => _errorText =
-            context.l10n.settings_cloudSync_dropbox_connect_copyFailed,
+        () => _errorText = context.l10n.settings_oauth_connect_copyFailed,
       );
       return;
     }
@@ -185,14 +184,14 @@ class _LightroomConnectDialogState extends State<LightroomConnectDialog> {
             child: TextButton.icon(
               onPressed: _connecting ? null : _copyLink,
               icon: const Icon(Icons.link, size: 18),
-              label: Text(l10n.settings_cloudSync_dropbox_connect_copyLink),
+              label: Text(l10n.settings_oauth_connect_copyLink),
             ),
           ),
           if (_linkCopied)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
-                l10n.settings_cloudSync_dropbox_connect_linkCopied,
+                l10n.settings_oauth_connect_linkCopied,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
