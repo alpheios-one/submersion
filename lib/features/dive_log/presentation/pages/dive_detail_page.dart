@@ -68,9 +68,8 @@ import 'package:submersion/features/dive_log/presentation/widgets/collapsible_se
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/safety_review_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_safety_summary_section.dart';
 import 'package:submersion/features/safety/domain/services/altitude_flag.dart';
-import 'package:submersion/features/safety/presentation/widgets/linked_incidents_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/surface_gps_section.dart';
@@ -403,16 +402,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ];
       },
       DiveDetailSectionId.safetyReview: (topGap) {
-        // Both widgets collapse to nothing when empty, so each owns its own
-        // spacing rather than having a spacer left behind.
+        // The review and the incidents chip collapse independently, so
+        // neither alone can tell whether the pair has anything to show;
+        // DiveSafetySummarySection decides that -- and so owns the one gap
+        // above it -- before either half builds.
         return [
-          if (dive.profile.isNotEmpty)
-            SafetyReviewSection(
-              key: _safetyReviewSectionKey,
-              diveId: dive.id,
-              topPadding: topGap,
-            ),
-          LinkedIncidentsRow(diveId: dive.id),
+          DiveSafetySummarySection(
+            key: _safetyReviewSectionKey,
+            diveId: dive.id,
+            hasProfile: dive.profile.isNotEmpty,
+            topGap: topGap,
+          ),
         ];
       },
       DiveDetailSectionId.sacSegments: (_) {
