@@ -606,7 +606,20 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
     // Reset to sourceConfirmation so the canAdvance provider transitions
     // false -> true, enabling auto-advance even when re-confirming.
-    state = state.copyWith(currentStep: ImportWizardStep.sourceConfirmation);
+    //
+    // Anything an earlier confirmation parsed is dropped here: re-confirming
+    // means re-deciding what this file is, so a payload built under the old
+    // answer is stale. The CSV branch below never parses -- it hands off to
+    // Map Fields -- so without this an override to CSV after a successful
+    // parse would keep the old payload, and Map Fields would auto-skip on it,
+    // confirmFieldMapping would early-return on it, and Review would show the
+    // superseded import.
+    state = state.copyWith(
+      currentStep: ImportWizardStep.sourceConfirmation,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
 
     final effectiveOverride = overrideApp ?? state.pendingSourceOverride;
 
@@ -869,8 +882,20 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   ///
   /// The state copy is what the steps already on screen render; the throw is
   /// what stops the wizard advancing past them.
+  ///
+  /// Anything a previous attempt parsed goes with it. A user can walk back to
+  /// Confirm Source, change the source and confirm again, so a failure here
+  /// can land on top of an earlier success -- and every gate past this point
+  /// reads that payload, so leaving it would carry a superseded import
+  /// forward under a message saying the current one failed.
   ImportStepFailure _fail(String message) {
-    state = state.copyWith(isLoading: false, error: message);
+    state = state.copyWith(
+      isLoading: false,
+      error: message,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
     return ImportStepFailure(message);
   }
 

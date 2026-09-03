@@ -94,6 +94,49 @@ void main() {
       },
     );
 
+    test('drops the payload a previous attempt left behind', () async {
+      // Reachable by backtracking: parse a file, walk back to Confirm Source,
+      // change the source and confirm again. The second parse fails, but the
+      // first one's payload is still in state -- and every gate past this
+      // point reads that payload, so the wizard would carry a superseded
+      // import forward under a message saying the current one failed.
+      final notifier = await _notifier();
+      _seed(notifier, _bytes(_oneDiveUddf));
+      await notifier.confirmSource();
+      expect(notifier.state.payload, isNotNull, reason: 'first parse');
+
+      _seed(notifier, _bytes(_emptyUddf));
+      await expectLater(
+        notifier.confirmSource(),
+        throwsA(isA<ImportStepFailure>()),
+      );
+
+      expect(notifier.state.payload, isNull);
+      expect(notifier.state.duplicateResult, isNull);
+      expect(notifier.state.selections, isEmpty);
+      expect(notifier.state.error, isNotNull);
+    });
+
+    test('drops the payload when the source is re-confirmed as CSV', () async {
+      // The CSV branch of confirmSource hands off to Map Fields instead of
+      // parsing, so it never reaches _fail. Without clearing, overriding the
+      // source to CSV after a successful parse leaves the old payload in
+      // place: Map Fields auto-skips on it, confirmFieldMapping early-returns
+      // on it, and Review shows the superseded import.
+      final notifier = await _notifier();
+      _seed(notifier, _bytes(_oneDiveUddf));
+      await notifier.confirmSource();
+      expect(notifier.state.payload, isNotNull, reason: 'first parse');
+
+      await notifier.confirmSource(
+        overrideApp: SourceApp.generic,
+        overrideFormat: ImportFormat.csv,
+      );
+
+      expect(notifier.state.payload, isNull);
+      expect(notifier.state.currentStep, ImportWizardStep.fieldMapping);
+    });
+
     test('reports the failure when the picked file carries no bytes', () async {
       final notifier = await _notifier();
       notifier.state = notifier.state.copyWith(

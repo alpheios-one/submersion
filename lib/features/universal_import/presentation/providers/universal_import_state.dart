@@ -207,6 +207,7 @@ class UniversalImportState {
     ImportPayload? payload,
     bool clearPayload = false,
     ImportDuplicateResult? duplicateResult,
+    bool clearDuplicateResult = false,
     Map<ImportEntityType, Set<int>>? selections,
     Map<ImportEntityType, int>? importCounts,
     String? importPhase,
@@ -264,7 +265,9 @@ class UniversalImportState {
           ? null
           : (fieldMapping ?? this.fieldMapping),
       payload: clearPayload ? null : (payload ?? this.payload),
-      duplicateResult: duplicateResult ?? this.duplicateResult,
+      duplicateResult: clearDuplicateResult
+          ? null
+          : (duplicateResult ?? this.duplicateResult),
       selections: selections ?? this.selections,
       importCounts: importCounts ?? this.importCounts,
       importPhase: importPhase ?? this.importPhase,
