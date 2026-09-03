@@ -317,12 +317,19 @@ class DiveUncombineService {
       localUpdatedAt: now,
     );
 
-    // 2. Provenance rows, moved. Every row in a segment overlaps the others
-    // in time -- that is what put them in one segment -- so they are
-    // competing recordings of the same minutes and must each keep their own
-    // display strand. Re-slot them 0..n-1 within the segment for that, or
-    // clear the slot entirely on a segment of one so the restored dive looks
-    // exactly like a dive that was never combined.
+    // 2. Provenance rows, copied onto the restored dive. Every row in a
+    // segment overlaps the others in time -- that is what put them in one
+    // segment -- so they are competing recordings of the same minutes and
+    // must each keep their own display strand. Re-slot them 0..n-1 within
+    // the segment for that, or clear the slot entirely on a segment of one
+    // so the restored dive looks exactly like a dive that was never
+    // combined.
+    //
+    // The originals are not deleted until step 8, once every row that
+    // references them has moved. dive_profile_series.source_id is ON DELETE
+    // SET NULL, so deleting a source row first silently unattributes the
+    // series still pointing at it, which is the failure clearSource exists
+    // to describe.
     final newSourceIdByOld = <String, String>{};
     final soloSegment = segment.sourceIds.length == 1;
     for (var i = 0; i < segment.sourceIds.length; i++) {
@@ -342,10 +349,6 @@ class DiveUncombineService {
                   mergeSourceSlot: Value(soloSegment ? null : i),
                 ),
           );
-      await (_db.delete(
-        _db.diveDataSources,
-      )..where((t) => t.id.equals(oldId))).go();
-      await _sync.logDeletion(entityType: 'diveDataSources', recordId: oldId);
     }
 
     // 3. What else the segment takes with it, selected by where it sits on
@@ -481,6 +484,15 @@ class DiveUncombineService {
     }
     await _deleteEvents(movingEvents);
     await _deleteSwitches(movingSwitches);
+
+    // 8. The originals of the provenance rows copied in step 2, now that
+    // nothing on this dive still references them.
+    for (final oldId in segment.sourceIds) {
+      await (_db.delete(
+        _db.diveDataSources,
+      )..where((t) => t.id.equals(oldId))).go();
+      await _sync.logDeletion(entityType: 'diveDataSources', recordId: oldId);
+    }
 
     return newDiveId;
   }
@@ -640,7 +652,7 @@ class DiveUncombineService {
     }
 
     final spanById = {for (final span in spans) span.sourceId: span};
-    return [
+    final grouped = [
       for (final ids in groupSourcesIntoSegments(
         spans: spans,
         spanless: spanless,
@@ -650,6 +662,24 @@ class DiveUncombineService {
           startSeconds: _reduce(ids, spanById, (s) => s.start, min: true),
           endSeconds: _reduce(ids, spanById, (s) => s.end, min: false),
         ),
+    ];
+    // Segments are told apart by disjointness, and spans that merely TOUCH
+    // count as disjoint (a merge that bridged a gap too short to fill leaves
+    // one segment ending exactly where the next begins). Both ends of
+    // [UncombineSegment.contains] are inclusive, so a shared boundary second
+    // would sit in two segments at once and an event on it would move to
+    // whichever came first. Pull each end back off its successor's start.
+    return [
+      for (var i = 0; i < grouped.length; i++)
+        if (i + 1 < grouped.length &&
+            grouped[i].endSeconds >= grouped[i + 1].startSeconds)
+          UncombineSegment(
+            sourceIds: grouped[i].sourceIds,
+            startSeconds: grouped[i].startSeconds,
+            endSeconds: grouped[i + 1].startSeconds - 1,
+          )
+        else
+          grouped[i],
     ];
   }
 

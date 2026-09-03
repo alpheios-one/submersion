@@ -211,9 +211,100 @@ void main() {
         expect(await service.plan('a'), hasLength(1));
       },
     );
+
+    test('segments never share a boundary second', () async {
+      // Spans that merely TOUCH count as disjoint, so a merge across a gap
+      // too short to fill leaves one segment ending exactly where the next
+      // begins. Both ends of UncombineSegment.contains are inclusive, so
+      // without a correction that second would sit in two segments and an
+      // event on it would move to whichever was visited first.
+      const entry = 1780000000000;
+      await db
+          .into(db.dives)
+          .insert(
+            DivesCompanion.insert(
+              id: 'touching',
+              diveDateTime: entry,
+              createdAt: 0,
+              updatedAt: 0,
+            ).copyWith(entryTime: const Value(entry)),
+          );
+      for (final (id, startS, endS) in [('s1', 0, 1800), ('s2', 1800, 3000)]) {
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion.insert(
+                id: id,
+                diveId: 'touching',
+                importedAt: DateTime.utc(2026, 7, 1),
+                createdAt: DateTime.utc(2026, 7, 1),
+              ).copyWith(
+                // No profile series, so the spans come from these.
+                entryTime: Value(
+                  DateTime.fromMillisecondsSinceEpoch(
+                    entry + startS * 1000,
+                    isUtc: true,
+                  ),
+                ),
+                exitTime: Value(
+                  DateTime.fromMillisecondsSinceEpoch(
+                    entry + endS * 1000,
+                    isUtc: true,
+                  ),
+                ),
+              ),
+            );
+      }
+
+      final segments = await service.plan('touching');
+
+      expect(segments, hasLength(2));
+      expect(segments.first.endSeconds, lessThan(segments.last.startSeconds));
+      expect(segments.first.contains(1800), isFalse);
+      expect(segments.last.contains(1800), isTrue);
+    });
   });
 
   group('separate', () {
+    test('round-trips with foreign keys enforced', () async {
+      // Production opens the database with PRAGMA foreign_keys = ON and no
+      // deferred constraints, while this suite turns them off so link rows
+      // can be seeded without catalog rows. That convention hides insert and
+      // delete ORDER defects: dive_profile_series.source_id is ON DELETE SET
+      // NULL, so deleting a provenance row before the series pointing at it
+      // have moved silently unattributes them rather than failing loudly.
+      await db.customStatement('PRAGMA foreign_keys = ON');
+      await db
+          .into(db.divers)
+          .insert(
+            DiversCompanion.insert(
+              id: 'diver1',
+              name: 'Test Diver',
+              createdAt: 0,
+              updatedAt: 0,
+            ),
+          );
+
+      final mergedId = await mergeTwoImports();
+      final restoredId = (await service.separate(diveId: mergedId)).single;
+
+      // Every moved series still names the provenance row that owns it: a
+      // null here is the SET NULL cascade having fired on a row that had not
+      // moved yet.
+      for (final diveId in [mergedId, restoredId]) {
+        final series = await profileSeries.getSeriesForDive(diveId);
+        expect(series, isNotEmpty);
+        expect(series.map((s) => s.sourceId), everyElement(isNotNull));
+        final sourceIds = {
+          for (final row in await (db.select(
+            db.diveDataSources,
+          )..where((t) => t.diveId.equals(diveId))).get())
+            row.id,
+        };
+        expect(series.map((s) => s.sourceId), everyElement(isIn(sourceIds)));
+      }
+    });
+
     test('summarises each restored dive from its own samples', () async {
       // backfillPrimaryDataSource mints a provenance row from the dive it
       // found, so a legacy dive with no bottom_time carries none here. The
