@@ -289,7 +289,11 @@ if __name__ == "__main__":
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `python3 scripts/release/linux_repo/fetch_release_packages_test.py`
-Expected: FAIL, module not found.
+Expected: FAIL with `FileNotFoundError: [Errno 2] No such file or
+directory: ... fetch_release_packages.py`. The harness loads the script by
+path through `spec_from_file_location` plus `exec_module`, which never
+consults the import system, so a missing file raises when the loader opens
+it rather than as an import error.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -488,7 +492,8 @@ class LayoutTest(unittest.TestCase):
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `python3 scripts/release/linux_repo/build_apt_repo_test.py`
-Expected: FAIL, module not found.
+Expected: FAIL with `FileNotFoundError` for `build_apt_repo.py`, for the
+same reason as Task 2: the harness loads by path, not by import.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -866,8 +871,13 @@ Run the workflow by hand and confirm it deploys, then from a Debian container:
 
 ```bash
 docker run --rm debian:12 bash -c '
+  set -eu
   apt-get update -qq && apt-get install -y -qq curl ca-certificates gnupg > /dev/null
-  curl -fsSL https://packages.submersion.app/setup.sh | sh
+  # Downloaded and then run, never piped into sh. A failed curl writes
+  # nothing and sh exits 0 on an empty script, so the pipeline would report
+  # a successful enrollment over a repository that was never added.
+  curl -fsSL https://packages.submersion.app/setup.sh -o /tmp/setup.sh
+  sh /tmp/setup.sh
   apt-get install -y submersion
   submersion --version
 '
@@ -1060,12 +1070,15 @@ flutter test
 
 ```bash
 docker run --rm debian:12 bash -c '
+  set -eu
   apt-get update -qq && apt-get install -y -qq curl ca-certificates gnupg > /dev/null
-  curl -fsSL https://packages.submersion.app/setup.sh | sh
+  curl -fsSL https://packages.submersion.app/setup.sh -o /tmp/setup.sh
+  sh /tmp/setup.sh
   apt-get install -y submersion && submersion --version'
 docker run --rm fedora:latest bash -c '
-  curl -fsSL https://packages.submersion.app/submersion.repo \
-    | sed s/@CHANNEL@/stable/ > /etc/yum.repos.d/submersion.repo
+  set -eu
+  curl -fsSL https://packages.submersion.app/submersion.repo -o /tmp/repo.in
+  sed s/@CHANNEL@/stable/ /tmp/repo.in > /etc/yum.repos.d/submersion.repo
   dnf install -y submersion && submersion --version'
 ```
 
