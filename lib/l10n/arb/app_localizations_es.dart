@@ -22812,6 +22812,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '¿Eliminar \"$name\"?\n\nEsta región se descargó con una versión anterior, por lo que sus teselas se almacenan junto con las de otras regiones y no se pueden liberar por separado. Eliminarla no recuperará almacenamiento.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22902,6 +22907,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Tamano';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Desconocido';
 
   @override
   String get maps_offline_tiles => 'Teselas';

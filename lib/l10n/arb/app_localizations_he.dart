@@ -22222,6 +22222,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'למחוק את \"$name\"?\n\nאזור זה הורד בגרסה קודמת, ולכן האריחים שלו מאוחסנים יחד עם אלה של אזורים אחרים ולא ניתן לפנות אותם בנפרד. מחיקתו לא תפנה שטח אחסון.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22312,6 +22317,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'גודל';
+
+  @override
+  String get maps_offline_sizeUnknown => 'לא ידוע';
 
   @override
   String get maps_offline_tiles => 'אריחים';

@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/maps/data/repositories/offline_map_repository.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/domain/entities/cached_region.dart';
+import 'package:uuid/uuid.dart';
 
 /// Provider for the offline map repository.
 final offlineMapRepositoryProvider = Provider<OfflineMapRepository>((ref) {
@@ -26,6 +27,18 @@ final cachedRegionsProvider = FutureProvider<List<CachedRegion>>((ref) async {
 final cacheStatsProvider = FutureProvider<CacheStats>((ref) async {
   final service = ref.watch(tileCacheServiceProvider);
   return service.getCacheStats();
+});
+
+/// The ids of the regions that own their tiles, and so can report a real size
+/// and free real bytes when deleted.
+///
+/// A region missing from this set was downloaded before per-region stores
+/// existed: its tiles are commingled in the shared offline store and cannot be
+/// told apart from any other legacy region's. The UI uses this to avoid
+/// claiming a size it cannot measure.
+final regionStoreIdsProvider = FutureProvider<Set<String>>((ref) async {
+  final service = ref.watch(tileCacheServiceProvider);
+  return service.getRegionStoreIds();
 });
 
 /// State for region download progress.
@@ -86,13 +99,30 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
   final OfflineMapRepository _repository;
   final Ref _ref;
 
+  static const _uuid = Uuid();
+
+  /// The region currently downloading, and the region whose download the
+  /// diver cancelled.
+  ///
+  /// Cancelling and finishing both end the progress stream the same way, so
+  /// the loop needs to be told which happened. Keyed by region rather than a
+  /// flag so a cancellation can never be attributed to a later download.
+  String? _activeRegionId;
+  String? _cancelledRegionId;
+
   DownloadProgressNotifier(this._cacheService, this._repository, this._ref)
     : super(const DownloadState());
 
-  /// Download tiles for a rectangular region.
+  /// Download tiles for a rectangular region into a store of its own.
   ///
   /// The [tileLayerOptions] should be configured with the URL template
   /// for the tile server (e.g., OpenStreetMap).
+  ///
+  /// The region's id is minted here, before the download, because the store
+  /// that holds its tiles is named after it. Everything after that point is
+  /// all-or-nothing: either the region is recorded and its store released, or
+  /// the store is deleted. A store left behind would hold tiles no region
+  /// could reach and nothing but "Clear all cache" could free.
   Future<void> downloadRegion({
     required String name,
     required double minLat,
@@ -103,6 +133,16 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
     required int maxZoom,
     required TileLayer tileLayerOptions,
   }) async {
+    final regionId = _uuid.v4();
+    // A cancellation belongs to the download it was aimed at, so this both
+    // clears a stale one and handles the download that supersedes another:
+    // the service cancels the running download when a new one starts, and
+    // without being marked cancelled here that first download would fall
+    // through to its success path and record a region for the handful of
+    // tiles it had managed. Null when nothing was running, which is the
+    // ordinary case.
+    _cancelledRegionId = _activeRegionId;
+    _activeRegionId = regionId;
     try {
       state = state.copyWith(
         isDownloading: true,
@@ -115,7 +155,8 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
         clearError: true,
       );
 
-      final stream = _cacheService.downloadRegion(
+      final stream = await _cacheService.downloadRegion(
+        regionId: regionId,
         southWest: LatLng(minLat, minLng),
         northEast: LatLng(maxLat, maxLng),
         minZoom: minZoom,
@@ -123,8 +164,20 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
         options: tileLayerOptions,
       );
 
+      // Cancelling during setup used to be a cancel in name only. The
+      // progress card is on screen from the moment this method starts, so the
+      // diver can press cancel while the store is still being created, and at
+      // that point there is no download instance for the service to cancel.
+      // The download would then run to completion, invisibly, and only be
+      // thrown away at the end: every tile fetched, every byte of it wasted.
+      // Now the download is cancelled as soon as there is something to cancel.
+      if (_cancelledRegionId == regionId) {
+        await _cacheService.discardRegionDownload(regionId);
+        state = const DownloadState();
+        return;
+      }
+
       int downloadedTiles = 0;
-      int sizeBytes = 0;
 
       await for (final progress in stream) {
         downloadedTiles = progress.downloadedTiles;
@@ -138,12 +191,22 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
         );
       }
 
-      // Estimate size based on average tile size (typical map tiles are ~20KB)
-      // This is a rough estimate; actual size would need to be queried from cache
-      sizeBytes = downloadedTiles * 20 * 1024;
+      if (_cancelledRegionId == regionId) {
+        // A cancelled download used to keep its partial tiles and record a
+        // region for them anyway. Now both go.
+        await _cacheService.discardRegionDownload(regionId);
+        state = const DownloadState();
+        return;
+      }
+
+      // A real measurement of the region's own store, which is what per-region
+      // stores buy: the size used to be tiles * 20 KiB and had never read the
+      // cache.
+      final sizeBytes = await _cacheService.measureRegionSize(regionId);
 
       // Save region to database
       await _repository.createRegion(
+        id: regionId,
         name: name,
         minLat: minLat,
         maxLat: maxLat,
@@ -155,18 +218,47 @@ class DownloadProgressNotifier extends StateNotifier<DownloadState> {
         sizeBytes: sizeBytes,
       );
 
+      // The store is reachable through its region now, so it no longer needs
+      // protecting from the orphan sweep.
+      _cacheService.finishRegionDownload(regionId);
+
       // Refresh the regions list and cache stats
       _ref.invalidate(cachedRegionsProvider);
       _ref.invalidate(cacheStatsProvider);
+      _ref.invalidate(regionStoreIdsProvider);
 
       state = state.copyWith(isDownloading: false);
     } catch (e) {
+      // Whatever failed, the store must not outlive the attempt.
+      await _discardQuietly(regionId);
       state = state.copyWith(isDownloading: false, error: e.toString());
+    } finally {
+      // Only if this download is still the current one. A superseded download
+      // finishes after the one that replaced it started, and clearing the slot
+      // unconditionally would hand the newer download an empty one: the next
+      // cancel would mark nothing, so that download would stop transferring
+      // and then record a region for the tiles it had, which is the phantom
+      // region this branch exists to prevent.
+      if (_activeRegionId == regionId) {
+        _activeRegionId = null;
+      }
+    }
+  }
+
+  /// Deletes a failed download's store, keeping the original failure as the
+  /// error the diver sees: a cleanup that fails on the way out would otherwise
+  /// replace the reason the download failed.
+  Future<void> _discardQuietly(String regionId) async {
+    try {
+      await _cacheService.discardRegionDownload(regionId);
+    } catch (_) {
+      // Reported through the orphan sweep instead, which will find the store.
     }
   }
 
   /// Cancel an ongoing download.
   Future<void> cancelDownload() async {
+    _cancelledRegionId = _activeRegionId;
     await _cacheService.cancelDownload();
     state = const DownloadState();
   }
@@ -260,9 +352,19 @@ class CachedRegionsNotifier
   }
 
   /// Delete a cached region and its tiles.
+  ///
+  /// The tiles go first. If removing them fails, the region row survives, so
+  /// the diver still has a handle on those bytes and can try again; the other
+  /// order would leave tiles on disk that nothing in the app could see, let
+  /// alone reclaim.
+  ///
+  /// For a region downloaded before per-region stores, removing the tiles is a
+  /// no-op: they are commingled in the shared offline store with every other
+  /// legacy region's and cannot be told apart. The row is still removed.
   Future<void> deleteRegion(String id) async {
     try {
-      // Delete from database
+      await _cacheService.deleteRegionTiles(id);
+
       await _repository.deleteRegion(id);
 
       // Reload regions
@@ -270,9 +372,26 @@ class CachedRegionsNotifier
 
       // Refresh cache stats
       _ref.invalidate(cacheStatsProvider);
+      _ref.invalidate(regionStoreIdsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  /// Delete region stores whose region is gone.
+  ///
+  /// A store outlives its region when the app dies mid-download, or when a
+  /// delete removed the tiles and then failed before the row. Either way the
+  /// tiles are unreachable, which is the condition this whole change exists to
+  /// prevent, so the sweep runs whenever the offline maps page is opened.
+  ///
+  /// Returns how many stores it reclaimed, which the caller needs because the
+  /// storage totals on screen were measured before those bytes went away.
+  Future<int> pruneOrphanStores() async {
+    final regions = await _repository.getAllRegions();
+    return _cacheService.pruneOrphanRegionStores(
+      knownRegionIds: regions.map((r) => r.id).toSet(),
+    );
   }
 
   /// Update a region's last accessed timestamp.
@@ -282,22 +401,56 @@ class CachedRegionsNotifier
   }
 
   /// Clear all cached tiles and regions.
+  ///
+  /// Region by region, so that a partial failure leaves a coherent state
+  /// rather than a plausible-looking lie. Clearing the tiles wholesale first
+  /// and the rows afterwards meant that a failure between the two left rows
+  /// describing regions whose tiles were already gone: the page would offer
+  /// them as regions, report their size as unmeasurable, and warn that
+  /// deleting them would not reclaim anything, when in fact there was nothing
+  /// left to reclaim.
+  ///
+  /// Each region is removed the same way a single delete removes one, tiles
+  /// before row, so whatever survives a failure is exactly the set whose bytes
+  /// are still on disk. The shared stores are reset afterwards, which also
+  /// takes any region store no row was pointing at.
   Future<void> clearAllCache() async {
-    try {
-      // Clear tiles from cache service
-      await _cacheService.clearCache();
+    Object? firstError;
+    StackTrace? firstStackTrace;
 
-      // Get all regions and delete them
-      final regions = await _repository.getAllRegions();
-      for (final region in regions) {
-        await _repository.deleteRegion(region.id);
+    try {
+      // A running download owns a store with no row yet, so the loop below
+      // would walk straight past it and the reset would then delete the store
+      // out from under it. Cancelling through the download notifier, rather
+      // than the service, is what makes the difference: it marks the download
+      // cancelled, so it discards itself instead of finishing and recording a
+      // region whose tiles this clear had already removed.
+      await _ref.read(downloadProgressProvider.notifier).cancelDownload();
+
+      for (final region in await _repository.getAllRegions()) {
+        try {
+          await _cacheService.deleteRegionTiles(region.id);
+          await _repository.deleteRegion(region.id);
+        } catch (e, st) {
+          // Kept, not thrown: one locked store must not strand every other
+          // region's bytes, which is the whole point of clearing.
+          firstError ??= e;
+          firstStackTrace ??= st;
+        }
       }
 
-      // Reload
+      await _cacheService.clearCache();
+
       await _loadRegions();
       _ref.invalidate(cacheStatsProvider);
+      _ref.invalidate(regionStoreIdsProvider);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      firstError ??= e;
+      firstStackTrace ??= st;
+    }
+
+    if (firstError != null) {
+      state = AsyncValue.error(firstError, firstStackTrace ?? StackTrace.empty);
     }
   }
 }

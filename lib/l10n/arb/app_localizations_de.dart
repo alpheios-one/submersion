@@ -22748,6 +22748,11 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return '\"$name\" löschen?\n\nDiese Region wurde mit einer früheren Version heruntergeladen. Ihre Kacheln liegen zusammen mit denen anderer Regionen und lassen sich nicht einzeln freigeben. Das Löschen gibt keinen Speicherplatz frei.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22838,6 +22843,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Größe';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Unbekannt';
 
   @override
   String get maps_offline_tiles => 'Kacheln';
