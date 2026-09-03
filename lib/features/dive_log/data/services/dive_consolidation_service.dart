@@ -170,6 +170,21 @@ class DiveConsolidationService {
         (r) => r.diveId == targetDiveId,
       );
 
+      // Where a folded-in dive's own merge slots have to land so they do not
+      // collide with the target's (issue #1451). A slot names a strand
+      // WITHIN one dive, so two dives that were each combined from halves
+      // both carry slot 0, and copying those over verbatim would collapse
+      // all four rows into a single chip. Rebased past whatever the target
+      // already uses, the same way timeOffsetSeconds composes below.
+      // Secondaries with no slots of their own leave this untouched.
+      var nextMergeSlot =
+          1 +
+          snapshot.dataSourceRows
+              .where((r) => r.diveId == targetDiveId)
+              .map((r) => r.mergeSourceSlot)
+              .nonNulls
+              .fold<int>(-1, (a, b) => a > b ? a : b);
+
       for (final secondary in plan.secondaries) {
         final secRow = snapshot.diveRows.firstWhere(
           (r) => r.id == secondary.id,
@@ -233,9 +248,13 @@ class DiveConsolidationService {
                 ),
               );
         } else {
+          final slotBase = nextMergeSlot;
+          var highestSecSlot = -1;
           for (final row in secSources) {
             final copiedId = _uuid.v4();
             sourceIdMap[row.id] = copiedId;
+            final slot = row.mergeSourceSlot;
+            if (slot != null && slot > highestSecSlot) highestSecSlot = slot;
             await _db
                 .into(_db.diveDataSources)
                 .insert(
@@ -254,9 +273,13 @@ class DiveConsolidationService {
                         timeOffsetSeconds: Value(
                           (row.timeOffsetSeconds ?? 0) + offset,
                         ),
+                        mergeSourceSlot: Value(
+                          slot == null ? null : slot + slotBase,
+                        ),
                       ),
                 );
           }
+          nextMergeSlot = slotBase + highestSecSlot + 1;
           // A profile row whose sourceId names none of the copied rows (an
           // old row that never got attributed) still needs an owner on the
           // target, so fall back to the secondary's primary source.
