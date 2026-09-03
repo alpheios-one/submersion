@@ -39,7 +39,6 @@ class BlenderInvoiceCard extends ConsumerStatefulWidget {
 
 class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   late final TextEditingController _billedTo;
-  late final List<TextEditingController> _flushVolumes;
 
   /// The logbook name is a starting point, offered once. Re-seeding on every
   /// rebuild would fight the diver as they typed a customer's name.
@@ -53,24 +52,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   void initState() {
     super.initState();
     _billedTo = TextEditingController(text: ref.read(blenderBilledToProvider));
-    final settings = ref.read(settingsProvider);
-    _flushVolumes = [
-      for (final g in ref.read(blenderFlushFeeGasesProvider))
-        TextEditingController(
-          text: formatRoundedForInput(
-            litersToDisplayVolume(g.volumeLiters, settings),
-            2,
-          ),
-        ),
-    ];
   }
 
   @override
   void dispose() {
     _billedTo.dispose();
-    for (final c in _flushVolumes) {
-      c.dispose();
-    }
     super.dispose();
   }
 
@@ -452,34 +438,25 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
               style: style,
             ),
           ),
+          // Read-only: this role's flush volume is entered once, on the Cost
+          // card (blender_billing_card.dart), and shown here as text rather
+          // than a second, easily-drifting entry point for the same number
+          // (issue #42).
           SizedBox(
             width: 72,
-            child: TextField(
+            child: InputDecorator(
               key: Key('blender-flush-fee-liters-${role.name}'),
-              controller: _flushVolumes[index],
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-              ],
               decoration: InputDecoration(
                 isDense: true,
                 suffixText: units.volumeSymbol,
                 border: const OutlineInputBorder(),
               ),
-              onChanged: (v) {
-                final gases = [...ref.read(blenderFlushFeeGasesProvider)];
-                gases[index] = gases[index].copyWith(
-                  volumeLiters: displayVolumeToLiters(
-                    parseUserDecimal(v) ?? 0,
-                    settings,
-                  ),
-                );
-                ref.read(blenderFlushFeeGasesProvider.notifier).state = gases;
-              },
-              onEditingComplete: () => saveBlenderPreferences(ref),
-              onSubmitted: (_) => saveBlenderPreferences(ref),
+              child: Text(
+                formatRoundedForInput(
+                  litersToDisplayVolume(gas.volumeLiters, settings),
+                  2,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),
