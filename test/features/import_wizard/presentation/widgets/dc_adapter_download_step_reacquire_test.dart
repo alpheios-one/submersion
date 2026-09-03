@@ -58,6 +58,28 @@ class _SeededDiscoveryNotifier extends DiscoveryNotifier {
   }
 }
 
+/// Discovery notifier whose scan never starts, mirroring what the real
+/// [DiscoveryNotifier.startScan] does when Android denies the Bluetooth
+/// permissions: it records an error and returns before the branch that
+/// empties `discoveredDevices`, so an earlier scan's devices stay in the
+/// provider.
+class _BlockedScanNotifier extends DiscoveryNotifier {
+  _BlockedScanNotifier({required super.service, required DiscoveryState seed})
+    : super(requiresRuntimePermissions: false) {
+    state = seed;
+  }
+
+  @override
+  Future<void> startScan() async {
+    state = state.copyWith(
+      isScanning: false,
+      errorMessage:
+          'Bluetooth permissions are required to scan for dive computers. '
+          'Please grant Bluetooth access in Settings.',
+    );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Test data
 // ---------------------------------------------------------------------------
@@ -113,14 +135,18 @@ DiscoveredDevice _discovered(String address) => DiscoveredDevice(
 );
 
 class _Harness {
-  _Harness({DiscoveryState seed = const DiscoveryState()})
-    : hostApi = _RecordingHostApi(),
-      _seed = seed {
+  _Harness({
+    DiscoveryState seed = const DiscoveryState(),
+    bool blockScan = false,
+  }) : hostApi = _RecordingHostApi(),
+       _seed = seed,
+       _blockScan = blockScan {
     service = pigeon.DiveComputerService(hostApi: hostApi);
   }
 
   final _RecordingHostApi hostApi;
   final DiscoveryState _seed;
+  final bool _blockScan;
   final FakeImportAdapterDeps deps = FakeImportAdapterDeps();
   late final pigeon.DiveComputerService service;
 
@@ -137,7 +163,9 @@ class _Harness {
       overrides: [
         diveComputerServiceProvider.overrideWithValue(service),
         discoveryNotifierProvider.overrideWith(
-          (ref) => _SeededDiscoveryNotifier(service: service, seed: _seed),
+          (ref) => _blockScan
+              ? _BlockedScanNotifier(service: service, seed: _seed)
+              : _SeededDiscoveryNotifier(service: service, seed: _seed),
         ),
         diveComputerRepositoryProvider.overrideWithValue(deps.computerRepo),
         deviceDescriptorsProvider.overrideWith((ref) async => []),
@@ -402,6 +430,27 @@ void main() {
       );
       await _settle(tester);
 
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
+    });
+
+    testWidgets('keeps the stored address when the scan could not start', (
+      tester,
+    ) async {
+      // A scan blocked before it starts leaves the previous scan's devices
+      // in the provider, so the discovered list says nothing about what is
+      // advertising now. Adopting the one same-model entry from it would
+      // download from a device this attempt never saw, and a successful
+      // download would then rewrite the stored address to match it.
+      final h = _Harness(
+        seed: DiscoveryState(discoveredDevices: [_discovered(freshAddress)]),
+        blockScan: true,
+      );
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+      await _settle(tester);
+
+      expect(h.hostApi.calls, ['stopDiscovery', 'startDownload']);
       expect(h.hostApi.downloads.single.address, _savedAddress);
       expect(_selectedDevice(tester), isNull);
     });

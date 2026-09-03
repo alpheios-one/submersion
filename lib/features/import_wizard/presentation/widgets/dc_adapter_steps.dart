@@ -378,10 +378,27 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
 
   /// The one device of [computer]'s make and model the scan saw while the
   /// stored [address] stayed silent, or null.
+  ///
+  /// Only a scan that actually ran can answer this. `scanForAddress` also
+  /// resolves with null when the scan never started, in which case the
+  /// discovered list still holds whatever an earlier scan left in the
+  /// provider, and adopting a device from it would download from something
+  /// this attempt never saw. An error message on the discovery state is
+  /// exactly that signal: a scan that starts clears it.
   DiscoveredDevice? _sameModelFallback(DiveComputer computer, String address) {
+    final discovery = ref.read(discoveryNotifierProvider);
+    final scanError = discovery.errorMessage;
+    if (scanError != null) {
+      _log.warning(
+        'Not looking for a same-model stand-in for ${computer.displayName}: '
+        'the scan for $address did not run ($scanError)',
+        category: LogCategory.bluetooth,
+      );
+      return null;
+    }
     final device = sameModelFallbackDevice(
       computer: computer,
-      discovered: ref.read(discoveryNotifierProvider).discoveredDevices,
+      discovered: discovery.discoveredDevices,
     );
     if (device != null) {
       _log.info(
