@@ -89,7 +89,7 @@ class MetadataWriteHandler: NSObject {
             // must never do (issue #1472). Refuse instead; the UI does not
             // offer the action for a video, so this is reached only by a
             // mislabelled asset.
-            print("[MetadataWriteHandler] Asset is a video; metadata writing is not supported")
+            NSLog("[MetadataWriteHandler] Asset is a video; metadata writing is not supported")
             result(FlutterError(
                 code: "VIDEO_UNSUPPORTED",
                 message: "Writing metadata to a video is not supported.",

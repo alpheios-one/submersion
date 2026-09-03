@@ -151,13 +151,16 @@ class MetadataWriteService {
   static const _channel = MethodChannel('com.submersion.app/metadata');
   final _log = LoggerService.forClass(MetadataWriteService);
 
-  /// Test seam overriding the platform-support check. Production leaves null
-  /// so the real `Platform` check is used. Mirrors
-  /// `BackupBookmarkService.debugSupportedOverride`.
+  /// Debug-only seam overriding the platform-support check. Leave null to use
+  /// the real `Platform` check.
   ///
   /// Without it every test here has to be skipped off Apple and Android, and
-  /// CI runs its test shards on Linux, so the whole file would be dead weight
-  /// exactly where it is meant to guard against regressions.
+  /// CI runs its test shards on Linux, so both files would be dead weight
+  /// exactly where they are meant to guard against regressions.
+  ///
+  /// [isSupported] reads this inside an `assert`, which is stripped from
+  /// release builds, so assigning it cannot change shipped behavior. Same
+  /// shape as Flutter's own `debugDefaultTargetPlatformOverride`.
   @visibleForTesting
   static bool? debugSupportedOverride;
 
@@ -165,10 +168,12 @@ class MetadataWriteService {
   ///
   /// [platformAssetId] - The platform-specific asset identifier.
   /// [metadata] - The dive metadata to write.
-  /// [isVideo] - Whether the asset is a video. Videos are refused here, before
-  ///             the platform channel. The flag still travels to the native
-  ///             side, which additionally checks the media type the library
-  ///             itself reports, so an asset mislabelled here is refused too.
+  /// [isVideo] - Whether the caller believes the asset is a video. Videos are
+  ///             refused two ways. When this is true the refusal happens here,
+  ///             before the platform channel, and nothing is sent. When it is
+  ///             false the call proceeds, and the native handler refuses
+  ///             anyway if the library reports the asset as a video, which is
+  ///             how a mislabelled asset is caught.
   ///
   /// Returns true if successful.
   /// Throws [MetadataWriteException] with a user-friendly message on failure.
@@ -275,9 +280,20 @@ class MetadataWriteService {
   }
 
   /// Check if metadata writing is supported on this platform.
-  bool get isSupported =>
-      debugSupportedOverride ??
-      (Platform.isIOS || Platform.isMacOS || Platform.isAndroid);
+  bool get isSupported {
+    var supported = Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
+    // The override is read inside an assert so it is compiled out of release
+    // builds entirely: production behavior cannot be changed by assigning it,
+    // whatever the analyzer's @visibleForTesting enforcement does or does not
+    // catch. Mirrors how `defaultTargetPlatform` honours
+    // `debugDefaultTargetPlatformOverride`.
+    assert(() {
+      final override = debugSupportedOverride;
+      if (override != null) supported = override;
+      return true;
+    }());
+    return supported;
+  }
 
   /// Get supported file types for the current platform.
   List<String> get supportedTypes {

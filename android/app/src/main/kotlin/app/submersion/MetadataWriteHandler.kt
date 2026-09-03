@@ -95,7 +95,7 @@ class MetadataWriteHandler(
                 ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), mediaId)
             val mimeType = appContext.contentResolver.getType(filesUri)
             if (mimeType == null) {
-                result.error("ASSET_NOT_FOUND", "Photo not found with ID: $assetId", null)
+                result.error("ASSET_NOT_FOUND", "Asset not found with ID: $assetId", null)
                 return
             }
             if (!mimeType.startsWith("image/")) {
