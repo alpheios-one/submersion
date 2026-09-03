@@ -3029,6 +3029,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '另有 $count 项逾期';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => '保险正常';
 
   @override
@@ -3235,9 +3240,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboard_gauges_retry => '状态不可用 - 点按重试';
-
-  @override
-  String get dashboard_urgent_title => '需要注意';
 
   @override
   String get dashboard_media_title => '最近媒体';

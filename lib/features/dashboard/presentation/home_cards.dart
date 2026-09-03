@@ -1,7 +1,8 @@
 /// The customizable home screen cards. Declaration order is the default
 /// display order and must match the pre-customization dashboard layout.
-/// The urgent banner is deliberately absent: it is pinned and always
-/// renders above all customizable content when triggered.
+/// Every card here is hideable, with one override: DashboardPage forces
+/// [HomeCardType.gaugeStrip] back on while a dive-safety alert is live, so
+/// GaugeStrip's hardened chips cannot be hidden by hiding their host card.
 enum HomeCardType {
   hero,
   gaugeStrip,
