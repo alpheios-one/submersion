@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'package:submersion/core/services/logger_service.dart';
@@ -150,6 +151,16 @@ class MetadataWriteService {
   static const _channel = MethodChannel('com.submersion.app/metadata');
   final _log = LoggerService.forClass(MetadataWriteService);
 
+  /// Test seam overriding the platform-support check. Production leaves null
+  /// so the real `Platform` check is used. Mirrors
+  /// `BackupBookmarkService.debugSupportedOverride`.
+  ///
+  /// Without it every test here has to be skipped off Apple and Android, and
+  /// CI runs its test shards on Linux, so the whole file would be dead weight
+  /// exactly where it is meant to guard against regressions.
+  @visibleForTesting
+  static bool? debugSupportedOverride;
+
   /// Write dive metadata to a photo in the device library.
   ///
   /// [platformAssetId] - The platform-specific asset identifier.
@@ -265,7 +276,8 @@ class MetadataWriteService {
 
   /// Check if metadata writing is supported on this platform.
   bool get isSupported =>
-      Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
+      debugSupportedOverride ??
+      (Platform.isIOS || Platform.isMacOS || Platform.isAndroid);
 
   /// Get supported file types for the current platform.
   List<String> get supportedTypes {

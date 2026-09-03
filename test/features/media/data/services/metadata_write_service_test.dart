@@ -1,15 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/media/data/services/metadata_write_service.dart';
-
-/// Mirrors `MetadataWriteService.isSupported`, which is checked BEFORE the
-/// platform channel: on an unsupported host the service throws outright and
-/// the mocked channel is never reached, so every case that asserts on a
-/// channel response has to be skipped there.
-final bool _metadataWriteSupported =
-    Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
 
 /// Enough dive data to clear the service's `hasData` guard.
 const _metadata = DiveMediaMetadata(
@@ -28,12 +19,16 @@ void main() {
   late Future<Object?> Function(MethodCall) handler;
 
   setUp(() {
+    // `isSupported` is checked before the channel, and CI runs its test shards
+    // on Linux; without this the whole file would silently skip there.
+    MetadataWriteService.debugSupportedOverride = true;
     handler = (_) async => true;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) => handler(call));
   });
 
   tearDown(() {
+    MetadataWriteService.debugSupportedOverride = null;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
   });
@@ -65,7 +60,7 @@ void main() {
         isFalse,
         reason: 'the native video path is gone; nothing should reach it',
       );
-    }, skip: !_metadataWriteSupported);
+    });
 
     test('the channel payload carries no keep-original instruction', () async {
       MethodCall? seen;
@@ -84,7 +79,7 @@ void main() {
             'issue #1472: no argument may tell the native side whether to '
             'delete the original',
       );
-    }, skip: !_metadataWriteSupported);
+    });
 
     test('a native video refusal is given a curated message', () async {
       // Reachable only if an asset labelled a photo turns out to be a video.
@@ -101,7 +96,7 @@ void main() {
               .having((e) => e.message, 'message', isNot(contains('raw'))),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
   });
 
   group('live photos', () {
@@ -121,7 +116,7 @@ void main() {
           ),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
 
     test('the raw PhotoKit error never reaches the message', () async {
       // Before the native Live Photo check existed, PhotoKit rejected the
@@ -146,7 +141,7 @@ void main() {
           ),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
   });
 
   group('other platform failures', () {
@@ -162,7 +157,7 @@ void main() {
               .having((e) => e.message, 'message', contains('read-only')),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
 
     test('WRITE_FAILED still passes the native message through', () async {
       handler = (_) async =>
@@ -176,7 +171,7 @@ void main() {
               .having((e) => e.message, 'message', 'disk full'),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
 
     test('a failure raised on the Dart side carries no code', () async {
       // A `false` result is rejected by a throw inside the service's own try,
@@ -191,7 +186,22 @@ void main() {
           isA<MetadataWriteException>().having((e) => e.code, 'code', isNull),
         ),
       );
-    }, skip: !_metadataWriteSupported);
+    });
+
+    test('an unknown code with no message still names the code', () async {
+      handler = (_) async => throw PlatformException(code: 'MYSTERY');
+
+      await expectLater(
+        write(),
+        throwsA(
+          isA<MetadataWriteException>().having(
+            (e) => e.message,
+            'message',
+            contains('MYSTERY'),
+          ),
+        ),
+      );
+    });
 
     test('a thrown non-platform error is still surfaced', () async {
       // The mock messenger re-wraps anything that is not a PlatformException
@@ -199,6 +209,6 @@ void main() {
       handler = (_) async => throw StateError('boom');
 
       await expectLater(write(), throwsA(isA<MetadataWriteException>()));
-    }, skip: !_metadataWriteSupported);
+    });
   });
 }

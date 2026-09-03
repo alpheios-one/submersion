@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,14 +17,6 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/test_database.dart';
-
-/// Mirrors `MetadataWriteService.isSupported`, which is checked BEFORE the
-/// platform channel: on an unsupported host the service throws outright, so
-/// the mocked channel is unreachable and a test asserting its result can never
-/// pass there. Tests that only assert the viewer recovers (spinner dropped, a
-/// SnackBar shown) hold on every platform and are deliberately NOT skipped.
-final bool _metadataWriteSupported =
-    Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
 
 class _UnavailableResolver implements MediaSourceResolver {
   @override
@@ -88,6 +78,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     nativeCalls = [];
+    // CI runs its test shards on Linux, where the service's real platform
+    // check is false and would refuse before reaching the mocked channel.
+    MetadataWriteService.debugSupportedOverride = true;
     handler = (_) async => true;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) {
@@ -97,6 +90,7 @@ void main() {
   });
 
   tearDown(() async {
+    MetadataWriteService.debugSupportedOverride = null;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
     await tearDownTestDatabase();
@@ -212,7 +206,7 @@ void main() {
     expect(find.text('Dive data written to photo'), findsOneWidget);
     // The modal spinner must not outlive the write.
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 
   testWidgets('a native refusal is reported as a failure', (tester) async {
     handler = (_) async => false;
@@ -227,7 +221,7 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.textContaining('The operation returned false'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 
   testWidgets('a native error surfaces and drops the spinner', (tester) async {
     handler = (_) async =>
@@ -262,7 +256,7 @@ void main() {
     expect(find.textContaining('PHPhotosErrorDomain'), findsNothing);
     expect(find.textContaining('Live Photos'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 
   testWidgets('a native video refusal is translated, not shown raw', (
     tester,
@@ -285,5 +279,5 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 }
