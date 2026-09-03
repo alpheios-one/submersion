@@ -115,12 +115,19 @@ secret material or create public infrastructure, so a person performs them.
 - [ ] **Step 1: Generate the key offline**
 
 ```bash
-# tr -d before tee: command substitution strips the trailing newline from the
-# argument, but tee would write it into the file whose contents become the
-# LINUX_REPO_GPG_PASSPHRASE secret. The stored passphrase would then not match
-# the one the key was created with, and every signing step would fail.
-openssl rand -base64 32 | tr -d '\n' > /tmp/repo-pass
-chmod 600 /tmp/repo-pass
+# Everything here is private key material, so it is written inside a
+# mktemp -d directory (created 0700) with umask 077 in force. Shell
+# redirection creates files using the caller's umask, commonly 0644, and a
+# chmod afterwards still leaves a window in which another local user can read
+# the file. The directory closes that window regardless of file mode.
+umask 077
+KEYDIR=$(mktemp -d)
+
+# tr -d: command substitution strips the trailing newline from the argument,
+# but the file is what becomes the LINUX_REPO_GPG_PASSPHRASE secret. The
+# stored passphrase would then not match the one the key was created with,
+# and every signing step would fail.
+openssl rand -base64 32 | tr -d '\n' > "$KEYDIR/repo-pass"
 
 # --pinentry-mode loopback is required on GnuPG 2.1+ for --passphrase to be
 # honoured at all; without it gpg ignores the option and tries to prompt
@@ -129,7 +136,7 @@ chmod 600 /tmp/repo-pass
 #
 # --passphrase-file rather than --passphrase: a passphrase given on the command
 # line is visible to every user on the machine through ps.
-gpg --batch --pinentry-mode loopback --passphrase-file /tmp/repo-pass \
+gpg --batch --pinentry-mode loopback --passphrase-file "$KEYDIR/repo-pass" \
   --quick-generate-key "Submersion Package Signing <dev@submersion.app>" \
   rsa4096 sign never
 
@@ -137,28 +144,31 @@ KEYID=$(gpg --list-keys --with-colons dev@submersion.app | awk -F: '/^pub/{print
 
 # Exporting a passphrase-protected secret key needs the same treatment: it
 # decrypts the key, so it prompts exactly as generation does.
-gpg --batch --pinentry-mode loopback --passphrase-file /tmp/repo-pass \
-  --armor --export-secret-keys "$KEYID" > /tmp/repo-private.asc
+gpg --batch --pinentry-mode loopback --passphrase-file "$KEYDIR/repo-pass" \
+  --armor --export-secret-keys "$KEYID" > "$KEYDIR/repo-private.asc"
 
 # The public half needs no passphrase.
-gpg --export "$KEYID" > /tmp/submersion.gpg    # dearmored, for signed-by=
+gpg --export "$KEYID" > "$KEYDIR/submersion.gpg"   # dearmored, for signed-by=
+
+echo "Key material is in $KEYDIR"
 ```
 
-Expected: `/tmp/submersion.gpg` is a binary keyring, and
-`gpg --show-keys /tmp/submersion.gpg` prints the key.
+Expected: `$KEYDIR/submersion.gpg` is a binary keyring, and
+`gpg --show-keys "$KEYDIR/submersion.gpg"` prints the key. Confirm the
+directory is private with `ls -ld "$KEYDIR"`, which must show `drwx------`.
 
 - [ ] **Step 2: Store the secrets**
 
 In `submersion-app/submersion`: `LINUX_REPO_GPG_PRIVATE_KEY` (contents of
-`/tmp/repo-private.asc`) and `LINUX_REPO_GPG_PASSPHRASE` (contents of
-`/tmp/repo-pass`), for RPM signing at build time.
+`$KEYDIR/repo-private.asc`) and `LINUX_REPO_GPG_PASSPHRASE` (contents of
+`$KEYDIR/repo-pass`), for RPM signing at build time.
 
 In `submersion-app/linux-packages`: the same two secrets, for metadata signing.
 
 In `submersion-app/submersion`: `LINUX_REPO_DISPATCH_TOKEN`, a fine-grained PAT
 with Contents: write on `submersion-app/linux-packages` only.
 
-Then `shred -u /tmp/repo-private.asc /tmp/repo-pass`.
+Then `shred -u "$KEYDIR"/repo-private.asc "$KEYDIR"/repo-pass && rmdir "$KEYDIR"`.
 
 - [ ] **Step 3: Create the repository and point DNS at it**
 
@@ -777,34 +787,42 @@ jobs:
       - name: Import the signing key
         env:
           KEY: ${{ secrets.LINUX_REPO_GPG_PRIVATE_KEY }}
-        # printf rather than echo: armored key material is multi-line, and
-        # printf's behavior does not vary with the shell's echo semantics.
-        run: printf '%s\n' "$KEY" | gpg --batch --import
+          PASSPHRASE: ${{ secrets.LINUX_REPO_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          # printf rather than echo: armored key material is multi-line, and
+          # printf's behavior does not vary with the shell's echo semantics.
+          printf '%s\n' "$KEY" | gpg --batch --import
+
+          # The passphrase goes to a 0600 file rather than into each gpg
+          # command's argv, matching Task 1. Process arguments are readable
+          # through ps and /proc by anything else on the machine. The runner
+          # is ephemeral and single-tenant, so the practical exposure here is
+          # far smaller than on the maintainer's laptop, but the cost of doing
+          # it properly is one line and the inconsistency was its own smell.
+          umask 077
+          printf '%s' "$PASSPHRASE" > "$RUNNER_TEMP/gpg-pass"
 
       - name: Sign the APT metadata
-        env:
-          PASSPHRASE: ${{ secrets.LINUX_REPO_GPG_PASSPHRASE }}
         run: |
           set -euo pipefail
           for suite in stable beta; do
             gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "$PASSPHRASE" \
+              --passphrase-file "$RUNNER_TEMP/gpg-pass" \
               --clearsign -o "_site/apt/dists/$suite/InRelease" \
               "_site/apt/dists/$suite/Release"
             gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "$PASSPHRASE" \
+              --passphrase-file "$RUNNER_TEMP/gpg-pass" \
               -abs -o "_site/apt/dists/$suite/Release.gpg" \
               "_site/apt/dists/$suite/Release"
           done
 
       - name: Sign the DNF metadata
-        env:
-          PASSPHRASE: ${{ secrets.LINUX_REPO_GPG_PASSPHRASE }}
         run: |
           set -euo pipefail
           for suite in stable beta; do
             gpg --batch --yes --pinentry-mode loopback \
-              --passphrase "$PASSPHRASE" \
+              --passphrase-file "$RUNNER_TEMP/gpg-pass" \
               --detach-sign --armor \
               -o "_site/rpm/$suite/repodata/repomd.xml.asc" \
               "_site/rpm/$suite/repodata/repomd.xml"
