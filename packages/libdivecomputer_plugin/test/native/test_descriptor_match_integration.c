@@ -300,15 +300,21 @@ static void test_seac_filter_does_not_claim_generic_tablets(void) {
     printf("PASS: test_seac_filter_does_not_claim_generic_tablets\n");
 }
 
-// An advertised name can arrive padded. The Perdix 3 shipped a trailing NUL
-// (issue #723); a trailing space or dangling separator survives strlen where a
-// NUL does not, and would leave the serial token empty. An empty token is not
-// a foreign device, it is the bare model word, which already resolves.
+// An advertised name can arrive whitespace-padded, and trailing space survives
+// strlen where the Perdix 3's trailing NUL (issue #723) does not: a NUL simply
+// ends the C string. Padding leaves no serial token, which is the bare model
+// word rather than a foreign device.
 static void test_seac_tablet_padded_names_resolve(void) {
     expect_ble_match("Tablet ", "Tablet", 0x10);
-    expect_ble_match("Tablet-", "Tablet", 0x10);
     expect_ble_match("Tablet 123456 ", "Tablet", 0x10);
     expect_ble_match("Seac Tablet ", "Tablet", 0x10);
+    // A dangling "-" or "_" is not padding. A separator promises a serial
+    // token, so a name ending on one is malformed rather than padded, and
+    // tolerating it would widen the false-positive surface for no device
+    // anyone has observed.
+    expect_no_ble_match("Tablet-");
+    expect_no_ble_match("Tablet_");
+    expect_no_ble_match("Tablet - ");
     printf("PASS: test_seac_tablet_padded_names_resolve\n");
 }
 
