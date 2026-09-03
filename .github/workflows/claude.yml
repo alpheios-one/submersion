@@ -19,6 +19,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+          token: ${{ secrets.WORKFLOW_PAT }}
       - name: Add upstream remote
         run: |
           git remote add upstream https://github.com/submersion-app/submersion.git || true
