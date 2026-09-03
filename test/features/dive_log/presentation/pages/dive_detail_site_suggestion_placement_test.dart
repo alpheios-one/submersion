@@ -40,15 +40,6 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    // The header card lays a map under a gradient; overflow warnings in the
-    // constrained test viewport say nothing about banner placement.
-    final originalOnError = FlutterError.onError;
-    FlutterError.onError = (details) {
-      if (details.toString().contains('overflowed')) return;
-      originalOnError?.call(details);
-    };
-    addTearDown(() => FlutterError.onError = originalOnError);
-
     final overrides = await getBaseOverrides();
     await tester.pumpWidget(
       ProviderScope(
@@ -93,7 +84,6 @@ void main() {
           ),
           findsNothing,
         );
-        tester.takeException();
       },
     );
   }
