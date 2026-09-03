@@ -392,7 +392,7 @@ class MacDiveDbReader {
         pk: r['Z_PK'] as int,
         uuid: _str(r['ZUUID']) ?? '',
         diveFk: (r['ZRELATIONSHIPDIVE'] as int?) ?? 0,
-        position: (r['ZPOSITION'] as int?) ?? 0,
+        position: r['ZPOSITION'] as int?,
         caption: _str(r['ZCAPTION']),
         path: _str(r['ZPATH']),
         originalPath: _str(r['ZORIGINALPATH']),

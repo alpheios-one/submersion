@@ -414,7 +414,12 @@ class MacDiveRawDiveImage {
   final int pk;
   final String uuid;
   final int diveFk;
-  final int position;
+
+  /// MacDive's display order within the dive (`ZPOSITION`), or null when
+  /// it recorded none, which is the overwhelmingly common case: 259 of the
+  /// 261 rows in the reference library are null. Null means "no recorded
+  /// place", which is not the same as place zero.
+  final int? position;
   final String? caption;
 
   /// MacDive's current location for the photo (`ZPATH`). In practice a
@@ -432,7 +437,7 @@ class MacDiveRawDiveImage {
     required this.pk,
     required this.uuid,
     required this.diveFk,
-    this.position = 0,
+    this.position,
     this.caption,
     this.path,
     this.originalPath,

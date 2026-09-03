@@ -150,4 +150,33 @@ void main() {
       [for (var i = 0; i < count; i++) 'photo_$i.jpg'],
     );
   });
+
+  test('positioned photos lead, unpositioned follow in row order', () async {
+    // MacDive leaves ZPOSITION null for nearly every photo, so an
+    // unpositioned row means "no recorded place", not "place 0".
+    final payload = await MacDiveDiveMapper.toPayload(
+      _logbook(
+        dives: const [MacDiveRawDive(pk: 1, uuid: 'dive-uuid-1')],
+        images: const [
+          MacDiveRawDiveImage(pk: 3, uuid: 'c', diveFk: 1, path: 'c.jpg'),
+          MacDiveRawDiveImage(pk: 1, uuid: 'a', diveFk: 1, path: 'a.jpg'),
+          MacDiveRawDiveImage(
+            pk: 9,
+            uuid: 'p',
+            diveFk: 1,
+            position: 1,
+            path: 'positioned.jpg',
+          ),
+        ],
+      ),
+    );
+
+    expect(
+      [
+        for (final m in payload.entitiesOf(ImportEntityType.media))
+          m['filename'],
+      ],
+      ['positioned.jpg', 'a.jpg', 'c.jpg'],
+    );
+  });
 }

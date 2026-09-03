@@ -47,7 +47,7 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
   // stable up to 32 elements, so without one a dive with many photos comes
   // out shuffled.
   final keyed =
-      <({int diveIndex, int position, int pk, Map<String, dynamic> entry})>[];
+      <({int diveIndex, int? position, int pk, Map<String, dynamic> entry})>[];
   for (final image in images) {
     final diveIndex = diveIndexByPk[image.diveFk];
     if (diveIndex == null) continue;
@@ -64,11 +64,22 @@ List<Map<String, dynamic>> macDiveMediaEntriesFromImages({
       ),
     ));
   }
+  // Within a dive: rows MacDive gave a place come first, in that order,
+  // and rows it did not follow in the order the table holds them. A null
+  // position is not place zero, so the two are kept apart rather than
+  // conflated.
   keyed.sort((a, b) {
     final byDive = a.diveIndex.compareTo(b.diveIndex);
     if (byDive != 0) return byDive;
-    final byPosition = a.position.compareTo(b.position);
-    return byPosition != 0 ? byPosition : a.pk.compareTo(b.pk);
+    final aPos = a.position;
+    final bPos = b.position;
+    if (aPos != bPos) {
+      if (aPos == null) return 1;
+      if (bPos == null) return -1;
+      final byPosition = aPos.compareTo(bPos);
+      if (byPosition != 0) return byPosition;
+    }
+    return a.pk.compareTo(b.pk);
   });
   return [for (final k in keyed) k.entry];
 }
