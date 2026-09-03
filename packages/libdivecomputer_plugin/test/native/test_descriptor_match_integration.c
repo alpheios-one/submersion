@@ -287,10 +287,44 @@ static void test_seac_filter_does_not_claim_generic_tablets(void) {
     expect_no_ble_match("Tablet PC");
     expect_no_ble_match("Tablet-Pro");
     expect_no_ble_match("Tabletop");
+    // A serial that is not separated from the model word has to start with a
+    // digit. Without that boundary a letter simply continues "Tablet" and any
+    // later digit satisfies the serial rule, so ordinary consumer names get
+    // claimed: these three are the shapes that slipped through.
+    expect_no_ble_match("Tabletop123");
+    expect_no_ble_match("TabletS6");
+    expect_no_ble_match("TabletPC1");
     expect_no_ble_match("Tablet S6 Lite");
     expect_no_ble_match("My Tablet 123456");
     expect_no_ble_match("Seac");
     printf("PASS: test_seac_filter_does_not_claim_generic_tablets\n");
+}
+
+// An advertised name can arrive padded. The Perdix 3 shipped a trailing NUL
+// (issue #723); a trailing space or dangling separator survives strlen where a
+// NUL does not, and would leave the serial token empty. An empty token is not
+// a foreign device, it is the bare model word, which already resolves.
+static void test_seac_tablet_padded_names_resolve(void) {
+    expect_ble_match("Tablet ", "Tablet", 0x10);
+    expect_ble_match("Tablet-", "Tablet", 0x10);
+    expect_ble_match("Tablet 123456 ", "Tablet", 0x10);
+    expect_ble_match("Seac Tablet ", "Tablet", 0x10);
+    printf("PASS: test_seac_tablet_padded_names_resolve\n");
+}
+
+// The manufacturer is Seacsub S.p.A. and its own marketing writes "SEAC SUB",
+// so the vendor word is not always the bare "Seac" token. Stripping only the
+// short spelling leaves the longer ones unmatched for no reason.
+static void test_seac_vendor_word_spellings_resolve(void) {
+    expect_ble_match("Seacsub Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SEAC SUB Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SeacSub Tablet", "Tablet", 0x10);
+    expect_ble_match("Seacsub-Tablet-123456", "Tablet", 0x10);
+    // The vendor word is only ever stripped when the model word follows it, so
+    // neither the bare vendor name nor an unrelated Seac product is claimed.
+    expect_no_ble_match("Seacsub");
+    expect_no_ble_match("Seacraft Ghost 123456");
+    printf("PASS: test_seac_vendor_word_spellings_resolve\n");
 }
 
 // The other two Seac Screen rows are cable-only (DC_TRANSPORT_SERIAL), so a
@@ -321,6 +355,8 @@ int main(void) {
     test_oceans_s1_names_still_resolve();
     test_seac_tablet_serial_spellings_resolve();
     test_seac_filter_does_not_claim_generic_tablets();
+    test_seac_tablet_padded_names_resolve();
+    test_seac_vendor_word_spellings_resolve();
     test_seac_cable_only_models_stay_off_ble();
     printf("\nAll descriptor match integration tests passed.\n");
     return 0;
