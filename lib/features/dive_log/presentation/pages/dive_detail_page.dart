@@ -854,6 +854,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The site suggestion sits above the header card, never inside
+            // it. Embedded mode has its own copy under the toolbar (which
+            // stays put while the body scrolls), so only the standalone page
+            // renders one here; otherwise the banner would appear twice.
+            // Collapses to nothing when there is no suggestion, so no
+            // spacing of its own is needed.
+            if (!widget.embedded)
+              SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
             // Fixed: Header
             Consumer(
               builder: (context, ref, _) {
@@ -1417,7 +1425,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               );
             },
           ),
-          SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
