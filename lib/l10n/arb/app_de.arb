@@ -9983,6 +9983,7 @@
   "divePlanner_semantics_altitudeGroup": "Höhengruppe: {group}",
   "diveSites_import_detail_maxDepth": "Max. {depth}",
   "autoUpdate_banner_download": "Herunterladen",
+  "autoUpdate_banner_packageManagerHint": "Aktualisieren mit: {command}",
   "settings_cloudSync_provider_icloud_subtitle": "Über Apple iCloud synchronisieren",
   "settings_debugLog_search_hint": "Protokolle durchsuchen...",
   "settings_debugLog_appBar_title": "Debug-Protokolle",

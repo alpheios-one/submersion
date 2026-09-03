@@ -9983,6 +9983,7 @@
   "divePlanner_semantics_altitudeGroup": "Grupo de altitud: {group}",
   "diveSites_import_detail_maxDepth": "Máx. {depth}",
   "autoUpdate_banner_download": "Descargar",
+  "autoUpdate_banner_packageManagerHint": "Actualiza con: {command}",
   "settings_cloudSync_provider_icloud_subtitle": "Sincronizar mediante Apple iCloud",
   "settings_debugLog_search_hint": "Buscar en los registros...",
   "settings_debugLog_appBar_title": "Registros de depuración",

@@ -9983,6 +9983,7 @@
   "divePlanner_semantics_altitudeGroup": "קבוצת גובה: {group}",
   "diveSites_import_detail_maxDepth": "מקסימום {depth}",
   "autoUpdate_banner_download": "הורדה",
+  "autoUpdate_banner_packageManagerHint": "עדכן עם: {command}",
   "settings_cloudSync_provider_icloud_subtitle": "סנכרון באמצעות Apple iCloud",
   "settings_debugLog_search_hint": "חיפוש ביומנים...",
   "settings_debugLog_appBar_title": "יומני ניפוי באגים",

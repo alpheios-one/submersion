@@ -9983,6 +9983,7 @@
   "divePlanner_semantics_altitudeGroup": "Magassági csoport: {group}",
   "diveSites_import_detail_maxDepth": "Max. {depth}",
   "autoUpdate_banner_download": "Letöltés",
+  "autoUpdate_banner_packageManagerHint": "Frissites: {command}",
   "settings_cloudSync_provider_icloud_subtitle": "Szinkronizálás Apple iCloud segítségével",
   "settings_debugLog_search_hint": "Keresés a naplókban...",
   "settings_debugLog_appBar_title": "Hibakeresési naplók",

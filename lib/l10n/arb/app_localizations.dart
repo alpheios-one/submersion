@@ -56005,6 +56005,12 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get autoUpdate_banner_download;
 
+  /// Shown instead of a Download button when Submersion was installed from a .deb or .rpm, since the system package manager owns the upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Update with: {command}'**
+  String autoUpdate_banner_packageManagerHint(String command);
+
   /// Subtitle of the iCloud provider tile on the Cloud Sync page.
   ///
   /// In en, this message translates to:

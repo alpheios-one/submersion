@@ -33803,6 +33803,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get autoUpdate_banner_download => 'Letöltés';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'Frissites: $command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       'Szinkronizálás Apple iCloud segítségével';
 

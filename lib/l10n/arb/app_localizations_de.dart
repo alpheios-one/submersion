@@ -33884,6 +33884,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get autoUpdate_banner_download => 'Herunterladen';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'Aktualisieren mit: $command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       'Über Apple iCloud synchronisieren';
 

@@ -20076,6 +20076,16 @@
   "divePlanner_semantics_altitudeGroup": "Altitude group: {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",
   "autoUpdate_banner_download": "Download",
+  "autoUpdate_banner_packageManagerHint": "Update with: {command}",
+  "@autoUpdate_banner_packageManagerHint": {
+    "description": "Shown instead of a Download button when Submersion was installed from a .deb or .rpm, since the system package manager owns the upgrade.",
+    "placeholders": {
+      "command": {
+        "type": "String",
+        "example": "sudo apt upgrade submersion"
+      }
+    }
+  },
   "settings_cloudSync_provider_icloud_subtitle": "Sync via Apple iCloud",
   "settings_debugLog_search_hint": "Search logs...",
   "settings_debugLog_appBar_title": "Debug Logs",

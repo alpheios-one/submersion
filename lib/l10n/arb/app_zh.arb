@@ -9983,6 +9983,7 @@
   "divePlanner_semantics_altitudeGroup": "海拔分组：{group}",
   "diveSites_import_detail_maxDepth": "最大 {depth}",
   "autoUpdate_banner_download": "下载",
+  "autoUpdate_banner_packageManagerHint": "更新命令：{command}",
   "settings_cloudSync_provider_icloud_subtitle": "通过 Apple iCloud 同步",
   "settings_debugLog_search_hint": "搜索日志...",
   "settings_debugLog_appBar_title": "调试日志",
