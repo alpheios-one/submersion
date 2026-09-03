@@ -514,6 +514,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 activeDiveSourceProvider(dive.id),
               );
               final dataSources = computerReadingsAsync.valueOrNull ?? [];
+              // 2+ segments means a Combine stitched this dive together, so
+              // it can be pulled back apart (issue #1504). Read separately
+              // from the source count: the halves of a combined import
+              // collapse to a single display source (#1451).
+              final segmentCount =
+                  ref.watch(diveSegmentCountProvider(dive.id)).valueOrNull ?? 0;
               return DataSourcesSection(
                 dataSources: dataSources,
                 diveCreatedAt: dive.dateTime,
@@ -533,6 +539,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   readingId: readingId,
                 ),
                 onSplit: (readingId) => _confirmAndSplit(dive, readingId),
+                onSeparate: segmentCount >= 2
+                    ? () => _confirmAndSeparate(dive, segmentCount)
+                    : null,
                 onCompareIn3d: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -5381,6 +5390,58 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.diveLog_sources_splitFailed)));
+    }
+  }
+
+  /// Confirms and runs "Separate combined dives": the inverse of Combine,
+  /// and the only recovery path once the merge undo snackbar has dismissed.
+  Future<void> _confirmAndSeparate(Dive dive, int segmentCount) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.diveLog_sources_separateDialog_title),
+        content: Text(l10n.diveLog_sources_separateDialog_body(segmentCount)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.common_action_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.diveLog_sources_separateDialog_confirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      final newDiveIds = await ref
+          .read(diveUncombineServiceProvider)
+          .separate(diveId: dive.id);
+      // Re-scan the surviving dive and every restored one (fire-and-forget).
+      scheduleQualityScan([dive.id, ...newDiveIds]);
+      if (!mounted) return;
+      ref.invalidate(diveProvider(dive.id));
+      ref.invalidate(diveProfileProvider(dive.id));
+      ref.invalidate(sourceProfilesProvider(dive.id));
+      ref.invalidate(diveDataSourcesProvider(dive.id));
+      ref.invalidate(diveSegmentCountProvider(dive.id));
+      ref.invalidate(paginatedDiveListProvider);
+      ref.invalidate(divesProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.diveLog_sources_separateDone(newDiveIds.length + 1),
+          ),
+          showCloseIcon: true,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.diveLog_sources_separateFailed)),
+      );
     }
   }
 
