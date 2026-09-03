@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Pre-push hook for Submersion
-# Runs dart format check, flutter analyze, and a SCOPED test run before pushing.
+# Runs dart format check, flutter analyze, a generated-l10n staleness check, and
+# a SCOPED test run before pushing.
 #
 # Why scoped tests: the full suite is ~1900 test files. Measured on the full
 # suite, 79% of local test wall-clock is `loading <file>` (isolate spawn +
@@ -164,6 +165,80 @@ else
     range_resolved=0
 fi
 
+# --- Generated-l10n staleness ----------------------------------------------
+#
+# lib/l10n/arb/app_localizations*.dart is produced by `flutter gen-l10n` and is
+# CHECKED IN. It is the only generated output in the repo that can go stale:
+# *.g.dart, *.freezed.dart and *.mocks.dart are gitignored and rebuilt per tree.
+# Nothing regenerates the l10n on the way to a build either -- `flutter test`
+# does not, despite `generate: true` in pubspec.yaml -- so what is committed is
+# exactly what ships. An ARB edit that skipped gen-l10n, or a generated file
+# hand-resolved during a merge (they conflict often, since every locale changes
+# together), otherwise reaches main with the stale string intact. CI asserts the
+# same thing in Analyze & Format; here it is a second cheaper.
+#
+# Only runs when the push touches lib/l10n/. gen-l10n rewrites all 12 files
+# unconditionally, even when the bytes are identical, and app_localizations.dart
+# is imported by 378 test files -- the biggest hub in the repo -- so doing this
+# on every push would bump those mtimes and force a pointless recompile.
+#
+# Compares against the WORKING TREE, not HEAD: an ARB edit and its regenerated
+# output that are both still uncommitted pass, while a stale pair fails whether
+# or not it has been committed. Runs BEFORE the parallel stage rather than
+# inside it, because rewriting these files underneath a concurrent
+# `flutter analyze` would let it read a half-written source.
+l10n_touched=0
+if [ "$range_resolved" = "0" ]; then
+    # Push range unknown: check rather than guess. It costs about 3s.
+    l10n_touched=1
+else
+    while IFS= read -r f; do
+        case "$f" in
+            lib/l10n/*) l10n_touched=1; break ;;
+        esac
+    done <<< "$changed_files"
+fi
+
+l10n_failed=0
+if [ "$l10n_touched" = "1" ]; then
+    echo "🌍 Verifying generated localizations match the ARB files..."
+    l10n_before=$(mktemp -d)
+    l10n_after=$(mktemp -d)
+    l10n_log=$(mktemp)
+    set +e
+    cp lib/l10n/arb/app_localizations*.dart "$l10n_before/" 2>/dev/null
+    flutter gen-l10n > "$l10n_log" 2>&1
+    l10n_status=$?
+    set -e
+    if [ "$l10n_status" -ne 0 ]; then
+        echo "❌ flutter gen-l10n failed!"
+        cat "$l10n_log"
+        l10n_failed=1
+    else
+        cp lib/l10n/arb/app_localizations*.dart "$l10n_after/" 2>/dev/null || true
+        stale=""
+        for f in "$l10n_after"/*.dart; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f")
+            if [ ! -f "$l10n_before/$base" ] || ! cmp -s "$f" "$l10n_before/$base"; then
+                stale="${stale}   lib/l10n/arb/${base}"$'\n'
+            fi
+        done
+        if [ -n "$stale" ]; then
+            echo "❌ Generated localizations were stale! These did not match their ARBs:"
+            printf '%s' "$stale"
+            echo "   They have been REGENERATED IN PLACE. Review and commit them,"
+            echo "   then push again."
+            l10n_failed=1
+        else
+            echo "✅ Generated localizations are up to date"
+        fi
+    fi
+    rm -rf "$l10n_before" "$l10n_after"
+    rm -f "$l10n_log"
+    echo ""
+fi
+
 # --- Static checks ----------------------------------------------------------
 #
 # Format and analyze are independent, so run them concurrently and report both
@@ -243,6 +318,12 @@ fi
 
 rm -f "$fmt_log" "$ana_log"
 echo ""
+
+# Reported above, before the parallel stage; gated here so format, analyze and
+# l10n all get a verdict on one run rather than stopping at the first failure.
+if [ "$l10n_failed" -ne 0 ]; then
+    checks_failed=1
+fi
 
 if [ "$checks_failed" -ne 0 ]; then
     echo "Fix the issues above before pushing."
