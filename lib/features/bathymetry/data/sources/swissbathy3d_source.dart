@@ -102,6 +102,17 @@ class SwissBathy3dSource implements BathymetrySource {
           (tileE: tileE, tileN: tileN),
     ];
 
+    // Distinct 1-km tile coordinates can legitimately resolve to the exact
+    // same STAC asset href (observed in production: a wide span's tile
+    // range came back with an identical href across many of its bboxes,
+    // per the per-tile diagnostic panel) -- memoized per fetch() call so
+    // that shared asset's zip is downloaded over the network exactly once,
+    // not once per tile coordinate that happens to resolve to it. This
+    // does not change what each tile key ends up caching (still correctly
+    // whatever the server resolved for it), only how many times the exact
+    // same bytes are re-fetched, per the OGD fair-use requirement.
+    final sharedDownloads = <String, Future<Uint8List>>{};
+
     // Bounded concurrency, not strictly sequential nor unbounded: up to
     // maxConcurrentTileRequests tiles in flight at once. Each is
     // cache-checked before any network call, so a warm cache stays cheap;
@@ -112,7 +123,12 @@ class SwissBathy3dSource implements BathymetrySource {
       coord,
     ) async {
       try {
-        return await _fetchTile(coord.tileE, coord.tileN, lake);
+        return await _fetchTile(
+          coord.tileE,
+          coord.tileN,
+          lake,
+          sharedDownloads,
+        );
       } on BathymetryFetchException {
         // One tile's transient failure (network timeout, a bad STAC
         // response) must not sink the whole stitched fetch when
@@ -142,10 +158,16 @@ class SwissBathy3dSource implements BathymetrySource {
   /// stitch around, not an error. Transient failures (network, unparseable
   /// STAC response) still throw and are never cached, so the caller falls
   /// through to the next resolver tier and retries on the next visit.
+  ///
+  /// [sharedDownloads] memoizes the zip download by asset href across every
+  /// tile in the same [fetch] call — see that method's doc — so two tile
+  /// coordinates resolving to the same href share one network round trip
+  /// instead of each downloading and parsing it independently.
   Future<BathymetryGrid?> _fetchTile(
     int tileE,
     int tileN,
     SwissLakeLevel lake,
+    Map<String, Future<Uint8List>> sharedDownloads,
   ) async {
     final tileKey = '${tileE}_$tileN';
 
@@ -157,17 +179,26 @@ class SwissBathy3dSource implements BathymetrySource {
     if (await _tileCache.hasCachedAnswer(tileKey)) return null;
 
     final SwissBathyAsset? asset;
-    final Uint8List zipBytes;
     try {
       asset = await _findAsset(_tileBboxWgs84(tileE, tileN));
-      if (asset == null) {
-        await _tileCache.writeEmpty(tileKey);
-        return null;
-      }
-      zipBytes = await _stac.downloadBytes(asset.href);
     } on SwissStacException catch (e) {
       // Transient: network error, HTTP failure, unparseable STAC response.
       // Must not be cached — the next visit should retry.
+      throw BathymetryFetchException('swissBATHY3D fetch failed: $e');
+    }
+    if (asset == null) {
+      await _tileCache.writeEmpty(tileKey);
+      return null;
+    }
+
+    final resolvedAsset = asset;
+    final Uint8List zipBytes;
+    try {
+      zipBytes = await sharedDownloads.putIfAbsent(
+        resolvedAsset.href,
+        () => _stac.downloadBytes(resolvedAsset.href),
+      );
+    } on SwissStacException catch (e) {
       throw BathymetryFetchException('swissBATHY3D fetch failed: $e');
     }
 

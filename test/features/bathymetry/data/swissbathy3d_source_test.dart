@@ -244,6 +244,61 @@ nodata_value -9999
       },
     );
 
+    test('multiple distinct tile coordinates that resolve to the same STAC '
+        'asset href download and parse it only once', () async {
+      // Regression test for the real Bug 12 symptom, reported via the
+      // per-tile diagnostic panel: a fresh install, querying a wide span
+      // around a real Walensee dive site, found every one of ~72 distinct
+      // 1-km tile coordinates carrying byte-identical raw grid content.
+      // The per-tile pipeline itself is stateless and correctly keyed
+      // (verified by every other test in this file using genuinely
+      // different hrefs per tile), so the only way distinct tile
+      // coordinates legitimately end up with identical content is the
+      // STAC server resolving them to the very same asset href — this
+      // reproduces exactly that server behavior and verifies the fetch
+      // still succeeds, still serves each tile its (correctly identical,
+      // matching what the server actually said) grid, but stops
+      // re-downloading and re-parsing that same zip once per tile
+      // coordinate.
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  // A real STAC item's own bbox can legitimately be wider
+                  // than the 1-km tile bbox that was queried -- as long
+                  // as it still overlaps every one of this fetch's tile
+                  // queries, SwissStacClient._featureOverlaps accepts it
+                  // for each of them, exactly like a genuinely
+                  // lake-scale (not 1-km-scale) asset would.
+                  'bbox': [8.0, 46.0, 10.0, 48.0],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/shared_tile.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 2500);
+
+      expect(
+        itemCalls,
+        greaterThan(1),
+      ); // each tile still resolves its own asset
+      expect(downloadCalls, 1); // but the shared href is fetched once
+      expect(grid.sourceId, 'swissbathy3d');
+    });
+
     test('the query coordinate stays inside the stitched mosaic\'s rendered '
         'bounds, at realistic tile resolution and tile count', () async {
       // The 3D scene always places the dive site marker at (0,0) in a
