@@ -71,6 +71,7 @@ void main() {
     WidgetTester tester, {
     List<dynamic> extraOverrides = const [],
     DiverWeightEntry? latestWeight,
+    Future<DiverWeightEntry?>? latestWeightFuture,
     double? latestHeight,
     Future<double?>? latestHeightFuture,
     AppSettings? settings,
@@ -95,7 +96,9 @@ void main() {
             (ref) async => const [suitItem, bcdItem],
           ),
           latestDiverWeightProvider.overrideWith(
-            (ref) async => latestWeight ?? entry,
+            (ref) async => latestWeightFuture == null
+                ? (latestWeight ?? entry)
+                : await latestWeightFuture,
           ),
           latestDiverHeightProvider.overrideWith(
             (ref) async => latestHeightFuture == null
@@ -419,6 +422,35 @@ void main() {
       );
       expect(field.controller?.text, '190');
       expect(find.textContaining('BMI 22.2'), findsOneWidget);
+    });
+
+    testWidgets('a late profile body weight does not overwrite what the '
+        'diver has already typed', (tester) async {
+      final pending = Completer<DiverWeightEntry?>();
+      await pumpPage(
+        tester,
+        latestWeightFuture: pending.future,
+        latestHeight: 180.0,
+        settle: false,
+      );
+
+      // The diver types before the profile weight arrives.
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Body Weight (optional)'),
+        '70',
+      );
+      await tester.pump();
+      // 70 kg at 180 cm.
+      expect(find.textContaining('BMI 21.6'), findsOneWidget);
+
+      pending.complete(entry);
+      await tester.pumpAndSettle();
+
+      final field = tester.widget<TextField>(
+        find.widgetWithText(TextField, 'Body Weight (optional)'),
+      );
+      expect(field.controller?.text, '70');
+      expect(find.textContaining('BMI 21.6'), findsOneWidget);
     });
 
     testWidgets('save-to-profile stores the entered height', (tester) async {

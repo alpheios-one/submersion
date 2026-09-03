@@ -318,14 +318,18 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     // Prefill body weight from the newest profile entry, once.
     final latestWeight = ref.watch(latestDiverWeightProvider).valueOrNull;
     if (!_bodyWeightSeeded && latestWeight != null) {
+      // One-shot, and consumed whether or not it is used: see the height
+      // seed below for why a late arrival must not clobber a typed value.
       _bodyWeightSeeded = true;
-      // Rounded to a tenth, then rendered by the locale formatter: a
-      // toStringAsFixed seed would put a dot in the field that the parser in
-      // [_bodyWeightKg] reads as a grouping separator under de/es/it.
-      final shown = units.convertWeight(latestWeight.weightKg);
-      _bodyWeightController.text = formatDecimalForInput(
-        (shown * 10).roundToDouble() / 10,
-      );
+      if (_bodyWeightController.text.isEmpty) {
+        // Rounded to a tenth, then rendered by the locale formatter: a
+        // toStringAsFixed seed would put a dot in the field that the parser
+        // in [_bodyWeightKg] reads as a grouping separator under de/es/it.
+        final shown = units.convertWeight(latestWeight.weightKg);
+        _bodyWeightController.text = formatDecimalForInput(
+          (shown * 10).roundToDouble() / 10,
+        );
+      }
     }
     // Prefill height from the newest profile entry that records one, once.
     // Whole centimetres or whole inches need no locale formatting.
