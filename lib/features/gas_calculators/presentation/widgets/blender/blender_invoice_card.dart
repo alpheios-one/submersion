@@ -430,6 +430,13 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   /// chooser fail to list any targets ("not all sharing methods could be
   /// displayed", issue #44) - the same reason the dive profile export sheet
   /// on the dive detail page pops before it shares.
+  ///
+  /// The pop alone was not enough on Windows: the sheet's closing route
+  /// transition still owns window focus for a moment afterwards, and
+  /// `DataTransferManager.ShowShareUIForWindow` fails with that same "not
+  /// all sharing methods" error when invoked before focus returns to the
+  /// main window. The dive profile export on the dive detail page waits a
+  /// frame the same way before it shares (issue #44 follow-up).
   Future<void> _runExport(
     BlenderInvoiceExportFormat format,
     BlenderInvoiceExportData data,
@@ -437,6 +444,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   ) async {
     setState(() => _isExporting = true);
     try {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       switch (format) {
         case BlenderInvoiceExportFormat.pdf:
           await ExportService().exportBlenderInvoiceToPdf(
@@ -517,24 +525,19 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
           ),
           // Read-only: this role's flush volume is entered once, on the Fill
           // gases settings card (blender_fill_gases_card.dart), next to its
-          // price, and shown here as text rather than a second,
+          // price, and shown here as plain text rather than a second,
           // easily-drifting entry point for the same number (issue #42
+          // follow-up). Plain text, not a disabled-looking field: an
+          // InputDecorator still reads as an inert input control (issue #44
           // follow-up).
           SizedBox(
             width: 72,
-            child: InputDecorator(
+            child: Text(
+              '${formatRoundedForInput(litersToDisplayVolume(gas.volumeLiters, settings), 2)} '
+              '${units.volumeSymbol}',
               key: Key('blender-flush-fee-liters-${role.name}'),
-              decoration: InputDecoration(
-                isDense: true,
-                suffixText: units.volumeSymbol,
-                border: const OutlineInputBorder(),
-              ),
-              child: Text(
-                formatRoundedForInput(
-                  litersToDisplayVolume(gas.volumeLiters, settings),
-                  2,
-                ),
-              ),
+              style: style,
+              textAlign: TextAlign.end,
             ),
           ),
           const SizedBox(width: 8),

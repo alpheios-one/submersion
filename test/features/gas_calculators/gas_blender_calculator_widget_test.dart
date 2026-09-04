@@ -6,6 +6,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_procedure_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
@@ -238,11 +239,41 @@ void main() {
   ) async {
     // PR #1359 review point 4: fill/settled temperatures are configured once
     // on the settings page; a read-only echo here keeps them from being
-    // overlooked mid-fill.
+    // overlooked mid-fill. Issue #44 follow-up: both temperatures show
+    // unconditionally now, even when they are equal, since a fill station
+    // cares what the cylinder settles to regardless.
     await _pump(tester);
 
-    expect(find.text('Fill temperature: 20°C'), findsOneWidget);
+    expect(
+      find.text('Fill temperature: 20°C  ·  Settled temperature: 20°C'),
+      findsOneWidget,
+    );
   });
+
+  testWidgets(
+    'the temperature summary sits under the fill procedure title, not the '
+    'page header',
+    (tester) async {
+      // Issue #44 follow-up: moved off the page header (which now holds only
+      // the settings gear) and onto BlenderProcedureCard.
+      await _pump(tester);
+
+      expect(
+        find.descendant(
+          of: find.byType(BlenderProcedureCard),
+          matching: find.byKey(const Key('blender-temperature-summary')),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(BlenderProcedureCard),
+          matching: find.byKey(const Key('blender-settings')),
+        ),
+        findsNothing,
+      );
+    },
+  );
 
   testWidgets('a chilled fill shows both temperatures on the main screen', (
     tester,

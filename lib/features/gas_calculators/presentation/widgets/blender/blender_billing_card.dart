@@ -440,52 +440,72 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
       children: [
         // Read-only: this role's purge volume is entered once, next to its
         // bank on the Fill gases settings (issue #42 follow-up), and shown
-        // here as text rather than a second, easily-drifting entry point for
-        // the same number -- the same treatment already given to the price
-        // below.
+        // here as plain text rather than a second, easily-drifting entry
+        // point for the same number -- the same treatment already given to
+        // the price below. Plain text, not a disabled-looking field: an
+        // InputDecorator still reads as an inert input control (issue #44
+        // follow-up).
         Expanded(
-          child: InputDecorator(
+          child: _flushFeeReadOnlyValue(
+            context,
             key: Key('blender-flush-fee-volume-${role.name}'),
-            decoration: InputDecoration(
-              labelText:
-                  '$label '
-                  '${context.l10n.gasCalculators_blender_flushFeeVolume} '
-                  '(${units.volumeSymbol})',
-              isDense: true,
-              border: const OutlineInputBorder(),
-            ),
-            child: Text(
-              formatRoundedForInput(
-                litersToDisplayVolume(volumeLiters, settings),
-                2,
-              ),
+            label:
+                '$label '
+                '${context.l10n.gasCalculators_blender_flushFeeVolume} '
+                '(${units.volumeSymbol})',
+            value: formatRoundedForInput(
+              litersToDisplayVolume(volumeLiters, settings),
+              2,
             ),
           ),
         ),
         const SizedBox(width: 8),
         // Read-only: this role's price is entered once, next to its bank on
-        // the Fill gases settings (issue #42), and shown here as text rather
-        // than a second, easily-drifting entry point for the same number.
+        // the Fill gases settings (issue #42), and shown here as plain text
+        // rather than a second, easily-drifting entry point for the same
+        // number.
         Expanded(
-          child: InputDecorator(
+          child: _flushFeeReadOnlyValue(
+            context,
             key: Key('blender-flush-fee-price-${role.name}'),
-            decoration: InputDecoration(
-              labelText:
-                  '$label '
-                  '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
-              isDense: true,
-              border: const OutlineInputBorder(),
-            ),
-            child: Text(
-              price == null
-                  ? ''
-                  : formatRoundedForInput(
-                      pricePer100LitersToDisplay(price, settings),
-                      2,
-                    ),
-            ),
+            label:
+                '$label '
+                '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
+            value: price == null
+                ? ''
+                : formatRoundedForInput(
+                    pricePer100LitersToDisplay(price, settings),
+                    2,
+                  ),
           ),
         ),
+      ],
+    );
+  }
+
+  /// A label/value pair rendered as plain text, no border or floating-label
+  /// box -- the look already used for [_costLine] and [_totalLine], so a
+  /// read-only figure never reads as an inert input control (issue #44
+  /// follow-up).
+  Widget _flushFeeReadOnlyValue(
+    BuildContext context, {
+    required Key key,
+    required String label,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+    return Column(
+      key: key,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        Text(value, style: theme.textTheme.bodyMedium),
       ],
     );
   }

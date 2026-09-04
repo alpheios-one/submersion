@@ -637,10 +637,19 @@ void main() {
     /// file I/O and PDF/Excel encoding behind the export actually get to
     /// complete - plain `pump()` only flushes work already done, it does not
     /// wait for it.
+    ///
+    /// Pumps with an explicit duration, not a bare `pump()`: `_runExport`
+    /// (issue #44 follow-up) waits out a real `Future.delayed` before it
+    /// shares, to give the OS window back its focus after the export picker
+    /// closes, and that delayed Future is bound to the test binding's fake
+    /// clock rather than wall time. A bare `pump()` never advances that
+    /// clock, so the delay would only resolve once enough zero-duration
+    /// pumps happened to accumulate the needed time - here, driven straight
+    /// off the elapsed real time, it resolves in step with it.
     Future<void> settleWithLoadingIndicator(WidgetTester tester) async {
       for (var i = 0; i < 20; i++) {
         await Future<void>.delayed(const Duration(milliseconds: 50));
-        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
       }
     }
 
@@ -859,7 +868,14 @@ void main() {
         ),
         findsNothing,
       );
-      expect(find.text('20'), findsWidgets);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('blender-flush-fee-liters-o2')),
+          matching: find.byType(InputDecorator),
+        ),
+        findsNothing,
+      );
+      expect(find.textContaining('20'), findsWidgets);
     });
   });
 }
