@@ -59,12 +59,28 @@ void main() {
         .where((l) => l.overlay != SceneOverlay.contours)
         .length;
     expect(structural, 5);
-    // Depth budget covers the deepest of path/grid/site.
+    // Depth budget covers the deeper of path/grid; siteMaxDepth (30, from
+    // possibly elsewhere in the lake) does not enter the scale.
     expect(scene.bounds.maxDepthMeters, 49); // grid max = 30 + 19
     // Scrub path still spans the dive's timeline.
     expect(scene.scrubPath, isNotNull);
     expect(scene.scrubPath!.normalizedTimes.last, closeTo(1.0, 1e-9));
   });
+
+  test(
+    'a siteMaxDepth beyond the grid and path does not inflate the scale',
+    () {
+      final scene = service.build(
+        path(),
+        siteMaxDepth: 500,
+        grid: grid(),
+        gridCenter: center,
+        pathAnchor: (east: 15.0, north: -10.0),
+      );
+      // Scale stays tied to the measured terrain and the dive's own path.
+      expect(scene.bounds.maxDepthMeters, 49);
+    },
+  );
 
   test('grid without a center is ignored (falls back to synthesized)', () {
     final scene = service.build(path(), grid: grid());
