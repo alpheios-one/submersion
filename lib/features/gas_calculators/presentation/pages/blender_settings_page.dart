@@ -3,7 +3,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_manager.dart';
@@ -12,9 +11,12 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Trimix Mixer's own settings, reached both from the calculator's
 /// settings gear and from the global Settings page (issue #1335 follow-up):
-/// fill gases, mixing conditions, saved target-fill mixes, and billing
-/// defaults, kept off the always-visible calculator so the fields a diver
-/// sets once per session don't compete with the ones they retype every fill.
+/// fill gases, mixing conditions, and saved target-fill mixes, kept off the
+/// always-visible calculator so the fields a diver sets once per session
+/// don't compete with the ones they retype every fill. Billing has no
+/// defaults of its own left to configure here: the currency always follows
+/// Settings -> Units -> Default currency (issue #44 follow-up removed the
+/// mixer's own, now-redundant read-only mirror of that setting).
 class BlenderSettingsPage extends ConsumerWidget {
   const BlenderSettingsPage({super.key});
 
@@ -121,8 +123,6 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                     child: MixTemplateManager(),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const BlenderDefaultsCard(),
               ],
             ),
           ),

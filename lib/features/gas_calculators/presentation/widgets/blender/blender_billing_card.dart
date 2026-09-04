@@ -90,7 +90,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             const SizedBox(height: 20),
             const Divider(height: 1),
             const SizedBox(height: 12),
-            _flushFeeSettings(context, settings, units),
+            _flushFeeSettings(context, settings, units, currency),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
               for (final line in billing.lines)
@@ -369,6 +369,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     BuildContext context,
     AppSettings settings,
     UnitFormatter units,
+    String currency,
   ) {
     final enabled = ref.watch(blenderFlushFeeEnabledProvider);
     final mode = ref.watch(blenderFlushFeeModeProvider);
@@ -413,21 +414,26 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               },
             ),
           ),
-          for (var i = 0; i < BlenderGasRole.values.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            _flushFeeGasRow(context, ref, i, settings, units),
-          ],
+          for (var i = 0; i < BlenderGasRole.values.length; i++)
+            _flushFeeGasRow(context, ref, i, settings, units, currency),
         ],
       ],
     );
   }
 
+  /// One tab-aligned row per gas: label, purge volume, price -- all three
+  /// rows lined up on the same columns (issue #44 follow-up) instead of the
+  /// former two stacked label/value blocks. Both figures are entered once,
+  /// next to their bank on the Fill gases settings card, and shown here as
+  /// plain text rather than a second, easily-drifting entry point for the
+  /// same numbers.
   Widget _flushFeeGasRow(
     BuildContext context,
     WidgetRef ref,
     int index,
     AppSettings settings,
     UnitFormatter units,
+    String currency,
   ) {
     final role = BlenderGasRole.values[index];
     final label = blenderGasRoleLabel(context, role);
@@ -435,78 +441,43 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     final volumeLiters = ref
         .watch(blenderFlushFeeGasesProvider)[index]
         .volumeLiters;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Read-only: this role's purge volume is entered once, next to its
-        // bank on the Fill gases settings (issue #42 follow-up), and shown
-        // here as plain text rather than a second, easily-drifting entry
-        // point for the same number -- the same treatment already given to
-        // the price below. Plain text, not a disabled-looking field: an
-        // InputDecorator still reads as an inert input control (issue #44
-        // follow-up).
-        Expanded(
-          child: _flushFeeReadOnlyValue(
-            context,
-            key: Key('blender-flush-fee-volume-${role.name}'),
-            label:
-                '$label '
-                '${context.l10n.gasCalculators_blender_flushFeeVolume} '
-                '(${units.volumeSymbol})',
-            value: formatRoundedForInput(
-              litersToDisplayVolume(volumeLiters, settings),
-              2,
+    final style = Theme.of(context).textTheme.bodyMedium;
+    return Padding(
+      key: Key('blender-flush-fee-row-${role.name}'),
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Text(
+              '$label ${context.l10n.gasCalculators_blender_flushFeeVolume}',
+              style: style,
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        // Read-only: this role's price is entered once, next to its bank on
-        // the Fill gases settings (issue #42), and shown here as plain text
-        // rather than a second, easily-drifting entry point for the same
-        // number.
-        Expanded(
-          child: _flushFeeReadOnlyValue(
-            context,
-            key: Key('blender-flush-fee-price-${role.name}'),
-            label:
-                '$label '
-                '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
-            value: price == null
-                ? ''
-                : formatRoundedForInput(
-                    pricePer100LitersToDisplay(price, settings),
-                    2,
-                  ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '${formatRoundedForInput(litersToDisplayVolume(volumeLiters, settings), 2)} '
+              '${units.volumeSymbol}',
+              key: Key('blender-flush-fee-volume-${role.name}'),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
           ),
-        ),
-      ],
-    );
-  }
-
-  /// A label/value pair rendered as plain text, no border or floating-label
-  /// box -- the look already used for [_costLine] and [_totalLine], so a
-  /// read-only figure never reads as an inert input control (issue #44
-  /// follow-up).
-  Widget _flushFeeReadOnlyValue(
-    BuildContext context, {
-    required Key key,
-    required String label,
-    required String value,
-  }) {
-    final theme = Theme.of(context);
-    return Column(
-      key: key,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+          Expanded(
+            flex: 3,
+            child: Text(
+              price == null
+                  ? ''
+                  : '${formatRoundedForInput(pricePer100LitersToDisplay(price, settings), 2)} '
+                        '$currency/100${units.volumeSymbol}',
+              key: Key('blender-flush-fee-price-${role.name}'),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
           ),
-        ),
-        Text(value, style: theme.textTheme.bodyMedium),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -63,14 +63,20 @@ void main() {
     expect(find.text('1.'), findsNothing);
   });
 
-  testWidgets('the oxygen and helium roles show their fixed purity', (
+  testWidgets('the oxygen and helium roles show no purity field at all', (
     tester,
   ) async {
     // Issue #42: only the topup role's oxygen fraction is editable; oxygen
-    // and helium are always 100% pure.
+    // and helium are always 100% pure. Issue #44 follow-up: that fixed
+    // value is no longer shown at all, not even as read-only text -- a
+    // number nobody can change isn't information the diver needs here.
     await _pump(tester);
 
-    expect(find.text('100 %'), findsNWidgets(2));
+    expect(find.text('100 %'), findsNothing);
+    expect(find.byKey(const Key('blender-gas-fixed-o2')), findsNothing);
+    expect(find.byKey(const Key('blender-gas-fixed-he')), findsNothing);
+    // Only the topup role gets a mix field.
+    expect(find.byKey(const Key('blender-topup-o2')), findsOneWidget);
   });
 
   testWidgets('submitting the topup O2 field saves the preferences', (

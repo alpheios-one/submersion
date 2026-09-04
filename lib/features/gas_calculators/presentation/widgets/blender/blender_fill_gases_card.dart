@@ -49,7 +49,6 @@ class BlenderFillGasesCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final order = ref.watch(blenderFillOrderProvider);
-    final topupO2 = ref.watch(blenderTopupO2PercentProvider);
 
     return Card(
       child: Padding(
@@ -66,7 +65,6 @@ class BlenderFillGasesCard extends ConsumerWidget {
                 role: order[position],
                 position: position,
                 order: order,
-                topupO2: topupO2,
                 units: units,
               ),
             ],
@@ -82,7 +80,6 @@ class BlenderFillGasesCard extends ConsumerWidget {
     required BlenderGasRole role,
     required int position,
     required List<BlenderGasRole> order,
-    required double topupO2,
     required UnitFormatter units,
   }) {
     final label = blenderGasRoleLabel(context, role);
@@ -118,8 +115,16 @@ class BlenderFillGasesCard extends ConsumerWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(child: _mixField(context, ref, role, topupO2)),
-            const SizedBox(width: 8),
+            // Oxygen and helium are fixed at 100% purity, so the fraction
+            // isn't shown at all for those roles -- not even as read-only
+            // text (issue #44 follow-up): a fixed value nobody can change
+            // is not information a diver needs on this card. Only the topup
+            // role's mix is configurable, and gets the full row width when
+            // it's the only field on it.
+            if (role == BlenderGasRole.topup) ...[
+              Expanded(child: _topupO2Field(context, ref)),
+              const SizedBox(width: 8),
+            ],
             Expanded(child: _priceField(context, ref, role, units)),
           ],
         ),
@@ -129,28 +134,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
     );
   }
 
-  /// Oxygen and helium roles show their fixed purity as read-only text; only
-  /// the topup role's fraction is an editable field.
-  Widget _mixField(
-    BuildContext context,
-    WidgetRef ref,
-    BlenderGasRole role,
-    double topupO2,
-  ) {
-    if (role != BlenderGasRole.topup) {
-      // Oxygen and helium are fixed at 100% purity -- shown as text rather
-      // than an O2/He pair, which would otherwise print a confusing "0%" for
-      // whichever of the two the role is not.
-      return InputDecorator(
-        key: Key('blender-gas-fixed-${role.name}'),
-        decoration: InputDecoration(
-          labelText: context.l10n.gasCalculators_blender_purity,
-          isDense: true,
-          border: const OutlineInputBorder(),
-        ),
-        child: const Text('100 %'),
-      );
-    }
+  Widget _topupO2Field(BuildContext context, WidgetRef ref) {
     return TextField(
       key: const Key('blender-topup-o2'),
       controller: topupO2Controller,

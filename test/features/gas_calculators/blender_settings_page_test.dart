@@ -104,7 +104,6 @@ void main() {
     expect(find.text('Trimix Mixer'), findsOneWidget);
     expect(find.text('Fill gases'), findsOneWidget);
     expect(find.text('Blending conditions'), findsOneWidget);
-    expect(find.text('Default settings and billing'), findsOneWidget);
   });
 
   testWidgets('fill gases and mixing conditions leave the main screen', (
@@ -117,16 +116,23 @@ void main() {
     expect(find.text('Blending conditions'), findsNothing);
   });
 
-  testWidgets('the currency and price fields leave the billing card', (
-    tester,
-  ) async {
-    await _pump(tester);
-    expect(find.byKey(const Key('blender-currency-display')), findsNothing);
+  testWidgets(
+    'the price fields leave the billing card, and settings carries no local '
+    'currency choice',
+    (tester) async {
+      // Issue #44 follow-up: the mixer's own read-only currency mirror is
+      // gone along with the "Default settings and billing" section that used
+      // to hold it -- the currency always follows Settings -> Units ->
+      // Default currency, with nothing left to show for it here.
+      await _pump(tester);
+      expect(find.byKey(const Key('blender-currency-display')), findsNothing);
 
-    await tester.tap(find.byKey(const Key('blender-settings')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('blender-currency-display')), findsOneWidget);
-  });
+      await tester.tap(find.byKey(const Key('blender-settings')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('blender-currency-display')), findsNothing);
+      expect(find.text('Default settings and billing'), findsNothing);
+    },
+  );
 
   testWidgets(
     'the cylinder-sizes link navigates to the global tank presets, not settings',

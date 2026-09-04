@@ -285,5 +285,47 @@ void main() {
       expect(find.textContaining('20'), findsWidgets);
       expect(find.textContaining('7.5'), findsWidgets);
     });
+
+    testWidgets(
+      'lines up one tab-aligned row per gas, with the currency instead of '
+      'a hard-coded "price" label',
+      (tester) async {
+        // Issue #44: label, volume and price sit on the same row per gas,
+        // in the same columns for every role, instead of two stacked
+        // label/value blocks. The rate carries the diver's actual currency
+        // rather than a hard-coded word.
+        final ref = await _pump(tester);
+        ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+        ref.read(blenderGasPricesProvider.notifier).state = const [
+          7.5,
+          null,
+          null,
+        ];
+        await tester.pumpAndSettle();
+
+        final o2Row = find.byKey(const Key('blender-flush-fee-row-o2'));
+        expect(o2Row, findsOneWidget);
+        expect(
+          find.descendant(of: o2Row, matching: find.textContaining('O₂')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: o2Row,
+            matching: find.byKey(const Key('blender-flush-fee-volume-o2')),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: o2Row,
+            matching: find.byKey(const Key('blender-flush-fee-price-o2')),
+          ),
+          findsOneWidget,
+        );
+        expect(find.textContaining('CHF/100'), findsWidgets);
+        expect(find.text('Price'), findsNothing);
+      },
+    );
   });
 }
