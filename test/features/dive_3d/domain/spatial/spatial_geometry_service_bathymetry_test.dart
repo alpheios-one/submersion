@@ -44,6 +44,17 @@ void main() {
     expect(scene.layers.length, 5);
   });
 
+  test(
+    'without a grid, a siteMaxDepth beyond the path does not inflate the scale',
+    () {
+      // The synthesized terrain is reconstructed from the path alone, so a
+      // siteMaxDepth deeper than the path (here 500 vs. path.maxDepth = 18)
+      // must not squash it toward the surface (issue #45, fallback path).
+      final scene = service.build(path(), siteMaxDepth: 500);
+      expect(scene.bounds.maxDepthMeters, path().maxDepth);
+    },
+  );
+
   test('with a grid the terrain is the bathymetry mesh, path intact', () {
     final scene = service.build(
       path(),
