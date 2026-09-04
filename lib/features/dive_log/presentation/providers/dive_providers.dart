@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_log/data/repositories/tank_pressure_rep
 import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
 import 'package:submersion/features/dive_log/data/services/dive_merge_service.dart';
 import 'package:submersion/features/dive_log/data/services/dive_split_service.dart';
+import 'package:submersion/features/dive_log/data/services/dive_uncombine_service.dart';
 import 'package:submersion/features/dive_log/data/services/estimated_tank_pressure_synthesizer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
@@ -221,6 +222,29 @@ final diveConsolidationServiceProvider = Provider<DiveConsolidationService>((
 /// consolidation).
 final diveSplitServiceProvider = Provider<DiveSplitService>((ref) {
   return DiveSplitService(ref.watch(diveRepositoryProvider));
+});
+
+/// Separate-a-combined-dive service singleton (inverse of combine).
+final diveUncombineServiceProvider = Provider<DiveUncombineService>((ref) {
+  return DiveUncombineService(ref.watch(diveRepositoryProvider));
+});
+
+/// How many segments a dive's provenance rows read as: 2 or more means a
+/// Combine stitched it together and it can be separated again (issue #1504).
+///
+/// One for an ordinary dive, however many sources it has, and zero for a dive
+/// with no provenance rows at all.
+final diveSegmentCountProvider = FutureProvider.family<int, String>((
+  ref,
+  diveId,
+) async {
+  final service = ref.watch(diveUncombineServiceProvider);
+  // The same tick diveDataSourcesProvider uses: the answer is a function of
+  // the dive's provenance rows and its profile samples.
+  ref.invalidateSelfWhen(
+    ref.watch(diveRepositoryProvider).watchAnalysisInputChanges(),
+  );
+  return (await service.plan(diveId)).length;
 });
 
 /// Autocomplete suggestions: distinct keys this diver has used

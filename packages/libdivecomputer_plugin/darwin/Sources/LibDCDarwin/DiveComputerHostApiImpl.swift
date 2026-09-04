@@ -886,7 +886,9 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             for i in 0..<Int(dive.event_count) {
                 let e = eventsPtr[i]
                 guard e.type != 0 else { continue }  // skip SAMPLE_EVENT_NONE
-                let typeName = Self.mapEventType(e.type)
+                // One shared table for every platform; see
+                // libdc_event_type_name in libdc_wrapper.h.
+                let typeName = String(cString: libdc_event_type_name(e.type))
                 let data: [String: String] = [
                     "flags": String(e.flags),
                     "value": String(e.value),
@@ -958,37 +960,6 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             exitLatitude: dive.exit_latitude.isNaN ? nil : dive.exit_latitude,
             exitLongitude: dive.exit_longitude.isNaN ? nil : dive.exit_longitude
         )
-    }
-
-    private static func mapEventType(_ type: UInt32) -> String {
-        switch type {
-        case 0: return "none"
-        case 1: return "deco"
-        case 2: return "ascent"
-        case 3: return "ceiling"
-        case 4: return "workload"
-        case 5: return "transmitter"
-        case 6: return "violation"
-        case 7: return "bookmark"
-        case 8: return "surface"
-        case 9: return "safetystop"
-        case 10: return "gaschange"
-        case 11: return "safetystop_voluntary"
-        case 12: return "safetystop_mandatory"
-        case 13: return "deepstop"
-        case 14: return "ceiling_safetystop"
-        case 15: return "floor"
-        case 16: return "divetime"
-        case 17: return "maxdepth"
-        case 18: return "OLF"
-        case 19: return "PO2"
-        case 20: return "airtime"
-        case 21: return "rgbm"
-        case 22: return "heading"
-        case 23: return "tissuelevel"
-        case 24: return "gaschange2"
-        default: return "unknown_\(type)"
-        }
     }
 
     // MARK: - Parse Raw Dive Data

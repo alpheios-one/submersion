@@ -9,6 +9,20 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'تعذر نسخ الرابط.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'نسخ الرابط';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'تم نسخ الرابط. الصقه في متصفحك للتفويض.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'استيراد من جهاز Garmin';
 
@@ -2342,6 +2356,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'عناصر طقم المعدات';
 
   @override
+  String get preDive_item_type_equipment => 'عنصر معدات';
+
+  @override
   String get preDive_item_valueLabel => 'تسمية القيمة';
 
   @override
@@ -2520,6 +2537,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'بدون';
+
+  @override
+  String get preDive_start_noEquipment => 'بدون';
 
   @override
   String get preDive_start_begin => 'بدء';
@@ -3131,6 +3151,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count أخرى متأخرة';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'التأمين سليم';
 
   @override
@@ -3343,9 +3368,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get dashboard_gauges_retry =>
       'الحالة غير متاحة - انقر لإعادة المحاولة';
-
-  @override
-  String get dashboard_urgent_title => 'يتطلب الانتباه';
 
   @override
   String get dashboard_media_title => 'أحدث الوسائط';
@@ -4417,43 +4439,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_consolidate_undone => 'تم التراجع عن الدمج';
-
-  @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'سيتم دمج الغوصة في الساعة $time مع هذه الغوصة.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'تأكيد الدمج';
-
-  @override
-  String get diveLog_mergeDialog_empty =>
-      'لم يتم العثور على غوصات أخرى في هذا اليوم.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'سيتم دمج ملف هذه الغوصة والأسطوانات والضغوط والأحداث والوسوم ورفقاء الغوص والمشاهدات في هذه الغوصة كمصدر كمبيوتر إضافي. يمكن التراجع عن هذا الإجراء باستخدام \'إلغاء ربط الكمبيوتر\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'خطأ في تحميل الغوصات: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'دمج';
-
-  @override
-  String get diveLog_mergeDialog_next => 'التالي';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'اختر غوصة من نفس اليوم لدمجها كجهاز كمبيوتر إضافي.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'دمج مع غوصة أخرى';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'ما الذي يفعله هذا';
 
   @override
   String get diveLog_computerSheet_description =>
@@ -7579,6 +7564,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_sources_splitFailed => 'فشل الفصل';
 
   @override
+  String get diveLog_sources_menu_separate => 'فصل الغوصات المدمجة';
+
+  @override
+  String get diveLog_sources_separateDialog_title => 'فصل الغوصات المدمجة؟';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'تم دمج هذه الغوصة من $count غوصات. يعود ملف كل غوصة وأحداثها وأسطواناتها وتبديلات الغاز إلى غوصتها الخاصة. أما بقية بيانات السجل، بما فيها رفقاء الغوص والوسوم والمعدات والوسائط والملاحظات ورقم الغوصة، فتبقى في هذه الغوصة.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'فصل';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت استعادة $count غوصات',
+      one: 'تمت استعادة غوصة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => 'تعذّر فصل هذه الغوصة';
+
+  @override
   String get divePlanner_action_addTank => 'إضافة أسطوانة';
 
   @override
@@ -9573,12 +9586,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divers_edit_updateButton => 'تحديث الغواص';
 
   @override
-  String get divers_list_activeBadge => 'نشط';
-
-  @override
-  String get divers_list_addDiverButton => 'إضافة غواص';
-
-  @override
   String get divers_list_addDiverTooltip => 'إضافة ملف غواص جديد';
 
   @override
@@ -9617,27 +9624,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'عرض الغواص $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'الغواص النشط';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'غواصون آخرون';
-
-  @override
-  String get divers_summary_overviewTitle => 'نظرة عامة';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'إجراءات سريعة';
-
-  @override
-  String get divers_summary_subtitle => 'اختر غواصًا من القائمة لعرض التفاصيل';
-
-  @override
-  String get divers_summary_title => 'ملفات الغواصين';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'إجمالي الغواصين';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -10020,13 +10006,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get enum_pdfTemplate_padiStyle_description =>
       'تخطيط مطابق لتنسيق سجل PADI';
-
-  @override
-  String get enum_pdfTemplate_professional => 'احترافي';
-
-  @override
-  String get enum_pdfTemplate_professional_description =>
-      'مناطق للتوقيع والختم للتحقق';
 
   @override
   String get enum_pdfTemplate_simple => 'بسيط';
@@ -13558,10 +13537,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'تمت كتابة بيانات الغوصة على الصورة';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'تمت كتابة بيانات الغوصة على الفيديو';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'خطأ في تحميل الصور: $error';
   }
@@ -13725,18 +13700,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيتم كتابة البيانات الوصفية التالية على الصورة:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'سيتم كتابة البيانات الوصفية التالية على الفيديو:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'وقت الغوصة';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'الاحتفاظ بالفيديو الأصلي';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13756,16 +13723,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'كتابة بيانات الغوصة على الصورة';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'كتابة بيانات الغوصة على الفيديو';
+  String get media_writeMetadata_videoUnsupported =>
+      'لا يمكن كتابة بيانات الغوص إلا في الصور، وليس في مقاطع الفيديو.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
       'سيؤدي هذا إلى تعديل الصورة الأصلية.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'سيتم إنشاء فيديو جديد مع البيانات الوصفية. لا يمكن تعديل البيانات الوصفية للفيديو في مكانها.';
 
   @override
   String get media_writeMetadata_writeButton => 'كتابة';
@@ -14719,20 +14682,53 @@ class AppLocalizationsAr extends AppLocalizations {
       'إعادة تعيين إلى الافتراضي';
 
   @override
-  String get settings_diveDetailSections_fixedSections =>
-      'الأقسام الثابتة: الرأس، مخطط ملف الغوصة';
+  String get settings_diveDetailSections_fixedSections => 'القسم الثابت: الرأس';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'الأقسام القابلة للتخصيص (اسحب لإعادة الترتيب)';
 
   @override
-  String get diveDetailSection_decoO2_name =>
-      'حالة تخفيف الضغط / تحميل الأنسجة';
+  String get diveDetailSection_profile_name => 'مخطط الغطسة';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL، السقف، خريطة حرارة الأنسجة، سمية O2';
+  String get diveDetailSection_profile_description =>
+      'مخطط العمق/الزمن، التشغيل، تحديد النطاق';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'حالة تخفيف الضغط';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL، السقف، محطات التوقف، سمية O2';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'تحميل الأنسجة';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'التشبع لكل حجيرة وخريطة حرارية';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'خيارات العرض';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'التخطيط';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'الأقسام';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'إظهار جميع الأقسام';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'إعادة ترتيب الأقسام…';
+
+  @override
+  String get diveDetailLayout_detailed => 'مفصّل';
+
+  @override
+  String get diveDetailLayout_list => 'قائمة';
 
   @override
   String get diveDetailSection_safetyReview_name => 'مراجعة السلامة';
@@ -15761,10 +15757,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_dropbox_account_title => 'حساب Dropbox';
 
   @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'تعذر فتح المتصفح. جرب زر إعادة فتح المتصفح.';
-
-  @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'رمز التفويض';
 
   @override
@@ -16488,24 +16480,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_import_cancelling => 'جارٍ الإلغاء...';
 
   @override
-  String get settings_import_dialog_title => 'جارٍ استيراد البيانات';
-
-  @override
-  String get settings_import_doNotClose => 'يرجى عدم إغلاق التطبيق';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current من $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'جارٍ استيراد الرفاق...';
 
   @override
   String get settings_import_phase_certifications => 'جارٍ استيراد الشهادات...';
-
-  @override
-  String get settings_import_phase_complete => 'جارٍ الإنهاء...';
 
   @override
   String get settings_import_phase_diveCenters => 'جارٍ استيراد مراكز الغوص...';
@@ -16524,9 +16502,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ استيراد مجموعات المعدات...';
 
   @override
-  String get settings_import_phase_parsing => 'جارٍ تحليل الملف...';
-
-  @override
   String get settings_import_phase_preparing => 'جارٍ التحضير...';
 
   @override
@@ -16543,20 +16518,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase، $current من $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'تقدم الاستيراد: $percent بالمئة';
-  }
 
   @override
   String get settings_language_appBar_title => 'اللغة';
@@ -18898,6 +18859,28 @@ class AppLocalizationsAr extends AppLocalizations {
       'يتطلب استيراد الصور مجلدًا على قرص هذا الجهاز. شغّل هذا الاستيراد على جهاز كمبيوتر لتضمينها. تُستورد الغطسات والمواقع بشكل طبيعي.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count صور مضمّنة في الأرشيف',
+      one: 'صورة واحدة مضمّنة في الأرشيف',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination => 'اختر مكان حفظ الصور...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'تُحفظ الصور في هذا المجلد ويتم ربطها من هناك. لا يحتفظ Submersion بنسخة خاصة به أبدًا.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'لا يمكن الكتابة في هذا المجلد. اختر مجلدًا آخر.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19501,6 +19484,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'إضافة صور بطاقات الشهادات الممسوحة ضوئيًا إلى ملف PDF';
 
   @override
+  String get transfer_pdfExport_includeVerificationAreas =>
+      'تضمين مناطق التحقق';
+
+  @override
+  String get transfer_pdfExport_includeVerificationAreasSubtitle =>
+      'إضافة مربعات الختم والتوقيع للتحقق';
+
+  @override
   String get transfer_pdfExport_pageSizeA4 => 'A4';
 
   @override
@@ -19538,13 +19529,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get transfer_pdfExport_templatePadiStyleDesc =>
       'تخطيط مطابق لتنسيق سجل PADI';
-
-  @override
-  String get transfer_pdfExport_templateProfessional => 'احترافي';
-
-  @override
-  String get transfer_pdfExport_templateProfessionalDesc =>
-      'مساحات للتوقيع والختم للتحقق';
 
   @override
   String transfer_pdfExport_templateSemanticLabel(Object templateName) {
@@ -20574,6 +20558,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذه الصيغة غير مدعومة بعد. يرجى التصدير كـ UDDF أو CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'تعذّر تشغيل كشف التكرارات، لذلك لم يُوسم أي عنصر في هذه القائمة بأنه موجود مسبقًا في سجلك. راجع القائمة قبل الاستيراد.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'لا يحتوي هذا الملف على أعمدة لربطها. ارجع واختر الملف مرة أخرى، أو اختر مصدرًا آخر.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'تعذّر متابعة الاستيراد: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'تعيين الأعمدة';
 
   @override
@@ -20751,11 +20748,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String universalImport_semantics_sourceUncertain(Object description) {
     return 'المصدر غير مؤكد: $description';
-  }
-
-  @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'تبديل التحديد لـ $name';
   }
 
   @override
@@ -21468,29 +21460,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'رمز PIN مطلوب';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'اتصال';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'أدخل رمز PIN المكون من 4 إلى 6 أرقام المعروض على جهازك';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'تحقق من شاشة كمبيوتر الغوص لرؤية رمز PIN.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'تحقق من شاشة $deviceName لرؤية رمز PIN.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'إدخال رمز PIN، من 4 إلى 6 أرقام';
-
-  @override
-  String get diveComputer_pinEntry_title => 'أدخل رمز PIN';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -22510,6 +22479,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'حذف \"$name\"؟\n\nتم تنزيل هذه المنطقة بإصدار سابق، لذا تُخزَّن بلاطاتها مع بلاطات مناطق أخرى ولا يمكن تحريرها بمفردها. لن يؤدي حذفها إلى استعادة مساحة تخزين.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22600,6 +22574,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'الحجم';
+
+  @override
+  String get maps_offline_sizeUnknown => 'غير معروف';
 
   @override
   String get maps_offline_tiles => 'البلاطات';
@@ -23872,6 +23849,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'مؤشر كتلة الجسم $bmi. عادة ما يعني ارتفاع مؤشر كتلة الجسم أنسجة أكثر طفوا وقليلا من الرصاص الإضافي.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'تكوين الجسم';
+
+  @override
   String get tools_weight_breakdownTitle => 'كيف تم الحساب';
 
   @override
@@ -23889,6 +23874,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'الطول (اختياري)';
+
+  @override
   String get tools_weight_noGear =>
       'أضف المعدات التي تخطط للغوص بها لتخصيص التنبؤ.';
 
@@ -23903,6 +23891,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'حفظ الوزن في الملف الشخصي';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'مقدر من مؤشر كتلة الجسم';
 
   @override
   String get tools_weight_source_measured => 'مقاس من غوصاتك';
@@ -33579,14 +33570,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'صورة مصغّرة لفيديو. انقر للعرض بملء الشاشة';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'صورة مصغّرة لصورة، مفقودة من الجهاز. انقر للعرض بملء الشاشة';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'صورة مصغّرة لفيديو، مفقود من الجهاز. انقر للعرض بملء الشاشة';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'صورة مصغّرة لصورة. انقر لفتح المعرض';
 
@@ -33697,6 +33680,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get autoUpdate_banner_download => 'تنزيل';
+
+  @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'حدّث باستخدام: $command';
+  }
 
   @override
   String get settings_cloudSync_provider_icloud_subtitle =>
@@ -34654,6 +34642,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_export_progress_loadingSignatures =>
       'جارٍ تحميل التوقيعات...';
+
+  @override
+  String get settings_export_progress_loadingProfiles =>
+      'جارٍ تحميل ملفات الغوص...';
 
   @override
   String get settings_export_progress_loadingCertifications =>
@@ -35946,4 +35938,87 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'يلزم إذن الوصول إلى جهات الاتصال لاختيار صورة.';
+
+  @override
+  String get diveComputer_merge_title => 'دمج أجهزة كمبيوتر الغوص';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return 'ستصبح $count سجلات سجلاً واحداً. تنتقل الغطسات والملفات وسجل التنزيل إلى السجل الذي تحتفظ به، وتُحذف السجلات الأخرى.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'الاحتفاظ بهذا السجل';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'الرقم التسلسلي $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'لا يوجد رقم تسلسلي';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ستنتقل $count غطسات إلى السجل المحتفظ به.',
+      one: 'ستنتقل غطسة واحدة إلى السجل المحتفظ به.',
+      zero: 'لا توجد غطسات مرتبطة بالسجلات الأخرى.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'تُبلغ هذه السجلات عن أرقام تسلسلية مختلفة. قد تكون أجهزة مختلفة.';
+
+  @override
+  String get diveComputer_merge_action => 'دمج';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم دمج $count سجلات في $name',
+      one: 'تم دمج سجل واحد في $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'تعذّر دمج أجهزة الكمبيوتر: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'دمج أجهزة الكمبيوتر';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'الدمج مع جهاز كمبيوتر آخر';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'الدمج مع';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'لا توجد أجهزة كمبيوتر أخرى للدمج معها.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'نفس الرقم التسلسلي';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return 'يُبلغ $name عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً مرتين.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'تُبلغ $count سجلات محفوظة أخرى عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً أكثر من مرة.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'دمج';
 }

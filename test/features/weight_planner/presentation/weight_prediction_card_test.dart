@@ -28,6 +28,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(
             prediction: prediction,
@@ -55,6 +56,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(prediction: prediction, units: units),
         ),
@@ -87,6 +89,7 @@ void main() {
     );
     await tester.pumpWidget(
       localizedMaterialApp(
+        locale: const Locale('en'),
         home: const SingleChildScrollView(
           child: WeightPredictionCard(prediction: lowPrediction, units: units),
         ),
@@ -95,5 +98,37 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Low confidence - estimate'), findsOneWidget);
+  });
+
+  testWidgets('body composition term renders its label and source', (
+    tester,
+  ) async {
+    const bmiPrediction = WeightPrediction(
+      totalKg: 8.6,
+      terms: [
+        PredictionTerm(
+          label: 'bmi',
+          kg: 0.6,
+          source: TermSource.bodyComposition,
+        ),
+      ],
+      confidence: PredictionConfidence.low,
+      supportingDives: 0,
+    );
+    await tester.pumpWidget(
+      localizedMaterialApp(
+        locale: const Locale('en'),
+        home: const SingleChildScrollView(
+          child: WeightPredictionCard(prediction: bmiPrediction, units: units),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('How this was calculated'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Body composition (estimated from BMI)'), findsOneWidget);
+    expect(find.text('+0.6 kg'), findsOneWidget);
   });
 }

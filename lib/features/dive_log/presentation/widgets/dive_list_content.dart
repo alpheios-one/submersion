@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +10,15 @@ import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
+import 'package:submersion/core/services/export/pdf/diver_photo_loader.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
+import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/divers/domain/entities/diver.dart';
+import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/core/constants/pdf_templates.dart';
+import 'package:submersion/features/transfer/presentation/widgets/pdf_export_dialog.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
@@ -548,6 +558,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     _BulkExportFormat format,
     String formatLabel,
   ) async {
+    // PDF gets the same template picker the Transfer page uses, so a bulk
+    // export is not silently a different document from a full-logbook one.
+    PdfExportOptions? pdfOptions;
+    if (format == _BulkExportFormat.pdf) {
+      pdfOptions = await PdfExportDialog.show(context);
+      // A null return means the diver cancelled, not that anything failed.
+      if (pdfOptions == null || !mounted) return;
+    }
+
     final destination = await showExportDestinationSheet(
       context,
       title: formatLabel,
@@ -581,9 +600,21 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     try {
       final repository = ref.read(diveRepositoryProvider);
-      final selectedDives = await repository.getDivesByIds(
-        _selectedIds.toList(),
-      );
+      var selectedDives = await repository.getDivesByIds(_selectedIds.toList());
+
+      // getDivesByIds hydrates profiles but not the buddy junction, which only
+      // getAllDives loads. #1017 asks for buddies in the detailed logbook, so
+      // attach them here rather than shipping an export that omits the team.
+      if (format == _BulkExportFormat.pdf) {
+        final buddiesByDive = await ref
+            .read(buddyRepositoryProvider)
+            .getBuddiesForDives(selectedDives.map((d) => d.id).toList());
+        if (buddiesByDive.isNotEmpty) {
+          selectedDives = selectedDives
+              .map((d) => d.copyWith(buddies: buddiesByDive[d.id] ?? const []))
+              .toList();
+        }
+      }
       final exportService = ref.read(exportServiceProvider);
       final settings = ref.read(settingsProvider);
       final pdfDates = PdfDateFormatter(
@@ -595,6 +626,32 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
           .map((d) => d.site!)
           .toSet()
           .toList();
+
+      // The picker offers certification cards, so the bulk path has to supply
+      // the same context the settings export does or the option does nothing.
+      //
+      // Best-effort, like the buddy lookup above: this personalizes the
+      // document rather than defining it, so a failed read degrades to a
+      // plainer export instead of no export.
+      List<Certification>? certifications;
+      Diver? diver;
+      Uint8List? diverPhoto;
+      if (format == _BulkExportFormat.pdf) {
+        try {
+          if (pdfOptions?.includeCertificationCards == true) {
+            certifications = await ref.read(allCertificationsProvider.future);
+          }
+          diver = await ref.read(currentDiverProvider.future);
+          // The portrait travels with the diver: passing one without the
+          // other leaves the Detailed front matter on its placeholder frame.
+          diverPhoto = await ref.read(diverPhotoLoaderProvider)(
+            diver?.photoPath,
+          );
+        } catch (_) {
+          // Keep the export going without the personalization.
+        }
+      }
+      if (!mounted) return;
 
       if (!keepDialogForDelivery) {
         if (!mounted) return;
@@ -609,10 +666,20 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               ? await exportService.exportDivesToPdf(
                   selectedDives,
                   dates: pdfDates,
+                  units: UnitFormatter(settings),
+                  options: pdfOptions!,
+                  certifications: certifications,
+                  diver: diver,
+                  diverPhoto: diverPhoto,
                 )
               : await exportService.saveDivesToPdfFile(
                   selectedDives,
                   dates: pdfDates,
+                  units: UnitFormatter(settings),
+                  options: pdfOptions!,
+                  certifications: certifications,
+                  diver: diver,
+                  diverPhoto: diverPhoto,
                 ),
         _BulkExportFormat.csv =>
           sharing

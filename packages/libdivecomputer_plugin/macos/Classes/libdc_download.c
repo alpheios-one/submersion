@@ -149,6 +149,41 @@ static int is_usable_location(double latitude, double longitude) {
            longitude >= -180.0 && longitude <= 180.0;
 }
 
+const char *libdc_event_type_name(unsigned int type) {
+    // Switch on the enum symbols, never on literal codes: each symbol's value
+    // is owned by libdivecomputer's parser.h, and the native test
+    // (test_event_type_names.c) walks the whole enum against this table.
+    switch (type) {
+    case SAMPLE_EVENT_NONE: return "none";
+    case SAMPLE_EVENT_DECOSTOP: return "deco";
+    case SAMPLE_EVENT_RBT: return "rbt";
+    case SAMPLE_EVENT_ASCENT: return "ascent";
+    case SAMPLE_EVENT_CEILING: return "ceiling";
+    case SAMPLE_EVENT_WORKLOAD: return "workload";
+    case SAMPLE_EVENT_TRANSMITTER: return "transmitter";
+    case SAMPLE_EVENT_VIOLATION: return "violation";
+    case SAMPLE_EVENT_BOOKMARK: return "bookmark";
+    case SAMPLE_EVENT_SURFACE: return "surface";
+    case SAMPLE_EVENT_SAFETYSTOP: return "safetystop";
+    case SAMPLE_EVENT_GASCHANGE: return "gaschange";
+    case SAMPLE_EVENT_SAFETYSTOP_VOLUNTARY: return "safetystop_voluntary";
+    case SAMPLE_EVENT_SAFETYSTOP_MANDATORY: return "safetystop_mandatory";
+    case SAMPLE_EVENT_DEEPSTOP: return "deepstop";
+    case SAMPLE_EVENT_CEILING_SAFETYSTOP: return "ceiling_safetystop";
+    case SAMPLE_EVENT_FLOOR: return "floor";
+    case SAMPLE_EVENT_DIVETIME: return "divetime";
+    case SAMPLE_EVENT_MAXDEPTH: return "maxdepth";
+    case SAMPLE_EVENT_OLF: return "OLF";
+    case SAMPLE_EVENT_PO2: return "PO2";
+    case SAMPLE_EVENT_AIRTIME: return "airtime";
+    case SAMPLE_EVENT_RGBM: return "rgbm";
+    case SAMPLE_EVENT_HEADING: return "heading";
+    case SAMPLE_EVENT_TISSUELEVEL: return "tissuelevel";
+    case SAMPLE_EVENT_GASCHANGE2: return "gaschange2";
+    default: return "unknown";
+    }
+}
+
 static void push_event(libdc_parsed_dive_t *dive,
                         unsigned int time_ms,
                         unsigned int type,

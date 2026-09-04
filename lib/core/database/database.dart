@@ -320,7 +320,7 @@ class PreDiveChecklistTemplateItems extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 
-  /// 'check' | 'value' | 'equipmentSet' (PreDiveItemType.name).
+  /// 'check' | 'value' | 'equipmentSet' | 'equipment' (PreDiveItemType.name).
   TextColumn get itemType => text().withDefault(const Constant('check'))();
   TextColumn get valueLabel => text().nullable()();
   TextColumn get valueUnit => text().nullable()();
@@ -331,6 +331,18 @@ class PreDiveChecklistTemplateItems extends Table {
 
   /// Required items must end Done or Flagged (never Skipped).
   BoolColumn get isRequired => boolean().withDefault(const Constant(false))();
+
+  /// Remembered equipment for an 'equipment'-typed item. Chosen at session
+  /// start (not in the template editor, mirroring the equipmentSet flow)
+  /// and persisted here so later sessions pre-fill the same device. Issue
+  /// #814.
+  ///
+  /// Deliberately not a SQL-level FK: template items are (re-)seeded
+  /// independently of the equipment table in isolated schema fixtures (and
+  /// at every app start for builtin templates), so a REFERENCES clause would
+  /// require the equipment table to exist wherever this table does.
+  /// Referential integrity is enforced at the application layer instead.
+  TextColumn get equipmentId => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -423,6 +435,12 @@ class PreDiveSessionItems extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+
+  /// JSON-encoded list of overdue-service entries, frozen the moment the
+  /// diver last moved this item away from pending. Null while pending (the
+  /// runner computes the live overdue list from equipmentId instead) and
+  /// cleared back to null on reset. Issue #814 phase 2.
+  TextColumn get overdueServices => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -1875,6 +1893,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   // Dive detail section order and visibility (v56) — JSON array
   TextColumn get diveDetailSections => text().nullable()();
+  // Dive detail page layout: detailed | list (v185). A stored "compact",
+  // from before that layout was dropped, reads back as detailed.
+  TextColumn get diveDetailLayout => text().nullable()();
   // Table view profile panel default visibility (v61)
   BoolColumn get showProfilePanelInTableView =>
       boolean().withDefault(const Constant(true))();
@@ -2604,6 +2625,27 @@ class DiveDataSources extends Table {
   /// time base", which is every source that was never consolidated.
   IntColumn get timeOffsetSeconds => integer().nullable()();
 
+  /// This row's position among its own original dive's data sources at the
+  /// moment a sequential Combine carried it here (issue #1451). Null on every
+  /// row a merge never carried, which is every row on an ordinary dive.
+  ///
+  /// `DiveMergeService.apply` copies each combined segment's
+  /// `dive_data_sources` rows onto the merged dive as provenance, because
+  /// each is the sole surviving copy of its half's rawData / rawFingerprint /
+  /// sourceUuid. Two halves of one physical dive therefore arrive as two
+  /// rows, and the display used to offer them as two switchable sources: the
+  /// chart then drew only the active half. The rows are the same strand seen
+  /// in two consecutive slices, not two competing recordings, so
+  /// `_canonicalDataSourceRows` collapses rows sharing a slot into one
+  /// display source. The rows themselves stay in the table untouched.
+  ///
+  /// A slot rather than a plain flag so a dive that was consolidated (two
+  /// computers, slots 0 and 1 in each segment) and only then combined still
+  /// shows one chip per computer instead of flattening both strands into one.
+  /// Segments whose sources carry no computerId have nothing else to
+  /// distinguish their strands by, which is exactly the case that was broken.
+  IntColumn get mergeSourceSlot => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -3332,7 +3374,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 183;
+  static const int currentSchemaVersion = 187;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3765,6 +3807,33 @@ class AppDatabase extends _$AppDatabase {
     // a parallel branch's rung never ran ours and the beforeOpen backstop
     // only runs AFTER onUpgrade: by then the rows would be gone.
     183,
+    // v184 (issue #1451): dive_data_sources.merge_source_slot, the marker a
+    // sequential Combine stamps on the provenance rows it carries so the
+    // display can collapse the halves of one dive back into one source.
+    // Backfilled for dives combined before this rung shipped.
+    184,
+    // v185 (issue #1476): diver_settings.dive_detail_layout, the dive detail
+    // page's layout choice. Column-only rung, no backfill: a null reads back
+    // as the detailed layout, which is what every existing diver was already
+    // getting. Numbered 185 because PR #1451 took 184 while this branch was
+    // open; the column is nullable and additive either way, so the
+    // compatibility floor stays at 183.
+    185,
+    // v186: pre_dive_checklist_template_items.equipment_id, the remembered
+    // single-equipment link for an 'equipment'-typed template item. Chosen
+    // at session start (not in the template editor), mirroring the
+    // equipmentSet flow. Issue #814. Column-only rung, no backfill, so the
+    // beforeOpen backstop is safe to re-run. Renumbered from 181: main
+    // landed 181 through 185 while this branch was open, and a rung at or
+    // below the shipped version never runs its onUpgrade step.
+    186,
+    // v187: pre_dive_session_items.overdue_services, the frozen snapshot of
+    // overdue-service entries for a resolved checklist item (issue #814
+    // phase 2). Column-only rung, no backfill: every pre-existing row
+    // correctly reads back as null (no frozen snapshot), which the UI
+    // already treats as "nothing known" for a resolved legacy row.
+    // Renumbered from 182 for the same reason as 186 above.
+    187,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4712,6 +4781,22 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         "ALTER TABLE diver_settings ADD COLUMN no_fly_preset TEXT "
         "NOT NULL DEFAULT 'standard'",
+      );
+    }
+  }
+
+  /// v185: diver_settings.dive_detail_layout, the dive detail page's layout
+  /// choice (detailed/list; a stored "compact" from before that layout was
+  /// dropped reads back as detailed). Idempotent so it is safe to call from
+  /// both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertDiveDetailLayoutColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (cols.isNotEmpty && !names.contains('dive_detail_layout')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN dive_detail_layout TEXT',
       );
     }
   }
@@ -5850,9 +5935,9 @@ class AppDatabase extends _$AppDatabase {
   /// diver's layout at the lane they were seeing. Runs after
   /// [_assertGasConsumptionDisplayColumn] so the lane names are final.
   ///
-  /// Never called from beforeOpen: DiveFieldAdapter.fieldFromName aliases
-  /// sacRate to sac for layouts that arrive later by sync, and re-running
-  /// this on every open would rewrite rows the diver has since changed. No
+  /// Never called from beforeOpen: diveFieldFromName aliases sacRate to sac
+  /// for layouts that arrive later by sync, and re-running this on every
+  /// open would rewrite rows the diver has since changed. No
   /// HLC bump: every device applies the same deterministic rewrite to its
   /// own rows, so there is nothing to push.
   Future<void> _rewriteLegacySacRateLayouts() async {
@@ -5921,6 +6006,48 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Idempotent DDL for the v181 pre_dive_checklist_template_items
+  /// equipment_id column (issue #814): the remembered single-equipment link
+  /// for an 'equipment'-typed template item, chosen at session start (not in
+  /// the template editor) and persisted so later sessions pre-fill the same
+  /// device. Self-guards on the table existing. Same dual-call contract
+  /// (onUpgrade + beforeOpen backstop) as the other column-assert helpers.
+  ///
+  /// No SQL-level REFERENCES clause: template items are (re-)seeded
+  /// independently of the equipment table (isolated schema fixtures, builtin
+  /// template reseeding on every app start), so referential integrity is
+  /// enforced at the application layer instead of via SQLite FK.
+  Future<void> _assertTemplateItemEquipmentIdColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_checklist_template_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('equipment_id')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
+      'TEXT',
+    );
+  }
+
+  /// Idempotent DDL for the v182 pre_dive_session_items.overdue_services
+  /// column (issue #814 phase 2): the frozen snapshot of overdue-service
+  /// entries for a resolved checklist item, written by the repository the
+  /// moment an item leaves pending and cleared on reset. Self-guards on the
+  /// table existing. Same dual-call contract (onUpgrade + beforeOpen
+  /// backstop) as the other column-assert helpers.
+  Future<void> _assertSessionItemOverdueServicesColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_session_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('overdue_services')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_session_items ADD COLUMN overdue_services TEXT',
+    );
+  }
+
   Future<void> _assertBuddyFavoriteColumn() async {
     final cols = await customSelect("PRAGMA table_info('buddies')").get();
     if (cols.isEmpty) return;
@@ -5962,6 +6089,107 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE dive_data_sources ADD COLUMN time_offset_seconds INTEGER',
       );
     }
+  }
+
+  /// Idempotent DDL for the v184 dive_data_sources.merge_source_slot column
+  /// (issue #1451). Same dual-call contract (onUpgrade + beforeOpen backstop)
+  /// as the other column-assert helpers. Nullable with no default, so every
+  /// pre-existing row reads back as "not carried by a merge".
+  Future<void> _assertDataSourceMergeSlotColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('merge_source_slot')) {
+      await customStatement(
+        'ALTER TABLE dive_data_sources ADD COLUMN merge_source_slot INTEGER',
+      );
+    }
+  }
+
+  /// Stamp `merge_source_slot = 0` on the provenance rows of dives that were
+  /// combined before v184 shipped, so their halves collapse to one display
+  /// source the way a post-v184 combine does (issue #1451).
+  ///
+  /// Nothing recorded the marker at the time, so the rows have to be
+  /// recognized by shape. A dive qualifies only when all three hold:
+  ///
+  ///  - it has two or more `dive_data_sources` rows, and
+  ///  - none of them is primary. Every importer writes its own row with
+  ///    `is_primary = 1` (dive_import_service, uddf_entity_importer,
+  ///    saveComputerReading) and a consolidation leaves the target's primary
+  ///    row alone, so "no primary at all" is the signature of
+  ///    `DiveMergeService.apply`, which writes every carried row
+  ///    `isPrimary: false`, and
+  ///  - every row has an entry and an exit time, and no two of those spans
+  ///    overlap, and
+  ///  - no row carries a non-zero `time_offset_seconds`.
+  ///
+  /// The span test is what makes this safe. Combined halves are consecutive
+  /// slices of one timeline, so their spans are disjoint; two computers
+  /// recording one dive cover the same minutes, so theirs overlap. Without
+  /// it, a consolidation whose target row was never marked primary would
+  /// collapse to a single chip and the chart would go back to drawing the
+  /// interleaved union of both computers (issue #543). A dive whose rows
+  /// carry no entry/exit times cannot be classified either way and is left
+  /// alone: it keeps exactly today's behavior.
+  ///
+  /// The offset test closes the one hole in that reasoning.
+  /// `DiveConsolidationService` shifts a folded-in dive's SAMPLES by
+  /// `time_offset_seconds` but copies its `entry_time`/`exit_time` over
+  /// verbatim, so a secondary whose clock was badly out has a stored span
+  /// that misses the target's even though the two cover the same minutes.
+  /// The span test would read that as a Combine. A non-zero offset is the
+  /// trace consolidation leaves and a Combine never writes, so requiring
+  /// zero across the dive rules that shape out. It costs a few false
+  /// negatives -- a pre-v184 dive that was consolidated and then combined is
+  /// now skipped -- and a skipped dive simply keeps today's display, which
+  /// is the safe direction to be wrong in for a one-shot write over user
+  /// data.
+  ///
+  /// Runs once on the v184 rung, not from the beforeOpen backstop: it writes
+  /// rows rather than asserting DDL, and every merge performed after the
+  /// upgrade stamps its own slots.
+  ///
+  /// Guarded on the columns it reads, like every other migration helper here.
+  /// A database whose `dive_data_sources` a parallel branch shaped without
+  /// entry/exit times must still open: the classification has no input there,
+  /// so skipping is the same answer as running.
+  Future<void> _backfillMergeSourceSlots() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    const required = {
+      'dive_id',
+      'is_primary',
+      'entry_time',
+      'exit_time',
+      'time_offset_seconds',
+      'merge_source_slot',
+    };
+    if (!names.containsAll(required)) return;
+    await customStatement(
+      'UPDATE dive_data_sources SET merge_source_slot = 0 '
+      'WHERE merge_source_slot IS NULL '
+      'AND dive_id IN ('
+      '  SELECT dive_id FROM dive_data_sources'
+      '  GROUP BY dive_id'
+      '  HAVING COUNT(*) >= 2'
+      '     AND SUM(CASE WHEN is_primary THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN entry_time IS NULL OR exit_time IS NULL'
+      '                  THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN COALESCE(time_offset_seconds, 0) <> 0'
+      '                  THEN 1 ELSE 0 END) = 0'
+      ') '
+      'AND dive_id NOT IN ('
+      '  SELECT a.dive_id FROM dive_data_sources a'
+      '  JOIN dive_data_sources b'
+      '    ON b.dive_id = a.dive_id AND b.id <> a.id'
+      '  WHERE a.entry_time < b.exit_time AND b.entry_time < a.exit_time'
+      ')',
+    );
   }
 
   /// Site-level entry/exit method columns on dive_sites (issue #1104).
@@ -9770,6 +9998,35 @@ class AppDatabase extends _$AppDatabase {
           }
         }
         if (from < 183) await reportProgress();
+        // v184: the marker a sequential Combine stamps on the provenance
+        // rows it carries, plus a backfill for dives combined before it
+        // existed (issue #1451).
+        if (from < 184) {
+          await _assertDataSourceMergeSlotColumn();
+          await _backfillMergeSourceSlots();
+        }
+        if (from < 184) await reportProgress();
+        // v185: diver_settings.dive_detail_layout. Column-only rung, no
+        // backfill: a null reads back as the detailed layout, which is what
+        // every existing diver was already getting.
+        if (from < 185) {
+          await _assertDiveDetailLayoutColumn();
+        }
+        if (from < 185) await reportProgress();
+        // v186: pre_dive_checklist_template_items.equipment_id (issue #814).
+        // Column-only rung, no backfill: every pre-existing item correctly
+        // defaults to unlinked.
+        if (from < 186) {
+          await _assertTemplateItemEquipmentIdColumn();
+        }
+        if (from < 186) await reportProgress();
+        // v187: pre_dive_session_items.overdue_services (issue #814 phase 2).
+        // Column-only rung, no backfill: every pre-existing resolved item
+        // correctly reads back as "nothing known" until it is next resolved.
+        if (from < 187) {
+          await _assertSessionItemOverdueServicesColumn();
+        }
+        if (from < 187) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9949,6 +10206,12 @@ class AppDatabase extends _$AppDatabase {
         // Reading a consolidated dive's sources throws without it.
         await _assertDataSourceTimeOffsetColumn();
 
+        // v184 backstop: re-assert the merge provenance marker (issue
+        // #1451; same parallel-branch version-collision self-heal).
+        // Reading any dive's sources throws without it. Only the column is
+        // re-asserted here; the one-shot backfill belongs to the rung.
+        await _assertDataSourceMergeSlotColumn();
+
         // v160 backstop: re-assert service_kinds.default_category. A device
         // that reached 160 or higher through a parallel branch never enters
         // the `from < 160` block above, and the seed SQL below is
@@ -10026,6 +10289,12 @@ class AppDatabase extends _$AppDatabase {
         // that arrives by restore or sync-adopt never runs onUpgrade, and
         // every read of a diver or buddy row would throw without the column.
         await _assertProfilePhotoColumns();
+
+        // v185 backstop: re-assert diver_settings.dive_detail_layout. Every
+        // settings read selects the whole row, so a database that skipped the
+        // rung would throw on the first read instead of falling back to the
+        // default layout.
+        await _assertDiveDetailLayoutColumn();
         // v182 backstop: re-assert the packed profile series tables, then
         // pack any dive that still has legacy rows and no series row. A
         // schema-version collision with a parallel branch skips the rung on
@@ -10107,6 +10376,18 @@ class AppDatabase extends _$AppDatabase {
             stackTrace: stackTrace,
           );
         }
+
+        // v186 backstop: re-assert pre_dive_checklist_template_items.
+        // equipment_id (same parallel-branch version-collision self-heal).
+        // Safe to re-run on every open: the helper is column-only with no
+        // backfill, so it cannot resurrect or overwrite diver data.
+        await _assertTemplateItemEquipmentIdColumn();
+
+        // v187 backstop: re-assert pre_dive_session_items.overdue_services
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertSessionItemOverdueServicesColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

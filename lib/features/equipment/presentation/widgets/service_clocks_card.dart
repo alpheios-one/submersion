@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_schedule_dialogs.dart';
+import 'package:submersion/features/equipment/presentation/widgets/service_trigger_text.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Service clocks card on the equipment detail page: one row per
@@ -33,46 +34,16 @@ class ServiceClocksCard extends ConsumerWidget {
     };
   }
 
-  String _triggerText(BuildContext context, ServiceClockStatus status) {
-    final l10n = context.l10n;
-    final parts = <String>[];
-    final dueDate = status.dueDate;
-    if (dueDate != null) {
-      final formatted = MaterialLocalizations.of(
+  String _triggerText(BuildContext context, ServiceClockStatus status) =>
+      formatServiceTriggerText(
         context,
-      ).formatShortDate(dueDate);
-      parts.add(
-        // Strict isAfter: at the exact due instant (now == dueDate) the engine
-        // treats the date trigger as due-soon, not overdue, so render "Due
-        // {date}" until now is strictly past dueDate. Matches the engine's
-        // now.isAfter(dueDate) boundary.
-        status.now.isAfter(dueDate)
-            ? l10n.equipment_serviceClocks_overdueSince(formatted)
-            : l10n.equipment_serviceClocks_dueOn(formatted),
+        now: status.now,
+        dueDate: status.dueDate,
+        divesSinceAnchor: status.divesSinceAnchor,
+        divesRemaining: status.divesRemaining,
+        hoursSinceAnchor: status.hoursSinceAnchor,
+        hoursRemaining: status.hoursRemaining,
       );
-    }
-    final divesRemaining = status.divesRemaining;
-    final divesSince = status.divesSinceAnchor;
-    if (divesRemaining != null && divesSince != null) {
-      parts.add(
-        l10n.equipment_serviceClocks_divesLeft(
-          divesRemaining < 0 ? 0 : divesRemaining,
-          divesSince + divesRemaining,
-        ),
-      );
-    }
-    final hoursRemaining = status.hoursRemaining;
-    final hoursSince = status.hoursSinceAnchor;
-    if (hoursRemaining != null && hoursSince != null) {
-      parts.add(
-        l10n.equipment_serviceClocks_hoursLeft(
-          (hoursRemaining < 0 ? 0.0 : hoursRemaining).toStringAsFixed(1),
-          (hoursSince + hoursRemaining).toStringAsFixed(1),
-        ),
-      );
-    }
-    return parts.join(' · ');
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

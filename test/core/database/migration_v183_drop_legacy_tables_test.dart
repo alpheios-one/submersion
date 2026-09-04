@@ -148,7 +148,10 @@ void main() {
         scalar(raw, 'SELECT COUNT(*) AS n FROM tank_pressure_series'),
         greaterThan(0),
       );
-      expect(scalar(raw, 'PRAGMA user_version'), 183);
+      expect(
+        scalar(raw, 'PRAGMA user_version'),
+        AppDatabase.currentSchemaVersion,
+      );
 
       await db.close();
     },
@@ -208,7 +211,10 @@ void main() {
       ),
       isEmpty,
     );
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
   });
 
   test(
@@ -249,7 +255,10 @@ void main() {
         scalar(raw, 'SELECT SUM(sample_count) AS n FROM tank_pressure_series'),
         3,
       );
-      expect(scalar(raw, 'PRAGMA user_version'), 183);
+      expect(
+        scalar(raw, 'PRAGMA user_version'),
+        AppDatabase.currentSchemaVersion,
+      );
     },
   );
 
@@ -274,7 +283,10 @@ void main() {
     addTearDown(db.close);
     await expectLater(db.customSelect('SELECT 1').get(), completes);
 
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
     // Only dive_profiles is unpackable here. Its samples are still only in
     // the legacy table, so its drop is skipped rather than destroying them.
     // The pressures are packed per dive independently of it, which is the
@@ -328,7 +340,10 @@ void main() {
     );
     await first.customSelect('SELECT 1').get();
     await first.close();
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
     expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 11);
 
     // The malformed series table is repaired (dropped, so the backstop's
@@ -380,7 +395,10 @@ void main() {
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
 
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
     expect(
       raw.select(
         "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -420,7 +438,10 @@ void main() {
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
 
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
     expect(
       raw.select(
         "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -501,7 +522,10 @@ void main() {
     addTearDown(db.close);
     await expectLater(db.customSelect('SELECT 1').get(), completes);
 
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
     expect(scalar(raw, 'SELECT COUNT(*) AS n FROM dive_profiles'), 1);
   });
 
@@ -539,7 +563,10 @@ void main() {
       raw.select("SELECT name FROM sqlite_master WHERE name = 'dive_profiles'"),
       isEmpty,
     );
-    expect(scalar(raw, 'PRAGMA user_version'), 183);
+    expect(
+      scalar(raw, 'PRAGMA user_version'),
+      AppDatabase.currentSchemaVersion,
+    );
   });
 
   test(
@@ -615,7 +642,10 @@ void main() {
   );
 
   test('v183 is present in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 183);
+    // v183 is now a past migration; the latest-version tripwire lives in the
+    // newest migration's test (migration_v185_dive_detail_layout_test.dart),
+    // so assert membership rather than equality.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(183));
     expect(AppDatabase.migrationVersions, contains(183));
     // The wire compatibility floor lands on 183, not on the 182 rung that
     // replaced the two synced entities: no released build was ever stamped

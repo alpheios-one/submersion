@@ -11,6 +11,7 @@ import 'package:submersion/features/buddies/presentation/providers/buddy_provide
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
@@ -41,6 +42,7 @@ import 'package:submersion/features/universal_import/data/services/shearwater_db
 import 'package:submersion/features/universal_import/data/services/surfacing_pressure_normalizer.dart';
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
 import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
+import 'package:submersion/features/universal_import/domain/services/bundled_photo_exporter.dart';
 import 'package:submersion/features/universal_import/domain/services/import_media_resolver.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
 import 'package:submersion/core/services/files/picked_file_materializer.dart';
@@ -61,13 +63,21 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     ZipExpansionService zipExpansionService = const ZipExpansionService(),
     GarminDeviceDetector garminDeviceDetector = const GarminDeviceDetector(),
     FitParserService fitParserService = const FitParserService(),
-  }) : _batchParseService = batchParseService,
+    Future<bool> Function(String path) folderWriteProbe = folderAcceptsWrites,
+  }) : _folderWriteProbe = folderWriteProbe,
+       _batchParseService = batchParseService,
        _zipExpansion = zipExpansionService,
        _garminDetector = garminDeviceDetector,
        _fitParser = fitParserService,
        super(const UniversalImportState());
 
   final Ref _ref;
+
+  /// Injectable so a widget test can answer the writability question
+  /// without real filesystem work: `testWidgets` runs in a fake-async
+  /// zone that never completes real IO, so an awaited probe would park
+  /// forever.
+  final Future<bool> Function(String path) _folderWriteProbe;
 
   /// Injectable so tests can drive deterministic batch-parse outcomes
   /// (progress, cancellation) without real file timing.
@@ -141,15 +151,28 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   /// non-ZIP import (pickFiles/pickFolder do not fully reset state) and its
   /// photos could be misattached to the new dives. Temp dirs superseded by
   /// this expansion are deleted so extracted data does not accumulate.
-  void _applyExpansionExtras(ArchiveExpansion expansion) {
+  ///
+  /// Public only so a test can drive it: the picker entry points that need
+  /// it most go through the static file picker and cannot be exercised.
+  @visibleForTesting
+  void applyExpansionExtras(ArchiveExpansion expansion) {
     final superseded = [
       for (final dir in state.zipTempDirPaths)
         if (!expansion.tempDirPaths.contains(dir)) dir,
     ];
+    // Every photo decision belongs to the selection that prompted it. A
+    // fresh pick drops them all, or a destination chosen for one archive
+    // would silently receive the next archive's photos, and a resolution
+    // or skip from an earlier logbook would open the Photos step's gate
+    // for a new one that has not been looked at.
     state = state.copyWith(
       photoPathsByBaseName: expansion.photoPathsByBaseName,
       unmatchedPhotoCount: expansion.unmatchedPhotoPaths.length,
       zipTempDirPaths: expansion.tempDirPaths,
+      clearBundledPhotoFolderPath: true,
+      clearPhotoFolderPath: true,
+      clearPhotoResolution: true,
+      photosSkipped: false,
     );
     _deleteTempDirs(superseded);
   }
@@ -211,7 +234,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     try {
       if (ZipExpansionService.isZipBytes(bytes)) {
         final expansion = await _zipExpansion.expandZipBytes(bytes, fileName);
-        _applyExpansionExtras(expansion);
+        applyExpansionExtras(expansion);
         if (expansion.filePaths.isEmpty) {
           state = state.copyWith(
             isLoading: false,
@@ -304,7 +327,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
         for (final f in await materializePickedFiles(result)) f.path,
       ];
       final expansion = await _zipExpansion.expandAll(pickedPaths);
-      _applyExpansionExtras(expansion);
+      applyExpansionExtras(expansion);
 
       if (expansion.filePaths.isEmpty) {
         state = state.copyWith(
@@ -390,7 +413,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     state = const UniversalImportState().copyWith(isLoading: true);
     _deleteTempDirs(staleTempDirs);
     final expansion = await _zipExpansion.expandAll(paths);
-    _applyExpansionExtras(expansion);
+    applyExpansionExtras(expansion);
     if (expansion.filePaths.isEmpty) {
       state = state.copyWith(
         isLoading: false,
@@ -440,12 +463,29 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
   }
 
-  /// Proceeds without photos.
+  /// Records where photos bundled in an imported archive should be saved.
+  /// They are written there at import time and linked in place.
+  ///
+  /// Returns false, recording nothing, when the folder cannot be written
+  /// to, so the user hears about a read-only pick now rather than finding
+  /// the photos missing after the import.
+  Future<bool> chooseBundledPhotoFolder(String path) async {
+    if (!await _folderWriteProbe(path)) {
+      _log.warning('Bundled photo folder is not writable: $path');
+      return false;
+    }
+    state = state.copyWith(bundledPhotoFolderPath: path, photosSkipped: false);
+    return true;
+  }
+
+  /// Proceeds without photos: neither the logbook's referenced photos nor
+  /// any bundled in an archive are imported.
   void skipPhotos() {
     state = state.copyWith(
       photosSkipped: true,
       clearPhotoResolution: true,
       clearPhotoFolderPath: true,
+      clearBundledPhotoFolderPath: true,
     );
   }
 
@@ -476,7 +516,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       // Folder scans surface ZIPs (DiveCloud exports); expand them so
       // members flow through the batch like directly picked files.
       final expansion = await _zipExpansion.expandAll(paths);
-      _applyExpansionExtras(expansion);
+      applyExpansionExtras(expansion);
       final expandedPaths = expansion.filePaths;
 
       if (expandedPaths.isEmpty) {
@@ -605,7 +645,20 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
     // Reset to sourceConfirmation so the canAdvance provider transitions
     // false -> true, enabling auto-advance even when re-confirming.
-    state = state.copyWith(currentStep: ImportWizardStep.sourceConfirmation);
+    //
+    // Anything an earlier confirmation parsed is dropped here: re-confirming
+    // means re-deciding what this file is, so a payload built under the old
+    // answer is stale. The CSV branch below never parses -- it hands off to
+    // Map Fields -- so without this an override to CSV after a successful
+    // parse would keep the old payload, and Map Fields would auto-skip on it,
+    // confirmFieldMapping would early-return on it, and Review would show the
+    // superseded import.
+    state = state.copyWith(
+      currentStep: ImportWizardStep.sourceConfirmation,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
 
     final effectiveOverride = overrideApp ?? state.pendingSourceOverride;
 
@@ -777,15 +830,14 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
         isLoading: false,
         files: result.files,
         clearDetectionResult: true,
-        error: 'No data could be parsed from the selected files',
       );
-      return;
+      throw _fail('No data could be parsed from the selected files');
     }
 
     final payload = _applySurfacingPressureRule(
       const PayloadMerger().merge(result.parsed),
     );
-    final dupResult = await _checkDuplicates(payload);
+    final dupResult = await _checkDuplicatesOrEmpty(payload);
     final selections = _defaultSelections(payload, dupResult);
 
     state = state.copyWith(
@@ -800,13 +852,23 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
   // -- Parsing + Duplicate Check --
 
+  /// Parse the selected file and move the wizard to review.
+  ///
+  /// Throws [ImportStepFailure] when no payload could be produced. The wizard
+  /// gates every later step on that payload, so returning quietly here would
+  /// let it advance onto a step with nothing to act on -- for a non-CSV file
+  /// that is the CSV-only Map Fields step, which then reads "0 of 0 columns
+  /// mapped" with Next disabled and no explanation.
   Future<void> _parseAndCheckDuplicates() async {
     final bytes = state.fileBytes;
     final opts = state.options;
-    if (bytes == null || opts == null) return;
+    if (bytes == null || opts == null) {
+      throw _fail('The selected file could not be read. Please pick it again.');
+    }
 
     state = state.copyWith(isLoading: true, clearError: true);
 
+    final ImportPayload payload;
     try {
       final registry = opts.format == ImportFormat.csv
           ? await _buildPresetRegistry()
@@ -823,34 +885,77 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       } else {
         parsed = await parser.parse(bytes, options: opts);
       }
-      final payload = _applySurfacingPressureRule(parsed);
+      payload = _applySurfacingPressureRule(parsed);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to parse import file',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw _fail('Failed to parse file: $e');
+    }
 
-      if (payload.isEmpty) {
-        final errorMsg = payload.warnings.isNotEmpty
+    if (payload.isEmpty) {
+      throw _fail(
+        payload.warnings.isNotEmpty
             ? payload.warnings.first.message
-            : 'No data could be parsed from the file';
-        state = state.copyWith(isLoading: false, error: errorMsg);
-        return;
-      }
-
-      // Run duplicate checking
-      final dupResult = await _checkDuplicates(payload);
-
-      // Build default selections: all selected, minus duplicates
-      final selections = _defaultSelections(payload, dupResult);
-
-      state = state.copyWith(
-        isLoading: false,
-        payload: payload,
-        duplicateResult: dupResult,
-        selections: selections,
-        currentStep: ImportWizardStep.review,
+            : 'No data could be parsed from the file',
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to parse file: $e',
+    }
+
+    final dupResult = await _checkDuplicatesOrEmpty(payload);
+
+    // Build default selections: all selected, minus duplicates
+    final selections = _defaultSelections(payload, dupResult);
+
+    state = state.copyWith(
+      isLoading: false,
+      payload: payload,
+      duplicateResult: dupResult,
+      selections: selections,
+      currentStep: ImportWizardStep.review,
+    );
+  }
+
+  /// Record [message] on the state and return the failure to throw.
+  ///
+  /// The state copy is what the steps already on screen render; the throw is
+  /// what stops the wizard advancing past them.
+  ///
+  /// Anything a previous attempt parsed goes with it. A user can walk back to
+  /// Confirm Source, change the source and confirm again, so a failure here
+  /// can land on top of an earlier success -- and every gate past this point
+  /// reads that payload, so leaving it would carry a superseded import
+  /// forward under a message saying the current one failed.
+  ImportStepFailure _fail(String message) {
+    state = state.copyWith(
+      isLoading: false,
+      error: message,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
+    return ImportStepFailure(message);
+  }
+
+  /// Duplicate detection, degraded to "found none" if it throws.
+  ///
+  /// Flagging duplicates is a convenience laid over the import, and it reads
+  /// the whole existing library to do it. A failure in that read is no reason
+  /// to make the file unimportable: the review step still lists every incoming
+  /// row for the user to deselect by hand.
+  Future<ImportDuplicateResult> _checkDuplicatesOrEmpty(
+    ImportPayload payload,
+  ) async {
+    try {
+      return await _checkDuplicates(payload);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Duplicate detection failed; importing without it',
+        error: e,
+        stackTrace: stackTrace,
       );
+      return const ImportDuplicateResult();
     }
   }
 

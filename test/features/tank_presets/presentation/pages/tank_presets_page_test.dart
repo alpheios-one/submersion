@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -73,6 +74,69 @@ void main() {
 
       // AL80 working pressure 206.843 bar = ~3000 psi, displayed as "3000 psi"
       expect(find.textContaining('3000 psi'), findsWidgets);
+    });
+
+    testWidgets('a custom preset whose slug collides with a built-in keeps its '
+        'own name', (tester) async {
+      // TankPresetEntity.generateSlug('Steel 12L') is 'steel12l', but a diver
+      // can land on a built-in slug exactly -- nothing rejects a custom preset
+      // named so that it slugs to one. Only isBuiltIn rows may be relabelled
+      // from the built-in translation table.
+      final now = DateTime(2026);
+      final presets = [
+        TankPresetEntity.fromBuiltIn(TankPresets.steel12),
+        TankPresetEntity(
+          id: 'custom-1',
+          name: 'steel12',
+          displayName: 'My Steel 12L',
+          volumeLiters: 12,
+          workingPressureBar: 232,
+          material: TankMaterial.steel,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final mockSettings = MockSettingsNotifier();
+
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const TankPresetsPage(),
+          ),
+          GoRoute(
+            path: '/tank-presets/new',
+            builder: (context, state) => const Scaffold(),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => mockSettings),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            tankPresetListNotifierProvider.overrideWith(
+              (ref) => _MockTankPresetListNotifier(presets),
+            ),
+          ].cast(),
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('My Steel 12L'), findsOneWidget);
+      expect(find.text('Steel 12L'), findsOneWidget);
     });
   });
 }

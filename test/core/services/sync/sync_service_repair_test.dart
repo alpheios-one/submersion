@@ -68,8 +68,18 @@ void main() {
       );
       await epochStore.setLastAccepted(marker);
       await epochStore.setPendingReplace(marker);
+      // Aged, because a LEFTOVER is by definition from a run that already
+      // ended. The sweep spares recent files: the temp dir is shared, so a
+      // young ssv1_ file is far more likely to be a base export another
+      // process is writing right now than an orphan (see
+      // deleteLeftoverBaseTempFiles).
       final leftover = File('${fakeAppTemp.path}/ssv1_base_dev_0.abc.json');
       await leftover.writeAsString('stale');
+      leftover.setLastModifiedSync(
+        DateTime.now().subtract(const Duration(hours: 2)),
+      );
+      final inFlight = File('${fakeAppTemp.path}/ssv1_base_dev_9.xyz.json');
+      await inFlight.writeAsString('being written');
       // An unrelated temp file (the dir is shared) must be left untouched.
       final unrelated = File('${fakeAppTemp.path}/user_photo.jpg');
       await unrelated.writeAsString('keep');
@@ -79,6 +89,11 @@ void main() {
       expect(epochStore.lastAcceptedMarker, isNull);
       expect(epochStore.pendingReplace, isNull);
       expect(leftover.existsSync(), isFalse);
+      expect(
+        inFlight.existsSync(),
+        isTrue,
+        reason: 'a repair must not delete a base export still being written',
+      );
       expect(unrelated.existsSync(), isTrue);
     },
   );

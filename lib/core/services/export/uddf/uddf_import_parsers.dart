@@ -47,6 +47,15 @@ class UddfImportParsers {
   // "15.0" or "15.000". Captures the integer so it can be parsed exactly.
   static final RegExp _zeroFractionPattern = RegExp(r'^([+-]?\d+)\.0*$');
 
+  // A trip name of the form "<location><non-breaking space><ISO date>", which
+  // is how Subsurface's UDDF exporter names a trip. The location half is
+  // optional: a trip with no location exports as just the separator and the
+  // date, and Dart counts U+00A0 as whitespace, so by the time the name has
+  // been read and trimmed the separator is gone and only the date is left.
+  static final RegExp _tripNamePattern = RegExp(
+    r'^(?:(.*)\u00A0)?(\d{4}-\d{2}-\d{2})$',
+  );
+
   /// Parses a UDDF integer-semantics value, tolerating the float
   /// serialization several exporters emit.
   ///
@@ -283,18 +292,59 @@ class UddfImportParsers {
     return GasMix(o2: o2, he: he);
   }
 
+  /// A datetime carrying trailing timezone info: a "Z", or an offset in any
+  /// of the shapes ISO 8601 allows ("+02:00", "+0200", "+02"). Group 1 is the
+  /// datetime with that suffix removed.
+  ///
+  /// Requiring a clock time in front of the offset is what makes the compact
+  /// forms safe to strip: the trailing "-05" of a bare "2008-09-05" cannot be
+  /// mistaken for one. Without the compact forms the suffix survived,
+  /// [DateTime.parse] applied the offset, and the wall clock was stored
+  /// shifted by it ("08:42:30+0200" landed as 06:42:30).
+  ///
+  /// The time is captured rather than asserted with a lookbehind, because
+  /// this package builds for web too, where a Dart RegExp becomes a JS one
+  /// and lookbehind throws on Safari older than 16.4. A static final field
+  /// would take UDDF import down entirely on first use there.
+  static final RegExp _timeZoneSuffixPattern = RegExp(
+    r'^(.*\d{2}:\d{2}(?::\d{2})?(?:[.,]\d+)?)\s*(?:Z|[+-]\d{2}:?\d{2}|[+-]\d{2})$',
+  );
+
+  /// A date carrying no time, optionally followed by the "T" separator that
+  /// an exporter leaves dangling when the time is unknown.
+  static final RegExp _dateWithoutTimePattern = RegExp(
+    r'^(\d{4}-\d{2}-\d{2})[T ]?$',
+  );
+
   /// Parse a UDDF datetime string using the wall-clock-as-UTC convention.
   ///
   /// UDDF dive datetimes represent the wall-clock reading from the dive
   /// computer (e.g. "2024-06-15T08:42:00"). Any timezone suffix is ignored
   /// and the date/time components are stored verbatim as a UTC DateTime so
   /// that they survive a DB round-trip unchanged.
+  ///
+  /// A value with no time is read as midnight on that date. Subsurface builds
+  /// this element as `concat(@date, 'T', @time)`, so a dive logged by hand
+  /// with no entry time exports as a bare "2008-09-05T" that
+  /// [DateTime.parse] rejects. Returning null for those let the caller fall
+  /// back to the import clock, which stamped every such dive with the day it
+  /// was imported rather than the day it was dived (#239).
   static DateTime? parseDiveDateTime(String? text) {
-    if (text == null || text.isEmpty) return null;
+    if (text == null) return null;
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return null;
     // Strip any trailing timezone info (Z, +HH:MM, -HH:MM, etc.)
-    final bare = text.split(RegExp(r'[Z+\-](?=\d{2}:\d{2}$)|Z$')).first;
-    final dt = DateTime.tryParse(bare);
-    if (dt == null) return null;
+    final bare =
+        _timeZoneSuffixPattern.firstMatch(trimmed)?.group(1) ?? trimmed;
+    var dt = DateTime.tryParse(bare);
+    if (dt == null) {
+      final dateWithoutTime = _dateWithoutTimePattern
+          .firstMatch(bare)
+          ?.group(1);
+      if (dateWithoutTime == null) return null;
+      dt = DateTime.tryParse(dateWithoutTime);
+      if (dt == null) return null;
+    }
     return DateTime.utc(
       dt.year,
       dt.month,
@@ -401,11 +451,48 @@ class UddfImportParsers {
     }
   }
 
+  /// Reads one trip element.
+  ///
+  /// Handles both shapes in circulation: Submersion writes each trip as its
+  /// own `<divetrip>` carrying the trip fields directly, while UDDF 3.2 (and
+  /// Subsurface's exporter) nests `<trip>` elements inside a single
+  /// `<divetrip>` container and hangs the name and notes off a `<trippart>`.
   static Map<String, dynamic> parseTrip(XmlElement tripElement) {
     final trip = <String, dynamic>{};
 
-    trip['name'] = getElementText(tripElement, 'name') ?? '';
-    trip['notes'] = getElementText(tripElement, 'notes') ?? '';
+    final tripPart = tripElement.findElements('trippart').firstOrNull;
+    // getElementText already trims, but the name is matched against a
+    // pattern below, so trim once here and use that value throughout.
+    final rawName =
+        (getElementText(tripElement, 'name') ??
+                (tripPart == null ? null : getElementText(tripPart, 'name')) ??
+                '')
+            .trim();
+
+    // Subsurface has no trip-name field of its own, so its exporter builds
+    // one as "<location>\u00A0<start date>". Recovering the two halves keeps
+    // the trip out of the library named after a date, and gives it a date to
+    // fall back on when no dive of the trip was imported.
+    String? locationFromName;
+    var name = rawName;
+    final nameParts = _tripNamePattern.firstMatch(rawName);
+    if (nameParts != null) {
+      final location = nameParts.group(1)?.trim();
+      final nameDate = DateTime.tryParse(nameParts.group(2)!);
+      if (nameDate != null) {
+        trip['_nameDate'] = nameDate;
+        if (location != null && location.isNotEmpty) {
+          name = location;
+          locationFromName = location;
+        }
+      }
+    }
+
+    trip['name'] = name;
+    trip['notes'] =
+        getElementText(tripElement, 'notes') ??
+        (tripPart == null ? null : getElementText(tripPart, 'notes')) ??
+        '';
 
     // Parse date range
     final dateOfTrip = tripElement.findElements('dateoftrip').firstOrNull;
@@ -428,8 +515,13 @@ class UddfImportParsers {
 
     // Parse geography
     final geographyElement = tripElement.findElements('geography').firstOrNull;
-    if (geographyElement != null) {
-      trip['location'] = getElementText(geographyElement, 'location');
+    final location = geographyElement == null
+        ? null
+        : getElementText(geographyElement, 'location');
+    if (location != null) {
+      trip['location'] = location;
+    } else if (locationFromName != null) {
+      trip['location'] = locationFromName;
     }
 
     return trip;

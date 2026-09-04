@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
@@ -66,6 +68,18 @@ void main() {
           highlightedDiveIdProvider.overrideWith((ref) => diveId),
           diveOverride,
           analysisOverride,
+          // The panel's analysis now comes from sourceProfileAnalysisProvider,
+          // which awaits the dive's data sources and delegates to the
+          // overridden profileAnalysisProvider when there are fewer than two.
+          // Without these two overrides the analysis would never resolve, and
+          // the overlay assertions below would be measuring an unresolved
+          // dependency rather than the reload window they are about.
+          diveDataSourcesProvider(
+            diveId,
+          ).overrideWith((ref) async => <DiveDataSource>[]),
+          sourceProfilesProvider(
+            diveId,
+          ).overrideWith((ref) async => <String, SourceProfile>{}),
           gasSwitchesProvider(
             diveId,
           ).overrideWith((ref) async => <GasSwitchWithTank>[]),

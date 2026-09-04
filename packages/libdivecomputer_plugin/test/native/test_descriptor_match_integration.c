@@ -21,6 +21,10 @@
 // model-code digits [4:6] are significant, so the surrounding manufacture-date
 // and unit-number digits are zeroed (the bug was first reported against real
 // Symbios devices in issue #288).
+//
+// Regression for issue #1419: the Seac Tablet never appeared in a BLE scan.
+// Its filter demanded a name of "Tablet" plus ASCII digits and nothing else,
+// so any separator or letter in the advertised serial dropped the device.
 
 // Every check in this file is an assert, so a build that defines NDEBUG would
 // compile all of them out and leave each test printing PASS while verifying
@@ -243,6 +247,100 @@ static void test_oceans_s1_names_still_resolve(void) {
     printf("PASS: test_oceans_s1_names_still_resolve\n");
 }
 
+// Issue #1419: a Seac Tablet was never discovered over BLE on Android even
+// though the same computer downloads fine over the USB cable. "Tablet" is the
+// only BLE-capable Seac row, so the digits in its advertised name are a plain
+// serial and disambiguate nothing -- yet upstream matched them with
+// dc_match_prefix_with_number, which accepts "Tablet" followed by ASCII digits
+// and NOTHING else. Any separator or letter in the serial made the scanner
+// drop the advertisement before it ever reached the wizard.
+//
+// The serials below are synthetic: no digit position is significant, only the
+// shape of the name.
+static void test_seac_tablet_serial_spellings_resolve(void) {
+    // The form upstream documented, and the bare model word.
+    expect_ble_match("Tablet123456", "Tablet", 0x10);
+    expect_ble_match("Tablet", "Tablet", 0x10);
+    // Separated serials.
+    expect_ble_match("Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("Tablet-123456", "Tablet", 0x10);
+    expect_ble_match("Tablet_123456", "Tablet", 0x10);
+    // Alphanumeric serials.
+    expect_ble_match("Tablet1A2B3C", "Tablet", 0x10);
+    expect_ble_match("Tablet A1B2C3", "Tablet", 0x10);
+    // Vendor-prefixed, the spelling several other vendors advertise.
+    expect_ble_match("Seac Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SeacTablet123456", "Tablet", 0x10);
+    // Advertised names vary in case by firmware and Bluetooth stack.
+    expect_ble_match("TABLET-123456", "Tablet", 0x10);
+    expect_ble_match("SEAC TABLET 123456", "Tablet", 0x10);
+    printf("PASS: test_seac_tablet_serial_spellings_resolve\n");
+}
+
+// "Tablet" is an ordinary English word, so widening the Seac filter must not
+// turn every nearby consumer peripheral into a "recognized" dive computer.
+// A false positive is worse than a miss: the wizard promises a download and
+// then speaks the Seac protocol to something that cannot answer (issue #123).
+// The serial token has to contain a digit, and only one separator is allowed,
+// which is what keeps these out.
+static void test_seac_filter_does_not_claim_generic_tablets(void) {
+    expect_no_ble_match("Tablet PC");
+    expect_no_ble_match("Tablet-Pro");
+    expect_no_ble_match("Tabletop");
+    // A serial that is not separated from the model word has to start with a
+    // digit. Without that boundary a letter simply continues "Tablet" and any
+    // later digit satisfies the serial rule, so ordinary consumer names get
+    // claimed: these three are the shapes that slipped through.
+    expect_no_ble_match("Tabletop123");
+    expect_no_ble_match("TabletS6");
+    expect_no_ble_match("TabletPC1");
+    expect_no_ble_match("Tablet S6 Lite");
+    expect_no_ble_match("My Tablet 123456");
+    expect_no_ble_match("Seac");
+    printf("PASS: test_seac_filter_does_not_claim_generic_tablets\n");
+}
+
+// An advertised name can arrive whitespace-padded, and trailing space survives
+// strlen where the Perdix 3's trailing NUL (issue #723) does not: a NUL simply
+// ends the C string. Padding leaves no serial token, which is the bare model
+// word rather than a foreign device.
+static void test_seac_tablet_padded_names_resolve(void) {
+    expect_ble_match("Tablet ", "Tablet", 0x10);
+    expect_ble_match("Tablet 123456 ", "Tablet", 0x10);
+    expect_ble_match("Seac Tablet ", "Tablet", 0x10);
+    // A dangling "-" or "_" is not padding. A separator promises a serial
+    // token, so a name ending on one is malformed rather than padded, and
+    // tolerating it would widen the false-positive surface for no device
+    // anyone has observed.
+    expect_no_ble_match("Tablet-");
+    expect_no_ble_match("Tablet_");
+    expect_no_ble_match("Tablet - ");
+    printf("PASS: test_seac_tablet_padded_names_resolve\n");
+}
+
+// The manufacturer is Seacsub S.p.A. and its own marketing writes "SEAC SUB",
+// so the vendor word is not always the bare "Seac" token. Stripping only the
+// short spelling leaves the longer ones unmatched for no reason.
+static void test_seac_vendor_word_spellings_resolve(void) {
+    expect_ble_match("Seacsub Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SEAC SUB Tablet 123456", "Tablet", 0x10);
+    expect_ble_match("SeacSub Tablet", "Tablet", 0x10);
+    expect_ble_match("Seacsub-Tablet-123456", "Tablet", 0x10);
+    // The vendor word is only ever stripped when the model word follows it, so
+    // neither the bare vendor name nor an unrelated Seac product is claimed.
+    expect_no_ble_match("Seacsub");
+    expect_no_ble_match("Seacraft Ghost 123456");
+    printf("PASS: test_seac_vendor_word_spellings_resolve\n");
+}
+
+// The other two Seac Screen rows are cable-only (DC_TRANSPORT_SERIAL), so a
+// BLE advertisement must not resolve to them however it is spelled.
+static void test_seac_cable_only_models_stay_off_ble(void) {
+    expect_no_ble_match("Screen123456");
+    expect_no_ble_match("Action123456");
+    printf("PASS: test_seac_cable_only_models_stay_off_ble\n");
+}
+
 int main(void) {
     test_hud_resolves_to_g2_hud();
     test_other_short_aliases_resolve();
@@ -261,6 +359,11 @@ int main(void) {
     test_suunto_rejection_requires_the_full_shape();
     test_unobserved_model_codes_are_not_suppressed();
     test_oceans_s1_names_still_resolve();
+    test_seac_tablet_serial_spellings_resolve();
+    test_seac_filter_does_not_claim_generic_tablets();
+    test_seac_tablet_padded_names_resolve();
+    test_seac_vendor_word_spellings_resolve();
+    test_seac_cable_only_models_stay_off_ble();
     printf("\nAll descriptor match integration tests passed.\n");
     return 0;
 }

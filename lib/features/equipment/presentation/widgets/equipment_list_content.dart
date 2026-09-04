@@ -127,7 +127,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   void _invalidateCurrentProvider(WidgetRef ref) {
     final filter = ref.read(equipmentFilterProvider);
     if (filter.serviceDueOnly) {
-      ref.invalidate(serviceDueEquipmentProvider);
+      // The service-due list derives from the clock evaluation, so refresh
+      // that base rather than the leaf, which would replay cached verdicts.
+      ref.invalidate(activeEquipmentClocksProvider);
     } else if (filter.status == null) {
       ref.invalidate(activeEquipmentProvider);
     } else {

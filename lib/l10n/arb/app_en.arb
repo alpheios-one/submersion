@@ -1,4 +1,8 @@
 {
+  "settings_oauth_connect_browserFailed": "Could not open your browser. Use Copy link and paste the address into your browser.",
+  "settings_oauth_connect_copyFailed": "Could not copy the link.",
+  "settings_oauth_connect_copyLink": "Copy link",
+  "settings_oauth_connect_linkCopied": "Link copied. Paste it into your browser to authorize.",
   "universalImport_action_importFromGarmin": "Import from Garmin Device",
   "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
   "@diveLog_edit_flightWindowWarning": {
@@ -1501,6 +1505,7 @@
   "preDive_item_type_check": "Checkbox",
   "preDive_item_type_value": "Recorded value",
   "preDive_item_type_equipmentSet": "Equipment set items",
+  "preDive_item_type_equipment": "Equipment item",
   "preDive_item_valueLabel": "Value label",
   "preDive_item_valueUnit": "Unit",
   "preDive_item_valueMin": "Min (warning)",
@@ -1594,6 +1599,7 @@
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Equipment set",
   "preDive_start_noEquipmentSet": "None",
+  "preDive_start_noEquipment": "None",
   "preDive_start_begin": "Begin",
   "diveLog_listPage_bottomSheet_preDiveChecklist": "Start pre-dive checklist",
   "preDive_dashboard_title": "Pre-Dive Check",
@@ -1959,6 +1965,14 @@
       }
     }
   },
+  "dashboard_gauges_gearOverdueMore": "+{count} more overdue",
+  "@dashboard_gauges_gearOverdueMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboard_gauges_insuranceOk": "Insurance OK",
   "dashboard_gauges_insuranceExpires": "Insurance expires {date}",
   "@dashboard_gauges_insuranceExpires": {
@@ -2111,7 +2125,6 @@
     }
   },
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
-  "dashboard_urgent_title": "Needs attention",
   "dashboard_media_title": "Recent media",
   "dashboard_recentSites_title": "Recent sites",
   "dashboard_yearInReview_title": "This year",
@@ -2689,30 +2702,6 @@
   "diveLog_consolidate_snackbar": "Dive merged as an additional computer.",
   "diveLog_consolidate_undoError": "Couldn't undo the merge.",
   "diveLog_consolidate_undone": "Merge undone",
-  "diveLog_mergeDialog_confirmSubtitle": "Merging dive at {time} into this dive.",
-  "@diveLog_mergeDialog_confirmSubtitle": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "diveLog_mergeDialog_confirmTitle": "Confirm merge",
-  "diveLog_mergeDialog_empty": "No other dives found on this day.",
-  "diveLog_mergeDialog_explanation": "This dive's profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with 'Unlink computer'.",
-  "diveLog_mergeDialog_loadError": "Error loading dives: {error}",
-  "@diveLog_mergeDialog_loadError": {
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "diveLog_mergeDialog_merge": "Merge",
-  "diveLog_mergeDialog_next": "Next",
-  "diveLog_mergeDialog_subtitle": "Select a dive from the same day to merge as an additional computer.",
-  "diveLog_mergeDialog_title": "Merge with another dive",
-  "diveLog_mergeDialog_whatThisDoes": "What this does",
   "diveLog_computerSheet_description": "Select which computer's profile to edit from.",
   "@diveLog_computerSheet_description": {
     "description": "Description of the computer profile selection sheet"
@@ -4072,6 +4061,14 @@
   "diveLog_sources_splitDialog_confirm": "Split",
   "diveLog_sources_splitDone": "Dive split",
   "diveLog_sources_splitFailed": "Split failed",
+  "diveLog_sources_menu_separate": "Separate combined dives",
+  "diveLog_sources_separateDialog_title": "Separate combined dives?",
+  "diveLog_sources_separateDialog_body": "This dive was combined from {count} dives. Each one's profile, events, tanks and gas switches move back to its own dive. The rest of the logbook entry, including buddies, tags, equipment, media, notes and the dive number, stays on this dive.",
+  "@diveLog_sources_separateDialog_body": {"placeholders": {"count": {"type": "int"}}},
+  "diveLog_sources_separateDialog_confirm": "Separate",
+  "diveLog_sources_separateDone": "{count, plural, =1{1 dive restored} other{{count} dives restored}}",
+  "@diveLog_sources_separateDone": {"placeholders": {"count": {"type": "int"}}},
+  "diveLog_sources_separateFailed": "Could not separate this dive",
   "@diveLog_sources_minutes": {
     "placeholders": {
       "count": {
@@ -5710,8 +5707,6 @@
   "divers_edit_selectInsuranceExpiryTooltip": "Select insurance expiry date",
   "divers_edit_selectMedicalClearanceTooltip": "Select medical clearance date",
   "divers_edit_updateButton": "Update Diver",
-  "divers_list_activeBadge": "Active",
-  "divers_list_addDiverButton": "Add Diver",
   "divers_list_addDiverTooltip": "Add a new diver profile",
   "divers_list_appBarTitle": "Diver Profiles",
   "divers_list_compactTitle": "Divers",
@@ -5723,13 +5718,6 @@
   "divers_list_loadingStats": "Loading...",
   "divers_list_retryButton": "Retry",
   "divers_list_viewDiverLabel": "View diver {name}",
-  "divers_summary_activeDiverTitle": "Active Diver",
-  "divers_summary_otherDiversTitle": "Other Divers",
-  "divers_summary_overviewTitle": "Overview",
-  "divers_summary_quickActionsTitle": "Quick Actions",
-  "divers_summary_subtitle": "Select a diver from the list to view details",
-  "divers_summary_title": "Diver Profiles",
-  "divers_summary_totalDiversLabel": "Total Divers",
   "@divers_detail_deleteDialogContent": {
     "placeholders": {
       "name": {
@@ -5942,8 +5930,6 @@
   "enum_pdfTemplate_nauiStyle_description": "Layout matching NAUI logbook format",
   "enum_pdfTemplate_padiStyle": "PADI Style",
   "enum_pdfTemplate_padiStyle_description": "Layout matching PADI logbook format",
-  "enum_pdfTemplate_professional": "Professional",
-  "enum_pdfTemplate_professional_description": "Signature and stamp areas for verification",
   "enum_pdfTemplate_simple": "Simple",
   "enum_pdfTemplate_simple_description": "Compact table format, many dives per page",
   "enum_profileEvent_alert": "Alert",
@@ -7906,7 +7892,6 @@
   "media_photoViewer_cannotWriteMetadata": "Cannot write metadata - media not linked to library",
   "media_photoViewer_closeTooltip": "Close photo viewer",
   "media_photoViewer_diveDataWrittenToPhoto": "Dive data written to photo",
-  "media_photoViewer_diveDataWrittenToVideo": "Dive data written to video",
   "media_photoViewer_errorLoadingPhotos": "Error loading photos: {error}",
   "media_photoViewer_failedToLoadImage": "Failed to load image",
   "media_photoViewer_failedToLoadVideo": "Failed to load video",
@@ -7952,18 +7937,15 @@
   "media_writeMetadata_cancelButton": "Cancel",
   "media_writeMetadata_depthLabel": "Depth",
   "media_writeMetadata_descriptionPhoto": "The following metadata will be written to the photo:",
-  "media_writeMetadata_descriptionVideo": "The following metadata will be written to the video:",
   "media_writeMetadata_diveTimeLabel": "Dive time",
   "media_writeMetadata_gpsLabel": "GPS",
-  "media_writeMetadata_keepOriginalVideo": "Keep original video",
   "media_writeMetadata_livePhotoUnsupported": "Live Photos are not supported yet. Duplicate this as a still photo, then write the dive data to the copy.",
   "media_writeMetadata_noDataAvailable": "No dive data available to write.",
   "media_writeMetadata_siteLabel": "Site",
   "media_writeMetadata_temperatureLabel": "Temperature",
   "media_writeMetadata_titlePhoto": "Write Dive Data to Photo",
-  "media_writeMetadata_titleVideo": "Write Dive Data to Video",
+  "media_writeMetadata_videoUnsupported": "Dive data can only be written to photos, not videos.",
   "media_writeMetadata_warningPhotoText": "This will modify the original photo.",
-  "media_writeMetadata_warningVideoText": "A new video will be created with the metadata. Video metadata cannot be modified in-place.",
   "media_writeMetadata_writeButton": "Write",
   "@media_diveMediaSection_selectedCount": {
     "placeholders": {
@@ -9102,10 +9084,21 @@
   "settings_appearance_diveDetails_sectionOrderVisibility_subtitle": "Choose which sections appear and their order",
   "settings_diveDetailSections_title": "Section Order & Visibility",
   "settings_diveDetailSections_resetToDefault": "Reset to Default",
-  "settings_diveDetailSections_fixedSections": "Fixed sections: Header, Dive Profile Chart",
+  "settings_diveDetailSections_fixedSections": "Fixed section: Header",
   "settings_diveDetailSections_configurableSections": "Configurable sections (drag to reorder)",
-  "diveDetailSection_decoO2_name": "Deco Status / Tissue Loading",
-  "diveDetailSection_decoO2_description": "NDL, ceiling, tissue heat map, O2 toxicity",
+  "diveDetailSection_profile_name": "Dive Profile",
+  "diveDetailSection_profile_description": "Depth/time chart, playback, range selection",
+  "diveDetailSection_decoStatus_name": "Deco Status",
+  "diveDetailSection_decoStatus_description": "NDL, ceiling, stops, O2 toxicity",
+  "diveDetailSection_tissueLoading_name": "Tissue Loading",
+  "diveDetailSection_tissueLoading_description": "Per-compartment saturation and heat map",
+  "diveLog_detail_displayOptions_tooltip": "Display options",
+  "diveLog_detail_displayOptions_layout": "Layout",
+  "diveLog_detail_displayOptions_sections": "Sections",
+  "diveLog_detail_displayOptions_showAll": "Show all sections",
+  "diveLog_detail_displayOptions_reorder": "Reorder sections...",
+  "diveDetailLayout_detailed": "Detailed",
+  "diveDetailLayout_list": "List",
   "diveDetailSection_safetyReview_name": "Safety Review",
   "diveDetailSection_safetyReview_description": "Automatic post-dive profile observations",
   "safetyReview_sectionTitle": "Safety review",
@@ -9659,7 +9652,6 @@
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} connection failed: {error}",
   "settings_cloudSync_dropbox_account_title": "Dropbox account",
-  "settings_cloudSync_dropbox_connect_browserFailed": "Could not open your browser. Try the Reopen browser button.",
   "settings_cloudSync_dropbox_connect_codeLabel": "Authorization code",
   "settings_cloudSync_dropbox_connect_emptyCode": "Enter the authorization code shown in your browser",
   "settings_cloudSync_dropbox_connect_failed": "Could not connect to Dropbox: {error}",
@@ -9864,26 +9856,19 @@
   "settings_gfPreset_medium_name": "Medium",
   "settings_import_cancelButton": "Cancel import",
   "settings_import_cancelling": "Cancelling...",
-  "settings_import_dialog_title": "Importing Data",
-  "settings_import_doNotClose": "Please do not close the app",
-  "settings_import_itemCount": "{current} of {total}",
   "settings_import_phase_buddies": "Importing buddies...",
   "settings_import_phase_certifications": "Importing certifications...",
-  "settings_import_phase_complete": "Finalizing...",
   "settings_import_phase_diveCenters": "Importing dive centers...",
   "settings_import_phase_diveTypes": "Importing dive types...",
   "settings_import_phase_dives": "Importing dives...",
   "settings_import_phase_equipment": "Importing equipment...",
   "settings_import_phase_equipmentSets": "Importing equipment sets...",
-  "settings_import_phase_parsing": "Parsing file...",
   "settings_import_phase_preparing": "Preparing...",
   "settings_import_phase_sites": "Importing dive sites...",
   "settings_import_phase_tags": "Importing tags...",
   "settings_import_phase_trips": "Importing trips...",
   "settings_import_phase_courses": "Importing courses...",
   "settings_import_phase_applyingTags": "Applying tags...",
-  "settings_import_progressLabel": "{phase}, {current} of {total}",
-  "settings_import_progressPercent": "Import progress: {percent} percent",
   "settings_language_appBar_title": "Language",
   "settings_language_selected": "Selected",
   "settings_language_systemDefault": "System Default",
@@ -10495,36 +10480,6 @@
   },
   "@settings_decompression_cnsMethodSourceSubsurface": {
     "description": "Tappable link label for the Subsurface source implementation. Keep 'Subsurface', 'CNS' and the file name 'divelist.cpp' as written; translate only the descriptor 'implementation'."
-  },
-  "@settings_import_itemCount": {
-    "placeholders": {
-      "current": {
-        "type": "Object"
-      },
-      "total": {
-        "type": "Object"
-      }
-    }
-  },
-  "@settings_import_progressLabel": {
-    "placeholders": {
-      "phase": {
-        "type": "Object"
-      },
-      "current": {
-        "type": "Object"
-      },
-      "total": {
-        "type": "Object"
-      }
-    }
-  },
-  "@settings_import_progressPercent": {
-    "placeholders": {
-      "percent": {
-        "type": "Object"
-      }
-    }
   },
   "@settings_notifications_days": {
     "placeholders": {
@@ -11747,6 +11702,27 @@
   "@importWizard_photos_mobileUnsupported": {
     "description": "Shown on mobile, where a photo folder cannot be picked"
   },
+  "importWizard_photos_bundledCount": "{count, plural, one{1 photo bundled in the archive} other{{count} photos bundled in the archive}}",
+  "@importWizard_photos_bundledCount": {
+    "description": "Count of photos bundled inside an imported ZIP archive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importWizard_photos_chooseDestination": "Choose where to save photos...",
+  "@importWizard_photos_chooseDestination": {
+    "description": "Button that opens a folder picker for where bundled archive photos are saved"
+  },
+  "importWizard_photos_destinationNote": "The photos are saved to this folder and linked from there. Submersion never keeps its own copy.",
+  "@importWizard_photos_destinationNote": {
+    "description": "Explains that bundled photos are written to the chosen folder and linked, never stored inside the app"
+  },
+  "importWizard_photos_destinationUnwritable": "That folder can't be written to. Choose another one.",
+  "@importWizard_photos_destinationUnwritable": {
+    "description": "Snackbar shown when the folder chosen for bundled archive photos cannot be written to"
+  },
   "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
   "@importWizard_review_olderDivesSkipped": {
     "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",
@@ -11973,6 +11949,8 @@
   "transfer_pdfExport_exportButton": "Export PDF",
   "transfer_pdfExport_includeCertCards": "Include Certification Cards",
   "transfer_pdfExport_includeCertCardsSubtitle": "Add scanned certification card images to the PDF",
+  "transfer_pdfExport_includeVerificationAreas": "Include Verification Areas",
+  "transfer_pdfExport_includeVerificationAreasSubtitle": "Add stamp and signature boxes for agency verification",
   "transfer_pdfExport_pageSizeA4": "A4",
   "transfer_pdfExport_pageSizeA4Desc": "210 x 297 mm",
   "transfer_pdfExport_pageSizeHeader": "Page Size",
@@ -11985,8 +11963,6 @@
   "transfer_pdfExport_templateNauiStyleDesc": "Layout matching NAUI logbook format",
   "transfer_pdfExport_templatePadiStyle": "PADI Style",
   "transfer_pdfExport_templatePadiStyleDesc": "Layout matching PADI logbook format",
-  "transfer_pdfExport_templateProfessional": "Professional",
-  "transfer_pdfExport_templateProfessionalDesc": "Signature and stamp areas for verification",
   "transfer_pdfExport_templateSemanticLabel": "Select {templateName} template",
   "transfer_pdfExport_templateSimple": "Simple",
   "transfer_pdfExport_templateSimpleDesc": "Compact table format, many dives per page",
@@ -12643,6 +12619,9 @@
   "universalImport_description_supportedFormats": "Select a dive log file to import. Supported formats include CSV, UDDF, Subsurface XML, Garmin FIT, and Shearwater Cloud databases.",
   "universalImport_dive_decideAction": "Decide",
   "universalImport_error_unsupportedFormat": "This format is not yet supported. Please export as UDDF or CSV.",
+  "universalImport_error_duplicateCheckFailed": "Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.",
+  "universalImport_error_noColumnsToMap": "This file has no columns to map. Go back and select the file again, or choose a different source.",
+  "universalImport_error_stepFailed": "Import could not continue: {details}",
   "universalImport_label_columnMapping": "Column Mapping",
   "universalImport_label_columnsMapped": "{mapped} of {total} columns mapped",
   "universalImport_label_consolidate": "Consolidate",
@@ -12689,7 +12668,6 @@
   "universalImport_semantics_probableDuplicate": "Probable duplicate",
   "universalImport_semantics_sourceDetected": "Source detected: {description}",
   "universalImport_semantics_sourceUncertain": "Source uncertain: {description}",
-  "universalImport_semantics_toggleSelection": "Toggle selection for {name}",
   "universalImport_snackbar_bulkMarkedAs": "{count} marked as {action}",
   "universalImport_snackbar_markedAs": "Marked as {action}",
   "universalImport_step_import": "Import",
@@ -12845,6 +12823,21 @@
   },
   "@universalImport_error_unsupportedFormat": {
     "description": "Error message shown when the detected file format is not supported"
+  },
+  "@universalImport_error_duplicateCheckFailed": {
+    "description": "Warning on the review step when duplicate detection failed and the incoming rows were left unmarked"
+  },
+  "@universalImport_error_noColumnsToMap": {
+    "description": "Shown on the column mapping step when the file produced no columns to map"
+  },
+  "@universalImport_error_stepFailed": {
+    "description": "Error shown when the import wizard could not advance past the current step",
+    "placeholders": {
+      "details": {
+        "type": "Object",
+        "example": "FormatException: unexpected end of input"
+      }
+    }
   },
   "@universalImport_label_columnMapping": {
     "description": "Title for the CSV column mapping step"
@@ -13144,15 +13137,6 @@
       "description": {
         "type": "Object",
         "example": "Could not determine source application"
-      }
-    }
-  },
-  "@universalImport_semantics_toggleSelection": {
-    "description": "Accessibility label for toggling selection of an import entity",
-    "placeholders": {
-      "name": {
-        "type": "Object",
-        "example": "Dive #42"
       }
     }
   },
@@ -14037,19 +14021,6 @@
   "diveComputer_pinCode_label": "PIN Code",
   "diveComputer_pinCode_submit": "Submit",
   "diveComputer_pinCode_title": "PIN Code Required",
-  "diveComputer_pinEntry_connectButton": "Connect",
-  "diveComputer_pinEntry_helperText": "Enter the 4-6 digit PIN shown on your device",
-  "diveComputer_pinEntry_instructionsGeneric": "Check your dive computer display for the PIN code.",
-  "diveComputer_pinEntry_instructionsWithDevice": "Check your {deviceName} display for the PIN code.",
-  "@diveComputer_pinEntry_instructionsWithDevice": {
-    "placeholders": {
-      "deviceName": {
-        "type": "String"
-      }
-    }
-  },
-  "diveComputer_pinEntry_semanticLabel": "PIN code entry, 4 to 6 digits",
-  "diveComputer_pinEntry_title": "Enter PIN Code",
   "diveComputer_scan_bluetoothSemanticLabel": "Bluetooth device: {name}",
   "@diveComputer_scan_bluetoothSemanticLabel": {
     "placeholders": {
@@ -14689,6 +14660,15 @@
       }
     }
   },
+  "maps_offline_deleteRegionLegacyMessage": "Delete \"{name}\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions' and cannot be freed on their own. Deleting it will not reclaim storage.",
+  "@maps_offline_deleteRegionLegacyMessage": {
+    "description": "Confirmation shown before deleting an offline map region that was downloaded by an older version of the app, whose map tiles are stored together with other regions' and so cannot be freed on their own.",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "maps_offline_deleteRegionMessage": "Delete \"{name}\" and its {count} cached tiles?\n\nThis will free up {size} of storage.",
   "@maps_offline_deleteRegionMessage": {
     "placeholders": {
@@ -14803,6 +14783,10 @@
     }
   },
   "maps_offline_size": "Size",
+  "maps_offline_sizeUnknown": "Unknown",
+  "@maps_offline_sizeUnknown": {
+    "description": "Shown in place of a storage size for an offline map region whose size the app cannot measure. Stands in for a quantity such as \"25.0 MB\"."
+  },
   "maps_offline_tiles": "Tiles",
   "maps_offline_tilesPerSecond": "{rate} tiles/sec",
   "@maps_offline_tilesPerSecond": {
@@ -15757,6 +15741,15 @@
       }
     }
   },
+  "tools_weight_bmiHelper": "BMI {bmi}. A higher BMI usually means more buoyant tissue and a little more lead.",
+  "@tools_weight_bmiHelper": {
+    "placeholders": {
+      "bmi": {
+        "type": "String"
+      }
+    }
+  },
+  "tools_weight_bmiTerm": "Body composition",
   "tools_weight_breakdownTitle": "How this was calculated",
   "tools_weight_confidence_high": "High confidence",
   "tools_weight_confidence_low": "Low confidence - estimate",
@@ -15769,11 +15762,13 @@
       }
     }
   },
+  "tools_weight_heightOptional": "Height (optional)",
   "tools_weight_noGear": "Add the gear you plan to dive to personalize the prediction.",
   "tools_weight_personalTerm": "Personal baseline",
   "tools_weight_placementTitle": "Suggested placement",
   "tools_weight_predictedWeight": "Predicted weight",
   "tools_weight_saveToProfile": "Save weight to profile",
+  "tools_weight_source_bodyComposition": "estimated from BMI",
   "tools_weight_source_measured": "measured from your dives",
   "tools_weight_source_physics": "physics",
   "tools_weight_source_typeDefault": "default estimate",
@@ -20099,8 +20094,6 @@
   "trips_gallery_diveSection_subtitle": "{date} ({count} {photoLabel})",
   "trips_gallery_thumbnail_photo": "Photo thumbnail. Tap to view full screen",
   "trips_gallery_thumbnail_video": "Video thumbnail. Tap to view full screen",
-  "trips_gallery_thumbnail_photoMissing": "Photo thumbnail, missing from device. Tap to view full screen",
-  "trips_gallery_thumbnail_videoMissing": "Video thumbnail, missing from device. Tap to view full screen",
   "trips_photos_thumbnail_photo": "Photo thumbnail. Tap to open gallery",
   "trips_photos_thumbnail_video": "Video thumbnail. Tap to open gallery",
   "trips_picker_suggestedSemantics": "Suggested trip: {name}. Tap to use",
@@ -20123,6 +20116,16 @@
   "divePlanner_semantics_altitudeGroup": "Altitude group: {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",
   "autoUpdate_banner_download": "Download",
+  "autoUpdate_banner_packageManagerHint": "Update with: {command}",
+  "@autoUpdate_banner_packageManagerHint": {
+    "description": "Shown instead of a Download button when Submersion was installed from a .deb or .rpm, since the system package manager owns the upgrade.",
+    "placeholders": {
+      "command": {
+        "type": "String",
+        "example": "sudo apt upgrade submersion"
+      }
+    }
+  },
   "settings_cloudSync_provider_icloud_subtitle": "Sync via Apple iCloud",
   "settings_debugLog_search_hint": "Search logs...",
   "settings_debugLog_appBar_title": "Debug Logs",
@@ -21109,6 +21112,7 @@
   "settings_export_progress_equipmentCsv": "Exporting equipment to CSV...",
   "settings_export_progress_pdf": "Generating PDF logbook...",
   "settings_export_progress_loadingSignatures": "Loading signatures...",
+  "settings_export_progress_loadingProfiles": "Loading dive profiles...",
   "settings_export_progress_loadingCertifications": "Loading certifications...",
   "settings_export_progress_loadingFonts": "Loading fonts...",
   "settings_export_progress_templatePdf": "Generating {template} PDF...",
@@ -21984,5 +21988,75 @@
   "profilePhoto_error_tooLarge": "That image is too large to use. Try a smaller one.",
   "profilePhoto_error_undecodable": "That file could not be read as an image.",
   "profilePhoto_error_contactNoPhoto": "That contact does not have a photo.",
-  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo."
+  "profilePhoto_error_contactPermission": "Contacts permission is required to choose a photo.",
+  "diveComputer_merge_title": "Merge Dive Computers",
+  "diveComputer_merge_intro": "{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.",
+  "@diveComputer_merge_intro": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_merge_keepLabel": "Keep this record",
+  "diveComputer_merge_serialLabel": "Serial {serial}",
+  "@diveComputer_merge_serialLabel": {
+    "placeholders": {
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_merge_noSerial": "No serial number",
+  "diveComputer_merge_affectedDives": "{count, plural, =0{No dives are attached to the other records.} =1{1 dive will move to the record you keep.} other{{count} dives will move to the record you keep.}}",
+  "@diveComputer_merge_affectedDives": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_merge_serialMismatchWarning": "These records report different serial numbers. They may be different physical computers.",
+  "diveComputer_merge_action": "Merge",
+  "diveComputer_merge_snackbar": "{count, plural, =1{1 record merged into {name}} other{{count} records merged into {name}}}",
+  "@diveComputer_merge_snackbar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_merge_failed": "Could not merge computers: {error}",
+  "@diveComputer_merge_failed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_list_selection_mergeTooltip": "Merge computers",
+  "diveComputer_detail_mergeMenu": "Merge with another computer",
+  "diveComputer_detail_mergePickerTitle": "Merge with",
+  "diveComputer_detail_mergePickerEmpty": "There are no other computers to merge with.",
+  "diveComputer_detail_mergePickerSameSerial": "Same serial number",
+  "diveComputer_detail_duplicateBanner": "{name} reports the same serial number. It may be this computer saved twice.",
+  "@diveComputer_detail_duplicateBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "diveComputer_detail_duplicateBannerMultiple": "{count} other saved records report the same serial number. They may be this computer saved more than once.",
+  "@diveComputer_detail_duplicateBannerMultiple": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diveComputer_detail_duplicateBannerAction": "Merge"
 }

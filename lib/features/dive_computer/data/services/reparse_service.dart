@@ -608,7 +608,10 @@ class ReparseService {
 
     await db.batch((batch) {
       for (final e in parsed.events) {
-        final eventType = _mapEventTypeString(e.type);
+        final eventType = _mapEventTypeString(
+          e.type,
+          flags: int.tryParse(e.data?['flags'] ?? ''),
+        );
         if (eventType == null) continue;
 
         batch.insert(
@@ -888,7 +891,7 @@ class ReparseService {
   }
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.
-  static String? _mapEventTypeString(String type) {
+  static String? _mapEventTypeString(String type, {int? flags}) {
     switch (type) {
       case 'safetystop':
       case 'safetystop_voluntary':
@@ -896,7 +899,11 @@ class ReparseService {
         return 'safetyStopStart';
       case 'deco':
       case 'deepstop':
-        return 'decoStopStart';
+        // libdivecomputer reports the two ends of a stop as one event type
+        // with SAMPLE_FLAGS_BEGIN (1) or SAMPLE_FLAGS_END (2); an event with
+        // neither is a bare marker and reads as the start. Mirrors the
+        // download path in dive_computer_repository_impl.dart.
+        return flags == kLibdcSampleFlagsEnd ? 'decoStopEnd' : 'decoStopStart';
       case 'violation':
         return 'decoViolation';
       case 'gaschange':
@@ -911,6 +918,11 @@ class ReparseService {
         return 'decoViolation';
       case 'PO2':
         return 'ppO2High';
+      case 'rbt':
+      case 'airtime':
+        // Remaining bottom time (Uwatec) and air time (Suunto) alarms both
+        // mean the gas supply is running short at the current rate.
+        return 'lowGas';
       default:
         return null;
     }
@@ -923,6 +935,7 @@ class ReparseService {
       case 'ppO2High':
         return 'alert';
       case 'ascentRateWarning':
+      case 'lowGas':
         return 'warning';
       default:
         return 'info';
