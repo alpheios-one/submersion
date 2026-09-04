@@ -304,9 +304,25 @@ class SwissBathyExtractionDebugInfo {
   /// header could even be read — every field below is null in that case.
   final String? error;
 
-  /// The downloaded grid's own ESRI ASCII header (`ncols`/`nrows`/
+  /// How many `.asc`/`.grd` entries the downloaded zip actually contained
+  /// (see [extractGridZipTexts]) — null only on [error]. Bug 15: this was
+  /// silently assumed to always be 1; a value greater than 1 here, on a
+  /// lake whose earlier live tests showed only one tile ever cached, is
+  /// itself the direct confirmation of that bug's root cause.
+  final int? entryCount;
+
+  /// Which of the zip's [entryCount] entries actually overlapped this
+  /// tile's bbox once [extractRawEsriSubgrid] checked its real header
+  /// (0-based), or null when none did. The header fields below describe
+  /// this entry when set, or the zip's first entry otherwise (for
+  /// visibility into what a "no overlap" verdict was actually checked
+  /// against).
+  final int? matchedEntryIndex;
+
+  /// The inspected entry's own ESRI ASCII header (`ncols`/`nrows`/
   /// `xllcorner`/`yllcorner`/`cellsize`), exactly as
-  /// [EsriAsciiGridParser.parseRaw] read it — null only on [error].
+  /// [EsriAsciiGridParser.parseRaw] read it — null only on [error] or an
+  /// empty zip.
   final int? ncols;
   final int? nrows;
   final double? xllcorner;
@@ -350,6 +366,8 @@ class SwissBathyExtractionDebugInfo {
     required this.tileKey,
     required this.assetHref,
     required this.error,
+    required this.entryCount,
+    required this.matchedEntryIndex,
     required this.ncols,
     required this.nrows,
     required this.xllcorner,
@@ -396,6 +414,8 @@ Future<SwissBathyExtractionDebugInfo> buildSwissBathyExtractionDebugInfo({
         tileKey: tileKey,
         assetHref: assetHref,
         error: error,
+        entryCount: null,
+        matchedEntryIndex: null,
         ncols: null,
         nrows: null,
         xllcorner: null,
@@ -453,36 +473,59 @@ Future<SwissBathyExtractionDebugInfo> buildSwissBathyExtractionDebugInfo({
     return failure('asset download failed: $e', assetHref: asset.href);
   }
 
-  final gridText = SwissBathy3dSource.extractGridZipText(zipBytes);
-  if (gridText == null) {
+  final gridTexts = SwissBathy3dSource.extractGridZipTexts(zipBytes);
+  if (gridTexts.isEmpty) {
     return failure('zip contains no .asc/.grd entry', assetHref: asset.href);
   }
 
-  final RawEsriGrid raw;
+  // Bug 15: the zip is not guaranteed to hold exactly one grid file -- try
+  // every entry (mirroring extractRawEsriSubgridFromGrids), so entryCount
+  // and matchedEntryIndex below show the real ground truth instead of
+  // assuming entry 0 is the only one worth inspecting.
+  final List<RawEsriGrid> rawGrids;
   try {
-    raw = EsriAsciiGridParser.parseRaw(gridText);
+    rawGrids = [
+      for (final text in gridTexts) EsriAsciiGridParser.parseRaw(text),
+    ];
   } on FormatException catch (e) {
     return failure('grid parse failed: $e', assetHref: asset.href);
   }
 
   int clampInt(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
+
+  var matchedEntryIndex = -1;
+  for (var i = 0; i < rawGrids.length; i++) {
+    final slice = extractRawEsriSubgrid(
+      rawGrids[i],
+      minEasting: minEasting,
+      maxEasting: maxEasting,
+      minNorthing: minNorthing,
+      maxNorthing: maxNorthing,
+    );
+    if (slice != null) {
+      matchedEntryIndex = i;
+      break;
+    }
+  }
+  // No entry actually overlapped: still report the first entry's own
+  // header/window below, since that is what a "no overlap" verdict would
+  // have been checked against.
+  final inspectedIndex = matchedEntryIndex >= 0 ? matchedEntryIndex : 0;
+  final raw = rawGrids[inspectedIndex];
+
   final colFromRaw = ((minEasting - raw.xll) / raw.cellsize).floor();
   final colToRaw = ((maxEasting - raw.xll) / raw.cellsize).ceil();
   final rowFromRaw = ((minNorthing - raw.yll) / raw.cellsize).floor();
   final rowToRaw = ((maxNorthing - raw.yll) / raw.cellsize).ceil();
 
-  final extracted = extractRawEsriSubgrid(
-    raw,
-    minEasting: minEasting,
-    maxEasting: maxEasting,
-    minNorthing: minNorthing,
-    maxNorthing: maxNorthing,
-  );
+  final extracted = matchedEntryIndex >= 0;
 
   return SwissBathyExtractionDebugInfo(
     tileKey: tileKey,
     assetHref: asset.href,
     error: null,
+    entryCount: rawGrids.length,
+    matchedEntryIndex: matchedEntryIndex >= 0 ? matchedEntryIndex : null,
     ncols: raw.ncols,
     nrows: raw.nrows,
     xllcorner: raw.xll,
@@ -500,7 +543,7 @@ Future<SwissBathyExtractionDebugInfo> buildSwissBathyExtractionDebugInfo({
     colToClamped: clampInt(colToRaw, 0, raw.ncols),
     rowFromClamped: clampInt(rowFromRaw, 0, raw.nrows),
     rowToClamped: clampInt(rowToRaw, 0, raw.nrows),
-    extractionSucceeded: extracted != null,
+    extractionSucceeded: extracted,
   );
 }
 
@@ -520,7 +563,13 @@ String formatSwissBathyExtractionDebugInfo(SwissBathyExtractionDebugInfo info) {
   buf
     ..writeln('asset href: ${info.assetHref}')
     ..writeln(
-      'lake-wide grid header: ncols=${info.ncols} nrows=${info.nrows} '
+      'zip .asc/.grd entries: ${info.entryCount} '
+      '(matched entry: ${info.matchedEntryIndex ?? "none"}) '
+      '-- Bug 15: more than 1 here confirms the zip holds several internal '
+      'sub-tiles, not one grid per lake',
+    )
+    ..writeln(
+      'inspected entry grid header: ncols=${info.ncols} nrows=${info.nrows} '
       'xllcorner=${info.xllcorner} yllcorner=${info.yllcorner} '
       'cellsize=${info.cellsize}',
     )

@@ -133,3 +133,93 @@ RawEsriGrid? extractRawEsriSubgrid(
     values: values,
   );
 }
+
+/// Same extraction as [extractRawEsriSubgrid], but across every raw grid
+/// parsed from one downloaded asset rather than just one.
+///
+/// A live check found a swissBATHY3D zip's own `.asc`/`.grd` entries are not
+/// necessarily one-grid-per-lake either: swisstopo's internal tiling inside
+/// the archive can itself be ~1-km squares, independent of and not
+/// necessarily aligned with this app's own 1-km external tile grid. Reading
+/// only the zip's first matching entry (as [SwissBathy3dSource] originally
+/// did) meant every requested tile whose true location fell in a *different*
+/// internal file either found no overlap (most tiles: a false "no data"
+/// gap) or — for the one external tile that happened to coincide with that
+/// first internal file — the correct content purely by coincidence: the
+/// root cause of Bug 15 (nearly every tile "not cached" except one, which
+/// carried the same content as pre-Bug-13 whole-lake caching used to). This
+/// tries every entry in [raws] (in the order [SwissBathy3dSource] parsed
+/// them), extracts the overlap from each, and stitches any that do overlap
+/// together — covering both the common case (the tile falls entirely inside
+/// one internal file) and the boundary case (it straddles two). Returns
+/// null only when none of [raws] overlaps at all.
+RawEsriGrid? extractRawEsriSubgridFromGrids(
+  List<RawEsriGrid> raws, {
+  required double minEasting,
+  required double maxEasting,
+  required double minNorthing,
+  required double maxNorthing,
+}) {
+  final slices = <RawEsriGrid>[
+    for (final raw in raws)
+      ?extractRawEsriSubgrid(
+        raw,
+        minEasting: minEasting,
+        maxEasting: maxEasting,
+        minNorthing: minNorthing,
+        maxNorthing: maxNorthing,
+      ),
+  ];
+  if (slices.isEmpty) return null;
+  return slices.length == 1 ? slices.single : _stitchRawGrids(slices);
+}
+
+/// Merges same-`cellsize` [slices] into one rectangular [RawEsriGrid], each
+/// placed by rounding its own origin's offset from the merged origin to the
+/// nearest cell — the same tolerance-to-drift approach
+/// [SwissBathy3dSource._stitchTiles] uses for already-reprojected tiles,
+/// applied here one layer earlier, directly in LV95 meters. Overlapping
+/// cells prefer whichever slice is later in the list (arbitrary but
+/// deterministic; slices are not expected to disagree where they overlap,
+/// since they come from the same source asset).
+RawEsriGrid _stitchRawGrids(List<RawEsriGrid> slices) {
+  final cellsize = slices.first.cellsize;
+
+  var minX = double.infinity;
+  var maxX = -double.infinity;
+  var minY = double.infinity;
+  var maxY = -double.infinity;
+  for (final s in slices) {
+    if (s.xll < minX) minX = s.xll;
+    if (s.xll + s.ncols * cellsize > maxX) maxX = s.xll + s.ncols * cellsize;
+    if (s.yll < minY) minY = s.yll;
+    if (s.yll + s.nrows * cellsize > maxY) maxY = s.yll + s.nrows * cellsize;
+  }
+
+  final ncols = ((maxX - minX) / cellsize).round();
+  final nrows = ((maxY - minY) / cellsize).round();
+  final values = List<double?>.filled(nrows * ncols, null);
+  for (final s in slices) {
+    final colOffset = ((s.xll - minX) / cellsize).round();
+    final rowOffset = ((s.yll - minY) / cellsize).round();
+    for (var r = 0; r < s.nrows; r++) {
+      final destRow = rowOffset + r;
+      if (destRow < 0 || destRow >= nrows) continue;
+      for (var c = 0; c < s.ncols; c++) {
+        final destCol = colOffset + c;
+        if (destCol < 0 || destCol >= ncols) continue;
+        final v = s.values[r * s.ncols + c];
+        if (v != null) values[destRow * ncols + destCol] = v;
+      }
+    }
+  }
+
+  return RawEsriGrid(
+    ncols: ncols,
+    nrows: nrows,
+    xll: minX,
+    yll: minY,
+    cellsize: cellsize,
+    values: values,
+  );
+}

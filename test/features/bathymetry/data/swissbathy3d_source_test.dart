@@ -26,6 +26,19 @@ Uint8List _zipOf(String entryName, String content) {
   return Uint8List.fromList(ZipEncoder().encode(archive));
 }
 
+/// Like [_zipOf], but with several `.asc` entries in one zip -- the shape
+/// a live check found swissBATHY3D's own asset zips can actually have
+/// (Bug 15): several internal sub-tile grids rather than a single
+/// whole-lake or single-tile one.
+Uint8List _zipOfMultiple(Map<String, String> entries) {
+  final archive = Archive();
+  for (final MapEntry(key: name, value: content) in entries.entries) {
+    final bytes = utf8.encode(content);
+    archive.addFile(ArchiveFile(name, bytes.length, bytes));
+  }
+  return Uint8List.fromList(ZipEncoder().encode(archive));
+}
+
 /// Echoes the request's own `bbox` query parameter back as the mocked STAC
 /// feature's `bbox`, so these fixtures satisfy [SwissStacClient]'s overlap
 /// check the same way a real, spatially-honest server response would.
@@ -398,6 +411,102 @@ nodata_value -9999
         expect(westGrid.depthAt(0, 0), isNot(eastGrid.depthAt(0, 0)));
       },
     );
+
+    test('a zip asset containing several separate internal sub-tile grids is '
+        'searched for the one that actually covers each requested tile, not '
+        'just its first entry (Bug 15)', () async {
+      // Regression test for the real Bug 15 symptom, reported via the
+      // per-tile diagnostic panel after the Bug 13/14 fixes: a live
+      // download of the actual swissBATHY3D zip found its own header
+      // described only a ~1-km area, not the whole lake the Bug 13 fix
+      // assumed a single asset always covered -- yet the STAC item's
+      // bbox and the zip's filename both suggested lake-wide coverage.
+      // The remaining explanation is that the zip holds several separate
+      // `.asc` entries (swisstopo's own internal sub-tiling), and the
+      // code only ever read the zip's FIRST matching entry -- so every
+      // requested tile outside that one entry's own footprint came back
+      // as a false "no data" gap, except the one tile that happened to
+      // coincide with it. This mocks exactly that zip shape: three
+      // separate `.asc` entries, each covering a different 1-km area
+      // with its own distinct value, inside one asset.
+      const cellsPerTile = 10;
+      String row(double value) => List.filled(cellsPerTile, value).join(' ');
+      String tileAsc(double xll, double value) =>
+          'ncols $cellsPerTile\n'
+          'nrows $cellsPerTile\n'
+          'xllcorner $xll\n'
+          'yllcorner 1240000\n'
+          'cellsize 100\n'
+          'nodata_value -9999\n'
+          '${List.filled(cellsPerTile, row(value)).join('\n')}\n';
+
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  // Wide enough to overlap every tile bbox this test
+                  // queries -- mirrors the real STAC item's declared,
+                  // lake-scale bbox.
+                  'bbox': [8.0, 46.0, 10.0, 48.0],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/lake_zip.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(
+          _zipOfMultiple({
+            // The FIRST entry the zip lists covers tile 2685 only --
+            // exactly what a "read only the zip's first entry" bug would
+            // return for every one of the three tile requests below.
+            'first.asc': tileAsc(2685000, 111.0),
+            'second.asc': tileAsc(2687000, 222.0),
+            'third.asc': tileAsc(2689000, 333.0),
+          }),
+          200,
+        );
+      });
+
+      final first = Lv95Transform.toWgs84(2685500, 1240500); // tile 2685
+      final second = Lv95Transform.toWgs84(2687500, 1240500); // tile 2687
+      final third = Lv95Transform.toWgs84(2689500, 1240500); // tile 2689
+
+      final firstGrid = await source.fetch(
+        GeoPoint(first.latitude, first.longitude),
+        spanMeters: 100,
+      );
+      final secondGrid = await source.fetch(
+        GeoPoint(second.latitude, second.longitude),
+        spanMeters: 100,
+      );
+      final thirdGrid = await source.fetch(
+        GeoPoint(third.latitude, third.longitude),
+        spanMeters: 100,
+      );
+
+      // Separate fetch() calls each download their own copy (tile-level
+      // caching, not asset-level).
+      expect(downloadCalls, 3);
+
+      const referenceLevel = 406.1; // Zürichsee
+      expect(firstGrid.depthAt(0, 0), closeTo(referenceLevel - 111.0, 1e-9));
+      expect(secondGrid.depthAt(0, 0), closeTo(referenceLevel - 222.0, 1e-9));
+      expect(thirdGrid.depthAt(0, 0), closeTo(referenceLevel - 333.0, 1e-9));
+      // The exact Bug 15 symptom this guards against: only the entry
+      // matching the FIRST tile's own footprint must resolve to it --
+      // the second and third tiles must not silently fall back to that
+      // same first zip entry's content.
+      expect(secondGrid.depthAt(0, 0), isNot(firstGrid.depthAt(0, 0)));
+      expect(thirdGrid.depthAt(0, 0), isNot(firstGrid.depthAt(0, 0)));
+      expect(secondGrid.depthAt(0, 0), isNot(thirdGrid.depthAt(0, 0)));
+    });
 
     test('falls through to the next STAC candidate when the first one\'s '
         'declared bbox overlaps but its actual downloaded content does not '

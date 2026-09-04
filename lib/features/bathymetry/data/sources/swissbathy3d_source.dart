@@ -32,12 +32,23 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// A single STAC asset is not necessarily scoped to one 1-km tile — a live
 /// check found swisstopo instead publishes one asset per LAKE (e.g. all of
 /// Walensee in one "swissbathy3d_walensee" zip). [_fetchTile] downloads and
-/// parses that raw grid once per asset href (shared across every tile
-/// coordinate that resolves to it, via [fetch]'s `sharedRawGrids`) and then
-/// slices out just the requested tile's own cells with
-/// [extractRawEsriSubgrid] before caching — without that slicing step, every
-/// tile in the same lake would cache and stitch the exact same whole-lake
-/// grid regardless of its own coordinates.
+/// parses that asset's raw grids once per asset href (shared across every
+/// tile coordinate that resolves to it, via [fetch]'s `sharedRawGrids`) and
+/// then slices out just the requested tile's own cells with
+/// [extractRawEsriSubgridFromGrids] before caching — without that slicing
+/// step, every tile in the same lake would cache and stitch the exact same
+/// whole-lake grid regardless of its own coordinates.
+///
+/// Nor is a lake's zip guaranteed to contain a single grid file itself — a
+/// further live check found the downloaded asset's own `.asc`/`.grd` file
+/// can describe only a ~1-km sub-area of the lake (swisstopo's own internal
+/// tiling inside the archive), with the zip containing several such entries
+/// that together cover the whole lake. Reading only the zip's first
+/// matching entry meant nearly every requested tile fell outside that one
+/// entry's footprint and came back as a false "no data" gap, except the one
+/// coincidentally aligned with it (Bug 15) — [extractGridZipTexts] reads
+/// every entry, and [_downloadAndParseRaw] parses all of them, so
+/// [extractRawEsriSubgridFromGrids] can search across the whole set.
 ///
 /// A STAC item's declared `bbox` overlapping a tile's query is not proof its
 /// actual raster does too (the declared bbox can be coarser, or simply
@@ -46,8 +57,9 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// every tile query it happened to satisfy, well within a lake's real
 /// coverage. [_firstOverlappingCandidate] tries every candidate STAC
 /// returned for a tile's bbox, in order, and keeps the first whose
-/// downloaded content genuinely slices a non-empty [extractRawEsriSubgrid]
-/// result — only when none do is the tile treated as a real gap.
+/// downloaded content genuinely slices a non-empty
+/// [extractRawEsriSubgridFromGrids] result — only when none do is the tile
+/// treated as a real gap.
 class SwissBathy3dSource implements BathymetrySource {
   static const String sourceId = 'swissbathy3d';
   static const double tileSizeMeters = 1000;
@@ -126,13 +138,16 @@ class SwissBathy3dSource implements BathymetrySource {
     // Distinct 1-km tile coordinates can legitimately resolve to the exact
     // same STAC asset href -- confirmed live: swisstopo publishes one asset
     // per LAKE, not per tile, so every tile coordinate within a lake shares
-    // one href. Memoized per fetch() call on the fully PARSED raw grid (not
-    // just the downloaded bytes) so that shared, potentially lake-sized
-    // ESRI ASCII grid is downloaded and parsed over the network exactly
-    // once, not once per tile coordinate that happens to resolve to it.
-    // Each tile still gets its own, location-correct slice of that shared
-    // raw grid via extractRawEsriSubgrid in _fetchTile.
-    final sharedRawGrids = <String, Future<RawEsriGrid?>>{};
+    // one href. Memoized per fetch() call on the fully PARSED raw grid list
+    // (not just the downloaded bytes) so that shared, potentially lake-sized
+    // zip is downloaded and every one of its `.asc`/`.grd` entries parsed
+    // over the network exactly once, not once per tile coordinate that
+    // happens to resolve to it. Each tile still gets its own,
+    // location-correct slice via extractRawEsriSubgridFromGrids in
+    // _fetchTile -- a list, not a single grid, because the zip's own
+    // internal entries are not guaranteed to be one-per-lake either (see
+    // that function's doc for Bug 15).
+    final sharedRawGrids = <String, Future<List<RawEsriGrid>>>{};
 
     // Bounded concurrency, not strictly sequential nor unbounded: up to
     // maxConcurrentTileRequests tiles in flight at once. Each is
@@ -189,7 +204,7 @@ class SwissBathy3dSource implements BathymetrySource {
     int tileE,
     int tileN,
     SwissLakeLevel lake,
-    Map<String, Future<RawEsriGrid?>> sharedRawGrids,
+    Map<String, Future<List<RawEsriGrid>>> sharedRawGrids,
   ) async {
     final tileKey = '${tileE}_$tileN';
 
@@ -244,30 +259,30 @@ class SwissBathy3dSource implements BathymetrySource {
 
   /// Tries each of [candidates] in order — downloading (via [download]) and
   /// slicing out ([tileE], [tileN])'s own cells with
-  /// [extractRawEsriSubgrid] — and returns the first whose actual content
-  /// genuinely overlaps the tile, or null when none do.
+  /// [extractRawEsriSubgridFromGrids] — and returns the first whose actual
+  /// content genuinely overlaps the tile, or null when none do.
   ///
   /// A STAC item's declared `bbox` overlapping the query
   /// ([SwissStacClient.findAssetCandidates]'s filter) is only the server's
   /// word for it; it can be coarser or simply wrong relative to its own
-  /// raster's real footprint, which only [extractRawEsriSubgrid] — reading
-  /// the downloaded grid's own `xllcorner`/`yllcorner`/`ncols`/`nrows` —
-  /// can actually confirm. Trusting the first bbox-plausible candidate
-  /// alone meant one wrong-but-plausible candidate silently starved every
-  /// tile query it happened to satisfy, surfacing as widespread "no tile
-  /// here" gaps despite genuine coverage.
+  /// raster's real footprint, which only [extractRawEsriSubgridFromGrids] —
+  /// reading the downloaded grid's own `xllcorner`/`yllcorner`/`ncols`/
+  /// `nrows` — can actually confirm. Trusting the first bbox-plausible
+  /// candidate alone meant one wrong-but-plausible candidate silently
+  /// starved every tile query it happened to satisfy, surfacing as
+  /// widespread "no tile here" gaps despite genuine coverage.
   Future<({SwissBathyAsset asset, RawEsriGrid subRaw})?>
   _firstOverlappingCandidate(
     int tileE,
     int tileN,
     List<SwissBathyAsset> candidates,
-    Future<RawEsriGrid?> Function(String href) download,
+    Future<List<RawEsriGrid>> Function(String href) download,
   ) async {
     for (final asset in candidates) {
-      final fullRaw = await download(asset.href);
-      if (fullRaw == null) continue;
-      final subRaw = extractRawEsriSubgrid(
-        fullRaw,
+      final rawGrids = await download(asset.href);
+      if (rawGrids.isEmpty) continue;
+      final subRaw = extractRawEsriSubgridFromGrids(
+        rawGrids,
         minEasting: tileE * tileSizeMeters,
         maxEasting: (tileE + 1) * tileSizeMeters,
         minNorthing: tileN * tileSizeMeters,
@@ -279,15 +294,17 @@ class SwissBathy3dSource implements BathymetrySource {
     return null;
   }
 
-  /// Downloads and parses the raw ESRI ASCII grid at [href] (potentially an
-  /// entire lake's worth of cells), or null when the zip contains no
-  /// `.asc`/`.grd` entry. Shared across every tile coordinate that resolves
-  /// to the same href — see [_fetchTile]'s and [fetch]'s docs.
-  Future<RawEsriGrid?> _downloadAndParseRaw(String href) async {
+  /// Downloads and parses every `.asc`/`.grd` entry in the zip at [href]
+  /// (potentially several, each an entire lake's worth of cells, or
+  /// swisstopo's own internal sub-tiles of one — see
+  /// [extractRawEsriSubgridFromGrids]'s doc for why this cannot assume a
+  /// single entry), or an empty list when it contains none. Shared across
+  /// every tile coordinate that resolves to the same href — see
+  /// [_fetchTile]'s and [fetch]'s docs.
+  Future<List<RawEsriGrid>> _downloadAndParseRaw(String href) async {
     final zipBytes = await _stac.downloadBytes(href);
-    final gridText = extractGridZipText(zipBytes);
-    if (gridText == null) return null;
-    return EsriAsciiGridParser.parseRaw(gridText);
+    final gridTexts = extractGridZipTexts(zipBytes);
+    return [for (final text in gridTexts) EsriAsciiGridParser.parseRaw(text)];
   }
 
   static bool _isStale(DateTime? checkedAt) {
@@ -560,21 +577,28 @@ class SwissBathy3dSource implements BathymetrySource {
     ];
   }
 
-  /// The first `.asc`/`.grd` entry in the zip, or null when it contains only
-  /// other formats (e.g. XYZ, which this source does not parse). Public (not
-  /// `_`-prefixed) so the temporary swissBATHY3D debug panel
+  /// Every `.asc`/`.grd` entry in the zip, in the archive's own order, or an
+  /// empty list when it contains only other formats (e.g. XYZ, which this
+  /// source does not parse).
+  ///
+  /// Used to read only the FIRST such entry (any others in the same zip
+  /// were silently ignored) — correct for a zip with exactly one grid, but
+  /// a live check found swisstopo's own zips are not guaranteed to have
+  /// just one: nearly every requested tile came back "no data" except the
+  /// one that happened to match that first entry's own footprint (Bug 15).
+  /// Public (not `_`-prefixed) so the temporary swissBATHY3D debug panel
   /// (`swiss_bathy_debug_info.dart`) can decode the exact same downloaded
-  /// zip when diagnosing Bug 14, instead of duplicating this parsing.
-  static String? extractGridZipText(Uint8List zipBytes) {
+  /// zip when diagnosing tile extraction, instead of duplicating this
+  /// parsing.
+  static List<String> extractGridZipTexts(Uint8List zipBytes) {
     final archive = ZipDecoder().decodeBytes(zipBytes);
-    for (final entry in archive) {
-      if (!entry.isFile) continue;
-      final lower = entry.name.toLowerCase();
-      if (lower.endsWith('.asc') || lower.endsWith('.grd')) {
-        return utf8.decode(entry.readBytes() ?? const [], allowMalformed: true);
-      }
-    }
-    return null;
+    return [
+      for (final entry in archive)
+        if (entry.isFile &&
+            (entry.name.toLowerCase().endsWith('.asc') ||
+                entry.name.toLowerCase().endsWith('.grd')))
+          utf8.decode(entry.readBytes() ?? const [], allowMalformed: true),
+    ];
   }
 }
 

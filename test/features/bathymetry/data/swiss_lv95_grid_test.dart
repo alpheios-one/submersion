@@ -195,4 +195,105 @@ nodata_value -9999
       expect(clipped.values, everyElement(100.0));
     });
   });
+
+  group('extractRawEsriSubgridFromGrids', () {
+    // Regression tests for Bug 15: a live check found a swissBATHY3D zip's
+    // own .asc/.grd entries are not guaranteed to be a single whole-lake
+    // grid either -- the archive can hold several separate ~1-km entries
+    // (swisstopo's own internal sub-tiling). Reading only the zip's first
+    // entry meant every requested tile outside that one entry's own
+    // footprint came back as a false "no data" gap, except the one
+    // coincidentally aligned with it.
+    RawEsriGrid subTile(double xll, double yll, double value) {
+      const cellsPerTile = 10;
+      String row(double v) => List.filled(cellsPerTile, v).join(' ');
+      final buffer = StringBuffer()
+        ..writeln('ncols $cellsPerTile')
+        ..writeln('nrows $cellsPerTile')
+        ..writeln('xllcorner $xll')
+        ..writeln('yllcorner $yll')
+        ..writeln('cellsize 100')
+        ..writeln('nodata_value -9999');
+      for (var r = 0; r < cellsPerTile; r++) {
+        buffer.writeln(row(value));
+      }
+      return EsriAsciiGridParser.parseRaw(buffer.toString());
+    }
+
+    test('picks the one internal entry whose own header actually covers the '
+        'requested tile, not just the first entry in the list', () {
+      // Two internal sub-tiles, distinct and far enough apart that a
+      // fixed-first-entry bug could never accidentally pass this test.
+      final west = subTile(2685000, 1240000, 111.0);
+      final east = subTile(2695000, 1240000, 222.0);
+
+      final resultForWest = extractRawEsriSubgridFromGrids(
+        [west, east], // first entry happens to be the match
+        minEasting: 2685000,
+        maxEasting: 2686000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+      expect(resultForWest.values, everyElement(111.0));
+
+      final resultForEast = extractRawEsriSubgridFromGrids(
+        [west, east], // first entry is NOT the match this time
+        minEasting: 2695000,
+        maxEasting: 2696000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+      expect(resultForEast.values, everyElement(222.0));
+
+      // The exact Bug 15 symptom: two distinct requested locations must
+      // not resolve to the same content just because they share a zip.
+      expect(resultForWest.values, isNot(resultForEast.values));
+    });
+
+    test('stitches two internal entries together when the requested tile '
+        'straddles both', () {
+      final west = subTile(2685000, 1240000, 111.0);
+      final east = subTile(2686000, 1240000, 222.0);
+
+      final straddling = extractRawEsriSubgridFromGrids(
+        [west, east],
+        minEasting: 2685500,
+        maxEasting: 2686500,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      )!;
+
+      expect(straddling.ncols, 10); // 500m of each side, at 100m cells
+      expect(straddling.values.take(5), everyElement(111.0));
+      expect(straddling.values.skip(5).take(5), everyElement(222.0));
+    });
+
+    test('returns null when no internal entry overlaps the requested tile at '
+        'all', () {
+      final west = subTile(2685000, 1240000, 111.0);
+      final east = subTile(2695000, 1240000, 222.0);
+
+      final result = extractRawEsriSubgridFromGrids(
+        [west, east],
+        minEasting: 2690000,
+        maxEasting: 2691000,
+        minNorthing: 1240000,
+        maxNorthing: 1241000,
+      );
+      expect(result, isNull);
+    });
+
+    test('an empty grid list returns null', () {
+      expect(
+        extractRawEsriSubgridFromGrids(
+          const [],
+          minEasting: 2685000,
+          maxEasting: 2686000,
+          minNorthing: 1240000,
+          maxNorthing: 1241000,
+        ),
+        isNull,
+      );
+    });
+  });
 }
