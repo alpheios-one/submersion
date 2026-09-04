@@ -235,6 +235,35 @@ jobs:
       - name: Check formatting
         run: dart format --set-exit-if-changed .
 
+      # lib/l10n/arb/app_localizations*.dart is produced by `flutter gen-l10n`
+      # and is CHECKED IN, unlike the build_runner outputs (*.g.dart /
+      # *.freezed.dart / *.mocks.dart), which are gitignored and rebuilt by the
+      # codegen job above. Nothing else in the pipeline regenerates it, and
+      # `flutter test` does not either despite `generate: true` in pubspec.yaml,
+      # so what is committed is exactly what ships. Without this assertion an
+      # ARB edit that skipped `flutter gen-l10n`, or a generated file that was
+      # hand-edited or hand-resolved during a merge (these conflict often, since
+      # every locale changes together), merges fully green and the app serves
+      # the stale string. Only the handful of keys some test asserts by value
+      # would catch it today, out of ~9800.
+      #
+      # Runs LAST so the analyze and format verdicts above are reported against
+      # the tree as committed, not against a freshly regenerated copy.
+      - name: Verify generated localizations match the ARB files
+        run: |
+          flutter gen-l10n
+          # --porcelain rather than `git diff --exit-code` so a brand-new locale
+          # whose generated file was never added shows up as untracked drift too.
+          drift="$(git status --porcelain -- 'lib/l10n/arb/app_localizations*.dart')"
+          if [ -n "$drift" ]; then
+            echo "Generated localizations do not match the ARB files:"
+            printf '%s\n' "$drift"
+            git --no-pager diff -- 'lib/l10n/arb/app_localizations*.dart'
+            echo "::error::lib/l10n/arb/app_localizations*.dart is out of date. Run 'flutter gen-l10n' and commit the result."
+            exit 1
+          fi
+          echo "Generated localizations are up to date."
+
   test:
     name: Test (shard ${{ matrix.shard }})
     needs: codegen
@@ -1182,6 +1211,18 @@ jobs:
       - build-windows
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Check CI aggregation gate
+        # Deliberately duplicated from script-tests, which runs the same guard
+        # for a faster signal. This copy is the enforcing one: a guard that
+        # runs only inside a gated job cannot report its own de-gating, since
+        # dropping that job from `needs` below would make its failure advisory
+        # too. Running it here, in the one job branch protection requires,
+        # closes that loop. Ordered before the results check so a de-gated
+        # pipeline reports the cause rather than a downstream symptom.
+        run: python3 scripts/check_ci_success_gate.py
+
       - name: Verify all required jobs succeeded
         run: |
           results="${{ join(needs.*.result, ' ') }}"
