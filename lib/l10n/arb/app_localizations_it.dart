@@ -11731,7 +11731,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Registro manutenzione eliminato';
 
   @override
-  String get equipment_service_totalCostLabel => 'Costo totale manutenzione';
+  String equipment_service_totalCostLabel(String currency) {
+    return 'Costo totale manutenzione ($currency)';
+  }
 
   @override
   String get equipment_setDetail_addEquipmentButton => 'Aggiungi attrezzatura';
@@ -11966,7 +11968,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_summary_totalItems => 'Articoli totali';
 
   @override
-  String get equipment_summary_totalValue => 'Valore totale';
+  String equipment_summary_totalValue(String currency) {
+    return 'Valore totale ($currency)';
+  }
 
   @override
   String get equipment_tab_equipment => 'Attrezzatura';
