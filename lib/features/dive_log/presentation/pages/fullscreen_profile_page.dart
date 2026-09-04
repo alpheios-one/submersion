@@ -311,12 +311,21 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
         ? primarySource
         : dataSources.where((s) => s.id == activeSourceId).firstOrNull ??
               primarySource;
-    final activeProfile = activeSource == null
-        ? null
-        : sourceProfiles[activeSource.id];
+    // Attribution (activeComputerId) and the drawn points come from the same
+    // provider result so they can never disagree; the direct lookup only
+    // serves the dives where the provider yields null (single-source, and the
+    // sequential halves of a Combine).
+    final resolvedActive = ref.watch(
+      activeSourceProfileProvider(widget.diveId),
+    );
+    final activeProfile =
+        resolvedActive ??
+        (activeSource == null ? null : sourceProfiles[activeSource.id]);
     // Same rule as the detail page: sources that never overlap in time are
     // consecutive halves of one dive, not alternative recordings of it, so
-    // they are drawn as one series rather than one-at-a-time (#1451).
+    // they are drawn as one series rather than one-at-a-time (#1451). Drives
+    // the source switcher below; the drawn series comes from the provider,
+    // which applies this same rule internally.
     final isMultiSource = usesPerSourceRendering(
       dataSources,
       sourceProfiles.values,
@@ -329,9 +338,9 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and photo pins scaled to it drift off the visible span (#1167).
-    final chartProfile = (isMultiSource && activeProfile != null)
-        ? activeProfile.points
-        : dive.profile;
+    // activeSourceProfileProvider is the one rule for this, shared with the
+    // detail page and the dive-list panel (#543).
+    final chartProfile = resolvedActive?.points ?? dive.profile;
 
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]

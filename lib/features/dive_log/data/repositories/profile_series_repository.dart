@@ -552,6 +552,26 @@ class ProfileSeriesRepository {
   Future<int> clearComputer(String computerId, {int? now}) =>
       _setComputer(null, (t) => t.computerId.equals(computerId), now: now);
 
+  /// Moves every series of [fromComputerIds] onto [toComputerId] and restamps
+  /// each, for a dive computer merge (#645). Returns the number touched.
+  ///
+  /// Does not notify the sync bus: the merge runs this inside its own
+  /// transaction and notifies once after commit, so a notification here
+  /// would fire while the rows are still uncommitted.
+  Future<int> repointComputer(
+    List<String> fromComputerIds,
+    String toComputerId, {
+    int? now,
+  }) {
+    if (fromComputerIds.isEmpty) return Future.value(0);
+    return _setComputer(
+      toComputerId,
+      (t) => t.computerId.isIn(fromComputerIds),
+      now: now,
+      notify: false,
+    );
+  }
+
   /// Diver reassignment: a computer that now belongs to [diverId] must not
   /// stay attributed on dives the diver does not own.
   Future<int> clearComputersOfDiverForForeignDives(
@@ -628,6 +648,7 @@ class ProfileSeriesRepository {
     String? computerId,
     Expression<bool> Function($DiveProfileSeriesTable t) where, {
     int? now,
+    bool notify = true,
   }) async {
     final nowMs = now ?? DateTime.now().millisecondsSinceEpoch;
     final ids = await _ids(where);
@@ -640,8 +661,47 @@ class ProfileSeriesRepository {
       ),
       nowMs,
     );
-    SyncEventBus.notifyLocalChange();
+    if (notify) SyncEventBus.notifyLocalChange();
     return ids.length;
+  }
+
+  /// Where each series of [diveId] sits on the timeline, without its blob.
+  ///
+  /// [getRowsForDives] selects whole rows, so it reads every packed sample
+  /// blob off disk even when the caller only wants the summary scalars beside
+  /// them. This projects to the four columns a span needs, for callers on a
+  /// UI path: `diveSegmentCountProvider` asks on every dive-detail open
+  /// whether the dive can be separated (issue #1504), and a dive's samples
+  /// are the most expensive thing it owns.
+  ///
+  /// Ordered like [getIdentitiesForDive], earliest first then by id.
+  Future<
+    List<({String id, String? sourceId, int startTimestamp, int endTimestamp})>
+  >
+  getSpansForDive(String diveId) async {
+    final rows =
+        await (_db.selectOnly(_db.diveProfileSeries)
+              ..addColumns([
+                _db.diveProfileSeries.id,
+                _db.diveProfileSeries.sourceId,
+                _db.diveProfileSeries.startTimestamp,
+                _db.diveProfileSeries.endTimestamp,
+              ])
+              ..where(_db.diveProfileSeries.diveId.equals(diveId))
+              ..orderBy([
+                OrderingTerm.asc(_db.diveProfileSeries.startTimestamp),
+                OrderingTerm.asc(_db.diveProfileSeries.id),
+              ]))
+            .get();
+    return [
+      for (final r in rows)
+        (
+          id: r.read(_db.diveProfileSeries.id)!,
+          sourceId: r.read(_db.diveProfileSeries.sourceId),
+          startTimestamp: r.read(_db.diveProfileSeries.startTimestamp)!,
+          endTimestamp: r.read(_db.diveProfileSeries.endTimestamp)!,
+        ),
+    ];
   }
 
   /// Raw rows of every series of [diveIds], undecoded, for snapshots that

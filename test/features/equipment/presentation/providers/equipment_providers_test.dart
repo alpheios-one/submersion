@@ -8,6 +8,7 @@ import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/service_record.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -20,6 +21,7 @@ EquipmentItem _makeEquipment({
   String? diverId,
   DateTime? lastServiceDate,
   int? serviceIntervalDays,
+  DateTime? purchaseDate,
 }) {
   return EquipmentItem(
     id: id,
@@ -28,6 +30,7 @@ EquipmentItem _makeEquipment({
     diverId: diverId,
     lastServiceDate: lastServiceDate,
     serviceIntervalDays: serviceIntervalDays,
+    purchaseDate: purchaseDate,
   );
 }
 
@@ -199,5 +202,96 @@ void main() {
         );
       },
     );
+
+    test('includes gear whose service-ledger clock is overdue, with no legacy '
+        'interval column set', () async {
+      final diver = await seedCurrentDiver();
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      // A regulator bought years ago and never serviced. createEquipment
+      // auto-attaches the built-in 365-day regulator-service clock, which
+      // anchors on the purchase date, so the clock is long overdue. The
+      // legacy serviceIntervalDays column is null -- no in-app surface has
+      // written it since the service ledger landed (DB v122/v131).
+      await equipmentRepo.createEquipment(
+        _makeEquipment(
+          name: 'Neglected Reg',
+          diverId: diver.id,
+          purchaseDate: DateTime(2020),
+        ),
+      );
+
+      final names = (await container.read(
+        serviceDueEquipmentProvider.future,
+      )).map((e) => e.name).toList();
+
+      expect(
+        names,
+        contains('Neglected Reg'),
+        reason:
+            'The Service Due filter must read the service ledger; the '
+            'legacy single-clock columns are no longer written',
+      );
+    });
+
+    test('drops an item once its overdue clock is serviced', () async {
+      final diver = await seedCurrentDiver();
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      final reg = await equipmentRepo.createEquipment(
+        _makeEquipment(
+          name: 'Serviced Reg',
+          diverId: diver.id,
+          purchaseDate: DateTime(2020),
+        ),
+      );
+
+      expect(
+        (await container.read(
+          serviceDueEquipmentProvider.future,
+        )).map((e) => e.name),
+        contains('Serviced Reg'),
+      );
+
+      // Logging the service resets that clock's anchor, so the item must
+      // leave the list the notifier's refresh feeds.
+      final now = DateTime.now();
+      await container
+          .read(serviceRecordNotifierProvider(reg.id).notifier)
+          .addRecord(
+            ServiceRecord(
+              id: '',
+              equipmentId: reg.id,
+              serviceCategory: ServiceCategory.annual,
+              serviceKindId: 'regulator-service',
+              serviceDate: now,
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+
+      expect(await container.read(serviceDueEquipmentProvider.future), isEmpty);
+    });
+
+    test('excludes gear whose ledger clocks are all still ok', () async {
+      final diver = await seedCurrentDiver();
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+
+      await equipmentRepo.createEquipment(
+        _makeEquipment(
+          name: 'Fresh Reg',
+          diverId: diver.id,
+          purchaseDate: DateTime.now(),
+        ),
+      );
+
+      expect(await container.read(serviceDueEquipmentProvider.future), isEmpty);
+    });
   });
 }

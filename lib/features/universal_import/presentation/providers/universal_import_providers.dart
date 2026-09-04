@@ -11,6 +11,7 @@ import 'package:submersion/features/buddies/presentation/providers/buddy_provide
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
@@ -644,7 +645,20 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
     // Reset to sourceConfirmation so the canAdvance provider transitions
     // false -> true, enabling auto-advance even when re-confirming.
-    state = state.copyWith(currentStep: ImportWizardStep.sourceConfirmation);
+    //
+    // Anything an earlier confirmation parsed is dropped here: re-confirming
+    // means re-deciding what this file is, so a payload built under the old
+    // answer is stale. The CSV branch below never parses -- it hands off to
+    // Map Fields -- so without this an override to CSV after a successful
+    // parse would keep the old payload, and Map Fields would auto-skip on it,
+    // confirmFieldMapping would early-return on it, and Review would show the
+    // superseded import.
+    state = state.copyWith(
+      currentStep: ImportWizardStep.sourceConfirmation,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
 
     final effectiveOverride = overrideApp ?? state.pendingSourceOverride;
 
@@ -816,15 +830,14 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
         isLoading: false,
         files: result.files,
         clearDetectionResult: true,
-        error: 'No data could be parsed from the selected files',
       );
-      return;
+      throw _fail('No data could be parsed from the selected files');
     }
 
     final payload = _applySurfacingPressureRule(
       const PayloadMerger().merge(result.parsed),
     );
-    final dupResult = await _checkDuplicates(payload);
+    final dupResult = await _checkDuplicatesOrEmpty(payload);
     final selections = _defaultSelections(payload, dupResult);
 
     state = state.copyWith(
@@ -839,13 +852,23 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
   // -- Parsing + Duplicate Check --
 
+  /// Parse the selected file and move the wizard to review.
+  ///
+  /// Throws [ImportStepFailure] when no payload could be produced. The wizard
+  /// gates every later step on that payload, so returning quietly here would
+  /// let it advance onto a step with nothing to act on -- for a non-CSV file
+  /// that is the CSV-only Map Fields step, which then reads "0 of 0 columns
+  /// mapped" with Next disabled and no explanation.
   Future<void> _parseAndCheckDuplicates() async {
     final bytes = state.fileBytes;
     final opts = state.options;
-    if (bytes == null || opts == null) return;
+    if (bytes == null || opts == null) {
+      throw _fail('The selected file could not be read. Please pick it again.');
+    }
 
     state = state.copyWith(isLoading: true, clearError: true);
 
+    final ImportPayload payload;
     try {
       final registry = opts.format == ImportFormat.csv
           ? await _buildPresetRegistry()
@@ -862,34 +885,77 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       } else {
         parsed = await parser.parse(bytes, options: opts);
       }
-      final payload = _applySurfacingPressureRule(parsed);
+      payload = _applySurfacingPressureRule(parsed);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to parse import file',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw _fail('Failed to parse file: $e');
+    }
 
-      if (payload.isEmpty) {
-        final errorMsg = payload.warnings.isNotEmpty
+    if (payload.isEmpty) {
+      throw _fail(
+        payload.warnings.isNotEmpty
             ? payload.warnings.first.message
-            : 'No data could be parsed from the file';
-        state = state.copyWith(isLoading: false, error: errorMsg);
-        return;
-      }
-
-      // Run duplicate checking
-      final dupResult = await _checkDuplicates(payload);
-
-      // Build default selections: all selected, minus duplicates
-      final selections = _defaultSelections(payload, dupResult);
-
-      state = state.copyWith(
-        isLoading: false,
-        payload: payload,
-        duplicateResult: dupResult,
-        selections: selections,
-        currentStep: ImportWizardStep.review,
+            : 'No data could be parsed from the file',
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Failed to parse file: $e',
+    }
+
+    final dupResult = await _checkDuplicatesOrEmpty(payload);
+
+    // Build default selections: all selected, minus duplicates
+    final selections = _defaultSelections(payload, dupResult);
+
+    state = state.copyWith(
+      isLoading: false,
+      payload: payload,
+      duplicateResult: dupResult,
+      selections: selections,
+      currentStep: ImportWizardStep.review,
+    );
+  }
+
+  /// Record [message] on the state and return the failure to throw.
+  ///
+  /// The state copy is what the steps already on screen render; the throw is
+  /// what stops the wizard advancing past them.
+  ///
+  /// Anything a previous attempt parsed goes with it. A user can walk back to
+  /// Confirm Source, change the source and confirm again, so a failure here
+  /// can land on top of an earlier success -- and every gate past this point
+  /// reads that payload, so leaving it would carry a superseded import
+  /// forward under a message saying the current one failed.
+  ImportStepFailure _fail(String message) {
+    state = state.copyWith(
+      isLoading: false,
+      error: message,
+      clearPayload: true,
+      clearDuplicateResult: true,
+      selections: const {},
+    );
+    return ImportStepFailure(message);
+  }
+
+  /// Duplicate detection, degraded to "found none" if it throws.
+  ///
+  /// Flagging duplicates is a convenience laid over the import, and it reads
+  /// the whole existing library to do it. A failure in that read is no reason
+  /// to make the file unimportable: the review step still lists every incoming
+  /// row for the user to deselect by hand.
+  Future<ImportDuplicateResult> _checkDuplicatesOrEmpty(
+    ImportPayload payload,
+  ) async {
+    try {
+      return await _checkDuplicates(payload);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Duplicate detection failed; importing without it',
+        error: e,
+        stackTrace: stackTrace,
       );
+      return const ImportDuplicateResult();
     }
   }
 

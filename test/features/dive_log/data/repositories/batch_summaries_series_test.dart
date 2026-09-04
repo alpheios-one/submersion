@@ -56,9 +56,65 @@ void main() {
     },
   );
 
-  test('every series of a dive contributes, primary or not', () async {
+  // #543: a consolidated dive carries the secondary computer's series
+  // demoted next to the primary's; the sparkline must not interleave them.
+  test('a demoted series is left out when the dive has a primary', () async {
     await series.insertSeries(
       diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 1.0),
+        ProfileSample(timestamp: 10, depth: 3.0),
+      ],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
+      samples: const [
+        ProfileSample(timestamp: 5, depth: 20.0),
+        ProfileSample(timestamp: 15, depth: 20.0),
+      ],
+      now: now,
+    );
+    final summaries = await dives.getBatchProfileSummaries(['dive-1']);
+    expect(summaries['dive-1']!.map((p) => p.timestamp), [0, 10]);
+    expect(summaries['dive-1']!.map((p) => p.depth), [1.0, 3.0]);
+  });
+
+  // #1451: a sequential Combine keeps each half's own series primary, so
+  // "primary only" is still the WHOLE stitched dive here. Pinned because the
+  // #543 rule above reads like "one series wins" and a future tightening to a
+  // single primary would silently halve every combined dive's sparkline.
+  test('the primary halves of a combined dive all contribute', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      samples: const [
+        ProfileSample(timestamp: 0, depth: 0.0),
+        ProfileSample(timestamp: 600, depth: 20.0),
+      ],
+      now: now,
+    );
+    await series.insertSeries(
+      diveId: 'dive-1',
+      computerId: null,
+      samples: const [
+        ProfileSample(timestamp: 600, depth: 20.0),
+        ProfileSample(timestamp: 1200, depth: 0.0),
+      ],
+      now: now,
+    );
+    final summaries = await dives.getBatchProfileSummaries(['dive-1']);
+    expect(
+      summaries['dive-1']!.last.timestamp,
+      1200,
+      reason: 'the second half must not be dropped as a demoted series',
+    );
+  });
+
+  test('with no primary series every series contributes', () async {
+    await series.insertSeries(
+      diveId: 'dive-1',
+      isPrimary: false,
       samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
       now: now,
     );

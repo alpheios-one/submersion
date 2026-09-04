@@ -116,6 +116,30 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @settings_oauth_connect_browserFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open your browser. Use Copy link and paste the address into your browser.'**
+  String get settings_oauth_connect_browserFailed;
+
+  /// No description provided for @settings_oauth_connect_copyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the link.'**
+  String get settings_oauth_connect_copyFailed;
+
+  /// No description provided for @settings_oauth_connect_copyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_oauth_connect_copyLink;
+
+  /// No description provided for @settings_oauth_connect_linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied. Paste it into your browser to authorize.'**
+  String get settings_oauth_connect_linkCopied;
+
   /// No description provided for @universalImport_action_importFromGarmin.
   ///
   /// In en, this message translates to:
@@ -4025,6 +4049,12 @@ abstract class AppLocalizations {
   /// **'Equipment set items'**
   String get preDive_item_type_equipmentSet;
 
+  /// No description provided for @preDive_item_type_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment item'**
+  String get preDive_item_type_equipment;
+
   /// No description provided for @preDive_item_valueLabel.
   ///
   /// In en, this message translates to:
@@ -4354,6 +4384,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get preDive_start_noEquipmentSet;
+
+  /// No description provided for @preDive_start_noEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get preDive_start_noEquipment;
 
   /// No description provided for @preDive_start_begin.
   ///
@@ -12916,6 +12952,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Split failed'**
   String get diveLog_sources_splitFailed;
+
+  /// No description provided for @diveLog_sources_menu_separate.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate combined dives'**
+  String get diveLog_sources_menu_separate;
+
+  /// No description provided for @diveLog_sources_separateDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate combined dives?'**
+  String get diveLog_sources_separateDialog_title;
+
+  /// No description provided for @diveLog_sources_separateDialog_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive was combined from {count} dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. The rest of the logbook entry, including buddies, tags, equipment, media, notes and the dive number, stays on this dive.'**
+  String diveLog_sources_separateDialog_body(int count);
+
+  /// No description provided for @diveLog_sources_separateDialog_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate'**
+  String get diveLog_sources_separateDialog_confirm;
+
+  /// No description provided for @diveLog_sources_separateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive restored} other{{count} dives restored}}'**
+  String diveLog_sources_separateDone(int count);
+
+  /// No description provided for @diveLog_sources_separateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not separate this dive'**
+  String get diveLog_sources_separateFailed;
 
   /// No description provided for @divePlanner_action_addTank.
   ///
@@ -22712,12 +22784,6 @@ abstract class AppLocalizations {
   /// **'Dive data written to photo'**
   String get media_photoViewer_diveDataWrittenToPhoto;
 
-  /// No description provided for @media_photoViewer_diveDataWrittenToVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive data written to video'**
-  String get media_photoViewer_diveDataWrittenToVideo;
-
   /// No description provided for @media_photoViewer_errorLoadingPhotos.
   ///
   /// In en, this message translates to:
@@ -22988,12 +23054,6 @@ abstract class AppLocalizations {
   /// **'The following metadata will be written to the photo:'**
   String get media_writeMetadata_descriptionPhoto;
 
-  /// No description provided for @media_writeMetadata_descriptionVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'The following metadata will be written to the video:'**
-  String get media_writeMetadata_descriptionVideo;
-
   /// No description provided for @media_writeMetadata_diveTimeLabel.
   ///
   /// In en, this message translates to:
@@ -23005,12 +23065,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS'**
   String get media_writeMetadata_gpsLabel;
-
-  /// No description provided for @media_writeMetadata_keepOriginalVideo.
-  ///
-  /// In en, this message translates to:
-  /// **'Keep original video'**
-  String get media_writeMetadata_keepOriginalVideo;
 
   /// No description provided for @media_writeMetadata_livePhotoUnsupported.
   ///
@@ -23042,23 +23096,17 @@ abstract class AppLocalizations {
   /// **'Write Dive Data to Photo'**
   String get media_writeMetadata_titlePhoto;
 
-  /// No description provided for @media_writeMetadata_titleVideo.
+  /// No description provided for @media_writeMetadata_videoUnsupported.
   ///
   /// In en, this message translates to:
-  /// **'Write Dive Data to Video'**
-  String get media_writeMetadata_titleVideo;
+  /// **'Dive data can only be written to photos, not videos.'**
+  String get media_writeMetadata_videoUnsupported;
 
   /// No description provided for @media_writeMetadata_warningPhotoText.
   ///
   /// In en, this message translates to:
   /// **'This will modify the original photo.'**
   String get media_writeMetadata_warningPhotoText;
-
-  /// No description provided for @media_writeMetadata_warningVideoText.
-  ///
-  /// In en, this message translates to:
-  /// **'A new video will be created with the metadata. Video metadata cannot be modified in-place.'**
-  String get media_writeMetadata_warningVideoText;
 
   /// No description provided for @media_writeMetadata_writeButton.
   ///
@@ -24731,7 +24779,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_diveDetailSections_fixedSections.
   ///
   /// In en, this message translates to:
-  /// **'Fixed sections: Header, Dive Profile Chart'**
+  /// **'Fixed section: Header'**
   String get settings_diveDetailSections_fixedSections;
 
   /// No description provided for @settings_diveDetailSections_configurableSections.
@@ -24740,17 +24788,83 @@ abstract class AppLocalizations {
   /// **'Configurable sections (drag to reorder)'**
   String get settings_diveDetailSections_configurableSections;
 
-  /// No description provided for @diveDetailSection_decoO2_name.
+  /// No description provided for @diveDetailSection_profile_name.
   ///
   /// In en, this message translates to:
-  /// **'Deco Status / Tissue Loading'**
-  String get diveDetailSection_decoO2_name;
+  /// **'Dive Profile'**
+  String get diveDetailSection_profile_name;
 
-  /// No description provided for @diveDetailSection_decoO2_description.
+  /// No description provided for @diveDetailSection_profile_description.
   ///
   /// In en, this message translates to:
-  /// **'NDL, ceiling, tissue heat map, O2 toxicity'**
-  String get diveDetailSection_decoO2_description;
+  /// **'Depth/time chart, playback, range selection'**
+  String get diveDetailSection_profile_description;
+
+  /// No description provided for @diveDetailSection_decoStatus_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Deco Status'**
+  String get diveDetailSection_decoStatus_name;
+
+  /// No description provided for @diveDetailSection_decoStatus_description.
+  ///
+  /// In en, this message translates to:
+  /// **'NDL, ceiling, stops, O2 toxicity'**
+  String get diveDetailSection_decoStatus_description;
+
+  /// No description provided for @diveDetailSection_tissueLoading_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Tissue Loading'**
+  String get diveDetailSection_tissueLoading_name;
+
+  /// No description provided for @diveDetailSection_tissueLoading_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Per-compartment saturation and heat map'**
+  String get diveDetailSection_tissueLoading_description;
+
+  /// No description provided for @diveLog_detail_displayOptions_tooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Display options'**
+  String get diveLog_detail_displayOptions_tooltip;
+
+  /// No description provided for @diveLog_detail_displayOptions_layout.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get diveLog_detail_displayOptions_layout;
+
+  /// No description provided for @diveLog_detail_displayOptions_sections.
+  ///
+  /// In en, this message translates to:
+  /// **'Sections'**
+  String get diveLog_detail_displayOptions_sections;
+
+  /// No description provided for @diveLog_detail_displayOptions_showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sections'**
+  String get diveLog_detail_displayOptions_showAll;
+
+  /// No description provided for @diveLog_detail_displayOptions_reorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder sections...'**
+  String get diveLog_detail_displayOptions_reorder;
+
+  /// No description provided for @diveDetailLayout_detailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed'**
+  String get diveDetailLayout_detailed;
+
+  /// No description provided for @diveDetailLayout_list.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get diveDetailLayout_list;
 
   /// No description provided for @diveDetailSection_safetyReview_name.
   ///
@@ -26296,12 +26410,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dropbox account'**
   String get settings_cloudSync_dropbox_account_title;
-
-  /// No description provided for @settings_cloudSync_dropbox_connect_browserFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Could not open your browser. Try the Reopen browser button.'**
-  String get settings_cloudSync_dropbox_connect_browserFailed;
 
   /// No description provided for @settings_cloudSync_dropbox_connect_codeLabel.
   ///
@@ -34316,6 +34424,24 @@ abstract class AppLocalizations {
   /// **'This format is not yet supported. Please export as UDDF or CSV.'**
   String get universalImport_error_unsupportedFormat;
 
+  /// Warning on the review step when duplicate detection failed and the incoming rows were left unmarked
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.'**
+  String get universalImport_error_duplicateCheckFailed;
+
+  /// Shown on the column mapping step when the file produced no columns to map
+  ///
+  /// In en, this message translates to:
+  /// **'This file has no columns to map. Go back and select the file again, or choose a different source.'**
+  String get universalImport_error_noColumnsToMap;
+
+  /// Error shown when the import wizard could not advance past the current step
+  ///
+  /// In en, this message translates to:
+  /// **'Import could not continue: {details}'**
+  String universalImport_error_stepFailed(Object details);
+
   /// Title for the CSV column mapping step
   ///
   /// In en, this message translates to:
@@ -39671,6 +39797,18 @@ abstract class AppLocalizations {
   /// **'Based on {count} logged dives'**
   String tools_weight_basedOnDives(int count);
 
+  /// No description provided for @tools_weight_bmiHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI {bmi}. A higher BMI usually means more buoyant tissue and a little more lead.'**
+  String tools_weight_bmiHelper(String bmi);
+
+  /// No description provided for @tools_weight_bmiTerm.
+  ///
+  /// In en, this message translates to:
+  /// **'Body composition'**
+  String get tools_weight_bmiTerm;
+
   /// No description provided for @tools_weight_breakdownTitle.
   ///
   /// In en, this message translates to:
@@ -39701,6 +39839,12 @@ abstract class AppLocalizations {
   /// **'{delta} vs previous rig'**
   String tools_weight_deltaVsPrevious(String delta);
 
+  /// No description provided for @tools_weight_heightOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (optional)'**
+  String get tools_weight_heightOptional;
+
   /// No description provided for @tools_weight_noGear.
   ///
   /// In en, this message translates to:
@@ -39730,6 +39874,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save weight to profile'**
   String get tools_weight_saveToProfile;
+
+  /// No description provided for @tools_weight_source_bodyComposition.
+  ///
+  /// In en, this message translates to:
+  /// **'estimated from BMI'**
+  String get tools_weight_source_bodyComposition;
 
   /// No description provided for @tools_weight_source_measured.
   ///
@@ -55857,6 +56007,12 @@ abstract class AppLocalizations {
   /// **'Download'**
   String get autoUpdate_banner_download;
 
+  /// Shown instead of a Download button when Submersion was installed from a .deb or .rpm, since the system package manager owns the upgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Update with: {command}'**
+  String autoUpdate_banner_packageManagerHint(String command);
+
   /// Subtitle of the iCloud provider tile on the Cloud Sync page.
   ///
   /// In en, this message translates to:
@@ -59337,6 +59493,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contacts permission is required to choose a photo.'**
   String get profilePhoto_error_contactPermission;
+
+  /// No description provided for @diveComputer_merge_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Dive Computers'**
+  String get diveComputer_merge_title;
+
+  /// No description provided for @diveComputer_merge_intro.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.'**
+  String diveComputer_merge_intro(int count);
+
+  /// No description provided for @diveComputer_merge_keepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep this record'**
+  String get diveComputer_merge_keepLabel;
+
+  /// No description provided for @diveComputer_merge_serialLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial {serial}'**
+  String diveComputer_merge_serialLabel(String serial);
+
+  /// No description provided for @diveComputer_merge_noSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'No serial number'**
+  String get diveComputer_merge_noSerial;
+
+  /// No description provided for @diveComputer_merge_affectedDives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives are attached to the other records.} =1{1 dive will move to the record you keep.} other{{count} dives will move to the record you keep.}}'**
+  String diveComputer_merge_affectedDives(int count);
+
+  /// No description provided for @diveComputer_merge_serialMismatchWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'These records report different serial numbers. They may be different physical computers.'**
+  String get diveComputer_merge_serialMismatchWarning;
+
+  /// No description provided for @diveComputer_merge_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_merge_action;
+
+  /// No description provided for @diveComputer_merge_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 record merged into {name}} other{{count} records merged into {name}}}'**
+  String diveComputer_merge_snackbar(int count, String name);
+
+  /// No description provided for @diveComputer_merge_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not merge computers: {error}'**
+  String diveComputer_merge_failed(String error);
+
+  /// No description provided for @diveComputer_list_selection_mergeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge computers'**
+  String get diveComputer_list_selection_mergeTooltip;
+
+  /// No description provided for @diveComputer_detail_mergeMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with another computer'**
+  String get diveComputer_detail_mergeMenu;
+
+  /// No description provided for @diveComputer_detail_mergePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with'**
+  String get diveComputer_detail_mergePickerTitle;
+
+  /// No description provided for @diveComputer_detail_mergePickerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no other computers to merge with.'**
+  String get diveComputer_detail_mergePickerEmpty;
+
+  /// No description provided for @diveComputer_detail_mergePickerSameSerial.
+  ///
+  /// In en, this message translates to:
+  /// **'Same serial number'**
+  String get diveComputer_detail_mergePickerSameSerial;
+
+  /// No description provided for @diveComputer_detail_duplicateBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} reports the same serial number. It may be this computer saved twice.'**
+  String diveComputer_detail_duplicateBanner(String name);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerMultiple.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} other saved records report the same serial number. They may be this computer saved more than once.'**
+  String diveComputer_detail_duplicateBannerMultiple(int count);
+
+  /// No description provided for @diveComputer_detail_duplicateBannerAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get diveComputer_detail_duplicateBannerAction;
 }
 
 class _AppLocalizationsDelegate

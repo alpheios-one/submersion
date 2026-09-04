@@ -9,6 +9,19 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      '无法打开浏览器。请使用“复制链接”，并将地址粘贴到浏览器中。';
+
+  @override
+  String get settings_oauth_connect_copyFailed => '无法复制链接。';
+
+  @override
+  String get settings_oauth_connect_copyLink => '复制链接';
+
+  @override
+  String get settings_oauth_connect_linkCopied => '链接已复制。请粘贴到浏览器中进行授权。';
+
+  @override
   String get universalImport_action_importFromGarmin => '从 Garmin 设备导入';
 
   @override
@@ -2253,6 +2266,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_item_type_equipmentSet => '装备套装事项';
 
   @override
+  String get preDive_item_type_equipment => '装备项目';
+
+  @override
   String get preDive_item_valueLabel => '数值标签';
 
   @override
@@ -2426,6 +2442,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => '无';
+
+  @override
+  String get preDive_start_noEquipment => '无';
 
   @override
   String get preDive_start_begin => '开始';
@@ -7326,6 +7345,34 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_sources_splitFailed => '拆分失败';
+
+  @override
+  String get diveLog_sources_menu_separate => '拆分合并的潜水';
+
+  @override
+  String get diveLog_sources_separateDialog_title => '要拆分合并的潜水吗？';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return '本次潜水由 $count 次潜水合并而成。每次潜水的剖面、事件、气瓶和换气记录都会回到各自的潜水中。日志条目的其余部分，包括潜伴、标签、装备、媒体、备注和潜水编号，仍保留在本次潜水中。';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => '拆分';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已恢复 $count 次潜水',
+      one: '已恢复 $count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => '无法拆分这次潜水';
 
   @override
   String get divePlanner_action_addTank => '添加气瓶';
@@ -13006,9 +13053,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_photoViewer_diveDataWrittenToPhoto => '潜水数据已写入照片';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo => '潜水数据已写入视频';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return '加载照片出错：$error';
   }
@@ -13167,16 +13211,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_descriptionPhoto => '以下元数据将写入照片：';
 
   @override
-  String get media_writeMetadata_descriptionVideo => '以下元数据将写入视频：';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => '潜水时间';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo => '保留原始视频';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13195,14 +13233,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => '写入潜水数据到照片';
 
   @override
-  String get media_writeMetadata_titleVideo => '写入潜水数据到视频';
+  String get media_writeMetadata_videoUnsupported => '潜水数据只能写入照片，不能写入视频。';
 
   @override
   String get media_writeMetadata_warningPhotoText => '这将修改原始照片。';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      '将创建包含元数据的新视频。视频元数据无法就地修改。';
 
   @override
   String get media_writeMetadata_writeButton => '写入';
@@ -14126,17 +14160,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_diveDetailSections_resetToDefault => '恢复默认';
 
   @override
-  String get settings_diveDetailSections_fixedSections => '固定区块：头部信息、潜水轮廓图';
+  String get settings_diveDetailSections_fixedSections => '固定区块：头部信息';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       '可配置区块（拖动以重新排序）';
 
   @override
-  String get diveDetailSection_decoO2_name => '减压状态 / 组织负荷';
+  String get diveDetailSection_profile_name => '潜水曲线';
 
   @override
-  String get diveDetailSection_decoO2_description => '免减压极限、上限深度、组织热力图、氧气毒性';
+  String get diveDetailSection_profile_description => '深度/时间图表、回放、区间选择';
+
+  @override
+  String get diveDetailSection_decoStatus_name => '减压状态';
+
+  @override
+  String get diveDetailSection_decoStatus_description => '免减压极限、上限深度、减压停留、氧气毒性';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => '组织负荷';
+
+  @override
+  String get diveDetailSection_tissueLoading_description => '各组织仓饱和度与热力图';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => '显示选项';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => '布局';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => '分区';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => '显示所有分区';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => '重新排序分区…';
+
+  @override
+  String get diveDetailLayout_detailed => '详细';
+
+  @override
+  String get diveDetailLayout_list => '列表';
 
   @override
   String get diveDetailSection_safetyReview_name => '安全回顾';
@@ -15108,10 +15175,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Dropbox 账户';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      '无法打开浏览器。请尝试“重新打开浏览器”按钮。';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => '授权码';
@@ -19710,6 +19773,19 @@ class AppLocalizationsZh extends AppLocalizations {
       '暂不支持此格式。请导出为 UDDF 或 CSV。';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      '重复检测未能运行，因此此列表中没有任何条目被标记为日志中已存在。导入前请先核对列表。';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      '此文件没有可映射的列。请返回重新选择文件，或改用其他来源。';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return '导入无法继续：$details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => '列映射';
 
   @override
@@ -22895,6 +22971,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi。BMI 越高通常意味着浮力组织越多，需要的配重略多。';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => '身体成分';
+
+  @override
   String get tools_weight_breakdownTitle => '计算方式';
 
   @override
@@ -22912,6 +22996,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => '身高（可选）';
+
+  @override
   String get tools_weight_noGear => '添加计划使用的装备以获得个性化预测。';
 
   @override
@@ -22925,6 +23012,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => '将体重保存到个人资料';
+
+  @override
+  String get tools_weight_source_bodyComposition => '根据 BMI 估算';
 
   @override
   String get tools_weight_source_measured => '根据您的潜水测得';
@@ -31914,6 +32004,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoUpdate_banner_download => '下载';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return '更新命令：$command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       '通过 Apple iCloud 同步';
 
@@ -34006,4 +34101,85 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get profilePhoto_error_contactPermission => '选择照片需要通讯录访问权限。';
+
+  @override
+  String get diveComputer_merge_title => '合并潜水电脑';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count 条记录将合并为一条。潜水、剖面和下载历史会移到你保留的记录中，其余记录将被删除。';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => '保留此记录';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return '序列号 $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => '无序列号';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水将移到保留的记录中。',
+      one: '1 次潜水将移到保留的记录中。',
+      zero: '其他记录没有关联的潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning => '这些记录的序列号不同，可能是不同的设备。';
+
+  @override
+  String get diveComputer_merge_action => '合并';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已将 $count 条记录合并到 $name',
+      one: '已将 1 条记录合并到 $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return '无法合并潜水电脑：$error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => '合并潜水电脑';
+
+  @override
+  String get diveComputer_detail_mergeMenu => '与其他潜水电脑合并';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => '合并到';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty => '没有其他可合并的潜水电脑。';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => '序列号相同';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name 的序列号与此相同，可能是同一台潜水电脑被保存了两次。';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '另有 $count 条已保存记录的序列号与此相同，可能是同一台潜水电脑被保存了多次。';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => '合并';
 }

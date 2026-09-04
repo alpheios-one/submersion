@@ -9,6 +9,21 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'No se pudo abrir el navegador. Usa Copiar enlace y pega la dirección en tu navegador.';
+
+  @override
+  String get settings_oauth_connect_copyFailed =>
+      'No se pudo copiar el enlace.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Copiar enlace';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Enlace copiado. Pégalo en tu navegador para autorizar.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Importar desde dispositivo Garmin';
 
@@ -2396,6 +2411,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elementos del conjunto de equipo';
 
   @override
+  String get preDive_item_type_equipment => 'Elemento de equipo';
+
+  @override
   String get preDive_item_valueLabel => 'Etiqueta del valor';
 
   @override
@@ -2573,6 +2591,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'Ninguno';
+
+  @override
+  String get preDive_start_noEquipment => 'Ninguno';
 
   @override
   String get preDive_start_begin => 'Comenzar';
@@ -7696,6 +7717,36 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveLog_sources_splitFailed => 'Error al separar';
+
+  @override
+  String get diveLog_sources_menu_separate => 'Separar inmersiones combinadas';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      '¿Separar las inmersiones combinadas?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'Esta inmersión se combinó a partir de $count inmersiones. El perfil, los eventos, los tanques y los cambios de gas de cada una vuelven a su propia inmersión. El resto de la entrada del cuaderno, incluidos los compañeros, las etiquetas, el equipo, los archivos multimedia, las notas y el número de inmersión, permanece en esta inmersión.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separar';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones restauradas',
+      one: '1 inmersión restaurada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'No se pudo separar esta inmersión';
 
   @override
   String get divePlanner_action_addTank => 'Agregar Botella';
@@ -13646,10 +13697,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Datos de inmersion escritos en la foto';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Datos de inmersion escritos en el video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Error al cargar fotos: $error';
   }
@@ -13820,18 +13867,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los siguientes metadatos se escribiran en la foto:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'Los siguientes metadatos se escribiran en el video:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Hora de inmersion';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo =>
-      'Conservar video original';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13852,16 +13891,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escribir datos de inmersion en la foto';
 
   @override
-  String get media_writeMetadata_titleVideo =>
-      'Escribir datos de inmersion en el video';
+  String get media_writeMetadata_videoUnsupported =>
+      'Los datos de buceo solo se pueden escribir en fotos, no en vídeos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
       'Esto modificara la foto original.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'Se creara un nuevo video con los metadatos. Los metadatos del video no se pueden modificar en su lugar.';
 
   @override
   String get media_writeMetadata_writeButton => 'Escribir';
@@ -14830,18 +14865,55 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_diveDetailSections_fixedSections =>
-      'Secciones fijas: Encabezado, Grafico de Perfil de Inmersion';
+      'Seccion fija: Encabezado';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'Secciones configurables (arrastra para reordenar)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'Estado Deco / Carga de Tejidos';
+  String get diveDetailSection_profile_name => 'Perfil de buceo';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, techo, mapa de calor de tejidos, toxicidad de O2';
+  String get diveDetailSection_profile_description =>
+      'Gráfico de profundidad/tiempo, reproducción, selección de rango';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'Estado de deco';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, techo, paradas, toxicidad de O2';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'Carga tisular';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'Saturación por compartimento y mapa de calor';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip =>
+      'Opciones de visualización';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'Diseño';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'Secciones';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll =>
+      'Mostrar todas las secciones';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'Reordenar secciones…';
+
+  @override
+  String get diveDetailLayout_detailed => 'Detallada';
+
+  @override
+  String get diveDetailLayout_list => 'Lista';
 
   @override
   String get diveDetailSection_safetyReview_name => 'Revisión de seguridad';
@@ -15889,10 +15961,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Cuenta de Dropbox';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'No se pudo abrir el navegador. Prueba el botón Reabrir navegador.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
@@ -20811,6 +20879,19 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este formato aún no es compatible. Por favor exporta como UDDF o CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'No se pudo ejecutar la detección de duplicados, por lo que nada de esta lista está marcado como ya presente en tu cuaderno. Revísala antes de importar.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'Este archivo no tiene columnas que asignar. Vuelve atrás y selecciona el archivo de nuevo, o elige otra fuente.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'No se pudo continuar la importación: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Mapeo de Columnas';
 
   @override
@@ -24171,6 +24252,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'IMC $bmi. Un IMC más alto suele significar más tejido flotante y un poco más de lastre.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Composición corporal';
+
+  @override
   String get tools_weight_breakdownTitle => 'Cómo se calculó';
 
   @override
@@ -24188,6 +24277,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Estatura (opcional)';
+
+  @override
   String get tools_weight_noGear =>
       'Añade el equipo con el que vas a bucear para personalizar la predicción.';
 
@@ -24202,6 +24294,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Guardar peso en el perfil';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'estimado a partir del IMC';
 
   @override
   String get tools_weight_source_measured => 'medido de tus inmersiones';
@@ -33914,6 +34009,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get autoUpdate_banner_download => 'Descargar';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'Actualiza con: $command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       'Sincronizar mediante Apple iCloud';
 
@@ -36181,4 +36281,88 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'Se necesita permiso de contactos para elegir una foto.';
+
+  @override
+  String get diveComputer_merge_title => 'Combinar ordenadores de buceo';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count registros pasarán a ser uno. Las inmersiones, los perfiles y el historial de descargas se moverán al registro que conserves. Los demás registros se eliminarán.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Conservar este registro';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Número de serie $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'Sin número de serie';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones se moverán al registro que conserves.',
+      one: '1 inmersión se moverá al registro que conserves.',
+      zero: 'Los otros registros no tienen inmersiones asociadas.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'Estos registros indican números de serie distintos. Podrían ser ordenadores físicos diferentes.';
+
+  @override
+  String get diveComputer_merge_action => 'Combinar';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count registros combinados en $name',
+      one: '1 registro combinado en $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'No se pudieron combinar los ordenadores: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Combinar ordenadores';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Combinar con otro ordenador';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Combinar con';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'No hay otros ordenadores con los que combinar.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial =>
+      'Mismo número de serie';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name indica el mismo número de serie. Puede que este ordenador esté guardado dos veces.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return 'Otros $count registros guardados indican el mismo número de serie. Puede que este ordenador esté guardado más de una vez.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Combinar';
 }

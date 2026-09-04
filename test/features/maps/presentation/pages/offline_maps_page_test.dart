@@ -64,7 +64,7 @@ class _UnreadableTileCache implements TileCacheService {
 
   @override
   Future<int> pruneOrphanRegionStores({
-    required Set<String> knownRegionIds,
+    required Future<Set<String>> Function() readKnownRegionIds,
   }) async => 0;
 
   @override
@@ -80,11 +80,17 @@ class _FailingTileCache implements TileCacheService {
       throw StateError('store is locked');
 
   @override
+  Future<void> cancelDownload() async {}
+
+  @override
+  Future<void> clearCache() async {}
+
+  @override
   Future<Set<String>> getRegionStoreIds() async => {'owns'};
 
   @override
   Future<int> pruneOrphanRegionStores({
-    required Set<String> knownRegionIds,
+    required Future<Set<String>> Function() readKnownRegionIds,
   }) async => 0;
 
   @override
@@ -215,6 +221,51 @@ void main() {
     await tester.pump();
     await tester.pump();
     await tester.tap(find.text('Delete'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('store is locked'), findsOneWidget);
+    expect(repository.regions, hasLength(1));
+  });
+
+  testWidgets('a clear that could not free everything says so', (tester) async {
+    // Clearing one region at a time means a locked store leaves that region
+    // behind while the rest go. Without a message the diver reads that as
+    // "Clear all" quietly refusing to clear all.
+    final base = await getBaseOverrides();
+    final repository = _FakeRepository([_region(id: 'owns', name: 'Cozumel')]);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          offlineMapRepositoryProvider.overrideWithValue(repository),
+          tileCacheServiceProvider.overrideWithValue(_FailingTileCache()),
+          cacheStatsProvider.overrideWith(
+            (ref) async => const CacheStats(
+              tileCount: 900,
+              sizeKiB: 8000,
+              hits: 10,
+              misses: 2,
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: OfflineMapsPage(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Clear All Cache'));
+    await tester.pump();
+    await tester.pump();
+    await tester.tap(find.text('Clear All'));
     await tester.pump();
     await tester.pump();
 

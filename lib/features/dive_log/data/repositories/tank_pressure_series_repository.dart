@@ -279,6 +279,26 @@ class TankPressureSeriesRepository {
   Future<int> clearComputer(String computerId, {int? now}) =>
       _setComputer(null, (t) => t.computerId.equals(computerId), now: now);
 
+  /// Moves every series of [fromComputerIds] onto [toComputerId] and restamps
+  /// each, for a dive computer merge (#645). Returns the number touched.
+  ///
+  /// Notifies nothing: `_setComputer` here never touches the sync bus (unlike
+  /// its profile-series twin, which takes a `notify` switch for this reason).
+  /// The merge runs this inside its own transaction and notifies once after
+  /// commit, so a notification here would publish uncommitted rows.
+  Future<int> repointComputer(
+    List<String> fromComputerIds,
+    String toComputerId, {
+    int? now,
+  }) {
+    if (fromComputerIds.isEmpty) return Future.value(0);
+    return _setComputer(
+      toComputerId,
+      (t) => t.computerId.isIn(fromComputerIds),
+      now: now,
+    );
+  }
+
   /// Diver reassignment: a computer that now belongs to [diverId] must not
   /// stay attributed on dives the diver does not own.
   Future<int> clearComputersOfDiverForForeignDives(

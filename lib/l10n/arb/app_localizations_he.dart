@@ -9,6 +9,20 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'לא ניתן להעתיק את הקישור.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'העתקת קישור';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'הקישור הועתק. הדבק אותו בדפדפן שלך כדי לאשר.';
+
+  @override
   String get universalImport_action_importFromGarmin => 'ייבוא מהתקן Garmin';
 
   @override
@@ -2321,6 +2335,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'פריטי סט ציוד';
 
   @override
+  String get preDive_item_type_equipment => 'פריט ציוד';
+
+  @override
   String get preDive_item_valueLabel => 'תווית ערך';
 
   @override
@@ -2499,6 +2516,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'ללא';
+
+  @override
+  String get preDive_start_noEquipment => 'ללא';
 
   @override
   String get preDive_start_begin => 'התחל';
@@ -7502,6 +7522,36 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_sources_splitFailed => 'הפיצול נכשל';
+
+  @override
+  String get diveLog_sources_menu_separate => 'הפרדת צלילות ממוזגות';
+
+  @override
+  String get diveLog_sources_separateDialog_title =>
+      'להפריד את הצלילות הממוזגות?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'הצלילה הזו מוזגה מ-$count צלילות. הפרופיל, האירועים, הבלונים והחלפות הגז של כל אחת יחזרו לצלילה שלה. שאר רשומת היומן, ובכללה השותפים, התגיות, הציוד, המדיה, ההערות ומספר הצלילה, תישאר בצלילה הזו.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'הפרדה';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות שוחזרו',
+      one: 'צלילה אחת שוחזרה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed =>
+      'לא ניתן היה להפריד את הצלילה הזו';
 
   @override
   String get divePlanner_action_addTank => 'הוסף מיכל';
@@ -13317,10 +13367,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'נתוני צלילה נכתבו לתמונה';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'נתוני צלילה נכתבו לסרטון';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'שגיאה בטעינת תמונות: $error';
   }
@@ -13483,17 +13529,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'המטא-נתונים הבאים ייכתבו לתמונה:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'המטא-נתונים הבאים ייכתבו לסרטון:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'זמן צלילה';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo => 'שמור סרטון מקורי';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13513,15 +13552,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'כתוב נתוני צלילה לתמונה';
 
   @override
-  String get media_writeMetadata_titleVideo => 'כתוב נתוני צלילה לסרטון';
+  String get media_writeMetadata_videoUnsupported =>
+      '‏ניתן לכתוב נתוני צלילה רק לתמונות, לא לסרטונים.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
       'פעולה זו תשנה את התמונה המקורית.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'ייווצר סרטון חדש עם המטא-נתונים. לא ניתן לשנות מטא-נתונים של סרטון במקום.';
 
   @override
   String get media_writeMetadata_writeButton => 'כתוב';
@@ -14469,19 +14505,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_diveDetailSections_resetToDefault => 'איפוס לברירת מחדל';
 
   @override
-  String get settings_diveDetailSections_fixedSections =>
-      'סעיפים קבועים: כותרת, תרשים פרופיל צלילה';
+  String get settings_diveDetailSections_fixedSections => 'סעיף קבוע: כותרת';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'סעיפים הניתנים להגדרה (גרור לסידור מחדש)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'סטטוס דקו / עומס רקמות';
+  String get diveDetailSection_profile_name => 'פרופיל הצלילה';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, תקרה, מפת חום של רקמות, רעילות O2';
+  String get diveDetailSection_profile_description =>
+      'גרף עומק/זמן, נגינה, בחירת טווח';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'סטטוס דקו';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, תקרה, עצירות, רעילות O2';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'עומס רקמות';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'רוויה לפי תא ומפת חום';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'אפשרויות תצוגה';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'פריסה';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'מקטעים';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'הצג את כל המקטעים';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'שינוי סדר המקטעים…';
+
+  @override
+  String get diveDetailLayout_detailed => 'מפורט';
+
+  @override
+  String get diveDetailLayout_list => 'רשימה';
 
   @override
   String get diveDetailSection_safetyReview_name => 'סקירת בטיחות';
@@ -15498,10 +15568,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'חשבון Dropbox';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'לא ניתן לפתוח את הדפדפן. נסה את כפתור פתח מחדש את הדפדפן.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel => 'קוד הרשאה';
@@ -20270,6 +20336,19 @@ class AppLocalizationsHe extends AppLocalizations {
       'פורמט זה אינו נתמך עדיין. נא לייצא כ-UDDF או CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'לא ניתן היה להריץ זיהוי כפילויות, ולכן שום פריט ברשימה הזו אינו מסומן כקיים כבר ביומן. בדוק את הרשימה לפני הייבוא.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'לקובץ הזה אין עמודות למיפוי. חזור אחורה ובחר את הקובץ שוב, או בחר מקור אחר.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'לא ניתן להמשיך בייבוא: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'מיפוי עמודות';
 
   @override
@@ -23552,6 +23631,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. BMI גבוה יותר בדרך כלל אומר יותר רקמה צפה ומעט יותר משקולות.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'הרכב גוף';
+
+  @override
   String get tools_weight_breakdownTitle => 'כיצד זה חושב';
 
   @override
@@ -23569,6 +23656,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'גובה (אופציונלי)';
+
+  @override
   String get tools_weight_noGear =>
       'הוסף את הציוד שאיתו תצלול כדי להתאים אישית את החיזוי.';
 
@@ -23583,6 +23673,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'שמור משקל בפרופיל';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'מוערך לפי BMI';
 
   @override
   String get tools_weight_source_measured => 'נמדד מהצלילות שלך';
@@ -33222,6 +33315,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get autoUpdate_banner_download => 'הורדה';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'עדכן עם: $command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       'סנכרון באמצעות Apple iCloud';
 
@@ -35423,4 +35521,86 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get profilePhoto_error_contactPermission =>
       'נדרשת הרשאת גישה לאנשי הקשר כדי לבחור תמונה.';
+
+  @override
+  String get diveComputer_merge_title => 'מיזוג מחשבי צלילה';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count רשומות יהפכו לאחת. הצלילות, הפרופילים והיסטוריית ההורדות יעברו לרשומה שתשמור. שאר הרשומות יימחקו.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'לשמור רשומה זו';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'מספר סידורי $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'אין מספר סידורי';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות יעברו לרשומה שתישמר.',
+      one: 'צלילה אחת תעבור לרשומה שתישמר.',
+      zero: 'לא משויכות צלילות לרשומות האחרות.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'רשומות אלו מדווחות על מספרים סידוריים שונים. ייתכן שמדובר במחשבים שונים.';
+
+  @override
+  String get diveComputer_merge_action => 'מיזוג';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count רשומות מוזגו לתוך $name',
+      one: 'רשומה אחת מוזגה לתוך $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'לא ניתן למזג את המחשבים: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'מיזוג מחשבים';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'מיזוג עם מחשב אחר';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'מיזוג עם';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty => 'אין מחשבים אחרים למיזוג.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'אותו מספר סידורי';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name מדווח על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר פעמיים.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count רשומות שמורות נוספות מדווחות על אותו מספר סידורי. ייתכן שזהו אותו מחשב שנשמר יותר מפעם אחת.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'מיזוג';
 }

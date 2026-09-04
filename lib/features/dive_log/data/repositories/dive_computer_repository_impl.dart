@@ -19,6 +19,7 @@ import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_sample_units.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
@@ -1113,6 +1114,11 @@ class DiveComputerRepository {
     double? entryLongitude,
     double? exitLatitude,
     double? exitLongitude,
+    // Minimum water temperature the computer reported for the dive as a
+    // whole. Some computers (the Cressi Leonardo among them) log it only in
+    // the dive header and never as a sample, so it cannot be recovered from
+    // the profile points.
+    double? minTemperature,
   }) async {
     try {
       _log.info('Importing profile from computer $computerId');
@@ -1177,7 +1183,7 @@ class DiveComputerRepository {
         // the persisted profile events and their icons are unchanged.
         final decoEventMaps = events
             ?.where((e) => !_nonDecoEventTypes.contains(e.type))
-            .map((e) => _mapEventTypeString(e.type))
+            .map((e) => _mapEventTypeString(e.type, flags: e.flags))
             .whereType<String>()
             .map((type) => {'eventType': type})
             .toList();
@@ -1296,16 +1302,20 @@ class DiveComputerRepository {
         );
 
         // Create a data source record for provenance tracking.
-        // Derive water temp from profile samples when not provided as a
+        // Derive water temp from profile samples when the computer reported no
         // top-level value (e.g. Shearwater); maxCns is derived at the top of
-        // this branch.
+        // this branch. The header value wins where there is one, and a missing
+        // header value never blanks a temperature the samples do carry, which
+        // is the same order re-parse applies (ReparseService._minWaterTemp).
         final sampleTemps = points
             .map((p) => p.temperature)
             .whereType<double>()
             .toList();
-        final minWaterTemp = sampleTemps.isNotEmpty
-            ? sampleTemps.reduce((a, b) => a < b ? a : b)
-            : null;
+        final minWaterTemp =
+            minTemperature ??
+            (sampleTemps.isNotEmpty
+                ? sampleTemps.reduce((a, b) => a < b ? a : b)
+                : null);
 
         final nowDt = DateTime.fromMillisecondsSinceEpoch(now);
         await _db
@@ -1568,7 +1578,10 @@ class DiveComputerRepository {
       if (events != null && events.isNotEmpty) {
         await _db.batch((batch) {
           for (final event in events) {
-            final eventType = _mapEventTypeString(event.type);
+            final eventType = _mapEventTypeString(
+              event.type,
+              flags: event.flags,
+            );
             if (eventType == null) continue;
 
             // Find depth at event time from profile points
@@ -2042,7 +2055,7 @@ class DiveComputerRepository {
   ///
   /// Only maps to values that exist in [ProfileEventType]. Returns null for
   /// unknown event types that should be skipped.
-  String? _mapEventTypeString(String type) {
+  String? _mapEventTypeString(String type, {int? flags}) {
     switch (type) {
       case 'safetystop':
       case 'safetystop_voluntary':
@@ -2050,7 +2063,10 @@ class DiveComputerRepository {
         return 'safetyStopStart';
       case 'deco':
       case 'deepstop':
-        return 'decoStopStart';
+        // libdivecomputer reports the two ends of a stop as one event type
+        // with SAMPLE_FLAGS_BEGIN (1) or SAMPLE_FLAGS_END (2); an event with
+        // neither is a bare marker and reads as the start.
+        return flags == kLibdcSampleFlagsEnd ? 'decoStopEnd' : 'decoStopStart';
       case 'violation':
         return 'decoViolation';
       case 'gaschange':
