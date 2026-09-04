@@ -42,14 +42,21 @@ void main() {
     );
   }
 
-  /// equipment_id carries a real FK, so linking to one requires a row to
-  /// point at.
+  /// Seeds a real equipment row for a template item to link to.
+  ///
+  /// equipment_id is deliberately a plain nullable column with no SQL-level
+  /// foreign key (built-in templates are reseeded on every open, and a real
+  /// FK breaks isolated migration fixtures that omit the equipment table), so
+  /// nothing in the schema forces this row to exist. It is seeded anyway
+  /// because these tests assert the application-level link round-trips
+  /// against a row that genuinely exists.
   Future<void> seedEquipment(String id) async {
     final db = DatabaseService.instance.database;
     final now = DateTime.now().millisecondsSinceEpoch;
     await db.customStatement(
       'INSERT INTO equipment (id, name, type, created_at, updated_at) '
-      "VALUES ('$id', '$id', 'other', $now, $now)",
+      'VALUES (?, ?, ?, ?, ?)',
+      [id, id, 'other', now, now],
     );
   }
 

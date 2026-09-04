@@ -319,6 +319,67 @@ void main() {
       );
       expect(find.text('Service overdue'), findsNothing);
     });
+
+    testWidgets(
+      'a frozen entry is worded against completedAt, not the wall clock: a '
+      'dueDate that was still in the future at freeze time keeps reading '
+      '"Due", however long ago the item was resolved',
+      (tester) async {
+        // The entry was frozen because its dives trigger was overdue, while
+        // its date trigger was not yet due. Reading it against DateTime.now()
+        // would silently reword the snapshot to "Overdue since" once real
+        // time passed dueDate, even though nothing stored changed.
+        await pumpTile(
+          tester,
+          s: session(),
+          it: item(
+            state: PreDiveItemState.done,
+            completedAt: now, // 2023-11-14
+            equipmentId: 'g1',
+            overdueServices: [
+              OverdueServiceEntry(
+                kindName: 'Hydrostatic test',
+                dueDate: DateTime(2024, 6), // after completedAt, before today
+                divesSinceAnchor: 53,
+                divesRemaining: -3,
+              ),
+            ],
+          ),
+        );
+
+        expect(find.text('Service overdue'), findsOneWidget);
+        expect(find.textContaining('Hydrostatic test: Due '), findsOneWidget);
+        expect(find.textContaining('Overdue since'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'a pending item is still worded against the wall clock, so a dueDate '
+      'already in the past reads "Overdue since"',
+      (tester) async {
+        await pumpTile(
+          tester,
+          s: session(),
+          it: item(equipmentId: 'g1'),
+          overrides: [
+            serviceClockStatusesProvider('g1').overrideWith(
+              (ref) async => [
+                ServiceClockStatus(
+                  schedule: overdueStatus.schedule,
+                  kind: overdueStatus.kind,
+                  anchor: now,
+                  dueDate: DateTime(2024, 6),
+                  severity: ServiceClockSeverity.overdue,
+                  now: DateTime(2026, 1, 1),
+                ),
+              ],
+            ),
+          ],
+        );
+
+        expect(find.textContaining('Overdue since'), findsOneWidget);
+      },
+    );
   });
 
   group('tap target', () {

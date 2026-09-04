@@ -37,31 +37,46 @@ class SessionItemTile extends ConsumerWidget {
     required this.onReset,
   });
 
-  /// The item's overdue-service entries to display: live-computed from its
-  /// linked equipment while pending (so the warning tracks the current
-  /// service state up to the moment of decision), or the frozen snapshot
-  /// once resolved (so a later service log entry cannot silently rewrite
-  /// what the diver saw when they made the call).
-  List<OverdueServiceEntry> _overdueEntries(WidgetRef ref) {
+  /// The item's overdue-service entries to display, paired with the instant
+  /// they should be read against: live-computed from its linked equipment
+  /// while pending (so the warning tracks the current service state up to the
+  /// moment of decision), or the frozen snapshot once resolved (so a later
+  /// service log entry cannot silently rewrite what the diver saw when they
+  /// made the call).
+  ///
+  /// The instant matters because [formatServiceTriggerText] decides between
+  /// "Due {date}" and "Overdue since {date}" by comparing it against the
+  /// entry's dueDate. An entry frozen while overdue on its dives or hours
+  /// trigger can still carry a dueDate in the future, so reading a resolved
+  /// item against the wall clock would silently reword the snapshot once that
+  /// date passes. Resolved items therefore read against completedAt, the same
+  /// instant the repository stamped when it froze the snapshot.
+  (List<OverdueServiceEntry>, DateTime) _overdueEntries(WidgetRef ref) {
     if (item.state != PreDiveItemState.pending) {
-      return item.overdueServices ?? const [];
+      return (
+        item.overdueServices ?? const [],
+        item.completedAt ?? DateTime.now(),
+      );
     }
     final equipmentId = item.equipmentId;
-    if (equipmentId == null) return const [];
+    if (equipmentId == null) return (const [], DateTime.now());
     final statuses =
         ref.watch(serviceClockStatusesProvider(equipmentId)).value ?? const [];
-    return [
-      for (final status in statuses)
-        if (status.severity == ServiceClockSeverity.overdue)
-          OverdueServiceEntry.fromStatus(status),
-    ];
+    return (
+      [
+        for (final status in statuses)
+          if (status.severity == ServiceClockSeverity.overdue)
+            OverdueServiceEntry.fromStatus(status),
+      ],
+      DateTime.now(),
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final l10n = context.l10n;
-    final overdueEntries = _overdueEntries(ref);
+    final (overdueEntries, overdueAsOf) = _overdueEntries(ref);
     final actionable = ChecklistSessionEngine.isItemActionable(
       session,
       sortedItems,
@@ -123,7 +138,8 @@ class SessionItemTile extends ConsumerWidget {
         ),
         for (final entry in overdueEntries)
           Text(
-            '${entry.kindName}: ${formatServiceTriggerText(context, now: DateTime.now(), dueDate: entry.dueDate, divesSinceAnchor: entry.divesSinceAnchor, divesRemaining: entry.divesRemaining, hoursSinceAnchor: entry.hoursSinceAnchor, hoursRemaining: entry.hoursRemaining)}',
+            '${entry.kindName}: '
+            '${formatServiceTriggerText(context, now: overdueAsOf, dueDate: entry.dueDate, divesSinceAnchor: entry.divesSinceAnchor, divesRemaining: entry.divesRemaining, hoursSinceAnchor: entry.hoursSinceAnchor, hoursRemaining: entry.hoursRemaining)}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.error,
             ),

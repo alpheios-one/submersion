@@ -26,6 +26,7 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
     double? valueNumber,
     String? note,
     List<OverdueServiceEntry>? overdueServices,
+    bool freezeOverdueServices = false,
   }) {
     return ref
         .read(preDiveSessionRepositoryProvider)
@@ -35,12 +36,17 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
           state: state,
           valueNumber: valueNumber,
           note: note,
-          // A transition to pending always clears the frozen snapshot
-          // server-side regardless of what is passed, so pass through the
-          // item's existing value here -- it only matters for a call that
-          // leaves the item resolved (a note/value edit that keeps the
-          // current state), where it must survive untouched.
-          overdueServices: overdueServices ?? item.overdueServices,
+          // Only a resolving call overwrites the snapshot, and it may
+          // legitimately write null (an item with no linked equipment has
+          // nothing to freeze). A plain `??` fallback could not express that,
+          // so the intent is carried by the flag rather than by the value.
+          // Every other call passes the item's existing snapshot straight
+          // through: a transition to pending clears it repository-side
+          // regardless, and a note or value edit that leaves the item
+          // resolved must leave the snapshot untouched.
+          overdueServices: freezeOverdueServices
+              ? overdueServices
+              : item.overdueServices,
         );
   }
 
@@ -63,15 +69,21 @@ class PreDiveSessionRunnerPage extends ConsumerWidget {
       valueNumber: valueNumber,
       note: note,
       overdueServices: overdueServices,
+      freezeOverdueServices: true,
     );
   }
 
-  Future<List<OverdueServiceEntry>> _overdueEntriesFor(
+  /// The item's currently overdue service clocks, or null when the item has
+  /// no linked equipment. Null and empty are deliberately different: null
+  /// means there was nothing to check, while an empty list means the linked
+  /// equipment was checked and nothing was overdue. Collapsing the two would
+  /// store a snapshot for every unlinked item and lose that distinction.
+  Future<List<OverdueServiceEntry>?> _overdueEntriesFor(
     WidgetRef ref,
     PreDiveSessionItem item,
   ) async {
     final equipmentId = item.equipmentId;
-    if (equipmentId == null) return const [];
+    if (equipmentId == null) return null;
     final statuses = await ref.read(
       serviceClockStatusesProvider(equipmentId).future,
     );

@@ -359,6 +359,46 @@ void main() {
     },
   );
 
+  testWidgets(
+    'resolving an item with no linked equipment writes a null snapshot, not '
+    'an empty one',
+    (tester) async {
+      // Null and empty are different: null means there was nothing to check,
+      // empty means the linked equipment was checked and came back clean.
+      // Freezing an empty list for every unlinked item would erase that.
+      final repo = await pumpRunner(tester, s: session(), items: [item(0)]);
+
+      await tester.tap(find.text('Item 0'));
+      await tester.pumpAndSettle();
+
+      final call = repo.calls.single;
+      expect(call.state, PreDiveItemState.done);
+      expect(call.overdueServices, isNull);
+    },
+  );
+
+  testWidgets(
+    'resolving an equipment-linked item with no overdue clocks writes an '
+    'empty snapshot, not null',
+    (tester) async {
+      final repo = await pumpRunner(
+        tester,
+        s: session(),
+        items: [item(0, equipmentId: 'g1')],
+        extraOverrides: [
+          serviceClockStatusesProvider('g1').overrideWith((ref) async => []),
+        ],
+      );
+
+      await tester.tap(find.text('Item 0'));
+      await tester.pumpAndSettle();
+
+      final call = repo.calls.single;
+      expect(call.state, PreDiveItemState.done);
+      expect(call.overdueServices, isEmpty);
+    },
+  );
+
   testWidgets('Skip menu action records a skipped state', (tester) async {
     final repo = await pumpRunner(
       tester,
