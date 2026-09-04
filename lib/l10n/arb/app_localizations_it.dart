@@ -10189,13 +10189,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Layout conforme al formato logbook PADI';
 
   @override
-  String get enum_pdfTemplate_professional => 'Professionale';
-
-  @override
-  String get enum_pdfTemplate_professional_description =>
-      'Aree per firma e timbro per la verifica';
-
-  @override
   String get enum_pdfTemplate_simple => 'Semplice';
 
   @override
@@ -19773,6 +19766,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Aggiungi le immagini delle tessere certificazione scansionate al PDF';
 
   @override
+  String get transfer_pdfExport_includeVerificationAreas =>
+      'Includi aree di verifica';
+
+  @override
+  String get transfer_pdfExport_includeVerificationAreasSubtitle =>
+      'Aggiungi caselle timbro e firma per la verifica';
+
+  @override
   String get transfer_pdfExport_pageSizeA4 => 'A4';
 
   @override
@@ -19810,13 +19811,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get transfer_pdfExport_templatePadiStyleDesc =>
       'Layout corrispondente al formato logbook PADI';
-
-  @override
-  String get transfer_pdfExport_templateProfessional => 'Professionale';
-
-  @override
-  String get transfer_pdfExport_templateProfessionalDesc =>
-      'Aree per firma e timbro per la verifica';
 
   @override
   String transfer_pdfExport_templateSemanticLabel(Object templateName) {
@@ -34905,6 +34899,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_export_progress_loadingSignatures =>
       'Caricamento delle firme...';
+
+  @override
+  String get settings_export_progress_loadingProfiles =>
+      'Caricamento dei profili di immersione...';
 
   @override
   String get settings_export_progress_loadingCertifications =>

@@ -9717,12 +9717,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_pdfTemplate_padiStyle_description => '匹配 PADI 潜水日志格式的布局';
 
   @override
-  String get enum_pdfTemplate_professional => '专业';
-
-  @override
-  String get enum_pdfTemplate_professional_description => '包含签名和盖章区域用于验证';
-
-  @override
   String get enum_pdfTemplate_simple => '简洁';
 
   @override
@@ -18736,6 +18730,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_pdfExport_includeCertCardsSubtitle => '将扫描的证书卡片图片添加到 PDF';
 
   @override
+  String get transfer_pdfExport_includeVerificationAreas => '包含验证区域';
+
+  @override
+  String get transfer_pdfExport_includeVerificationAreasSubtitle =>
+      '添加机构验证所需的印章和签名框';
+
+  @override
   String get transfer_pdfExport_pageSizeA4 => 'A4';
 
   @override
@@ -18770,12 +18771,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transfer_pdfExport_templatePadiStyleDesc => '匹配 PADI 潜水日志格式的布局';
-
-  @override
-  String get transfer_pdfExport_templateProfessional => '专业';
-
-  @override
-  String get transfer_pdfExport_templateProfessionalDesc => '用于验证的签名和印章区域';
 
   @override
   String transfer_pdfExport_templateSemanticLabel(Object templateName) {
@@ -32861,6 +32856,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_export_progress_loadingSignatures => '正在加载签名...';
+
+  @override
+  String get settings_export_progress_loadingProfiles => '正在加载潜水剖面...';
 
   @override
   String get settings_export_progress_loadingCertifications => '正在加载证书...';

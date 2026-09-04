@@ -10113,13 +10113,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Lay-out volgens PADI logboekformaat';
 
   @override
-  String get enum_pdfTemplate_professional => 'Professioneel';
-
-  @override
-  String get enum_pdfTemplate_professional_description =>
-      'Handtekening- en stempelvelden voor verificatie';
-
-  @override
   String get enum_pdfTemplate_simple => 'Eenvoudig';
 
   @override
@@ -19607,6 +19600,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gescande certificeringskaartafbeeldingen aan de PDF toevoegen';
 
   @override
+  String get transfer_pdfExport_includeVerificationAreas =>
+      'Verificatievelden toevoegen';
+
+  @override
+  String get transfer_pdfExport_includeVerificationAreasSubtitle =>
+      'Stempel- en handtekeningvakken voor verificatie toevoegen';
+
+  @override
   String get transfer_pdfExport_pageSizeA4 => 'A4';
 
   @override
@@ -19644,13 +19645,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get transfer_pdfExport_templatePadiStyleDesc =>
       'Lay-out overeenkomstig PADI-logboekformaat';
-
-  @override
-  String get transfer_pdfExport_templateProfessional => 'Professioneel';
-
-  @override
-  String get transfer_pdfExport_templateProfessionalDesc =>
-      'Handtekening- en stempelvelden voor verificatie';
 
   @override
   String transfer_pdfExport_templateSemanticLabel(Object templateName) {
@@ -34662,6 +34656,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_export_progress_loadingSignatures =>
       'Handtekeningen laden...';
+
+  @override
+  String get settings_export_progress_loadingProfiles =>
+      'Duikprofielen laden...';
 
   @override
   String get settings_export_progress_loadingCertifications =>
