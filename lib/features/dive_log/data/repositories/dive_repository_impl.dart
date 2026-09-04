@@ -12,6 +12,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_times_sql.dart';
+import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
 import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 import 'package:submersion/features/dive_log/data/services/data_source_strand.dart';
@@ -4860,6 +4861,57 @@ class DiveRepository {
     return _mergedSeriesPoints(diveId);
   }
 
+  /// Merged profiles for many dives, keyed by dive id.
+  ///
+  /// The batch form of [getMergedProfile], for the PDF exporter: [getAllDives]
+  /// skips profile hydration for performance, so a logbook export has to load
+  /// profiles itself, and doing that one dive at a time is an N+1 query.
+  ///
+  /// Deliberately not the `primaryOnly` read. That keeps only `is_primary`
+  /// series, and per #623 a file-imported dive can end up with no primary
+  /// series at all, which would render a blank chart for exactly the dives
+  /// imported from another logbook. Sharing [_pointsForSeries] with
+  /// [getMergedProfile] is what keeps the export and the on-screen chart on
+  /// the same samples: every source, minus the originals a saved edit
+  /// superseded.
+  ///
+  /// Dives with no samples are absent from the result rather than mapped to an
+  /// empty list. [ProfileSeriesRepository.getSeriesForDives] chunks the id
+  /// list so the `IN` clause stays bounded, but the returned map still holds
+  /// every sample of every id passed in: a caller that cares about peak memory
+  /// should call this in batches and reduce each batch before requesting the
+  /// next (see `_buildLogbookPdfBytes`).
+  Future<Map<String, List<domain.DiveProfilePoint>>> getMergedProfilesForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return {};
+
+    final byDive = await _profileSeries.getSeriesForDives(diveIds);
+
+    // The primary-source read is the only SQL the per-dive merge performs, and
+    // only for mixed-source dives. Batching it here keeps the loop below free
+    // of round trips, so a bulk export costs two statements rather than one
+    // per dive.
+    final primaries = await _primarySourceComputers([
+      for (final entry in byDive.entries)
+        if (_needsPrimarySource(entry.value)) entry.key,
+    ]);
+
+    final result = <String, List<domain.DiveProfilePoint>>{};
+    for (final entry in byDive.entries) {
+      // Absent for a dive that never needed the lookup, which resolves the
+      // same way the single-dive path does when it skips the query.
+      final primary = primaries[entry.key];
+      final points = _mergePoints(
+        entry.value,
+        hasSources: primary?.hasSources ?? true,
+        primaryComputerId: primary?.computerId,
+      );
+      if (points.isNotEmpty) result[entry.key] = points;
+    }
+    return result;
+  }
+
   /// The merged profile from series rows; an empty list when [diveId] has
   /// none.
   ///
@@ -4871,42 +4923,122 @@ class DiveRepository {
   Future<List<domain.DiveProfilePoint>> _mergedSeriesPoints(
     String diveId,
   ) async {
-    final List<ProfileSeries> series = await _profileSeries.getSeriesForDive(
+    return _pointsForSeries(
       diveId,
+      await _profileSeries.getSeriesForDive(diveId),
     );
-    final needsPrimary =
-        series.any((s) => s.isPrimary) &&
-        series.any((s) => !s.isPrimary && s.computerId != null);
+  }
+
+  /// [series] reduced to the points a reader should see: the superseded
+  /// originals of a saved edit dropped, then every remaining source's samples
+  /// interleaved by timestamp.
+  ///
+  /// Takes the series rather than reading them so [getMergedProfilesForDives]
+  /// can batch the read and still land on the same points as the single-dive
+  /// path. The extra [_primarySourceComputer] query is skipped unless a
+  /// demoted series actually carries a computer id, which is the only case
+  /// where the primary computer decides family membership; a single-source
+  /// dive resolves with no further SQL.
+  Future<List<domain.DiveProfilePoint>> _pointsForSeries(
+    String diveId,
+    List<ProfileSeries> series,
+  ) async {
     var hasSources = true;
     String? primaryComputerId;
-    if (needsPrimary) {
+    if (_needsPrimarySource(series)) {
       final primary = await _primarySourceComputer(diveId);
       hasSources = primary.hasSources;
       primaryComputerId = primary.computerId;
     }
-    return mergeSeriesPointsCollapsingDuplicates(
-      dropSupersededSeries(
-        series,
-        hasSources: hasSources,
-        primaryComputerId: primaryComputerId,
-      ),
+    return _mergePoints(
+      series,
+      hasSources: hasSources,
+      primaryComputerId: primaryComputerId,
     );
   }
+
+  /// Whether [series] needs the primary `dive_data_sources` row to resolve.
+  ///
+  /// Only a promoted series alongside a demoted one that still names a
+  /// computer lets the primary computer decide family membership; a
+  /// single-source dive resolves with no further SQL. Shared by the
+  /// single-dive and batched paths so the condition cannot drift.
+  bool _needsPrimarySource(List<ProfileSeries> series) =>
+      series.any((s) => s.isPrimary) &&
+      series.any((s) => !s.isPrimary && s.computerId != null);
+
+  /// [series] reduced to displayable points. Pure: every read it depends on
+  /// has already happened.
+  List<domain.DiveProfilePoint> _mergePoints(
+    List<ProfileSeries> series, {
+    required bool hasSources,
+    required String? primaryComputerId,
+  }) => mergeSeriesPointsCollapsingDuplicates(
+    dropSupersededSeries(
+      series,
+      hasSources: hasSources,
+      primaryComputerId: primaryComputerId,
+    ),
+  );
 
   /// The computer owning [diveId]'s primary data source, and whether the dive
   /// has any `dive_data_sources` rows to read that from.
   Future<({bool hasSources, String? computerId})> _primarySourceComputer(
     String diveId,
   ) async {
-    final sourceRows = _canonicalDataSourceRows(
-      await (_db.select(_db.diveDataSources)
-            ..where((t) => t.diveId.equals(diveId))
-            ..orderBy([
-              (t) => OrderingTerm.desc(t.isPrimary),
-              (t) => OrderingTerm.asc(t.createdAt),
-            ]))
-          .get(),
+    return _primaryFromRows(
+      await (_db.select(
+        _db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).get(),
     );
+  }
+
+  /// [_primarySourceComputer] for many dives in one statement.
+  ///
+  /// The per-dive read is the only SQL [_pointsForSeries] performs, so
+  /// hoisting it out of [getMergedProfilesForDives] turns that loop into pure
+  /// computation instead of one round trip per dive.
+  ///
+  /// Every requested id gets an entry: a dive with no `dive_data_sources` rows
+  /// answers `hasSources: false`, which is what decides family membership, so
+  /// a missing key would silently read as "has sources".
+  Future<Map<String, ({bool hasSources, String? computerId})>>
+  _primarySourceComputers(List<String> diveIds) async {
+    if (diveIds.isEmpty) return const {};
+
+    final rows = <DiveDataSourcesData>[];
+    for (final chunk in seriesIdChunks(diveIds)) {
+      rows.addAll(
+        await (_db.select(
+          _db.diveDataSources,
+        )..where((t) => t.diveId.isIn(chunk))).get(),
+      );
+    }
+
+    final byDive = <String, List<DiveDataSourcesData>>{};
+    for (final row in rows) {
+      byDive.putIfAbsent(row.diveId, () => []).add(row);
+    }
+
+    return {
+      for (final id in diveIds) id: _primaryFromRows(byDive[id] ?? const []),
+    };
+  }
+
+  /// The primary-source answer for one dive's `dive_data_sources` [rows].
+  ///
+  /// Ordering happens here rather than in SQL so the batched read and the
+  /// single-dive read collapse duplicate computers in the same order, which is
+  /// what keeps the export and the on-screen chart on the same samples.
+  ({bool hasSources, String? computerId}) _primaryFromRows(
+    List<DiveDataSourcesData> rows,
+  ) {
+    final ordered = [...rows]
+      ..sort((a, b) {
+        if (a.isPrimary != b.isPrimary) return a.isPrimary ? -1 : 1;
+        return a.createdAt.compareTo(b.createdAt);
+      });
+    final sourceRows = _canonicalDataSourceRows(ordered);
     if (sourceRows.isEmpty) return (hasSources: false, computerId: null);
     return (hasSources: true, computerId: sourceRows.first.computerId);
   }

@@ -10025,13 +10025,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Layout matching PADI logbook format';
 
   @override
-  String get enum_pdfTemplate_professional => 'Professional';
-
-  @override
-  String get enum_pdfTemplate_professional_description =>
-      'Signature and stamp areas for verification';
-
-  @override
   String get enum_pdfTemplate_simple => 'Simple';
 
   @override
@@ -19430,6 +19423,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add scanned certification card images to the PDF';
 
   @override
+  String get transfer_pdfExport_includeVerificationAreas =>
+      'Include Verification Areas';
+
+  @override
+  String get transfer_pdfExport_includeVerificationAreasSubtitle =>
+      'Add stamp and signature boxes for agency verification';
+
+  @override
   String get transfer_pdfExport_pageSizeA4 => 'A4';
 
   @override
@@ -19467,13 +19468,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get transfer_pdfExport_templatePadiStyleDesc =>
       'Layout matching PADI logbook format';
-
-  @override
-  String get transfer_pdfExport_templateProfessional => 'Professional';
-
-  @override
-  String get transfer_pdfExport_templateProfessionalDesc =>
-      'Signature and stamp areas for verification';
 
   @override
   String transfer_pdfExport_templateSemanticLabel(Object templateName) {
@@ -34406,6 +34400,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_export_progress_loadingSignatures =>
       'Loading signatures...';
+
+  @override
+  String get settings_export_progress_loadingProfiles =>
+      'Loading dive profiles...';
 
   @override
   String get settings_export_progress_loadingCertifications =>
