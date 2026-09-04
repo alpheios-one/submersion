@@ -4,6 +4,7 @@ import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 
@@ -52,9 +53,12 @@ void main() {
             startMix: const GasMix(o2: 14.5, he: 57.2),
             targetPressureBar: 220,
             targetMix: const GasMix(o2: 15, he: 55),
-            fillGas1: const GasMix(o2: 99.5),
-            fillGas2: const GasMix(o2: 0, he: 99),
-            fillGas3: const GasMix(o2: 20.9),
+            topupO2Percent: 20.9,
+            fillOrder: const [
+              BlenderGasRole.he,
+              BlenderGasRole.o2,
+              BlenderGasRole.topup,
+            ],
           );
 
       await repository.setBlenderPreferences(prefs);
@@ -65,9 +69,12 @@ void main() {
       expect(loaded.startMix, const GasMix(o2: 14.5, he: 57.2));
       expect(loaded.targetPressureBar, 220);
       expect(loaded.targetMix, const GasMix(o2: 15, he: 55));
-      expect(loaded.fillGas1, const GasMix(o2: 99.5));
-      expect(loaded.fillGas2, const GasMix(o2: 0, he: 99));
-      expect(loaded.fillGas3, const GasMix(o2: 20.9));
+      expect(loaded.topupO2Percent, 20.9);
+      expect(loaded.fillOrder, [
+        BlenderGasRole.he,
+        BlenderGasRole.o2,
+        BlenderGasRole.topup,
+      ]);
     });
 
     test('a later write overwrites the earlier one', () async {

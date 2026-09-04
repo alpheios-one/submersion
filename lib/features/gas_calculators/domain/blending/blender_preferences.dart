@@ -1,6 +1,7 @@
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 
@@ -90,9 +91,8 @@ class BlenderPreferences {
     required this.startMix,
     required this.targetPressureBar,
     required this.targetMix,
-    required this.fillGas1,
-    required this.fillGas2,
-    required this.fillGas3,
+    required this.topupO2Percent,
+    this.fillOrder = kDefaultBlenderFillOrder,
     this.flushFeeEnabled = false,
     this.flushFeeMode = FlushFeeMode.perInvoice,
     this.flushFeeGases = defaultFlushFeeGases,
@@ -116,8 +116,12 @@ class BlenderPreferences {
 
   final List<MixTemplate> templates;
 
-  /// Price per 100 litres of free gas, positional against the three fill gas
-  /// slots. Null means the diver has not priced that gas.
+  /// Price per 100 litres of free gas, one entry per [BlenderGasRole] in
+  /// that enum's order (issue #42). Null means the diver has not priced that
+  /// role. Keyed by role rather than by fill position so a price stays
+  /// attached to "the oxygen bank" however [fillOrder] is arranged, and so
+  /// the flush fee ([flushFeeGases]) can share this same price rather than
+  /// keeping its own.
   final List<double?> gasPrices;
 
   final double fillTempC;
@@ -140,7 +144,8 @@ class BlenderPreferences {
   /// How often [flushFeeEnabled] adds its lines to the bill.
   final FlushFeeMode flushFeeMode;
 
-  /// One entry per [FlushFeeGasKind], in that enum's order.
+  /// One entry per [BlenderGasRole], in that enum's order. Each role's price
+  /// comes from [gasPrices], not from here.
   final List<FlushFeeGasSetting> flushFeeGases;
 
   /// When the running bill started. Null means "not set yet", which the
@@ -155,18 +160,27 @@ class BlenderPreferences {
   /// path enforces it.
   static const int maxBilledFills = kMaxBilledFills;
 
-  /// The starting cylinder pressure and mix, the target fill, and the three
-  /// fill gases -- the last-entered values issue #1335 asks to remember
-  /// across sessions. Matches the hard-coded defaults the state providers in
+  /// The starting cylinder pressure and mix, and the target fill -- the
+  /// last-entered values issue #1335 asks to remember across sessions.
+  /// Matches the hard-coded defaults the state providers in
   /// `gas_blender_providers.dart` used before persistence existed, so a first
   /// run behaves exactly as it always has.
   final double startPressureBar;
   final GasMix startMix;
   final double targetPressureBar;
   final GasMix targetMix;
-  final GasMix fillGas1;
-  final GasMix fillGas2;
-  final GasMix fillGas3;
+
+  /// The topup role's oxygen fraction (issue #42). The oxygen and helium
+  /// roles are fixed at 100% purity and have no equivalent field; only the
+  /// topup role's mix is configurable, since a fill station's third bank is
+  /// air on most days but not always.
+  final double topupO2Percent;
+
+  /// The order the three roles are filled in, e.g. oxygen, then helium, then
+  /// topup. A display/fill-sequence preference, independent of [gasPrices]
+  /// and [flushFeeGases], which stay keyed by role identity regardless of
+  /// how this is arranged.
+  final List<BlenderGasRole> fillOrder;
 
   /// Lives beside [ArchivedInvoice] itself; re-exposed here for the same
   /// reason as [maxBilledFills].
@@ -186,9 +200,8 @@ class BlenderPreferences {
         startMix: const GasMix(o2: 21),
         targetPressureBar: 200.0,
         targetMix: const GasMix(o2: 32),
-        fillGas1: const GasMix(o2: 100),
-        fillGas2: const GasMix(o2: 0, he: 100),
-        fillGas3: const GasMix(o2: 21),
+        topupO2Percent: 21.0,
+        fillOrder: kDefaultBlenderFillOrder,
         billedDate: null,
         archivedInvoices: const [],
       );
@@ -206,9 +219,8 @@ class BlenderPreferences {
     GasMix? startMix,
     double? targetPressureBar,
     GasMix? targetMix,
-    GasMix? fillGas1,
-    GasMix? fillGas2,
-    GasMix? fillGas3,
+    double? topupO2Percent,
+    List<BlenderGasRole>? fillOrder,
     bool? flushFeeEnabled,
     FlushFeeMode? flushFeeMode,
     List<FlushFeeGasSetting>? flushFeeGases,
@@ -229,9 +241,8 @@ class BlenderPreferences {
     startMix: startMix ?? this.startMix,
     targetPressureBar: targetPressureBar ?? this.targetPressureBar,
     targetMix: targetMix ?? this.targetMix,
-    fillGas1: fillGas1 ?? this.fillGas1,
-    fillGas2: fillGas2 ?? this.fillGas2,
-    fillGas3: fillGas3 ?? this.fillGas3,
+    topupO2Percent: topupO2Percent ?? this.topupO2Percent,
+    fillOrder: normalizeBlenderFillOrder(fillOrder ?? this.fillOrder),
     flushFeeEnabled: flushFeeEnabled ?? this.flushFeeEnabled,
     flushFeeMode: flushFeeMode ?? this.flushFeeMode,
     flushFeeGases: flushFeeGases ?? this.flushFeeGases,
@@ -254,9 +265,8 @@ class BlenderPreferences {
     'startMix': _gasMixToJson(startMix),
     'targetPressureBar': targetPressureBar,
     'targetMix': _gasMixToJson(targetMix),
-    'fillGas1': _gasMixToJson(fillGas1),
-    'fillGas2': _gasMixToJson(fillGas2),
-    'fillGas3': _gasMixToJson(fillGas3),
+    'topupO2Percent': topupO2Percent,
+    'fillOrder': [for (final role in fillOrder) role.name],
     'flushFeeEnabled': flushFeeEnabled,
     'flushFeeMode': flushFeeMode.name,
     'flushFeeGases': flushFeeGases.map((g) => g.toJson()).toList(),
@@ -335,10 +345,24 @@ class BlenderPreferences {
       startMix: _gasMixFromJson(json['startMix']) ?? const GasMix(o2: 21),
       targetPressureBar: _toDouble(json['targetPressureBar']) ?? 200.0,
       targetMix: _gasMixFromJson(json['targetMix']) ?? const GasMix(o2: 32),
-      fillGas1: _gasMixFromJson(json['fillGas1']) ?? const GasMix(o2: 100),
-      fillGas2:
-          _gasMixFromJson(json['fillGas2']) ?? const GasMix(o2: 0, he: 100),
-      fillGas3: _gasMixFromJson(json['fillGas3']) ?? const GasMix(o2: 21),
+      // Falls back to the pre-issue-#42 'fillGas3' bank's O2 fraction: with
+      // no reorder feature to have moved it, that bank was always the topup
+      // role, so this recovers a diver's custom topup mix (e.g. nitrox
+      // rather than air) losslessly. A blob with neither key is a fresh
+      // install, which defaults to air.
+      topupO2Percent:
+          _toDouble(json['topupO2Percent']) ??
+          _gasMixFromJson(json['fillGas3'])?.o2 ??
+          21.0,
+      // Same reasoning: the fill order was always O2, then He, then topup
+      // before this field existed, since bank position was the only order
+      // there was.
+      fillOrder: normalizeBlenderFillOrder(
+        [
+          for (final name in (json['fillOrder'] as List?) ?? const [])
+            if (name is String) BlenderGasRole.fromName(name),
+        ].whereType<BlenderGasRole>().toList(),
+      ),
       flushFeeEnabled: json['flushFeeEnabled'] == true,
       flushFeeMode: FlushFeeMode.fromName(
         json['flushFeeMode'] is String ? json['flushFeeMode'] as String : null,

@@ -246,4 +246,86 @@ void main() {
     expect(ref.read(blenderCylinderLitersProvider), closeTo(15, 0.001));
     expect(repo.blenderPreferences?.cylinderWaterLiters, closeTo(15, 0.001));
   });
+
+  group('flush fee gas row', () {
+    // Issue #44 follow-up: an InputDecorator still reads as a disabled
+    // input field (border, floating label box) even with no TextField
+    // inside it. The purge volume and price are read from settings and
+    // must show as plain text instead, the same look as _costLine.
+    testWidgets('shows the price and purge volume as plain text, not a '
+        'field-styled control', (tester) async {
+      final ref = await _pump(tester);
+      ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+      ref.read(blenderGasPricesProvider.notifier).state = const [
+        7.5,
+        null,
+        null,
+      ];
+      await tester.pumpAndSettle();
+
+      for (final key in [
+        'blender-flush-fee-volume-o2',
+        'blender-flush-fee-price-o2',
+      ]) {
+        expect(
+          find.descendant(
+            of: find.byKey(Key(key)),
+            matching: find.byType(InputDecorator),
+          ),
+          findsNothing,
+        );
+        expect(
+          find.descendant(
+            of: find.byKey(Key(key)),
+            matching: find.byType(TextField),
+          ),
+          findsNothing,
+        );
+      }
+      expect(find.textContaining('20'), findsWidgets);
+      expect(find.textContaining('7.5'), findsWidgets);
+    });
+
+    testWidgets(
+      'lines up one tab-aligned row per gas, with the currency instead of '
+      'a hard-coded "price" label',
+      (tester) async {
+        // Issue #44: label, volume and price sit on the same row per gas,
+        // in the same columns for every role, instead of two stacked
+        // label/value blocks. The rate carries the diver's actual currency
+        // rather than a hard-coded word.
+        final ref = await _pump(tester);
+        ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+        ref.read(blenderGasPricesProvider.notifier).state = const [
+          7.5,
+          null,
+          null,
+        ];
+        await tester.pumpAndSettle();
+
+        final o2Row = find.byKey(const Key('blender-flush-fee-row-o2'));
+        expect(o2Row, findsOneWidget);
+        expect(
+          find.descendant(of: o2Row, matching: find.textContaining('O₂')),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: o2Row,
+            matching: find.byKey(const Key('blender-flush-fee-volume-o2')),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          find.descendant(
+            of: o2Row,
+            matching: find.byKey(const Key('blender-flush-fee-price-o2')),
+          ),
+          findsOneWidget,
+        );
+        expect(find.textContaining('CHF/100'), findsWidgets);
+        expect(find.text('Price'), findsNothing);
+      },
+    );
+  });
 }

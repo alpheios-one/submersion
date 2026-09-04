@@ -3,7 +3,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
-import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_manager.dart';
@@ -12,9 +11,12 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Trimix Mixer's own settings, reached both from the calculator's
 /// settings gear and from the global Settings page (issue #1335 follow-up):
-/// fill gases, mixing conditions, saved target-fill mixes, and billing
-/// defaults, kept off the always-visible calculator so the fields a diver
-/// sets once per session don't compete with the ones they retype every fill.
+/// fill gases, mixing conditions, and saved target-fill mixes, kept off the
+/// always-visible calculator so the fields a diver sets once per session
+/// don't compete with the ones they retype every fill. Billing has no
+/// defaults of its own left to configure here: the currency always follows
+/// Settings -> Units -> Default currency (issue #44 follow-up removed the
+/// mixer's own, now-redundant read-only mirror of that setting).
 class BlenderSettingsPage extends ConsumerWidget {
   const BlenderSettingsPage({super.key});
 
@@ -45,29 +47,18 @@ class _BlenderSettingsBody extends ConsumerStatefulWidget {
 }
 
 class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
-  late final List<TextEditingController> _gasO2;
-  late final List<TextEditingController> _gasHe;
+  late final TextEditingController _topupO2;
   late final List<TextEditingController> _gasPrices;
+  late final List<TextEditingController> _flushVolumes;
 
   @override
   void initState() {
     super.initState();
     String n(double v) => formatDecimalForInput(v);
 
-    final g1 = ref.read(blenderFillGas1Provider);
-    final g2 = ref.read(blenderFillGas2Provider);
-    final g3 = ref.read(blenderFillGas3Provider);
-
-    _gasO2 = [
-      TextEditingController(text: n(g1.o2)),
-      TextEditingController(text: n(g2.o2)),
-      TextEditingController(text: n(g3.o2)),
-    ];
-    _gasHe = [
-      TextEditingController(text: n(g1.he)),
-      TextEditingController(text: n(g2.he)),
-      TextEditingController(text: n(g3.he)),
-    ];
+    _topupO2 = TextEditingController(
+      text: n(ref.read(blenderTopupO2PercentProvider)),
+    );
 
     final settings = ref.read(settingsProvider);
     _gasPrices = [
@@ -81,11 +72,24 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                 ),
         ),
     ];
+    _flushVolumes = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: formatRoundedForInput(
+            litersToDisplayVolume(g.volumeLiters, settings),
+            2,
+          ),
+        ),
+    ];
   }
 
   @override
   void dispose() {
-    for (final c in [..._gasO2, ..._gasHe, ..._gasPrices]) {
+    _topupO2.dispose();
+    for (final c in _gasPrices) {
+      c.dispose();
+    }
+    for (final c in _flushVolumes) {
       c.dispose();
     }
     super.dispose();
@@ -106,9 +110,9 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 BlenderFillGasesCard(
-                  o2Controllers: _gasO2,
-                  heControllers: _gasHe,
+                  topupO2Controller: _topupO2,
                   priceControllers: _gasPrices,
+                  flushVolumeControllers: _flushVolumes,
                 ),
                 const SizedBox(height: 16),
                 const BlenderConditionsCard(),
@@ -119,8 +123,6 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                     child: MixTemplateManager(),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const BlenderDefaultsCard(),
               ],
             ),
           ),

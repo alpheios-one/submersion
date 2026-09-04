@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
@@ -53,8 +54,6 @@ class BlenderBillingCard extends ConsumerStatefulWidget {
 
 class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   late final TextEditingController _cylinder;
-  late final List<TextEditingController> _flushVolumes;
-  late final List<TextEditingController> _flushPrices;
 
   @override
   void initState() {
@@ -64,37 +63,11 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     _cylinder = TextEditingController(
       text: formatRoundedForInput(litersToDisplayVolume(liters, settings), 2),
     );
-    _flushVolumes = [
-      for (final g in ref.read(blenderFlushFeeGasesProvider))
-        TextEditingController(
-          text: formatRoundedForInput(
-            litersToDisplayVolume(g.volumeLiters, settings),
-            2,
-          ),
-        ),
-    ];
-    _flushPrices = [
-      for (final g in ref.read(blenderFlushFeeGasesProvider))
-        TextEditingController(
-          text: g.pricePer100 == null
-              ? ''
-              : formatRoundedForInput(
-                  pricePer100LitersToDisplay(g.pricePer100!, settings),
-                  2,
-                ),
-        ),
-    ];
   }
 
   @override
   void dispose() {
     _cylinder.dispose();
-    for (final c in _flushVolumes) {
-      c.dispose();
-    }
-    for (final c in _flushPrices) {
-      c.dispose();
-    }
     super.dispose();
   }
 
@@ -117,7 +90,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             const SizedBox(height: 20),
             const Divider(height: 1),
             const SizedBox(height: 12),
-            _flushFeeSettings(context, settings, units),
+            _flushFeeSettings(context, settings, units, currency),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
               for (final line in billing.lines)
@@ -388,13 +361,15 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   }
 
   /// The hose-purge flat fee: whether it is charged, how often it appears on
-  /// the bill, and each gas's default volume and price. The bill itself
-  /// reads these gases from [BlenderInvoiceCard], which keeps its own
-  /// editable liter field seeded from the same setting (issue #1335).
+  /// the bill, and each gas's volume and price, both entered on the Fill
+  /// gases settings card and shown here as read-only text (issue #42
+  /// follow-up). The bill itself reads the same setting for its own,
+  /// likewise read-only, line.
   Widget _flushFeeSettings(
     BuildContext context,
     AppSettings settings,
     UnitFormatter units,
+    String currency,
   ) {
     final enabled = ref.watch(blenderFlushFeeEnabledProvider);
     final mode = ref.watch(blenderFlushFeeModeProvider);
@@ -439,88 +414,70 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               },
             ),
           ),
-          for (var i = 0; i < FlushFeeGasKind.values.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            _flushFeeGasRow(context, i, settings, units),
-          ],
+          for (var i = 0; i < BlenderGasRole.values.length; i++)
+            _flushFeeGasRow(context, ref, i, settings, units, currency),
         ],
       ],
     );
   }
 
+  /// One tab-aligned row per gas: label, purge volume, price -- all three
+  /// rows lined up on the same columns (issue #44 follow-up) instead of the
+  /// former two stacked label/value blocks. Both figures are entered once,
+  /// next to their bank on the Fill gases settings card, and shown here as
+  /// plain text rather than a second, easily-drifting entry point for the
+  /// same numbers.
   Widget _flushFeeGasRow(
     BuildContext context,
+    WidgetRef ref,
     int index,
     AppSettings settings,
     UnitFormatter units,
+    String currency,
   ) {
-    final kind = FlushFeeGasKind.values[index];
-    final label = flushFeeGasLabel(context, kind);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: TextField(
-            key: Key('blender-flush-fee-volume-${kind.name}'),
-            controller: _flushVolumes[index],
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            decoration: InputDecoration(
-              labelText:
-                  '$label '
-                  '${context.l10n.gasCalculators_blender_flushFeeVolume} '
-                  '(${units.volumeSymbol})',
-              isDense: true,
-              border: const OutlineInputBorder(),
+    final role = BlenderGasRole.values[index];
+    final label = blenderGasRoleLabel(context, role);
+    final price = ref.watch(blenderGasPricesProvider)[index];
+    final volumeLiters = ref
+        .watch(blenderFlushFeeGasesProvider)[index]
+        .volumeLiters;
+    final style = Theme.of(context).textTheme.bodyMedium;
+    return Padding(
+      key: Key('blender-flush-fee-row-${role.name}'),
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 5,
+            child: Text(
+              '$label ${context.l10n.gasCalculators_blender_flushFeeVolume}',
+              style: style,
             ),
-            onChanged: (_) => _saveFlushFeeGases(settings),
-            onEditingComplete: () => saveBlenderPreferences(ref),
-            onSubmitted: (_) => saveBlenderPreferences(ref),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: TextField(
-            key: Key('blender-flush-fee-price-${kind.name}'),
-            controller: _flushPrices[index],
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-            ],
-            decoration: InputDecoration(
-              labelText:
-                  '$label '
-                  '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
-              isDense: true,
-              border: const OutlineInputBorder(),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '${formatRoundedForInput(litersToDisplayVolume(volumeLiters, settings), 2)} '
+              '${units.volumeSymbol}',
+              key: Key('blender-flush-fee-volume-${role.name}'),
+              style: style,
+              textAlign: TextAlign.end,
             ),
-            onChanged: (_) => _saveFlushFeeGases(settings),
-            onEditingComplete: () => saveBlenderPreferences(ref),
-            onSubmitted: (_) => saveBlenderPreferences(ref),
           ),
-        ),
-      ],
+          Expanded(
+            flex: 3,
+            child: Text(
+              price == null
+                  ? ''
+                  : '${formatRoundedForInput(pricePer100LitersToDisplay(price, settings), 2)} '
+                        '$currency/100${units.volumeSymbol}',
+              key: Key('blender-flush-fee-price-${role.name}'),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
     );
-  }
-
-  void _saveFlushFeeGases(AppSettings settings) {
-    ref.read(blenderFlushFeeGasesProvider.notifier).state = [
-      for (var i = 0; i < FlushFeeGasKind.values.length; i++)
-        FlushFeeGasSetting(
-          volumeLiters: displayVolumeToLiters(
-            parseUserDecimal(_flushVolumes[i].text) ?? 0,
-            settings,
-          ),
-          pricePer100: switch (parseUserDecimal(_flushPrices[i].text)) {
-            final double entered => displayToPricePer100Liters(
-              entered,
-              settings,
-            ),
-            null => null,
-          },
-        ),
-    ];
   }
 }

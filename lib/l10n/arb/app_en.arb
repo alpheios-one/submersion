@@ -6969,6 +6969,28 @@
   "gasCalculators_blender_he": "He",
   "gasCalculators_blender_air": "Air",
   "gasCalculators_blender_helium": "Helium",
+  "gasCalculators_blender_topup": "Topup",
+  "gasCalculators_blender_purity": "Purity",
+  "gasCalculators_blender_moveGasUp": "Move {gas} up",
+  "@gasCalculators_blender_moveGasUp": {
+    "description": "Accessibility label for the move-up button on a fill-gas role row.",
+    "placeholders": {
+      "gas": {
+        "type": "String",
+        "example": "Helium"
+      }
+    }
+  },
+  "gasCalculators_blender_moveGasDown": "Move {gas} down",
+  "@gasCalculators_blender_moveGasDown": {
+    "description": "Accessibility label for the move-down button on a fill-gas role row.",
+    "placeholders": {
+      "gas": {
+        "type": "String",
+        "example": "Helium"
+      }
+    }
+  },
   "gasCalculators_blender_procedure": "Fill procedure",
   "gasCalculators_blender_amounts": "Gas to add",
   "gasCalculators_blender_stepStart": "Start with {pressure} {gas}",
@@ -7082,6 +7104,8 @@
   "gasCalculators_blender_billedTotal": "Total",
   "gasCalculators_blender_invoiceArchive": "Invoice archive",
   "gasCalculators_blender_invoiceArchiveFilter": "Filter by date",
+  "gasCalculators_blender_invoiceArchiveAllYears": "All years",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "All months",
   "gasCalculators_blender_invoiceArchiveEmpty": "No paid invoices yet.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "No invoices in this date range.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} fills",

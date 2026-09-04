@@ -9,6 +9,7 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_cylinder_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_archive_section.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_procedure_card.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -123,20 +124,21 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
               // under Settings -> Trimix Mixer now (issue #1335 follow-up);
               // only the fields a diver retypes every fill stay on this
               // always-visible screen.
-              Row(
-                children: [
-                  Expanded(child: _temperatureSummary(context)),
-                  IconButton(
-                    key: const Key('blender-settings'),
-                    icon: const Icon(Icons.settings_outlined),
-                    tooltip: context.l10n.settings_section_trimixMixer_title,
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) => const BlenderSettingsPage(),
-                      ),
+              // The temperature summary that used to sit here now lives under
+              // the "Fill procedure" title on BlenderProcedureCard (issue #44
+              // follow-up); the settings gear stays put.
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  key: const Key('blender-settings'),
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: context.l10n.settings_section_trimixMixer_title,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (context) => const BlenderSettingsPage(),
                     ),
                   ),
-                ],
+                ),
               ),
               BlenderCylinderCard(
                 startPressure: _startP,
@@ -155,34 +157,12 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
               const BlenderBillingCard(),
               const SizedBox(height: 16),
               const BlenderInvoiceCard(),
+              const SizedBox(height: 16),
+              const BlenderInvoiceArchiveSection(),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  /// The fill and settled temperatures set on the settings page, read-only
-  /// here so a diver working the calculator does not have to open settings to
-  /// see what they configured.
-  Widget _temperatureSummary(BuildContext context) {
-    final units = _units;
-    final fillTemp = ref.watch(blenderFillTempProvider);
-    final settledTemp = ref.watch(blenderSettledTempProvider);
-    final fillLabel =
-        '${context.l10n.gasCalculators_blender_fillTemp}: '
-        '${units.formatTemperature(fillTemp, decimals: 0)}';
-    final label = fillTemp == settledTemp
-        ? fillLabel
-        : '$fillLabel  ·  ${context.l10n.gasCalculators_blender_settledTemp}: '
-              '${units.formatTemperature(settledTemp, decimals: 0)}';
-    return Text(
-      label,
-      key: const Key('blender-temperature-summary'),
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-      overflow: TextOverflow.ellipsis,
     );
   }
 }

@@ -29,13 +29,12 @@ void main() {
 
   group('FlushFeeGasSetting', () {
     test('round-trips through JSON', () {
-      const setting = FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5);
+      const setting = FlushFeeGasSetting(volumeLiters: 20);
       final decoded = FlushFeeGasSetting.fromJson(
         jsonDecode(jsonEncode(setting.toJson())),
         defaultVolumeLiters: 12,
       );
       expect(decoded.volumeLiters, 20);
-      expect(decoded.pricePer100, 7.5);
     });
 
     test('falls back to the default volume when malformed', () {
@@ -44,12 +43,10 @@ void main() {
         defaultVolumeLiters: 15,
       );
       expect(decoded.volumeLiters, 15);
-      expect(decoded.pricePer100, isNull);
     });
 
-    test('copyWith can clear the price', () {
-      const setting = FlushFeeGasSetting(volumeLiters: 20, pricePer100: 7.5);
-      expect(setting.copyWith(clearPrice: true).pricePer100, isNull);
+    test('copyWith replaces the volume', () {
+      const setting = FlushFeeGasSetting(volumeLiters: 20);
       expect(setting.copyWith(volumeLiters: 30).volumeLiters, 30);
     });
   });

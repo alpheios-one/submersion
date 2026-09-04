@@ -12207,6 +12207,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_helium => 'Helium';
 
   @override
+  String get gasCalculators_blender_topup => 'Topup';
+
+  @override
+  String get gasCalculators_blender_purity => 'Reinheit';
+
+  @override
+  String gasCalculators_blender_moveGasUp(String gas) {
+    return '$gas nach oben verschieben';
+  }
+
+  @override
+  String gasCalculators_blender_moveGasDown(String gas) {
+    return '$gas nach unten verschieben';
+  }
+
+  @override
   String get gasCalculators_blender_procedure => 'Füllreihenfolge';
 
   @override
@@ -12444,7 +12460,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_billedDateEdit => 'Rechnungsdatum ändern';
 
   @override
-  String get gasCalculators_blender_tariff => 'Aktueller Tarif';
+  String get gasCalculators_blender_tariff => 'Tarif';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12519,6 +12535,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gasCalculators_blender_invoiceArchiveFilter =>
       'Nach Datum filtern';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'Alle Jahre';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'Alle Monate';
 
   @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
