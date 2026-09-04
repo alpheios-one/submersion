@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:share_plus_platform_interface/share_plus_platform_interface.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -11,9 +15,31 @@ import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.da
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_invoice_export_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+/// The share helpers write into getApplicationDocumentsDirectory(), a
+/// platform channel with no implementation under flutter_test.
+class _FakePathProvider extends PathProviderPlatform
+    with MockPlatformInterfaceMixin {
+  _FakePathProvider(this.documentsPath);
+  final String documentsPath;
+
+  @override
+  Future<String?> getApplicationDocumentsPath() async => documentsPath;
+}
+
+class _FakeSharePlatform extends SharePlatform {
+  final List<ShareParams> calls = [];
+
+  @override
+  Future<ShareResult> share(ShareParams params) async {
+    calls.add(params);
+    return const ShareResult('ok', ShareResultStatus.success);
+  }
+}
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
@@ -566,6 +592,139 @@ void main() {
       expect(find.byKey(const Key('blender-pay')), findsNothing);
     });
   });
+
+  group('export', () {
+    late Directory documents;
+    final platform = _FakeSharePlatform();
+
+    setUpAll(() => SharePlatform.instance = platform);
+
+    setUp(() {
+      documents = Directory.systemTemp.createTempSync('blender_invoice_test');
+      PathProviderPlatform.instance = _FakePathProvider(documents.path);
+      platform.calls.clear();
+    });
+
+    tearDown(() => documents.deleteSync(recursive: true));
+
+    /// Fills the running bill with one manual line so the export button is
+    /// on screen, then opens the export picker.
+    Future<void> addLineAndOpenPicker(WidgetTester tester) async {
+      await _pump(tester);
+      await tester.tap(find.byKey(const Key('blender-add-manual-line')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('blender-line-description')),
+        'Analyser cell',
+      );
+      await tester.enterText(
+        find.byKey(const Key('blender-line-amount')),
+        '12.50',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('blender-export')));
+      await tester.pumpAndSettle();
+    }
+
+    /// A bounded pump loop rather than [WidgetTester.pumpAndSettle]: the
+    /// export button shows a [CircularProgressIndicator] while its future is
+    /// in flight, and that ticks forever, so `pumpAndSettle` never sees "no
+    /// more frames scheduled" and times out even once the real work
+    /// underneath is done. Runs inside [WidgetTester.runAsync] so the real
+    /// file I/O and PDF/Excel encoding behind the export actually get to
+    /// complete - plain `pump()` only flushes work already done, it does not
+    /// wait for it.
+    Future<void> settleWithLoadingIndicator(WidgetTester tester) async {
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        await tester.pump();
+      }
+    }
+
+    testWidgets('tapping PDF shares a PDF', (tester) async {
+      await addLineAndOpenPicker(tester);
+
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const Key('blender-export-pdf')));
+        await settleWithLoadingIndicator(tester);
+      });
+      await tester.pumpAndSettle();
+
+      expect(platform.calls, hasLength(1));
+      expect(platform.calls.single.files!.single.mimeType, 'application/pdf');
+    });
+
+    testWidgets('tapping Excel shares a spreadsheet', (tester) async {
+      await addLineAndOpenPicker(tester);
+
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const Key('blender-export-excel')));
+        await settleWithLoadingIndicator(tester);
+      });
+      await tester.pumpAndSettle();
+
+      expect(platform.calls, hasLength(1));
+      expect(
+        platform.calls.single.files!.single.mimeType,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
+
+    testWidgets('tapping Image captures the boundary and shares a PNG', (
+      tester,
+    ) async {
+      await addLineAndOpenPicker(tester);
+
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const Key('blender-export-image')));
+        await settleWithLoadingIndicator(tester);
+      });
+      await tester.pumpAndSettle();
+
+      expect(platform.calls, hasLength(1));
+      expect(platform.calls.single.files!.single.mimeType, 'image/png');
+    });
+
+    testWidgets(
+      'the picker closes and the export button starts spinning before '
+      'anything is shared',
+      (tester) async {
+        // Regression test for issue #44: the OS share sheet used to be
+        // invoked only after `action(anchor)` resolved, with the picker
+        // popped afterwards - so sharing raced the picker's own dismissal.
+        // Now the tile pops the picker synchronously on tap, before any
+        // export work starts, so by the very next frame the export button
+        // is already spinning (proof the picker's future already resolved)
+        // while nothing has been shared yet.
+        await addLineAndOpenPicker(tester);
+
+        await tester.runAsync(() async {
+          await tester.tap(find.byKey(const Key('blender-export-pdf')));
+          await tester.pump();
+
+          expect(
+            find.descendant(
+              of: find.byKey(const Key('blender-export')),
+              matching: find.byType(CircularProgressIndicator),
+            ),
+            findsOneWidget,
+          );
+          expect(platform.calls, isEmpty);
+
+          await settleWithLoadingIndicator(tester);
+        });
+        await tester.pumpAndSettle();
+
+        expect(find.byType(BlenderInvoiceExportSheet), findsNothing);
+
+        expect(platform.calls, hasLength(1));
+      },
+    );
+  });
+
   group('review findings', () {
     test('an amount can be cleared on an edited line', () {
       // Raised in review on PR #1215. Null marks a line as not yet priced,

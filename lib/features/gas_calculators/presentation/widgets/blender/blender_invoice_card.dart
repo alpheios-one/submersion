@@ -1,4 +1,7 @@
+import 'dart:ui' as ui show ImageByteFormat;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -47,6 +50,11 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   /// Wraps the whole card for the "Export as Image" option, so it captures
   /// exactly what the diver is already looking at.
   final _exportBoundaryKey = GlobalKey();
+
+  /// True while an export chosen from [BlenderInvoiceExportSheet] is
+  /// running. Drives the export button's spinner; the export itself only
+  /// starts once that sheet has fully closed (see [_openExportSheet]).
+  bool _isExporting = false;
 
   @override
   void initState() {
@@ -226,16 +234,24 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                   children: [
                     OutlinedButton.icon(
                       key: const Key('blender-export'),
-                      onPressed: () => _openExportSheet(
-                        context,
-                        fills,
-                        currency,
-                        units,
-                        decimals,
-                        billedDate,
-                        total,
-                      ),
-                      icon: const Icon(Icons.ios_share, size: 18),
+                      onPressed: _isExporting
+                          ? null
+                          : () => _openExportSheet(
+                              context,
+                              fills,
+                              currency,
+                              units,
+                              decimals,
+                              billedDate,
+                              total,
+                            ),
+                      icon: _isExporting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.ios_share, size: 18),
                       label: Text(context.l10n.gasCalculators_blender_export),
                     ),
                     FilledButton.icon(
@@ -345,7 +361,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     );
   }
 
-  void _openExportSheet(
+  Future<void> _openExportSheet(
     BuildContext context,
     List<BilledFill> fills,
     String currency,
@@ -353,7 +369,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     int decimals,
     DateTime billedDate,
     BilledTotal total,
-  ) {
+  ) async {
     final settings = ref.read(settingsProvider);
     final topupO2 = ref.read(blenderTopupO2PercentProvider);
     final prices = ref.read(blenderGasPricesProvider);
@@ -397,14 +413,75 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
       incomplete: !total.complete,
     );
 
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => BlenderInvoiceExportSheet(
-        data: data,
-        imageBoundaryKey: _exportBoundaryKey,
-      ),
-    );
+    final choice =
+        await showModalBottomSheet<(BlenderInvoiceExportFormat, Rect?)>(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => const BlenderInvoiceExportSheet(),
+        );
+    if (choice == null) return;
+    await _runExport(choice.$1, data, choice.$2);
+  }
+
+  /// Runs the export chosen from [BlenderInvoiceExportSheet].
+  ///
+  /// Started only after that sheet has fully closed: opening the OS share
+  /// sheet while it was still mounted and mid-transition made the native
+  /// chooser fail to list any targets ("not all sharing methods could be
+  /// displayed", issue #44) - the same reason the dive profile export sheet
+  /// on the dive detail page pops before it shares.
+  Future<void> _runExport(
+    BlenderInvoiceExportFormat format,
+    BlenderInvoiceExportData data,
+    Rect? anchor,
+  ) async {
+    setState(() => _isExporting = true);
+    try {
+      switch (format) {
+        case BlenderInvoiceExportFormat.pdf:
+          await ExportService().exportBlenderInvoiceToPdf(
+            data,
+            sharePositionOrigin: anchor,
+          );
+        case BlenderInvoiceExportFormat.excel:
+          await ExportService().exportBlenderInvoiceToExcel(
+            data,
+            sharePositionOrigin: anchor,
+          );
+        case BlenderInvoiceExportFormat.image:
+          final boundary =
+              _exportBoundaryKey.currentContext?.findRenderObject()
+                  as RenderRepaintBoundary?;
+          if (boundary == null) {
+            throw StateError('invoice card is not on screen');
+          }
+          final image = await boundary.toImage(pixelRatio: 2.0);
+          final byteData = await image.toByteData(
+            format: ui.ImageByteFormat.png,
+          );
+          if (byteData == null) {
+            throw StateError('failed to encode invoice image');
+          }
+          await ExportService().exportImageAsPng(
+            byteData.buffer.asUint8List(),
+            'submersion_blender_invoice_${DateTime.now().millisecondsSinceEpoch}.png',
+            sharePositionOrigin: anchor,
+          );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.gasCalculators_blender_exportError('$e'),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
   }
 
   /// One structured flush-fee line: the gas, its purge volume, and what that
