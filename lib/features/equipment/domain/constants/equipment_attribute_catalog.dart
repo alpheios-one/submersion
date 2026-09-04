@@ -386,7 +386,14 @@ abstract final class EquipmentAttributeCatalog {
       EquipmentAttributeDef(
         key: EquipmentAttrKeys.gloveType,
         kind: AttributeKind.choice,
-        choiceKeys: ['five_finger', 'mitt', 'dry'],
+        choiceKeys: [
+          'five_finger',
+          'three_finger',
+          'mitt',
+          'dry',
+          'dry_liner',
+          'utility',
+        ],
       ),
     ],
     EquipmentType.boots: [

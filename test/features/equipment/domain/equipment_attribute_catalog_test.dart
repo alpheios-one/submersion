@@ -137,6 +137,25 @@ void main() {
     expect(isValidThicknessDesignation('abc'), isFalse);
   });
 
+  group('gloves attributes', () {
+    test('glove_type lists every wet, dry, liner and utility style, in the '
+        'order the picker shows them', () {
+      final def = EquipmentAttributeCatalog.defFor(EquipmentAttrKeys.gloveType);
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.choice);
+      // Ordered by coverage first, then by system: the picker renders
+      // choiceKeys in this order, so the order is part of the contract.
+      expect(def.choiceKeys, [
+        'five_finger',
+        'three_finger',
+        'mitt',
+        'dry',
+        'dry_liner',
+        'utility',
+      ]);
+    });
+  });
+
   group('dpv attributes', () {
     test('exposes the curated dpv keys plus the universal ones', () {
       final keys = EquipmentAttributeCatalog.attributesFor(
