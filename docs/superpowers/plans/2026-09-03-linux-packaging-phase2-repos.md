@@ -114,7 +114,17 @@ secret material or create public infrastructure, so a person performs them.
 
 - [ ] **Step 1: Generate the key offline**
 
+Save this as a script and run it with `bash generate-key.sh` rather than
+pasting it line by line: it aborts on the first failure, and pasting would
+close an interactive shell instead.
+
 ```bash
+#!/usr/bin/env bash
+# Without this the block runs on after a failure: a gpg that could not
+# generate the key would flow straight into the export below and produce an
+# empty or wrong secret, which then gets pasted into a GitHub secret.
+set -euo pipefail
+
 # Everything here is private key material, so it is written inside a
 # mktemp -d directory (created 0700) with umask 077 in force. Shell
 # redirection creates files using the caller's umask, commonly 0644, and a
@@ -151,6 +161,17 @@ gpg --batch --pinentry-mode loopback --passphrase-file "$KEYDIR/repo-pass" \
   rsa4096 sign never
 
 KEYID=$(gpg --list-keys --with-colons dev@submersion.app | awk -F: '/^pub/{print $5; exit}')
+
+# pipefail above already aborts if gpg itself fails. This covers the other
+# case: gpg succeeding while printing no pub record, which leaves KEYID empty
+# and no non-zero status anywhere. An empty key id would make the export below
+# select nothing in particular, and the result would be pasted into a GitHub
+# secret without anyone noticing.
+if [ -z "$KEYID" ]; then
+  echo "Could not read the new key's id from $GNUPGHOME." >&2
+  exit 1
+fi
+echo "Key id: $KEYID"
 
 # Exporting a passphrase-protected secret key needs the same treatment: it
 # decrypts the key, so it prompts exactly as generation does.
@@ -898,7 +919,11 @@ jobs:
         run: |
           set -euo pipefail
           docker run --rm -v "$PWD/_site:/site:ro" debian:12 bash -c '
-            set -eux
+            # pipefail matters for the apt-cache pipeline below: without it
+            # a failed apt-cache is masked by tee succeeding. Note this is a
+            # standalone pipeline, where set -e plus pipefail does abort; in
+            # an if condition a failing pipeline would merely read as false.
+            set -euxo pipefail
             apt-get update -qq && apt-get install -y -qq ca-certificates > /dev/null
             cp /site/submersion.gpg /usr/share/keyrings/submersion.gpg
             echo "deb [signed-by=/usr/share/keyrings/submersion.gpg] file:///site/apt stable main" \
