@@ -1203,6 +1203,7 @@ jobs:
       - analyze
       - test
       - timezone-tests
+      - script-tests
       - integration-test
       - build-ios
       - build-macos
