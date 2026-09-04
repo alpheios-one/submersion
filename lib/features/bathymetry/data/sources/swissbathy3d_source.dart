@@ -285,7 +285,7 @@ class SwissBathy3dSource implements BathymetrySource {
   /// to the same href — see [_fetchTile]'s and [fetch]'s docs.
   Future<RawEsriGrid?> _downloadAndParseRaw(String href) async {
     final zipBytes = await _stac.downloadBytes(href);
-    final gridText = _extractGridText(zipBytes);
+    final gridText = extractGridZipText(zipBytes);
     if (gridText == null) return null;
     return EsriAsciiGridParser.parseRaw(gridText);
   }
@@ -561,8 +561,11 @@ class SwissBathy3dSource implements BathymetrySource {
   }
 
   /// The first `.asc`/`.grd` entry in the zip, or null when it contains only
-  /// other formats (e.g. XYZ, which this source does not parse).
-  static String? _extractGridText(Uint8List zipBytes) {
+  /// other formats (e.g. XYZ, which this source does not parse). Public (not
+  /// `_`-prefixed) so the temporary swissBATHY3D debug panel
+  /// (`swiss_bathy_debug_info.dart`) can decode the exact same downloaded
+  /// zip when diagnosing Bug 14, instead of duplicating this parsing.
+  static String? extractGridZipText(Uint8List zipBytes) {
     final archive = ZipDecoder().decodeBytes(zipBytes);
     for (final entry in archive) {
       if (!entry.isFile) continue;

@@ -14,13 +14,17 @@
 // running app without a debugger.
 import 'dart:typed_data';
 
+import 'package:http/http.dart' as http;
+
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
+import 'package:submersion/features/bathymetry/data/sources/esri_ascii_parser.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
+import 'package:submersion/features/bathymetry/data/sources/swiss_lv95_grid.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
@@ -99,6 +103,12 @@ class SwissBathyDebugInfo {
   /// builds it, without making the request.
   final String? firstTileStacUrl;
 
+  /// The real header/row-col extraction diagnostic for the first tile in
+  /// [tiles] (Bug 14) — unlike everything else in this class, building this
+  /// DOES make network calls (see [buildSwissBathyExtractionDebugInfo]).
+  /// Null only when [insideSwissLakeCoverage] is false (no tile to diagnose).
+  final SwissBathyExtractionDebugInfo? firstTileExtraction;
+
   const SwissBathyDebugInfo({
     required this.siteId,
     required this.siteName,
@@ -111,6 +121,7 @@ class SwissBathyDebugInfo {
     required this.lv95,
     required this.tiles,
     required this.firstTileStacUrl,
+    required this.firstTileExtraction,
   });
 }
 
@@ -144,6 +155,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
       lv95: null,
       tiles: const [],
       firstTileStacUrl: null,
+      firstTileExtraction: null,
     );
   }
 
@@ -213,6 +225,11 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
           )
           .toString();
 
+  final firstTileExtraction = await buildSwissBathyExtractionDebugInfo(
+    tileE: tileEMin,
+    tileN: tileNMin,
+  );
+
   return SwissBathyDebugInfo(
     siteId: siteId,
     siteName: siteName,
@@ -225,6 +242,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
     lv95: lv95,
     tiles: tiles,
     firstTileStacUrl: firstUrl,
+    firstTileExtraction: firstTileExtraction,
   );
 }
 
@@ -246,6 +264,273 @@ List<double> _tileBboxWgs84(int tileE, int tileN) {
     ne.longitude + epsilon,
     ne.latitude + epsilon,
   ];
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+///
+/// Investigated Bug 14 (extractRawEsriSubgrid() reportedly returning null
+/// for nearly every tile in a lake, or — for the one tile that did cache —
+/// a hash identical to the whole, unclipped lake grid from before that
+/// function existed): earlier bug reports about this extraction step were
+/// diagnosed by re-deriving its row/col arithmetic on paper, never against
+/// the actual downloaded file. This class instead carries the REAL header
+/// values and the REAL row/col window [extractRawEsriSubgrid] computes for
+/// one concrete tile, straight off a genuine STAC lookup and asset
+/// download — no theory, just the numbers the extraction step itself would
+/// see and act on.
+class SwissBathyExtractionDebugInfo {
+  final String tileKey;
+
+  /// The STAC asset actually resolved for this tile's bbox, or null when
+  /// the lookup itself failed or found nothing (see [error]).
+  final String? assetHref;
+
+  /// Set when the STAC lookup, download, or grid parse failed before a
+  /// header could even be read — every field below is null in that case.
+  final String? error;
+
+  /// The downloaded grid's own ESRI ASCII header (`ncols`/`nrows`/
+  /// `xllcorner`/`yllcorner`/`cellsize`), exactly as
+  /// [EsriAsciiGridParser.parseRaw] read it — null only on [error].
+  final int? ncols;
+  final int? nrows;
+  final double? xllcorner;
+  final double? yllcorner;
+  final double? cellsize;
+
+  /// This tile's target bounding box in LV95 meters — the same
+  /// min/maxEasting/Northing values
+  /// [SwissBathy3dSource._firstOverlappingCandidate] passes to
+  /// [extractRawEsriSubgrid] for this tile. Always known (no network call
+  /// needed), unlike everything below it.
+  final double minEasting;
+  final double maxEasting;
+  final double minNorthing;
+  final double maxNorthing;
+
+  /// The row/col window [extractRawEsriSubgrid] derives from the header
+  /// and bbox above, BEFORE its own `clampInt(...,0,nrows/ncols)` call —
+  /// null on [error]. A negative or past-the-edge value here (rather than
+  /// a silently clamped one) is the arithmetic actually going wrong, not a
+  /// tile that is genuinely just outside the downloaded grid.
+  final int? colFromRaw;
+  final int? colToRaw;
+  final int? rowFromRaw;
+  final int? rowToRaw;
+
+  /// The same window after [extractRawEsriSubgrid]'s own clamp — what it
+  /// actually slices with. `colFromClamped >= colToClamped` (or the row
+  /// equivalent) is exactly the condition under which it returns null.
+  final int? colFromClamped;
+  final int? colToClamped;
+  final int? rowFromClamped;
+  final int? rowToClamped;
+
+  /// Whether [extractRawEsriSubgrid], called with these exact inputs,
+  /// actually returned a non-null slice — the ground truth this whole
+  /// diagnostic exists to explain.
+  final bool extractionSucceeded;
+
+  const SwissBathyExtractionDebugInfo({
+    required this.tileKey,
+    required this.assetHref,
+    required this.error,
+    required this.ncols,
+    required this.nrows,
+    required this.xllcorner,
+    required this.yllcorner,
+    required this.cellsize,
+    required this.minEasting,
+    required this.maxEasting,
+    required this.minNorthing,
+    required this.maxNorthing,
+    required this.colFromRaw,
+    required this.colToRaw,
+    required this.rowFromRaw,
+    required this.rowToRaw,
+    required this.colFromClamped,
+    required this.colToClamped,
+    required this.rowFromClamped,
+    required this.rowToClamped,
+    required this.extractionSucceeded,
+  });
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// [SwissBathyExtractionDebugInfo] for tile ([tileE], [tileN]) by actually
+/// performing the STAC items lookup and downloading+parsing the first
+/// resolved candidate — the same steps
+/// [SwissBathy3dSource._firstOverlappingCandidate] takes for a real fetch —
+/// so the header and row/col numbers below come from the real file, not a
+/// second paper recalculation. Unlike the rest of this module, this DOES
+/// issue network requests; scoped to one tile, only run when the debug
+/// panel is expanded (see `site_terrain_pane.dart`).
+Future<SwissBathyExtractionDebugInfo> buildSwissBathyExtractionDebugInfo({
+  required int tileE,
+  required int tileN,
+  http.Client? httpClient,
+}) async {
+  final tileKey = '${tileE}_$tileN';
+  final minEasting = tileE * SwissBathy3dSource.tileSizeMeters;
+  final maxEasting = (tileE + 1) * SwissBathy3dSource.tileSizeMeters;
+  final minNorthing = tileN * SwissBathy3dSource.tileSizeMeters;
+  final maxNorthing = (tileN + 1) * SwissBathy3dSource.tileSizeMeters;
+
+  SwissBathyExtractionDebugInfo failure(String error, {String? assetHref}) =>
+      SwissBathyExtractionDebugInfo(
+        tileKey: tileKey,
+        assetHref: assetHref,
+        error: error,
+        ncols: null,
+        nrows: null,
+        xllcorner: null,
+        yllcorner: null,
+        cellsize: null,
+        minEasting: minEasting,
+        maxEasting: maxEasting,
+        minNorthing: minNorthing,
+        maxNorthing: maxNorthing,
+        colFromRaw: null,
+        colToRaw: null,
+        rowFromRaw: null,
+        rowToRaw: null,
+        colFromClamped: null,
+        colToClamped: null,
+        rowFromClamped: null,
+        rowToClamped: null,
+        extractionSucceeded: false,
+      );
+
+  final stac = SwissStacClient(client: httpClient);
+  final bbox = _tileBboxWgs84(tileE, tileN);
+
+  // Mirrors SwissBathy3dSource._findAssetCandidates: try every known
+  // collection id, falling through on a confirmed 404.
+  List<SwissBathyAsset> candidates = const [];
+  SwissStacCollectionNotFoundException? lastNotFound;
+  var resolvedCollection = false;
+  for (final collectionId in SwissStacClient.collectionIds) {
+    try {
+      candidates = await stac.findAssetCandidates(
+        collectionId: collectionId,
+        bbox: bbox,
+      );
+      resolvedCollection = true;
+      break;
+    } on SwissStacCollectionNotFoundException catch (e) {
+      lastNotFound = e;
+    } on SwissStacException catch (e) {
+      return failure('STAC items lookup failed: $e');
+    }
+  }
+  if (!resolvedCollection) {
+    return failure('no known collection id resolved: $lastNotFound');
+  }
+  if (candidates.isEmpty) {
+    return failure('no STAC candidates overlap this tile bbox');
+  }
+
+  final asset = candidates.first;
+  final Uint8List zipBytes;
+  try {
+    zipBytes = await stac.downloadBytes(asset.href);
+  } on SwissStacException catch (e) {
+    return failure('asset download failed: $e', assetHref: asset.href);
+  }
+
+  final gridText = SwissBathy3dSource.extractGridZipText(zipBytes);
+  if (gridText == null) {
+    return failure('zip contains no .asc/.grd entry', assetHref: asset.href);
+  }
+
+  final RawEsriGrid raw;
+  try {
+    raw = EsriAsciiGridParser.parseRaw(gridText);
+  } on FormatException catch (e) {
+    return failure('grid parse failed: $e', assetHref: asset.href);
+  }
+
+  int clampInt(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);
+  final colFromRaw = ((minEasting - raw.xll) / raw.cellsize).floor();
+  final colToRaw = ((maxEasting - raw.xll) / raw.cellsize).ceil();
+  final rowFromRaw = ((minNorthing - raw.yll) / raw.cellsize).floor();
+  final rowToRaw = ((maxNorthing - raw.yll) / raw.cellsize).ceil();
+
+  final extracted = extractRawEsriSubgrid(
+    raw,
+    minEasting: minEasting,
+    maxEasting: maxEasting,
+    minNorthing: minNorthing,
+    maxNorthing: maxNorthing,
+  );
+
+  return SwissBathyExtractionDebugInfo(
+    tileKey: tileKey,
+    assetHref: asset.href,
+    error: null,
+    ncols: raw.ncols,
+    nrows: raw.nrows,
+    xllcorner: raw.xll,
+    yllcorner: raw.yll,
+    cellsize: raw.cellsize,
+    minEasting: minEasting,
+    maxEasting: maxEasting,
+    minNorthing: minNorthing,
+    maxNorthing: maxNorthing,
+    colFromRaw: colFromRaw,
+    colToRaw: colToRaw,
+    rowFromRaw: rowFromRaw,
+    rowToRaw: rowToRaw,
+    colFromClamped: clampInt(colFromRaw, 0, raw.ncols),
+    colToClamped: clampInt(colToRaw, 0, raw.ncols),
+    rowFromClamped: clampInt(rowFromRaw, 0, raw.nrows),
+    rowToClamped: clampInt(rowToRaw, 0, raw.nrows),
+    extractionSucceeded: extracted != null,
+  );
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// [SwissBathyExtractionDebugInfo] as plain, copy-pasteable text, appended
+/// below [formatSwissBathyDebugInfo]'s output.
+String formatSwissBathyExtractionDebugInfo(SwissBathyExtractionDebugInfo info) {
+  final buf = StringBuffer()
+    ..writeln(
+      '--- extraction diagnostic for tile ${info.tileKey} (temporary) ---',
+    );
+  if (info.error != null) {
+    buf.write('FAILED: ${info.error}');
+    if (info.assetHref != null) buf.write(' (asset: ${info.assetHref})');
+    return buf.toString();
+  }
+  buf
+    ..writeln('asset href: ${info.assetHref}')
+    ..writeln(
+      'lake-wide grid header: ncols=${info.ncols} nrows=${info.nrows} '
+      'xllcorner=${info.xllcorner} yllcorner=${info.yllcorner} '
+      'cellsize=${info.cellsize}',
+    )
+    ..writeln(
+      'target bbox (LV95 m): '
+      'E[${info.minEasting}..${info.maxEasting}] '
+      'N[${info.minNorthing}..${info.maxNorthing}]',
+    )
+    ..writeln(
+      'row/col window, unclamped: '
+      'col[${info.colFromRaw}..${info.colToRaw}) '
+      'row[${info.rowFromRaw}..${info.rowToRaw}) '
+      '(valid index range is [0,ncols)/[0,nrows) — colTo/rowTo==ncols/nrows '
+      'is a normal, in-range EXCLUSIVE end, not an overflow)',
+    )
+    ..writeln(
+      'row/col window, after clampInt(...,0,ncols/nrows): '
+      'col[${info.colFromClamped}..${info.colToClamped}) '
+      'row[${info.rowFromClamped}..${info.rowToClamped}) '
+      '${(info.colFromClamped ?? 0) >= (info.colToClamped ?? 0) || (info.rowFromClamped ?? 0) >= (info.rowToClamped ?? 0) ? "-> EMPTY (this is why extractRawEsriSubgrid returns null)" : "-> non-empty"}',
+    )
+    ..write(
+      'extractRawEsriSubgrid() returned: ${info.extractionSucceeded ? "a slice" : "null"}',
+    );
+  return buf.toString();
 }
 
 /// Renders a [SwissBathyDebugInfo] as plain, copy-pasteable text.
@@ -298,7 +583,11 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
     );
   }
   if (info.firstTileStacUrl != null) {
-    buf.write('first tile STAC query: ${info.firstTileStacUrl}');
+    buf.writeln('first tile STAC query: ${info.firstTileStacUrl}');
+  }
+  final extraction = info.firstTileExtraction;
+  if (extraction != null) {
+    buf.write(formatSwissBathyExtractionDebugInfo(extraction));
   }
   return buf.toString();
 }
