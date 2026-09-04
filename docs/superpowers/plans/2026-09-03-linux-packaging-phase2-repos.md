@@ -818,12 +818,26 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       # The logic lives in the app repo, where the tests and review are.
+      #
+      # Non-cone sparse-checkout with a directory pattern does include that
+      # directory's contents: the patterns are gitignore-style, so an anchored
+      # path matches the directory and everything beneath it. Verified against
+      # git directly rather than assumed, because the behavior reads as
+      # ambiguous and cone mode is the more usual choice for a directory.
+      # Non-cone is used here to match the single-file checkout in
+      # build-all.yml's verify job, which cone mode cannot express.
       - name: Check out the app repository
         uses: actions/checkout@v7
         with:
           repository: submersion-app/submersion
           sparse-checkout: scripts/release/linux_repo
           sparse-checkout-cone-mode: false
+
+      # Guard rather than trust: an empty checkout would otherwise surface as
+      # a confusing "No such file or directory" from assemble_site.py two
+      # steps later.
+      - name: Confirm the scripts were checked out
+        run: test -f scripts/release/linux_repo/assemble_site.py
 
       - name: Install repository tools
         run: |
