@@ -88,8 +88,8 @@ void main() {
     );
   });
 
-  test('v185 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 185);
+  test('v185 is in the ladder and at or below the current schema version', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(185));
     expect(AppDatabase.migrationVersions, contains(185));
   });
 

@@ -2356,6 +2356,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_item_type_equipmentSet => 'عناصر طقم المعدات';
 
   @override
+  String get preDive_item_type_equipment => 'عنصر معدات';
+
+  @override
   String get preDive_item_valueLabel => 'تسمية القيمة';
 
   @override
@@ -2534,6 +2537,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get preDive_start_noEquipmentSet => 'بدون';
+
+  @override
+  String get preDive_start_noEquipment => 'بدون';
 
   @override
   String get preDive_start_begin => 'بدء';

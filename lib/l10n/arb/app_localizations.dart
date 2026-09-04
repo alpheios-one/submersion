@@ -4049,6 +4049,12 @@ abstract class AppLocalizations {
   /// **'Equipment set items'**
   String get preDive_item_type_equipmentSet;
 
+  /// No description provided for @preDive_item_type_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment item'**
+  String get preDive_item_type_equipment;
+
   /// No description provided for @preDive_item_valueLabel.
   ///
   /// In en, this message translates to:
@@ -4378,6 +4384,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None'**
   String get preDive_start_noEquipmentSet;
+
+  /// No description provided for @preDive_start_noEquipment.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get preDive_start_noEquipment;
 
   /// No description provided for @preDive_start_begin.
   ///

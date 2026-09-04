@@ -320,7 +320,7 @@ class PreDiveChecklistTemplateItems extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 
-  /// 'check' | 'value' | 'equipmentSet' (PreDiveItemType.name).
+  /// 'check' | 'value' | 'equipmentSet' | 'equipment' (PreDiveItemType.name).
   TextColumn get itemType => text().withDefault(const Constant('check'))();
   TextColumn get valueLabel => text().nullable()();
   TextColumn get valueUnit => text().nullable()();
@@ -331,6 +331,18 @@ class PreDiveChecklistTemplateItems extends Table {
 
   /// Required items must end Done or Flagged (never Skipped).
   BoolColumn get isRequired => boolean().withDefault(const Constant(false))();
+
+  /// Remembered equipment for an 'equipment'-typed item. Chosen at session
+  /// start (not in the template editor, mirroring the equipmentSet flow)
+  /// and persisted here so later sessions pre-fill the same device. Issue
+  /// #814.
+  ///
+  /// Deliberately not a SQL-level FK: template items are (re-)seeded
+  /// independently of the equipment table in isolated schema fixtures (and
+  /// at every app start for builtin templates), so a REFERENCES clause would
+  /// require the equipment table to exist wherever this table does.
+  /// Referential integrity is enforced at the application layer instead.
+  TextColumn get equipmentId => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -423,6 +435,12 @@ class PreDiveSessionItems extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+
+  /// JSON-encoded list of overdue-service entries, frozen the moment the
+  /// diver last moved this item away from pending. Null while pending (the
+  /// runner computes the live overdue list from equipmentId instead) and
+  /// cleared back to null on reset. Issue #814 phase 2.
+  TextColumn get overdueServices => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -3356,7 +3374,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 185;
+  static const int currentSchemaVersion = 187;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3801,6 +3819,21 @@ class AppDatabase extends _$AppDatabase {
     // open; the column is nullable and additive either way, so the
     // compatibility floor stays at 183.
     185,
+    // v186: pre_dive_checklist_template_items.equipment_id, the remembered
+    // single-equipment link for an 'equipment'-typed template item. Chosen
+    // at session start (not in the template editor), mirroring the
+    // equipmentSet flow. Issue #814. Column-only rung, no backfill, so the
+    // beforeOpen backstop is safe to re-run. Renumbered from 181: main
+    // landed 181 through 185 while this branch was open, and a rung at or
+    // below the shipped version never runs its onUpgrade step.
+    186,
+    // v187: pre_dive_session_items.overdue_services, the frozen snapshot of
+    // overdue-service entries for a resolved checklist item (issue #814
+    // phase 2). Column-only rung, no backfill: every pre-existing row
+    // correctly reads back as null (no frozen snapshot), which the UI
+    // already treats as "nothing known" for a resolved legacy row.
+    // Renumbered from 182 for the same reason as 186 above.
+    187,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -5971,6 +6004,48 @@ class AppDatabase extends _$AppDatabase {
         'INTEGER NOT NULL DEFAULT 0',
       );
     }
+  }
+
+  /// Idempotent DDL for the v181 pre_dive_checklist_template_items
+  /// equipment_id column (issue #814): the remembered single-equipment link
+  /// for an 'equipment'-typed template item, chosen at session start (not in
+  /// the template editor) and persisted so later sessions pre-fill the same
+  /// device. Self-guards on the table existing. Same dual-call contract
+  /// (onUpgrade + beforeOpen backstop) as the other column-assert helpers.
+  ///
+  /// No SQL-level REFERENCES clause: template items are (re-)seeded
+  /// independently of the equipment table (isolated schema fixtures, builtin
+  /// template reseeding on every app start), so referential integrity is
+  /// enforced at the application layer instead of via SQLite FK.
+  Future<void> _assertTemplateItemEquipmentIdColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_checklist_template_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('equipment_id')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
+      'TEXT',
+    );
+  }
+
+  /// Idempotent DDL for the v182 pre_dive_session_items.overdue_services
+  /// column (issue #814 phase 2): the frozen snapshot of overdue-service
+  /// entries for a resolved checklist item, written by the repository the
+  /// moment an item leaves pending and cleared on reset. Self-guards on the
+  /// table existing. Same dual-call contract (onUpgrade + beforeOpen
+  /// backstop) as the other column-assert helpers.
+  Future<void> _assertSessionItemOverdueServicesColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_session_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('overdue_services')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_session_items ADD COLUMN overdue_services TEXT',
+    );
   }
 
   Future<void> _assertBuddyFavoriteColumn() async {
@@ -9938,6 +10013,20 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveDetailLayoutColumn();
         }
         if (from < 185) await reportProgress();
+        // v186: pre_dive_checklist_template_items.equipment_id (issue #814).
+        // Column-only rung, no backfill: every pre-existing item correctly
+        // defaults to unlinked.
+        if (from < 186) {
+          await _assertTemplateItemEquipmentIdColumn();
+        }
+        if (from < 186) await reportProgress();
+        // v187: pre_dive_session_items.overdue_services (issue #814 phase 2).
+        // Column-only rung, no backfill: every pre-existing resolved item
+        // correctly reads back as "nothing known" until it is next resolved.
+        if (from < 187) {
+          await _assertSessionItemOverdueServicesColumn();
+        }
+        if (from < 187) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -10287,6 +10376,18 @@ class AppDatabase extends _$AppDatabase {
             stackTrace: stackTrace,
           );
         }
+
+        // v186 backstop: re-assert pre_dive_checklist_template_items.
+        // equipment_id (same parallel-branch version-collision self-heal).
+        // Safe to re-run on every open: the helper is column-only with no
+        // backfill, so it cannot resurrect or overwrite diver data.
+        await _assertTemplateItemEquipmentIdColumn();
+
+        // v187 backstop: re-assert pre_dive_session_items.overdue_services
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertSessionItemOverdueServicesColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
