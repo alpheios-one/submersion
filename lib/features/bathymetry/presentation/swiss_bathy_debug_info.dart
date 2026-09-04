@@ -12,6 +12,7 @@
 // without any network call, the same coordinate/cache-key derivation the
 // production pipeline performs, so that derivation is visible in the
 // running app without a debugger.
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -20,6 +21,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/core/services/windows_app_data_migration.dart'
+    show legacyWindowsCompanyName, windowsProductName;
 import 'package:submersion/core/utils/lv95_transform.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
@@ -881,6 +884,18 @@ String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
 // deleted by hand outside the app.
 // ---------------------------------------------------------------------
 
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. One legacy, pre-rename
+/// Windows app-data directory [windows_app_data_migration.migrateCompanyDirectory]
+/// would have moved data OUT of on a previous launch — see
+/// [buildSwissBathyCachePathsDebugInfo]'s doc for why this matters even
+/// after the migration has already run once.
+class SwissBathyLegacyPathInfo {
+  final String path;
+  final bool exists;
+
+  const SwissBathyLegacyPathInfo({required this.path, required this.exists});
+}
+
 /// TEMPORARY - DEBUG ONLY, remove before upstream PR.
 class SwissBathyCachePathsDebugInfo {
   /// The one sqlite file both [SwissBathyTileCacheRepository] and
@@ -893,9 +908,16 @@ class SwissBathyCachePathsDebugInfo {
   /// the path it WOULD open, just not confirmed live.
   final bool localCacheDatabaseOpen;
 
+  /// The legacy `<APPDATA|LOCALAPPDATA>/$legacyWindowsCompanyName/$windowsProductName`
+  /// directories [migrateWindowsAppDataDirectories] checks on every Windows
+  /// launch, with whether each still exists on disk right now. Empty on any
+  /// non-Windows platform, or when neither environment variable is set.
+  final List<SwissBathyLegacyPathInfo> legacyWindowsPaths;
+
   const SwissBathyCachePathsDebugInfo({
     required this.localCacheDatabasePath,
     required this.localCacheDatabaseOpen,
+    required this.legacyWindowsPaths,
   });
 }
 
@@ -903,6 +925,20 @@ class SwissBathyCachePathsDebugInfo {
 /// path [LocalCacheDatabaseService.initialize] opens — read-only, issues no
 /// network request and does not touch the database beyond checking whether
 /// it is already open.
+///
+/// Also re-derives the legacy Windows company-name directories
+/// [migrateWindowsAppDataDirectories] moves data out of on first launch after
+/// the rename. That migration only runs the move ONCE: if it fell back to
+/// COPYING (same-volume rename can fail e.g. with a file handle still open),
+/// the legacy tree is deliberately left in place afterwards (see
+/// [AppDataMigrationOutcome.copied]'s doc). A human manually deleting the
+/// CURRENT `submersion_local.db` between test runs never touches that
+/// retained legacy tree — so if the very first migration on this machine
+/// ever copied instead of renamed, the next app launch sees the (now
+/// missing) target as empty and copies the legacy tree BACK into place,
+/// resurrecting whatever tile cache rows existed back when that first
+/// migration ran. This surfaces both legacy directories so that possibility
+/// is visible instead of theorized.
 Future<SwissBathyCachePathsDebugInfo>
 buildSwissBathyCachePathsDebugInfo() async {
   final supportDir = await getApplicationSupportDirectory();
@@ -913,9 +949,28 @@ buildSwissBathyCachePathsDebugInfo() async {
   } on StateError {
     open = false;
   }
+  final legacyPaths = <SwissBathyLegacyPathInfo>[];
+  if (Platform.isWindows) {
+    for (final variable in const ['APPDATA', 'LOCALAPPDATA']) {
+      final root = Platform.environment[variable];
+      if (root == null || root.isEmpty) continue;
+      final legacyPath = p.join(
+        root,
+        legacyWindowsCompanyName,
+        windowsProductName,
+      );
+      legacyPaths.add(
+        SwissBathyLegacyPathInfo(
+          path: legacyPath,
+          exists: await Directory(legacyPath).exists(),
+        ),
+      );
+    }
+  }
   return SwissBathyCachePathsDebugInfo(
     localCacheDatabasePath: dbPath,
     localCacheDatabaseOpen: open,
+    legacyWindowsPaths: legacyPaths,
   );
 }
 
@@ -948,7 +1003,7 @@ String formatSwissBathyCachePathsDebugInfo(SwissBathyCachePathsDebugInfo info) {
       '(per quantized cell / raw coordinate) tables live in that ONE file '
       '-- not two separate files',
     )
-    ..write(
+    ..writeln(
       'downloaded zip bytes: held in memory only for the duration of one '
       'SwissBathy3dSource.fetch() call, never written to disk -- no '
       'getTemporaryDirectory()/getApplicationCacheDirectory() location '
@@ -957,6 +1012,29 @@ String formatSwissBathyCachePathsDebugInfo(SwissBathyCachePathsDebugInfo info) {
       'tile_cache_service.dart, but that caches OSM/topo/satellite imagery '
       'tiles, not swissBATHY3D depth data)',
     );
+  if (info.legacyWindowsPaths.isEmpty) {
+    buf.write(
+      'legacy pre-rename Windows company-name directories: none on this '
+      'platform (Windows-only check)',
+    );
+  } else {
+    buf.writeln(
+      'legacy pre-rename Windows company-name directories '
+      '(windows_app_data_migration.dart, legacyWindowsCompanyName='
+      '"$legacyWindowsCompanyName") -- if the migration ever fell back to '
+      'COPYING instead of renaming, one of these is retained forever and '
+      'gets copied back into the current path above the next time that path '
+      'is missing, e.g. after a manual delete:',
+    );
+    for (var i = 0; i < info.legacyWindowsPaths.length; i++) {
+      final legacy = info.legacyWindowsPaths[i];
+      final last = i == info.legacyWindowsPaths.length - 1;
+      buf.write(
+        '  ${legacy.path}: ${legacy.exists ? "EXISTS" : "not present"}'
+        '${last ? '' : '\n'}',
+      );
+    }
+  }
   return buf.toString();
 }
 
@@ -966,10 +1044,19 @@ class SwissBathyCacheClearResult {
   final int outerCacheRowsDeleted;
   final String path;
 
+  /// How many of [SwissBathyCachePathsDebugInfo.legacyWindowsPaths] were
+  /// found on disk and deleted outright (`Directory.delete(recursive: true)`)
+  /// — not merely emptied, since the whole legacy company directory is
+  /// nothing but retained swissBATHY3D-migration leftovers (see
+  /// [buildSwissBathyCachePathsDebugInfo]'s doc). Always 0 on non-Windows
+  /// platforms.
+  final int legacyDirsDeleted;
+
   const SwissBathyCacheClearResult({
     required this.tileRowsDeleted,
     required this.outerCacheRowsDeleted,
     required this.path,
+    required this.legacyDirsDeleted,
   });
 }
 
@@ -980,8 +1067,15 @@ class SwissBathyCacheClearResult {
 /// swissBATHY3D lake (mirrors [BathymetryRepository.quantumDegFor] — that
 /// is exactly the set of outer-cache rows a Swiss coordinate can produce,
 /// 'ok' and 'empty' alike). Rows belonging to other sources (GMRT/EMODnet/
-/// ETOPO) are left untouched, as are all non-bathymetry app data. Returns
-/// null when the local cache database is not open.
+/// ETOPO) are left untouched, as are all non-bathymetry app data.
+///
+/// Also deletes, entirely, any legacy pre-rename Windows company-name
+/// directory that still exists (see [buildSwissBathyCachePathsDebugInfo]'s
+/// doc for why one can survive indefinitely and get copied back into the
+/// current path on a later launch) — otherwise a single button press could
+/// clear the live database only to have the next app start silently refill
+/// it from that retained legacy copy. Returns null when the local cache
+/// database is not open.
 Future<SwissBathyCacheClearResult?> clearSwissBathyDebugCache() async {
   final LocalCacheDatabase db;
   try {
@@ -1006,10 +1100,24 @@ Future<SwissBathyCacheClearResult?> clearSwissBathyDebugCache() async {
   }
 
   final paths = await buildSwissBathyCachePathsDebugInfo();
+  var legacyDirsDeleted = 0;
+  for (final legacy in paths.legacyWindowsPaths) {
+    if (!legacy.exists) continue;
+    try {
+      await Directory(legacy.path).delete(recursive: true);
+      legacyDirsDeleted++;
+    } catch (_) {
+      // Best effort, same as windows_app_data_migration.dart's own cleanup:
+      // a file handle held open elsewhere must not abort the rest of the
+      // clear.
+    }
+  }
+
   return SwissBathyCacheClearResult(
     tileRowsDeleted: tileRowsDeleted,
     outerCacheRowsDeleted: outerCacheRowsDeleted,
     path: paths.localCacheDatabasePath,
+    legacyDirsDeleted: legacyDirsDeleted,
   );
 }
 
@@ -1018,6 +1126,7 @@ Future<SwissBathyCacheClearResult?> clearSwissBathyDebugCache() async {
 String formatSwissBathyCacheClearResult(SwissBathyCacheClearResult? result) {
   if (result == null) return 'cache not initialized -- nothing to clear';
   return '${result.tileRowsDeleted} tile row(s) + '
-      '${result.outerCacheRowsDeleted} outer cache row(s) deleted '
+      '${result.outerCacheRowsDeleted} outer cache row(s) + '
+      '${result.legacyDirsDeleted} legacy Windows directory(ies) deleted '
       'from ${result.path}';
 }

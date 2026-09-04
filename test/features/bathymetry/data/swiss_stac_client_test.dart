@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -419,6 +422,57 @@ void main() {
         () => client.downloadBytes('https://example.org/a.zip'),
         throwsA(isA<SwissStacException>()),
       );
+    });
+
+    // Regression: a real swissBATHY3D asset ZIP is lake-wide (potentially
+    // tens of megabytes) and was observed timing out at the old 15-second
+    // limit on ordinary connections. This proves a download that takes
+    // longer than that old limit, but stays under the new one, now succeeds
+    // instead of throwing.
+    test('does not time out on a download slower than the old 15s limit', () {
+      fakeAsync((async) {
+        final client = SwissStacClient(
+          client: MockClient((_) async {
+            await Future<void>.delayed(const Duration(seconds: 20));
+            return http.Response.bytes([1, 2, 3], 200);
+          }),
+        );
+
+        Uint8List? bytes;
+        Object? error;
+        unawaited(
+          client
+              .downloadBytes('https://example.org/a.zip')
+              .then((v) => bytes = v, onError: (e) => error = e),
+        );
+
+        async.elapse(const Duration(seconds: 20));
+
+        expect(error, isNull);
+        expect(bytes, [1, 2, 3]);
+      });
+    });
+
+    test('still times out on a download slower than the new 120s limit', () {
+      fakeAsync((async) {
+        final client = SwissStacClient(
+          client: MockClient((_) async {
+            await Future<void>.delayed(const Duration(seconds: 121));
+            return http.Response.bytes([1, 2, 3], 200);
+          }),
+        );
+
+        Object? error;
+        unawaited(
+          client
+              .downloadBytes('https://example.org/a.zip')
+              .then((_) {}, onError: (e) => error = e),
+        );
+
+        async.elapse(const Duration(seconds: 121));
+
+        expect(error, isA<SwissStacException>());
+      });
     });
   });
 }

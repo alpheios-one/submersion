@@ -62,7 +62,17 @@ class SwissStacCollectionNotFoundException implements Exception {
 class SwissStacClient {
   static const List<String> collectionIds = ['ch.swisstopo.swissbathy3d'];
 
-  static const Duration _timeout = Duration(seconds: 15);
+  /// Timeout for a STAC items metadata lookup — a small JSON response, so 15
+  /// seconds stays generous without letting one slow lake stall a fetch that
+  /// may need to look up dozens of tiles.
+  static const Duration _itemsTimeout = Duration(seconds: 15);
+
+  /// Timeout for downloading an asset ZIP. A lake-wide swissBATHY3D grid can
+  /// be tens of megabytes, and this app has been observed timing out at the
+  /// old 15-second value on ordinary connections — 120 seconds gives a large
+  /// download real room without waiting forever on a genuinely dead
+  /// connection.
+  static const Duration _downloadTimeout = Duration(seconds: 120);
 
   final http.Client _client;
   final String baseUrl;
@@ -125,7 +135,7 @@ class SwissStacClient {
     );
     final http.Response resp;
     try {
-      resp = await _client.get(url).timeout(_timeout);
+      resp = await _client.get(url).timeout(_itemsTimeout);
     } catch (e) {
       throw SwissStacException('STAC items request failed: $e');
     }
@@ -223,7 +233,7 @@ class SwissStacClient {
   Future<Uint8List> downloadBytes(String href) async {
     final http.Response resp;
     try {
-      resp = await _client.get(Uri.parse(href)).timeout(_timeout);
+      resp = await _client.get(Uri.parse(href)).timeout(_downloadTimeout);
     } catch (e) {
       throw SwissStacException('Asset download failed: $e');
     }
