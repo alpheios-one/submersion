@@ -17,6 +17,8 @@ import 'package:submersion/features/settings/presentation/pages/safety_settings_
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/widgets/coordinate_format_picker.dart';
+import 'package:submersion/features/dive_sites/domain/services/site_location_backfill_service.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/place_name_language_picker.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
@@ -53,6 +55,7 @@ import 'package:submersion/features/auto_update/domain/entities/update_status.da
 import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_mode_provider.dart';
 import 'package:submersion/features/settings/presentation/pages/debug_log_viewer_page.dart';
+import 'package:submersion/features/settings/presentation/widgets/gtr_reserve_dialog.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -584,7 +587,7 @@ class _UnitsSectionContent extends ConsumerWidget {
                     ],
                   ),
                   onTap: () =>
-                      showPlaceNameLanguagePicker(context, ref, settings),
+                      unawaited(_pickPlaceNameLanguage(context, ref, settings)),
                 ),
               ],
             ),
@@ -1235,6 +1238,17 @@ class _DecompressionSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildSourceDropdownTile(
                   context,
+                  title: context.l10n.settings_decompression_gtrSource,
+                  value: settings.defaultGtrSource,
+                  onChanged: (source) => ref
+                      .read(settingsProvider.notifier)
+                      .setDefaultGtrSource(source),
+                ),
+                const Divider(height: 1),
+                _buildGtrReserveTile(context, ref, settings),
+                const Divider(height: 1),
+                _buildSourceDropdownTile(
+                  context,
                   title: context.l10n.settings_decompression_cnsSource,
                   value: settings.defaultCnsSource,
                   onChanged: (source) => ref
@@ -1360,6 +1374,42 @@ class _DecompressionSectionContent extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Reserve pressure the calculated GTR counts down to, shown and edited in
+  /// the diver's pressure unit, stored in bar.
+  Widget _buildGtrReserveTile(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) {
+    final units = UnitFormatter(settings);
+    return ListTile(
+      dense: true,
+      title: Text(context.l10n.settings_decompression_gtrReserve),
+      subtitle: Text(context.l10n.settings_decompression_gtrReserve_subtitle),
+      trailing: Text(units.formatPressure(settings.gtrReservePressure)),
+      onTap: () => _showGtrReserveDialog(context, ref, settings),
+    );
+  }
+
+  Future<void> _showGtrReserveDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) async {
+    final units = UnitFormatter(settings);
+    final entered = await showDialog<double>(
+      context: context,
+      builder: (_) => GtrReserveDialog(
+        initialValue: units.convertPressure(settings.gtrReservePressure),
+        unitSymbol: units.pressureSymbol,
+      ),
+    );
+    if (entered == null || !entered.isFinite || entered <= 0) return;
+    await ref
+        .read(settingsProvider.notifier)
+        .setGtrReservePressure(units.pressureToBar(entered));
   }
 
   String _cnsMethodLabel(BuildContext context, CnsCalculationMethod method) {
@@ -3203,11 +3253,12 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
       ),
     };
 
+    // #1512: this stamp was hand-rolled as M/D/YYYY with a 24-hour clock, so
+    // it ignored both the date and the time preference.
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final lastCheck = prefs.lastCheckTime;
     final lastCheckText = lastCheck != null
-        ? '${lastCheck.month}/${lastCheck.day}/${lastCheck.year} '
-              '${lastCheck.hour.toString().padLeft(2, '0')}:'
-              '${lastCheck.minute.toString().padLeft(2, '0')}'
+        ? units.formatDateTime(lastCheck, l10n: context.l10n)
         : context.l10n.settings_updates_never;
 
     return Card(
@@ -3767,4 +3818,26 @@ class _GradientFactorDialogState extends State<_GradientFactorDialog> {
       ],
     );
   }
+}
+
+/// Picks the place name language and, when it changed, offers to look the
+/// diver's sites up again in the new language.
+///
+/// Without that offer a change quietly splits the database: sites geocoded
+/// before it keep their old names, so statistics group one region under two
+/// spellings (issue #1187). The refresh flow asks for confirmation itself,
+/// so a diver who only wants the language changed can decline.
+Future<void> _pickPlaceNameLanguage(
+  BuildContext context,
+  WidgetRef ref,
+  AppSettings settings,
+) async {
+  final previous = settings.placeNameLanguage;
+  final chosen = await showPlaceNameLanguagePicker(context, ref, settings);
+  if (chosen == null || chosen == previous || !context.mounted) return;
+  await showSiteLocationBackfillFlow(
+    context,
+    ref,
+    mode: SiteLocationLookupMode.refreshAll,
+  );
 }

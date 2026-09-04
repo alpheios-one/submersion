@@ -45,6 +45,16 @@ class DataSourcesSection extends StatefulWidget {
   /// separate dive" (confirmation happens in the caller).
   final void Function(String readingId)? onSplit;
 
+  /// Called when the user chooses "Separate combined dives" (confirmation
+  /// happens in the caller). Null hides the action.
+  ///
+  /// A dive-level action rather than a per-source one: it is the inverse of
+  /// Combine, and a Combine's segments do not line up with the display
+  /// sources. Two file imports collapse to one card (issue #1451), and a
+  /// dive consolidated before it was combined has one card per computer,
+  /// each straddling both halves.
+  final VoidCallback? onSeparate;
+
   /// Called when the user taps a source card to temporarily view it.
   final void Function(String sourceId)? onTapSource;
 
@@ -61,6 +71,7 @@ class DataSourcesSection extends StatefulWidget {
     this.viewedSourceId,
     this.onSetPrimary,
     this.onSplit,
+    this.onSeparate,
     this.onTapSource,
     this.onCompareIn3d,
   });
@@ -106,19 +117,24 @@ class _DataSourcesSectionState extends State<DataSourcesSection> {
         _SourceComparisonGrid(sources: widget.dataSources, units: widget.units),
       );
       children.add(const SizedBox(height: 8));
-      if (widget.onCompareIn3d != null) {
-        children.add(
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              icon: const Icon(Icons.view_in_ar, size: 18),
-              label: Text(context.l10n.diveLog_sources_compareIn3d),
-              onPressed: widget.onCompareIn3d,
-            ),
-          ),
-        );
-        children.add(const SizedBox(height: 8));
-      }
+    }
+    final actions = <Widget>[
+      if (isMultiSource && widget.onCompareIn3d != null)
+        TextButton.icon(
+          icon: const Icon(Icons.view_in_ar, size: 18),
+          label: Text(context.l10n.diveLog_sources_compareIn3d),
+          onPressed: widget.onCompareIn3d,
+        ),
+      if (widget.onSeparate != null)
+        TextButton.icon(
+          icon: const Icon(Icons.call_split, size: 18),
+          label: Text(context.l10n.diveLog_sources_menu_separate),
+          onPressed: widget.onSeparate,
+        ),
+    ];
+    if (actions.isNotEmpty) {
+      children.add(Wrap(spacing: 8, runSpacing: 4, children: actions));
+      children.add(const SizedBox(height: 8));
     }
     for (var i = 0; i < widget.dataSources.length; i++) {
       final source = widget.dataSources[i];

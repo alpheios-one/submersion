@@ -22,6 +22,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/domain/services/computer_cns_extractor.dart';
+import 'package:submersion/features/dive_log/domain/services/gas_time_remaining.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_event_mapper.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -427,20 +428,32 @@ ProfileAnalysisService _resolveAnalysisService(
   MetricDataSource ttsSource = MetricDataSource.calculated,
   MetricDataSource cnsSource = MetricDataSource.calculated,
   MetricDataSource decoStopSource = MetricDataSource.calculated,
+  MetricDataSource gtrSource = MetricDataSource.calculated,
   RebreatherPpO2? rebreatherPpO2,
 }) {
-  final hasComputerNdl = profile.any((p) => p.ndl != null);
-  final hasComputerCeiling = profile.any((p) => p.ceiling != null);
-  // TTS=0 is a sentinel from dive computers that don't track TTS;
-  // treat it as unavailable so we fall back to calculated values.
+  // A zero is not a reading. Computers that do not measure one of these
+  // still leave a zero in every sample, so a series that is zero from end to
+  // end counts as unreported and the calculated curve stands. TTS has always
+  // been read that way; the Cressi Leonardo forces the same rule on the other
+  // two, because it logs its deco obligation as a single bit and no numbers,
+  // leaving a stop depth of zero through a stop and a no-stop time of zero
+  // for the rest of the dive.
+  final hasComputerNdl = profile.any((p) => p.ndl != null && p.ndl! > 0);
+  final hasComputerCeiling = profile.any(
+    (p) => p.ceiling != null && p.ceiling! > 0,
+  );
   final hasComputerTts = profile.any((p) => p.tts != null && p.tts! > 0);
   final hasComputerCns = profile.any((p) => p.cns != null);
+  // Air-integrated computers log their own GTR (libdc RBT, stored in
+  // seconds); a null sample is the computer blanking its display.
+  final hasComputerGtr = profile.any((p) => p.rbt != null);
 
   final useNdl = ndlSource == MetricDataSource.computer && hasComputerNdl;
   final useCeiling =
       ceilingSource == MetricDataSource.computer && hasComputerCeiling;
   final useTts = ttsSource == MetricDataSource.computer && hasComputerTts;
   final useCns = cnsSource == MetricDataSource.computer && hasComputerCns;
+  final useGtr = gtrSource == MetricDataSource.computer && hasComputerGtr;
   // Resolved independently of useCeiling: the deco stop band must not be
   // dragged along when the user picks "computer" for the ceiling line alone.
   final useDecoStop =
@@ -469,6 +482,7 @@ ProfileAnalysisService _resolveAnalysisService(
     decoStopActual: useDecoStop
         ? MetricDataSource.computer
         : MetricDataSource.calculated,
+    gtrActual: useGtr ? MetricDataSource.computer : MetricDataSource.calculated,
   );
 
   if (!useNdl &&
@@ -476,6 +490,7 @@ ProfileAnalysisService _resolveAnalysisService(
       !useDecoStop &&
       !useTts &&
       !useCns &&
+      !useGtr &&
       resolvedPpO2 == null) {
     // Millivolts stand alone: a dive can carry them with no ppO2, cells or
     // setpoint to overlay, and they must not be dropped on this path (#810).
@@ -532,6 +547,12 @@ ProfileAnalysisService _resolveAnalysisService(
                     ? analysis.cnsCurve![i]
                     : 0.0),
           )
+        : null,
+    // The computer's GTR verbatim: a null sample stays blank rather than
+    // borrowing the calculated value, because this source exists to show
+    // what the diver's display actually read.
+    gtrCurve: useGtr
+        ? List<int?>.generate(profile.length, (i) => profile[i].rbt)
         : null,
     // ppO2 from sensor/setpoint (null keeps the calculated curve).
     ppO2Curve: resolvedPpO2,
@@ -744,6 +765,7 @@ class _ProfileAnalysisInput {
   final List<double>? rebreatherPpO2Curve;
   final DiveEnvironment environment;
   final CnsCalculationMethod cnsCalculationMethod;
+  final double gtrReserveBar;
 
   const _ProfileAnalysisInput({
     required this.gfLow,
@@ -776,6 +798,7 @@ class _ProfileAnalysisInput {
     this.rebreatherPpO2Curve,
     this.environment = DiveEnvironment.standard,
     this.cnsCalculationMethod = CnsCalculationMethod.shearwater,
+    this.gtrReserveBar = defaultGtrReserveBar,
   });
 }
 
@@ -821,6 +844,7 @@ ProfileAnalysis _runProfileAnalysis(_ProfileAnalysisInput input) {
     gasSegments: input.gasSegments,
     ascentGasPlan: ascentGasPlan,
     rebreatherPpO2Curve: input.rebreatherPpO2Curve,
+    gtrReserveBar: input.gtrReserveBar,
   );
 }
 
@@ -954,7 +978,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     // Try to get per-tank pressure data first (works for single and multi-tank)
     List<double>? pressures;
     if (tanks.isNotEmpty) {
-      // Load per-tank pressure data from tank_pressure_profiles table
+      // Load per-tank pressure data from the tank_pressure_series table
       final tankPressureRepo = ref.watch(tankPressureRepositoryProvider);
       final allTankPressures = await tankPressureRepo.getTankPressuresForDive(
         diveId,
@@ -991,7 +1015,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     }
 
     // Read per-metric source preferences from legend state.
-    // Use select() to only watch the 4 data-source fields — toggling
+    // Use select() to only watch the per-metric source fields — toggling
     // visibility or expanding menu sections should NOT trigger a full
     // Buhlmann recalculation.
     final ndlSource = ref.watch(
@@ -1007,6 +1031,12 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     );
     final decoStopSource = ref.watch(
       profileLegendProvider.select((s) => s.decoStopSource),
+    );
+    final gtrSource = ref.watch(
+      profileLegendProvider.select((s) => s.gtrSource),
+    );
+    final gtrReserveBar = ref.watch(
+      settingsProvider.select((s) => s.gtrReservePressure),
     );
 
     final useComputerCns = cnsSource == MetricDataSource.computer;
@@ -1095,6 +1125,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
         ),
         ascentMaxPpO2: ascentMaxPpO2,
         rebreatherPpO2Curve: rebreatherPpO2?.curve,
+        gtrReserveBar: gtrReserveBar,
       ),
     );
     // The isolate only ever saw two fractions, so it stamped the conservative
@@ -1112,6 +1143,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
       ttsSource: ttsSource,
       cnsSource: cnsSource,
       decoStopSource: decoStopSource,
+      gtrSource: gtrSource,
       rebreatherPpO2: rebreatherPpO2,
     );
 
@@ -1162,7 +1194,17 @@ final sourceProfileAnalysisProvider =
         final primaryId =
             sources.where((s) => s.isPrimary).map((s) => s.id).firstOrNull ??
             sources.first.id;
-        final effectiveSourceId = key.sourceId ?? primaryId;
+        // A stale id (the selection outliving its source row, e.g. right
+        // after a split) resolves to the primary, exactly as
+        // activeSourceProfileProvider resolves the chart's series, so the
+        // analysis is never computed over a different series than the one
+        // drawn. Falling through to the dive-level analysis here would pair
+        // merged-length curves with the primary's bucket (#543).
+        final requested = key.sourceId;
+        final effectiveSourceId =
+            requested != null && sources.any((s) => s.id == requested)
+            ? requested
+            : primaryId;
         final dive = await ref.watch(analysisDiveProvider(key.diveId).future);
         if (dive == null) return null;
         final profiles = await ref.watch(
@@ -1609,6 +1651,7 @@ final diveProfileAnalysisProvider = Provider.family<ProfileAnalysis?, Dive>((
       ttsSource: MetricDataSource.computer,
       cnsSource: MetricDataSource.computer,
       decoStopSource: MetricDataSource.computer,
+      gtrSource: MetricDataSource.computer,
       rebreatherPpO2: rebreatherPpO2,
     );
     return overlaid;

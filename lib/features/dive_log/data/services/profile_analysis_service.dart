@@ -11,6 +11,7 @@ import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
 import 'package:submersion/core/deco/entities/dive_environment.dart';
+import 'package:submersion/features/dive_log/domain/services/gas_time_remaining.dart';
 import 'package:submersion/core/deco/entities/gradient_factor_source.dart';
 import 'package:submersion/core/deco/entities/o2_exposure.dart';
 import 'package:submersion/core/deco/entities/profile_gas_segment.dart';
@@ -289,6 +290,12 @@ class ProfileAnalysis {
   /// Time To Surface at each profile point (seconds)
   final List<int>? ttsCurve;
 
+  /// Gas time remaining at each profile point (seconds); null entries are
+  /// where an air-integrated computer would blank the display (surface, SAC
+  /// window not yet full, pressure not falling, deco ceiling). Null when the
+  /// dive has no pressure data. See [calculateGtrCurve].
+  final List<int?>? gtrCurve;
+
   /// Cumulative CNS% at each profile point (includes residual from prior dives)
   final List<double>? cnsCurve;
 
@@ -348,6 +355,7 @@ class ProfileAnalysis {
     this.surfaceGfCurve,
     this.meanDepthCurve,
     this.ttsCurve,
+    this.gtrCurve,
     this.cnsCurve,
     this.otuCurve,
     required this.maxDepth,
@@ -408,6 +416,11 @@ class ProfileAnalysis {
   /// Whether TTS curve data is available
   bool get hasTtsData => ttsCurve != null && ttsCurve!.isNotEmpty;
 
+  /// Whether any sample carries a gas time remaining value. A curve of
+  /// nothing but blanks is not data, and the chart's own availability check
+  /// agrees; the two must not disagree about whether to offer the metric.
+  bool get hasGtrData => gtrCurve?.any((v) => v != null) ?? false;
+
   /// Whether CNS curve data is available
   bool get hasCnsData => cnsCurve != null && cnsCurve!.isNotEmpty;
 
@@ -440,6 +453,7 @@ class ProfileAnalysis {
     List<double>? surfaceGfCurve,
     List<double>? meanDepthCurve,
     List<int>? ttsCurve,
+    List<int?>? gtrCurve,
     List<double>? cnsCurve,
     List<double>? otuCurve,
     double? maxDepth,
@@ -474,6 +488,7 @@ class ProfileAnalysis {
       surfaceGfCurve: surfaceGfCurve ?? this.surfaceGfCurve,
       meanDepthCurve: meanDepthCurve ?? this.meanDepthCurve,
       ttsCurve: ttsCurve ?? this.ttsCurve,
+      gtrCurve: gtrCurve ?? this.gtrCurve,
       cnsCurve: cnsCurve ?? this.cnsCurve,
       otuCurve: otuCurve ?? this.otuCurve,
       maxDepth: maxDepth ?? this.maxDepth,
@@ -615,6 +630,7 @@ class ProfileAnalysisService {
     List<ProfileGasSegment>? gasSegments,
     AscentGasPlan? ascentGasPlan,
     List<double>? rebreatherPpO2Curve,
+    double gtrReserveBar = defaultGtrReserveBar,
   }) {
     if (depths.isEmpty || depths.length != timestamps.length) {
       // Still an answer from a configured service, so it can say which
@@ -742,10 +758,6 @@ class ProfileAnalysisService {
             startCns: startCns,
           )
         : null;
-
-    final pointO2Fractions = ocGasMetrics?.o2Fractions;
-    final pointN2Fractions = ocGasMetrics?.n2Fractions;
-    final pointHeFractions = ocGasMetrics?.heFractions;
 
     // A measured ppO2 curve (from O2 cells/setpoint) takes priority for
     // rebreather dives: it reflects the actual loop ppO2, unlike the setpoint
@@ -912,6 +924,36 @@ class ProfileAnalysisService {
       }
     }
 
+    // Per-sample breathed fractions for the gas display curves. OC: the
+    // recorded tank/switch schedule. CCR: the loop itself (issue #579), the
+    // same model the engine loads tissues with: inspired inert = ambient -
+    // loop ppO2, split by the diluent's He:N2 ratio. The loop ppO2 is the
+    // displayed ppO2 curve so the ppN2/density overlays agree with it. With
+    // no setpoint segments the loop cannot be modeled and the legacy
+    // first-tank fractions stand.
+    final ccrLoopFractions = diveMode == DiveMode.ccr && gasSegments != null
+        ? _calculateCcrLoopFractions(
+            depths: depths,
+            timestamps: timestamps,
+            gasSegments: gasSegments,
+            loopPpO2Curve: ppO2Curve,
+          )
+        : null;
+    final pointO2Fractions =
+        ocGasMetrics?.o2Fractions ?? ccrLoopFractions?.o2Fractions;
+    final pointN2Fractions =
+        ocGasMetrics?.n2Fractions ?? ccrLoopFractions?.n2Fractions;
+    final pointHeFractions =
+        ocGasMetrics?.heFractions ?? ccrLoopFractions?.heFractions;
+    // MOD is a property of the gas, not of depth, and the chart draws it as a
+    // flat reference that moves only on a gas switch. On a CCR that gas is the
+    // diluent (the mix the diver can flush to or bail out on), not the
+    // depth-varying effective loop fraction.
+    final modO2Fractions =
+        ocGasMetrics?.o2Fractions ??
+        ccrLoopFractions?.diluentO2Fractions ??
+        List.filled(depths.length, o2Fraction);
+
     // Calculate additional gas/deco curves
     final ppN2Curve = pointN2Fractions != null
         ? _calculatePpCurve(depths, pointN2Fractions)
@@ -923,9 +965,7 @@ class ProfileAnalysisService {
         : heFraction > 0
         ? _calculatePpCurve(depths, List.filled(depths.length, heFraction))
         : null;
-    final modCurve = _calculateModCurve(
-      pointO2Fractions ?? List.filled(depths.length, o2Fraction),
-    );
+    final modCurve = _calculateModCurve(modO2Fractions);
     final densityCurve = _calculateDensityCurve(
       depths: depths,
       o2Fractions: pointO2Fractions ?? List.filled(depths.length, o2Fraction),
@@ -936,6 +976,18 @@ class ProfileAnalysisService {
     final surfaceGfCurve = _calculateSurfaceGfCurve(decoStatuses);
     final meanDepthCurve = _calculateMeanDepthCurve(depths);
     final ttsCurve = decoStatuses.map((s) => s.ttsSeconds).toList();
+    // Same pressure track as the SAC curve, blanked by this analysis's own
+    // ceiling so GTR and the deco band never disagree about deco being in
+    // force.
+    final gtrCurve = pressures != null && pressures.length == depths.length
+        ? calculateGtrCurve(
+            depths: depths,
+            timestamps: timestamps,
+            pressures: pressures,
+            reserveBar: gtrReserveBar,
+            ceilings: ceilingCurve,
+          )
+        : null;
     final cnsCurve =
         ocGasMetrics?.cnsCurve ??
         _calculateCnsCurve(
@@ -969,6 +1021,7 @@ class ProfileAnalysisService {
       surfaceGfCurve: surfaceGfCurve,
       meanDepthCurve: meanDepthCurve,
       ttsCurve: ttsCurve,
+      gtrCurve: gtrCurve,
       cnsCurve: cnsCurve,
       otuCurve: otuCurve,
       maxDepth: maxDepth,
@@ -1805,6 +1858,71 @@ class ProfileAnalysisService {
       ),
       cnsCurve: cnsCurve,
       otuCurve: otuCurve,
+    );
+  }
+
+  /// Effective breathed fractions on a CCR loop at each sample, plus the
+  /// diluent O2 fraction for the MOD line.
+  ///
+  /// Mirrors the engine's `ClosedCircuit.inspiredAt` without the water-vapor
+  /// term, so the curves stay on the same ambient-pressure basis as the OC
+  /// partial pressures and the displayed loop ppO2. The loop ppO2 clamps to
+  /// ambient (the loop cannot exceed it near the surface) and a sample with no
+  /// loop ppO2 information falls back to breathing the diluent open-circuit
+  /// rather than reporting a hypoxic loop.
+  ({
+    List<double> o2Fractions,
+    List<double> n2Fractions,
+    List<double> heFractions,
+    List<double> diluentO2Fractions,
+  })
+  _calculateCcrLoopFractions({
+    required List<double> depths,
+    required List<int> timestamps,
+    required List<ProfileGasSegment> gasSegments,
+    required List<double> loopPpO2Curve,
+  }) {
+    final o2Fractions = <double>[];
+    final n2Fractions = <double>[];
+    final heFractions = <double>[];
+    final diluentO2Fractions = <double>[];
+
+    for (int i = 0; i < depths.length; i++) {
+      final diluent = _activeGasSegmentAtTimestamp(timestamps[i], gasSegments);
+      // Inert fractions summing past 1 (import noise) are scaled back to 1
+      // together so the recorded He:N2 ratio survives; the diluent then has
+      // no O2 left and its MOD reads as unavailable.
+      final rawFN2 = math.max(diluent.fN2, 0.0);
+      final rawFHe = math.max(diluent.fHe, 0.0);
+      final rawInert = rawFN2 + rawFHe;
+      final overFull = rawInert > 1.0;
+      final diluentFN2 = overFull ? rawFN2 / rawInert : rawFN2;
+      final diluentFHe = overFull ? rawFHe / rawInert : rawFHe;
+      final diluentInert = overFull ? 1.0 : rawInert;
+      diluentO2Fractions.add(1.0 - diluentInert);
+
+      final ambientPressure = 1.0 + (depths[i] / 10.0);
+      final loopPpO2 = i < loopPpO2Curve.length ? loopPpO2Curve[i] : 0.0;
+      if (loopPpO2 <= 0 || diluentInert <= 0) {
+        o2Fractions.add(1.0 - diluentInert);
+        n2Fractions.add(diluentFN2);
+        heFractions.add(diluentFHe);
+        continue;
+      }
+
+      final pO2 = math.min(loopPpO2, ambientPressure);
+      final inertFraction = (ambientPressure - pO2) / ambientPressure;
+      final n2Share = diluentFN2 / diluentInert;
+      o2Fractions.add(pO2 / ambientPressure);
+      n2Fractions.add(inertFraction * n2Share);
+      heFractions.add(inertFraction * (1.0 - n2Share));
+    }
+
+    return (
+      o2Fractions: o2Fractions,
+      n2Fractions: n2Fractions,
+      heFractions: heFractions,
+      diluentO2Fractions: diluentO2Fractions,
     );
   }
 

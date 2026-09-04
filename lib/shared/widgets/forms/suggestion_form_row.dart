@@ -4,9 +4,9 @@ import 'package:submersion/core/text/fuzzy_match.dart';
 import 'package:submersion/shared/widgets/forms/form_style.dart';
 
 /// Row-styled autocomplete text field: label left, always-mounted bare
-/// field right (safe for validators inside always-open sections), with the
-/// SuggestionField dropdown behavior (substring matches, then fuzzy
-/// near-matches when [enableFuzzy]).
+/// field right (safe for validators inside always-open sections), with a
+/// dropdown that offers substring matches first, then fuzzy near-matches
+/// when [enableFuzzy].
 ///
 /// [caption] renders muted under the row (merge source label);
 /// [trailing] docks a widget after the field (merge cycle button).

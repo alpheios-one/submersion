@@ -62,7 +62,7 @@ class DiveComputerGearLinker {
   /// Every computer that logged [diveId].
   ///
   /// Deliberately NOT `DiveComputerRepository.getComputerIdsForDive`, which
-  /// reads `dive_profiles` and so sees only dives that carry profile samples.
+  /// reads `dive_profile_series` and so sees only dives that carry samples.
   /// A file-imported dive registered by #1288 can have `computer_id` stamped
   /// and a data-source row while having no samples at all, and its computer
   /// belongs on it just the same.

@@ -685,6 +685,15 @@ class UddfExportBuilders {
             if (dive.isFavorite) {
               builder.element('isfavorite', nest: 'true');
             }
+            // Statistics exclusion (#526 / #1272). App-specific, like
+            // isfavorite: another application's UDDF omits these and imports
+            // as included, which is the right default.
+            if (dive.excludedFromStats) {
+              builder.element('excludedfromstats', nest: 'true');
+            }
+            if (dive.excludedFromGasStats) {
+              builder.element('excludedfromgasstats', nest: 'true');
+            }
             if (dive.photoIds.isNotEmpty) {
               builder.element(
                 'photos',
@@ -1480,24 +1489,41 @@ class UddfExportBuilders {
                       },
                     );
                   }
-                  if (owner.insurance.provider != null) {
+                  // Gated on any detail, not on the provider name: a policy
+                  // number or an assistance line saved without naming the
+                  // insurer would otherwise never reach the file.
+                  if (owner.insurance.hasAnyDetail) {
                     builder.element(
                       'insurance',
                       nest: () {
-                        builder.element(
-                          'provider',
-                          nest: owner.insurance.provider,
-                        );
-                        if (owner.insurance.policyNumber != null) {
+                        if (owner.insurance.providerLabel != null) {
+                          builder.element(
+                            'provider',
+                            nest: owner.insurance.providerLabel,
+                          );
+                        }
+                        if (owner.insurance.policyLabel != null) {
                           builder.element(
                             'policynumber',
-                            nest: owner.insurance.policyNumber,
+                            nest: owner.insurance.policyLabel,
                           );
                         }
                         if (owner.insurance.expiryDate != null) {
                           builder.element(
                             'expirydate',
                             nest: owner.insurance.expiryDate!.toIso8601String(),
+                          );
+                        }
+                        if (owner.insurance.assistanceLine != null) {
+                          builder.element(
+                            'emergencyphone',
+                            nest: owner.insurance.assistanceLine,
+                          );
+                        }
+                        if (owner.insurance.officeLine != null) {
+                          builder.element(
+                            'phone',
+                            nest: owner.insurance.officeLine,
                           );
                         }
                       },

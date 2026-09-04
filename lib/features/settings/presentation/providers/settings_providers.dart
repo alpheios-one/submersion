@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -278,6 +279,15 @@ class AppSettings {
   /// Default data source for CNS metric (computer or calculated)
   final MetricDataSource defaultCnsSource;
 
+  /// Default data source for GTR (gas time remaining): the computer's own
+  /// reading or the app's calculation.
+  final MetricDataSource defaultGtrSource;
+
+  /// Tank pressure (bar) the calculated GTR counts down to, i.e. what the
+  /// diver wants left on surfacing. Mirrors the reserve setting on an
+  /// air-integrated computer.
+  final double gtrReservePressure;
+
   /// Algorithm used for calculated CNS%; see
   /// docs/plans/2026-07-16-cns-calculation-method-setting-design.md
   final CnsCalculationMethod cnsCalculationMethod;
@@ -389,6 +399,9 @@ class AppSettings {
   /// Default visibility for TTS on dive profile
   final bool defaultShowTts;
 
+  /// Default visibility for GTR on dive profile
+  final bool defaultShowGtr;
+
   /// Default visibility for CNS% on dive profile
   final bool defaultShowCns;
 
@@ -443,6 +456,9 @@ class AppSettings {
 
   /// Ordered list of dive detail section visibility preferences
   final List<DiveDetailSectionConfig> diveDetailSections;
+
+  /// How the dive detail page arranges the sections it shows.
+  final DiveDetailLayout diveDetailLayout;
 
   /// Home dashboard gauge-strip chip types the user has hidden.
   /// Ids are [HomeChipType.name] values; empty means all chips shown.
@@ -538,6 +554,9 @@ class AppSettings {
     this.defaultDecoStopSource = MetricDataSource.calculated,
     this.defaultTtsSource = MetricDataSource.calculated,
     this.defaultCnsSource = MetricDataSource.calculated,
+    this.defaultGtrSource = MetricDataSource.calculated,
+    // Same default as the planner's reserve and defaultGtrReserveBar.
+    this.gtrReservePressure = 50.0,
     this.cnsCalculationMethod = CnsCalculationMethod.shearwater,
     // Appearance defaults
     this.cardColorAttribute = CardColorAttribute.none,
@@ -575,6 +594,7 @@ class AppSettings {
     this.defaultShowSurfaceGf = false,
     this.defaultShowMeanDepth = false,
     this.defaultShowTts = false,
+    this.defaultShowGtr = false,
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
@@ -599,6 +619,7 @@ class AppSettings {
     this.showDetailsPaneCertifications = false,
     this.showDetailsPaneCourses = false,
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
+    this.diveDetailLayout = DiveDetailLayout.detailed,
     this.hiddenHomeChips = const <String>{},
     this.homeCardOrder = const <String>[],
     this.hiddenHomeCards = const <String>{},
@@ -702,6 +723,8 @@ class AppSettings {
     MetricDataSource? defaultDecoStopSource,
     MetricDataSource? defaultTtsSource,
     MetricDataSource? defaultCnsSource,
+    MetricDataSource? defaultGtrSource,
+    double? gtrReservePressure,
     CnsCalculationMethod? cnsCalculationMethod,
     CardColorAttribute? cardColorAttribute,
     ListViewMode? diveListViewMode,
@@ -738,6 +761,7 @@ class AppSettings {
     bool? defaultShowSurfaceGf,
     bool? defaultShowMeanDepth,
     bool? defaultShowTts,
+    bool? defaultShowGtr,
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
@@ -762,6 +786,7 @@ class AppSettings {
     bool? showDetailsPaneCourses,
     List<DiveDetailSectionConfig>? diveDetailSections,
     bool clearDiveDetailSections = false,
+    DiveDetailLayout? diveDetailLayout,
     Set<String>? hiddenHomeChips,
     List<String>? homeCardOrder,
     Set<String>? hiddenHomeCards,
@@ -841,6 +866,8 @@ class AppSettings {
           defaultDecoStopSource ?? this.defaultDecoStopSource,
       defaultTtsSource: defaultTtsSource ?? this.defaultTtsSource,
       defaultCnsSource: defaultCnsSource ?? this.defaultCnsSource,
+      defaultGtrSource: defaultGtrSource ?? this.defaultGtrSource,
+      gtrReservePressure: gtrReservePressure ?? this.gtrReservePressure,
       cnsCalculationMethod: cnsCalculationMethod ?? this.cnsCalculationMethod,
       cardColorAttribute: cardColorAttribute ?? this.cardColorAttribute,
       diveListViewMode: diveListViewMode ?? this.diveListViewMode,
@@ -889,6 +916,7 @@ class AppSettings {
       defaultShowSurfaceGf: defaultShowSurfaceGf ?? this.defaultShowSurfaceGf,
       defaultShowMeanDepth: defaultShowMeanDepth ?? this.defaultShowMeanDepth,
       defaultShowTts: defaultShowTts ?? this.defaultShowTts,
+      defaultShowGtr: defaultShowGtr ?? this.defaultShowGtr,
       defaultShowCns: defaultShowCns ?? this.defaultShowCns,
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
@@ -926,6 +954,7 @@ class AppSettings {
       diveDetailSections: clearDiveDetailSections
           ? DiveDetailSectionConfig.defaultSections
           : (diveDetailSections ?? this.diveDetailSections),
+      diveDetailLayout: diveDetailLayout ?? this.diveDetailLayout,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
       homeCardOrder: homeCardOrder ?? this.homeCardOrder,
       hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
@@ -1630,6 +1659,16 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultGtrSource(MetricDataSource value) async {
+    state = state.copyWith(defaultGtrSource: value);
+    await _saveSettings();
+  }
+
+  Future<void> setGtrReservePressure(double value) async {
+    state = state.copyWith(gtrReservePressure: value);
+    await _saveSettings();
+  }
+
   Future<void> setCnsCalculationMethod(CnsCalculationMethod value) async {
     state = state.copyWith(cnsCalculationMethod: value);
     await _saveSettings();
@@ -1812,6 +1851,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultShowGtr(bool value) async {
+    state = state.copyWith(defaultShowGtr: value);
+    await _saveSettings();
+  }
+
   Future<void> setDefaultShowCns(bool value) async {
     state = state.copyWith(defaultShowCns: value);
     await _saveSettings();
@@ -1895,6 +1939,30 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> resetDiveDetailSections() async {
     state = state.copyWith(clearDiveDetailSections: true);
+    await _saveSettings();
+  }
+
+  Future<void> setDiveDetailLayout(DiveDetailLayout layout) async {
+    state = state.copyWith(diveDetailLayout: layout);
+    await _saveSettings();
+  }
+
+  /// Record whether [id] shows unfolded in the list layout.
+  ///
+  /// Fold state rides in the section list rather than a column of its own,
+  /// so this rewrites that list with the one entry changed.
+  Future<void> setDiveDetailSectionExpanded(
+    DiveDetailSectionId id,
+    bool expanded,
+  ) async {
+    final sections = state.diveDetailSections;
+    if (!sections.any((s) => s.id == id && s.expanded != expanded)) return;
+    state = state.copyWith(
+      diveDetailSections: [
+        for (final section in sections)
+          section.id == id ? section.copyWith(expanded: expanded) : section,
+      ],
+    );
     await _saveSettings();
   }
 
@@ -2268,6 +2336,10 @@ final defaultShowMeanDepthProvider = Provider<bool>((ref) {
 
 final defaultShowTtsProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.defaultShowTts));
+});
+
+final defaultShowGtrProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultShowGtr));
 });
 
 final defaultShowCnsProvider = Provider<bool>((ref) {

@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_section_pairs.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -19,7 +21,14 @@ import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/export/pdf/diver_photo_loader.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
+import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/divers/domain/entities/diver.dart';
+import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
+import 'package:submersion/features/transfer/presentation/widgets/pdf_export_dialog.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
 import 'package:submersion/core/utils/share_anchor.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -40,6 +49,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_compute
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_badge.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_sighting_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_badge_row.dart';
 import 'package:submersion/shared/utils/ink_centered_text_style.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_nav_buttons.dart';
@@ -48,7 +58,8 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
-import 'package:submersion/features/marine_life/presentation/species_display.dart';
+import 'package:submersion/features/media/presentation/pages/dive_species_photo_viewer_page.dart';
+import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -64,10 +75,10 @@ import 'package:submersion/features/dive_log/presentation/widgets/collapsible_se
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/safety_review_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_safety_summary_section.dart';
 import 'package:submersion/features/safety/domain/services/altitude_flag.dart';
-import 'package:submersion/features/safety/presentation/widgets/linked_incidents_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/surface_gps_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/data_sources_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_detail_row.dart';
@@ -86,6 +97,8 @@ import 'package:submersion/features/dive_log/presentation/widgets/playback_contr
 import 'package:submersion/features/dive_log/presentation/widgets/playback_stats_panel.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_selection_overlay.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/range_stats_panel.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_detail_properties_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_section_fold.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/responsive_section_pair.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/sac_volume_hint.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
@@ -97,9 +110,7 @@ import 'package:submersion/features/dive_sites/presentation/pages/site_detail_pa
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
-import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
-import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/media/presentation/helpers/photo_import_helper.dart';
@@ -339,9 +350,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// Maps each configurable section ID to a builder returning its widgets.
   ///
   /// Each builder preserves the exact data-driven visibility conditions from
-  /// the original hardcoded layout. Spacing SizedBoxes are included before
-  /// each section's content (or handled internally by the section widget).
-  Map<DiveDetailSectionId, List<Widget> Function()> _sectionBuilders({
+  /// the original hardcoded layout, and emits no gap of its own:
+  /// [_buildOrderedSections] places one gap between consecutive sections, so
+  /// spacing is decided in one place. The exceptions are the
+  /// [_selfSpacingSections], which only learn whether they have anything to
+  /// show after build; they take the gap to put above themselves as the
+  /// builder's argument, and emit nothing at all when empty.
+  Map<DiveDetailSectionId, List<Widget> Function(double topGap)>
+  _sectionBuilders({
     required BuildContext context,
     required WidgetRef ref,
     required Dive dive,
@@ -350,33 +366,65 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required AppSettings settings,
   }) {
     return {
-      DiveDetailSectionId.decoO2: () {
+      DiveDetailSectionId.profile: (_) {
+        if (dive.profile.isEmpty) return [];
+        return [_buildProfileSection(context, ref, dive)];
+      },
+      DiveDetailSectionId.decoStatus: (_) {
         if (dive.profile.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
           Consumer(
             builder: (context, ref, _) {
               final selectedPointIndex = ref.watch(
                 profileTrackingIndexProvider(diveId),
               );
-              return _buildDecoO2Panel(context, ref, dive, selectedPointIndex);
+              return _decoStatusColumn(
+                context,
+                ref,
+                dive,
+                selectedPointIndex,
+                stretch: false,
+              );
             },
           ),
         ];
       },
-      DiveDetailSectionId.safetyReview: () {
-        // The widgets collapse to nothing when empty, so plain SizedBox
-        // spacers would double up; each widget owns its own spacing.
-        return [
-          if (dive.profile.isNotEmpty)
-            SafetyReviewSection(key: _safetyReviewSectionKey, diveId: dive.id),
-          LinkedIncidentsRow(diveId: dive.id),
-        ];
-      },
-      DiveDetailSectionId.sacSegments: () {
+      DiveDetailSectionId.tissueLoading: (_) {
         if (dive.profile.isEmpty) return [];
         return [
-          const SizedBox(height: 24),
+          Consumer(
+            builder: (context, ref, _) {
+              final selectedPointIndex = ref.watch(
+                profileTrackingIndexProvider(diveId),
+              );
+              return _tissueLoadingCard(
+                context,
+                ref,
+                dive,
+                selectedPointIndex,
+                expand: false,
+              );
+            },
+          ),
+        ];
+      },
+      DiveDetailSectionId.safetyReview: (topGap) {
+        // The review and the incidents chip collapse independently, so
+        // neither alone can tell whether the pair has anything to show;
+        // DiveSafetySummarySection decides that -- and so owns the one gap
+        // above it -- before either half builds.
+        return [
+          DiveSafetySummarySection(
+            key: _safetyReviewSectionKey,
+            diveId: dive.id,
+            hasProfile: dive.profile.isNotEmpty,
+            topGap: topGap,
+          ),
+        ];
+      },
+      DiveDetailSectionId.sacSegments: (_) {
+        if (dive.profile.isEmpty) return [];
+        return [
           Consumer(
             builder: (context, ref, _) {
               final selectedPointIndex = ref.watch(
@@ -392,19 +440,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           ),
         ];
       },
-      DiveDetailSectionId.details: () {
+      DiveDetailSectionId.details: (_) {
         return [
           _detailsCard(context, dive, units, computerReadingsAsync, settings),
         ];
       },
-      DiveDetailSectionId.environment: () {
+      DiveDetailSectionId.environment: (_) {
         if (!_hasEnvironmentData(dive)) return [];
-        return [
-          const SizedBox(height: 24),
-          _buildEnvironmentSection(context, dive, units),
-        ];
+        return [_buildEnvironmentSection(context, dive, units)];
       },
-      DiveDetailSectionId.altitude: () {
+      DiveDetailSectionId.altitude: (_) {
         if (dive.altitude == null || dive.altitude! <= 0) {
           // Safety phase 2: the site is at altitude but the dive was not
           // altitude-adjusted -- surface an informational note instead of
@@ -413,105 +458,92 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             diveAltitude: dive.altitude,
             siteAltitude: dive.site?.altitude,
           )) {
-            return [
-              const SizedBox(height: 24),
-              _buildAltitudeMismatchNote(context, dive),
-            ];
+            return [_buildAltitudeMismatchNote(context, dive)];
           }
           return [];
         }
-        return [
-          const SizedBox(height: 24),
-          _buildAltitudeSection(context, ref, dive),
-        ];
+        return [_buildAltitudeSection(context, ref, dive)];
       },
-      DiveDetailSectionId.tide: () {
-        // _buildTideSection includes its own internal spacing
-        return [_buildTideSection(context, ref, dive)];
+      DiveDetailSectionId.tide: (topGap) {
+        return [_buildTideSection(context, ref, dive, topGap: topGap)];
       },
-      DiveDetailSectionId.reefHealth: () {
-        return [_buildReefHealthSection(context, ref, dive)];
+      DiveDetailSectionId.reefHealth: (topGap) {
+        return [_buildReefHealthSection(context, ref, dive, topGap: topGap)];
       },
-      DiveDetailSectionId.surfaceGps: () {
+      DiveDetailSectionId.surfaceGps: (_) {
         if (!_hasSurfaceGps(dive)) return [];
-        return [
-          const SizedBox(height: 24),
-          _surfaceGpsCard(dive, computerReadingsAsync, settings),
-        ];
+        return [_surfaceGpsCard(dive, computerReadingsAsync, settings)];
       },
-      DiveDetailSectionId.weights: () {
+      DiveDetailSectionId.weights: (_) {
         if (!_hasWeights(dive)) return [];
-        return [
-          const SizedBox(height: 24),
-          _buildWeightSection(context, dive, units),
-        ];
+        return [_buildWeightSection(context, dive, units)];
       },
-      DiveDetailSectionId.buoyancy: () {
+      DiveDetailSectionId.buoyancy: (_) {
         if (dive.tanks.isEmpty && !_hasExposureSuit(dive)) return [];
-        return [
-          const SizedBox(height: 24),
-          BuoyancySection(diveId: dive.id, units: units),
-        ];
+        return [BuoyancySection(diveId: dive.id, units: units)];
       },
-      DiveDetailSectionId.tanks: () {
+      DiveDetailSectionId.tanks: (_) {
         if (dive.tanks.isEmpty) return [];
-        return [
-          const SizedBox(height: 24),
-          _cylindersCard(dive, units, settings),
-        ];
+        return [_cylindersCard(dive, units, settings)];
       },
-      DiveDetailSectionId.buddies: () {
-        return [
-          const SizedBox(height: 24),
-          _buildBuddiesSection(context, ref, dive),
-        ];
+      DiveDetailSectionId.buddies: (_) {
+        return [_buildBuddiesSection(context, ref, dive)];
       },
-      DiveDetailSectionId.signatures: () {
-        return [
-          const SizedBox(height: 24),
-          _signaturesColumn(context, ref, dive),
-        ];
+      DiveDetailSectionId.signatures: (_) {
+        return [_signaturesColumn(context, ref, dive)];
       },
-      DiveDetailSectionId.equipment: () {
+      DiveDetailSectionId.equipment: (_) {
         if (dive.equipment.isEmpty) return [];
-        return [
-          const SizedBox(height: 24),
-          _buildEquipmentSection(context, ref, dive),
-        ];
+        return [_buildEquipmentSection(context, ref, dive)];
       },
-      DiveDetailSectionId.sightings: () {
-        // _buildSightingsSection includes its own internal spacing
-        return [_buildSightingsSection(context, ref)];
+      DiveDetailSectionId.sightings: (topGap) {
+        return [_buildSightingsSection(context, ref, topGap: topGap)];
       },
-      DiveDetailSectionId.media: () {
-        return [
-          const SizedBox(height: 24),
-          _buildMediaSection(context, ref, dive),
-        ];
+      DiveDetailSectionId.media: (_) {
+        return [_buildMediaSection(context, ref, dive)];
       },
-      DiveDetailSectionId.tags: () {
+      DiveDetailSectionId.tags: (_) {
         if (dive.tags.isEmpty) return [];
-        return [const SizedBox(height: 24), _buildTagsSection(context, dive)];
+        return [_buildTagsSection(context, dive)];
       },
-      DiveDetailSectionId.notes: () {
-        return [const SizedBox(height: 24), _buildNotesSection(context, dive)];
+      DiveDetailSectionId.notes: (_) {
+        return [_buildNotesSection(context, dive)];
       },
-      DiveDetailSectionId.customFields: () {
+      DiveDetailSectionId.customFields: (_) {
         if (dive.customFields.isEmpty) return [];
-        return [
-          const SizedBox(height: 24),
-          _buildCustomFieldsSection(context, dive),
-        ];
+        return [_buildCustomFieldsSection(context, dive)];
       },
-      DiveDetailSectionId.dataSources: () {
+      DiveDetailSectionId.dataSources: (_) {
         return [
-          const SizedBox(height: 24),
           Consumer(
             builder: (context, ref, _) {
               final viewedSourceId = ref.watch(
                 activeDiveSourceProvider(dive.id),
               );
               final dataSources = computerReadingsAsync.valueOrNull ?? [];
+              // 2+ segments means a Combine stitched this dive together, so
+              // it can be pulled back apart (issue #1504). Read separately
+              // from the source count: the halves of a combined import
+              // collapse to a single display source (#1451).
+              //
+              // Read through the built-in AsyncValue.value, not the
+              // valueOrNull polyfill. The two agree on every rebuild this
+              // provider takes today: invalidateSelfWhen on the analysis tick
+              // and the outright invalidate after a separation are both
+              // self-invalidates, and the polyfill is `when`, which defaults
+              // skipLoadingOnRefresh: true, so a refresh keeps the previous
+              // count either way.
+              //
+              // They diverge on a RELOAD, the rebuild a changed dependency
+              // forces, where `when` takes its loading branch and valueOrNull
+              // answers null. Nothing reloads this provider yet: it watches
+              // only singletons that never rebuild. `.value` is what keeps the
+              // read correct if that changes, since `valueOrNull ?? 0` would
+              // read as "never combined" for a frame and blink the Separate
+              // action out of the section. _buildProfileSection reads the same
+              // way, and there the reload path is already live (#1468).
+              final segmentCount =
+                  ref.watch(diveSegmentCountProvider(dive.id)).value ?? 0;
               return DataSourcesSection(
                 dataSources: dataSources,
                 diveCreatedAt: dive.dateTime,
@@ -531,6 +563,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   readingId: readingId,
                 ),
                 onSplit: (readingId) => _confirmAndSplit(dive, readingId),
+                onSeparate: segmentCount >= 2
+                    ? () => _confirmAndSeparate(dive, segmentCount)
+                    : null,
                 onCompareIn3d: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -667,7 +702,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required UnitFormatter units,
     required AsyncValue<List<DiveDataSource>> computerReadingsAsync,
     required AppSettings settings,
-    required Map<DiveDetailSectionId, List<Widget> Function()> builders,
+    required DiveDetailLayout layout,
+    required Map<DiveDetailSectionId, List<Widget> Function(double topGap)>
+    builders,
   }) {
     // Visible sections in configured order, minus gauge-hidden ones.
     final visible = [
@@ -676,6 +713,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           section.id,
     ];
     final visibleIds = visible.toSet();
+    final unfolded = {
+      for (final section in settings.diveDetailSections)
+        if (section.expanded) section.id,
+    };
 
     final children = <Widget>[];
     final consumed = <DiveDetailSectionId>{};
@@ -685,7 +726,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       // slot.
       if (consumed.contains(id)) continue;
 
-      final pair = diveDetailSectionPairFor(id);
+      final pair = layout.pairsSections ? diveDetailSectionPairFor(id) : null;
       if (pair != null && visibleIds.contains(pair.partnerOf(id)!)) {
         final cards = _buildPairCards(
           pair,
@@ -697,36 +738,115 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           settings: settings,
         );
         if (cards != null) {
-          // The row takes the leading gap of the slot it lands in, which is
-          // this half's -- not necessarily the pair's left half, since the
-          // diver may have ordered the right half first. Details is the one
-          // section that emits no gap of its own (it butts against the
-          // profile chart).
-          if (id != DiveDetailSectionId.details) {
-            children.add(const SizedBox(height: 24));
-          }
+          _addSectionGap(children, layout);
           children.add(
-            ResponsiveSectionPair(first: cards.$1, second: cards.$2),
+            ResponsiveSectionPair(
+              first: cards.first,
+              second: cards.second,
+              stackedFirst: cards.stackedFirst,
+              stackedSecond: cards.stackedSecond,
+              minRowWidth: pair.minRowWidth,
+              stackGap: layout.sectionGap,
+              stretch: pair.stretch,
+            ),
           );
           consumed.addAll([pair.left, pair.right]);
           continue;
         }
       }
 
-      children.addAll(builders[id]?.call() ?? const []);
+      if (layout.foldsSections) {
+        // A folded row wants no gap above its content or itself: each row
+        // draws its own divider, and the content starts flush under the
+        // header.
+        final content = builders[id]?.call(0) ?? const <Widget>[];
+        if (content.isEmpty) continue;
+        children.add(
+          _foldSection(
+            context,
+            ref,
+            id,
+            content,
+            isExpanded: unfolded.contains(id),
+          ),
+        );
+        continue;
+      }
+      final selfSpacing = _selfSpacingSections.contains(id);
+      final content =
+          builders[id]?.call(
+            selfSpacing && children.isNotEmpty ? layout.sectionGap : 0,
+          ) ??
+          const <Widget>[];
+      if (content.isEmpty) continue;
+      if (!selfSpacing) _addSectionGap(children, layout);
+      children.addAll(content);
     }
     return children;
   }
 
-  /// The two bare cards for [pair] in left-then-right order, or null when
-  /// either half has nothing to show -- in which case both sections fall back
-  /// to rendering full-width in their own slots.
+  /// Sections that decide whether they render from data that arrives after
+  /// build -- a tide model, a reef-health lookup, sightings, safety findings.
+  ///
+  /// Their builders always return a widget, so [_buildOrderedSections] cannot
+  /// tell an empty one from a full one and must not put a gap above it; the
+  /// widget takes the gap as an argument and places it only when it has
+  /// content to place it above.
+  static const _selfSpacingSections = {
+    DiveDetailSectionId.safetyReview,
+    DiveDetailSectionId.tide,
+    DiveDetailSectionId.reefHealth,
+    DiveDetailSectionId.sightings,
+  };
+
+  /// Adds the gap that separates the next section from the one before it.
+  ///
+  /// Nothing is added above the first section: the header block's own
+  /// trailing gap already separates it. Every later section gets exactly one
+  /// [DiveDetailLayout.sectionGap], so the spacing between cards is even
+  /// wherever the diver puts them.
+  void _addSectionGap(List<Widget> children, DiveDetailLayout layout) {
+    if (children.isEmpty) return;
+    children.add(SizedBox(height: layout.sectionGap));
+  }
+
+  /// One folded row for [id] in the list layout, with [content] behind it.
+  ///
+  /// [isExpanded] comes from the diver's saved section list and the toggle
+  /// writes straight back to it, so a dive reopens the way it was left
+  /// instead of folding itself again.
+  Widget _foldSection(
+    BuildContext context,
+    WidgetRef ref,
+    DiveDetailSectionId id,
+    List<Widget> content, {
+    required bool isExpanded,
+  }) {
+    return DiveSectionFold(
+      key: ValueKey('diveSectionFold_${id.name}'),
+      title: id.localizedDisplayName(context.l10n),
+      icon: id.icon,
+      isExpanded: isExpanded,
+      onToggle: (expanded) => ref
+          .read(settingsProvider.notifier)
+          .setDiveDetailSectionExpanded(id, expanded),
+      contentBuilder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: content,
+      ),
+    );
+  }
+
+  /// The bare cards for [pair] in left-then-right order, or null when either
+  /// half has nothing to show -- in which case both sections fall back to
+  /// rendering full-width in their own slots.
   ///
   /// The presence gates mirror what each section builder would decide for
   /// itself: Conditions, Tide and Signatures all self-erase when empty, so
   /// without these checks a pair could put a blank column beside a half-width
   /// card.
-  (Widget, Widget)? _buildPairCards(
+  _PairCards? _buildPairCards(
     DiveDetailSectionPair pair, {
     required BuildContext context,
     required WidgetRef ref,
@@ -736,9 +856,43 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     required AppSettings settings,
   }) {
     switch (pair.left) {
+      case DiveDetailSectionId.decoStatus:
+        if (dive.profile.isEmpty) return null;
+        // Each half watches the tracking index in its own Consumer so
+        // hovering the profile chart rebuilds the two cards rather than the
+        // whole page, exactly as the combined panel did.
+        Widget decoColumn({required bool stretch}) => Consumer(
+          builder: (context, ref, _) => _decoStatusColumn(
+            context,
+            ref,
+            dive,
+            ref.watch(profileTrackingIndexProvider(dive.id)),
+            stretch: stretch,
+          ),
+        );
+        Widget tissueCard({required bool expand}) => Consumer(
+          builder: (context, ref, _) => _tissueLoadingCard(
+            context,
+            ref,
+            dive,
+            ref.watch(profileTrackingIndexProvider(dive.id)),
+            expand: expand,
+          ),
+        );
+        return _PairCards(
+          decoColumn(stretch: true),
+          tissueCard(expand: true),
+          // Stacked in a narrow pane there is no shared height to fill, and
+          // the stretching variants would collapse their flexible parts --
+          // the deco card, the heat map -- to nothing. The combined panel
+          // stacked its natural-height cards for the same reason.
+          stackedFirst: decoColumn(stretch: false),
+          stackedSecond: tissueCard(expand: false),
+        );
+
       case DiveDetailSectionId.details:
         if (!_hasEnvironmentData(dive)) return null;
-        return (
+        return _PairCards(
           _detailsCard(context, dive, units, computerReadingsAsync, settings),
           _buildEnvironmentSection(context, dive, units),
         );
@@ -747,11 +901,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         if (!_hasSurfaceGps(dive)) return null;
         final tide = _tideCard(context, ref, dive);
         if (tide == null) return null;
-        return (_surfaceGpsCard(dive, computerReadingsAsync, settings), tide);
+        return _PairCards(
+          _surfaceGpsCard(dive, computerReadingsAsync, settings),
+          tide,
+        );
 
       case DiveDetailSectionId.tanks:
         if (dive.tanks.isEmpty || !_hasWeights(dive)) return null;
-        return (
+        return _PairCards(
           _cylindersCard(dive, units, settings),
           _buildWeightSection(context, dive, units),
         );
@@ -764,7 +921,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             ref.watch(buddiesForDiveProvider(dive.id)).valueOrNull ??
             const <BuddyWithRole>[];
         if (buddies.isEmpty && dive.courseId == null) return null;
-        return (
+        return _PairCards(
           _buildBuddiesSection(context, ref, dive),
           _signaturesColumn(context, ref, dive),
         );
@@ -835,6 +992,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .watch(preDiveSessionForDiveProvider(dive.id))
         .value;
 
+    final layout = settings.diveDetailLayout;
+
     final builders = _sectionBuilders(
       context: context,
       ref: ref,
@@ -846,12 +1005,20 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     final body = SingleChildScrollView(
       controller: DetailScrollController.maybeOf(context),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(layout.pagePadding),
       child: RepaintBoundary(
         key: _pageExportKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // The site suggestion sits above the header card, never inside
+            // it. Embedded mode has its own copy under the toolbar (which
+            // stays put while the body scrolls), so only the standalone page
+            // renders one here; otherwise the banner would appear twice.
+            // Collapses to nothing when there is no suggestion, so no
+            // spacing of its own is needed.
+            if (!widget.embedded)
+              SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
             // Fixed: Header
             Consumer(
               builder: (context, ref, _) {
@@ -877,14 +1044,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 );
               },
             ),
-            const SizedBox(height: 24),
-            // Fixed: Dive Profile Chart
-            if (dive.profile.isNotEmpty)
-              _buildProfileSection(context, ref, dive),
-            // Configurable sections in user-defined order, with two adjacent
-            // card pairs (Details+Conditions, Buddies+Signatures) laid out
-            // side by side when the pane is wide enough. Gauge dives hide
-            // gas/deco sections (deco/O2 tox, SAC segments, cylinders).
+            SizedBox(height: layout.headerGap),
+            // Configurable sections in user-defined order -- the dive profile
+            // chart among them -- with the card pairs (Deco+Tissue,
+            // Details+Conditions, Cylinders+Weights, Buddies+Signatures) laid
+            // out side by side when the pane is wide enough. Gauge dives hide
+            // gas/deco sections (deco status, tissue loading, SAC segments,
+            // cylinders). The list layout folds each section to a header row.
             ..._buildOrderedSections(
               context: context,
               ref: ref,
@@ -892,6 +1058,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               units: units,
               computerReadingsAsync: computerReadingsAsync,
               settings: settings,
+              layout: layout,
               builders: builders,
             ),
             const SizedBox(height: 32),
@@ -910,26 +1077,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       );
     }
 
-    // Standalone mode: Full Scaffold with AppBar
+    // Standalone mode: Full Scaffold with AppBar. On a phone-width window
+    // the title has no room beside six action icons, so the favorite toggle
+    // -- the one action that reads as well from a menu -- moves into the
+    // overflow.
+    final compactActions =
+        MediaQuery.sizeOf(context).width < _kCompactAppBarWidth;
+    final favoriteLabel = dive.isFavorite
+        ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
+        : context.l10n.diveLog_detail_tooltip_addToFavorites;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.diveLog_detail_appBar),
         actions: [
+          DiveDetailPropertiesMenu(isGauge: dive.isGauge),
           DiveNavButtons(diveId: diveId, onNavigate: _navigateToDive),
-          IconButton(
-            icon: Icon(
-              dive.isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: dive.isFavorite ? Colors.red : null,
+          if (!compactActions)
+            IconButton(
+              icon: Icon(
+                dive.isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: dive.isFavorite ? Colors.red : null,
+              ),
+              tooltip: favoriteLabel,
+              onPressed: () {
+                ref
+                    .read(paginatedDiveListProvider.notifier)
+                    .toggleFavorite(diveId);
+              },
             ),
-            tooltip: dive.isFavorite
-                ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
-                : context.l10n.diveLog_detail_tooltip_addToFavorites,
-            onPressed: () {
-              ref
-                  .read(paginatedDiveListProvider.notifier)
-                  .toggleFavorite(diveId);
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.edit),
             tooltip: context.l10n.diveLog_detail_tooltip_editDive,
@@ -939,6 +1114,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             key: _appBarMenuKey,
             onSelected: (value) {
               switch (value) {
+                case 'toggleFavorite':
+                  ref
+                      .read(paginatedDiveListProvider.notifier)
+                      .toggleFavorite(diveId);
+                  break;
                 case 'export':
                   _showExportOptions(
                     context,
@@ -965,6 +1145,18 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               }
             },
             itemBuilder: (context) => [
+              if (compactActions)
+                PopupMenuItem(
+                  value: 'toggleFavorite',
+                  child: ListTile(
+                    leading: Icon(
+                      dive.isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: dive.isFavorite ? Colors.red : null,
+                    ),
+                    title: Text(favoriteLabel),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               PopupMenuItem(
                 value: 'export',
                 child: ListTile(
@@ -1024,191 +1216,203 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .watch(preDiveSessionForDiveProvider(dive.id))
         .value;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Dive number badge
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '#${dive.diveNumber ?? '-'}',
-                  maxLines: 1,
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
-                  ),
-                ),
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(color: colorScheme.outlineVariant, width: 1),
             ),
           ),
-          const SizedBox(width: 12),
-          // Site name and location
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dive.effectiveName ??
-                      dive.site?.name ??
-                      context.l10n.diveLog_listPage_unknownSite,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (dive.effectiveName != null && dive.site != null)
-                  Text(
-                    dive.site!.name,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
+          child: Row(
+            children: [
+              // Dive number badge
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '#${dive.diveNumber ?? '-'}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
-                if (dive.site?.locationString.isNotEmpty == true)
-                  Text(
-                    dive.site!.locationString,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
-          ),
-          DiveNavButtons(diveId: dive.id, onNavigate: _navigateToDive),
-          // Favorite toggle
-          IconButton(
-            icon: Icon(
-              dive.isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: dive.isFavorite ? Colors.red : null,
-              size: 20,
-            ),
-            visualDensity: VisualDensity.compact,
-            tooltip: dive.isFavorite
-                ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
-                : context.l10n.diveLog_detail_tooltip_addToFavorites,
-            onPressed: () {
-              ref
-                  .read(paginatedDiveListProvider.notifier)
-                  .toggleFavorite(diveId);
-            },
-          ),
-          // Edit button - use query params in master-detail layout
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20),
-            visualDensity: VisualDensity.compact,
-            tooltip: context.l10n.diveLog_detail_tooltip_edit,
-            onPressed: () {
-              final state = GoRouterState.of(context);
-              final currentPath = state.uri.path;
-              context.go('$currentPath?selected=$diveId&mode=edit');
-            },
-          ),
-          // More options
-          PopupMenuButton<String>(
-            key: _headerMenuKey,
-            icon: const Icon(Icons.more_vert, size: 20),
-            padding: EdgeInsets.zero,
-            onSelected: (value) {
-              switch (value) {
-                case 'export':
-                  _showExportOptions(
-                    context,
-                    ref,
-                    dive,
-                    shareAnchorFrom(_headerMenuKey.currentContext),
-                  );
-                  break;
-                case 'reparse':
-                  _reparseDive(context, ref, dive);
-                  break;
-                case 'logNearMiss':
-                  context.push('/incidents/new?diveId=$diveId');
-                  break;
-                case 'linkPreDive':
-                  _linkPreDiveChecklist(context, dive);
-                  break;
-                case 'unlinkPreDive':
-                  _unlinkPreDiveChecklist(context, linkedPreDive!);
-                  break;
-                case 'delete':
-                  _showDeleteConfirmation(context, ref);
-                  break;
-                case 'open':
-                  // Open in full-page mode. push (not go) so there's a back
-                  // button and the pushed page skips the master-detail
-                  // redirect above instead of bouncing straight back into
-                  // the pane it was opened from.
-                  context.push('/dives/$diveId');
-                  break;
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'open',
-                child: ListTile(
-                  leading: const Icon(Icons.open_in_new),
-                  title: Text(context.l10n.diveLog_detail_menu_openFullPage),
-                  contentPadding: EdgeInsets.zero,
                 ),
               ),
-              PopupMenuItem(
-                value: 'export',
-                child: ListTile(
-                  leading: const Icon(Icons.download),
-                  title: Text(context.l10n.diveLog_detail_menu_export),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              PopupMenuItem(
-                value: 'logNearMiss',
-                child: ListTile(
-                  leading: const Icon(Icons.flag_outlined),
-                  title: Text(context.l10n.diveLog_detail_menu_logNearMiss),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              _preDiveLinkMenuItem(context, linkedPreDive),
-              if (hasRawData)
-                PopupMenuItem(
-                  value: 'reparse',
-                  child: ListTile(
-                    leading: const Icon(Icons.refresh),
-                    title: Text(
-                      context.l10n.diveLog_detail_menu_reparseRawData,
+              const SizedBox(width: 12),
+              // Site name and location
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      dive.effectiveName ??
+                          dive.site?.name ??
+                          context.l10n.diveLog_listPage_unknownSite,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+                    if (dive.effectiveName != null && dive.site != null)
+                      Text(
+                        dive.site!.name,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    if (dive.site?.locationString.isNotEmpty == true)
+                      Text(
+                        dive.site!.locationString,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
                 ),
-              PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  title: Text(
-                    context.l10n.diveLog_detail_menu_delete,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                  contentPadding: EdgeInsets.zero,
+              ),
+              DiveDetailPropertiesMenu(isGauge: dive.isGauge),
+              DiveNavButtons(diveId: dive.id, onNavigate: _navigateToDive),
+              // Favorite toggle
+              IconButton(
+                icon: Icon(
+                  dive.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: dive.isFavorite ? Colors.red : null,
+                  size: 20,
                 ),
+                visualDensity: VisualDensity.compact,
+                tooltip: dive.isFavorite
+                    ? context.l10n.diveLog_detail_tooltip_removeFromFavorites
+                    : context.l10n.diveLog_detail_tooltip_addToFavorites,
+                onPressed: () {
+                  ref
+                      .read(paginatedDiveListProvider.notifier)
+                      .toggleFavorite(diveId);
+                },
+              ),
+              // Edit button - use query params in master-detail layout
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20),
+                visualDensity: VisualDensity.compact,
+                tooltip: context.l10n.diveLog_detail_tooltip_edit,
+                onPressed: () {
+                  final state = GoRouterState.of(context);
+                  final currentPath = state.uri.path;
+                  context.go('$currentPath?selected=$diveId&mode=edit');
+                },
+              ),
+              // More options
+              PopupMenuButton<String>(
+                key: _headerMenuKey,
+                icon: const Icon(Icons.more_vert, size: 20),
+                padding: EdgeInsets.zero,
+                onSelected: (value) {
+                  switch (value) {
+                    case 'export':
+                      _showExportOptions(
+                        context,
+                        ref,
+                        dive,
+                        shareAnchorFrom(_headerMenuKey.currentContext),
+                      );
+                      break;
+                    case 'reparse':
+                      _reparseDive(context, ref, dive);
+                      break;
+                    case 'logNearMiss':
+                      context.push('/incidents/new?diveId=$diveId');
+                      break;
+                    case 'linkPreDive':
+                      _linkPreDiveChecklist(context, dive);
+                      break;
+                    case 'unlinkPreDive':
+                      _unlinkPreDiveChecklist(context, linkedPreDive!);
+                      break;
+                    case 'delete':
+                      _showDeleteConfirmation(context, ref);
+                      break;
+                    case 'open':
+                      // Open in full-page mode. push (not go) so there's a back
+                      // button and the pushed page skips the master-detail
+                      // redirect above instead of bouncing straight back into
+                      // the pane it was opened from.
+                      context.push('/dives/$diveId');
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'open',
+                    child: ListTile(
+                      leading: const Icon(Icons.open_in_new),
+                      title: Text(
+                        context.l10n.diveLog_detail_menu_openFullPage,
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'export',
+                    child: ListTile(
+                      leading: const Icon(Icons.download),
+                      title: Text(context.l10n.diveLog_detail_menu_export),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'logNearMiss',
+                    child: ListTile(
+                      leading: const Icon(Icons.flag_outlined),
+                      title: Text(context.l10n.diveLog_detail_menu_logNearMiss),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  _preDiveLinkMenuItem(context, linkedPreDive),
+                  if (hasRawData)
+                    PopupMenuItem(
+                      value: 'reparse',
+                      child: ListTile(
+                        leading: const Icon(Icons.refresh),
+                        title: Text(
+                          context.l10n.diveLog_detail_menu_reparseRawData,
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: const Icon(Icons.delete, color: Colors.red),
+                      title: Text(
+                        context.l10n.diveLog_detail_menu_delete,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SiteSuggestionCard(diveId: dive.id, currentSite: dive.site),
+        ),
+      ],
     );
   }
 
@@ -1647,6 +1851,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   Widget _buildProfileSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Every async chart input below is read through the built-in
+    // AsyncValue.value, which keeps the previous value while a provider
+    // reloads. The valueOrNull polyfill returns null during a reload, and
+    // these providers reload behind any detail change tick (the first-view
+    // safety review write included): the chart would drop its overlays and
+    // estimated pressure series for a frame, then draw them again.
+    //
     // Get profile analysis (async to avoid blocking UI with Buhlmann computation)
     final analysis = ref
         .watch(
@@ -1655,7 +1866,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             sourceId: ref.watch(activeDiveSourceProvider(dive.id)),
           )),
         )
-        .valueOrNull;
+        .value;
 
     // Get marker settings
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
@@ -1668,11 +1879,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Get per-tank pressure data for multi-tank visualization
     final tankPressuresAsync = ref.watch(tankPressuresProvider(dive.id));
-    final tankPressures = tankPressuresAsync.valueOrNull;
+    final tankPressures = tankPressuresAsync.value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(dive.id))
-        .valueOrNull;
+        .value;
 
     // Get playback state
     final playbackState = ref.watch(playbackProvider(dive.id));
@@ -1683,13 +1894,21 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Profiles grouped by owning data source, plus the active-source and
     // overlay view state driving the whole page.
     final sourceProfiles =
-        ref.watch(sourceProfilesProvider(dive.id)).valueOrNull ??
+        ref.watch(sourceProfilesProvider(dive.id)).value ??
         const <String, SourceProfile>{};
     final dataSources =
-        ref.watch(diveDataSourcesProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(diveDataSourcesProvider(dive.id)).value ?? const [];
     final computerNames = _computerDisplayNames(context, dataSources);
     final labels = _sourceNameLabels(context);
-    final isMultiSource = dataSources.length >= 2;
+    // Per-source rendering exists because two computers recording one dive
+    // disagree sample by sample (#543); the halves of a split dive a Combine
+    // stitched together are not that, and drawing one of those would hide the
+    // rest of the dive (#1451). Profiles that have not loaded yet carry no
+    // spans, so this stays true on the first build, exactly as it does today.
+    final isMultiSource = usesPerSourceRendering(
+      dataSources,
+      sourceProfiles.values,
+    );
 
     final activeSourceId = ref.watch(activeDiveSourceProvider(dive.id));
     final overlayIds = ref.watch(overlaySourcesProvider(dive.id));
@@ -1710,9 +1929,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // The chart's main series: the active source's own points on a
     // multi-source dive; dive.profile otherwise (identical for the primary).
-    final activeProfile = activeSource == null
-        ? null
-        : sourceProfiles[activeSource.id];
+    // activeSourceProfileProvider is the one rule for this, shared with the
+    // dive-list panel and the selected-point lookups further down (#543).
+    // Attribution (activeComputerId) reads the SAME result, so the drawn
+    // points and the computer they are credited to can never disagree; the
+    // direct lookup only serves single-source dives, where the provider
+    // yields null and dive.profile is drawn.
+    final resolvedActive = ref.watch(activeSourceProfileProvider(dive.id));
+    final activeProfile =
+        resolvedActive ??
+        (activeSource == null ? null : sourceProfiles[activeSource.id]);
     // A metadata-only active source has an entry with no points; the chart
     // then renders its empty-profile placeholder instead of silently
     // falling back to the primary's profile (mixed attribution).
@@ -1721,9 +1947,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // from dive.profile: the merged series spans every source, so markers
     // computed against it can report a depth the drawn curve never reaches
     // and a range extent that runs past its end (#1167).
-    final chartProfile = (isMultiSource && activeProfile != null)
-        ? activeProfile.points
-        : dive.profile;
+    final chartProfile = resolvedActive?.points ?? dive.profile;
 
     // Keep the playback and range extents on the drawn series.
     //
@@ -1774,7 +1998,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
 
     final photoMedia =
-        ref.watch(mediaForDiveProvider(dive.id)).valueOrNull ?? const [];
+        ref.watch(mediaForDiveProvider(dive.id)).value ?? const [];
     final photoMarkers = chartProfile.isEmpty
         ? const <PhotoChartMarker>[]
         : photoMarkersFromMedia(
@@ -1790,7 +2014,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // ghosted next to the actual logged profile.
     final plannedOverlay = ref
         .watch(plannedProfileOverlayProvider(dive.id))
-        .valueOrNull;
+        .value;
     final overlays = <ChartSourceOverlay>[
       for (final id in overlayIds)
         if (id != activeSource?.id &&
@@ -2007,6 +2231,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         surfaceGfCurve: analysis?.surfaceGfCurve,
                         meanDepthCurve: analysis?.meanDepthCurve,
                         ttsCurve: analysis?.ttsCurve,
+                        gtrCurve: analysis?.gtrCurve,
                         cnsCurve: analysis?.cnsCurve,
                         otuCurve: analysis?.otuCurve,
                         tankVolume: dive.tanks
@@ -2029,14 +2254,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             estimatedTankPressures?.pressures ?? tankPressures,
                         estimatedTankIds:
                             estimatedTankPressures?.estimatedTankIds,
-                        gasSwitches: gasSwitchesAsync.valueOrNull,
+                        gasSwitches: gasSwitchesAsync.value,
                         gasSegments:
                             (dive.tanks.isEmpty || chartProfile.isEmpty)
                             ? null
                             : buildGasUsageSegments(
                                 tanks: dive.tanks,
-                                gasSwitches:
-                                    gasSwitchesAsync.valueOrNull ?? const [],
+                                gasSwitches: gasSwitchesAsync.value ?? const [],
                                 diveDurationSeconds:
                                     chartProfile.last.timestamp,
                                 firstSampleSeconds:
@@ -2120,6 +2344,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             ),
             // Sources bar: tap a chip to make that source drive the whole
             // page; the eye overlays a source on the chart for comparison.
+            // Both of those are per-source RENDERING, which is why the bar
+            // follows usesPerSourceRendering rather than the source count:
+            // on a dive whose sources are consecutive halves there is no
+            // "other source" to switch to or overlay, only the rest of the
+            // same dive. Set primary and Split do not disappear with it --
+            // the Data Sources section carries its own copy of both, gated
+            // on the source count alone (data_sources_section.dart).
             if (isMultiSource)
               SourceBar(
                 sources: [
@@ -2221,7 +2452,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     return '$minutes:${secs.toString().padLeft(2, '0')}';
   }
 
-  Widget _buildDecoO2Panel(
+  /// The three cards the deco/tissue panel is made of, or null when the dive
+  /// has no usable profile analysis.
+  ///
+  /// Built together from one analysis read so the deco status, the O2
+  /// exposure and the tissue heat map stay three views of the same instant,
+  /// even though the diver can show, hide and order Deco Status and Tissue
+  /// Loading separately.
+  ({Widget deco, Widget o2, Widget Function({bool expand}) tissue})?
+  _decoPanelCards(
     BuildContext context,
     WidgetRef ref,
     Dive dive,
@@ -2240,8 +2479,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     // Retain the last usable analysis for THIS dive and fall back to it when the
     // provider momentarily yields null/empty (e.g. a mid-sync empty-profile
     // read), so a single transient null doesn't blink the cards out. A dive that
-    // has genuinely never produced an analysis falls through to the
-    // SizedBox.shrink below and correctly shows nothing.
+    // has genuinely never produced an analysis falls through to the null below
+    // and correctly shows nothing.
     if (isUsable) {
       _lastDecoPanelAnalysis = current;
       _lastDecoPanelAnalysisDiveId = dive.id;
@@ -2253,9 +2492,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               : null);
 
     // Don't show if no analysis is, or ever was, available for this dive.
-    if (analysis == null || analysis.decoStatuses.isEmpty) {
-      return const SizedBox.shrink();
-    }
+    if (analysis == null || analysis.decoStatuses.isEmpty) return null;
 
     // Use selected point or default to final status
     final index =
@@ -2265,21 +2502,27 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         : analysis.decoStatuses.length - 1;
     final status = analysis.decoStatuses[index];
 
-    // Build "at time" subtitle when a point is selected
+    // Build "at time" subtitle when a point is selected. The index came from
+    // the chart, which draws the active source's series, so it is resolved
+    // against that series and never against the merged dive.profile: on a
+    // consolidated dive the union has every computer's samples, so the same
+    // index lands on a different time (#543).
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
     final String? timeSubtitle =
-        selectedPointIndex != null && selectedPointIndex < dive.profile.length
+        selectedPointIndex != null && selectedPointIndex < chartProfile.length
         ? context.l10n.diveLog_detail_collapsed_atTime(
-            _formatTimestamp(dive.profile[selectedPointIndex].timestamp),
+            _formatTimestamp(chartProfile[selectedPointIndex].timestamp),
           )
         : null;
 
-    Widget buildTissueCard({bool expandVisualization = false}) {
+    Widget buildTissueCard({bool expand = false}) {
       return CompactTissueLoadingCard(
         status: status,
         decoStatuses: analysis.decoStatuses,
         selectedIndex: selectedPointIndex,
         subtitle: timeSubtitle,
-        expandVisualization: expandVisualization,
+        expandVisualization: expand,
         onHeatMapHover: (index) {
           ref.read(profileTrackingIndexProvider(diveId).notifier).state = index;
         },
@@ -2324,43 +2567,45 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       weeklyOtu: weeklyOtu,
     );
 
-    // Use LayoutBuilder to respond to actual panel width, not screen width.
-    // This handles both phone screens and narrow master-detail panes.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 600) {
-          // Narrow: stack vertically at full width
-          return Column(
-            children: [
-              buildTissueCard(),
-              const SizedBox(height: 8),
-              decoCard,
-              const SizedBox(height: 8),
-              o2Card,
-            ],
-          );
-        }
-        // Wide: two-column layout
-        return IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Expanded(child: decoCard),
-                    const SizedBox(height: 8),
-                    o2Card,
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: buildTissueCard(expandVisualization: true)),
-            ],
-          ),
-        );
-      },
+    return (deco: decoCard, o2: o2Card, tissue: buildTissueCard);
+  }
+
+  /// The Deco Status section: the deco card with the O2 exposure card beneath
+  /// it, the arrangement the two have always had.
+  ///
+  /// [stretch] fills the height the parent gives the column, which the
+  /// Deco Status / Tissue Loading pair relies on to keep both of its columns
+  /// the same height.
+  Widget _decoStatusColumn(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    int? selectedPointIndex, {
+    required bool stretch,
+  }) {
+    final cards = _decoPanelCards(context, ref, dive, selectedPointIndex);
+    if (cards == null) return const SizedBox.shrink();
+    return Column(
+      mainAxisSize: stretch ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        if (stretch) Expanded(child: cards.deco) else cards.deco,
+        const SizedBox(height: 8),
+        cards.o2,
+      ],
     );
+  }
+
+  /// The Tissue Loading section: the heat map / stacked-area card on its own.
+  Widget _tissueLoadingCard(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    int? selectedPointIndex, {
+    required bool expand,
+  }) {
+    final cards = _decoPanelCards(context, ref, dive, selectedPointIndex);
+    if (cards == null) return const SizedBox.shrink();
+    return cards.tissue(expand: expand);
   }
 
   Widget _buildSacSegmentsSection(
@@ -2462,13 +2707,17 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     }
 
     // Determine which phase the selected point falls into (using original
-    // non-overlapping segments for correct timestamp matching)
+    // non-overlapping segments for correct timestamp matching). The index is
+    // a chart index, so it is resolved against the series the chart draws
+    // (#543), see activeSourceProfileProvider.
+    final chartProfile =
+        ref.watch(activeSourceProfileProvider(dive.id))?.points ?? dive.profile;
     DivePhase? selectedPhase;
     int? selectedSegmentIndex;
     if (selectedPointIndex != null &&
-        dive.profile.isNotEmpty &&
-        selectedPointIndex < dive.profile.length) {
-      final selectedTimestamp = dive.profile[selectedPointIndex].timestamp;
+        chartProfile.isNotEmpty &&
+        selectedPointIndex < chartProfile.length) {
+      final selectedTimestamp = chartProfile[selectedPointIndex].timestamp;
       for (int i = 0; i < displaySegments.length; i++) {
         if (selectedTimestamp >= displaySegments[i].startTimestamp &&
             selectedTimestamp <= displaySegments[i].endTimestamp) {
@@ -2497,157 +2746,141 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       };
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CollapsibleCardSection(
-          title: context.l10n.diveLog_detail_section_sacRateBySegment,
-          icon: Icons.air,
-          collapsedSubtitle: getSubtitle(),
-          isExpanded: isExpanded,
-          onToggle: (expanded) {
-            ref
-                .read(collapsibleSectionProvider.notifier)
-                .setSacSegmentsExpanded(expanded);
-          },
-          contentBuilder: (context) => Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (display == GasConsumptionDisplay.both) ...[
-                  _buildLaneSelector(context, ref, lane),
-                  const SizedBox(height: 8),
-                ],
-                // Segmentation method selector
-                _buildSegmentationSelector(
-                  context,
-                  ref,
-                  selectedMethod,
-                  hasGasSwitches,
-                ),
-                const SizedBox(height: 12),
-
-                // Segment list
-                ...renderSegments.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final segment = entry.value;
-                  final avgDepthDisplay = units.formatDepth(segment.avgDepth);
-
-                  // In phase mode, highlight by matching phase name;
-                  // otherwise match by index into the original list
-                  final isSelected = isPhaseMode
-                      ? segment.phase == selectedPhase
-                      : index == selectedSegmentIndex;
-
-                  // Get segment label based on type
-                  final segmentLabel = segment.displayLabel;
-
-                  return Container(
-                    margin: EdgeInsets.only(
-                      bottom: index < renderSegments.length - 1 ? 8 : 0,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 6,
-                    ),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer
-                                .withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 1,
-                            ),
-                          )
-                        : null,
-                    child: Row(
-                      children: [
-                        // Phase icon for depth-phase segmentation
-                        if (segment.phase != null) ...[
-                          Text(
-                            segment.phase!.shortLabel,
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                        SizedBox(
-                          width: segment.phase != null ? 70 : 62,
-                          child: Text(
-                            segmentLabel,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : null,
-                                  color: isSelected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : null,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Expanded(
-                          child: _buildSacBar(
-                            context,
-                            segment.sacRate,
-                            renderSegments
-                                .map((s) => s.sacRate)
-                                .reduce((a, b) => a > b ? a : b),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 90,
-                          child: Text(
-                            formatSacValue(
-                              segment.sacRate,
-                              segmentTankId: segment.tankId,
-                            ),
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 50,
-                          child: Text(
-                            avgDepthDisplay,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
-                            textAlign: TextAlign.end,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                // Some segment fell back to the pressure lane above: say why.
-                if (lane == GasConsumptionLane.rmv &&
-                    renderSegments.any(
-                      (s) => volumeForSegment(s.tankId) == null,
-                    )) ...[
-                  const SizedBox(height: 8),
-                  SacVolumeHint(
-                    volumeSymbol: units.volumeSymbol,
-                    onTap: () => context.push('/dives/${dive.id}/edit'),
-                  ),
-                ],
-              ],
+    return CollapsibleCardSection(
+      title: context.l10n.diveLog_detail_section_sacRateBySegment,
+      icon: Icons.air,
+      collapsedSubtitle: getSubtitle(),
+      isExpanded: isExpanded,
+      onToggle: (expanded) {
+        ref
+            .read(collapsibleSectionProvider.notifier)
+            .setSacSegmentsExpanded(expanded);
+      },
+      contentBuilder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (display == GasConsumptionDisplay.both) ...[
+              _buildLaneSelector(context, ref, lane),
+              const SizedBox(height: 8),
+            ],
+            // Segmentation method selector
+            _buildSegmentationSelector(
+              context,
+              ref,
+              selectedMethod,
+              hasGasSwitches,
             ),
-          ),
-        ),
+            const SizedBox(height: 12),
 
-        const SizedBox(height: 24),
-      ],
+            // Segment list
+            ...renderSegments.asMap().entries.map((entry) {
+              final index = entry.key;
+              final segment = entry.value;
+              final avgDepthDisplay = units.formatDepth(segment.avgDepth);
+
+              // In phase mode, highlight by matching phase name;
+              // otherwise match by index into the original list
+              final isSelected = isPhaseMode
+                  ? segment.phase == selectedPhase
+                  : index == selectedSegmentIndex;
+
+              // Get segment label based on type
+              final segmentLabel = segment.displayLabel;
+
+              return Container(
+                margin: EdgeInsets.only(
+                  bottom: index < renderSegments.length - 1 ? 8 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: isSelected
+                    ? BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 1,
+                        ),
+                      )
+                    : null,
+                child: Row(
+                  children: [
+                    // Phase icon for depth-phase segmentation
+                    if (segment.phase != null) ...[
+                      Text(
+                        segment.phase!.shortLabel,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                    SizedBox(
+                      width: segment.phase != null ? 70 : 62,
+                      child: Text(
+                        segmentLabel,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: isSelected ? FontWeight.bold : null,
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Expanded(
+                      child: _buildSacBar(
+                        context,
+                        segment.sacRate,
+                        renderSegments
+                            .map((s) => s.sacRate)
+                            .reduce((a, b) => a > b ? a : b),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 90,
+                      child: Text(
+                        formatSacValue(
+                          segment.sacRate,
+                          segmentTankId: segment.tankId,
+                        ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 50,
+                      child: Text(
+                        avgDepthDisplay,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            // Some segment fell back to the pressure lane above: say why.
+            if (lane == GasConsumptionLane.rmv &&
+                renderSegments.any(
+                  (s) => volumeForSegment(s.tankId) == null,
+                )) ...[
+              const SizedBox(height: 8),
+              SacVolumeHint(
+                volumeSymbol: units.volumeSymbol,
+                onTap: () => context.push('/dives/${dive.id}/edit'),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
@@ -3159,6 +3392,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     if (action == null) return;
 
+    // Same template picker as the Transfer page, so a single-dive export is
+    // the document the diver chose rather than a fixed legacy layout.
+    if (!mounted) return;
+    final pdfOptions = await PdfExportDialog.show(context);
+    // A null return means the diver cancelled, not that anything failed.
+    if (pdfOptions == null) return;
+
     // Show loading dialog while generating PDF
     if (!mounted) return;
     showDialog(
@@ -3178,12 +3418,47 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     try {
       final exportService = ref.read(exportServiceProvider);
       final settings = ref.read(settingsProvider);
+      // The detail page already holds the dive's profile, so the chart does
+      // not need another query.
+      final profiles = dive.profile.isEmpty
+          ? null
+          : {dive.id: PdfProfileSeries.downsampled(dive.profile)};
+
+      // getDiveById does not hydrate the buddy junction, but this page already
+      // resolves it for its own Buddies section; #1017 wants them in the PDF.
+      //
+      // Best-effort: these enrich the document rather than define it, so a
+      // failed lookup degrades to a plainer export instead of no export.
+      var exportDive = dive;
+      List<Certification>? certifications;
+      Diver? diver;
+      Uint8List? diverPhoto;
+      try {
+        final buddies = await ref.read(buddiesForDiveProvider(dive.id).future);
+        if (buddies.isNotEmpty) exportDive = dive.copyWith(buddies: buddies);
+        if (pdfOptions.includeCertificationCards) {
+          certifications = await ref.read(allCertificationsProvider.future);
+        }
+        diver = await ref.read(currentDiverProvider.future);
+        // The portrait travels with the diver: passing one without the other
+        // leaves the Detailed front matter on its placeholder frame.
+        diverPhoto = await ref.read(diverPhotoLoaderProvider)(diver?.photoPath);
+      } catch (_) {
+        // Export the dive as loaded.
+      }
+
       final result = await exportService.generateDivePdfBytes(
-        [dive],
+        [exportDive],
         dates: PdfDateFormatter(
           dateFormat: settings.dateFormat,
           timeFormat: settings.timeFormat,
         ),
+        units: UnitFormatter(settings),
+        options: pdfOptions,
+        profiles: profiles,
+        certifications: certifications,
+        diver: diver,
+        diverPhoto: diverPhoto,
       );
 
       // Close loading dialog BEFORE opening file picker to avoid navigator lock issues
@@ -3296,11 +3571,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context.l10n.diveLog_detail_label_avgDepth,
                 units.formatDepth(dive.avgDepth),
               ),
-            if (dive.waterType != null)
+            // Effective, so a dive that never had a water type of its own
+            // still shows the one its site carries (issue #1427).
+            if (dive.effectiveWaterType != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.waterType!.displayName,
+                dive.effectiveWaterType!.displayName,
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(
@@ -3385,7 +3662,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
   }
 
@@ -3463,7 +3740,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         dive.currentDirection != null ||
         dive.currentStrength != null ||
         dive.swellHeight != null ||
-        dive.entryMethod != null ||
+        dive.effectiveEntryMethod != null ||
         dive.exitMethod != null;
 
     return Card(
@@ -3599,11 +3876,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_swellHeight,
                   units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
-              if (dive.entryMethod != null)
+              // Effective, so a dive that never had an entry method of its
+              // own still shows the one its site carries (issue #1427).
+              if (dive.effectiveEntryMethod != null)
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_entryMethod,
-                  dive.entryMethod!.localizedName(context.l10n),
+                  dive.effectiveEntryMethod!.localizedName(context.l10n),
                 ),
               if (dive.exitMethod != null)
                 _buildDetailRow(
@@ -3823,8 +4102,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildReefHealthSection(
     BuildContext context,
     WidgetRef ref,
-    Dive dive,
-  ) {
+    Dive dive, {
+    required double topGap,
+  }) {
     final site = dive.site;
     if (site?.hasCoordinates != true) return const SizedBox.shrink();
     if (site!.waterType == WaterType.fresh) return const SizedBox.shrink();
@@ -3841,7 +4121,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       data: (part) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 24),
+          SizedBox(height: topGap),
           Card(
             child: WaterConditionsCard(
               health: part,
@@ -3865,14 +4145,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// 2. Calculated from tide model (if dive site has coordinates and tide data)
   ///
   /// Returns [SizedBox.shrink] when no tide data is available so the section
-  /// takes up zero space.  The 24-px top spacer is included only when the
+  /// takes up zero space. The [topGap] spacer is included only when the
   /// section actually renders content.
-  Widget _buildTideSection(BuildContext context, WidgetRef ref, Dive dive) {
+  Widget _buildTideSection(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive, {
+    required double topGap,
+  }) {
     final card = _tideCard(context, ref, dive);
     if (card == null) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [const SizedBox(height: 24), card],
+      children: [
+        SizedBox(height: topGap),
+        card,
+      ],
     );
   }
 
@@ -4655,15 +4943,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildBuddyTile(BuildContext context, BuddyWithRole bwr) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: ProfileAvatar(
+        photo: bwr.buddy.photo,
+        initials: bwr.buddy.initials,
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Text(
-          bwr.buddy.initials,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
       ),
       title: Text(bwr.buddy.name),
       subtitle: Text(bwr.role.localizedName(context.l10n)),
@@ -4767,8 +5050,16 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  Widget _buildSightingsSection(BuildContext context, WidgetRef ref) {
+  Widget _buildSightingsSection(
+    BuildContext context,
+    WidgetRef ref, {
+    required double topGap,
+  }) {
     final sightingsAsync = ref.watch(diveSightingsProvider(diveId));
+    // Loads beside the sightings: a row shows its chip once the count is in.
+    final photoCounts =
+        ref.watch(diveSpeciesPhotoCountsProvider(diveId)).value ??
+        const <String, int>{};
 
     return sightingsAsync.when(
       data: (sightings) {
@@ -4779,7 +5070,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 24),
+            SizedBox(height: topGap),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -4807,9 +5098,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                       ],
                     ),
                     const Divider(),
-                    ...sightings.map(
-                      (sighting) => _buildSightingTile(context, sighting),
-                    ),
+                    for (final sighting in sightings)
+                      DiveSightingRow(
+                        sighting: sighting,
+                        photoCount: photoCounts[sighting.speciesId] ?? 0,
+                        onOpen: () =>
+                            context.push('/species/${sighting.speciesId}'),
+                        onOpenPhotos: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => DiveSpeciesPhotoViewerPage(
+                              diveId: diveId,
+                              speciesId: sighting.speciesId,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -4820,111 +5124,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       loading: () => const SizedBox.shrink(),
       error: (_, _) => const SizedBox.shrink(),
     );
-  }
-
-  Widget _buildSightingTile(BuildContext context, Sighting sighting) {
-    return Semantics(
-      button: true,
-      label: context.l10n.diveLog_detail_semantics_viewSpecies(
-        localizedSpeciesName(
-          context.l10n,
-          sighting.speciesId,
-          sighting.speciesName,
-        ),
-      ),
-      child: InkWell(
-        onTap: () => context.push('/species/${sighting.speciesId}'),
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: _getCategoryColor(sighting.speciesCategory),
-                child: Icon(
-                  iconForSpeciesCategory(
-                    sighting.speciesCategory ?? SpeciesCategory.other,
-                  ),
-                  color: Colors.white,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      localizedSpeciesName(
-                        context.l10n,
-                        sighting.speciesId,
-                        sighting.speciesName,
-                      ),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    if (sighting.notes.isNotEmpty)
-                      Text(
-                        sighting.notes,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-              if (sighting.count > 1)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'x${sighting.count}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Color _getCategoryColor(SpeciesCategory? category) {
-    switch (category) {
-      case SpeciesCategory.fish:
-        return Colors.blue;
-      case SpeciesCategory.shark:
-        return Colors.grey.shade700;
-      case SpeciesCategory.ray:
-        return Colors.indigo;
-      case SpeciesCategory.mammal:
-        return Colors.brown;
-      case SpeciesCategory.turtle:
-        return Colors.green.shade700;
-      case SpeciesCategory.invertebrate:
-        return Colors.purple;
-      case SpeciesCategory.coral:
-        return Colors.pink;
-      case SpeciesCategory.plant:
-        return Colors.green;
-      case SpeciesCategory.other:
-      case null:
-        return Colors.grey;
-    }
   }
 
   Widget _buildMediaSection(BuildContext context, WidgetRef ref, Dive dive) {
@@ -5331,26 +5530,36 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       instructorId = courseAsync.value!.instructorId;
     }
 
+    // Captured before the sheet closes: the save outlives it, and reporting
+    // a failure needs a messenger that is still in the tree.
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+
     showSignatureCaptureSheet(
       context: context,
       initialSignerName: instructorName,
-      onSave: (strokes, signerName) async {
-        // Get the canvas dimensions from the capture widget
-        // Using a reasonable default for signature capture
-        const width = 400.0;
-        const height = 200.0;
-
-        await ref
+      onSave: (strokes, signerName, canvasSize) async {
+        // The strokes are in the capture canvas's own coordinates, so the
+        // PNG is rendered at that exact size. A hardcoded size cropped
+        // every signature drawn on a canvas wider than it (issue #1358).
+        final signature = await ref
             .read(signatureSaveNotifierProvider.notifier)
             .saveFromStrokes(
               diveId: dive.id,
               strokes: strokes,
-              width: width,
-              height: height,
+              width: canvasSize.width,
+              height: canvasSize.height,
               signerName: signerName,
               signerId: instructorId,
               backgroundColor: Colors.white,
             );
+        // A null result means the save threw. Nothing watches the notifier's
+        // AsyncValue, so without this the failure is entirely silent.
+        if (signature == null) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.signatures_error_saveFailed)),
+          );
+        }
       },
     );
   }
@@ -5417,6 +5626,58 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.diveLog_sources_splitFailed)));
+    }
+  }
+
+  /// Confirms and runs "Separate combined dives": the inverse of Combine,
+  /// and the only recovery path once the merge undo snackbar has dismissed.
+  Future<void> _confirmAndSeparate(Dive dive, int segmentCount) async {
+    final l10n = context.l10n;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.diveLog_sources_separateDialog_title),
+        content: Text(l10n.diveLog_sources_separateDialog_body(segmentCount)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.common_action_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(l10n.diveLog_sources_separateDialog_confirm),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      final newDiveIds = await ref
+          .read(diveUncombineServiceProvider)
+          .separate(diveId: dive.id);
+      // Re-scan the surviving dive and every restored one (fire-and-forget).
+      scheduleQualityScan([dive.id, ...newDiveIds]);
+      if (!mounted) return;
+      ref.invalidate(diveProvider(dive.id));
+      ref.invalidate(diveProfileProvider(dive.id));
+      ref.invalidate(sourceProfilesProvider(dive.id));
+      ref.invalidate(diveDataSourcesProvider(dive.id));
+      ref.invalidate(diveSegmentCountProvider(dive.id));
+      ref.invalidate(paginatedDiveListProvider);
+      ref.invalidate(divesProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.diveLog_sources_separateDone(newDiveIds.length + 1),
+          ),
+          showCloseIcon: true,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.diveLog_sources_separateFailed)),
+      );
     }
   }
 
@@ -5709,3 +5970,26 @@ enum _ProfileExportAction { saveToPhotos, saveToFile, share }
 
 /// Actions available for PDF export
 enum _PdfExportAction { saveToFile, share }
+
+/// Below this window width the standalone app bar keeps only the actions
+/// that leave room for its title; the rest go into the overflow menu.
+const double _kCompactAppBarWidth = 600;
+
+/// The bare cards of a section pair, in left-then-right order.
+///
+/// [stackedFirst] and [stackedSecond] are the cards to show instead when the
+/// pair stacks in a narrow pane: null where the row-mode card already keeps
+/// its natural height, set where it is built to fill a shared row height.
+class _PairCards {
+  const _PairCards(
+    this.first,
+    this.second, {
+    this.stackedFirst,
+    this.stackedSecond,
+  });
+
+  final Widget first;
+  final Widget second;
+  final Widget? stackedFirst;
+  final Widget? stackedSecond;
+}

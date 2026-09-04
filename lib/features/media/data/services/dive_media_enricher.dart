@@ -61,7 +61,7 @@ class DiveMediaEnricher {
     for (final item in media) {
       // Signatures are attached to a dive but not moments within it, and the
       // chart excludes them regardless — don't fabricate a depth/time for one.
-      if (item.mediaType == MediaType.instructorSignature) continue;
+      if (item.isSignature) continue;
 
       // A pinned item (issue #1090) is positioned from the diver's offset,
       // never from its capture time, so a backfill converges on the pin

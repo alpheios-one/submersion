@@ -118,6 +118,15 @@ class Dive extends Equatable {
   final double? weightingFeedbackKg;
   // Favorites and tags (v1.1/v1.5)
   final bool isFavorite;
+
+  /// Excluded from every descriptive statistic, its count included (#526).
+  /// The dive stays fully visible and editable in the logbook.
+  final bool excludedFromStats;
+
+  /// Excluded from SAC/RMV and gas-mix aggregates only (#1272), for a dive
+  /// whose gas number is unrepresentative. Implied by [excludedFromStats];
+  /// the implication is applied in SQL by DiveStatsScope, not stored here.
+  final bool excludedFromGasStats;
   final List<Tag> tags;
 
   // Dive mode (v1.5) - OC, CCR, or SCR
@@ -233,6 +242,8 @@ class Dive extends Equatable {
     this.weightingFeedback,
     this.weightingFeedbackKg,
     this.isFavorite = false,
+    this.excludedFromStats = false,
+    this.excludedFromGasStats = false,
     this.tags = const [],
     // CCR/SCR fields (v1.5)
     this.diveMode = DiveMode.oc,
@@ -273,6 +284,36 @@ class Dive extends Equatable {
 
   /// Effective start time of the dive (entryTime if set, otherwise dateTime)
   DateTime get effectiveEntryTime => entryTime ?? dateTime;
+
+  /// Water type of the dive, falling back to the assigned site's (issue
+  /// #1427).
+  ///
+  /// [waterType] is snapped from the site when a site is assigned (see
+  /// `waterTypeAfterSiteAssign`), but dives logged or imported before that,
+  /// and dives whose site gained its water type later, still carry null. The
+  /// site's answer is the best one available for those, so displays and
+  /// statistics read this rather than [waterType]. A value the diver set on
+  /// the dive always wins: a site's water type is a default, not a fact about
+  /// every dive made there.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  WaterType? get effectiveWaterType => waterType ?? site?.waterType;
+
+  /// Entry method of the dive, falling back to the assigned site's (issue
+  /// #1427). The entry-method twin of [effectiveWaterType], with the same
+  /// reasoning: the site's value is snapped onto a dive when the site is
+  /// assigned (issue #1104), so only dives predating that, or whose site was
+  /// filled in later, are left without one.
+  ///
+  /// [exitMethod] has no such getter on purpose. Its snap-on-assign rule turns
+  /// on whether the diver has unlinked exit from entry, and that flag is dive
+  /// form state which is never persisted, so a read-time fallback cannot
+  /// reproduce it. See `entryExitAfterSiteAssign`.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  EntryMethod? get effectiveEntryMethod => entryMethod ?? site?.entryMethod;
 
   /// User-defined name, normalized for display: trimmed, with empty or
   /// whitespace-only values treated as unset (null). In-app writes never
@@ -585,6 +626,8 @@ class Dive extends Equatable {
     WeightingFeedback? weightingFeedback,
     double? weightingFeedbackKg,
     bool? isFavorite,
+    bool? excludedFromStats,
+    bool? excludedFromGasStats,
     List<Tag>? tags,
     // CCR/SCR fields
     DiveMode? diveMode,
@@ -680,6 +723,8 @@ class Dive extends Equatable {
       weightingFeedback: weightingFeedback ?? this.weightingFeedback,
       weightingFeedbackKg: weightingFeedbackKg ?? this.weightingFeedbackKg,
       isFavorite: isFavorite ?? this.isFavorite,
+      excludedFromStats: excludedFromStats ?? this.excludedFromStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       tags: tags ?? this.tags,
       // CCR/SCR fields
       diveMode: diveMode ?? this.diveMode,
@@ -778,6 +823,8 @@ class Dive extends Equatable {
     weightingFeedback,
     weightingFeedbackKg,
     isFavorite,
+    excludedFromStats,
+    excludedFromGasStats,
     tags,
     // CCR/SCR fields
     diveMode,
@@ -979,20 +1026,18 @@ class DiveProfilePoint extends Equatable {
 /// Used for multi-tank dives with AI transmitters providing
 /// continuous pressure data for each tank
 class TankPressurePoint extends Equatable {
-  final String id;
   final String tankId;
   final int timestamp; // seconds from dive start
   final double pressure; // bar
 
   const TankPressurePoint({
-    required this.id,
     required this.tankId,
     required this.timestamp,
     required this.pressure,
   });
 
   @override
-  List<Object?> get props => [id, tankId, timestamp, pressure];
+  List<Object?> get props => [tankId, timestamp, pressure];
 }
 
 /// Tank configuration for a dive

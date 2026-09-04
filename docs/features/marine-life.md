@@ -1,4 +1,4 @@
-# Marine Life
+# Species
 
 Track species sightings and build a database of your underwater encounters.
 
@@ -10,6 +10,12 @@ Submersion includes a pre-seeded species database with 511 species, plus you can
   <strong>Screenshot: Species List</strong><br>
   <em>Browsable species database with categories</em>
 </div>
+
+The catalog covers freshwater species too (lakes, rivers, springs and
+cenotes: pike, trout, cichlids, crayfish, turtles, otters and water plants
+among them). Catalog corrections and additions reach existing installs on
+the next launch after an update; a species you edited yourself is left as
+you set it.
 
 ## Species Categories
 
@@ -97,6 +103,24 @@ For species not in the database:
 7. Add photo (optional)
 8. Save
 
+### Looking a species up online
+
+When you add a species, tap **Look up online** to search iNaturalist by common
+or scientific name. Choosing a result fills the common name (in your language
+where iNaturalist has it), the scientific name, the category and the taxonomy
+class; you can still edit anything before saving. The same lookup is offered
+when you add a species from the dive's marine life picker, and on a dive site's
+"Recorded nearby" list for names the catalog does not know yet.
+
+Lookups happen only when you tap **Look up**; nothing is sent while you type,
+and nothing from iNaturalist is stored except the fields you save.
+
+### Suggesting a species for the catalog
+
+On a custom species, the menu offers **Suggest for the catalog**. It opens a
+prefilled GitHub issue in your browser with the species' details; posting it
+is up to you.
+
 ## Sighting Statistics
 
 ### Marine Life Dashboard
@@ -144,15 +168,44 @@ Each dive site shows:
 
 ### Species Photos
 
-Add reference photos:
+Tag the photos on your dives with the species in them, and see every photo of
+a species in one place.
 
-- Database photos for ID
-- Your photos for personal sightings
-- Before/after comparisons
+- On a species page, the **Photos** section shows every photo tagged with it.
+  **Tag photos** offers the untagged photos from the dives where you logged
+  the species; **Add photos** imports pictures from your camera roll, matches
+  each one to a dive as the media importer does, and tags it.
+- In the photo viewer, the **Species** action lists the dive's sightings as
+  chips you can toggle, plus a search for any other species. Tagging a species
+  that is not yet logged on that dive adds the sighting for you.
+- Tagged species appear as chips under the photo; tap one to open the species.
+- The Species page shows each species' newest tagged photo in place of its
+  category icon. On a dive, each sighting row shows how many of the dive's
+  photos carry the species; tap the count to view them. The media library's
+  filter has a **Species** facet, which smart albums keep too.
 
-<div class="tip">
-<strong>Coming Soon:</strong> Photo management with per-sighting images will be available in v2.0.
-</div>
+A species with tagged photos cannot be deleted from the catalog until the
+tags are removed, the same rule as for sightings.
+
+## Growing the Catalog (maintainers)
+
+The bundled catalog is `assets/data/species.json`; its `version` gates a
+one-time upgrade pass on each device that rewrites rows the diver never
+edited. To add species:
+
+1. Add entries to `tool/data/freshwater_species_seed.json` (or a sibling seed)
+   with descriptions in all 11 locales, and any locale names iNaturalist lacks
+   to `tool/data/freshwater_species_name_overrides.json`.
+2. `dart run tool/generate_freshwater_species.dart` (network) writes the
+   catalog rows and the localized names file and bumps the version.
+3. `dart run tool/generate_species_arb_keys.dart`, `flutter gen-l10n`,
+   `dart run tool/generate_species_lookups.dart`,
+   `dart run tool/generate_species_gbif_keys.dart` (network).
+4. Run `test/features/marine_life/presentation/species_lookup_coverage_test.dart`.
+
+Suggestions filed through the in-app "Suggest for the catalog" action arrive
+as GitHub issues labelled `species-suggestion`; they land in the seed the same
+way.
 
 ## Identification Tips
 

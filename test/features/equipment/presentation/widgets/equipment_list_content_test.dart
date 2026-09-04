@@ -76,6 +76,7 @@ Future<List<Override>> _buildOverrides({
     // all equipment when no filter is selected, so we override that.
     equipmentByStatusProvider.overrideWith((ref, status) => equipment),
     activeEquipmentProvider.overrideWith((ref) async => equipment),
+    allEquipmentProvider.overrideWith((ref) async => equipment),
     equipmentListViewModeProvider.overrideWith((ref) => ListViewMode.table),
     equipmentTableConfigProvider.overrideWith(
       (ref) => _TestEquipTableConfigNotifier(_testConfig),
@@ -90,6 +91,7 @@ final _visibleEquipmentProvider = StateProvider<List<EquipmentItem>>(
 
 Future<List<Override>> _buildPhoneOverrides({
   required List<EquipmentItem> items,
+  List<EquipmentItem> serviceDue = const [],
   ListViewMode viewMode = ListViewMode.detailed,
   String? highlightedEquipmentId,
 }) async {
@@ -102,6 +104,8 @@ Future<List<Override>> _buildPhoneOverrides({
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
     equipmentByStatusProvider.overrideWith((ref, status) => items),
     activeEquipmentProvider.overrideWith((ref) async => items),
+    allEquipmentProvider.overrideWith((ref) async => items),
+    serviceDueEquipmentProvider.overrideWith((ref) async => serviceDue),
     equipmentListViewModeProvider.overrideWith((ref) => viewMode),
     equipmentTableConfigProvider.overrideWith(
       (ref) => _TestEquipTableConfigNotifier(_testConfig),
@@ -110,6 +114,62 @@ Future<List<Override>> _buildPhoneOverrides({
       (ref) => highlightedEquipmentId,
     ),
   ];
+}
+
+// ---------------------------------------------------------------------------
+// Filter panel helpers
+//
+// The status and category filters live behind the top-bar icon (PR #1435
+// review), so every filtering test drives them through the panel.
+// ---------------------------------------------------------------------------
+
+final Finder _filterButton = find.byKey(
+  const ValueKey('equipment_filter_button'),
+);
+
+String _typeChipKey(EquipmentType? type) =>
+    'equipment_filter_type_${type?.name ?? 'all'}';
+
+String _statusChipKey(EquipmentStatus? status) =>
+    'equipment_filter_status_${status?.name ?? 'all'}';
+
+Finder _typeChip(EquipmentType? type) =>
+    find.byKey(ValueKey(_typeChipKey(type)));
+
+Future<void> _openFilterPanel(WidgetTester tester) async {
+  await tester.tap(_filterButton);
+  await tester.pumpAndSettle();
+}
+
+/// Tap a chip in the panel, scrolling it into view first: the sheet is short
+/// enough that the lower sections start off screen.
+Future<void> _tapPanelChip(WidgetTester tester, String key) async {
+  final finder = find.byKey(ValueKey(key));
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _applyPanel(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('equipment_filter_apply')));
+  await tester.pumpAndSettle();
+}
+
+/// Open the panel, tap [chipKeys] in order, and apply.
+Future<void> _filterVia(WidgetTester tester, List<String> chipKeys) async {
+  await _openFilterPanel(tester);
+  for (final key in chipKeys) {
+    await _tapPanelChip(tester, key);
+  }
+  await _applyPanel(tester);
+}
+
+bool _badgeIsVisible(WidgetTester tester) {
+  final badge = tester.widget<Badge>(
+    find.descendant(of: _filterButton, matching: find.byType(Badge)),
+  );
+  return badge.isLabelVisible;
 }
 
 void main() {
@@ -361,7 +421,12 @@ void main() {
     // Vertical divider was part of the standalone table app bar, now removed.
     // Column settings and divider are in TableModeLayout.
 
-    testWidgets('table shows filter chips area', (tester) async {
+    testWidgets('table content carries no filter row of its own', (
+      tester,
+    ) async {
+      // Table mode's filter icon lives in TableModeLayout's app bar actions
+      // (see EquipmentListPage); the table itself spends no rows on filters
+      // until one is active.
       final overrides = await _buildOverrides(
         equipment: [_makeEquipment(id: 'e1', name: 'Test Reg')],
       );
@@ -374,8 +439,8 @@ void main() {
       );
       await tester.pump();
 
-      // Filter chips area should render with filter icon
-      expect(find.byIcon(Icons.filter_list), findsOneWidget);
+      expect(find.byIcon(Icons.filter_list), findsNothing);
+      expect(find.byType(InputChip), findsNothing);
     });
 
     testWidgets('table renders equipment data in cells', (tester) async {
@@ -664,6 +729,356 @@ void main() {
     );
   });
 
+  group('filter panel (#1274, PR #1435 review)', () {
+    final items = [
+      _makeEquipment(
+        id: 'e1',
+        name: 'Alpha Reg',
+        type: EquipmentType.regulator,
+      ),
+      _makeEquipment(id: 'e2', name: 'Bravo BCD', type: EquipmentType.bcd),
+      _makeEquipment(id: 'e3', name: 'Charlie BCD', type: EquipmentType.bcd),
+      _makeEquipment(id: 'e4', name: 'Delta Suit', type: EquipmentType.wetsuit),
+    ];
+
+    Future<void> pumpPhoneList(
+      WidgetTester tester, {
+      List<EquipmentItem>? equipment,
+    }) async {
+      final overrides = await _buildPhoneOverrides(
+        items: equipment ?? items,
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: overrides,
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    /// Pump a list whose source lists are driven by [source], so a test can
+    /// shrink the gear out from under an active filter.
+    Future<void> pumpLiveList(
+      WidgetTester tester,
+      StateProvider<List<EquipmentItem>> source, {
+      List<EquipmentItem> Function(List<EquipmentItem> all)? byStatus,
+    }) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            equipmentByStatusProvider.overrideWith(
+              (ref, status) =>
+                  byStatus?.call(ref.watch(source)) ?? ref.watch(source),
+            ),
+            activeEquipmentProvider.overrideWith(
+              (ref) async => ref.watch(source),
+            ),
+            allEquipmentProvider.overrideWith((ref) async => ref.watch(source)),
+            serviceDueEquipmentProvider.overrideWith(
+              (ref) async => const <EquipmentItem>[],
+            ),
+            equipmentListViewModeProvider.overrideWith(
+              (ref) => ListViewMode.detailed,
+            ),
+            equipmentTableConfigProvider.overrideWith(
+              (ref) => _TestEquipTableConfigNotifier(_testConfig),
+            ),
+            highlightedEquipmentIdProvider.overrideWith((ref) => null),
+          ],
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the list shows no filter row until a filter is applied', (
+      tester,
+    ) async {
+      // The point of the panel: nothing but the top-bar icon costs screen
+      // real estate while the list is unfiltered.
+      await pumpPhoneList(tester);
+
+      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.byType(InputChip), findsNothing);
+      expect(_filterButton, findsOneWidget);
+    });
+
+    testWidgets('the panel offers one chip per owned type plus All Types', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+      await _openFilterPanel(tester);
+
+      expect(_typeChip(null), findsOneWidget);
+      expect(_typeChip(EquipmentType.regulator), findsOneWidget);
+      expect(_typeChip(EquipmentType.bcd), findsOneWidget);
+      expect(_typeChip(EquipmentType.wetsuit), findsOneWidget);
+      // No fins in the fixture, so no fins chip.
+      expect(_typeChip(EquipmentType.fins), findsNothing);
+    });
+
+    testWidgets('picking a type narrows the list to that type', (tester) async {
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.bcd)]);
+
+      expect(find.text('Bravo BCD'), findsOneWidget);
+      expect(find.text('Charlie BCD'), findsOneWidget);
+      expect(find.text('Alpha Reg'), findsNothing);
+      expect(find.text('Delta Suit'), findsNothing);
+    });
+
+    testWidgets('the panel edits a draft: nothing moves until Apply', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await _openFilterPanel(tester);
+      await _tapPanelChip(tester, _typeChipKey(EquipmentType.bcd));
+      // Still the full list behind the sheet.
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+
+      await _applyPanel(tester);
+      expect(find.byType(EquipmentListTile), findsNWidgets(2));
+    });
+
+    testWidgets('cancelling the panel leaves the filter alone', (tester) async {
+      await pumpPhoneList(tester);
+
+      await _openFilterPanel(tester);
+      await _tapPanelChip(tester, _typeChipKey(EquipmentType.bcd));
+      await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+      expect(_badgeIsVisible(tester), isFalse);
+    });
+
+    testWidgets('the All Types chip restores the full list', (tester) async {
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.wetsuit)]);
+      expect(find.byType(EquipmentListTile), findsOneWidget);
+
+      await _filterVia(tester, [_typeChipKey(null)]);
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('re-tapping the selected type chip clears the filter', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.bcd)]);
+      expect(find.byType(EquipmentListTile), findsNWidgets(2));
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.bcd)]);
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('type filter composes with the status filter (AND)', (
+      tester,
+    ) async {
+      // The status provider is overridden to return the full fixture list, so
+      // after picking a status the type chip must still narrow client-side.
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [
+        _statusChipKey(EquipmentStatus.retired),
+        _typeChipKey(EquipmentType.regulator),
+      ]);
+
+      expect(find.text('Alpha Reg'), findsOneWidget);
+      expect(find.byType(EquipmentListTile), findsOneWidget);
+    });
+
+    testWidgets('the status axis is a single choice', (tester) async {
+      // Service Due and a concrete status cannot both be on: the list reads
+      // one provider, and EquipmentFilterState asserts it.
+      await pumpPhoneList(tester);
+
+      await _openFilterPanel(tester);
+      await _tapPanelChip(tester, _statusChipKey(EquipmentStatus.retired));
+      await _tapPanelChip(tester, 'equipment_filter_status_serviceDue');
+      await _applyPanel(tester);
+
+      expect(tester.takeException(), isNull);
+      // Service Due won, and its (empty) provider is what the list shows.
+      expect(find.byType(EquipmentListTile), findsNothing);
+      expect(find.text('Service Due'), findsOneWidget);
+      expect(find.text(EquipmentStatus.retired.displayName), findsNothing);
+    });
+
+    testWidgets('the top-bar icon is badged only while a filter is active', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+      expect(_badgeIsVisible(tester), isFalse);
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.bcd)]);
+      expect(_badgeIsVisible(tester), isTrue);
+
+      await _filterVia(tester, [_typeChipKey(null)]);
+      expect(_badgeIsVisible(tester), isFalse);
+    });
+
+    testWidgets('the active-filter bar names each axis and removes it', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [
+        _statusChipKey(EquipmentStatus.retired),
+        _typeChipKey(EquipmentType.bcd),
+      ]);
+
+      final statusChip = find.widgetWithText(
+        InputChip,
+        EquipmentStatus.retired.displayName,
+      );
+      final typeChip = find.widgetWithText(
+        InputChip,
+        EquipmentType.bcd.displayName,
+      );
+      expect(statusChip, findsOneWidget);
+      expect(typeChip, findsOneWidget);
+
+      // Dropping the category leaves the status filter in place. The delete
+      // affordance is invoked through the chip's own callback so the test
+      // does not depend on which glyph Material picks for it.
+      tester.widget<InputChip>(typeChip).onDeleted!();
+      await tester.pumpAndSettle();
+      expect(typeChip, findsNothing);
+      expect(statusChip, findsOneWidget);
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('clear all in the active-filter bar drops every axis', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester);
+
+      await _filterVia(tester, [
+        _statusChipKey(EquipmentStatus.retired),
+        _typeChipKey(EquipmentType.bcd),
+      ]);
+      expect(find.byType(InputChip), findsNWidgets(2));
+
+      await tester.tap(
+        find.byKey(const ValueKey('equipment_activeFilter_clearAll')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InputChip), findsNothing);
+      expect(_badgeIsVisible(tester), isFalse);
+      expect(find.byType(EquipmentListTile), findsNWidgets(4));
+    });
+
+    testWidgets('empty type match shows the category empty state', (
+      tester,
+    ) async {
+      // Select a type, then shrink the source list so nothing matches; the
+      // filter must stay clearable and the empty state must name the category.
+      final source = StateProvider<List<EquipmentItem>>((ref) => items);
+      await pumpLiveList(tester, source);
+
+      await _filterVia(tester, [_typeChipKey(EquipmentType.wetsuit)]);
+      expect(find.text('Delta Suit'), findsOneWidget);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(EquipmentListContent)),
+      );
+      container.read(source.notifier).state = [items.first];
+      await tester.pumpAndSettle();
+
+      expect(find.byType(EquipmentListTile), findsNothing);
+      // The active-filter bar stays on screen so the filter can be cleared.
+      expect(
+        find.widgetWithText(InputChip, EquipmentType.wetsuit.displayName),
+        findsOneWidget,
+      );
+      expect(find.text('No equipment in this category'), findsOneWidget);
+      // A category filter is active, so the add-first-equipment CTA (which
+      // implies there is no gear at all) must not appear.
+      expect(find.text('Add Your First Equipment'), findsNothing);
+    });
+
+    testWidgets(
+      'add-first-equipment CTA stays hidden when a type is selected and the '
+      'underlying list becomes empty (#1435)',
+      (tester) async {
+        // Regression: the CTA visibility used to key off blameCategory,
+        // which is false once the pre-filter source is empty -- letting the
+        // "add your first equipment" button reappear while a category filter
+        // was still active.
+        final source = StateProvider<List<EquipmentItem>>((ref) => items);
+        await pumpLiveList(tester, source);
+
+        await _filterVia(tester, [_typeChipKey(EquipmentType.wetsuit)]);
+        expect(find.text('Delta Suit'), findsOneWidget);
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(EquipmentListContent)),
+        );
+        container.read(source.notifier).state = const <EquipmentItem>[];
+        await tester.pumpAndSettle();
+
+        expect(find.byType(EquipmentListTile), findsNothing);
+        expect(
+          find.widgetWithText(InputChip, EquipmentType.wetsuit.displayName),
+          findsOneWidget,
+        );
+        expect(find.text('Add Your First Equipment'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'a category survives an empty status list and the empty state blames '
+      'the status, not the category',
+      (tester) async {
+        // No item carries any non-active status, so every status filter comes
+        // back empty while the default view has gear.
+        final source = StateProvider<List<EquipmentItem>>((ref) => items);
+        await pumpLiveList(
+          tester,
+          source,
+          byStatus: (_) => const <EquipmentItem>[],
+        );
+
+        await _filterVia(tester, [_typeChipKey(EquipmentType.wetsuit)]);
+        expect(find.text('Delta Suit'), findsOneWidget);
+
+        await _filterVia(tester, [_statusChipKey(EquipmentStatus.retired)]);
+
+        expect(find.byType(EquipmentListTile), findsNothing);
+        // The status list was empty before the category narrowed anything,
+        // so the category is not to blame.
+        expect(find.text('No equipment in this category'), findsNothing);
+        expect(find.text('No equipment with this status'), findsOneWidget);
+
+        // Both filters are still listed, and clearing them restores the list.
+        expect(find.byType(InputChip), findsNWidgets(2));
+        await tester.tap(
+          find.byKey(const ValueKey('equipment_activeFilter_clearAll')),
+        );
+        await tester.pumpAndSettle();
+        expect(find.byType(EquipmentListTile), findsNWidgets(4));
+      },
+    );
+  });
+
   group('filter selection and refresh target the right provider (#636)', () {
     Future<void> pumpPhoneList(
       WidgetTester tester,
@@ -694,10 +1109,7 @@ void main() {
         ),
       ]);
 
-      await tester.tap(find.byType(DropdownButton<Object?>));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
-      await tester.pumpAndSettle();
+      await _filterVia(tester, [_statusChipKey(EquipmentStatus.retired)]);
 
       // The status branch of build() is now live; both fixtures come back
       // because the status provider is overridden to return the full list.
@@ -740,6 +1152,7 @@ void main() {
               statusBuilds++;
               return items;
             }),
+            allEquipmentProvider.overrideWith((ref) async => items),
             equipmentListViewModeProvider.overrideWith(
               (ref) => ListViewMode.detailed,
             ),
@@ -802,6 +1215,7 @@ void main() {
               statusBuilds++;
               return items;
             }),
+            allEquipmentProvider.overrideWith((ref) async => items),
             equipmentListViewModeProvider.overrideWith(
               (ref) => ListViewMode.detailed,
             ),
@@ -814,10 +1228,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButton<Object?>));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
-      await tester.pumpAndSettle();
+      await _filterVia(tester, [_statusChipKey(EquipmentStatus.retired)]);
 
       final activeBefore = activeBuilds;
       final statusBefore = statusBuilds;

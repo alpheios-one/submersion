@@ -10,6 +10,205 @@ import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 // ignore_for_file: invalid_use_of_internal_member
 
 void main() {
+  group('store routing', () {
+    // The whole point of the two-store split. Submersion used to keep browse
+    // caching and downloaded offline regions in one store, and FMTC's
+    // removeOldestTilesAboveLimit orders by lastModified across a whole store,
+    // so any cap or age sweep would have deleted regions a diver downloaded
+    // for a trip. These assertions pin the routing that makes capping safe.
+    test('browsing writes to the browse store only', () {
+      final strategies = TileCacheService.browseStoreStrategies();
+
+      expect(
+        strategies['submersion_tiles_browse'],
+        BrowseStoreStrategy.readUpdateCreate,
+      );
+      expect(strategies['submersion_tiles'], BrowseStoreStrategy.read);
+    });
+
+    test('browsing never creates tiles in the offline store', () {
+      // If this ever becomes readUpdateCreate, incidental panning would grow
+      // the uncapped store without bound and the browse cap would be a lie.
+      for (final entry in TileCacheService.browseStoreStrategies().entries) {
+        if (entry.key == 'submersion_tiles') {
+          expect(
+            entry.value,
+            BrowseStoreStrategy.read,
+            reason: 'the offline store must never be written by browsing',
+          );
+        }
+      }
+    });
+
+    test('the offline view reads both stores and writes neither', () {
+      final strategies = TileCacheService.offlineStoreStrategies();
+
+      expect(strategies, hasLength(2));
+      expect(
+        strategies.values,
+        everyElement(BrowseStoreStrategy.read),
+        reason: 'an offline-only view must not mutate any store',
+      );
+    });
+
+    test('the two stores are distinct and the offline one keeps its name', () {
+      // Renaming submersion_tiles would strand every existing install's
+      // downloaded regions, which is the one thing this split must not do.
+      final browse = TileCacheService.browseStoreStrategies().keys.toSet();
+      final offline = TileCacheService.offlineStoreStrategies().keys.toSet();
+
+      expect(browse, offline);
+      expect(browse, contains('submersion_tiles'));
+      expect(browse, hasLength(2));
+    });
+
+    test('the store name getters match the routing maps', () {
+      // Cheap, but the offline getter keeping its historical value is what
+      // stops an upgrade from stranding every downloaded region.
+      expect(TileCacheService.instance.storeName, 'submersion_tiles');
+      expect(
+        TileCacheService.instance.browseStoreName,
+        'submersion_tiles_browse',
+      );
+      expect(
+        TileCacheService.browseStoreStrategies().keys,
+        containsAll([
+          TileCacheService.instance.storeName,
+          TileCacheService.instance.browseStoreName,
+        ]),
+      );
+    });
+
+    test('an uninitialized service refuses to hand out a store', () {
+      // _ensureInitialized now checks both stores, so a half-initialized
+      // service cannot leak a null browse store into a tile provider.
+      expect(() => TileCacheService.instance.store, throwsStateError);
+    });
+
+    test('the browse cap and age are bounded', () {
+      expect(TileCacheService.browseStoreMaxTiles, greaterThan(0));
+      expect(TileCacheService.browseTileMaxAge, const Duration(days: 30));
+    });
+  });
+
+  // Issue #1403: deleting a region used to free nothing, because FMTC can only
+  // delete a whole store and every region shared one. Giving each downloaded
+  // region its own store is what makes deletion expressible at all.
+  group('per-region stores', () {
+    test('a region store name is derived from the region id', () {
+      expect(
+        TileCacheService.regionStoreName('abc-123'),
+        'submersion_region_abc-123',
+      );
+      expect(
+        TileCacheService.regionIdFromStoreName('submersion_region_abc-123'),
+        'abc-123',
+      );
+    });
+
+    test('the shared stores are never read as region stores', () {
+      // A prefix collision here would make the orphan sweep delete every
+      // legacy tile in the app.
+      for (final shared in const [
+        'submersion_tiles',
+        'submersion_tiles_browse',
+      ]) {
+        expect(TileCacheService.regionIdFromStoreName(shared), isNull);
+      }
+      expect(
+        TileCacheService.regionIdFromStoreName('submersion_region_'),
+        isNull,
+        reason: 'an empty id is not a region',
+      );
+    });
+
+    test('browsing reads other stores and never writes them', () {
+      // The single most important assertion in this file. If unspecified
+      // stores ever became writable, panning the map would grow every
+      // downloaded region without bound and its measured size would drift.
+      expect(TileCacheService.otherStoresStrategy, BrowseStoreStrategy.read);
+    });
+
+    test('totals count this app\'s stores and no others', () {
+      // The FMTC root is shared, and the totals sit next to a button that only
+      // clears these. Counting a store that button cannot touch would put
+      // bytes on screen that nothing on the page can free.
+      for (final ours in const [
+        'submersion_tiles',
+        'submersion_tiles_browse',
+        'submersion_region_abc',
+      ]) {
+        expect(TileCacheService.isOwnStoreName(ours), isTrue, reason: ours);
+      }
+      for (final theirs in const [
+        'someone_elses_store',
+        'submersion_region_',
+        'tiles',
+      ]) {
+        expect(
+          TileCacheService.isOwnStoreName(theirs),
+          isFalse,
+          reason: theirs,
+        );
+      }
+    });
+
+    test('orphan selection keeps every store it cannot prove is garbage', () {
+      final orphans = TileCacheService.orphanRegionStores(
+        availableStores: const [
+          'submersion_tiles',
+          'submersion_tiles_browse',
+          'submersion_region_kept',
+          'submersion_region_downloading',
+          'submersion_region_orphan',
+          'someone_elses_store',
+        ],
+        knownRegionIds: {'kept'},
+        inFlightRegionIds: {'downloading'},
+      );
+
+      expect(orphans, {'submersion_region_orphan'});
+    });
+
+    test('cache totals do not decay as regions are added', () {
+      // FMTC records a miss against every store it was allowed to read, so a
+      // sum would multiply one uncached tile by the number of stores and drive
+      // the reported hit rate to nothing as a diver downloads regions.
+      final stats = TileCacheService.aggregateCacheStats(const [
+        (size: 100.0, length: 10, hits: 4, misses: 200),
+        (size: 50.0, length: 5, hits: 1, misses: 200),
+        (size: 25.0, length: 2, hits: 0, misses: 30),
+      ]);
+
+      expect(stats.tileCount, 17);
+      expect(stats.sizeKiB, 175.0);
+      expect(stats.hits, 5);
+      expect(stats.misses, 200);
+    });
+
+    test('an empty cache reports nothing rather than dividing by zero', () {
+      final stats = TileCacheService.aggregateCacheStats(const []);
+
+      expect(stats.tileCount, 0);
+      expect(stats.misses, 0);
+      expect(stats.hitRate, 0);
+    });
+
+    test('orphan selection never returns a shared or foreign store', () {
+      final orphans = TileCacheService.orphanRegionStores(
+        availableStores: const [
+          'submersion_tiles',
+          'submersion_tiles_browse',
+          'someone_elses_store',
+        ],
+        knownRegionIds: const {},
+        inFlightRegionIds: const {},
+      );
+
+      expect(orphans, isEmpty);
+    });
+  });
+
   group('TileCacheService.handleTileError', () {
     // Returns the next LogEntry emitted on the shared logger stream while
     // [action] runs. The subscription is established before [action] so the
@@ -121,6 +320,26 @@ void main() {
       expect(result, isNull); // handler degraded instead of propagating
       expect(entry.level, LogLevel.warning);
       expect(entry.message, contains('cause=_ThrowingToString'));
+    });
+  });
+
+  group('a cache that never initialized', () {
+    // The app runs on regardless: startup swallows an initialize() failure
+    // with a log line, so every FMTC-backed call throws for the rest of the
+    // session. Deleting a region removes its tiles before its row, so a throw
+    // here would leave the diver unable to delete any region at all, legacy
+    // ones included, where there is no store and nothing to free.
+    test('has no region tiles to delete, rather than an error', () async {
+      await expectLater(
+        TileCacheService.instance.deleteRegionTiles('any-region'),
+        completes,
+      );
+    });
+
+    test('still refuses the calls that need a live store', () {
+      // The no-op above is scoped to tile deletion. Anything that would hand
+      // back a store must keep failing loudly.
+      expect(() => TileCacheService.instance.store, throwsStateError);
     });
   });
 }

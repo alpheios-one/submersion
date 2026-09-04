@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
+import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/helpers/media_source_labels.dart';
@@ -9,6 +12,7 @@ import 'package:submersion/features/media/presentation/providers/media_library_p
 import 'package:submersion/features/media/presentation/providers/media_smart_album_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_filter_labels.dart';
 import 'package:submersion/features/media/presentation/widgets/media_smart_album_name_dialog.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -46,6 +50,8 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
 
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
+    final species = ref.watch(allSpeciesProvider).value ?? const [];
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     Widget chip(String label, VoidCallback onClear) {
       return InputChip(
@@ -89,10 +95,23 @@ class MediaLibraryActiveFilterChips extends ConsumerWidget {
       );
     }
 
+    final speciesId = filter.speciesId;
+    if (speciesId != null) {
+      final name =
+          species
+              .where((s) => s.id == speciesId)
+              .firstOrNull
+              ?.localizedCommonName(l10n) ??
+          l10n.media_library_filter_species;
+      chips.add(
+        chip(name, () => _update(ref, (f) => f.copyWith(speciesId: null))),
+      );
+    }
+
     if (filter.fromDate != null || filter.toDate != null) {
       chips.add(
         chip(
-          formatFilterDateRange(context, filter.fromDate, filter.toDate),
+          formatFilterDateRange(units, filter.fromDate, filter.toDate),
           () => _update(ref, (f) => f.copyWith(fromDate: null, toDate: null)),
         ),
       );

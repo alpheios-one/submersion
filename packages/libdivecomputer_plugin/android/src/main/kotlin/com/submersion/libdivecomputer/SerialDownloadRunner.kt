@@ -13,11 +13,12 @@ private const val RUNNER_LIBDC_STATUS_CANCELLED = -10
  * (see SerialDownloadClient). Adapted from DiveComputerHostApiImpl's in-process
  * serial download; emits results through the AIDL callback instead of Pigeon.
  *
- * NOTE: convertParsedDive / mapEventType below are duplicated verbatim from
- * DiveComputerHostApiImpl (they read the native dive pointer, which is valid in
+ * NOTE: convertParsedDive below is duplicated verbatim from
+ * DiveComputerHostApiImpl (it reads the native dive pointer, which is valid in
  * whichever process owns it). FOLLOW-UP: once this branch builds in CI, extract
- * them into a shared `DiveConverter` object used by both the BLE (in-process)
- * and serial (:dc) paths, to remove the duplication.
+ * it into a shared `DiveConverter` object used by both the BLE (in-process)
+ * and serial (:dc) paths, to remove the duplication. The event-name table has
+ * already been extracted (see libdcEventTypeName).
  */
 class SerialDownloadRunner(private val context: Context) {
 
@@ -217,7 +218,7 @@ class SerialDownloadRunner(private val context: Context) {
             if (e[1] == 0L) return@mapNotNull null  // skip EVENT_NONE
             DiveEvent(
                 timeSeconds = e[0] / 1000,
-                type = mapEventType(e[1].toInt()),
+                type = libdcEventTypeName(e[1].toInt()),
                 data = mapOf("flags" to e[2].toString(), "value" to e[3].toString())
             )
         }
@@ -271,34 +272,5 @@ class SerialDownloadRunner(private val context: Context) {
             rawData = rawData,
             rawFingerprint = rawFingerprint
         )
-    }
-
-    private fun mapEventType(type: Int): String = when (type) {
-        0 -> "none"
-        1 -> "deco"
-        2 -> "ascent"
-        3 -> "ceiling"
-        4 -> "workload"
-        5 -> "transmitter"
-        6 -> "violation"
-        7 -> "bookmark"
-        8 -> "surface"
-        9 -> "safetystop"
-        10 -> "gaschange"
-        11 -> "safetystop_voluntary"
-        12 -> "safetystop_mandatory"
-        13 -> "deepstop"
-        14 -> "ceiling_safetystop"
-        15 -> "floor"
-        16 -> "divetime"
-        17 -> "maxdepth"
-        18 -> "OLF"
-        19 -> "PO2"
-        20 -> "airtime"
-        21 -> "rgbm"
-        22 -> "heading"
-        23 -> "tissuelevel"
-        24 -> "gaschange2"
-        else -> "unknown_$type"
     }
 }

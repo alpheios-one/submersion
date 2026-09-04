@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis_auth/auth_io.dart' as gauth;
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_authenticator.dart';
@@ -12,6 +11,8 @@ import 'package:submersion/core/services/cloud_storage/google_drive/google_drive
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
 import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/utils/log_failure.dart';
+import 'package:submersion/shared/utils/browser_launch.dart';
 
 /// Runs the user-consent step of the loopback flow and returns credentials.
 typedef ObtainConsentCredentials =
@@ -50,7 +51,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     ObtainConsentCredentials? obtainConsent,
     BuildRefreshingClient? buildClient,
     http.Client Function()? baseClientFactory,
-    Future<void> Function(String url)? launchBrowser,
+    Future<bool> Function(String url)? launchBrowser,
     String? clientSecret,
   }) : _clientSecret =
            clientSecret ?? GoogleDriveClientConfig.desktopClientSecret,
@@ -59,7 +60,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
            obtainConsent ?? gauth.obtainAccessCredentialsViaUserConsent,
        _buildClient = buildClient ?? gauth.autoRefreshingClient,
        _baseClientFactory = baseClientFactory ?? _timedClient,
-       _launchBrowser = launchBrowser ?? launchUrlString;
+       _launchBrowser = launchBrowser ?? _openConsentPage;
 
   static final _log = LoggerService.forClass(DesktopOAuthAuthenticator);
 
@@ -71,6 +72,40 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
   /// on top of it -- on sync and, via `mediaHttpClient()`, on the media
   /// transfer queue (#1279).
   static http.Client _timedClient() => TimeoutHttpClient.overSockets();
+
+  /// Hands the consent URL to the browser, with the Linux fallback chain
+  /// url_launcher alone does not provide.
+  static Future<bool> _openConsentPage(String url) =>
+      openInBrowser(Uri.parse(url));
+
+  /// Opens the consent page, turning "nothing took the URL" into a throw.
+  ///
+  /// [openInBrowser] reports that by returning false rather than throwing --
+  /// exactly the no-scheme-handler case this flow has to survive -- so a
+  /// discarded result would leave the loopback wait looking like a hang with
+  /// nothing in the log to explain it.
+  Future<void> _launchConsentPage(String url) async {
+    try {
+      if (await _launchBrowser(url)) return;
+    } on Exception {
+      _logManualConsentUrl(url);
+      rethrow;
+    }
+    _logManualConsentUrl(url);
+    throw const CloudStorageException(
+      'No browser accepted the Google consent URL. Open the URL logged just '
+      'above this error to finish connecting by hand.',
+    );
+  }
+
+  /// Logs the consent URL as the manual way out of a failed launch.
+  ///
+  /// Only on failure: the URL carries the PKCE challenge and the state
+  /// parameter, so it has no business in the log of a flow that worked, where
+  /// it would be a very long line nobody reads and a needless copy of the
+  /// request's one-time secrets.
+  void _logManualConsentUrl(String url) =>
+      _log.warning('Open this URL to finish Google consent: $url');
 
   /// openid + email are included so the id_token carries the account email
   /// for the settings tile subtitle; drive.appdata is the only Drive scope.
@@ -87,7 +122,7 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
   final ObtainConsentCredentials _obtainConsent;
   final BuildRefreshingClient _buildClient;
   final http.Client Function() _baseClientFactory;
-  final Future<void> Function(String url) _launchBrowser;
+  final Future<bool> Function(String url) _launchBrowser;
 
   gauth.AutoRefreshingAuthClient? _authClient;
   StreamSubscription<gauth.AccessCredentials>? _updateSubscription;
@@ -112,7 +147,16 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     final base = _baseClientFactory();
     try {
       final credentials = await _obtainConsent(_clientId, scopes, base, (url) {
-        unawaited(_launchBrowser(url));
+        // The loopback flow then parks on the redirect until the browser
+        // comes back with a code, so a launch that failed reads as a hang.
+        // _launchConsentPage logs the URL if that happens: on a desktop with
+        // no working https scheme handler (see openInBrowser) that log line
+        // is the only way to finish consent by hand.
+        logFailure(
+          _launchConsentPage(url),
+          DesktopOAuthAuthenticator,
+          'open the Google consent page',
+        );
       });
       await _tokenStore.save(credentials);
       _installClient(credentials);
@@ -127,8 +171,28 @@ class DesktopOAuthAuthenticator implements GoogleDriveAuthenticator {
     }
   }
 
+  /// Single-flights [attemptSilentAuth]: the `_authClient != null` guard is
+  /// read before the token-store await, so two concurrent callers would both
+  /// get past it and both install. The second install closes the client the
+  /// first already published to the provider and the media store, and nothing
+  /// rebuilds from a still-non-null authClient -- so every later Drive call
+  /// failed with "HTTP request failed. Client is already closed." until the
+  /// process restarted.
+  ///
+  /// Two callers is the ordinary case: the Cloud Sync page fires an unawaited
+  /// refreshState() -> isAuthenticated() while a launch sync sits inside its
+  /// own isAuthenticated().
+  Future<bool>? _silentAuthInFlight;
+
   @override
-  Future<bool> attemptSilentAuth() async {
+  Future<bool> attemptSilentAuth() {
+    if (_authClient != null) return Future.value(true);
+    return _silentAuthInFlight ??= _runSilentAuth().whenComplete(
+      () => _silentAuthInFlight = null,
+    );
+  }
+
+  Future<bool> _runSilentAuth() async {
     try {
       if (_authClient != null) return true;
 

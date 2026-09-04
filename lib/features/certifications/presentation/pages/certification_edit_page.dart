@@ -1,12 +1,13 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/certification_levels.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -32,6 +33,13 @@ class CertificationEditPage extends ConsumerStatefulWidget {
   final Certification? initialCertification;
   final void Function(Certification result)? onStaged;
 
+  /// Test seam: replaces the platform image picker, which has no Dart-side
+  /// entry point a fake can be injected through. Receives the source and
+  /// returns the raw bytes plus a declared name, or null when the user
+  /// cancels. Mirrors [OcrScanPage.pickImageOverride].
+  final Future<({Uint8List bytes, String name})?> Function(ImageSource source)?
+  pickPhotoOverride;
+
   const CertificationEditPage({
     super.key,
     this.certificationId,
@@ -40,6 +48,7 @@ class CertificationEditPage extends ConsumerStatefulWidget {
     this.onCancel,
     this.initialCertification,
     this.onStaged,
+    @visibleForTesting this.pickPhotoOverride,
   }) : assert(
          onStaged == null || certificationId == null,
          'Staging mode (onStaged) prefills from initialCertification and never '
@@ -199,18 +208,48 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     if (source == null) return null;
 
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        maxWidth: 2000,
-        maxHeight: 2000,
-        imageQuality: 85,
+      // No maxWidth / maxHeight / imageQuality here: image_picker_macos,
+      // image_picker_windows and image_picker_linux all document those
+      // arguments as silently ignored, so a desktop pick entered the database
+      // at full size and rode into every sync changeset as base64. The cap is
+      // enforced below instead, in Dart, where it holds on every platform.
+      final ({Uint8List bytes, String name})? source_;
+      if (widget.pickPhotoOverride != null) {
+        source_ = await widget.pickPhotoOverride!(source);
+      } else {
+        final picked = await _imagePicker.pickImage(source: source);
+        // Read through the XFile handle, not File(picked.path). A picked file
+        // is a HANDLE: on Android SAF the path can be unusable, and
+        // image_picker makes no promise it addresses a real filesystem entry.
+        source_ = picked == null
+            ? null
+            : (bytes: await picked.readAsBytes(), name: picked.name);
+      }
+
+      if (source_ == null) return null;
+
+      final encoded = await encodeStoredImage(
+        ImageEncodeRequest.fromBytes(
+          bytes: source_.bytes,
+          spec: ImageEncodeSpec.certificationCard,
+          declaredName: source_.name,
+        ),
       );
-
-      if (picked == null) return null;
-
-      // Read the file bytes directly
-      final file = File(picked.path);
-      return await file.readAsBytes();
+      if (encoded.outcome != ImageEncodeOutcome.encoded) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                encoded.outcome == ImageEncodeOutcome.tooLarge
+                    ? context.l10n.profilePhoto_error_tooLarge
+                    : context.l10n.profilePhoto_error_undecodable,
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+      return encoded.bytes;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1006,7 +1045,7 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
   }
 }
 
-class _DatePickerField extends StatelessWidget {
+class _DatePickerField extends ConsumerWidget {
   final String label;
   final DateTime? value;
   final IconData icon;
@@ -1022,14 +1061,15 @@ class _DatePickerField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = UnitFormatter(ref.watch(settingsProvider));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Semantics(
           button: true,
           label: value != null
-              ? '$label: ${DateFormat.yMMMd().format(value!)}. Tap to change'
+              ? '$label: ${units.formatDate(value)}. Tap to change'
               : '$label: not set. Tap to select',
           child: InkWell(
             onTap: () => _pickDate(context),
@@ -1048,7 +1088,7 @@ class _DatePickerField extends StatelessWidget {
               ),
               child: Text(
                 value != null
-                    ? DateFormat.yMMMd().format(value!)
+                    ? units.formatDate(value)
                     : context.l10n.certifications_edit_datePicker_tapToSelect,
                 style: TextStyle(
                   color: value != null

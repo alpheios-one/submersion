@@ -6,6 +6,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
+import 'package:submersion/features/media_store/presentation/widgets/media_transfers_suspended_notice.dart';
 import 'package:submersion/features/media_store/presentation/widgets/transfers_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
@@ -126,10 +127,23 @@ class _TransfersPageState extends ConsumerState<TransfersPage> {
                     ),
                   ],
                 ),
-          body: TransfersView(
-            isSelectionMode: _isSelectionMode,
-            selectedIds: _selectedIds,
-            onToggle: _selection.toggle,
+          // The notice lives here rather than inside TransfersView: this
+          // page builds the runtime deliberately (see initState), while the
+          // Media console embeds the bare view, and watching the runtime
+          // from there would construct it - and kick a drain, a queue
+          // reclaim and the opportunistic verify sweep - just because a tab
+          // was selected.
+          body: Column(
+            children: [
+              const MediaTransfersSuspendedNotice(),
+              Expanded(
+                child: TransfersView(
+                  isSelectionMode: _isSelectionMode,
+                  selectedIds: _selectedIds,
+                  onToggle: _selection.toggle,
+                ),
+              ),
+            ],
           ),
         ),
       ),

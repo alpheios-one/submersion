@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/performance/perf_timer.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
@@ -264,14 +265,18 @@ class SiteRepository {
     ),
   );
 
-  /// Fills whichever of country, region, city and body of water are still
-  /// empty on [siteId] from [found], leaving every other column untouched
-  /// (issue #1187). Returns true when a column was written. The row is
-  /// marked pending for sync only when something changed.
-  Future<bool> fillMissingLocationDetails(
+  /// Writes country, region, city and body of water on [siteId] from
+  /// [found], leaving every other column untouched (issue #1187). With
+  /// [overwrite] false only columns that are still empty are written; with
+  /// it true a differing stored value is replaced too, which is how sites
+  /// geocoded in another place name language are brought back into line.
+  /// The rule itself lives in [mergeLocationDetails]. Returns true when a
+  /// column was written; the row is marked pending for sync only then.
+  Future<bool> applyLocationDetails(
     String siteId,
-    PlaceLookup found,
-  ) async {
+    PlaceLookup found, {
+    required bool overwrite,
+  }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
       final changed = await _db.transaction(() async {
@@ -280,9 +285,10 @@ class SiteRepository {
         )..where((t) => t.id.equals(siteId))).getSingleOrNull();
         if (row == null) return false;
 
-        final merged = mergeMissingLocationDetails(
+        final merged = mergeLocationDetails(
           current: SiteLocationDetails.ofSite(_mapRowToSite(row)),
           found: found,
+          overwrite: overwrite,
         );
         if (merged == null) return false;
 
@@ -868,7 +874,7 @@ class SiteRepository {
                MAX(dive_date_time) AS last_dived,
                MAX(max_depth) AS max_depth_reached
         FROM dives
-        WHERE site_id IS NOT NULL
+        WHERE site_id IS NOT NULL${DiveStatsScope.and(alias: 'dives')}
         GROUP BY site_id
       ''').get();
 

@@ -4,6 +4,7 @@ import 'package:submersion/core/database/imported_computer_identity.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/utils/deco_dive_detector.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_computer_gear_linker.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
@@ -1388,12 +1389,20 @@ class UddfEntityImporter {
     final diveIdByIndex = <int, String>{};
     final inlineBuddyIds = <String>{};
 
-    // Sort selected indices by dateTime (oldest first) for sequential numbering.
+    // Sort selected indices by dateTime (oldest first) for sequential
+    // numbering. An undated dive is stored at [now] further down, so it has
+    // to sort as [now] here too: keying it as year zero handed the newest
+    // row in the batch the lowest dive number (#239).
     final sortedSelected = selected.toList()
       ..sort((a, b) {
-        final aTime = items[a]['dateTime'] as DateTime? ?? DateTime(0);
-        final bTime = items[b]['dateTime'] as DateTime? ?? DateTime(0);
-        return aTime.compareTo(bTime);
+        final aTime = items[a]['dateTime'] as DateTime? ?? now;
+        final bTime = items[b]['dateTime'] as DateTime? ?? now;
+        final byTime = aTime.compareTo(bTime);
+        // Dives sharing a timestamp keep the order the file lists them in.
+        // List.sort makes no stability guarantee, so a tie left to it can
+        // come out in any order, and a logbook of dives entered by hand
+        // arrives with a whole day of them tied at midnight.
+        return byTime != 0 ? byTime : a.compareTo(b);
       });
 
     // Auto-assign dive numbers starting from the next available number,
@@ -1567,15 +1576,47 @@ class UddfEntityImporter {
       final parsedEntryTime = diveData['entryTime'] as DateTime?;
       final entryTime = parsedEntryTime ?? dateTime;
       final exitTime = runtime != null ? dateTime.add(runtime) : null;
+      // Parser-emitted profile events; consumed below for the deco default
+      // and persisted as ProfileEvents after the dive row is created.
+      final eventMaps = (diveData['events'] as List?)
+          ?.cast<Map<String, dynamic>>();
+      // UDDF sources emit events under 'profileEvents' instead of 'events'
+      // (see the NOTE ON UDDF DIVERGENCE below). Only 'events' is persisted
+      // as ProfileEvents, but both shapes should count toward deco detection.
+      final decoDetectionEventMaps =
+          eventMaps ??
+          (diveData['profileEvents'] as List?)?.cast<Map<String, dynamic>>();
+      // Sources without an explicit dive type used to land every dive on
+      // 'recreational', including dives whose samples show mandatory deco
+      // (ceiling, deco stops, exhausted NDL). Default those to the built-in
+      // 'technical' type instead.
+      final defaultDiveType =
+          DecoDiveDetector.isDecoDive(
+            samples: profile.map(
+              (p) => DecoDiveSample(
+                depth: p.depth,
+                ndl: p.ndl,
+                ceiling: p.ceiling,
+                decoType: p.decoType,
+                tts: p.tts,
+              ),
+            ),
+            eventMaps: decoDetectionEventMaps,
+          )
+          ? 'technical'
+          : 'recreational';
       final diveTypeIds =
           (diveData['diveTypeIds'] as List?)?.cast<String>() ??
-          [diveData['diveType'] as String? ?? 'recreational'];
+          [diveData['diveType'] as String? ?? defaultDiveType];
 
       // Parse dive mode, planner flag, and favorite
       final diveMode =
           _parseEnum(diveData['diveMode'], DiveMode.values) ?? DiveMode.oc;
       final isPlanned = diveData['isPlanned'] as bool? ?? false;
       final isFavorite = diveData['isFavorite'] as bool? ?? false;
+      final excludedFromStats = diveData['excludedFromStats'] as bool? ?? false;
+      final excludedFromGasStats =
+          diveData['excludedFromGasStats'] as bool? ?? false;
 
       // Build diluent gas mix (if present)
       final diluentO2 = diveData['diluentO2'] as double?;
@@ -1660,6 +1701,8 @@ class UddfEntityImporter {
         diveMode: diveMode,
         isPlanned: isPlanned,
         isFavorite: isFavorite,
+        excludedFromStats: excludedFromStats,
+        excludedFromGasStats: excludedFromGasStats,
         courseId: linkedCourseId,
         setpointLow: asDoubleOrNull(diveData['setpointLow']),
         setpointHigh: asDoubleOrNull(diveData['setpointHigh']),
@@ -1863,8 +1906,6 @@ class UddfEntityImporter {
       // event persistence is intentionally out of scope for Slice C; when a
       // future slice adds UDDF event import, unify the keys or add a second
       // consumer block here.
-      final eventMaps = (diveData['events'] as List?)
-          ?.cast<Map<String, dynamic>>();
       if (eventMaps != null && eventMaps.isNotEmpty) {
         final events = <ProfileEvent>[];
         for (final m in eventMaps) {

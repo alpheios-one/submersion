@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
@@ -240,19 +241,41 @@ class _DiveProfilePanelContentState
   }
 
   Widget _buildProfileContent(BuildContext context, Dive dive) {
+    // The active source's own series on a multi-source dive, dive.profile
+    // (identical to the primary's) otherwise. Never the merged union: on a
+    // consolidated dive it interleaves two computers' samples, and this
+    // panel drew that as a full-band sawtooth with a doubled point count
+    // (#543). The analysis is computed over the same series so its curves
+    // stay index-aligned with what is drawn: sourceProfileAnalysisProvider
+    // resolves a stale selection to the primary the same way the provider
+    // above does.
+    final activeSourceProfile = ref.watch(
+      activeSourceProfileProvider(widget.diveId),
+    );
+    final chartProfile = activeSourceProfile?.points ?? dive.profile;
+    // AsyncValue.value, not the valueOrNull polyfill: it keeps the previous
+    // value across a provider reload so the chart does not drop a series for
+    // a frame when a background write ticks the dive.
+    //
+    // That retention cannot cross a source switch: the analysis is keyed by
+    // source, so switching moves to a different family instance, which starts
+    // with no value. The outgoing source's curves are therefore never paired
+    // with the incoming source's series. Retention is scoped to a reload of
+    // ONE source's own analysis, where the series is the same one.
     final analysis = ref
-        .watch(profileAnalysisProvider(widget.diveId))
-        .valueOrNull;
-    final gasSwitches = ref
-        .watch(gasSwitchesProvider(widget.diveId))
-        .valueOrNull;
-    final tankPressures = ref
-        .watch(tankPressuresProvider(widget.diveId))
-        .valueOrNull;
+        .watch(
+          sourceProfileAnalysisProvider((
+            diveId: widget.diveId,
+            sourceId: ref.watch(activeDiveSourceProvider(widget.diveId)),
+          )),
+        )
+        .value;
+    final gasSwitches = ref.watch(gasSwitchesProvider(widget.diveId)).value;
+    final tankPressures = ref.watch(tankPressuresProvider(widget.diveId)).value;
     // Chart-only: real pressures augmented with linear estimates (#197).
     final estimatedTankPressures = ref
         .watch(estimatedTankPressuresProvider(widget.diveId))
-        .valueOrNull;
+        .value;
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final colorScheme = Theme.of(context).colorScheme;
@@ -266,10 +289,10 @@ class _DiveProfilePanelContentState
       showPressureThresholdMarkersProvider,
     );
     final markers = <ProfileMarker>[];
-    if (dive.profile.isNotEmpty) {
+    if (chartProfile.isNotEmpty) {
       if (showMaxDepthMarker && analysis != null) {
         final m = ProfileMarkersService.getMaxDepthMarker(
-          profile: dive.profile,
+          profile: chartProfile,
           maxDepthTimestamp: analysis.maxDepthTimestamp,
           maxDepth: analysis.maxDepth,
         );
@@ -278,7 +301,7 @@ class _DiveProfilePanelContentState
       if (showPressureThresholdMarkers && dive.tanks.isNotEmpty) {
         markers.addAll(
           ProfileMarkersService.getPressureThresholdMarkers(
-            profile: dive.profile,
+            profile: chartProfile,
             tanks: dive.tanks,
             tankPressures: tankPressures,
           ),
@@ -367,7 +390,8 @@ class _DiveProfilePanelContentState
               child: Padding(
                 padding: const EdgeInsets.only(left: 4, right: 4),
                 child: DiveProfileChart(
-                  profile: dive.profile,
+                  profile: chartProfile,
+                  activeComputerId: activeSourceProfile?.computerId,
                   diveDuration: dive.effectiveRuntime,
                   maxDepth: dive.maxDepth,
                   ceilingCurve: analysis?.ceilingCurve,
@@ -389,6 +413,7 @@ class _DiveProfilePanelContentState
                   surfaceGfCurve: analysis?.surfaceGfCurve,
                   meanDepthCurve: analysis?.meanDepthCurve,
                   ttsCurve: analysis?.ttsCurve,
+                  gtrCurve: analysis?.gtrCurve,
                   cnsCurve: analysis?.cnsCurve,
                   otuCurve: analysis?.otuCurve,
                   markers: markers,
@@ -399,22 +424,22 @@ class _DiveProfilePanelContentState
                       estimatedTankPressures?.pressures ?? tankPressures,
                   estimatedTankIds: estimatedTankPressures?.estimatedTankIds,
                   gasSwitches: gasSwitches,
-                  gasSegments: (dive.tanks.isEmpty || dive.profile.isEmpty)
+                  gasSegments: (dive.tanks.isEmpty || chartProfile.isEmpty)
                       ? null
                       : buildGasUsageSegments(
                           tanks: dive.tanks,
                           gasSwitches: gasSwitches ?? const [],
-                          diveDurationSeconds: dive.profile.last.timestamp,
-                          firstSampleSeconds: dive.profile.first.timestamp,
+                          diveDurationSeconds: chartProfile.last.timestamp,
+                          firstSampleSeconds: chartProfile.first.timestamp,
                         ),
-                  diveDurationSeconds: dive.profile.isEmpty
+                  diveDurationSeconds: chartProfile.isEmpty
                       ? null
-                      : dive.profile.last.timestamp,
+                      : chartProfile.last.timestamp,
                   tooltipBelow: true,
                   highlightedTimestamp:
                       trackingIndex != null &&
-                          trackingIndex < dive.profile.length
-                      ? dive.profile[trackingIndex].timestamp
+                          trackingIndex < chartProfile.length
+                      ? chartProfile[trackingIndex].timestamp
                       : null,
                   onPointSelected: (index) {
                     ref

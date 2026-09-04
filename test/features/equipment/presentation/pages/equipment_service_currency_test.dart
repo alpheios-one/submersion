@@ -49,7 +49,6 @@ void main() {
   Future<void> pumpDetail(
     WidgetTester tester, {
     required List<ServiceRecord> records,
-    Map<String, double> totals = const {},
     String defaultCurrency = 'USD',
   }) async {
     tester.view.devicePixelRatio = 1.0;
@@ -79,9 +78,6 @@ void main() {
           serviceRecordNotifierProvider(
             _equipment.id,
           ).overrideWith((ref) => _SeededServiceRecordNotifier(records)),
-          serviceRecordTotalCostProvider(
-            _equipment.id,
-          ).overrideWith((ref) async => totals),
           serviceClockStatusesProvider(
             _equipment.id,
           ).overrideWith((ref) async => const []),
@@ -119,7 +115,9 @@ void main() {
 
       final expected = formatMoney(120, 'EUR');
       await scrollTo(tester, find.text(expected));
-      expect(find.text(expected), findsOneWidget);
+      // Both the record row and the (now correctly non-empty) total row show
+      // the same formatted amount.
+      expect(find.text(expected), findsNWidgets(2));
       expect(expected, contains('€'));
     });
 
@@ -133,14 +131,14 @@ void main() {
           _record(id: 'r1', cost: 100, currency: 'EUR'),
           _record(id: 'r2', cost: 900, currency: 'USD'),
         ],
-        totals: const {'EUR': 100, 'USD': 900},
       );
 
       await scrollTo(tester, find.text(formatMoney(900, 'USD')));
 
-      // One total row per currency, so both are labelled -- a single combined
-      // row would give exactly one label.
-      expect(find.text('Total Service Cost'), findsNWidgets(2));
+      // One total row per currency, each naming the currency it counts. A
+      // single combined row would give exactly one label.
+      expect(find.text('Total Service Cost (USD)'), findsOneWidget);
+      expect(find.text('Total Service Cost (EUR)'), findsOneWidget);
       // Each currency's own figure appears, and the naive sum never does.
       expect(find.text(formatMoney(900, 'USD')), findsWidgets);
       expect(find.text(formatMoney(100, 'EUR')), findsWidgets);
@@ -154,7 +152,6 @@ void main() {
       await pumpDetail(
         tester,
         records: [_record(id: 'r1', cost: 40, currency: '')],
-        totals: const {'': 40},
         defaultCurrency: 'GBP',
       );
 
@@ -165,7 +162,7 @@ void main() {
     testWidgets('records without a cost produce no total row', (tester) async {
       await pumpDetail(tester, records: [_record(id: 'r1')]);
 
-      expect(find.text('Total Service Cost'), findsNothing);
+      expect(find.textContaining('Total Service Cost'), findsNothing);
     });
   });
 

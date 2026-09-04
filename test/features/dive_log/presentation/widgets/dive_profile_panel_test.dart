@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,6 +8,10 @@ import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/deco/entities/o2_exposure.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
@@ -83,10 +90,41 @@ Dive _makeDiveNoProfile({String id = 'dive-no-profile'}) {
   );
 }
 
+/// Pumps until the rendered [DiveProfileChart] draws [expected], failing
+/// with a clear message after a bounded number of frames so a regression
+/// names the series the chart actually drew rather than hanging or failing
+/// on a later, less specific assertion. `pumpAndSettle` is not used: the
+/// chart hosts implicit animations that can keep a frame scheduled.
+Future<void> _pumpUntilChartProfile(
+  WidgetTester tester,
+  List<DiveProfilePoint> expected,
+) async {
+  const maxFrames = 50;
+  List<DiveProfileChart> charts = const [];
+  for (var i = 0; i < maxFrames; i++) {
+    await tester.pump(const Duration(milliseconds: 10));
+    charts = tester
+        .widgetList<DiveProfileChart>(find.byType(DiveProfileChart))
+        .toList();
+    if (charts.length == 1 && listEquals(charts.single.profile, expected)) {
+      return;
+    }
+  }
+  fail(
+    'DiveProfileChart did not draw the expected ${expected.length}-point '
+    'series within $maxFrames frames; found ${charts.length} chart(s) with '
+    '${charts.map((c) => c.profile.length).toList()} point(s).',
+  );
+}
+
 Widget _buildPanel({
   String? highlightedDiveId,
   Dive? diveToReturn,
   ProfileAnalysis? analysis,
+  List<DiveDataSource> sources = const [],
+  Map<String, SourceProfile> sourceProfiles = const {},
+  ProfileAnalysis? activeSourceAnalysis,
+  List<Override> extraOverrides = const [],
 }) {
   return testApp(
     overrides: [
@@ -100,9 +138,24 @@ Widget _buildPanel({
           highlightedDiveId,
         ).overrideWith((ref) => Future.value(diveToReturn)),
       if (highlightedDiveId != null)
+        diveDataSourcesProvider(
+          highlightedDiveId,
+        ).overrideWith((ref) => Future.value(sources)),
+      if (highlightedDiveId != null)
+        sourceProfilesProvider(
+          highlightedDiveId,
+        ).overrideWith((ref) => Future.value(sourceProfiles)),
+      // Single-source dives delegate to the dive-level analysis; a
+      // multi-source dive asks for the active source's own analysis.
+      if (highlightedDiveId != null)
         profileAnalysisProvider(
           highlightedDiveId,
         ).overrideWith((ref) => Future.value(analysis)),
+      if (highlightedDiveId != null && sources.length >= 2)
+        sourceProfileAnalysisProvider((
+          diveId: highlightedDiveId,
+          sourceId: null,
+        )).overrideWith((ref) => Future.value(activeSourceAnalysis)),
       if (highlightedDiveId != null)
         gasSwitchesProvider(
           highlightedDiveId,
@@ -111,6 +164,7 @@ Widget _buildPanel({
         tankPressuresProvider(
           highlightedDiveId,
         ).overrideWith((ref) => Future.value({})),
+      ...extraOverrides,
     ],
     child: const SizedBox(height: 350, width: 600, child: DiveProfilePanel()),
   );
@@ -182,6 +236,9 @@ void main() {
             diveProvider(
               'loading-dive',
             ).overrideWith((ref) => Future.value(null)),
+            diveDataSourcesProvider(
+              'loading-dive',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               'loading-dive',
             ).overrideWith((ref) => Future.value(null)),
@@ -549,9 +606,15 @@ void main() {
             diveProvider(
               'dive-switch-1',
             ).overrideWith((ref) => Future.value(dive1)),
+            diveDataSourcesProvider(
+              'dive-switch-1',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             diveProvider(
               'dive-switch-2',
             ).overrideWith((ref) => Future.value(dive2)),
+            diveDataSourcesProvider(
+              'dive-switch-2',
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               'dive-switch-1',
             ).overrideWith((ref) => Future.value(null)),
@@ -762,6 +825,9 @@ void main() {
             ),
             highlightedDiveIdProvider.overrideWith((ref) => diveId),
             diveProvider(diveId).overrideWith((ref) => Future.value(dive)),
+            diveDataSourcesProvider(
+              diveId,
+            ).overrideWith((ref) => Future.value(<DiveDataSource>[])),
             profileAnalysisProvider(
               diveId,
             ).overrideWith((ref) => Future.value(null)),
@@ -800,6 +866,243 @@ void main() {
       await tester.pump();
 
       expect(find.byType(DiveProfileChart), findsOneWidget);
+    });
+    // -----------------------------------------------------------------------
+    // Multi-source dives (#543)
+    // -----------------------------------------------------------------------
+
+    testWidgets(
+      'a consolidated dive draws the active source, not the merged union',
+      (tester) async {
+        const diveId = 'consolidated';
+        final now = DateTime(2026, 7, 13);
+        // The primary (Perdix) samples every 10 s at 15 C; the consolidated
+        // Garmin copy samples every second at 16.5 C.
+        final perdix = List.generate(
+          7,
+          (i) => DiveProfilePoint(
+            timestamp: i * 10,
+            depth: i < 4 ? i * 3.0 : (6 - i) * 3.0,
+            temperature: 15.0,
+          ),
+        );
+        final garmin = List.generate(
+          61,
+          (i) => DiveProfilePoint(
+            timestamp: i,
+            depth: i < 31 ? i * 0.3 : (60 - i) * 0.3,
+            temperature: 16.5,
+          ),
+        );
+        // What getDiveById hands out: both series interleaved by timestamp.
+        final merged = [...perdix, ...garmin]
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        final dive = _makeDiveWithProfile(id: diveId, profile: merged);
+        final sources = [
+          DiveDataSource(
+            id: 'src-perdix',
+            diveId: diveId,
+            computerId: 'dc-perdix',
+            isPrimary: true,
+            importedAt: now,
+            createdAt: now,
+          ),
+          DiveDataSource(
+            id: 'src-garmin',
+            diveId: diveId,
+            computerId: 'dc-garmin',
+            isPrimary: false,
+            importedAt: now,
+            createdAt: now,
+          ),
+        ];
+        final profiles = {
+          'src-perdix': SourceProfile(
+            sourceId: 'src-perdix',
+            computerId: 'dc-perdix',
+            isEdited: false,
+            points: perdix,
+          ),
+          'src-garmin': SourceProfile(
+            sourceId: 'src-garmin',
+            computerId: 'dc-garmin',
+            isEdited: false,
+            points: garmin,
+          ),
+        };
+
+        await tester.pumpWidget(
+          _buildPanel(
+            highlightedDiveId: diveId,
+            diveToReturn: dive,
+            sources: sources,
+            sourceProfiles: profiles,
+            activeSourceAnalysis: _makeAnalysis(profileLength: perdix.length),
+          ),
+        );
+        // dive, data sources and source profiles each resolve on their own
+        // tick, and the derived provider rebuilds the panel one frame later;
+        // settle on the chart actually showing the resolved series rather
+        // than on an assumed frame count.
+        await _pumpUntilChartProfile(tester, perdix);
+
+        final chart = tester.widget<DiveProfileChart>(
+          find.byType(DiveProfileChart),
+        );
+        expect(chart.profile, perdix);
+        expect(chart.profile.length, isNot(merged.length));
+        expect(chart.activeComputerId, 'dc-perdix');
+        expect(chart.diveDurationSeconds, perdix.last.timestamp);
+        // Every temperature drawn is the active computer's reading; the
+        // merged union would alternate 15 / 16.5 sample by sample.
+        expect(chart.profile.map((p) => p.temperature).toSet(), {15.0});
+      },
+    );
+
+    testWidgets('switching the active source draws no analysis until the new '
+        "source's own analysis resolves", (tester) async {
+      // The panel keys its analysis on the active source, so switching
+      // sources moves it to a DIFFERENT family instance rather than
+      // reloading the current one. AsyncValue.value retains a previous
+      // value only within one instance, so the incoming source starts with
+      // no value and the outgoing source's curves are never paired with the
+      // newly drawn series. This pins that: the alternative (curves held
+      // across the switch) would index a 7-point ceiling into a 61-point
+      // profile.
+      const diveId = 'consolidated-switch';
+      final now = DateTime(2026, 7, 13);
+      final perdix = List.generate(
+        7,
+        (i) => DiveProfilePoint(
+          timestamp: i * 10,
+          depth: i < 4 ? i * 3.0 : (6 - i) * 3.0,
+          temperature: 15.0,
+        ),
+      );
+      final garmin = List.generate(
+        61,
+        (i) => DiveProfilePoint(
+          timestamp: i,
+          depth: i < 31 ? i * 0.3 : (60 - i) * 0.3,
+          temperature: 16.5,
+        ),
+      );
+      final merged = [...perdix, ...garmin]
+        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      final dive = _makeDiveWithProfile(id: diveId, profile: merged);
+      final sources = [
+        DiveDataSource(
+          id: 'src-perdix',
+          diveId: diveId,
+          computerId: 'dc-perdix',
+          isPrimary: true,
+          importedAt: now,
+          createdAt: now,
+        ),
+        DiveDataSource(
+          id: 'src-garmin',
+          diveId: diveId,
+          computerId: 'dc-garmin',
+          isPrimary: false,
+          importedAt: now,
+          createdAt: now,
+        ),
+      ];
+      final profiles = {
+        'src-perdix': SourceProfile(
+          sourceId: 'src-perdix',
+          computerId: 'dc-perdix',
+          isEdited: false,
+          points: perdix,
+        ),
+        'src-garmin': SourceProfile(
+          sourceId: 'src-garmin',
+          computerId: 'dc-garmin',
+          isEdited: false,
+          points: garmin,
+        ),
+      };
+
+      // Held open for the whole test: the Garmin analysis stays loading, so
+      // any curve the chart draws after the switch could only be the
+      // Perdix analysis retained across it.
+      final garminAnalysis = Completer<ProfileAnalysis?>();
+      addTearDown(() {
+        if (!garminAnalysis.isCompleted) garminAnalysis.complete(null);
+      });
+
+      await tester.pumpWidget(
+        _buildPanel(
+          highlightedDiveId: diveId,
+          diveToReturn: dive,
+          sources: sources,
+          sourceProfiles: profiles,
+          activeSourceAnalysis: _makeAnalysis(profileLength: perdix.length),
+          extraOverrides: [
+            sourceProfileAnalysisProvider((
+              diveId: diveId,
+              sourceId: 'src-garmin',
+            )).overrideWith((ref) => garminAnalysis.future),
+          ],
+        ),
+      );
+      await _pumpUntilChartProfile(tester, perdix);
+      expect(
+        tester
+            .widget<DiveProfileChart>(find.byType(DiveProfileChart))
+            .ceilingCurve,
+        hasLength(perdix.length),
+        reason: 'the primary starts with its own analysis drawn',
+      );
+
+      ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfilePanel)),
+      ).read(activeDiveSourceProvider(diveId).notifier).state = 'src-garmin';
+      await _pumpUntilChartProfile(tester, garmin);
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.profile, garmin);
+      expect(chart.activeComputerId, 'dc-garmin');
+      expect(
+        chart.ceilingCurve,
+        isNull,
+        reason:
+            "the Perdix analysis must not survive onto the Garmin series; "
+            'a 7-point ceiling drawn against 61 points would misplace every '
+            'overlay',
+      );
+    });
+
+    testWidgets('a single-source dive still draws dive.profile', (
+      tester,
+    ) async {
+      final dive = _makeDiveWithProfile(id: 'single');
+      await tester.pumpWidget(
+        _buildPanel(
+          highlightedDiveId: 'single',
+          diveToReturn: dive,
+          sources: [
+            DiveDataSource(
+              id: 'src-only',
+              diveId: 'single',
+              computerId: 'dc-only',
+              isPrimary: true,
+              importedAt: DateTime(2026, 7, 13),
+              createdAt: DateTime(2026, 7, 13),
+            ),
+          ],
+          analysis: _makeAnalysis(),
+        ),
+      );
+      await _pumpUntilChartProfile(tester, dive.profile);
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.profile, dive.profile);
+      expect(chart.activeComputerId, isNull);
     });
   });
 }

@@ -58,6 +58,28 @@ class _SeededDiscoveryNotifier extends DiscoveryNotifier {
   }
 }
 
+/// Discovery notifier whose scan never starts, mirroring what the real
+/// [DiscoveryNotifier.startScan] does when Android denies the Bluetooth
+/// permissions: it records an error and returns before the branch that
+/// empties `discoveredDevices`, so an earlier scan's devices stay in the
+/// provider.
+class _BlockedScanNotifier extends DiscoveryNotifier {
+  _BlockedScanNotifier({required super.service, required DiscoveryState seed})
+    : super(requiresRuntimePermissions: false) {
+    state = seed;
+  }
+
+  @override
+  Future<void> startScan() async {
+    state = state.copyWith(
+      isScanning: false,
+      errorMessage:
+          'Bluetooth permissions are required to scan for dive computers. '
+          'Please grant Bluetooth access in Settings.',
+    );
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Test data
 // ---------------------------------------------------------------------------
@@ -83,12 +105,17 @@ DiveComputer _savedComputer({
   );
 }
 
-pigeon.DiscoveredDevice _advert(String address) => pigeon.DiscoveredDevice(
-  vendor: 'Shearwater',
-  product: 'Petrel 3',
-  model: 10,
+pigeon.DiscoveredDevice _advert(
+  String address, {
+  String vendor = 'Shearwater',
+  String product = 'Petrel 3',
+  int model = 10,
+}) => pigeon.DiscoveredDevice(
+  vendor: vendor,
+  product: product,
+  model: model,
   address: address,
-  name: 'Petrel 3',
+  name: product,
   transport: pigeon.TransportType.ble,
 );
 
@@ -108,14 +135,18 @@ DiscoveredDevice _discovered(String address) => DiscoveredDevice(
 );
 
 class _Harness {
-  _Harness({DiscoveryState seed = const DiscoveryState()})
-    : hostApi = _RecordingHostApi(),
-      _seed = seed {
+  _Harness({
+    DiscoveryState seed = const DiscoveryState(),
+    bool blockScan = false,
+  }) : hostApi = _RecordingHostApi(),
+       _seed = seed,
+       _blockScan = blockScan {
     service = pigeon.DiveComputerService(hostApi: hostApi);
   }
 
   final _RecordingHostApi hostApi;
   final DiscoveryState _seed;
+  final bool _blockScan;
   final FakeImportAdapterDeps deps = FakeImportAdapterDeps();
   late final pigeon.DiveComputerService service;
 
@@ -132,7 +163,9 @@ class _Harness {
       overrides: [
         diveComputerServiceProvider.overrideWithValue(service),
         discoveryNotifierProvider.overrideWith(
-          (ref) => _SeededDiscoveryNotifier(service: service, seed: _seed),
+          (ref) => _blockScan
+              ? _BlockedScanNotifier(service: service, seed: _seed)
+              : _SeededDiscoveryNotifier(service: service, seed: _seed),
         ),
         diveComputerRepositoryProvider.overrideWithValue(deps.computerRepo),
         deviceDescriptorsProvider.overrideWith((ref) async => []),
@@ -310,6 +343,116 @@ void main() {
 
       expect(h.hostApi.calls, ['startDownload']);
       expect(h.hostApi.downloads.single.address, '/dev/ttyUSB0');
+    });
+  });
+
+  // Issue #1423 was reported with a Ratio iX3M on iPhone: the computer
+  // stopped downloading after its CoreBluetooth identifier (the stored
+  // "address") changed. The scan saw the computer under its new identifier,
+  // but only an exact address match was accepted, so the download fell back
+  // to the stale identifier and the native resolver spent 35 s scanning for
+  // something nothing advertises. The mechanism does not depend on the
+  // model, so these tests reuse this file's saved Petrel 3 fixture; only the
+  // addresses below are the ones from the report.
+  group('DcAdapterDownloadStep same-model fallback', () {
+    const freshAddress = 'C4E774E2-7D1F-DB41-EBD3-69D345D782F3';
+
+    testWidgets(
+      'adopts the only device of the saved model when the stored address '
+      'never advertises',
+      (tester) async {
+        final h = _Harness();
+        await tester.pumpWidget(h.build(_savedComputer()));
+        await tester.pump();
+        expect(h.hostApi.calls, ['startDiscovery']);
+
+        h.service.onDeviceDiscovered(_advert(freshAddress));
+        await tester.pump();
+        // An exact address match still has the whole timeout to appear; the
+        // fallback only applies once the scan gives up on the stored one.
+        expect(h.hostApi.calls, ['startDiscovery']);
+
+        await tester.pump(
+          DcAdapterDownloadStep.knownDeviceScanTimeout +
+              const Duration(seconds: 1),
+        );
+        await _settle(tester);
+
+        expect(h.hostApi.calls, [
+          'startDiscovery',
+          'stopDiscovery',
+          'startDownload',
+        ]);
+        final sent = h.hostApi.downloads.single;
+        expect(sent.address, freshAddress);
+        expect(sent.vendor, 'Shearwater');
+        expect(sent.product, 'Petrel 3');
+        expect(_selectedDevice(tester)?.address, freshAddress);
+      },
+    );
+
+    testWidgets('keeps the stored address when two devices of the saved model '
+        'advertise', (tester) async {
+      final h = _Harness();
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+
+      h.service.onDeviceDiscovered(_advert(freshAddress));
+      h.service.onDeviceDiscovered(_advert('11:22:33:44:55:66'));
+      await tester.pump(
+        DcAdapterDownloadStep.knownDeviceScanTimeout +
+            const Duration(seconds: 1),
+      );
+      await _settle(tester);
+
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
+    });
+
+    testWidgets('keeps the stored address when only another model advertises', (
+      tester,
+    ) async {
+      final h = _Harness();
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+
+      h.service.onDeviceDiscovered(
+        _advert(
+          freshAddress,
+          vendor: 'Ratio',
+          product: 'iX3M 2021 GPS Fancy',
+          model: 96,
+        ),
+      );
+      await tester.pump(
+        DcAdapterDownloadStep.knownDeviceScanTimeout +
+            const Duration(seconds: 1),
+      );
+      await _settle(tester);
+
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
+    });
+
+    testWidgets('keeps the stored address when the scan could not start', (
+      tester,
+    ) async {
+      // A scan blocked before it starts leaves the previous scan's devices
+      // in the provider, so the discovered list says nothing about what is
+      // advertising now. Adopting the one same-model entry from it would
+      // download from a device this attempt never saw, and a successful
+      // download would then rewrite the stored address to match it.
+      final h = _Harness(
+        seed: DiscoveryState(discoveredDevices: [_discovered(freshAddress)]),
+        blockScan: true,
+      );
+      await tester.pumpWidget(h.build(_savedComputer()));
+      await tester.pump();
+      await _settle(tester);
+
+      expect(h.hostApi.calls, ['stopDiscovery', 'startDownload']);
+      expect(h.hostApi.downloads.single.address, _savedAddress);
+      expect(_selectedDevice(tester), isNull);
     });
   });
 }

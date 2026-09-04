@@ -217,9 +217,9 @@ void main() {
       await tester.pumpWidget(await _buildTestApp());
       await tester.pumpAndSettle();
 
-      // GPS Log is rail index 13 (after Transfer, before Settings).
+      // GPS Log is rail index 14 (after Transfer, before Settings).
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      rail.onDestinationSelected!(13);
+      rail.onDestinationSelected!(14);
       await tester.pumpAndSettle();
 
       expect(find.text('GPS Log Page'), findsOneWidget);
@@ -227,7 +227,7 @@ void main() {
       final selected = tester
           .widget<NavigationRail>(find.byType(NavigationRail))
           .selectedIndex;
-      expect(selected, 13);
+      expect(selected, 14);
     });
 
     testWidgets('recording strip appears while a GPS session is active', (
@@ -280,6 +280,7 @@ void main() {
   group('MainScaffold mobile nav customization', () {
     Future<({Widget app, GoRouter router})> buildHarnessWithRouter({
       required AppSettingsRepository repo,
+      EdgeInsets systemPadding = EdgeInsets.zero,
     }) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
@@ -367,14 +368,26 @@ void main() {
           locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          // MaterialApp.builder wraps the Navigator, so padding stated here
+          // is what the modal route's own SafeArea sees.
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(padding: systemPadding),
+            child: child!,
+          ),
         ),
       );
 
       return (app: app, router: router);
     }
 
-    Future<Widget> buildHarness({required AppSettingsRepository repo}) async {
-      final result = await buildHarnessWithRouter(repo: repo);
+    Future<Widget> buildHarness({
+      required AppSettingsRepository repo,
+      EdgeInsets systemPadding = EdgeInsets.zero,
+    }) async {
+      final result = await buildHarnessWithRouter(
+        repo: repo,
+        systemPadding: systemPadding,
+      );
       return result.app;
     }
 
@@ -449,7 +462,7 @@ void main() {
       expect(find.widgetWithText(NavigationDestination, 'Trips'), findsNothing);
     });
 
-    testWidgets('wide-screen rail still shows all 15 default destinations', (
+    testWidgets('wide-screen rail still shows all 16 default destinations', (
       tester,
     ) async {
       // Wide viewport (desktop-extended so rail labels are rendered as Text).
@@ -463,11 +476,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // The wide-screen rail is NOT customized, so it keeps the default
-      // 15-entry order regardless of stored primary-ids customization.
+      // 16-entry order regardless of stored primary-ids customization.
       // NavigationRailDestination is a descriptor (not a Widget), so inspect
       // the NavigationRail.destinations list directly.
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.destinations, hasLength(15));
+      expect(rail.destinations, hasLength(16));
 
       String labelOf(NavigationRailDestination d) {
         final label = d.label;
@@ -487,6 +500,7 @@ void main() {
         'Dive Centers',
         'Certifications',
         'Courses',
+        'Species',
         'Statistics',
         'Planning',
         'Transfer',
@@ -535,21 +549,112 @@ void main() {
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await tester.pumpAndSettle();
 
-      // The overflow sheet should contain the items NOT in primary.
-      expect(find.widgetWithText(ListTile, 'Dives'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Sites'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Trips'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Dive Centers'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Certifications'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Courses'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Planning'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Transfer'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Settings'), findsOneWidget);
+      // The overflow sheet should contain the items NOT in primary. The sheet
+      // is height-capped, so the tiles past the fold have to be scrolled to;
+      // reaching them all is itself the guard that none is stranded.
+      final sheetList = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byType(Scrollable),
+      );
+      for (final label in const [
+        'Dives',
+        'Sites',
+        'Trips',
+        'Dive Centers',
+        'Certifications',
+        'Courses',
+        'Planning',
+        'Transfer',
+        'Settings',
+      ]) {
+        final tile = find.widgetWithText(ListTile, label);
+        await tester.scrollUntilVisible(tile, 100, scrollable: sheetList);
+        expect(tile, findsOneWidget);
+      }
 
       // Items now in primary should NOT appear in the overflow sheet.
       expect(find.widgetWithText(ListTile, 'Equipment'), findsNothing);
       expect(find.widgetWithText(ListTile, 'Buddies'), findsNothing);
       expect(find.widgetWithText(ListTile, 'Statistics'), findsNothing);
+    });
+
+    // Issue #1480: the overflow sheet is scroll-controlled, and a dozen
+    // destinations are taller than a phone screen, so the sheet grew until it
+    // touched y=0 and its header sat under the Android status bar.
+    testWidgets('overflow sheet stops short of the top edge on a phone', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(360, 560);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(await buildHarness(repo: _FakeRepo()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      expect(tester.getRect(find.byType(BottomSheet)).top, greaterThan(0));
+    });
+
+    // `useSafeArea: true` inserts `SafeArea(bottom: false)`, so it covers top,
+    // left and right and deliberately lets the sheet run to the bottom edge.
+    // The SafeArea in the builder supplies the bottom inset the outer one
+    // skips; it is not a double application, because a SafeArea strips the
+    // padding it consumes out of the MediaQuery it hands down.
+    testWidgets('overflow sheet applies every system inset exactly once', (
+      tester,
+    ) async {
+      const insets = EdgeInsets.only(top: 44, left: 30, right: 30, bottom: 34);
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        await buildHarness(repo: _FakeRepo(), systemPadding: insets),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      final screen = tester.getRect(find.byType(MaterialApp));
+      final sheet = tester.getRect(find.byType(BottomSheet));
+      final body = tester.getRect(
+        find.byKey(const ValueKey('navOverflowSheetBody')),
+      );
+
+      expect(sheet.left, insets.left);
+      expect(sheet.right, screen.right - insets.right);
+      expect(sheet.top, greaterThanOrEqualTo(insets.top));
+      expect(sheet.bottom, screen.bottom);
+      expect(body.bottom, screen.bottom - insets.bottom);
+      expect(body.left, sheet.left);
+      expect(body.right, sheet.right);
+    });
+
+    testWidgets('overflow sheet close action survives scrolling the list', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(360, 560);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(await buildHarness(repo: _FakeRepo()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      final closeButton = find.widgetWithIcon(IconButton, Icons.close);
+      final before = tester.getRect(closeButton);
+      await tester.drag(find.byType(ListView), const Offset(0, -200));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(closeButton), before);
+
+      await tester.tap(closeButton);
+      await tester.pumpAndSettle();
+      expect(find.byType(BottomSheet), findsNothing);
     });
   });
 
