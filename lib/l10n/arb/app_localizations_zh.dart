@@ -31973,6 +31973,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autoUpdate_banner_download => '下载';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return '更新命令：$command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       '通过 Apple iCloud 同步';
 

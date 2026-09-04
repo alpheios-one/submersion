@@ -33588,6 +33588,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get autoUpdate_banner_download => 'تنزيل';
 
   @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'حدّث باستخدام: $command';
+  }
+
+  @override
   String get settings_cloudSync_provider_icloud_subtitle =>
       'المزامنة عبر Apple iCloud';
 

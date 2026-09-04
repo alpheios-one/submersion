@@ -9977,6 +9977,7 @@
   "divePlanner_semantics_altitudeGroup": "مجموعة الارتفاع: {group}",
   "diveSites_import_detail_maxDepth": "أقصى {depth}",
   "autoUpdate_banner_download": "تنزيل",
+  "autoUpdate_banner_packageManagerHint": "حدّث باستخدام: {command}",
   "settings_cloudSync_provider_icloud_subtitle": "المزامنة عبر Apple iCloud",
   "settings_debugLog_search_hint": "البحث في السجلات...",
   "settings_debugLog_appBar_title": "سجلات التصحيح",

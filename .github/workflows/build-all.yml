@@ -549,9 +549,31 @@ jobs:
   build-linux:
     name: Build Linux
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # The glibc floor is pinned by the container image, not the runner label:
+    # GitHub retires runner images on its own schedule, and a label-pinned
+    # floor would rise silently the day 22.04 is removed. glibc 2.35 covers
+    # Ubuntu 22.04+, Debian 12+, and every current Fedora and openSUSE.
+    container: ubuntu:22.04
+    timeout-minutes: 40
 
     steps:
+      # Before checkout: a bare image has no git, so actions/checkout cannot
+      # fetch submodules, and no curl/unzip for subosito/flutter-action.
+      - name: Install Linux dependencies
+        run: |
+          apt-get update -y
+          DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev \
+            libsqlite3-dev libsecret-1-dev libwebkit2gtk-4.1-dev \
+            libssl-dev \
+            curl git unzip xz-utils ca-certificates file binutils
+
+      # actions/checkout inside a container trips git's dubious-ownership
+      # check, which makes every later git command fail.
+      - name: Trust the workspace
+        run: git config --global --add safe.directory '*'
+
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
@@ -561,15 +583,6 @@ jobs:
       - name: Read Flutter version
         id: flutter-ver
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y \
-            clang cmake ninja-build pkg-config \
-            libgtk-3-dev liblzma-dev libstdc++-12-dev \
-            libsqlite3-dev libsecret-1-dev libwebkit2gtk-4.1-dev \
-            libssl-dev
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -615,19 +628,98 @@ jobs:
         # app (issue #1129).
         run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
+      - name: Install packaging tools
+        run: |
+          DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            ruby ruby-dev build-essential rpm python3-pil
+          gem install --no-document fpm
+
+      # Staged before the tarball step, so the installer scripts the tarball
+      # carries never leak into the package trees.
+      # Shared with ci.yaml's build-linux job so the two cannot drift.
+      - name: Build .deb and .rpm
+        env:
+          TAG_NAME: ${{ inputs.version-tag }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+          scripts/release/build_linux_packages.sh \
+            --bundle build/linux/x64/release/bundle \
+            --version "$VERSION" \
+            --deb "Submersion-${TAG_NAME}-Linux-amd64.deb" \
+            --rpm "Submersion-${TAG_NAME}-Linux-x86_64.rpm"
+
+      # Runs after the package trees are staged, so these extras reach the
+      # tarball only. A tarball user has no package manager doing the work,
+      # so the archive carries its own installer and dependency map.
       - name: Create tarball
         env:
           TAG_NAME: ${{ inputs.version-tag }}
         run: |
-          cd build/linux/x64/release/bundle
+          set -euo pipefail
+          BUNDLE=build/linux/x64/release/bundle
+          cp scripts/release/linux_tarball_extras/install.sh "$BUNDLE/"
+          cp scripts/release/linux_tarball_extras/uninstall.sh "$BUNDLE/"
+          chmod +x "$BUNDLE/install.sh" "$BUNDLE/uninstall.sh"
+          cp scripts/data/linux_soname_map.json "$BUNDLE/deps.json"
+          python3 scripts/gen_udev_rules.py \
+            packages/libdivecomputer_plugin/third_party/libdivecomputer/src/descriptor.c \
+            > "$BUNDLE/60-submersion-divecomputers.rules"
+          cd "$BUNDLE"
           tar czf "$GITHUB_WORKSPACE/Submersion-${TAG_NAME}-Linux.tar.gz" .
 
-      - name: Upload Linux artifact
+      - name: Upload Linux artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: linux-tar
-          path: Submersion-*.tar.gz
+          name: linux-packages
+          path: |
+            Submersion-*.tar.gz
+            Submersion-*.deb
+            Submersion-*.rpm
           retention-days: 5
+
+  # ============================================================================
+  # Verify Linux Packages
+  # ============================================================================
+  verify-linux-packages:
+    name: Verify Linux Packages
+    needs: build-linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: debian:12
+            format: deb
+          - image: fedora:latest
+            format: rpm
+
+    steps:
+      # Checkout first: actions/checkout cleans the workspace by default, so
+      # downloading the artifact before it would delete the download.
+      - name: Check out the verification script
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: scripts/release/verify_linux_package.sh
+          sparse-checkout-cone-mode: false
+
+      - name: Download Linux packages
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-packages
+          path: packages
+
+      # Installing through the real package manager is the point: it proves
+      # every declared dependency is resolvable on a stock system, which is
+      # exactly what the tar.gz could never demonstrate.
+      - name: Install and run in a clean ${{ matrix.image }}
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$PWD/packages:/p" \
+            -v "$PWD/scripts/release/verify_linux_package.sh:/verify.sh:ro" \
+            ${{ matrix.image }} bash /verify.sh
 
   # ============================================================================
   # Android Build

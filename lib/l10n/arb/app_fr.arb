@@ -9977,6 +9977,7 @@
   "divePlanner_semantics_altitudeGroup": "Groupe d’altitude : {group}",
   "diveSites_import_detail_maxDepth": "Max {depth}",
   "autoUpdate_banner_download": "Télécharger",
+  "autoUpdate_banner_packageManagerHint": "Mettre à jour avec : {command}",
   "settings_cloudSync_provider_icloud_subtitle": "Synchroniser via Apple iCloud",
   "settings_debugLog_search_hint": "Rechercher dans les journaux...",
   "settings_debugLog_appBar_title": "Journaux de débogage",
