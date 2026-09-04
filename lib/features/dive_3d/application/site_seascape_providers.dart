@@ -195,7 +195,10 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   // buildWithLabels() actually ran for this site just now (investigating
   // Bug 11), whether it took the compute()-isolate branch above or the
   // synchronous one — both funnel through here, back on the main isolate.
-  recordSwissBathySceneBuilt(siteId);
+  // Gated on kDebugMode: the backing map is unbounded, throwaway debug
+  // state (one entry per ever-visited site id, never evicted) that has no
+  // reason to grow in a release build no debug panel ever reads from.
+  if (kDebugMode) recordSwissBathySceneBuilt(siteId);
   // Mirrors SiteSeascapeGeometryService's depth budget so the axes and the
   // terrain agree on the scene frame.
   final maxDepth = math.max(

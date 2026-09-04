@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -335,19 +336,24 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     // an extra load.
     final site = ref.watch(siteProvider(widget.siteId)).valueOrNull;
     final center = site?.location;
+    // TEMPORARY - DEBUG ONLY, remove before upstream PR: gated on kDebugMode
+    // so tapping the chip in a release build does nothing (no debug fetch,
+    // no expansion) rather than merely hiding an already-expanded panel.
     return Align(
       alignment: Alignment.topLeft,
       child: GestureDetector(
-        onTap: () => setState(() {
-          _debugExpanded = !_debugExpanded;
-          if (_debugExpanded && center != null) {
-            _debugFuture = buildSwissBathyDebugInfo(
-              siteId: widget.siteId,
-              siteName: site?.name ?? widget.siteId,
-              center: center,
-            );
-          }
-        }),
+        onTap: !kDebugMode
+            ? null
+            : () => setState(() {
+                _debugExpanded = !_debugExpanded;
+                if (_debugExpanded && center != null) {
+                  _debugFuture = buildSwissBathyDebugInfo(
+                    siteId: widget.siteId,
+                    siteName: site?.name ?? widget.siteId,
+                    center: center,
+                  );
+                }
+              }),
         child: Container(
           constraints: const BoxConstraints(maxWidth: 360),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -376,7 +382,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                 ],
               ),
               // TEMPORARY - DEBUG ONLY, remove before upstream PR.
-              if (_debugExpanded) _debugPanel(scene, grid),
+              if (kDebugMode && _debugExpanded) _debugPanel(scene, grid),
             ],
           ),
         ),
