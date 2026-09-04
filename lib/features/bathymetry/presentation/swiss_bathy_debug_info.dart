@@ -15,6 +15,8 @@
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
@@ -109,6 +111,12 @@ class SwissBathyDebugInfo {
   /// Null only when [insideSwissLakeCoverage] is false (no tile to diagnose).
   final SwissBathyExtractionDebugInfo? firstTileExtraction;
 
+  /// Where the swissBATHY3D-related caches actually live on disk, and which
+  /// path_provider call resolved that location — independent of
+  /// [insideSwissLakeCoverage] (a storage-location question, not a
+  /// this-site-specific one).
+  final SwissBathyCachePathsDebugInfo cachePaths;
+
   const SwissBathyDebugInfo({
     required this.siteId,
     required this.siteName,
@@ -122,6 +130,7 @@ class SwissBathyDebugInfo {
     required this.tiles,
     required this.firstTileStacUrl,
     required this.firstTileExtraction,
+    required this.cachePaths,
   });
 }
 
@@ -140,6 +149,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
   final fetchCenter = quantum > 0
       ? GeoPoint(cell.lat + quantum / 2, cell.lon + quantum / 2)
       : center;
+  final cachePaths = await buildSwissBathyCachePathsDebugInfo();
 
   final lake = findSwissLake(fetchCenter);
   if (lake == null) {
@@ -156,6 +166,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
       tiles: const [],
       firstTileStacUrl: null,
       firstTileExtraction: null,
+      cachePaths: cachePaths,
     );
   }
 
@@ -243,6 +254,7 @@ Future<SwissBathyDebugInfo> buildSwissBathyDebugInfo({
     tiles: tiles,
     firstTileStacUrl: firstUrl,
     firstTileExtraction: firstTileExtraction,
+    cachePaths: cachePaths,
   );
 }
 
@@ -556,7 +568,8 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
                 '${info.fetchCenter.latitude}, ${info.fetchCenter.longitude}',
     );
   if (!info.insideSwissLakeCoverage) {
-    buf.write('outside known Swiss lake coverage (findSwissLake -> null)');
+    buf.writeln('outside known Swiss lake coverage (findSwissLake -> null)');
+    buf.write(formatSwissBathyCachePathsDebugInfo(info.cachePaths));
     return buf.toString();
   }
   buf.writeln(
@@ -587,8 +600,9 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
   }
   final extraction = info.firstTileExtraction;
   if (extraction != null) {
-    buf.write(formatSwissBathyExtractionDebugInfo(extraction));
+    buf.writeln(formatSwissBathyExtractionDebugInfo(extraction));
   }
+  buf.write(formatSwissBathyCachePathsDebugInfo(info.cachePaths));
   return buf.toString();
 }
 
@@ -846,4 +860,164 @@ String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
     ..writeln('nodata cells: ${fp.nullCount} / ${fp.rows * fp.cols}')
     ..write('grid depths hash (fnv1a32): 0x${fp.hash.toRadixString(16)}');
   return buf.toString();
+}
+
+// ---------------------------------------------------------------------
+// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+//
+// Investigates a report that swissBATHY3D data reloaded suspiciously fast
+// after deleting BOTH AppData\Local\Submersion\submersion and
+// AppData\Roaming\Submersion\submersion on Windows — suggesting a third,
+// unaccounted-for persistence location. In code, there is only ONE: both
+// [SwissBathyTileCacheRepository] (table `swiss_bathy_tile_cache`) and
+// [BathymetryRepository] (table `bathymetry_cache`) share a single sqlite
+// file opened by [LocalCacheDatabaseService.initialize] via
+// getApplicationSupportDirectory() — there is no separate on-disk cache
+// for the downloaded zip bytes; [SwissBathy3dSource] keeps those only in
+// memory for the duration of one fetch() call. This section surfaces that
+// resolved path directly in the app (so it does not have to be re-derived
+// on paper per platform) and a debug-only action to clear every
+// swissBATHY3D-related row from it, regardless of what a human already
+// deleted by hand outside the app.
+// ---------------------------------------------------------------------
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+class SwissBathyCachePathsDebugInfo {
+  /// The one sqlite file both [SwissBathyTileCacheRepository] and
+  /// [BathymetryRepository] read/write, as actually resolved via
+  /// getApplicationSupportDirectory() on THIS run.
+  final String localCacheDatabasePath;
+
+  /// False when [LocalCacheDatabaseService.instance.database] threw
+  /// [StateError] (not yet initialized) — [localCacheDatabasePath] is still
+  /// the path it WOULD open, just not confirmed live.
+  final bool localCacheDatabaseOpen;
+
+  const SwissBathyCachePathsDebugInfo({
+    required this.localCacheDatabasePath,
+    required this.localCacheDatabaseOpen,
+  });
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Re-derives the exact
+/// path [LocalCacheDatabaseService.initialize] opens — read-only, issues no
+/// network request and does not touch the database beyond checking whether
+/// it is already open.
+Future<SwissBathyCachePathsDebugInfo>
+buildSwissBathyCachePathsDebugInfo() async {
+  final supportDir = await getApplicationSupportDirectory();
+  final dbPath = p.join(supportDir.path, 'Submersion', 'submersion_local.db');
+  var open = true;
+  try {
+    LocalCacheDatabaseService.instance.database;
+  } on StateError {
+    open = false;
+  }
+  return SwissBathyCachePathsDebugInfo(
+    localCacheDatabasePath: dbPath,
+    localCacheDatabaseOpen: open,
+  );
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// [SwissBathyCachePathsDebugInfo] as plain, copy-pasteable text.
+String formatSwissBathyCachePathsDebugInfo(SwissBathyCachePathsDebugInfo info) {
+  final buf = StringBuffer()
+    ..writeln('--- cache storage locations (temporary) ---')
+    ..writeln(
+      'path provider call: getApplicationSupportDirectory() '
+      '(NOT getApplicationDocumentsDirectory() -- that one only backs the '
+      'main dive database -- and NOT getTemporaryDirectory())',
+    )
+    ..writeln(
+      'resolves on this platform to: iOS/macOS -> sandboxed '
+      '"Library/Application Support/..."; Android -> app-private support '
+      'dir; Linux -> XDG_DATA_HOME (~/.local/share/...); Windows -> '
+      r'%APPDATA% (FOLDERID_RoamingAppData) with the app'
+      "'s Company/Product name appended twice (see "
+      'windows_app_data_migration.dart for the exact segments, including a '
+      'legacy pre-rename Company name a stale copy could still sit under)',
+    )
+    ..writeln('local cache database file: ${info.localCacheDatabasePath}')
+    ..writeln(
+      'database currently open in this process: '
+      '${info.localCacheDatabaseOpen ? "yes" : "NOT open (StateError) -- reads/clears below would fail"}',
+    )
+    ..writeln(
+      'both swiss_bathy_tile_cache (per-1km-tile) AND bathymetry_cache '
+      '(per quantized cell / raw coordinate) tables live in that ONE file '
+      '-- not two separate files',
+    )
+    ..write(
+      'downloaded zip bytes: held in memory only for the duration of one '
+      'SwissBathy3dSource.fetch() call, never written to disk -- no '
+      'getTemporaryDirectory()/getApplicationCacheDirectory() location '
+      'exists for swissBATHY3D specifically (a DIFFERENT, unrelated '
+      'getApplicationCacheDirectory() cache exists for draped map tiles in '
+      'tile_cache_service.dart, but that caches OSM/topo/satellite imagery '
+      'tiles, not swissBATHY3D depth data)',
+    );
+  return buf.toString();
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+class SwissBathyCacheClearResult {
+  final int tileRowsDeleted;
+  final int outerCacheRowsDeleted;
+  final String path;
+
+  const SwissBathyCacheClearResult({
+    required this.tileRowsDeleted,
+    required this.outerCacheRowsDeleted,
+    required this.path,
+  });
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Deletes every
+/// swissBATHY3D-related row from the local cache database: ALL rows in
+/// `swiss_bathy_tile_cache` (that table exists for nothing else), plus only
+/// the `bathymetry_cache` rows whose center coordinate falls inside a known
+/// swissBATHY3D lake (mirrors [BathymetryRepository.quantumDegFor] — that
+/// is exactly the set of outer-cache rows a Swiss coordinate can produce,
+/// 'ok' and 'empty' alike). Rows belonging to other sources (GMRT/EMODnet/
+/// ETOPO) are left untouched, as are all non-bathymetry app data. Returns
+/// null when the local cache database is not open.
+Future<SwissBathyCacheClearResult?> clearSwissBathyDebugCache() async {
+  final LocalCacheDatabase db;
+  try {
+    db = LocalCacheDatabaseService.instance.database;
+  } on StateError {
+    return null;
+  }
+
+  final tileRowsDeleted = await db.delete(db.swissBathyTileCache).go();
+
+  final outerRows = await db.select(db.bathymetryCache).get();
+  final swissKeys = [
+    for (final row in outerRows)
+      if (findSwissLake(GeoPoint(row.centerLat, row.centerLon)) != null)
+        row.cacheKey,
+  ];
+  var outerCacheRowsDeleted = 0;
+  if (swissKeys.isNotEmpty) {
+    outerCacheRowsDeleted = await (db.delete(
+      db.bathymetryCache,
+    )..where((t) => t.cacheKey.isIn(swissKeys))).go();
+  }
+
+  final paths = await buildSwissBathyCachePathsDebugInfo();
+  return SwissBathyCacheClearResult(
+    tileRowsDeleted: tileRowsDeleted,
+    outerCacheRowsDeleted: outerCacheRowsDeleted,
+    path: paths.localCacheDatabasePath,
+  );
+}
+
+/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// [SwissBathyCacheClearResult] as a short, human-readable confirmation.
+String formatSwissBathyCacheClearResult(SwissBathyCacheClearResult? result) {
+  if (result == null) return 'cache not initialized -- nothing to clear';
+  return '${result.tileRowsDeleted} tile row(s) + '
+      '${result.outerCacheRowsDeleted} outer cache row(s) deleted '
+      'from ${result.path}';
 }

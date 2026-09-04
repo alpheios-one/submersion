@@ -71,6 +71,11 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   bool _debugExpanded = false;
   Future<SwissBathyDebugInfo>? _debugFuture;
 
+  // TEMPORARY - DEBUG ONLY, remove before upstream PR: backs the "clear
+  // swissBATHY3D cache" debug action in [_debugPanel].
+  bool _clearingSwissBathyCache = false;
+  String? _swissBathyClearResultText;
+
   @override
   void dispose() {
     _scrub.dispose();
@@ -379,6 +384,67 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     );
   }
 
+  // TEMPORARY - DEBUG ONLY, remove before upstream PR: clears every
+  // swissBATHY3D-related row from the local cache database (see
+  // clearSwissBathyDebugCache), then re-runs the fetch-layer diagnostic so
+  // the panel reflects the now-empty cache instead of a stale snapshot.
+  Future<void> _clearSwissBathyCache() async {
+    setState(() => _clearingSwissBathyCache = true);
+    String resultText;
+    try {
+      final result = await clearSwissBathyDebugCache();
+      resultText = formatSwissBathyCacheClearResult(result);
+    } catch (e) {
+      resultText = 'clear failed: $e';
+    }
+    if (!mounted) return;
+    setState(() {
+      _clearingSwissBathyCache = false;
+      _swissBathyClearResultText = resultText;
+    });
+    final site = ref.read(siteProvider(widget.siteId)).valueOrNull;
+    final center = site?.location;
+    if (center == null) return;
+    setState(() {
+      _debugFuture = buildSwissBathyDebugInfo(
+        siteId: widget.siteId,
+        siteName: site?.name ?? widget.siteId,
+        center: center,
+      );
+    });
+  }
+
+  // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+  Widget _clearSwissBathyCacheRow() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 24,
+          child: TextButton(
+            key: const ValueKey('swissBathyDebugClearCacheButton'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            onPressed: _clearingSwissBathyCache ? null : _clearSwissBathyCache,
+            child: _clearingSwissBathyCache
+                ? const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text(
+                    'clear swissBATHY3D cache (debug)',
+                    style: TextStyle(fontSize: 10),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // TEMPORARY - DEBUG ONLY, remove before upstream PR.
   Widget _debugPanel(Scene3d scene, BathymetryGrid grid) {
     // TEMPORARY - DEBUG ONLY, remove before upstream PR: the render-layer
@@ -401,9 +467,16 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     if (future == null) {
       return Padding(
         padding: const EdgeInsets.only(top: 4),
-        child: SelectableText(
-          'debug: site coordinate not loaded yet\n$renderText',
-          style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SelectableText(
+              'debug: site coordinate not loaded yet\n$renderText',
+              style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
+            ),
+            _clearSwissBathyCacheRow(),
+          ],
         ),
       );
     }
@@ -433,6 +506,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                 text,
                 style: const TextStyle(fontSize: 10, fontFamily: 'monospace'),
               ),
+              _clearSwissBathyCacheRow(),
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(
@@ -443,6 +517,17 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                   onPressed: () => Clipboard.setData(ClipboardData(text: text)),
                 ),
               ),
+              if (_swissBathyClearResultText != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: SelectableText(
+                    'clear result: $_swissBathyClearResultText',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ),
             ],
           );
         },
