@@ -259,10 +259,10 @@ nodata_value -9999
         // West tile (Z=400 -> depth 6.1) occupies the western columns, east
         // tile (Z=410 -> depth -3.9) the eastern ones: stitched side by
         // side, not overwritten or overlapping.
-        expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
-        expect(grid.depthAt(1, 0), closeTo(406.1 - 400.0, 1e-6));
-        expect(grid.depthAt(0, 2), closeTo(406.1 - 410.0, 1e-6));
-        expect(grid.depthAt(1, 3), closeTo(406.1 - 410.0, 1e-6));
+        expect(grid.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
+        expect(grid.depthAt(1, 0), closeTo(405.92 - 400.0, 1e-6));
+        expect(grid.depthAt(0, 2), closeTo(405.92 - 410.0, 1e-6));
+        expect(grid.depthAt(1, 3), closeTo(405.92 - 410.0, 1e-6));
         // The east tile's nodata sentinel survives stitching as a gap.
         expect(grid.depthAt(0, 3), isNull);
       },
@@ -403,7 +403,7 @@ nodata_value -9999
         expect(eastGrid.rows, cellsPerTile);
         expect(eastGrid.cols, cellsPerTile);
 
-        const referenceLevel = 406.1; // Zürichsee
+        const referenceLevel = 405.92; // Zürichsee
         expect(westGrid.depthAt(0, 0), closeTo(referenceLevel - 100.0, 1e-9));
         expect(eastGrid.depthAt(0, 0), closeTo(referenceLevel - 200.0, 1e-9));
         // The exact Bug 13 symptom this guards against: two distinct,
@@ -495,7 +495,7 @@ nodata_value -9999
       // caching, not asset-level).
       expect(downloadCalls, 3);
 
-      const referenceLevel = 406.1; // Zürichsee
+      const referenceLevel = 405.92; // Zürichsee
       expect(firstGrid.depthAt(0, 0), closeTo(referenceLevel - 111.0, 1e-9));
       expect(secondGrid.depthAt(0, 0), closeTo(referenceLevel - 222.0, 1e-9));
       expect(thirdGrid.depthAt(0, 0), closeTo(referenceLevel - 333.0, 1e-9));
@@ -584,7 +584,7 @@ nodata_value -9999
       expect(grid.sourceId, 'swissbathy3d');
       expect(grid.rows, 4);
       expect(grid.cols, 4);
-      const referenceLevel = 406.1; // Zürichsee
+      const referenceLevel = 405.92; // Zürichsee
       // gridBody's cell (0, 0) resolves to 408.0 once the parser's south-
       // first row flip is applied to the fixture's data lines; what
       // matters here is that it is the fixture's real content, not the
@@ -841,14 +841,14 @@ nodata_value -9999
       expect(itemCalls, 2);
       expect(grid.rows, 2);
       expect(grid.cols, 2);
-      expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+      expect(grid.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
 
       // The failed tile was never cached as a definitive answer, so a
       // later retry (e.g. once the network recovers) queries it again
       // rather than being permanently stuck as "no data".
       final again = await source.fetch(boundaryPoint, spanMeters: 200);
       expect(itemCalls, 3);
-      expect(again.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+      expect(again.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
     });
 
     test('throws when every tile in the span fails transiently, so the '
@@ -918,7 +918,7 @@ nodata_value -9999
       expect(itemCalls, 2);
       expect(grid.rows, 2);
       expect(grid.cols, 2);
-      expect(grid.depthAt(0, 0), closeTo(406.1 - 400.0, 1e-6));
+      expect(grid.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
     });
 
     test('caps concurrent tile requests at maxConcurrentTileRequests for a '

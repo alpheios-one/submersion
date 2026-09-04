@@ -37,15 +37,17 @@ class SwissLakeLevel {
 /// water level. Deliberately NOT a database table (per task design decision)
 /// so a new lake or a corrected level ships as a code change, no migration.
 ///
-/// REVIEWER WARNING: these mean-level figures are approximate values from
-/// general geographic knowledge, not a network fetch of BAFU hydrological
-/// data (no network access was available while writing this table). Verify
-/// every value against the official BAFU gauge data
-/// (https://www.hydrodaten.admin.ch) before relying on computed depths.
+/// Mean-level figures are from the Bundesamt für Energie (BFE) publication
+/// "Naturseen der Schweiz" (as of 1 January 1983, averages of annual series
+/// through 1980): https://pubdb.bfe.admin.ch/de/publication/download/925
+///
+/// These are historical long-term averages, not real-time gauge readings —
+/// appropriate for this app's coarse LN02-to-depth conversion, since
+/// regulated lakes barely drift from their mean level over time.
 const List<SwissLakeLevel> swissLakeLevels = [
   SwissLakeLevel(
     name: 'Genfersee (Lac Léman)',
-    meanLevelMeters: 372.0,
+    meanLevelMeters: 372.05,
     minLat: 46.20,
     maxLat: 46.51,
     minLon: 6.14,
@@ -53,7 +55,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Bodensee (Obersee)',
-    meanLevelMeters: 395.2,
+    meanLevelMeters: 395.63,
     minLat: 47.50,
     maxLat: 47.72,
     minLon: 9.05,
@@ -61,7 +63,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Neuenburgersee',
-    meanLevelMeters: 429.4,
+    meanLevelMeters: 429.20,
     minLat: 46.75,
     maxLat: 47.10,
     minLon: 6.66,
@@ -69,7 +71,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Vierwaldstättersee',
-    meanLevelMeters: 433.6,
+    meanLevelMeters: 433.58,
     minLat: 46.92,
     maxLat: 47.13,
     minLon: 8.30,
@@ -77,7 +79,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Zürichsee',
-    meanLevelMeters: 406.1,
+    meanLevelMeters: 405.92,
     minLat: 47.13,
     maxLat: 47.36,
     minLon: 8.55,
@@ -85,7 +87,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Zugersee',
-    meanLevelMeters: 413.6,
+    meanLevelMeters: 413.59,
     minLat: 47.10,
     maxLat: 47.23,
     minLon: 8.44,
@@ -93,7 +95,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Thunersee',
-    meanLevelMeters: 558.0,
+    meanLevelMeters: 557.66,
     minLat: 46.63,
     maxLat: 46.75,
     minLon: 7.63,
@@ -101,7 +103,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Brienzersee',
-    meanLevelMeters: 564.0,
+    meanLevelMeters: 563.74,
     minLat: 46.66,
     maxLat: 46.76,
     minLon: 7.86,
@@ -109,7 +111,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Bielersee',
-    meanLevelMeters: 429.3,
+    meanLevelMeters: 429.15,
     minLat: 47.02,
     maxLat: 47.16,
     minLon: 7.05,
@@ -117,7 +119,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Walensee',
-    meanLevelMeters: 419.1,
+    meanLevelMeters: 419.07,
     minLat: 47.10,
     maxLat: 47.18,
     minLon: 9.13,
@@ -125,7 +127,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Lago Maggiore (Schweizer Referenz)',
-    meanLevelMeters: 193.5,
+    meanLevelMeters: 193.52,
     minLat: 45.82,
     maxLat: 46.17,
     minLon: 8.60,
@@ -133,7 +135,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Lago di Lugano',
-    meanLevelMeters: 271.0,
+    meanLevelMeters: 270.49,
     minLat: 45.85,
     maxLat: 46.05,
     minLon: 8.85,
@@ -141,7 +143,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Greifensee',
-    meanLevelMeters: 435.4,
+    meanLevelMeters: 435.14,
     minLat: 47.32,
     maxLat: 47.39,
     minLon: 8.65,
@@ -149,7 +151,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Hallwilersee',
-    meanLevelMeters: 449.0,
+    meanLevelMeters: 448.67,
     minLat: 47.24,
     maxLat: 47.32,
     minLon: 8.19,
@@ -157,7 +159,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Baldeggersee',
-    meanLevelMeters: 463.5,
+    meanLevelMeters: 463.04,
     minLat: 47.18,
     maxLat: 47.23,
     minLon: 8.24,
@@ -165,7 +167,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Sempachsee',
-    meanLevelMeters: 504.0,
+    meanLevelMeters: 503.77,
     minLat: 47.10,
     maxLat: 47.16,
     minLon: 8.13,
@@ -173,7 +175,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Pfäffikersee',
-    meanLevelMeters: 537.0,
+    meanLevelMeters: 536.98,
     minLat: 47.34,
     maxLat: 47.38,
     minLon: 8.77,
@@ -181,7 +183,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Ägerisee',
-    meanLevelMeters: 724.0,
+    meanLevelMeters: 723.89,
     minLat: 47.11,
     maxLat: 47.16,
     minLon: 8.60,
@@ -189,7 +191,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Murtensee',
-    meanLevelMeters: 429.4,
+    meanLevelMeters: 429.21,
     minLat: 46.88,
     maxLat: 46.96,
     minLon: 7.05,
@@ -197,7 +199,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
   ),
   SwissLakeLevel(
     name: 'Sarnersee',
-    meanLevelMeters: 469.5,
+    meanLevelMeters: 469.40,
     minLat: 46.85,
     maxLat: 46.92,
     minLon: 8.20,
