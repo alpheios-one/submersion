@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blend_billing.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
@@ -21,10 +22,21 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// cylinder-size vault, so renaming or deleting a size under Settings ->
 /// Manage -> Tank Presets is renaming or deleting it here too.
 class _CylinderChoice {
-  const _CylinderChoice({required this.label, required this.liters});
+  const _CylinderChoice({required this.label, required this.liters})
+    : isManageLink = false;
+
+  /// The "manage cylinder sizes" entry appended after the presets: a marker
+  /// rather than a null value, because [PopupMenuButton] reads a null
+  /// selection as "dismissed without choosing" and never calls [onSelected]
+  /// for it.
+  const _CylinderChoice.manageLink()
+    : label = '',
+      liters = 0,
+      isManageLink = true;
 
   final String label;
   final double liters;
+  final bool isManageLink;
 }
 
 /// What the blend costs at the fill station's prices.
@@ -41,6 +53,8 @@ class BlenderBillingCard extends ConsumerStatefulWidget {
 
 class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   late final TextEditingController _cylinder;
+  late final List<TextEditingController> _flushVolumes;
+  late final List<TextEditingController> _flushPrices;
 
   @override
   void initState() {
@@ -50,11 +64,37 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
     _cylinder = TextEditingController(
       text: formatRoundedForInput(litersToDisplayVolume(liters, settings), 2),
     );
+    _flushVolumes = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: formatRoundedForInput(
+            litersToDisplayVolume(g.volumeLiters, settings),
+            2,
+          ),
+        ),
+    ];
+    _flushPrices = [
+      for (final g in ref.read(blenderFlushFeeGasesProvider))
+        TextEditingController(
+          text: g.pricePer100 == null
+              ? ''
+              : formatRoundedForInput(
+                  pricePer100LitersToDisplay(g.pricePer100!, settings),
+                  2,
+                ),
+        ),
+    ];
   }
 
   @override
   void dispose() {
     _cylinder.dispose();
+    for (final c in _flushVolumes) {
+      c.dispose();
+    }
+    for (final c in _flushPrices) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -72,36 +112,12 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // A Wrap rather than a Row: the heading and the link together
-            // are a few pixels too wide for the narrowest phone, and dropping
-            // the link to its own line reads better than truncating it.
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                // No bottom padding: it would be counted into this child's
-                // height and leave the heading riding above the link it is
-                // centred against.
-                BlenderSectionTitle(
-                  context.l10n.gasCalculators_blender_billing,
-                  bottomPadding: 0,
-                ),
-                // Opens the global tank presets this card's dropdown
-                // reads (issue #1335 follow-up: the blender no longer
-                // keeps its own cylinder-size vault, so this jumps
-                // straight to Settings -> Manage -> Tank Presets).
-                TextButton.icon(
-                  key: const Key('blender-cylinder-sizes-link'),
-                  onPressed: () => context.push('/tank-presets'),
-                  icon: const Icon(Icons.straighten, size: 18),
-                  label: Text(
-                    context.l10n.gasCalculators_blender_manageCylinderSizes,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+            BlenderSectionTitle(context.l10n.gasCalculators_blender_billing),
             _cylinderRow(context, settings, units),
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            _flushFeeSettings(context, settings, units),
             if (billing.lines.isNotEmpty) ...[
               const Divider(height: 28),
               for (final line in billing.lines)
@@ -148,6 +164,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             gas: formatPreciseGasName(context, line.gas),
             addedBar: line.addedBar,
             cost: line.cost,
+            freeGasLiters: line.freeGasLiters,
           ),
       ],
       total: billing.total,
@@ -236,8 +253,35 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
                     value: choice,
                     child: Text(choice.label),
                   ),
+                if (choices.isNotEmpty) const PopupMenuDivider(),
+                // Last, directly under the list it manages (issue #1335
+                // follow-up review): opens the global tank presets this
+                // dropdown reads, since the blender no longer keeps its own
+                // cylinder-size vault.
+                PopupMenuItem<_CylinderChoice>(
+                  key: const Key('blender-cylinder-sizes-link'),
+                  value: const _CylinderChoice.manageLink(),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.straighten, size: 18),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          context
+                              .l10n
+                              .gasCalculators_blender_manageCylinderSizes,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
               onSelected: (choice) {
+                if (choice.isManageLink) {
+                  context.push('/tank-presets');
+                  return;
+                }
                 ref.read(blenderCylinderLitersProvider.notifier).state =
                     choice.liters;
                 _cylinder.text = formatRoundedForInput(
@@ -341,5 +385,142 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
         ),
       ],
     );
+  }
+
+  /// The hose-purge flat fee: whether it is charged, how often it appears on
+  /// the bill, and each gas's default volume and price. The bill itself
+  /// reads these gases from [BlenderInvoiceCard], which keeps its own
+  /// editable liter field seeded from the same setting (issue #1335).
+  Widget _flushFeeSettings(
+    BuildContext context,
+    AppSettings settings,
+    UnitFormatter units,
+  ) {
+    final enabled = ref.watch(blenderFlushFeeEnabledProvider);
+    final mode = ref.watch(blenderFlushFeeModeProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          key: const Key('blender-flush-fee-enabled'),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          title: Text(context.l10n.gasCalculators_blender_flushFeeEnable),
+          value: enabled,
+          onChanged: (value) {
+            ref.read(blenderFlushFeeEnabledProvider.notifier).state = value;
+            saveBlenderPreferences(ref);
+          },
+        ),
+        if (enabled) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SegmentedButton<FlushFeeMode>(
+              key: const Key('blender-flush-fee-mode'),
+              segments: [
+                ButtonSegment(
+                  value: FlushFeeMode.perInvoice,
+                  label: Text(
+                    context.l10n.gasCalculators_blender_flushFeeModePerInvoice,
+                  ),
+                ),
+                ButtonSegment(
+                  value: FlushFeeMode.perFill,
+                  label: Text(
+                    context.l10n.gasCalculators_blender_flushFeeModePerFill,
+                  ),
+                ),
+              ],
+              selected: {mode},
+              onSelectionChanged: (selection) {
+                ref.read(blenderFlushFeeModeProvider.notifier).state =
+                    selection.first;
+                saveBlenderPreferences(ref);
+              },
+            ),
+          ),
+          for (var i = 0; i < FlushFeeGasKind.values.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            _flushFeeGasRow(context, i, settings, units),
+          ],
+        ],
+      ],
+    );
+  }
+
+  Widget _flushFeeGasRow(
+    BuildContext context,
+    int index,
+    AppSettings settings,
+    UnitFormatter units,
+  ) {
+    final kind = FlushFeeGasKind.values[index];
+    final label = flushFeeGasLabel(context, kind);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: TextField(
+            key: Key('blender-flush-fee-volume-${kind.name}'),
+            controller: _flushVolumes[index],
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            decoration: InputDecoration(
+              labelText:
+                  '$label '
+                  '${context.l10n.gasCalculators_blender_flushFeeVolume} '
+                  '(${units.volumeSymbol})',
+              isDense: true,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (_) => _saveFlushFeeGases(settings),
+            onEditingComplete: () => saveBlenderPreferences(ref),
+            onSubmitted: (_) => saveBlenderPreferences(ref),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            key: Key('blender-flush-fee-price-${kind.name}'),
+            controller: _flushPrices[index],
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            decoration: InputDecoration(
+              labelText:
+                  '$label '
+                  '${context.l10n.gasCalculators_blender_unitPrice(units.volumeSymbol)}',
+              isDense: true,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (_) => _saveFlushFeeGases(settings),
+            onEditingComplete: () => saveBlenderPreferences(ref),
+            onSubmitted: (_) => saveBlenderPreferences(ref),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _saveFlushFeeGases(AppSettings settings) {
+    ref.read(blenderFlushFeeGasesProvider.notifier).state = [
+      for (var i = 0; i < FlushFeeGasKind.values.length; i++)
+        FlushFeeGasSetting(
+          volumeLiters: displayVolumeToLiters(
+            parseUserDecimal(_flushVolumes[i].text) ?? 0,
+            settings,
+          ),
+          pricePer100: switch (parseUserDecimal(_flushPrices[i].text)) {
+            final double entered => displayToPricePer100Liters(
+              entered,
+              settings,
+            ),
+            null => null,
+          },
+        ),
+    ];
   }
 }

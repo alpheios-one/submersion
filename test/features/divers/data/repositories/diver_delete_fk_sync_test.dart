@@ -181,6 +181,72 @@ void main() {
     expect(await pendingCountFor('dives', 'dive-c'), 1);
   });
 
+  test(
+    'a surviving legacy dive_profiles row does not block the delete',
+    () async {
+      // The v183 rung drops dive_profiles only once its rows have moved into
+      // the series table, so a device whose pack threw still carries it, and
+      // its computer_id FK has no ON DELETE action. A row of that table on
+      // another diver's dive fails `DELETE FROM dive_computers` with
+      // SqliteException(787) and rolls the whole delete back, so the diver can
+      // never be deleted on that device. DiveComputerRepository.deleteComputer
+      // guards the same statement the same way (#823).
+      await db.customStatement(
+        'CREATE TABLE dive_profiles ('
+        'id TEXT NOT NULL PRIMARY KEY, '
+        'dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE, '
+        'computer_id TEXT REFERENCES dive_computers (id), '
+        'timestamp INTEGER NOT NULL, '
+        'depth REAL NOT NULL)',
+      );
+      await insertDiver('diver-a');
+      await insertDiver('diver-b');
+      const stale = 1000;
+      await db
+          .into(db.diveComputers)
+          .insert(
+            DiveComputersCompanion.insert(
+              id: 'comp-a',
+              name: 'Perdix',
+              diverId: const Value('diver-a'),
+              createdAt: stale,
+              updatedAt: stale,
+            ),
+          );
+      await db
+          .into(db.dives)
+          .insert(
+            DivesCompanion.insert(
+              id: 'dive-b',
+              diverId: const Value('diver-b'),
+              diveDateTime: stale,
+              createdAt: stale,
+              updatedAt: stale,
+            ),
+          );
+      await db.customStatement(
+        'INSERT INTO dive_profiles (id, dive_id, computer_id, timestamp, depth) '
+        'VALUES (?, ?, ?, ?, ?)',
+        ['dp-b', 'dive-b', 'comp-a', 0, 1.0],
+      );
+
+      await repository.deleteDiverWithReassignment('diver-a');
+
+      expect(
+        await db
+            .customSelect("SELECT id FROM divers WHERE id = 'diver-a'")
+            .get(),
+        isEmpty,
+      );
+      final profile = await db
+          .customSelect(
+            "SELECT computer_id FROM dive_profiles WHERE id = 'dp-b'",
+          )
+          .getSingle();
+      expect(profile.readNullable<String>('computer_id'), isNull);
+    },
+  );
+
   test('a dive of the deleted diver is not marked pending', () async {
     // It is about to be deleted with its diver; marking it pending would
     // publish a row that no longer exists.

@@ -10282,6 +10282,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_sortField_fileSize => 'حجم الملف';
 
   @override
+  String get enum_sortField_lastDive => 'آخر غوصة';
+
+  @override
   String get enum_sortField_lastServiceDate => 'آخر صيانة';
 
   @override
@@ -11126,6 +11129,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'معدات $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'لا توجد $filterText';
   }
@@ -11133,6 +11141,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'لا توجد معدات بهذه الحالة';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'لا توجد معدات في هذه الفئة';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11147,10 +11159,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_list_filterAll => 'جميع المعدات';
 
   @override
-  String get equipment_list_filterLabel => 'تصفية:';
+  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
 
   @override
-  String get equipment_list_filterServiceDue => 'الصيانة مستحقة';
+  String get equipment_list_typeFilterAll => 'جميع الأنواع';
+
+  @override
+  String get equipment_list_filterTooltip => 'تصفية المعدات';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'مسح';
+
+  @override
+  String get equipment_filter_title => 'تصفية المعدات';
+
+  @override
+  String get equipment_filter_clearAll => 'مسح الكل';
+
+  @override
+  String get equipment_filter_apply => 'تطبيق الفلاتر';
+
+  @override
+  String get equipment_filter_cancel => 'إلغاء';
+
+  @override
+  String get equipment_filter_section_status => 'الحالة';
+
+  @override
+  String get equipment_filter_section_category => 'الفئة';
 
   @override
   String get equipment_list_retryButton => 'إعادة المحاولة';
@@ -12150,6 +12186,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'إضافة قالب';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'ضبط القيم';
+
+  @override
   String get gasCalculators_blender_billing => 'التكلفة';
 
   @override
@@ -12189,7 +12228,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'حفظ هذه التعبئة';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'فرض رسوم لتنظيف خرطوم التعبئة';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'مرة واحدة لكل فاتورة';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'مرة واحدة لكل تعبئة';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'حجم التنظيف';
+
+  @override
   String get gasCalculators_blender_billed => 'الفاتورة';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'فاتورة بتاريخ $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'تغيير تاريخ الفاتورة';
+
+  @override
+  String get gasCalculators_blender_tariff => 'التعرفة الحالية';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12208,14 +12273,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'المبلغ';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'إفراغ';
+  String get gasCalculators_blender_export => 'تصدير';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'إفراغ الفاتورة؟';
+  String get gasCalculators_blender_exportPdf => 'تصدير كملف PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'سيؤدي هذا إلى حذف جميع التعبئات المحفوظة وعددها $count.';
+  String get gasCalculators_blender_exportImage => 'تصدير كصورة';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'تصدير كملف Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'فشل التصدير: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'دفع';
+
+  @override
+  String get gasCalculators_blender_payTitle =>
+      'وضع علامة على الفاتورة كمدفوعة؟';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'سيؤدي هذا إلى أرشفة جميع التعبئات المحفوظة وعددها $count وبدء فاتورة جديدة.';
   }
 
   @override
@@ -12239,6 +12322,35 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'الإجمالي';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'أرشيف الفواتير';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'تصفية حسب التاريخ';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'لا توجد فواتير مدفوعة بعد.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'لا توجد فواتير ضمن هذا النطاق الزمني.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count تعبئات';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'غير مكتمل';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'بدون عنوان';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'الفاتورة غير موجودة.';
 
   @override
   String get gasCalculators_blender_defaults => 'الإعدادات الافتراضية والفوترة';
@@ -15598,6 +15710,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'تعذرت قراءة تغييرات $deviceList أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'تعذرت قراءة تغييرات $deviceList أثناء المزامنة الأخيرة، لذا لم يتم دمجها. ستعيد المزامنة التالية المحاولة تلقائيًا.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -34873,6 +34995,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'جارٍ تنزيل المكتبة ($downloaded من $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'جارٍ استيراد المكتبة ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'لم يتم إعداد أي مزود تخزين سحابي';
 
@@ -35494,6 +35629,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'جارٍ سرد الغوصات…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'جارٍ سرد الغوصات… (تم العثور على $count غوصة حتى الآن)',
+      one: 'جارٍ سرد الغوصات… (تم العثور على غوصة واحدة حتى الآن)',
+      zero: 'جارٍ سرد الغوصات…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'جلب الغوصة $current من $total…';
   }
@@ -35503,6 +35650,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'تحميل المزيد';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35528,6 +35678,111 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'تسجيل الدخول إلى Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'سجّل الدخول بحساب Garmin Connect الخاص بك لاستيراد غوصاتك مباشرة. لا يتم تخزين كلمة المرور مطلقًا، بل يتم تخزين الجلسة الناتجة فقط.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'البريد الإلكتروني';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'البريد الإلكتروني مطلوب';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'كلمة المرور';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'كلمة المرور مطلوبة';
+
+  @override
+  String get garminConnect_signIn_button => 'تسجيل الدخول';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'جارٍ تسجيل الدخول…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'تم تسجيل الدخول باسم $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'التحقق مطلوب';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'أدخل رمز التحقق المُرسل إلى $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'رمز التحقق';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'رمز التحقق مطلوب';
+
+  @override
+  String get garminConnect_mfa_button => 'تحقّق';
+
+  @override
+  String get garminConnect_mfa_submitting => 'جارٍ التحقق…';
+
+  @override
+  String get garminConnect_fetch_listing => 'جارٍ سرد الغوصات…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'جارٍ سرد الغوصات… (تم العثور على $count غوصة حتى الآن)',
+      one: 'جارٍ سرد الغوصات… (تم العثور على غوصة واحدة حتى الآن)',
+      zero: 'جارٍ سرد الغوصات…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'جلب الغوصة $current من $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'تعذّر جلب الغوصات';
+
+  @override
+  String get garminConnect_fetch_retry => 'إعادة المحاولة';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'تحميل المزيد';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم العثور على $count غوصة',
+      one: 'تم العثور على غوصة واحدة',
+      zero: 'لم يتم العثور على غوصات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر تحويل $count غوصة وتم تخطيها.',
+      one: 'تعذّر تحويل غوصة واحدة وتم تخطيها.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'تحميل الكل';
+
+  @override
   String get importWizard_review_sortTooltip => 'ترتيب';
 
   @override
@@ -35545,6 +35800,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'استيراد الغوصات من تطبيق Suunto أو حساب app.suunto.com';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'استيراد الغوصات من حساب Garmin Connect الخاص بك';
 
   @override
   String get transfer_section_cloudTitle => 'السحابة';

@@ -9988,6 +9988,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_sortField_fileSize => '文件大小';
 
   @override
+  String get enum_sortField_lastDive => '最近潜水';
+
+  @override
   String get enum_sortField_lastServiceDate => '最近维护';
 
   @override
@@ -10802,12 +10805,20 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type 装备';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return '没有$filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => '此类别中没有装备';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate => '您的所有装备维护都已是最新状态！';
@@ -10821,10 +10832,34 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_list_filterAll => '全部装备';
 
   @override
-  String get equipment_list_filterLabel => '筛选:';
+  String get equipment_list_filterServiceDue => '需要维护';
 
   @override
-  String get equipment_list_filterServiceDue => '需要维护';
+  String get equipment_list_typeFilterAll => '全部类型';
+
+  @override
+  String get equipment_list_filterTooltip => '筛选装备';
+
+  @override
+  String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String get equipment_filter_title => '筛选装备';
+
+  @override
+  String get equipment_filter_clearAll => '清除全部';
+
+  @override
+  String get equipment_filter_apply => '应用筛选';
+
+  @override
+  String get equipment_filter_cancel => '取消';
+
+  @override
+  String get equipment_filter_section_status => '状态';
+
+  @override
+  String get equipment_filter_section_category => '类别';
 
   @override
   String get equipment_list_retryButton => '重试';
@@ -11788,6 +11823,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => '添加模板';
 
   @override
+  String get gasCalculators_blender_templateAdjust => '调整数值';
+
+  @override
   String get gasCalculators_blender_billing => '费用';
 
   @override
@@ -11824,7 +11862,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_saveFill => '保存本次充填';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable => '收取充气软管吹扫费';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice => '每张账单一次';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => '每次充填一次';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => '吹扫量';
+
+  @override
   String get gasCalculators_blender_billed => '已计费';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return '开票日期：$date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => '更改开票日期';
+
+  @override
+  String get gasCalculators_blender_tariff => '当前价目';
 
   @override
   String get gasCalculators_blender_billedNone => '尚无计费内容。完成一次充填后保存到这里。';
@@ -11842,14 +11903,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => '金额';
 
   @override
-  String get gasCalculators_blender_clearBilled => '清空';
+  String get gasCalculators_blender_export => '导出';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => '清空账单？';
+  String get gasCalculators_blender_exportPdf => '导出为 PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return '这将删除全部 $count 条已保存的充填记录。';
+  String get gasCalculators_blender_exportImage => '导出为图片';
+
+  @override
+  String get gasCalculators_blender_exportExcel => '导出为 Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => '付款';
+
+  @override
+  String get gasCalculators_blender_payTitle => '将账单标记为已付款？';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return '这将归档全部 $count 条已保存的充填记录并开始一张新账单。';
   }
 
   @override
@@ -11872,6 +11950,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => '合计';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => '账单存档';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => '按日期筛选';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty => '尚无已付款账单。';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered => '此时间段内没有账单。';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count 次充装';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => '不完整';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => '无标题';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound => '未找到该账单。';
 
   @override
   String get gasCalculators_blender_defaults => '默认设置与计费';
@@ -15093,6 +15197,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return '上次同步时无法读取 $deviceList 的更改，因此未合并。下次同步将自动重试。';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -33140,6 +33254,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return '正在下载资料库（$downloaded/$total）';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return '正在导入资料库（$percent%）';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider => '未配置云服务商';
 
   @override
@@ -33727,6 +33854,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get suuntoCloud_fetch_listing => '正在列出潜水记录…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return '正在获取第 $current 次潜水，共 $total 次…';
   }
@@ -33736,6 +33875,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => '重试';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => '加载更多';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -33761,6 +33903,111 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => '登录 Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      '使用您的 Garmin Connect 账户登录，即可直接导入潜水记录。您的密码不会被保存，仅缓存由此生成的会话。';
+
+  @override
+  String get garminConnect_signIn_emailLabel => '电子邮件';
+
+  @override
+  String get garminConnect_signIn_emailRequired => '请输入电子邮件';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => '密码';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => '请输入密码';
+
+  @override
+  String get garminConnect_signIn_button => '登录';
+
+  @override
+  String get garminConnect_signIn_signingIn => '正在登录…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return '已登录为 $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => '需要验证';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return '请输入发送到您 $method 的验证码。';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => '验证码';
+
+  @override
+  String get garminConnect_mfa_codeRequired => '请输入验证码';
+
+  @override
+  String get garminConnect_mfa_button => '验证';
+
+  @override
+  String get garminConnect_mfa_submitting => '正在验证…';
+
+  @override
+  String get garminConnect_fetch_listing => '正在列出潜水记录…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '正在列出潜水记录…（目前已找到 $count 次）',
+      one: '正在列出潜水记录…（目前已找到 1 次）',
+      zero: '正在列出潜水记录…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return '正在获取第 $current 次潜水，共 $total 次…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => '无法获取潜水记录';
+
+  @override
+  String get garminConnect_fetch_retry => '重试';
+
+  @override
+  String get garminConnect_fetch_loadMore => '加载更多';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '找到 $count 次潜水',
+      one: '找到 1 次潜水',
+      zero: '未找到潜水记录',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '有 $count 次潜水无法转换，已跳过。',
+      one: '有 1 次潜水无法转换，已跳过。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => '加载全部';
+
+  @override
   String get importWizard_review_sortTooltip => '排序';
 
   @override
@@ -33778,6 +34025,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       '从您的 Suunto 应用或 app.suunto.com 账户导入潜水记录';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      '从您的 Garmin Connect 账户导入潜水记录';
 
   @override
   String get transfer_section_cloudTitle => '云端';

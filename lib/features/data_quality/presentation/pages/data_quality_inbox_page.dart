@@ -165,10 +165,21 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
           ),
         );
       case SplitSourceRepair(:final diveId, :final sourceId):
-        final newId = await ref
-            .read(diveSplitServiceProvider)
-            .split(diveId: diveId, sourceId: sourceId);
-        scheduleQualityScan([diveId, newId]);
+        // Split does not return a RepairResult, so withUndo cannot wrap it.
+        // It still has to report a failure: it refuses a source that no
+        // longer belongs to the dive, and a dive whose stored series this
+        // build cannot decode. Left unwrapped, the tap did nothing visible
+        // and the finding stayed open forever.
+        try {
+          final newId = await ref
+              .read(diveSplitServiceProvider)
+              .split(diveId: diveId, sourceId: sourceId);
+          scheduleQualityScan([diveId, newId]);
+        } catch (e) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.diveLog_sources_splitFailed)),
+          );
+        }
       case DespikeRepair(:final diveId):
         await withUndo(
           () => executor.applyProfileRepair(

@@ -10299,6 +10299,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_sortField_fileSize => 'File Size';
 
   @override
+  String get enum_sortField_lastDive => 'Last Dive';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Last Service';
 
   @override
@@ -11142,6 +11145,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type equipment';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'No $filterText';
   }
@@ -11149,6 +11157,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'No equipment with this status';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'No equipment in this category';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11163,10 +11175,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_list_filterAll => 'All Equipment';
 
   @override
-  String get equipment_list_filterLabel => 'Filter:';
+  String get equipment_list_filterServiceDue => 'Service Due';
 
   @override
-  String get equipment_list_filterServiceDue => 'Service Due';
+  String get equipment_list_typeFilterAll => 'All Types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filter equipment';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Clear';
+
+  @override
+  String get equipment_filter_title => 'Filter Equipment';
+
+  @override
+  String get equipment_filter_clearAll => 'Clear All';
+
+  @override
+  String get equipment_filter_apply => 'Apply Filters';
+
+  @override
+  String get equipment_filter_cancel => 'Cancel';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Category';
 
   @override
   String get equipment_list_retryButton => 'Retry';
@@ -12168,6 +12204,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Add template';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Adjust values';
+
+  @override
   String get gasCalculators_blender_billing => 'Cost';
 
   @override
@@ -12207,7 +12246,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Save this fill';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Charge a fee to purge the fill hose';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice => 'Once per bill';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => 'Once per fill';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Purge volume';
+
+  @override
   String get gasCalculators_blender_billed => 'Billed';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Invoice dated $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Change invoice date';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Current tariff';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12226,14 +12289,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Amount';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Clear';
+  String get gasCalculators_blender_export => 'Export';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Clear the bill?';
+  String get gasCalculators_blender_exportPdf => 'Export as PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'This removes all $count saved fills.';
+  String get gasCalculators_blender_exportImage => 'Export as Image';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Export as Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Pay';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'Mark the bill as paid?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'This archives all $count saved fills and starts a new bill.';
   }
 
   @override
@@ -12257,6 +12337,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Total';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Invoice archive';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filter by date';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'No paid invoices yet.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'No invoices in this date range.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count fills';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Incomplete';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Untitled';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Invoice not found.';
 
   @override
   String get gasCalculators_blender_defaults => 'Default settings and billing';
@@ -15615,6 +15724,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Changes from $deviceList could not be read during the last sync, so they were not merged. The next sync will retry automatically.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Changes from $deviceList could not be read during the last sync, so they were not merged. The next sync will retry automatically.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -34685,6 +34804,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Downloading library ($downloaded of $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importing library ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'No cloud provider configured';
 
@@ -35300,6 +35432,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Listing dives…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Listing dives… ($count found so far)',
+      one: 'Listing dives… (1 found so far)',
+      zero: 'Listing dives…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'Fetching dive $current of $total…';
   }
@@ -35309,6 +35453,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Try Again';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Load More';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35334,6 +35481,111 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'Sign in to Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'Email';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'Email is required';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Password';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'Password is required';
+
+  @override
+  String get garminConnect_signIn_button => 'Sign In';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Signing in…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Verification Required';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Enter the verification code sent to your $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Verification Code';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'Verification code is required';
+
+  @override
+  String get garminConnect_mfa_button => 'Verify';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Verifying…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Listing dives…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Listing dives… ($count found so far)',
+      one: 'Listing dives… (1 found so far)',
+      zero: 'Listing dives…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Fetching dive $current of $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'Could not fetch dives';
+
+  @override
+  String get garminConnect_fetch_retry => 'Try Again';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Load More';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count dives',
+      one: 'Found 1 dive',
+      zero: 'No dives found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives could not be converted and were skipped.',
+      one: '1 dive could not be converted and was skipped.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Fetch All';
+
+  @override
   String get importWizard_review_sortTooltip => 'Sort';
 
   @override
@@ -35351,6 +35603,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Import dives from your Suunto app / app.suunto.com account';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Import dives from your Garmin Connect account';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';

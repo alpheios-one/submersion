@@ -10222,6 +10222,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_sortField_fileSize => 'גודל הקובץ';
 
   @override
+  String get enum_sortField_lastDive => 'צלילה אחרונה';
+
+  @override
   String get enum_sortField_lastServiceDate => 'טיפול אחרון';
 
   @override
@@ -11061,12 +11064,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return 'ציוד $type';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'אין $filterText';
   }
 
   @override
   String get equipment_list_emptyState_noStatusMatch => 'אין ציוד עם סטטוס זה';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch => 'אין ציוד בקטגוריה זו';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11081,10 +11092,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_list_filterAll => 'כל הציוד';
 
   @override
-  String get equipment_list_filterLabel => 'סנן:';
+  String get equipment_list_filterServiceDue => 'טיפול נדרש';
 
   @override
-  String get equipment_list_filterServiceDue => 'טיפול נדרש';
+  String get equipment_list_typeFilterAll => 'כל הסוגים';
+
+  @override
+  String get equipment_list_filterTooltip => 'סינון ציוד';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'נקה';
+
+  @override
+  String get equipment_filter_title => 'סנן ציוד';
+
+  @override
+  String get equipment_filter_clearAll => 'נקה הכל';
+
+  @override
+  String get equipment_filter_apply => 'החל מסננים';
+
+  @override
+  String get equipment_filter_cancel => 'ביטול';
+
+  @override
+  String get equipment_filter_section_status => 'סטטוס';
+
+  @override
+  String get equipment_filter_section_category => 'קטגוריה';
 
   @override
   String get equipment_list_retryButton => 'נסה שוב';
@@ -12070,6 +12105,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'הוסף תבנית';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'התאם ערכים';
+
+  @override
   String get gasCalculators_blender_billing => 'עלות';
 
   @override
@@ -12108,7 +12146,32 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'שמור את המילוי הזה';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'גבה עמלה על שטיפת צינור המילוי';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'פעם אחת לחשבונית';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill => 'פעם אחת לכל מילוי';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'נפח שטיפה';
+
+  @override
   String get gasCalculators_blender_billed => 'חיוב';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'חשבונית מתאריך $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'שינוי תאריך החשבונית';
+
+  @override
+  String get gasCalculators_blender_tariff => 'תעריף נוכחי';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12127,14 +12190,31 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'סכום';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'נקה';
+  String get gasCalculators_blender_export => 'ייצוא';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'לנקות את החיוב?';
+  String get gasCalculators_blender_exportPdf => 'ייצוא כ-PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'פעולה זו תמחק את כל $count המילויים השמורים.';
+  String get gasCalculators_blender_exportImage => 'ייצוא כתמונה';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'ייצוא כ-Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'תשלום';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'לסמן את החשבונית כשולמה?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'פעולה זו תעביר לארכיון את כל $count המילויים השמורים ותתחיל חשבונית חדשה.';
   }
 
   @override
@@ -12158,6 +12238,35 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'סה\"כ';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'ארכיון חשבוניות';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'סינון לפי תאריך';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'אין עדיין חשבוניות ששולמו.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'אין חשבוניות בטווח התאריכים הזה.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count מילויים';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'לא שלם';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'ללא כותרת';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'החשבונית לא נמצאה.';
 
   @override
   String get gasCalculators_blender_defaults => 'הגדרות ברירת מחדל וחיוב';
@@ -15485,6 +15594,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'לא ניתן היה לקרוא את השינויים מ-$deviceList במהלך הסנכרון האחרון, ולכן הם לא מוזגו. הסנכרון הבא ינסה שוב אוטומטית.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -34524,6 +34643,19 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'מוריד את הספרייה ($downloaded מתוך $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'מייבא את הספרייה ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider => 'לא הוגדר ספק ענן';
 
   @override
@@ -35136,6 +35268,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'מציג רשימת צלילות…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מציג רשימת צלילות… (נמצאו $count צלילות עד כה)',
+      one: 'מציג רשימת צלילות… (נמצאה צלילה אחת עד כה)',
+      zero: 'מציג רשימת צלילות…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'מוריד צלילה $current מתוך $total…';
   }
@@ -35145,6 +35289,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'נסה שוב';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'טען עוד';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35170,6 +35317,111 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'התחברות ל-Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'התחבר עם חשבון Garmin Connect שלך כדי לייבא את הצלילות שלך ישירות. הסיסמה שלך לעולם אינה נשמרת, רק ההפעלה שנוצרת ממנה.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'דוא\"ל';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'נדרש דוא\"ל';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'סיסמה';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'נדרשת סיסמה';
+
+  @override
+  String get garminConnect_signIn_button => 'התחברות';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'מתחבר…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'מחובר כ-$email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'נדרש אימות';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'הזן את קוד האימות שנשלח אל $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'קוד אימות';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'נדרש קוד אימות';
+
+  @override
+  String get garminConnect_mfa_button => 'אמת';
+
+  @override
+  String get garminConnect_mfa_submitting => 'מאמת…';
+
+  @override
+  String get garminConnect_fetch_listing => 'מציג רשימת צלילות…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'מציג רשימת צלילות… (נמצאו $count צלילות עד כה)',
+      one: 'מציג רשימת צלילות… (נמצאה צלילה אחת עד כה)',
+      zero: 'מציג רשימת צלילות…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'מוריד צלילה $current מתוך $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'לא ניתן להוריד את הצלילות';
+
+  @override
+  String get garminConnect_fetch_retry => 'נסה שוב';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'טען עוד';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נמצאו $count צלילות',
+      one: 'נמצאה צלילה אחת',
+      zero: 'לא נמצאו צלילות',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לא ניתן היה להמיר $count צלילות והן דולגו.',
+      one: 'לא ניתן היה להמיר צלילה אחת והיא דולגה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'טען הכול';
+
+  @override
   String get importWizard_review_sortTooltip => 'מיון';
 
   @override
@@ -35187,6 +35439,13 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'ייבוא צלילות מאפליקציית Suunto או מחשבון app.suunto.com';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'ייבוא צלילות מחשבון Garmin Connect שלך';
 
   @override
   String get transfer_section_cloudTitle => 'ענן';

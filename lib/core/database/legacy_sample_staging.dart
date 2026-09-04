@@ -275,11 +275,19 @@ Future<ProfilePackReport> packStagedLegacyRows(
     byTank: false,
     byGroupIdentity: true,
   );
+  // byGroupIdentity here too, for the reason the pack above carries. The
+  // pressure side has no source or primary flag, so all it buys is the
+  // null-computer wildcard, and that is exactly the case that matters: this
+  // device stamps a computer onto its own series after packing while a peer
+  // below the floor still holds the same readings unattributed. Without it
+  // the clear demands an exact match the pack never made, so the staged
+  // rows are never deleted and every later apply re-runs the whole pack.
   await _clearStagedRowsAlreadyPacked(
     db,
     staging: kLegacyTankStagingTable,
     series: 'tank_pressure_series',
     byTank: true,
+    byGroupIdentity: true,
   );
   return report;
 }

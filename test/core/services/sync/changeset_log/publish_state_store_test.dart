@@ -107,4 +107,15 @@ void main() {
       expect(s.publishedHlcHigh, isNull);
     });
   });
+
+  test(
+    'hasAny is false before any publish and true once a row exists',
+    () async {
+      expect(await store.hasAny(), isFalse);
+      await store.markAdoptedPendingBase('s3', null);
+      expect(await store.hasAny(), isTrue);
+      await store.resetForProvider('s3');
+      expect(await store.hasAny(), isFalse);
+    },
+  );
 }

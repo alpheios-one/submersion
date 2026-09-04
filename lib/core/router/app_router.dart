@@ -147,6 +147,8 @@ import 'package:submersion/features/weight_planner/presentation/pages/weight_pla
 import 'package:submersion/features/deco_calculator/presentation/pages/deco_calculator_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_invoice_archive_detail_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_invoice_archive_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculator_detail_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculators_page.dart';
 import 'package:submersion/features/dive_computer/presentation/pages/device_list_page.dart';
@@ -155,6 +157,7 @@ import 'package:submersion/features/dive_computer/presentation/providers/downloa
     show diveImportServiceProvider;
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/garmin_cloud_adapter.dart';
 import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
@@ -293,6 +296,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                       builder: (context, state) =>
                           GasCalculatorDetailPage(toolId: id),
                     ),
+                ],
+              ),
+              // The blender's paid-invoice archive is a SIBLING of the
+              // generated calculator routes above, not a child of the
+              // 'blender' entry: that entry is built inside the loop and has
+              // no routes: list of its own to extend. Declared after the loop
+              // for the same reason 'dive-planner/:planId' is declared after
+              // its subtree - static routes still win matching regardless of
+              // declaration order here, but this keeps the generated block
+              // readable as one unit.
+              GoRoute(
+                path: 'gas-calculators/blender/invoices',
+                name: 'blenderInvoiceArchive',
+                builder: (context, state) => const BlenderInvoiceArchivePage(),
+                routes: [
+                  GoRoute(
+                    path: ':invoiceId',
+                    name: 'blenderInvoiceArchiveDetail',
+                    builder: (context, state) =>
+                        BlenderInvoiceArchiveDetailPage(
+                          invoiceId: state.pathParameters['invoiceId']!,
+                        ),
+                  ),
                 ],
               ),
               GoRoute(
@@ -900,6 +926,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'importFromCloudSuunto',
                 builder: (context, state) =>
                     const _SuuntoCloudImportWizardRoute(),
+              ),
+              GoRoute(
+                path: 'import-cloud/garmin',
+                name: 'importFromCloudGarmin',
+                builder: (context, state) =>
+                    const _GarminCloudImportWizardRoute(),
               ),
             ],
           ),
@@ -1679,6 +1711,32 @@ class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
 
     return UnifiedImportWizard(
       adapter: SuuntoCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
+  }
+}
+
+/// Wrapper that creates a [GarminCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Garmin Connect account.
+class _GarminCloudImportWizardRoute extends ConsumerWidget {
+  const _GarminCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: GarminCloudAdapter(
         importService: importService,
         computerRepository: computerRepo,
         diveRepository: diveRepo,

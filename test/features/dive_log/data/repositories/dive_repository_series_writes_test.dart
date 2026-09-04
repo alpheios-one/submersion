@@ -49,6 +49,20 @@ void main() {
         );
   }
 
+  /// The `local_updated_at` of the pending sync record of [seriesId], or null
+  /// when the series was never marked pending.
+  Future<int?> pendingSince(String seriesId) async {
+    final row = await db
+        .customSelect(
+          "SELECT local_updated_at AS t FROM sync_records "
+          "WHERE entity_type = 'diveProfileSeries' AND record_id = ? "
+          "AND sync_status = 'pending'",
+          variables: [Variable<String>(seriesId)],
+        )
+        .getSingleOrNull();
+    return row?.read<int>('t');
+  }
+
   setUp(() async {
     db = await setUpTestDatabase();
     dives = DiveRepository();
@@ -205,6 +219,70 @@ void main() {
         (await series.getSeriesForDive('dive-1')).every((s) => s.isPrimary),
         isTrue,
       );
+    },
+  );
+
+  test(
+    'restoreOriginalProfile leaves a primary when the primary source owns no series',
+    () async {
+      // The primary dive_data_sources row names comp-1, which owns nothing:
+      // a metadata-only source, or one whose samples a consolidation
+      // re-stamped onto another computer. Deleting the edit and then
+      // promoting by comp-1 matches zero rows, and the dive is left with no
+      // primary series at all. It keeps rendering, because getDiveById and
+      // getMergedProfile ignore the flag, while getDiveProfile,
+      // getAscentDescentRates, getTimeAtDepthRanges and the data-quality
+      // prefilters all silently skip it (issue #1149).
+      await computer('comp-1');
+      await computer('comp-2');
+      await dives.createDive(dive('dive-1', const []));
+      await source('src-1', 'dive-1', 'comp-1', primary: true);
+      final owned = await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-2',
+        isPrimary: false,
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: 1000,
+      );
+      await series.insertSeries(
+        diveId: 'dive-1',
+        sourceId: 'src-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 9.0)],
+        now: 1000,
+      );
+      await dives.restoreOriginalProfile('dive-1');
+      final rows = await series.getSeriesForDive('dive-1');
+      expect(rows.map((s) => s.id), [owned]);
+      expect(rows.single.isPrimary, isTrue);
+      expect((await dives.getDiveProfile('dive-1')).map((p) => p.depth), [1.0]);
+    },
+  );
+
+  test(
+    'deleteComputerReading restamps the series whose source it deletes',
+    () async {
+      // dive_profile_series.source_id is ON DELETE SET NULL, so the cascade
+      // changes the row with no updated_at bump, no hlc restamp and nothing
+      // pending. This device then reads the series as unattributed while
+      // every peer still reads it as owned by the deleted source, and no
+      // later write republishes it.
+      await computer('comp-1');
+      await dives.createDive(dive('dive-1', const []));
+      await source('src-1', 'dive-1', 'comp-1', primary: true);
+      final id = await series.insertSeries(
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        sourceId: 'src-1',
+        samples: const [ProfileSample(timestamp: 0, depth: 1.0)],
+        now: 1000,
+      );
+      final before = (await series.getRowsForDives(['dive-1'])).single;
+      await dives.deleteComputerReading('src-1');
+      final after = (await series.getRowsForDives(['dive-1'])).single;
+      expect(after.sourceId, isNull);
+      expect(after.updatedAt, greaterThan(before.updatedAt));
+      expect(after.hlc, isNot(before.hlc));
+      expect(await pendingSince(id), greaterThan(1000));
     },
   );
 

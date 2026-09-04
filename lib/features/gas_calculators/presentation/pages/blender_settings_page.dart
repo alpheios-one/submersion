@@ -5,7 +5,9 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_conditions_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_defaults_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/mix_template_manager.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Trimix Mixer's own settings, reached both from the calculator's
@@ -13,7 +15,6 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// fill gases, mixing conditions, saved target-fill mixes, and billing
 /// defaults, kept off the always-visible calculator so the fields a diver
 /// sets once per session don't compete with the ones they retype every fill.
-/// Each card keeps its existing internal layout unchanged.
 class BlenderSettingsPage extends ConsumerWidget {
   const BlenderSettingsPage({super.key});
 
@@ -46,6 +47,7 @@ class _BlenderSettingsBody extends ConsumerStatefulWidget {
 class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
   late final List<TextEditingController> _gasO2;
   late final List<TextEditingController> _gasHe;
+  late final List<TextEditingController> _gasPrices;
 
   @override
   void initState() {
@@ -66,11 +68,24 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
       TextEditingController(text: n(g2.he)),
       TextEditingController(text: n(g3.he)),
     ];
+
+    final settings = ref.read(settingsProvider);
+    _gasPrices = [
+      for (final p in ref.read(blenderGasPricesProvider))
+        TextEditingController(
+          text: p == null
+              ? ''
+              : formatRoundedForInput(
+                  pricePer100LitersToDisplay(p, settings),
+                  2,
+                ),
+        ),
+    ];
   }
 
   @override
   void dispose() {
-    for (final c in [..._gasO2, ..._gasHe]) {
+    for (final c in [..._gasO2, ..._gasHe, ..._gasPrices]) {
       c.dispose();
     }
     super.dispose();
@@ -93,6 +108,7 @@ class _BlenderSettingsBodyState extends ConsumerState<_BlenderSettingsBody> {
                 BlenderFillGasesCard(
                   o2Controllers: _gasO2,
                   heControllers: _gasHe,
+                  priceControllers: _gasPrices,
                 ),
                 const SizedBox(height: 16),
                 const BlenderConditionsCard(),

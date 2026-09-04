@@ -10388,6 +10388,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_sortField_fileSize => 'Bestandsgrootte';
 
   @override
+  String get enum_sortField_lastDive => 'Laatste duik';
+
+  @override
   String get enum_sortField_lastServiceDate => 'Laatste onderhoud';
 
   @override
@@ -11238,6 +11241,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type-uitrusting';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Geen $filterText';
   }
@@ -11245,6 +11253,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Geen uitrusting met deze status';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'Geen uitrusting in deze categorie';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11259,10 +11271,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_list_filterAll => 'Alle uitrusting';
 
   @override
-  String get equipment_list_filterLabel => 'Filter:';
+  String get equipment_list_filterServiceDue => 'Service nodig';
 
   @override
-  String get equipment_list_filterServiceDue => 'Service nodig';
+  String get equipment_list_typeFilterAll => 'Alle types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Uitrusting filteren';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Wissen';
+
+  @override
+  String get equipment_filter_title => 'Uitrusting filteren';
+
+  @override
+  String get equipment_filter_clearAll => 'Alles wissen';
+
+  @override
+  String get equipment_filter_apply => 'Filters toepassen';
+
+  @override
+  String get equipment_filter_cancel => 'Annuleren';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Categorie';
 
   @override
   String get equipment_list_retryButton => 'Opnieuw proberen';
@@ -12280,6 +12316,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_templateAdd => 'Sjabloon toevoegen';
 
   @override
+  String get gasCalculators_blender_templateAdjust => 'Waarden aanpassen';
+
+  @override
   String get gasCalculators_blender_billing => 'Kosten';
 
   @override
@@ -12318,7 +12357,33 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_saveFill => 'Deze vulling opslaan';
 
   @override
+  String get gasCalculators_blender_flushFeeEnable =>
+      'Een vergoeding rekenen voor het doorspoelen van de vulslang';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerInvoice =>
+      'Eenmaal per factuur';
+
+  @override
+  String get gasCalculators_blender_flushFeeModePerFill =>
+      'Eenmaal per vulling';
+
+  @override
+  String get gasCalculators_blender_flushFeeVolume => 'Spoelvolume';
+
+  @override
   String get gasCalculators_blender_billed => 'Gefactureerd';
+
+  @override
+  String gasCalculators_blender_billedDate(String date) {
+    return 'Factuur van $date';
+  }
+
+  @override
+  String get gasCalculators_blender_billedDateEdit => 'Factuurdatum wijzigen';
+
+  @override
+  String get gasCalculators_blender_tariff => 'Huidig tarief';
 
   @override
   String get gasCalculators_blender_billedNone =>
@@ -12337,14 +12402,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_lineAmount => 'Bedrag';
 
   @override
-  String get gasCalculators_blender_clearBilled => 'Wissen';
+  String get gasCalculators_blender_export => 'Exporteren';
 
   @override
-  String get gasCalculators_blender_clearBilledTitle => 'Factuur wissen?';
+  String get gasCalculators_blender_exportPdf => 'Exporteren als PDF';
 
   @override
-  String gasCalculators_blender_clearBilledBody(int count) {
-    return 'Dit verwijdert alle $count opgeslagen vullingen.';
+  String get gasCalculators_blender_exportImage => 'Exporteren als afbeelding';
+
+  @override
+  String get gasCalculators_blender_exportExcel => 'Exporteren als Excel';
+
+  @override
+  String gasCalculators_blender_exportError(String error) {
+    return 'Exporteren mislukt: $error';
+  }
+
+  @override
+  String get gasCalculators_blender_pay => 'Betalen';
+
+  @override
+  String get gasCalculators_blender_payTitle => 'Factuur als betaald markeren?';
+
+  @override
+  String gasCalculators_blender_payBody(int count) {
+    return 'Dit archiveert alle $count opgeslagen vullingen en start een nieuwe factuur.';
   }
 
   @override
@@ -12368,6 +12450,35 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_billedTotal => 'Totaal';
+
+  @override
+  String get gasCalculators_blender_invoiceArchive => 'Factuurarchief';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveFilter => 'Filteren op datum';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmpty =>
+      'Nog geen betaalde facturen.';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered =>
+      'Geen facturen in deze periode.';
+
+  @override
+  String gasCalculators_blender_invoiceArchiveFillCount(int count) {
+    return '$count vullingen';
+  }
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveIncomplete => 'Onvolledig';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveUntitled => 'Zonder titel';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveNotFound =>
+      'Factuur niet gevonden.';
 
   @override
   String get gasCalculators_blender_defaults =>
@@ -15762,6 +15873,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' en ';
+
+  @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Wijzigingen van $deviceList konden tijdens de laatste synchronisatie niet worden gelezen en zijn daarom niet samengevoegd. De volgende synchronisatie probeert het automatisch opnieuw.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Wijzigingen van $deviceList konden tijdens de laatste synchronisatie niet worden gelezen en zijn daarom niet samengevoegd. De volgende synchronisatie probeert het automatisch opnieuw.';
+  }
 
   @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
@@ -34980,6 +35101,19 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Bibliotheek downloaden ($downloaded van $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Bibliotheek importeren ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'Geen cloudprovider ingesteld';
 
@@ -35604,6 +35738,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get suuntoCloud_fetch_listing => 'Duiken worden opgehaald…';
 
   @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Duiken worden opgehaald… (tot nu toe $count gevonden)',
+      one: 'Duiken worden opgehaald… (tot nu toe 1 gevonden)',
+      zero: 'Duiken worden opgehaald…',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
     return 'Duik $current van $total downloaden…';
   }
@@ -35613,6 +35759,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get suuntoCloud_fetch_retry => 'Opnieuw proberen';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Meer laden';
 
   @override
   String suuntoCloud_fetch_foundDives(int count) {
@@ -35639,6 +35788,112 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get garminConnect_signIn_title => 'Aanmelden bij Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Meld je aan met je Garmin Connect-account om je duiken rechtstreeks te importeren. Je wachtwoord wordt nooit opgeslagen, alleen de resulterende sessie.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'E-mail';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'E-mail is verplicht';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Wachtwoord';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'Wachtwoord is verplicht';
+
+  @override
+  String get garminConnect_signIn_button => 'Aanmelden';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Bezig met aanmelden…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Aangemeld als $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Verificatie vereist';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Voer de verificatiecode in die naar je $method is verzonden.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Verificatiecode';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'Verificatiecode is verplicht';
+
+  @override
+  String get garminConnect_mfa_button => 'Verifiëren';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Bezig met verifiëren…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Duiken worden opgehaald…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Duiken worden opgehaald… (tot nu toe $count gevonden)',
+      one: 'Duiken worden opgehaald… (tot nu toe 1 gevonden)',
+      zero: 'Duiken worden opgehaald…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Duik $current van $total downloaden…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'Kan duiken niet ophalen';
+
+  @override
+  String get garminConnect_fetch_retry => 'Opnieuw proberen';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Meer laden';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken gevonden',
+      one: '1 duik gevonden',
+      zero: 'Geen duiken gevonden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count duiken konden niet worden geconverteerd en zijn overgeslagen.',
+      one: '1 duik kon niet worden geconverteerd en is overgeslagen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Alles laden';
+
+  @override
   String get importWizard_review_sortTooltip => 'Sorteren';
 
   @override
@@ -35656,6 +35911,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get transfer_importCloud_suuntoSubtitle =>
       'Duiken importeren uit je Suunto-app of app.suunto.com-account';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Duiken importeren uit je Garmin Connect-account';
 
   @override
   String get transfer_section_cloudTitle => 'Cloud';

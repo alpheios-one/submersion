@@ -17738,6 +17738,12 @@ abstract class AppLocalizations {
   /// **'File Size'**
   String get enum_sortField_fileSize;
 
+  /// No description provided for @enum_sortField_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Dive'**
+  String get enum_sortField_lastDive;
+
   /// No description provided for @enum_sortField_lastServiceDate.
   ///
   /// In en, this message translates to:
@@ -19172,6 +19178,12 @@ abstract class AppLocalizations {
   /// **'{status} equipment'**
   String equipment_list_emptyState_filterText_status(Object status);
 
+  /// Fragment inserted into equipment_list_emptyState_noEquipment when a category chip is selected and it narrowed the list to zero items, e.g. "Wetsuit equipment"
+  ///
+  /// In en, this message translates to:
+  /// **'{type} equipment'**
+  String equipment_list_emptyState_filterText_type(Object type);
+
   /// No description provided for @equipment_list_emptyState_noEquipment.
   ///
   /// In en, this message translates to:
@@ -19183,6 +19195,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No equipment with this status'**
   String get equipment_list_emptyState_noStatusMatch;
+
+  /// Empty-state body shown when a selected category chip narrowed the (already non-empty) status-filtered list down to zero items
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment in this category'**
+  String get equipment_list_emptyState_noTypeMatch;
 
   /// No description provided for @equipment_list_emptyState_serviceDueUpToDate.
   ///
@@ -19202,17 +19220,65 @@ abstract class AppLocalizations {
   /// **'All Equipment'**
   String get equipment_list_filterAll;
 
-  /// No description provided for @equipment_list_filterLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Filter:'**
-  String get equipment_list_filterLabel;
-
   /// No description provided for @equipment_list_filterServiceDue.
   ///
   /// In en, this message translates to:
   /// **'Service Due'**
   String get equipment_list_filterServiceDue;
+
+  /// Label of the chip that clears the category filter and shows equipment of every type
+  ///
+  /// In en, this message translates to:
+  /// **'All Types'**
+  String get equipment_list_typeFilterAll;
+
+  /// No description provided for @equipment_list_filterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter equipment'**
+  String get equipment_list_filterTooltip;
+
+  /// No description provided for @equipment_list_activeFilter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get equipment_list_activeFilter_clear;
+
+  /// No description provided for @equipment_filter_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Equipment'**
+  String get equipment_filter_title;
+
+  /// No description provided for @equipment_filter_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get equipment_filter_clearAll;
+
+  /// No description provided for @equipment_filter_apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get equipment_filter_apply;
+
+  /// No description provided for @equipment_filter_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get equipment_filter_cancel;
+
+  /// No description provided for @equipment_filter_section_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get equipment_filter_section_status;
+
+  /// No description provided for @equipment_filter_section_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get equipment_filter_section_category;
 
   /// No description provided for @equipment_list_retryButton.
   ///
@@ -20960,6 +21026,12 @@ abstract class AppLocalizations {
   /// **'Add template'**
   String get gasCalculators_blender_templateAdd;
 
+  /// No description provided for @gasCalculators_blender_templateAdjust.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust values'**
+  String get gasCalculators_blender_templateAdjust;
+
   /// No description provided for @gasCalculators_blender_billing.
   ///
   /// In en, this message translates to:
@@ -21026,11 +21098,53 @@ abstract class AppLocalizations {
   /// **'Save this fill'**
   String get gasCalculators_blender_saveFill;
 
+  /// No description provided for @gasCalculators_blender_flushFeeEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Charge a fee to purge the fill hose'**
+  String get gasCalculators_blender_flushFeeEnable;
+
+  /// No description provided for @gasCalculators_blender_flushFeeModePerInvoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Once per bill'**
+  String get gasCalculators_blender_flushFeeModePerInvoice;
+
+  /// No description provided for @gasCalculators_blender_flushFeeModePerFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Once per fill'**
+  String get gasCalculators_blender_flushFeeModePerFill;
+
+  /// No description provided for @gasCalculators_blender_flushFeeVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Purge volume'**
+  String get gasCalculators_blender_flushFeeVolume;
+
   /// No description provided for @gasCalculators_blender_billed.
   ///
   /// In en, this message translates to:
   /// **'Billed'**
   String get gasCalculators_blender_billed;
+
+  /// No description provided for @gasCalculators_blender_billedDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice dated {date}'**
+  String gasCalculators_blender_billedDate(String date);
+
+  /// No description provided for @gasCalculators_blender_billedDateEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Change invoice date'**
+  String get gasCalculators_blender_billedDateEdit;
+
+  /// No description provided for @gasCalculators_blender_tariff.
+  ///
+  /// In en, this message translates to:
+  /// **'Current tariff'**
+  String get gasCalculators_blender_tariff;
 
   /// No description provided for @gasCalculators_blender_billedNone.
   ///
@@ -21062,23 +21176,53 @@ abstract class AppLocalizations {
   /// **'Amount'**
   String get gasCalculators_blender_lineAmount;
 
-  /// No description provided for @gasCalculators_blender_clearBilled.
+  /// No description provided for @gasCalculators_blender_export.
   ///
   /// In en, this message translates to:
-  /// **'Clear'**
-  String get gasCalculators_blender_clearBilled;
+  /// **'Export'**
+  String get gasCalculators_blender_export;
 
-  /// No description provided for @gasCalculators_blender_clearBilledTitle.
+  /// No description provided for @gasCalculators_blender_exportPdf.
   ///
   /// In en, this message translates to:
-  /// **'Clear the bill?'**
-  String get gasCalculators_blender_clearBilledTitle;
+  /// **'Export as PDF'**
+  String get gasCalculators_blender_exportPdf;
 
-  /// No description provided for @gasCalculators_blender_clearBilledBody.
+  /// No description provided for @gasCalculators_blender_exportImage.
   ///
   /// In en, this message translates to:
-  /// **'This removes all {count} saved fills.'**
-  String gasCalculators_blender_clearBilledBody(int count);
+  /// **'Export as Image'**
+  String get gasCalculators_blender_exportImage;
+
+  /// No description provided for @gasCalculators_blender_exportExcel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as Excel'**
+  String get gasCalculators_blender_exportExcel;
+
+  /// No description provided for @gasCalculators_blender_exportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String gasCalculators_blender_exportError(String error);
+
+  /// No description provided for @gasCalculators_blender_pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get gasCalculators_blender_pay;
+
+  /// No description provided for @gasCalculators_blender_payTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark the bill as paid?'**
+  String get gasCalculators_blender_payTitle;
+
+  /// No description provided for @gasCalculators_blender_payBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This archives all {count} saved fills and starts a new bill.'**
+  String gasCalculators_blender_payBody(int count);
 
   /// No description provided for @gasCalculators_blender_editLine.
   ///
@@ -21109,6 +21253,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total'**
   String get gasCalculators_blender_billedTotal;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice archive'**
+  String get gasCalculators_blender_invoiceArchive;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by date'**
+  String get gasCalculators_blender_invoiceArchiveFilter;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No paid invoices yet.'**
+  String get gasCalculators_blender_invoiceArchiveEmpty;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No invoices in this date range.'**
+  String get gasCalculators_blender_invoiceArchiveEmptyFiltered;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveFillCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} fills'**
+  String gasCalculators_blender_invoiceArchiveFillCount(int count);
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete'**
+  String get gasCalculators_blender_invoiceArchiveIncomplete;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveUntitled.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled'**
+  String get gasCalculators_blender_invoiceArchiveUntitled;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice not found.'**
+  String get gasCalculators_blender_invoiceArchiveNotFound;
 
   /// No description provided for @gasCalculators_blender_defaults.
   ///
@@ -26297,6 +26489,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **' and '**
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerReadFailed_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes from {deviceList} could not be read during the last sync, so they were not merged. The next sync will retry automatically.'**
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList);
 
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_bannerNamed.
   ///
@@ -57893,6 +58097,21 @@ abstract class AppLocalizations {
   /// **'Uploading library ({uploaded} of {total})'**
   String settings_cloudSync_progress_uploadingLibrary(int uploaded, int total);
 
+  /// No description provided for @settings_cloudSync_progress_downloadingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading library ({downloaded} of {total})'**
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  );
+
+  /// No description provided for @settings_cloudSync_progress_importingLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing library ({percent}%)'**
+  String settings_cloudSync_progress_importingLibrary(int percent);
+
   /// No description provided for @settings_cloudSync_result_noProvider.
   ///
   /// In en, this message translates to:
@@ -58937,6 +59156,12 @@ abstract class AppLocalizations {
   /// **'Listing dives…'**
   String get suuntoCloud_fetch_listing;
 
+  /// Progress line while paging through the Suunto cloud's workout list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String suuntoCloud_fetch_listingFound(int count);
+
   /// Progress line while downloading each dive from the Suunto cloud.
   ///
   /// In en, this message translates to:
@@ -58955,6 +59180,12 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get suuntoCloud_fetch_retry;
 
+  /// No description provided for @suuntoCloud_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get suuntoCloud_fetch_loadMore;
+
   /// Result headline after fetching dives from the Suunto cloud.
   ///
   /// In en, this message translates to:
@@ -58966,6 +59197,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
   String suuntoCloud_fetch_someFailed(int count);
+
+  /// No description provided for @garminConnect_signIn_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to Garmin Connect'**
+  String get garminConnect_signIn_title;
+
+  /// No description provided for @garminConnect_signIn_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  String get garminConnect_signIn_description;
+
+  /// No description provided for @garminConnect_signIn_emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get garminConnect_signIn_emailLabel;
+
+  /// No description provided for @garminConnect_signIn_emailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get garminConnect_signIn_emailRequired;
+
+  /// No description provided for @garminConnect_signIn_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get garminConnect_signIn_passwordLabel;
+
+  /// No description provided for @garminConnect_signIn_passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get garminConnect_signIn_passwordRequired;
+
+  /// No description provided for @garminConnect_signIn_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get garminConnect_signIn_button;
+
+  /// No description provided for @garminConnect_signIn_signingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get garminConnect_signIn_signingIn;
+
+  /// Success state on the Garmin Connect sign-in step, once a session is established.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String garminConnect_signIn_signedInAs(String email);
+
+  /// No description provided for @garminConnect_mfa_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Required'**
+  String get garminConnect_mfa_title;
+
+  /// Instructions on the Garmin Connect MFA step, naming where the code was sent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code sent to your {method}.'**
+  String garminConnect_mfa_description(String method);
+
+  /// No description provided for @garminConnect_mfa_codeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get garminConnect_mfa_codeLabel;
+
+  /// No description provided for @garminConnect_mfa_codeRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code is required'**
+  String get garminConnect_mfa_codeRequired;
+
+  /// No description provided for @garminConnect_mfa_button.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get garminConnect_mfa_button;
+
+  /// No description provided for @garminConnect_mfa_submitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying…'**
+  String get garminConnect_mfa_submitting;
+
+  /// No description provided for @garminConnect_fetch_listing.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing dives…'**
+  String get garminConnect_fetch_listing;
+
+  /// Progress line while paging through Garmin Connect's activity list, showing the running dive count found so far.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Listing dives…} =1{Listing dives… (1 found so far)} other{Listing dives… ({count} found so far)}}'**
+  String garminConnect_fetch_listingFound(int count);
+
+  /// Progress line while downloading each dive from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching dive {current} of {total}…'**
+  String garminConnect_fetch_fetchingDiveOf(int current, int total);
+
+  /// No description provided for @garminConnect_fetch_failedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not fetch dives'**
+  String get garminConnect_fetch_failedTitle;
+
+  /// No description provided for @garminConnect_fetch_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get garminConnect_fetch_retry;
+
+  /// No description provided for @garminConnect_fetch_loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get garminConnect_fetch_loadMore;
+
+  /// Result headline after fetching dives from Garmin Connect.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No dives found} =1{Found 1 dive} other{Found {count} dives}}'**
+  String garminConnect_fetch_foundDives(int count);
+
+  /// Shown when one or more fetched Garmin Connect dives could not be converted and were skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive could not be converted and was skipped.} other{{count} dives could not be converted and were skipped.}}'**
+  String garminConnect_fetch_someFailed(int count);
+
+  /// Button on the Garmin Connect fetch step that fetches every remaining page of dives instead of one page at a time.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch All'**
+  String get garminConnect_fetch_fetchAll;
 
   /// No description provided for @importWizard_review_sortTooltip.
   ///
@@ -59002,6 +59377,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import dives from your Suunto app / app.suunto.com account'**
   String get transfer_importCloud_suuntoSubtitle;
+
+  /// No description provided for @transfer_importCloud_garminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Garmin'**
+  String get transfer_importCloud_garminTitle;
+
+  /// No description provided for @transfer_importCloud_garminSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import dives from your Garmin Connect account'**
+  String get transfer_importCloud_garminSubtitle;
 
   /// No description provided for @transfer_section_cloudTitle.
   ///

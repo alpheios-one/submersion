@@ -362,8 +362,21 @@ class DatabaseService {
       await migrator.customSelect('SELECT 1').get();
       // [storedBefore] is the version the file had ON DISK before the
       // ladder ran, read by the caller: keying off the migrator's own
-      // version here would always read 183 and never VACUUM.
-      if (willVacuum) {
+      // version here would always read 183 and never VACUUM. The ladder's
+      // own beforeOpen backstop can also drop the legacy tables on a file
+      // already stamped 183, which no version comparison can see, so the
+      // drop itself is the second reason to reclaim.
+      //
+      // Unreachable while 183 is the current version, because this method
+      // only runs with a ladder pending and every such file is below 183.
+      // It is here for the rung after next: a file stamped 183 whose v184
+      // ladder is pending has willVacuum false, and its backstop can still
+      // be the open that finally drops the tables. The background executor
+      // reopens on a fresh connection that no longer sees them, so nothing
+      // downstream would catch it.
+      final unplannedReclaim =
+          !willVacuum && migrator.droppedLegacySampleTables;
+      if (vacuumPending() && (willVacuum || unplannedReclaim)) {
         // v183 dropped the row-per-sample tables, which on an older file are
         // most of its pages. VACUUM here: outside any migration transaction,
         // on the one exclusive main-isolate connection, and before the
@@ -371,15 +384,18 @@ class DatabaseService {
         // out-of-space temp store leaves a correct database that is merely
         // larger than it needs to be.
         //
-        // One shot, by design. It runs only on the open that crossed 183, so
-        // a database whose rung skipped the drop and lost the tables later
-        // through the beforeOpen backstop never reaches this, and neither
-        // does one whose VACUUM was killed part way. Both are correct, just
-        // still carrying the free pages; the next real VACUUM is whatever
-        // maintenance the user runs. The ticket is taken before the attempt,
-        // not after, so a VACUUM that throws is not retried either.
+        // One shot per open. A VACUUM killed part way leaves a correct
+        // database still carrying its free pages, and the drop that earned
+        // the reclamation has already happened, so nothing asks again. The
+        // ticket is taken before the attempt, not after, so a VACUUM that
+        // throws is not retried either.
+        //
+        // Announced as a step only when it was PLANNED. The totals were
+        // fixed before the ladder started so every report of this open
+        // agrees, and reporting an unplanned reclaim as a step would send
+        // the bar past its own total.
         takeVacuumTicket();
-        report(ladderSteps, ladderSteps);
+        if (!unplannedReclaim) report(ladderSteps, ladderSteps);
         try {
           await migrator.customStatement('VACUUM');
         } catch (e, stackTrace) {
@@ -390,7 +406,7 @@ class DatabaseService {
             stackTrace: stackTrace,
           );
         }
-        report(ladderSteps + 1, ladderSteps);
+        if (!unplannedReclaim) report(ladderSteps + 1, ladderSteps);
       }
     } catch (_) {
       // Best-effort close so we don't leak the connection (or its locks, which
@@ -441,6 +457,29 @@ class DatabaseService {
       // not race this connection's locks.
       await closeDatabaseForAppShutdown(database, background: background);
       rethrow;
+    }
+    // The forcing statement above ran beforeOpen, and that is where the
+    // v183 backstop drops a legacy sample table the rung had to skip. This
+    // open has no pending ladder, so nothing else will ever reclaim those
+    // pages: without this the diver's file stays at its pre-migration size
+    // permanently, because there is no other VACUUM of the live database
+    // anywhere in the app.
+    //
+    // On the worker isolate, so a large rewrite does not block the UI, and
+    // awaited, so nothing queries a file mid-VACUUM. Non-fatal for the same
+    // reason as the migration path's copy: a busy lock or a full temp store
+    // leaves a correct database that is merely larger than it needs to be.
+    if (database.droppedLegacySampleTables) {
+      try {
+        await database.customStatement('VACUUM');
+      } catch (e, stackTrace) {
+        _log.warning(
+          'VACUUM after the backstop dropped the legacy sample tables was '
+          'skipped; the database is correct but has not reclaimed their pages',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
     _background = background;
     return database;

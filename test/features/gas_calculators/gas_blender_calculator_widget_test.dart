@@ -232,6 +232,30 @@ void main() {
     expect(find.textContaining('104.3'), findsOneWidget);
   });
 
+  testWidgets('the main screen shows the configured mixing temperature', (
+    tester,
+  ) async {
+    // PR #1359 review point 4: fill/settled temperatures are configured once
+    // on the settings page; a read-only echo here keeps them from being
+    // overlooked mid-fill.
+    await _pump(tester);
+
+    expect(find.text('Fill temperature: 20°C'), findsOneWidget);
+  });
+
+  testWidgets('a chilled fill shows both temperatures on the main screen', (
+    tester,
+  ) async {
+    final ref = await _pump(tester);
+    ref.read(blenderFillTempProvider.notifier).state = 5;
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Fill temperature: 5°C  ·  Settled temperature: 20°C'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('a chilled fill names the settled pressure', (tester) async {
     final ref = await _pump(tester);
     ref.read(blenderFillTempProvider.notifier).state = 5;
