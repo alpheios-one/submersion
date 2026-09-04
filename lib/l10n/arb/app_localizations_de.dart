@@ -12493,6 +12493,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nach Datum filtern';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'Alle Jahre';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'Alle Monate';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'Noch keine bezahlten Rechnungen.';
 

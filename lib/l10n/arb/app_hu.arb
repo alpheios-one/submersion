@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "Alapértelmezett beállítások és számlázás",
   "gasCalculators_blender_invoiceArchive": "Számla-archívum",
   "gasCalculators_blender_invoiceArchiveFilter": "Szűrés dátum szerint",
+  "gasCalculators_blender_invoiceArchiveAllYears": "Minden év",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "Minden hónap",
   "gasCalculators_blender_invoiceArchiveEmpty": "Még nincs kifizetett számla.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "Nincs számla ebben az időszakban.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} töltés",

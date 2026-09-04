@@ -11,68 +11,98 @@ ArchivedInvoice _invoice(DateTime date) => ArchivedInvoice(
 );
 
 void main() {
-  group('blenderInvoiceArchivePeriods', () {
-    test('is empty for an empty archive', () {
-      expect(blenderInvoiceArchivePeriods(const []), isEmpty);
+  group('blenderInvoiceArchiveYearFilters', () {
+    test('is just "all years" for an empty archive', () {
+      expect(blenderInvoiceArchiveYearFilters(const []), [
+        const BlenderInvoiceArchiveYearFilter.all(),
+      ]);
     });
 
-    test(
-      'buckets by year, newest first, when invoices span more than one year',
-      () {
-        final periods = blenderInvoiceArchivePeriods([
-          _invoice(DateTime(2025, 12, 1)),
-          _invoice(DateTime(2026, 4, 3)),
-          _invoice(DateTime(2025, 2, 1)),
-        ]);
-
-        expect(periods, [
-          const BlenderInvoiceArchivePeriod.year(2026),
-          const BlenderInvoiceArchivePeriod.year(2025),
-        ]);
-        expect(periods.every((p) => !p.isMonthly), isTrue);
-      },
-    );
-
-    test(
-      'buckets by year+month, newest first, when everything is one year',
-      () {
-        final periods = blenderInvoiceArchivePeriods([
-          _invoice(DateTime(2026, 1, 5)),
-          _invoice(DateTime(2026, 3, 20)),
-          _invoice(DateTime(2026, 3, 2)),
-        ]);
-
-        expect(periods, [
-          const BlenderInvoiceArchivePeriod.yearMonth(2026, 3),
-          const BlenderInvoiceArchivePeriod.yearMonth(2026, 1),
-        ]);
-        expect(periods.every((p) => p.isMonthly), isTrue);
-      },
-    );
-
-    test('a single invoice still yields one year+month bucket', () {
-      final periods = blenderInvoiceArchivePeriods([
-        _invoice(DateTime(2026, 6, 15)),
+    test('leads with "all years", then every year on file newest first', () {
+      final filters = blenderInvoiceArchiveYearFilters([
+        _invoice(DateTime(2025, 12, 1)),
+        _invoice(DateTime(2026, 4, 3)),
+        _invoice(DateTime(2025, 2, 1)),
       ]);
 
-      expect(periods, [const BlenderInvoiceArchivePeriod.yearMonth(2026, 6)]);
+      expect(filters, [
+        const BlenderInvoiceArchiveYearFilter.all(),
+        const BlenderInvoiceArchiveYearFilter.year(2026),
+        const BlenderInvoiceArchiveYearFilter.year(2025),
+      ]);
     });
   });
 
-  group('BlenderInvoiceArchivePeriod.matches', () {
-    test('a year bucket matches any month within that year', () {
-      const period = BlenderInvoiceArchivePeriod.year(2026);
-      expect(period.matches(DateTime(2026, 1, 1)), isTrue);
-      expect(period.matches(DateTime(2026, 12, 31)), isTrue);
-      expect(period.matches(DateTime(2025, 12, 31)), isFalse);
+  group('blenderInvoiceArchiveMonthFilters', () {
+    test('leads with "all months", then months in that year newest first', () {
+      final invoices = [
+        _invoice(DateTime(2025, 12, 1)),
+        _invoice(DateTime(2026, 4, 3)),
+        _invoice(DateTime(2026, 1, 5)),
+      ];
+
+      expect(
+        blenderInvoiceArchiveMonthFilters(
+          invoices,
+          const BlenderInvoiceArchiveYearFilter.year(2026),
+        ),
+        [
+          const BlenderInvoiceArchiveMonthFilter.all(),
+          const BlenderInvoiceArchiveMonthFilter.month(4),
+          const BlenderInvoiceArchiveMonthFilter.month(1),
+        ],
+      );
     });
 
-    test('a year+month bucket matches only that month', () {
-      const period = BlenderInvoiceArchivePeriod.yearMonth(2026, 4);
-      expect(period.matches(DateTime(2026, 4, 1)), isTrue);
-      expect(period.matches(DateTime(2026, 4, 30)), isTrue);
-      expect(period.matches(DateTime(2026, 5, 1)), isFalse);
-      expect(period.matches(DateTime(2025, 4, 1)), isFalse);
+    test('considers every year when the year filter is "all years"', () {
+      final invoices = [
+        _invoice(DateTime(2025, 12, 1)),
+        _invoice(DateTime(2026, 4, 3)),
+        _invoice(DateTime(2026, 1, 5)),
+      ];
+
+      expect(
+        blenderInvoiceArchiveMonthFilters(
+          invoices,
+          const BlenderInvoiceArchiveYearFilter.all(),
+        ),
+        [
+          const BlenderInvoiceArchiveMonthFilter.all(),
+          const BlenderInvoiceArchiveMonthFilter.month(12),
+          const BlenderInvoiceArchiveMonthFilter.month(4),
+          const BlenderInvoiceArchiveMonthFilter.month(1),
+        ],
+      );
+    });
+  });
+
+  group('BlenderInvoiceArchiveYearFilter.matches', () {
+    test('"all years" matches any date', () {
+      const filter = BlenderInvoiceArchiveYearFilter.all();
+      expect(filter.matches(DateTime(2020, 1, 1)), isTrue);
+      expect(filter.matches(DateTime(2030, 12, 31)), isTrue);
+    });
+
+    test('a specific year matches only that year', () {
+      const filter = BlenderInvoiceArchiveYearFilter.year(2026);
+      expect(filter.matches(DateTime(2026, 1, 1)), isTrue);
+      expect(filter.matches(DateTime(2026, 12, 31)), isTrue);
+      expect(filter.matches(DateTime(2025, 12, 31)), isFalse);
+    });
+  });
+
+  group('BlenderInvoiceArchiveMonthFilter.matches', () {
+    test('"all months" matches any date', () {
+      const filter = BlenderInvoiceArchiveMonthFilter.all();
+      expect(filter.matches(DateTime(2026, 1, 1)), isTrue);
+      expect(filter.matches(DateTime(2026, 12, 31)), isTrue);
+    });
+
+    test('a specific month matches only that month, in any year', () {
+      const filter = BlenderInvoiceArchiveMonthFilter.month(4);
+      expect(filter.matches(DateTime(2026, 4, 1)), isTrue);
+      expect(filter.matches(DateTime(2025, 4, 30)), isTrue);
+      expect(filter.matches(DateTime(2026, 5, 1)), isFalse);
     });
   });
 }

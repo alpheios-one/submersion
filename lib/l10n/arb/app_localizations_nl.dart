@@ -12411,6 +12411,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveFilter => 'Filteren op datum';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'Alle jaren';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'Alle maanden';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'Nog geen betaalde facturen.';
 

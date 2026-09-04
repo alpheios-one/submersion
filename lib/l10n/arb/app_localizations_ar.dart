@@ -12284,6 +12284,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveFilter => 'تصفية حسب التاريخ';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'كل السنوات';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'كل الأشهر';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'لا توجد فواتير مدفوعة بعد.';
 

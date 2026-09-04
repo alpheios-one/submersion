@@ -7092,6 +7092,8 @@
   "gasCalculators_blender_billedTotal": "Total",
   "gasCalculators_blender_invoiceArchive": "Invoice archive",
   "gasCalculators_blender_invoiceArchiveFilter": "Filter by date",
+  "gasCalculators_blender_invoiceArchiveAllYears": "All years",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "All months",
   "gasCalculators_blender_invoiceArchiveEmpty": "No paid invoices yet.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "No invoices in this date range.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} fills",

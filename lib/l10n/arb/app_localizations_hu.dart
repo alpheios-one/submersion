@@ -12466,6 +12466,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szűrés dátum szerint';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'Minden év';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'Minden hónap';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'Még nincs kifizetett számla.';
 

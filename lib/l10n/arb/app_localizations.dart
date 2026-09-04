@@ -21176,6 +21176,18 @@ abstract class AppLocalizations {
   /// **'Filter by date'**
   String get gasCalculators_blender_invoiceArchiveFilter;
 
+  /// No description provided for @gasCalculators_blender_invoiceArchiveAllYears.
+  ///
+  /// In en, this message translates to:
+  /// **'All years'**
+  String get gasCalculators_blender_invoiceArchiveAllYears;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveAllMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'All months'**
+  String get gasCalculators_blender_invoiceArchiveAllMonths;
+
   /// No description provided for @gasCalculators_blender_invoiceArchiveEmpty.
   ///
   /// In en, this message translates to:

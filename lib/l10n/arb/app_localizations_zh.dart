@@ -11914,6 +11914,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveFilter => '按日期筛选';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => '所有年份';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => '所有月份';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty => '尚无已付款账单。';
 
   @override

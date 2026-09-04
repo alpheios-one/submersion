@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "Standardeinstellungen und Abrechnung",
   "gasCalculators_blender_invoiceArchive": "Rechnungsarchiv",
   "gasCalculators_blender_invoiceArchiveFilter": "Nach Datum filtern",
+  "gasCalculators_blender_invoiceArchiveAllYears": "Alle Jahre",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "Alle Monate",
   "gasCalculators_blender_invoiceArchiveEmpty": "Noch keine bezahlten Rechnungen.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "Keine Rechnungen in diesem Zeitraum.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} Füllungen",

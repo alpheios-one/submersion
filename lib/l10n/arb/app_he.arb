@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "הגדרות ברירת מחדל וחיוב",
   "gasCalculators_blender_invoiceArchive": "ארכיון חשבוניות",
   "gasCalculators_blender_invoiceArchiveFilter": "סינון לפי תאריך",
+  "gasCalculators_blender_invoiceArchiveAllYears": "כל השנים",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "כל החודשים",
   "gasCalculators_blender_invoiceArchiveEmpty": "אין עדיין חשבוניות ששולמו.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "אין חשבוניות בטווח התאריכים הזה.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} מילויים",

@@ -12505,6 +12505,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveFilter => 'Filtrar por data';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'Todos os anos';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'Todos os meses';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'Ainda não há faturas pagas.';
 

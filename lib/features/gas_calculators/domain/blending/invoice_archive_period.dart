@@ -2,50 +2,65 @@ import 'package:equatable/equatable.dart';
 
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 
-/// A time bucket the invoice archive section can be narrowed to.
-///
-/// Either a whole calendar year ([month] null) or one year+month, matching
-/// whichever granularity [blenderInvoiceArchivePeriods] picks for the
-/// invoices actually on file.
-class BlenderInvoiceArchivePeriod extends Equatable {
-  const BlenderInvoiceArchivePeriod.year(this.year) : month = null;
-  const BlenderInvoiceArchivePeriod.yearMonth(this.year, this.month);
+/// The year half of the archive section's two-stage filter: either narrowed
+/// to one calendar year, or "all years" (issue #44).
+class BlenderInvoiceArchiveYearFilter extends Equatable {
+  const BlenderInvoiceArchiveYearFilter.all() : year = null;
+  const BlenderInvoiceArchiveYearFilter.year(int this.year);
 
-  final int year;
-  final int? month;
+  final int? year;
 
-  bool get isMonthly => month != null;
+  bool get isAll => year == null;
 
-  bool matches(DateTime date) =>
-      date.year == year && (month == null || date.month == month);
+  bool matches(DateTime date) => year == null || date.year == year;
 
   @override
-  List<Object?> get props => [year, month];
+  List<Object?> get props => [year];
 }
 
-/// Buckets for [invoices], newest first.
-///
-/// Year buckets when the archive already spans more than one calendar year -
-/// each year is then a meaningful choice on its own. Falls back to
-/// year+month buckets when everything sits in a single year, where a lone
-/// "2026" bucket would not narrow anything down (issue #44).
-List<BlenderInvoiceArchivePeriod> blenderInvoiceArchivePeriods(
+/// The month half of the filter, narrowed by the year filter it sits under:
+/// either one calendar month, or "all months".
+class BlenderInvoiceArchiveMonthFilter extends Equatable {
+  const BlenderInvoiceArchiveMonthFilter.all() : month = null;
+  const BlenderInvoiceArchiveMonthFilter.month(int this.month);
+
+  final int? month;
+
+  bool get isAll => month == null;
+
+  bool matches(DateTime date) => month == null || date.month == month;
+
+  @override
+  List<Object?> get props => [month];
+}
+
+/// The years [invoices] actually fall in, newest first, with "all years"
+/// leading - the options the archive section's year filter offers.
+List<BlenderInvoiceArchiveYearFilter> blenderInvoiceArchiveYearFilters(
   List<ArchivedInvoice> invoices,
 ) {
-  if (invoices.isEmpty) return const [];
-  final years = {for (final invoice in invoices) invoice.date.year};
-  if (years.length > 1) {
-    return years.map(BlenderInvoiceArchivePeriod.year).toList()
-      ..sort((a, b) => b.year.compareTo(a.year));
-  }
+  final years = {for (final invoice in invoices) invoice.date.year}.toList()
+    ..sort((a, b) => b.compareTo(a));
+  return [
+    const BlenderInvoiceArchiveYearFilter.all(),
+    for (final year in years) BlenderInvoiceArchiveYearFilter.year(year),
+  ];
+}
+
+/// The months [invoices] actually fall in under [yearFilter], newest first,
+/// with "all months" leading - the options the archive section's month
+/// filter offers once a year is picked. Considers every year on file when
+/// [yearFilter] is "all years", matching only that one year otherwise.
+List<BlenderInvoiceArchiveMonthFilter> blenderInvoiceArchiveMonthFilters(
+  List<ArchivedInvoice> invoices,
+  BlenderInvoiceArchiveYearFilter yearFilter,
+) {
   final months = {
-    for (final invoice in invoices) (invoice.date.year, invoice.date.month),
-  };
-  return months
-      .map((m) => BlenderInvoiceArchivePeriod.yearMonth(m.$1, m.$2))
-      .toList()
-    ..sort((a, b) {
-      final byYear = b.year.compareTo(a.year);
-      return byYear != 0 ? byYear : b.month!.compareTo(a.month!);
-    });
+    for (final invoice in invoices)
+      if (yearFilter.matches(invoice.date)) invoice.date.month,
+  }.toList()..sort((a, b) => b.compareTo(a));
+  return [
+    const BlenderInvoiceArchiveMonthFilter.all(),
+    for (final month in months) BlenderInvoiceArchiveMonthFilter.month(month),
+  ];
 }

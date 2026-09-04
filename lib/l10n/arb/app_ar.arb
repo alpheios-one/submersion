@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "الإعدادات الافتراضية والفوترة",
   "gasCalculators_blender_invoiceArchive": "أرشيف الفواتير",
   "gasCalculators_blender_invoiceArchiveFilter": "تصفية حسب التاريخ",
+  "gasCalculators_blender_invoiceArchiveAllYears": "كل السنوات",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "كل الأشهر",
   "gasCalculators_blender_invoiceArchiveEmpty": "لا توجد فواتير مدفوعة بعد.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "لا توجد فواتير ضمن هذا النطاق الزمني.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} تعبئات",

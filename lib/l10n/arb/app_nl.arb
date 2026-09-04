@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "Standaardinstellingen en facturering",
   "gasCalculators_blender_invoiceArchive": "Factuurarchief",
   "gasCalculators_blender_invoiceArchiveFilter": "Filteren op datum",
+  "gasCalculators_blender_invoiceArchiveAllYears": "Alle jaren",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "Alle maanden",
   "gasCalculators_blender_invoiceArchiveEmpty": "Nog geen betaalde facturen.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "Geen facturen in deze periode.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} vullingen",

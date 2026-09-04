@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "Definições por defeito e faturação",
   "gasCalculators_blender_invoiceArchive": "Arquivo de faturas",
   "gasCalculators_blender_invoiceArchiveFilter": "Filtrar por data",
+  "gasCalculators_blender_invoiceArchiveAllYears": "Todos os anos",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "Todos os meses",
   "gasCalculators_blender_invoiceArchiveEmpty": "Ainda não há faturas pagas.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "Nenhuma fatura neste período.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} enchimentos",

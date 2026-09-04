@@ -5,6 +5,7 @@ import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_archive_totals_summary.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_archived_invoice_tile.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -74,7 +75,11 @@ class BlenderInvoiceArchivePage extends ConsumerWidget {
       body: Column(
         children: [
           if (range != null) _ActiveFilterBar(range: range, units: units),
-          if (totals.isNotEmpty) _TotalsSummary(totals: totals),
+          if (totals.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: BlenderArchiveTotalsSummary(totals: totals),
+            ),
           Expanded(
             child: invoices.isEmpty
                 ? Padding(
@@ -128,45 +133,6 @@ class _ActiveFilterBar extends ConsumerWidget {
                       null,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TotalsSummary extends StatelessWidget {
-  const _TotalsSummary({required this.totals});
-
-  final List<MapEntry<String, double>> totals;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          for (final entry in totals)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.gasCalculators_blender_billedTotal,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  formatMoney(entry.value, entry.key),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );

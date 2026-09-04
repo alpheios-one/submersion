@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
@@ -54,6 +55,32 @@ Future<void> _expand(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _pickYear(WidgetTester tester, String label) async {
+  await tester.tap(
+    find.byKey(const Key('blender-invoice-archive-section-year')),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _pickMonth(WidgetTester tester, String label) async {
+  await tester.tap(
+    find.byKey(const Key('blender-invoice-archive-section-month')),
+  );
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
+}
+
+/// The total row's text, scoped to `BlenderArchiveTotalsSummary` - a per-line
+/// invoice can show the same amount as the (single-invoice) filtered total,
+/// so a bare `find.text` would match both.
+Finder _totalText(String text) => find.descendant(
+  of: find.byKey(const Key('blender-archive-totals-summary')),
+  matching: find.text(text),
+);
+
 void main() {
   group('BlenderInvoiceArchiveSection', () {
     testWidgets('renders nothing when nothing has been paid yet', (
@@ -79,64 +106,130 @@ void main() {
     });
 
     testWidgets(
-      'buckets by year+month and preselects the newest month when all '
-      'invoices fall in one year',
+      'defaults to the newest year and month, with a total for just that '
+      'month',
       (tester) async {
         final ref = await _pump(tester);
         ref.read(blenderArchivedInvoicesProvider.notifier).state = [
-          _invoice(id: 'a', date: DateTime(2026, 1, 10), billedTo: 'January'),
-          _invoice(id: 'b', date: DateTime(2026, 3, 5), billedTo: 'March'),
+          _invoice(
+            id: 'a',
+            date: DateTime(2026, 1, 10),
+            billedTo: 'Ada',
+            total: 10,
+          ),
+          _invoice(
+            id: 'b',
+            date: DateTime(2026, 3, 5),
+            billedTo: 'Bob',
+            total: 25,
+          ),
         ];
         await tester.pumpAndSettle();
         await _expand(tester);
 
         // Newest month (March) is preselected, so only that invoice shows.
+        expect(find.text('Bob'), findsOneWidget);
+        expect(find.text('Ada'), findsNothing);
+        expect(find.text('2026'), findsOneWidget);
         expect(find.text('March'), findsOneWidget);
-        expect(find.text('January'), findsNothing);
-        expect(find.text('March 2026'), findsOneWidget);
+        expect(_totalText(formatMoney(25, 'CHF')), findsOneWidget);
       },
     );
 
     testWidgets(
-      'buckets by year and preselects the newest year when invoices span '
-      'more than one year',
+      'picking a year narrows the month options to that year, defaulting '
+      'back to its newest month',
       (tester) async {
         final ref = await _pump(tester);
         ref.read(blenderArchivedInvoicesProvider.notifier).state = [
-          _invoice(id: 'a', date: DateTime(2025, 12, 1), billedTo: 'Old'),
-          _invoice(id: 'b', date: DateTime(2026, 1, 5), billedTo: 'New'),
+          _invoice(
+            id: 'a',
+            date: DateTime(2025, 12, 1),
+            billedTo: 'Old',
+            total: 20,
+          ),
+          _invoice(
+            id: 'b',
+            date: DateTime(2026, 1, 5),
+            billedTo: 'New',
+            total: 15,
+          ),
         ];
         await tester.pumpAndSettle();
         await _expand(tester);
 
         expect(find.text('New'), findsOneWidget);
         expect(find.text('Old'), findsNothing);
-        expect(find.text('2026'), findsOneWidget);
+
+        await _pickYear(tester, '2025');
+
+        expect(find.text('Old'), findsOneWidget);
+        expect(find.text('New'), findsNothing);
+        expect(find.text('December'), findsOneWidget);
+        expect(_totalText(formatMoney(20, 'CHF')), findsOneWidget);
       },
     );
 
-    testWidgets('switching the period dropdown narrows the list', (
-      tester,
-    ) async {
-      final ref = await _pump(tester);
-      ref.read(blenderArchivedInvoicesProvider.notifier).state = [
-        _invoice(id: 'a', date: DateTime(2025, 12, 1), billedTo: 'Old'),
-        _invoice(id: 'b', date: DateTime(2026, 1, 5), billedTo: 'New'),
-      ];
-      await tester.pumpAndSettle();
-      await _expand(tester);
+    testWidgets(
+      'picking "all years" shows every invoice, defaults the month filter '
+      'to "all months", and totals the whole archive',
+      (tester) async {
+        final ref = await _pump(tester);
+        ref.read(blenderArchivedInvoicesProvider.notifier).state = [
+          _invoice(
+            id: 'a',
+            date: DateTime(2025, 12, 1),
+            billedTo: 'Old',
+            total: 20,
+          ),
+          _invoice(
+            id: 'b',
+            date: DateTime(2026, 1, 5),
+            billedTo: 'New',
+            total: 15,
+          ),
+        ];
+        await tester.pumpAndSettle();
+        await _expand(tester);
 
-      expect(find.text('New'), findsOneWidget);
-      expect(find.text('Old'), findsNothing);
+        await _pickYear(tester, 'All years');
 
-      await tester.tap(find.text('2026'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('2025').last);
-      await tester.pumpAndSettle();
+        expect(find.text('Old'), findsOneWidget);
+        expect(find.text('New'), findsOneWidget);
+        expect(find.text('All months'), findsOneWidget);
+        expect(_totalText(formatMoney(35, 'CHF')), findsOneWidget);
+      },
+    );
 
-      expect(find.text('Old'), findsOneWidget);
-      expect(find.text('New'), findsNothing);
-    });
+    testWidgets(
+      'picking a month under "all years" narrows the list to that month '
+      'across every year',
+      (tester) async {
+        final ref = await _pump(tester);
+        ref.read(blenderArchivedInvoicesProvider.notifier).state = [
+          _invoice(
+            id: 'a',
+            date: DateTime(2025, 12, 1),
+            billedTo: 'Old',
+            total: 20,
+          ),
+          _invoice(
+            id: 'b',
+            date: DateTime(2026, 1, 5),
+            billedTo: 'New',
+            total: 15,
+          ),
+        ];
+        await tester.pumpAndSettle();
+        await _expand(tester);
+        await _pickYear(tester, 'All years');
+        await _pickMonth(tester, 'December');
+
+        expect(find.text('Old'), findsOneWidget);
+        expect(find.text('New'), findsNothing);
+        expect(_totalText(formatMoney(20, 'CHF')), findsOneWidget);
+      },
+    );
 
     testWidgets('tapping an invoice opens its detail route', (tester) async {
       final router = GoRouter(

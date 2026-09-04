@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "Ajustes por defecto y facturación",
   "gasCalculators_blender_invoiceArchive": "Archivo de facturas",
   "gasCalculators_blender_invoiceArchiveFilter": "Filtrar por fecha",
+  "gasCalculators_blender_invoiceArchiveAllYears": "Todos los años",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "Todos los meses",
   "gasCalculators_blender_invoiceArchiveEmpty": "Aún no hay facturas pagadas.",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "No hay facturas en este rango de fechas.",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} llenados",

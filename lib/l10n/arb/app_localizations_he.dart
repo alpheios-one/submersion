@@ -12201,6 +12201,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveFilter => 'סינון לפי תאריך';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveAllYears => 'כל השנים';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveAllMonths => 'כל החודשים';
+
+  @override
   String get gasCalculators_blender_invoiceArchiveEmpty =>
       'אין עדיין חשבוניות ששולמו.';
 

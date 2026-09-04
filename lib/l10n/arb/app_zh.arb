@@ -125,6 +125,8 @@
   "gasCalculators_blender_defaults": "默认设置与计费",
   "gasCalculators_blender_invoiceArchive": "账单存档",
   "gasCalculators_blender_invoiceArchiveFilter": "按日期筛选",
+  "gasCalculators_blender_invoiceArchiveAllYears": "所有年份",
+  "gasCalculators_blender_invoiceArchiveAllMonths": "所有月份",
   "gasCalculators_blender_invoiceArchiveEmpty": "尚无已付款账单。",
   "gasCalculators_blender_invoiceArchiveEmptyFiltered": "此时间段内没有账单。",
   "gasCalculators_blender_invoiceArchiveFillCount": "{count} 次充装",
