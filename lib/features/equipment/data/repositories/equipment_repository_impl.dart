@@ -13,6 +13,7 @@ import 'package:submersion/features/equipment/data/repositories/service_schedule
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 
 class EquipmentRepository {
   AppDatabase get _db => DatabaseService.instance.database;
@@ -242,6 +243,8 @@ class EquipmentRepository {
       // must not rethrow and make the caller treat the whole create as failed
       // (which could prompt a retry and duplicate the item). The clocks can be
       // added manually later; log and continue.
+      // Each step is caught on its own so one failing does not skip the
+      // other, and so the log names the step that actually failed.
       try {
         await ServiceScheduleRepository().autoAttachForEquipment(
           equipmentId: id,
@@ -252,6 +255,16 @@ class EquipmentRepository {
         _log.error(
           'Auto-attach of default service clocks failed for equipment $id; '
           'the equipment was still created',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+      try {
+        await _attachLegacyIntervalClock(id, equipment);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Mirroring the legacy service interval onto the ledger failed for '
+          'equipment $id; the equipment was still created',
           error: e,
           stackTrace: stackTrace,
         );
@@ -271,6 +284,39 @@ class EquipmentRepository {
       );
       rethrow;
     }
+  }
+
+  /// Mirror a legacy single-clock interval onto the service ledger.
+  ///
+  /// The ledger is the only source the due-service surfaces read, and the
+  /// legacy `serviceIntervalDays` column has no editor left in the app -- but
+  /// UDDF import still carries one, so an imported item would otherwise land
+  /// with an interval nothing evaluates. The deterministic
+  /// `legacy-svc-<equipment id>` id and General service kind match the v122
+  /// and v131 migrations, so an item that arrives by import and the same item
+  /// that arrives by migration or sync converge on one clock, not two.
+  Future<void> _attachLegacyIntervalClock(
+    String id,
+    EquipmentItem equipment,
+  ) async {
+    final intervalDays = equipment.serviceIntervalDays;
+    if (intervalDays == null) return;
+    final scheduleId = 'legacy-svc-$id';
+    final repository = ServiceScheduleRepository();
+    final existing = await repository.getSchedulesForEquipment(id);
+    if (existing.any((s) => s.id == scheduleId)) return;
+    final now = DateTime.now();
+    await repository.createSchedule(
+      ServiceSchedule(
+        id: scheduleId,
+        equipmentId: id,
+        serviceKindId: 'general-service',
+        intervalDays: intervalDays,
+        anchorDate: equipment.lastServiceDate,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
   }
 
   /// Update equipment
@@ -458,14 +504,6 @@ class EquipmentRepository {
       );
       rethrow;
     }
-  }
-
-  /// Get equipment with service due
-  Future<List<EquipmentItem>> getEquipmentWithServiceDue({
-    String? diverId,
-  }) async {
-    final allEquipment = await getActiveEquipment(diverId: diverId);
-    return allEquipment.where((g) => g.isServiceDue).toList();
   }
 
   /// Get all active equipment with service due dates for notification scheduling

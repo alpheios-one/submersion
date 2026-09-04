@@ -18,11 +18,15 @@ import 'package:submersion/features/dashboard/presentation/widgets/media_ribbon_
 import 'package:submersion/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_dives_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/recent_sites_map_card.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/urgent_banner.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/year_in_review_card.dart';
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
+import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dashboard/presentation/home_cards.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -36,6 +40,51 @@ import '../../../../helpers/mock_providers.dart';
 /// Counts how many times a refreshed provider was rebuilt.
 int refreshBuilds = 0;
 
+/// Gauges carrying one dive-safety alert (an expired policy), the state that
+/// hardens the strip against being hidden.
+final _expiredInsuranceGauges = DashboardGauges(
+  gearGauges: const [],
+  hasGear: false,
+  insurance: DiverInsurance(provider: 'DAN', expiryDate: DateTime(2020, 1, 1)),
+  noFlyStatus: null,
+  daysSinceLastDive: null,
+);
+
+/// The other way into the same override: a lapsed service clock rather than
+/// an expired policy.
+final _overdueGearGauges = DashboardGauges(
+  gearGauges: [
+    GearGauge(
+      type: EquipmentType.regulator,
+      itemId: 'reg-1',
+      itemName: 'Regulator',
+      status: ServiceClockStatus(
+        schedule: ServiceSchedule(
+          id: 'schedule',
+          equipmentId: 'reg-1',
+          serviceKindId: 'kind',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+        kind: ServiceKind(
+          id: 'kind',
+          name: 'Annual service',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+        anchor: DateTime(2026, 1, 1),
+        dueDate: DateTime(2026, 6, 1),
+        severity: ServiceClockSeverity.overdue,
+        now: DateTime(2026, 9, 1),
+      ),
+    ),
+  ],
+  hasGear: true,
+  insurance: null,
+  noFlyStatus: null,
+  daysSinceLastDive: null,
+);
+
 Future<void> pumpDashboard(
   WidgetTester tester, {
   DashboardMilestones? milestones,
@@ -44,7 +93,7 @@ Future<void> pumpDashboard(
   YearInReview? yearInReview,
   List<RecentSitePin> sites = const [],
   MockSettingsNotifier? settingsNotifier,
-  DashboardAlerts? alerts,
+  DashboardGauges? gauges,
 }) async {
   refreshBuilds = 0;
   final overrides = await getBaseOverrides(settingsNotifier: settingsNotifier);
@@ -84,22 +133,16 @@ Future<void> pumpDashboard(
         dashboardQuickStatsProvider.overrideWith(
           (ref) async => const DashboardQuickStats(),
         ),
-        dashboardAlertsProvider.overrideWith(
-          (ref) async =>
-              alerts ??
-              const DashboardAlerts(
-                insuranceExpiringSoon: false,
-                insuranceExpired: false,
-              ),
-        ),
         dashboardGaugesProvider.overrideWith(
-          (ref) async => const DashboardGauges(
-            gearGauges: [],
-            hasGear: false,
-            insurance: null,
-            noFlyStatus: null,
-            daysSinceLastDive: null,
-          ),
+          (ref) async =>
+              gauges ??
+              const DashboardGauges(
+                gearGauges: [],
+                hasGear: false,
+                insurance: null,
+                noFlyStatus: null,
+                daysSinceLastDive: null,
+              ),
         ),
         milestonesProvider.overrideWith(
           (ref) async =>
@@ -141,7 +184,6 @@ void main() {
     expect(find.byType(RecentDivesCard), findsOneWidget);
     expect(find.byType(QuickActionsCard), findsOneWidget);
 
-    expect(find.byType(UrgentBanner), findsNothing);
     expect(find.byType(MilestonesCard), findsNothing);
     expect(find.byType(MediaRibbonCard), findsNothing);
     expect(find.byType(OnThisDayCard), findsNothing);
@@ -255,21 +297,89 @@ void main() {
     expect(heroY, greaterThan(recentDivesY));
   });
 
-  testWidgets('urgent banner stays above all cards regardless of order', (
+  testWidgets('a live alert no longer pushes anything above the hero', (
+    tester,
+  ) async {
+    await pumpDashboard(tester, gauges: _expiredInsuranceGauges);
+
+    // The alert now lives in the gauge strip, so the greeting stays the
+    // first thing on the page instead of being pushed down by a banner.
+    expect(find.byType(GaugeStrip), findsOneWidget);
+    final heroY = tester.getTopLeft(find.byType(HeroHeader)).dy;
+    final stripY = tester.getTopLeft(find.byType(GaugeStrip)).dy;
+    expect(heroY, lessThan(stripY));
+  });
+
+  testWidgets('a safety alert forces the gauge strip back on when hidden', (
     tester,
   ) async {
     await pumpDashboard(
       tester,
-      alerts: const DashboardAlerts(
-        insuranceExpiringSoon: false,
-        insuranceExpired: true,
+      gauges: _expiredInsuranceGauges,
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
       ),
     );
 
-    expect(find.byType(UrgentBanner), findsOneWidget);
-    final bannerY = tester.getTopLeft(find.byType(UrgentBanner)).dy;
+    expect(find.byType(GaugeStrip), findsOneWidget);
+    // The override is scoped to the strip: other hidden cards stay hidden.
     final heroY = tester.getTopLeft(find.byType(HeroHeader)).dy;
-    expect(bannerY, lessThan(heroY));
+    final stripY = tester.getTopLeft(find.byType(GaugeStrip)).dy;
+    expect(heroY, lessThan(stripY));
+  });
+
+  testWidgets('overdue gear also forces the gauge strip back on', (
+    tester,
+  ) async {
+    await pumpDashboard(
+      tester,
+      gauges: _overdueGearGauges,
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
+      ),
+    );
+
+    expect(find.byType(GaugeStrip), findsOneWidget);
+  });
+
+  testWidgets('overdue overflow alone forces the gauge strip back on', (
+    tester,
+  ) async {
+    // Pins the guard to GaugeStrip's own alert definition rather than to the
+    // cap values: the strip renders an alert-tone "+N more overdue" chip
+    // whenever the overflow is positive, so the page must force the strip
+    // open in that state even with no overdue gauge in the shown list.
+    await pumpDashboard(
+      tester,
+      gauges: const DashboardGauges(
+        gearGauges: [],
+        gearOverdueOverflow: 2,
+        hasGear: true,
+        insurance: null,
+        noFlyStatus: null,
+        daysSinceLastDive: null,
+      ),
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
+      ),
+    );
+
+    expect(find.byType(GaugeStrip), findsOneWidget);
+    expect(find.text('+2 more overdue'), findsOneWidget);
+  });
+
+  testWidgets('hiding the gauge strip works when no alert is live', (
+    tester,
+  ) async {
+    await pumpDashboard(
+      tester,
+      settingsNotifier: MockSettingsNotifier(
+        AppSettings(hiddenHomeCards: {HomeCardType.gaugeStrip.name}),
+      ),
+    );
+
+    expect(find.byType(GaugeStrip), findsNothing);
+    expect(find.byType(HeroHeader), findsOneWidget);
   });
 
   testWidgets('all cards hidden shows empty state with settings link', (
@@ -293,7 +403,7 @@ void main() {
   });
 
   testWidgets(
-    'all cards hidden with active urgent banner shows banner AND empty state',
+    'all cards hidden with a live alert shows the strip AND the empty state',
     (tester) async {
       await pumpDashboard(
         tester,
@@ -302,20 +412,19 @@ void main() {
             hiddenHomeCards: {for (final c in HomeCardType.values) c.name},
           ),
         ),
-        alerts: const DashboardAlerts(
-          insuranceExpiringSoon: false,
-          insuranceExpired: true,
-        ),
+        gauges: _expiredInsuranceGauges,
       );
 
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      expect(find.byType(UrgentBanner), findsOneWidget);
+      // The forced strip must not swallow the CTA: without it the diver has
+      // no route back to re-enabling their cards.
+      expect(find.byType(GaugeStrip), findsOneWidget);
       expect(find.text(l10n.dashboard_allHidden_message), findsOneWidget);
-      final bannerY = tester.getTopLeft(find.byType(UrgentBanner)).dy;
+      final stripY = tester.getTopLeft(find.byType(GaugeStrip)).dy;
       final messageY = tester
           .getTopLeft(find.text(l10n.dashboard_allHidden_message))
           .dy;
-      expect(bannerY, lessThan(messageY));
+      expect(stripY, lessThan(messageY));
     },
   );
 }

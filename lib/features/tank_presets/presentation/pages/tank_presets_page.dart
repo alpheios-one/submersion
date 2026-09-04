@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/constants/tank_preset_display.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -148,7 +149,16 @@ class TankPresetsPage extends ConsumerWidget {
             ? Theme.of(context).colorScheme.secondary
             : Theme.of(context).colorScheme.primary,
       ),
-      title: Text(preset.displayName),
+      // Only seeded rows resolve through the built-in translation table. A
+      // custom preset can slug onto a built-in name (nothing rejects a diver
+      // creating their own "AL80"), and its displayName is the diver's, not
+      // an identifier to be relabelled.
+      title: Text(
+        preset.isBuiltIn
+            ? builtInTankPresetName(context.l10n, preset.name) ??
+                  preset.displayName
+            : preset.displayName,
+      ),
       subtitle: Text(
         '$volumeStr • $pressureStr • ${preset.material.displayName}',
       ),

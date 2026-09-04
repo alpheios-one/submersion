@@ -1,5 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
@@ -18,16 +16,23 @@ import 'package:submersion/features/media/presentation/providers/media_providers
 /// Invalidates the Riverpod providers that correspond to the given set of
 /// imported entity types.
 ///
-/// Pass [ref] from the calling notifier or widget. At call sites:
+/// Takes the invalidator as a callback rather than a `Ref` so the one mapping
+/// serves both a notifier's `Ref` and a widget's `WidgetRef`, which share no
+/// supertype, and so tests can record the exact set of providers without
+/// standing up a container.
+///
+/// The callback parameter is `dynamic` because Riverpod 3 does not export
+/// `ProviderOrFamily`, the type `invalidate` accepts, so it cannot be named
+/// here. Call sites forward through a lambda:
 ///
 /// ```dart
-/// invalidateImportRelatedProviders(ref, importedTypes);
+/// invalidateImportRelatedProviders((p) => ref.invalidate(p), importedTypes);
 /// ```
 ///
 /// Call this after a successful import to ensure all affected UI providers
 /// refresh their data from the database.
 void invalidateImportRelatedProviders(
-  Ref ref,
+  void Function(dynamic provider) invalidate,
   Set<ImportEntityType> importedTypes,
 ) {
   if (importedTypes.isEmpty) return;
@@ -35,52 +40,61 @@ void invalidateImportRelatedProviders(
   for (final type in importedTypes) {
     switch (type) {
       case ImportEntityType.dives:
-        ref.invalidate(diveListNotifierProvider);
-        ref.invalidate(paginatedDiveListProvider);
+        invalidate(diveListNotifierProvider);
+        invalidate(paginatedDiveListProvider);
+        invalidate(divesProvider);
+        invalidate(diveStatisticsProvider);
+        invalidate(diveRecordsProvider);
+        invalidate(nextDiveNumberProvider);
         // Dive computer records may be updated when dives are imported.
-        ref.invalidate(allDiveComputersProvider);
+        invalidate(allDiveComputersProvider);
+        // Dives link to sites, buddies, trips and so on, so their counts and
+        // lists can change even when those entities were not imported.
+        invalidate(sitesWithCountsProvider);
+        invalidate(siteListNotifierProvider);
 
       case ImportEntityType.sites:
-        ref.invalidate(sitesProvider);
-        ref.invalidate(sitesWithCountsProvider);
-        ref.invalidate(siteListNotifierProvider);
+        invalidate(sitesProvider);
+        invalidate(sitesWithCountsProvider);
+        invalidate(siteListNotifierProvider);
 
       case ImportEntityType.buddies:
-        ref.invalidate(allBuddiesProvider);
+        invalidate(allBuddiesProvider);
 
       case ImportEntityType.equipment:
-        ref.invalidate(allEquipmentProvider);
-        ref.invalidate(activeEquipmentProvider);
-        ref.invalidate(retiredEquipmentProvider);
-        ref.invalidate(serviceDueEquipmentProvider);
-        ref.invalidate(equipmentListNotifierProvider);
+        invalidate(allEquipmentProvider);
+        invalidate(activeEquipmentProvider);
+        invalidate(retiredEquipmentProvider);
+        // Base clock evaluation: the service-due list derives from it.
+        invalidate(activeEquipmentClocksProvider);
+        invalidate(equipmentListNotifierProvider);
 
       case ImportEntityType.equipmentSets:
-        ref.invalidate(equipmentSetsProvider);
+        invalidate(equipmentSetsProvider);
 
       case ImportEntityType.trips:
-        ref.invalidate(allTripsProvider);
+        invalidate(allTripsProvider);
 
       case ImportEntityType.diveCenters:
-        ref.invalidate(allDiveCentersProvider);
+        invalidate(allDiveCentersProvider);
 
       case ImportEntityType.certifications:
-        ref.invalidate(allCertificationsProvider);
+        invalidate(allCertificationsProvider);
 
       case ImportEntityType.courses:
-        ref.invalidate(allCoursesProvider);
+        invalidate(allCoursesProvider);
 
       case ImportEntityType.tags:
-        ref.invalidate(tagsProvider);
+        invalidate(tagsProvider);
 
       case ImportEntityType.diveTypes:
-        ref.invalidate(diveTypesProvider);
+        invalidate(diveTypesProvider);
 
       case ImportEntityType.media:
         // Photos land on dives that may already be on screen.
-        ref.invalidate(mediaForDiveProvider);
-        ref.invalidate(mediaCountForDiveProvider);
-        ref.invalidate(mediaListNotifierProvider);
+        invalidate(mediaForDiveProvider);
+        invalidate(mediaCountForDiveProvider);
+        invalidate(mediaListNotifierProvider);
     }
   }
 }

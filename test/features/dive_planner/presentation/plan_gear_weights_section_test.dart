@@ -63,6 +63,7 @@ void main() {
       allEquipmentProvider.overrideWith((ref) async => const [suitItem]),
       activeEquipmentProvider.overrideWith((ref) async => const [suitItem]),
       latestDiverWeightProvider.overrideWith((ref) async => entry),
+      latestDiverHeightProvider.overrideWith((ref) async => null),
     ];
 
     await tester.pumpWidget(
@@ -118,6 +119,7 @@ void main() {
           allEquipmentProvider.overrideWith((ref) async => const [suitItem]),
           activeEquipmentProvider.overrideWith((ref) async => const [suitItem]),
           latestDiverWeightProvider.overrideWith((ref) async => null),
+          latestDiverHeightProvider.overrideWith((ref) async => null),
           equipmentSetsProvider.overrideWith((ref) async => [set]),
           equipmentSetWithItemsProvider(
             'set-1',
@@ -160,6 +162,7 @@ void main() {
           allEquipmentProvider.overrideWith((ref) async => const []),
           activeEquipmentProvider.overrideWith((ref) async => const []),
           latestDiverWeightProvider.overrideWith((ref) async => null),
+          latestDiverHeightProvider.overrideWith((ref) async => null),
         ],
         child: const PlanGearWeightsSection(),
       ),

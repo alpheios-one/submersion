@@ -431,10 +431,17 @@ ProfileAnalysisService _resolveAnalysisService(
   MetricDataSource gtrSource = MetricDataSource.calculated,
   RebreatherPpO2? rebreatherPpO2,
 }) {
-  final hasComputerNdl = profile.any((p) => p.ndl != null);
-  final hasComputerCeiling = profile.any((p) => p.ceiling != null);
-  // TTS=0 is a sentinel from dive computers that don't track TTS;
-  // treat it as unavailable so we fall back to calculated values.
+  // A zero is not a reading. Computers that do not measure one of these
+  // still leave a zero in every sample, so a series that is zero from end to
+  // end counts as unreported and the calculated curve stands. TTS has always
+  // been read that way; the Cressi Leonardo forces the same rule on the other
+  // two, because it logs its deco obligation as a single bit and no numbers,
+  // leaving a stop depth of zero through a stop and a no-stop time of zero
+  // for the rest of the dive.
+  final hasComputerNdl = profile.any((p) => p.ndl != null && p.ndl! > 0);
+  final hasComputerCeiling = profile.any(
+    (p) => p.ceiling != null && p.ceiling! > 0,
+  );
   final hasComputerTts = profile.any((p) => p.tts != null && p.tts! > 0);
   final hasComputerCns = profile.any((p) => p.cns != null);
   // Air-integrated computers log their own GTR (libdc RBT, stored in
@@ -971,7 +978,7 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     // Try to get per-tank pressure data first (works for single and multi-tank)
     List<double>? pressures;
     if (tanks.isNotEmpty) {
-      // Load per-tank pressure data from tank_pressure_profiles table
+      // Load per-tank pressure data from the tank_pressure_series table
       final tankPressureRepo = ref.watch(tankPressureRepositoryProvider);
       final allTankPressures = await tankPressureRepo.getTankPressuresForDive(
         diveId,
@@ -1187,7 +1194,17 @@ final sourceProfileAnalysisProvider =
         final primaryId =
             sources.where((s) => s.isPrimary).map((s) => s.id).firstOrNull ??
             sources.first.id;
-        final effectiveSourceId = key.sourceId ?? primaryId;
+        // A stale id (the selection outliving its source row, e.g. right
+        // after a split) resolves to the primary, exactly as
+        // activeSourceProfileProvider resolves the chart's series, so the
+        // analysis is never computed over a different series than the one
+        // drawn. Falling through to the dive-level analysis here would pair
+        // merged-length curves with the primary's bucket (#543).
+        final requested = key.sourceId;
+        final effectiveSourceId =
+            requested != null && sources.any((s) => s.id == requested)
+            ? requested
+            : primaryId;
         final dive = await ref.watch(analysisDiveProvider(key.diveId).future);
         if (dive == null) return null;
         final profiles = await ref.watch(

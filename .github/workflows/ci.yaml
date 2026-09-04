@@ -235,6 +235,35 @@ jobs:
       - name: Check formatting
         run: dart format --set-exit-if-changed .
 
+      # lib/l10n/arb/app_localizations*.dart is produced by `flutter gen-l10n`
+      # and is CHECKED IN, unlike the build_runner outputs (*.g.dart /
+      # *.freezed.dart / *.mocks.dart), which are gitignored and rebuilt by the
+      # codegen job above. Nothing else in the pipeline regenerates it, and
+      # `flutter test` does not either despite `generate: true` in pubspec.yaml,
+      # so what is committed is exactly what ships. Without this assertion an
+      # ARB edit that skipped `flutter gen-l10n`, or a generated file that was
+      # hand-edited or hand-resolved during a merge (these conflict often, since
+      # every locale changes together), merges fully green and the app serves
+      # the stale string. Only the handful of keys some test asserts by value
+      # would catch it today, out of ~9800.
+      #
+      # Runs LAST so the analyze and format verdicts above are reported against
+      # the tree as committed, not against a freshly regenerated copy.
+      - name: Verify generated localizations match the ARB files
+        run: |
+          flutter gen-l10n
+          # --porcelain rather than `git diff --exit-code` so a brand-new locale
+          # whose generated file was never added shows up as untracked drift too.
+          drift="$(git status --porcelain -- 'lib/l10n/arb/app_localizations*.dart')"
+          if [ -n "$drift" ]; then
+            echo "Generated localizations do not match the ARB files:"
+            printf '%s\n' "$drift"
+            git --no-pager diff -- 'lib/l10n/arb/app_localizations*.dart'
+            echo "::error::lib/l10n/arb/app_localizations*.dart is out of date. Run 'flutter gen-l10n' and commit the result."
+            exit 1
+          fi
+          echo "Generated localizations are up to date."
+
   test:
     name: Test (shard ${{ matrix.shard }})
     needs: codegen
@@ -248,10 +277,11 @@ jobs:
         # must equal (shard count + 1) for the scripts job -- Codecov holds the
         # patch/project status until every partial lcov arrives (see codecov.yml).
         # It is also bounded by the account-wide concurrent-job cap: this workflow
-        # already fans out ~9-10 non-test jobs (analyze + 5 builds + scripts +
-        # integration) that share the pool AND gate ci-success, so oversharding
-        # queues the builds and makes total CI slower, not faster. 8 keeps us
-        # under the cap while roughly halving test wall-clock.
+        # already fans out ~10-11 non-test jobs (analyze + 5 builds + scripts +
+        # timezone + integration) that share the pool AND gate ci-success, so
+        # oversharding queues the builds and makes total CI slower, not
+        # faster. 8 keeps us under the cap while roughly halving test
+        # wall-clock.
         shard: [0, 1, 2, 3, 4, 5, 6, 7]
     env:
       TOTAL_SHARDS: 8
@@ -338,6 +368,96 @@ jobs:
           flags: shard-${{ matrix.shard }}
           fail_ci_if_error: false  # Enable after configuring repo on codecov.io
 
+  # Replays the timezone-sensitive tests under a non-UTC zone. The runners are
+  # UTC, where a device's UTC offset is zero and a whole class of frame bug
+  # cannot reproduce: `dives.dive_date_time` holds a wall clock flagged as UTC
+  # while the filter's dates are built LOCAL, so mixing the two frames shifts
+  # the day boundary by exactly that offset and stays invisible here
+  # (issue #1368).
+  #
+  # Two zones, because they fail differently: America/New_York is a whole hour
+  # WEST of UTC (a boundary pulls dives out), Australia/Adelaide is a HALF hour
+  # EAST (a boundary pulls extra dives in, and the half hour catches rounding a
+  # whole-hour offset hides). Both observe DST, so a `Duration(days: 1)` added
+  # to a local date lands 23 or 25 hours out at a transition.
+  #
+  # Scoped to a hand-maintained file list rather than the whole suite: an
+  # unscoped `flutter test --tags ...` still compiles every test file, which is
+  # the dominant cost. Add any new test whose result depends on the machine's
+  # zone here.
+  timezone-tests:
+    name: Timezone Tests
+    needs: codegen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Read Flutter version
+        id: flutter-ver
+        run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
+
+      - uses: subosito/flutter-action@v2
+        id: setup-flutter
+        with:
+          flutter-version: ${{ steps.flutter-ver.outputs.version }}
+          channel: 'stable'
+
+      - name: Cache Flutter SDK
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.setup-flutter.outputs.CACHE-PATH }}
+          key: ${{ steps.setup-flutter.outputs.CACHE-KEY }}
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.pub-cache
+            ${{ github.workspace }}/.dart_tool
+          key: pub-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Disable Swift Package Manager (project uses CocoaPods)
+        run: flutter config --no-enable-swift-package-manager
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Download generated code
+        uses: actions/download-artifact@v8
+        with:
+          name: generated-code
+
+      - name: Unpack generated code
+        run: tar -xzf generated-code.tar.gz
+
+      - name: Run zone-sensitive tests under non-UTC zones
+        run: |
+          set -euo pipefail
+          files=(
+            test/features/dive_log/dive_filter_date_boundary_test.dart
+            test/features/dive_log/domain/models/dive_filter_state_test.dart
+            test/features/dive_log/data/repositories/dive_records_filter_test.dart
+            test/features/dive_log/data/repositories/dive_repository_weekday_filter_test.dart
+            test/features/statistics/data/dive_filter_sql_test.dart
+          )
+          # Guard against a rename silently emptying the list: with no paths,
+          # `flutter test` would run the ENTIRE suite twice and look green.
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Listed test file is missing: $f"
+              exit 1
+            fi
+          done
+          for zone in America/New_York Australia/Adelaide; do
+            echo "::group::TZ=$zone"
+            TZ="$zone" flutter test "${files[@]}"
+            echo "::endgroup::"
+          done
+
   # Unit-tests the dependency-free Python guard scripts (e.g. the issue #318
   # ProGuard keep-rule checker). No Flutter/codegen needed, so it runs in
   # parallel and gives the guard logic its own coverage, scoped to the script.
@@ -352,7 +472,32 @@ jobs:
           python-version: '3.x'
 
       - name: Install coverage.py
-        run: python3 -m pip install coverage
+        # Retried: a single unreachable-index blip used to fail the whole job.
+        # pip reports that as `(from versions: none)` -- an empty candidate
+        # list, not a version conflict -- after silently exhausting its own
+        # retries, e.g. run 33789978791.
+        run: |
+          for attempt in 1 2 3; do
+            if python3 -m pip install coverage; then
+              exit 0
+            fi
+            echo "::warning::pip install coverage failed (attempt $attempt/3)"
+            # An `[ ... ] && sleep` one-liner would abort the step with no
+            # message here: the step shell is `bash -e`, and on the last
+            # attempt the false test makes the loop body's final command
+            # return 1. See scripts/pre_push_hook_test.sh for the same bug.
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 10))
+            fi
+          done
+          echo "::error::pip install coverage failed after 3 attempts"
+          exit 1
+
+      - name: Check CI aggregation gate
+        # Fails if a job is missing from ci-success.needs. Such a job shows red
+        # on the PR while the required check stays green, which is how
+        # script-tests itself went ungated from 2026-06-24 to 2026-09-03.
+        run: python3 scripts/check_ci_success_gate.py
 
       - name: Check JNI local-reference hygiene (source)
         # Source-level guard: no build artifact needed (unlike the APK/mapping
@@ -369,7 +514,7 @@ jobs:
       - name: Run Python guard tests with coverage
         run: |
           mkdir -p coverage
-          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_bundled_native_assets.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py'
+          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_bundled_native_assets.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/check_ci_success_gate.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py'
           python3 -m coverage run --include="$guards" \
             scripts/check_proguard_serial_keep_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -380,6 +525,8 @@ jobs:
             scripts/check_jni_local_refs_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_dc_process_isolation_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/check_ci_success_gate_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/fix_macho_symbol_order_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -763,7 +910,7 @@ jobs:
         run: echo "version=$(cat ${{ env.FLUTTER_VERSION_FILE }})" >> "$GITHUB_OUTPUT"
 
       - name: Setup Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -955,6 +1102,54 @@ jobs:
         # positive control that the check is not vacuously passing.
         run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
+      # Packaging runs here as well as in build-all.yml because build-all.yml
+      # is workflow_call-only: nothing a pull request triggers ever invokes it,
+      # so without this the packaging path would be unverifiable until after a
+      # merge, when a break already blocks the beta pipeline. Both workflows
+      # call the same scripts, so they cannot drift.
+      #
+      # This job runs on ubuntu-latest, not the ubuntu:22.04 container
+      # build-all.yml uses, so it covers packaging mechanics and dependency
+      # resolution but NOT the glibc floor. build-all.yml remains the only
+      # check on the floor itself.
+      - name: Install packaging tools
+        run: |
+          sudo apt-get install -y ruby ruby-dev build-essential rpm python3-pil binutils
+          sudo gem install --no-document fpm
+
+      - name: Build .deb and .rpm
+        run: |
+          set -euo pipefail
+          mkdir -p packages
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+/./')
+          scripts/release/build_linux_packages.sh \
+            --bundle build/linux/x64/release/bundle \
+            --version "$VERSION" \
+            --deb "packages/Submersion-ci-Linux-amd64.deb" \
+            --rpm "packages/Submersion-ci-Linux-x86_64.rpm"
+
+      # The .deb is verified against the runner's own Ubuntu release rather
+      # than an older distro. This job builds on ubuntu-latest, so its binary
+      # requires that runner's glibc, and installing it on debian:12
+      # (glibc 2.36) fails with "GLIBC_2.38 not found" no matter how correct
+      # the packaging is. build-all.yml builds inside an ubuntu:22.04
+      # container and is where installation on older distros is proven.
+      #
+      # The tag is derived from the runner rather than pinned, so this keeps
+      # matching when GitHub moves ubuntu-latest to the next release.
+      - name: Verify the packages install in clean containers
+        run: |
+          set -euo pipefail
+          UBUNTU_TAG="ubuntu:$(. /etc/os-release && echo "$VERSION_ID")"
+          echo "runner is $UBUNTU_TAG"
+          for image in "$UBUNTU_TAG" fedora:latest; do
+            echo "=== $image ==="
+            docker run --rm \
+              -v "$PWD/packages:/p" \
+              -v "$PWD/scripts/release/verify_linux_package.sh:/verify.sh:ro" \
+              "$image" bash /verify.sh
+          done
+
       - name: Upload Linux artifact
         uses: actions/upload-artifact@v7
         if: >
@@ -1074,6 +1269,85 @@ jobs:
   # `changes` is likewise listed: on a docs/CI-only change it reports code=false
   # and the whole pipeline SKIPS (an accepted green), but if the detector itself
   # FAILS we must not silently skip-then-green, so its failure must reach here.
+  # A submodule pointer is a single sha with no file diff, so a pull request
+  # that moves libdivecomputer backwards reverts every fork commit in between
+  # while showing a reviewer nothing at all to look at. PR #342 sat with a
+  # pointer that would have silently undone two shipped driver fixes. Nothing
+  # else in the pipeline can catch this: the app still builds, and the reverted
+  # commits are drivers no CI job exercises.
+  #
+  # The invariant is one-directional on purpose. The pointer may run AHEAD of
+  # the fork's submersion-patches tip (a patch is pushed to the fork before the
+  # app pull request that adopts it merges), and it may stand still. It may
+  # never contain less than the base branch already contains.
+  submodule-pointer:
+    name: libdivecomputer pointer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: The libdivecomputer pointer must not go backwards
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          sub=packages/libdivecomputer_plugin/third_party/libdivecomputer
+          if [ "$EVENT" = "pull_request" ]; then
+            base="$PR_BASE"; head="$PR_HEAD"
+          else
+            base="$PUSH_BEFORE"; head="$PUSH_AFTER"
+          fi
+          if [ -z "$base" ] || ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
+            echo "Base commit unavailable ('$base'); nothing to compare against."
+            exit 0
+          fi
+
+          base_link="$(git rev-parse --verify --quiet "${base}:${sub}" || true)"
+          head_link="$(git rev-parse --verify "${head}:${sub}")"
+          if [ -z "$base_link" ]; then
+            echo "The submodule is new on this branch; nothing to compare against."
+            exit 0
+          fi
+          if [ "$base_link" = "$head_link" ]; then
+            echo "Pointer unchanged at $head_link."
+            exit 0
+          fi
+
+          # The base pointer may be unreachable from the shallow submodule
+          # clone, and either end may live on a branch this checkout never
+          # fetched, so take the whole fork before deciding.
+          git -C "$sub" fetch --quiet --tags origin '+refs/heads/*:refs/remotes/origin/*'
+
+          for sha in "$base_link" "$head_link"; do
+            if ! git -C "$sub" cat-file -e "${sha}^{commit}" 2>/dev/null; then
+              echo "::error::libdivecomputer commit $sha is not reachable in $(git config -f .gitmodules submodule.${sub}.url). Push the branch it lives on before merging."
+              exit 1
+            fi
+          done
+
+          if git -C "$sub" merge-base --is-ancestor "$base_link" "$head_link"; then
+            echo "Pointer moves forward: $base_link -> $head_link"
+            exit 0
+          fi
+
+          echo "The libdivecomputer pointer moves to a commit that does not contain the base branch's."
+          echo "Base: $base_link"
+          echo "Head: $head_link"
+          echo "These commits are on the base pointer and would be reverted:"
+          git -C "$sub" log --oneline "${head_link}..${base_link}"
+          echo "::error::libdivecomputer pointer would revert the commits listed above. Rebase the submodule branch onto the current submersion-patches tip and update the pointer."
+          exit 1
+
+  # Adding a job below WITHOUT adding it here makes it advisory: red on the PR,
+  # ignored by the merge box. scripts/check_ci_success_gate.py fails the build
+  # if that happens; exempt a genuinely non-gating job there, not by omission.
   ci-success:
     name: CI Success
     if: always()
@@ -1082,14 +1356,29 @@ jobs:
       - codegen
       - analyze
       - test
+      - timezone-tests
+      - script-tests
       - integration-test
       - build-ios
       - build-macos
       - build-android
       - build-linux
       - build-windows
+      - submodule-pointer
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+
+      - name: Check CI aggregation gate
+        # Deliberately duplicated from script-tests, which runs the same guard
+        # for a faster signal. This copy is the enforcing one: a guard that
+        # runs only inside a gated job cannot report its own de-gating, since
+        # dropping that job from `needs` below would make its failure advisory
+        # too. Running it here, in the one job branch protection requires,
+        # closes that loop. Ordered before the results check so a de-gated
+        # pipeline reports the cause rather than a downstream symptom.
+        run: python3 scripts/check_ci_success_gate.py
+
       - name: Verify all required jobs succeeded
         run: |
           results="${{ join(needs.*.result, ' ') }}"

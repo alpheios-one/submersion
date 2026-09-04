@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
@@ -113,6 +115,7 @@ import 'package:submersion/features/settings/presentation/pages/language_setting
 import 'package:submersion/features/settings/presentation/pages/nav_customization_page.dart';
 import 'package:submersion/features/settings/presentation/pages/theme_gallery_page.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/storage_usage_page.dart';
 import 'package:submersion/features/settings/presentation/pages/diver_profile_hub_page.dart';
 import 'package:submersion/features/settings/presentation/pages/personal_info_edit_page.dart';
 import 'package:submersion/features/settings/presentation/pages/emergency_contacts_edit_page.dart';
@@ -151,6 +154,8 @@ import 'package:submersion/features/dive_computer/presentation/providers/downloa
     show diveImportServiceProvider;
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/garmin_cloud_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
@@ -609,6 +614,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     initialName: extra?['name'] as String?,
                     initialEmail: extra?['email'] as String?,
                     initialPhone: extra?['phone'] as String?,
+                    initialPhoto: extra?['photo'] as Uint8List?,
                   );
                 },
               ),
@@ -889,6 +895,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) =>
                     const _UniversalImportWizardRoute(),
               ),
+              GoRoute(
+                path: 'import-cloud/suunto',
+                name: 'importFromCloudSuunto',
+                builder: (context, state) =>
+                    const _SuuntoCloudImportWizardRoute(),
+              ),
+              GoRoute(
+                path: 'import-cloud/garmin',
+                name: 'importFromCloudGarmin',
+                builder: (context, state) =>
+                    const _GarminCloudImportWizardRoute(),
+              ),
             ],
           ),
 
@@ -982,6 +1000,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'storage',
                 name: 'storageSettings',
                 builder: (context, state) => const StorageSettingsPage(),
+              ),
+              GoRoute(
+                path: 'storage-usage',
+                name: 'storageUsage',
+                builder: (context, state) => const StorageUsagePage(),
               ),
               GoRoute(
                 path: 'data-quality',
@@ -1355,7 +1378,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/species',
             name: 'species',
-            builder: (context, state) => const SpeciesPage(),
+            // A nav destination: the rail and bottom bar reach it with `go`,
+            // so it cross-fades like its siblings instead of animating in.
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SpeciesPage(),
+            ),
             routes: [
               GoRoute(
                 path: 'manage',
@@ -1544,7 +1572,14 @@ class _DiveComputerDiscoveryWizardRoute extends ConsumerWidget {
 
 /// Wrapper that creates a [DiveComputerAdapter] for quick download
 /// from a known (previously paired) computer.
-class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
+///
+/// The adapter is created once per route instance and reused across
+/// rebuilds. [diveComputerByIdProvider] re-emits on every dive_computers
+/// table tick, and a completed download writes that table (device serial
+/// and firmware), so this widget rebuilds in the middle of the wizard. A
+/// fresh adapter built here on every rebuild would carry none of the
+/// downloaded dives, and the wizard's Review step would list nothing.
+class _DiveComputerDownloadWizardRoute extends ConsumerStatefulWidget {
   const _DiveComputerDownloadWizardRoute({
     required this.computerId,
     this.forceFullDownload = false,
@@ -1554,13 +1589,28 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
   final bool forceFullDownload;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final diverId = ref.watch(currentDiverIdProvider) ?? '';
-    final importService = ref.watch(diveImportServiceProvider);
-    final computerRepo = ref.watch(diveComputerRepositoryProvider);
-    final diveRepo = ref.watch(diveRepositoryProvider);
-    final consolidationService = ref.watch(diveConsolidationServiceProvider);
-    final computerAsync = ref.watch(diveComputerByIdProvider(computerId));
+  ConsumerState<_DiveComputerDownloadWizardRoute> createState() =>
+      _DiveComputerDownloadWizardRouteState();
+}
+
+class _DiveComputerDownloadWizardRouteState
+    extends ConsumerState<_DiveComputerDownloadWizardRoute> {
+  DiveComputerAdapter? _adapter;
+
+  @override
+  void didUpdateWidget(_DiveComputerDownloadWizardRoute oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.computerId != widget.computerId ||
+        oldWidget.forceFullDownload != widget.forceFullDownload) {
+      _adapter = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final computerAsync = ref.watch(
+      diveComputerByIdProvider(widget.computerId),
+    );
 
     return computerAsync.when(
       data: (computer) {
@@ -1574,18 +1624,21 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
             ),
           );
         }
-        return UnifiedImportWizard(
-          adapter: DiveComputerAdapter(
-            importService: importService,
-            computerRepository: computerRepo,
-            diveRepository: diveRepo,
-            consolidationService: consolidationService,
-            diverId: diverId,
-            knownComputer: computer,
-            ref: ref,
-            forceFullDownload: forceFullDownload,
-          ),
+        final adapter = _adapter ??= DiveComputerAdapter(
+          importService: ref.read(diveImportServiceProvider),
+          computerRepository: ref.read(diveComputerRepositoryProvider),
+          diveRepository: ref.read(diveRepositoryProvider),
+          consolidationService: ref.read(diveConsolidationServiceProvider),
+          diverId: ref.read(currentDiverIdProvider) ?? '',
+          knownComputer: computer,
+          ref: ref,
+          forceFullDownload: widget.forceFullDownload,
         );
+        // A new adapter is a new session: key the wizard on it so the reset
+        // in didUpdateWidget starts the wizard over instead of handing a
+        // fresh adapter to a wizard mid-flow (which pins the one it started
+        // with).
+        return UnifiedImportWizard(key: ObjectKey(adapter), adapter: adapter);
       },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -1608,6 +1661,59 @@ class _UniversalImportWizardRoute extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return UnifiedImportWizard(adapter: UniversalAdapter(ref: ref));
+  }
+}
+
+/// Wrapper that creates a [SuuntoCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Suunto cloud (app.suunto.com)
+/// account.
+class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
+  const _SuuntoCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: SuuntoCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
+  }
+}
+
+/// Wrapper that creates a [GarminCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Garmin Connect account.
+class _GarminCloudImportWizardRoute extends ConsumerWidget {
+  const _GarminCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: GarminCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
   }
 }
 

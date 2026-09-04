@@ -130,6 +130,34 @@ void main() {
       expect(find.byIcon(Icons.lock_outline), findsNWidgets(2));
     });
 
+    testWidgets('every movable destination gets a reorderable row', (
+      tester,
+    ) async {
+      // Tall surface so the whole list renders without scrolling; the page
+      // uses a ReorderableListView.builder, which only builds visible rows.
+      tester.view.physicalSize = const Size(1200, 3000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final repo = _FakeRepo();
+      await tester.pumpWidget(buildHarness(repo));
+      await tester.pumpAndSettle();
+
+      // A destination that is not listed here cannot be moved between the
+      // phone bottom bar and the More menu, so adding one to kNavDestinations
+      // without it appearing here would silently strand it in overflow.
+      for (final id in movableNavIds) {
+        expect(
+          find.byKey(ValueKey('nav-item-$id')),
+          findsOneWidget,
+          reason: '$id has no row in the navigation customizer',
+        );
+      }
+      expect(find.byKey(const ValueKey('nav-item-species')), findsOneWidget);
+      expect(find.text('Species'), findsOneWidget);
+    });
+
     testWidgets('shows the divider row with correct label', (tester) async {
       final repo = _FakeRepo();
       await tester.pumpWidget(buildHarness(repo));

@@ -527,10 +527,17 @@ class MediaRepository {
   /// Whether any attachable media exists (signatures excluded). Cheap
   /// EXISTS probe for setup/status surfaces.
   Future<bool> hasAnyMedia() async {
+    // Excludes every signature spelling, not just the instructor one, so a
+    // logbook whose only media rows are buddy signatures still reports empty.
+    final placeholders = List.filled(
+      kSignatureFileTypes.length,
+      '?',
+    ).join(', ');
     final row = await _db
         .customSelect(
-          "SELECT EXISTS(SELECT 1 FROM media "
-          "WHERE file_type != 'instructor_signature') AS present",
+          'SELECT EXISTS(SELECT 1 FROM media '
+          'WHERE file_type NOT IN ($placeholders)) AS present',
+          variables: kSignatureFileTypes.map(Variable.withString).toList(),
         )
         .getSingle();
     return row.read<int>('present') == 1;
@@ -1930,6 +1937,42 @@ class MediaRepository {
           hasRendition: row.read(rendition) != null,
         ),
     ];
+  }
+
+  /// SQLite's default bound-parameter ceiling is 999 on older builds; a
+  /// library backfill can queue far more rows than that.
+  static const int _labelChunk = 500;
+
+  /// A display label (file name, else caption) for each of [ids] that has
+  /// one. Ids with neither, or with no row, are absent.
+  ///
+  /// selectOnly projection, one query per chunk: the Transfers page names
+  /// every queued row, and hydrating a full MediaItem per row would drag the
+  /// imageData BLOB in for each and pin it in a provider cache.
+  Future<Map<String, String>> getDisplayLabels(Iterable<String> ids) async {
+    final all = ids.toSet().toList();
+    if (all.isEmpty) return const {};
+    final id = _db.media.id;
+    final name = _db.media.originalFilename;
+    final caption = _db.media.caption;
+    final labels = <String, String>{};
+    for (var start = 0; start < all.length; start += _labelChunk) {
+      final end = (start + _labelChunk).clamp(0, all.length);
+      final query = _db.selectOnly(_db.media)
+        ..addColumns([id, name, caption])
+        ..where(id.isIn(all.sublist(start, end)));
+      for (final row in await query.get()) {
+        final label = _firstNonBlank(row.read(name), row.read(caption));
+        if (label != null) labels[row.read(id)!] = label;
+      }
+    }
+    return labels;
+  }
+
+  static String? _firstNonBlank(String? first, String? second) {
+    if (first != null && first.isNotEmpty) return first;
+    if (second != null && second.isNotEmpty) return second;
+    return null;
   }
 
   /// Clears a stale thumb stamp (verify sweep reverse repair). Mirrors

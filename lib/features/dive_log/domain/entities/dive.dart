@@ -285,6 +285,36 @@ class Dive extends Equatable {
   /// Effective start time of the dive (entryTime if set, otherwise dateTime)
   DateTime get effectiveEntryTime => entryTime ?? dateTime;
 
+  /// Water type of the dive, falling back to the assigned site's (issue
+  /// #1427).
+  ///
+  /// [waterType] is snapped from the site when a site is assigned (see
+  /// `waterTypeAfterSiteAssign`), but dives logged or imported before that,
+  /// and dives whose site gained its water type later, still carry null. The
+  /// site's answer is the best one available for those, so displays and
+  /// statistics read this rather than [waterType]. A value the diver set on
+  /// the dive always wins: a site's water type is a default, not a fact about
+  /// every dive made there.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  WaterType? get effectiveWaterType => waterType ?? site?.waterType;
+
+  /// Entry method of the dive, falling back to the assigned site's (issue
+  /// #1427). The entry-method twin of [effectiveWaterType], with the same
+  /// reasoning: the site's value is snapped onto a dive when the site is
+  /// assigned (issue #1104), so only dives predating that, or whose site was
+  /// filled in later, are left without one.
+  ///
+  /// [exitMethod] has no such getter on purpose. Its snap-on-assign rule turns
+  /// on whether the diver has unlinked exit from entry, and that flag is dive
+  /// form state which is never persisted, so a read-time fallback cannot
+  /// reproduce it. See `entryExitAfterSiteAssign`.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  EntryMethod? get effectiveEntryMethod => entryMethod ?? site?.entryMethod;
+
   /// User-defined name, normalized for display: trimmed, with empty or
   /// whitespace-only values treated as unset (null). In-app writes never
   /// store such values, but synced rows from other writers can; display
@@ -996,20 +1026,18 @@ class DiveProfilePoint extends Equatable {
 /// Used for multi-tank dives with AI transmitters providing
 /// continuous pressure data for each tank
 class TankPressurePoint extends Equatable {
-  final String id;
   final String tankId;
   final int timestamp; // seconds from dive start
   final double pressure; // bar
 
   const TankPressurePoint({
-    required this.id,
     required this.tankId,
     required this.timestamp,
     required this.pressure,
   });
 
   @override
-  List<Object?> get props => [id, tankId, timestamp, pressure];
+  List<Object?> get props => [tankId, timestamp, pressure];
 }
 
 /// Tank configuration for a dive

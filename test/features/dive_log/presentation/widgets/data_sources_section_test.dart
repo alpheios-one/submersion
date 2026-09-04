@@ -1352,4 +1352,87 @@ void main() {
       expect(find.text('Shearwater Perdix'), findsOneWidget);
     });
   });
+
+  group('Separate combined dives', () {
+    testWidgets('hides Separate when onSeparate is null', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          child: SingleChildScrollView(
+            child: DataSourcesSection(
+              dataSources: [_makeSource()],
+              diveCreatedAt: DateTime(2026, 3, 20, 10, 0),
+              diveId: 'dive-1',
+              units: _units,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Separate combined dives'), findsNothing);
+    });
+
+    testWidgets('offers Separate on a single-card combined dive', (
+      tester,
+    ) async {
+      // The repro of issue #1504: two file imports combined collapse to one
+      // display source, so the per-source Split is gone. Separate is a
+      // section-level action and does not depend on the source count.
+      var separated = 0;
+
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          child: SingleChildScrollView(
+            child: DataSourcesSection(
+              dataSources: [_makeSource(computerId: null)],
+              diveCreatedAt: DateTime(2026, 3, 20, 10, 0),
+              diveId: 'dive-1',
+              units: _units,
+              onSeparate: () => separated++,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Separate combined dives'), findsOneWidget);
+      await tester.tap(find.text('Separate combined dives'));
+      await tester.pumpAndSettle();
+
+      expect(separated, 1);
+    });
+
+    testWidgets('shows Separate alongside Compare in 3D on a multi-source '
+        'dive', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          child: SingleChildScrollView(
+            child: DataSourcesSection(
+              dataSources: [
+                _makeSource(),
+                _makeSource(
+                  id: 'src-2',
+                  computerId: 'comp-2',
+                  isPrimary: false,
+                  computerModel: 'Shearwater Teric',
+                ),
+              ],
+              diveCreatedAt: DateTime(2026, 3, 20, 10, 0),
+              diveId: 'dive-1',
+              units: _units,
+              onSeparate: () {},
+              onCompareIn3d: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Compare in 3D'), findsOneWidget);
+      expect(find.text('Separate combined dives'), findsOneWidget);
+    });
+  });
 }

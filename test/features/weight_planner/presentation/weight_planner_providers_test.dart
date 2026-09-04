@@ -127,6 +127,7 @@ void main() {
           (ref) async => const [suitItem, leadItem],
         ),
         latestDiverWeightProvider.overrideWith((ref) async => entry),
+        latestDiverHeightProvider.overrideWith((ref) async => null),
       ],
     );
     addTearDown(c.dispose);
@@ -187,6 +188,7 @@ void main() {
         ),
         allEquipmentProvider.overrideWith((ref) async => const [suitItem]),
         latestDiverWeightProvider.overrideWith((ref) async => entry),
+        latestDiverHeightProvider.overrideWith((ref) async => null),
       ],
     );
     addTearDown(c2.dispose);
@@ -258,5 +260,42 @@ void main() {
     // The excluded lead item contributes nothing; suit + tank dominate.
     expect(prediction!.totalKg, greaterThan(4.0));
     expect(prediction.supportingDives, 12);
+  });
+
+  test('weightCalibrationProvider carries the profile height into the '
+      'model', () async {
+    final base = await getBaseOverrides();
+    final c = ProviderContainer(
+      overrides: [
+        ...base,
+        weightObservationsProvider.overrideWith((ref) async => observations()),
+        allEquipmentProvider.overrideWith(
+          (ref) async => const [suitItem, leadItem],
+        ),
+        latestDiverWeightProvider.overrideWith((ref) async => entry),
+        latestDiverHeightProvider.overrideWith((ref) async => 165.0),
+      ],
+    );
+    addTearDown(c.dispose);
+    final model = await c.read(weightCalibrationProvider.future);
+    expect(model.heightCm, 165.0);
+    final prediction = model.predict(
+      RigSpec(
+        gear: [gearFeatureFor(suitItem)!],
+        tanks: const [
+          TankSpec(
+            presetName: 'al80',
+            volumeL: 11.1,
+            workingPressureBar: 207,
+            material: TankMaterial.aluminum,
+          ),
+        ],
+        waterType: WaterType.salt,
+        bodyWeightKg: 80,
+      ),
+    );
+    final term = prediction.terms.singleWhere((t) => t.label == 'bmi');
+    expect(term.source, TermSource.bodyComposition);
+    expect(term.kg, greaterThan(0.5));
   });
 }

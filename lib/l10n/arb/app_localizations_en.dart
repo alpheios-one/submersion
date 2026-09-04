@@ -9,6 +9,20 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get settings_oauth_connect_browserFailed =>
+      'Could not open your browser. Use Copy link and paste the address into your browser.';
+
+  @override
+  String get settings_oauth_connect_copyFailed => 'Could not copy the link.';
+
+  @override
+  String get settings_oauth_connect_copyLink => 'Copy link';
+
+  @override
+  String get settings_oauth_connect_linkCopied =>
+      'Link copied. Paste it into your browser to authorize.';
+
+  @override
   String get universalImport_action_importFromGarmin =>
       'Import from Garmin Device';
 
@@ -1272,9 +1286,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buddies_label_notSpecified => 'Not specified';
-
-  @override
-  String get buddies_label_photoComingSoon => 'Photo support coming in v2.0';
 
   @override
   String get buddies_message_added => 'Buddy added successfully';
@@ -2566,6 +2577,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get common_action_cancel => 'Cancel';
 
   @override
+  String get common_action_clearRating => 'Clear rating';
+
+  @override
   String get common_action_close => 'Close';
 
   @override
@@ -3141,6 +3155,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String dashboard_gauges_gearOverdueMore(int count) {
+    return '+$count more overdue';
+  }
+
+  @override
   String get dashboard_gauges_insuranceOk => 'Insurance OK';
 
   @override
@@ -3351,9 +3370,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboard_gauges_retry => 'Status unavailable - tap to retry';
-
-  @override
-  String get dashboard_urgent_title => 'Needs attention';
 
   @override
   String get dashboard_media_title => 'Recent media';
@@ -4430,42 +4446,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_consolidate_undone => 'Merge undone';
 
   @override
-  String diveLog_mergeDialog_confirmSubtitle(String time) {
-    return 'Merging dive at $time into this dive.';
-  }
-
-  @override
-  String get diveLog_mergeDialog_confirmTitle => 'Confirm merge';
-
-  @override
-  String get diveLog_mergeDialog_empty => 'No other dives found on this day.';
-
-  @override
-  String get diveLog_mergeDialog_explanation =>
-      'This dive\'s profile, tanks, pressures, events, tags, buddies, and sightings will be folded into this dive as an additional computer source. This action can be reversed with \'Unlink computer\'.';
-
-  @override
-  String diveLog_mergeDialog_loadError(String error) {
-    return 'Error loading dives: $error';
-  }
-
-  @override
-  String get diveLog_mergeDialog_merge => 'Merge';
-
-  @override
-  String get diveLog_mergeDialog_next => 'Next';
-
-  @override
-  String get diveLog_mergeDialog_subtitle =>
-      'Select a dive from the same day to merge as an additional computer.';
-
-  @override
-  String get diveLog_mergeDialog_title => 'Merge with another dive';
-
-  @override
-  String get diveLog_mergeDialog_whatThisDoes => 'What this does';
-
-  @override
   String get diveLog_computerSheet_description =>
       'Select which computer\'s profile to edit from.';
 
@@ -4829,7 +4809,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_section_equipment => 'Equipment';
 
   @override
-  String get diveLog_detail_section_marineLife => 'Marine Life';
+  String get diveLog_detail_section_marineLife => 'Species';
 
   @override
   String diveLog_detail_sightingPhotos(int count) {
@@ -5154,7 +5134,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_edit_noEquipmentSelected => 'No equipment selected';
 
   @override
-  String get diveLog_edit_noMarineLife => 'No marine life logged';
+  String get diveLog_edit_noMarineLife => 'No species logged';
 
   @override
   String get diveLog_edit_notSpecified => 'Not specified';
@@ -5294,7 +5274,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_edit_section_exitTime => 'Exit Time';
 
   @override
-  String get diveLog_edit_section_marineLife => 'Marine Life';
+  String get diveLog_edit_section_marineLife => 'Species';
 
   @override
   String get diveLog_edit_section_notes => 'Notes';
@@ -6200,8 +6180,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add depth range, difficulty or rating';
 
   @override
-  String get diveSites_edit_invite_lifeNotes =>
-      'Add marine life, notes or sharing';
+  String get diveSites_edit_invite_lifeNotes => 'Add species, notes or sharing';
 
   @override
   String get diveSites_edit_invite_location => 'Add GPS position or altitude';
@@ -7099,6 +7078,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_search_errorLoadingDiveTypes => 'Error loading dive types';
 
   @override
+  String get diveLog_search_errorLoadingEquipment => 'Error loading equipment';
+
+  @override
   String get diveLog_search_errorLoadingTrips => 'Error loading trips';
 
   @override
@@ -7124,6 +7106,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_search_label_durationRange => 'Duration Range (min)';
+
+  @override
+  String get diveLog_search_label_equipment => 'Equipment';
 
   @override
   String get diveLog_search_label_trip => 'Trip';
@@ -7251,7 +7236,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_speciesPicker_searchHint => 'Search species...';
 
   @override
-  String get diveLog_speciesPicker_title => 'Add Marine Life';
+  String get diveLog_speciesPicker_title => 'Add Species';
 
   @override
   String get diveLog_speciesPicker_tooltip_clearSearch => 'Clear search';
@@ -7591,6 +7576,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_sources_splitFailed => 'Split failed';
+
+  @override
+  String get diveLog_sources_menu_separate => 'Separate combined dives';
+
+  @override
+  String get diveLog_sources_separateDialog_title => 'Separate combined dives?';
+
+  @override
+  String diveLog_sources_separateDialog_body(int count) {
+    return 'This dive was combined from $count dives. Each one\'s profile, events, tanks and gas switches move back to its own dive. The rest of the logbook entry, including buddies, tags, equipment, media, notes and the dive number, stays on this dive.';
+  }
+
+  @override
+  String get diveLog_sources_separateDialog_confirm => 'Separate';
+
+  @override
+  String diveLog_sources_separateDone(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives restored',
+      one: '1 dive restored',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveLog_sources_separateFailed => 'Could not separate this dive';
 
   @override
   String get divePlanner_action_addTank => 'Add Tank';
@@ -8033,6 +8046,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_detail_section_difficultyLevel => 'Difficulty Level';
 
   @override
+  String get diveSites_detail_section_diveStatistics => 'Dive Statistics';
+
+  @override
   String get diveSites_detail_section_divesAtSite => 'Dives at this Site';
 
   @override
@@ -8046,6 +8062,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveSites_detail_section_rating => 'Rating';
+
+  @override
+  String get diveSites_detail_stats_avgDuration => 'Average Duration';
+
+  @override
+  String get diveSites_detail_stats_firstDive => 'First Dive';
+
+  @override
+  String get diveSites_detail_stats_lastDive => 'Last Dive';
+
+  @override
+  String get diveSites_detail_stats_longestDive => 'Longest Dive';
+
+  @override
+  String get diveSites_detail_stats_maxDepth => 'Deepest Dive';
+
+  @override
+  String get diveSites_detail_stats_minDepth => 'Shallowest Dive';
+
+  @override
+  String get diveSites_detail_stats_notAvailable => 'Not available';
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -8417,8 +8454,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_edit_section_difficultyLevel => 'Difficulty Level';
 
   @override
-  String get diveSites_edit_section_expectedMarineLife =>
-      'Expected Marine Life';
+  String get diveSites_edit_section_expectedMarineLife => 'Expected Species';
 
   @override
   String get diveSites_edit_section_gpsCoordinates => 'GPS Coordinates';
@@ -9567,12 +9603,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get divers_edit_updateButton => 'Update Diver';
 
   @override
-  String get divers_list_activeBadge => 'Active';
-
-  @override
-  String get divers_list_addDiverButton => 'Add Diver';
-
-  @override
   String get divers_list_addDiverTooltip => 'Add a new diver profile';
 
   @override
@@ -9611,28 +9641,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String divers_list_viewDiverLabel(Object name) {
     return 'View diver $name';
   }
-
-  @override
-  String get divers_summary_activeDiverTitle => 'Active Diver';
-
-  @override
-  String get divers_summary_otherDiversTitle => 'Other Divers';
-
-  @override
-  String get divers_summary_overviewTitle => 'Overview';
-
-  @override
-  String get divers_summary_quickActionsTitle => 'Quick Actions';
-
-  @override
-  String get divers_summary_subtitle =>
-      'Select a diver from the list to view details';
-
-  @override
-  String get divers_summary_title => 'Diver Profiles';
-
-  @override
-  String get divers_summary_totalDiversLabel => 'Total Divers';
 
   @override
   String divers_detail_deleteDialogConfirmHint(String name) {
@@ -10275,6 +10283,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_sortField_fileSize => 'File Size';
+
+  @override
+  String get enum_sortField_lastDive => 'Last Dive';
 
   @override
   String get enum_sortField_lastServiceDate => 'Last Service';
@@ -11120,6 +11131,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipment_list_emptyState_filterText_type(Object type) {
+    return '$type equipment';
+  }
+
+  @override
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'No $filterText';
   }
@@ -11127,6 +11143,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get equipment_list_emptyState_noStatusMatch =>
       'No equipment with this status';
+
+  @override
+  String get equipment_list_emptyState_noTypeMatch =>
+      'No equipment in this category';
 
   @override
   String get equipment_list_emptyState_serviceDueUpToDate =>
@@ -11141,10 +11161,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_list_filterAll => 'All Equipment';
 
   @override
-  String get equipment_list_filterLabel => 'Filter:';
+  String get equipment_list_filterServiceDue => 'Service Due';
 
   @override
-  String get equipment_list_filterServiceDue => 'Service Due';
+  String get equipment_list_typeFilterAll => 'All Types';
+
+  @override
+  String get equipment_list_filterTooltip => 'Filter equipment';
+
+  @override
+  String get equipment_list_activeFilter_clear => 'Clear';
+
+  @override
+  String get equipment_filter_title => 'Filter Equipment';
+
+  @override
+  String get equipment_filter_clearAll => 'Clear All';
+
+  @override
+  String get equipment_filter_apply => 'Apply Filters';
+
+  @override
+  String get equipment_filter_cancel => 'Cancel';
+
+  @override
+  String get equipment_filter_section_status => 'Status';
+
+  @override
+  String get equipment_filter_section_category => 'Category';
 
   @override
   String get equipment_list_retryButton => 'Retry';
@@ -12281,7 +12325,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marineLife_siteSection_noExpected => 'No expected species added';
 
   @override
-  String get marineLife_siteSection_noSpotted => 'No marine life spotted yet';
+  String get marineLife_siteSection_noSpotted => 'No species spotted yet';
 
   @override
   String marineLife_siteSection_spottedCountSemantics(
@@ -12295,7 +12339,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marineLife_siteSection_spottedHere => 'Spotted Here';
 
   @override
-  String get marineLife_siteSection_title => 'Marine Life';
+  String get marineLife_siteSection_title => 'Species';
 
   @override
   String get marineLife_speciesDetail_backTooltip => 'Back';
@@ -12744,7 +12788,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marineLife_speciesPage_emptyHint =>
-      'Marine life sightings added to a dive will show up here.';
+      'Species sightings added to a dive will show up here.';
 
   @override
   String get marineLife_speciesPage_noMatch => 'No species match your search';
@@ -13438,10 +13482,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Dive data written to photo';
 
   @override
-  String get media_photoViewer_diveDataWrittenToVideo =>
-      'Dive data written to video';
-
-  @override
   String media_photoViewer_errorLoadingPhotos(Object error) {
     return 'Error loading photos: $error';
   }
@@ -13604,17 +13644,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The following metadata will be written to the photo:';
 
   @override
-  String get media_writeMetadata_descriptionVideo =>
-      'The following metadata will be written to the video:';
-
-  @override
   String get media_writeMetadata_diveTimeLabel => 'Dive time';
 
   @override
   String get media_writeMetadata_gpsLabel => 'GPS';
-
-  @override
-  String get media_writeMetadata_keepOriginalVideo => 'Keep original video';
 
   @override
   String get media_writeMetadata_livePhotoUnsupported =>
@@ -13634,15 +13667,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_writeMetadata_titlePhoto => 'Write Dive Data to Photo';
 
   @override
-  String get media_writeMetadata_titleVideo => 'Write Dive Data to Video';
+  String get media_writeMetadata_videoUnsupported =>
+      'Dive data can only be written to photos, not videos.';
 
   @override
   String get media_writeMetadata_warningPhotoText =>
       'This will modify the original photo.';
-
-  @override
-  String get media_writeMetadata_warningVideoText =>
-      'A new video will be created with the metadata. Video metadata cannot be modified in-place.';
 
   @override
   String get media_writeMetadata_writeButton => 'Write';
@@ -14004,6 +14034,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nav_sites => 'Sites';
+
+  @override
+  String get nav_species => 'Species';
 
   @override
   String get nav_statistics => 'Statistics';
@@ -14592,18 +14625,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_diveDetailSections_fixedSections =>
-      'Fixed sections: Header, Dive Profile Chart';
+      'Fixed section: Header';
 
   @override
   String get settings_diveDetailSections_configurableSections =>
       'Configurable sections (drag to reorder)';
 
   @override
-  String get diveDetailSection_decoO2_name => 'Deco Status / Tissue Loading';
+  String get diveDetailSection_profile_name => 'Dive Profile';
 
   @override
-  String get diveDetailSection_decoO2_description =>
-      'NDL, ceiling, tissue heat map, O2 toxicity';
+  String get diveDetailSection_profile_description =>
+      'Depth/time chart, playback, range selection';
+
+  @override
+  String get diveDetailSection_decoStatus_name => 'Deco Status';
+
+  @override
+  String get diveDetailSection_decoStatus_description =>
+      'NDL, ceiling, stops, O2 toxicity';
+
+  @override
+  String get diveDetailSection_tissueLoading_name => 'Tissue Loading';
+
+  @override
+  String get diveDetailSection_tissueLoading_description =>
+      'Per-compartment saturation and heat map';
+
+  @override
+  String get diveLog_detail_displayOptions_tooltip => 'Display options';
+
+  @override
+  String get diveLog_detail_displayOptions_layout => 'Layout';
+
+  @override
+  String get diveLog_detail_displayOptions_sections => 'Sections';
+
+  @override
+  String get diveLog_detail_displayOptions_showAll => 'Show all sections';
+
+  @override
+  String get diveLog_detail_displayOptions_reorder => 'Reorder sections...';
+
+  @override
+  String get diveDetailLayout_detailed => 'Detailed';
+
+  @override
+  String get diveDetailLayout_list => 'List';
 
   @override
   String get diveDetailSection_safetyReview_name => 'Safety Review';
@@ -15079,7 +15147,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Equipment used in dive';
 
   @override
-  String get diveDetailSection_sightings_name => 'Marine Life Sightings';
+  String get diveDetailSection_sightings_name => 'Species Sightings';
 
   @override
   String get diveDetailSection_sightings_description =>
@@ -15581,6 +15649,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
 
   @override
+  String settings_cloudSync_peerReadFailed_banner(Object deviceList) {
+    return 'Changes from $deviceList could not be read during the last sync, so they were not merged. The next sync will retry automatically.';
+  }
+
+  @override
+  String settings_cloudSync_peerReadFailed_bannerPlural(Object deviceList) {
+    return 'Changes from $deviceList could not be read during the last sync, so they were not merged. The next sync will retry automatically.';
+  }
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_bannerNamed(Object deviceList) {
     return '$deviceList syncs from a newer version of Submersion, so its latest changes are held for now.';
   }
@@ -15618,10 +15696,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_cloudSync_dropbox_account_title => 'Dropbox account';
-
-  @override
-  String get settings_cloudSync_dropbox_connect_browserFailed =>
-      'Could not open your browser. Try the Reopen browser button.';
 
   @override
   String get settings_cloudSync_dropbox_connect_codeLabel =>
@@ -16349,25 +16423,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_import_cancelling => 'Cancelling...';
 
   @override
-  String get settings_import_dialog_title => 'Importing Data';
-
-  @override
-  String get settings_import_doNotClose => 'Please do not close the app';
-
-  @override
-  String settings_import_itemCount(Object current, Object total) {
-    return '$current of $total';
-  }
-
-  @override
   String get settings_import_phase_buddies => 'Importing buddies...';
 
   @override
   String get settings_import_phase_certifications =>
       'Importing certifications...';
-
-  @override
-  String get settings_import_phase_complete => 'Finalizing...';
 
   @override
   String get settings_import_phase_diveCenters => 'Importing dive centers...';
@@ -16386,9 +16446,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Importing equipment sets...';
 
   @override
-  String get settings_import_phase_parsing => 'Parsing file...';
-
-  @override
   String get settings_import_phase_preparing => 'Preparing...';
 
   @override
@@ -16405,20 +16462,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_import_phase_applyingTags => 'Applying tags...';
-
-  @override
-  String settings_import_progressLabel(
-    Object phase,
-    Object current,
-    Object total,
-  ) {
-    return '$phase, $current of $total';
-  }
-
-  @override
-  String settings_import_progressPercent(Object percent) {
-    return 'Import progress: $percent percent';
-  }
 
   @override
   String get settings_language_appBar_title => 'Language';
@@ -16560,8 +16603,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_manage_species => 'Species';
 
   @override
-  String get settings_manage_species_subtitle =>
-      'Manage marine life species catalog';
+  String get settings_manage_species_subtitle => 'Manage the species catalog';
 
   @override
   String get settings_manage_tags => 'Tags';
@@ -17417,6 +17459,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signatures_error_enterSignerName => 'Please enter the signer name';
 
   @override
+  String get signatures_error_saveFailed =>
+      'Could not save the signature. Please try again.';
+
+  @override
   String get signatures_field_instructorName => 'Instructor Name';
 
   @override
@@ -17497,7 +17543,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_category_marineLife_subtitle => 'Species sightings';
 
   @override
-  String get statistics_category_marineLife_title => 'Marine Life';
+  String get statistics_category_marineLife_title => 'Species';
 
   @override
   String get statistics_category_overview_title => 'Overview';
@@ -17836,7 +17882,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_listContent_selectedSuffix => ', selected';
 
   @override
-  String get statistics_marineLife_appBar_title => 'Marine Life';
+  String get statistics_marineLife_appBar_title => 'Species';
 
   @override
   String get statistics_marineLife_bestSites_empty => 'No site data';
@@ -17859,8 +17905,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get statistics_marineLife_bestSites_title =>
-      'Best Sites for Marine Life';
+  String get statistics_marineLife_bestSites_title => 'Best Sites';
 
   @override
   String get statistics_marineLife_mostCommon_empty => 'No sighting data';
@@ -18761,6 +18806,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Importing photos needs a folder on this device\'s disk. Run this import on a computer to include them. Dives and sites import normally.';
 
   @override
+  String importWizard_photos_bundledCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos bundled in the archive',
+      one: '1 photo bundled in the archive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get importWizard_photos_chooseDestination =>
+      'Choose where to save photos...';
+
+  @override
+  String get importWizard_photos_destinationNote =>
+      'The photos are saved to this folder and linked from there. Submersion never keeps its own copy.';
+
+  @override
+  String get importWizard_photos_destinationUnwritable =>
+      'That folder can\'t be written to. Choose another one.';
+
+  @override
   String importWizard_review_olderDivesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -19429,13 +19497,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transfer_section_exportSubtitle => 'CSV, UDDF, PDF logbook';
 
   @override
-  String get transfer_section_exportTitle => 'Export';
+  String get transfer_section_exportTitle => 'File Export';
 
   @override
   String get transfer_section_importSubtitle => 'CSV, UDDF files';
 
   @override
-  String get transfer_section_importTitle => 'Import';
+  String get transfer_section_importTitle => 'File Import';
 
   @override
   String get transfer_summary_description => 'Import and export dive data';
@@ -20438,6 +20506,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'This format is not yet supported. Please export as UDDF or CSV.';
 
   @override
+  String get universalImport_error_duplicateCheckFailed =>
+      'Duplicate detection could not run, so nothing in this list is marked as already in your logbook. Check it before importing.';
+
+  @override
+  String get universalImport_error_noColumnsToMap =>
+      'This file has no columns to map. Go back and select the file again, or choose a different source.';
+
+  @override
+  String universalImport_error_stepFailed(Object details) {
+    return 'Import could not continue: $details';
+  }
+
+  @override
   String get universalImport_label_columnMapping => 'Column Mapping';
 
   @override
@@ -20617,11 +20698,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String universalImport_semantics_sourceUncertain(Object description) {
     return 'Source uncertain: $description';
-  }
-
-  @override
-  String universalImport_semantics_toggleSelection(Object name) {
-    return 'Toggle selection for $name';
   }
 
   @override
@@ -21149,6 +21225,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'No USB serial ports found. Is the dive computer connected and powered on?';
 
   @override
+  String diveComputer_download_noUsbDeviceFound(Object model) {
+    return 'No $model found over USB. Is it connected to this computer and powered on?';
+  }
+
+  @override
   String get diveComputer_download_stalePairing =>
       'This dive computer\'s Bluetooth pairing is out of date. Forget the dive computer in your device\'s Bluetooth settings, then pair it again from the dive computer\'s Bluetooth menu.';
 
@@ -21329,29 +21410,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveComputer_pinCode_title => 'PIN Code Required';
-
-  @override
-  String get diveComputer_pinEntry_connectButton => 'Connect';
-
-  @override
-  String get diveComputer_pinEntry_helperText =>
-      'Enter the 4-6 digit PIN shown on your device';
-
-  @override
-  String get diveComputer_pinEntry_instructionsGeneric =>
-      'Check your dive computer display for the PIN code.';
-
-  @override
-  String diveComputer_pinEntry_instructionsWithDevice(String deviceName) {
-    return 'Check your $deviceName display for the PIN code.';
-  }
-
-  @override
-  String get diveComputer_pinEntry_semanticLabel =>
-      'PIN code entry, 4 to 6 digits';
-
-  @override
-  String get diveComputer_pinEntry_title => 'Enter PIN Code';
 
   @override
   String diveComputer_scan_bluetoothSemanticLabel(String name) {
@@ -22193,6 +22251,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'That file has a position or timestamp this app cannot read.';
 
   @override
+  String get gpsTrack_importError_tooLarge =>
+      'That file has too many positions to store as one track. Split it into shorter tracks and import them separately.';
+
+  @override
   String get gpsTrack_export_saved => 'Track saved';
 
   @override
@@ -22362,6 +22424,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String maps_offline_deleteRegionLegacyMessage(Object name) {
+    return 'Delete \"$name\"?\n\nThis region was downloaded by an earlier version, so its tiles are stored together with other regions\' and cannot be freed on their own. Deleting it will not reclaim storage.';
+  }
+
+  @override
   String maps_offline_deleteRegionMessage(
     Object name,
     Object count,
@@ -22452,6 +22519,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maps_offline_size => 'Size';
+
+  @override
+  String get maps_offline_sizeUnknown => 'Unknown';
 
   @override
   String get maps_offline_tiles => 'Tiles';
@@ -23473,6 +23543,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_mediaStorage_saved => 'Media store connected';
 
   @override
+  String get settings_mediaStorage_error_notReady =>
+      'The cloud storage could not be read yet. Wait a moment and try connecting again.';
+
+  @override
   String get settings_mediaStorage_action_disconnect => 'Disconnect';
 
   @override
@@ -23518,6 +23592,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Failed';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_title =>
+      'Transfers paused';
+
+  @override
+  String get settings_mediaStorage_transfers_suspended_subtitle =>
+      'This device and the cloud store no longer agree on which store is in use. Reconnecting media storage adopts the store the cloud holds now.';
 
   @override
   String settings_mediaStorage_transfers_queued(int count) {
@@ -23718,6 +23800,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tools_weight_bmiHelper(String bmi) {
+    return 'BMI $bmi. A higher BMI usually means more buoyant tissue and a little more lead.';
+  }
+
+  @override
+  String get tools_weight_bmiTerm => 'Body composition';
+
+  @override
   String get tools_weight_breakdownTitle => 'How this was calculated';
 
   @override
@@ -23735,6 +23825,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get tools_weight_heightOptional => 'Height (optional)';
+
+  @override
   String get tools_weight_noGear =>
       'Add the gear you plan to dive to personalize the prediction.';
 
@@ -23749,6 +23842,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tools_weight_saveToProfile => 'Save weight to profile';
+
+  @override
+  String get tools_weight_source_bodyComposition => 'estimated from BMI';
 
   @override
   String get tools_weight_source_measured => 'measured from your dives';
@@ -33249,14 +33345,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Video thumbnail. Tap to view full screen';
 
   @override
-  String get trips_gallery_thumbnail_photoMissing =>
-      'Photo thumbnail, missing from device. Tap to view full screen';
-
-  @override
-  String get trips_gallery_thumbnail_videoMissing =>
-      'Video thumbnail, missing from device. Tap to view full screen';
-
-  @override
   String get trips_photos_thumbnail_photo =>
       'Photo thumbnail. Tap to open gallery';
 
@@ -33364,6 +33452,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get autoUpdate_banner_download => 'Download';
+
+  @override
+  String autoUpdate_banner_packageManagerHint(String command) {
+    return 'Update with: $command';
+  }
 
   @override
   String get settings_cloudSync_provider_icloud_subtitle =>
@@ -34619,6 +34712,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_progress_downloadingLibrary(
+    int downloaded,
+    int total,
+  ) {
+    return 'Downloading library ($downloaded of $total)';
+  }
+
+  @override
+  String settings_cloudSync_progress_importingLibrary(int percent) {
+    return 'Importing library ($percent%)';
+  }
+
+  @override
   String get settings_cloudSync_result_noProvider =>
       'No cloud provider configured';
 
@@ -35199,4 +35305,438 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveLog_edit_statisticsIncludedHint =>
       'Counted in every statistic';
+
+  @override
+  String get suuntoCloud_signIn_title => 'Sign in to Suunto';
+
+  @override
+  String get suuntoCloud_signIn_description =>
+      'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+
+  @override
+  String get suuntoCloud_signIn_emailLabel => 'Email';
+
+  @override
+  String get suuntoCloud_signIn_emailRequired => 'Email is required';
+
+  @override
+  String get suuntoCloud_signIn_passwordLabel => 'Password';
+
+  @override
+  String get suuntoCloud_signIn_passwordRequired => 'Password is required';
+
+  @override
+  String get suuntoCloud_signIn_button => 'Sign In';
+
+  @override
+  String get suuntoCloud_signIn_signingIn => 'Signing in…';
+
+  @override
+  String suuntoCloud_signIn_signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get suuntoCloud_fetch_listing => 'Listing dives…';
+
+  @override
+  String suuntoCloud_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Listing dives… ($count found so far)',
+      one: 'Listing dives… (1 found so far)',
+      zero: 'Listing dives…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_fetchingDiveOf(int current, int total) {
+    return 'Fetching dive $current of $total…';
+  }
+
+  @override
+  String get suuntoCloud_fetch_failedTitle => 'Could not fetch dives';
+
+  @override
+  String get suuntoCloud_fetch_retry => 'Try Again';
+
+  @override
+  String get suuntoCloud_fetch_loadMore => 'Load More';
+
+  @override
+  String suuntoCloud_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count dives',
+      one: 'Found 1 dive',
+      zero: 'No dives found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String suuntoCloud_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives could not be converted and were skipped.',
+      one: '1 dive could not be converted and was skipped.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_signIn_title => 'Sign in to Garmin Connect';
+
+  @override
+  String get garminConnect_signIn_description =>
+      'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+
+  @override
+  String get garminConnect_signIn_emailLabel => 'Email';
+
+  @override
+  String get garminConnect_signIn_emailRequired => 'Email is required';
+
+  @override
+  String get garminConnect_signIn_passwordLabel => 'Password';
+
+  @override
+  String get garminConnect_signIn_passwordRequired => 'Password is required';
+
+  @override
+  String get garminConnect_signIn_button => 'Sign In';
+
+  @override
+  String get garminConnect_signIn_signingIn => 'Signing in…';
+
+  @override
+  String garminConnect_signIn_signedInAs(String email) {
+    return 'Signed in as $email';
+  }
+
+  @override
+  String get garminConnect_mfa_title => 'Verification Required';
+
+  @override
+  String garminConnect_mfa_description(String method) {
+    return 'Enter the verification code sent to your $method.';
+  }
+
+  @override
+  String get garminConnect_mfa_codeLabel => 'Verification Code';
+
+  @override
+  String get garminConnect_mfa_codeRequired => 'Verification code is required';
+
+  @override
+  String get garminConnect_mfa_button => 'Verify';
+
+  @override
+  String get garminConnect_mfa_submitting => 'Verifying…';
+
+  @override
+  String get garminConnect_fetch_listing => 'Listing dives…';
+
+  @override
+  String garminConnect_fetch_listingFound(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Listing dives… ($count found so far)',
+      one: 'Listing dives… (1 found so far)',
+      zero: 'Listing dives…',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_fetchingDiveOf(int current, int total) {
+    return 'Fetching dive $current of $total…';
+  }
+
+  @override
+  String get garminConnect_fetch_failedTitle => 'Could not fetch dives';
+
+  @override
+  String get garminConnect_fetch_retry => 'Try Again';
+
+  @override
+  String get garminConnect_fetch_loadMore => 'Load More';
+
+  @override
+  String garminConnect_fetch_foundDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Found $count dives',
+      one: 'Found 1 dive',
+      zero: 'No dives found',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String garminConnect_fetch_someFailed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives could not be converted and were skipped.',
+      one: '1 dive could not be converted and was skipped.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get garminConnect_fetch_fetchAll => 'Fetch All';
+
+  @override
+  String get importWizard_review_sortTooltip => 'Sort';
+
+  @override
+  String get importWizard_review_sortByDate => 'Date';
+
+  @override
+  String get importWizard_review_sortByDepth => 'Depth';
+
+  @override
+  String get importWizard_review_sortByDuration => 'Time';
+
+  @override
+  String get transfer_importCloud_suuntoTitle => 'Suunto';
+
+  @override
+  String get transfer_importCloud_suuntoSubtitle =>
+      'Import dives from your Suunto app / app.suunto.com account';
+
+  @override
+  String get transfer_importCloud_garminTitle => 'Garmin';
+
+  @override
+  String get transfer_importCloud_garminSubtitle =>
+      'Import dives from your Garmin Connect account';
+
+  @override
+  String get transfer_section_cloudTitle => 'Cloud';
+
+  @override
+  String get transfer_section_cloudSubtitle => 'Import from cloud';
+
+  @override
+  String get settings_storageUsage_appBar_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_title => 'Storage Usage';
+
+  @override
+  String get settings_storageUsage_tile_subtitle =>
+      'See what is using space on this device';
+
+  @override
+  String get settings_storageUsage_total => 'Total';
+
+  @override
+  String get settings_storageUsage_totalPartial => 'Total so far';
+
+  @override
+  String get settings_storageUsage_refresh_tooltip => 'Recalculate';
+
+  @override
+  String get settings_storageUsage_unavailable => 'Not available';
+
+  @override
+  String get settings_storageUsage_measureFailed => 'Could not measure';
+
+  @override
+  String get settings_storageUsage_group_appData => 'App Data';
+
+  @override
+  String get settings_storageUsage_group_mediaCache => 'Media Cache';
+
+  @override
+  String get settings_storageUsage_group_caches => 'Caches';
+
+  @override
+  String get settings_storageUsage_group_backups => 'Backups';
+
+  @override
+  String get settings_storageUsage_group_temporary => 'Temporary Files';
+
+  @override
+  String get settings_storageUsage_group_exports => 'Exported Files';
+
+  @override
+  String get settings_storageUsage_category_database => 'Dive log database';
+
+  @override
+  String get settings_storageUsage_category_localCache =>
+      'Local cache database';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheOriginals =>
+      'Original photos and videos';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheThumbs => 'Thumbnails';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheRenditions =>
+      'Video renditions';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheStaging =>
+      'Staged transfers';
+
+  @override
+  String get settings_storageUsage_category_mediaCacheTranscode =>
+      'Transcoded video';
+
+  @override
+  String get settings_storageUsage_category_mapTiles => 'Map tiles';
+
+  @override
+  String get settings_storageUsage_category_networkImages => 'Network images';
+
+  @override
+  String get settings_storageUsage_category_videoThumbnails =>
+      'Video thumbnails';
+
+  @override
+  String get settings_storageUsage_category_pdfThumbnails =>
+      'Document thumbnails';
+
+  @override
+  String get settings_storageUsage_category_backups => 'Backup files';
+
+  @override
+  String get settings_storageUsage_category_temporary => 'Temporary files';
+
+  @override
+  String get settings_storageUsage_category_exports => 'Exported files';
+
+  @override
+  String get profilePhoto_sheet_title => 'Profile Photo';
+
+  @override
+  String get profilePhoto_source_camera => 'Take Photo';
+
+  @override
+  String get profilePhoto_source_library => 'Choose from Library';
+
+  @override
+  String get profilePhoto_source_file => 'Choose File';
+
+  @override
+  String get profilePhoto_source_contacts => 'Choose from Contacts';
+
+  @override
+  String get profilePhoto_action_remove => 'Remove Photo';
+
+  @override
+  String get profilePhoto_crop_title => 'Adjust Photo';
+
+  @override
+  String get profilePhoto_crop_hint => 'Drag to reposition, pinch to zoom';
+
+  @override
+  String get profilePhoto_error_tooLarge =>
+      'That image is too large to use. Try a smaller one.';
+
+  @override
+  String get profilePhoto_error_undecodable =>
+      'That file could not be read as an image.';
+
+  @override
+  String get profilePhoto_error_contactNoPhoto =>
+      'That contact does not have a photo.';
+
+  @override
+  String get profilePhoto_error_contactPermission =>
+      'Contacts permission is required to choose a photo.';
+
+  @override
+  String get diveComputer_merge_title => 'Merge Dive Computers';
+
+  @override
+  String diveComputer_merge_intro(int count) {
+    return '$count records will become one. Dives, profiles and download history move to the record you keep. The other records are deleted.';
+  }
+
+  @override
+  String get diveComputer_merge_keepLabel => 'Keep this record';
+
+  @override
+  String diveComputer_merge_serialLabel(String serial) {
+    return 'Serial $serial';
+  }
+
+  @override
+  String get diveComputer_merge_noSerial => 'No serial number';
+
+  @override
+  String diveComputer_merge_affectedDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives will move to the record you keep.',
+      one: '1 dive will move to the record you keep.',
+      zero: 'No dives are attached to the other records.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get diveComputer_merge_serialMismatchWarning =>
+      'These records report different serial numbers. They may be different physical computers.';
+
+  @override
+  String get diveComputer_merge_action => 'Merge';
+
+  @override
+  String diveComputer_merge_snackbar(int count, String name) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count records merged into $name',
+      one: '1 record merged into $name',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveComputer_merge_failed(String error) {
+    return 'Could not merge computers: $error';
+  }
+
+  @override
+  String get diveComputer_list_selection_mergeTooltip => 'Merge computers';
+
+  @override
+  String get diveComputer_detail_mergeMenu => 'Merge with another computer';
+
+  @override
+  String get diveComputer_detail_mergePickerTitle => 'Merge with';
+
+  @override
+  String get diveComputer_detail_mergePickerEmpty =>
+      'There are no other computers to merge with.';
+
+  @override
+  String get diveComputer_detail_mergePickerSameSerial => 'Same serial number';
+
+  @override
+  String diveComputer_detail_duplicateBanner(String name) {
+    return '$name reports the same serial number. It may be this computer saved twice.';
+  }
+
+  @override
+  String diveComputer_detail_duplicateBannerMultiple(int count) {
+    return '$count other saved records report the same serial number. They may be this computer saved more than once.';
+  }
+
+  @override
+  String get diveComputer_detail_duplicateBannerAction => 'Merge';
 }

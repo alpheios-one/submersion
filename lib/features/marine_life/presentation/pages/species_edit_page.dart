@@ -221,7 +221,7 @@ class _SpeciesEditPageState extends ConsumerState<SpeciesEditPage> {
       context,
       initialQuery: _commonNameController.text.trim(),
     );
-    if (result != null && mounted) _applyLookup(result);
+    if (result is SpeciesLookupChosen && mounted) _applyLookup(result.result);
   }
 
   /// Fills what the lookup knows and leaves the description alone; the
