@@ -123,6 +123,16 @@ secret material or create public infrastructure, so a person performs them.
 umask 077
 KEYDIR=$(mktemp -d)
 
+# gpg writes the generated secret key into its own home directory, not into
+# the file the export is redirected to, so GNUPGHOME is pointed inside KEYDIR.
+# Without this the private key persists in ~/.gnupg after the cleanup below
+# believes it has removed everything, and, worse, the KEYID lookup further
+# down would match any existing key for the same address, so the export could
+# quietly produce the wrong key and the repository would be signed by it.
+export GNUPGHOME="$KEYDIR/gnupg"
+mkdir -p "$GNUPGHOME"
+chmod 700 "$GNUPGHOME"
+
 # tr -d: command substitution strips the trailing newline from the argument,
 # but the file is what becomes the LINUX_REPO_GPG_PASSPHRASE secret. The
 # stored passphrase would then not match the one the key was created with,
@@ -154,8 +164,10 @@ echo "Key material is in $KEYDIR"
 ```
 
 Expected: `$KEYDIR/submersion.gpg` is a binary keyring, and
-`gpg --show-keys "$KEYDIR/submersion.gpg"` prints the key. Confirm the
-directory is private with `ls -ld "$KEYDIR"`, which must show `drwx------`.
+`gpg --show-keys "$KEYDIR/submersion.gpg"` prints one key. Confirm the
+directory is private with `ls -ld "$KEYDIR"`, which must show `drwx------`,
+and confirm the isolation held with `gpg --list-secret-keys`, which must list
+exactly the key just generated and nothing from your personal keyring.
 
 - [ ] **Step 2: Store the secrets**
 
@@ -168,7 +180,25 @@ In `submersion-app/linux-packages`: the same two secrets, for metadata signing.
 In `submersion-app/submersion`: `LINUX_REPO_DISPATCH_TOKEN`, a fine-grained PAT
 with Contents: write on `submersion-app/linux-packages` only.
 
-Then `shred -u "$KEYDIR"/repo-private.asc "$KEYDIR"/repo-pass && rmdir "$KEYDIR"`.
+Then shred the two secrets, which are now stored where they are needed:
+
+```bash
+# shred is GNU coreutils and is absent on macOS, where this procedure is most
+# likely to be run; rm -P is the BSD equivalent. On APFS, and on any SSD,
+# neither reliably overwrites the original blocks, so treat this as tidying
+# rather than secure erasure. The real protection is that these files only
+# ever existed inside a 0700 directory.
+if command -v shred > /dev/null 2>&1; then
+  shred -u "$KEYDIR/repo-private.asc" "$KEYDIR/repo-pass"
+else
+  rm -P "$KEYDIR/repo-private.asc" "$KEYDIR/repo-pass"
+fi
+```
+
+`$KEYDIR` itself stays until Step 4, because it still holds the public key that
+step commits, and the isolated `GNUPGHOME` inside it still holds the secret
+key. Do not `rmdir` it here: the directory is not empty, so that would fail,
+and it would destroy the public key before it has been copied anywhere.
 
 - [ ] **Step 3: Create the repository and point DNS at it**
 
@@ -183,9 +213,25 @@ The dearmored public key is committed to this repo at
 `scripts/release/linux_repo/site_assets/submersion.gpg`, because it is public by
 definition and the site must serve identical bytes on every rebuild.
 
+```bash
+cp "$KEYDIR/submersion.gpg" scripts/release/linux_repo/site_assets/submersion.gpg
+gpg --show-keys scripts/release/linux_repo/site_assets/submersion.gpg
+```
+
 Add a `### Linux Package Repository` section to
 `docs/developer/release-secrets-setup.md` recording all four secrets, which repo
 each lives in, the key fingerprint, and the rotation procedure.
+
+Only now remove the working directory, which also removes the isolated
+`GNUPGHOME` and with it the generated secret key:
+
+```bash
+rm -rf "$KEYDIR"
+unset GNUPGHOME
+```
+
+`rm -rf` rather than `rmdir`, because the directory holds the GnuPG home as
+well as the public key.
 
 - [ ] **Step 5: Commit**
 
