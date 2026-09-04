@@ -54,6 +54,9 @@ _NEEDS_BLOCK = re.compile(r"^    needs:" + _COMMENT)
 # captured list by greedy matching.
 _NEEDS_INLINE = re.compile(r"^    needs:\s*\[([^\]]*)\]" + _COMMENT)
 _NEEDS_ITEM = re.compile(r"^      - ([A-Za-z0-9_-]+)" + _COMMENT)
+# Captures the text before `run:` so its width gives the key's indent, which
+# is what delimits a block scalar's content from the next sibling key.
+_RUN_KEY = re.compile(r"^(\s*(?:-\s+)?)run:\s*(.*)$")
 
 
 def _job_lines(text):
@@ -110,16 +113,55 @@ def gate_needs(text):
     return None
 
 
-def gate_runs_guard(text):
-    """Return True if the gate job itself invokes this guard.
+def _strip_comment(value):
+    """Drop a trailing comment. ` #` starts one; a bare `#` inside a word does not."""
+    cut = value.find(" #")
+    return value if cut < 0 else value[:cut]
 
-    Scoped to the gate job's own body on purpose: finding the script anywhere
-    in the file would be satisfied by running it in a merely gated job, which
-    is the arrangement this check exists to reject.
+
+def _run_commands(body):
+    """Yield the shell text of every `run:` step in a job body.
+
+    Only text that actually executes: YAML comments never appear, and neither
+    do shell comment lines inside a `run: |` block. Both spellings are
+    covered, the inline `run: cmd` and the block scalar.
+    """
+    lines = list(body)
+    index = 0
+    while index < len(lines):
+        match = _RUN_KEY.match(lines[index])
+        index += 1
+        if not match:
+            continue
+        prefix, rest = match.group(1), match.group(2)
+        if not rest.startswith(("|", ">")):
+            yield _strip_comment(rest)
+            continue
+        # Block scalar: everything indented deeper than the `run` key itself.
+        key_indent = len(prefix)
+        while index < len(lines):
+            line = lines[index]
+            if line.strip() and len(line) - len(line.lstrip()) <= key_indent:
+                break
+            stripped = line.strip()
+            if stripped and not stripped.startswith("#"):
+                yield _strip_comment(stripped)
+            index += 1
+
+
+def gate_runs_guard(text):
+    """Return True if the gate job itself executes this guard.
+
+    Two scopes matter, and both are deliberate. The gate job's own body,
+    because finding the script anywhere in the file would be satisfied by
+    running it in a merely gated job, which is the arrangement this check
+    exists to reject. And `run:` text only, because a comment naming the
+    script is not an invocation: accepting one would let someone delete the
+    step, leave the documentation, and still be told the gate runs it.
     """
     for job_id, body in _job_lines(text):
         if job_id == GATE_JOB:
-            return any(GUARD_SCRIPT in line for line in body)
+            return any(GUARD_SCRIPT in cmd for cmd in _run_commands(body))
     return False
 
 
@@ -165,7 +207,13 @@ def check_file(path):
         violations = find_violations(fh.read())
     lines = [f"  FAIL  {v}" for v in violations]
     if not violations:
-        lines.append(f"  ok    every job reaches the {GATE_JOB} gate")
+        # "non-exempt" matters: EXEMPT_JOBS are allowed to stay outside the
+        # gate, so an unqualified "every job" would overstate the check.
+        exempt = ", ".join(sorted(EXEMPT_JOBS)) or "none"
+        lines.append(
+            f"  ok    every non-exempt job reaches the {GATE_JOB} gate "
+            f"(exempt: {exempt})"
+        )
     return not violations, lines
 
 

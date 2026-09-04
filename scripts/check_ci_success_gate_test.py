@@ -101,6 +101,37 @@ RED_GATE_DOES_NOT_RUN_GUARD = GREEN.replace(
     "      - run: python3 scripts/check_ci_success_gate.py\n", ""
 )
 
+# Deleting the step but leaving documentation behind must not read as running
+# it. A guard that accepts a mention of its own filename as proof of execution
+# is the false green it exists to prevent.
+RED_GATE_ONLY_MENTIONS_GUARD_IN_COMMENT = GREEN.replace(
+    "      - run: python3 scripts/check_ci_success_gate.py\n",
+    "      # we used to run scripts/check_ci_success_gate.py here\n",
+)
+
+# A shell comment inside a run block is equally non-executing.
+RED_GATE_MENTIONS_GUARD_IN_SHELL_COMMENT = GREEN.replace(
+    "      - run: python3 scripts/check_ci_success_gate.py\n",
+    """      - run: |
+          # scripts/check_ci_success_gate.py used to run here
+          echo done
+""",
+)
+
+# The inline spelling with a trailing YAML comment still genuinely runs it.
+GREEN_RUN_WITH_TRAILING_COMMENT = GREEN.replace(
+    "      - run: python3 scripts/check_ci_success_gate.py\n",
+    "      - run: python3 scripts/check_ci_success_gate.py  # self-hosting\n",
+)
+
+# So does the block-scalar spelling.
+GREEN_RUN_AS_BLOCK_SCALAR = GREEN.replace(
+    "      - run: python3 scripts/check_ci_success_gate.py\n",
+    """      - run: |
+          python3 scripts/check_ci_success_gate.py
+""",
+)
+
 
 class ParserTests(unittest.TestCase):
     def test_job_ids_skip_non_job_top_level_keys(self):
@@ -161,6 +192,24 @@ class GuardTests(unittest.TestCase):
     def test_gate_runs_guard_detects_the_step(self):
         self.assertTrue(guard.gate_runs_guard(GREEN))
         self.assertFalse(guard.gate_runs_guard(RED_GATE_DOES_NOT_RUN_GUARD))
+
+    def test_yaml_comment_mentioning_the_guard_does_not_count(self):
+        self.assertFalse(
+            guard.gate_runs_guard(RED_GATE_ONLY_MENTIONS_GUARD_IN_COMMENT)
+        )
+        violations = guard.find_violations(RED_GATE_ONLY_MENTIONS_GUARD_IN_COMMENT)
+        self.assertTrue(any(guard.GUARD_SCRIPT in v for v in violations))
+
+    def test_shell_comment_mentioning_the_guard_does_not_count(self):
+        self.assertFalse(
+            guard.gate_runs_guard(RED_GATE_MENTIONS_GUARD_IN_SHELL_COMMENT)
+        )
+
+    def test_inline_run_with_trailing_comment_counts(self):
+        self.assertTrue(guard.gate_runs_guard(GREEN_RUN_WITH_TRAILING_COMMENT))
+
+    def test_block_scalar_run_counts(self):
+        self.assertTrue(guard.gate_runs_guard(GREEN_RUN_AS_BLOCK_SCALAR))
 
     def test_guard_step_in_another_job_does_not_satisfy_the_gate(self):
         # Running it only in a gated job is the arrangement that cannot survive
@@ -228,6 +277,14 @@ class FileTests(unittest.TestCase):
     def test_check_file_ok(self):
         ok, _ = guard.check_file(self._write(GREEN))
         self.assertTrue(ok)
+
+    def test_pass_message_acknowledges_exemptions(self):
+        # EXEMPT_JOBS are allowed outside the gate, so a bare "every job
+        # reaches the gate" would overstate what was verified.
+        _, lines = guard.check_file(self._write(GREEN))
+        self.assertTrue(
+            any("non-exempt" in line for line in lines), lines
+        )
 
     def test_check_file_red(self):
         ok, _ = guard.check_file(self._write(RED_UNGATED_JOB))
