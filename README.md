@@ -334,6 +334,13 @@ The built app will be at `build\windows\x64\runner\Release\`.
 <details>
 <summary><b>Linux: installing</b></summary>
 
+> **Distro requirement:** Submersion needs glibc 2.38 or newer, which means
+> Ubuntu 24.04+, Debian 13+, Fedora 39+, Linux Mint 22+, Arch, or openSUSE
+> Tumbleweed. Debian 12, Ubuntu 22.04, and RHEL 9 cannot run any current
+> Submersion build. The packages install but the app will not start, and the
+> tarball fails the same way, because three bundled libraries require
+> GLIBC_2.38. Upgrading the distribution is the only path.
+
 **Debian, Ubuntu, Mint, and derivatives**
 
 Download `Submersion-<version>-Linux-amd64.deb` from
