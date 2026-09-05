@@ -48,9 +48,12 @@ class BlenderMixRow extends StatelessWidget {
   /// row's values are not persisted.
   final VoidCallback? onSave;
 
-  /// Shown under both the O2 and He fields when set. The two fractions are
-  /// only ever invalid together (negative, or summing past 100%), so there is
-  /// no single field to pin the message to.
+  /// Shown under both the O2 and He fields when set, and under neither the
+  /// pressure nor the price field. The two fractions are only ever invalid
+  /// together (negative, or summing past 100%), so there is no single field to
+  /// pin the message to -- but a pressure or a price has nothing to do with an
+  /// invalid mix, and repeating the message under those fields would only
+  /// suggest they need fixing too.
   final String? errorText;
 
   /// A price field for this row's gas, shown below the O2/He fields when set
@@ -163,16 +166,18 @@ class BlenderMixRow extends StatelessWidget {
     controller: o2Controller,
     label: '${context.l10n.gasCalculators_blender_o2} (%)',
     onChanged: (_) => onMix(),
+    errorText: errorText,
   );
 
   Widget _heField(BuildContext context) => _field(
     controller: heController,
     label: '${context.l10n.gasCalculators_blender_he} (%)',
     onChanged: (_) => onMix(),
+    errorText: errorText,
   );
 
-  /// Unlike [_field], this never shows [errorText]: an invalid O2/He mix has
-  /// nothing to do with the price the row's gas costs.
+  /// Like the pressure field, this never shows [errorText]: an invalid O2/He
+  /// mix has nothing to do with the price the row's gas costs.
   Widget _priceField(BuildContext context) {
     return TextField(
       controller: priceController,
@@ -189,10 +194,13 @@ class BlenderMixRow extends StatelessWidget {
     );
   }
 
+  /// [errorText] is passed in per field rather than read from the widget, so
+  /// that only the fields the message applies to carry it.
   Widget _field({
     required TextEditingController controller,
     required String label,
     required ValueChanged<String> onChanged,
+    String? errorText,
   }) {
     return TextField(
       controller: controller,
