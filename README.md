@@ -341,10 +341,17 @@ The built app will be at `build\windows\x64\runner\Release\`.
 > tarball fails the same way, because three bundled libraries require
 > GLIBC_2.38. Upgrading the distribution is the only path.
 
+> **Where the packages are today:** the `.deb` and `.rpm` ship with every beta
+> build at
+> [submersion-app/beta-builds](https://github.com/submersion-app/beta-builds/releases).
+> They reach the stable
+> [Releases page](https://github.com/submersion-app/submersion/releases) with
+> the next stable release; that page currently carries the tarball only.
+
 **Debian, Ubuntu, Mint, and derivatives**
 
-Download `Submersion-<version>-Linux-amd64.deb` from
-[Releases](https://github.com/submersion-app/submersion/releases), then:
+Download `Submersion-v<version>-Linux-amd64.deb` from
+[beta releases](https://github.com/submersion-app/beta-builds/releases), then:
 
 ```bash
 sudo apt install ./Submersion-*-Linux-amd64.deb
@@ -352,7 +359,8 @@ sudo apt install ./Submersion-*-Linux-amd64.deb
 
 **Fedora and RHEL**
 
-Download `Submersion-<version>-Linux-x86_64.rpm`, then:
+Download `Submersion-v<version>-Linux-x86_64.rpm` from the
+[beta releases](https://github.com/submersion-app/beta-builds/releases), then:
 
 ```bash
 sudo dnf install ./Submersion-*-Linux-x86_64.rpm
@@ -373,7 +381,7 @@ packages recommend but do not require.
 
 **Everything else (Arch, NixOS, and anyone who prefers not to install packages)**
 
-Download `Submersion-<version>-Linux.tar.gz`, unpack it, and run the included
+Download `Submersion-v<version>-Linux.tar.gz`, unpack it, and run the included
 installer:
 
 ```bash
