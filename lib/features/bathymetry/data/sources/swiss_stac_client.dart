@@ -54,11 +54,9 @@ class SwissStacCollectionNotFoundException implements Exception {
 /// Minimal client for the swisstopo STAC API (data.geo.admin.ch), scoped to
 /// looking up the swissBATHY3D asset covering one bounding box.
 ///
-/// [collectionIds] lists candidate collection IDs to try in order. The exact
-/// ID was confirmed externally as `ch.swisstopo.swissbathy3d` (see PR
-/// discussion), but a human with network access should verify this against
-/// the live API before this path ships to users, per the task's design
-/// decision to defend against an unexpected naming pattern.
+/// [collectionIds] lists candidate collection IDs to try in order. The primary
+/// ID is currently `ch.swisstopo.swissbathy3d`; additional IDs can be added if
+/// swisstopo changes naming in the future.
 class SwissStacClient {
   static const List<String> collectionIds = ['ch.swisstopo.swissbathy3d'];
 
