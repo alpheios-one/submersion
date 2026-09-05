@@ -65,6 +65,7 @@ jobs:
       FORK_REPO: alpheios-one/submersion
       UPSTREAM_REPO: submersion-app/submersion
       ISSUE_NUM: ${{ github.event.issue.number }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -93,15 +94,14 @@ jobs:
           fi
 
       # --- Ast 4: Link-Extraktion mit Fehlerbehandlung ---
-      - name: Upstream-Link aus Fork-Issue-Body extrahieren
+      - name: Upstream-Link aus Fork-Issue-Titel extrahieren
         id: extraktion
         if: steps.idempotenz.outputs.weiter == 'true'
         run: |
-          BODY=$(gh issue view "$ISSUE_NUM" --repo "$FORK_REPO" --json body -q .body)
-          UPSTREAM_NUM=$(echo "$BODY" | grep -oP "github\.com/${UPSTREAM_REPO}/issues/\K[0-9]+" | head -1)
+          UPSTREAM_NUM=$(echo "$ISSUE_TITLE" | grep -oP "github\.com/${UPSTREAM_REPO}/issues/\K[0-9]+" | head -1)
           if [ -z "$UPSTREAM_NUM" ]; then
             gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
-              --body "Fehler: Kein gültiger Link zu ${UPSTREAM_REPO} im Issue-Text gefunden. Erwartetes Format: volle URL https://github.com/${UPSTREAM_REPO}/issues/<nummer>. Abgebrochen, Label entfernt."
+              --body "Fehler: Kein gültiger Link zu ${UPSTREAM_REPO} im Issue-Titel gefunden. Erwartetes Format: voller Titel = volle URL https://github.com/${UPSTREAM_REPO}/issues/<nummer>. Abgebrochen, Label entfernt."
             gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
             echo "weiter=false" >> "$GITHUB_OUTPUT"
           else
