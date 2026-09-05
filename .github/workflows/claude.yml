@@ -4,6 +4,8 @@ on:
     types: [created]
   pull_request_review_comment:
     types: [created]
+  issues:
+    types: [labeled]
 jobs:
   claude:
     if: contains(github.event.comment.body, '@claude')
@@ -48,3 +50,42 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           claude_args: |
             --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(dart run:*),Bash(dart:*),Bash(git fetch:*),Bash(git remote:*),Bash(git merge:*),Bash(git rebase:*),Bash(git checkout:*),Bash(git switch:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git push:*),Bash(git rm:*),Bash(gh pr:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh issue close:*),WebFetch(domain:github.com)"
+
+  claude-phase1:
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'todo-ai'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.WORKFLOW_PAT }}
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/submersion-app/submersion.git || true
+          git fetch upstream main
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Dies ist Issue #${{ github.event.issue.number }}: "${{ github.event.issue.title }}"
+
+            Bitte NUR folgendes tun, keine Analyse, kein Code:
+            1. Branch von upstream/main (submersion-app/submersion) erstellen.
+               Namensschema: <typ>/issue-<nummer>-<kurzbeschreibung>, wobei <typ> sich aus
+               dem referenzierten Upstream-Issue ergibt (fix / feature / optimierung).
+               <nummer> ist die Nummer des referenzierten Upstream-Issues falls vorhanden,
+               sonst die Nummer dieses Fork-Issues (${{ github.event.issue.number }}).
+            2. Leeren Commit erstellen: git commit --allow-empty -m "Platzhalter für Issue #${{ github.event.issue.number }}"
+            3. Branch pushen
+            4. Leeren Pull Request öffnen mit Titel und kurzer Referenz auf Issue #${{ github.event.issue.number }},
+               PR-Beschrieb: "Platzhalter-PR, Analyse und Umsetzung folgen in separaten Aufträgen."
+
+            Sonst nichts. Keine Architekturanalyse, keine Implementierung, keine Tests.
+          claude_args: |
+            --allowedTools "Bash(git fetch:*),Bash(git remote:*),Bash(git checkout:*),Bash(git switch:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(gh issue view:*),Bash(gh issue comment:*)"
