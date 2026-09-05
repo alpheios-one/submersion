@@ -13091,6 +13091,18 @@ abstract class AppLocalizations {
   /// **'Not entered — assuming {value} {unit}'**
   String divePlanner_info_reserveDefault(Object unit, Object value);
 
+  /// No description provided for @divePlanner_field_bailoutGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Bailout gas'**
+  String get divePlanner_field_bailoutGas;
+
+  /// No description provided for @divePlanner_field_bailoutGasHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-circuit gas carried in case the loop fails'**
+  String get divePlanner_field_bailoutGasHint;
+
   /// No description provided for @divePlanner_field_hePercent.
   ///
   /// In en, this message translates to:
@@ -13114,12 +13126,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Plan Name'**
   String get divePlanner_field_planName;
-
-  /// No description provided for @divePlanner_field_role.
-  ///
-  /// In en, this message translates to:
-  /// **'Role'**
-  String get divePlanner_field_role;
 
   /// No description provided for @divePlanner_field_startPressure.
   ///
@@ -13276,6 +13282,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tanks'**
   String get divePlanner_label_tanks;
+
+  /// No description provided for @divePlanner_savedTanks_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved tanks'**
+  String get divePlanner_savedTanks_title;
+
+  /// No description provided for @divePlanner_savedTanks_save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a tank'**
+  String get divePlanner_savedTanks_save;
+
+  /// No description provided for @divePlanner_savedTanks_saveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save tank as'**
+  String get divePlanner_savedTanks_saveTitle;
+
+  /// No description provided for @divePlanner_savedTanks_nameField.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank name'**
+  String get divePlanner_savedTanks_nameField;
+
+  /// No description provided for @divePlanner_savedTanks_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Tank saved'**
+  String get divePlanner_savedTanks_saved;
+
+  /// No description provided for @divePlanner_savedTanks_manage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get divePlanner_savedTanks_manage;
+
+  /// No description provided for @divePlanner_savedTanks_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved tanks yet. Save a tank from this plan to reuse it in other plans.'**
+  String get divePlanner_savedTanks_empty;
 
   /// No description provided for @divePlanner_label_time.
   ///
@@ -24366,6 +24414,30 @@ abstract class AppLocalizations {
   /// **'Ascent rate'**
   String get plannerCanvas_rates_ascent;
 
+  /// No description provided for @plannerCanvas_rates_intermediateAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Intermediate stop ascent rate'**
+  String get plannerCanvas_rates_intermediateAscent;
+
+  /// No description provided for @plannerCanvas_rates_lastStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Last stop'**
+  String get plannerCanvas_rates_lastStop;
+
+  /// No description provided for @plannerCanvas_rates_shallowAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Shallow stop ascent rate'**
+  String get plannerCanvas_rates_shallowAscent;
+
+  /// No description provided for @plannerCanvas_rates_finalAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Final ascent rate (last {depth})'**
+  String plannerCanvas_rates_finalAscent(String depth);
+
   /// No description provided for @plannerCanvas_rates_descent.
   ///
   /// In en, this message translates to:
@@ -24504,11 +24576,11 @@ abstract class AppLocalizations {
   /// **'RT'**
   String get plannerCanvas_table_runtime;
 
-  /// No description provided for @plannerCanvas_table_stop.
+  /// No description provided for @plannerCanvas_table_duration.
   ///
   /// In en, this message translates to:
-  /// **'Stop'**
-  String get plannerCanvas_table_stop;
+  /// **'Duration'**
+  String get plannerCanvas_table_duration;
 
   /// No description provided for @plannerCanvas_turnRule_allUsable.
   ///
@@ -36927,17 +36999,49 @@ abstract class AppLocalizations {
   /// **'Add Segment'**
   String get divePlanner_segmentEditor_addTitle;
 
-  /// No description provided for @divePlanner_segmentEditor_ascentRate.
+  /// No description provided for @divePlanner_segmentEditor_depth.
   ///
   /// In en, this message translates to:
-  /// **'Ascent Rate ({unit}/min)'**
-  String divePlanner_segmentEditor_ascentRate(Object unit);
+  /// **'Depth ({unit})'**
+  String divePlanner_segmentEditor_depth(Object unit);
 
-  /// No description provided for @divePlanner_segmentEditor_descentRate.
+  /// No description provided for @divePlanner_segmentEditor_derivedAscent.
   ///
   /// In en, this message translates to:
-  /// **'Descent Rate ({unit}/min)'**
-  String divePlanner_segmentEditor_descentRate(Object unit);
+  /// **'Ascent {from} → {to} at {rate}/min'**
+  String divePlanner_segmentEditor_derivedAscent(
+    Object from,
+    Object to,
+    Object rate,
+  );
+
+  /// No description provided for @divePlanner_segmentEditor_derivedAscentNoRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascent {from} → {to}'**
+  String divePlanner_segmentEditor_derivedAscentNoRate(Object from, Object to);
+
+  /// No description provided for @divePlanner_segmentEditor_derivedDescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Descent {from} → {to} at {rate}/min'**
+  String divePlanner_segmentEditor_derivedDescent(
+    Object from,
+    Object to,
+    Object rate,
+  );
+
+  /// No description provided for @divePlanner_segmentEditor_derivedDescentNoRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Descent {from} → {to}'**
+  String divePlanner_segmentEditor_derivedDescentNoRate(Object from, Object to);
+
+  /// No description provided for @divePlanner_segmentEditor_derivedLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level at {depth}'**
+  String divePlanner_segmentEditor_derivedLevel(Object depth);
 
   /// No description provided for @divePlanner_segmentEditor_duration.
   ///
@@ -36950,30 +37054,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edit Segment'**
   String get divePlanner_segmentEditor_editTitle;
-
-  /// No description provided for @divePlanner_segmentEditor_endDepth.
-  ///
-  /// In en, this message translates to:
-  /// **'End Depth ({unit})'**
-  String divePlanner_segmentEditor_endDepth(Object unit);
-
-  /// No description provided for @divePlanner_segmentEditor_gasSwitchTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Gas switch time'**
-  String get divePlanner_segmentEditor_gasSwitchTime;
-
-  /// No description provided for @divePlanner_segmentEditor_segmentType.
-  ///
-  /// In en, this message translates to:
-  /// **'Segment Type'**
-  String get divePlanner_segmentEditor_segmentType;
-
-  /// No description provided for @divePlanner_segmentEditor_startDepth.
-  ///
-  /// In en, this message translates to:
-  /// **'Start Depth ({unit})'**
-  String divePlanner_segmentEditor_startDepth(Object unit);
 
   /// No description provided for @divePlanner_segmentEditor_tankGas.
   ///
@@ -37047,53 +37127,11 @@ abstract class AppLocalizations {
   /// **'Quick Plan'**
   String get divePlanner_segmentList_quickPlan;
 
-  /// No description provided for @divePlanner_segmentList_safetyStop.
-  ///
-  /// In en, this message translates to:
-  /// **'Safety stop {depth} for {minutes} min'**
-  String divePlanner_segmentList_safetyStop(Object depth, Object minutes);
-
   /// No description provided for @divePlanner_segmentList_title.
   ///
   /// In en, this message translates to:
   /// **'Dive Segments'**
   String get divePlanner_segmentList_title;
-
-  /// No description provided for @divePlanner_segmentType_ascent.
-  ///
-  /// In en, this message translates to:
-  /// **'Ascent'**
-  String get divePlanner_segmentType_ascent;
-
-  /// No description provided for @divePlanner_segmentType_bottomTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Bottom Time'**
-  String get divePlanner_segmentType_bottomTime;
-
-  /// No description provided for @divePlanner_segmentType_decoStop.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco Stop'**
-  String get divePlanner_segmentType_decoStop;
-
-  /// No description provided for @divePlanner_segmentType_descent.
-  ///
-  /// In en, this message translates to:
-  /// **'Descent'**
-  String get divePlanner_segmentType_descent;
-
-  /// No description provided for @divePlanner_segmentType_gasSwitch.
-  ///
-  /// In en, this message translates to:
-  /// **'Gas Switch'**
-  String get divePlanner_segmentType_gasSwitch;
-
-  /// No description provided for @divePlanner_segmentType_safetyStop.
-  ///
-  /// In en, this message translates to:
-  /// **'Safety Stop'**
-  String get divePlanner_segmentType_safetyStop;
 
   /// No description provided for @divePlanner_undo.
   ///

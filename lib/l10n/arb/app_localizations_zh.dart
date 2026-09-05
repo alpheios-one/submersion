@@ -7430,6 +7430,12 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_bailoutGas => '备用气体';
+
+  @override
+  String get divePlanner_field_bailoutGasHint => '开放式循环气体，用于循环系统故障时';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -7440,9 +7446,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get divePlanner_field_planName => '计划名称';
-
-  @override
-  String get divePlanner_field_role => '角色';
 
   @override
   String divePlanner_field_startPressure(Object pressureSymbol) {
@@ -7527,6 +7530,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => '气瓶';
+
+  @override
+  String get divePlanner_savedTanks_title => '已保存气瓶';
+
+  @override
+  String get divePlanner_savedTanks_save => '保存气瓶';
+
+  @override
+  String get divePlanner_savedTanks_saveTitle => '气瓶另存为';
+
+  @override
+  String get divePlanner_savedTanks_nameField => '气瓶名称';
+
+  @override
+  String get divePlanner_savedTanks_saved => '气瓶已保存';
+
+  @override
+  String get divePlanner_savedTanks_manage => '管理';
+
+  @override
+  String get divePlanner_savedTanks_empty => '尚无已保存气瓶。保存此计划中的一个气瓶以便在其他计划中重复使用。';
 
   @override
   String get divePlanner_label_time => '时间';
@@ -13966,6 +13990,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_rates_ascent => '上升速率';
 
   @override
+  String get plannerCanvas_rates_intermediateAscent => '中间停留上升速率';
+
+  @override
+  String get plannerCanvas_rates_lastStop => '最后停留';
+
+  @override
+  String get plannerCanvas_rates_shallowAscent => '浅停留上升速率';
+
+  @override
+  String plannerCanvas_rates_finalAscent(String depth) {
+    return '最终上升速率（最后 $depth）';
+  }
+
+  @override
   String get plannerCanvas_rates_descent => '下降速率';
 
   @override
@@ -14045,7 +14083,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_table_runtime => 'RT';
 
   @override
-  String get plannerCanvas_table_stop => '停留';
+  String get plannerCanvas_table_duration => '时长';
 
   @override
   String get plannerCanvas_turnRule_allUsable => '全部可用';
@@ -21276,13 +21314,44 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_segmentEditor_addTitle => '添加段落';
 
   @override
-  String divePlanner_segmentEditor_ascentRate(Object unit) {
-    return '上升速率 ($unit/分钟)';
+  String divePlanner_segmentEditor_depth(Object unit) {
+    return '深度 ($unit)';
   }
 
   @override
-  String divePlanner_segmentEditor_descentRate(Object unit) {
-    return '下降速率 ($unit/分钟)';
+  String divePlanner_segmentEditor_derivedAscent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return '上升 $from → $to，$rate/分钟';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedAscentNoRate(Object from, Object to) {
+    return '上升 $from → $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return '下降 $from → $to，$rate/分钟';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescentNoRate(
+    Object from,
+    Object to,
+  ) {
+    return '下降 $from → $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedLevel(Object depth) {
+    return '保持在 $depth';
   }
 
   @override
@@ -21290,22 +21359,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get divePlanner_segmentEditor_editTitle => '编辑段落';
-
-  @override
-  String divePlanner_segmentEditor_endDepth(Object unit) {
-    return '终止深度 ($unit)';
-  }
-
-  @override
-  String get divePlanner_segmentEditor_gasSwitchTime => '气体切换时间';
-
-  @override
-  String get divePlanner_segmentEditor_segmentType => '段落类型';
-
-  @override
-  String divePlanner_segmentEditor_startDepth(Object unit) {
-    return '起始深度 ($unit)';
-  }
 
   @override
   String get divePlanner_segmentEditor_tankGas => '气瓶 / 气体';
@@ -21354,30 +21407,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_segmentList_quickPlan => '快捷计划';
 
   @override
-  String divePlanner_segmentList_safetyStop(Object depth, Object minutes) {
-    return '安全停留 $depth 停留 $minutes 分钟';
-  }
-
-  @override
   String get divePlanner_segmentList_title => '潜水分段';
-
-  @override
-  String get divePlanner_segmentType_ascent => '上升';
-
-  @override
-  String get divePlanner_segmentType_bottomTime => '底部时间';
-
-  @override
-  String get divePlanner_segmentType_decoStop => '减压停留';
-
-  @override
-  String get divePlanner_segmentType_descent => '下降';
-
-  @override
-  String get divePlanner_segmentType_gasSwitch => '气体切换';
-
-  @override
-  String get divePlanner_segmentType_safetyStop => '安全停留';
 
   @override
   String get divePlanner_undo => '撤销';

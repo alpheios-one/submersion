@@ -7610,6 +7610,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_bailoutGas => 'גז חילוץ';
+
+  @override
+  String get divePlanner_field_bailoutGasHint =>
+      'גז מעגל פתוח הנישא למקרה של תקלה במעגל';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -7620,9 +7627,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get divePlanner_field_planName => 'שם התכנית';
-
-  @override
-  String get divePlanner_field_role => 'תפקיד';
 
   @override
   String divePlanner_field_startPressure(Object pressureSymbol) {
@@ -7707,6 +7711,28 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'מיכלים';
+
+  @override
+  String get divePlanner_savedTanks_title => 'מכלים שמורים';
+
+  @override
+  String get divePlanner_savedTanks_save => 'שמור מכל';
+
+  @override
+  String get divePlanner_savedTanks_saveTitle => 'שמור מכל בשם';
+
+  @override
+  String get divePlanner_savedTanks_nameField => 'שם המכל';
+
+  @override
+  String get divePlanner_savedTanks_saved => 'המכל נשמר';
+
+  @override
+  String get divePlanner_savedTanks_manage => 'ניהול';
+
+  @override
+  String get divePlanner_savedTanks_empty =>
+      'אין עדיין מכלים שמורים. שמור מכל מתוכנית זו לשימוש חוזר בתוכניות אחרות.';
 
   @override
   String get divePlanner_label_time => 'זמן';
@@ -14304,6 +14330,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get plannerCanvas_rates_ascent => 'קצב עלייה';
 
   @override
+  String get plannerCanvas_rates_intermediateAscent =>
+      'קצב עלייה בין עצירות בינוניות';
+
+  @override
+  String get plannerCanvas_rates_lastStop => 'עצירה אחרונה';
+
+  @override
+  String get plannerCanvas_rates_shallowAscent => 'קצב עלייה בין עצירות רדודות';
+
+  @override
+  String plannerCanvas_rates_finalAscent(String depth) {
+    return 'קצב עלייה סופי ($depth אחרונים)';
+  }
+
+  @override
   String get plannerCanvas_rates_descent => 'קצב ירידה';
 
   @override
@@ -14383,7 +14424,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get plannerCanvas_table_runtime => 'RT';
 
   @override
-  String get plannerCanvas_table_stop => 'עצירה';
+  String get plannerCanvas_table_duration => 'משך';
 
   @override
   String get plannerCanvas_turnRule_allUsable => 'הכול שמיש';
@@ -21872,13 +21913,44 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_segmentEditor_addTitle => 'הוסף קטע';
 
   @override
-  String divePlanner_segmentEditor_ascentRate(Object unit) {
-    return 'קצב עלייה ($unit/min)';
+  String divePlanner_segmentEditor_depth(Object unit) {
+    return 'עומק ($unit)';
   }
 
   @override
-  String divePlanner_segmentEditor_descentRate(Object unit) {
-    return 'קצב ירידה ($unit/min)';
+  String divePlanner_segmentEditor_derivedAscent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'עלייה $from → $to בקצב $rate/דקה';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedAscentNoRate(Object from, Object to) {
+    return 'עלייה $from → $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'ירידה $from → $to בקצב $rate/דקה';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescentNoRate(
+    Object from,
+    Object to,
+  ) {
+    return 'ירידה $from → $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedLevel(Object depth) {
+    return 'שמירת עומק ב-$depth';
   }
 
   @override
@@ -21886,22 +21958,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get divePlanner_segmentEditor_editTitle => 'עריכת קטע';
-
-  @override
-  String divePlanner_segmentEditor_endDepth(Object unit) {
-    return 'עומק סיום ($unit)';
-  }
-
-  @override
-  String get divePlanner_segmentEditor_gasSwitchTime => 'זמן החלפת גז';
-
-  @override
-  String get divePlanner_segmentEditor_segmentType => 'סוג קטע';
-
-  @override
-  String divePlanner_segmentEditor_startDepth(Object unit) {
-    return 'עומק התחלה ($unit)';
-  }
 
   @override
   String get divePlanner_segmentEditor_tankGas => 'מיכל / גז';
@@ -21951,30 +22007,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_segmentList_quickPlan => 'תוכנית מהירה';
 
   @override
-  String divePlanner_segmentList_safetyStop(Object depth, Object minutes) {
-    return 'עצירת בטיחות $depth למשך $minutes min';
-  }
-
-  @override
   String get divePlanner_segmentList_title => 'קטעי צלילה';
-
-  @override
-  String get divePlanner_segmentType_ascent => 'עלייה';
-
-  @override
-  String get divePlanner_segmentType_bottomTime => 'זמן תחתית';
-
-  @override
-  String get divePlanner_segmentType_decoStop => 'עצירת דקו';
-
-  @override
-  String get divePlanner_segmentType_descent => 'ירידה';
-
-  @override
-  String get divePlanner_segmentType_gasSwitch => 'החלפת גז';
-
-  @override
-  String get divePlanner_segmentType_safetyStop => 'עצירת בטיחות';
 
   @override
   String get divePlanner_undo => 'בטל';

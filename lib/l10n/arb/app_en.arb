@@ -4692,14 +4692,29 @@
   "divePlanner_error_reserveExceedsTank": "Exceeds tank pressure",
   "divePlanner_error_reserveMustBePositive": "Must be greater than 0",
   "divePlanner_info_reserveDefault": "Not entered — assuming {value} {unit}",
+  "divePlanner_field_bailoutGas": "Bailout gas",
+  "divePlanner_field_bailoutGasHint": "Open-circuit gas carried in case the loop fails",
   "divePlanner_field_hePercent": "He %",
   "divePlanner_field_name": "Name",
   "divePlanner_field_o2Percent": "O₂ %",
   "divePlanner_field_planName": "Plan Name",
-  "divePlanner_field_role": "Role",
   "divePlanner_field_startPressure": "Start ({pressureSymbol})",
+  "@divePlanner_field_startPressure": {
+    "placeholders": {
+      "pressureSymbol": {
+        "type": "Object"
+      }
+    }
+  },
   "divePlanner_field_travelGas": "Also used as travel gas",
   "divePlanner_field_volume": "Volume ({volumeSymbol})",
+  "@divePlanner_field_volume": {
+    "placeholders": {
+      "volumeSymbol": {
+        "type": "Object"
+      }
+    }
+  },
   "divePlanner_hint_tankName": "Enter tank name",
   "divePlanner_label_altitude": "Altitude:",
   "divePlanner_label_belowMinReserve": "Below Min Reserve",
@@ -4723,6 +4738,13 @@
   "divePlanner_label_sacRate": "RMV:",
   "divePlanner_label_status": "Status",
   "divePlanner_label_tanks": "Tanks",
+  "divePlanner_savedTanks_title": "Saved tanks",
+  "divePlanner_savedTanks_save": "Save a tank",
+  "divePlanner_savedTanks_saveTitle": "Save tank as",
+  "divePlanner_savedTanks_nameField": "Tank name",
+  "divePlanner_savedTanks_saved": "Tank saved",
+  "divePlanner_savedTanks_manage": "Manage",
+  "divePlanner_savedTanks_empty": "No saved tanks yet. Save a tank from this plan to reuse it in other plans.",
   "divePlanner_label_time": "Time",
   "divePlanner_label_timeAxis": "Time (min)",
   "divePlanner_label_tts": "TTS",
@@ -8981,6 +9003,17 @@
   "plannerCanvas_tab_setup": "Setup",
   "plannerCanvas_o2Narcotic": "Treat O₂ as narcotic",
   "plannerCanvas_rates_ascent": "Ascent rate",
+  "plannerCanvas_rates_intermediateAscent": "Intermediate stop ascent rate",
+  "plannerCanvas_rates_lastStop": "Last stop",
+  "plannerCanvas_rates_shallowAscent": "Shallow stop ascent rate",
+  "plannerCanvas_rates_finalAscent": "Final ascent rate (last {depth})",
+  "@plannerCanvas_rates_finalAscent": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
   "plannerCanvas_rates_descent": "Descent rate",
   "plannerCanvas_rates_title": "Rates",
   "plannerCanvas_range_title": "Range table",
@@ -9042,7 +9075,7 @@
   "plannerCanvas_table_depth": "Depth",
   "plannerCanvas_table_gas": "Gas",
   "plannerCanvas_table_runtime": "RT",
-  "plannerCanvas_table_stop": "Stop",
+  "plannerCanvas_table_duration": "Duration",
   "plannerCanvas_turnRule_allUsable": "All usable",
   "plannerCanvas_turnRule_custom": "Custom",
   "plannerCanvas_turnRule_halves": "Halves",
@@ -13436,20 +13469,6 @@
       }
     }
   },
-  "@divePlanner_field_startPressure": {
-    "placeholders": {
-      "pressureSymbol": {
-        "type": "Object"
-      }
-    }
-  },
-  "@divePlanner_field_volume": {
-    "placeholders": {
-      "volumeSymbol": {
-        "type": "Object"
-      }
-    }
-  },
   "@divePlanner_label_depthAxis": {
     "placeholders": {
       "depthSymbol": {
@@ -14337,42 +14356,74 @@
   },
   "diveImport_uddf_trips": "Trips",
   "divePlanner_segmentEditor_addTitle": "Add Segment",
-  "divePlanner_segmentEditor_ascentRate": "Ascent Rate ({unit}/min)",
-  "@divePlanner_segmentEditor_ascentRate": {
+  "divePlanner_segmentEditor_depth": "Depth ({unit})",
+  "@divePlanner_segmentEditor_depth": {
     "placeholders": {
       "unit": {
         "type": "Object"
       }
     }
   },
-  "divePlanner_segmentEditor_descentRate": "Descent Rate ({unit}/min)",
-  "@divePlanner_segmentEditor_descentRate": {
+  "divePlanner_segmentEditor_derivedAscent": "Ascent {from} → {to} at {rate}/min",
+  "@divePlanner_segmentEditor_derivedAscent": {
     "placeholders": {
-      "unit": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      },
+      "rate": {
+        "type": "Object"
+      }
+    }
+  },
+  "divePlanner_segmentEditor_derivedAscentNoRate": "Ascent {from} → {to}",
+  "@divePlanner_segmentEditor_derivedAscentNoRate": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      }
+    }
+  },
+  "divePlanner_segmentEditor_derivedDescent": "Descent {from} → {to} at {rate}/min",
+  "@divePlanner_segmentEditor_derivedDescent": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      },
+      "rate": {
+        "type": "Object"
+      }
+    }
+  },
+  "divePlanner_segmentEditor_derivedDescentNoRate": "Descent {from} → {to}",
+  "@divePlanner_segmentEditor_derivedDescentNoRate": {
+    "placeholders": {
+      "from": {
+        "type": "Object"
+      },
+      "to": {
+        "type": "Object"
+      }
+    }
+  },
+  "divePlanner_segmentEditor_derivedLevel": "Level at {depth}",
+  "@divePlanner_segmentEditor_derivedLevel": {
+    "placeholders": {
+      "depth": {
         "type": "Object"
       }
     }
   },
   "divePlanner_segmentEditor_duration": "Duration (min)",
   "divePlanner_segmentEditor_editTitle": "Edit Segment",
-  "divePlanner_segmentEditor_endDepth": "End Depth ({unit})",
-  "@divePlanner_segmentEditor_endDepth": {
-    "placeholders": {
-      "unit": {
-        "type": "Object"
-      }
-    }
-  },
-  "divePlanner_segmentEditor_gasSwitchTime": "Gas switch time",
-  "divePlanner_segmentEditor_segmentType": "Segment Type",
-  "divePlanner_segmentEditor_startDepth": "Start Depth ({unit})",
-  "@divePlanner_segmentEditor_startDepth": {
-    "placeholders": {
-      "unit": {
-        "type": "Object"
-      }
-    }
-  },
   "divePlanner_segmentEditor_tankGas": "Tank / Gas",
   "divePlanner_segmentList_addSegment": "Add Segment",
   "divePlanner_segmentList_ascent": "Ascent {startDepth} → {endDepth}",
@@ -14432,24 +14483,7 @@
     }
   },
   "divePlanner_segmentList_quickPlan": "Quick Plan",
-  "divePlanner_segmentList_safetyStop": "Safety stop {depth} for {minutes} min",
-  "@divePlanner_segmentList_safetyStop": {
-    "placeholders": {
-      "depth": {
-        "type": "Object"
-      },
-      "minutes": {
-        "type": "Object"
-      }
-    }
-  },
   "divePlanner_segmentList_title": "Dive Segments",
-  "divePlanner_segmentType_ascent": "Ascent",
-  "divePlanner_segmentType_bottomTime": "Bottom Time",
-  "divePlanner_segmentType_decoStop": "Deco Stop",
-  "divePlanner_segmentType_descent": "Descent",
-  "divePlanner_segmentType_gasSwitch": "Gas Switch",
-  "divePlanner_segmentType_safetyStop": "Safety Stop",
   "divePlanner_undo": "Undo",
   "gasCalculators_rockBottom_aboutDescription": "Rock bottom is the minimum gas reserve for an emergency ascent while sharing air with your buddy.\n\n• Uses a stressed RMV (2-3x normal)\n• Assumes both divers on one tank\n• Includes safety stop when enabled\n\nAlways turn the dive BEFORE reaching rock bottom!",
   "gasCalculators_rockBottom_aboutTitle": "About Rock Bottom",

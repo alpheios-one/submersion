@@ -7785,6 +7785,13 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_bailoutGas => 'Bailout gaz';
+
+  @override
+  String get divePlanner_field_bailoutGasHint =>
+      'Nyitott rendszeru gaz a kor meghibasodasa esetere';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -7795,9 +7802,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get divePlanner_field_planName => 'Terv neve';
-
-  @override
-  String get divePlanner_field_role => 'Szerep';
 
   @override
   String divePlanner_field_startPressure(Object pressureSymbol) {
@@ -7882,6 +7886,28 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'Palackok';
+
+  @override
+  String get divePlanner_savedTanks_title => 'Mentett palackok';
+
+  @override
+  String get divePlanner_savedTanks_save => 'Palack mentése';
+
+  @override
+  String get divePlanner_savedTanks_saveTitle => 'Palack mentése másként';
+
+  @override
+  String get divePlanner_savedTanks_nameField => 'Palack neve';
+
+  @override
+  String get divePlanner_savedTanks_saved => 'Palack mentve';
+
+  @override
+  String get divePlanner_savedTanks_manage => 'Kezelés';
+
+  @override
+  String get divePlanner_savedTanks_empty =>
+      'Még nincsenek mentett palackok. Ments el egy palackot ebből a tervből, hogy más tervekben is használhasd.';
 
   @override
   String get divePlanner_label_time => 'Idő';
@@ -14616,6 +14642,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get plannerCanvas_rates_ascent => 'Emelkedési ütem';
 
   @override
+  String get plannerCanvas_rates_intermediateAscent =>
+      'Emelkedési sebesség a közepes megállók között';
+
+  @override
+  String get plannerCanvas_rates_lastStop => 'Utolsó megálló';
+
+  @override
+  String get plannerCanvas_rates_shallowAscent =>
+      'Emelkedési sebesség a sekély megállók között';
+
+  @override
+  String plannerCanvas_rates_finalAscent(String depth) {
+    return 'Végső emelkedési sebesség (utolsó $depth)';
+  }
+
+  @override
   String get plannerCanvas_rates_descent => 'Merülési ütem';
 
   @override
@@ -14695,7 +14737,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get plannerCanvas_table_runtime => 'RT';
 
   @override
-  String get plannerCanvas_table_stop => 'Megálló';
+  String get plannerCanvas_table_duration => 'Időtartam';
 
   @override
   String get plannerCanvas_turnRule_allUsable => 'Minden felhasználható';
@@ -22371,13 +22413,44 @@ class AppLocalizationsHu extends AppLocalizations {
   String get divePlanner_segmentEditor_addTitle => 'Szegmens hozzaadasa';
 
   @override
-  String divePlanner_segmentEditor_ascentRate(Object unit) {
-    return 'Emelkedesi sebesseg ($unit/min)';
+  String divePlanner_segmentEditor_depth(Object unit) {
+    return 'Melyseg ($unit)';
   }
 
   @override
-  String divePlanner_segmentEditor_descentRate(Object unit) {
-    return 'Süllyedesi sebesseg ($unit/min)';
+  String divePlanner_segmentEditor_derivedAscent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'Emelkedes $from -> $to, $rate/perc';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedAscentNoRate(Object from, Object to) {
+    return 'Emelkedes $from -> $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'Sullyedes $from -> $to, $rate/perc';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescentNoRate(
+    Object from,
+    Object to,
+  ) {
+    return 'Sullyedes $from -> $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedLevel(Object depth) {
+    return 'Szinten $depth';
   }
 
   @override
@@ -22385,22 +22458,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get divePlanner_segmentEditor_editTitle => 'Szegmens szerkesztese';
-
-  @override
-  String divePlanner_segmentEditor_endDepth(Object unit) {
-    return 'Vegmelyseg ($unit)';
-  }
-
-  @override
-  String get divePlanner_segmentEditor_gasSwitchTime => 'Gazcsere ideje';
-
-  @override
-  String get divePlanner_segmentEditor_segmentType => 'Szegmens tipusa';
-
-  @override
-  String divePlanner_segmentEditor_startDepth(Object unit) {
-    return 'Kezdo melyseg ($unit)';
-  }
 
   @override
   String get divePlanner_segmentEditor_tankGas => 'Palack / Gaz';
@@ -22450,30 +22507,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get divePlanner_segmentList_quickPlan => 'Gyors terv';
 
   @override
-  String divePlanner_segmentList_safetyStop(Object depth, Object minutes) {
-    return 'Biztonsagi megallo $depth, $minutes min';
-  }
-
-  @override
   String get divePlanner_segmentList_title => 'Merulesi szegmensek';
-
-  @override
-  String get divePlanner_segmentType_ascent => 'Emelkedes';
-
-  @override
-  String get divePlanner_segmentType_bottomTime => 'Fenekido';
-
-  @override
-  String get divePlanner_segmentType_decoStop => 'Deko megallo';
-
-  @override
-  String get divePlanner_segmentType_descent => 'Süllyedes';
-
-  @override
-  String get divePlanner_segmentType_gasSwitch => 'Gazcsere';
-
-  @override
-  String get divePlanner_segmentType_safetyStop => 'Biztonsagi megallo';
 
   @override
   String get divePlanner_undo => 'Visszavonás';

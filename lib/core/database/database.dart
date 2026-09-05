@@ -553,6 +553,17 @@ class DivePlans extends Table {
   IntColumn get gfHigh => integer()();
   RealColumn get descentRate => real().withDefault(const Constant(18.0))();
   RealColumn get ascentRate => real().withDefault(const Constant(9.0))();
+
+  /// Ascent rate between intermediate (deeper than 9 m) stops, m/min.
+  RealColumn get intermediateAscentRate =>
+      real().withDefault(const Constant(6.0))();
+
+  /// Ascent rate between shallow (9 m and above) stops, m/min.
+  RealColumn get shallowAscentRate => real().withDefault(const Constant(3.0))();
+
+  /// Ascent rate from the last stop to the surface, m/min.
+  RealColumn get finalAscentRate => real().withDefault(const Constant(1.0))();
+
   RealColumn get lastStopDepth => real().withDefault(const Constant(3.0))();
   IntColumn get gasSwitchStopSeconds =>
       integer().withDefault(const Constant(0))();
@@ -3399,7 +3410,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 190;
+  static const int currentSchemaVersion = 191;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3879,6 +3890,12 @@ class AppDatabase extends _$AppDatabase {
     // uncompressed costs space and nothing else. Numbered 190 because main
     // took 188 and 189 while this branch was open.
     190,
+    // v191: per-band planner ascent rates (9/6/3/1 m/min TDI phases).
+    // Renumbered from 188, which was itself renumbered from 185 and 184:
+    // main landed the insurance-phone, media-equipment-link and raw-data
+    // recompression rungs (188-190) while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    191,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -6424,6 +6441,30 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE dive_plan_tanks ADD COLUMN is_travel_gas '
         'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+  }
+
+  /// The v191 dive_plans per-band ascent rate columns: the ascent slows in
+  /// stages between intermediate stops, between shallow stops, and over the
+  /// final stretch to the surface. PRAGMA-guarded so a healthy database
+  /// no-ops and a partial schema does not throw. Called from the v191
+  /// onUpgrade step and the beforeOpen backstop, matching the other additive
+  /// column helpers.
+  Future<void> _assertPlanAscentRateColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dive_plans')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    const defaults = {
+      'intermediate_ascent_rate': '6.0',
+      'shallow_ascent_rate': '3.0',
+      'final_ascent_rate': '1.0',
+    };
+    for (final entry in defaults.entries) {
+      if (names.contains(entry.key)) continue;
+      await customStatement(
+        'ALTER TABLE dive_plans ADD COLUMN ${entry.key} '
+        'REAL NOT NULL DEFAULT ${entry.value}',
       );
     }
   }
@@ -10249,6 +10290,16 @@ class AppDatabase extends _$AppDatabase {
           await _recompressRawDiveData();
         }
         if (from < 190) await reportProgress();
+        // v191: per-band planner ascent rates. Additive columns with
+        // defaults, so an existing plan picks up the standard 6/3/1 m/min
+        // ascent bands and its computed schedule redistributes time from the
+        // stops into the ascent. Renumbered from 188: main landed the
+        // insurance-phone, media-equipment-link and raw-data recompression
+        // rungs at 188-190 while this branch was open.
+        if (from < 191) {
+          await _assertPlanAscentRateColumns();
+        }
+        if (from < 191) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -10418,6 +10469,11 @@ class AppDatabase extends _$AppDatabase {
         // v156 backstop: re-assert the dive_plan_tanks travel-gas column
         // (same parallel-branch version-collision self-heal).
         await _assertTravelGasColumn();
+
+        // v191 backstop: re-assert the dive_plans per-band ascent rate
+        // columns. A database that arrives by restore or sync-adopt never
+        // runs onUpgrade, and reading a plan without them throws.
+        await _assertPlanAscentRateColumns();
 
         // v157 backstop: re-assert the default service price columns (issue
         // #829; same parallel-branch version-collision self-heal).
