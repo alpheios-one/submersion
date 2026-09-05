@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_about_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billing_card.dart';
@@ -133,11 +134,13 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
                   key: const Key('blender-settings'),
                   icon: const Icon(Icons.settings_outlined),
                   tooltip: context.l10n.settings_section_trimixMixer_title,
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (context) => const BlenderSettingsPage(),
-                    ),
-                  ),
+                  // Through the router, not Navigator.push: this widget sits
+                  // inside the app's ShellRoute, so an imperative route lands
+                  // on the shell's own navigator, under a bottom bar that can
+                  // still change the location out from under it. The archive
+                  // icon below and the Settings entry both reach their pages
+                  // this way (PR #1359 review).
+                  onPressed: () => context.push(kTrimixMixerSettingsRoute),
                 ),
               ),
               BlenderCylinderCard(

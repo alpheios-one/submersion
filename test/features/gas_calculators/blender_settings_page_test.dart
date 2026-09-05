@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_fill_gases_card.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
@@ -22,6 +23,42 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Pumps the calculator behind a [GoRouter] whose Trimix Mixer route is the
+/// real page, so tapping the gear is exercised the way the app's ShellRoute
+/// reaches it rather than through an imperative Navigator.push (PR #1359
+/// review). Hands back a getter for the current location.
+Future<String Function()> _pumpWithRouter(WidgetTester tester) async {
+  final router = GoRouter(
+    initialLocation: '/gas-calculators',
+    routes: [
+      GoRoute(
+        path: '/gas-calculators',
+        builder: (context, state) =>
+            const Scaffold(body: GasBlenderCalculator()),
+      ),
+      GoRoute(
+        path: kTrimixMixerSettingsRoute,
+        builder: (context, state) => const BlenderSettingsPage(),
+      ),
+    ],
+  );
+
+  await tester.pumpWidget(
+    testAppRouter(
+      locale: const Locale('en'),
+      router: router,
+      overrides: [
+        settingsProvider.overrideWith(
+          (ref) => _TestSettingsNotifier(const AppSettings()),
+        ),
+        tankPresetsProvider.overrideWith((ref) async => const []),
+      ],
+    ),
+  );
+  await tester.pumpAndSettle();
+  return () => router.state.uri.toString();
 }
 
 Future<void> _pump(WidgetTester tester) async {
@@ -97,10 +134,14 @@ String _fieldText(WidgetTester tester, Finder card, int index) => tester
 
 void main() {
   testWidgets('the gear opens the Trimix Mixer settings page', (tester) async {
-    await _pump(tester);
+    final location = await _pumpWithRouter(tester);
     await tester.tap(find.byKey(const Key('blender-settings')));
     await tester.pumpAndSettle();
 
+    // The registered route, not a page pushed onto the shell's navigator:
+    // the location has to describe what is on screen, or the bottom bar can
+    // change it underneath (PR #1359 review).
+    expect(location(), kTrimixMixerSettingsRoute);
     expect(find.text('Trimix Mixer'), findsOneWidget);
     expect(find.text('Fill gases'), findsOneWidget);
     expect(find.text('Blending conditions'), findsOneWidget);
@@ -124,7 +165,7 @@ void main() {
       // gone along with the "Default settings and billing" section that used
       // to hold it -- the currency always follows Settings -> Units ->
       // Default currency, with nothing left to show for it here.
-      await _pump(tester);
+      await _pumpWithRouter(tester);
       expect(find.byKey(const Key('blender-currency-display')), findsNothing);
 
       await tester.tap(find.byKey(const Key('blender-settings')));

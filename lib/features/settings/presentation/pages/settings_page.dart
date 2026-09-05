@@ -11,6 +11,7 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/settings/presentation/widgets/notification_permission_card.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
@@ -2341,7 +2342,7 @@ class _ManageSectionContent extends StatelessWidget {
                     context.l10n.settings_section_trimixMixer_subtitle,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.push('/settings/trimix-mixer'),
+                  onTap: () => context.push(kTrimixMixerSettingsRoute),
                 ),
                 const Divider(height: 1),
                 ListTile(
