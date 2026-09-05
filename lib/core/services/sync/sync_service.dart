@@ -13,9 +13,11 @@ import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.da
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/conflict_reference.dart';
+import 'package:submersion/core/services/sync/changeset_log/base_apply_progress.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_json_stream_reader.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_parse_client.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
+import 'package:submersion/core/services/sync/changeset_log/byte_progress_stream.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_codec.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
@@ -83,6 +85,15 @@ class SyncResult {
   /// [skippedPeerNames].
   final Map<String, String> newerSchemaPeerNames;
 
+  /// Peers whose changeset read threw during the pull. Their cursors stayed
+  /// put, so the next sync retries them; the UI names them so the user can
+  /// see whose data did not merge this run.
+  final Set<String> readFailedPeerDeviceIds;
+
+  /// Display names for [readFailedPeerDeviceIds], same contract as
+  /// [skippedPeerNames].
+  final Map<String, String> readFailedPeerNames;
+
   /// Set with [SyncResultStatus.awaitingAdoption]: the cloud library was
   /// replaced under this marker's epoch and the user must adopt (or defer)
   /// before any sync can proceed.
@@ -99,6 +110,8 @@ class SyncResult {
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.newerSchemaPeerNames = const {},
+    this.readFailedPeerDeviceIds = const {},
+    this.readFailedPeerNames = const {},
     this.replaceMarker,
   });
 
@@ -314,8 +327,16 @@ class SyncService {
   /// Test seam: apply a base from a local file through the streaming merge.
   @visibleForTesting
   Future<({int recordsApplied, int conflictsFound, int recordsFailed})>
-  debugApplyBaseFile(String filePath, {DateTime? lastSync}) async {
-    final r = await _applyRemoteBaseFile(filePath, lastSync);
+  debugApplyBaseFile(
+    String filePath, {
+    DateTime? lastSync,
+    void Function(double fraction)? onProgress,
+  }) async {
+    final r = await _applyRemoteBaseFile(
+      filePath,
+      lastSync,
+      onProgress: onProgress,
+    );
     return (
       recordsApplied: r.recordsApplied,
       conflictsFound: r.conflictsFound,
@@ -596,8 +617,32 @@ class SyncService {
           conflictsFound += r.conflictsFound;
           recordsFailed += r.recordsFailed;
         },
+        // A peer's base can run to hundreds of megabytes and take minutes
+        // to download and import. Spread it across the pull's share of the
+        // bar (0.4 to 0.8) so the user sees it advancing instead of reading a
+        // motionless bar as a hang and killing the app, which restarts the
+        // whole adoption from part 0 (issue #1421).
+        onBaseDownloadProgress: (manifest, downloaded, total) =>
+            _reportProgress(
+              SyncPhase.downloading,
+              0.4 + 0.15 * (downloaded / total),
+              _l10n.settings_cloudSync_progress_downloadingLibrary(
+                downloaded,
+                total,
+              ),
+            ),
         applyBaseFile: (path, manifest) async {
-          final r = await _applyRemoteBaseFile(path, lastSyncTime);
+          final r = await _applyRemoteBaseFile(
+            path,
+            lastSyncTime,
+            onProgress: (fraction) => _reportProgress(
+              SyncPhase.downloading,
+              0.55 + 0.25 * fraction,
+              _l10n.settings_cloudSync_progress_importingLibrary(
+                (fraction * 100).round(),
+              ),
+            ),
+          );
           recordsSynced += r.recordsApplied;
           conflictsFound += r.conflictsFound;
           recordsFailed += r.recordsFailed;
@@ -798,6 +843,8 @@ class SyncService {
         skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
         newerSchemaPeerNames: pullResult.newerSchemaPeerNames,
+        readFailedPeerDeviceIds: pullResult.readFailedPeerDeviceIds,
+        readFailedPeerNames: pullResult.readFailedPeerNames,
       );
     } on TimeoutException {
       _log.warning('Sync timed out');
@@ -1149,7 +1196,19 @@ class SyncService {
     // skipped below and the live row wins (clearing any local tombstone in the
     // merge heals a peer that already dropped the row on the buggy build).
     final contradictedByEntity = <String, Set<String>>{};
-    final liveByType = remotePayload.data.toJson();
+    // toJson omits the inbound-only legacy sample entities, so they are
+    // folded back in from the typed fields fromJson already parsed them
+    // into, the way the adopt path does. Without them a peer below v183
+    // that publishes a row both live and tombstoned (consolidation undo
+    // re-inserts the snapshot's rows while the old tombstones are still in
+    // its deletion_log) has the tombstone win: these entities carry no
+    // updatedAt, so _mergeEntity's local-deletion guard has no "newer than
+    // the deletion" escape and skips the live row entirely.
+    final liveByType = {
+      ...remotePayload.data.toJson(),
+      'diveProfiles': remotePayload.data.diveProfiles,
+      'tankPressureProfiles': remotePayload.data.tankPressureProfiles,
+    };
     for (final delEntry in remotePayload.deletions.entries) {
       final deletedIds = {for (final d in delEntry.value) d.id};
       if (deletedIds.isEmpty) continue;
@@ -1380,10 +1439,10 @@ class SyncService {
             hasUpdatedAt: false,
           ),
           (type: 'gasSwitches', records: data.gasSwitches, hasUpdatedAt: false),
-          // Extra entities added in the SyncData expansion. Four are
+          // Extra entities added in the SyncData expansion. Five are
           // append-only and use the blind-upsert merge path (no updatedAt
           // column: diveCustomFields, diveDataSources, siteSpecies,
-          // fieldPresets). Two carry updatedAt and use the standard
+          // mediaSpecies, fieldPresets). Two carry updatedAt and use the standard
           // conflict-detection path (csvPresets, viewConfigs). FK ordering
           // is handled by the deferred-FK transaction wrapping this loop.
           (
@@ -1396,7 +1455,22 @@ class SyncService {
             records: data.diveDataSources,
             hasUpdatedAt: false,
           ),
+          (
+            type: 'diveProfileSeries',
+            records: data.diveProfileSeries,
+            hasUpdatedAt: true,
+          ),
+          (
+            type: 'tankPressureSeries',
+            records: data.tankPressureSeries,
+            hasUpdatedAt: true,
+          ),
           (type: 'siteSpecies', records: data.siteSpecies, hasUpdatedAt: false),
+          (
+            type: 'mediaSpecies',
+            records: data.mediaSpecies,
+            hasUpdatedAt: false,
+          ),
           (
             type: 'siteFeatures',
             records: data.siteFeatures,
@@ -1519,6 +1593,11 @@ class SyncService {
       recordsFailed += result.recordsFailed;
     }
 
+    await _packLegacySamplesIfPresent(
+      data.diveProfiles.isNotEmpty || data.tankPressureProfiles.isNotEmpty,
+      parentsArrived: data.dives.isNotEmpty || data.diveTanks.isNotEmpty,
+    );
+
     // Integrity backstop: applying a remote deletion of a parent can leave a
     // local row pointing at it via a non-cascading FK, which would fail the
     // deferred-FK COMMIT and abort the whole sync. Clear or delete any such
@@ -1533,6 +1612,64 @@ class SyncService {
     );
   }
 
+  /// v182 receive-side tolerance: after a merge (changeset OR base file) has
+  /// applied any inbound-only legacy row-per-sample rows, pack them into
+  /// series for whichever dives don't already have one. A no-op (and no log)
+  /// when this payload carried none AND nothing is still staged, which is
+  /// the common case once every peer has upgraded.
+  ///
+  /// The staging check is what makes the retry this method's own doc
+  /// promises real. A staged row whose dive had not arrived is kept for the
+  /// next apply, and the payload that finally brings that dive need not
+  /// carry legacy rows of its own: gating on the payload alone let the rows
+  /// sit until the next payload happened to carry legacy rows of its own.
+  ///
+  /// Runs inside the caller's deferred-FK merge transaction, so a throw here
+  /// must never escape: it would roll back the whole payload while leaving
+  /// the changeset reader's cursor advanced, and the next sync would neither
+  /// replay nor retry the payload, wedging the peer permanently. The legacy
+  /// rows this call packs are already applied and durable in
+  /// `legacy_sample_staging.dart`'s staging tables by the time it runs, and
+  /// [SyncDataSerializer.packLegacySamples] leaves them staged on a throw
+  /// (it only empties the staging tables after a successful pack), so
+  /// nothing is lost by deferring: the next apply in this session (another
+  /// changeset, base file, or adopt) packs the same staged rows. The
+  /// staging tables are ordinary tables, not TEMP, so that retry survives
+  /// an app restart: the changeset cursor that would offer these rows again
+  /// is committed durably, and a staging that evaporated with the
+  /// connection made the promise false exactly when it mattered.
+  Future<void> _packLegacySamplesIfPresent(
+    bool anyLegacyRowsApplied, {
+    bool parentsArrived = false,
+  }) async {
+    if (!anyLegacyRowsApplied) {
+      // A staged row the last pass could not place is blocked on a parent
+      // (its dive, or a pressure row's tank). Only a payload that brought
+      // one can unblock it, so a payload that brought neither cannot, and
+      // re-running the whole pack on every apply to find that out is the
+      // difference between a bounded retry and a permanent per-apply cost
+      // for one row that may never be placeable.
+      if (!parentsArrived) return;
+      if (!await _serializer.hasStagedLegacySamples()) return;
+    }
+    try {
+      final packed = await _serializer.packLegacySamples();
+      _log.info(
+        'Packed legacy sample rows from a peer: '
+        '${packed.profileSeries} profile series, '
+        '${packed.tankSeries} tank series, '
+        '${packed.skippedAlreadyPacked} dives already packed here',
+      );
+    } catch (e, st) {
+      _log.warning(
+        'Packing legacy sample rows from a peer failed; the rows stay '
+        'staged and the next sync apply in this session retries them',
+        error: e,
+        stackTrace: st,
+      );
+    }
+  }
+
   /// Apply a base that was streamed to a local temp [filePath], in bounded
   /// memory. Three forward passes over the file:
   ///   1. header `exportedAt` + the full `deletions` map (both small),
@@ -1543,24 +1680,54 @@ class SyncService {
   /// main isolate in BasePartFileSink.assemble -- folding it in is a deferred
   /// follow-up) and falls back to the inline path on any worker failure, so a
   /// broken isolate degrades to old behaviour and never fails or corrupts sync.
+  ///
+  /// [onProgress] receives a 0.0 to 1.0 fraction spanning the three passes
+  /// (each pass is one third), with a final 1.0 once the transaction commits.
   Future<_MergeResult> _applyRemoteBaseFile(
     String filePath,
-    DateTime? localLastSync,
-  ) async {
+    DateTime? localLastSync, {
+    void Function(double fraction)? onProgress,
+  }) async {
+    final totalBytes = await File(filePath).length();
+    final stopwatch = Stopwatch()..start();
+    _log.info('Applying peer base: $totalBytes bytes');
+    final progress = BaseApplyProgress(totalBytes, onProgress);
     BaseParseClient? client;
+    _MergeResult result;
     try {
       client = await baseParseClientSpawn(filePath);
-      return await _applyRemoteBaseFileViaWorker(client, localLastSync);
+      client.onProgress = progress.bytes;
+      result = await _applyRemoteBaseFileViaWorker(
+        client,
+        localLastSync,
+        progress,
+      );
     } catch (e, st) {
       _log.warning(
         'Base-apply worker failed; falling back to inline',
         error: e,
         stackTrace: st,
       );
-      return _applyRemoteBaseFileInline(filePath, localLastSync);
+      // Kill the (possibly wedged, memory-hungry) worker BEFORE the inline
+      // passes start competing with it for memory and file I/O.
+      await client?.dispose();
+      client = null;
+      progress.restart();
+      result = await _applyRemoteBaseFileInline(
+        filePath,
+        localLastSync,
+        progress,
+      );
     } finally {
       await client?.dispose();
     }
+    progress.done();
+    _log.info(
+      'Peer base applied in ${stopwatch.elapsed.inSeconds}s: '
+      '${result.recordsApplied} applied, ${result.conflictsFound} conflicts, '
+      '${result.recordsFailed} failed',
+    );
+    return result;
   }
 
   /// Worker-backed base apply: the file read + JSON parse run in [client]'s
@@ -1571,6 +1738,7 @@ class SyncService {
   Future<_MergeResult> _applyRemoteBaseFileViaWorker(
     BaseParseClient client,
     DateTime? localLastSync,
+    BaseApplyProgress progress,
   ) async {
     final lastSyncMs = localLastSync?.millisecondsSinceEpoch;
 
@@ -1595,10 +1763,11 @@ class SyncService {
     final parentUpdatedAt = <String, Map<String, int>>{};
     final contradictedByEntity = <String, Set<String>>{};
     final pass2Tables = <String>{
-      for (final table in entityHasUpdatedAt.keys)
+      for (final table in _baseApplyEntityFlags.keys)
         if (parentTypes.contains(table) || deletionIds.containsKey(table))
           table,
     };
+    progress.beginPass(1);
     client.startDataRows(pass2Tables);
     List<({String table, Map<String, dynamic> row})>? p2batch;
     while ((p2batch = await client.nextDataBatch()) != null) {
@@ -1607,7 +1776,8 @@ class SyncService {
         final rec = r.row;
         final id = _recordIdForEntity(table, rec);
         if (id == null) continue;
-        if (parentTypes.contains(table) && entityHasUpdatedAt[table] == true) {
+        if (parentTypes.contains(table) &&
+            _baseApplyEntityFlags[table] == true) {
           final u = _extractUpdatedAtMillis(rec);
           if (u != null) (parentUpdatedAt[table] ??= {})[id] = u;
         }
@@ -1653,6 +1823,11 @@ class SyncService {
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
+      // v182 receive-side tolerance: true once a legacy diveProfiles /
+      // tankPressureProfiles row has streamed through, so the packer only
+      // runs when this base actually carried some.
+      var sawLegacySamples = false;
+      var sawParents = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1660,7 +1835,7 @@ class SyncService {
         final r = await _mergeEntity(
           entityType: table,
           records: batch,
-          hasUpdatedAt: entityHasUpdatedAt[table] ?? false,
+          hasUpdatedAt: _baseApplyEntityFlags[table] ?? false,
           lastSyncMs: lastSyncMs,
           pendingRecordIds: pendingByEntity[table] ?? const <String>{},
           allTombstones: tombstonesByEntity,
@@ -1673,7 +1848,8 @@ class SyncService {
         batch = <Map<String, dynamic>>[];
       }
 
-      client.startDataRows(entityHasUpdatedAt.keys.toSet());
+      progress.beginPass(2);
+      client.startDataRows(_baseApplyEntityFlags.keys.toSet());
       List<({String table, Map<String, dynamic> row})>? p3batch;
       while ((p3batch = await client.nextDataBatch()) != null) {
         for (final r in p3batch!) {
@@ -1681,11 +1857,22 @@ class SyncService {
             await flush();
             currentTable = r.table;
           }
+          if (inboundOnlyLegacyEntities.containsKey(r.table)) {
+            sawLegacySamples = true;
+          }
+          if (r.table == 'dives' || r.table == 'diveTanks') {
+            sawParents = true;
+          }
           batch.add(r.row);
           if (batch.length >= batchSize) await flush();
         }
       }
       await flush();
+
+      await _packLegacySamplesIfPresent(
+        sawLegacySamples,
+        parentsArrived: sawParents,
+      );
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -1703,15 +1890,20 @@ class SyncService {
   Future<_MergeResult> _applyRemoteBaseFileInline(
     String filePath,
     DateTime? localLastSync,
+    BaseApplyProgress progress,
   ) async {
     final file = File(filePath);
     final lastSyncMs = localLastSync?.millisecondsSinceEpoch;
+    // The inline parse blocks the UI isolate, so its heartbeats are what
+    // keep the bar moving; the fallback runs the whole file three times.
+    Stream<List<int>> openWithProgress() =>
+        withByteProgress(file.openRead(), onProgress: progress.consumed);
 
     // ---- Pass 1: exportedAt + deletions ----
     var baseExportedAt = 0;
     final deletions = <String, List<SyncDeletion>>{};
     await BaseJsonStreamReader().parse(
-      file.openRead(),
+      openWithProgress(),
       onScalar: (key, raw) async {
         if (key == 'exportedAt') {
           baseExportedAt = (jsonDecode(utf8.decode(raw)) as num?)?.toInt() ?? 0;
@@ -1746,17 +1938,19 @@ class SyncService {
     };
     final parentUpdatedAt = <String, Map<String, int>>{};
     final contradictedByEntity = <String, Set<String>>{};
+    progress.beginPass(1);
     await BaseJsonStreamReader().parse(
-      file.openRead(),
+      openWithProgress(),
       wantRows: (section, table) =>
           section == 'data' &&
-          entityHasUpdatedAt.containsKey(table) &&
+          _baseApplyEntityFlags.containsKey(table) &&
           (parentTypes.contains(table) || deletionIds.containsKey(table)),
       onRow: (section, table, rowBytes) async {
         final rec = jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>;
         final id = _recordIdForEntity(table, rec);
         if (id == null) return;
-        if (parentTypes.contains(table) && entityHasUpdatedAt[table] == true) {
+        if (parentTypes.contains(table) &&
+            _baseApplyEntityFlags[table] == true) {
           final u = _extractUpdatedAtMillis(rec);
           if (u != null) (parentUpdatedAt[table] ??= {})[id] = u;
         }
@@ -1808,6 +2002,11 @@ class SyncService {
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
+      // v182 receive-side tolerance: true once a legacy diveProfiles /
+      // tankPressureProfiles row has streamed through, so the packer only
+      // runs when this base actually carried some.
+      var sawLegacySamples = false;
+      var sawParents = false;
 
       Future<void> flush() async {
         final table = currentTable;
@@ -1815,7 +2014,7 @@ class SyncService {
         final r = await _mergeEntity(
           entityType: table,
           records: batch,
-          hasUpdatedAt: entityHasUpdatedAt[table] ?? false,
+          hasUpdatedAt: _baseApplyEntityFlags[table] ?? false,
           lastSyncMs: lastSyncMs,
           pendingRecordIds: pendingByEntity[table] ?? const <String>{},
           allTombstones: tombstonesByEntity,
@@ -1828,20 +2027,32 @@ class SyncService {
         batch = <Map<String, dynamic>>[];
       }
 
+      progress.beginPass(2);
       await BaseJsonStreamReader().parse(
-        file.openRead(),
+        openWithProgress(),
         wantRows: (section, table) =>
-            section == 'data' && entityHasUpdatedAt.containsKey(table),
+            section == 'data' && _baseApplyEntityFlags.containsKey(table),
         onRow: (section, table, rowBytes) async {
           if (table != currentTable) {
             await flush();
             currentTable = table;
+          }
+          if (inboundOnlyLegacyEntities.containsKey(table)) {
+            sawLegacySamples = true;
+          }
+          if (table == 'dives' || table == 'diveTanks') {
+            sawParents = true;
           }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
         },
       );
       await flush();
+
+      await _packLegacySamplesIfPresent(
+        sawLegacySamples,
+        parentsArrived: sawParents,
+      );
 
       await _serializer.repairDanglingForeignKeys();
       return _MergeResult(
@@ -1883,8 +2094,8 @@ class SyncService {
           // protected from a stale remote tombstone even on append-only child
           // tables that have a createdAt.
           // Clockless child tables with neither updatedAt nor createdAt
-          // (dive_profiles, dive_tanks, tank_pressure_profiles, sightings) have
-          // no age signal: the uuid-keyed ones regenerate with fresh ids on
+          // (dive_tanks and sightings, and the retired dive_profiles /
+          // tank_pressure_profiles before them) have no age signal: the uuid-keyed ones regenerate with fresh ids on
           // re-import, so a stale tombstone won't match a current row. The
           // composite-natural-key junctions (dive_equipment, equipment_set_items)
           // WOULD match a re-inserted row, but the contradicted-key skip above
@@ -1957,9 +2168,10 @@ class SyncService {
 
   /// Per-entity "has an updatedAt column" flag, mirroring the `mergeOrder`
   /// records in [_applyRemotePayloadInner]. The streaming base apply
-  /// ([_applyRemoteBaseFile]) uses it for (a) conflict-detection behavior in
-  /// [_mergeEntity] and (b) the set of entity tables it applies (a table absent
-  /// from these keys is silently skipped on base import).
+  /// ([_applyRemoteBaseFile]) uses it (via [_baseApplyEntityFlags], which
+  /// also folds in [inboundOnlyLegacyEntities]) for (a) conflict-detection
+  /// behavior in [_mergeEntity] and (b) the set of entity tables it applies
+  /// (a table absent from that union is silently skipped on base import).
   ///
   /// MUST list every [SyncData] entity: a structural test
   /// (`entityHasUpdatedAt covers exactly the SyncData entities`) asserts the
@@ -2017,7 +2229,6 @@ class SyncService {
     'diveTags': false,
     'diveDiveTypes': false,
     'diveBuddies': false,
-    'diveProfiles': false,
     'diveProfileEvents': false,
     'diveSafetyReviews': false,
     'diveSafetyFindings': false,
@@ -2027,11 +2238,11 @@ class SyncService {
     'diveCustomFields': false,
     'diveDataSources': false,
     'siteSpecies': false,
+    'mediaSpecies': false,
     'siteFeatures': true,
     'csvPresets': true,
     'viewConfigs': true,
     'fieldPresets': false,
-    'tankPressureProfiles': false,
     'tideRecords': false,
     'sightings': false,
     'certifications': true,
@@ -2044,7 +2255,38 @@ class SyncService {
     'mediaStores': false,
     'connectedAccounts': true,
     'mediaSubscriptions': true,
+    'diveProfileSeries': true,
+    'tankPressureSeries': true,
   };
+
+  /// v182 receive-side tolerance: legacy row-per-sample entities an older
+  /// peer still sends. Parsed and applied when such a peer's data arrives,
+  /// whether as a changeset (via `mergeOrder` in [_applyRemotePayloadInner])
+  /// or as a base file (unioned into the table set the base-file apply path
+  /// reads off the wire, see [_baseApplyEntityFlags]), then packed into
+  /// series by [SyncDataSerializer.packLegacySamples]. Deliberately absent
+  /// from [entityHasUpdatedAt] and from [SyncData.toJson]: never exported,
+  /// and kept out of the structural test that pins `entityHasUpdatedAt` to
+  /// the `SyncData` entity set. Removed together with the legacy tables in
+  /// plan 2e.
+  @visibleForTesting
+  static const Map<String, bool> inboundOnlyLegacyEntities = {
+    'diveProfiles': false,
+    'tankPressureProfiles': false,
+  };
+
+  /// Table set the base-file apply path (`_applyRemoteBaseFile*`) and the
+  /// replace-adopt streaming path (`_adoptApplyStreaming`) read off the wire
+  /// (and, for adopt, clear before re-inserting): every merge-applied entity
+  /// ([entityHasUpdatedAt]) plus the inbound-only legacy entities
+  /// ([inboundOnlyLegacyEntities]). A table absent from this union is
+  /// silently skipped on base import (mirrors [entityHasUpdatedAt]'s own doc
+  /// comment); kept separate from [entityHasUpdatedAt] itself so that map's
+  /// structural test is unaffected.
+  static final Map<String, bool> _baseApplyEntityFlags = Map.unmodifiable({
+    ...entityHasUpdatedAt,
+    ...inboundOnlyLegacyEntities,
+  });
 
   /// Every synced child -> parent FK whose parent can be deleted (and thus
   /// tombstoned in the deletion log). Used by [_mergeEntity] to keep a peer's
@@ -2072,11 +2314,6 @@ class SyncService {
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'relatedDiveId', parent: 'dives', nullable: true),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
-    ],
-    'diveProfiles': [
-      (field: 'diveId', parent: 'dives', nullable: false),
-      (field: 'computerId', parent: 'diveComputers', nullable: true),
-      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
     ],
     // v175 gear twins: a peer's live computer whose gear item we deleted
     // locally would otherwise dangle this FK and abort the whole sync at
@@ -2120,13 +2357,19 @@ class SyncService {
     'diveSafetyFindings': [(field: 'diveId', parent: 'dives', nullable: false)],
     'gasSwitches': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveCustomFields': [(field: 'diveId', parent: 'dives', nullable: false)],
-    'tankPressureProfiles': [
-      (field: 'diveId', parent: 'dives', nullable: false),
-      (field: 'computerId', parent: 'diveComputers', nullable: true),
-    ],
     'tideRecords': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveDataSources': [
       (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'computerId', parent: 'diveComputers', nullable: true),
+    ],
+    'diveProfileSeries': [
+      (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'computerId', parent: 'diveComputers', nullable: true),
+      (field: 'sourceId', parent: 'diveDataSources', nullable: true),
+    ],
+    'tankPressureSeries': [
+      (field: 'diveId', parent: 'dives', nullable: false),
+      (field: 'tankId', parent: 'diveTanks', nullable: false),
       (field: 'computerId', parent: 'diveComputers', nullable: true),
     ],
     'sightings': [
@@ -2136,10 +2379,15 @@ class SyncService {
     'media': [
       (field: 'diveId', parent: 'dives', nullable: true),
       (field: 'siteId', parent: 'diveSites', nullable: true),
+      (field: 'equipmentId', parent: 'equipment', nullable: true),
       (field: 'signerId', parent: 'buddies', nullable: true),
     ],
     'siteSpecies': [
       (field: 'siteId', parent: 'diveSites', nullable: false),
+      (field: 'speciesId', parent: 'species', nullable: false),
+    ],
+    'mediaSpecies': [
+      (field: 'mediaId', parent: 'media', nullable: false),
       (field: 'speciesId', parent: 'species', nullable: false),
     ],
     'siteFeatures': [(field: 'siteId', parent: 'diveSites', nullable: false)],
@@ -2408,6 +2656,14 @@ class SyncService {
     // Drift's batch is all-or-nothing, so a failure fails every row it would
     // have applied -- move those from applied to failed, mirroring the per-row
     // catch above.
+    //
+    // The two inbound-only legacy sample entities are the exception to the
+    // all-or-nothing part: their upsert goes to the staging tables of
+    // legacy_sample_staging.dart, which insert in chunks, so a throw can
+    // leave earlier chunks staged. Counting the whole batch failed is still
+    // right, and the partial stage is harmless: the staged rows are
+    // pack that reads it is idempotent, and a retry restages the same ids
+    // over the same rows.
     if (toUpsert.isNotEmpty) {
       try {
         await _serializer.upsertRecords(entityType, toUpsert);
@@ -2677,20 +2933,48 @@ class SyncService {
     _log.info('Local sync state repaired');
   }
 
-  /// Best-effort sweep of leftover streaming-base temp files (base export
-  /// base export `ssv1_base_*.json` and assembled `ssv1_*.base` / `ssv1_adopt_*`
-  /// parts) from the app temp dir. Every sync temp file is prefixed `ssv1_`, so
+  /// How recently a sync temp file must have been touched to be spared as
+  /// "probably still being written" rather than swept as a leftover. Mirrors
+  /// `ResumableBasePublishStore._orphanGrace`, for the same reason.
+  static const Duration _tempFileGrace = Duration(minutes: 5);
+
+  /// Best-effort sweep of leftover streaming-base temp files (base exports
+  /// `ssv1_base_*.json` and assembled `ssv1_*.base` / `ssv1_adopt_*` parts)
+  /// from the app temp dir. Every sync temp file is prefixed `ssv1_`, so
   /// the sweep matches ONLY that prefix -- never an unrelated app temp file
   /// (the dir is a shared, general-purpose temp location). Failure is logged
   /// and ignored; a stale temp file is harmless.
-  Future<void> deleteLeftoverBaseTempFiles() async {
+  ///
+  /// Skips anything touched within [_tempFileGrace]. The prefix keeps the
+  /// sweep off files this app did not write, but NOT off files another
+  /// instance of it is writing right now: under `flutter test`
+  /// [resolveSyncTempDir] falls back to the machine-wide
+  /// `Directory.systemTemp`, so every concurrent test process shares one
+  /// directory and a base export in flight in one of them sits next to this
+  /// sweep running in another. Deleting it fails that publish, which surfaces
+  /// as a sync returning non-success in a test file that touched no sync code
+  /// at all. The uuid in each name prevents collisions but cannot help here,
+  /// because the sweep matches on prefix rather than on a name it chose. A
+  /// leftover worth reaping is by definition from a run that already ended, so
+  /// it is old; a true orphan younger than the grace is simply reclaimed by
+  /// the next sweep.
+  ///
+  /// [tempDir] is injectable so tests can sweep a private directory instead of
+  /// the shared one -- otherwise this test would be the very hazard it covers.
+  Future<void> deleteLeftoverBaseTempFiles({
+    @visibleForTesting Future<Directory> Function()? tempDir,
+  }) async {
     try {
-      final dir = await resolveSyncTempDir();
+      final dir = await (tempDir?.call() ?? resolveSyncTempDir());
+      final cutoff = DateTime.now().subtract(_tempFileGrace);
       await for (final entity in dir.list(followLinks: false)) {
         if (entity is! File) continue;
         final name = entity.uri.pathSegments.last;
         if (name.startsWith('ssv1_')) {
           try {
+            // Inside the try: the file can vanish between the listing and the
+            // stat, which is exactly what a concurrent sweep looks like.
+            if ((await entity.lastModified()).isAfter(cutoff)) continue;
             await entity.delete();
           } catch (_) {
             // best effort
@@ -3358,8 +3642,15 @@ class SyncService {
     // Replace semantics: clear every synced table, then insert the cloud union
     // (latest export wins). Equivalent to the old upsert-then-delete-not-in-
     // cloud, but needs no in-RAM id set to diff against, so adopt memory stays
-    // bounded regardless of library size (#358 adopt OOM).
-    for (final entity in entityHasUpdatedAt.keys) {
+    // bounded regardless of library size (#358 adopt OOM). The legacy sample
+    // entities are still applied from a not-yet-upgraded peer's point of view
+    // (v182 receive-side tolerance) below, but there is no local table to
+    // clear for them any more (v183 dropped `dive_profiles` /
+    // `tank_pressure_profiles`; an inbound row now stages in a per-connection
+    // staging table instead), so the clear loop skips them; the series tables,
+    // which [entityHasUpdatedAt] already lists, get no special treatment.
+    for (final entity in _baseApplyEntityFlags.keys) {
+      if (inboundOnlyLegacyEntities.containsKey(entity)) continue;
       await _serializer.deleteAllRecords(entity);
     }
 
@@ -3386,20 +3677,44 @@ class SyncService {
       for (final c in changesets) (at: c.exportedAt, file: null, changeset: c),
     ]..sort((a, b) => a.at.compareTo(b.at));
 
+    // v182 receive-side tolerance: true once a legacy diveProfiles /
+    // tankPressureProfiles row has been applied from any unit, so the
+    // packer only runs when the adopted library actually carried some.
+    var sawLegacySamples = false;
+    var sawParents = false;
+
     for (final unit in units) {
       final changeset = unit.changeset;
       if (changeset != null) {
-        for (final entry in changeset.data.toJson().entries) {
-          if (!entityHasUpdatedAt.containsKey(entry.key)) continue;
-          await applyBatch(
-            entry.key,
-            (entry.value as List).cast<Map<String, dynamic>>(),
-          );
+        // changeset.data.toJson() omits diveProfiles/tankPressureProfiles
+        // (inbound only, never re-exported through toJson), so they are
+        // folded back in from the typed fields fromJson already parsed them
+        // into, matching the raw wire shape a not-yet-upgraded peer sends.
+        final changesetData = {
+          ...changeset.data.toJson(),
+          'diveProfiles': changeset.data.diveProfiles,
+          'tankPressureProfiles': changeset.data.tankPressureProfiles,
+        };
+        for (final entry in changesetData.entries) {
+          if (!_baseApplyEntityFlags.containsKey(entry.key)) continue;
+          final records = (entry.value as List).cast<Map<String, dynamic>>();
+          if (records.isNotEmpty &&
+              inboundOnlyLegacyEntities.containsKey(entry.key)) {
+            sawLegacySamples = true;
+          }
+          if (records.isNotEmpty &&
+              (entry.key == 'dives' || entry.key == 'diveTanks')) {
+            sawParents = true;
+          }
+          await applyBatch(entry.key, records);
         }
         continue;
       }
 
-      // Base file: stream `data` rows, batching 500 per table.
+      // Base file: stream `data` rows, batching 500 per table. Read directly
+      // off disk, so a not-yet-upgraded peer's raw diveProfiles /
+      // tankPressureProfiles rows are present here regardless of what this
+      // build's own SyncData.toJson would emit.
       const batchSize = 500;
       String? currentTable;
       var batch = <Map<String, dynamic>>[];
@@ -3413,11 +3728,17 @@ class SyncService {
       await BaseJsonStreamReader().parse(
         File(unit.file!).openRead(),
         wantRows: (section, table) =>
-            section == 'data' && entityHasUpdatedAt.containsKey(table),
+            section == 'data' && _baseApplyEntityFlags.containsKey(table),
         onRow: (section, table, rowBytes) async {
           if (table != currentTable) {
             await flush();
             currentTable = table;
+          }
+          if (inboundOnlyLegacyEntities.containsKey(table)) {
+            sawLegacySamples = true;
+          }
+          if (table == 'dives' || table == 'diveTanks') {
+            sawParents = true;
           }
           batch.add(jsonDecode(utf8.decode(rowBytes)) as Map<String, dynamic>);
           if (batch.length >= batchSize) await flush();
@@ -3425,6 +3746,11 @@ class SyncService {
       );
       await flush();
     }
+
+    await _packLegacySamplesIfPresent(
+      sawLegacySamples,
+      parentsArrived: sawParents,
+    );
 
     await _serializer.repairDanglingForeignKeys();
   }

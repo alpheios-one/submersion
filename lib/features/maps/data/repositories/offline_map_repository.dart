@@ -3,12 +3,10 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/maps/domain/entities/cached_region.dart'
     as domain;
-import 'package:uuid/uuid.dart';
 
 /// Repository for managing cached map regions.
 class OfflineMapRepository {
   AppDatabase get _db => DatabaseService.instance.database;
-  static const _uuid = Uuid();
 
   /// Emits whenever the `cached_regions` table changes so the offline-map
   /// providers refresh after a download completes or a region is evicted.
@@ -30,7 +28,12 @@ class OfflineMapRepository {
   }
 
   /// Create a new cached region record.
+  ///
+  /// [id] is minted by the caller rather than here, because a region's tiles
+  /// live in a store named after it and that store has to exist before the
+  /// download that fills it can start.
   Future<domain.CachedRegion> createRegion({
+    required String id,
     required String name,
     required double minLat,
     required double maxLat,
@@ -42,7 +45,6 @@ class OfflineMapRepository {
     required int sizeBytes,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final id = _uuid.v4();
 
     await _db
         .into(_db.cachedRegions)

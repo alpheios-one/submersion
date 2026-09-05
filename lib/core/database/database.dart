@@ -4,8 +4,12 @@ import 'dart:developer' as developer;
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/dive_computer_gear_backfill.dart';
+import 'package:submersion/core/database/dive_type_uniqueness.dart';
 import 'package:submersion/core/database/imported_computer_backfill.dart';
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/profile_series_pack_coverage.dart';
+import 'package:submersion/core/database/profile_series_pack.dart';
+import 'package:submersion/core/database/raw_dive_data_codec.dart';
 import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
 
@@ -21,7 +25,15 @@ class Divers extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Never written for divers; kept so a
+  /// database that predates v181 still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the diver rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   // Emergency contact
   TextColumn get emergencyContactName => text().nullable()();
   TextColumn get emergencyContactPhone => text().nullable()();
@@ -41,6 +53,13 @@ class Divers extends Table {
   TextColumn get insuranceProvider => text().nullable()();
   TextColumn get insurancePolicyNumber => text().nullable()();
   IntColumn get insuranceExpiryDate => integer().nullable()(); // Unix timestamp
+
+  /// The insurer's 24-hour dive emergency assistance line, and its general or
+  /// office line (issue #1522). Without these the emergency card can only lead
+  /// with the regional diver hotline, which is the wrong first call for a
+  /// diver insured by anyone else.
+  TextColumn get insuranceEmergencyPhone => text().nullable()();
+  TextColumn get insurancePhone => text().nullable()();
   // General
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isDefault => boolean().withDefault(const Constant(false))();
@@ -309,7 +328,7 @@ class PreDiveChecklistTemplateItems extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 
-  /// 'check' | 'value' | 'equipmentSet' (PreDiveItemType.name).
+  /// 'check' | 'value' | 'equipmentSet' | 'equipment' (PreDiveItemType.name).
   TextColumn get itemType => text().withDefault(const Constant('check'))();
   TextColumn get valueLabel => text().nullable()();
   TextColumn get valueUnit => text().nullable()();
@@ -320,6 +339,18 @@ class PreDiveChecklistTemplateItems extends Table {
 
   /// Required items must end Done or Flagged (never Skipped).
   BoolColumn get isRequired => boolean().withDefault(const Constant(false))();
+
+  /// Remembered equipment for an 'equipment'-typed item. Chosen at session
+  /// start (not in the template editor, mirroring the equipmentSet flow)
+  /// and persisted here so later sessions pre-fill the same device. Issue
+  /// #814.
+  ///
+  /// Deliberately not a SQL-level FK: template items are (re-)seeded
+  /// independently of the equipment table in isolated schema fixtures (and
+  /// at every app start for builtin templates), so a REFERENCES clause would
+  /// require the equipment table to exist wherever this table does.
+  /// Referential integrity is enforced at the application layer instead.
+  TextColumn get equipmentId => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -412,6 +443,12 @@ class PreDiveSessionItems extends Table {
     #id,
     onDelete: KeyAction.setNull,
   )();
+
+  /// JSON-encoded list of overdue-service entries, frozen the moment the
+  /// diver last moved this item away from pending. Null while pending (the
+  /// runner computes the live overdue list from equipmentId instead) and
+  /// cleared back to null on reset. Issue #814 phase 2.
+  TextColumn get overdueServices => text().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -729,6 +766,18 @@ class Dives extends Table {
   RealColumn get weightingFeedbackKg => real().nullable()();
   // Favorite flag (v1.1)
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  // Statistics exclusion (schema v180, issues #526 and #1272).
+  // excludedFromStats is the master flag: the dive stays in the logbook but
+  // contributes to no descriptive aggregate, its count included.
+  // excludedFromGasStats drops the dive from SAC/RMV and gas-mix aggregates
+  // only, for an otherwise ordinary dive whose gas number is unrepresentative
+  // (for example purging the tank for an end-of-dive weight check).
+  // The master flag implies the gas flag; the implication is applied in SQL by
+  // DiveStatsScope, not stored on the row.
+  BoolColumn get excludedFromStats =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get excludedFromGasStats =>
+      boolean().withDefault(const Constant(false))();
   // Dive mode for CCR/SCR (v1.5)
   TextColumn get diveMode =>
       text().withDefault(const Constant('oc'))(); // oc, ccr, scr
@@ -823,88 +872,9 @@ class Dives extends Table {
   /// (nullable: rows written before HLC rollout fall back to updatedAt).
   TextColumn get hlc => text().nullable()();
 
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
-/// Time-series dive profile data points
-class DiveProfiles extends Table {
-  TextColumn get id => text()();
-  TextColumn get diveId =>
-      text().references(Dives, #id, onDelete: KeyAction.cascade)();
-  TextColumn get computerId =>
-      text().nullable().references(DiveComputers, #id)();
-
-  /// Owning [DiveDataSources] row (issue #1149).
-  ///
-  /// [computerId] cannot identify the owner on its own: file imports and
-  /// manual entries leave it null on both the source row and the profile
-  /// rows, so two file-imported sources on one dive are indistinguishable.
-  /// This FK names the owner outright, which is what `setPrimaryDataSource`
-  /// promotes on.
-  ///
-  /// Nullable, and consumers must tolerate null: rows written before v158,
-  /// and rows synced from a peer running an older schema, carry none. The
-  /// fallback is the legacy convention (match on [computerId]; null belongs
-  /// to the primary source). `onDelete: setNull` because samples must
-  /// outlive their metadata row -- dropping a source must never destroy the
-  /// profile it describes.
-  TextColumn get sourceId => text().nullable().references(
-    DiveDataSources,
-    #id,
-    onDelete: KeyAction.setNull,
-  )();
-  BoolColumn get isPrimary => boolean().withDefault(
-    const Constant(true),
-  )(); // Primary profile for stats
-  IntColumn get timestamp => integer()(); // seconds from dive start
-  RealColumn get depth => real()();
-  // Deprecated: use tank_pressure_profiles table. Column retained for schema compat.
-  RealColumn get pressure => real().nullable()();
-  RealColumn get temperature => real().nullable()();
-  IntColumn get heartRate => integer().nullable()();
-  // Compass heading in degrees (0-359) from DC_SAMPLE_BEARING; null when the
-  // computer does not report bearing samples.
-  RealColumn get heading => real().nullable()();
-  // Computed decompression data (optional, can be calculated on-the-fly)
-  RealColumn get ascentRate => real().nullable()(); // m/min
-  RealColumn get ceiling => real().nullable()(); // deco ceiling in meters
-  IntColumn get ndl => integer().nullable()(); // no-deco limit in seconds
-
-  // CCR/SCR rebreather data (v1.5)
-  RealColumn get setpoint =>
-      real().nullable()(); // Current setpoint at sample (bar)
-  RealColumn get ppO2 => real().nullable()(); // Measured/calculated ppO2 (bar)
-
-  // Individual CCR O2 cell readings (bar). Subsurface exports up to 6
-  // (sensor1..sensor6); rebreathers run 3 (e.g. JJ-CCR) to 5 (e.g. rEvo).
-  // Stored raw exactly as the source reports them; null when absent.
-  RealColumn get o2Sensor1 => real().nullable()();
-  RealColumn get o2Sensor2 => real().nullable()();
-  RealColumn get o2Sensor3 => real().nullable()();
-  RealColumn get o2Sensor4 => real().nullable()();
-  RealColumn get o2Sensor5 => real().nullable()();
-  RealColumn get o2Sensor6 => real().nullable()();
-  // Raw O2 cell output in millivolts (issue #810). Reported even when the
-  // matching o2SensorN is null because the logged calibration was untrusted.
-  IntColumn get o2SensorMv1 => integer().nullable()();
-  IntColumn get o2SensorMv2 => integer().nullable()();
-  IntColumn get o2SensorMv3 => integer().nullable()();
-  IntColumn get o2SensorMv4 => integer().nullable()();
-  IntColumn get o2SensorMv5 => integer().nullable()();
-  IntColumn get o2SensorMv6 => integer().nullable()();
-
-  // Per-sample decompression data (v1.5)
-  RealColumn get cns => real().nullable()(); // CNS percentage 0-100
-  IntColumn get tts => integer().nullable()(); // Time to surface in seconds
-  IntColumn get rbt =>
-      integer().nullable()(); // Remaining bottom time in seconds
-  IntColumn get decoType =>
-      integer().nullable()(); // 0=NDL, 1=safety, 2=deco, 3=deep
-
-  // Wearable integration (v2.0) - tracks source of heart rate data
-  TextColumn get heartRateSource =>
-      text().nullable()(); // 'diveComputer', 'appleWatch', 'garmin', 'manual'
+  /// When the diver dismissed the site suggestion for this dive (photo GPS or
+  /// dive-computer GPS). Null = never dismissed. Synced with the row.
+  IntColumn get siteSuggestionDismissedAt => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -1399,6 +1369,17 @@ class Media extends Table {
   // taken_at. Lives on the media row, not on media_enrichment, so it syncs
   // with the row and survives every enrichment recompute.
   IntColumn get manualElapsedSeconds => integer().nullable()();
+  // v189: equipment attachment (issue #1517). Invoices, receipts and warranty
+  // paperwork linked to a piece of gear, so an insurance claim after lost
+  // luggage, theft or fire has the proof attached to the item it covers.
+  // Same SET NULL semantics as [siteId]: the repository's deletion partition
+  // decides whether a leftover row dies or survives, and it stamps the HLC a
+  // silent FK never would.
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -1779,6 +1760,11 @@ class DiverSettings extends Table {
       integer().withDefault(const Constant(1))();
   IntColumn get defaultTtsSource => integer().withDefault(const Constant(1))();
   IntColumn get defaultCnsSource => integer().withDefault(const Constant(1))();
+  // Gas time remaining on the profile chart (v177). Source is a
+  // MetricDataSource index: 0 = computer, 1 = calculated. Reserve is bar.
+  IntColumn get defaultGtrSource => integer().withDefault(const Constant(1))();
+  RealColumn get gtrReservePressure =>
+      real().withDefault(const Constant(50.0))();
   // CNS calculation method: 'classic' | 'shearwater' | 'subsurface' (v113)
   TextColumn get cnsCalculationMethod =>
       text().withDefault(const Constant('shearwater'))();
@@ -1877,6 +1863,8 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowTts =>
       boolean().withDefault(const Constant(false))();
+  BoolColumn get defaultShowGtr =>
+      boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowCns =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowOtu =>
@@ -1924,6 +1912,9 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(true))();
   // Dive detail section order and visibility (v56) — JSON array
   TextColumn get diveDetailSections => text().nullable()();
+  // Dive detail page layout: detailed | list (v185). A stored "compact",
+  // from before that layout was dropped, reads back as detailed.
+  TextColumn get diveDetailLayout => text().nullable()();
   // Table view profile panel default visibility (v61)
   BoolColumn get showProfilePanelInTableView =>
       boolean().withDefault(const Constant(true))();
@@ -1962,7 +1953,16 @@ class Buddies extends Table {
   TextColumn get name => text()();
   TextColumn get email => text().nullable()();
   TextColumn get phone => text().nullable()();
+
+  /// Deprecated, superseded by [photo]. Two readers disagreed about how to
+  /// load it and nothing ever wrote it; kept so a database that predates v181
+  /// still maps.
   TextColumn get photoPath => text().nullable()();
+
+  /// Profile photo: a 512x512 square JPEG produced by
+  /// `lib/core/services/images/profile_photo_codec.dart`. Stored on the row so
+  /// it syncs with the buddy rather than depending on a device-local path.
+  BlobColumn get photo => blob().nullable()();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
@@ -2183,6 +2183,17 @@ class DiveDiveTypes extends Table {
 
 /// Seeds one junction row per existing dive from its representative dive_type
 /// slug. Used by the v92 migration and asserted directly in tests.
+///
+/// The `NOT EXISTS` guard makes a second run a no-op, which its sibling
+/// [kSeedBuiltInDiveTypesSql] has always had via `INSERT OR IGNORE` on stable
+/// slug ids. This one mints a RANDOM id per row, so it had nothing to conflict
+/// with and a re-run simply doubled every dive's types -- issue #1360. Because
+/// the sync merge keys junction rows on that id, each device's own seed pass
+/// produced rows the fleet then unioned rather than deduplicated.
+///
+/// The guard is keyed on the dive having ANY junction row, not on the exact
+/// pair: this seed's job is to give a dive its first type, so a dive that
+/// already has one (a synced peer's, or a later edit) needs nothing.
 const String kSeedDiveDiveTypesSql = '''
   INSERT INTO dive_dive_types (id, dive_id, dive_type_id, created_at)
   SELECT
@@ -2191,6 +2202,9 @@ const String kSeedDiveDiveTypesSql = '''
     COALESCE(NULLIF(dive_type, ''), 'recreational'),
     CAST(strftime('%s','now') AS INTEGER) * 1000
   FROM dives
+  WHERE NOT EXISTS (
+    SELECT 1 FROM dive_dive_types j WHERE j.dive_id = dives.id
+  )
 ''';
 
 /// Seeds the built-in dive types. Used by BOTH [onCreate] (fresh installs) and
@@ -2612,7 +2626,13 @@ class DiveDataSources extends Table {
   IntColumn get gradientFactorHigh => integer().nullable()();
   DateTimeColumn get importedAt => dateTime()();
   DateTimeColumn get createdAt => dateTime()();
-  BlobColumn get rawData => blob().nullable()();
+
+  /// The raw bytes libdivecomputer returned for this download, zlib-compressed
+  /// at rest behind a self-describing header (issue #227). The converter runs
+  /// on every read and write, so callers see the original bytes and the sync
+  /// layer keeps exchanging them uncompressed. See [RawDiveDataConverter].
+  BlobColumn get rawData =>
+      blob().map(const RawDiveDataConverter()).nullable()();
   BlobColumn get rawFingerprint => blob().nullable()();
   TextColumn get sourceUuid => text().nullable()();
   TextColumn get descriptorVendor => text().nullable()();
@@ -2629,6 +2649,27 @@ class DiveDataSources extends Table {
   /// away from the primary's. Null and 0 both mean "already on the dive's
   /// time base", which is every source that was never consolidated.
   IntColumn get timeOffsetSeconds => integer().nullable()();
+
+  /// This row's position among its own original dive's data sources at the
+  /// moment a sequential Combine carried it here (issue #1451). Null on every
+  /// row a merge never carried, which is every row on an ordinary dive.
+  ///
+  /// `DiveMergeService.apply` copies each combined segment's
+  /// `dive_data_sources` rows onto the merged dive as provenance, because
+  /// each is the sole surviving copy of its half's rawData / rawFingerprint /
+  /// sourceUuid. Two halves of one physical dive therefore arrive as two
+  /// rows, and the display used to offer them as two switchable sources: the
+  /// chart then drew only the active half. The rows are the same strand seen
+  /// in two consecutive slices, not two competing recordings, so
+  /// `_canonicalDataSourceRows` collapses rows sharing a slot into one
+  /// display source. The rows themselves stay in the table untouched.
+  ///
+  /// A slot rather than a plain flag so a dive that was consolidated (two
+  /// computers, slots 0 and 1 in each segment) and only then combined still
+  /// shows one chip per computer instead of flattening both strands into one.
+  /// Segments whose sources carry no computerId have nothing else to
+  /// distinguish their strands by, which is exactly the case that was broken.
+  IntColumn get mergeSourceSlot => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -2758,27 +2799,97 @@ class GasSwitches extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-/// Per-tank time-series pressure data for multi-tank dives
-/// Enables visualization of pressure curves for each tank (AI transmitters)
-class TankPressureProfiles extends Table {
+/// One packed series of profile samples: every sample a
+/// (dive, computer, source, is_primary) group holds, encoded by
+/// `ProfileSeriesCodec` (spec 2026-08-28-profile-sample-storage). Replaced
+/// row-per-sample `dive_profiles`, which v183 dropped.
+///
+/// The identity columns mirror the ones `dive_profiles` carried, so every
+/// ownership predicate ported one for one. The summary scalars are the values the SQL
+/// consumers read instead of decoding the blob; they are computed from the
+/// same samples the blob packs, so they can never disagree with it.
+@DataClassName('DiveProfileSeriesRow')
+class DiveProfileSeries extends Table {
+  // coverage:ignore-start
   TextColumn get id => text()();
   TextColumn get diveId =>
       text().references(Dives, #id, onDelete: KeyAction.cascade)();
-  TextColumn get tankId =>
-      text().references(DiveTanks, #id, onDelete: KeyAction.cascade)();
-  IntColumn get timestamp => integer()(); // seconds from dive start
-  RealColumn get pressure => real()(); // bar
-  // Which computer contributed this pressure sample (null = primary source /
-  // manual). Same null-means-primary semantics as dive_profiles.computerId;
-  // deletes set null.
   TextColumn get computerId => text().nullable().references(
     DiveComputers,
     #id,
     onDelete: KeyAction.setNull,
   )();
+  TextColumn get sourceId => text().nullable().references(
+    DiveDataSources,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  BoolColumn get isPrimary => boolean().withDefault(const Constant(true))();
+  IntColumn get sampleCount => integer()();
+
+  /// Seconds from dive start of the first and last sample.
+  IntColumn get startTimestamp => integer()();
+  IntColumn get endTimestamp => integer()();
+
+  /// Metres.
+  RealColumn get maxDepth => real()();
+  RealColumn get firstDepth => real()();
+  RealColumn get lastDepth => real()();
+
+  /// Any sample carries deco_type; any carries deco_type = 2; any carries
+  /// ceiling > 0. The deco classification and deco-signal predicates read
+  /// these instead of scanning samples.
+  BoolColumn get hasDecoType => boolean().withDefault(const Constant(false))();
+  BoolColumn get hasDecoStop => boolean().withDefault(const Constant(false))();
+  BoolColumn get hasPositiveCeiling =>
+      boolean().withDefault(const Constant(false))();
+  IntColumn get codecVersion => integer()();
+
+  /// `ProfileSeriesCodec` output.
+  BlobColumn get samples => blob()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution.
+  TextColumn get hlc => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
+  // coverage:ignore-end
+}
+
+/// One packed series of tank pressure readings for a (dive, tank, computer)
+/// group, encoded by `TankPressureSeriesCodec`. Replaced row-per-sample
+/// `tank_pressure_profiles`, which v183 dropped.
+///
+/// Not the domain entity of the same name
+/// (lib/features/dive_log/domain/entities/profile_series.dart); consumers
+/// import that one as domain.
+@DataClassName('TankPressureSeriesRow')
+class TankPressureSeries extends Table {
+  // coverage:ignore-start
+  TextColumn get id => text()();
+  TextColumn get diveId =>
+      text().references(Dives, #id, onDelete: KeyAction.cascade)();
+  TextColumn get tankId =>
+      text().references(DiveTanks, #id, onDelete: KeyAction.cascade)();
+  TextColumn get computerId => text().nullable().references(
+    DiveComputers,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  IntColumn get sampleCount => integer()();
+  IntColumn get startTimestamp => integer()();
+  IntColumn get endTimestamp => integer()();
+  IntColumn get codecVersion => integer()();
+  BlobColumn get samples => blob()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+  // coverage:ignore-end
 }
 
 /// Tide data recorded with a dive for historical reference.
@@ -3182,7 +3293,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     DiverSettings,
     Trips,
     Dives,
-    DiveProfiles,
+    DiveProfileSeries,
     DiveSites,
     DiveTanks,
     Equipment,
@@ -3223,7 +3334,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     EmergencyChambers,
     Incidents,
     GasSwitches,
-    TankPressureProfiles,
+    TankPressureSeries,
     TideRecords,
     // Site-species junction
     SiteSpecies,
@@ -3288,7 +3399,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 175;
+  static const int currentSchemaVersion = 190;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3323,7 +3434,25 @@ class AppDatabase extends _$AppDatabase {
   /// breaking. Peers below 170 are held until they update. Their payloads
   /// still arrive here; _renamedWireKeys plus the value map in
   /// _applyDiverSettingDefaults carry the receiving-side tolerance.
-  static const int minimumCompatibleSchemaVersion = 170;
+  ///
+  /// Raised 170 -> 183 by the packed profile series: v182 replaces the synced
+  /// entities diveProfiles and tankPressureProfiles with diveProfileSeries and
+  /// tankPressureSeries, which the first rule above classifies as breaking.
+  /// Peers below 183 are held until they update. Their payloads still arrive
+  /// here; SyncData keeps the two legacy keys inbound-only and
+  /// SyncDataSerializer.packLegacySamples packs them into series on apply.
+  ///
+  /// 183 rather than 182, even though 182 is the rung that made the change:
+  /// no released build was ever stamped 182. Shipped devices are at 180, the
+  /// 181 rung shipped in PR #1390, and 182 and 183 land in the same release,
+  /// so nothing in the fleet is held by 183 that 182 did not already hold.
+  /// The extra step records that v183, not v182, is the rung that drops the
+  /// legacy tables and purges their `deletion_log` rows. The floor is stamped
+  /// on this device's own payloads and only holds readers below it; the gate
+  /// is one-directional and does nothing to inbound payloads from an older
+  /// peer. See [_purgeLegacySampleBookkeeping] for why those inbound legacy
+  /// rows stay safe without the purged tombstones.
+  static const int minimumCompatibleSchemaVersion = 183;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3649,6 +3778,107 @@ class AppDatabase extends _$AppDatabase {
     // comment already reserves for it. 169 is now permanently skipped, as are
     // 162 and 167.
     175,
+    // v177: GTR settings on diver_settings and the dive_profiles.rbt
+    // minutes-to-seconds repair.
+    177,
+    // v178: one dive_dive_types row per (dive, type), collapsing the
+    // duplicates the unguarded v92 seed minted on every device and the sync
+    // merge then unioned by row id. Issue #1360. (That comment originally
+    // recorded PR #1328 as holding 176; #1328 has since moved to 179, the
+    // rung below.)
+    178,
+    // v179: dives.site_suggestion_dismissed_at, the synced per-dive dismissal
+    // of the photo / dive-computer site suggestion. Renumbered twice while
+    // this branch was open -- from 172 when main landed 173-175, then from
+    // 176 when main landed 177 (GTR) -- because a rung below the shipped
+    // version never runs its onUpgrade step: a database already at the
+    // shipped version gains the column only through the beforeOpen backstop.
+    // 178 shipped with the dive-type uniqueness work while this branch was
+    // open, so this sits above it. 162, 167, 169 and 176 are skipped; the
+    // ladder is non-contiguous by design.
+    179,
+    // v180 (statistics exclusion): dives.excluded_from_stats and
+    // dives.excluded_from_gas_stats, letting a diver keep a dive in the
+    // logbook while removing it from statistics. Issues #526 and #1272.
+    // Renumbered from 178: main landed 178 (dive-type uniqueness) and 179
+    // (site-suggestion dismissal) while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    // Column-only rung with no backfill, so the beforeOpen backstop is
+    // safe to re-run.
+    180,
+    // v181: divers.photo and buddies.photo, the profile photo blobs. Claimed
+    // against origin/main at 180, having been renumbered from 180 when PR
+    // #1374 (statistics exclusion) landed and took that rung while this
+    // branch held only its design docs. A rung at or below the shipped
+    // version merges with no conflict marker and its onUpgrade step then
+    // never runs, so re-verify this number if this branch sits open while
+    // main advances again.
+    181,
+    // v182 (packed profile series, spec 2026-08-28-profile-sample-storage):
+    // dive_profile_series and tank_pressure_series, one zlib columnar blob
+    // per (dive, computer, source, is_primary) group and per (dive, tank,
+    // computer) group, packed from the row-per-sample tables by
+    // packLegacyProfileRows with ids derived from the identity tuple so every
+    // device converges (the #1360 lesson). The legacy tables stay until the
+    // consumers move; the same PR retires them in a later plan. 176 remains
+    // skipped; the ladder is non-contiguous by design. Numbered 182 because
+    // PR #1390 (profile photos) took 181.
+    182,
+    // v183 (packed profile series, plan 2e): drop the row-per-sample
+    // dive_profiles and tank_pressure_profiles tables and purge the sync
+    // bookkeeping that named them. Every reader moved to the series tables
+    // in plans 2b to 2d, so the rows have no consumer left. The rung packs
+    // once more before it drops, because a device that reached 182 through
+    // a parallel branch's rung never ran ours and the beforeOpen backstop
+    // only runs AFTER onUpgrade: by then the rows would be gone.
+    183,
+    // v184 (issue #1451): dive_data_sources.merge_source_slot, the marker a
+    // sequential Combine stamps on the provenance rows it carries so the
+    // display can collapse the halves of one dive back into one source.
+    // Backfilled for dives combined before this rung shipped.
+    184,
+    // v185 (issue #1476): diver_settings.dive_detail_layout, the dive detail
+    // page's layout choice. Column-only rung, no backfill: a null reads back
+    // as the detailed layout, which is what every existing diver was already
+    // getting. Numbered 185 because PR #1451 took 184 while this branch was
+    // open; the column is nullable and additive either way, so the
+    // compatibility floor stays at 183.
+    185,
+    // v186: pre_dive_checklist_template_items.equipment_id, the remembered
+    // single-equipment link for an 'equipment'-typed template item. Chosen
+    // at session start (not in the template editor), mirroring the
+    // equipmentSet flow. Issue #814. Column-only rung, no backfill, so the
+    // beforeOpen backstop is safe to re-run. Renumbered from 181: main
+    // landed 181 through 185 while this branch was open, and a rung at or
+    // below the shipped version never runs its onUpgrade step.
+    186,
+    // v187: pre_dive_session_items.overdue_services, the frozen snapshot of
+    // overdue-service entries for a resolved checklist item (issue #814
+    // phase 2). Column-only rung, no backfill: every pre-existing row
+    // correctly reads back as null (no frozen snapshot), which the UI
+    // already treats as "nothing known" for a resolved legacy row.
+    // Renumbered from 182 for the same reason as 186 above.
+    187,
+    // v188: divers.insurance_emergency_phone and divers.insurance_phone, the
+    // insurer's 24h assistance line and office line (issue #1522). Column-only
+    // rung, no backfill: nothing in an existing database can tell us an
+    // insurer's hotline, so every pre-existing row correctly reads back as
+    // "not recorded" and the card keeps leading with the regional hotline.
+    188,
+    // v189: media.equipment_id plus idx_media_equipment_id (issue #1517).
+    // The link that files an invoice, receipt or warranty document against a
+    // piece of gear. Column-and-index rung, no backfill, so the beforeOpen
+    // backstop is safe to re-run. Renumbered from 188: main took that step
+    // for the insurance phone columns while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    189,
+    // v190: recompress dive_data_sources.raw_data in place (issue #227).
+    // No DDL; the column's SQL type is unchanged and only the stored bytes
+    // move. Guarded per row: the self-describing header means a row this
+    // rung skips keeps reading correctly forever, so a blob left
+    // uncompressed costs space and nothing else. Numbered 190 because main
+    // took 188 and 189 while this branch was open.
+    190,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4137,6 +4367,265 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// v182: the packed profile series tables.
+  ///
+  /// Raw idempotent DDL so it doubles as the beforeOpen backstop for a
+  /// database stranded at 182 by a parallel branch. The DDL must agree with
+  /// the Drift declarations column for column; the v182 migration test
+  /// compares the two on a fresh database.
+  ///
+  /// Each table waits for its own foreign-key parents. A child table whose
+  /// parent is absent poisons the parents that ARE present: SQLite resolves
+  /// the child's references when a cascade fires, so `DELETE FROM dives`
+  /// would fail with "no such table: main.dive_tanks" on a partial schema
+  /// (the older migration-test fixtures, and a database caught mid-upgrade).
+  /// Every real database has carried all four parents for many versions, and
+  /// the beforeOpen backstop creates whatever was skipped on the next open.
+  Future<void> _assertProfileSeriesSchema() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table'",
+    ).get();
+    final present = tables.map((r) => r.read<String>('name')).toSet();
+    if (present.containsAll(const {
+      'dives',
+      'dive_computers',
+      'dive_data_sources',
+    })) {
+      await _assertDiveProfileSeriesTable();
+    }
+    if (present.containsAll(const {'dives', 'dive_computers', 'dive_tanks'})) {
+      await _assertTankPressureSeriesTable();
+    }
+  }
+
+  Future<void> _assertDiveProfileSeriesTable() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS dive_profile_series (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE,
+        computer_id TEXT REFERENCES dive_computers (id) ON DELETE SET NULL,
+        source_id TEXT REFERENCES dive_data_sources (id) ON DELETE SET NULL,
+        is_primary INTEGER NOT NULL DEFAULT 1 CHECK (is_primary IN (0, 1)),
+        sample_count INTEGER NOT NULL,
+        start_timestamp INTEGER NOT NULL,
+        end_timestamp INTEGER NOT NULL,
+        max_depth REAL NOT NULL,
+        first_depth REAL NOT NULL,
+        last_depth REAL NOT NULL,
+        has_deco_type INTEGER NOT NULL DEFAULT 0
+          CHECK (has_deco_type IN (0, 1)),
+        has_deco_stop INTEGER NOT NULL DEFAULT 0
+          CHECK (has_deco_stop IN (0, 1)),
+        has_positive_ceiling INTEGER NOT NULL DEFAULT 0
+          CHECK (has_positive_ceiling IN (0, 1)),
+        codec_version INTEGER NOT NULL,
+        samples BLOB NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_dive_profile_series_dive_primary '
+      'ON dive_profile_series (dive_id, is_primary)',
+    );
+  }
+
+  /// v183: drops the row-per-sample profile table.
+  ///
+  /// Called from the v183 rung and from the `beforeOpen` backstop, and in
+  /// both places only once the pack has returned normally AND
+  /// `dive_profile_series` exists. Both conditions are load-bearing. A pack
+  /// that threw packed nothing, and a pack that ran with no series table to
+  /// pack into ALSO packed nothing: `_assertProfileSeriesSchema` skips a
+  /// series table whose foreign-key parents are absent, and the packer's
+  /// unpacked-dive scan then reports no work rather than failing. Dropping
+  /// on either would destroy the only copy of those samples.
+  ///
+  /// Idempotent (`IF EXISTS` throughout), so a ladder that failed later and
+  /// retried from the top runs this again harmlessly.
+  ///
+  /// Split from [_purgeLegacySampleBookkeeping] because the two have
+  /// different preconditions: the bookkeeping purge is always correct, while
+  /// dropping the table is only safe once the samples in it are packed.
+  /// Split from [_dropLegacyTankTable] because the two legacy tables have
+  /// different parents, so one can be packable on a database where the other
+  /// is not.
+  Future<void> _dropLegacyProfileTable() async {
+    final present = await _tableExists('dive_profiles');
+    await customStatement('DROP INDEX IF EXISTS idx_dive_profiles_dive_id');
+    await customStatement('DROP TABLE IF EXISTS dive_profiles');
+    if (present) _droppedLegacySampleTables = true;
+  }
+
+  /// v183: drops the row-per-sample tank pressure table. The mirror of
+  /// [_dropLegacyProfileTable], gated on `tank_pressure_series` existing
+  /// (that table waits for `dive_tanks`, which `dive_profile_series` does
+  /// not need).
+  Future<void> _dropLegacyTankTable() async {
+    final present = await _tableExists('tank_pressure_profiles');
+    await customStatement('DROP INDEX IF EXISTS idx_tank_pressure_dive_tank');
+    await customStatement('DROP TABLE IF EXISTS tank_pressure_profiles');
+    if (present) _droppedLegacySampleTables = true;
+  }
+
+  bool _droppedLegacySampleTables = false;
+
+  /// True once this connection has actually dropped a row-per-sample legacy
+  /// table, whether from the v183 rung or from the beforeOpen backstop.
+  ///
+  /// The pages those tables held are most of an older file, and only a
+  /// VACUUM returns them to the filesystem. Which open performs the drop is
+  /// not something the stored schema version can answer: the rung is allowed
+  /// to skip it (its pack threw, the series table's foreign-key parents were
+  /// absent, or the residue count found rows no series covered), and the
+  /// backstop then drops on the first later open whose pack succeeds, by
+  /// which time the file is long since stamped 183. So the reclamation keys
+  /// off this, the event itself. See [DatabaseService].
+  bool get droppedLegacySampleTables => _droppedLegacySampleTables;
+
+  /// True when [table] exists in this database right now.
+  Future<bool> _tableExists(String table) async {
+    final rows = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+      variables: [Variable<String>(table)],
+    ).get();
+    return rows.isNotEmpty;
+  }
+
+  /// Drops whichever legacy sample table the pack has provably moved into
+  /// its series table. Never both unconditionally: on a database missing one
+  /// side's foreign-key parents only one series table exists, and the other
+  /// legacy table is still the only copy of its samples.
+  ///
+  /// Two gates per table, and both are load-bearing. The series table must
+  /// exist, and [countLegacyRowsAwaitingPack] must find no legacy row that a
+  /// series row does not cover. A pack that returned normally is not proof
+  /// the rows moved: an orphaned pressure row is skipped, a dive that
+  /// already had a series row is never revisited so a second computer's rows
+  /// stay behind, and `INSERT OR IGNORE` can pack nothing at all into a
+  /// series table a parallel branch shaped differently. Dropping on any of
+  /// those destroys the only copy.
+  Future<void> _dropPackedLegacySampleTables() async {
+    final residue = await countLegacyRowsAwaitingPack(this);
+    if (await _tableExists('dive_profile_series')) {
+      if (residue.profiles == 0) {
+        await _dropLegacyProfileTable();
+      } else {
+        developer.log(
+          'Keeping dive_profiles: ${residue.profiles} row(s) no series row '
+          'covers. A later open retries the pack.',
+          name: 'AppDatabase',
+        );
+      }
+    }
+    if (await _tableExists('tank_pressure_series')) {
+      if (residue.tanks == 0) {
+        await _dropLegacyTankTable();
+      } else {
+        developer.log(
+          'Keeping tank_pressure_profiles: ${residue.tanks} row(s) no series '
+          'row covers. A later open retries the pack.',
+          name: 'AppDatabase',
+        );
+      }
+    }
+  }
+
+  /// v183: deletes the sync bookkeeping of the retired sample entities.
+  ///
+  /// The `sync_records` rows are this device's pending outbound work for
+  /// entity types this build no longer exports. Left behind they would be
+  /// published forever and never acknowledged.
+  ///
+  /// The `deletion_log` rows did double duty, and the second job is the one
+  /// worth naming: outbound they are tombstones peers apply, and INBOUND they
+  /// were the resurrection guard for these two entity types, the rows
+  /// SyncService's merge consults to keep a peer's copy of a sample this
+  /// device deleted from coming back. Purging them retires that guard, which
+  /// is safe because there is nothing left for it to guard. A `diveProfiles`
+  /// or `tankPressureProfiles` row from an older peer no longer reaches a
+  /// live table at all: those entity types are inbound-only
+  /// (SyncService.inboundOnlyLegacyEntities), their rows land in the TEMP
+  /// staging tables of `legacy_sample_staging.dart`, and the packer builds a
+  /// series only for a dive that has none, so a stale legacy row cannot
+  /// overwrite or revive a series this device holds. Deleting samples in this
+  /// build tombstones `diveProfileSeries` / `tankPressureSeries` instead, and
+  /// those tombstones are untouched here.
+  ///
+  /// The compatibility floor (183) is NOT what makes this safe. That gate is
+  /// one-directional: it stops readers below 183 from applying our payloads,
+  /// not older peers' payloads from reaching us. The staging shim above is
+  /// what handles those, and it is what has to be retired before the floor
+  /// argument would ever apply.
+  ///
+  /// UNCONDITIONAL in the rung: this is bookkeeping about rows nothing
+  /// exports any more, so it is correct whether or not the pack that guards
+  /// the table drop succeeded.
+  ///
+  /// Guarded per table like every other migration helper: a minimal
+  /// old-schema fixture (and a database that reached this rung through a
+  /// guarded path) can lack the sync bookkeeping entirely, and a DELETE
+  /// naming a missing table aborts the whole ladder.
+  /// sync_records ONLY. The deletion_log rows for these two entities stay,
+  /// because they are still load-bearing on the receive side: a peer below
+  /// the floor keeps publishing row-per-sample rows, and _mergeEntity's
+  /// local-deletion guard is what stops one this device already deleted
+  /// from being staged and packed back into a series. Purging them removed
+  /// that guard while the inbound shim still exists. (Nothing is at risk on
+  /// the send side either way: peers below 183 are held and apply none of
+  /// this device's payloads, so those tombstones were never reaching them.)
+  /// They can go with the shim.
+  Future<void> _purgeLegacySampleBookkeeping() async {
+    final exists = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+      "AND name = 'sync_records'",
+    ).get();
+    if (exists.isEmpty) return;
+    await customStatement(
+      "DELETE FROM sync_records WHERE entity_type IN ('diveProfiles', "
+      "'tankPressureProfiles')",
+    );
+  }
+
+  /// The `user_version` this database carries on disk right now.
+  Future<int> _storedSchemaVersion() async {
+    final row = await customSelect('PRAGMA user_version').getSingle();
+    return (row.data.values.first as int?) ?? 0;
+  }
+
+  /// True when either retired row-per-sample table is still present.
+  Future<bool> _legacySampleTablesPresent() async {
+    final rows = await customSelect(
+      "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_profiles', 'tank_pressure_profiles')",
+    ).get();
+    return rows.isNotEmpty;
+  }
+
+  Future<void> _assertTankPressureSeriesTable() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS tank_pressure_series (
+        id TEXT NOT NULL PRIMARY KEY,
+        dive_id TEXT NOT NULL REFERENCES dives (id) ON DELETE CASCADE,
+        tank_id TEXT NOT NULL REFERENCES dive_tanks (id) ON DELETE CASCADE,
+        computer_id TEXT REFERENCES dive_computers (id) ON DELETE SET NULL,
+        sample_count INTEGER NOT NULL,
+        start_timestamp INTEGER NOT NULL,
+        end_timestamp INTEGER NOT NULL,
+        codec_version INTEGER NOT NULL,
+        samples BLOB NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_tank_pressure_series_dive_tank '
+      'ON tank_pressure_series (dive_id, tank_id)',
+    );
+  }
+
   Future<void> _assertQualityFindingsSchema() async {
     await customStatement('''
       CREATE TABLE IF NOT EXISTS quality_findings (
@@ -4337,6 +4826,22 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         "ALTER TABLE diver_settings ADD COLUMN no_fly_preset TEXT "
         "NOT NULL DEFAULT 'standard'",
+      );
+    }
+  }
+
+  /// v185: diver_settings.dive_detail_layout, the dive detail page's layout
+  /// choice (detailed/list; a stored "compact" from before that layout was
+  /// dropped reads back as detailed). Idempotent so it is safe to call from
+  /// both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertDiveDetailLayoutColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (cols.isNotEmpty && !names.contains('dive_detail_layout')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN dive_detail_layout TEXT',
       );
     }
   }
@@ -4664,10 +5169,16 @@ class AppDatabase extends _$AppDatabase {
 
   /// Data self-heal: synthesize a primary [DiveDataSources] row for any dive
   /// that has profile samples but no data-source row. Older file imports (and
-  /// any import path predating dive_data_sources) wrote dive_profiles without
-  /// the metadata row, which stranded the grouped-by-source view that the 3D
+  /// any import path predating dive_data_sources) wrote samples without the
+  /// metadata row, which stranded the grouped-by-source view that the 3D
   /// scene, spatial map, and computer-compare all read -- they spun forever on
   /// a null scene. The 2D chart survived because it reads dive.profile directly.
+  ///
+  /// Reads `dive_profile_series`, not the retired row-per-sample
+  /// `dive_profiles`: v183 dropped that table, so the pre-183 guard and
+  /// predicate would have made this helper a permanent no-op. The rung packs
+  /// before it drops, so a dive that had primary legacy rows has a primary
+  /// series row and is still healed.
   ///
   /// Runs on every open; a cheap no-op once healed (the NOT EXISTS guard leaves
   /// nothing to insert). Local-only by design: the id is deterministic
@@ -4684,10 +5195,50 @@ class AppDatabase extends _$AppDatabase {
     // exist yet.
     final tables = await customSelect(
       "SELECT name FROM sqlite_master WHERE type='table' "
-      "AND name IN ('dives', 'dive_profiles', 'dive_data_sources')",
+      "AND name IN ('dives', 'dive_profile_series', 'dive_data_sources')",
     ).get();
     final present = tables.map((r) => r.read<String>('name')).toSet();
-    if (!present.containsAll({'dives', 'dive_profiles', 'dive_data_sources'})) {
+    if (!present.containsAll({
+      'dives',
+      'dive_profile_series',
+      'dive_data_sources',
+    })) {
+      return;
+    }
+    // Column guard as well as table guard. A minimal fixture (and a database
+    // caught mid-upgrade) can carry a dive_data_sources that predates these
+    // columns, and beforeOpen's own _assertProfileSeriesSchema will have
+    // created dive_profile_series for it, so the table check alone is not
+    // enough: the INSERT below would abort the open.
+    final sourceCols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final sourceColNames = sourceCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!sourceColNames.containsAll(const {
+      'id',
+      'dive_id',
+      'is_primary',
+      'imported_at',
+      'created_at',
+    })) {
+      return;
+    }
+    // The same column guard on the OTHER side of the statement. A
+    // dive_profile_series a parallel branch shaped differently, or a fixture
+    // that stands one up by hand, survives beforeOpen's IF NOT EXISTS DDL
+    // untouched, so its presence says nothing about its shape. These are the
+    // two columns the EXISTS predicate below reads; the rest of the series
+    // row (source_id, computer_id, the summary scalars, the blob) this
+    // helper never names.
+    final seriesCols = await customSelect(
+      "PRAGMA table_info('dive_profile_series')",
+    ).get();
+    final seriesColNames = seriesCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!seriesColNames.containsAll(const {'dive_id', 'is_primary'})) {
       return;
     }
     await customStatement('''
@@ -4699,8 +5250,8 @@ class AppDatabase extends _$AppDatabase {
         SELECT CAST(strftime('%s','now') AS INTEGER) AS now_s
       ) n
       WHERE EXISTS (
-        SELECT 1 FROM dive_profiles p
-        WHERE p.dive_id = d.id AND p.is_primary = 1
+        SELECT 1 FROM dive_profile_series s
+        WHERE s.dive_id = d.id AND s.is_primary = 1
       )
       AND NOT EXISTS (
         SELECT 1 FROM dive_data_sources s WHERE s.dive_id = d.id
@@ -5200,6 +5751,19 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v179: site_suggestion_dismissed_at on dives. Null means the site
+  /// suggestion (from photo GPS or dive-computer GPS) was never dismissed.
+  Future<void> _assertSiteSuggestionDismissedAtColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('site_suggestion_dismissed_at')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN site_suggestion_dismissed_at INTEGER',
+      );
+    }
+  }
+
   /// v161: default_show_o2_cell_mv on diver_settings (issue #1235). The
   /// per-cell O2 mV toggle previously had no persisted default; this lets a
   /// diver make it visible by default on the profile chart.
@@ -5216,6 +5780,60 @@ class AppDatabase extends _$AppDatabase {
         'CHECK (default_show_o2_cell_mv IN (0, 1))',
       );
     }
+  }
+
+  /// v177: the GTR (gas time remaining) settings on diver_settings: default
+  /// visibility, computer-vs-calculated source, and the reserve pressure
+  /// (bar) the calculated value counts down to.
+  Future<void> _assertGtrSettingsColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_show_gtr')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_show_gtr '
+        'INTEGER NOT NULL DEFAULT 0 '
+        'CHECK (default_show_gtr IN (0, 1))',
+      );
+    }
+    if (!names.contains('default_gtr_source')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN default_gtr_source '
+        'INTEGER NOT NULL DEFAULT 1',
+      );
+    }
+    if (!names.contains('gtr_reserve_pressure')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN gtr_reserve_pressure '
+        'REAL NOT NULL DEFAULT 50.0',
+      );
+    }
+  }
+
+  /// v177: dive_profiles.rbt is documented in seconds, and the Subsurface and
+  /// UDDF importers store seconds, but libdivecomputer reports RBT/GTR in
+  /// minutes and every libdc path (download, reparse, raw-log import) wrote
+  /// the raw value. Rows that came through libdc on a download, reparse or
+  /// raw-log import carry raw bytes on their data source, so scale only
+  /// them. Shearwater Cloud and MacDive imports also parse through libdc but
+  /// persist no raw bytes and no format marker, so their existing rbt rows
+  /// cannot be told apart from file imports here; re-importing them writes
+  /// seconds.
+  Future<void> _scaleLibdcRbtMinutesToSeconds() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' "
+      "AND name IN ('dive_profiles', 'dive_data_sources')",
+    ).get();
+    if (tables.length < 2) return;
+    final cols = await customSelect("PRAGMA table_info('dive_profiles')").get();
+    if (!cols.any((c) => c.read<String>('name') == 'rbt')) return;
+    await customStatement(
+      'UPDATE dive_profiles SET rbt = rbt * 60 '
+      'WHERE rbt IS NOT NULL AND dive_id IN '
+      '(SELECT dive_id FROM dive_data_sources WHERE raw_data IS NOT NULL)',
+    );
   }
 
   /// v163: default_show_estimated_tank_pressure on diver_settings (issue
@@ -5362,9 +5980,9 @@ class AppDatabase extends _$AppDatabase {
   /// diver's layout at the lane they were seeing. Runs after
   /// [_assertGasConsumptionDisplayColumn] so the lane names are final.
   ///
-  /// Never called from beforeOpen: DiveFieldAdapter.fieldFromName aliases
-  /// sacRate to sac for layouts that arrive later by sync, and re-running
-  /// this on every open would rewrite rows the diver has since changed. No
+  /// Never called from beforeOpen: diveFieldFromName aliases sacRate to sac
+  /// for layouts that arrive later by sync, and re-running this on every
+  /// open would rewrite rows the diver has since changed. No
   /// HLC bump: every device applies the same deterministic rewrite to its
   /// own rows, so there is nothing to push.
   Future<void> _rewriteLegacySacRateLayouts() async {
@@ -5409,6 +6027,115 @@ class AppDatabase extends _$AppDatabase {
   /// letting frequently-dived buddies be pinned to the top of the "Add
   /// buddy" picker regardless of sort. Self-guards on the table existing, and
   /// defaults every pre-existing row to not-favorited.
+  /// Idempotent DDL for the v180 dives.excluded_from_stats and
+  /// dives.excluded_from_gas_stats columns (issues #526 and #1272), letting a
+  /// diver keep a dive in the logbook while removing it from statistics.
+  /// Self-guards on the table existing, and defaults every pre-existing row to
+  /// included. Same dual-call contract (onUpgrade + beforeOpen backstop) as
+  /// the other column-assert helpers.
+  Future<void> _assertDiveStatsExclusionColumns() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('excluded_from_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+    if (!names.contains('excluded_from_gas_stats')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN excluded_from_gas_stats '
+        'INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v181 pre_dive_checklist_template_items
+  /// equipment_id column (issue #814): the remembered single-equipment link
+  /// for an 'equipment'-typed template item, chosen at session start (not in
+  /// the template editor) and persisted so later sessions pre-fill the same
+  /// device. Self-guards on the table existing. Same dual-call contract
+  /// (onUpgrade + beforeOpen backstop) as the other column-assert helpers.
+  ///
+  /// No SQL-level REFERENCES clause: template items are (re-)seeded
+  /// independently of the equipment table (isolated schema fixtures, builtin
+  /// template reseeding on every app start), so referential integrity is
+  /// enforced at the application layer instead of via SQLite FK.
+  Future<void> _assertTemplateItemEquipmentIdColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_checklist_template_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('equipment_id')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_checklist_template_items ADD COLUMN equipment_id '
+      'TEXT',
+    );
+  }
+
+  /// Idempotent DDL for the v182 pre_dive_session_items.overdue_services
+  /// column (issue #814 phase 2): the frozen snapshot of overdue-service
+  /// entries for a resolved checklist item, written by the repository the
+  /// moment an item leaves pending and cleared on reset. Self-guards on the
+  /// table existing. Same dual-call contract (onUpgrade + beforeOpen
+  /// backstop) as the other column-assert helpers.
+  Future<void> _assertSessionItemOverdueServicesColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('pre_dive_session_items')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('overdue_services')) return;
+    await customStatement(
+      'ALTER TABLE pre_dive_session_items ADD COLUMN overdue_services TEXT',
+    );
+  }
+
+  /// v188: the two insurer phone numbers the emergency card leads with.
+  /// Column-only and independently guarded, so an interrupted upgrade that
+  /// added one of the two still gets the other.
+  Future<void> _assertInsurancePhoneColumns() async {
+    final cols = await customSelect("PRAGMA table_info('divers')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('insurance_emergency_phone')) {
+      await customStatement(
+        'ALTER TABLE divers ADD COLUMN insurance_emergency_phone TEXT',
+      );
+    }
+    if (!names.contains('insurance_phone')) {
+      await customStatement(
+        'ALTER TABLE divers ADD COLUMN insurance_phone TEXT',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v189 media.equipment_id column plus its lookup
+  /// index (issue #1517): the link that makes an invoice or receipt an
+  /// attachment of a piece of gear. Self-guards on the media table existing,
+  /// so a partial migration-test fixture passes through untouched. Same
+  /// dual-call contract (onUpgrade + beforeOpen backstop) as the other
+  /// column-assert helpers.
+  ///
+  /// No REFERENCES clause: SQLite cannot add a foreign key with ALTER TABLE,
+  /// so a migrated database enforces the equipment link at the repository
+  /// layer only -- exactly what media.site_id has always done for the rows
+  /// that predate it.
+  Future<void> _assertMediaEquipmentIdColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('equipment_id')) {
+      await customStatement('ALTER TABLE media ADD COLUMN equipment_id TEXT');
+    }
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_media_equipment_id '
+      'ON media(equipment_id)',
+    );
+  }
+
   Future<void> _assertBuddyFavoriteColumn() async {
     final cols = await customSelect("PRAGMA table_info('buddies')").get();
     if (cols.isEmpty) return;
@@ -5417,6 +6144,21 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE buddies ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0',
       );
+    }
+  }
+
+  /// Idempotent DDL for the v181 divers.photo and buddies.photo columns.
+  /// Holds a 512x512 square JPEG, so it is nullable with no default. Self-
+  /// guards on each table existing, which is what makes it safe to call from
+  /// both the ladder and beforeOpen.
+  Future<void> _assertProfilePhotoColumns() async {
+    for (final table in const ['divers', 'buddies']) {
+      final cols = await customSelect("PRAGMA table_info('$table')").get();
+      if (cols.isEmpty) continue;
+      final names = cols.map((c) => c.read<String>('name')).toSet();
+      if (!names.contains('photo')) {
+        await customStatement('ALTER TABLE $table ADD COLUMN photo BLOB');
+      }
     }
   }
 
@@ -5436,6 +6178,219 @@ class AppDatabase extends _$AppDatabase {
       );
     }
   }
+
+  /// Idempotent DDL for the v184 dive_data_sources.merge_source_slot column
+  /// (issue #1451). Same dual-call contract (onUpgrade + beforeOpen backstop)
+  /// as the other column-assert helpers. Nullable with no default, so every
+  /// pre-existing row reads back as "not carried by a merge".
+  Future<void> _assertDataSourceMergeSlotColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('merge_source_slot')) {
+      await customStatement(
+        'ALTER TABLE dive_data_sources ADD COLUMN merge_source_slot INTEGER',
+      );
+    }
+  }
+
+  /// Stamp `merge_source_slot = 0` on the provenance rows of dives that were
+  /// combined before v184 shipped, so their halves collapse to one display
+  /// source the way a post-v184 combine does (issue #1451).
+  ///
+  /// Nothing recorded the marker at the time, so the rows have to be
+  /// recognized by shape. A dive qualifies only when all three hold:
+  ///
+  ///  - it has two or more `dive_data_sources` rows, and
+  ///  - none of them is primary. Every importer writes its own row with
+  ///    `is_primary = 1` (dive_import_service, uddf_entity_importer,
+  ///    saveComputerReading) and a consolidation leaves the target's primary
+  ///    row alone, so "no primary at all" is the signature of
+  ///    `DiveMergeService.apply`, which writes every carried row
+  ///    `isPrimary: false`, and
+  ///  - every row has an entry and an exit time, and no two of those spans
+  ///    overlap, and
+  ///  - no row carries a non-zero `time_offset_seconds`.
+  ///
+  /// The span test is what makes this safe. Combined halves are consecutive
+  /// slices of one timeline, so their spans are disjoint; two computers
+  /// recording one dive cover the same minutes, so theirs overlap. Without
+  /// it, a consolidation whose target row was never marked primary would
+  /// collapse to a single chip and the chart would go back to drawing the
+  /// interleaved union of both computers (issue #543). A dive whose rows
+  /// carry no entry/exit times cannot be classified either way and is left
+  /// alone: it keeps exactly today's behavior.
+  ///
+  /// The offset test closes the one hole in that reasoning.
+  /// `DiveConsolidationService` shifts a folded-in dive's SAMPLES by
+  /// `time_offset_seconds` but copies its `entry_time`/`exit_time` over
+  /// verbatim, so a secondary whose clock was badly out has a stored span
+  /// that misses the target's even though the two cover the same minutes.
+  /// The span test would read that as a Combine. A non-zero offset is the
+  /// trace consolidation leaves and a Combine never writes, so requiring
+  /// zero across the dive rules that shape out. It costs a few false
+  /// negatives -- a pre-v184 dive that was consolidated and then combined is
+  /// now skipped -- and a skipped dive simply keeps today's display, which
+  /// is the safe direction to be wrong in for a one-shot write over user
+  /// data.
+  ///
+  /// Runs once on the v184 rung, not from the beforeOpen backstop: it writes
+  /// rows rather than asserting DDL, and every merge performed after the
+  /// upgrade stamps its own slots.
+  ///
+  /// Guarded on the columns it reads, like every other migration helper here.
+  /// A database whose `dive_data_sources` a parallel branch shaped without
+  /// entry/exit times must still open: the classification has no input there,
+  /// so skipping is the same answer as running.
+  Future<void> _backfillMergeSourceSlots() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    const required = {
+      'dive_id',
+      'is_primary',
+      'entry_time',
+      'exit_time',
+      'time_offset_seconds',
+      'merge_source_slot',
+    };
+    if (!names.containsAll(required)) return;
+    await customStatement(
+      'UPDATE dive_data_sources SET merge_source_slot = 0 '
+      'WHERE merge_source_slot IS NULL '
+      'AND dive_id IN ('
+      '  SELECT dive_id FROM dive_data_sources'
+      '  GROUP BY dive_id'
+      '  HAVING COUNT(*) >= 2'
+      '     AND SUM(CASE WHEN is_primary THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN entry_time IS NULL OR exit_time IS NULL'
+      '                  THEN 1 ELSE 0 END) = 0'
+      '     AND SUM(CASE WHEN COALESCE(time_offset_seconds, 0) <> 0'
+      '                  THEN 1 ELSE 0 END) = 0'
+      ') '
+      'AND dive_id NOT IN ('
+      '  SELECT a.dive_id FROM dive_data_sources a'
+      '  JOIN dive_data_sources b'
+      '    ON b.dive_id = a.dive_id AND b.id <> a.id'
+      '  WHERE a.entry_time < b.exit_time AND b.entry_time < a.exit_time'
+      ')',
+    );
+  }
+
+  /// v190: rewrite `dive_data_sources.raw_data` in its compressed at-rest
+  /// form (issue #227).
+  ///
+  /// PRAGMA-guarded like every other data rung, so a partial schema no-ops
+  /// rather than throwing. Rows already carrying the magic are skipped, which
+  /// is what makes a second run free and an interrupted run cost only the
+  /// work it already did.
+  ///
+  /// Every row is guarded on its own. An unguarded pack step in the v182
+  /// profile-series rung could leave a database that would not open, which is
+  /// the worst outcome available to a migration and the one this rung is
+  /// closest to repeating. A row that will not pack is left exactly as it is
+  /// and logged; nothing about it justifies refusing to open the diver's log.
+  ///
+  /// Paged with a keyset cursor rather than read whole: a large library holds
+  /// thousands of blobs, and loading every one into memory to save space
+  /// would be a strange way to go about it.
+  Future<void> _recompressRawDiveData() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('id') || !names.contains('raw_data')) return;
+
+    const pageSize = 200;
+    String? cursor;
+    while (true) {
+      final page = await customSelect(
+        'SELECT id, raw_data FROM dive_data_sources '
+        'WHERE raw_data IS NOT NULL${cursor == null ? '' : ' AND id > ?'} '
+        'ORDER BY id LIMIT $pageSize',
+        variables: [if (cursor != null) Variable(cursor)],
+      ).get();
+      if (page.isEmpty) break;
+      cursor = page.last.read<String>('id');
+
+      for (final row in page) {
+        final id = row.read<String>('id');
+        final stored = row.read<Uint8List>('raw_data');
+        if (isCompressedRawDiveData(stored)) continue;
+        try {
+          final packed = encodeRawDiveData(stored);
+          if (packed.length >= stored.length) continue;
+          await customStatement(
+            'UPDATE dive_data_sources SET raw_data = ? WHERE id = ?',
+            [packed, id],
+          );
+          _recompressedRawBlobs = true;
+        } catch (e, stackTrace) {
+          _rawBlobsLeftUncompressed++;
+          developer.log(
+            'v190 left raw_data on dive_data_sources row $id uncompressed; '
+            'the bytes are intact and still readable',
+            name: 'AppDatabase',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      }
+      if (page.length < pageSize) break;
+    }
+  }
+
+  bool _recompressedRawBlobs = false;
+  int _rawBlobsLeftUncompressed = 0;
+
+  /// How many rows the v190 rung could not pack on this connection.
+  ///
+  /// Counted rather than only logged: a swallowed exception with nothing but
+  /// a log line is invisible to any test, and the one thing worth proving
+  /// about this rung is that a row it cannot pack changes nothing else.
+  int get rawBlobsLeftUncompressed => _rawBlobsLeftUncompressed;
+
+  /// True once this connection's v190 rung has actually shrunk at least one
+  /// `raw_data` blob.
+  ///
+  /// The rewritten pages go to the freelist, and only a VACUUM returns them
+  /// to the filesystem. Keyed off the event rather than the stored version
+  /// for the same reason as [droppedLegacySampleTables]: a file with no raw
+  /// data crosses this rung without earning a reclaim, and rewriting it would
+  /// cost a diver a full-file VACUUM for nothing.
+  bool get recompressedRawBlobs => _recompressedRawBlobs;
+
+  /// True when this connection did something whose freed pages are still held
+  /// by the file. The single signal [DatabaseService] reads to decide whether
+  /// its one VACUUM is worth taking.
+  bool get hasUnreclaimedPages =>
+      droppedLegacySampleTables || recompressedRawBlobs;
+
+  /// What earned this connection's pending reclaim, for a log line that has
+  /// to name a cause.
+  ///
+  /// Both causes can be true of one upgrade, and neither has to be: a file
+  /// old enough to plan a VACUUM gets one even when its v183 rung skipped the
+  /// drop, and a message naming a step that did not run is worse than one
+  /// saying so. Kept beside [hasUnreclaimedPages] so a future reclaiming rung
+  /// that adds itself to the gate is looking straight at the string it also
+  /// has to extend.
+  String get unreclaimedPagesReason {
+    final causes = [
+      if (droppedLegacySampleTables) 'the legacy sample tables were dropped',
+      if (recompressedRawBlobs) 'raw dive data was recompressed',
+    ];
+    if (causes.isEmpty) return 'no reclaiming step reported on this connection';
+    return causes.join(' and ');
+  }
+
+  /// Test hook: run the v190 recompression on demand so tests can assert it
+  /// is idempotent. Not used in production; the migration calls the private
+  /// method.
+  Future<void> recompressRawDiveDataForTest() => _recompressRawDiveData();
 
   /// Site-level entry/exit method columns on dive_sites (issue #1104).
   /// PRAGMA-guarded so a healthy database no-ops and a partial schema does
@@ -5829,6 +6784,11 @@ class AppDatabase extends _$AppDatabase {
         // raw-SQL indexes, so a fresh install would otherwise be the one
         // device in the library without them.
         await assertTagUniqueness(this);
+
+        // Dive-type junction uniqueness index (v178, issue #1360): same
+        // reason as the tag indexes above -- createAll() does not build
+        // raw-SQL indexes.
+        await assertDiveTypeUniqueness(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         int completedSteps = 0;
@@ -9072,6 +10032,223 @@ class AppDatabase extends _$AppDatabase {
           await backfillDiveComputerGearTwins(this);
         }
         if (from < 175) await reportProgress();
+        // v177: GTR (gas time remaining) settings on diver_settings, and a
+        // one-time repair of dive_profiles.rbt for rows that came through
+        // libdivecomputer, which reports minutes into a seconds column.
+        if (from < 177) {
+          await _assertGtrSettingsColumns();
+          await _scaleLibdcRbtMinutesToSeconds();
+        }
+        if (from < 177) await reportProgress();
+        if (from < 178) {
+          // Duplicate dive types (issue #1360). The helper dedupes BEFORE
+          // creating the unique index and its dedupe is total (`id`
+          // tie-breaks), so no tie can survive to abort the index creation --
+          // the failure mode v148 documents. Self-guarding on the tables
+          // existing.
+          await assertDiveTypeUniqueness(this);
+        }
+        if (from < 178) await reportProgress();
+        // v179: dives.site_suggestion_dismissed_at (site suggestion dismissal).
+        if (from < 179) {
+          await _assertSiteSuggestionDismissedAtColumn();
+        }
+        if (from < 179) await reportProgress();
+        // v180: dives.excluded_from_stats and dives.excluded_from_gas_stats
+        // (issues #526 and #1272). Column-only rung, no backfill: every
+        // pre-existing row correctly defaults to included.
+        if (from < 180) {
+          await _assertDiveStatsExclusionColumns();
+        }
+        if (from < 180) await reportProgress();
+        // v181: divers.photo and buddies.photo, the profile photo blobs.
+        if (from < 181) {
+          await _assertProfilePhotoColumns();
+        }
+        if (from < 181) await reportProgress();
+        // v182: packed profile series tables, then pack every legacy
+        // row-per-sample row into them. Both steps are idempotent (IF NOT
+        // EXISTS DDL; INSERT OR IGNORE on ids derived from the identity
+        // tuple), so a retry after a failed ladder, or a collision re-run,
+        // is safe. v183 below drops the legacy tables.
+        //
+        // Wrapped the way the v183 rung below is, and for the same reason:
+        // `profileSampleOf` casts unchecked, so one malformed legacy row
+        // (a text timestamp, say) would otherwise throw out of onUpgrade,
+        // `_runUpgradeLadder` would rethrow, and the database could not be
+        // opened on any relaunch. Nothing is dropped here, so continuing
+        // costs nothing: the legacy tables stay, and the v183 rung below or
+        // the beforeOpen backstop packs them later. The schema assert is
+        // inside the try for the same reason it is in v183: both the v183
+        // rung and the backstop re-assert it, so swallowing it here cannot
+        // leave the ladder with a schema no later step rebuilds.
+        // Deliberately redundant with the v183 rung below: `from < 182`
+        // implies `from < 183`, so on a single upgrade both packs run and
+        // the second finds everything covered. Kept because the v182 SCHEMA
+        // has to be correct on its own (a rung inserted between the two
+        // later, or a ladder interrupted between them, would otherwise
+        // leave a 182 database with legacy rows and no series), and because
+        // the cost is now one pass per distinct identity rather than per
+        // sample: see legacyCoverageIdentityColumns.
+        if (from < 182) {
+          try {
+            await _assertProfileSeriesSchema();
+            final report = await packLegacyProfileRows(this);
+            if (report.failedDives > 0) {
+              // Per-dive isolation means the pass as a whole succeeded, so
+              // this is the only place the skipped dives are visible. The
+              // residue count keeps their legacy table for a later open.
+              developer.log(
+                'v182: ${report.failedDives} dive(s) could not be packed and '
+                'stay in the legacy tables for a later open',
+                name: 'AppDatabase',
+              );
+            }
+          } catch (e, stackTrace) {
+            developer.log(
+              'v182: packing legacy profile rows failed; keeping the legacy '
+              'tables so no samples are lost',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
+        }
+        if (from < 182) await reportProgress();
+        // v183: the legacy row-per-sample tables are gone. Their sync
+        // bookkeeping goes with them: pending records and tombstones for
+        // entity types no peer exports. Idempotent (IF NOT EXISTS DDL,
+        // INSERT OR IGNORE, IF EXISTS, DELETE), so a retried ladder is safe.
+        // The pages come back at the one VACUUM in
+        // DatabaseService._runUpgradeLadder.
+        //
+        // The pack repeats here rather than relying on the v182 rung above.
+        // A device that reached 182 through a PARALLEL BRANCH's rung of the
+        // same number never ran ours, so `from < 182` is false for it and
+        // nothing has packed its rows; the beforeOpen backstop cannot save
+        // it either, because drift runs beforeOpen AFTER onUpgrade and the
+        // rows would already be dropped. Packing here is a no-op once
+        // packed (one indexed NOT EXISTS per legacy dive).
+        //
+        // Two steps with different preconditions:
+        //  - The bookkeeping purge is UNCONDITIONAL. Those rows describe
+        //    entities nothing exports any more, so deleting them is correct
+        //    whether or not the pack succeeded.
+        //  - The table drop is CONDITIONAL, per table, on that pack having
+        //    actually moved the samples. A series table a parallel branch
+        //    shaped differently makes every packer INSERT fail; dropping
+        //    anyway would destroy the only copy of those samples, and
+        //    letting the exception out would leave a database that cannot
+        //    open at all (backstop_resilience_test.dart pins that). A pack
+        //    that returned normally is not enough on its own either: when a
+        //    series table's foreign-key parents are absent
+        //    (`dive_data_sources` for profiles, `dive_tanks` for pressures)
+        //    `_assertProfileSeriesSchema` creates no series table, the
+        //    packer finds nothing to pack into and returns having packed
+        //    nothing, so `_dropPackedLegacySampleTables` requires the
+        //    matching series table as well. Skipping a drop leaves a correct
+        //    database that merely still carries the old table, and the
+        //    beforeOpen backstop below drops it on the first later open
+        //    whose pack succeeds.
+        if (from < 183) {
+          var packed = true;
+          try {
+            await _assertProfileSeriesSchema();
+            final report = await packLegacyProfileRows(this);
+            if (report.failedDives > 0) {
+              // Per-dive isolation means the pass as a whole succeeded, so
+              // this is the only place the skipped dives are visible. The
+              // residue count keeps their legacy table for a later open.
+              developer.log(
+                'v183: ${report.failedDives} dive(s) could not be packed and '
+                'stay in the legacy tables for a later open',
+                name: 'AppDatabase',
+              );
+            }
+          } catch (e, stackTrace) {
+            packed = false;
+            developer.log(
+              'v183: packing legacy profile rows failed; keeping the legacy '
+              'tables so no samples are lost',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
+          // Guarded like the beforeOpen backstop's own copy of these two
+          // steps, and for the same reason: a busy lock from the second
+          // isolate, or a legacy table shape the residue count cannot read,
+          // must not turn into a database that cannot open. onUpgrade
+          // rethrows, so an escape here replays on every relaunch, while
+          // skipping the drop costs only a table the backstop retires on a
+          // later open.
+          try {
+            await _purgeLegacySampleBookkeeping();
+            if (packed) {
+              await _dropPackedLegacySampleTables();
+            }
+          } catch (e, stackTrace) {
+            developer.log(
+              'v183: purging or dropping the legacy sample tables failed; '
+              'the backstop retries on a later open',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
+        }
+        if (from < 183) await reportProgress();
+        // v184: the marker a sequential Combine stamps on the provenance
+        // rows it carries, plus a backfill for dives combined before it
+        // existed (issue #1451).
+        if (from < 184) {
+          await _assertDataSourceMergeSlotColumn();
+          await _backfillMergeSourceSlots();
+        }
+        if (from < 184) await reportProgress();
+        // v185: diver_settings.dive_detail_layout. Column-only rung, no
+        // backfill: a null reads back as the detailed layout, which is what
+        // every existing diver was already getting.
+        if (from < 185) {
+          await _assertDiveDetailLayoutColumn();
+        }
+        if (from < 185) await reportProgress();
+        // v186: pre_dive_checklist_template_items.equipment_id (issue #814).
+        // Column-only rung, no backfill: every pre-existing item correctly
+        // defaults to unlinked.
+        if (from < 186) {
+          await _assertTemplateItemEquipmentIdColumn();
+        }
+        if (from < 186) await reportProgress();
+        // v187: pre_dive_session_items.overdue_services (issue #814 phase 2).
+        // Column-only rung, no backfill: every pre-existing resolved item
+        // correctly reads back as "nothing known" until it is next resolved.
+        if (from < 187) {
+          await _assertSessionItemOverdueServicesColumn();
+        }
+        if (from < 187) await reportProgress();
+        // v188: divers.insurance_emergency_phone + divers.insurance_phone
+        // (issue #1522). Column-only rung, no backfill.
+        if (from < 188) {
+          await _assertInsurancePhoneColumns();
+        }
+        if (from < 188) await reportProgress();
+        // v189: media.equipment_id (issue #1517). Column-and-index rung, no
+        // backfill: every pre-existing media row correctly reads back as
+        // unattached to any gear.
+        if (from < 189) {
+          await _assertMediaEquipmentIdColumn();
+        }
+        if (from < 189) await reportProgress();
+        // v190: recompress dive_data_sources.raw_data in place (issue #227).
+        // No DDL. Guarded per row, so a blob that will not pack is left as it
+        // is rather than failing the ladder. No beforeOpen backstop: the
+        // backstops re-assert schema a partial upgrade may have missed, and
+        // this rung changes none.
+        if (from < 190) {
+          await _recompressRawDiveData();
+        }
+        if (from < 190) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -9251,6 +10428,12 @@ class AppDatabase extends _$AppDatabase {
         // Reading a consolidated dive's sources throws without it.
         await _assertDataSourceTimeOffsetColumn();
 
+        // v184 backstop: re-assert the merge provenance marker (issue
+        // #1451; same parallel-branch version-collision self-heal).
+        // Reading any dive's sources throws without it. Only the column is
+        // re-asserted here; the one-shot backfill belongs to the rung.
+        await _assertDataSourceMergeSlotColumn();
+
         // v160 backstop: re-assert service_kinds.default_category. A device
         // that reached 160 or higher through a parallel branch never enters
         // the `from < 160` block above, and the seed SQL below is
@@ -9266,10 +10449,19 @@ class AppDatabase extends _$AppDatabase {
         // (issue #1235; same parallel-branch version-collision self-heal).
         await _assertO2CellMvDefaultColumn();
 
+        // v177 backstop: re-assert the GTR settings columns (same
+        // parallel-branch version-collision self-heal). The rbt repair is
+        // deliberately NOT re-run here: it is a one-shot data fix.
+        await _assertGtrSettingsColumns();
+
         // v163 backstop: re-assert
         // diver_settings.default_show_estimated_tank_pressure (issue #731;
         // same parallel-branch version-collision self-heal).
         await _assertEstimatedTankPressureDefaultColumn();
+
+        // v179 backstop: re-assert dives.site_suggestion_dismissed_at (same
+        // parallel-branch version-collision self-heal).
+        await _assertSiteSuggestionDismissedAtColumn();
 
         // v164 backstop: re-assert media.manual_elapsed_seconds (issue
         // #1090; same parallel-branch version-collision self-heal). The
@@ -9308,6 +10500,128 @@ class AppDatabase extends _$AppDatabase {
         // the ladder, and re-running it on every open would resurrect a gear
         // item the user deleted.
         await _assertDiveComputerEquipmentColumn();
+
+        // v180 backstop: re-assert the dives statistics-exclusion columns
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertDiveStatsExclusionColumns();
+
+        // v181 backstop: re-assert divers.photo and buddies.photo. A database
+        // that arrives by restore or sync-adopt never runs onUpgrade, and
+        // every read of a diver or buddy row would throw without the column.
+        await _assertProfilePhotoColumns();
+
+        // v185 backstop: re-assert diver_settings.dive_detail_layout. Every
+        // settings read selects the whole row, so a database that skipped the
+        // rung would throw on the first read instead of falling back to the
+        // default layout.
+        await _assertDiveDetailLayoutColumn();
+        // v182 backstop: re-assert the packed profile series tables, then
+        // pack any dive that still has legacy rows and no series row. A
+        // schema-version collision with a parallel branch skips the rung on
+        // devices that took the other branch's number first, so this is the
+        // self-heal for series tables a device would otherwise never build.
+        // Cheap once packed (an indexed NOT EXISTS per legacy dive). v183
+        // drops the legacy tables, and the packer no-ops once they are gone
+        // (a missing table reports no columns, so neither side is packable),
+        // which is what makes this safe to keep running afterwards. Note the
+        // v183 rung packs for itself: beforeOpen runs after onUpgrade, so on
+        // the upgrading open this call comes too late to feed the drop.
+        // Best effort: the ladder's own call is where a packing failure is
+        // visible and retried. Here a malformed legacy table, a series table
+        // a parallel branch shaped differently, or a busy lock from the
+        // second isolate must not turn into a database that cannot open.
+        //
+        // The schema assert is INSIDE the try for that reason, the way the
+        // v182 and v183 rungs already place it. CREATE TABLE IF NOT EXISTS
+        // is a no-op against an existing table of any shape, so the assert
+        // goes on to CREATE INDEX ... (dive_id, is_primary): against a
+        // series table lacking that column SQLite raises "no such column",
+        // and outside the guard that throw failed the open on every launch
+        // rather than the one self-heal it belongs to.
+        try {
+          await _assertProfileSeriesSchema();
+          final report = await packLegacyProfileRows(this);
+          if (report.failedDives > 0) {
+            developer.log(
+              'beforeOpen: ${report.failedDives} dive(s) could not be packed '
+              'and stay in the legacy tables for a later open',
+              name: 'AppDatabase',
+            );
+          }
+          // v183 convergence: the rung skips its table drop when its own
+          // pack threw, and a rung never runs twice, so without this the
+          // legacy tables would survive forever on that database. Once a
+          // later open's pack succeeds the samples are all in the series and
+          // the tables can go. Gated on the stored version so a database
+          // still below 183 (a migration fixture, or one caught mid-ladder)
+          // keeps its tables until its own rung has run, and gated per table
+          // on the matching series table existing, for the same reason the
+          // rung is: a series table whose foreign-key parents are absent is
+          // never created, and the pack over it moves nothing.
+          //
+          // Nested try so the log names the step that threw. A drop or purge
+          // failure here is its own event, and it must not be reported as a
+          // packing failure; a pack failure, by contrast, has to keep the
+          // drop from running at all, which is why this sits INSIDE the
+          // pack's try rather than beside it.
+          try {
+            if (await _storedSchemaVersion() >= 183) {
+              // The purge is unconditional at 183, matching its own doc:
+              // those rows describe two entities this build never exports
+              // again, so they are dead whether or not the legacy tables
+              // are still here. Gating it on the tables tied it to
+              // something unrelated, and a device that crossed 183 through
+              // a parallel branch's rung of the same number (which dropped
+              // the tables itself) then kept them forever: sync_records
+              // that can never be acknowledged, and tombstones riding
+              // every base publish.
+              if (await _legacySampleTablesPresent()) {
+                await _dropPackedLegacySampleTables();
+              }
+              await _purgeLegacySampleBookkeeping();
+            }
+          } catch (e, stackTrace) {
+            developer.log(
+              'Backstop drop of the legacy sample tables failed; continuing',
+              name: 'AppDatabase',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
+        } catch (e, stackTrace) {
+          developer.log(
+            'Backstop pack of legacy profile rows failed; continuing',
+            name: 'AppDatabase',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+
+        // v186 backstop: re-assert pre_dive_checklist_template_items.
+        // equipment_id (same parallel-branch version-collision self-heal).
+        // Safe to re-run on every open: the helper is column-only with no
+        // backfill, so it cannot resurrect or overwrite diver data.
+        await _assertTemplateItemEquipmentIdColumn();
+
+        // v187 backstop: re-assert pre_dive_session_items.overdue_services
+        // (same parallel-branch version-collision self-heal). Safe to re-run
+        // on every open: the helper is column-only with no backfill, so it
+        // cannot resurrect or overwrite diver data.
+        await _assertSessionItemOverdueServicesColumn();
+
+        // v188 backstop: re-assert the divers insurance phone columns. Every
+        // diver read selects the whole row, so a database that arrives by
+        // restore or sync-adopt without the rung would throw on the first read
+        // rather than merely lack the numbers.
+        await _assertInsurancePhoneColumns();
+
+        // v189 backstop: re-assert media.equipment_id and its index (same
+        // parallel-branch version-collision self-heal). Safe to re-run on
+        // every open: column-and-index only, no backfill, so it cannot
+        // resurrect or overwrite diver data.
+        await _assertMediaEquipmentIdColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
@@ -9464,13 +10778,21 @@ class AppDatabase extends _$AppDatabase {
         // exactly the second device the duplicate tags came from.
         await assertTagUniqueness(this);
 
+        // v178 backstop (issue #1360): re-assert the dive-type junction
+        // uniqueness index, deduping first so the creation cannot abort. Same
+        // reasoning as the tag backstop above -- a database that arrives by
+        // restore or sync-adopt never runs onUpgrade, and that is exactly the
+        // second device the duplicate types came from.
+        await assertDiveTypeUniqueness(this);
+
         // Data self-heal: backfill a primary dive_data_sources row for dives
         // that have profile samples but no source row (legacy file imports).
         // Without it, the 3D/spatial/compare views spin forever on those dives.
         // Idempotent and local-only (deterministic ids, no HLC bump). Runs
         // AFTER ensurePerformanceIndexes so its per-dive EXISTS/NOT EXISTS
-        // subqueries hit idx_dive_profiles_dive_id / idx_dive_data_sources_dive_id
-        // instead of full-scanning million-row tables on a fresh/restored DB.
+        // subqueries hit idx_dive_profile_series_dive_primary /
+        // idx_dive_data_sources_dive_id instead of full-scanning on a
+        // fresh/restored DB.
         await _backfillMissingDataSources();
 
         // Data self-heal (issue #1064): adopt dives.computer_id from the

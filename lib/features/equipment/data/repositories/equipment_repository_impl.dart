@@ -10,11 +10,39 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/data/repositories/service_schedule_repository.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 
 class EquipmentRepository {
+  /// Injectable seams mirror [SiteRepository]: tests hand in a coordinator
+  /// over an in-memory queue, production builds the default. A redirecting
+  /// GENERATIVE constructor (not a factory) so existing test fakes that
+  /// `extends EquipmentRepository` keep their implicit super() call.
+  EquipmentRepository({
+    MediaRepository? mediaRepository,
+    MediaDeletionCoordinator? mediaDeletionCoordinator,
+  }) : this._(mediaRepository ?? MediaRepository(), mediaDeletionCoordinator);
+
+  EquipmentRepository._(
+    this._mediaRepository,
+    MediaDeletionCoordinator? coordinator,
+  ) : _mediaDeletionCoordinator =
+          coordinator ??
+          MediaDeletionCoordinator(
+            mediaRepository: _mediaRepository,
+            queue: () => MediaTransferQueueRepository(),
+            // No worker kick from the data layer (provider cycles): queued
+            // intents drain on the next connectivity event, app start, or
+            // any other kick; the Verify Library sweep is the backstop.
+          );
+
+  final MediaRepository _mediaRepository;
+  final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
@@ -242,6 +270,8 @@ class EquipmentRepository {
       // must not rethrow and make the caller treat the whole create as failed
       // (which could prompt a retry and duplicate the item). The clocks can be
       // added manually later; log and continue.
+      // Each step is caught on its own so one failing does not skip the
+      // other, and so the log names the step that actually failed.
       try {
         await ServiceScheduleRepository().autoAttachForEquipment(
           equipmentId: id,
@@ -252,6 +282,16 @@ class EquipmentRepository {
         _log.error(
           'Auto-attach of default service clocks failed for equipment $id; '
           'the equipment was still created',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
+      try {
+        await _attachLegacyIntervalClock(id, equipment);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Mirroring the legacy service interval onto the ledger failed for '
+          'equipment $id; the equipment was still created',
           error: e,
           stackTrace: stackTrace,
         );
@@ -271,6 +311,39 @@ class EquipmentRepository {
       );
       rethrow;
     }
+  }
+
+  /// Mirror a legacy single-clock interval onto the service ledger.
+  ///
+  /// The ledger is the only source the due-service surfaces read, and the
+  /// legacy `serviceIntervalDays` column has no editor left in the app -- but
+  /// UDDF import still carries one, so an imported item would otherwise land
+  /// with an interval nothing evaluates. The deterministic
+  /// `legacy-svc-<equipment id>` id and General service kind match the v122
+  /// and v131 migrations, so an item that arrives by import and the same item
+  /// that arrives by migration or sync converge on one clock, not two.
+  Future<void> _attachLegacyIntervalClock(
+    String id,
+    EquipmentItem equipment,
+  ) async {
+    final intervalDays = equipment.serviceIntervalDays;
+    if (intervalDays == null) return;
+    final scheduleId = 'legacy-svc-$id';
+    final repository = ServiceScheduleRepository();
+    final existing = await repository.getSchedulesForEquipment(id);
+    if (existing.any((s) => s.id == scheduleId)) return;
+    final now = DateTime.now();
+    await repository.createSchedule(
+      ServiceSchedule(
+        id: scheduleId,
+        equipmentId: id,
+        serviceKindId: 'general-service',
+        intervalDays: intervalDays,
+        anchorDate: equipment.lastServiceDate,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    );
   }
 
   /// Update equipment
@@ -325,6 +398,23 @@ class EquipmentRepository {
     }
   }
 
+  /// Splits a dying item's attachments (issue #1517): rows only this item
+  /// referenced die with it, rows a dive or site still needs survive with
+  /// equipment_id cleared and an HLC stamp -- which a silent FK SET NULL
+  /// never produces, so without this the unlink would not propagate to the
+  /// diver's other devices.
+  Future<void> _cascadeMediaForEquipmentDeletion(List<String> ids) async {
+    final split = await _mediaRepository.partitionMediaForEquipmentDeletion(
+      ids,
+    );
+    if (split.doomed.isNotEmpty) {
+      await _mediaDeletionCoordinator.deleteMediaItems(split.doomed);
+    }
+    if (split.unlinkIds.isNotEmpty) {
+      await _mediaRepository.unlinkMediaFromDeletedEquipment(split.unlinkIds);
+    }
+  }
+
   /// Delete equipment. Service schedules and service records are first-class
   /// synced children cascade-deleted by SQLite, but cascades emit no
   /// deletion-log entries, so each is tombstoned explicitly (mirrors
@@ -332,6 +422,11 @@ class EquipmentRepository {
   Future<void> deleteEquipment(String id) async {
     try {
       _log.info('Deleting equipment: $id');
+      // Attachments first, outside the transaction: the coordinator's queue
+      // writes live in another database, so no cross-DB transaction exists
+      // and every step is individually idempotent/tombstoned. Same shape and
+      // same reasoning as SiteRepository's media cascade.
+      await _cascadeMediaForEquipmentDeletion([id]);
       await _db.transaction(() async {
         final schedules = await (_db.select(
           _db.serviceSchedules,
@@ -460,14 +555,6 @@ class EquipmentRepository {
     }
   }
 
-  /// Get equipment with service due
-  Future<List<EquipmentItem>> getEquipmentWithServiceDue({
-    String? diverId,
-  }) async {
-    final allEquipment = await getActiveEquipment(diverId: diverId);
-    return allEquipment.where((g) => g.isServiceDue).toList();
-  }
-
   /// Get all active equipment with service due dates for notification scheduling
   Future<List<EquipmentItem>> getEquipmentWithServiceDates({
     String? diverId,
@@ -579,6 +666,12 @@ class EquipmentRepository {
   }
 
   /// Get dive count for equipment item
+  /// Deliberately does NOT apply DiveStatsScope. A dive the diver excluded
+  /// from statistics still physically happened: it cycled this gear and put
+  /// hours on it. Suppressing it here would push a real service interval
+  /// later than it should be, a safety-relevant error rather than a cosmetic
+  /// one. Do not "fix" this.
+  // stats-scope-exempt: gear wear is physical, not descriptive
   Future<int> getDiveCountForEquipment(String equipmentId) async {
     try {
       final result = await _db
@@ -606,6 +699,12 @@ class EquipmentRepository {
   /// (date, duration) samples of dives linked to this equipment via the
   /// dive_equipment junction or dive_tanks.equipment_id, for usage-based
   /// service clocks. Duration is COALESCE(runtime, bottom_time) seconds.
+  /// Deliberately does NOT apply DiveStatsScope. A dive the diver excluded
+  /// from statistics still physically happened: it cycled this gear and put
+  /// hours on it. Suppressing it here would push a real service interval
+  /// later than it should be, a safety-relevant error rather than a cosmetic
+  /// one. Do not "fix" this.
+  // stats-scope-exempt: gear wear is physical, not descriptive
   Future<List<DiveUsageSample>> getUsageSamplesForEquipment(
     String equipmentId, {
     DateTime? since,
@@ -659,6 +758,12 @@ class EquipmentRepository {
   }
 
   /// Get trip count for equipment item (unique trips from dives using this equipment)
+  /// Deliberately does NOT apply DiveStatsScope. A dive the diver excluded
+  /// from statistics still physically happened: it cycled this gear and put
+  /// hours on it. Suppressing it here would push a real service interval
+  /// later than it should be, a safety-relevant error rather than a cosmetic
+  /// one. Do not "fix" this.
+  // stats-scope-exempt: gear wear is physical, not descriptive
   Future<int> getTripCountForEquipment(String equipmentId) async {
     try {
       final result = await _db
@@ -685,6 +790,7 @@ class EquipmentRepository {
   }
 
   /// Get trip IDs for equipment item
+  // stats-scope-exempt: gear usage is physical, not descriptive
   Future<List<String>> getTripIdsForEquipment(String equipmentId) async {
     try {
       final result = await _db

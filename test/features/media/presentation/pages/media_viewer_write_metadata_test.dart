@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,14 +17,6 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/test_database.dart';
-
-/// Mirrors `MetadataWriteService.isSupported`, which is checked BEFORE the
-/// platform channel: on an unsupported host the service throws outright, so
-/// the mocked channel is unreachable and a test asserting its result can never
-/// pass there. Tests that only assert the viewer recovers (spinner dropped, a
-/// SnackBar shown) hold on every platform and are deliberately NOT skipped.
-final bool _metadataWriteSupported =
-    Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
 
 class _UnavailableResolver implements MediaSourceResolver {
   @override
@@ -53,11 +43,12 @@ MediaItem item({
   String id = 'm1',
   String? platformAssetId = 'asset-1',
   double? depthMeters = 18.3,
+  MediaType mediaType = MediaType.photo,
 }) => MediaItem(
   id: id,
   diveId: 'dive-1',
   platformAssetId: platformAssetId,
-  mediaType: MediaType.photo,
+  mediaType: mediaType,
   sourceType: MediaSourceType.platformGallery,
   takenAt: DateTime.utc(2026, 7, 1, 10),
   createdAt: DateTime.utc(2026, 7, 1),
@@ -87,6 +78,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     nativeCalls = [];
+    // CI runs its test shards on Linux, where the service's real platform
+    // check is false and would refuse before reaching the mocked channel.
+    MetadataWriteService.debugSupportedOverride = true;
     handler = (_) async => true;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) {
@@ -96,6 +90,7 @@ void main() {
   });
 
   tearDown(() async {
+    MetadataWriteService.debugSupportedOverride = null;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
     await tearDownTestDatabase();
@@ -156,6 +151,14 @@ void main() {
     expect(find.byIcon(Icons.edit_note), findsNothing);
   });
 
+  testWidgets('the action is hidden for videos (issue #1472)', (tester) async {
+    // Writing metadata to a video meant exporting a copy, creating a new
+    // asset and deleting the original. The whole path is gone, so the
+    // action must not be offered for one.
+    await pump(tester, item(mediaType: MediaType.video));
+    expect(find.byIcon(Icons.edit_note), findsNothing);
+  });
+
   testWidgets('media not in the library reports it and never calls native', (
     tester,
   ) async {
@@ -203,7 +206,7 @@ void main() {
     expect(find.text('Dive data written to photo'), findsOneWidget);
     // The modal spinner must not outlive the write.
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 
   testWidgets('a native refusal is reported as a failure', (tester) async {
     handler = (_) async => false;
@@ -218,7 +221,7 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.textContaining('The operation returned false'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
 
   testWidgets('a native error surfaces and drops the spinner', (tester) async {
     handler = (_) async =>
@@ -253,5 +256,28 @@ void main() {
     expect(find.textContaining('PHPhotosErrorDomain'), findsNothing);
     expect(find.textContaining('Live Photos'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  }, skip: !_metadataWriteSupported);
+  });
+
+  testWidgets('a native video refusal is translated, not shown raw', (
+    tester,
+  ) async {
+    // Reachable when an item stored as a photo turns out to be a video in the
+    // library: the native handlers check the real media type, not the flag
+    // Dart sent, so the refusal can arrive even though the action is hidden
+    // for anything already known to be a video (issue #1472).
+    handler = (_) async => throw PlatformException(
+      code: metadataWriteVideoUnsupportedCode,
+      message: 'Writing metadata to a video is not supported.',
+    );
+    await pump(tester, item());
+    await openDialog(tester);
+    await confirmWrite(tester);
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(
+      find.text('Dive data can only be written to photos, not videos.'),
+      findsOneWidget,
+    );
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
 }

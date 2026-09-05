@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/changeset_log/base_part_file_sink.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_codec.dart';
@@ -11,6 +15,12 @@ import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 /// SyncService._applyRemotePayload (HLC LWW + tombstones + FK repair), injected
 /// so the merge stays the single source of truth.
 typedef ApplyPayload = Future<void> Function(SyncPayload payload);
+
+/// Progress of a peer base download: [downloaded] of [total] parts have landed
+/// for the base named by [manifest]. Lets the caller keep the progress bar
+/// moving through a multi-hundred-MB adoption (issue #1421).
+typedef BaseDownloadProgress =
+    void Function(SyncManifest manifest, int downloaded, int total);
 
 /// Applies a base that has been streamed to a local temp [filePath]. The real
 /// implementation streams the file through the merge in bounded memory; see
@@ -27,6 +37,8 @@ class ChangesetReadResult {
     this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.newerSchemaPeerNames = const {},
+    this.readFailedPeerDeviceIds = const {},
+    this.readFailedPeerNames = const {},
     this.retiredPeerIds = const {},
     this.retiredPeerHasFiles = false,
   });
@@ -58,6 +70,18 @@ class ChangesetReadResult {
   /// published one, keyed by device id. Same fallback contract as
   /// [skippedPeerNames]: absent means the UI shows a short id label.
   final Map<String, String> newerSchemaPeerNames;
+
+  /// Peers whose read threw partway through this pull (a provider error, a
+  /// malformed manifest or changeset, an apply failure, ...). Their cursors
+  /// stayed put, so the next sync retries them -- but the caller must surface
+  /// them rather than reporting a misleadingly clean sync.
+  final Set<String> readFailedPeerDeviceIds;
+
+  /// Display names for the entries in [readFailedPeerDeviceIds] whose
+  /// manifests were parsed (and named the device) before the failure. Same
+  /// fallback contract as [skippedPeerNames]: absent means the UI shows a
+  /// short id label.
+  final Map<String, String> readFailedPeerNames;
   final Set<String> retiredPeerIds;
 
   /// True when a retired peer still has non-marker files in the bucket (a
@@ -76,6 +100,7 @@ class ChangesetReader {
   final ChangesetCodec _codec;
   final PeerCursorStore _peerCursors;
   final BasePartFileSink _baseSink;
+  static final _log = LoggerService.forClass(ChangesetReader);
 
   Future<ChangesetReadResult> pull({
     required CloudStorageProvider provider,
@@ -86,6 +111,7 @@ class ChangesetReader {
     String? currentEpochId,
     int localSchemaVersion = AppDatabase.currentSchemaVersion,
     List<CloudFileInfo>? preListedFiles,
+    BaseDownloadProgress? onBaseDownloadProgress,
   }) async {
     final providerId = provider.providerId;
     // [preListedFiles] lets the caller reuse a listing it just made (the
@@ -122,11 +148,16 @@ class ChangesetReader {
     final skippedPeerNames = <String, String>{};
     final newerSchemaPeerDeviceIds = <String>{};
     final newerSchemaPeerNames = <String, String>{};
+    final readFailedPeerDeviceIds = <String>{};
+    final readFailedPeerNames = <String, String>{};
 
     var peersProcessed = 0;
     var payloadsApplied = 0;
 
     for (final peerId in peerIds) {
+      // Captured as soon as the manifest parses, so the catch below can name
+      // the peer even when the failure comes later in the read.
+      String? peerName;
       try {
         // A retired peer's files are being deleted; never merge from them and
         // never advance a cursor against them.
@@ -137,6 +168,10 @@ class ChangesetReader {
           await provider.downloadFile(manifestFile.id),
         );
         peerManifests.add(manifest);
+        final manifestName = manifest.deviceName;
+        if (manifestName != null && manifestName.isNotEmpty) {
+          peerName = manifestName;
+        }
 
         // Stale-epoch filter: once this device is on a library epoch, a peer
         // stamped with a different epoch (including an unstamped legacy peer)
@@ -180,20 +215,47 @@ class ChangesetReader {
         // Cold-start, or lapped by the peer's compaction: adopt the base.
         final baseSeq = manifest.baseSeq;
         if (baseSeq != null && lastApplied < baseSeq) {
+          // A base adoption can run for minutes on a large library, so log
+          // its shape and timing: a debug log that goes silent here is
+          // otherwise indistinguishable from a hang.
+          _log.info(
+            'Adopting base seq $baseSeq from peer $peerId'
+            '${peerName != null ? ' ($peerName)' : ''}: '
+            '${manifest.basePartCount ?? 0} parts, '
+            '${manifest.baseBytes ?? 0} bytes '
+            '(cursor at $lastApplied, head ${manifest.headSeq})',
+          );
+          final stopwatch = Stopwatch()..start();
           final path = await _fetchBaseToFile(
             provider,
             peerId,
             manifest,
             byName,
+            onPartDownloaded: onBaseDownloadProgress == null
+                ? null
+                : (downloaded, total) =>
+                      onBaseDownloadProgress(manifest, downloaded, total),
           );
           if (path == null) {
+            _log.warning(
+              'Base seq $baseSeq from peer $peerId is incomplete or corrupt; '
+              'will retry next sync',
+            );
             continue; // missing or corrupt base -> transient, retry next sync
           }
+          _log.info(
+            'Base seq $baseSeq from peer $peerId assembled in '
+            '${stopwatch.elapsed.inSeconds}s; applying',
+          );
           try {
             await applyBaseFile(path, manifest);
           } finally {
             await _baseSink.deleteQuietly(path);
           }
+          _log.info(
+            'Base seq $baseSeq from peer $peerId applied '
+            '(${stopwatch.elapsed.inSeconds}s total)',
+          );
           payloadsApplied++;
           appliedThrough = baseSeq;
           baseSeqApplied = baseSeq;
@@ -209,9 +271,19 @@ class ChangesetReader {
         for (var seq = appliedThrough + 1; seq <= manifest.headSeq; seq++) {
           final csFile = byName[ChangesetLogLayout.changesetName(peerId, seq)];
           if (csFile == null) break; // gap -> apply what we have, retry later
-          final cs = _codec.decodeChangeset(
-            await provider.downloadFile(csFile.id),
-          );
+          final Uint8List csBytes;
+          try {
+            csBytes = await provider.downloadFile(csFile.id);
+          } on EnvelopeCorruptException {
+            // Same standing as the checksum failure below, so the same
+            // handling: break rather than throw, which reaches the cursor
+            // upsert and records the seqs already applied. Throwing here
+            // would unwind to the per-peer catch, which skips that upsert,
+            // so every later sync would re-download and re-apply this
+            // peer's whole backlog and still never advance past this seq.
+            break;
+          }
+          final cs = _codec.decodeChangeset(csBytes);
           if (!_codec.serializer.validateChecksum(cs)) {
             break; // corrupt changeset -> stop; a fixed sync retries from here
           }
@@ -232,9 +304,21 @@ class ChangesetReader {
             appliedHlcHigh: appliedHlc,
           );
         }
-      } catch (_) {
+      } catch (e, stackTrace) {
         // One bad peer must not block the others; its cursor stays put so the
-        // next sync retries it.
+        // next sync retries it. Record the failure so the caller can surface
+        // it instead of reporting a misleadingly clean sync.
+        readFailedPeerDeviceIds.add(peerId);
+        if (peerName != null) {
+          readFailedPeerNames[peerId] = peerName;
+        }
+        _log.warning(
+          'Failed to read peer $peerId'
+          '${peerName != null ? ' ($peerName)' : ''}; '
+          'cursor kept for retry next sync',
+          error: e,
+          stackTrace: stackTrace,
+        );
         continue;
       }
     }
@@ -247,6 +331,8 @@ class ChangesetReader {
       skippedPeerNames: skippedPeerNames,
       newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
       newerSchemaPeerNames: newerSchemaPeerNames,
+      readFailedPeerDeviceIds: readFailedPeerDeviceIds,
+      readFailedPeerNames: readFailedPeerNames,
       retiredPeerIds: retiredPeerIds,
       retiredPeerHasFiles: retiredPeerHasFiles,
     );
@@ -268,8 +354,9 @@ class ChangesetReader {
     CloudStorageProvider provider,
     String peerId,
     SyncManifest manifest,
-    Map<String, CloudFileInfo> byName,
-  ) {
+    Map<String, CloudFileInfo> byName, {
+    void Function(int downloaded, int total)? onPartDownloaded,
+  }) {
     final baseSeq = manifest.baseSeq!;
     final partCount = manifest.basePartCount ?? 0;
     // A manifest that names a base (baseSeq set) but no parts is malformed --
@@ -287,6 +374,7 @@ class ChangesetReader {
         if (pf == null) return null;
         return provider.downloadFile(pf.id);
       },
+      onPartDownloaded: onPartDownloaded,
     );
   }
 }

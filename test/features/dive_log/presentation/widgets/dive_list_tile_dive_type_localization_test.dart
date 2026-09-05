@@ -6,7 +6,6 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/compact_dive_list_tile.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/dense_dive_list_tile.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
@@ -293,131 +292,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Blue Hole'), findsOneWidget);
-    });
-  });
-
-  group('DenseDiveListTile dive-type slot', () {
-    Widget tile({
-      required Locale locale,
-      required DiveSummary summary,
-      DiveField slot1Field = DiveField.siteName,
-      DiveField slot2Field = DiveField.dateTime,
-      DiveField slot3Field = DiveField.maxDepth,
-      List<DiveTypeEntity>? types,
-    }) => harness(
-      locale: locale,
-      types: types,
-      builder: (resolve, _) => DenseDiveListTile(
-        diveId: 'd1',
-        diveNumber: 7,
-        dateTime: DateTime(2026, 3, 15),
-        siteName: 'Blue Hole',
-        maxDepth: 20.0,
-        duration: const Duration(minutes: 30),
-        summary: summary,
-        slot1Field: slot1Field,
-        slot2Field: slot2Field,
-        slot3Field: slot3Field,
-        onTap: () {},
-        diveTypeLabelResolver: resolve,
-      ),
-    );
-
-    testWidgets('text slot localizes a built-in type', (tester) async {
-      await tester.pumpWidget(
-        tile(
-          locale: const Locale('de'),
-          summary: summaryWith(['wreck']),
-          slot1Field: DiveField.diveTypeName,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Wracktauchen'), findsOneWidget);
-      expect(find.text('Wreck'), findsNothing);
-    });
-
-    testWidgets('second text slot localizes a built-in type', (tester) async {
-      await tester.pumpWidget(
-        tile(
-          locale: const Locale('de'),
-          summary: summaryWith(['night']),
-          slot2Field: DiveField.diveTypeName,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.textContaining('Nachttauchen'), findsWidgets);
-    });
-
-    testWidgets('stat slot localizes a built-in type', (tester) async {
-      await tester.pumpWidget(
-        tile(
-          locale: const Locale('de'),
-          summary: summaryWith(['wreck']),
-          slot3Field: DiveField.diveTypeName,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.textContaining('Wracktauchen'), findsOneWidget);
-    });
-
-    testWidgets('a custom type keeps its own name under German', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        tile(
-          locale: const Locale('de'),
-          summary: summaryWith(['muck_x1']),
-          slot1Field: DiveField.diveTypeName,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Muck'), findsOneWidget);
-    });
-
-    testWidgets('English still shows the English built-in label', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        tile(
-          locale: const Locale('en'),
-          summary: summaryWith(['wreck']),
-          slot1Field: DiveField.diveTypeName,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Wreck'), findsOneWidget);
-    });
-
-    testWidgets('a summary-less tile still resolves non-default slots', (
-      tester,
-    ) async {
-      // Same legacy path as the compact tile: no DiveSummary, so both the text
-      // slot and the stat slot fall through to the resolver-threaded tail.
-      await tester.pumpWidget(
-        harness(
-          locale: const Locale('de'),
-          builder: (resolve, _) => DenseDiveListTile(
-            diveId: 'd1',
-            diveNumber: 7,
-            dateTime: DateTime(2026, 3, 15),
-            siteName: 'Blue Hole',
-            maxDepth: 20.0,
-            duration: const Duration(minutes: 30),
-            slot1Field: DiveField.diveTypeName,
-            slot3Field: DiveField.waterTemp,
-            onTap: () {},
-            diveTypeLabelResolver: resolve,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Blue Hole'), findsNothing);
     });
   });
 

@@ -88,6 +88,36 @@ int libdc_descriptor_lookup_model(unsigned int transport, unsigned int model,
                                   libdc_descriptor_info_t *info);
 
 // ============================================================
+// USB HID Discovery Helpers
+// ============================================================
+
+// Transport bitmask of the descriptor identified by vendor/product/model.
+// Returns 0 when no descriptor matches, which is also a valid "no transports"
+// answer; callers only ever test individual bits, so the two are equivalent.
+//
+// The USB HID download path uses this to decide whether a model is worth
+// looking for on the HID bus before it probes serial ports (issue #1271).
+unsigned int libdc_descriptor_transports(const char *vendor, const char *product,
+                                         unsigned int model);
+
+// Whether the descriptor identified by vendor/product/model accepts a USB HID
+// device with this vendor and product id. Returns 1 for a match, 0 otherwise.
+//
+// The id tables live in libdivecomputer's own filter functions
+// (dc_filter_uwatec, dc_filter_suunto), reachable through the public
+// dc_descriptor_filter(). Asking libdivecomputer rather than copying the
+// tables here means new HID hardware arrives with a submodule bump.
+//
+// A descriptor that does not declare DC_TRANSPORT_USBHID rejects every id.
+// That has to be decided from the transport bitmask rather than from the
+// filter: a filter with no USB HID branch (dc_filter_shearwater, for one)
+// falls through to "accept", so the filter alone would say yes for hardware
+// that has no HID interface at all.
+int libdc_usbhid_match(const char *vendor, const char *product,
+                       unsigned int model,
+                       unsigned short vid, unsigned short pid);
+
+// ============================================================
 // Custom I/O Callbacks (for BLE bridge)
 // ============================================================
 
@@ -174,7 +204,7 @@ typedef struct {
     double o2_sensor[6];       // per-cell ppO2 in bar (NAN if that cell absent)
     unsigned int o2_sensor_mv[6]; // per-cell raw output in mV (UINT32_MAX if absent)
     double cns;                // percentage 0-100 (NAN if unavailable)
-    unsigned int rbt;          // remaining bottom time in seconds (UINT32_MAX if unavailable)
+    unsigned int rbt;          // remaining bottom time in MINUTES as libdc reports it (UINT32_MAX if unavailable); Dart converts to seconds
     // Decompression status at this sample
     unsigned int deco_type;    // 0=NDL, 1=safetystop, 2=decostop, 3=deepstop (UINT32_MAX if unavailable)
     unsigned int deco_time;    // seconds (NDL seconds or stop time remaining)
@@ -195,6 +225,14 @@ typedef struct {
     double endpressure;        // bar
     unsigned int usage;        // dc_usage_t (0=none, 1=oxygen, 2=diluent, 3=sidemount)
 } libdc_tank_t;
+
+// Name of a libdivecomputer sample event type (parser_sample_event_t), in
+// the spelling the Dart layer switches on ("ascent", "ceiling", ...). This is
+// the single table every platform binding must use: the per-platform copies
+// it replaced had all skipped SAMPLE_EVENT_RBT, shifting every later code by
+// one so ascent-rate alarms were reported as ceiling breaches. Returns
+// "unknown" for codes outside the enum. Statically allocated (do not free).
+const char *libdc_event_type_name(unsigned int type);
 
 #define LIBDC_MAX_EVENTS 256
 

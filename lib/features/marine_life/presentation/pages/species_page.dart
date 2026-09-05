@@ -9,12 +9,15 @@ import 'package:submersion/features/marine_life/presentation/providers/seen_spec
 import 'package:submersion/features/marine_life/presentation/species_display.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/seen_species_tile.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_category_chips.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The species the diver has seen across every dive, searchable and sortable.
 ///
-/// Reached at `/species` from the Statistics > Marine Life tab. Housekeeping
+/// Reached at `/species` from the nav and from the Statistics > Species
+/// tab. Housekeeping
 /// (edit, delete, reset the catalog) stays on the manager at
 /// `/species/manage`, behind the app-bar action. Query, category and sort are
 /// per-visit state, so they live here rather than in a provider.
@@ -118,6 +121,11 @@ class _SpeciesPageState extends ConsumerState<SpeciesPage> {
   }
 
   Widget _buildList(List<SeenSpecies> entries) {
+    // Covers load beside the list, not ahead of it: a species with no photo
+    // yet, or a cover query still running, shows the category avatar.
+    final covers =
+        ref.watch(speciesCoverMediaProvider).value ??
+        const <String, MediaItem>{};
     final l10n = context.l10n;
     if (entries.isEmpty) {
       return _EmptyState(
@@ -158,6 +166,7 @@ class _SpeciesPageState extends ConsumerState<SpeciesPage> {
               final entry = visible[index];
               return SeenSpeciesTile(
                 entry: entry,
+                cover: covers[entry.species.id],
                 onTap: () => context.push('/species/${entry.species.id}'),
               );
             },

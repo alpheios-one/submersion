@@ -42,6 +42,12 @@ void Function(sqlite3.Database) _connectionSetup(String? keyHex) {
   return (db) => applyMainDatabaseSetup(db, keyHex: keyHex);
 }
 
+/// Default for [DatabaseService._runUpgradeLadder]'s VACUUM ticket: a caller
+/// that hands over no ticket gets the pre-existing behaviour.
+bool _alwaysPending() => true;
+
+void _noop() {}
+
 class DatabaseService {
   DatabaseService._();
 
@@ -237,7 +243,9 @@ class DatabaseService {
   ///
   /// A single synchronous `PRAGMA user_version` read (via
   /// [getStoredSchemaVersion]) drives BOTH the newer-than-app guard and
-  /// the migration-pending decision, so the file is opened synchronously
+  /// the migration-pending decision, and is handed on to
+  /// [_runUpgradeLadder] for its one-time VACUUM rather than re-read there,
+  /// so the file is opened synchronously
   /// on the UI isolate at most once per open — the rest is executor work.
   Future<AppDatabase> _openDatabase(
     String dbPath, {
@@ -286,8 +294,20 @@ class DatabaseService {
       // That is safe -- every step is idempotent by contract -- but it does
       // mean onMigrationProgress can restart at step 1, so a progress bar may
       // visibly rewind. A rewinding bar beats a bricked launch.
+      // The VACUUM ticket lives out here, not inside the ladder: a busy lock
+      // makes retryWhileDatabaseBusy call the whole thing again from the
+      // top, and rewriting a 769 MB file a second time is exactly the cost
+      // the one-shot design was avoiding. Taken at most once per open.
+      var vacuumTicket = true;
       await retryWhileDatabaseBusy(
-        () => _runUpgradeLadder(file, keyHex, onMigrationProgress),
+        () => _runUpgradeLadder(
+          file,
+          keyHex,
+          stored,
+          onMigrationProgress,
+          vacuumPending: () => vacuumTicket,
+          takeVacuumTicket: () => vacuumTicket = false,
+        ),
       );
       lastOpenMode = DatabaseOpenMode.migrationThenBackground;
     } else {
@@ -309,15 +329,94 @@ class DatabaseService {
   Future<void> _runUpgradeLadder(
     File file,
     String? keyHex,
-    void Function(int currentStep, int totalSteps)? onMigrationProgress,
-  ) async {
+    int? storedBefore,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress, {
+    bool Function() vacuumPending = _alwaysPending,
+    void Function() takeVacuumTicket = _noop,
+  }) async {
+    // Whether this attempt will VACUUM, decided before the ladder starts so
+    // every progress report of this open counts the same total.
+    final willVacuum =
+        storedBefore != null && storedBefore < 183 && vacuumPending();
+    final ladderSteps = storedBefore == null
+        ? 0
+        : AppDatabase.migrationStepCount(storedBefore);
+    // The VACUUM is a step of the upgrade as the diver experiences it, so it
+    // is counted as one. Without it the ladder's last report reads
+    // "finished" and the bar sits full while a large file is rewritten, with
+    // nothing on screen saying the app is still working. The callback shape
+    // carries the total on every call, so an extra step needs no new API.
+    void report(int currentStep, int totalSteps) {
+      onMigrationProgress?.call(
+        currentStep,
+        willVacuum ? totalSteps + 1 : totalSteps,
+      );
+    }
+
     final migrator = AppDatabase(
       NativeDatabase(file, setup: _connectionSetup(keyHex)),
-      onMigrationProgress: onMigrationProgress,
+      onMigrationProgress: onMigrationProgress == null ? null : report,
     );
     try {
       // Force the upgrade ladder to completion before switching executors.
       await migrator.customSelect('SELECT 1').get();
+      // [storedBefore] is the version the file had ON DISK before the
+      // ladder ran, read by the caller: keying off the migrator's own
+      // version here would always read 183 and never VACUUM. The ladder's
+      // own beforeOpen backstop can also drop the legacy tables on a file
+      // already stamped 183, which no version comparison can see, so the
+      // drop itself is the second reason to reclaim.
+      //
+      // Unreachable while 183 is the current version, because this method
+      // only runs with a ladder pending and every such file is below 183.
+      // It is here for the rung after next: a file stamped 183 whose v184
+      // ladder is pending has willVacuum false, and its backstop can still
+      // be the open that finally drops the tables. The background executor
+      // reopens on a fresh connection that no longer sees them, so nothing
+      // downstream would catch it.
+      //
+      // v190 (issue #227) recompresses raw_data in place, which frees pages
+      // the same way the v183 drop did. A file upgrading from 184 or later
+      // has willVacuum false, so the recompression reaches the one VACUUM
+      // through this branch, unannounced as a progress step. The totals were
+      // fixed before the ladder started, and reporting an unplanned reclaim
+      // as a step would send the bar past its own total.
+      final unplannedReclaim = !willVacuum && migrator.hasUnreclaimedPages;
+      if (vacuumPending() && (willVacuum || unplannedReclaim)) {
+        // v183 dropped the row-per-sample tables, which on an older file are
+        // most of its pages, and v190 rewrites every raw_data blob smaller;
+        // both leave the freed pages on the freelist. VACUUM here: outside
+        // any migration transaction,
+        // on the one exclusive main-isolate connection, and before the
+        // background executor opens the file. Non-fatal: a busy lock or an
+        // out-of-space temp store leaves a correct database that is merely
+        // larger than it needs to be.
+        //
+        // One shot per open. A VACUUM killed part way leaves a correct
+        // database still carrying its free pages, and the drop that earned
+        // the reclamation has already happened, so nothing asks again. The
+        // ticket is taken before the attempt, not after, so a VACUUM that
+        // throws is not retried either.
+        //
+        // Announced as a step only when it was PLANNED. The totals were
+        // fixed before the ladder started so every report of this open
+        // agrees, and reporting an unplanned reclaim as a step would send
+        // the bar past its own total.
+        takeVacuumTicket();
+        if (!unplannedReclaim) report(ladderSteps, ladderSteps);
+        try {
+          await migrator.customStatement('VACUUM');
+        } catch (e, stackTrace) {
+          _log.warning(
+            'Post-migration VACUUM skipped; the database is correct but has '
+            'not returned its free pages to the filesystem '
+            '(${migrator.unreclaimedPagesReason})',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+        if (!unplannedReclaim) report(ladderSteps + 1, ladderSteps);
+      }
     } catch (_) {
       // Best-effort close so we don't leak the connection (or its locks, which
       // would defeat the retry), then let the original error surface.
@@ -367,6 +466,35 @@ class DatabaseService {
       // not race this connection's locks.
       await closeDatabaseForAppShutdown(database, background: background);
       rethrow;
+    }
+    // The forcing statement above ran beforeOpen, and that is where the
+    // v183 backstop drops a legacy sample table the rung had to skip. This
+    // open has no pending ladder, so nothing else will ever reclaim those
+    // pages: without this the diver's file stays at its pre-migration size
+    // permanently, because there is no other VACUUM of the live database
+    // anywhere in the app.
+    //
+    // On the worker isolate, so a large rewrite does not block the UI, and
+    // awaited, so nothing queries a file mid-VACUUM. Non-fatal for the same
+    // reason as the migration path's copy: a busy lock or a full temp store
+    // leaves a correct database that is merely larger than it needs to be.
+    //
+    // The v190 recompression reaches this the same way if it ever runs on an
+    // open with no pending ladder. It cannot today, but the gate is one
+    // signal so a future rung that frees pages does not have to remember to
+    // add itself in two places.
+    if (database.hasUnreclaimedPages) {
+      try {
+        await database.customStatement('VACUUM');
+      } catch (e, stackTrace) {
+        _log.warning(
+          'VACUUM after an upgrade freed pages was skipped; the database is '
+          'correct but has not returned them to the filesystem '
+          '(${database.unreclaimedPagesReason})',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
     _background = background;
     return database;

@@ -7,11 +7,13 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/domain/services/photo_gps_point_selector.dart';
 
 class MediaRepository {
   AppDatabase get _db => DatabaseService.instance.database;
@@ -47,7 +49,11 @@ class MediaRepository {
   /// since linking is precisely when the enrichment does not exist yet.
   Stream<void> watchMediaChanges() => _db
       .tableUpdates(
-        TableUpdateQuery.onAllTables([_db.media, _db.mediaEnrichment]),
+        TableUpdateQuery.onAllTables([
+          _db.media,
+          _db.mediaEnrichment,
+          _db.mediaSpecies,
+        ]),
       )
       .debounce(changeTickDebounce);
 
@@ -118,6 +124,49 @@ class MediaRepository {
     final query = _db.selectOnly(_db.media)
       ..addColumns([count])
       ..where(_db.media.siteId.equals(siteId));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  /// Get all documents and photos attached to a piece of equipment, oldest
+  /// first (issue #1517). Ordered by createdAt rather than takenAt: an
+  /// invoice's "taken" stamp is the moment it was attached, which carries no
+  /// meaning, while the attach order is the order the diver filed them in.
+  ///
+  /// Id breaks the ties, and it is load-bearing rather than decorative:
+  /// created_at is stored to the MILLISECOND and DocumentImportService stamps
+  /// DateTime.now() per file inside its loop, so one picker selection of
+  /// several documents routinely lands them in the same millisecond. SQLite
+  /// leaves tied ordering undefined, so without this the diver's document
+  /// list reshuffles between runs and between devices.
+  Future<List<domain.MediaItem>> getMediaForEquipment(
+    String equipmentId,
+  ) async {
+    try {
+      final query = _db.select(_db.media)
+        ..where((t) => t.equipmentId.equals(equipmentId))
+        ..orderBy([
+          (t) => OrderingTerm.asc(t.createdAt),
+          (t) => OrderingTerm.asc(t.id),
+        ]);
+      final rows = await query.get();
+      return rows.map(mediaItemFromRow).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get media for equipment: $equipmentId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Count of media attached to a piece of equipment (badges/headers).
+  Future<int> getMediaCountForEquipment(String equipmentId) async {
+    final count = _db.media.id.count();
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([count])
+      ..where(_db.media.equipmentId.equals(equipmentId));
     final row = await query.getSingle();
     return row.read(count) ?? 0;
   }
@@ -226,6 +275,7 @@ class MediaRepository {
               id: Value(id),
               diveId: Value(item.diveId),
               siteId: Value(item.siteId),
+              equipmentId: Value(item.equipmentId),
               filePath: Value(item.filePath ?? ''),
               fileType: Value(mediaTypeToDbString(item.mediaType)),
               platformAssetId: Value(item.platformAssetId),
@@ -346,6 +396,7 @@ class MediaRepository {
         MediaCompanion(
           diveId: Value(item.diveId),
           siteId: Value(item.siteId),
+          equipmentId: Value(item.equipmentId),
           filePath: Value(item.filePath ?? ''),
           fileType: Value(mediaTypeToDbString(item.mediaType)),
           platformAssetId: Value(item.platformAssetId),
@@ -521,10 +572,17 @@ class MediaRepository {
   /// Whether any attachable media exists (signatures excluded). Cheap
   /// EXISTS probe for setup/status surfaces.
   Future<bool> hasAnyMedia() async {
+    // Excludes every signature spelling, not just the instructor one, so a
+    // logbook whose only media rows are buddy signatures still reports empty.
+    final placeholders = List.filled(
+      kSignatureFileTypes.length,
+      '?',
+    ).join(', ');
     final row = await _db
         .customSelect(
-          "SELECT EXISTS(SELECT 1 FROM media "
-          "WHERE file_type != 'instructor_signature') AS present",
+          'SELECT EXISTS(SELECT 1 FROM media '
+          'WHERE file_type NOT IN ($placeholders)) AS present',
+          variables: kSignatureFileTypes.map(Variable.withString).toList(),
         )
         .getSingle();
     return row.read<int>('present') == 1;
@@ -710,6 +768,140 @@ class MediaRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to mark media verified: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Records the outcome of an explicit check on one row: `lastVerifiedAt`
+  /// always, and the orphan flag only when the check actually learned it
+  /// ([isOrphaned] non-null).
+  ///
+  /// Narrow for the same reason [markVerified] is. `MediaItemVerifier`'s
+  /// callers hold a snapshot of the row, and an upload that completes after
+  /// the snapshot was taken stamps `remoteUploadedAt` on the row; a whole-row
+  /// write from the snapshot ([updateMedia]) would roll that stamp back to
+  /// null, and the pending mark would then sync the rollback fleet-wide.
+  ///
+  /// Unlike [markVerified] this always writes: the user asked for a check
+  /// and the date of that check is the answer, whether or not the flag moved.
+  /// Like it, a row that is gone by the time the check lands (deleted during
+  /// a Check all media pass) gets no pending record pointing at nothing.
+  Future<void> stampVerification(
+    String id, {
+    required DateTime verifiedAt,
+    bool? isOrphaned,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final rowsWritten =
+          await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+            MediaCompanion(
+              isOrphaned: isOrphaned == null
+                  ? const Value.absent()
+                  : Value(isOrphaned),
+              lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+              updatedAt: Value(now),
+            ),
+          );
+      if (rowsWritten == 0) return;
+      await _syncRepository.markRecordPending(
+        entityType: 'media',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to stamp verification: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Rows this device imported that carry the "missing" flag.
+  ///
+  /// Feeds the one-time origin republish: before the origin-device fix a
+  /// peer could flag a row it never had, and that flag synced back to the
+  /// device that does have the file. Re-checking these here is the only way
+  /// to find out; a peer's rows are that peer's to judge.
+  Future<List<domain.MediaItem>> getOrphanedMediaOwnedBy(
+    String deviceId,
+  ) async {
+    try {
+      final query =
+          _db.select(_db.media).join([
+            leftOuterJoin(
+              _db.mediaEnrichment,
+              _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
+            ),
+          ])..where(
+            _db.media.isOrphaned.equals(true) &
+                _db.media.originDeviceId.equals(deviceId),
+          );
+      final rows = await query.get();
+      return rows.map((row) {
+        final mediaRow = row.readTable(_db.media);
+        final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get orphaned media for device $deviceId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Ids of rows this device imported that carry any media store stamp.
+  ///
+  /// These are the rows whose stamps a peer may have dropped (the
+  /// pending-skip in sync's merge); republishing them hands the stamps back.
+  Future<List<String>> getStoreStampedMediaIdsOwnedBy(String deviceId) async {
+    final id = _db.media.id;
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([id])
+      ..where(
+        _db.media.originDeviceId.equals(deviceId) &
+            (_db.media.remoteUploadedAt.isNotNull() |
+                _db.media.remoteThumbUploadedAt.isNotNull() |
+                _db.media.remoteCompressedUploadedAt.isNotNull()),
+      );
+    final rows = await query.get();
+    return [for (final row in rows) row.read(id)!];
+  }
+
+  /// Marks [ids] pending for sync without changing a column, so the next
+  /// changeset carries the rows exactly as they are. Returns how many.
+  ///
+  /// One transaction: markRecordPending's own per-row transaction nests as a
+  /// savepoint, so a library with thousands of stamped rows commits once.
+  Future<int> republishForSync(Iterable<String> ids) async {
+    final list = ids.toList();
+    if (list.isEmpty) return 0;
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await _db.transaction(() async {
+        for (final id in list) {
+          await _syncRepository.markRecordPending(
+            entityType: 'media',
+            recordId: id,
+            localUpdatedAt: now,
+          );
+        }
+      });
+      SyncEventBus.notifyLocalChange();
+      _log.info('Republished ${list.length} media rows for sync');
+      return list.length;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to republish ${list.length} media rows',
         error: e,
         stackTrace: stackTrace,
       );
@@ -1056,8 +1248,7 @@ class MediaRepository {
         WHERE dive_id = ?
         AND latitude IS NOT NULL
         AND longitude IS NOT NULL
-        AND latitude != 0
-        AND longitude != 0
+        AND NOT (latitude = 0 AND longitude = 0)
         ORDER BY taken_at ASC
         ''',
             variables: [Variable.withString(diveId)],
@@ -1071,6 +1262,7 @@ class MediaRepository {
               longitude: row.data['longitude'] as double,
               takenAt: DateTime.fromMillisecondsSinceEpoch(
                 row.data['taken_at'] as int,
+                isUtc: true,
               ),
             ),
           )
@@ -1085,21 +1277,74 @@ class MediaRepository {
     }
   }
 
-  /// Get the best GPS coordinates from a dive's media.
-  ///
-  /// Returns the GPS from the earliest photo with coordinates, or null if
-  /// no photos have GPS data. The earliest photo is typically taken at the
-  /// dive site before entering the water.
+  /// The best photo fix for each of [diveIds]: the GPS-tagged media row whose
+  /// capture time is nearest the dive's entry time (see
+  /// [selectBestPhotoGps]). One join query, no dive hydration. Dives with no
+  /// usable fix are absent from the map.
+  Future<Map<String, PhotoGpsPoint>> getBestPhotoGpsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const {};
+    try {
+      final samplesByDive = <String, List<PhotoGpsPoint>>{};
+      final entryByDive = <String, DateTime>{};
+      // SQLite caps bound variables; chunk generously below the limit.
+      for (var i = 0; i < diveIds.length; i += 500) {
+        final chunk = diveIds.sublist(
+          i,
+          i + 500 > diveIds.length ? diveIds.length : i + 500,
+        );
+        final m = _db.media;
+        final d = _db.dives;
+        final query =
+            _db.select(m).join([innerJoin(d, d.id.equalsExp(m.diveId))])..where(
+              m.diveId.isIn(chunk) &
+                  m.latitude.isNotNull() &
+                  m.longitude.isNotNull() &
+                  m.takenAt.isNotNull() &
+                  (m.latitude.equals(0) & m.longitude.equals(0)).not(),
+            );
+        for (final row in await query.get()) {
+          final media = row.readTable(m);
+          final dive = row.readTable(d);
+          final diveId = media.diveId!;
+          entryByDive[diveId] = DateTime.fromMillisecondsSinceEpoch(
+            dive.entryTime ?? dive.diveDateTime,
+            isUtc: true,
+          );
+          samplesByDive.putIfAbsent(diveId, () => []).add((
+            mediaId: media.id,
+            location: GeoPoint(media.latitude!, media.longitude!),
+            takenAt: DateTime.fromMillisecondsSinceEpoch(
+              media.takenAt!,
+              isUtc: true,
+            ),
+          ));
+        }
+      }
+      return {
+        for (final e in samplesByDive.entries)
+          e.key: ?selectBestPhotoGps(e.value, entryByDive[e.key]!),
+      };
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get best photo GPS for dives',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// The best photo fix for one dive, or null. See [getBestPhotoGpsForDives].
   Future<({double latitude, double longitude})?> getBestGpsFromDiveMedia(
     String diveId,
   ) async {
-    final gpsPoints = await getGpsFromDiveMedia(diveId);
-    if (gpsPoints.isEmpty) return null;
-
-    // Return the first (earliest) GPS point
+    final best = (await getBestPhotoGpsForDives([diveId]))[diveId];
+    if (best == null) return null;
     return (
-      latitude: gpsPoints.first.latitude,
-      longitude: gpsPoints.first.longitude,
+      latitude: best.location.latitude,
+      longitude: best.location.longitude,
     );
   }
 
@@ -1280,12 +1525,16 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// A media row is linked to the logbook when it references a dive or a
-  /// site (orphan-prevention spec section 3). Single definition shared by
-  /// the deletion cascades, the unlink partitions, and the orphan backlog
-  /// sweep so the predicates cannot drift apart.
-  static Expression<bool> isLinkedToDiveOrSite($MediaTable m) =>
-      m.diveId.isNotNull() | m.siteId.isNotNull();
+  /// A media row is linked to the logbook when it references a dive, a site
+  /// or a piece of equipment (orphan-prevention spec section 3). Single
+  /// definition shared by the deletion cascades, the unlink partitions, and
+  /// the orphan backlog sweep so the predicates cannot drift apart.
+  ///
+  /// The equipment arm is what keeps an attached invoice out of the orphan
+  /// sweep: it is linked to no dive and no site, so without it every gear
+  /// document would be swept as unreferenced (issue #1517).
+  static Expression<bool> isLinkedToLogbook($MediaTable m) =>
+      m.diveId.isNotNull() | m.siteId.isNotNull() | m.equipmentId.isNotNull();
 
   /// Splits a dying dive's media (orphan-prevention spec 4.2): `doomed`
   /// rows die with the dive (dive-only; full items because the blob-delete
@@ -1307,7 +1556,9 @@ class MediaRepository {
     final doomed = <domain.MediaItem>[];
     final unlinkIds = <String>[];
     for (final row in rows) {
-      final keep = row.siteId != null;
+      // Any surviving link keeps the row: a photo the site gallery still
+      // shows, or an invoice still filed against a piece of gear.
+      final keep = row.siteId != null || row.equipmentId != null;
       if (keep) {
         unlinkIds.add(row.id);
       } else {
@@ -1355,7 +1606,7 @@ class MediaRepository {
     final doomed = <domain.MediaItem>[];
     final unlinkIds = <String>[];
     for (final row in rows) {
-      final keep = row.diveId != null;
+      final keep = row.diveId != null || row.equipmentId != null;
       if (keep) {
         unlinkIds.add(row.id);
       } else {
@@ -1391,6 +1642,46 @@ class MediaRepository {
     });
     SyncEventBus.notifyLocalChange();
   }
+
+  /// Splits a dying item's media: `doomed` rows die with the equipment
+  /// (equipment-only; full items because the blob-delete intent needs
+  /// contentHash/filename/type), `unlinkIds` survive as dive- or site-linked
+  /// rows with equipmentId nulled. Equipment counterpart of
+  /// [partitionMediaForSiteDeletion] (issue #1517).
+  Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
+  partitionMediaForEquipmentDeletion(List<String> equipmentIds) async {
+    // Empty-guard mirrors the dive and site partitions: bulk callers
+    // legitimately hand over empty collections.
+    if (equipmentIds.isEmpty) {
+      return (doomed: const <domain.MediaItem>[], unlinkIds: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.equipmentId.isIn(equipmentIds))).get();
+    final doomed = <domain.MediaItem>[];
+    final unlinkIds = <String>[];
+    for (final row in rows) {
+      final keep = row.diveId != null || row.siteId != null;
+      if (keep) {
+        unlinkIds.add(row.id);
+      } else {
+        doomed.add(mediaItemFromRow(row));
+      }
+    }
+    return (doomed: doomed, unlinkIds: unlinkIds);
+  }
+
+  /// Explicitly unlinks surviving media from deleted equipment, with the HLC
+  /// stamp the silent FK SET NULL never produced. Equipment counterpart of
+  /// [unlinkMediaFromDeletedSites].
+  ///
+  /// Routed through [_unlinkColumns], which already does exactly this work:
+  /// one transaction that clears the column, bumps updated_at and marks each
+  /// row sync-pending. The dive and site twins hand-roll the same block and
+  /// explain it as avoiding retain_in_library, but [_unlinkColumns] does not
+  /// touch that column, so there is nothing here to avoid.
+  Future<void> unlinkMediaFromDeletedEquipment(List<String> mediaIds) =>
+      _unlinkColumns(mediaIds, const MediaCompanion(equipmentId: Value(null)));
 
   /// Stage B of the repair apply (Media section Phase 3): commits every
   /// prepared write in one transaction with per-row HLC marking. Stage A
@@ -1513,70 +1804,109 @@ class MediaRepository {
   /// Splits [mediaIds] by whether anything other than the dive still needs
   /// the row, for the dive-unlink path.
   ///
-  /// `siteLinked` rows survive a dive unlink with the link merely cleared,
-  /// the same carve-out the dive-deletion cascade makes: a dive-scoped
-  /// action must never destroy a site's only photo as a side effect.
-  Future<({List<String> deletable, List<String> siteLinked})>
+  /// `keptIds` rows survive a dive unlink with the link merely cleared, the
+  /// same carve-out the dive-deletion cascade makes: a dive-scoped action
+  /// must never destroy a site's only photo -- or a piece of gear's only
+  /// invoice -- as a side effect.
+  Future<({List<String> deletable, List<String> keptIds})>
   partitionForDiveUnlink(List<String> mediaIds) async {
     if (mediaIds.isEmpty) {
-      return (deletable: const <String>[], siteLinked: const <String>[]);
+      return (deletable: const <String>[], keptIds: const <String>[]);
     }
     final rows = await (_db.select(
       _db.media,
     )..where((t) => t.id.isIn(mediaIds))).get();
     final deletable = <String>[];
-    final siteLinked = <String>[];
+    final keptIds = <String>[];
     for (final row in rows) {
-      if (row.siteId != null) {
-        siteLinked.add(row.id);
+      if (row.siteId != null || row.equipmentId != null) {
+        keptIds.add(row.id);
       } else {
         deletable.add(row.id);
       }
     }
-    return (deletable: deletable, siteLinked: siteLinked);
+    return (deletable: deletable, keptIds: keptIds);
   }
 
   /// Mirror of [partitionForDiveUnlink] for the site-unlink path: rows a
-  /// dive still references survive with only the site link cleared, the
-  /// rest leave the library.
-  Future<({List<String> deletable, List<String> diveLinked})>
+  /// dive or a piece of equipment still references survive with only the
+  /// site link cleared, the rest leave the library.
+  Future<({List<String> deletable, List<String> keptIds})>
   partitionForSiteUnlink(List<String> mediaIds) async {
     if (mediaIds.isEmpty) {
-      return (deletable: const <String>[], diveLinked: const <String>[]);
+      return (deletable: const <String>[], keptIds: const <String>[]);
     }
     final rows = await (_db.select(
       _db.media,
     )..where((t) => t.id.isIn(mediaIds))).get();
     final deletable = <String>[];
-    final diveLinked = <String>[];
+    final keptIds = <String>[];
     for (final row in rows) {
-      if (row.diveId != null) {
-        diveLinked.add(row.id);
+      if (row.diveId != null || row.equipmentId != null) {
+        keptIds.add(row.id);
       } else {
         deletable.add(row.id);
       }
     }
-    return (deletable: deletable, diveLinked: diveLinked);
+    return (deletable: deletable, keptIds: keptIds);
+  }
+
+  /// The equipment counterpart: rows a dive or site still references survive
+  /// with only the equipment link cleared, the rest leave the library.
+  Future<({List<String> deletable, List<String> keptIds})>
+  partitionForEquipmentUnlink(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) {
+      return (deletable: const <String>[], keptIds: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.id.isIn(mediaIds))).get();
+    final deletable = <String>[];
+    final keptIds = <String>[];
+    for (final row in rows) {
+      if (row.diveId != null || row.siteId != null) {
+        keptIds.add(row.id);
+      } else {
+        deletable.add(row.id);
+      }
+    }
+    return (deletable: deletable, keptIds: keptIds);
   }
 
   /// Of [mediaIds], those carrying metadata a user typed or set that no
-  /// source file holds: a caption, or the favorite flag.
+  /// source file holds: a caption, the favorite flag, or a species tag.
   ///
   /// Used to decide whether an unlink needs to warn before it removes the
-  /// rows. Deliberately no join against `media_species`: that table is
-  /// declared but nothing in the app reads or writes it, so joining it
-  /// would cost a scan to always return nothing.
+  /// rows.
   Future<Set<String>> idsWithUserMetadata(List<String> mediaIds) async {
     if (mediaIds.isEmpty) return {};
-    final rows =
-        await (_db.select(_db.media)..where(
-              (t) =>
-                  t.id.isIn(mediaIds) &
-                  (t.isFavorite.equals(true) |
-                      (t.caption.isNotNull() & t.caption.equals('').not())),
-            ))
-            .get();
-    return {for (final row in rows) row.id};
+    // Chunked: a "select all" in the library can pass thousands of ids,
+    // past SQLite's bound-variable limit for a single IN (...).
+    const chunkSize = 500;
+    final out = <String>{};
+    for (var i = 0; i < mediaIds.length; i += chunkSize) {
+      final chunk = mediaIds.sublist(
+        i,
+        i + chunkSize < mediaIds.length ? i + chunkSize : mediaIds.length,
+      );
+      final rows =
+          await (_db.select(_db.media)..where(
+                (t) =>
+                    t.id.isIn(chunk) &
+                    (t.isFavorite.equals(true) |
+                        (t.caption.isNotNull() & t.caption.equals('').not())),
+              ))
+              .get();
+      final tagged =
+          await (_db.selectOnly(_db.mediaSpecies)
+                ..addColumns([_db.mediaSpecies.mediaId])
+                ..where(_db.mediaSpecies.mediaId.isIn(chunk)))
+              .get();
+      out
+        ..addAll(rows.map((row) => row.id))
+        ..addAll(tagged.map((row) => row.read(_db.mediaSpecies.mediaId)!));
+    }
+    return out;
   }
 
   /// Moves media to [newDiveId] (also the link path for unlinked rows).
@@ -1627,6 +1957,18 @@ class MediaRepository {
   Future<void> linkMediaToSite(List<String> mediaIds, String siteId) =>
       _unlinkColumns(mediaIds, MediaCompanion(siteId: Value(siteId)));
 
+  /// Same mechanic for the equipment link, for media a dive or site still
+  /// needs.
+  Future<void> unlinkFromEquipment(List<String> mediaIds) =>
+      _unlinkColumns(mediaIds, const MediaCompanion(equipmentId: Value(null)));
+
+  /// Attaches the equipment link, same sync-safe shape.
+  Future<void> linkMediaToEquipment(
+    List<String> mediaIds,
+    String equipmentId,
+  ) =>
+      _unlinkColumns(mediaIds, MediaCompanion(equipmentId: Value(equipmentId)));
+
   Future<void> _unlinkColumns(
     List<String> mediaIds,
     MediaCompanion changes, {
@@ -1661,7 +2003,7 @@ class MediaRepository {
     final query = _db.selectOnly(_db.media)
       ..addColumns([id])
       ..where(
-        isLinkedToDiveOrSite(_db.media).not() &
+        isLinkedToLogbook(_db.media).not() &
             _db.media.createdAt.isSmallerThanValue(
               olderThan.millisecondsSinceEpoch,
             ),
@@ -1723,6 +2065,42 @@ class MediaRepository {
     ];
   }
 
+  /// SQLite's default bound-parameter ceiling is 999 on older builds; a
+  /// library backfill can queue far more rows than that.
+  static const int _labelChunk = 500;
+
+  /// A display label (file name, else caption) for each of [ids] that has
+  /// one. Ids with neither, or with no row, are absent.
+  ///
+  /// selectOnly projection, one query per chunk: the Transfers page names
+  /// every queued row, and hydrating a full MediaItem per row would drag the
+  /// imageData BLOB in for each and pin it in a provider cache.
+  Future<Map<String, String>> getDisplayLabels(Iterable<String> ids) async {
+    final all = ids.toSet().toList();
+    if (all.isEmpty) return const {};
+    final id = _db.media.id;
+    final name = _db.media.originalFilename;
+    final caption = _db.media.caption;
+    final labels = <String, String>{};
+    for (var start = 0; start < all.length; start += _labelChunk) {
+      final end = (start + _labelChunk).clamp(0, all.length);
+      final query = _db.selectOnly(_db.media)
+        ..addColumns([id, name, caption])
+        ..where(id.isIn(all.sublist(start, end)));
+      for (final row in await query.get()) {
+        final label = _firstNonBlank(row.read(name), row.read(caption));
+        if (label != null) labels[row.read(id)!] = label;
+      }
+    }
+    return labels;
+  }
+
+  static String? _firstNonBlank(String? first, String? second) {
+    if (first != null && first.isNotEmpty) return first;
+    if (second != null && second.isNotEmpty) return second;
+    return null;
+  }
+
   /// Clears a stale thumb stamp (verify sweep reverse repair). Mirrors
   /// [clearRemoteUploaded].
   Future<void> clearRemoteThumbUploaded(String mediaId) async {
@@ -1746,11 +2124,18 @@ class MediaRepository {
   /// gain protection soonest. Scoped to rows linked to a dive or site so
   /// orphaned rows are never uploaded (orphan-prevention spec section 4.1).
   Future<List<String>> getBackfillCandidateIds() async {
+    // A row another device imported is that device's to upload: this one
+    // cannot read its path, so enqueueing it only manufactures a "source
+    // unavailable" failure. Rows from before origin tracking carry no id
+    // and keep today's verdict.
+    final thisDevice = await _syncRepository.getDeviceId();
     final id = _db.media.id;
     final query = _db.selectOnly(_db.media)
       ..addColumns([id])
       ..where(
-        isLinkedToDiveOrSite(_db.media) &
+        isLinkedToLogbook(_db.media) &
+            (_db.media.originDeviceId.isNull() |
+                _db.media.originDeviceId.equals(thisDevice)) &
             // Photos from any uploadable source.
             ((_db.media.remoteUploadedAt.isNull() &
                     _db.media.remoteCompressedUploadedAt.isNull() &

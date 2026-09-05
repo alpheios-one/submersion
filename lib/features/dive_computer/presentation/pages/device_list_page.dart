@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_computer/presentation/utils/last_download_formatter.dart';
+import 'package:submersion/features/dive_computer/presentation/widgets/dive_computer_merge_sheet.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -57,9 +61,19 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
               ? SelectionAppBar(
                   controller: _selection,
                   selectableIds: visibleIds,
-                  // Delete only: favourite reads as singular, and a multi-device
-                  // download would be a new flow rather than a lifted action.
-                  actions: const [],
+                  // Merge and delete: favourite reads as singular, and a
+                  // multi-device download would be a new flow rather than a
+                  // lifted action.
+                  actions: [
+                    BulkAction(
+                      id: 'merge',
+                      icon: Icons.merge_type,
+                      label:
+                          context.l10n.diveComputer_list_selection_mergeTooltip,
+                      minCount: 2,
+                      onInvoke: _startMerge,
+                    ),
+                  ],
                   shell: SelectionBarShell.appBar,
                   onDelete: _confirmAndDelete,
                 )
@@ -120,6 +134,35 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
                   icon: const Icon(Icons.add),
                   label: Text(context.l10n.diveComputer_list_addComputer),
                 ),
+        ),
+      ),
+    );
+  }
+
+  /// Folds the checked computers into one (#645). The sheet owns the
+  /// confirmation; this only reports the outcome and leaves selection mode.
+  Future<void> _startMerge() async {
+    final ids = _selectedIds;
+    final computers = [
+      for (final computer
+          in ref.read(allDiveComputersProvider).value ?? const <DiveComputer>[])
+        if (ids.contains(computer.id)) computer,
+    ];
+    if (computers.length < 2) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await DiveComputerMergeSheet.show(context, computers);
+    if (result == null || !mounted) return;
+
+    _selection.exit();
+    final survivor = computers.firstWhere((c) => c.id == result.survivorId);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          context.l10n.diveComputer_merge_snackbar(
+            result.mergedComputerIds.length,
+            survivor.displayName,
+          ),
         ),
       ),
     );
@@ -294,7 +337,7 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
 }
 
 /// Card widget displaying a single dive computer.
-class _ComputerCard extends StatelessWidget {
+class _ComputerCard extends ConsumerWidget {
   final DiveComputer computer;
   final VoidCallback onTap;
   final VoidCallback onDownload;
@@ -312,9 +355,10 @@ class _ComputerCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -409,7 +453,11 @@ class _ComputerCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            formatLastDownload(context, computer.lastDownload),
+                            formatLastDownload(
+                              context,
+                              computer.lastDownload,
+                              units: units,
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),

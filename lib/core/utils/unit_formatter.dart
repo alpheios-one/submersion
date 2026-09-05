@@ -323,10 +323,15 @@ class UnitFormatter {
   String formatHeight(double? cm) {
     if (cm == null) return '--';
     if (heightIsMetric) return '${cm.round()} cm';
+    final split = cmToFeetInches(cm);
+    return '${split.feet}\' ${split.inches}"';
+  }
+
+  /// Split a stored height (centimeters) into whole feet and inches,
+  /// rounding to the nearest inch and carrying 12 inches into the next foot.
+  ({int feet, int inches}) cmToFeetInches(double cm) {
     final totalInches = (cm / _cmPerInch).round();
-    final feet = totalInches ~/ 12;
-    final inches = totalInches % 12;
-    return '$feet\' $inches"';
+    return (feet: totalInches ~/ 12, inches: totalInches % 12);
   }
 
   /// Build a stored height (centimeters) from imperial feet and inches.
@@ -503,6 +508,46 @@ class UnitFormatter {
   /// The weekday leads in both orders: "Mon, Jan 15" or "Mon, 15 Jan".
   static String weekdayMonthDayPattern(DateFormatPreference dateFormat) =>
       'EEE, ${monthDayPattern(dateFormat)}';
+
+  /// Narrow all-numeric month and day, in [dateFormat]'s order and with its
+  /// own separator: 'M/d', 'd/M', 'M-d' or 'd.M'.
+  ///
+  /// For the cramped surfaces that cannot afford a spelled month, above all a
+  /// chart axis, where a wide label is what crowds the ticks. Derived from the
+  /// pattern rather than from [DateFormatPreference.isDayFirst], which is also
+  /// true for the ISO preference: reading that flag alone hands an ISO diver a
+  /// day-first '8/10' and drops the dotted preference's dots.
+  static String numericMonthDayPattern(DateFormatPreference dateFormat) =>
+      dateFormat.pattern
+          // The year and the separator that binds it to its neighbour.
+          .replaceFirst(RegExp(r'y+[^A-Za-z]+'), '')
+          .replaceFirst(RegExp(r'[^A-Za-z]+y+$'), '')
+          // Narrowest numeric form of whichever tokens are left.
+          .replaceFirst(RegExp(r'M+'), 'M')
+          .replaceFirst(RegExp(r'd+'), 'd')
+          // A space or comma is what the spelled-out preferences separate
+          // with, and neither reads as a date once the month is a digit.
+          .replaceFirst(RegExp(r'[,\s]+'), '/');
+
+  /// `DateFormat` pattern for a bare month and year in [dateFormat]'s shape.
+  ///
+  /// Derived by dropping the day token and the separator that binds it to its
+  /// neighbour, so every preference keeps its own punctuation and ordering:
+  /// 'MM/dd/yyyy' and 'dd/MM/yyyy' both collapse to 'MM/yyyy', 'yyyy-MM-dd' to
+  /// 'yyyy-MM', and the spelled-out forms to 'MMM yyyy'.
+  static String monthYearPattern(DateFormatPreference dateFormat) => dateFormat
+      .pattern
+      // A day followed by its separator: 'dd/', 'd ', 'd, '.
+      .replaceFirst(RegExp(r'd+[^A-Za-z]+'), '')
+      // Or a trailing day preceded by its separator: '-dd'.
+      .replaceFirst(RegExp(r'[^A-Za-z]+d+$'), '');
+
+  /// Format month and year only, in the diver's date shape.
+  /// Example: "Mar 2026", "03/2026" or "2026-03"
+  String formatMonthYear(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    return DateFormat(monthYearPattern(settings.dateFormat)).format(dateTime);
+  }
 
   /// Format month and day only (respects day-first vs month-first preference)
   /// Example: "Jan 15" or "15 Jan"

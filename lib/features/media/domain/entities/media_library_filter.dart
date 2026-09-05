@@ -3,8 +3,14 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
 /// Library health facet: rows whose backing file is missing (persisted
-/// orphan flag). Every row carries a dive or site link, so there is no
-/// "unlinked" facet; an album saved with one decodes to no constraint.
+/// orphan flag).
+///
+/// There is deliberately no "unlinked" facet, but NOT because unlinked rows
+/// cannot exist: they can. A row with `retain_in_library` set keeps its place
+/// with no dive, site or equipment link, and the orphan sweep
+/// (`getSweepableOrphanIds`) exists precisely to collect the unlinked rows
+/// nothing retains. The facet was simply never built, so an album saved with
+/// one decodes to no constraint.
 enum MediaHealthFilter { missing }
 
 /// Cross-dive library filter. Compiled to SQL by MediaLibraryRepository;
@@ -15,6 +21,7 @@ class MediaLibraryFilter {
     this.siteId,
     this.tripId,
     this.diveId,
+    this.speciesId,
     this.fromDate,
     this.toDate,
     this.sourceType,
@@ -25,6 +32,9 @@ class MediaLibraryFilter {
   final String? siteId;
   final String? tripId;
   final String? diveId;
+
+  /// Rows tagged with this species (a `media_species` row for the pair).
+  final String? speciesId;
 
   /// Inclusive bounds applied to the sort key (takenAt, falling back to
   /// createdAt).
@@ -41,6 +51,7 @@ class MediaLibraryFilter {
       siteId == null &&
       tripId == null &&
       diveId == null &&
+      speciesId == null &&
       fromDate == null &&
       toDate == null &&
       sourceType == null &&
@@ -53,6 +64,7 @@ class MediaLibraryFilter {
     Object? siteId = _undefined,
     Object? tripId = _undefined,
     Object? diveId = _undefined,
+    Object? speciesId = _undefined,
     Object? fromDate = _undefined,
     Object? toDate = _undefined,
     Object? sourceType = _undefined,
@@ -65,6 +77,9 @@ class MediaLibraryFilter {
       siteId: siteId == _undefined ? this.siteId : siteId as String?,
       tripId: tripId == _undefined ? this.tripId : tripId as String?,
       diveId: diveId == _undefined ? this.diveId : diveId as String?,
+      speciesId: speciesId == _undefined
+          ? this.speciesId
+          : speciesId as String?,
       fromDate: fromDate == _undefined ? this.fromDate : fromDate as DateTime?,
       toDate: toDate == _undefined ? this.toDate : toDate as DateTime?,
       sourceType: sourceType == _undefined
@@ -91,6 +106,7 @@ class MediaLibraryFilter {
     'siteId': siteId,
     'tripId': tripId,
     'diveId': diveId,
+    'speciesId': speciesId,
     'fromDate': _dateToMillis(fromDate),
     'toDate': _dateToMillis(toDate),
     'sourceType': sourceType?.name,
@@ -106,6 +122,7 @@ class MediaLibraryFilter {
       siteId: json['siteId'] as String?,
       tripId: json['tripId'] as String?,
       diveId: json['diveId'] as String?,
+      speciesId: json['speciesId'] as String?,
       fromDate: _dateFromMillis(json['fromDate']),
       toDate: _dateFromMillis(json['toDate']),
       sourceType: _enumByName(MediaSourceType.values, json['sourceType']),
@@ -135,6 +152,7 @@ class MediaLibraryFilter {
         other.siteId == siteId &&
         other.tripId == tripId &&
         other.diveId == diveId &&
+        other.speciesId == speciesId &&
         other.fromDate == fromDate &&
         other.toDate == toDate &&
         other.sourceType == sourceType &&
@@ -147,6 +165,7 @@ class MediaLibraryFilter {
     siteId,
     tripId,
     diveId,
+    speciesId,
     fromDate,
     toDate,
     sourceType,

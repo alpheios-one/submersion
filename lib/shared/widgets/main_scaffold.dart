@@ -14,6 +14,11 @@ import 'package:submersion/shared/widgets/global_drop_target.dart';
 import 'package:submersion/shared/widgets/nav/nav_destinations.dart';
 import 'package:submersion/shared/widgets/nav/nav_primary_provider.dart';
 
+/// Fraction of the screen height the phone overflow ("More") sheet may fill.
+///
+/// The remainder is scrim the user can tap to dismiss the sheet.
+const double _moreSheetMaxHeight = 0.85;
+
 class MainScaffold extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -110,8 +115,25 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // Scroll-controlled means the sheet has no height ceiling, and a dozen
+      // overflow destinations are taller than a phone screen. Left alone the
+      // sheet grew to y=0, putting its title and close button under the
+      // Android status bar (issue #1480). The safe area keeps it clear of the
+      // status bar and cutouts; the height cap leaves a strip of scrim above
+      // it so tapping outside stays an obvious way out.
+      useSafeArea: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * _moreSheetMaxHeight,
+      ),
+      // Not redundant with useSafeArea: that inserts SafeArea(bottom: false),
+      // so the sheet deliberately runs to the bottom edge of the screen. This
+      // one supplies the bottom inset the outer one skips, keeping the last
+      // tile clear of the home indicator. Nothing is applied twice -- a
+      // SafeArea strips the padding it consumes out of the MediaQuery, so the
+      // horizontal insets are already zero by the time this one reads them.
       builder: (sheetContext) => SafeArea(
         child: Column(
+          key: const ValueKey('navOverflowSheetBody'),
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(

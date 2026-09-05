@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:submersion/shared/widgets/export_destination_sheet.dart';
+import 'package:submersion/core/services/export/models/uddf_export_options.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_computer/presentation/utils/last_download_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.dart';
@@ -12,6 +15,7 @@ import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.d
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/transfer/presentation/widgets/csv_export_dialog.dart';
 import 'package:submersion/features/transfer/presentation/widgets/pdf_export_dialog.dart';
 import 'package:submersion/features/transfer/presentation/widgets/transfer_list_content.dart';
@@ -74,6 +78,8 @@ class TransferPage extends ConsumerWidget {
         return _ExportSectionContent(ref: ref);
       case 'computers':
         return _ComputersSectionContent(ref: ref);
+      case 'cloud':
+        return _CloudSectionContent(ref: ref);
       default:
         return Center(
           child: Text(context.l10n.transfer_unknownSection(sectionId)),
@@ -148,6 +154,8 @@ class _TransferSectionDetailPage extends ConsumerWidget {
         return _ExportSectionContent(ref: ref);
       case 'computers':
         return _ComputersSectionContent(ref: ref);
+      case 'cloud':
+        return _CloudSectionContent(ref: ref);
       default:
         return Center(
           child: Text(context.l10n.transfer_unknownSection(sectionId)),
@@ -326,16 +334,19 @@ class _ExportSectionContent extends ConsumerWidget {
                   title: Text(context.l10n.transfer_export_uddfTitle),
                   subtitle: Text(context.l10n.transfer_export_uddfSubtitle),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showExportOptions(
-                    context,
-                    ref,
-                    title: context.l10n.transfer_export_uddfTitle,
-                    shareAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .exportDivesToUddf(),
-                    saveAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .saveUddfToFile(),
+                  onTap: () => unawaited(
+                    _showExportOptions(
+                      context,
+                      ref,
+                      title: context.l10n.transfer_export_uddfTitle,
+                      offerRawData: true,
+                      shareAction: (options) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .exportDivesToUddf(options),
+                      saveAction: (options) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .saveUddfToFile(options),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -363,16 +374,18 @@ class _ExportSectionContent extends ConsumerWidget {
                   title: Text(context.l10n.transfer_export_excelTitle),
                   subtitle: Text(context.l10n.transfer_export_excelSubtitle),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showExportOptions(
-                    context,
-                    ref,
-                    title: context.l10n.transfer_export_excelTitle,
-                    shareAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .exportToExcel(),
-                    saveAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .saveExcelToFile(),
+                  onTap: () => unawaited(
+                    _showExportOptions(
+                      context,
+                      ref,
+                      title: context.l10n.transfer_export_excelTitle,
+                      shareAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .exportToExcel(),
+                      saveAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .saveExcelToFile(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -383,16 +396,18 @@ class _ExportSectionContent extends ConsumerWidget {
                     context.l10n.transfer_export_maintenanceSubtitle,
                   ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showExportOptions(
-                    context,
-                    ref,
-                    title: context.l10n.transfer_export_maintenanceTitle,
-                    shareAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .exportMaintenanceLog(),
-                    saveAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .saveMaintenanceLogToFile(),
+                  onTap: () => unawaited(
+                    _showExportOptions(
+                      context,
+                      ref,
+                      title: context.l10n.transfer_export_maintenanceTitle,
+                      shareAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .exportMaintenanceLog(),
+                      saveAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .saveMaintenanceLogToFile(),
+                    ),
                   ),
                 ),
                 const Divider(height: 1),
@@ -401,15 +416,18 @@ class _ExportSectionContent extends ConsumerWidget {
                   title: Text(context.l10n.transfer_export_kmlTitle),
                   subtitle: Text(context.l10n.transfer_export_kmlSubtitle),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _showExportOptions(
-                    context,
-                    ref,
-                    title: context.l10n.transfer_export_kmlTitle,
-                    shareAction: () =>
-                        ref.read(exportNotifierProvider.notifier).exportToKml(),
-                    saveAction: () => ref
-                        .read(exportNotifierProvider.notifier)
-                        .saveKmlToFile(),
+                  onTap: () => unawaited(
+                    _showExportOptions(
+                      context,
+                      ref,
+                      title: context.l10n.transfer_export_kmlTitle,
+                      shareAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .exportToKml(),
+                      saveAction: (_) => ref
+                          .read(exportNotifierProvider.notifier)
+                          .saveKmlToFile(),
+                    ),
                   ),
                 ),
               ],
@@ -439,13 +457,13 @@ class _ExportSectionContent extends ConsumerWidget {
     if (options == null || !context.mounted) return;
 
     // Now show share/save options
-    _showExportOptions(
+    await _showExportOptions(
       context,
       ref,
       title: context.l10n.transfer_export_pdfTitle,
-      shareAction: () =>
+      shareAction: (_) =>
           ref.read(exportNotifierProvider.notifier).exportDivesToPdf(options),
-      saveAction: () =>
+      saveAction: (_) =>
           ref.read(exportNotifierProvider.notifier).savePdfToFile(options),
     );
   }
@@ -458,28 +476,28 @@ class _ExportSectionContent extends ConsumerWidget {
     final notifier = ref.read(exportNotifierProvider.notifier);
     switch (type) {
       case CsvExportType.dives:
-        _showExportOptions(
+        await _showExportOptions(
           context,
           ref,
           title: context.l10n.transfer_csvExport_optionDivesTitle,
-          shareAction: () => notifier.exportDivesToCsv(),
-          saveAction: () => notifier.saveDivesCsvToFile(),
+          shareAction: (_) => notifier.exportDivesToCsv(),
+          saveAction: (_) => notifier.saveDivesCsvToFile(),
         );
       case CsvExportType.sites:
-        _showExportOptions(
+        await _showExportOptions(
           context,
           ref,
           title: context.l10n.transfer_csvExport_optionSitesTitle,
-          shareAction: () => notifier.exportSitesToCsv(),
-          saveAction: () => notifier.saveSitesCsvToFile(),
+          shareAction: (_) => notifier.exportSitesToCsv(),
+          saveAction: (_) => notifier.saveSitesCsvToFile(),
         );
       case CsvExportType.equipment:
-        _showExportOptions(
+        await _showExportOptions(
           context,
           ref,
           title: context.l10n.transfer_csvExport_optionEquipmentTitle,
-          shareAction: () => notifier.exportEquipmentToCsv(),
-          saveAction: () => notifier.saveEquipmentCsvToFile(),
+          shareAction: (_) => notifier.exportEquipmentToCsv(),
+          saveAction: (_) => notifier.saveEquipmentCsvToFile(),
         );
     }
   }
@@ -543,55 +561,30 @@ class _ExportSectionContent extends ConsumerWidget {
   }
 
   /// Show export options dialog (Share vs Save to File).
-  void _showExportOptions(
+  Future<void> _showExportOptions(
     BuildContext context,
     WidgetRef ref, {
     required String title,
-    required Future<void> Function() shareAction,
-    required Future<void> Function() saveAction,
-  }) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (bottomSheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.share),
-                title: Text(context.l10n.transfer_export_optionShareTitle),
-                subtitle: Text(
-                  context.l10n.transfer_export_optionShareSubtitle,
-                ),
-                onTap: () {
-                  Navigator.of(bottomSheetContext).pop();
-                  _handleExport(context, ref, shareAction);
-                },
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.save_alt),
-                title: Text(context.l10n.transfer_export_optionSaveTitle),
-                subtitle: Text(context.l10n.transfer_export_optionSaveSubtitle),
-                onTap: () {
-                  Navigator.of(bottomSheetContext).pop();
-                  _handleExport(context, ref, saveAction);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+    required Future<void> Function(UddfExportOptions options) shareAction,
+    required Future<void> Function(UddfExportOptions options) saveAction,
+    bool offerRawData = false,
+  }) async {
+    // The shared sheet, not a second copy of it. This page used to inline its
+    // own share/save sheet built from the same four l10n keys; keeping both
+    // meant the raw data toggle would have to be added and maintained twice.
+    final choice = await showExportDestinationSheetWithOptions(
+      context,
+      title: title,
+      showRawDataToggle: offerRawData,
     );
+    if (choice == null || !context.mounted) return;
+
+    final options = UddfExportOptions(includeRawData: choice.includeRawData);
+    final action = switch (choice.destination) {
+      ExportDestination.share => shareAction,
+      ExportDestination.saveToFile => saveAction,
+    };
+    _handleExport(context, ref, () => action(options));
   }
 }
 
@@ -606,6 +599,7 @@ class _ComputersSectionContent extends ConsumerWidget {
     final computersAsync = ref.watch(allDiveComputersProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -683,6 +677,7 @@ class _ComputersSectionContent extends ConsumerWidget {
                       computer,
                       theme,
                       colorScheme,
+                      units,
                     ),
                   ),
                 ],
@@ -724,6 +719,7 @@ class _ComputersSectionContent extends ConsumerWidget {
     DiveComputer computer,
     ThemeData theme,
     ColorScheme colorScheme,
+    UnitFormatter units,
   ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -805,7 +801,11 @@ class _ComputersSectionContent extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          formatLastDownload(context, computer.lastDownload),
+                          formatLastDownload(
+                            context,
+                            computer.lastDownload,
+                            units: units,
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 11,
@@ -841,6 +841,113 @@ class _ComputersSectionContent extends ConsumerWidget {
       default:
         return Icons.watch;
     }
+  }
+}
+
+/// Cloud import section content.
+///
+/// Lists dive-computer manufacturer cloud accounts that dives can be
+/// imported from directly (no file export/transfer needed). Additional
+/// providers (Shearwater Cloud, etc.) get their own card here as they're
+/// added.
+class _CloudSectionContent extends ConsumerWidget {
+  final WidgetRef ref;
+
+  const _CloudSectionContent({required this.ref});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            context,
+            context.l10n.transfer_section_cloudTitle,
+          ),
+          const SizedBox(height: 8),
+          _CloudProviderCard(
+            title: context.l10n.transfer_importCloud_suuntoTitle,
+            subtitle: context.l10n.transfer_importCloud_suuntoSubtitle,
+            icon: Icons.watch,
+            onTap: () => context.push('/transfer/import-cloud/suunto'),
+          ),
+          const SizedBox(height: 8),
+          _CloudProviderCard(
+            title: context.l10n.transfer_importCloud_garminTitle,
+            subtitle: context.l10n.transfer_importCloud_garminSubtitle,
+            icon: Icons.watch,
+            onTap: () => context.push('/transfer/import-cloud/garmin'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A single tappable cloud-provider entry within [_CloudSectionContent].
+class _CloudProviderCard extends StatelessWidget {
+  const _CloudProviderCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: colorScheme.primary),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: colorScheme.onSurfaceVariant),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

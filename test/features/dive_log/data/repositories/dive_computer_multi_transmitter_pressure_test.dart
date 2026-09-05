@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
 
 import '../../../../helpers/test_database.dart';
 
@@ -42,15 +43,17 @@ void main() {
   }
 
   Future<List<({int timestamp, double pressure})>> seriesFor(
+    String diveId,
     String tankId,
   ) async {
-    final rows =
-        await (db.select(db.tankPressureProfiles)
-              ..where((t) => t.tankId.equals(tankId))
-              ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
-            .get();
+    final series = await TankPressureSeriesRepository().getSeriesForTank(
+      diveId,
+      tankId,
+    );
     return [
-      for (final r in rows) (timestamp: r.timestamp, pressure: r.pressure),
+      for (final s in series)
+        for (final sample in s.samples)
+          (timestamp: sample.timestamp, pressure: sample.pressure),
     ];
   }
 
@@ -102,12 +105,12 @@ void main() {
     final tanks = await tanksFor(diveId);
     expect(tanks, hasLength(2));
 
-    expect(await seriesFor(tanks[0].id), [
+    expect(await seriesFor(diveId, tanks[0].id), [
       (timestamp: 0, pressure: 192.6),
       (timestamp: 600, pressure: 180.0),
       (timestamp: 1200, pressure: 162.7),
     ], reason: 'the O2 transmitter must not be overwritten by the diluent');
-    expect(await seriesFor(tanks[1].id), [
+    expect(await seriesFor(diveId, tanks[1].id), [
       (timestamp: 0, pressure: 191.4),
       (timestamp: 600, pressure: 150.0),
       (timestamp: 1200, pressure: 104.5),
@@ -156,11 +159,17 @@ void main() {
 
       final tanks = await tanksFor(diveId);
       expect(
-        await seriesFor(tanks[0].id).then((s) => s.map((p) => p.timestamp)),
+        await seriesFor(
+          diveId,
+          tanks[0].id,
+        ).then((s) => s.map((p) => p.timestamp)),
         [0, 60, 120],
       );
       expect(
-        await seriesFor(tanks[1].id).then((s) => s.map((p) => p.timestamp)),
+        await seriesFor(
+          diveId,
+          tanks[1].id,
+        ).then((s) => s.map((p) => p.timestamp)),
         [0, 120],
         reason: 'the diluent has no reading at 60s and must not invent one',
       );
@@ -225,7 +234,7 @@ void main() {
 
       final tanks = await tanksFor(diveId);
       expect(tanks, hasLength(1));
-      expect(await seriesFor(tanks[0].id), [
+      expect(await seriesFor(diveId, tanks[0].id), [
         (timestamp: 0, pressure: 200.0),
         (timestamp: 600, pressure: 150.0),
       ]);

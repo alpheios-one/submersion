@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:submersion/core/services/export/models/uddf_export_options.dart';
+import 'package:submersion/core/services/export/uddf/uddf_source_fetch.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/export_destination_sheet.dart';
@@ -119,6 +122,7 @@ class _BuddyDetailContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(buddyStatsProvider(buddy.id));
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     final body = SingleChildScrollView(
       controller: DetailScrollController.maybeOf(context),
@@ -142,7 +146,7 @@ class _BuddyDetailContent extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Statistics
-          _buildStatsSection(context, statsAsync),
+          _buildStatsSection(context, statsAsync, units),
           const SizedBox(height: 24),
 
           // Notes
@@ -229,16 +233,15 @@ class _BuddyDetailContent extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
+          ProfileAvatar(
+            photo: buddy.photo,
+            initials: buddy.initials,
             radius: 18,
             backgroundColor: colorScheme.primaryContainer,
-            child: Text(
-              buddy.initials,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimaryContainer,
-              ),
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onPrimaryContainer,
             ),
           ),
           const SizedBox(width: 12),
@@ -333,11 +336,14 @@ class _BuddyDetailContent extends ConsumerWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
 
-    final destination = await showExportDestinationSheet(
+    final choice = await showExportDestinationSheetWithOptions(
       context,
       title: l10n.buddies_action_shareDives,
+      showRawDataToggle: true,
     );
-    if (destination == null) return;
+    if (choice == null) return;
+    final destination = choice.destination;
+    final options = UddfExportOptions(includeRawData: choice.includeRawData);
 
     // Show preparing message
     scaffoldMessenger.showSnackBar(
@@ -390,11 +396,25 @@ class _BuddyDetailContent extends ConsumerWidget {
       // request. Either way no success snackbar follows: the share sheet and
       // the save panel each provide their own feedback.
       final exportService = ref.read(exportServiceProvider);
+      final dataSources = await ref.read(uddfSourceFetchProvider)(
+        dives.map((d) => d.id).toList(growable: false),
+        options,
+      );
       switch (destination) {
         case ExportDestination.share:
-          await exportService.exportDivesToUddf(dives, sites: sites);
+          await exportService.exportDivesToUddf(
+            dives,
+            sites: sites,
+            dataSources: dataSources,
+            options: options,
+          );
         case ExportDestination.saveToFile:
-          await exportService.saveDivesToUddfFile(dives, sites: sites);
+          await exportService.saveDivesToUddfFile(
+            dives,
+            sites: sites,
+            dataSources: dataSources,
+            options: options,
+          );
       }
     } catch (e) {
       scaffoldMessenger.hideCurrentSnackBar();
@@ -410,22 +430,15 @@ class _BuddyDetailContent extends ConsumerWidget {
     return Center(
       child: Column(
         children: [
-          CircleAvatar(
+          ProfileAvatar(
+            photo: buddy.photo,
+            initials: buddy.initials,
             radius: 50,
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            backgroundImage: buddy.photoPath != null
-                ? AssetImage(buddy.photoPath!)
-                : null,
-            child: buddy.photoPath == null
-                ? Text(
-                    buddy.initials,
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  )
-                : null,
+            textStyle: TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            ),
           ),
           const SizedBox(height: 16),
           Text(buddy.name, style: Theme.of(context).textTheme.headlineMedium),
@@ -519,6 +532,7 @@ class _BuddyDetailContent extends ConsumerWidget {
   Widget _buildStatsSection(
     BuildContext context,
     AsyncValue<BuddyStats> statsAsync,
+    UnitFormatter units,
   ) {
     return Card(
       child: Padding(
@@ -545,13 +559,13 @@ class _BuddyDetailContent extends ConsumerWidget {
                     _StatRow(
                       icon: Icons.first_page,
                       label: context.l10n.buddies_stat_firstDive,
-                      value: DateFormat.yMMMd().format(stats.firstDive!),
+                      value: units.formatDate(stats.firstDive),
                     ),
                   if (stats.lastDive != null)
                     _StatRow(
                       icon: Icons.last_page,
                       label: context.l10n.buddies_stat_lastDive,
-                      value: DateFormat.yMMMd().format(stats.lastDive!),
+                      value: units.formatDate(stats.lastDive),
                     ),
                   if (stats.favoriteSite != null)
                     _StatRow(
@@ -599,7 +613,7 @@ class _BuddyDetailContent extends ConsumerWidget {
     final theme = Theme.of(context);
     // Includes the year: shared dives routinely span several years, so a bare
     // "Mar 28" is ambiguous (#982). Matches the stats card above.
-    final dateFormat = DateFormat.yMMMd();
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     return Card(
       child: Padding(
@@ -703,7 +717,7 @@ class _BuddyDetailContent extends ConsumerWidget {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      dateFormat.format(dive.dateTime),
+                                      units.formatDate(dive.dateTime),
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             color: theme

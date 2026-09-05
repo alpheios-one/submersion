@@ -1,29 +1,30 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType;
-import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/dropbox/dropbox_auth_store.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 import 'package:submersion/core/services/cloud_storage/s3/s3_config.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
 import 'package:submersion/features/divers/data/repositories/diver_merge_repository.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart'
     show StoragePlatformCapabilities, storagePlatformCapabilitiesProvider;
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/pages/troubleshoot_sync_page.dart';
 import 'package:submersion/features/settings/presentation/widgets/replace_cloud_library_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/newer_schema_peer_banner.dart';
+import 'package:submersion/features/settings/presentation/widgets/read_failed_peer_banner.dart';
 import 'package:submersion/features/settings/presentation/widgets/skipped_peer_banner.dart';
 import 'package:submersion/features/settings/presentation/widgets/sync_now_action.dart';
+import 'package:submersion/features/settings/presentation/widgets/cloud_provider_authenticate.dart';
 import 'package:submersion/features/settings/presentation/widgets/conflict_resolution_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/encryption_settings_section.dart';
@@ -855,7 +856,7 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
 
     try {
       // Authenticate with the provider
-      await _authenticateWithBrowserWait(context, cloudProvider, provider);
+      await authenticateWithBrowserWait(context, cloudProvider, provider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -875,6 +876,10 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
 
       // Refresh sync state after successful authentication
       ref.read(syncStateProvider.notifier).refreshState();
+    } on CloudAuthCancelled {
+      // The user backed out of the browser sign-in deliberately. Clear the
+      // half-made selection, but do not dress a decision up as a failure.
+      ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
     } catch (e) {
       // Clear the provider selection on failure
       ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
@@ -896,76 +901,6 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
         );
       }
     }
-  }
-
-  /// On desktop, Google Drive authentication round-trips through the
-  /// system browser (loopback OAuth); keep a cancellable waiting dialog up
-  /// while it completes so the page does not look frozen. Other providers
-  /// and platforms authenticate directly.
-  Future<void> _authenticateWithBrowserWait(
-    BuildContext context,
-    CloudStorageProvider cloudProvider,
-    CloudProviderType provider,
-  ) async {
-    final needsDialog =
-        provider == CloudProviderType.googledrive &&
-        (Platform.isWindows || Platform.isLinux);
-    if (!needsDialog) {
-      await cloudProvider.authenticate();
-      return;
-    }
-
-    // Single synchronously-checked guard: whichever happens first -- auth
-    // settling or the user tapping Cancel -- closes the dialog exactly once.
-    // Because dialogClosed is checked and set with no intervening await, the
-    // two paths can never interleave, so the pop always targets the dialog
-    // (showDialog pushes it synchronously below, before any await yields to
-    // the auth microtask) and never the page route.
-    final navigator = Navigator.of(context, rootNavigator: true);
-    var dialogClosed = false;
-    void closeDialog(bool cancelled) {
-      if (dialogClosed) return;
-      dialogClosed = true;
-      navigator.pop(cancelled);
-    }
-
-    final auth = cloudProvider.authenticate();
-    unawaited(
-      auth.then((_) => closeDialog(false), onError: (_) => closeDialog(false)),
-    );
-    final cancelled =
-        await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (dialogContext) => AlertDialog(
-            title: Text(
-              dialogContext
-                  .l10n
-                  .settings_cloudSync_googleDrive_browserWait_title,
-            ),
-            content: Text(
-              dialogContext
-                  .l10n
-                  .settings_cloudSync_googleDrive_browserWait_message,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => closeDialog(true),
-                child: Text(
-                  MaterialLocalizations.of(dialogContext).cancelButtonLabel,
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-    if (cancelled) {
-      // Abandon the pending flow; the loopback listener times out on its
-      // own. Swallow its eventual error so nothing surfaces later.
-      unawaited(auth.catchError((_) {}));
-      throw const CloudStorageException('Google Sign-In was cancelled');
-    }
-    await auth;
   }
 
   /// Localized connection-failure message. For iCloud, the wording reflects
@@ -1156,6 +1091,7 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
             ),
           SkippedPeerBanner(peers: syncState.skippedPeerLabels),
           NewerSchemaPeerBanner(peers: syncState.newerSchemaPeerLabels),
+          ReadFailedPeerBanner(peers: syncState.readFailedPeerLabels),
           if (syncState.movedMarker != null)
             _buildMovedBanner(context, ref, syncState.movedMarker!),
           if (syncState.cleanupOldBackendProviderId != null)
@@ -1553,7 +1489,9 @@ class _CloudSyncPageState extends ConsumerState<CloudSyncPage> {
     } else if (difference.inDays < 7) {
       return l10n.settings_cloudSync_time_daysAgo(difference.inDays);
     } else {
-      return DateFormat.yMMMd().format(dateTime);
+      // watch, not read: both callers render this into the widget tree, so a
+      // preference change while the page is open must repaint it.
+      return UnitFormatter(ref.watch(settingsProvider)).formatDate(dateTime);
     }
   }
 }

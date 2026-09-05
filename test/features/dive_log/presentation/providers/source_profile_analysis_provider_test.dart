@@ -165,6 +165,64 @@ void main() {
     expect(byId!.ascentRates.length, primaryBucket.length);
   });
 
+  test('a stale source id resolves to the primary bucket, not the merged '
+      'dive.profile (#543)', () async {
+    // The active-source selection can outlive its source row (a split). The
+    // chart resolves that to the primary; the analysis must follow, or its
+    // merged-length curves get index-paired with the primary's bucket.
+    final primaryBucket = _profile(100);
+    final secondaryBucket = _profile(100, startOffsetSeconds: 1);
+    final merged = [...primaryBucket, ...secondaryBucket]
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final dive = Dive(
+      id: 'dive-1',
+      dateTime: DateTime(2026, 5, 7),
+      profile: merged,
+    );
+
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(_prefs),
+        diverRepositoryProvider.overrideWithValue(_FakeDiverRepository()),
+        settingsProvider.overrideWith((ref) => _SettingsNotifier(ref)),
+        analysisDiveProvider('dive-1').overrideWith((ref) async => dive),
+        diveDataSourcesProvider('dive-1').overrideWith(
+          (ref) async => [
+            source('src-a', 'dc-a', true),
+            source('src-b', 'dc-b', false),
+          ],
+        ),
+        sourceProfilesProvider('dive-1').overrideWith(
+          (ref) async => {
+            'src-a': SourceProfile(
+              sourceId: 'src-a',
+              computerId: 'dc-a',
+              isEdited: false,
+              points: primaryBucket,
+            ),
+            'src-b': SourceProfile(
+              sourceId: 'src-b',
+              computerId: 'dc-b',
+              isEdited: false,
+              points: secondaryBucket,
+            ),
+          },
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final analysis = await container.read(
+      sourceProfileAnalysisProvider((
+        diveId: 'dive-1',
+        sourceId: 'src-gone',
+      )).future,
+    );
+
+    expect(analysis, isNotNull);
+    expect(analysis!.ascentRates.length, primaryBucket.length);
+  });
+
   test('single-source dives keep using dive.profile', () async {
     final profile = _profile(80);
     final dive = Dive(
