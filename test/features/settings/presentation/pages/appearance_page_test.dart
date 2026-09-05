@@ -289,7 +289,7 @@ void main() {
   // they fail if the action ever goes missing from the page users actually
   // see again.
   group('AppearancePage swissBATHY3D manual reload', () {
-    Widget buildTestWidgetWith(List<riverpod.Override> extraOverrides) {
+    Widget buildTestWidgetWith(List<Override> extraOverrides) {
       return ProviderScope(
         overrides: [
           settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
