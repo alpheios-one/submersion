@@ -12309,6 +12309,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'حجم التنظيف';
 
   @override
+  String gasCalculators_blender_flushFeeLine(String gas) {
+    return 'تنظيف خرطوم $gas';
+  }
+
+  @override
   String get gasCalculators_blender_billed => 'الفاتورة';
 
   @override
@@ -12337,6 +12342,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_lineAmount => 'المبلغ';
+
+  @override
+  String get gasCalculators_blender_lineNeedsDescription =>
+      'أدخل وصفًا، أو أسطوانة ومزيجًا.';
 
   @override
   String get gasCalculators_blender_export => 'تصدير';

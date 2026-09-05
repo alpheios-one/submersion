@@ -12527,6 +12527,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Volumen de purga';
 
   @override
+  String gasCalculators_blender_flushFeeLine(String gas) {
+    return 'Purga de manguera de $gas';
+  }
+
+  @override
   String get gasCalculators_blender_billed => 'Facturado';
 
   @override
@@ -12556,6 +12561,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_lineAmount => 'Importe';
+
+  @override
+  String get gasCalculators_blender_lineNeedsDescription =>
+      'Introduce una descripción, o un cilindro y una mezcla.';
 
   @override
   String get gasCalculators_blender_export => 'Exportar';

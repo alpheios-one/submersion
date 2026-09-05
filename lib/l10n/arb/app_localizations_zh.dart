@@ -11940,6 +11940,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => '吹扫量';
 
   @override
+  String gasCalculators_blender_flushFeeLine(String gas) {
+    return '$gas 管路吹扫';
+  }
+
+  @override
   String get gasCalculators_blender_billed => '已计费';
 
   @override
@@ -11967,6 +11972,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_lineAmount => '金额';
+
+  @override
+  String get gasCalculators_blender_lineNeedsDescription => '请输入说明，或气瓶与混合气。';
 
   @override
   String get gasCalculators_blender_export => '导出';

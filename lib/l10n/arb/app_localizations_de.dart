@@ -12522,6 +12522,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Spülvolumen';
 
   @override
+  String gasCalculators_blender_flushFeeLine(String gas) {
+    return '$gas-Schlauchspülung';
+  }
+
+  @override
   String get gasCalculators_blender_billed => 'Abgerechnet';
 
   @override
@@ -12550,6 +12555,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_lineAmount => 'Betrag';
+
+  @override
+  String get gasCalculators_blender_lineNeedsDescription =>
+      'Gib eine Beschreibung oder Flasche und Mischung ein.';
 
   @override
   String get gasCalculators_blender_export => 'Exportieren';

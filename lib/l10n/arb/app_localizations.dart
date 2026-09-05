@@ -21186,6 +21186,12 @@ abstract class AppLocalizations {
   /// **'Purge volume'**
   String get gasCalculators_blender_flushFeeVolume;
 
+  /// No description provided for @gasCalculators_blender_flushFeeLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{gas} hose purge'**
+  String gasCalculators_blender_flushFeeLine(String gas);
+
   /// No description provided for @gasCalculators_blender_billed.
   ///
   /// In en, this message translates to:
@@ -21239,6 +21245,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amount'**
   String get gasCalculators_blender_lineAmount;
+
+  /// No description provided for @gasCalculators_blender_lineNeedsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a description, or a cylinder and mix.'**
+  String get gasCalculators_blender_lineNeedsDescription;
 
   /// No description provided for @gasCalculators_blender_export.
   ///

@@ -12230,6 +12230,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'נפח שטיפה';
 
   @override
+  String gasCalculators_blender_flushFeeLine(String gas) {
+    return 'שטיפת צינור $gas';
+  }
+
+  @override
   String get gasCalculators_blender_billed => 'חיוב';
 
   @override
@@ -12258,6 +12263,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get gasCalculators_blender_lineAmount => 'סכום';
+
+  @override
+  String get gasCalculators_blender_lineNeedsDescription =>
+      'יש להזין תיאור, או מכל ותערובת.';
 
   @override
   String get gasCalculators_blender_export => 'ייצוא';

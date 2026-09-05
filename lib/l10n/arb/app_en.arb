@@ -7123,6 +7123,14 @@
   "gasCalculators_blender_flushFeeModePerInvoice": "Once per bill",
   "gasCalculators_blender_flushFeeModePerFill": "Once per fill",
   "gasCalculators_blender_flushFeeVolume": "Purge volume",
+  "gasCalculators_blender_flushFeeLine": "{gas} hose purge",
+  "@gasCalculators_blender_flushFeeLine": {
+    "placeholders": {
+      "gas": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_blender_billed": "Billed",
   "gasCalculators_blender_billedDate": "Invoice dated {date}",
   "gasCalculators_blender_billedDateEdit": "Change invoice date",
@@ -7132,6 +7140,7 @@
   "gasCalculators_blender_addManualLine": "Add a line",
   "gasCalculators_blender_lineDescription": "Description",
   "gasCalculators_blender_lineAmount": "Amount",
+  "gasCalculators_blender_lineNeedsDescription": "Enter a description, or a cylinder and mix.",
   "gasCalculators_blender_export": "Export",
   "gasCalculators_blender_exportPdf": "Export as PDF",
   "gasCalculators_blender_exportImage": "Export as Image",
