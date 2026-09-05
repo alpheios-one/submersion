@@ -7,7 +7,13 @@ import 'package:submersion/features/gas_calculators/presentation/providers/gas_b
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+
 import '../../helpers/mock_providers.dart';
+import '../../support/fake_app_settings_repository.dart';
 
 Future<void> _pump(
   WidgetTester tester, {
@@ -107,6 +113,67 @@ void main() {
       );
 
       expect(find.text('Incomplete'), findsOneWidget);
+    });
+  });
+
+  group('reached without the calculator', () {
+    /// The class doc promises a deep link resolves, and a deep link is
+    /// exactly the case where GasBlenderCalculator never mounted to run
+    /// blenderPreferencesLoaderProvider (PR #1359 review).
+    testWidgets('resolves an invoice loaded straight from storage', (
+      tester,
+    ) async {
+      final repository = FakeAppSettingsRepository()
+        ..blenderPreferences = BlenderPreferences(
+          templates: const [],
+          gasPrices: const [null, null, null],
+          fillTempC: kReferenceTempC,
+          settledTempC: kReferenceTempC,
+          cylinderWaterLiters: 12,
+          model: BlendGasModel.zFactor,
+          billedFills: const [],
+          billedTo: '',
+          startPressureBar: 0,
+          startMix: const GasMix(o2: 21),
+          targetPressureBar: 200,
+          targetMix: const GasMix(o2: 32),
+          topupO2Percent: 21,
+          archivedInvoices: [
+            ArchivedInvoice(
+              id: 'inv-1',
+              date: DateTime(2026, 3, 5),
+              billedTo: 'Ada',
+              fills: const [
+                BilledFill(id: 'f', label: 'Tx 18/45', lines: [], total: 35),
+              ],
+              total: 35,
+              currencyCode: 'CHF',
+            ),
+          ],
+        );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => MockSettingsNotifier(
+                const AppSettings(defaultCurrency: 'CHF'),
+              ),
+            ),
+            appSettingsRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: BlenderInvoiceArchiveDetailPage(invoiceId: 'inv-1'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Invoice not found'), findsNothing);
+      expect(find.text('Tx 18/45'), findsOneWidget);
     });
   });
 }

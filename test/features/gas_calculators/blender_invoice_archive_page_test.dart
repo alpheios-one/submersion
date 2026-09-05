@@ -10,8 +10,14 @@ import 'package:submersion/features/gas_calculators/presentation/widgets/blender
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import 'package:submersion/features/dive_log/domain/entities/dive.dart'
+    show GasMix;
+import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
+import 'package:submersion/features/gas_calculators/domain/blending/equation_of_state.dart';
+
 import '../../helpers/mock_providers.dart';
 import '../../helpers/test_app.dart';
+import '../../support/fake_app_settings_repository.dart';
 
 ArchivedInvoice _invoice({
   required String id,
@@ -265,4 +271,78 @@ void main() {
       expect(find.text('archive-reached'), findsOneWidget);
     });
   });
+
+  group('reached without the calculator', () {
+    /// The archive route is a page of its own: a deep link, a restored route
+    /// or the Settings entry can all reach it without GasBlenderCalculator
+    /// ever mounting, and that calculator used to be the only thing that ran
+    /// blenderPreferencesLoaderProvider (PR #1359 review).
+    Future<void> pumpAlone(
+      WidgetTester tester,
+      FakeAppSettingsRepository repository,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => MockSettingsNotifier(
+                const AppSettings(defaultCurrency: 'CHF'),
+              ),
+            ),
+            appSettingsRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: BlenderInvoiceArchivePage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('loads the stored invoices instead of showing empty', (
+      tester,
+    ) async {
+      final repository = FakeAppSettingsRepository()
+        ..blenderPreferences = _storedPreferences([
+          _invoice(id: 'inv-1', date: DateTime(2026, 3, 5), billedTo: 'Ada'),
+        ]);
+
+      await pumpAlone(tester, repository);
+
+      expect(find.text('Ada'), findsOneWidget);
+      expect(find.textContaining('No paid invoices'), findsNothing);
+    });
+
+    testWidgets('still says so when nothing has been archived', (tester) async {
+      final repository = FakeAppSettingsRepository()
+        ..blenderPreferences = _storedPreferences(const []);
+
+      await pumpAlone(tester, repository);
+
+      expect(find.textContaining('No paid invoices'), findsOneWidget);
+    });
+  });
 }
+
+/// Preferences whose only interesting content is [archived], so a test can
+/// tell "loaded from storage" apart from "left at the provider default".
+BlenderPreferences _storedPreferences(List<ArchivedInvoice> archived) =>
+    BlenderPreferences(
+      templates: const [],
+      gasPrices: const [null, null, null],
+      fillTempC: kReferenceTempC,
+      settledTempC: kReferenceTempC,
+      cylinderWaterLiters: 12,
+      model: BlendGasModel.zFactor,
+      billedFills: const [],
+      billedTo: '',
+      startPressureBar: 0,
+      startMix: const GasMix(o2: 21),
+      targetPressureBar: 200,
+      targetMix: const GasMix(o2: 32),
+      topupO2Percent: 21,
+      archivedInvoices: archived,
+    );

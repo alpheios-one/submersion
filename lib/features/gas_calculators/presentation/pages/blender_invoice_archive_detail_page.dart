@@ -24,6 +24,10 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Without this the deep link promised above resolves against an archive
+    // that is still empty, and every id reads as "not found" (PR #1359
+    // review). See BlenderInvoiceArchivePage for the same reasoning.
+    ref.watch(blenderPreferencesLoaderProvider);
     final l10n = context.l10n;
     final invoices = ref.watch(blenderArchivedInvoicesProvider);
     ArchivedInvoice? invoice;

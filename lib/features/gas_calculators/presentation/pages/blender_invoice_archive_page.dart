@@ -35,6 +35,13 @@ class BlenderInvoiceArchivePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // This route stands on its own: a deep link, a route restored on
+    // relaunch, or the history icon tapped from a calculator that was never
+    // opened this session all reach it without GasBlenderCalculator ever
+    // mounting, and the archive lives in a provider that stays at its empty
+    // default until this load runs (PR #1359 review). Watching it here is the
+    // same contract BlenderSettingsPage keeps for its own fields.
+    ref.watch(blenderPreferencesLoaderProvider);
     final l10n = context.l10n;
     final invoices = ref.watch(filteredBlenderArchivedInvoicesProvider);
     final allInvoices = ref.watch(blenderArchivedInvoicesProvider);
