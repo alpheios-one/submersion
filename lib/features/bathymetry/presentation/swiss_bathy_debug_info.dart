@@ -1,4 +1,5 @@
-// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+// Debug-only diagnostics for swissBATHY3D integration. Gated behind
+// kDebugMode; not present in release builds.
 //
 // Investigated the suspected root cause behind Bug 6/7/9 (two real,
 // independently-meaningful dive sites at Walensee reportedly render a
