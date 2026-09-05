@@ -1641,6 +1641,10 @@ void main() {
             path: '/equipment/service-types',
             builder: (context, state) => const Text('Service Types Stub'),
           ),
+          GoRoute(
+            path: '/settings/trimix-mixer',
+            builder: (context, state) => const Text('Trimix Mixer Stub'),
+          ),
         ],
       );
 
@@ -1692,6 +1696,24 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Service Types Stub'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    // Issue #1335 follow-up: the mixer's own settings gear moved off the
+    // top-level settings list and in here, next to Tank Presets -- the
+    // global preset list its cylinder dropdown now reads.
+    testWidgets('renders the trimix mixer tile and navigates on tap', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildManageWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trimix Mixer'), findsOneWidget);
+
+      await tester.tap(find.text('Trimix Mixer'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trimix Mixer Stub'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
@@ -1918,6 +1940,7 @@ void main() {
         '/settings',
         reason: 'the fallback clears the selected-section query parameter',
       );
+      await tester.scrollUntilVisible(find.text('Units'), 100);
       expect(find.text('Units'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
