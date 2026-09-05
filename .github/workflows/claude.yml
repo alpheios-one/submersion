@@ -61,7 +61,7 @@ jobs:
       id-token: write
       actions: read
     env:
-      GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       FORK_REPO: alpheios-one/submersion
       UPSTREAM_REPO: submersion-app/submersion
       ISSUE_NUM: ${{ github.event.issue.number }}
