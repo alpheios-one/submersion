@@ -13,6 +13,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kan de browser niet openen. Gebruik Link kopiëren en plak het adres in je browser.';
 
   @override
+  String equipment_documents_removeError(String error) {
+    return 'Kan het document niet verwijderen: $error';
+  }
+
+  @override
   String get settings_oauth_connect_copyFailed => 'Kan de link niet kopiëren.';
 
   @override
@@ -2613,6 +2618,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get common_action_close => 'Sluiten';
+
+  @override
+  String get common_action_copyLink => 'Link kopiëren';
+
+  @override
+  String get common_link_couldNotOpen => 'Kan de link niet openen';
 
   @override
   String get common_action_continue => 'Doorgaan';
@@ -11229,6 +11240,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'bijv. 5, 5/4, 7/5/3';
+
+  @override
+  String get equipment_edit_webLinkHint => 'bijv. shop.example.com/product';
 
   @override
   String get equipment_edit_thicknessHint => 'bijv. 5mm, 7mm';
@@ -24838,6 +24852,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_speed_mps => 'Topsnelheid';
 
   @override
+  String get attrLabel_sku => 'SKU';
+
+  @override
+  String get attrLabel_retailer => 'Verkoper';
+
+  @override
+  String get attrLabel_product_url => 'Weblink';
+
+  @override
   String get attrLabel_sleeve_length => 'Mouwen';
 
   @override
@@ -25224,6 +25247,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Gebruik 5, 5/4 of 7/5/3';
+
+  @override
+  String get equipment_edit_invalidWebLink =>
+      'Voer een webadres in, bijv. shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -32919,6 +32946,34 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get common_action_remove => 'Verwijderen';
+
+  @override
+  String get equipment_documents_title => 'Documenten';
+
+  @override
+  String get equipment_documents_subtitle =>
+      'Facturen, bonnen en garantiepapieren';
+
+  @override
+  String get equipment_documents_attachButton => 'Bijvoegen';
+
+  @override
+  String get equipment_documents_empty => 'Nog geen documenten bijgevoegd';
+
+  @override
+  String get equipment_documents_removeTitle => 'Document verwijderen?';
+
+  @override
+  String get equipment_documents_removeContent =>
+      'Het is dan niet langer aan dit item gekoppeld. Je originele bestand blijft ongemoeid.';
+
+  @override
+  String get equipment_documents_removed => 'Document verwijderd';
+
+  @override
+  String equipment_documents_loadError(String error) {
+    return 'Kan documenten niet laden: $error';
+  }
 
   @override
   String get common_action_unpin => 'Losmaken';

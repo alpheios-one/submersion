@@ -9,7 +9,25 @@ import 'package:submersion/core/constants/enums.dart';
 /// - choice:    valueText holds the stable option key (never a display string)
 /// - flag:      valueNum 0/1
 /// - date:      valueNum unix milliseconds
-enum AttributeKind { text, number, thickness, choice, flag, date }
+/// - url:       valueText holds the link as the diver typed it; [parseWebLink]
+///              is the only thing allowed to turn it into a launchable Uri
+enum AttributeKind { text, number, thickness, choice, flag, date, url }
+
+/// Which block of the edit and detail forms an attribute belongs in.
+///
+/// The store does not care -- every group lands in the same
+/// `equipment_attributes` rows -- but a purchase record and a physical spec
+/// answer different questions, so they are not shown side by side.
+enum AttributeGroup {
+  /// What the item physically is: size, thickness, lift, buoyancy. The
+  /// default, rendered with the type-specific fields.
+  spec,
+
+  /// Where the item came from: the receipt trail an insurer asks for after
+  /// lost luggage, theft or fire (issue #1517). Rendered with purchase date
+  /// and price.
+  purchase,
+}
 
 /// Unit dimension for number attributes; drives UnitFormatter conversion.
 /// thicknessMm always displays in mm (industry convention in every market).
@@ -46,6 +64,11 @@ abstract final class EquipmentAttrKeys {
   static const weightStyle = 'weight_style';
   static const insulationLevel = 'insulation_level';
   static const fillMaterial = 'fill_material';
+
+  // Purchase record (issue #1517).
+  static const sku = 'sku';
+  static const retailer = 'retailer';
+  static const productUrl = 'product_url';
 }
 
 class EquipmentAttributeDef {
@@ -56,11 +79,15 @@ class EquipmentAttributeDef {
   final AttributeDimension dimension;
   final List<String> choiceKeys;
 
+  /// Which form block renders this attribute; see [AttributeGroup].
+  final AttributeGroup group;
+
   const EquipmentAttributeDef({
     required this.key,
     required this.kind,
     this.dimension = AttributeDimension.none,
     this.choiceKeys = const [],
+    this.group = AttributeGroup.spec,
   });
 }
 
@@ -77,6 +104,28 @@ abstract final class EquipmentAttributeCatalog {
       key: EquipmentAttrKeys.dryWeightKg,
       kind: AttributeKind.number,
       dimension: AttributeDimension.massKg,
+    ),
+  ];
+
+  /// The purchase record, present for every equipment type (issue #1517).
+  /// Kept apart from [universal] because these are provenance, not physical
+  /// specification: they answer "what did I buy, from whom, and where is the
+  /// listing" for an insurance claim.
+  static const List<EquipmentAttributeDef> purchase = [
+    EquipmentAttributeDef(
+      key: EquipmentAttrKeys.sku,
+      kind: AttributeKind.text,
+      group: AttributeGroup.purchase,
+    ),
+    EquipmentAttributeDef(
+      key: EquipmentAttrKeys.retailer,
+      kind: AttributeKind.text,
+      group: AttributeGroup.purchase,
+    ),
+    EquipmentAttributeDef(
+      key: EquipmentAttrKeys.productUrl,
+      kind: AttributeKind.url,
+      group: AttributeGroup.purchase,
     ),
   ];
 
@@ -502,20 +551,72 @@ abstract final class EquipmentAttributeCatalog {
     EquipmentType.other: [],
   };
 
-  /// Curated attributes for [type]: type-specific first, then universal.
+  /// Curated attributes for [type]: type-specific first, then universal,
+  /// then the purchase record. Consumers that render one block at a time
+  /// filter on [EquipmentAttributeDef.group].
   static List<EquipmentAttributeDef> attributesFor(EquipmentType type) => [
     ...(_byType[type] ?? const []),
     ...universal,
+    ...purchase,
   ];
 
   static final Map<String, EquipmentAttributeDef> _byKey = {
     for (final defs in _byType.values)
       for (final def in defs) def.key: def,
     for (final def in universal) def.key: def,
+    for (final def in purchase) def.key: def,
   };
 
   /// Definition for a curated key, or null for unknown/custom keys.
   static EquipmentAttributeDef? defFor(String key) => _byKey[key];
+}
+
+/// Turns a stored `url`-kind value into a launchable link, or null when it
+/// is not one.
+///
+/// Two jobs, and the second is the important one:
+/// 1. A bare host gets `https://` prepended. Retailers are written down as
+///    "scubashop.com", not with a scheme, and refusing those would make the
+///    field feel broken.
+/// 2. Only `http` and `https` survive. The stored text is handed to
+///    url_launcher, so a `file:`, `mailto:` or `javascript:` value would be
+///    an arbitrary launch performed on the diver's behalf -- and the value
+///    can arrive from a synced device or an import, not just from typing.
+Uri? parseWebLink(String? raw) {
+  final text = raw?.trim() ?? '';
+  if (text.isEmpty || text.contains(RegExp(r'\s'))) return null;
+
+  // Deciding whether a leading "word:" is a scheme or a host with a port.
+  // RFC 3986 allows dots in a scheme, so "shop.example.com:8080/item" parses
+  // as scheme "shop.example.com" -- which would then be rejected below as a
+  // non-web scheme, even though every browser reads it as host:port.
+  //
+  // The discriminator is the dot: real schemes ("mailto", "javascript",
+  // "file", "ftp") do not contain one, hostnames always do. Anything with a
+  // dotted prefix is treated as a host and gets https:// prepended.
+  //
+  // Deliberately NOT "prepend https:// unless it already starts with http(s)":
+  // that turns "mailto:shop@example.com" into
+  // "https://mailto:shop@example.com", which parses as userInfo "mailto:shop"
+  // on host "example.com" -- a launchable website conjured out of a mailto,
+  // exactly the substitution this function exists to prevent.
+  final schemeMatch = RegExp(r'^([A-Za-z][A-Za-z0-9+.\-]*):').firstMatch(text);
+  final hasScheme = schemeMatch != null && !schemeMatch.group(1)!.contains('.');
+  final candidate = hasScheme ? text : 'https://$text';
+
+  final uri = Uri.tryParse(candidate);
+  if (uri == null) return null;
+  if (uri.scheme != 'http' && uri.scheme != 'https') return null;
+  // A host with no dot is a typo or a local name, not a retailer's site.
+  if (!uri.host.contains('.')) return null;
+  // No userInfo. "shop.example.com@evil.com" parses with host evil.com while
+  // the detail row still shows the text as stored, so what the diver reads
+  // and what the tap opens disagree -- the classic phishing shape. Nothing
+  // legitimate about a product listing needs credentials in the URL, and a
+  // url attribute can arrive from a synced device or an import rather than
+  // from this diver's keyboard.
+  if (uri.userInfo.isNotEmpty) return null;
+  return uri;
 }
 
 /// Parses the primary (thickest, written-first) panel from a thickness

@@ -13,6 +13,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo abrir el navegador. Usa Copiar enlace y pega la dirección en tu navegador.';
 
   @override
+  String equipment_documents_removeError(String error) {
+    return 'No se pudo quitar el documento: $error';
+  }
+
+  @override
   String get settings_oauth_connect_copyFailed =>
       'No se pudo copiar el enlace.';
 
@@ -2636,6 +2641,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get common_action_close => 'Cerrar';
+
+  @override
+  String get common_action_copyLink => 'Copiar enlace';
+
+  @override
+  String get common_link_couldNotOpen => 'No se pudo abrir el enlace';
 
   @override
   String get common_action_continue => 'Continuar';
@@ -11311,6 +11322,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'p. ej., 5, 5/4, 7/5/3';
+
+  @override
+  String get equipment_edit_webLinkHint => 'p. ej. shop.example.com/product';
 
   @override
   String get equipment_edit_thicknessHint => 'p. ej., 5mm, 7mm';
@@ -25050,6 +25064,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_speed_mps => 'Velocidad máxima';
 
   @override
+  String get attrLabel_sku => 'SKU';
+
+  @override
+  String get attrLabel_retailer => 'Vendedor';
+
+  @override
+  String get attrLabel_product_url => 'Enlace web';
+
+  @override
   String get attrLabel_sleeve_length => 'Mangas';
 
   @override
@@ -25438,6 +25461,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Usa 5, 5/4 o 7/5/3';
+
+  @override
+  String get equipment_edit_invalidWebLink =>
+      'Introduce una dirección web, p. ej. shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -33174,6 +33201,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get common_action_remove => 'Quitar';
+
+  @override
+  String get equipment_documents_title => 'Documentos';
+
+  @override
+  String get equipment_documents_subtitle =>
+      'Facturas, recibos y documentación de garantía';
+
+  @override
+  String get equipment_documents_attachButton => 'Adjuntar';
+
+  @override
+  String get equipment_documents_empty => 'Aún no hay documentos adjuntos';
+
+  @override
+  String get equipment_documents_removeTitle => '¿Quitar documento?';
+
+  @override
+  String get equipment_documents_removeContent =>
+      'Dejará de estar adjunto a este equipo. Tu archivo original no se toca.';
+
+  @override
+  String get equipment_documents_removed => 'Documento eliminado';
+
+  @override
+  String equipment_documents_loadError(String error) {
+    return 'No se pudieron cargar los documentos: $error';
+  }
 
   @override
   String get common_action_unpin => 'Desanclar';

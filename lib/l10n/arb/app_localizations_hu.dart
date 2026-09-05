@@ -13,6 +13,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.';
 
   @override
+  String equipment_documents_removeError(String error) {
+    return 'A dokumentum nem távolítható el: $error';
+  }
+
+  @override
   String get settings_oauth_connect_copyFailed =>
       'Nem sikerült másolni a linket.';
 
@@ -2621,6 +2626,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get common_action_close => 'Bezaras';
+
+  @override
+  String get common_action_copyLink => 'Hivatkozás másolása';
+
+  @override
+  String get common_link_couldNotOpen => 'A hivatkozás nem nyitható meg';
 
   @override
   String get common_action_continue => 'Folytatás';
@@ -11281,6 +11292,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'pl. 5, 5/4, 7/5/3';
+
+  @override
+  String get equipment_edit_webLinkHint => 'pl. shop.example.com/product';
 
   @override
   String get equipment_edit_thicknessHint => 'pl. 5mm, 7mm';
@@ -24925,6 +24939,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_speed_mps => 'Végsebesség';
 
   @override
+  String get attrLabel_sku => 'Cikkszám';
+
+  @override
+  String get attrLabel_retailer => 'Forgalmazó';
+
+  @override
+  String get attrLabel_product_url => 'Webhivatkozás';
+
+  @override
   String get attrLabel_sleeve_length => 'Ujjak';
 
   @override
@@ -25311,6 +25334,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Formátum: 5, 5/4 vagy 7/5/3';
+
+  @override
+  String get equipment_edit_invalidWebLink =>
+      'Adjon meg egy webcímet, pl. shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -33011,6 +33038,34 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get common_action_remove => 'Eltávolítás';
+
+  @override
+  String get equipment_documents_title => 'Dokumentumok';
+
+  @override
+  String get equipment_documents_subtitle =>
+      'Számlák, nyugták és garancialevelek';
+
+  @override
+  String get equipment_documents_attachButton => 'Csatolás';
+
+  @override
+  String get equipment_documents_empty => 'Még nincs csatolt dokumentum';
+
+  @override
+  String get equipment_documents_removeTitle => 'Eltávolítja a dokumentumot?';
+
+  @override
+  String get equipment_documents_removeContent =>
+      'Többé nem lesz ehhez a felszereléshez csatolva. Az eredeti fájl érintetlen marad.';
+
+  @override
+  String get equipment_documents_removed => 'A dokumentum eltávolítva';
+
+  @override
+  String equipment_documents_loadError(String error) {
+    return 'A dokumentumok nem tölthetők be: $error';
+  }
 
   @override
   String get common_action_unpin => 'Rögzítés feloldása';

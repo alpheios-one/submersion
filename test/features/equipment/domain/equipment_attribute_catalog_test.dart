@@ -47,7 +47,14 @@ void main() {
     );
     expect(
       keysFor(EquipmentType.other),
-      unorderedEquals(['buoyancy_kg', 'dry_weight_kg']),
+      unorderedEquals([
+        'buoyancy_kg',
+        'dry_weight_kg',
+        // Present on every type since issue #1517.
+        'sku',
+        'retailer',
+        'product_url',
+      ]),
     );
     // The drysuit layers (#1537) are rated by warmth, not by millimetres:
     // asking for thickness_mm would be the wrong question for a garment sold
@@ -172,6 +179,9 @@ void main() {
         'depth_rating_m',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
     });
 
@@ -282,6 +292,9 @@ void main() {
         'upf_rating',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
       // Warmth belongs to baselayer (#1537). Two ways to say "this one is
       // warm" is how one idea drifts into two words per locale.
@@ -306,6 +319,9 @@ void main() {
         'purge_valve',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
       expect(EquipmentAttributeCatalog.defFor('snorkel_type')!.choiceKeys, [
         'classic',
@@ -321,6 +337,9 @@ void main() {
         'size',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
       // A spanner width or a hex key has no closed list to pick from.
       expect(
@@ -337,6 +356,9 @@ void main() {
         'mount',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
       expect(
         EquipmentAttributeCatalog.defFor('gauge_max_pressure_bar')!.dimension,
@@ -367,6 +389,9 @@ void main() {
         'mount',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
       expect(EquipmentAttributeCatalog.defFor('balance_zone')!.choiceKeys, [
         'northern',
@@ -445,6 +470,9 @@ void main() {
         'depth_rating_m',
         'buoyancy_kg',
         'dry_weight_kg',
+        'sku',
+        'retailer',
+        'product_url',
       ]);
     });
 

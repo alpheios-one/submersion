@@ -13,6 +13,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
 
   @override
+  String equipment_documents_removeError(String error) {
+    return 'לא ניתן להסיר את המסמך: $error';
+  }
+
+  @override
   String get settings_oauth_connect_copyFailed => 'לא ניתן להעתיק את הקישור.';
 
   @override
@@ -2559,6 +2564,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get common_action_close => 'סגירה';
+
+  @override
+  String get common_action_copyLink => 'העתקת קישור';
+
+  @override
+  String get common_link_couldNotOpen => 'לא ניתן לפתוח את הקישור';
 
   @override
   String get common_action_continue => 'המשך';
@@ -11056,6 +11067,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'למשל, 5, 5/4, 7/5/3';
+
+  @override
+  String get equipment_edit_webLinkHint => 'למשל shop.example.com/product';
 
   @override
   String get equipment_edit_thicknessHint => 'למשל, 5 מ\"מ, 7 מ\"מ';
@@ -24405,6 +24419,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_speed_mps => 'מהירות מרבית';
 
   @override
+  String get attrLabel_sku => 'מק״ט';
+
+  @override
+  String get attrLabel_retailer => 'קמעונאי';
+
+  @override
+  String get attrLabel_product_url => 'קישור אינטרנט';
+
+  @override
   String get attrLabel_sleeve_length => 'שרוולים';
 
   @override
@@ -24790,6 +24813,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'השתמשו ב-5, 5/4 או 7/5/3';
+
+  @override
+  String get equipment_edit_invalidWebLink =>
+      'הזן כתובת אינטרנט, למשל shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -32476,6 +32503,33 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get common_action_remove => 'הסר';
+
+  @override
+  String get equipment_documents_title => 'מסמכים';
+
+  @override
+  String get equipment_documents_subtitle => 'חשבוניות, קבלות ומסמכי אחריות';
+
+  @override
+  String get equipment_documents_attachButton => 'צירוף';
+
+  @override
+  String get equipment_documents_empty => 'עדיין לא צורפו מסמכים';
+
+  @override
+  String get equipment_documents_removeTitle => 'להסיר את המסמך?';
+
+  @override
+  String get equipment_documents_removeContent =>
+      'המסמך יפסיק להיות מצורף לפריט זה. הקובץ המקורי שלך לא ייגע.';
+
+  @override
+  String get equipment_documents_removed => 'המסמך הוסר';
+
+  @override
+  String equipment_documents_loadError(String error) {
+    return 'לא ניתן לטעון את המסמכים: $error';
+  }
 
   @override
   String get common_action_unpin => 'בטל הצמדה';

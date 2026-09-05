@@ -13,6 +13,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Der Browser konnte nicht geöffnet werden. Verwenden Sie „Link kopieren“ und fügen Sie die Adresse in Ihren Browser ein.';
 
   @override
+  String equipment_documents_removeError(String error) {
+    return 'Dokument konnte nicht entfernt werden: $error';
+  }
+
+  @override
   String get settings_oauth_connect_copyFailed =>
       'Der Link konnte nicht kopiert werden.';
 
@@ -2639,6 +2644,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get common_action_close => 'Schließen';
+
+  @override
+  String get common_action_copyLink => 'Link kopieren';
+
+  @override
+  String get common_link_couldNotOpen => 'Link konnte nicht geöffnet werden';
 
   @override
   String get common_action_continue => 'Fortfahren';
@@ -11309,6 +11320,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'z.B. 5, 5/4, 7/5/3';
+
+  @override
+  String get equipment_edit_webLinkHint => 'z.B. shop.example.com/product';
 
   @override
   String get equipment_edit_thicknessHint => 'z.B. 5mm, 7mm';
@@ -24980,6 +24994,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get attrLabel_speed_mps => 'Höchstgeschwindigkeit';
 
   @override
+  String get attrLabel_sku => 'SKU';
+
+  @override
+  String get attrLabel_retailer => 'Händler';
+
+  @override
+  String get attrLabel_product_url => 'Weblink';
+
+  @override
   String get attrLabel_sleeve_length => 'Ärmel';
 
   @override
@@ -25368,6 +25391,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get equipment_edit_invalidThickness => 'Format: 5, 5/4 oder 7/5/3';
+
+  @override
+  String get equipment_edit_invalidWebLink =>
+      'Webadresse eingeben, z.B. shop.example.com';
 
   @override
   String get statistics_progression_divesBySuitThickness_title =>
@@ -33084,6 +33111,34 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get common_action_remove => 'Entfernen';
+
+  @override
+  String get equipment_documents_title => 'Dokumente';
+
+  @override
+  String get equipment_documents_subtitle =>
+      'Rechnungen, Belege und Garantieunterlagen';
+
+  @override
+  String get equipment_documents_attachButton => 'Anhängen';
+
+  @override
+  String get equipment_documents_empty => 'Noch keine Dokumente angehängt';
+
+  @override
+  String get equipment_documents_removeTitle => 'Dokument entfernen?';
+
+  @override
+  String get equipment_documents_removeContent =>
+      'Es ist dann nicht mehr an diesen Artikel angehängt. Ihre Originaldatei bleibt unberührt.';
+
+  @override
+  String get equipment_documents_removed => 'Dokument entfernt';
+
+  @override
+  String equipment_documents_loadError(String error) {
+    return 'Dokumente konnten nicht geladen werden: $error';
+  }
 
   @override
   String get common_action_unpin => 'Lösen';

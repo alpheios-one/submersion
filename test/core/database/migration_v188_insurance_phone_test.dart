@@ -59,8 +59,10 @@ void main() {
     expect(row.data['insurance_phone'], isNull);
   });
 
-  test('v188 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 188);
+  test('migration list includes v188 and schema is at least 188', () {
+    // Relaxed from an exact match when v189 landed: the exact assertion is
+    // the newest rung's job, and it moves with it.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(188));
     expect(AppDatabase.migrationVersions, contains(188));
   });
 
