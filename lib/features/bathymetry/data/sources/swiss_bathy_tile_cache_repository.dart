@@ -21,10 +21,16 @@ class SwissBathyTileCacheEntry {
   /// checked" (including rows written before this field existed).
   final DateTime? checkedAt;
 
+  /// The href of the STAC asset [sourceDatetime] was read from — lets a
+  /// freshness check match back to the exact previously-covering candidate.
+  /// Null for tiles cached before this field existed (v15 and earlier).
+  final String? sourceHref;
+
   const SwissBathyTileCacheEntry({
     required this.grid,
     this.sourceDatetime,
     this.checkedAt,
+    this.sourceHref,
   });
 }
 
@@ -58,6 +64,7 @@ class SwissBathyTileCacheRepository {
         checkedAt: row.checkedAt == null
             ? null
             : DateTime.fromMillisecondsSinceEpoch(row.checkedAt!),
+        sourceHref: row.sourceHref,
       );
     } catch (_) {
       return null; // corrupt row: caller re-derives and overwrites it
@@ -89,6 +96,7 @@ class SwissBathyTileCacheRepository {
     String tileKey,
     BathymetryGrid grid, {
     String? sourceDatetime,
+    String? sourceHref,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db
@@ -101,6 +109,7 @@ class SwissBathyTileCacheRepository {
             fetchedAt: now,
             sourceDatetime: Value(sourceDatetime),
             checkedAt: Value(now),
+            sourceHref: Value(sourceHref),
           ),
         );
   }

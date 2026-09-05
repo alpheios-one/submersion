@@ -110,6 +110,15 @@ class SwissBathyTileCache extends Table {
   /// check immediately, which covers rows written before this field existed.
   IntColumn get checkedAt => integer().nullable()();
 
+  /// The href of the STAC asset [sourceDatetime] was read from. A freshness
+  /// check matches the current STAC response back to this exact asset by
+  /// href before comparing datetimes, rather than assuming the first
+  /// bbox-overlapping candidate is the one that actually covered this tile
+  /// (it is not necessarily -- see [SwissBathy3dSource._firstOverlappingCandidate]).
+  /// Null for 'empty' rows and rows written before this field existed
+  /// (v15), which fall back to one full re-resolution on their next check.
+  TextColumn get sourceHref => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {tileKey};
 }
@@ -262,7 +271,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -385,6 +394,25 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           }
         }
       }
+      // v16: the href a freshness check's version token was read from, so a
+      // stale check can match back to the exact previously-covering asset
+      // instead of assuming the first bbox-overlapping candidate is it.
+      //
+      // Column-existence checked first for the same reason as v15 above:
+      // v14's createTable already builds the table with the current
+      // (post-v16) column set for upgrades starting below v14.
+      if (from < 16) {
+        final cols = await customSelect(
+          "PRAGMA table_info('swiss_bathy_tile_cache')",
+        ).get();
+        final columnNames = cols.map((c) => c.read<String>('name')).toSet();
+        if (columnNames.isNotEmpty && !columnNames.contains('source_href')) {
+          await m.addColumn(
+            swissBathyTileCache,
+            swissBathyTileCache.sourceHref,
+          );
+        }
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -474,6 +502,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           fetched_at INTEGER NOT NULL,
           source_datetime TEXT NULL,
           checked_at INTEGER NULL,
+          source_href TEXT NULL,
           PRIMARY KEY (tile_key)
         )
       ''');

@@ -1103,6 +1103,85 @@ nodata_value -9999
       expect(second.depthAt(0, 0), first.depthAt(0, 0));
     });
 
+    test('a stale check matches back to the previously-covering candidate by '
+        'href, not list position, so a still-present decoy does not trigger '
+        'a spurious re-download (Copilot review)', () async {
+      // The first fetch sees two candidates for the tile: a decoy whose
+      // declared bbox overlaps but whose real content does not (Bug 14),
+      // and the real one that actually covers it. _firstOverlappingCandidate
+      // resolves to the real one, so ITS href/datetime -- not the decoy's,
+      // and not just "whichever is candidates.first" -- is what a later
+      // stale check must compare against.
+      const decoyGrid = '''
+ncols 4
+nrows 4
+xllcorner 2900000
+yllcorner 1400000
+cellsize 100
+nodata_value -9999
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+1.0 1.0 1.0 1.0
+''';
+
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          final requestedBbox = _requestedBbox(req);
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': requestedBbox,
+                  'properties': {'datetime': '2020-01-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/decoy.zip'},
+                  },
+                },
+                {
+                  'bbox': requestedBbox,
+                  'properties': {'datetime': '2023-01-01T00:00:00Z'},
+                  'assets': {
+                    'grid': {'href': 'https://example.org/real.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        if (req.url.path.endsWith('decoy.zip')) {
+          return http.Response.bytes(_zipOf('tile.asc', decoyGrid), 200);
+        }
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final first = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 1);
+      // Both candidates are tried once during the initial resolution: the
+      // decoy is downloaded and rejected before the real one is found.
+      expect(downloadCalls, 2);
+
+      await backdateCheckedAt(
+        zurichseePoint,
+        DateTime.now().subtract(const Duration(days: 31)),
+      );
+
+      // The stale check must recognize that the real candidate's own
+      // datetime (2023-01-01) is unchanged. Comparing against
+      // candidates.first (the decoy, 2020-01-01) instead -- the pre-fix
+      // behavior -- would always look "changed" and force an unnecessary
+      // re-download of both candidates on every single check.
+      final second = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(itemCalls, 2); // exactly one extra light metadata lookup
+      expect(downloadCalls, 2); // unchanged version: no re-download
+      expect(second.depthAt(0, 0), first.depthAt(0, 0));
+    });
+
     test(
       'a stale cached tile is re-downloaded when the source version changed',
       () async {

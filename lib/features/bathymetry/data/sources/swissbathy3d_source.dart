@@ -253,6 +253,7 @@ class SwissBathy3dSource implements BathymetrySource {
       tileKey,
       grid,
       sourceDatetime: resolved.asset.datetime,
+      sourceHref: resolved.asset.href,
     );
     return grid;
   }
@@ -313,12 +314,14 @@ class SwissBathy3dSource implements BathymetrySource {
   }
 
   /// Revalidates an expired cached tile with one light STAC item lookup (no
-  /// asset download) and only re-downloads the zip when the item's version
-  /// token actually changed. Any failure along the way — the metadata
-  /// lookup itself, the re-download, or reparsing — falls back to serving
-  /// the still-cached [cached] grid unchanged rather than propagating an
-  /// error: a stale-but-present tile beats no tile, and per the fair-use
-  /// requirement this must never turn into an unbounded re-download loop.
+  /// asset download) and only re-downloads the zip when the previously-
+  /// covering asset's version token actually changed, or when that asset
+  /// cannot be matched among the current candidates at all. Any failure
+  /// along the way — the metadata lookup itself, the re-download, or
+  /// reparsing — falls back to serving the still-cached [cached] grid
+  /// unchanged rather than propagating an error: a stale-but-present tile
+  /// beats no tile, and per the fair-use requirement this must never turn
+  /// into an unbounded re-download loop.
   Future<BathymetryGrid?> _refreshIfStale(
     String tileKey,
     int tileE,
@@ -359,20 +362,39 @@ class SwissBathy3dSource implements BathymetrySource {
       return (grid: cached.grid, outcome: _TileCheckOutcome.failed);
     }
 
-    // The first candidate's datetime is enough for the cheap staleness
-    // check itself -- it only decides whether a real download is worth
-    // doing at all. Which candidate's content actually covers this tile is
-    // resolved below, only once a download has been judged necessary.
-    final asset = candidates.isEmpty ? null : candidates.first;
-    if (asset == null || asset.datetime == cached.sourceDatetime) {
-      // No newer survey published (a null item lookup is treated the same
-      // way: nothing to update, not "delete this known-good tile") -- just
-      // record that the check happened, so the next one is due again in
-      // staleCheckInterval.
-      await _tileCache.touch(tileKey, sourceDatetime: asset?.datetime);
+    // Match by href, not list position: the candidate whose content
+    // actually covers this tile is not necessarily candidates.first (see
+    // _firstOverlappingCandidate's doc above) and that order is not
+    // guaranteed stable across requests either. Comparing an unrelated
+    // candidate's datetime against cached.sourceDatetime would report
+    // "changed" for two assets that were never the same thing to begin
+    // with, forcing a real download on every single check. Matching back
+    // to the exact previously-covering href keeps the check just as cheap
+    // (still only the light items lookup above, no asset download) while
+    // actually comparing the right two datetimes.
+    final previousHref = cached.sourceHref;
+    SwissBathyAsset? matched;
+    if (previousHref != null) {
+      for (final candidate in candidates) {
+        if (candidate.href == previousHref) {
+          matched = candidate;
+          break;
+        }
+      }
+    }
+    if (matched != null && matched.datetime == cached.sourceDatetime) {
+      // Same asset, same version: nothing to update, just record that the
+      // check happened, so the next one is due again in staleCheckInterval.
+      await _tileCache.touch(tileKey, sourceDatetime: matched.datetime);
       return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
     }
 
+    // Either the previously-covering asset changed version, or it is no
+    // longer among the current candidates (renamed/replaced), or this row
+    // predates sourceHref (v15 and earlier) and has never been matched
+    // yet. None of those can be told apart from metadata alone, so fall
+    // through to a real re-resolution -- the one-time cost self-heals a
+    // pre-v16 row onto its href for every check after this one.
     try {
       final resolved = await _firstOverlappingCandidate(
         tileE,
@@ -383,7 +405,18 @@ class SwissBathy3dSource implements BathymetrySource {
       if (resolved == null) {
         // None of the candidates' actual content covers this tile --
         // nothing usable to update to, so just record the check happened.
-        await _tileCache.touch(tileKey, sourceDatetime: asset.datetime);
+        await _tileCache.touch(tileKey, sourceDatetime: cached.sourceDatetime);
+        return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
+      }
+      if (resolved.asset.href == previousHref &&
+          resolved.asset.datetime == cached.sourceDatetime) {
+        // Only reachable when the href-based shortcut above could not run
+        // (no stored href yet) but re-resolution landed on the exact same
+        // asset and version anyway -- still no update needed.
+        await _tileCache.touch(
+          tileKey,
+          sourceDatetime: resolved.asset.datetime,
+        );
         return (grid: cached.grid, outcome: _TileCheckOutcome.upToDate);
       }
       final grid = parseSwissLv95RawGrid(
@@ -396,6 +429,7 @@ class SwissBathy3dSource implements BathymetrySource {
         tileKey,
         grid,
         sourceDatetime: resolved.asset.datetime,
+        sourceHref: resolved.asset.href,
       );
       return (grid: grid, outcome: _TileCheckOutcome.updated);
     } on SwissStacException {
