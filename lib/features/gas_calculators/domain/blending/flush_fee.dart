@@ -7,6 +7,7 @@
 // the flush fee's price too. There is no separate flush-fee price to enter or
 // drift out of sync with it.
 
+import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 
 /// How often the configured flush fee appears on the bill.
@@ -69,3 +70,51 @@ double? flushFeeCost(double volumeLiters, double? pricePer100) =>
     pricePer100 == null ? null : volumeLiters / 100 * pricePer100;
 
 double? _toDouble(Object? value) => value is num ? value.toDouble() : null;
+
+/// How many times the configured fee appears on a bill holding [fillCount]
+/// fills. Zero under [FlushFeeMode.perFill] before anything has been filled:
+/// there is no fill to purge for yet.
+int flushFeeMultiplier({required FlushFeeMode mode, required int fillCount}) =>
+    mode == FlushFeeMode.perInvoice ? 1 : fillCount;
+
+/// The flush fee as billable lines, one per role, so every surface that
+/// totals, archives or exports a bill itemises the fee instead of folding it
+/// into a total nothing on the page accounts for.
+///
+/// Derived on demand rather than appended to the running bill: the fee
+/// reprices itself whenever its settings change, and under
+/// [FlushFeeMode.perFill] whenever another cylinder is billed, so it cannot
+/// be a stored row the way a finished fill is. Materialising it at the moment
+/// a bill is totalled, paid or exported is what keeps those three agreeing on
+/// one number.
+///
+/// [labelFor] supplies the role's display name, keeping l10n and
+/// BuildContext out of the domain. A line carries no [BilledFill.lines]: the
+/// volume and price behind its amount are settings, not gas drawn from a
+/// bank, and there is nothing to itemise beneath it.
+List<BilledFill> flushFeeFills({
+  required bool enabled,
+  required FlushFeeMode mode,
+  required int fillCount,
+  required List<FlushFeeGasSetting> gases,
+  required List<double?> pricesPer100,
+  required String Function(BlenderGasRole role) labelFor,
+}) {
+  final multiplier = flushFeeMultiplier(mode: mode, fillCount: fillCount);
+  if (!enabled || multiplier < 1) return const [];
+  return [
+    for (final role in BlenderGasRole.values)
+      if (role.index < gases.length)
+        BilledFill(
+          id: 'flush-${role.name}',
+          label: multiplier > 1
+              ? '${labelFor(role)}  \u00d7$multiplier'
+              : labelFor(role),
+          lines: const [],
+          total: flushFeeCost(
+            gases[role.index].volumeLiters * multiplier,
+            role.index < pricesPer100.length ? pricesPer100[role.index] : null,
+          ),
+        ),
+  ];
+}

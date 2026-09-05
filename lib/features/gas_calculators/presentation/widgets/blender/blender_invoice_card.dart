@@ -98,21 +98,28 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     final flushEnabled = ref.watch(blenderFlushFeeEnabledProvider);
     final flushMode = ref.watch(blenderFlushFeeModeProvider);
     final flushGases = ref.watch(blenderFlushFeeGasesProvider);
+    final gasPrices = ref.watch(blenderGasPricesProvider);
     // "Once per bill" always shows once the fee is on, even before the first
     // fill: it is a session setup cost, not tied to any one cylinder. "Once
     // per fill" has nothing to charge yet when nothing has been filled.
-    final flushMultiplier = flushMode == FlushFeeMode.perInvoice
-        ? 1
-        : fills.length;
+    final flushMultiplier = flushFeeMultiplier(
+      mode: flushMode,
+      fillCount: fills.length,
+    );
     final showFlush = flushEnabled && flushMultiplier > 0;
 
-    final total = _computeTotal(
-      fills,
-      showFlush: showFlush,
-      flushMultiplier: flushMultiplier,
-      flushGases: flushGases,
-      gasPrices: ref.watch(blenderGasPricesProvider),
+    // The one place the fee becomes money. Displayed, totalled, archived and
+    // exported from the same lines, so those four cannot disagree about what
+    // was charged (PR #1359 review).
+    final flushFills = _flushFills(
+      context,
+      enabled: flushEnabled,
+      mode: flushMode,
+      fillCount: fills.length,
+      gases: flushGases,
+      gasPrices: gasPrices,
     );
+    final total = totalOf([...fills, ...flushFills]);
 
     // Seed the name from the logbook, once, and only when the diver has not
     // typed one. A fill station fills other people's cylinders, so this is a
@@ -238,7 +245,7 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                           ? null
                           : () => _openExportSheet(
                               context,
-                              fills,
+                              [...fills, ...flushFills],
                               currency,
                               units,
                               decimals,
@@ -361,6 +368,8 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     );
   }
 
+  /// [fills] is the whole bill, hose purges included: an exported invoice
+  /// itemises everything its total charges for.
   Future<void> _openExportSheet(
     BuildContext context,
     List<BilledFill> fills,
@@ -638,38 +647,43 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     );
   }
 
-  /// The running total including the hose-purge flat fee, shared between the
-  /// live display and [_confirmPay] so an archived invoice never drops the
-  /// fee the diver was shown before paying.
-  BilledTotal _computeTotal(
-    List<BilledFill> fills, {
-    required bool showFlush,
-    required int flushMultiplier,
-    required List<FlushFeeGasSetting> flushGases,
+  /// [flushFeeFills] with this app's labels attached.
+  ///
+  /// The label has to stand on its own here, unlike the live display's
+  /// [_flushFeeLine], which sits under a heading naming the billing mode: an
+  /// archived or exported line is read months later with no such context, so
+  /// it says "hose purge" rather than just the gas.
+  List<BilledFill> _flushFills(
+    BuildContext context, {
+    required bool enabled,
+    required FlushFeeMode mode,
+    required int fillCount,
+    required List<FlushFeeGasSetting> gases,
     required List<double?> gasPrices,
-  }) {
-    final fillsTotal = totalOf(fills);
-    var flushAmount = 0.0;
-    var flushComplete = true;
-    if (showFlush) {
-      for (var i = 0; i < flushGases.length; i++) {
-        final price = i < gasPrices.length ? gasPrices[i] : null;
-        final cost = flushFeeCost(
-          flushGases[i].volumeLiters * flushMultiplier,
-          price,
-        );
-        if (cost == null) {
-          flushComplete = false;
-        } else {
-          flushAmount += cost;
-        }
-      }
-    }
-    return BilledTotal(
-      amount: fillsTotal.amount + flushAmount,
-      complete: fillsTotal.complete && flushComplete,
-    );
-  }
+  }) => flushFeeFills(
+    enabled: enabled,
+    mode: mode,
+    fillCount: fillCount,
+    gases: gases,
+    pricesPer100: gasPrices,
+    labelFor: (role) => context.l10n.gasCalculators_blender_flushFeeLine(
+      blenderGasRoleLabel(context, role),
+    ),
+  );
+
+  /// [_flushFills] for the bill as it stands right now.
+  ///
+  /// Reads rather than watches: both callers run from a button, after the
+  /// frame that decided what is on the bill.
+  List<BilledFill> _currentFlushFills(BuildContext context, int fillCount) =>
+      _flushFills(
+        context,
+        enabled: ref.read(blenderFlushFeeEnabledProvider),
+        mode: ref.read(blenderFlushFeeModeProvider),
+        fillCount: fillCount,
+        gases: ref.read(blenderFlushFeeGasesProvider),
+        gasPrices: ref.read(blenderGasPricesProvider),
+      );
 
   void _delete(BilledFill fill) {
     ref.read(blenderBilledFillsProvider.notifier).state = [
@@ -748,27 +762,19 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
         ],
       ),
     );
-    if (ok != true) return;
+    if (ok != true || !mounted) return;
 
-    final flushEnabled = ref.read(blenderFlushFeeEnabledProvider);
-    final flushMode = ref.read(blenderFlushFeeModeProvider);
-    final flushGases = ref.read(blenderFlushFeeGasesProvider);
-    final flushMultiplier = flushMode == FlushFeeMode.perInvoice
-        ? 1
-        : fills.length;
-    final showFlush = flushEnabled && flushMultiplier > 0;
-    final total = _computeTotal(
-      fills,
-      showFlush: showFlush,
-      flushMultiplier: flushMultiplier,
-      flushGases: flushGases,
-      gasPrices: ref.read(blenderGasPricesProvider),
-    );
+    // Archived with the purge lines materialised into it, not merely counted
+    // in the total: the fee is derived from settings that go on changing, so
+    // a bill that stored only the number could never be itemised again
+    // (PR #1359 review).
+    final billed = [...fills, ..._currentFlushFills(context, fills.length)];
+    final total = totalOf(billed);
     final archived = ArchivedInvoice(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       date: ref.read(blenderBilledDateProvider),
       billedTo: ref.read(blenderBilledToProvider),
-      fills: fills,
+      fills: billed,
       total: total.complete ? total.amount : null,
       currencyCode: ref.read(blenderCurrencyProvider),
     );
@@ -887,7 +893,16 @@ class _LineEditSheetState extends ConsumerState<_LineEditSheet> {
         : customMix != null
         ? formatPreciseMix(context, GasMix(o2: customMix.o2, he: customMix.he))
         : '';
-    if (effectiveLabel.isEmpty) return;
+    // Nothing to name the line with. Said out loud rather than returned on
+    // quietly: a Save that does nothing and explains nothing reads as a
+    // broken button (PR #1359 review), the same reasoning MixTemplateManager
+    // applies to a half-typed mix.
+    if (effectiveLabel.isEmpty) {
+      setState(
+        () => _error = context.l10n.gasCalculators_blender_lineNeedsDescription,
+      );
+      return;
+    }
     Navigator.of(context).pop(
       _LineEdit(label: effectiveLabel, amount: amount, customMix: customMix),
     );

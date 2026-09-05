@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:excel_community/excel_community.dart' as xl;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -369,6 +370,32 @@ void main() {
       expect(fills.single.total, closeTo(12.50, 0.001));
     });
 
+    testWidgets('saving a line with nothing to name it says so', (
+      tester,
+    ) async {
+      // PR #1359 review: with no description and no usable mix there was
+      // nothing to label the line with, and Save simply returned - no line,
+      // no message, a button that reads as broken.
+      await _pump(tester);
+      await tester.tap(find.byKey(const Key('blender-add-manual-line')));
+      await tester.pumpAndSettle();
+      // The mix fields are pre-filled, so the label can fall back to them
+      // until one of them is cleared.
+      await tester.enterText(find.widgetWithText(TextField, 'O\u2082 (%)'), '');
+      await tester.enterText(
+        find.byKey(const Key('blender-line-amount')),
+        '12.50',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Enter a description'), findsOneWidget);
+      // Still open, with the amount intact, so the diver can fix it in place.
+      expect(find.byKey(const Key('blender-line-amount')), findsOneWidget);
+    });
+
     testWidgets('a custom mix line records the cylinder and gas entered', (
       tester,
     ) async {
@@ -494,6 +521,48 @@ void main() {
       // already-paid total.
       expect(archived.single.currencyCode, 'CHF');
     });
+
+    testWidgets(
+      'paying archives the flush fee as a line, not only inside the total',
+      (tester) async {
+        // PR #1359 review: the fee was folded into the archived total while
+        // the archived fills carried no line for it, so a paid invoice could
+        // never be reconciled from its own itemisation.
+        final ref = await _pump(tester);
+        ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+        ref.read(blenderGasPricesProvider.notifier).state = const [
+          7.5,
+          15.0,
+          1.0,
+        ];
+        ref.read(blenderBilledFillsProvider.notifier).state = const [
+          BilledFill(id: 'a', label: 'Tx 18/45', lines: [], total: 35),
+        ];
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byKey(const Key('blender-pay')));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.widgetWithText(FilledButton, 'Pay'),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final archived = ref.read(blenderArchivedInvoicesProvider).single;
+        expect(archived.fills.map((f) => f.label), [
+          'Tx 18/45',
+          'O\u2082 hose purge',
+          'Helium hose purge',
+          'Topup hose purge',
+        ]);
+        // 35 + the three 20 L purges at 7.50, 15.00 and 1.00 per 100 L.
+        expect(archived.total, closeTo(39.7, 1e-9));
+        // The point of the fix: the stored lines add up to the stored total.
+        expect(totalOf(archived.fills).amount, closeTo(archived.total!, 1e-9));
+      },
+    );
 
     testWidgets('an unpriced fill flags the total as incomplete', (
       tester,
@@ -679,6 +748,59 @@ void main() {
       expect(
         platform.calls.single.files!.single.mimeType,
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
+
+    testWidgets('an exported invoice itemises the flush fee it charges for', (
+      tester,
+    ) async {
+      // PR #1359 review: the export took its total from a flush-inclusive
+      // sum but its lines from the fills alone, so a shared invoice listed
+      // less than it charged.
+      final ref = await _pump(tester);
+      ref.read(blenderFlushFeeEnabledProvider.notifier).state = true;
+      ref.read(blenderGasPricesProvider.notifier).state = const [
+        7.5,
+        15.0,
+        1.0,
+      ];
+      ref.read(blenderBilledFillsProvider.notifier).state = const [
+        BilledFill(id: 'a', label: 'Tx 18/45', lines: [], total: 35),
+      ];
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('blender-export')));
+      await tester.pumpAndSettle();
+
+      await tester.runAsync(() async {
+        await tester.tap(find.byKey(const Key('blender-export-excel')));
+        await settleWithLoadingIndicator(tester);
+      });
+      await tester.pumpAndSettle();
+
+      final shared = File(platform.calls.single.files!.single.path);
+      final sheet = xl.Excel.decodeBytes(shared.readAsBytesSync())['Invoice'];
+      String? cell(int row, int col) {
+        final value = sheet.rows[row][col]?.value;
+        return value is xl.TextCellValue ? value.value.toString() : null;
+      }
+
+      // Row 4 is the column header; the fill leads, then one row per purge.
+      expect(cell(5, 0), 'Tx 18/45');
+      expect(cell(6, 0), 'O\u2082 hose purge');
+      expect(cell(7, 0), 'Helium hose purge');
+      expect(cell(8, 0), 'Topup hose purge');
+      // And the grand total is the sum of exactly those four rows.
+      expect(
+        sheet.rows.any(
+          (row) => row.any(
+            (c) =>
+                c?.value is xl.TextCellValue &&
+                (c!.value as xl.TextCellValue).value.toString().contains(
+                  '39.70',
+                ),
+          ),
+        ),
+        isTrue,
       );
     });
 
