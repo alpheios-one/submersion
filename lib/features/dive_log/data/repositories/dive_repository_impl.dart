@@ -22,6 +22,7 @@ import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.d
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_source_export.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_times.dart'
     as domain;
@@ -6212,6 +6213,123 @@ class DiveRepository {
     }
   }
 
+  /// Every `dive_data_sources` row for [diveIds], for UDDF export.
+  ///
+  /// Deliberately NOT built on [getDataSources]: that one runs rows through
+  /// `_canonicalDataSourceRows`, which collapses rows sharing a merge slot
+  /// into one display source. Each collapsed row is the sole surviving copy
+  /// of its half's `rawData`, so exporting through it would silently drop
+  /// half of a combined dive's bytes.
+  ///
+  /// Rows with no `rawData` are included too. The provenance record has to
+  /// cover them, or a dive with one plain source beside one carrying bytes
+  /// would restore with fewer sources than it had.
+  ///
+  /// This MUST stay a Drift typed select. Issue #227 puts a `TypeConverter`
+  /// on `raw_data`; typed selects run converters and `customSelect` does not,
+  /// so a raw SQL version would return `SRD1` framed zlib and the export
+  /// would write compressed bytes into `<dcdump>` with nothing to catch it.
+  /// `sources_for_export_test.dart` pins this with a byte-identity check.
+  ///
+  /// The ordering is part of the contract: it defines the ordinals that pair
+  /// a `<source>` entry with its `<divecomputerdump>`.
+  Future<List<DiveSourceExport>> getSourcesForExport(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return const [];
+    try {
+      // Chunked because this binds one SQL variable per id and the full
+      // logbook export always passes every dive in the library, which is the
+      // case seriesIdChunks exists for.
+      //
+      // Chunking splits the dive ids, so every row of a given dive lands in
+      // exactly one chunk and its rows stay contiguous and correctly ordered.
+      // Only the order BETWEEN dives follows chunk order rather than dive id,
+      // which nothing depends on: the ordinals below are per dive, and
+      // consumers group by diveId.
+      //
+      // Deduplicated first. A single `IN` clause ignores a repeated id, but
+      // once the list is chunked the same id in two chunks fetches its rows
+      // twice, and the ordinals below would then count the duplicates,
+      // exporting a dive's sources more than once. LinkedHashSet keeps the
+      // caller's order.
+      final uniqueIds = diveIds.toSet().toList(growable: false);
+
+      final rows = <DiveDataSourcesData>[];
+      for (final chunk in seriesIdChunks(uniqueIds)) {
+        final query = _db.select(_db.diveDataSources)
+          ..where((t) => t.diveId.isIn(chunk))
+          ..orderBy([
+            (t) => OrderingTerm.asc(t.diveId),
+            (t) => OrderingTerm.desc(t.isPrimary),
+            (t) => OrderingTerm.asc(t.createdAt),
+            (t) => OrderingTerm.asc(t.id),
+          ]);
+        rows.addAll(await query.get());
+      }
+
+      final ordinalByDive = <String, int>{};
+      return rows
+          .map((row) {
+            final ordinal = ordinalByDive.update(
+              row.diveId,
+              (value) => value + 1,
+              ifAbsent: () => 0,
+            );
+            return DiveSourceExport(
+              id: row.id,
+              diveId: row.diveId,
+              ordinal: ordinal,
+              isPrimary: row.isPrimary,
+              importedAt: row.importedAt,
+              createdAt: row.createdAt,
+              rawData: row.rawData,
+              rawFingerprint: row.rawFingerprint,
+              computerId: row.computerId,
+              computerModel: row.computerModel,
+              computerSerial: row.computerSerial,
+              sourceFormat: row.sourceFormat,
+              sourceFileName: row.sourceFileName,
+              sourceFileFormat: row.sourceFileFormat,
+              sourceUuid: row.sourceUuid,
+              descriptorVendor: row.descriptorVendor,
+              descriptorProduct: row.descriptorProduct,
+              descriptorModel: row.descriptorModel,
+              libdivecomputerVersion: row.libdivecomputerVersion,
+              mergeSourceSlot: row.mergeSourceSlot,
+              timeOffsetSeconds: row.timeOffsetSeconds,
+              maxDepth: row.maxDepth,
+              avgDepth: row.avgDepth,
+              duration: row.duration,
+              waterTemp: row.waterTemp,
+              entryLatitude: row.entryLatitude,
+              entryLongitude: row.entryLongitude,
+              exitLatitude: row.exitLatitude,
+              exitLongitude: row.exitLongitude,
+              entryTime: row.entryTime,
+              exitTime: row.exitTime,
+              maxAscentRate: row.maxAscentRate,
+              maxDescentRate: row.maxDescentRate,
+              surfaceInterval: row.surfaceInterval,
+              cns: row.cns,
+              otu: row.otu,
+              decoAlgorithm: row.decoAlgorithm,
+              gradientFactorLow: row.gradientFactorLow,
+              gradientFactorHigh: row.gradientFactorHigh,
+              lastParsedAt: row.lastParsedAt,
+            );
+          })
+          .toList(growable: false);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to load data sources for export',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get every non-empty `source_uuid` and hex-encoded `raw_fingerprint`
   /// across ALL of a dive's `dive_data_sources` rows (not just the primary),
   /// as a `{ diveId -> { key, key, ... } }` map.
@@ -6423,6 +6541,44 @@ class DiveRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to save computer reading',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Insert several `dive_data_sources` rows as one unit.
+  ///
+  /// Deliberately NOT a loop over [saveComputerReading]. That one adopts a
+  /// dive's unattributed profile rows for the row it just inserted, and only
+  /// when that row is the dive's sole source; the guard exists because with a
+  /// second source present the rows could belong to either. Inserting one at a
+  /// time would let the first row adopt everything before the second row
+  /// exists, so a restored two-computer dive would attribute the whole profile
+  /// to whichever source happened to go in first.
+  ///
+  /// Inserting the whole batch first and evaluating the rule once afterwards
+  /// is what keeps that guard meaning what it says.
+  Future<void> saveComputerReadings(
+    List<DiveDataSourcesCompanion> readings,
+  ) async {
+    if (readings.isEmpty) return;
+    try {
+      await _db.transaction(() async {
+        for (final reading in readings) {
+          await _db.into(_db.diveDataSources).insert(reading);
+        }
+      });
+      // Every row now exists, so the sole-source test below sees the batch's
+      // real outcome rather than a half-written dive.
+      for (final reading in readings) {
+        await _adoptUnattributedProfiles(reading);
+      }
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to save computer readings',
         error: e,
         stackTrace: stackTrace,
       );

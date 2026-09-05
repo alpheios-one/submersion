@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:submersion/core/services/export/models/uddf_export_options.dart';
+import 'package:submersion/core/services/export/uddf/uddf_source_fetch.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
@@ -334,11 +336,14 @@ class _BuddyDetailContent extends ConsumerWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
 
-    final destination = await showExportDestinationSheet(
+    final choice = await showExportDestinationSheetWithOptions(
       context,
       title: l10n.buddies_action_shareDives,
+      showRawDataToggle: true,
     );
-    if (destination == null) return;
+    if (choice == null) return;
+    final destination = choice.destination;
+    final options = UddfExportOptions(includeRawData: choice.includeRawData);
 
     // Show preparing message
     scaffoldMessenger.showSnackBar(
@@ -391,11 +396,25 @@ class _BuddyDetailContent extends ConsumerWidget {
       // request. Either way no success snackbar follows: the share sheet and
       // the save panel each provide their own feedback.
       final exportService = ref.read(exportServiceProvider);
+      final dataSources = await ref.read(uddfSourceFetchProvider)(
+        dives.map((d) => d.id).toList(growable: false),
+        options,
+      );
       switch (destination) {
         case ExportDestination.share:
-          await exportService.exportDivesToUddf(dives, sites: sites);
+          await exportService.exportDivesToUddf(
+            dives,
+            sites: sites,
+            dataSources: dataSources,
+            options: options,
+          );
         case ExportDestination.saveToFile:
-          await exportService.saveDivesToUddfFile(dives, sites: sites);
+          await exportService.saveDivesToUddfFile(
+            dives,
+            sites: sites,
+            dataSources: dataSources,
+            options: options,
+          );
       }
     } catch (e) {
       scaffoldMessenger.hideCurrentSnackBar();
