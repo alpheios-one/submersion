@@ -52,7 +52,7 @@ jobs:
             --allowedTools "Bash(flutter pub get:*),Bash(flutter analyze:*),Bash(flutter test:*),Bash(dart format:*),Bash(dart run:*),Bash(dart:*),Bash(git fetch:*),Bash(git remote:*),Bash(git merge:*),Bash(git rebase:*),Bash(git checkout:*),Bash(git switch:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git push:*),Bash(git rm:*),Bash(gh pr:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh issue close:*),WebFetch(domain:github.com)"
 
   claude-phase1:
-    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'todo-ai'
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'auto-pruefen'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -60,32 +60,171 @@ jobs:
       issues: write
       id-token: write
       actions: read
+    env:
+      GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+      FORK_REPO: alpheios-one/submersion
+      UPSTREAM_REPO: submersion-app/submersion
+      ISSUE_NUM: ${{ github.event.issue.number }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ secrets.WORKFLOW_PAT }}
+
       - name: Add upstream remote
         run: |
-          git remote add upstream https://github.com/submersion-app/submersion.git || true
+          git remote add upstream https://github.com/${UPSTREAM_REPO}.git || true
           git fetch upstream main
+
+      # --- Ast 2: Idempotenz-Guard ---
+      - name: Prüfen ob bereits ein PR für dieses Issue existiert
+        id: idempotenz
+        run: |
+          EXISTING=$(gh pr list --repo "$FORK_REPO" --state open --json number,body \
+            --jq ".[] | select(.body != null and (.body | test(\"Bezug: #${ISSUE_NUM}([^0-9]|\$)\"))) | .number" \
+            | head -1)
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
+              --body "⚠️ Es existiert bereits PR #${EXISTING} mit Bezug zu diesem Issue. Kein neuer Lauf gestartet. Label entfernt."
+            gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
+            echo "weiter=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "weiter=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- Ast 4: Link-Extraktion mit Fehlerbehandlung ---
+      - name: Upstream-Link aus Fork-Issue-Body extrahieren
+        id: extraktion
+        if: steps.idempotenz.outputs.weiter == 'true'
+        run: |
+          BODY=$(gh issue view "$ISSUE_NUM" --repo "$FORK_REPO" --json body -q .body)
+          UPSTREAM_NUM=$(echo "$BODY" | grep -oP "github\.com/${UPSTREAM_REPO}/issues/\K[0-9]+" | head -1)
+          if [ -z "$UPSTREAM_NUM" ]; then
+            gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
+              --body "❌ Kein gültiger Link zu ${UPSTREAM_REPO} im Issue-Text gefunden. Erwartetes Format: volle URL https://github.com/${UPSTREAM_REPO}/issues/<nummer>. Abgebrochen, Label entfernt."
+            gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
+            echo "weiter=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "weiter=true" >> "$GITHUB_OUTPUT"
+            echo "upstream_num=$UPSTREAM_NUM" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- Ast 1: Cross-Repo-Read unauthentifiziert (umgeht Token-Scope-Risiko) ---
+      # --- Ast 5: Kommentare mitlesen, nicht nur Body ---
+      - name: Upstream-Issue öffentlich abrufen (kein Token nötig)
+        id: upstream
+        if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true'
+        run: |
+          NUM="${{ steps.extraktion.outputs.upstream_num }}"
+          JSON=$(curl -s "https://api.github.com/repos/${UPSTREAM_REPO}/issues/${NUM}")
+          if echo "$JSON" | jq -e '.message == "Not Found"' > /dev/null 2>&1; then
+            gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
+              --body "❌ Upstream-Issue #${NUM} nicht gefunden (404). Abgebrochen, Label entfernt."
+            gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
+            echo "weiter=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          TITLE=$(echo "$JSON" | jq -r '.title')
+          BODY=$(echo "$JSON" | jq -r '.body // ""')
+          TYP_ROH=$(echo "$JSON" | jq -r '(.type.name // .issue_type.name // "none")')
+          COMMENTS_URL=$(echo "$JSON" | jq -r '.comments_url')
+          COMMENTS=$(curl -s "$COMMENTS_URL" | jq -r '[.[].body] | join("\n---\n")' | head -c 3000)
+          {
+            echo "weiter=true"
+            echo "upstream_num=${NUM}"
+            echo "typ_roh=${TYP_ROH}"
+            echo "title<<GHA_EOF_TITLE"
+            echo "$TITLE"
+            echo "GHA_EOF_TITLE"
+            echo "body<<GHA_EOF_BODY"
+            echo "$BODY"
+            echo "GHA_EOF_BODY"
+            echo "comments<<GHA_EOF_COMMENTS"
+            echo "$COMMENTS"
+            echo "GHA_EOF_COMMENTS"
+          } >> "$GITHUB_OUTPUT"
+
+      # --- Ast 6: Nur der Paraphrasierungs-Schritt geht an Claude, schlank, ohne Tools ---
       - uses: anthropics/claude-code-action@v1
+        id: paraphrase
+        if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
-            Dies ist Issue #${{ github.event.issue.number }}: "${{ github.event.issue.title }}"
+            Upstream-Issue-Titel: ${{ steps.upstream.outputs.title }}
+            Upstream-Issue-Type (roh): ${{ steps.upstream.outputs.typ_roh }}
 
-            Bitte NUR folgendes tun, keine Analyse, kein Code:
-            1. Branch von upstream/main (submersion-app/submersion) erstellen.
-               Namensschema: <typ>/issue-<nummer>-<kurzbeschreibung>, wobei <typ> sich aus
-               dem referenzierten Upstream-Issue ergibt (fix / feature / optimierung).
-               <nummer> ist die Nummer des referenzierten Upstream-Issues falls vorhanden,
-               sonst die Nummer dieses Fork-Issues (${{ github.event.issue.number }}).
-            2. Leeren Commit erstellen: git commit --allow-empty -m "Platzhalter für Issue #${{ github.event.issue.number }}"
-            3. Branch pushen
-            4. Leeren Pull Request öffnen mit Titel und kurzer Referenz auf Issue #${{ github.event.issue.number }},
-               PR-Beschrieb: "Platzhalter-PR, Analyse und Umsetzung folgen in separaten Aufträgen."
+            Upstream-Issue-Beschreibung:
+            ${{ steps.upstream.outputs.body }}
 
-            Sonst nichts. Keine Architekturanalyse, keine Implementierung, keine Tests.
+            Kommentare (falls vorhanden):
+            ${{ steps.upstream.outputs.comments }}
+
+            Formuliere daraus in eigenen Worten (nicht wörtlich übernehmen):
+            - aufgabe: kurze Zusammenfassung, was umgesetzt werden soll
+            - kontext: Hintergrund und Problem aus dem Original-Issue, inklusive relevanter
+              Präzisierungen aus den Kommentaren
+            - typ: "fix" falls Issue-Type "Bug", "feature" falls Issue-Type "Feature",
+              sonst "optimierung"
+            - kurzbeschreibung: 3-5 Wörter, kleingeschrieben, mit Bindestrichen verbunden,
+              geeignet für einen Git-Branch-Namen (z.B. "grid-stitching-mehrere-tiles")
           claude_args: |
-            --allowedTools "Bash(git fetch:*),Bash(git remote:*),Bash(git checkout:*),Bash(git switch:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(gh issue view:*),Bash(gh issue comment:*)"
+            --allowedTools ""
+            --json-schema '{"type":"object","properties":{"aufgabe":{"type":"string"},"kontext":{"type":"string"},"typ":{"type":"string","enum":["fix","feature","optimierung"]},"kurzbeschreibung":{"type":"string"}},"required":["aufgabe","kontext","typ","kurzbeschreibung"]}'
+
+      # --- Branch, Commit, Push: reines Bash, kein Grund für einen weiteren Claude-Aufruf ---
+      - name: Branch erstellen, Platzhalter-Commit, pushen
+        id: branch
+        if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
+        run: |
+          RESULT='${{ steps.paraphrase.outputs.structured_output }}'
+          TYP=$(echo "$RESULT" | jq -r '.typ')
+          KURZ=$(echo "$RESULT" | jq -r '.kurzbeschreibung')
+          NUM="${{ steps.extraktion.outputs.upstream_num }}"
+          BRANCH="${TYP}/issue-${NUM}-${KURZ}"
+
+          git checkout -b "$BRANCH" upstream/main
+          git commit --allow-empty -m "Platzhalter für ${UPSTREAM_REPO}#${NUM}"
+          git push origin "$BRANCH"
+
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      # --- Ast 1 (Fix): explizites --repo, da gh pr create in einem Fork sonst gegen Upstream öffnet ---
+      # --- Verlinkung: "Bezug: #<nummer>" als reine Erwähnung, kein schliessendes Schlüsselwort ---
+      - name: Platzhalter-PR im eigenen Fork öffnen
+        id: pr
+        if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
+        run: |
+          RESULT='${{ steps.paraphrase.outputs.structured_output }}'
+          AUFGABE=$(echo "$RESULT" | jq -r '.aufgabe')
+          NUM="${{ steps.extraktion.outputs.upstream_num }}"
+          PR_URL=$(gh pr create --repo "$FORK_REPO" --base main --head "${{ steps.branch.outputs.branch }}" \
+            --title "$AUFGABE (Original: ${UPSTREAM_REPO}#${NUM})" \
+            --body "Bezug: #${ISSUE_NUM}
+
+          Platzhalter-PR, Analyse und Umsetzung folgen in separaten Aufträgen.")
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+
+      # --- Ast 7: Issue-Rewrite ERST NACH erfolgreicher PR-Erstellung, nicht davor ---
+      - name: Fork-Issue-Titel/Beschreibung aktualisieren
+        if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
+        run: |
+          RESULT='${{ steps.paraphrase.outputs.structured_output }}'
+          AUFGABE=$(echo "$RESULT" | jq -r '.aufgabe')
+          KONTEXT=$(echo "$RESULT" | jq -r '.kontext')
+          NUM="${{ steps.extraktion.outputs.upstream_num }}"
+          TITLE="${{ steps.upstream.outputs.title }}"
+
+          gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" \
+            --title "$AUFGABE (Original: ${UPSTREAM_REPO}#${NUM})" \
+            --body "Original-Issue: ${TITLE} [${UPSTREAM_REPO}#${NUM}]
+
+          Aufgabe:
+          ${AUFGABE}
+
+          Kontext:
+          ${KONTEXT}
+
+          PR: ${{ steps.pr.outputs.pr_url }}"
+
+          gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
