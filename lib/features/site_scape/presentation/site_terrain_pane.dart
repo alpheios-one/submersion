@@ -330,15 +330,11 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     Scene3d scene,
     BathymetryGrid grid,
   ) {
-    // TEMPORARY - DEBUG ONLY, remove before upstream PR: site.location is
-    // already resolved by this point (siteSeascapeProvider awaited it to
-    // reach SiteSeascapeReady), so re-watching it here is a cache hit, not
-    // an extra load.
+    // Debug-only: site.location is already resolved by this point
+    // (siteSeascapeProvider awaited it to reach SiteSeascapeReady), so re-watching it here is a cache hit.
     final site = ref.watch(siteProvider(widget.siteId)).valueOrNull;
     final center = site?.location;
-    // TEMPORARY - DEBUG ONLY, remove before upstream PR: gated on kDebugMode
-    // so tapping the chip in a release build does nothing (no debug fetch,
-    // no expansion) rather than merely hiding an already-expanded panel.
+    // Debug-only: gated on kDebugMode so tapping the chip in release builds does nothing.
     return Align(
       alignment: Alignment.topLeft,
       child: GestureDetector(
