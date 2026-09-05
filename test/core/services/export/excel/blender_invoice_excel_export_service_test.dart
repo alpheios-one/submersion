@@ -36,6 +36,24 @@ void main() {
         incomplete: incomplete,
       );
 
+  /// A fill entered as a lump sum: `BilledFill.isManual` is exactly
+  /// `lines.isEmpty`, so this shape reaches the export whenever a diver bills
+  /// a fill without itemising its gases.
+  BlenderInvoiceExportData manualFillData() => const BlenderInvoiceExportData(
+    date: 'Invoice dated Mar 5, 2026',
+    billedTo: '',
+    tariff: '',
+    fills: [
+      BlenderInvoiceExportFill(
+        label: 'Bench fill',
+        total: 'CHF 20.00',
+        lines: [],
+      ),
+    ],
+    total: 'CHF 20.00',
+    incomplete: false,
+  );
+
   String? cellText(xl.Sheet sheet, int rowIndex, int col) {
     final value = sheet.rows[rowIndex][col]?.value;
     return value is xl.TextCellValue ? value.value.toString() : null;
@@ -76,6 +94,20 @@ void main() {
     expect(cellText(sheet, 6, 0), '');
     expect(cellText(sheet, 6, 1), 'He');
     expect(cellText(sheet, 6, 4), '');
+  });
+
+  test('a fill with no lines keeps its label under the Fill column', () {
+    final bytes = service.generateBytes(manualFillData());
+    final decoded = xl.Excel.decodeBytes(bytes);
+    final sheet = decoded[BlenderInvoiceExcelExportService.invoiceSheet];
+
+    // Row 4 is the column header ('Fill', 'Gas', 'Volume', 'Cost', 'Total').
+    expect(cellText(sheet, 4, 0), 'Fill');
+    expect(cellText(sheet, 5, 0), 'Bench fill');
+    expect(cellText(sheet, 5, 1), '');
+    expect(cellText(sheet, 5, 2), '');
+    expect(cellText(sheet, 5, 3), '');
+    expect(cellText(sheet, 5, 4), 'CHF 20.00');
   });
 
   test('an incomplete total is flagged on its own row', () {

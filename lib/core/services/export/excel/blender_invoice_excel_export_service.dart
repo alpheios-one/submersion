@@ -37,8 +37,10 @@ class BlenderInvoiceExcelExportService {
     _writeRow(sheet, row, const ['Fill', 'Gas', 'Volume', 'Cost', 'Total']);
     row++;
     for (final fill in data.fills) {
+      // A lump-sum fill (BilledFill.isManual) has no gas lines, so its label
+      // still belongs in the Fill column with the rest blank.
       if (fill.lines.isEmpty) {
-        _writeRow(sheet, row, ['', fill.label, '', '', fill.total]);
+        _writeRow(sheet, row, [fill.label, '', '', '', fill.total]);
         row++;
         continue;
       }
