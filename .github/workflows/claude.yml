@@ -85,7 +85,7 @@ jobs:
             | head -1)
           if [ -n "$EXISTING" ]; then
             gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
-              --body "⚠️ Es existiert bereits PR #${EXISTING} mit Bezug zu diesem Issue. Kein neuer Lauf gestartet. Label entfernt."
+              --body "Hinweis: Es existiert bereits PR #${EXISTING} mit Bezug zu diesem Issue. Kein neuer Lauf gestartet. Label entfernt."
             gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
             echo "weiter=false" >> "$GITHUB_OUTPUT"
           else
@@ -101,7 +101,7 @@ jobs:
           UPSTREAM_NUM=$(echo "$BODY" | grep -oP "github\.com/${UPSTREAM_REPO}/issues/\K[0-9]+" | head -1)
           if [ -z "$UPSTREAM_NUM" ]; then
             gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
-              --body "❌ Kein gültiger Link zu ${UPSTREAM_REPO} im Issue-Text gefunden. Erwartetes Format: volle URL https://github.com/${UPSTREAM_REPO}/issues/<nummer>. Abgebrochen, Label entfernt."
+              --body "Fehler: Kein gültiger Link zu ${UPSTREAM_REPO} im Issue-Text gefunden. Erwartetes Format: volle URL https://github.com/${UPSTREAM_REPO}/issues/<nummer>. Abgebrochen, Label entfernt."
             gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
             echo "weiter=false" >> "$GITHUB_OUTPUT"
           else
@@ -119,7 +119,7 @@ jobs:
           JSON=$(curl -s "https://api.github.com/repos/${UPSTREAM_REPO}/issues/${NUM}")
           if echo "$JSON" | jq -e '.message == "Not Found"' > /dev/null 2>&1; then
             gh issue comment "$ISSUE_NUM" --repo "$FORK_REPO" \
-              --body "❌ Upstream-Issue #${NUM} nicht gefunden (404). Abgebrochen, Label entfernt."
+              --body "Fehler: Upstream-Issue #${NUM} nicht gefunden (404). Abgebrochen, Label entfernt."
             gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
             echo "weiter=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -198,11 +198,42 @@ jobs:
           RESULT='${{ steps.paraphrase.outputs.structured_output }}'
           AUFGABE=$(echo "$RESULT" | jq -r '.aufgabe')
           NUM="${{ steps.extraktion.outputs.upstream_num }}"
+
+          cat > /tmp/pr_body.md << PRBODY_EOF
+          Bezug: #${ISSUE_NUM}
+
+          Platzhalter-PR, Analyse folgt automatisch. Umsetzung erst nach manueller Freigabe.
+
+          ---
+
+          ## Phase 2 – sobald bereit, diesen Abschnitt als neuen Kommentar posten:
+
+          @claude bitte basierend auf Aufgabe und Kontext im verknüpften Issue #${ISSUE_NUM} umsetzen.
+          Entferne diesen Platzhalter-Abschnitt (ab "## Phase 2") aus der PR-Beschreibung, sobald
+          du mit der Umsetzung beginnst, und ersetze ihn durch eine kurze Zusammenfassung deiner
+          Änderungen.
+
+          Vorgehen:
+          - Bestehende Architektur/Datenstruktur analysieren, die für die Umsetzung relevant ist (betroffene Dateien, aktuelle Modellierung in DB/Repository)
+          - Prüfen, ob der Branch Merge-Konflikte gegenüber upstream/main (${UPSTREAM_REPO}) hat - NICHT gegenüber dem Fork-main (origin/main), da dieser keine verlässliche Referenz ist. Falls ja: zuerst gegen upstream/main mergen und Konflikte lösen
+          - Bestehende Code-Konventionen und Naming einhalten
+          - Datenbankmigration sauber mit Versionserhöhung anlegen, falls nötig
+          - UI-Anpassungen gemäss Aufgabenstellung umsetzen
+          - Bestehende Logik wiederverwenden, wo sinnvoll, statt neu zu implementieren
+          - Generierte Dateien (database.g.dart, .mocks.dart) via dart run build_runner build --delete-conflicting-outputs neu generieren. Nur falls das aus Berechtigungsgründen nicht möglich ist und die Datei von Hand angepasst werden musste, dies explizit als Reviewer-Warnung im PR-Beschrieb vermerken
+          - Unit-Tests ergänzen/aktualisieren, sofern im Projekt vorhanden
+          - Reihenfolge bei Testläufen: Nach flutter analyze zuerst alle bisherigen Änderungen (Konfliktlösung, Formatierung, Feature-Code) committen und pushen, bevor die volle Testsuite (flutter test, alle Shards) gestartet wird
+          - Nach Abschluss der Änderungen zwingend selbst prüfen: flutter pub get, flutter analyze (muss fehlerfrei durchlaufen) und flutter test --reporter expanded (alle Shards). Bei einem Fehlschlag den betroffenen Test konkret benennen und beheben, bevor abgeschlossen wird. Falls ein Befehl aus Tool-Berechtigungsgründen nicht ausgeführt werden kann, dies explizit im Abschlusskommentar melden
+          - Falls dieser PR später zum Upstream (${UPSTREAM_REPO}) hochgestreamt wird:
+            a) .github/workflows/claude.yml ist reine Fork-Automatisierung und wird vor dem finalen Push per git rm entfernt, dies im PR-Beschrieb erwähnen
+            b) CLAUDE.md NICHT pauschal entfernen - vor dem finalen Push prüfen: git diff upstream/main -- CLAUDE.md. Kein Diff -> Datei unverändert belassen. Diff vorhanden -> im PR-Beschrieb begründen
+            c) Vor dem Öffnen des Upstream-PRs prüfen: gh pr view <N> --json files -q '.files[] | select(.deletions > 0)'
+          - Erst wenn Analyse und Tests fehlerfrei durchlaufen (oder das Berechtigungsproblem klar gemeldet wurde), Abschlusskommentar posten: "Fertig - Analyse und Tests laufen fehlerfrei durch, bereit zur Prüfung."
+          PRBODY_EOF
+
           PR_URL=$(gh pr create --repo "$FORK_REPO" --base main --head "${{ steps.branch.outputs.branch }}" \
             --title "$AUFGABE (Original: ${UPSTREAM_REPO}#${NUM})" \
-            --body "Bezug: #${ISSUE_NUM}
-
-          Platzhalter-PR, Analyse und Umsetzung folgen in separaten Aufträgen.")
+            --body-file /tmp/pr_body.md)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
       # --- Ast 7: Issue-Rewrite ERST NACH erfolgreicher PR-Erstellung, nicht davor ---
