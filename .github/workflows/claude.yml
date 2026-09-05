@@ -161,7 +161,15 @@ jobs:
             ${{ steps.upstream.outputs.comments }}
 
             Formuliere daraus in eigenen Worten (nicht wörtlich übernehmen):
-            - aufgabe: kurze Zusammenfassung, was umgesetzt werden soll
+            - titel: SEHR kurzer, prägnanter Titel, max. 60 Zeichen, KEIN vollständiger Satz,
+              KEIN Nebensatz mit "damit"/"sodass"/"welches". Stil wie eine Zeitungsschlagzeile.
+              Gutes Beispiel: "Brevet-Karten: Hochformat zu Querformat".
+              Schlechtes Beispiel: "Darstellung der Tauchzertifikate von Hochkant- auf
+              Querformat umstellen, damit die Kartenansicht dem realen Kreditkartenformat
+              entspricht und die Liste vertikal statt horizontal gescrollt werden kann."
+            - aufgabe: kurze Zusammenfassung in 1-2 vollständigen Sätzen, was umgesetzt werden
+              soll (das darf länger sein als "titel" - dies kommt in die Issue-Beschreibung,
+              nicht in den Titel)
             - kontext: Hintergrund und Problem aus dem Original-Issue, inklusive relevanter
               Präzisierungen aus den Kommentaren
             - typ: "fix" falls Issue-Type "Bug", "feature" falls Issue-Type "Feature",
@@ -170,7 +178,7 @@ jobs:
               geeignet für einen Git-Branch-Namen (z.B. "grid-stitching-mehrere-tiles")
           claude_args: |
             --allowedTools ""
-            --json-schema '{"type":"object","properties":{"aufgabe":{"type":"string"},"kontext":{"type":"string"},"typ":{"type":"string","enum":["fix","feature","optimierung"]},"kurzbeschreibung":{"type":"string"}},"required":["aufgabe","kontext","typ","kurzbeschreibung"]}'
+            --json-schema '{"type":"object","properties":{"titel":{"type":"string","maxLength":60},"aufgabe":{"type":"string"},"kontext":{"type":"string"},"typ":{"type":"string","enum":["fix","feature","optimierung"]},"kurzbeschreibung":{"type":"string"}},"required":["titel","aufgabe","kontext","typ","kurzbeschreibung"]}'
 
       # --- Branch, Commit, Push: reines Bash, kein Grund für einen weiteren Claude-Aufruf ---
       - name: Branch erstellen, Platzhalter-Commit, pushen
@@ -196,19 +204,28 @@ jobs:
         if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
         run: |
           RESULT='${{ steps.paraphrase.outputs.structured_output }}'
+          TITEL_KURZ=$(echo "$RESULT" | jq -r '.titel')
           AUFGABE=$(echo "$RESULT" | jq -r '.aufgabe')
+          KONTEXT=$(echo "$RESULT" | jq -r '.kontext')
           NUM="${{ steps.extraktion.outputs.upstream_num }}"
+          TITLE="${{ steps.upstream.outputs.title }}"
 
           cat > /tmp/pr_body.md << PRBODY_EOF
-          Bezug: #${ISSUE_NUM}
+          **Bezug:** #${ISSUE_NUM}
 
-          Platzhalter-PR, Analyse folgt automatisch. Umsetzung erst nach manueller Freigabe.
+          **Original-Issue:** ${TITLE} [${UPSTREAM_REPO}#${NUM}]
+
+          **Aufgabe:**
+          ${AUFGABE}
+
+          **Kontext:**
+          ${KONTEXT}
 
           ---
 
           ## Phase 2 – sobald bereit, diesen Abschnitt als neuen Kommentar posten:
 
-          @claude bitte basierend auf Aufgabe und Kontext im verknüpften Issue #${ISSUE_NUM} umsetzen.
+          @claude bitte basierend auf Aufgabe und Kontext oben umsetzen.
           Entferne diesen Platzhalter-Abschnitt (ab "## Phase 2") aus der PR-Beschreibung, sobald
           du mit der Umsetzung beginnst, und ersetze ihn durch eine kurze Zusammenfassung deiner
           Änderungen.
@@ -232,7 +249,7 @@ jobs:
           PRBODY_EOF
 
           PR_URL=$(gh pr create --repo "$FORK_REPO" --base main --head "${{ steps.branch.outputs.branch }}" \
-            --title "$AUFGABE (Original: ${UPSTREAM_REPO}#${NUM})" \
+            --title "$TITEL_KURZ (Original: ${UPSTREAM_REPO}#${NUM})" \
             --body-file /tmp/pr_body.md)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
@@ -241,21 +258,22 @@ jobs:
         if: steps.idempotenz.outputs.weiter == 'true' && steps.extraktion.outputs.weiter == 'true' && steps.upstream.outputs.weiter == 'true'
         run: |
           RESULT='${{ steps.paraphrase.outputs.structured_output }}'
+          TITEL_KURZ=$(echo "$RESULT" | jq -r '.titel')
           AUFGABE=$(echo "$RESULT" | jq -r '.aufgabe')
           KONTEXT=$(echo "$RESULT" | jq -r '.kontext')
           NUM="${{ steps.extraktion.outputs.upstream_num }}"
           TITLE="${{ steps.upstream.outputs.title }}"
 
           gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" \
-            --title "$AUFGABE (Original: ${UPSTREAM_REPO}#${NUM})" \
-            --body "Original-Issue: ${TITLE} [${UPSTREAM_REPO}#${NUM}]
+            --title "$TITEL_KURZ (Original: ${UPSTREAM_REPO}#${NUM})" \
+            --body "**Original-Issue:** ${TITLE} [${UPSTREAM_REPO}#${NUM}]
 
-          Aufgabe:
+          **Aufgabe:**
           ${AUFGABE}
 
-          Kontext:
+          **Kontext:**
           ${KONTEXT}
 
-          PR: ${{ steps.pr.outputs.pr_url }}"
+          **Fork-PR:** ${{ steps.pr.outputs.pr_url }}"
 
           gh issue edit "$ISSUE_NUM" --repo "$FORK_REPO" --remove-label "auto-pruefen"
