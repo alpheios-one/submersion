@@ -138,6 +138,27 @@ void main() {
       expect(decoded.fillOrder, kDefaultBlenderFillOrder);
     });
 
+    test(
+      'a fill order that is not even a list falls back, keeping the rest',
+      () {
+        // PR #1359 review: this was the one field read through an unguarded
+        // cast, so a non-list value threw out of fromJson. The repository
+        // catches that and returns null, the loader treats null as "nothing
+        // stored", and the next settled edit writes the defaults back over the
+        // diver's mixes, prices, bill and archive. Every other field falls back
+        // on its own; so does this one now.
+        final decoded = BlenderPreferences.fromJson({
+          'fillOrder': 'o2,he,topup',
+          'gasPrices': [2.55, 7.99, 0.01],
+          'billedTo': 'Ada',
+        });
+
+        expect(decoded.fillOrder, kDefaultBlenderFillOrder);
+        expect(decoded.gasPrices, [2.55, 7.99, 0.01]);
+        expect(decoded.billedTo, 'Ada');
+      },
+    );
+
     test('a malformed mix falls back per field', () {
       final decoded = BlenderPreferences.fromJson({
         'startPressureBar': 'deep',

@@ -321,6 +321,19 @@ class BlenderPreferences {
         ? DateTime.tryParse(billedDateRaw)
         : null;
 
+    // Read through an `is` check like every other field rather than an
+    // `as List?` cast: a cast throws out of this constructor, the repository
+    // catches that and reports "nothing stored", and the first settled edit
+    // then writes defaults over the whole blob. One malformed key must not
+    // cost the diver their mixes, prices, bill and archive (PR #1359 review).
+    final rawFillOrder = json['fillOrder'];
+    final fillOrder = normalizeBlenderFillOrder(
+      [
+        for (final name in rawFillOrder is List ? rawFillOrder : const [])
+          if (name is String) BlenderGasRole.fromName(name),
+      ].whereType<BlenderGasRole>().toList(),
+    );
+
     final rawArchived = json['archivedInvoices'];
     final archivedInvoices = rawArchived is List
         ? rawArchived
@@ -357,12 +370,7 @@ class BlenderPreferences {
       // Same reasoning: the fill order was always O2, then He, then topup
       // before this field existed, since bank position was the only order
       // there was.
-      fillOrder: normalizeBlenderFillOrder(
-        [
-          for (final name in (json['fillOrder'] as List?) ?? const [])
-            if (name is String) BlenderGasRole.fromName(name),
-        ].whereType<BlenderGasRole>().toList(),
-      ),
+      fillOrder: fillOrder,
       flushFeeEnabled: json['flushFeeEnabled'] == true,
       flushFeeMode: FlushFeeMode.fromName(
         json['flushFeeMode'] is String ? json['flushFeeMode'] as String : null,
