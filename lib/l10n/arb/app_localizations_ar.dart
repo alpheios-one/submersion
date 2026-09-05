@@ -7648,6 +7648,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get divePlanner_field_bailoutGas => 'غاز الطوارئ';
+
+  @override
+  String get divePlanner_field_bailoutGasHint =>
+      'غاز الدائرة المفتوحة المحمول في حال تعطل الدائرة';
+
+  @override
   String get divePlanner_field_hePercent => 'He %';
 
   @override
@@ -7658,9 +7665,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_field_planName => 'اسم الخطة';
-
-  @override
-  String get divePlanner_field_role => 'الدور';
 
   @override
   String divePlanner_field_startPressure(Object pressureSymbol) {
@@ -7746,6 +7750,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_label_tanks => 'الأسطوانات';
+
+  @override
+  String get divePlanner_savedTanks_title => 'الأسطوانات المحفوظة';
+
+  @override
+  String get divePlanner_savedTanks_save => 'حفظ أسطوانة';
+
+  @override
+  String get divePlanner_savedTanks_saveTitle => 'حفظ الأسطوانة باسم';
+
+  @override
+  String get divePlanner_savedTanks_nameField => 'اسم الأسطوانة';
+
+  @override
+  String get divePlanner_savedTanks_saved => 'تم حفظ الأسطوانة';
+
+  @override
+  String get divePlanner_savedTanks_manage => 'إدارة';
+
+  @override
+  String get divePlanner_savedTanks_empty =>
+      'لا توجد أسطوانات محفوظة بعد. احفظ أسطوانة من هذه الخطة لإعادة استخدامها في خطط أخرى.';
 
   @override
   String get divePlanner_label_time => 'الوقت';
@@ -14397,6 +14423,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_rates_ascent => 'معدل الصعود';
 
   @override
+  String get plannerCanvas_rates_intermediateAscent =>
+      'معدل الصعود بين التوقفات المتوسطة';
+
+  @override
+  String get plannerCanvas_rates_lastStop => 'آخر توقف';
+
+  @override
+  String get plannerCanvas_rates_shallowAscent =>
+      'معدل الصعود بين التوقفات الضحلة';
+
+  @override
+  String plannerCanvas_rates_finalAscent(String depth) {
+    return 'معدل الصعود النهائي (آخر $depth)';
+  }
+
+  @override
   String get plannerCanvas_rates_descent => 'معدل النزول';
 
   @override
@@ -14476,7 +14518,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_table_runtime => 'RT';
 
   @override
-  String get plannerCanvas_table_stop => 'توقف';
+  String get plannerCanvas_table_duration => 'المدة';
 
   @override
   String get plannerCanvas_turnRule_allUsable => 'كل القابل للاستخدام';
@@ -22024,13 +22066,44 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_segmentEditor_addTitle => 'إضافة مقطع';
 
   @override
-  String divePlanner_segmentEditor_ascentRate(Object unit) {
-    return 'معدل الصعود ($unit/min)';
+  String divePlanner_segmentEditor_depth(Object unit) {
+    return 'العمق ($unit)';
   }
 
   @override
-  String divePlanner_segmentEditor_descentRate(Object unit) {
-    return 'معدل النزول ($unit/min)';
+  String divePlanner_segmentEditor_derivedAscent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'صعود $from ← $to بمعدل $rate/دقيقة';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedAscentNoRate(Object from, Object to) {
+    return 'صعود $from ← $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescent(
+    Object from,
+    Object to,
+    Object rate,
+  ) {
+    return 'نزول $from ← $to بمعدل $rate/دقيقة';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedDescentNoRate(
+    Object from,
+    Object to,
+  ) {
+    return 'نزول $from ← $to';
+  }
+
+  @override
+  String divePlanner_segmentEditor_derivedLevel(Object depth) {
+    return 'ثبات على $depth';
   }
 
   @override
@@ -22038,22 +22111,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get divePlanner_segmentEditor_editTitle => 'تعديل المقطع';
-
-  @override
-  String divePlanner_segmentEditor_endDepth(Object unit) {
-    return 'عمق النهاية ($unit)';
-  }
-
-  @override
-  String get divePlanner_segmentEditor_gasSwitchTime => 'وقت تبديل الغاز';
-
-  @override
-  String get divePlanner_segmentEditor_segmentType => 'نوع المقطع';
-
-  @override
-  String divePlanner_segmentEditor_startDepth(Object unit) {
-    return 'عمق البداية ($unit)';
-  }
 
   @override
   String get divePlanner_segmentEditor_tankGas => 'الأسطوانة / الغاز';
@@ -22103,30 +22160,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_segmentList_quickPlan => 'خطة سريعة';
 
   @override
-  String divePlanner_segmentList_safetyStop(Object depth, Object minutes) {
-    return 'وقفة أمان $depth لمدة $minutes min';
-  }
-
-  @override
   String get divePlanner_segmentList_title => 'مقاطع الغطسة';
-
-  @override
-  String get divePlanner_segmentType_ascent => 'صعود';
-
-  @override
-  String get divePlanner_segmentType_bottomTime => 'وقت القاع';
-
-  @override
-  String get divePlanner_segmentType_decoStop => 'وقفة تخفيف ضغط';
-
-  @override
-  String get divePlanner_segmentType_descent => 'نزول';
-
-  @override
-  String get divePlanner_segmentType_gasSwitch => 'تبديل الغاز';
-
-  @override
-  String get divePlanner_segmentType_safetyStop => 'وقفة أمان';
 
   @override
   String get divePlanner_undo => 'تراجع';
