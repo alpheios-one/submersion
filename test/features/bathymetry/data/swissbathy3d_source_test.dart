@@ -1714,6 +1714,93 @@ nodata_value -9999
       },
     );
 
+    test(
+      'a version change on a shared lake-wide asset re-downloads it once for '
+      'the whole sweep, not once per affected tile',
+      () async {
+        // Two adjacent 1-km tiles sharing one STAC asset href, cached via
+        // two separate fetch() calls -- the same wideGrid shape as the Bug
+        // 13 test above, but here to set up a sweep where BOTH cached tiles
+        // point at the one href that changes version. Without a downloader
+        // shared across the whole sweep (only within one fetch() call, via
+        // fetch()'s own sharedRawGrids), refreshAllCachedTiles would
+        // re-download this one changed zip once per tile it happens to
+        // cover instead of once for the sweep -- exactly the redundant
+        // download the OGD fair-use requirement forbids.
+        const cellsPerTile = 10;
+        String row(double value) => List.filled(cellsPerTile, value).join(' ');
+        String wideGridWith(double westValue, double eastValue) {
+          final buffer = StringBuffer()
+            ..writeln('ncols ${cellsPerTile * 2}')
+            ..writeln('nrows $cellsPerTile')
+            ..writeln('xllcorner 2685000')
+            ..writeln('yllcorner 1240000')
+            ..writeln('cellsize 100')
+            ..writeln('nodata_value -9999');
+          final dataRow = '${row(westValue)} ${row(eastValue)}';
+          for (var r = 0; r < cellsPerTile; r++) {
+            buffer.writeln(dataRow);
+          }
+          return buffer.toString();
+        }
+
+        var downloadCalls = 0;
+        var sweeping = false;
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': [8.0, 46.0, 10.0, 48.0],
+                    'properties': {
+                      'datetime': sweeping
+                          ? '2024-06-01T00:00:00Z'
+                          : '2023-01-01T00:00:00Z',
+                    },
+                    'assets': {
+                      'grid': {'href': 'https://example.org/lake_wide.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          downloadCalls++;
+          final body = sweeping
+              ? wideGridWith(150.0, 250.0)
+              : wideGridWith(100.0, 200.0);
+          return http.Response.bytes(_zipOf('lake.asc', body), 200);
+        });
+
+        final west = Lv95Transform.toWgs84(2685500, 1240500); // tile 2685
+        final east = Lv95Transform.toWgs84(2686500, 1240500); // tile 2686
+
+        await source.fetch(
+          GeoPoint(west.latitude, west.longitude),
+          spanMeters: 100,
+        );
+        await source.fetch(
+          GeoPoint(east.latitude, east.longitude),
+          spanMeters: 100,
+        );
+        // Separate fetch() calls each download their own copy (tile-level
+        // caching, not asset-level -- matches the Bug 12/13 tests above).
+        expect(downloadCalls, 2);
+
+        sweeping = true;
+        final summary = await source.refreshAllCachedTiles();
+
+        expect(summary.total, 2);
+        expect(summary.updated, 2);
+        // The shared href's new version is downloaded exactly once for the
+        // whole sweep -- not once per one of the two tiles it covers, which
+        // would make this 4 instead of 3.
+        expect(downloadCalls, 3);
+      },
+    );
+
     test('a cached "no tile here" negative is not part of the sweep, since '
         'there is no grid to revalidate', () async {
       var itemCalls = 0;

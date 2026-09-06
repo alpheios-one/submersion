@@ -353,6 +353,7 @@ class SwissBathy3dSource implements BathymetrySource {
       tileN,
       lake,
       cached,
+      _downloadAndParseRaw,
     )).grid;
   }
 
@@ -361,6 +362,16 @@ class SwissBathy3dSource implements BathymetrySource {
   /// happened rather than just the resulting grid — used by
   /// [refreshAllCachedTiles], the manual "reload map data" action, to build
   /// a summary of how many tiles were actually updated.
+  ///
+  /// [download] resolves a STAC asset href to its parsed raw grids, exactly
+  /// like [_downloadAndParseRaw] — but is a parameter, not a direct call to
+  /// that method, so [refreshAllCachedTiles] can pass in one memoized per
+  /// href across its whole sweep. Distinct cached tiles commonly share one
+  /// href (one asset per lake, see this file's own doc), so a version change
+  /// discovered while revalidating one of them would otherwise redundantly
+  /// re-download and re-parse the exact same zip once per affected tile
+  /// instead of once per sweep — the same fair-use concern [fetch]'s
+  /// `sharedRawGrids` already addresses for the initial-fetch path.
   Future<({BathymetryGrid? grid, _TileCheckOutcome outcome})>
   _checkAndMaybeUpdate(
     String tileKey,
@@ -368,6 +379,7 @@ class SwissBathy3dSource implements BathymetrySource {
     int tileN,
     SwissLakeLevel lake,
     SwissBathyTileCacheEntry cached,
+    Future<List<RawEsriGrid>> Function(String href) download,
   ) async {
     final List<SwissBathyAsset> candidates;
     try {
@@ -418,7 +430,7 @@ class SwissBathy3dSource implements BathymetrySource {
         tileE,
         tileN,
         candidates,
-        _downloadAndParseRaw,
+        download,
       );
       if (resolved == null) {
         // None of the candidates' actual content covers this tile --
@@ -472,8 +484,20 @@ class SwissBathy3dSource implements BathymetrySource {
   /// independent sequential or unbounded sweep, so a large cache (many
   /// visited lakes) revalidates quickly without exceeding the same
   /// fair-use-driven concurrency ceiling.
+  ///
+  /// Distinct cached tiles routinely share one STAC asset href (one asset
+  /// per lake, not per tile — see this file's own doc), so [sharedRawGrids]
+  /// memoizes the downloaded-and-parsed raw grids by href across the whole
+  /// sweep, exactly like [fetch]'s own `sharedRawGrids` does for the
+  /// initial-fetch path: a version change discovered on one tile of a lake
+  /// re-downloads that lake's zip at most once for the entire sweep, not
+  /// once per affected tile.
   Future<SwissBathyRefreshSummary> refreshAllCachedTiles() async {
     final tileKeys = await _tileCache.okTileKeys();
+
+    final sharedRawGrids = <String, Future<List<RawEsriGrid>>>{};
+    Future<List<RawEsriGrid>> download(String href) =>
+        sharedRawGrids.putIfAbsent(href, () => _downloadAndParseRaw(href));
 
     final outcomes = await _runBounded(tileKeys, maxConcurrentTileRequests, (
       tileKey,
@@ -501,6 +525,7 @@ class SwissBathy3dSource implements BathymetrySource {
         tileN,
         lake,
         cached,
+        download,
       );
       return result.outcome;
     });
