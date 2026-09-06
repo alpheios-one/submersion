@@ -53,7 +53,14 @@ class SwissBathyTileCacheRepository {
     )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
     if (row == null || row.status != 'ok') return null;
     final json = row.gridJson;
-    if (json == null) return null;
+    if (json == null) {
+      // Inconsistent row ('ok' but no grid): delete so callers retry instead
+      // of treating it as a cached negative.
+      await (_db.delete(
+        _db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).go();
+      return null;
+    }
     try {
       final grid = BathymetryGrid.fromJson(
         jsonDecode(json) as Map<String, dynamic>,

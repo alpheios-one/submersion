@@ -20,10 +20,16 @@ class SwissLakeDepthService {
     if (!_source.covers(point)) return null;
     final BathymetryGrid grid;
     try {
-      grid = await _source.fetch(
-        point,
-        spanMeters: SwissBathy3dSource.tileSizeMeters,
-      );
+      // spanMeters: 0 resolves to exactly the one tile containing `point` —
+      // tileEMin/tileEMax (and tileNMin/tileNMax) come out identical since
+      // both are floor((coord +/- 0) / tileSizeMeters). A span equal to a
+      // full tileSizeMeters instead always spans exactly two tiles per axis
+      // (four total), because adding a whole tile width to a floor() shifts
+      // it by exactly one tile regardless of where `point` sits — a single
+      // coordinate lookup was downloading up to four tiles for what
+      // bilinearInterpolateDepth's edge clamping (see that function) only
+      // ever needed one of.
+      grid = await _source.fetch(point, spanMeters: 0);
     } on BathymetryFetchException {
       return null;
     }

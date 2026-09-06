@@ -69,7 +69,7 @@ class SwissBathyTileDebugInfo {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 class SwissBathyDebugInfo {
   final String siteId;
   final String siteName;

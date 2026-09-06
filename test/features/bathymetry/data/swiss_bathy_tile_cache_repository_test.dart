@@ -70,6 +70,30 @@ void main() {
       },
     );
 
+    test("a row with status 'ok' but a null gridJson (an inconsistent row) is "
+        'deleted, same as a corrupt row, instead of just returning null and '
+        'leaving it in place', () async {
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: '2726_1221',
+              status: 'ok',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+      final entry = await repo.read('2726_1221');
+      expect(entry, isNull);
+
+      final remaining = await (db.select(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals('2726_1221'))).get();
+      expect(remaining, isEmpty);
+
+      expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+    });
+
     test('a row with valid JSON that does not decode to a BathymetryGrid is '
         'also treated as corrupt and deleted', () async {
       await db

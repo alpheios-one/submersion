@@ -103,4 +103,40 @@ void main() {
     final service = buildService((_) async => http.Response('oops', 500));
     expect(await service.depthForCoordinate(zurichseePoint), isNull);
   });
+
+  test('fetches exactly one tile per coordinate lookup, not the four a '
+      'span equal to a full tile width used to always require (regression: '
+      'spanMeters used to be passed as SwissBathy3dSource.tileSizeMeters, '
+      'which always spans exactly two tiles per axis -- four total -- for '
+      'every single-coordinate query, since a floor() shifted by a whole '
+      'tile width lands exactly one tile over regardless of where the '
+      'point sits within its own tile)', () async {
+    var itemsCalls = 0;
+    final service = buildService((req) async {
+      if (req.url.path.endsWith('/items')) {
+        itemsCalls++;
+        return http.Response(
+          jsonEncode({
+            'features': [
+              {
+                'bbox': req.url.queryParameters['bbox']!
+                    .split(',')
+                    .map(double.parse)
+                    .toList(),
+                'assets': {
+                  'grid': {'href': 'https://example.org/tile_grid.zip'},
+                },
+              },
+            ],
+          }),
+          200,
+        );
+      }
+      return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+    });
+
+    final depth = await service.depthForCoordinate(insideFixtureGridPoint);
+    expect(depth, isNotNull);
+    expect(itemsCalls, 1);
+  });
 }

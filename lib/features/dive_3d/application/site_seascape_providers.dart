@@ -191,13 +191,14 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   final built = grid.rows * grid.cols > _isolateCellThreshold
       ? await compute(_buildScene, input)
       : const SiteSeascapeGeometryService().buildWithLabels(input);
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR: records that
-  // buildWithLabels() actually ran for this site just now (investigating
-  // Bug 11), whether it took the compute()-isolate branch above or the
+  // DEBUG ONLY: records that buildWithLabels() actually ran for this site
+  // just now, whether it took the compute()-isolate branch above or the
   // synchronous one — both funnel through here, back on the main isolate.
-  // Gated on kDebugMode: the backing map is unbounded, throwaway debug
-  // state (one entry per ever-visited site id, never evicted) that has no
-  // reason to grow in a release build no debug panel ever reads from.
+  // Read by SwissBathyDebugInfo's debug panel to show when a site's scene
+  // was last (re)built. Gated on kDebugMode: the backing map is unbounded,
+  // throwaway debug state (one entry per ever-visited site id, never
+  // evicted) that has no reason to grow in a release build no debug panel
+  // ever reads from.
   if (kDebugMode) recordSwissBathySceneBuilt(siteId);
   // Mirrors SiteSeascapeGeometryService's depth budget so the axes and the
   // terrain agree on the scene frame: scaled from the measured grid alone,
