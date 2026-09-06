@@ -1761,6 +1761,71 @@ nodata_value -9999
       expect(resolution.definitive, isTrue);
     });
   });
+
+  group('SwissBathy3dSource._fetchTile with a corrupted cache row', () {
+    // Regression test for the SwissBathyTileCacheRepository.read() fix: a
+    // row whose gridJson fails to parse used to be left in the database
+    // with status 'ok'. read() correctly returned null for it, but
+    // hasCachedAnswer() then still saw a row and reported the tile as
+    // already resolved -- so fetch() treated real, recoverable corruption
+    // as a permanent "no data here" and never tried the network again.
+    // Deleting the corrupt row on read() closes that gap: hasCachedAnswer()
+    // now sees nothing, so this fetch proceeds exactly like a first visit.
+    test('a tile whose cached row has corrupt gridJson is re-downloaded '
+        'instead of being treated as a confirmed cache hit or miss', () async {
+      final lv95 = Lv95Transform.fromWgs84(
+        zurichseePoint.latitude,
+        zurichseePoint.longitude,
+      );
+      final tileKey = SwissBathy3dSource.tileKeyFor(lv95);
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: tileKey,
+              status: 'ok',
+              gridJson: const Value('not valid json {{{'),
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+      expect(grid.depthAt(0, 0), isNotNull);
+
+      // The corrupt row was replaced by a real one, not just deleted.
+      final rows = await (db.select(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.status, 'ok');
+    });
+  });
 }
 
 class _FakeFallbackSource implements BathymetrySource {
