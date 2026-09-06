@@ -1778,7 +1778,12 @@ class _AppearanceSectionContentState
     }
     if (!mounted) return;
 
-    final message = summary == null || summary.total == 0
+    // `summary == null` means the refresh could not even be attempted (e.g.
+    // the local cache database was not initialized) -- a real failure, not
+    // "nothing to check" -- so it must not fall into the up-to-date branch.
+    final message = summary == null
+        ? context.l10n.settings_appearance_bathymetryRefresh_resultFailed
+        : summary.total == 0
         ? context.l10n.settings_appearance_bathymetryRefresh_resultUpToDate
         : summary.updated > 0
         ? context.l10n.settings_appearance_bathymetryRefresh_resultUpdated(

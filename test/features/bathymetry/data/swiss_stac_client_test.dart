@@ -373,6 +373,64 @@ void main() {
       },
     );
 
+    test(
+      'follows the STAC next link to collect candidates past the first page',
+      () async {
+        final requestedUrls = <Uri>[];
+        final client = SwissStacClient(
+          client: MockClient((req) async {
+            requestedUrls.add(req.url);
+            if (req.url.queryParameters['page'] == '2') {
+              return http.Response(
+                jsonEncode({
+                  'features': [
+                    {
+                      'bbox': overlappingBbox,
+                      'assets': {
+                        'grid': {'href': 'https://example.org/second.zip'},
+                      },
+                    },
+                  ],
+                  'links': [],
+                }),
+                200,
+              );
+            }
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': overlappingBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/first.zip'},
+                    },
+                  },
+                ],
+                'links': [
+                  {
+                    'rel': 'next',
+                    'href':
+                        'https://data.geo.admin.ch/api/stac/v1/collections/'
+                        'ch.swisstopo.swissbathy3d/items?page=2',
+                  },
+                ],
+              }),
+              200,
+            );
+          }),
+        );
+        final candidates = await client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        );
+        expect(candidates.map((a) => a.href), [
+          'https://example.org/first.zip',
+          'https://example.org/second.zip',
+        ]);
+        expect(requestedUrls, hasLength(2));
+      },
+    );
+
     test('findAsset still returns just the first candidate', () async {
       final client = SwissStacClient(
         client: MockClient(

@@ -125,49 +125,71 @@ class SwissStacClient {
     required String collectionId,
     required List<double> bbox,
   }) async {
-    final url = Uri.parse('$baseUrl/collections/$collectionId/items').replace(
+    final candidates = <SwissBathyAsset>[];
+    Uri? url = Uri.parse('$baseUrl/collections/$collectionId/items').replace(
       queryParameters: {
         'bbox': bbox.map((v) => v.toString()).join(','),
-        'limit': '10',
+        'limit': '100',
       },
     );
-    final http.Response resp;
-    try {
-      resp = await _client.get(url).timeout(_itemsTimeout);
-    } catch (e) {
-      throw SwissStacException('STAC items request failed: $e');
-    }
-    if (resp.statusCode == 404) {
-      throw SwissStacCollectionNotFoundException(collectionId);
-    }
-    if (resp.statusCode != 200) {
-      throw SwissStacException('STAC items HTTP ${resp.statusCode}');
-    }
-    final Map<String, dynamic> body;
-    try {
-      body = jsonDecode(resp.body) as Map<String, dynamic>;
-    } catch (e) {
-      throw SwissStacException('STAC items response not JSON: $e');
-    }
-    final features = body['features'] as List<dynamic>? ?? const [];
-    final candidates = <SwissBathyAsset>[];
-    for (final feature in features) {
-      final featureMap = feature as Map<String, dynamic>;
-      if (!_featureOverlaps(featureMap, bbox)) continue;
-      final assets = featureMap['assets'] as Map<String, dynamic>?;
-      if (assets == null) continue;
-      final picked = _pickAsset(assets);
-      if (picked == null) continue;
-      final properties = featureMap['properties'] as Map<String, dynamic>?;
-      candidates.add(
-        SwissBathyAsset(
-          href: picked.href,
-          format: picked.format,
-          datetime: _itemDatetime(properties),
-        ),
-      );
+    // A single ~1km tile bbox should never legitimately intersect enough
+    // items to need more than a handful of pages; this cap bounds a
+    // pathological or misbehaving server rather than paging forever.
+    const maxPages = 10;
+    for (var page = 0; page < maxPages && url != null; page++) {
+      final http.Response resp;
+      try {
+        resp = await _client.get(url).timeout(_itemsTimeout);
+      } catch (e) {
+        throw SwissStacException('STAC items request failed: $e');
+      }
+      if (resp.statusCode == 404) {
+        throw SwissStacCollectionNotFoundException(collectionId);
+      }
+      if (resp.statusCode != 200) {
+        throw SwissStacException('STAC items HTTP ${resp.statusCode}');
+      }
+      final Map<String, dynamic> body;
+      try {
+        body = jsonDecode(resp.body) as Map<String, dynamic>;
+      } catch (e) {
+        throw SwissStacException('STAC items response not JSON: $e');
+      }
+      final features = body['features'] as List<dynamic>? ?? const [];
+      for (final feature in features) {
+        final featureMap = feature as Map<String, dynamic>;
+        if (!_featureOverlaps(featureMap, bbox)) continue;
+        final assets = featureMap['assets'] as Map<String, dynamic>?;
+        if (assets == null) continue;
+        final picked = _pickAsset(assets);
+        if (picked == null) continue;
+        final properties = featureMap['properties'] as Map<String, dynamic>?;
+        candidates.add(
+          SwissBathyAsset(
+            href: picked.href,
+            format: picked.format,
+            datetime: _itemDatetime(properties),
+          ),
+        );
+      }
+      url = _nextPageUrl(body);
     }
     return candidates;
+  }
+
+  /// The STAC `next` pagination link's href, if the response declares one
+  /// (OGC API Features / STAC `links` array with `"rel": "next"`), else null.
+  static Uri? _nextPageUrl(Map<String, dynamic> body) {
+    final links = body['links'] as List<dynamic>?;
+    if (links == null) return null;
+    for (final link in links) {
+      final linkMap = link as Map<String, dynamic>?;
+      if (linkMap?['rel'] != 'next') continue;
+      final href = linkMap?['href'] as String?;
+      if (href == null) continue;
+      return Uri.tryParse(href);
+    }
+    return null;
   }
 
   /// Whether STAC item [featureMap]'s own `bbox` genuinely overlaps the

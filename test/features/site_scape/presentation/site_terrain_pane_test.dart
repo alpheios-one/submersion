@@ -521,13 +521,13 @@ void main() {
       await tester.pump();
 
       expect(find.textContaining('GMRT'), findsOneWidget);
-      expect(find.textContaining('swissbathy3d'), findsNothing);
+      expect(find.textContaining('swissBATHY3D (© swisstopo)'), findsNothing);
 
       await tester.tap(find.byKey(const ValueKey('switchSiteButton')));
       await tester.pump();
       await tester.pump();
 
-      expect(find.textContaining('swissbathy3d'), findsOneWidget);
+      expect(find.textContaining('swissBATHY3D (© swisstopo)'), findsOneWidget);
       expect(find.textContaining('GMRT'), findsNothing);
     },
   );

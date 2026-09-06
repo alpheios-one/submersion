@@ -1584,6 +1584,29 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+
+    testWidgets(
+      'reports a failure, not up-to-date, when the refresh could not run '
+      'at all (null summary)',
+      (tester) async {
+        final overrides = [
+          ...getOverrides(),
+          swissBathyManualRefreshProvider.overrideWithValue(() async => null),
+        ];
+
+        await tester.pumpWidget(buildAppearanceWidget(overrides));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Reload Map Data'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text("Couldn't check all data; existing values were kept"),
+          findsOneWidget,
+        );
+        expect(find.text('All data is up to date'), findsNothing);
+      },
+    );
   });
 
   group('AppearanceSectionContent swissBATHY3D manual reload on the '

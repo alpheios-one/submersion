@@ -362,5 +362,30 @@ void main() {
 
       expect(find.text('2 tiles updated'), findsOneWidget);
     });
+
+    testWidgets(
+      'reports a failure, not up-to-date, when the refresh could not run '
+      'at all (null summary)',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(400, 2000));
+        addTearDown(() => tester.binding.setSurfaceSize(null));
+
+        await tester.pumpWidget(
+          buildTestWidgetWith([
+            swissBathyManualRefreshProvider.overrideWithValue(() async => null),
+          ]),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Reload Map Data'));
+        await tester.pumpAndSettle();
+
+        expect(
+          find.text("Couldn't check all data; existing values were kept"),
+          findsOneWidget,
+        );
+        expect(find.text('All data is up to date'), findsNothing);
+      },
+    );
   });
 }
