@@ -78,6 +78,20 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   String? _swissBathyClearResultText;
 
   @override
+  void didUpdateWidget(covariant SiteTerrainPane oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.siteId != widget.siteId) {
+      // Debug-only diagnostics are keyed to whatever site was on screen when
+      // they were fetched; carrying them across a siteId change would show
+      // stale data for the new site.
+      _debugExpanded = false;
+      _debugFuture = null;
+      _clearingSwissBathyCache = false;
+      _swissBathyClearResultText = null;
+    }
+  }
+
+  @override
   void dispose() {
     _scrub.dispose();
     _hoverPick.dispose();

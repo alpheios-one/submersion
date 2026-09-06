@@ -33,6 +33,8 @@ class _BathymetryRefreshTileState extends ConsumerState<BathymetryRefreshTile> {
     SwissBathyRefreshSummary? summary;
     try {
       summary = await refresh();
+    } catch (_) {
+      summary = null;
     } finally {
       if (mounted) setState(() => _isRefreshing = false);
     }

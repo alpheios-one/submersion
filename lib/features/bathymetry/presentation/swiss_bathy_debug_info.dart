@@ -282,7 +282,7 @@ List<double> _tileBboxWgs84(int tileE, int tileN) {
   ];
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 ///
 /// Investigated Bug 14 (extractRawEsriSubgrid() reportedly returning null
 /// for nearly every tile in a lake, or — for the one tile that did cache —
@@ -390,7 +390,7 @@ class SwissBathyExtractionDebugInfo {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Builds a
 /// [SwissBathyExtractionDebugInfo] for tile ([tileE], [tileN]) by actually
 /// performing the STAC items lookup and downloading+parsing the first
 /// resolved candidate — the same steps
@@ -548,7 +548,7 @@ Future<SwissBathyExtractionDebugInfo> buildSwissBathyExtractionDebugInfo({
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Renders a
 /// [SwissBathyExtractionDebugInfo] as plain, copy-pasteable text, appended
 /// below [formatSwissBathyDebugInfo]'s output.
 String formatSwissBathyExtractionDebugInfo(SwissBathyExtractionDebugInfo info) {
@@ -660,7 +660,7 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
 }
 
 // ---------------------------------------------------------------------
-// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 //
 // Investigated Bug 11 (two real, independently-meaningful dive sites
 // reportedly render a pixel-identical visible 3D profile even though the
@@ -674,7 +674,7 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
 // produce the same numbers.
 // ---------------------------------------------------------------------
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Timestamp of the
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Timestamp of the
 /// last [SiteSeascapeGeometryService.buildWithLabels] call per site id,
 /// written by the caller in `site_seascape_providers.dart` right after
 /// `built` resolves (both the synchronous and the `compute()`-isolate
@@ -683,16 +683,16 @@ String formatSwissBathyDebugInfo(SwissBathyDebugInfo info) {
 /// state for a single debugging session, not app state.
 final Map<String, DateTime> _swissBathyDebugLastBuiltAt = {};
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 void recordSwissBathySceneBuilt(String siteId) {
   _swissBathyDebugLastBuiltAt[siteId] = DateTime.now();
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 DateTime? swissBathyDebugLastBuiltAtFor(String siteId) =>
     _swissBathyDebugLastBuiltAt[siteId];
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. A cheap, order- and
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. A cheap, order- and
 /// value-sensitive fingerprint of a mesh's flat position buffer, plus when
 /// the scene that produced it was last (re)built for [siteId] — everything
 /// needed to tell "two sites really did render the same triangles" apart
@@ -745,7 +745,7 @@ class SwissBathyRenderFingerprint {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Builds a
 /// [SwissBathyRenderFingerprint] for the terrain mesh currently on screen
 /// for [siteId] — read-only, no recomputation of the mesh itself.
 SwissBathyRenderFingerprint buildSwissBathyRenderFingerprint({
@@ -771,7 +771,7 @@ SwissBathyRenderFingerprint buildSwissBathyRenderFingerprint({
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Pulls the single
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Pulls the single
 /// component at [offset] (0 = scene X/east, 1 = scene Y/depth, 2 = scene
 /// Z/north — see [SwissBathyRenderFingerprint]'s doc for why 1, not 2, is
 /// the depth axis) out of every xyz triplet in [positions].
@@ -784,7 +784,7 @@ Float32List _extractPositionComponent(Float32List positions, int offset) {
   return out;
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Pulls both horizontal
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Pulls both horizontal
 /// components (scene X/east, scene Z/north) out of every xyz triplet in
 /// [positions], interleaved as [x0, z0, x1, z1, ...] — the complement of
 /// [_extractPositionComponent] at offset 1.
@@ -798,7 +798,7 @@ Float32List _extractHorizontalComponents(Float32List positions) {
   return out;
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. A cheap fingerprint
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. A cheap fingerprint
 /// (hash plus min/max/null-count) of the raw [BathymetryGrid]
 /// [SiteSeascapeGeometryService.buildWithLabels] receives as input — the
 /// grid [SwissBathy3dSource.fetch] returned (stitched across tiles, when
@@ -829,7 +829,7 @@ class SwissBathyGridFingerprint {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Builds a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Builds a
 /// [SwissBathyGridFingerprint] for [grid] — read-only, no re-fetch.
 SwissBathyGridFingerprint buildSwissBathyGridFingerprint(BathymetryGrid grid) {
   double? minDepth;
@@ -857,12 +857,12 @@ SwissBathyGridFingerprint buildSwissBathyGridFingerprint(BathymetryGrid grid) {
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Raw bytes backing a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Raw bytes backing a
 /// typed-data view, for hashing without any double->string rounding loss.
 Uint8List _bytesOf(TypedData values) =>
     values.buffer.asUint8List(values.offsetInBytes, values.lengthInBytes);
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. FNV-1a folded over
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. FNV-1a folded over
 /// raw bytes rather than the source double values, so it is exact (no
 /// rounding/formatting loss) and cheap enough to run on a tap.
 int _fnv1aHashBytes(Uint8List bytes) {
@@ -874,7 +874,7 @@ int _fnv1aHashBytes(Uint8List bytes) {
   return hash;
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Renders a
 /// [SwissBathyRenderFingerprint] as plain, copy-pasteable text, appended
 /// below [formatSwissBathyDebugInfo]'s fetch-layer output.
 String formatSwissBathyRenderFingerprint(SwissBathyRenderFingerprint fp) {
@@ -899,7 +899,7 @@ String formatSwissBathyRenderFingerprint(SwissBathyRenderFingerprint fp) {
   return buf.toString();
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Renders a
 /// [SwissBathyGridFingerprint] as plain, copy-pasteable text, appended
 /// below [formatSwissBathyRenderFingerprint]'s output.
 String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
@@ -916,7 +916,7 @@ String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
 }
 
 // ---------------------------------------------------------------------
-// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 //
 // Investigates a report that swissBATHY3D data reloaded suspiciously fast
 // after deleting BOTH AppData\Local\Submersion\submersion and
@@ -934,7 +934,7 @@ String formatSwissBathyGridFingerprint(SwissBathyGridFingerprint fp) {
 // deleted by hand outside the app.
 // ---------------------------------------------------------------------
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. One legacy, pre-rename
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. One legacy, pre-rename
 /// Windows app-data directory [windows_app_data_migration.migrateCompanyDirectory]
 /// would have moved data OUT of on a previous launch — see
 /// [buildSwissBathyCachePathsDebugInfo]'s doc for why this matters even
@@ -946,7 +946,7 @@ class SwissBathyLegacyPathInfo {
   const SwissBathyLegacyPathInfo({required this.path, required this.exists});
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 class SwissBathyCachePathsDebugInfo {
   /// The one sqlite file both [SwissBathyTileCacheRepository] and
   /// [BathymetryRepository] read/write, as actually resolved via
@@ -971,7 +971,7 @@ class SwissBathyCachePathsDebugInfo {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Re-derives the exact
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Re-derives the exact
 /// path [LocalCacheDatabaseService.initialize] opens — read-only, issues no
 /// network request and does not touch the database beyond checking whether
 /// it is already open.
@@ -1024,7 +1024,7 @@ buildSwissBathyCachePathsDebugInfo() async {
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Renders a
 /// [SwissBathyCachePathsDebugInfo] as plain, copy-pasteable text.
 String formatSwissBathyCachePathsDebugInfo(SwissBathyCachePathsDebugInfo info) {
   final buf = StringBuffer()
@@ -1088,7 +1088,7 @@ String formatSwissBathyCachePathsDebugInfo(SwissBathyCachePathsDebugInfo info) {
   return buf.toString();
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR.
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
 class SwissBathyCacheClearResult {
   final int tileRowsDeleted;
   final int outerCacheRowsDeleted;
@@ -1110,7 +1110,7 @@ class SwissBathyCacheClearResult {
   });
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Deletes every
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Deletes every
 /// swissBATHY3D-related row from the local cache database: ALL rows in
 /// `swiss_bathy_tile_cache` (that table exists for nothing else), plus only
 /// the `bathymetry_cache` rows whose center coordinate falls inside a known
@@ -1171,7 +1171,7 @@ Future<SwissBathyCacheClearResult?> clearSwissBathyDebugCache() async {
   );
 }
 
-/// TEMPORARY - DEBUG ONLY, remove before upstream PR. Renders a
+/// DEBUG ONLY: gated behind kDebugMode, not shown in release builds. Renders a
 /// [SwissBathyCacheClearResult] as a short, human-readable confirmation.
 String formatSwissBathyCacheClearResult(SwissBathyCacheClearResult? result) {
   if (result == null) return 'cache not initialized -- nothing to clear';
