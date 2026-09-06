@@ -1121,7 +1121,7 @@ jobs:
         # positive control that the check is not vacuously passing.
         run: python3 scripts/check_bundled_native_assets.py build/linux/x64/release/bundle
 
-              # Packaging runs here as well as in build-all.yml because build-all.yml
+      # Packaging runs here as well as in build-all.yml because build-all.yml
       # is workflow_call-only: nothing a pull request triggers ever invokes it,
       # so without this the packaging path would be unverifiable until after a
       # merge, when a break already blocks the beta pipeline. Both workflows
