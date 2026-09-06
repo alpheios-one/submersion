@@ -67,7 +67,11 @@ class SwissBathyTileCacheRepository {
         sourceHref: row.sourceHref,
       );
     } catch (_) {
-      return null; // corrupt row: caller re-derives and overwrites it
+      // Corrupt row: delete so callers retry instead of treating it as a cached negative.
+      await (_db.delete(
+        _db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).go();
+      return null;
     }
   }
 
