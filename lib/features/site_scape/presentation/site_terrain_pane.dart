@@ -66,13 +66,13 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
   };
   bool _chartMode = false;
 
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR: backs the expandable
+  // DEBUG ONLY: gated behind kDebugMode, not shown in release builds
   // diagnostic panel in [_sourceChip], investigating Bug 6/7/9 (two real
   // Walensee sites reportedly rendering a pixel-identical mesh).
   bool _debugExpanded = false;
   Future<SwissBathyDebugInfo>? _debugFuture;
 
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR: backs the "clear
+  // DEBUG ONLY: gated behind kDebugMode, not shown in release builds
   // swissBATHY3D cache" debug action in [_debugPanel].
   bool _clearingSwissBathyCache = false;
   String? _swissBathyClearResultText;
@@ -377,7 +377,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                   ),
                 ],
               ),
-              // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+              // DEBUG ONLY: gated behind kDebugMode, not shown in release builds
               if (kDebugMode && _debugExpanded) _debugPanel(scene, grid),
             ],
           ),
@@ -386,7 +386,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     );
   }
 
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR: clears every
+  // DEBUG ONLY: gated behind kDebugMode, not shown in release builds
   // swissBATHY3D-related row from the local cache database (see
   // clearSwissBathyDebugCache), then re-runs the fetch-layer diagnostic so
   // the panel reflects the now-empty cache instead of a stale snapshot.
