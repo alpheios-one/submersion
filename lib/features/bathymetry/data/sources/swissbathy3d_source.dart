@@ -84,6 +84,12 @@ class SwissBathy3dSource implements BathymetrySource {
   /// call sites stay in lockstep with each other and with the design intent.
   static const int maxConcurrentTileRequests = 4;
 
+  /// Nominal grid spacing swissBATHY3D publishes for lake bathymetry.
+  /// Declared, not measured, per [SourceCapability]'s contract -- the actual
+  /// per-tile [BathymetryGrid.resolutionMeters] comes from each tile's own
+  /// ESRI ASCII header once fetched, and can be finer.
+  static const double declaredCellSizeMeters = 2.0;
+
   final SwissStacClient _stac;
   final SwissBathyTileCacheRepository _tileCache;
 
@@ -100,8 +106,20 @@ class SwissBathy3dSource implements BathymetrySource {
   @override
   bool get global => false;
 
-  @override
+  /// Not part of [BathymetrySource] -- a synchronous, no-network check used
+  /// by [SwissLakeDepthService] and [BathymetryRepository.quantumDegFor],
+  /// which need an answer ahead of (and independent from) the resolver's
+  /// [probe]/fetch cycle.
   bool covers(GeoPoint center) => findSwissLake(center) != null;
+
+  @override
+  Future<SourceCapability?> probe(GeoPoint center) async {
+    if (!covers(center)) return null;
+    return const SourceCapability(
+      cellSizeMeters: declaredCellSizeMeters,
+      detail: 'swissBATHY3D',
+    );
+  }
 
   /// The LV95 1-km tile index (e.g. "2600_1200") containing [lv95].
   static String tileKeyFor(Lv95Coordinates lv95) {
