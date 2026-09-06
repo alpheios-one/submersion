@@ -548,7 +548,7 @@ void main() {
       await _settle(tester);
       await tester.tap(find.widgetWithText(ListTile, 'Appearance').first);
       await _settle(tester);
-      final navBarTile = find.widgetWithText(ListTile, 'Navigation bar');
+      final navBarTile = find.widgetWithText(ListTile, 'Navigation layout');
       await tester.scrollUntilVisible(
         navBarTile,
         200,

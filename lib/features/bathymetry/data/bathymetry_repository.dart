@@ -22,6 +22,12 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// simply means "no real terrain available right now".
 class BathymetryRepository {
   static const int maxGridDim = 120;
+
+  /// Bumped whenever source SELECTION changes, not just the span. Cached
+  /// rows never expire, so without this every already-visited site would
+  /// keep serving the grid its old resolver chose. Old rows go inert, the
+  /// same way the 4 km rows did when the span went to 8 km.
+  static const String selectionGeneration = 'v2';
   static const double quantumDeg = 0.02;
 
   final LocalCacheDatabase _db;
@@ -52,19 +58,21 @@ class BathymetryRepository {
   }
 
   static String keyFor(GeoPoint c) {
-    // The span is part of the key: cached rows never expire, so a span
-    // change must miss the old rows and refetch the larger area. Stale
-    // rows are inert leftovers in this local-only cache.
+    // The span AND the selection generation are part of the key: cached
+    // rows never expire, so any change that would resolve a coordinate
+    // differently must miss the old rows and refetch. Stale rows are inert
+    // leftovers in this local-only cache.
     final span = BathymetryResolver.defaultSpanMeters.round();
     if (quantumDegFor(c) <= 0) {
       // Raw coordinate, not a quantized cell corner: needs enough decimals
       // to actually distinguish nearby sites (2 decimals is ~1 km at these
       // latitudes -- exactly the coalescing this branch exists to avoid).
       return '${c.latitude.toStringAsFixed(6)},'
-          '${c.longitude.toStringAsFixed(6)}@$span';
+          '${c.longitude.toStringAsFixed(6)}@$span$selectionGeneration';
     }
     final q = quantize(c);
-    return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}@$span';
+    return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}'
+        '@$span$selectionGeneration';
   }
 
   /// Whether the cache holds a DEFINITIVE answer (grid or empty) for this

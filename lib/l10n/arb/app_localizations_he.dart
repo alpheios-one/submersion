@@ -2175,6 +2175,37 @@ class AppLocalizationsHe extends AppLocalizations {
   String get checklists_menu_saveAsTemplate => 'שמור כתבנית...';
 
   @override
+  String get checklists_menu_clearAll => 'ניקוי רשימת המשימות...';
+
+  @override
+  String get checklists_clear_title => 'ניקוי רשימת המשימות';
+
+  @override
+  String checklists_clear_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'למחוק את כל $count הפריטים מרשימה זו? התבניות לא יושפעו.',
+      one: 'למחוק את הפריט היחיד מרשימה זו? התבניות לא יושפעו.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checklists_clear_confirm => 'ניקוי';
+
+  @override
+  String checklists_clear_success(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count פריטים הוסרו',
+      one: 'פריט אחד הוסר',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get checklists_applySheet_title => 'החלת תבנית';
 
   @override
@@ -15472,11 +15503,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_appearance_theme_system => 'ברירת מחדל של המערכת';
 
   @override
-  String get settings_navCustomization_title => 'Navigation bar';
+  String get settings_navCustomization_title => 'פריסת הניווט';
 
   @override
   String get settings_navCustomization_description =>
       'Drag items to reorder. The top three appear in your bottom navigation bar.';
+
+  @override
+  String get settings_navCustomization_descriptionDesktop =>
+      'גררו פריטים כדי לסדר מחדש את סרגל הצד. דף הבית תמיד נשאר למעלה.';
+
+  @override
+  String get settings_navCustomization_scopePhone => 'טלפון';
+
+  @override
+  String get settings_navCustomization_scopeDesktop => 'מחשב שולחני';
 
   @override
   String get settings_navCustomization_dividerLabel =>
@@ -24111,7 +24152,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'נתוני עומק: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)';
+      'נתוני עומק: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'עומק';
@@ -34390,7 +34431,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get common_action_retry => 'נסה שוב';
 
   @override
-  String get startup_versionMismatch_title => 'נדרש עדכון';
+  String get startup_versionMismatch_title =>
+      'הנתונים שלכם חדשים יותר מהאפליקציה הזו';
 
   @override
   String startup_versionMismatch_body(
@@ -34401,19 +34443,30 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get startup_versionMismatch_causes =>
+      'בדרך כלל המשמעות היא שגרסת בטא שדרגה את הנתונים שלכם, ששוחזר גיבוי מגרסה חדשה יותר, או שהקובץ משותף עם מכשיר בערוץ עדכונים אחר. ייתכן שגרסה יציבה חדשה יותר עדיין אינה קיימת.';
+
+  @override
   String get startup_versionMismatch_instructions =>
-      'עדכנו את Submersion לגרסה האחרונה. הנתונים שלכם בטוחים ולא שונו. אם נוצר גיבוי לפני השדרוג, הוא נמצא בתיקיית Backups וניתן לשחזר אותו לאחר העדכון.';
+      'הנתונים שלכם בטוחים ולא שונו. פתחו אותם עם הגרסה שכתבה אותם, או עם כל גרסה מאוחרת יותר. אם נוצר גיבוי לפני השדרוג, הוא נמצא בתיקיית Backups וניתן לשחזר אותו לאחר שתריצו גרסה שמסוגלת לפתוח את הקובץ.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
       'אפליקציה זו הותקנה מחנות אפליקציות והיא ישנה יותר מהגרסה שיצרה את הנתונים שלך. הנתונים שלך בטוחים ולא שונו. עדכן את Submersion כשהגרסה החדשה תופיע בחנות, ואז פתח את האפליקציה מחדש.';
 
   @override
-  String get startup_versionMismatch_download => 'הורדת הגרסה האחרונה';
+  String get startup_versionMismatch_download => 'חיפוש גרסה יציבה חדשה יותר';
+
+  @override
+  String get startup_versionMismatch_betaAction => 'הורדת גרסת בטא';
+
+  @override
+  String get startup_versionMismatch_betaNote =>
+      'גרסאות בטא הן גרסאות מקדימות. בחרו באפשרות זו רק אם גרסת בטא כתבה את הנתונים שלכם.';
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'אם פעולה זו אינה פותחת דפדפן, בקרו בכתובת:';
+      'אם הכפתורים אינם פותחים דפדפן, בקרו בכתובת:';
 
   @override
   String get universalImport_compare_downloaded => 'הורד';
@@ -36043,4 +36096,63 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveComputer_detail_duplicateBannerAction => 'מיזוג';
+
+  @override
+  String get startup_versionMismatch_restore_title =>
+      'שחזור הגיבוי שלפני העדכון';
+
+  @override
+  String get startup_versionMismatch_restore_body =>
+      'במכשיר הזה שמור עותק בטיחות של יומן הצלילה שנלקח לפני העדכון, והגרסה הזו יכולה לפתוח אותו.';
+
+  @override
+  String get startup_versionMismatch_restore_warning =>
+      'כל מה שתיעדת אחרי העדכון קיים רק בקובץ החדש יותר. הקובץ הזה נשמר כגיבוי מוצמד, כך שהתקנה מחדש של הגרסה החדשה תחזיר אותו.';
+
+  @override
+  String backup_history_preDowngradeSubtitle(String size) {
+    return 'מסד נתונים חדש יותר, נשמר בעת החזרה - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount צלילות',
+      one: 'צלילה אחת',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount אתרים',
+      one: 'אתר אחד',
+    );
+    return '$_temp0, $_temp1 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount צלילות',
+      one: 'צלילה אחת',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount אתרים',
+      one: 'אתר אחד',
+    );
+    return '$_temp0, $_temp1 - $size (אוטומטי)';
+  }
 }

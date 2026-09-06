@@ -905,6 +905,25 @@
   "checklists_item_delete": "حذف العنصر",
   "checklists_menu_applyTemplate": "تطبيق قالب...",
   "checklists_menu_saveAsTemplate": "حفظ كقالب...",
+  "checklists_menu_clearAll": "مسح قائمة التحقق...",
+  "checklists_clear_title": "مسح قائمة التحقق",
+  "checklists_clear_content": "{count, plural, =1{هل تريد حذف العنصر الوحيد من قائمة التحقق هذه؟ لن تتأثر القوالب.} other{هل تريد حذف جميع العناصر البالغ عددها {count} من قائمة التحقق هذه؟ لن تتأثر القوالب.}}",
+  "@checklists_clear_content": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checklists_clear_confirm": "مسح",
+  "checklists_clear_success": "{count, plural, =1{تمت إزالة عنصر واحد} other{تمت إزالة {count} عناصر}}",
+  "@checklists_clear_success": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "checklists_applySheet_title": "تطبيق القالب",
   "checklists_applySheet_empty": "لا توجد قوالب بعد. يمكنك إنشاؤها من الإعدادات.",
   "checklists_applySheet_itemCount": "{count, plural, =1{عنصر واحد} other{{count} عناصر}}",
@@ -4738,8 +4757,11 @@
   "settings_appearance_theme_dark": "داكن",
   "settings_appearance_theme_light": "فاتح",
   "settings_appearance_theme_system": "الافتراضي للنظام",
-  "settings_navCustomization_title": "Navigation bar",
+  "settings_navCustomization_title": "تخطيط التنقل",
   "settings_navCustomization_description": "Drag items to reorder. The top three appear in your bottom navigation bar.",
+  "settings_navCustomization_descriptionDesktop": "اسحب العناصر لإعادة ترتيب الشريط الجانبي. تبقى الصفحة الرئيسية دائمًا في الأعلى.",
+  "settings_navCustomization_scopePhone": "الهاتف",
+  "settings_navCustomization_scopeDesktop": "سطح المكتب",
   "settings_navCustomization_dividerLabel": "Items below appear in the More menu",
   "settings_navCustomization_resetButton": "Reset to defaults",
   "settings_navCustomization_pinnedTooltip": "Always shown",
@@ -7053,7 +7075,7 @@
   "@dive3d_seascape_noData": {},
   "dive3d_seascape_axis_distance": "المسافة ({unitSymbol})",
   "@dive3d_seascape_axis_distance": {},
-  "settings_about_bathymetryCredit": "بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)",
+  "settings_about_bathymetryCredit": "بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)",
   "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "العمق",
   "@dive3d_metric_depth": {},
@@ -10289,12 +10311,15 @@
   "startup_backupFailed_quit": "إنهاء",
   "startup_backupFailed_technicalDetails": "تفاصيل تقنية",
   "common_action_retry": "إعادة المحاولة",
-  "startup_versionMismatch_title": "التحديث مطلوب",
+  "startup_versionMismatch_title": "بياناتك أحدث من هذا التطبيق",
   "startup_versionMismatch_body": "حُفظت بيانات غوصك بإصدار أحدث من Submersion (المخطط v{databaseVersion}). هذا الإصدار يدعم حتى المخطط v{appVersion} فقط.",
-  "startup_versionMismatch_instructions": "يرجى تحديث Submersion إلى أحدث إصدار. بياناتك آمنة ولم تُعدَّل. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بعد التحديث.",
+  "startup_versionMismatch_causes": "يعني هذا عادةً أن إصدارًا تجريبيًا (بيتا) قد رقّى بياناتك، أو أنه تمت استعادة نسخة احتياطية من إصدار أحدث، أو أن الملف مشترك مع جهاز على قناة تحديث مختلفة. قد لا يكون هناك إصدار مستقر أحدث بعد.",
+  "startup_versionMismatch_instructions": "بياناتك آمنة ولم تُعدَّل. افتحها بالإصدار الذي كتبها، أو بأي إصدار أحدث. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بمجرد تشغيل إصدار قادر على فتح الملف.",
   "startup_versionMismatch_storeInstructions": "تم تثبيت هذا التطبيق من متجر تطبيقات وهو أقدم من الإصدار الذي أنشأ بياناتك. بياناتك آمنة ولم يتم تعديلها. حدّث Submersion عندما يظهر الإصدار الجديد في المتجر، ثم أعد فتحه.",
-  "startup_versionMismatch_download": "تنزيل أحدث إصدار",
-  "startup_versionMismatch_manualLink": "إذا لم يفتح ذلك متصفحًا، فتفضل بزيارة:",
+  "startup_versionMismatch_download": "البحث عن إصدار مستقر أحدث",
+  "startup_versionMismatch_betaAction": "الحصول على إصدار البيتا",
+  "startup_versionMismatch_betaNote": "إصدارات البيتا أولية. اختر هذا فقط إذا كان إصدار بيتا قد كتب بياناتك.",
+  "startup_versionMismatch_manualLink": "إذا لم تفتح هذه الأزرار متصفحًا، فتفضل بزيارة:",
   "universalImport_compare_downloaded": "المنزَّلة",
   "universalImport_compare_errorLoading": "خطأ في تحميل بيانات الغوصة",
   "universalImport_compare_diveNotFound": "لم يتم العثور على الغوصة الموجودة",
@@ -10721,5 +10746,11 @@
   "diveComputer_detail_mergePickerSameSerial": "نفس الرقم التسلسلي",
   "diveComputer_detail_duplicateBanner": "يُبلغ {name} عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً مرتين.",
   "diveComputer_detail_duplicateBannerMultiple": "تُبلغ {count} سجلات محفوظة أخرى عن نفس الرقم التسلسلي. قد يكون هذا الجهاز محفوظاً أكثر من مرة.",
-  "diveComputer_detail_duplicateBannerAction": "دمج"
+  "diveComputer_detail_duplicateBannerAction": "دمج",
+  "startup_versionMismatch_restore_title": "استعادة النسخة الاحتياطية السابقة للترقية",
+  "startup_versionMismatch_restore_body": "توجد على هذا الجهاز نسخة احتياطية من سجل الغوص أُخذت قبل الترقية، وهذا الإصدار يستطيع فتحها.",
+  "startup_versionMismatch_restore_warning": "كل ما سجّلته بعد الترقية موجود في الملف الأحدث فقط. يُحتفظ بذلك الملف كنسخة احتياطية مثبّتة، لذا فإن إعادة تثبيت الإصدار الأحدث تستعيده.",
+  "backup_history_preDowngradeSubtitle": "قاعدة بيانات أحدث، محفوظة عند الرجوع - {size}",
+  "backup_history_manualSubtitle": "{diveCount, plural, =1{غوصة واحدة} other{{diveCount} غوصات}}, {siteCount, plural, =1{موقع غوص واحد} other{{siteCount} مواقع غوص}} - {size}",
+  "backup_history_manualSubtitleAuto": "{diveCount, plural, =1{غوصة واحدة} other{{diveCount} غوصات}}, {siteCount, plural, =1{موقع غوص واحد} other{{siteCount} مواقع غوص}} - {size} (تلقائي)"
 }

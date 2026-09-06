@@ -2108,6 +2108,35 @@ class AppLocalizationsZh extends AppLocalizations {
   String get checklists_menu_saveAsTemplate => '保存为模板…';
 
   @override
+  String get checklists_menu_clearAll => '清空清单…';
+
+  @override
+  String get checklists_clear_title => '清空清单';
+
+  @override
+  String checklists_clear_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '要删除此清单中的全部 $count 个项目吗？模板不受影响。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checklists_clear_confirm => '清空';
+
+  @override
+  String checklists_clear_success(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已移除 $count 个项目',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get checklists_applySheet_title => '应用模板';
 
   @override
@@ -15073,11 +15102,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_theme_system => '系统默认';
 
   @override
-  String get settings_navCustomization_title => 'Navigation bar';
+  String get settings_navCustomization_title => '导航布局';
 
   @override
   String get settings_navCustomization_description =>
       'Drag items to reorder. The top three appear in your bottom navigation bar.';
+
+  @override
+  String get settings_navCustomization_descriptionDesktop =>
+      '拖动项目以重新排列侧边栏。主页始终位于顶部。';
+
+  @override
+  String get settings_navCustomization_scopePhone => '手机';
+
+  @override
+  String get settings_navCustomization_scopeDesktop => '桌面';
 
   @override
   String get settings_navCustomization_dividerLabel =>
@@ -23438,7 +23477,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      '水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022 · swissBATHY3D（© swisstopo）';
+      '水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D（© swisstopo）';
 
   @override
   String get dive3d_metric_depth => '深度';
@@ -33024,7 +33063,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_action_retry => '重试';
 
   @override
-  String get startup_versionMismatch_title => '需要更新';
+  String get startup_versionMismatch_title => '您的数据比此应用更新';
 
   @override
   String startup_versionMismatch_body(
@@ -33035,18 +33074,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get startup_versionMismatch_causes =>
+      '这通常意味着测试版构建升级了您的数据、从更新的构建恢复了备份，或者该文件与其他更新通道上的设备共享。更新的稳定版可能尚未发布。';
+
+  @override
   String get startup_versionMismatch_instructions =>
-      '请将 Submersion 更新到最新版本。您的数据是安全的，未被修改。如果升级前已创建备份，它位于您的 Backups 文件夹中，更新后可以恢复。';
+      '您的数据是安全的，未被修改。请使用写入这些数据的构建版本，或任何更高版本重新打开。如果升级前已创建备份，它位于您的 Backups 文件夹中，待您运行可以打开该文件的版本后即可恢复。';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
       '此应用安装自应用商店，版本低于创建您数据的版本。您的数据是安全的，未被修改。当新版本在商店上架后，请更新 Submersion 并重新打开。';
 
   @override
-  String get startup_versionMismatch_download => '下载最新版本';
+  String get startup_versionMismatch_download => '查找更新的稳定版';
 
   @override
-  String get startup_versionMismatch_manualLink => '如果未打开浏览器，请访问：';
+  String get startup_versionMismatch_betaAction => '获取测试版构建';
+
+  @override
+  String get startup_versionMismatch_betaNote =>
+      '测试版构建为预发布版本。仅当测试版构建写入了您的数据时才选择此项。';
+
+  @override
+  String get startup_versionMismatch_manualLink => '如果这些按钮未打开浏览器，请访问：';
 
   @override
   String get universalImport_compare_downloaded => '已下载';
@@ -34606,4 +34656,62 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveComputer_detail_duplicateBannerAction => '合并';
+
+  @override
+  String get startup_versionMismatch_restore_title => '恢复升级前的备份';
+
+  @override
+  String get startup_versionMismatch_restore_body =>
+      '本设备上存有升级前的潜水日志安全副本，当前版本可以打开它。';
+
+  @override
+  String get startup_versionMismatch_restore_warning =>
+      '升级之后记录的内容只存在于较新的文件中。该文件会作为已固定的备份保留，重新安装较新版本即可取回。';
+
+  @override
+  String backup_history_preDowngradeSubtitle(String size) {
+    return '较新的数据库，回退时保留 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount 次潜水',
+      one: '$diveCount 次潜水',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount 个潜点',
+      one: '$siteCount 个潜点',
+    );
+    return '$_temp0, $_temp1 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount 次潜水',
+      one: '$diveCount 次潜水',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount 个潜点',
+      one: '$siteCount 个潜点',
+    );
+    return '$_temp0, $_temp1 - $size（自动）';
+  }
 }

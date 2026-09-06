@@ -3797,6 +3797,36 @@ abstract class AppLocalizations {
   /// **'Save as template...'**
   String get checklists_menu_saveAsTemplate;
 
+  /// No description provided for @checklists_menu_clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear checklist...'**
+  String get checklists_menu_clearAll;
+
+  /// No description provided for @checklists_clear_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear checklist'**
+  String get checklists_clear_title;
+
+  /// No description provided for @checklists_clear_content.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Delete the only item from this checklist? Templates are not affected.} other{Delete all {count} items from this checklist? Templates are not affected.}}'**
+  String checklists_clear_content(int count);
+
+  /// No description provided for @checklists_clear_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get checklists_clear_confirm;
+
+  /// No description provided for @checklists_clear_success.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 item removed} other{{count} items removed}}'**
+  String checklists_clear_success(int count);
+
   /// No description provided for @checklists_applySheet_title.
   ///
   /// In en, this message translates to:
@@ -26328,10 +26358,10 @@ abstract class AppLocalizations {
   /// **'System default'**
   String get settings_appearance_theme_system;
 
-  /// Title of the settings page for customizing bottom navigation primary slots.
+  /// Title of the settings page for arranging the phone bottom bar and the wide-screen navigation rail.
   ///
   /// In en, this message translates to:
-  /// **'Navigation bar'**
+  /// **'Navigation layout'**
   String get settings_navCustomization_title;
 
   /// Help text at the top of the navigation customization page.
@@ -26339,6 +26369,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drag items to reorder. The top three appear in your bottom navigation bar.'**
   String get settings_navCustomization_description;
+
+  /// Help text shown when arranging the wide-screen navigation rail.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag items to reorder the sidebar. Home always stays at the top.'**
+  String get settings_navCustomization_descriptionDesktop;
+
+  /// Segmented-button label for editing the phone navigation order.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get settings_navCustomization_scopePhone;
+
+  /// Segmented-button label for editing the desktop navigation rail order.
+  ///
+  /// In en, this message translates to:
+  /// **'Desktop'**
+  String get settings_navCustomization_scopeDesktop;
 
   /// Non-interactive divider row between primary and overflow destinations.
   ///
@@ -40616,7 +40664,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_about_bathymetryCredit.
   ///
   /// In en, this message translates to:
-  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)'**
+  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)'**
   String get settings_about_bathymetryCredit;
 
   /// No description provided for @dive3d_metric_depth.
@@ -57739,7 +57787,7 @@ abstract class AppLocalizations {
   /// No description provided for @startup_versionMismatch_title.
   ///
   /// In en, this message translates to:
-  /// **'Update Required'**
+  /// **'Your Data Is Newer Than This App'**
   String get startup_versionMismatch_title;
 
   /// Explains a database written by a newer app build. Object, not int, so schema numbers are never group-separated.
@@ -57751,10 +57799,16 @@ abstract class AppLocalizations {
     Object appVersion,
   );
 
+  /// No description provided for @startup_versionMismatch_causes.
+  ///
+  /// In en, this message translates to:
+  /// **'This usually means a beta build upgraded your data, a backup was restored from a newer build, or the file is shared with a device on a different update channel. A newer stable release may not exist yet.'**
+  String get startup_versionMismatch_causes;
+
   /// No description provided for @startup_versionMismatch_instructions.
   ///
   /// In en, this message translates to:
-  /// **'Please update Submersion to the latest version. Your data is safe and has not been modified. If a backup was taken before the upgrade, it is in your Backups folder and can be restored after updating.'**
+  /// **'Your data is safe and has not been modified. Reopen it with the build that wrote it, or with any later build. If a backup was taken before the upgrade, it is in your Backups folder and can be restored once you are running a build that opens it.'**
   String get startup_versionMismatch_instructions;
 
   /// No description provided for @startup_versionMismatch_storeInstructions.
@@ -57766,13 +57820,25 @@ abstract class AppLocalizations {
   /// No description provided for @startup_versionMismatch_download.
   ///
   /// In en, this message translates to:
-  /// **'Download Latest Version'**
+  /// **'Check for a Newer Stable Release'**
   String get startup_versionMismatch_download;
+
+  /// No description provided for @startup_versionMismatch_betaAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Get the Beta Build'**
+  String get startup_versionMismatch_betaAction;
+
+  /// No description provided for @startup_versionMismatch_betaNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta builds are pre-release. Choose this only if a beta build wrote your data.'**
+  String get startup_versionMismatch_betaNote;
 
   /// No description provided for @startup_versionMismatch_manualLink.
   ///
   /// In en, this message translates to:
-  /// **'If that does not open a browser, visit:'**
+  /// **'If those buttons do not open a browser, visit:'**
   String get startup_versionMismatch_manualLink;
 
   /// No description provided for @universalImport_compare_downloaded.
@@ -60345,6 +60411,50 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Merge'**
   String get diveComputer_detail_duplicateBannerAction;
+
+  /// No description provided for @startup_versionMismatch_restore_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your pre-upgrade backup'**
+  String get startup_versionMismatch_restore_title;
+
+  /// No description provided for @startup_versionMismatch_restore_body.
+  ///
+  /// In en, this message translates to:
+  /// **'A safety copy of your dive log, taken before the upgrade, is on this device and this version can open it.'**
+  String get startup_versionMismatch_restore_body;
+
+  /// No description provided for @startup_versionMismatch_restore_warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything you logged after the upgrade exists only in the newer file. That file is kept as a pinned backup, so installing the newer version again gets it back.'**
+  String get startup_versionMismatch_restore_warning;
+
+  /// No description provided for @backup_history_preDowngradeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Newer database, kept when going back - {size}'**
+  String backup_history_preDowngradeSubtitle(String size);
+
+  /// No description provided for @backup_history_manualSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}} - {size}'**
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  );
+
+  /// No description provided for @backup_history_manualSubtitleAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'{diveCount, plural, =1{1 dive} other{{diveCount} dives}}, {siteCount, plural, =1{1 site} other{{siteCount} sites}} - {size} (auto)'**
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  );
 }
 
 class _AppLocalizationsDelegate

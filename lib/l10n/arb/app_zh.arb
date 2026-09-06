@@ -999,6 +999,25 @@
   "checklists_item_delete": "删除事项",
   "checklists_menu_applyTemplate": "应用模板…",
   "checklists_menu_saveAsTemplate": "保存为模板…",
+  "checklists_menu_clearAll": "清空清单…",
+  "checklists_clear_title": "清空清单",
+  "checklists_clear_content": "{count, plural, other{要删除此清单中的全部 {count} 个项目吗？模板不受影响。}}",
+  "@checklists_clear_content": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checklists_clear_confirm": "清空",
+  "checklists_clear_success": "{count, plural, other{已移除 {count} 个项目}}",
+  "@checklists_clear_success": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "checklists_applySheet_title": "应用模板",
   "checklists_applySheet_empty": "暂无模板。请在设置中创建。",
   "checklists_applySheet_itemCount": "{count, plural, =1{1 项事项} other{{count} 项事项}}",
@@ -4906,8 +4925,11 @@
   "settings_appearance_theme_dark": "深色",
   "settings_appearance_theme_light": "轻微",
   "settings_appearance_theme_system": "系统默认",
-  "settings_navCustomization_title": "Navigation bar",
+  "settings_navCustomization_title": "导航布局",
   "settings_navCustomization_description": "Drag items to reorder. The top three appear in your bottom navigation bar.",
+  "settings_navCustomization_descriptionDesktop": "拖动项目以重新排列侧边栏。主页始终位于顶部。",
+  "settings_navCustomization_scopePhone": "手机",
+  "settings_navCustomization_scopeDesktop": "桌面",
   "settings_navCustomization_dividerLabel": "Items below appear in the More menu",
   "settings_navCustomization_resetButton": "Reset to defaults",
   "settings_navCustomization_pinnedTooltip": "Always shown",
@@ -7053,7 +7075,7 @@
   "@dive3d_seascape_noData": {},
   "dive3d_seascape_axis_distance": "距离（{unitSymbol}）",
   "@dive3d_seascape_axis_distance": {},
-  "settings_about_bathymetryCredit": "水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022 · swissBATHY3D（© swisstopo）",
+  "settings_about_bathymetryCredit": "水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D（© swisstopo）",
   "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "深度",
   "@dive3d_metric_depth": {},
@@ -10289,12 +10311,15 @@
   "startup_backupFailed_quit": "退出",
   "startup_backupFailed_technicalDetails": "技术详情",
   "common_action_retry": "重试",
-  "startup_versionMismatch_title": "需要更新",
+  "startup_versionMismatch_title": "您的数据比此应用更新",
   "startup_versionMismatch_body": "您的潜水数据是由较新版本的 Submersion 保存的（架构 v{databaseVersion}）。此版本最高仅支持架构 v{appVersion}。",
-  "startup_versionMismatch_instructions": "请将 Submersion 更新到最新版本。您的数据是安全的，未被修改。如果升级前已创建备份，它位于您的 Backups 文件夹中，更新后可以恢复。",
+  "startup_versionMismatch_causes": "这通常意味着测试版构建升级了您的数据、从更新的构建恢复了备份，或者该文件与其他更新通道上的设备共享。更新的稳定版可能尚未发布。",
+  "startup_versionMismatch_instructions": "您的数据是安全的，未被修改。请使用写入这些数据的构建版本，或任何更高版本重新打开。如果升级前已创建备份，它位于您的 Backups 文件夹中，待您运行可以打开该文件的版本后即可恢复。",
   "startup_versionMismatch_storeInstructions": "此应用安装自应用商店，版本低于创建您数据的版本。您的数据是安全的，未被修改。当新版本在商店上架后，请更新 Submersion 并重新打开。",
-  "startup_versionMismatch_download": "下载最新版本",
-  "startup_versionMismatch_manualLink": "如果未打开浏览器，请访问：",
+  "startup_versionMismatch_download": "查找更新的稳定版",
+  "startup_versionMismatch_betaAction": "获取测试版构建",
+  "startup_versionMismatch_betaNote": "测试版构建为预发布版本。仅当测试版构建写入了您的数据时才选择此项。",
+  "startup_versionMismatch_manualLink": "如果这些按钮未打开浏览器，请访问：",
   "universalImport_compare_downloaded": "已下载",
   "universalImport_compare_errorLoading": "加载潜水数据出错",
   "universalImport_compare_diveNotFound": "未找到现有潜水记录",
@@ -10721,5 +10746,11 @@
   "diveComputer_detail_mergePickerSameSerial": "序列号相同",
   "diveComputer_detail_duplicateBanner": "{name} 的序列号与此相同，可能是同一台潜水电脑被保存了两次。",
   "diveComputer_detail_duplicateBannerMultiple": "另有 {count} 条已保存记录的序列号与此相同，可能是同一台潜水电脑被保存了多次。",
-  "diveComputer_detail_duplicateBannerAction": "合并"
+  "diveComputer_detail_duplicateBannerAction": "合并",
+  "startup_versionMismatch_restore_title": "恢复升级前的备份",
+  "startup_versionMismatch_restore_body": "本设备上存有升级前的潜水日志安全副本，当前版本可以打开它。",
+  "startup_versionMismatch_restore_warning": "升级之后记录的内容只存在于较新的文件中。该文件会作为已固定的备份保留，重新安装较新版本即可取回。",
+  "backup_history_preDowngradeSubtitle": "较新的数据库，回退时保留 - {size}",
+  "backup_history_manualSubtitle": "{diveCount, plural, =1{{diveCount} 次潜水} other{{diveCount} 次潜水}}, {siteCount, plural, =1{{siteCount} 个潜点} other{{siteCount} 个潜点}} - {size}",
+  "backup_history_manualSubtitleAuto": "{diveCount, plural, =1{{diveCount} 次潜水} other{{diveCount} 次潜水}}, {siteCount, plural, =1{{siteCount} 个潜点} other{{siteCount} 个潜点}} - {size}（自动）"
 }

@@ -10,6 +10,7 @@ import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/emodnet_source.dart';
 import 'package:submersion/features/bathymetry/data/sources/etopo_erddap_source.dart';
 import 'package:submersion/features/bathymetry/data/sources/gmrt_source.dart';
+import 'package:submersion/features/bathymetry/data/sources/noaa_dem_source.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/features/bathymetry/data/swiss_lake_depth_service.dart';
@@ -34,10 +35,15 @@ final bathymetryRepositoryProvider = Provider<BathymetryRepository?>((ref) {
       db: db,
       resolver: BathymetryResolver(
         // Tier order: swissBATHY3D first (lake-only, ~0.5-2 m, beats every
-        // other tier where it applies), then regional survey data, then
-        // global GMRT, then the coarse public-domain fallback.
+        // other tier where it applies), then regional survey data
+        // (NOAA's coastal mosaic leads only where it is MATERIALLY finer,
+        // which the resolver's preemption factor decides; where the mosaic
+        // holds nothing but its ETOPO background it declines during probe
+        // and is never fetched), then global GMRT, then the coarse
+        // public-domain fallback.
         sources: [
           SwissBathy3dSource(tileCache: SwissBathyTileCacheRepository(db)),
+          NoaaDemSource(),
           EmodnetSource(),
           GmrtSource(),
           EtopoErddapSource(),

@@ -2195,6 +2195,38 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checklists_menu_saveAsTemplate => 'حفظ كقالب...';
 
   @override
+  String get checklists_menu_clearAll => 'مسح قائمة التحقق...';
+
+  @override
+  String get checklists_clear_title => 'مسح قائمة التحقق';
+
+  @override
+  String checklists_clear_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'هل تريد حذف جميع العناصر البالغ عددها $count من قائمة التحقق هذه؟ لن تتأثر القوالب.',
+      one: 'هل تريد حذف العنصر الوحيد من قائمة التحقق هذه؟ لن تتأثر القوالب.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checklists_clear_confirm => 'مسح';
+
+  @override
+  String checklists_clear_success(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت إزالة $count عناصر',
+      one: 'تمت إزالة عنصر واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get checklists_applySheet_title => 'تطبيق القالب';
 
   @override
@@ -15576,11 +15608,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_appearance_theme_system => 'الافتراضي للنظام';
 
   @override
-  String get settings_navCustomization_title => 'Navigation bar';
+  String get settings_navCustomization_title => 'تخطيط التنقل';
 
   @override
   String get settings_navCustomization_description =>
       'Drag items to reorder. The top three appear in your bottom navigation bar.';
+
+  @override
+  String get settings_navCustomization_descriptionDesktop =>
+      'اسحب العناصر لإعادة ترتيب الشريط الجانبي. تبقى الصفحة الرئيسية دائمًا في الأعلى.';
+
+  @override
+  String get settings_navCustomization_scopePhone => 'الهاتف';
+
+  @override
+  String get settings_navCustomization_scopeDesktop => 'سطح المكتب';
 
   @override
   String get settings_navCustomization_dividerLabel =>
@@ -24281,7 +24323,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)';
+      'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'العمق';
@@ -34715,7 +34757,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_action_retry => 'إعادة المحاولة';
 
   @override
-  String get startup_versionMismatch_title => 'التحديث مطلوب';
+  String get startup_versionMismatch_title => 'بياناتك أحدث من هذا التطبيق';
 
   @override
   String startup_versionMismatch_body(
@@ -34726,19 +34768,30 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get startup_versionMismatch_causes =>
+      'يعني هذا عادةً أن إصدارًا تجريبيًا (بيتا) قد رقّى بياناتك، أو أنه تمت استعادة نسخة احتياطية من إصدار أحدث، أو أن الملف مشترك مع جهاز على قناة تحديث مختلفة. قد لا يكون هناك إصدار مستقر أحدث بعد.';
+
+  @override
   String get startup_versionMismatch_instructions =>
-      'يرجى تحديث Submersion إلى أحدث إصدار. بياناتك آمنة ولم تُعدَّل. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بعد التحديث.';
+      'بياناتك آمنة ولم تُعدَّل. افتحها بالإصدار الذي كتبها، أو بأي إصدار أحدث. إذا أُخذت نسخة احتياطية قبل الترقية، فهي موجودة في مجلد Backups ويمكن استعادتها بمجرد تشغيل إصدار قادر على فتح الملف.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
       'تم تثبيت هذا التطبيق من متجر تطبيقات وهو أقدم من الإصدار الذي أنشأ بياناتك. بياناتك آمنة ولم يتم تعديلها. حدّث Submersion عندما يظهر الإصدار الجديد في المتجر، ثم أعد فتحه.';
 
   @override
-  String get startup_versionMismatch_download => 'تنزيل أحدث إصدار';
+  String get startup_versionMismatch_download => 'البحث عن إصدار مستقر أحدث';
+
+  @override
+  String get startup_versionMismatch_betaAction => 'الحصول على إصدار البيتا';
+
+  @override
+  String get startup_versionMismatch_betaNote =>
+      'إصدارات البيتا أولية. اختر هذا فقط إذا كان إصدار بيتا قد كتب بياناتك.';
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'إذا لم يفتح ذلك متصفحًا، فتفضل بزيارة:';
+      'إذا لم تفتح هذه الأزرار متصفحًا، فتفضل بزيارة:';
 
   @override
   String get universalImport_compare_downloaded => 'المنزَّلة';
@@ -36402,4 +36455,63 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveComputer_detail_duplicateBannerAction => 'دمج';
+
+  @override
+  String get startup_versionMismatch_restore_title =>
+      'استعادة النسخة الاحتياطية السابقة للترقية';
+
+  @override
+  String get startup_versionMismatch_restore_body =>
+      'توجد على هذا الجهاز نسخة احتياطية من سجل الغوص أُخذت قبل الترقية، وهذا الإصدار يستطيع فتحها.';
+
+  @override
+  String get startup_versionMismatch_restore_warning =>
+      'كل ما سجّلته بعد الترقية موجود في الملف الأحدث فقط. يُحتفظ بذلك الملف كنسخة احتياطية مثبّتة، لذا فإن إعادة تثبيت الإصدار الأحدث تستعيده.';
+
+  @override
+  String backup_history_preDowngradeSubtitle(String size) {
+    return 'قاعدة بيانات أحدث، محفوظة عند الرجوع - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount غوصات',
+      one: 'غوصة واحدة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount مواقع غوص',
+      one: 'موقع غوص واحد',
+    );
+    return '$_temp0, $_temp1 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount غوصات',
+      one: 'غوصة واحدة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount مواقع غوص',
+      one: 'موقع غوص واحد',
+    );
+    return '$_temp0, $_temp1 - $size (تلقائي)';
+  }
 }

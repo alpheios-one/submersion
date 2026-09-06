@@ -2243,6 +2243,39 @@ class AppLocalizationsIt extends AppLocalizations {
   String get checklists_menu_saveAsTemplate => 'Salva come modello...';
 
   @override
+  String get checklists_menu_clearAll => 'Svuota checklist...';
+
+  @override
+  String get checklists_clear_title => 'Svuota checklist';
+
+  @override
+  String checklists_clear_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Eliminare tutti i $count elementi da questa checklist? I modelli non vengono modificati.',
+      one:
+          'Eliminare l\'unico elemento da questa checklist? I modelli non vengono modificati.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checklists_clear_confirm => 'Svuota';
+
+  @override
+  String checklists_clear_success(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementi rimossi',
+      one: '1 elemento rimosso',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get checklists_applySheet_title => 'Applica modello';
 
   @override
@@ -15861,11 +15894,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_appearance_theme_system => 'Predefinito di sistema';
 
   @override
-  String get settings_navCustomization_title => 'Navigation bar';
+  String get settings_navCustomization_title => 'Layout di navigazione';
 
   @override
   String get settings_navCustomization_description =>
       'Drag items to reorder. The top three appear in your bottom navigation bar.';
+
+  @override
+  String get settings_navCustomization_descriptionDesktop =>
+      'Trascina gli elementi per riordinare la barra laterale. Home resta sempre in alto.';
+
+  @override
+  String get settings_navCustomization_scopePhone => 'Telefono';
+
+  @override
+  String get settings_navCustomization_scopeDesktop => 'Desktop';
 
   @override
   String get settings_navCustomization_dividerLabel =>
@@ -24732,7 +24775,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'Dati batimetrici: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)';
+      'Dati batimetrici: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'Profondità';
@@ -35073,7 +35116,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get common_action_retry => 'Riprova';
 
   @override
-  String get startup_versionMismatch_title => 'Aggiornamento necessario';
+  String get startup_versionMismatch_title =>
+      'I tuoi dati sono più recenti di questa app';
 
   @override
   String startup_versionMismatch_body(
@@ -35084,19 +35128,31 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get startup_versionMismatch_causes =>
+      'Di solito significa che una build beta ha aggiornato i tuoi dati, che è stato ripristinato un backup da una build più recente, oppure che il file è condiviso con un dispositivo su un altro canale di aggiornamento. Una versione stabile più recente potrebbe non esistere ancora.';
+
+  @override
   String get startup_versionMismatch_instructions =>
-      'Aggiorna Submersion all’ultima versione. I tuoi dati sono al sicuro e non sono stati modificati. Se prima dell’aggiornamento è stato eseguito un backup, si trova nella cartella Backups e può essere ripristinato dopo l’aggiornamento.';
+      'I tuoi dati sono al sicuro e non sono stati modificati. Riaprili con la build che li ha scritti, o con una build successiva. Se prima dell’aggiornamento è stato eseguito un backup, si trova nella cartella Backups e può essere ripristinato quando usi una build in grado di aprire il file.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
       'Questa app è stata installata da un app store ed è più vecchia della versione che ha creato i tuoi dati. I tuoi dati sono al sicuro e non sono stati modificati. Aggiorna Submersion quando la nuova versione appare nello store, poi riaprila.';
 
   @override
-  String get startup_versionMismatch_download => 'Scarica l’ultima versione';
+  String get startup_versionMismatch_download =>
+      'Cerca una versione stabile più recente';
+
+  @override
+  String get startup_versionMismatch_betaAction => 'Scarica la build beta';
+
+  @override
+  String get startup_versionMismatch_betaNote =>
+      'Le build beta sono anteprime. Scegli questa opzione solo se una build beta ha scritto i tuoi dati.';
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'Se non si apre un browser, visita:';
+      'Se questi pulsanti non aprono un browser, visita:';
 
   @override
   String get universalImport_compare_downloaded => 'Scaricata';
@@ -36770,4 +36826,63 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get diveComputer_detail_duplicateBannerAction => 'Unisci';
+
+  @override
+  String get startup_versionMismatch_restore_title =>
+      'Ripristina la copia precedente all\'aggiornamento';
+
+  @override
+  String get startup_versionMismatch_restore_body =>
+      'Su questo dispositivo c\'è una copia di sicurezza del tuo diario di immersione fatta prima dell\'aggiornamento, e questa versione può aprirla.';
+
+  @override
+  String get startup_versionMismatch_restore_warning =>
+      'Tutto ciò che hai registrato dopo l\'aggiornamento esiste solo nel file più recente. Quel file viene conservato come backup bloccato: reinstallando la versione più recente lo recuperi.';
+
+  @override
+  String backup_history_preDowngradeSubtitle(String size) {
+    return 'Database più recente, conservato tornando indietro - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount immersioni',
+      one: '1 immersione',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount siti',
+      one: '1 sito',
+    );
+    return '$_temp0, $_temp1 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount immersioni',
+      one: '1 immersione',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount siti',
+      one: '1 sito',
+    );
+    return '$_temp0, $_temp1 - $size (auto)';
+  }
 }

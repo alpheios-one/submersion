@@ -2230,6 +2230,39 @@ class AppLocalizationsHu extends AppLocalizations {
   String get checklists_menu_saveAsTemplate => 'Mentés sablonként...';
 
   @override
+  String get checklists_menu_clearAll => 'Ellenőrzőlista törlése...';
+
+  @override
+  String get checklists_clear_title => 'Ellenőrzőlista törlése';
+
+  @override
+  String checklists_clear_content(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Törli mind a(z) $count elemet az ellenőrzőlistáról? A sablonokat ez nem érinti.',
+      one:
+          'Törli az ellenőrzőlista egyetlen elemét? A sablonokat ez nem érinti.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checklists_clear_confirm => 'Törlés';
+
+  @override
+  String checklists_clear_success(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem eltávolítva',
+      one: '1 elem eltávolítva',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get checklists_applySheet_title => 'Sablon alkalmazása';
 
   @override
@@ -15807,11 +15840,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_theme_system => 'Rendszer alapertelmezett';
 
   @override
-  String get settings_navCustomization_title => 'Navigation bar';
+  String get settings_navCustomization_title => 'Navigáció elrendezése';
 
   @override
   String get settings_navCustomization_description =>
       'Drag items to reorder. The top three appear in your bottom navigation bar.';
+
+  @override
+  String get settings_navCustomization_descriptionDesktop =>
+      'Húzza az elemeket az oldalsáv átrendezéséhez. A Kezdőlap mindig felül marad.';
+
+  @override
+  String get settings_navCustomization_scopePhone => 'Telefon';
+
+  @override
+  String get settings_navCustomization_scopeDesktop => 'Asztali';
 
   @override
   String get settings_navCustomization_dividerLabel =>
@@ -24629,7 +24672,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · swissBATHY3D (© swisstopo)';
+      'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'Mélység';
@@ -34918,7 +34961,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_action_retry => 'Újra';
 
   @override
-  String get startup_versionMismatch_title => 'Frissítés szükséges';
+  String get startup_versionMismatch_title =>
+      'Az adatai újabbak ennél az alkalmazásnál';
 
   @override
   String startup_versionMismatch_body(
@@ -34929,19 +34973,30 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get startup_versionMismatch_causes =>
+      'Ez általában azt jelenti, hogy egy béta verzió frissítette az adatait, hogy egy újabb verzióból készült biztonsági mentés lett visszaállítva, vagy hogy a fájl egy másik frissítési csatornán lévő eszközzel van megosztva. Lehet, hogy még nem létezik újabb stabil verzió.';
+
+  @override
   String get startup_versionMismatch_instructions =>
-      'Kérjük, frissítse a Submersiont a legújabb verzióra. Az adatai biztonságban vannak, és nem módosultak. Ha a frissítés előtt készült biztonsági mentés, az a Backups mappában található, és a frissítés után visszaállítható.';
+      'Az adatai biztonságban vannak, és nem módosultak. Nyissa meg őket azzal a verzióval, amely írta őket, vagy bármely későbbi verzióval. Ha a frissítés előtt készült biztonsági mentés, az a Backups mappában található, és visszaállítható, amint olyan verziót futtat, amely meg tudja nyitni a fájlt.';
 
   @override
   String get startup_versionMismatch_storeInstructions =>
       'Ezt az alkalmazást alkalmazásboltból telepítetted, és régebbi, mint az adataidat létrehozó verzió. Az adataid biztonságban vannak, nem módosultak. Frissítsd a Submersiont, amint az új verzió megjelenik a boltban, majd nyisd meg újra.';
 
   @override
-  String get startup_versionMismatch_download => 'Legújabb verzió letöltése';
+  String get startup_versionMismatch_download => 'Újabb stabil verzió keresése';
+
+  @override
+  String get startup_versionMismatch_betaAction => 'Béta verzió letöltése';
+
+  @override
+  String get startup_versionMismatch_betaNote =>
+      'A béta verziók előzetes kiadások. Csak akkor válassza ezt, ha egy béta verzió írta az adatait.';
 
   @override
   String get startup_versionMismatch_manualLink =>
-      'Ha ez nem nyit meg böngészőt, keresse fel:';
+      'Ha ezek a gombok nem nyitnak meg böngészőt, keresse fel:';
 
   @override
   String get universalImport_compare_downloaded => 'Letöltött';
@@ -36621,4 +36676,63 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveComputer_detail_duplicateBannerAction => 'Osszevonas';
+
+  @override
+  String get startup_versionMismatch_restore_title =>
+      'A frissítés előtti biztonsági mentés visszaállítása';
+
+  @override
+  String get startup_versionMismatch_restore_body =>
+      'A frissítés előtt készült biztonsági másolat a merülőnaplódról ezen az eszközön van, és ez a verzió meg tudja nyitni.';
+
+  @override
+  String get startup_versionMismatch_restore_warning =>
+      'Minden, amit a frissítés után rögzítettél, csak az újabb fájlban létezik. Azt a fájlt rögzített biztonsági mentésként megőrizzük, így az újabb verzió ismételt telepítésével visszakapod.';
+
+  @override
+  String backup_history_preDowngradeSubtitle(String size) {
+    return 'Újabb adatbázis, visszalépéskor megőrizve - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitle(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount merülés',
+      one: '1 merülés',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount merülőhely',
+      one: '1 merülőhely',
+    );
+    return '$_temp0, $_temp1 - $size';
+  }
+
+  @override
+  String backup_history_manualSubtitleAuto(
+    int diveCount,
+    int siteCount,
+    String size,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '$diveCount merülés',
+      one: '1 merülés',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      siteCount,
+      locale: localeName,
+      other: '$siteCount merülőhely',
+      one: '1 merülőhely',
+    );
+    return '$_temp0, $_temp1 - $size (automatikus)';
+  }
 }
