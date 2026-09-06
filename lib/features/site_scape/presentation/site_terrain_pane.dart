@@ -330,19 +330,21 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     Scene3d scene,
     BathymetryGrid grid,
   ) {
-    // DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
+    // DEBUG ONLY: gated behind kDebugMode AND the swissBATHY3D source, not
+    // shown in release builds or for any other bathymetry source.
     // site.location is already resolved by this point (siteSeascapeProvider
     // awaited it to reach SiteSeascapeReady), so re-watching it here is a
     // cache hit -- but the watch() call itself must not run in release
     // builds at all, since it exists purely to feed the debug panel below.
-    final site = kDebugMode
+    final isSwissBathy3d = sourceId == 'swissbathy3d';
+    final site = kDebugMode && isSwissBathy3d
         ? ref.watch(siteProvider(widget.siteId)).valueOrNull
         : null;
     final center = site?.location;
     return Align(
       alignment: Alignment.topLeft,
       child: GestureDetector(
-        onTap: !kDebugMode
+        onTap: !kDebugMode || !isSwissBathy3d
             ? null
             : () => setState(() {
                 _debugExpanded = !_debugExpanded;
@@ -381,8 +383,10 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                   ),
                 ],
               ),
-              // DEBUG ONLY: gated behind kDebugMode, not shown in release builds
-              if (kDebugMode && _debugExpanded) _debugPanel(scene, grid),
+              // DEBUG ONLY: gated behind kDebugMode and the swissBATHY3D
+              // source, not shown in release builds or other sources.
+              if (kDebugMode && isSwissBathy3d && _debugExpanded)
+                _debugPanel(scene, grid),
             ],
           ),
         ),

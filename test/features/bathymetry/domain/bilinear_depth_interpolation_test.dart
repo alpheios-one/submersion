@@ -70,6 +70,50 @@ void main() {
     },
   );
 
+  test(
+    'a nodata interior neighbor row does not leak into the south margin',
+    () {
+      // Row 0 is fully valid, row 1 (the interior neighbor row 0's south
+      // margin used to reference) is entirely nodata. A point half a cell
+      // south of row 0's center has a blend weight of 0 against row 1, so
+      // row 1 being nodata must not affect the result.
+      final rowBelowIsHole = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 1,
+        cellSizeLonDeg: 1,
+        rows: 2,
+        cols: 2,
+        depthsMeters: const [10, 20, null, null],
+        sourceId: 't',
+        resolutionMeters: 100,
+        fetchedAt: DateTime.utc(2026, 8, 16),
+      );
+      expect(bilinearInterpolateDepth(rowBelowIsHole, -0.4, 0.5), 15);
+    },
+  );
+
+  test(
+    'a nodata interior neighbor column does not leak into the west margin',
+    () {
+      // Column 0 is fully valid, column 1 (the interior neighbor column 0's
+      // west margin used to reference) is entirely nodata.
+      final colRightIsHole = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 1,
+        cellSizeLonDeg: 1,
+        rows: 2,
+        cols: 2,
+        depthsMeters: const [10, null, 30, null],
+        sourceId: 't',
+        resolutionMeters: 100,
+        fetchedAt: DateTime.utc(2026, 8, 16),
+      );
+      expect(bilinearInterpolateDepth(colRightIsHole, 0.5, -0.4), 20);
+    },
+  );
+
   test('nodata among the four surrounding cells still yields null', () {
     final withHole = BathymetryGrid(
       originLat: 0,

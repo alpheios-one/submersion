@@ -17,10 +17,18 @@ double? bilinearInterpolateDepth(BathymetryGrid grid, double lat, double lon) {
   if (rowF < -0.5 || rowF > grid.rows - 0.5) return null;
   if (colF < -0.5 || colF > grid.cols - 0.5) return null;
 
-  final r0 = _clampIndex(rowF.floor(), grid.rows - 1);
-  final c0 = _clampIndex(colF.floor(), grid.cols - 1);
-  final r1 = _clampIndex(r0 + 1, grid.rows - 1);
-  final c1 = _clampIndex(c0 + 1, grid.cols - 1);
+  final r0Raw = rowF.floor();
+  final c0Raw = colF.floor();
+  final r0 = _clampIndex(r0Raw, grid.rows - 1);
+  final c0 = _clampIndex(c0Raw, grid.cols - 1);
+  // In the south/west half-cell margin (rowF/colF in [-0.5, 0)), r0Raw/c0Raw
+  // is -1 and gets clamped up to 0 above — but a plain +1 neighbor would then
+  // point at row/col 1, an interior cell the blend weight (fr/fc) is clamped
+  // to ignore. If that interior cell is nodata, the null check below would
+  // reject a point that is genuinely still inside the grid. Keep r1/c1 at
+  // the same edge index instead, so a nodata interior neighbor can't leak in.
+  final r1 = r0Raw < 0 ? r0 : _clampIndex(r0 + 1, grid.rows - 1);
+  final c1 = c0Raw < 0 ? c0 : _clampIndex(c0 + 1, grid.cols - 1);
 
   final d00 = grid.depthAt(r0, c0);
   final d01 = grid.depthAt(r0, c1);
