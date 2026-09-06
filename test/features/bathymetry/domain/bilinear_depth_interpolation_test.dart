@@ -53,10 +53,11 @@ void main() {
     },
   );
 
-  test('a corner margin blends only the columns, clamped to the edge row', () {
+  test('a corner margin clamps to the nearest edge cell on both axes', () {
     // South-east corner margin: still within the footprint on both axes,
-    // but with no row/col beyond (2, 2) to blend against.
-    expect(bilinearInterpolateDepth(grid, -0.4, 2.4), 70);
+    // but with no row below 0 or column beyond 2 to blend against, so this
+    // must resolve to cell (0, 2)'s own value regardless of either weight.
+    expect(bilinearInterpolateDepth(grid, -0.4, 2.4), 30);
   });
 
   test(
