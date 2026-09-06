@@ -8,8 +8,6 @@ import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
-import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
-import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
@@ -27,6 +25,7 @@ import 'package:submersion/features/settings/presentation/widgets/visibility_sca
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/settings/presentation/widgets/bathymetry_refresh_tile.dart';
 import 'package:submersion/features/settings/presentation/widgets/nav_customization_tile.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
@@ -1765,37 +1764,6 @@ class _AppearanceSectionContentState
   String? _activeSectionKey;
   bool _showColumnConfig = false;
   String? _columnConfigSection;
-  bool _isRefreshingBathymetry = false;
-
-  Future<void> _refreshBathymetryCache() async {
-    setState(() => _isRefreshingBathymetry = true);
-    final refresh = ref.read(swissBathyManualRefreshProvider);
-    SwissBathyRefreshSummary? summary;
-    try {
-      summary = await refresh();
-    } finally {
-      if (mounted) setState(() => _isRefreshingBathymetry = false);
-    }
-    if (!mounted) return;
-
-    // `summary == null` means the refresh could not even be attempted (e.g.
-    // the local cache database was not initialized) -- a real failure, not
-    // "nothing to check" -- so it must not fall into the up-to-date branch.
-    final message = summary == null
-        ? context.l10n.settings_appearance_bathymetryRefresh_resultFailed
-        : summary.total == 0
-        ? context.l10n.settings_appearance_bathymetryRefresh_resultUpToDate
-        : summary.updated > 0
-        ? context.l10n.settings_appearance_bathymetryRefresh_resultUpdated(
-            summary.updated,
-          )
-        : summary.failed > 0
-        ? context.l10n.settings_appearance_bathymetryRefresh_resultFailed
-        : context.l10n.settings_appearance_bathymetryRefresh_resultUpToDate;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1939,25 +1907,7 @@ class _AppearanceSectionContentState
                   ),
                 ),
                 const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.refresh),
-                  title: Text(
-                    context.l10n.settings_appearance_bathymetryRefresh,
-                  ),
-                  subtitle: Text(
-                    context.l10n.settings_appearance_bathymetryRefresh_subtitle,
-                  ),
-                  trailing: _isRefreshingBathymetry
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : null,
-                  onTap: _isRefreshingBathymetry
-                      ? null
-                      : _refreshBathymetryCache,
-                ),
+                const BathymetryRefreshTile(leading: Icon(Icons.refresh)),
                 const Divider(height: 1),
                 const NavCustomizationTile(),
               ],

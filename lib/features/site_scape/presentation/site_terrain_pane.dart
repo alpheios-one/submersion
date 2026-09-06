@@ -330,11 +330,15 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     Scene3d scene,
     BathymetryGrid grid,
   ) {
-    // Debug-only: site.location is already resolved by this point
-    // (siteSeascapeProvider awaited it to reach SiteSeascapeReady), so re-watching it here is a cache hit.
-    final site = ref.watch(siteProvider(widget.siteId)).valueOrNull;
+    // DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
+    // site.location is already resolved by this point (siteSeascapeProvider
+    // awaited it to reach SiteSeascapeReady), so re-watching it here is a
+    // cache hit -- but the watch() call itself must not run in release
+    // builds at all, since it exists purely to feed the debug panel below.
+    final site = kDebugMode
+        ? ref.watch(siteProvider(widget.siteId)).valueOrNull
+        : null;
     final center = site?.location;
-    // Debug-only: gated on kDebugMode so tapping the chip in release builds does nothing.
     return Align(
       alignment: Alignment.topLeft,
       child: GestureDetector(
@@ -416,7 +420,7 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     });
   }
 
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+  // DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
   Widget _clearSwissBathyCacheRow() {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -447,12 +451,13 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     );
   }
 
-  // TEMPORARY - DEBUG ONLY, remove before upstream PR.
+  // DEBUG ONLY: gated behind kDebugMode, not shown in release builds.
   Widget _debugPanel(Scene3d scene, BathymetryGrid grid) {
-    // TEMPORARY - DEBUG ONLY, remove before upstream PR: the render-layer
-    // fingerprint needs no network/cache lookups (unlike the fetch-layer
-    // panel below), so it is available synchronously off the mesh that is
-    // already on screen — read at build time, not behind a FutureBuilder.
+    // DEBUG ONLY: gated behind kDebugMode, not shown in release builds. The
+    // render-layer fingerprint needs no network/cache lookups (unlike the
+    // fetch-layer panel below), so it is available synchronously off the
+    // mesh that is already on screen — read at build time, not behind a
+    // FutureBuilder.
     // The grid fingerprint is the same story: [grid] is the exact object
     // SiteSeascapeGeometryService.buildWithLabels() was called with (see
     // site_seascape_providers.dart), so this needs no re-fetch either —
