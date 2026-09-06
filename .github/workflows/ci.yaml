@@ -510,7 +510,7 @@ jobs:
         # Fails if the serial download service loses android:process=":dc" -- a
         # native download crash would then kill the app again (issue #318).
         run: python3 scripts/check_dc_process_isolation.py
-      
+
       - name: Run Python guard tests with coverage
         run: |
           mkdir -p coverage
@@ -1286,7 +1286,7 @@ jobs:
           name: pr-number
           path: pr-number.txt
           retention-days: 1
-          
+
   # A submodule pointer is a single sha with no file diff, so a pull request
   # that moves libdivecomputer backwards reverts every fork commit in between
   # while showing a reviewer nothing at all to look at. PR #342 sat with a
