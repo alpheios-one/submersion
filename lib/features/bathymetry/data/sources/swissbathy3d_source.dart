@@ -320,10 +320,27 @@ class SwissBathy3dSource implements BathymetrySource {
   /// single entry), or an empty list when it contains none. Shared across
   /// every tile coordinate that resolves to the same href — see
   /// [_fetchTile]'s and [fetch]'s docs.
+  ///
+  /// [extractGridZipTexts] decodes [zipBytes] with the `archive` package,
+  /// which throws its own `ArchiveException` (not [FormatException]) on
+  /// malformed zip bytes — e.g. an HTTP 200 response body that is actually
+  /// an HTML error page, or a truncated download. Every callsite of this
+  /// method already narrows on [FormatException] to report a clean parse
+  /// failure rather than a transient one (see [_fetchTile] and
+  /// [_checkAndMaybeUpdate]), so anything the decode or grid parse step
+  /// throws that is not already a [FormatException] is normalized into one
+  /// here, instead of escaping as a raw `ArchiveException` (or any other
+  /// type) and crashing the fetch/stitch pipeline.
   Future<List<RawEsriGrid>> _downloadAndParseRaw(String href) async {
     final zipBytes = await _stac.downloadBytes(href);
-    final gridTexts = extractGridZipTexts(zipBytes);
-    return [for (final text in gridTexts) EsriAsciiGridParser.parseRaw(text)];
+    try {
+      final gridTexts = extractGridZipTexts(zipBytes);
+      return [for (final text in gridTexts) EsriAsciiGridParser.parseRaw(text)];
+    } on FormatException {
+      rethrow;
+    } catch (e) {
+      throw FormatException('swissBATHY3D zip/grid decode failed: $e');
+    }
   }
 
   static bool _isStale(DateTime? checkedAt) {

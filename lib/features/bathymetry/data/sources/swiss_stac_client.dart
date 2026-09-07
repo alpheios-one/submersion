@@ -149,44 +149,74 @@ class SwissStacClient {
       if (resp.statusCode != 200) {
         throw SwissStacException('STAC items HTTP ${resp.statusCode}');
       }
-      final Map<String, dynamic> body;
+      final Object? decoded;
       try {
-        body = jsonDecode(resp.body) as Map<String, dynamic>;
+        decoded = jsonDecode(resp.body);
       } catch (e) {
         throw SwissStacException('STAC items response not JSON: $e');
       }
-      final features = body['features'] as List<dynamic>? ?? const [];
+      if (decoded is! Map<String, dynamic>) {
+        throw const SwissStacException(
+          'STAC items response was not a JSON object',
+        );
+      }
+      final body = decoded;
+      final rawFeatures = body['features'];
+      if (rawFeatures != null && rawFeatures is! List) {
+        throw const SwissStacException(
+          "STAC items response's 'features' field was not a list",
+        );
+      }
+      final features = rawFeatures as List<dynamic>? ?? const [];
       for (final feature in features) {
-        final featureMap = feature as Map<String, dynamic>;
-        if (!_featureOverlaps(featureMap, bbox)) continue;
-        final assets = featureMap['assets'] as Map<String, dynamic>?;
-        if (assets == null) continue;
+        if (feature is! Map<String, dynamic>) continue;
+        if (!_featureOverlaps(feature, bbox)) continue;
+        final assets = feature['assets'];
+        if (assets is! Map<String, dynamic>) continue;
         final picked = _pickAsset(assets);
         if (picked == null) continue;
-        final properties = featureMap['properties'] as Map<String, dynamic>?;
+        final properties = feature['properties'];
         candidates.add(
           SwissBathyAsset(
             href: picked.href,
             format: picked.format,
-            datetime: _itemDatetime(properties),
+            datetime: _itemDatetime(
+              properties is Map<String, dynamic> ? properties : null,
+            ),
           ),
         );
       }
       url = _nextPageUrl(body);
+      if (url != null && page == maxPages - 1) {
+        // A "next" link still exists but the page cap was just reached: the
+        // candidate list above is definitely incomplete, not "no tile
+        // here". Returning it would let a caller cache a false negative for
+        // a tile that a later page might actually cover. Throwing keeps
+        // this a transient failure (retried on the next visit) instead.
+        throw const SwissStacException(
+          'STAC items pagination exceeded $maxPages pages; refusing '
+          'partial results',
+        );
+      }
     }
     return candidates;
   }
 
   /// The STAC `next` pagination link's href, if the response declares one
   /// (OGC API Features / STAC `links` array with `"rel": "next"`), else null.
+  /// A malformed `links` array (missing entirely, not a list, or containing
+  /// non-object entries) is treated the same as "no next link" rather than
+  /// thrown — this is best-effort continuation, not a required field, so a
+  /// server sending unexpected shapes here should not abort an otherwise
+  /// successful page of results.
   static Uri? _nextPageUrl(Map<String, dynamic> body) {
-    final links = body['links'] as List<dynamic>?;
-    if (links == null) return null;
+    final links = body['links'];
+    if (links is! List) return null;
     for (final link in links) {
-      final linkMap = link as Map<String, dynamic>?;
-      if (linkMap?['rel'] != 'next') continue;
-      final href = linkMap?['href'] as String?;
-      if (href == null) continue;
+      if (link is! Map<String, dynamic>) continue;
+      if (link['rel'] != 'next') continue;
+      final href = link['href'];
+      if (href is! String) continue;
       return Uri.tryParse(href);
     }
     return null;
@@ -200,8 +230,8 @@ class SwissStacClient {
     Map<String, dynamic> featureMap,
     List<double> queryBbox,
   ) {
-    final raw = featureMap['bbox'] as List<dynamic>?;
-    if (raw == null || raw.length < 4) return false;
+    final raw = featureMap['bbox'];
+    if (raw is! List || raw.length < 4) return false;
     final double minLon, minLat, maxLon, maxLat;
     try {
       minLon = (raw[0] as num).toDouble();
@@ -235,8 +265,9 @@ class SwissStacClient {
     ({String href, String format})? bestGrid;
     ({String href, String format})? anyZip;
     for (final asset in assets.values) {
-      final href = (asset as Map<String, dynamic>?)?['href'] as String?;
-      if (href == null) continue;
+      if (asset is! Map<String, dynamic>) continue;
+      final href = asset['href'];
+      if (href is! String) continue;
       final lower = href.toLowerCase();
       if (!lower.endsWith('.zip')) continue;
       final looksLikeGrid = lower.contains('grid') || lower.contains('asc');

@@ -431,6 +431,199 @@ void main() {
       },
     );
 
+    test(
+      'throws instead of silently returning a partial candidate list when '
+      'a next link still exists past the page cap (an incomplete list here '
+      'must never be cached by a caller as a definitive "no tile here")',
+      () async {
+        final client = SwissStacClient(
+          client: MockClient((req) async {
+            final page = int.tryParse(req.url.queryParameters['page'] ?? '1');
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': overlappingBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/p$page.zip'},
+                    },
+                  },
+                ],
+                // Always declares a next page, regardless of how many pages
+                // have already been fetched -- simulates a server (or a
+                // misconfigured/pathological one) that never terminates.
+                'links': [
+                  {
+                    'rel': 'next',
+                    'href':
+                        'https://data.geo.admin.ch/api/stac/v1/collections/'
+                        'ch.swisstopo.swissbathy3d/items?page=${(page ?? 1) + 1}',
+                  },
+                ],
+              }),
+              200,
+            );
+          }),
+        );
+        expect(
+          () => client.findAssetCandidates(
+            collectionId: 'ch.swisstopo.swissbathy3d',
+            bbox: bbox,
+          ),
+          throwsA(isA<SwissStacException>()),
+        );
+      },
+    );
+
+    test('throws SwissStacException instead of a raw TypeError when the '
+        "response's top-level JSON is not an object", () async {
+      final client = SwissStacClient(
+        client: MockClient((_) async => http.Response(jsonEncode([]), 200)),
+      );
+      expect(
+        () => client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        ),
+        throwsA(isA<SwissStacException>()),
+      );
+    });
+
+    test('throws SwissStacException instead of a raw TypeError when '
+        "'features' is present but not a list", () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async =>
+              http.Response(jsonEncode({'features': 'not-a-list'}), 200),
+        ),
+      );
+      expect(
+        () => client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        ),
+        throwsA(isA<SwissStacException>()),
+      );
+    });
+
+    test(
+      'skips a feature entry that is not a JSON object instead of throwing '
+      'a raw TypeError, and still returns the valid candidates around it',
+      () async {
+        final client = SwissStacClient(
+          client: MockClient(
+            (_) async => http.Response(
+              jsonEncode({
+                'features': [
+                  'not-a-feature-object',
+                  {
+                    'bbox': overlappingBbox,
+                    'assets': {
+                      'grid': {'href': 'https://example.org/valid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            ),
+          ),
+        );
+        final candidates = await client.findAssetCandidates(
+          collectionId: 'ch.swisstopo.swissbathy3d',
+          bbox: bbox,
+        );
+        expect(candidates.map((a) => a.href), [
+          'https://example.org/valid.zip',
+        ]);
+      },
+    );
+
+    test('skips an asset entry that is not a JSON object instead of throwing a '
+        'raw TypeError when picking the best asset', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'malformed': 'not-an-object',
+                    'grid': {'href': 'https://example.org/valid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final candidates = await client.findAssetCandidates(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(candidates.map((a) => a.href), ['https://example.org/valid.zip']);
+    });
+
+    test('treats a malformed links array (non-object entries) as "no next '
+        'page" instead of throwing, and still returns the current page\'s '
+        'candidates', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/only.zip'},
+                  },
+                },
+              ],
+              'links': [
+                'not-a-link-object',
+                {'rel': 'next'}, // no href
+                {'href': 'https://example.org/no-rel'}, // no rel
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final candidates = await client.findAssetCandidates(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(candidates.map((a) => a.href), ['https://example.org/only.zip']);
+    });
+
+    test('treats a top-level "links" field that is not a list as "no next '
+        'page" instead of throwing', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/only.zip'},
+                  },
+                },
+              ],
+              'links': 'not-a-list',
+            }),
+            200,
+          ),
+        ),
+      );
+      final candidates = await client.findAssetCandidates(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(candidates.map((a) => a.href), ['https://example.org/only.zip']);
+    });
+
     test('findAsset still returns just the first candidate', () async {
       final client = SwissStacClient(
         client: MockClient(

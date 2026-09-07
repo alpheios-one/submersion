@@ -184,6 +184,46 @@ void main() {
       },
     );
 
+    // Regression: an asset "zip" download that is actually something else
+    // entirely -- e.g. an HTML error page served with HTTP 200, or a
+    // truncated/corrupted response -- makes the `archive` package's
+    // ZipDecoder throw its own ArchiveException, not a FormatException.
+    // _downloadAndParseRaw's callers only narrow on SwissStacException and
+    // FormatException to report a clean BathymetryFetchException; anything
+    // else used to escape raw and crash the fetch/stitch pipeline instead
+    // of being treated as one tile's transient failure.
+    test(
+      'invalid zip bytes (e.g. an HTML error page served as the asset) '
+      'surface as a BathymetryFetchException, not a raw decode error',
+      () async {
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': _requestedBbox(req),
+                    'assets': {
+                      'grid': {'href': 'https://example.org/tile_grid.zip'},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          return http.Response(
+            '<html><body>502 Bad Gateway</body></html>',
+            200,
+          );
+        });
+        expect(
+          () => source.fetch(zurichseePoint, spanMeters: 100),
+          throwsA(isA<BathymetryFetchException>()),
+        );
+      },
+    );
+
     test(
       'stitches all tiles the requested spanMeters bounding box touches',
       () async {

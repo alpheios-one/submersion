@@ -208,9 +208,19 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
                             axisLabels: axes.labels,
                             chromeStyle: seascapeChromeStyle(context),
                             chromeMode: SceneChromeMode.axesOnly,
-                            picker: GridHoverPicker(
-                              seascapePickGrid(grid, scene.layers.first.mesh),
-                            ),
+                            // scene.layers can legitimately be empty (see
+                            // _debugPanel's identical guard below); hover
+                            // picking has nothing to pick against then, so
+                            // this disables the picker instead of crashing
+                            // on .first.
+                            picker: scene.layers.isEmpty
+                                ? null
+                                : GridHoverPicker(
+                                    seascapePickGrid(
+                                      grid,
+                                      scene.layers.first.mesh,
+                                    ),
+                                  ),
                             hoverPick: _hoverPick,
                             onMarkerTap: _onMarkerTap,
                             terrainImagery: imagery?.image,
@@ -480,14 +490,17 @@ class _SiteTerrainPaneState extends ConsumerState<SiteTerrainPane> {
     // SiteSeascapeGeometryService.buildWithLabels() was called with (see
     // site_seascape_providers.dart), so this needs no re-fetch either —
     // one layer upstream of the render fingerprint above it in the text.
-    final renderFingerprint = buildSwissBathyRenderFingerprint(
-      siteId: widget.siteId,
-      mesh: scene.layers.first.mesh,
-    );
+    //
+    // scene.layers can legitimately be empty (e.g. right after a source
+    // switch, before the terrain layer has been added), so this must not
+    // assume .first exists — a debug-only panel throwing a RangeError while
+    // expanding would be its own bug, not a diagnostic.
     final gridFingerprint = buildSwissBathyGridFingerprint(grid);
-    final renderText =
-        '${formatSwissBathyGridFingerprint(gridFingerprint)}\n'
-        '${formatSwissBathyRenderFingerprint(renderFingerprint)}';
+    final renderText = scene.layers.isEmpty
+        ? '${formatSwissBathyGridFingerprint(gridFingerprint)}\n'
+              'render: scene has no layers yet'
+        : '${formatSwissBathyGridFingerprint(gridFingerprint)}\n'
+              '${formatSwissBathyRenderFingerprint(buildSwissBathyRenderFingerprint(siteId: widget.siteId, mesh: scene.layers.first.mesh))}';
     final future = _debugFuture;
     if (future == null) {
       return Padding(
