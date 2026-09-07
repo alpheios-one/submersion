@@ -167,7 +167,7 @@ class SwissStacClient {
           "STAC items response's 'features' field was not a list",
         );
       }
-      final features = rawFeatures as List<dynamic>? ?? const [];
+      final features = rawFeatures is List ? rawFeatures : const <dynamic>[];
       for (final feature in features) {
         if (feature is! Map<String, dynamic>) continue;
         if (!_featureOverlaps(feature, bbox)) continue;
@@ -232,15 +232,20 @@ class SwissStacClient {
   ) {
     final raw = featureMap['bbox'];
     if (raw is! List || raw.length < 4) return false;
-    final double minLon, minLat, maxLon, maxLat;
-    try {
-      minLon = (raw[0] as num).toDouble();
-      minLat = (raw[1] as num).toDouble();
-      maxLon = (raw[2] as num).toDouble();
-      maxLat = (raw[3] as num).toDouble();
-    } catch (_) {
+    final rawMinLon = raw[0];
+    final rawMinLat = raw[1];
+    final rawMaxLon = raw[2];
+    final rawMaxLat = raw[3];
+    if (rawMinLon is! num ||
+        rawMinLat is! num ||
+        rawMaxLon is! num ||
+        rawMaxLat is! num) {
       return false;
     }
+    final minLon = rawMinLon.toDouble();
+    final minLat = rawMinLat.toDouble();
+    final maxLon = rawMaxLon.toDouble();
+    final maxLat = rawMaxLat.toDouble();
     return minLon <= queryBbox[2] &&
         maxLon >= queryBbox[0] &&
         minLat <= queryBbox[3] &&

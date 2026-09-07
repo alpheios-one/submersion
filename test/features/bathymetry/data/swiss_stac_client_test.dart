@@ -247,6 +247,39 @@ void main() {
       expect(asset, isNull);
     });
 
+    test('skips a feature whose bbox contains non-numeric coordinates instead '
+        'of throwing a raw TypeError, and still returns the valid candidates '
+        'around it', () async {
+      final client = SwissStacClient(
+        client: MockClient(
+          (_) async => http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': ['not', 'a', 'number', 'here'],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/malformed.zip'},
+                  },
+                },
+                {
+                  'bbox': overlappingBbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/valid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          ),
+        ),
+      );
+      final candidates = await client.findAssetCandidates(
+        collectionId: 'ch.swisstopo.swissbathy3d',
+        bbox: bbox,
+      );
+      expect(candidates.map((a) => a.href), ['https://example.org/valid.zip']);
+    });
+
     test('returns null when the collection has no matching item', () async {
       final client = SwissStacClient(
         client: MockClient(
