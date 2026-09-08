@@ -5,6 +5,7 @@ import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/screen_awake.dart';
 
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
@@ -147,6 +148,12 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   final DiveComputerRepository _repository;
   StreamSubscription<pigeon.DownloadEvent>? _downloadSubscription;
 
+  /// Held for the length of a download so the idle timer cannot lock the
+  /// screen and suspend the transfer mid-dive (issue #1646). Taken in
+  /// [startDownload]; released on every path that ends the download, and in
+  /// [dispose] as a backstop. Null when no download is running.
+  ScreenAwakeHold? _screenAwake;
+
   // Stored for device info persistence after download completes.
   DiveComputer? _computer;
   DiscoveredDevice? _device;
@@ -190,6 +197,12 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   }) async {
     _computer = computer;
     _device = device;
+
+    // Hold the screen awake for the whole transfer. If startDownload runs
+    // again while a hold is already active, reuse it rather than stacking a
+    // second one; each terminal path clears the field so the next run
+    // acquires a fresh hold.
+    _screenAwake ??= ScreenAwake.acquire();
 
     try {
       state = state.copyWith(
@@ -235,6 +248,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
       // cannot mutate state after a synchronous start failure.
       _downloadSubscription?.cancel();
       _downloadSubscription = null;
+      _releaseScreenAwake();
       state = state.copyWith(
         phase: DownloadPhase.error,
         errorMessage: 'Download failed: $e',
@@ -275,6 +289,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         );
         _downloadSubscription?.cancel();
         _downloadSubscription = null;
+        _releaseScreenAwake();
         // Persist device info on the computer record.
         _persistDeviceInfo(serialNumber, firmwareVersion);
       case pigeon.DownloadErrorEvent(:final error):
@@ -289,6 +304,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         );
         _downloadSubscription?.cancel();
         _downloadSubscription = null;
+        _releaseScreenAwake();
     }
   }
 
@@ -399,20 +415,36 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   Future<void> cancelDownload() async {
     _downloadSubscription?.cancel();
     _downloadSubscription = null;
-    await _service.cancelDownload();
-    state = state.copyWith(phase: DownloadPhase.cancelled);
+    // Keep the screen-awake hold through the platform round trip -- the UI is
+    // still on the download screen until it returns -- but release it in a
+    // finally so a throwing cancel can't strand the hold.
+    try {
+      await _service.cancelDownload();
+      state = state.copyWith(phase: DownloadPhase.cancelled);
+    } finally {
+      _releaseScreenAwake();
+    }
   }
 
   /// Reset the download state.
   void reset() {
     _downloadSubscription?.cancel();
     _downloadSubscription = null;
+    _releaseScreenAwake();
     state = const DownloadState();
+  }
+
+  /// Drops the screen-awake hold if one is held. Idempotent, so every path
+  /// that ends a download can call it without tracking which fired first.
+  void _releaseScreenAwake() {
+    _screenAwake?.release();
+    _screenAwake = null;
   }
 
   @override
   void dispose() {
     _downloadSubscription?.cancel();
+    _releaseScreenAwake();
     super.dispose();
   }
 }
