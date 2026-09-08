@@ -24102,6 +24102,36 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'Műhold';
 
   @override
+  String get settings_appearance_bathymetryRefresh => 'Térképadatok frissítése';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      'A swissBATHY3D mélységadatok frissítéseinek ellenőrzése';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count csempe frissítve',
+      one: '1 csempe frissítve',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate =>
+      'Minden adat naprakész';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      'Nem sikerült minden adatot ellenőrizni; a meglévő értékek megmaradtak';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Még nincsenek tárolt tómélységadatok';
+
+  @override
   String get common_action_reparse => 'Újraelemzés';
 
   @override
@@ -24965,7 +24995,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM';
+      'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'Mélység';

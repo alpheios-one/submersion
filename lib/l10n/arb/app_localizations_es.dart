@@ -24203,6 +24203,36 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_appearance_mapStyle_esriSatellite => 'Satélite';
 
   @override
+  String get settings_appearance_bathymetryRefresh => 'Recargar datos del mapa';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_subtitle =>
+      'Comprueba si hay actualizaciones de los datos de profundidad swissBATHY3D';
+
+  @override
+  String settings_appearance_bathymetryRefresh_resultUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mosaicos actualizados',
+      one: '1 mosaico actualizado',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultUpToDate =>
+      'Todos los datos están actualizados';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultFailed =>
+      'No se pudieron comprobar todos los datos; se conservaron los valores existentes';
+
+  @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Aún no hay datos de profundidad de lagos almacenados';
+
+  @override
   String get common_action_reparse => 'Reanalizar';
 
   @override
@@ -25087,7 +25117,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_about_bathymetryCredit =>
-      'Datos de batimetría: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM';
+      'Datos de batimetría: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022 · NOAA NCEI DEM · swissBATHY3D (© swisstopo)';
 
   @override
   String get dive3d_metric_depth => 'Profundidad';
