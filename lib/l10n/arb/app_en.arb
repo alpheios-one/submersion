@@ -15272,6 +15272,7 @@
   },
   "settings_appearance_bathymetryRefresh_resultUpToDate": "All data is up to date",
   "settings_appearance_bathymetryRefresh_resultFailed": "Couldn't check all data; existing values were kept",
+  "settings_appearance_bathymetryRefresh_resultNothingCached": "No lake depth data cached yet",
   "common_action_reparse": "Re-parse",
   "@common_action_reparse": {
     "description": "Generic re-parse action label"

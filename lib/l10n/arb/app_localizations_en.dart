@@ -23479,6 +23479,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Couldn\'t check all data; existing values were kept';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'No lake depth data cached yet';
+
+  @override
   String get common_action_reparse => 'Re-parse';
 
   @override

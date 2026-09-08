@@ -6770,6 +6770,7 @@
   },
   "settings_appearance_bathymetryRefresh_resultUpToDate": "所有数据均为最新",
   "settings_appearance_bathymetryRefresh_resultFailed": "无法检查所有数据；已保留现有数值",
+  "settings_appearance_bathymetryRefresh_resultNothingCached": "尚未缓存湖泊深度数据",
   "settings_appearance_mapStyle_openStreetMap": "街道地图",
   "settings_appearance_mapStyle_openTopoMap": "地形图",
   "universalImport_bulk_replaceSourceAll": "全部替换（{count}）",

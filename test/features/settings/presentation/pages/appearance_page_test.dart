@@ -340,6 +340,36 @@ void main() {
       expect(find.text('All data is up to date'), findsOneWidget);
     });
 
+    // A sweep that reached a verdict on nothing (fresh install, or no Swiss
+    // lake view opened yet) used to report "All data is up to date", which
+    // claims a confirmation the app never made. It gets its own message.
+    testWidgets('reports that nothing is cached rather than claiming '
+        'everything is up to date when the sweep checked no tiles', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(400, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        buildTestWidgetWith([
+          swissBathyManualRefreshProvider.overrideWithValue(
+            () async => const SwissBathyRefreshSummary(
+              updated: 0,
+              upToDate: 0,
+              failed: 0,
+            ),
+          ),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Reload Map Data'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No lake depth data cached yet'), findsOneWidget);
+      expect(find.text('All data is up to date'), findsNothing);
+    });
+
     testWidgets('shows how many tiles were updated on success', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));

@@ -747,6 +747,9 @@ class SwissBathyRefreshSummary {
     required this.failed,
   });
 
-  /// Total tiles that were cached at the start of the sweep.
+  /// Tiles the sweep reached a verdict on. Excludes cached rows it skipped
+  /// without checking (an evicted, corrupt or unparseable key yields no
+  /// outcome), so this can be lower than the row count at the start of the
+  /// sweep and must not be read as "everything that was cached".
   int get total => updated + upToDate + failed;
 }

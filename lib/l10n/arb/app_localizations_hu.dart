@@ -23809,6 +23809,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült minden adatot ellenőrizni; a meglévő értékek megmaradtak';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Még nincsenek tárolt tómélységadatok';
+
+  @override
   String get common_action_reparse => 'Újraelemzés';
 
   @override

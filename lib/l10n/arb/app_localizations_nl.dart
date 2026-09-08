@@ -23698,6 +23698,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Niet alle gegevens konden worden gecontroleerd; bestaande waarden zijn behouden';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Nog geen meerdieptegegevens opgeslagen';
+
+  @override
   String get common_action_reparse => 'Opnieuw verwerken';
 
   @override

@@ -23291,6 +23291,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן היה לבדוק את כל הנתונים; הערכים הקיימים נשמרו';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'עדיין לא נשמרו נתוני עומק אגמים';
+
+  @override
   String get common_action_reparse => 'נתח מחדש';
 
   @override

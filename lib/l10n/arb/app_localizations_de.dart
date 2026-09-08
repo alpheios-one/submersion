@@ -23839,6 +23839,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nicht alle Daten konnten geprüft werden; bestehende Werte wurden beibehalten';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Noch keine Seetiefendaten gespeichert';
+
+  @override
   String get common_action_reparse => 'Neu auswerten';
 
   @override

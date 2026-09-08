@@ -6770,6 +6770,7 @@
   },
   "settings_appearance_bathymetryRefresh_resultUpToDate": "Alle gegevens zijn actueel",
   "settings_appearance_bathymetryRefresh_resultFailed": "Niet alle gegevens konden worden gecontroleerd; bestaande waarden zijn behouden",
+  "settings_appearance_bathymetryRefresh_resultNothingCached": "Nog geen meerdieptegegevens opgeslagen",
   "settings_appearance_mapStyle_openStreetMap": "Stratenkaart",
   "settings_appearance_mapStyle_openTopoMap": "Topografisch",
   "universalImport_bulk_replaceSourceAll": "Alles vervangen ({count})",

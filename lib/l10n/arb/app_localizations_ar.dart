@@ -23456,6 +23456,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر التحقق من جميع البيانات؛ تم الاحتفاظ بالقيم الحالية';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'لا توجد بيانات أعماق بحيرات مخزّنة بعد';
+
+  @override
   String get common_action_reparse => 'إعادة التحليل';
 
   @override

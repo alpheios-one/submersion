@@ -6770,6 +6770,7 @@
   },
   "settings_appearance_bathymetryRefresh_resultUpToDate": "כל הנתונים מעודכנים",
   "settings_appearance_bathymetryRefresh_resultFailed": "לא ניתן היה לבדוק את כל הנתונים; הערכים הקיימים נשמרו",
+  "settings_appearance_bathymetryRefresh_resultNothingCached": "עדיין לא נשמרו נתוני עומק אגמים",
   "settings_appearance_mapStyle_openStreetMap": "מפת רחובות",
   "settings_appearance_mapStyle_openTopoMap": "טופוגרפי",
   "universalImport_bulk_replaceSourceAll": "החלף הכול ({count})",

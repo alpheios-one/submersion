@@ -99,7 +99,6 @@ class SwissStacClient {
   /// order the server returned them.
   ///
   /// The `bbox` query parameter asks the server to filter spatially, but
-  /// this was never confirmed against the live API (see the class doc), and
   /// even a compliant server can legitimately return a neighboring tile
   /// whose bbox merely overlaps the query's edge buffer. Trusting the first
   /// feature blindly would silently splice an unrelated tile into the

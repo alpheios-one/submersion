@@ -39269,6 +39269,12 @@ abstract class AppLocalizations {
   /// **'Couldn\'t check all data; existing values were kept'**
   String get settings_appearance_bathymetryRefresh_resultFailed;
 
+  /// No description provided for @settings_appearance_bathymetryRefresh_resultNothingCached.
+  ///
+  /// In en, this message translates to:
+  /// **'No lake depth data cached yet'**
+  String get settings_appearance_bathymetryRefresh_resultNothingCached;
+
   /// Generic re-parse action label
   ///
   /// In en, this message translates to:

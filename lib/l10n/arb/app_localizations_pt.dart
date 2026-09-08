@@ -23890,6 +23890,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível verificar todos os dados; os valores existentes foram mantidos';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Ainda não há dados de profundidade de lagos armazenados';
+
+  @override
   String get common_action_reparse => 'Reanalisar';
 
   @override

@@ -23976,6 +23976,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de vérifier toutes les données ; les valeurs existantes ont été conservées';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      'Aucune donnée de profondeur de lac enregistrée pour l\'instant';
+
+  @override
   String get common_action_reparse => 'Réanalyser';
 
   @override

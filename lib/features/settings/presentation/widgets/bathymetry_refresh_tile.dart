@@ -43,10 +43,16 @@ class _BathymetryRefreshTileState extends ConsumerState<BathymetryRefreshTile> {
     // `summary == null` means the refresh could not even be attempted (e.g.
     // the local cache database was not initialized) -- a real failure, not
     // "nothing to check" -- so it must not fall into the up-to-date branch.
+    //
+    // total == 0 means the sweep reached a verdict on nothing, which on a
+    // fresh install (or before any Swiss lake view has been opened) means
+    // there was no cached data to check. Reporting that as "up to date"
+    // reads as a positive confirmation the app cannot actually make, so it
+    // gets its own message.
     final message = summary == null
         ? context.l10n.settings_appearance_bathymetryRefresh_resultFailed
         : summary.total == 0
-        ? context.l10n.settings_appearance_bathymetryRefresh_resultUpToDate
+        ? context.l10n.settings_appearance_bathymetryRefresh_resultNothingCached
         : summary.updated > 0
         ? context.l10n.settings_appearance_bathymetryRefresh_resultUpdated(
             summary.updated,

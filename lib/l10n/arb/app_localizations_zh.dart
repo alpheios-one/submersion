@@ -22651,6 +22651,10 @@ class AppLocalizationsZh extends AppLocalizations {
       '无法检查所有数据；已保留现有数值';
 
   @override
+  String get settings_appearance_bathymetryRefresh_resultNothingCached =>
+      '尚未缓存湖泊深度数据';
+
+  @override
   String get common_action_reparse => '重新解析';
 
   @override
