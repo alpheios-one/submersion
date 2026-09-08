@@ -50,9 +50,9 @@ void main() {
   });
 
   test('migration list includes v194', () {
-    // Relaxed as its own comment instructed when the next rung (v195,
-    // media_species.hlc) landed: the exact assertion is the newest rung's
-    // job and moves with it.
+    // Relaxed as its own comment instructed once later rungs (v195
+    // media_species.hlc, v196 weight presets) landed: the exact assertion is
+    // the newest rung's job and moves with it.
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(194));
     expect(AppDatabase.migrationVersions, contains(194));
   });

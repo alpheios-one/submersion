@@ -29,7 +29,9 @@ void main() {
     // branches, and a rung at or below the shipped version never runs its
     // onUpgrade step. This is the newest rung, so it owns the exact
     // assertion; relax it to greaterThanOrEqualTo when the next one lands.
-    expect(AppDatabase.currentSchemaVersion, 195);
+    // Relaxed once v196 (weight presets) landed on top; the exact
+    // assertion moves to the newest rung.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(195));
     expect(AppDatabase.migrationVersions, contains(195));
   });
 

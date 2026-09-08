@@ -1163,6 +1163,45 @@ class EquipmentSetGeofences extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Reusable weighting rigs (issue #1609): a named set of weight entries the
+/// diver can save from the dive editor and apply to later dives. First-class
+/// synced entity (own id + hlc), mirroring [TankPresets] / [EquipmentSets].
+@DataClassName('WeightPresetRow')
+class WeightPresets extends Table {
+  TextColumn get id => text()();
+  TextColumn get diverId => text().nullable().references(Divers, #id)();
+  TextColumn get displayName => text()();
+  TextColumn get notes => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// One weight entry inside a [WeightPresets] rig. Same shape as a [DiveWeights]
+/// row minus the dive link; synced as a full child of its preset (the preset's
+/// hlc gates the whole set, like [EquipmentSetItems]).
+@DataClassName('WeightPresetEntryRow')
+class WeightPresetEntries extends Table {
+  TextColumn get id => text()();
+  TextColumn get presetId =>
+      text().references(WeightPresets, #id, onDelete: KeyAction.cascade)();
+  TextColumn get weightType => text()();
+  RealColumn get amountKg => real()();
+  TextColumn get notes => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Data-quality findings produced by the Data Quality Assistant detectors.
 /// One row per (dive, detector, discriminator). Ids are deterministic
 /// UUIDv5 values so independent scans on two devices converge on the same
@@ -3351,6 +3390,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     DiveTypes,
     DiveRoles,
     TankPresets,
+    WeightPresets,
+    WeightPresetEntries,
     DiveComputers,
     DiveDataSources,
     DiveProfileEvents,
@@ -3424,7 +3465,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 195;
+  static const int currentSchemaVersion = 196;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -3920,6 +3961,10 @@ class AppDatabase extends _$AppDatabase {
     // are held by other open branches, and a rung at or below the shipped
     // version never runs its onUpgrade step.
     195,
+    // v196: weight_presets + weight_preset_entries (issue #1609). Renumbered
+    // from 192 then 195 -- main also landed the media-species-clock rung (195)
+    // while this branch was open (192 and 193 are held by other branches).
+    196,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -6506,6 +6551,39 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Reusable weighting rigs (issue #1609, v196). Idempotent `CREATE TABLE IF
+  /// NOT EXISTS` for both the preset header and its entries, so a database that
+  /// arrives by restore or sync-adopt (never runs onUpgrade) also gets them.
+  Future<void> _assertWeightPresetTables() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS weight_presets (
+        id TEXT NOT NULL PRIMARY KEY,
+        diver_id TEXT REFERENCES divers(id),
+        display_name TEXT NOT NULL,
+        notes TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS weight_preset_entries (
+        id TEXT NOT NULL PRIMARY KEY,
+        preset_id TEXT NOT NULL REFERENCES weight_presets(id) ON DELETE CASCADE,
+        weight_type TEXT NOT NULL,
+        amount_kg REAL NOT NULL,
+        notes TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_weight_preset_entries_preset '
+      'ON weight_preset_entries(preset_id)',
+    );
+  }
+
   /// The v195 media_species.hlc column (issue #1638): the tag's own clock,
   /// which is what puts it in an incremental changeset. PRAGMA-guarded so a
   /// healthy database no-ops and a partial schema does not throw. Called
@@ -6711,6 +6789,7 @@ class AppDatabase extends _$AppDatabase {
     'dive_types',
     'dive_roles',
     'tank_presets',
+    'weight_presets',
     'dive_computers',
     'tags',
     'courses',
@@ -10368,6 +10447,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaSpeciesHlcColumn();
         }
         if (from < 195) await reportProgress();
+        // v196: weight_presets + weight_preset_entries (issue #1609).
+        // Table-only rung, no backfill: a diver with no saved rig is the
+        // correct starting state for everyone.
+        if (from < 196) {
+          await _assertWeightPresetTables();
+        }
+        if (from < 196) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -10547,6 +10633,10 @@ class AppDatabase extends _$AppDatabase {
         // arrives by restore or sync-adopt never runs onUpgrade, and both
         // reading a tag and stamping one throw without the column.
         await _assertMediaSpeciesHlcColumn();
+
+        // v196 backstop: re-assert the weight-preset tables (issue #1609),
+        // same restore/sync-adopt reasoning.
+        await _assertWeightPresetTables();
 
         // v157 backstop: re-assert the default service price columns (issue
         // #829; same parallel-branch version-collision self-heal).
