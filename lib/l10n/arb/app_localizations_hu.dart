@@ -3785,6 +3785,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get decoCalculator_waterType => 'Víztípus';
 
   @override
+  String get decoCalculator_waterType_custom => 'Egyedi';
+
+  @override
   String get decoCalculator_waterType_standard => 'Normál';
 
   @override
@@ -7992,6 +7995,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get divePlanner_label_sacRate => 'RMV:';
+
+  @override
+  String get divePlanner_label_salinity => 'Sótartalom';
 
   @override
   String get divePlanner_label_status => 'Státusz';
@@ -18010,6 +18016,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_units_gasModel => 'Gázszámítások';
 
   @override
+  String get settings_units_waterType => 'Víztípus';
+
+  @override
   String get settings_units_gasModel_real => 'Valós gáz';
 
   @override
@@ -18029,6 +18038,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_units_dialog_gasModel => 'Gázszámítások';
+
+  @override
+  String get settings_units_dialog_waterType => 'Alapértelmezett víztípus';
 
   @override
   String get settings_units_dialog_temperatureUnit => 'Homerseklet egyseg';

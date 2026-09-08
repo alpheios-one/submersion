@@ -6406,6 +6406,12 @@ abstract class AppLocalizations {
   /// **'Water type'**
   String get decoCalculator_waterType;
 
+  /// No description provided for @decoCalculator_waterType_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get decoCalculator_waterType_custom;
+
   /// No description provided for @decoCalculator_waterType_standard.
   ///
   /// In en, this message translates to:
@@ -13408,6 +13414,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'RMV:'**
   String get divePlanner_label_sacRate;
+
+  /// No description provided for @divePlanner_label_salinity.
+  ///
+  /// In en, this message translates to:
+  /// **'Salinity'**
+  String get divePlanner_label_salinity;
 
   /// No description provided for @divePlanner_label_status.
   ///
@@ -29903,6 +29915,12 @@ abstract class AppLocalizations {
   /// **'Gas calculations'**
   String get settings_units_gasModel;
 
+  /// No description provided for @settings_units_waterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Water type'**
+  String get settings_units_waterType;
+
   /// No description provided for @settings_units_gasModel_real.
   ///
   /// In en, this message translates to:
@@ -29938,6 +29956,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gas calculations'**
   String get settings_units_dialog_gasModel;
+
+  /// No description provided for @settings_units_dialog_waterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Default water type'**
+  String get settings_units_dialog_waterType;
 
   /// No description provided for @settings_units_dialog_temperatureUnit.
   ///
