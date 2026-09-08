@@ -1287,6 +1287,17 @@ jobs:
           path: pr-number.txt
           retention-days: 1
 
+  # Single aggregation gate. Because the build jobs now run in parallel with the
+  # test shards (needs: codegen, not needs: test), a green build no longer
+  # implies tests passed. This job is the one to mark "required" in branch
+  # protection - it fails if ANY needed job failed or was cancelled. Skipped
+  # jobs (e.g. integration-test on push) are treated as acceptable.
+  # NOTE: codegen MUST be listed here - if it fails, every downstream job is
+  # SKIPPED, and skipped is treated as acceptable below, so without codegen in
+  # the needs list a codegen failure would report a false green.
+  # `changes` is likewise listed: on a docs/CI-only change it reports code=false
+  # and the whole pipeline SKIPS (an accepted green), but if the detector itself
+  # FAILS we must not silently skip-then-green, so its failure must reach here.
   # A submodule pointer is a single sha with no file diff, so a pull request
   # that moves libdivecomputer backwards reverts every fork commit in between
   # while showing a reviewer nothing at all to look at. PR #342 sat with a
@@ -1363,17 +1374,9 @@ jobs:
           echo "::error::libdivecomputer pointer would revert the commits listed above. Rebase the submodule branch onto the current submersion-patches tip and update the pointer."
           exit 1
 
-  # Single aggregation gate. Because the build jobs now run in parallel with the
-  # test shards (needs: codegen, not needs: test), a green build no longer
-  # implies tests passed. This job is the one to mark "required" in branch
-  # protection - it fails if ANY needed job failed or was cancelled. Skipped
-  # jobs (e.g. integration-test on push) are treated as acceptable.
-  # NOTE: codegen MUST be listed here - if it fails, every downstream job is
-  # SKIPPED, and skipped is treated as acceptable below, so without codegen in
-  # the needs list a codegen failure would report a false green.
-  # `changes` is likewise listed: on a docs/CI-only change it reports code=false
-  # and the whole pipeline SKIPS (an accepted green), but if the detector itself
-  # FAILS we must not silently skip-then-green, so its failure must reach here.
+  # Adding a job below WITHOUT adding it here makes it advisory: red on the PR,
+  # ignored by the merge box. scripts/check_ci_success_gate.py fails the build
+  # if that happens; exempt a genuinely non-gating job there, not by omission.
   ci-success:
     name: CI Success
     if: always()
