@@ -20,6 +20,18 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// network requests. Definitive negatives cache as 'empty'; transient
 /// failures write NO row so the next visit retries. Never throws: null
 /// simply means "no real terrain available right now".
+///
+/// Known trade-off, deliberately deferred to issue #1511: keying Swiss
+/// coordinates raw also gives up the outer cache's coalescing for them, so
+/// two points a few metres apart (a re-pinned site, a site-less GPS dive)
+/// each pay their own resolve and stitch even though they land on the same
+/// 1 km tiles. That cost is CPU, not network, because the tile downloads
+/// underneath are still deduped. Keying by LV95 tile (or by the tile range
+/// the span covers) would buy the coalescing back without reintroducing the
+/// false sharing this branch exists to prevent, but it belongs with the
+/// pre-processed-data work in #1511 rather than in the correctness fixes
+/// here: that issue may replace the live STAC fetch outright, which would
+/// change what the right key even is.
 class BathymetryRepository {
   static const int maxGridDim = 120;
 
@@ -67,6 +79,8 @@ class BathymetryRepository {
       // Raw coordinate, not a quantized cell corner: needs enough decimals
       // to actually distinguish nearby sites (2 decimals is ~1 km at these
       // latitudes -- exactly the coalescing this branch exists to avoid).
+      // See the class doc for the cache-coalescing this gives up, and why
+      // that is deferred to issue #1511.
       return '${c.latitude.toStringAsFixed(6)},'
           '${c.longitude.toStringAsFixed(6)}@$span$selectionGeneration';
     }
