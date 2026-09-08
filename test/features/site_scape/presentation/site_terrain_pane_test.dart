@@ -8,8 +8,6 @@ import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
-import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
-import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
@@ -20,7 +18,6 @@ import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/domain/entities/site_feature.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
-import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/site_scape/presentation/site_terrain_pane.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -532,86 +529,6 @@ void main() {
 
       expect(find.textContaining('swissBATHY3D (© swisstopo)'), findsOneWidget);
       expect(find.textContaining('GMRT'), findsNothing);
-    },
-  );
-
-  // Regression: the swissBATHY3D debug panel (kDebugMode + source-gated)
-  // read scene.layers.first.mesh unconditionally to build its render
-  // fingerprint. scene.layers can legitimately be empty, and that .first
-  // would throw a RangeError the instant a diver expanded the panel --
-  // a debug-only diagnostic crashing the pane is its own bug. The site's
-  // location is left null here so _debugFuture stays null and the panel
-  // takes its earliest, synchronous branch (no real STAC/DB lookups
-  // needed to hit the code path under test).
-  testWidgets(
-    'expanding the swissBATHY3D debug panel does not crash when the scene '
-    'has no layers yet',
-    (tester) async {
-      final grid = BathymetryGrid(
-        originLat: 12.15,
-        originLon: -68.30,
-        cellSizeLatDeg: 0.001,
-        cellSizeLonDeg: 0.001,
-        rows: 2,
-        cols: 2,
-        depthsMeters: const [20, 30, 25, 35],
-        sourceId: 'swissbathy3d',
-        resolutionMeters: 2,
-        fetchedAt: DateTime.utc(2026, 7, 28),
-      );
-      const center = GeoPoint(12.151, -68.299);
-      final box = BathymetryTerrainBuilder.enuBounds(grid, center);
-      const emptyScene = Scene3d(
-        layers: [],
-        markers: [],
-        bounds: SceneBounds(durationSeconds: 0, maxDepthMeters: 35),
-      );
-      final state = SiteSeascapeReady(
-        scene: emptyScene,
-        sourceId: 'swissbathy3d',
-        resolutionMeters: 2,
-        grid: grid,
-        axisInputs: (
-          minEast: box.minEast,
-          maxEast: box.maxEast,
-          minNorth: box.minNorth,
-          maxNorth: box.maxNorth,
-          maxDepth: 35,
-        ),
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            settingsProvider.overrideWith(
-              (ref) => _TestSettingsNotifier(const AppSettings()),
-            ),
-            siteSeascapeProvider.overrideWith((ref, id) async => state),
-            siteFeaturesProvider('site-1').overrideWith((ref) async => []),
-            // No location, so _sourceChip's tap handler leaves _debugFuture
-            // null -- keeps this test on the synchronous rendering path
-            // where the bug lives, without needing real STAC/cache access.
-            siteProvider.overrideWith(
-              (ref, id) async =>
-                  const DiveSite(id: 'site-1', name: 'No Location'),
-            ),
-          ],
-          child: const MaterialApp(
-            locale: Locale('en'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: SiteTerrainPane(siteId: 'site-1')),
-          ),
-        ),
-      );
-      await tester.pump();
-      await tester.pump();
-
-      await tester.tap(find.byIcon(Icons.info_outline));
-      await tester.pump();
-
-      expect(tester.takeException(), isNull);
-      expect(find.textContaining('scene has no layers yet'), findsOneWidget);
     },
   );
 }

@@ -680,10 +680,6 @@ class SwissBathy3dSource implements BathymetrySource {
   /// a live check found swisstopo's own zips are not guaranteed to have
   /// just one: nearly every requested tile came back "no data" except the
   /// one that happened to match that first entry's own footprint (Bug 15).
-  /// Public (not `_`-prefixed) so the temporary swissBATHY3D debug panel
-  /// (`swiss_bathy_debug_info.dart`) can decode the exact same downloaded
-  /// zip when diagnosing tile extraction, instead of duplicating this
-  /// parsing.
   static List<String> extractGridZipTexts(Uint8List zipBytes) {
     final archive = ZipDecoder().decodeBytes(zipBytes);
     return [
