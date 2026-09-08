@@ -123,6 +123,11 @@ import 'package:submersion/features/reef/presentation/widgets/water_conditions_c
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_cycle_graph.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_enum_display.dart';
+import 'package:submersion/features/weight_planner/presentation/widgets/weight_enum_display.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
+import 'package:submersion/features/tides/presentation/tide_state_display.dart';
 
 class DiveDetailPage extends ConsumerStatefulWidget {
   final String diveId;
@@ -3236,7 +3241,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_visibility,
-                dive.visibility!.displayName,
+                visibilityName(dive.visibility!, context.l10n),
               ),
             if (dive.avgDepth != null)
               _buildDetailRow(
@@ -3250,7 +3255,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_waterType,
-                dive.effectiveWaterType!.displayName,
+                dive.effectiveWaterType!.localizedName(context.l10n),
               ),
             if (dive.buddy != null && dive.buddy!.isNotEmpty)
               _buildDetailRow(
@@ -3697,7 +3702,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            altitudeGroup.displayName,
+                            altitudeGroup.localizedName(context.l10n),
                             style: Theme.of(context).textTheme.titleSmall
                                 ?.copyWith(
                                   fontWeight: FontWeight.w600,
@@ -3902,7 +3907,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // Build collapsed subtitle with tide state and height
     final collapsedSubtitle =
-        '${record.tideState.displayName} • ${DepthUnit.meters.convert(record.heightMeters, settings.depthUnit).toStringAsFixed(1)}${settings.depthUnit.symbol}';
+        '${record.tideState.localizedName(context.l10n)} • ${DepthUnit.meters.convert(record.heightMeters, settings.depthUnit).toStringAsFixed(1)}${settings.depthUnit.symbol}';
 
     // Compute cycle time range for the header
     final (cycleStart, cycleEnd) = _calculateCycleTimes(
@@ -3997,7 +4002,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   child: _buildDetailRow(
                     context,
                     context.l10n.diveLog_detail_label_state,
-                    record.tideState.displayName,
+                    record.tideState.localizedName(context.l10n),
                   ),
                 ),
               ],
@@ -4072,7 +4077,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     for (final weight in dive.weights) {
       displayWeights.add(
         _WeightDisplay(
-          type: weight.weightType.displayName,
+          type: weight.weightType.localizedName(context.l10n),
           amount: weight.amountKg,
         ),
       );
@@ -4083,7 +4088,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       displayWeights.add(
         _WeightDisplay(
           type:
-              dive.weightType?.displayName ??
+              dive.weightType?.localizedName(context.l10n) ??
               context.l10n.diveLog_detail_section_weight,
           amount: dive.weightAmount!,
         ),
@@ -4667,7 +4672,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      item.type.displayName,
+                      item.type.localizedName(context.l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),

@@ -9796,6 +9796,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_certificationAgency_cmas => 'CMAS';
 
   @override
+  String get enum_certificationAgency_ffessm => 'FFESSM';
+
+  @override
   String get enum_certificationAgency_gue => 'GUE';
 
   @override
@@ -9881,6 +9884,101 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_wreck => 'غوص حطام';
+
+  @override
+  String get enum_certificationLevel_masterDiver => 'غواص ماستر';
+
+  @override
+  String get enum_certificationLevel_assistantInstructor => 'مساعد مدرب';
+
+  @override
+  String get enum_certificationLevel_extendedRange => 'Extended Range';
+
+  @override
+  String get enum_certificationLevel_advancedTrimix => 'ترايمكس متقدم';
+
+  @override
+  String get enum_certificationLevel_cmas1StarDiver => 'غواص نجمة واحدة';
+
+  @override
+  String get enum_certificationLevel_cmas2StarDiver => 'غواص نجمتان';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiver => 'غواص ثلاث نجمات';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiver => 'غواص أربع نجمات';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiverAssistantInstructor =>
+      'غواص ثلاث نجمات - مساعد مدرب';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiverAssistantInstructor =>
+      'غواص أربع نجمات - مساعد مدرب';
+
+  @override
+  String get enum_certificationLevel_cmas1StarInstructor => 'مدرب نجمة واحدة';
+
+  @override
+  String get enum_certificationLevel_cmas2StarInstructor => 'مدرب نجمتان';
+
+  @override
+  String get enum_certificationLevel_cmas3StarInstructor => 'مدرب ثلاث نجمات';
+
+  @override
+  String get enum_certificationLevel_bsacOceanDiver => 'Ocean Diver';
+
+  @override
+  String get enum_certificationLevel_bsacSportsDiver => 'Sports Diver';
+
+  @override
+  String get enum_certificationLevel_bsacDiveLeader => 'Dive Leader';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedDiver => 'Advanced Diver';
+
+  @override
+  String get enum_certificationLevel_bsacFirstClassDiver => 'First Class Diver';
+
+  @override
+  String get enum_certificationLevel_bsacOpenWaterInstructor =>
+      'Open Water Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedInstructor =>
+      'Advanced Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacNationalInstructor =>
+      'National Instructor';
+
+  @override
+  String get enum_certificationLevel_gueFundamentals => 'Fundamentals';
+
+  @override
+  String get enum_certificationLevel_gueRec1 => 'Rec 1';
+
+  @override
+  String get enum_certificationLevel_gueRec2 => 'Rec 2';
+
+  @override
+  String get enum_certificationLevel_gueRec3 => 'Rec 3';
+
+  @override
+  String get enum_certificationLevel_gueTech1 => 'Tech 1';
+
+  @override
+  String get enum_certificationLevel_gueTech2 => 'Tech 2';
+
+  @override
+  String get enum_certificationLevel_gueCave1 => 'Cave 1';
+
+  @override
+  String get enum_certificationLevel_gueCave2 => 'Cave 2';
+
+  @override
+  String get enum_certificationLevel_gueDpv => 'DPV';
 
   @override
   String get enum_currentDirection_east => 'شرق';
@@ -10085,6 +10183,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_equipmentType_wetsuit => 'بدلة غوص';
+
+  @override
+  String get enum_equipmentType_snorkel => 'سنوركل';
+
+  @override
+  String get enum_equipmentType_transmitter => 'جهاز إرسال';
+
+  @override
+  String get enum_equipmentType_instrument => 'أداة / مقياس';
+
+  @override
+  String get enum_equipmentType_compass => 'بوصلة';
+
+  @override
+  String get enum_equipmentType_rebreather => 'جهاز إعادة التنفس';
+
+  @override
+  String get enum_equipmentType_tool => 'أداة';
+
+  @override
+  String get enum_equipmentType_rashGuard => 'قميص واقٍ من الاحتكاك';
 
   @override
   String get enum_eventSeverity_alert => 'تنبيه';
@@ -10473,6 +10592,54 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_tankRole_stage => 'أسطوانة مرحلية';
+
+  @override
+  String get enum_tideState_rising => 'مد';
+
+  @override
+  String get enum_tideState_falling => 'جزر';
+
+  @override
+  String get enum_tideState_slackHigh => 'المد الأعلى (ركود)';
+
+  @override
+  String get enum_tideState_slackLow => 'الجزر الأدنى (ركود)';
+
+  @override
+  String get enum_timeFormat_twelveHour => '12 ساعة';
+
+  @override
+  String get enum_timeFormat_twentyFourHour => '24 ساعة';
+
+  @override
+  String get enum_matchConfidence_exact => 'دقيق';
+
+  @override
+  String get enum_matchConfidence_interpolated => 'مُستكمَل';
+
+  @override
+  String get enum_matchConfidence_estimated => 'مُقدَّر';
+
+  @override
+  String get enum_matchConfidence_noProfile => 'لا يوجد ملف تعريف';
+
+  @override
+  String get enum_matchConfidence_manual => 'يدوي';
+
+  @override
+  String get enum_logCategory_app => 'التطبيق';
+
+  @override
+  String get enum_logCategory_bluetooth => 'Bluetooth';
+
+  @override
+  String get enum_logCategory_serial => 'تسلسلي';
+
+  @override
+  String get enum_logCategory_libdc => 'libdc';
+
+  @override
+  String get enum_logCategory_database => 'قاعدة البيانات';
 
   @override
   String get enum_visibility_excellent => 'ممتازة (>30m / >100ft)';

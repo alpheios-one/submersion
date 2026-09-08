@@ -9739,6 +9739,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_certificationAgency_cmas => 'CMAS';
 
   @override
+  String get enum_certificationAgency_ffessm => 'FFESSM';
+
+  @override
   String get enum_certificationAgency_gue => 'GUE';
 
   @override
@@ -9824,6 +9827,101 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_wreck => 'ספינה טרופה';
+
+  @override
+  String get enum_certificationLevel_masterDiver => 'צוללן מאסטר';
+
+  @override
+  String get enum_certificationLevel_assistantInstructor => 'עוזר מדריך';
+
+  @override
+  String get enum_certificationLevel_extendedRange => 'Extended Range';
+
+  @override
+  String get enum_certificationLevel_advancedTrimix => 'טרימיקס מתקדם';
+
+  @override
+  String get enum_certificationLevel_cmas1StarDiver => 'צוללן כוכב 1';
+
+  @override
+  String get enum_certificationLevel_cmas2StarDiver => 'צוללן כוכב 2';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiver => 'צוללן כוכב 3';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiver => 'צוללן כוכב 4';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiverAssistantInstructor =>
+      'צוללן כוכב 3 - עוזר מדריך';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiverAssistantInstructor =>
+      'צוללן כוכב 4 - עוזר מדריך';
+
+  @override
+  String get enum_certificationLevel_cmas1StarInstructor => 'מדריך כוכב 1';
+
+  @override
+  String get enum_certificationLevel_cmas2StarInstructor => 'מדריך כוכב 2';
+
+  @override
+  String get enum_certificationLevel_cmas3StarInstructor => 'מדריך כוכב 3';
+
+  @override
+  String get enum_certificationLevel_bsacOceanDiver => 'Ocean Diver';
+
+  @override
+  String get enum_certificationLevel_bsacSportsDiver => 'Sports Diver';
+
+  @override
+  String get enum_certificationLevel_bsacDiveLeader => 'Dive Leader';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedDiver => 'Advanced Diver';
+
+  @override
+  String get enum_certificationLevel_bsacFirstClassDiver => 'First Class Diver';
+
+  @override
+  String get enum_certificationLevel_bsacOpenWaterInstructor =>
+      'Open Water Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedInstructor =>
+      'Advanced Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacNationalInstructor =>
+      'National Instructor';
+
+  @override
+  String get enum_certificationLevel_gueFundamentals => 'Fundamentals';
+
+  @override
+  String get enum_certificationLevel_gueRec1 => 'Rec 1';
+
+  @override
+  String get enum_certificationLevel_gueRec2 => 'Rec 2';
+
+  @override
+  String get enum_certificationLevel_gueRec3 => 'Rec 3';
+
+  @override
+  String get enum_certificationLevel_gueTech1 => 'Tech 1';
+
+  @override
+  String get enum_certificationLevel_gueTech2 => 'Tech 2';
+
+  @override
+  String get enum_certificationLevel_gueCave1 => 'Cave 1';
+
+  @override
+  String get enum_certificationLevel_gueCave2 => 'Cave 2';
+
+  @override
+  String get enum_certificationLevel_gueDpv => 'DPV';
 
   @override
   String get enum_currentDirection_east => 'מזרח';
@@ -10028,6 +10126,27 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_equipmentType_wetsuit => 'חליפת צלילה';
+
+  @override
+  String get enum_equipmentType_snorkel => 'שנורקל';
+
+  @override
+  String get enum_equipmentType_transmitter => 'משדר';
+
+  @override
+  String get enum_equipmentType_instrument => 'מכשיר / מד לחץ';
+
+  @override
+  String get enum_equipmentType_compass => 'מצפן';
+
+  @override
+  String get enum_equipmentType_rebreather => 'ריברת\'ר';
+
+  @override
+  String get enum_equipmentType_tool => 'כלי';
+
+  @override
+  String get enum_equipmentType_rashGuard => 'חולצת ליקרה';
 
   @override
   String get enum_eventSeverity_alert => 'התראה';
@@ -10416,6 +10535,54 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_tankRole_stage => 'סטייג\'';
+
+  @override
+  String get enum_tideState_rising => 'עולה';
+
+  @override
+  String get enum_tideState_falling => 'יורד';
+
+  @override
+  String get enum_tideState_slackHigh => 'גאות מלאה (רגיעה)';
+
+  @override
+  String get enum_tideState_slackLow => 'שפל (רגיעה)';
+
+  @override
+  String get enum_timeFormat_twelveHour => '12 שעות';
+
+  @override
+  String get enum_timeFormat_twentyFourHour => '24 שעות';
+
+  @override
+  String get enum_matchConfidence_exact => 'מדויק';
+
+  @override
+  String get enum_matchConfidence_interpolated => 'משוער';
+
+  @override
+  String get enum_matchConfidence_estimated => 'מוערך';
+
+  @override
+  String get enum_matchConfidence_noProfile => 'אין פרופיל';
+
+  @override
+  String get enum_matchConfidence_manual => 'ידני';
+
+  @override
+  String get enum_logCategory_app => 'אפליקציה';
+
+  @override
+  String get enum_logCategory_bluetooth => 'Bluetooth';
+
+  @override
+  String get enum_logCategory_serial => 'טורי';
+
+  @override
+  String get enum_logCategory_libdc => 'libdc';
+
+  @override
+  String get enum_logCategory_database => 'מסד נתונים';
 
   @override
   String get enum_visibility_excellent => 'מצוינת (>30m / >100ft)';

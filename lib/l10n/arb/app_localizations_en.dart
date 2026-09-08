@@ -9814,6 +9814,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_certificationAgency_cmas => 'CMAS';
 
   @override
+  String get enum_certificationAgency_ffessm => 'FFESSM';
+
+  @override
   String get enum_certificationAgency_gue => 'GUE';
 
   @override
@@ -9899,6 +9902,102 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_wreck => 'Wreck';
+
+  @override
+  String get enum_certificationLevel_masterDiver => 'Master Diver';
+
+  @override
+  String get enum_certificationLevel_assistantInstructor =>
+      'Assistant Instructor';
+
+  @override
+  String get enum_certificationLevel_extendedRange => 'Extended Range';
+
+  @override
+  String get enum_certificationLevel_advancedTrimix => 'Advanced Trimix';
+
+  @override
+  String get enum_certificationLevel_cmas1StarDiver => '1★ Diver';
+
+  @override
+  String get enum_certificationLevel_cmas2StarDiver => '2★ Diver';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiver => '3★ Diver';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiver => '4★ Diver';
+
+  @override
+  String get enum_certificationLevel_cmas3StarDiverAssistantInstructor =>
+      '3★ Diver - Assistant Instructor';
+
+  @override
+  String get enum_certificationLevel_cmas4StarDiverAssistantInstructor =>
+      '4★ Diver - Assistant Instructor';
+
+  @override
+  String get enum_certificationLevel_cmas1StarInstructor => '1★ Instructor';
+
+  @override
+  String get enum_certificationLevel_cmas2StarInstructor => '2★ Instructor';
+
+  @override
+  String get enum_certificationLevel_cmas3StarInstructor => '3★ Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacOceanDiver => 'Ocean Diver';
+
+  @override
+  String get enum_certificationLevel_bsacSportsDiver => 'Sports Diver';
+
+  @override
+  String get enum_certificationLevel_bsacDiveLeader => 'Dive Leader';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedDiver => 'Advanced Diver';
+
+  @override
+  String get enum_certificationLevel_bsacFirstClassDiver => 'First Class Diver';
+
+  @override
+  String get enum_certificationLevel_bsacOpenWaterInstructor =>
+      'Open Water Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacAdvancedInstructor =>
+      'Advanced Instructor';
+
+  @override
+  String get enum_certificationLevel_bsacNationalInstructor =>
+      'National Instructor';
+
+  @override
+  String get enum_certificationLevel_gueFundamentals => 'Fundamentals';
+
+  @override
+  String get enum_certificationLevel_gueRec1 => 'Rec 1';
+
+  @override
+  String get enum_certificationLevel_gueRec2 => 'Rec 2';
+
+  @override
+  String get enum_certificationLevel_gueRec3 => 'Rec 3';
+
+  @override
+  String get enum_certificationLevel_gueTech1 => 'Tech 1';
+
+  @override
+  String get enum_certificationLevel_gueTech2 => 'Tech 2';
+
+  @override
+  String get enum_certificationLevel_gueCave1 => 'Cave 1';
+
+  @override
+  String get enum_certificationLevel_gueCave2 => 'Cave 2';
+
+  @override
+  String get enum_certificationLevel_gueDpv => 'DPV';
 
   @override
   String get enum_currentDirection_east => 'East';
@@ -10103,6 +10202,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_equipmentType_wetsuit => 'Wetsuit';
+
+  @override
+  String get enum_equipmentType_snorkel => 'Snorkel';
+
+  @override
+  String get enum_equipmentType_transmitter => 'Transmitter';
+
+  @override
+  String get enum_equipmentType_instrument => 'Instrument / Gauge';
+
+  @override
+  String get enum_equipmentType_compass => 'Compass';
+
+  @override
+  String get enum_equipmentType_rebreather => 'Rebreather';
+
+  @override
+  String get enum_equipmentType_tool => 'Tool';
+
+  @override
+  String get enum_equipmentType_rashGuard => 'Rash Guard';
 
   @override
   String get enum_eventSeverity_alert => 'Alert';
@@ -10491,6 +10611,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_tankRole_stage => 'Stage';
+
+  @override
+  String get enum_tideState_rising => 'Rising';
+
+  @override
+  String get enum_tideState_falling => 'Falling';
+
+  @override
+  String get enum_tideState_slackHigh => 'High Tide (Slack)';
+
+  @override
+  String get enum_tideState_slackLow => 'Low Tide (Slack)';
+
+  @override
+  String get enum_timeFormat_twelveHour => '12-hour';
+
+  @override
+  String get enum_timeFormat_twentyFourHour => '24-hour';
+
+  @override
+  String get enum_matchConfidence_exact => 'Exact';
+
+  @override
+  String get enum_matchConfidence_interpolated => 'Interpolated';
+
+  @override
+  String get enum_matchConfidence_estimated => 'Estimated';
+
+  @override
+  String get enum_matchConfidence_noProfile => 'No Profile';
+
+  @override
+  String get enum_matchConfidence_manual => 'Manual';
+
+  @override
+  String get enum_logCategory_app => 'App';
+
+  @override
+  String get enum_logCategory_bluetooth => 'Bluetooth';
+
+  @override
+  String get enum_logCategory_serial => 'Serial';
+
+  @override
+  String get enum_logCategory_libdc => 'libdc';
+
+  @override
+  String get enum_logCategory_database => 'Database';
 
   @override
   String get enum_visibility_excellent => 'Excellent (>30m / >100ft)';

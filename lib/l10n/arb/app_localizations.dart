@@ -16680,6 +16680,12 @@ abstract class AppLocalizations {
   /// **'CMAS'**
   String get enum_certificationAgency_cmas;
 
+  /// No description provided for @enum_certificationAgency_ffessm.
+  ///
+  /// In en, this message translates to:
+  /// **'FFESSM'**
+  String get enum_certificationAgency_ffessm;
+
   /// No description provided for @enum_certificationAgency_gue.
   ///
   /// In en, this message translates to:
@@ -16853,6 +16859,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wreck'**
   String get enum_certificationLevel_wreck;
+
+  /// No description provided for @enum_certificationLevel_masterDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Master Diver'**
+  String get enum_certificationLevel_masterDiver;
+
+  /// No description provided for @enum_certificationLevel_assistantInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Assistant Instructor'**
+  String get enum_certificationLevel_assistantInstructor;
+
+  /// No description provided for @enum_certificationLevel_extendedRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Extended Range'**
+  String get enum_certificationLevel_extendedRange;
+
+  /// No description provided for @enum_certificationLevel_advancedTrimix.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Trimix'**
+  String get enum_certificationLevel_advancedTrimix;
+
+  /// No description provided for @enum_certificationLevel_cmas1StarDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'1★ Diver'**
+  String get enum_certificationLevel_cmas1StarDiver;
+
+  /// No description provided for @enum_certificationLevel_cmas2StarDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'2★ Diver'**
+  String get enum_certificationLevel_cmas2StarDiver;
+
+  /// No description provided for @enum_certificationLevel_cmas3StarDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'3★ Diver'**
+  String get enum_certificationLevel_cmas3StarDiver;
+
+  /// No description provided for @enum_certificationLevel_cmas4StarDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'4★ Diver'**
+  String get enum_certificationLevel_cmas4StarDiver;
+
+  /// No description provided for @enum_certificationLevel_cmas3StarDiverAssistantInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'3★ Diver - Assistant Instructor'**
+  String get enum_certificationLevel_cmas3StarDiverAssistantInstructor;
+
+  /// No description provided for @enum_certificationLevel_cmas4StarDiverAssistantInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'4★ Diver - Assistant Instructor'**
+  String get enum_certificationLevel_cmas4StarDiverAssistantInstructor;
+
+  /// No description provided for @enum_certificationLevel_cmas1StarInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'1★ Instructor'**
+  String get enum_certificationLevel_cmas1StarInstructor;
+
+  /// No description provided for @enum_certificationLevel_cmas2StarInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'2★ Instructor'**
+  String get enum_certificationLevel_cmas2StarInstructor;
+
+  /// No description provided for @enum_certificationLevel_cmas3StarInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'3★ Instructor'**
+  String get enum_certificationLevel_cmas3StarInstructor;
+
+  /// No description provided for @enum_certificationLevel_bsacOceanDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean Diver'**
+  String get enum_certificationLevel_bsacOceanDiver;
+
+  /// No description provided for @enum_certificationLevel_bsacSportsDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Sports Diver'**
+  String get enum_certificationLevel_bsacSportsDiver;
+
+  /// No description provided for @enum_certificationLevel_bsacDiveLeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Leader'**
+  String get enum_certificationLevel_bsacDiveLeader;
+
+  /// No description provided for @enum_certificationLevel_bsacAdvancedDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Diver'**
+  String get enum_certificationLevel_bsacAdvancedDiver;
+
+  /// No description provided for @enum_certificationLevel_bsacFirstClassDiver.
+  ///
+  /// In en, this message translates to:
+  /// **'First Class Diver'**
+  String get enum_certificationLevel_bsacFirstClassDiver;
+
+  /// No description provided for @enum_certificationLevel_bsacOpenWaterInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Water Instructor'**
+  String get enum_certificationLevel_bsacOpenWaterInstructor;
+
+  /// No description provided for @enum_certificationLevel_bsacAdvancedInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced Instructor'**
+  String get enum_certificationLevel_bsacAdvancedInstructor;
+
+  /// No description provided for @enum_certificationLevel_bsacNationalInstructor.
+  ///
+  /// In en, this message translates to:
+  /// **'National Instructor'**
+  String get enum_certificationLevel_bsacNationalInstructor;
+
+  /// No description provided for @enum_certificationLevel_gueFundamentals.
+  ///
+  /// In en, this message translates to:
+  /// **'Fundamentals'**
+  String get enum_certificationLevel_gueFundamentals;
+
+  /// No description provided for @enum_certificationLevel_gueRec1.
+  ///
+  /// In en, this message translates to:
+  /// **'Rec 1'**
+  String get enum_certificationLevel_gueRec1;
+
+  /// No description provided for @enum_certificationLevel_gueRec2.
+  ///
+  /// In en, this message translates to:
+  /// **'Rec 2'**
+  String get enum_certificationLevel_gueRec2;
+
+  /// No description provided for @enum_certificationLevel_gueRec3.
+  ///
+  /// In en, this message translates to:
+  /// **'Rec 3'**
+  String get enum_certificationLevel_gueRec3;
+
+  /// No description provided for @enum_certificationLevel_gueTech1.
+  ///
+  /// In en, this message translates to:
+  /// **'Tech 1'**
+  String get enum_certificationLevel_gueTech1;
+
+  /// No description provided for @enum_certificationLevel_gueTech2.
+  ///
+  /// In en, this message translates to:
+  /// **'Tech 2'**
+  String get enum_certificationLevel_gueTech2;
+
+  /// No description provided for @enum_certificationLevel_gueCave1.
+  ///
+  /// In en, this message translates to:
+  /// **'Cave 1'**
+  String get enum_certificationLevel_gueCave1;
+
+  /// No description provided for @enum_certificationLevel_gueCave2.
+  ///
+  /// In en, this message translates to:
+  /// **'Cave 2'**
+  String get enum_certificationLevel_gueCave2;
+
+  /// No description provided for @enum_certificationLevel_gueDpv.
+  ///
+  /// In en, this message translates to:
+  /// **'DPV'**
+  String get enum_certificationLevel_gueDpv;
 
   /// No description provided for @enum_currentDirection_east.
   ///
@@ -17261,6 +17447,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Wetsuit'**
   String get enum_equipmentType_wetsuit;
+
+  /// No description provided for @enum_equipmentType_snorkel.
+  ///
+  /// In en, this message translates to:
+  /// **'Snorkel'**
+  String get enum_equipmentType_snorkel;
+
+  /// No description provided for @enum_equipmentType_transmitter.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter'**
+  String get enum_equipmentType_transmitter;
+
+  /// No description provided for @enum_equipmentType_instrument.
+  ///
+  /// In en, this message translates to:
+  /// **'Instrument / Gauge'**
+  String get enum_equipmentType_instrument;
+
+  /// No description provided for @enum_equipmentType_compass.
+  ///
+  /// In en, this message translates to:
+  /// **'Compass'**
+  String get enum_equipmentType_compass;
+
+  /// No description provided for @enum_equipmentType_rebreather.
+  ///
+  /// In en, this message translates to:
+  /// **'Rebreather'**
+  String get enum_equipmentType_rebreather;
+
+  /// No description provided for @enum_equipmentType_tool.
+  ///
+  /// In en, this message translates to:
+  /// **'Tool'**
+  String get enum_equipmentType_tool;
+
+  /// No description provided for @enum_equipmentType_rashGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Rash Guard'**
+  String get enum_equipmentType_rashGuard;
 
   /// No description provided for @enum_eventSeverity_alert.
   ///
@@ -18029,6 +18257,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stage'**
   String get enum_tankRole_stage;
+
+  /// No description provided for @enum_tideState_rising.
+  ///
+  /// In en, this message translates to:
+  /// **'Rising'**
+  String get enum_tideState_rising;
+
+  /// No description provided for @enum_tideState_falling.
+  ///
+  /// In en, this message translates to:
+  /// **'Falling'**
+  String get enum_tideState_falling;
+
+  /// No description provided for @enum_tideState_slackHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High Tide (Slack)'**
+  String get enum_tideState_slackHigh;
+
+  /// No description provided for @enum_tideState_slackLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Tide (Slack)'**
+  String get enum_tideState_slackLow;
+
+  /// No description provided for @enum_timeFormat_twelveHour.
+  ///
+  /// In en, this message translates to:
+  /// **'12-hour'**
+  String get enum_timeFormat_twelveHour;
+
+  /// No description provided for @enum_timeFormat_twentyFourHour.
+  ///
+  /// In en, this message translates to:
+  /// **'24-hour'**
+  String get enum_timeFormat_twentyFourHour;
+
+  /// No description provided for @enum_matchConfidence_exact.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact'**
+  String get enum_matchConfidence_exact;
+
+  /// No description provided for @enum_matchConfidence_interpolated.
+  ///
+  /// In en, this message translates to:
+  /// **'Interpolated'**
+  String get enum_matchConfidence_interpolated;
+
+  /// No description provided for @enum_matchConfidence_estimated.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated'**
+  String get enum_matchConfidence_estimated;
+
+  /// No description provided for @enum_matchConfidence_noProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'No Profile'**
+  String get enum_matchConfidence_noProfile;
+
+  /// No description provided for @enum_matchConfidence_manual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual'**
+  String get enum_matchConfidence_manual;
+
+  /// No description provided for @enum_logCategory_app.
+  ///
+  /// In en, this message translates to:
+  /// **'App'**
+  String get enum_logCategory_app;
+
+  /// No description provided for @enum_logCategory_bluetooth.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth'**
+  String get enum_logCategory_bluetooth;
+
+  /// No description provided for @enum_logCategory_serial.
+  ///
+  /// In en, this message translates to:
+  /// **'Serial'**
+  String get enum_logCategory_serial;
+
+  /// No description provided for @enum_logCategory_libdc.
+  ///
+  /// In en, this message translates to:
+  /// **'libdc'**
+  String get enum_logCategory_libdc;
+
+  /// No description provided for @enum_logCategory_database.
+  ///
+  /// In en, this message translates to:
+  /// **'Database'**
+  String get enum_logCategory_database;
 
   /// No description provided for @enum_visibility_excellent.
   ///
