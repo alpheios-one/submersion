@@ -22276,7 +22276,7 @@
     "description": "Collapsed Statistics group hint when the dive is not excluded"
   },
   "suuntoCloud_signIn_title": "Sign in to Suunto",
-  "suuntoCloud_signIn_description": "Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.",
+  "suuntoCloud_signIn_description": "Sign in with your app.suunto.com account to import your dives directly. Your password is never stored; only the resulting session is cached.",
   "suuntoCloud_signIn_emailLabel": "Email",
   "suuntoCloud_signIn_emailRequired": "Email is required",
   "suuntoCloud_signIn_passwordLabel": "Password",

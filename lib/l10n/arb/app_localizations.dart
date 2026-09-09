@@ -60481,7 +60481,7 @@ abstract class AppLocalizations {
   /// No description provided for @suuntoCloud_signIn_description.
   ///
   /// In en, this message translates to:
-  /// **'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  /// **'Sign in with your app.suunto.com account to import your dives directly. Your password is never stored; only the resulting session is cached.'**
   String get suuntoCloud_signIn_description;
 
   /// No description provided for @suuntoCloud_signIn_emailLabel.
