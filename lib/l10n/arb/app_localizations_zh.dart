@@ -13,6 +13,86 @@ class AppLocalizationsZh extends AppLocalizations {
       '无法打开浏览器。请使用“复制链接”，并将地址粘贴到浏览器中。';
 
   @override
+  String get equipment_components_add => '添加组件';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个组件',
+      one: '1 个组件',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError => '该装备已包含此项，因此无法将其添加为组件。';
+
+  @override
+  String get equipment_components_editRole => '编辑用途';
+
+  @override
+  String get equipment_components_empty => '暂无组件。请添加构成此装备的部件。';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return '属于 $name';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '属于 $count 个组合',
+      one: '属于 1 个组合',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '添加 $count 项',
+      one: '添加 1 项',
+      zero: '添加',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty => '没有其他可添加的在用装备。';
+
+  @override
+  String get equipment_components_pickerTitle => '添加组件';
+
+  @override
+  String get equipment_components_remove => '移除组件';
+
+  @override
+  String get equipment_components_reorder => '调整顺序';
+
+  @override
+  String get equipment_components_role => '用途';
+
+  @override
+  String get equipment_components_roleDialogTitle => '组件用途';
+
+  @override
+  String get equipment_components_roleHint => '例如：主二级头';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component：$kind';
+  }
+
+  @override
+  String get equipment_components_title => '组件';
+
+  @override
   String equipment_documents_removeError(String error) {
     return '无法移除文档：$error';
   }
@@ -10031,6 +10111,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_equipmentStatus_retired => '已退役';
 
   @override
+  String get enum_equipmentType_backplate => '背板';
+
+  @override
   String get enum_equipmentType_bcd => '浮力控制装置';
 
   @override
@@ -10056,6 +10139,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => '基础层';
+
+  @override
+  String get enum_equipmentType_firstStage => '一级头';
+
+  @override
+  String get enum_equipmentType_harness => '背带';
+
+  @override
+  String get enum_equipmentType_hose => '软管';
+
+  @override
+  String get enum_equipmentType_housing => '防水壳';
+
+  @override
+  String get enum_equipmentType_secondStage => '二级头';
+
+  @override
+  String get enum_equipmentType_strobe => '闪光灯';
 
   @override
   String get enum_equipmentType_undersuit => '内胆保暖服';
@@ -10119,6 +10220,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => '防磨衣';
+
+  @override
+  String get enum_equipmentType_wing => '背飞气囊';
 
   @override
   String get enum_eventSeverity_alert => '警报';
@@ -24366,6 +24470,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_unavailablePlaceholder_accessDenied => '无照片库访问权限';
 
   @override
+  String get attrLabel_hose_length_m => '软管长度';
+
+  @override
+  String get attrLabel_plate_material => '背板材质';
+
+  @override
   String get attrLabel_size => '尺码';
 
   @override
@@ -24565,6 +24675,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => '工具类型';
+
+  @override
+  String get attrChoice_plate_material_aluminum => '铝';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => '碳纤维';
+
+  @override
+  String get attrChoice_plate_material_steel => '钢';
 
   @override
   String get attrChoice_unit_type_eccr => '电子式 CCR (eCCR)';
@@ -26905,6 +27024,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => '备注';
+
+  @override
+  String get enum_equipmentField_components => '组件';
+
+  @override
+  String get enum_equipmentField_components_short => '部件';
 
   @override
   String get enum_equipmentField_itemName => '名称';

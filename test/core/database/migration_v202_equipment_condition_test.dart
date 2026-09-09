@@ -114,7 +114,9 @@ void _createV200Fixture(dynamic rawDb) {
 
 void main() {
   test('v202 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 202);
+    // Relaxed once v203 (equipment assemblies) landed on top; the newest
+    // rung owns the exact assertion.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(202));
     expect(AppDatabase.migrationVersions, contains(202));
   });
 

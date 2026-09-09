@@ -13,6 +13,89 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
 
   @override
+  String get equipment_components_add => 'הוספת רכיב';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count רכיבים',
+      one: 'רכיב אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError =>
+      'הפריט הזה כבר מכיל את זה, ולכן אי אפשר להוסיף אותו כרכיב.';
+
+  @override
+  String get equipment_components_editRole => 'עריכת תפקיד';
+
+  @override
+  String get equipment_components_empty =>
+      'אין רכיבים. הוסיפו את החלקים שמהם מורכב הפריט.';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return 'חלק מ-$name';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'חלק מ-$count מכלולים',
+      one: 'חלק ממכלול אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'הוספת $count',
+      one: 'הוספת 1',
+      zero: 'הוספה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty =>
+      'אין ציוד פעיל נוסף שאפשר להוסיף כאן.';
+
+  @override
+  String get equipment_components_pickerTitle => 'הוספת רכיבים';
+
+  @override
+  String get equipment_components_remove => 'הסרת רכיב';
+
+  @override
+  String get equipment_components_reorder => 'סידור מחדש';
+
+  @override
+  String get equipment_components_role => 'תפקיד';
+
+  @override
+  String get equipment_components_roleDialogTitle => 'תפקיד הרכיב';
+
+  @override
+  String get equipment_components_roleHint => 'לדוגמה: שלב שני ראשי';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component: $kind';
+  }
+
+  @override
+  String get equipment_components_title => 'רכיבים';
+
+  @override
   String equipment_documents_removeError(String error) {
     return 'לא ניתן להסיר את המסמך: $error';
   }
@@ -10272,6 +10355,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'הוצא משימוש';
 
   @override
+  String get enum_equipmentType_backplate => 'פלטת גב';
+
+  @override
   String get enum_equipmentType_bcd => 'אפוד ציפה';
 
   @override
@@ -10297,6 +10383,24 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => 'שכבת בסיס';
+
+  @override
+  String get enum_equipmentType_firstStage => 'שלב ראשון';
+
+  @override
+  String get enum_equipmentType_harness => 'רתמה';
+
+  @override
+  String get enum_equipmentType_hose => 'צינור';
+
+  @override
+  String get enum_equipmentType_housing => 'מארז';
+
+  @override
+  String get enum_equipmentType_secondStage => 'שלב שני';
+
+  @override
+  String get enum_equipmentType_strobe => 'פלאש';
 
   @override
   String get enum_equipmentType_undersuit => 'חליפה תחתונה';
@@ -10360,6 +10464,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => 'חולצת ליקרה';
+
+  @override
+  String get enum_equipmentType_wing => 'כנף';
 
   @override
   String get enum_eventSeverity_alert => 'התראה';
@@ -25064,6 +25171,12 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין גישה לספריית התמונות';
 
   @override
+  String get attrLabel_hose_length_m => 'אורך הצינור';
+
+  @override
+  String get attrLabel_plate_material => 'חומר הפלטה';
+
+  @override
   String get attrLabel_size => 'מידה';
 
   @override
@@ -25263,6 +25376,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => 'סוג הכלי';
+
+  @override
+  String get attrChoice_plate_material_aluminum => 'אלומיניום';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => 'סיבי פחמן';
+
+  @override
+  String get attrChoice_plate_material_steel => 'פלדה';
 
   @override
   String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
@@ -27655,6 +27777,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => 'הערות';
+
+  @override
+  String get enum_equipmentField_components => 'רכיבים';
+
+  @override
+  String get enum_equipmentField_components_short => 'חלקים';
 
   @override
   String get enum_equipmentField_itemName => 'שם';

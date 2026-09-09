@@ -13,6 +13,89 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile aprire il browser. Usa Copia link e incolla l\'indirizzo nel browser.';
 
   @override
+  String get equipment_components_add => 'Aggiungi componente';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count componenti',
+      one: '1 componente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError =>
+      'Quell\'articolo contiene già questo, quindi non può essere aggiunto come componente.';
+
+  @override
+  String get equipment_components_editRole => 'Modifica ruolo';
+
+  @override
+  String get equipment_components_empty =>
+      'Nessun componente. Aggiungi le parti che compongono questo articolo.';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return 'Parte di $name';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Parte di $count assiemi',
+      one: 'Parte di 1 assieme',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Aggiungi $count',
+      one: 'Aggiungi 1',
+      zero: 'Aggiungi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty =>
+      'Nessun\'altra attrezzatura attiva può essere aggiunta qui.';
+
+  @override
+  String get equipment_components_pickerTitle => 'Aggiungi componenti';
+
+  @override
+  String get equipment_components_remove => 'Rimuovi componente';
+
+  @override
+  String get equipment_components_reorder => 'Riordina';
+
+  @override
+  String get equipment_components_role => 'Ruolo';
+
+  @override
+  String get equipment_components_roleDialogTitle => 'Ruolo del componente';
+
+  @override
+  String get equipment_components_roleHint => 'es. Secondo stadio principale';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component: $kind';
+  }
+
+  @override
+  String get equipment_components_title => 'Componenti';
+
+  @override
   String equipment_documents_removeError(String error) {
     return 'Impossibile rimuovere il documento: $error';
   }
@@ -10524,6 +10607,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'Dismesso';
 
   @override
+  String get enum_equipmentType_backplate => 'Piastra dorsale';
+
+  @override
   String get enum_equipmentType_bcd => 'Jacket';
 
   @override
@@ -10549,6 +10635,24 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => 'Strato base';
+
+  @override
+  String get enum_equipmentType_firstStage => 'Primo stadio';
+
+  @override
+  String get enum_equipmentType_harness => 'Imbrago';
+
+  @override
+  String get enum_equipmentType_hose => 'Frusta';
+
+  @override
+  String get enum_equipmentType_housing => 'Custodia';
+
+  @override
+  String get enum_equipmentType_secondStage => 'Secondo stadio';
+
+  @override
+  String get enum_equipmentType_strobe => 'Flash';
 
   @override
   String get enum_equipmentType_undersuit => 'Sottomuta';
@@ -10612,6 +10716,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => 'Rash guard';
+
+  @override
+  String get enum_equipmentType_wing => 'Sacco wing';
 
   @override
   String get enum_eventSeverity_alert => 'Allarme';
@@ -25711,6 +25818,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessun accesso alla libreria foto';
 
   @override
+  String get attrLabel_hose_length_m => 'Lunghezza della frusta';
+
+  @override
+  String get attrLabel_plate_material => 'Materiale della piastra';
+
+  @override
   String get attrLabel_size => 'Taglia';
 
   @override
@@ -25910,6 +26023,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => 'Tipo di attrezzo';
+
+  @override
+  String get attrChoice_plate_material_aluminum => 'Alluminio';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => 'Fibra di carbonio';
+
+  @override
+  String get attrChoice_plate_material_steel => 'Acciaio';
 
   @override
   String get attrChoice_unit_type_eccr => 'CCR elettronico (eCCR)';
@@ -28344,6 +28466,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => 'Note';
+
+  @override
+  String get enum_equipmentField_components => 'Componenti';
+
+  @override
+  String get enum_equipmentField_components_short => 'Parti';
 
   @override
   String get enum_equipmentField_itemName => 'Nome';

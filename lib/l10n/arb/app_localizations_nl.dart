@@ -13,6 +13,89 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kan de browser niet openen. Gebruik Link kopiëren en plak het adres in je browser.';
 
   @override
+  String get equipment_components_add => 'Onderdeel toevoegen';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count onderdelen',
+      one: '1 onderdeel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError =>
+      'Dat item bevat dit item al, dus het kan niet als onderdeel worden toegevoegd.';
+
+  @override
+  String get equipment_components_editRole => 'Rol bewerken';
+
+  @override
+  String get equipment_components_empty =>
+      'Geen onderdelen. Voeg de delen toe waaruit dit item is opgebouwd.';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return 'Onderdeel van $name';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Onderdeel van $count samenstellen',
+      one: 'Onderdeel van 1 samenstel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count toevoegen',
+      one: '1 toevoegen',
+      zero: 'Toevoegen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty =>
+      'Er is geen andere actieve uitrusting die hier kan worden toegevoegd.';
+
+  @override
+  String get equipment_components_pickerTitle => 'Onderdelen toevoegen';
+
+  @override
+  String get equipment_components_remove => 'Onderdeel verwijderen';
+
+  @override
+  String get equipment_components_reorder => 'Herschikken';
+
+  @override
+  String get equipment_components_role => 'Rol';
+
+  @override
+  String get equipment_components_roleDialogTitle => 'Rol van onderdeel';
+
+  @override
+  String get equipment_components_roleHint => 'bijv. Primaire tweede trap';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component: $kind';
+  }
+
+  @override
+  String get equipment_components_title => 'Onderdelen';
+
+  @override
   String equipment_documents_removeError(String error) {
     return 'Kan het document niet verwijderen: $error';
   }
@@ -10442,6 +10525,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'Uit gebruik';
 
   @override
+  String get enum_equipmentType_backplate => 'Backplate';
+
+  @override
   String get enum_equipmentType_bcd => 'Trimvest';
 
   @override
@@ -10467,6 +10553,24 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => 'Basislaag';
+
+  @override
+  String get enum_equipmentType_firstStage => 'Eerste trap';
+
+  @override
+  String get enum_equipmentType_harness => 'Harnas';
+
+  @override
+  String get enum_equipmentType_hose => 'Slang';
+
+  @override
+  String get enum_equipmentType_housing => 'Behuizing';
+
+  @override
+  String get enum_equipmentType_secondStage => 'Tweede trap';
+
+  @override
+  String get enum_equipmentType_strobe => 'Flitser';
 
   @override
   String get enum_equipmentType_undersuit => 'Onderpak';
@@ -10530,6 +10634,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => 'Rashguard';
+
+  @override
+  String get enum_equipmentType_wing => 'Wing';
 
   @override
   String get enum_eventSeverity_alert => 'Alarm';
@@ -25512,6 +25619,12 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen toegang tot fotobibliotheek';
 
   @override
+  String get attrLabel_hose_length_m => 'Slanglengte';
+
+  @override
+  String get attrLabel_plate_material => 'Plaatmateriaal';
+
+  @override
   String get attrLabel_size => 'Maat';
 
   @override
@@ -25711,6 +25824,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => 'Soort gereedschap';
+
+  @override
+  String get attrChoice_plate_material_aluminum => 'Aluminium';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => 'Koolstofvezel';
+
+  @override
+  String get attrChoice_plate_material_steel => 'Staal';
 
   @override
   String get attrChoice_unit_type_eccr => 'Elektronische CCR (eCCR)';
@@ -28137,6 +28259,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => 'Notities';
+
+  @override
+  String get enum_equipmentField_components => 'Onderdelen';
+
+  @override
+  String get enum_equipmentField_components_short => 'Delen';
 
   @override
   String get enum_equipmentField_itemName => 'Naam';

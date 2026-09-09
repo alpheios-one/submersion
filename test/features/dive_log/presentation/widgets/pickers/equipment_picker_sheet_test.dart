@@ -17,9 +17,10 @@ Future<void> _pump(
   void Function(EquipmentItem)? onSelected,
 }) async {
   // Tall enough to render every row without scrolling. The picker groups
-  // by type (#1486, #1576), and this fixture gives every type exactly one
-  // item, so the list is 28 headings plus 28 tiles rather than 28 rows.
-  tester.view.physicalSize = const Size(900, 5000);
+  // by type (#1486, #1576) and this fixture gives every type exactly one
+  // item, so the list is one heading plus one tile per type; the assembly
+  // part types (#1487) brought the enum to 36.
+  tester.view.physicalSize = const Size(900, 6400);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(

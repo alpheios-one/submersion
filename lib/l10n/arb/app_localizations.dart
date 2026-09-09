@@ -122,6 +122,108 @@ abstract class AppLocalizations {
   /// **'Could not open your browser. Use Copy link and paste the address into your browser.'**
   String get settings_oauth_connect_browserFailed;
 
+  /// No description provided for @equipment_components_add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add component'**
+  String get equipment_components_add;
+
+  /// No description provided for @equipment_components_count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 component} other{{count} components}}'**
+  String equipment_components_count(num count);
+
+  /// No description provided for @equipment_components_cycleError.
+  ///
+  /// In en, this message translates to:
+  /// **'That item already contains this one, so it cannot be added as a component.'**
+  String get equipment_components_cycleError;
+
+  /// No description provided for @equipment_components_editRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit role'**
+  String get equipment_components_editRole;
+
+  /// No description provided for @equipment_components_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No components. Add the parts this item is assembled from.'**
+  String get equipment_components_empty;
+
+  /// No description provided for @equipment_components_partOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Part of {name}'**
+  String equipment_components_partOf(Object name);
+
+  /// No description provided for @equipment_components_partOfCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Part of 1 assembly} other{Part of {count} assemblies}}'**
+  String equipment_components_partOfCount(num count);
+
+  /// No description provided for @equipment_components_pickerConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Add} =1{Add 1} other{Add {count}}}'**
+  String equipment_components_pickerConfirm(num count);
+
+  /// No description provided for @equipment_components_pickerEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No other active gear can be added here.'**
+  String get equipment_components_pickerEmpty;
+
+  /// No description provided for @equipment_components_pickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add components'**
+  String get equipment_components_pickerTitle;
+
+  /// No description provided for @equipment_components_remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove component'**
+  String get equipment_components_remove;
+
+  /// No description provided for @equipment_components_reorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get equipment_components_reorder;
+
+  /// No description provided for @equipment_components_role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get equipment_components_role;
+
+  /// No description provided for @equipment_components_roleDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Component role'**
+  String get equipment_components_roleDialogTitle;
+
+  /// No description provided for @equipment_components_roleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Primary second stage'**
+  String get equipment_components_roleHint;
+
+  /// No description provided for @equipment_components_rollupClock.
+  ///
+  /// In en, this message translates to:
+  /// **'{component}: {kind}'**
+  String equipment_components_rollupClock(Object component, Object kind);
+
+  /// No description provided for @equipment_components_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Components'**
+  String get equipment_components_title;
+
   /// No description provided for @equipment_documents_removeError.
   ///
   /// In en, this message translates to:
@@ -17650,6 +17752,12 @@ abstract class AppLocalizations {
   /// **'Retired'**
   String get enum_equipmentStatus_retired;
 
+  /// No description provided for @enum_equipmentType_backplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Backplate'**
+  String get enum_equipmentType_backplate;
+
   /// No description provided for @enum_equipmentType_bcd.
   ///
   /// In en, this message translates to:
@@ -17703,6 +17811,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Base Layer'**
   String get enum_equipmentType_baselayer;
+
+  /// No description provided for @enum_equipmentType_firstStage.
+  ///
+  /// In en, this message translates to:
+  /// **'First Stage'**
+  String get enum_equipmentType_firstStage;
+
+  /// No description provided for @enum_equipmentType_harness.
+  ///
+  /// In en, this message translates to:
+  /// **'Harness'**
+  String get enum_equipmentType_harness;
+
+  /// No description provided for @enum_equipmentType_hose.
+  ///
+  /// In en, this message translates to:
+  /// **'Hose'**
+  String get enum_equipmentType_hose;
+
+  /// No description provided for @enum_equipmentType_housing.
+  ///
+  /// In en, this message translates to:
+  /// **'Housing'**
+  String get enum_equipmentType_housing;
+
+  /// No description provided for @enum_equipmentType_secondStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Second Stage'**
+  String get enum_equipmentType_secondStage;
+
+  /// No description provided for @enum_equipmentType_strobe.
+  ///
+  /// In en, this message translates to:
+  /// **'Strobe'**
+  String get enum_equipmentType_strobe;
 
   /// No description provided for @enum_equipmentType_undersuit.
   ///
@@ -17829,6 +17973,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rash Guard'**
   String get enum_equipmentType_rashGuard;
+
+  /// No description provided for @enum_equipmentType_wing.
+  ///
+  /// In en, this message translates to:
+  /// **'Wing'**
+  String get enum_equipmentType_wing;
 
   /// No description provided for @enum_eventSeverity_alert.
   ///
@@ -42261,6 +42411,18 @@ abstract class AppLocalizations {
   /// **'No photo library access'**
   String get media_unavailablePlaceholder_accessDenied;
 
+  /// No description provided for @attrLabel_hose_length_m.
+  ///
+  /// In en, this message translates to:
+  /// **'Hose length'**
+  String get attrLabel_hose_length_m;
+
+  /// No description provided for @attrLabel_plate_material.
+  ///
+  /// In en, this message translates to:
+  /// **'Plate material'**
+  String get attrLabel_plate_material;
+
   /// No description provided for @attrLabel_size.
   ///
   /// In en, this message translates to:
@@ -42662,6 +42824,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tool type'**
   String get attrLabel_tool_type;
+
+  /// No description provided for @attrChoice_plate_material_aluminum.
+  ///
+  /// In en, this message translates to:
+  /// **'Aluminum'**
+  String get attrChoice_plate_material_aluminum;
+
+  /// No description provided for @attrChoice_plate_material_carbon_fiber.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbon fiber'**
+  String get attrChoice_plate_material_carbon_fiber;
+
+  /// No description provided for @attrChoice_plate_material_steel.
+  ///
+  /// In en, this message translates to:
+  /// **'Steel'**
+  String get attrChoice_plate_material_steel;
 
   /// No description provided for @attrChoice_unit_type_eccr.
   ///
@@ -46910,6 +47090,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notes'**
   String get enum_tripField_notes_short;
+
+  /// No description provided for @enum_equipmentField_components.
+  ///
+  /// In en, this message translates to:
+  /// **'Components'**
+  String get enum_equipmentField_components;
+
+  /// No description provided for @enum_equipmentField_components_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Parts'**
+  String get enum_equipmentField_components_short;
 
   /// No description provided for @enum_equipmentField_itemName.
   ///

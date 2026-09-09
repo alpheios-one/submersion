@@ -111,6 +111,11 @@ class EquipmentRepository {
 
   /// Emits whenever the `equipment` table changes so list providers can
   /// refresh after a sync or any other write.
+  ///
+  /// Deliberately NOT the assembly template: every clock evaluation hangs
+  /// off this stream, and a membership edit changes no schedule or record.
+  /// Assembly-aware providers follow
+  /// EquipmentComponentRepository.watchComponentEdgeChanges instead.
   Stream<void> watchEquipmentChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.equipment));
 
@@ -431,10 +436,10 @@ class EquipmentRepository {
     }
   }
 
-  /// Delete equipment. Service schedules and service records are first-class
-  /// synced children cascade-deleted by SQLite, but cascades emit no
-  /// deletion-log entries, so each is tombstoned explicitly (mirrors
-  /// EquipmentSetRepository.deleteSet).
+  /// Delete equipment. Service schedules, service records, and assembly
+  /// component rows are first-class synced children cascade-deleted by
+  /// SQLite, but cascades emit no deletion-log entries, so each is
+  /// tombstoned explicitly (mirrors EquipmentSetRepository.deleteSet).
   Future<void> deleteEquipment(String id) async {
     try {
       _log.info('Deleting equipment: $id');
@@ -450,6 +455,15 @@ class EquipmentRepository {
         final records = await (_db.select(
           _db.serviceRecords,
         )..where((t) => t.equipmentId.equals(id))).get();
+        // Assembly rows in both directions: this item as a parent and as a
+        // part (issue #1487). Cascaded away by SQLite, so tombstoned here.
+        final componentRows =
+            await (_db.select(_db.equipmentComponents)..where(
+                  (t) =>
+                      t.parentEquipmentId.equals(id) |
+                      t.componentEquipmentId.equals(id),
+                ))
+                .get();
         await (_db.delete(_db.equipment)..where((t) => t.id.equals(id))).go();
         for (final s in schedules) {
           await _syncRepository.logDeletion(
@@ -461,6 +475,12 @@ class EquipmentRepository {
           await _syncRepository.logDeletion(
             entityType: 'serviceRecords',
             recordId: r.id,
+          );
+        }
+        for (final c in componentRows) {
+          await _syncRepository.logDeletion(
+            entityType: 'equipmentComponents',
+            recordId: c.id,
           );
         }
         await _syncRepository.logDeletion(

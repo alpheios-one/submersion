@@ -13,6 +13,89 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerült megnyitni a böngészőt. Használd a Link másolása gombot, és illeszd be a címet a böngésződbe.';
 
   @override
+  String get equipment_components_add => 'Alkatrész hozzáadása';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count alkatrész',
+      one: '1 alkatrész',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError =>
+      'Az a felszerelés már tartalmazza ezt, ezért nem adható hozzá alkatrészként.';
+
+  @override
+  String get equipment_components_editRole => 'Szerep szerkesztése';
+
+  @override
+  String get equipment_components_empty =>
+      'Nincsenek alkatrészek. Add hozzá azokat a részeket, amelyekből ez a felszerelés áll.';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return '$name része';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count összeállítás része',
+      one: '1 összeállítás része',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hozzáadása',
+      one: '1 hozzáadása',
+      zero: 'Hozzáadás',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty =>
+      'Nincs más aktív felszerelés, amit ide lehetne adni.';
+
+  @override
+  String get equipment_components_pickerTitle => 'Alkatrészek hozzáadása';
+
+  @override
+  String get equipment_components_remove => 'Alkatrész eltávolítása';
+
+  @override
+  String get equipment_components_reorder => 'Átrendezés';
+
+  @override
+  String get equipment_components_role => 'Szerep';
+
+  @override
+  String get equipment_components_roleDialogTitle => 'Alkatrész szerepe';
+
+  @override
+  String get equipment_components_roleHint => 'pl. Fő második fokozat';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component: $kind';
+  }
+
+  @override
+  String get equipment_components_title => 'Alkatrészek';
+
+  @override
   String equipment_documents_removeError(String error) {
     return 'A dokumentum nem távolítható el: $error';
   }
@@ -10497,6 +10580,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'Kivonva';
 
   @override
+  String get enum_equipmentType_backplate => 'Hátlemez';
+
+  @override
   String get enum_equipmentType_bcd => 'Jacket';
 
   @override
@@ -10522,6 +10608,24 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => 'Alapréteg';
+
+  @override
+  String get enum_equipmentType_firstStage => 'Első fokozat';
+
+  @override
+  String get enum_equipmentType_harness => 'Heveder';
+
+  @override
+  String get enum_equipmentType_hose => 'Tömlő';
+
+  @override
+  String get enum_equipmentType_housing => 'Tokozás';
+
+  @override
+  String get enum_equipmentType_secondStage => 'Második fokozat';
+
+  @override
+  String get enum_equipmentType_strobe => 'Vaku';
 
   @override
   String get enum_equipmentType_undersuit => 'Alsóöltözet';
@@ -10585,6 +10689,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => 'Vízi trikó';
+
+  @override
+  String get enum_equipmentType_wing => 'Szárny';
 
   @override
   String get enum_eventSeverity_alert => 'Riasztas';
@@ -25607,6 +25714,12 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs hozzáférés a fotókönyvtárhoz';
 
   @override
+  String get attrLabel_hose_length_m => 'Tömlő hossza';
+
+  @override
+  String get attrLabel_plate_material => 'Lemez anyaga';
+
+  @override
   String get attrLabel_size => 'Méret';
 
   @override
@@ -25806,6 +25919,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => 'Szerszám típusa';
+
+  @override
+  String get attrChoice_plate_material_aluminum => 'Alumínium';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => 'Szénszál';
+
+  @override
+  String get attrChoice_plate_material_steel => 'Acél';
 
   @override
   String get attrChoice_unit_type_eccr => 'Elektronikus CCR (eCCR)';
@@ -28234,6 +28356,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => 'Jegyz.';
+
+  @override
+  String get enum_equipmentField_components => 'Alkatrészek';
+
+  @override
+  String get enum_equipmentField_components_short => 'Részek';
 
   @override
   String get enum_equipmentField_itemName => 'Név';

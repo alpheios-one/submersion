@@ -13,6 +13,89 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.';
 
   @override
+  String get equipment_components_add => 'إضافة مكوّن';
+
+  @override
+  String equipment_components_count(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مكوّنات',
+      one: 'مكوّن واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_cycleError =>
+      'هذا العنصر يحتوي بالفعل على هذا، لذا لا يمكن إضافته كمكوّن.';
+
+  @override
+  String get equipment_components_editRole => 'تعديل الدور';
+
+  @override
+  String get equipment_components_empty =>
+      'لا توجد مكوّنات. أضف الأجزاء التي يتكوّن منها هذا العنصر.';
+
+  @override
+  String equipment_components_partOf(Object name) {
+    return 'جزء من $name';
+  }
+
+  @override
+  String equipment_components_partOfCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'جزء من $count تجميعات',
+      one: 'جزء من تجميعة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipment_components_pickerConfirm(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'إضافة $count',
+      one: 'إضافة 1',
+      zero: 'إضافة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_pickerEmpty =>
+      'لا توجد معدات نشطة أخرى يمكن إضافتها هنا.';
+
+  @override
+  String get equipment_components_pickerTitle => 'إضافة مكوّنات';
+
+  @override
+  String get equipment_components_remove => 'إزالة المكوّن';
+
+  @override
+  String get equipment_components_reorder => 'إعادة ترتيب';
+
+  @override
+  String get equipment_components_role => 'الدور';
+
+  @override
+  String get equipment_components_roleDialogTitle => 'دور المكوّن';
+
+  @override
+  String get equipment_components_roleHint => 'مثال: المرحلة الثانية الرئيسية';
+
+  @override
+  String equipment_components_rollupClock(Object component, Object kind) {
+    return '$component: $kind';
+  }
+
+  @override
+  String get equipment_components_title => 'المكوّنات';
+
+  @override
   String equipment_documents_removeError(String error) {
     return 'تعذرت إزالة المستند: $error';
   }
@@ -10331,6 +10414,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'متقاعد';
 
   @override
+  String get enum_equipmentType_backplate => 'لوحة ظهر';
+
+  @override
   String get enum_equipmentType_bcd => 'سترة الطفو';
 
   @override
@@ -10356,6 +10442,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_equipmentType_baselayer => 'طبقة أساسية';
+
+  @override
+  String get enum_equipmentType_firstStage => 'المرحلة الأولى';
+
+  @override
+  String get enum_equipmentType_harness => 'حزام';
+
+  @override
+  String get enum_equipmentType_hose => 'خرطوم';
+
+  @override
+  String get enum_equipmentType_housing => 'غلاف الكاميرا';
+
+  @override
+  String get enum_equipmentType_secondStage => 'المرحلة الثانية';
+
+  @override
+  String get enum_equipmentType_strobe => 'فلاش';
 
   @override
   String get enum_equipmentType_undersuit => 'بدلة داخلية';
@@ -10419,6 +10523,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_equipmentType_rashGuard => 'قميص واقٍ من الاحتكاك';
+
+  @override
+  String get enum_equipmentType_wing => 'جناح';
 
   @override
   String get enum_eventSeverity_alert => 'تنبيه';
@@ -25246,6 +25353,12 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يوجد وصول إلى مكتبة الصور';
 
   @override
+  String get attrLabel_hose_length_m => 'طول الخرطوم';
+
+  @override
+  String get attrLabel_plate_material => 'مادة اللوحة';
+
+  @override
   String get attrLabel_size => 'المقاس';
 
   @override
@@ -25445,6 +25558,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get attrLabel_tool_type => 'نوع الأداة';
+
+  @override
+  String get attrChoice_plate_material_aluminum => 'ألومنيوم';
+
+  @override
+  String get attrChoice_plate_material_carbon_fiber => 'ألياف الكربون';
+
+  @override
+  String get attrChoice_plate_material_steel => 'فولاذ';
 
   @override
   String get attrChoice_unit_type_eccr => 'CCR إلكتروني (eCCR)';
@@ -27855,6 +27977,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_tripField_notes_short => 'ملاحظات';
+
+  @override
+  String get enum_equipmentField_components => 'المكوّنات';
+
+  @override
+  String get enum_equipmentField_components_short => 'أجزاء';
 
   @override
   String get enum_equipmentField_itemName => 'الاسم';

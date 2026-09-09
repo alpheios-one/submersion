@@ -1107,12 +1107,60 @@ class EquipmentAttributes extends Table {
   ];
 }
 
+/// The assembly template (issue #1487): one row per part of a parent item.
+/// A clocked child of equipment, shaped like [EquipmentAttributes], because
+/// role and order are mutable payload that must merge on their own clock.
+/// An item is an assembly when it has at least one row here; there is no
+/// assembly type.
+@DataClassName('EquipmentComponentRow')
+class EquipmentComponents extends Table {
+  TextColumn get id => text()();
+  TextColumn get parentEquipmentId =>
+      text().references(Equipment, #id, onDelete: KeyAction.cascade)();
+  TextColumn get componentEquipmentId =>
+      text().references(Equipment, #id, onDelete: KeyAction.cascade)();
+
+  /// Free text such as "Primary second stage"; empty when unset.
+  TextColumn get role => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution.
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {parentEquipmentId, componentEquipmentId},
+  ];
+}
+
 /// Junction table for equipment used per dive
 class DiveEquipment extends Table {
   TextColumn get diveId =>
       text().references(Dives, #id, onDelete: KeyAction.cascade)();
   TextColumn get equipmentId =>
       text().references(Equipment, #id, onDelete: KeyAction.cascade)();
+
+  /// Provenance (issue #1487): the immediate parent assembly this row was
+  /// attached through, null for a top-level row. SET NULL on delete so the
+  /// part stays on the dive as flat gear when its assembly is deleted.
+  TextColumn get viaEquipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+
+  /// The equipment set that was applied, carried by every row of the
+  /// expanded subtree; null when the row was added by hand.
+  TextColumn get viaSetId => text().nullable().references(
+    EquipmentSets,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 
   @override
   Set<Column> get primaryKey => {diveId, equipmentId};
@@ -1157,6 +1205,23 @@ class DivePlanEquipment extends Table {
       text().references(DivePlans, #id, onDelete: KeyAction.cascade)();
   TextColumn get equipmentId =>
       text().references(Equipment, #id, onDelete: KeyAction.cascade)();
+
+  /// Provenance (issue #1487): the immediate parent assembly this row was
+  /// attached through, null for a top-level row. SET NULL on delete so the
+  /// part stays on the plan as flat gear when its assembly is deleted.
+  TextColumn get viaEquipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+
+  /// The equipment set that was applied, carried by every row of the
+  /// expanded subtree; null when the row was added by hand.
+  TextColumn get viaSetId => text().nullable().references(
+    EquipmentSets,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 
   @override
   Set<Column> get primaryKey => {planId, equipmentId};
@@ -3674,6 +3739,7 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     EquipmentSetGeofences,
     QualityFindings,
     EquipmentAttributes,
+    EquipmentComponents,
     Species,
     Sightings,
     Media,
@@ -3774,7 +3840,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 202;
+  static const int currentSchemaVersion = 203;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -4298,6 +4364,9 @@ class AppDatabase extends _$AppDatabase {
     // #1365 has since landed, so the two sit in order.
     201,
     202,
+    // 203: equipment assemblies (issue #1487). Renumbered from 202, which
+    // condition intelligence took while this branch was open.
+    203,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4558,6 +4627,72 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'ALTER TABLE dive_tanks ADD COLUMN source_tank_index INTEGER',
     );
+  }
+
+  /// v203: equipment_components (issue #1487), the assembly template. Pure
+  /// CREATE IF NOT EXISTS so it is safe from both onUpgrade and the beforeOpen
+  /// backstop.
+  Future<void> _assertEquipmentComponentsTable() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS equipment_components (
+        id TEXT NOT NULL PRIMARY KEY,
+        parent_equipment_id TEXT NOT NULL
+          REFERENCES equipment(id) ON DELETE CASCADE,
+        component_equipment_id TEXT NOT NULL
+          REFERENCES equipment(id) ON DELETE CASCADE,
+        role TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT,
+        UNIQUE (parent_equipment_id, component_equipment_id)
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_equipment_components_parent '
+      'ON equipment_components(parent_equipment_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_equipment_components_component '
+      'ON equipment_components(component_equipment_id)',
+    );
+  }
+
+  /// v203: the two nullable provenance columns on each gear junction
+  /// (issue #1487). PRAGMA-guarded per table and per column so a healthy
+  /// database no-ops and a partial fixture does not throw. Nothing writes
+  /// them until the dive side lands; adding them here keeps the ladder to
+  /// one rung for the feature.
+  ///
+  /// Each column is added only once the table it references exists. SQLite
+  /// accepts a REFERENCES clause naming a table that is not there, but with
+  /// foreign keys on it checks that clause at the next DML on the junction
+  /// and fails with "no such table". Older rungs' minimal-fixture tests hold
+  /// a junction without its parents, and the beforeOpen backstop re-runs
+  /// this on every open, so a real database always gets both columns.
+  Future<void> _assertGearProvenanceColumns() async {
+    final tables = (await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table'",
+    ).get()).map((r) => r.read<String>('name')).toSet();
+    final hasEquipment = tables.contains('equipment');
+    final hasSets = tables.contains('equipment_sets');
+    for (final table in ['dive_equipment', 'dive_plan_equipment']) {
+      final cols = await customSelect("PRAGMA table_info('$table')").get();
+      if (cols.isEmpty) continue;
+      final names = cols.map((c) => c.read<String>('name')).toSet();
+      if (hasEquipment && !names.contains('via_equipment_id')) {
+        await customStatement(
+          'ALTER TABLE $table ADD COLUMN via_equipment_id TEXT '
+          'REFERENCES equipment (id) ON DELETE SET NULL',
+        );
+      }
+      if (hasSets && !names.contains('via_set_id')) {
+        await customStatement(
+          'ALTER TABLE $table ADD COLUMN via_set_id TEXT '
+          'REFERENCES equipment_sets (id) ON DELETE SET NULL',
+        );
+      }
+    }
   }
 
   /// v124: equipment_attributes table + indexes. Idempotent so it is safe to
@@ -7369,6 +7504,7 @@ class AppDatabase extends _$AppDatabase {
     'equipment',
     'equipment_sets',
     'equipment_attributes',
+    'equipment_components',
     'dive_types',
     'dive_roles',
     'tank_presets',
@@ -11083,6 +11219,14 @@ class AppDatabase extends _$AppDatabase {
           await _backfillBuiltInExposureDefaults();
         }
         if (from < 202) await reportProgress();
+        // v203: equipment assemblies (issue #1487). The equipment_components
+        // template table plus two nullable provenance columns on each gear
+        // junction. Additive, no backfill. Renumbered from 202.
+        if (from < 203) {
+          await _assertEquipmentComponentsTable();
+          await _assertGearProvenanceColumns();
+        }
+        if (from < 203) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -11284,6 +11428,11 @@ class AppDatabase extends _$AppDatabase {
         // column, same restore/sync-adopt reasoning.
         await _assertTransmitterTables();
         await _assertDiveTankSourceIndexColumn();
+        // v203 backstop: re-assert the equipment_components table and the
+        // gear-junction provenance columns (issue #1487). A database that
+        // arrives by restore or sync-adopt never runs onUpgrade.
+        await _assertEquipmentComponentsTable();
+        await _assertGearProvenanceColumns();
 
         // v202 backstop: re-assert the condition columns and tables.
         await _assertEquipmentConditionSchema();
