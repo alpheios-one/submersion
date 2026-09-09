@@ -22340,7 +22340,7 @@
     }
   },
   "garminConnect_signIn_title": "Sign in to Garmin Connect",
-  "garminConnect_signIn_description": "Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.",
+  "garminConnect_signIn_description": "Sign in with your Garmin Connect account to import your dives directly. Your password is never stored; only the resulting session is cached.",
   "garminConnect_signIn_emailLabel": "Email",
   "garminConnect_signIn_emailRequired": "Email is required",
   "garminConnect_signIn_passwordLabel": "Password",

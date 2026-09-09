@@ -60589,7 +60589,7 @@ abstract class AppLocalizations {
   /// No description provided for @garminConnect_signIn_description.
   ///
   /// In en, this message translates to:
-  /// **'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.'**
+  /// **'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored; only the resulting session is cached.'**
   String get garminConnect_signIn_description;
 
   /// No description provided for @garminConnect_signIn_emailLabel.

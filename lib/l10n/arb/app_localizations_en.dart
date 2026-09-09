@@ -36327,7 +36327,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get garminConnect_signIn_description =>
-      'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored — only the resulting session is cached.';
+      'Sign in with your Garmin Connect account to import your dives directly. Your password is never stored; only the resulting session is cached.';
 
   @override
   String get garminConnect_signIn_emailLabel => 'Email';
