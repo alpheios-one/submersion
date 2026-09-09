@@ -1660,6 +1660,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get certifications_detail_label_agency => 'Verband';
 
   @override
+  String get certifications_detail_label_alsoRecognized => 'Also recognized as';
+
+  @override
   String get certifications_detail_label_cardNumber => 'Kartennummer';
 
   @override
@@ -1776,6 +1779,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch keine Zertifizierungen';
 
   @override
+  String certifications_ecard_alsoRecognized(String recognitions) {
+    return 'Also: $recognitions';
+  }
+
+  @override
   String get certifications_ecard_label_cardNumber => 'KARTEN-NR.';
 
   @override
@@ -1876,6 +1884,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get certifications_edit_label_agency => 'Verband *';
+
+  @override
+  String get certifications_edit_addRecognition => 'Add another recognition';
+
+  @override
+  String get certifications_edit_removeRecognition => 'Remove this recognition';
 
   @override
   String get certifications_edit_label_cardNumber => 'Kartennummer';

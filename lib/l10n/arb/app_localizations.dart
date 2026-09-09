@@ -2813,6 +2813,12 @@ abstract class AppLocalizations {
   /// **'Agency'**
   String get certifications_detail_label_agency;
 
+  /// No description provided for @certifications_detail_label_alsoRecognized.
+  ///
+  /// In en, this message translates to:
+  /// **'Also recognized as'**
+  String get certifications_detail_label_alsoRecognized;
+
   /// No description provided for @certifications_detail_label_cardNumber.
   ///
   /// In en, this message translates to:
@@ -3002,6 +3008,12 @@ abstract class AppLocalizations {
   /// **'No certifications yet'**
   String get certifications_ecardStack_empty_title;
 
+  /// Secondary line on the generated wallet card listing the other agency recognitions the same card grants, all at equal rank
+  ///
+  /// In en, this message translates to:
+  /// **'Also: {recognitions}'**
+  String certifications_ecard_alsoRecognized(String recognitions);
+
   /// Uppercase field label above the certification card number on the generated wallet card
   ///
   /// In en, this message translates to:
@@ -3181,6 +3193,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Agency *'**
   String get certifications_edit_label_agency;
+
+  /// No description provided for @certifications_edit_addRecognition.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another recognition'**
+  String get certifications_edit_addRecognition;
+
+  /// No description provided for @certifications_edit_removeRecognition.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this recognition'**
+  String get certifications_edit_removeRecognition;
 
   /// No description provided for @certifications_edit_label_cardNumber.
   ///

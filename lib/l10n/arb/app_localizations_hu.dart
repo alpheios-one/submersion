@@ -1649,6 +1649,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_detail_label_agency => 'Szervezet';
 
   @override
+  String get certifications_detail_label_alsoRecognized => 'Also recognized as';
+
+  @override
   String get certifications_detail_label_cardNumber => 'Kartyaszam';
 
   @override
@@ -1763,6 +1766,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Meg nincsenek kepesitesek';
 
   @override
+  String certifications_ecard_alsoRecognized(String recognitions) {
+    return 'Also: $recognitions';
+  }
+
+  @override
   String get certifications_ecard_label_cardNumber => 'KARTYASZAM';
 
   @override
@@ -1861,6 +1869,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get certifications_edit_label_agency => 'Szervezet *';
+
+  @override
+  String get certifications_edit_addRecognition => 'Add another recognition';
+
+  @override
+  String get certifications_edit_removeRecognition => 'Remove this recognition';
 
   @override
   String get certifications_edit_label_cardNumber => 'Kartyaszam';

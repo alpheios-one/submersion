@@ -1654,6 +1654,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_detail_label_agency => 'Agencia';
 
   @override
+  String get certifications_detail_label_alsoRecognized => 'Also recognized as';
+
+  @override
   String get certifications_detail_label_cardNumber => 'Numero do Cartao';
 
   @override
@@ -1769,6 +1772,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhuma certificacao ainda';
 
   @override
+  String certifications_ecard_alsoRecognized(String recognitions) {
+    return 'Also: $recognitions';
+  }
+
+  @override
   String get certifications_ecard_label_cardNumber => 'N.º DO CARTÃO';
 
   @override
@@ -1869,6 +1877,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_edit_label_agency => 'Agencia *';
+
+  @override
+  String get certifications_edit_addRecognition => 'Add another recognition';
+
+  @override
+  String get certifications_edit_removeRecognition => 'Remove this recognition';
 
   @override
   String get certifications_edit_label_cardNumber => 'Numero do Cartao';
