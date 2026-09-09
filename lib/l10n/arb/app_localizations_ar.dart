@@ -5854,6 +5854,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_filter_presetThisYear => 'هذا العام';
 
   @override
+  String get diveLog_filter_searchComputersHint => 'اكتب للبحث عن حواسيب الغوص';
+
+  @override
+  String get diveLog_filter_searchSitesHint => 'اكتب للبحث عن المواقع';
+
+  @override
+  String get diveLog_filter_searchTypesHint => 'اكتب للبحث عن الأنواع';
+
+  @override
+  String get diveLog_filter_searchCentersHint => 'اكتب للبحث عن مراكز الغوص';
+
+  @override
+  String get diveLog_filter_searchFieldsHint => 'اكتب للبحث عن الحقول';
+
+  @override
+  String get diveLog_filter_searchTripsHint => 'اكتب للبحث عن الرحلات';
+
+  @override
   String get diveLog_filter_sectionBuddy => 'زميل الغوص';
 
   @override

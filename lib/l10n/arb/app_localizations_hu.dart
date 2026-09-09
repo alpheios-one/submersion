@@ -5959,6 +5959,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_filter_presetThisYear => 'Idén';
 
   @override
+  String get diveLog_filter_searchComputersHint =>
+      'Gépelj a búvárcomputerek kereséséhez';
+
+  @override
+  String get diveLog_filter_searchSitesHint =>
+      'Gépelj a merülőhelyek kereséséhez';
+
+  @override
+  String get diveLog_filter_searchTypesHint =>
+      'Gépelj a merüléstípusok kereséséhez';
+
+  @override
+  String get diveLog_filter_searchCentersHint =>
+      'Gépelj a búvárközpontok kereséséhez';
+
+  @override
+  String get diveLog_filter_searchFieldsHint => 'Gépelj a mezők kereséséhez';
+
+  @override
+  String get diveLog_filter_searchTripsHint => 'Gépelj az utak kereséséhez';
+
+  @override
   String get diveLog_filter_sectionBuddy => 'Buddy';
 
   @override

@@ -5870,6 +5870,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_filter_presetThisYear => 'This year';
 
   @override
+  String get diveLog_filter_searchComputersHint => 'Type to search computers';
+
+  @override
+  String get diveLog_filter_searchSitesHint => 'Type to search sites';
+
+  @override
+  String get diveLog_filter_searchTypesHint => 'Type to search dive types';
+
+  @override
+  String get diveLog_filter_searchCentersHint => 'Type to search dive centers';
+
+  @override
+  String get diveLog_filter_searchFieldsHint => 'Type to search fields';
+
+  @override
+  String get diveLog_filter_searchTripsHint => 'Type to search trips';
+
+  @override
   String get diveLog_filter_sectionBuddy => 'Buddy';
 
   @override
