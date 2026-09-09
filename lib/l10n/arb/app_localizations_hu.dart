@@ -17425,6 +17425,31 @@ class AppLocalizationsHu extends AppLocalizations {
   String get weightPresets_action_rename => 'Átnevezés';
 
   @override
+  String get weightPresets_action_new => 'New preset';
+
+  @override
+  String get weightPresets_action_edit => 'Edit';
+
+  @override
+  String get weightPresets_new_title => 'New weight preset';
+
+  @override
+  String get weightPresets_edit_title => 'Edit weight preset';
+
+  @override
+  String get weightPresets_editor_addWeight => 'Add weight';
+
+  @override
+  String get weightPresets_editor_needName => 'Give the preset a name';
+
+  @override
+  String get weightPresets_editor_needWeight => 'Add at least one weight';
+
+  @override
+  String get weightPresets_editor_notFound =>
+      'This weighting rig no longer exists.';
+
+  @override
   String get weightPresets_rename_title => 'Séma átnevezése';
 
   @override
