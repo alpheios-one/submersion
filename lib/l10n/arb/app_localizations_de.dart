@@ -8350,6 +8350,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_detail_depth_maximum => 'Maximum';
 
   @override
+  String get diveSites_detail_depth_reachedHeading => 'Erreichte Tiefe';
+
+  @override
   String get diveSites_detail_depth_minimum => 'Minimum';
 
   @override
@@ -8474,6 +8477,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_detail_stats_notAvailable => 'Nicht verfügbar';
+
+  @override
+  String diveSites_detail_stats_viewAllDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count Tauchgänge anzeigen',
+      one: '1 Tauchgang anzeigen',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_detail_semantics_openLinkedDive(Object label) {
+    return '$label, diesen Tauchgang öffnen';
+  }
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -9571,6 +9590,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get diveSites_summary_stat_withGps => 'Mit GPS';
+
+  @override
+  String get diveSites_summary_stat_countries => 'Länder';
+
+  @override
+  String get diveSites_summary_stat_notDived => 'Nicht getaucht';
+
+  @override
+  String get diveSites_summary_section_recentlyDived => 'Zuletzt getaucht';
+
+  @override
+  String diveSites_summary_tile_lastDived(Object date) {
+    return 'Zuletzt getaucht $date';
+  }
 
   @override
   String get diveType_builtin_altitude => 'Bergseetauchen';
@@ -28087,6 +28120,30 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_siteField_maxDepthReached => 'Deine max. Tiefe';
+
+  @override
+  String get enum_siteField_firstDived => 'Erster Tauchgang';
+
+  @override
+  String get enum_siteField_firstDived_short => 'Erster TG';
+
+  @override
+  String get enum_siteField_averageDepthReached => 'Deine Ø-Tiefe';
+
+  @override
+  String get enum_siteField_averageDepthReached_short => 'Ø Tiefe';
+
+  @override
+  String get enum_siteField_longestDive => 'Längster Tauchgang';
+
+  @override
+  String get enum_siteField_longestDive_short => 'Längster';
+
+  @override
+  String get enum_siteField_averageDuration => 'Ø-Dauer';
+
+  @override
+  String get enum_siteField_averageDuration_short => 'Ø Dauer';
 
   @override
   String get enum_siteField_maxDepthReached_short => 'Dein Max.';

@@ -13972,6 +13972,12 @@ abstract class AppLocalizations {
   /// **'Maximum'**
   String get diveSites_detail_depth_maximum;
 
+  /// No description provided for @diveSites_detail_depth_reachedHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth Reached'**
+  String get diveSites_detail_depth_reachedHeading;
+
   /// No description provided for @diveSites_detail_depth_minimum.
   ///
   /// In en, this message translates to:
@@ -14205,6 +14211,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not available'**
   String get diveSites_detail_stats_notAvailable;
+
+  /// No description provided for @diveSites_detail_stats_viewAllDives.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{View 1 dive} other{View all {count} dives}}'**
+  String diveSites_detail_stats_viewAllDives(int count);
+
+  /// No description provided for @diveSites_detail_semantics_openLinkedDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}, open this dive'**
+  String diveSites_detail_semantics_openLinkedDive(Object label);
 
   /// No description provided for @diveSites_detail_semantics_copyToClipboard.
   ///
@@ -15903,6 +15921,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'With GPS'**
   String get diveSites_summary_stat_withGps;
+
+  /// No description provided for @diveSites_summary_stat_countries.
+  ///
+  /// In en, this message translates to:
+  /// **'Countries'**
+  String get diveSites_summary_stat_countries;
+
+  /// No description provided for @diveSites_summary_stat_notDived.
+  ///
+  /// In en, this message translates to:
+  /// **'Not dived'**
+  String get diveSites_summary_stat_notDived;
+
+  /// No description provided for @diveSites_summary_section_recentlyDived.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently Dived'**
+  String get diveSites_summary_section_recentlyDived;
+
+  /// No description provided for @diveSites_summary_tile_lastDived.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dived {date}'**
+  String diveSites_summary_tile_lastDived(Object date);
 
   /// No description provided for @diveType_builtin_altitude.
   ///
@@ -46532,6 +46574,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Max Depth'**
   String get enum_siteField_maxDepthReached;
+
+  /// No description provided for @enum_siteField_firstDived.
+  ///
+  /// In en, this message translates to:
+  /// **'First Dived'**
+  String get enum_siteField_firstDived;
+
+  /// No description provided for @enum_siteField_firstDived_short.
+  ///
+  /// In en, this message translates to:
+  /// **'First dived'**
+  String get enum_siteField_firstDived_short;
+
+  /// No description provided for @enum_siteField_averageDepthReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Avg Depth'**
+  String get enum_siteField_averageDepthReached;
+
+  /// No description provided for @enum_siteField_averageDepthReached_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Your avg'**
+  String get enum_siteField_averageDepthReached_short;
+
+  /// No description provided for @enum_siteField_longestDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest Dive'**
+  String get enum_siteField_longestDive;
+
+  /// No description provided for @enum_siteField_longestDive_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest'**
+  String get enum_siteField_longestDive_short;
+
+  /// No description provided for @enum_siteField_averageDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Duration'**
+  String get enum_siteField_averageDuration;
+
+  /// No description provided for @enum_siteField_averageDuration_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg time'**
+  String get enum_siteField_averageDuration_short;
 
   /// No description provided for @enum_siteField_maxDepthReached_short.
   ///

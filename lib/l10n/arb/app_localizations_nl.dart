@@ -8290,6 +8290,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_detail_depth_maximum => 'Maximum';
 
   @override
+  String get diveSites_detail_depth_reachedHeading => 'Bereikte diepte';
+
+  @override
   String get diveSites_detail_depth_minimum => 'Minimum';
 
   @override
@@ -8411,6 +8414,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_detail_stats_notAvailable => 'Niet beschikbaar';
+
+  @override
+  String diveSites_detail_stats_viewAllDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Alle $count duiken bekijken',
+      one: '1 duik bekijken',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_detail_semantics_openLinkedDive(Object label) {
+    return '$label, deze duik openen';
+  }
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -9495,6 +9514,20 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_summary_stat_withGps => 'Met GPS';
+
+  @override
+  String get diveSites_summary_stat_countries => 'Landen';
+
+  @override
+  String get diveSites_summary_stat_notDived => 'Niet gedoken';
+
+  @override
+  String get diveSites_summary_section_recentlyDived => 'Recent gedoken';
+
+  @override
+  String diveSites_summary_tile_lastDived(Object date) {
+    return 'Laatst gedoken $date';
+  }
 
   @override
   String get diveType_builtin_altitude => 'Hoogte';
@@ -27930,6 +27963,30 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get enum_siteField_maxDepthReached => 'Jouw max. diepte';
+
+  @override
+  String get enum_siteField_firstDived => 'Eerste duik';
+
+  @override
+  String get enum_siteField_firstDived_short => 'Eerste';
+
+  @override
+  String get enum_siteField_averageDepthReached => 'Gem. diepte';
+
+  @override
+  String get enum_siteField_averageDepthReached_short => 'Gem.';
+
+  @override
+  String get enum_siteField_longestDive => 'Langste duik';
+
+  @override
+  String get enum_siteField_longestDive_short => 'Langste';
+
+  @override
+  String get enum_siteField_averageDuration => 'Gem. duur';
+
+  @override
+  String get enum_siteField_averageDuration_short => 'Gem. duur';
 
   @override
   String get enum_siteField_maxDepthReached_short => 'Jouw max.';

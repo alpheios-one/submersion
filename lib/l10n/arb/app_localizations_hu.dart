@@ -8340,6 +8340,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_detail_depth_maximum => 'Maximum';
 
   @override
+  String get diveSites_detail_depth_reachedHeading => 'Elért mélység';
+
+  @override
   String get diveSites_detail_depth_minimum => 'Minimum';
 
   @override
@@ -8463,6 +8466,22 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_detail_stats_notAvailable => 'Nem elerheto';
+
+  @override
+  String diveSites_detail_stats_viewAllDives(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mind a(z) $count merülés megtekintése',
+      one: '1 merülés megtekintése',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String diveSites_detail_semantics_openLinkedDive(Object label) {
+    return '$label, merülés megnyitása';
+  }
 
   @override
   String diveSites_detail_semantics_copyToClipboard(Object label) {
@@ -9549,6 +9568,20 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveSites_summary_stat_withGps => 'GPS-szel';
+
+  @override
+  String get diveSites_summary_stat_countries => 'Országok';
+
+  @override
+  String get diveSites_summary_stat_notDived => 'Nem merült';
+
+  @override
+  String get diveSites_summary_section_recentlyDived => 'Nemrég merülve';
+
+  @override
+  String diveSites_summary_tile_lastDived(Object date) {
+    return 'Utoljára merülve: $date';
+  }
 
   @override
   String get diveType_builtin_altitude => 'Magaslati';
@@ -28027,6 +28060,30 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_siteField_maxDepthReached => 'Saját max. mélység';
+
+  @override
+  String get enum_siteField_firstDived => 'Első merülés';
+
+  @override
+  String get enum_siteField_firstDived_short => 'Első';
+
+  @override
+  String get enum_siteField_averageDepthReached => 'Átlagmélység';
+
+  @override
+  String get enum_siteField_averageDepthReached_short => 'Átlag';
+
+  @override
+  String get enum_siteField_longestDive => 'Leghosszabb merülés';
+
+  @override
+  String get enum_siteField_longestDive_short => 'Leghosszabb';
+
+  @override
+  String get enum_siteField_averageDuration => 'Átlagos időtartam';
+
+  @override
+  String get enum_siteField_averageDuration_short => 'Átlag idő';
 
   @override
   String get enum_siteField_maxDepthReached_short => 'Saját max.';
