@@ -7739,6 +7739,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_tank_tooltip_remove => 'Eliminar tanque';
 
   @override
+  String get diveLog_tank_regulatorLabel => 'Regulador';
+
+  @override
+  String get diveLog_tank_regulatorNone => 'Ninguno';
+
+  @override
   String get diveLog_tissue_label_ceiling => 'Techo';
 
   @override
@@ -10494,6 +10500,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_equipmentType_dpv => 'DPV';
 
   @override
+  String get enum_equipmentType_o2Cell => 'Célula de O2';
+
+  @override
+  String get enum_equipmentType_battery => 'Batería';
+
+  @override
   String get enum_equipmentType_computer => 'Ordenador de buceo';
 
   @override
@@ -11342,6 +11354,34 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
+    return 'Quedan $remaining de $total horas en agua salada';
+  }
+
+  @override
+  String equipment_serviceClocks_coldDivesLeft(String remaining, String total) {
+    return 'Quedan $remaining de $total inmersiones en agua fría';
+  }
+
+  @override
+  String equipment_serviceClocks_o2HoursLeft(String remaining, String total) {
+    return 'Quedan $remaining de $total horas con alto O2';
+  }
+
+  @override
+  String equipment_serviceClocks_deepCyclesLeft(
+    String remaining,
+    String total,
+  ) {
+    return 'Quedan $remaining de $total inmersiones profundas';
+  }
+
+  @override
+  String equipment_serviceClocks_cyclesLeft(String remaining, String total) {
+    return 'Quedan $remaining de $total ciclos de batería';
+  }
+
+  @override
   String get equipment_serviceClocks_manageKinds =>
       'Gestionar tipos de mantenimiento';
 
@@ -11364,6 +11404,26 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_intervalHours => 'Intervalo (horas)';
+
+  @override
+  String get equipment_scheduleDialog_intervalSaltHours =>
+      'Intervalo (horas en agua salada)';
+
+  @override
+  String get equipment_scheduleDialog_intervalColdDives =>
+      'Intervalo (inmersiones en agua fría)';
+
+  @override
+  String get equipment_scheduleDialog_intervalO2Hours =>
+      'Intervalo (horas con alto O2)';
+
+  @override
+  String get equipment_scheduleDialog_intervalDeepCycles =>
+      'Intervalo (inmersiones profundas)';
+
+  @override
+  String get equipment_scheduleDialog_intervalCycles =>
+      'Intervalo (ciclos de batería)';
 
   @override
   String equipment_scheduleDialog_inheritHint(String value) {
@@ -11717,6 +11777,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get equipment_edit_statusLabel => 'Estado';
+
+  @override
+  String get equipment_edit_parentLabel => 'Instalado en';
+
+  @override
+  String get equipment_edit_parentNone => 'No instalado en nada';
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'p. ej., 5, 5/4, 7/5/3';
@@ -25769,6 +25835,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_burn_time_h => 'Autonomía';
 
   @override
+  String get attrLabel_cell_slot => 'Posición de la célula';
+
+  @override
+  String get attrLabel_installed_date => 'Instalada el';
+
+  @override
+  String get attrLabel_rechargeable => 'Recargable';
+
+  @override
   String get attrLabel_battery_type => 'Batería';
 
   @override
@@ -26088,6 +26163,12 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get attrChoice_battery_type_lead_acid => 'Plomo-ácido';
+
+  @override
+  String get attrChoice_battery_type_alkaline => 'Alcalina';
+
+  @override
+  String get attrChoice_battery_type_lithium_primary => 'Litio (no recargable)';
 
   @override
   String get attrChoice_motor_type_brushless => 'Sin escobillas';
@@ -26629,6 +26710,42 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Reglas de revisión y volar tras bucear';
+
+  @override
+  String get settings_section_equipmentCondition_title => 'Estado del equipo';
+
+  @override
+  String get settings_section_equipmentCondition_subtitle =>
+      'Umbrales de exposición para los relojes de mantenimiento';
+
+  @override
+  String get equipmentConditionSettings_title => 'Estado del equipo';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHeader =>
+      'Umbrales de exposición';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHelp =>
+      'Una inmersión cuenta como fría, profunda o con alto O2 para los relojes de mantenimiento cuando cruza estos límites.';
+
+  @override
+  String get equipmentConditionSettings_coldLabel => 'Agua fría por debajo de';
+
+  @override
+  String get equipmentConditionSettings_deepLabel =>
+      'Inmersión profunda a partir de';
+
+  @override
+  String get equipmentConditionSettings_o2Label =>
+      'Mezcla con alto O2 por encima de (% O2)';
+
+  @override
+  String get equipmentConditionSettings_invalid => 'Introduce un número';
+
+  @override
+  String get equipmentConditionSettings_saveFailed =>
+      'No se pudo guardar. Inténtalo de nuevo.';
 
   @override
   String get settings_section_security_title => 'Seguridad de la app';

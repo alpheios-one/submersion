@@ -7717,6 +7717,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tank_tooltip_remove => 'Palack eltavolitasa';
 
   @override
+  String get diveLog_tank_regulatorLabel => 'Reduktor';
+
+  @override
+  String get diveLog_tank_regulatorNone => 'Nincs';
+
+  @override
   String get diveLog_tissue_label_ceiling => 'Plafon';
 
   @override
@@ -10466,6 +10472,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentType_dpv => 'DPV';
 
   @override
+  String get enum_equipmentType_o2Cell => 'O2-cella';
+
+  @override
+  String get enum_equipmentType_battery => 'Akkumulátor';
+
+  @override
   String get enum_equipmentType_computer => 'Merulesszamitogep';
 
   @override
@@ -11312,6 +11324,34 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
+    return '$remaining / $total sós vízi óra van hátra';
+  }
+
+  @override
+  String equipment_serviceClocks_coldDivesLeft(String remaining, String total) {
+    return '$remaining / $total hideg vízi merülés van hátra';
+  }
+
+  @override
+  String equipment_serviceClocks_o2HoursLeft(String remaining, String total) {
+    return '$remaining / $total magas O2-tartalmú óra van hátra';
+  }
+
+  @override
+  String equipment_serviceClocks_deepCyclesLeft(
+    String remaining,
+    String total,
+  ) {
+    return '$remaining / $total mély merülés van hátra';
+  }
+
+  @override
+  String equipment_serviceClocks_cyclesLeft(String remaining, String total) {
+    return '$remaining / $total akkumulátorciklus van hátra';
+  }
+
+  @override
   String get equipment_serviceClocks_manageKinds => 'Szerviztípusok kezelése';
 
   @override
@@ -11332,6 +11372,26 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_intervalHours => 'Intervallum (óra)';
+
+  @override
+  String get equipment_scheduleDialog_intervalSaltHours =>
+      'Intervallum (sós vízi órák)';
+
+  @override
+  String get equipment_scheduleDialog_intervalColdDives =>
+      'Intervallum (hideg vízi merülések)';
+
+  @override
+  String get equipment_scheduleDialog_intervalO2Hours =>
+      'Intervallum (magas O2-tartalmú órák)';
+
+  @override
+  String get equipment_scheduleDialog_intervalDeepCycles =>
+      'Intervallum (mély merülések)';
+
+  @override
+  String get equipment_scheduleDialog_intervalCycles =>
+      'Intervallum (akkumulátorciklusok)';
 
   @override
   String equipment_scheduleDialog_inheritHint(String value) {
@@ -11688,6 +11748,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_edit_statusLabel => 'Allapot';
+
+  @override
+  String get equipment_edit_parentLabel => 'Beszerelve ebbe';
+
+  @override
+  String get equipment_edit_parentNone => 'Nincs beszerelve';
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'pl. 5, 5/4, 7/5/3';
@@ -25644,6 +25710,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_burn_time_h => 'Üzemidő';
 
   @override
+  String get attrLabel_cell_slot => 'Cellahely';
+
+  @override
+  String get attrLabel_installed_date => 'Beszerelve';
+
+  @override
+  String get attrLabel_rechargeable => 'Újratölthető';
+
+  @override
   String get attrLabel_battery_type => 'Akkumulátor';
 
   @override
@@ -25960,6 +26035,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrChoice_battery_type_lead_acid => 'Ólom-savas';
+
+  @override
+  String get attrChoice_battery_type_alkaline => 'Alkáli';
+
+  @override
+  String get attrChoice_battery_type_lithium_primary =>
+      'Lítium (nem újratölthető)';
 
   @override
   String get attrChoice_motor_type_brushless => 'Szénkefe nélküli';
@@ -26502,6 +26584,42 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Áttekintési szabályok és repülés merülés után';
+
+  @override
+  String get settings_section_equipmentCondition_title =>
+      'Felszerelés állapota';
+
+  @override
+  String get settings_section_equipmentCondition_subtitle =>
+      'Terhelési küszöbök a szervizórákhoz';
+
+  @override
+  String get equipmentConditionSettings_title => 'Felszerelés állapota';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHeader =>
+      'Terhelési küszöbök';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHelp =>
+      'Egy merülés akkor számít hidegnek, mélynek vagy magas O2-tartalmúnak a szervizórák számára, ha átlépi ezeket a határokat.';
+
+  @override
+  String get equipmentConditionSettings_coldLabel => 'Hideg víz ez alatt';
+
+  @override
+  String get equipmentConditionSettings_deepLabel => 'Mély merülés ettől';
+
+  @override
+  String get equipmentConditionSettings_o2Label =>
+      'Magas O2-tartalmú keverék e felett (% O2)';
+
+  @override
+  String get equipmentConditionSettings_invalid => 'Adjon meg egy számot';
+
+  @override
+  String get equipmentConditionSettings_saveFailed =>
+      'A mentés nem sikerült. Próbálja újra.';
 
   @override
   String get settings_section_security_title => 'Alkalmazásbiztonság';

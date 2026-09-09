@@ -7776,6 +7776,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_tank_tooltip_remove => 'Retirer le bloc';
 
   @override
+  String get diveLog_tank_regulatorLabel => 'Détendeur';
+
+  @override
+  String get diveLog_tank_regulatorNone => 'Aucun';
+
+  @override
   String get diveLog_tissue_label_ceiling => 'Plafond';
 
   @override
@@ -10538,6 +10544,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_equipmentType_dpv => 'DPV';
 
   @override
+  String get enum_equipmentType_o2Cell => 'Cellule O2';
+
+  @override
+  String get enum_equipmentType_battery => 'Batterie';
+
+  @override
   String get enum_equipmentType_computer => 'Ordinateur de plongée';
 
   @override
@@ -11387,6 +11399,34 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
+    return '$remaining sur $total heures en eau salée restantes';
+  }
+
+  @override
+  String equipment_serviceClocks_coldDivesLeft(String remaining, String total) {
+    return '$remaining sur $total plongées en eau froide restantes';
+  }
+
+  @override
+  String equipment_serviceClocks_o2HoursLeft(String remaining, String total) {
+    return '$remaining sur $total heures à haut O2 restantes';
+  }
+
+  @override
+  String equipment_serviceClocks_deepCyclesLeft(
+    String remaining,
+    String total,
+  ) {
+    return '$remaining sur $total plongées profondes restantes';
+  }
+
+  @override
+  String equipment_serviceClocks_cyclesLeft(String remaining, String total) {
+    return '$remaining sur $total cycles de batterie restants';
+  }
+
+  @override
   String get equipment_serviceClocks_manageKinds =>
       'Gérer les types d\'entretien';
 
@@ -11408,6 +11448,26 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_intervalHours => 'Intervalle (heures)';
+
+  @override
+  String get equipment_scheduleDialog_intervalSaltHours =>
+      'Intervalle (heures en eau salée)';
+
+  @override
+  String get equipment_scheduleDialog_intervalColdDives =>
+      'Intervalle (plongées en eau froide)';
+
+  @override
+  String get equipment_scheduleDialog_intervalO2Hours =>
+      'Intervalle (heures à haut O2)';
+
+  @override
+  String get equipment_scheduleDialog_intervalDeepCycles =>
+      'Intervalle (plongées profondes)';
+
+  @override
+  String get equipment_scheduleDialog_intervalCycles =>
+      'Intervalle (cycles de batterie)';
 
   @override
   String equipment_scheduleDialog_inheritHint(String value) {
@@ -11766,6 +11826,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get equipment_edit_statusLabel => 'Statut';
+
+  @override
+  String get equipment_edit_parentLabel => 'Installé dans';
+
+  @override
+  String get equipment_edit_parentNone => 'Installé nulle part';
 
   @override
   String get equipment_edit_thicknessDesignationHint => 'ex: 5, 5/4, 7/5/3';
@@ -25846,6 +25912,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get attrLabel_burn_time_h => 'Autonomie';
 
   @override
+  String get attrLabel_cell_slot => 'Emplacement de la cellule';
+
+  @override
+  String get attrLabel_installed_date => 'Installée le';
+
+  @override
+  String get attrLabel_rechargeable => 'Rechargeable';
+
+  @override
   String get attrLabel_battery_type => 'Batterie';
 
   @override
@@ -26163,6 +26238,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get attrChoice_battery_type_lead_acid => 'Plomb-acide';
+
+  @override
+  String get attrChoice_battery_type_alkaline => 'Alcaline';
+
+  @override
+  String get attrChoice_battery_type_lithium_primary =>
+      'Lithium (non rechargeable)';
 
   @override
   String get attrChoice_motor_type_brushless => 'Sans balais';
@@ -26707,6 +26789,42 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Règles du bilan et vol après la plongée';
+
+  @override
+  String get settings_section_equipmentCondition_title => 'État du matériel';
+
+  @override
+  String get settings_section_equipmentCondition_subtitle =>
+      'Seuils d\'exposition pour les compteurs d\'entretien';
+
+  @override
+  String get equipmentConditionSettings_title => 'État du matériel';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHeader =>
+      'Seuils d\'exposition';
+
+  @override
+  String get equipmentConditionSettings_thresholdsHelp =>
+      'Une plongée compte comme froide, profonde ou à haut O2 pour les compteurs d\'entretien lorsqu\'elle franchit ces seuils.';
+
+  @override
+  String get equipmentConditionSettings_coldLabel => 'Eau froide en dessous de';
+
+  @override
+  String get equipmentConditionSettings_deepLabel =>
+      'Plongée profonde à partir de';
+
+  @override
+  String get equipmentConditionSettings_o2Label =>
+      'Mélange à haut O2 au-dessus de (% O2)';
+
+  @override
+  String get equipmentConditionSettings_invalid => 'Saisissez un nombre';
+
+  @override
+  String get equipmentConditionSettings_saveFailed =>
+      'Enregistrement impossible. Réessayez.';
 
   @override
   String get settings_section_security_title => 'Sécurité de l\'application';
