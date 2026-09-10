@@ -21189,7 +21189,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_summary_upcomingTitle => 'Aankomend';
 
   @override
-  String get trips_type_shore => 'Shore';
+  String get trips_type_shore => 'Kust';
 
   @override
   String get trips_type_liveaboard => 'Liveaboard';
@@ -21198,7 +21198,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_type_resort => 'Resort';
 
   @override
-  String get trips_type_dayTrip => 'Day Trip';
+  String get trips_type_dayTrip => 'Dagtrip';
 
   @override
   String get trips_edit_label_tripType => 'Trip Type';
