@@ -1391,7 +1391,7 @@ void main() {
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
 
-        notifier.initializeDefaultTag();
+        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
 
         expect(notifier.state.importTags.length, equals(1));
         expect(
@@ -1408,8 +1408,8 @@ void main() {
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
 
-        notifier.initializeDefaultTag();
-        notifier.initializeDefaultTag();
+        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
+        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
 
         expect(notifier.state.importTags.length, equals(1));
       });
@@ -1421,37 +1421,24 @@ void main() {
           'is off', () {
         when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
         when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
-        final diveComputerNotifier = ImportWizardNotifier(
-          mockAdapter,
-          tagRepository: mockTagRepo,
-          diverId: 'diver-1',
-          autoTagDiveComputerImports: false,
-        );
-        addTearDown(diveComputerNotifier.dispose);
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
-        diveComputerNotifier.setBundle(bundle);
+        notifier.setBundle(bundle);
 
-        diveComputerNotifier.initializeDefaultTag();
+        notifier.initializeDefaultTag(autoTagDiveComputerImports: false);
 
-        expect(diveComputerNotifier.state.importTags, isEmpty);
+        expect(notifier.state.importTags, isEmpty);
       });
 
       test('still adds the default tag for a dive computer source when the '
           'setting is on', () {
         when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
         when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
-        final diveComputerNotifier = ImportWizardNotifier(
-          mockAdapter,
-          tagRepository: mockTagRepo,
-          diverId: 'diver-1',
-        );
-        addTearDown(diveComputerNotifier.dispose);
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
-        diveComputerNotifier.setBundle(bundle);
+        notifier.setBundle(bundle);
 
-        diveComputerNotifier.initializeDefaultTag();
+        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
 
-        expect(diveComputerNotifier.state.importTags.length, equals(1));
+        expect(notifier.state.importTags.length, equals(1));
       });
 
       test(
@@ -1461,19 +1448,12 @@ void main() {
           when(
             mockAdapter.defaultTagName,
           ).thenReturn('test.uddf Import 2026-03-26');
-          final fileNotifier = ImportWizardNotifier(
-            mockAdapter,
-            tagRepository: mockTagRepo,
-            diverId: 'diver-1',
-            autoTagDiveComputerImports: false,
-          );
-          addTearDown(fileNotifier.dispose);
           final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
-          fileNotifier.setBundle(bundle);
+          notifier.setBundle(bundle);
 
-          fileNotifier.initializeDefaultTag();
+          notifier.initializeDefaultTag(autoTagDiveComputerImports: false);
 
-          expect(fileNotifier.state.importTags.length, equals(1));
+          expect(notifier.state.importTags.length, equals(1));
         },
       );
     });

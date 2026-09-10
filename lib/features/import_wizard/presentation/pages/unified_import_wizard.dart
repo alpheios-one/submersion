@@ -82,9 +82,6 @@ class _UnifiedImportWizardState extends State<UnifiedImportWizard> {
               (ref) => ImportWizardNotifier(
                 _adapter,
                 tagRepository: ref.read(tagRepositoryProvider),
-                autoTagDiveComputerImports: ref
-                    .read(settingsProvider)
-                    .autoTagDiveComputerImports,
               ),
         ),
       ],
@@ -318,7 +315,13 @@ class _UnifiedImportWizardBodyState
         ref
             .read(importWizardNotifierProvider.notifier)
             .setBundle(checkedBundle);
-        ref.read(importWizardNotifierProvider.notifier).initializeDefaultTag();
+        ref
+            .read(importWizardNotifierProvider.notifier)
+            .initializeDefaultTag(
+              autoTagDiveComputerImports: ref
+                  .read(settingsProvider)
+                  .autoTagDiveComputerImports,
+            );
       }
       await _animateToPage(nextPage);
     } else if (_currentPage == _reviewIndex) {

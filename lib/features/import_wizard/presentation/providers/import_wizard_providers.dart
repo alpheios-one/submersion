@@ -191,10 +191,8 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     this._adapter, {
     TagRepository? tagRepository,
     String? diverId,
-    bool autoTagDiveComputerImports = true,
   }) : _tagRepository = tagRepository,
        _diverId = diverId,
-       _autoTagDiveComputerImports = autoTagDiveComputerImports,
        super(const ImportWizardState());
 
   static final _log = LoggerService.forClass(ImportWizardNotifier);
@@ -202,12 +200,6 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   final ImportSourceAdapter _adapter;
   final TagRepository? _tagRepository;
   String? _diverId;
-
-  /// Whether a dive computer download should pre-populate the default
-  /// "{device} Import {date}" tag (issue #998). Read once at construction
-  /// from the diver's settings; the wizard is rebuilt per import session, so
-  /// a setting change takes effect on the next import rather than mid-flow.
-  final bool _autoTagDiveComputerImports;
 
   /// Active cancellation token for the currently-running import, or null
   /// when no import is in progress. The notifier owns the lifecycle: it's
@@ -494,13 +486,20 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   ///
   /// Safe to call multiple times — skips if a tag with the same name already
   /// exists. For dive computer downloads, also skips entirely when
-  /// [_autoTagDiveComputerImports] is off (issue #998): repeated Bluetooth
+  /// [autoTagDiveComputerImports] is false (issue #998): repeated Bluetooth
   /// downloads otherwise pile up one dated tag per session. File-based and
   /// cloud sources are unaffected by that setting and always get their
   /// default tag.
-  void initializeDefaultTag() {
+  ///
+  /// [autoTagDiveComputerImports] is passed in by the caller rather than
+  /// captured at construction: this method runs well after acquisition, so
+  /// reading the setting here -- instead of baking in whatever `read`
+  /// returned when the wizard's `ProviderScope` was first built -- avoids
+  /// racing [SettingsNotifier]'s async load and picking up a stale or
+  /// default value for a diver switched to mid-session.
+  void initializeDefaultTag({required bool autoTagDiveComputerImports}) {
     if (_adapter.sourceType == ImportSourceType.diveComputer &&
-        !_autoTagDiveComputerImports) {
+        !autoTagDiveComputerImports) {
       return;
     }
 
