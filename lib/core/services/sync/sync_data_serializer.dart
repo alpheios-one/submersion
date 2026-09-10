@@ -6607,6 +6607,7 @@ class SyncDataSerializer {
       'tissueVizMode': 'heatMap',
       'showMapBackgroundOnDiveCards': false,
       'groupTripsInDiveList': false,
+      'autoTagDiveComputerImports': true,
       'showMapBackgroundOnSiteCards': false,
       // Dive profile markers
       'showMaxDepthMarker': true,

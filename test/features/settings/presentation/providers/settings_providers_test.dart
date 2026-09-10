@@ -214,4 +214,23 @@ void main() {
       expect(settings.diveDetailSections[1].visible, true);
     });
   });
+
+  group('AppSettings autoTagDiveComputerImports', () {
+    test('has true as default', () {
+      const settings = AppSettings();
+      expect(settings.autoTagDiveComputerImports, true);
+    });
+
+    test('copyWith updates autoTagDiveComputerImports', () {
+      const settings = AppSettings();
+      final updated = settings.copyWith(autoTagDiveComputerImports: false);
+      expect(updated.autoTagDiveComputerImports, false);
+    });
+
+    test('copyWith without the field preserves the current value', () {
+      const settings = AppSettings(autoTagDiveComputerImports: false);
+      final updated = settings.copyWith(themePresetId: 'dark');
+      expect(updated.autoTagDiveComputerImports, false);
+    });
+  });
 }

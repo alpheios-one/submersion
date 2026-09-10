@@ -2052,6 +2052,13 @@ class DiverSettings extends Table {
   /// the list, so existing divers opt in rather than being reorganised.
   BoolColumn get groupTripsInDiveList =>
       boolean().withDefault(const Constant(false))();
+
+  /// Auto-tag every dive downloaded from a dive computer with a
+  /// "{device} Import {date}" tag (v208, issue #998). On by default,
+  /// matching the wizard's long-standing behavior; divers who find the tags
+  /// pile up too fast can turn this off from the tag management screen.
+  BoolColumn get autoTagDiveComputerImports =>
+      boolean().withDefault(const Constant(true))();
   // List view modes for other features (v52)
   TextColumn get siteListViewMode =>
       text().withDefault(const Constant('detailed'))();
@@ -3873,7 +3880,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 207;
+  static const int currentSchemaVersion = 208;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -4413,6 +4420,9 @@ class AppDatabase extends _$AppDatabase {
     // rung takes 207; the list only counts remaining steps for progress
     // reporting and is non-contiguous by design.
     207,
+    // v208: diver_settings.auto_tag_dive_computer_imports (issue #998).
+    // Additive defaulted boolean, no backfill.
+    208,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -7433,6 +7443,22 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'ALTER TABLE diver_settings ADD COLUMN group_trips_in_dive_list '
       'INTEGER NOT NULL DEFAULT 0',
+    );
+  }
+
+  /// Idempotent DDL for diver_settings.auto_tag_dive_computer_imports (v208,
+  /// issue #998). Existing rows default to on, matching the wizard's
+  /// prior behavior of always pre-filling an import tag.
+  Future<void> _assertAutoTagDiveComputerImportsColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('auto_tag_dive_computer_imports')) return;
+    await customStatement(
+      'ALTER TABLE diver_settings ADD COLUMN '
+      'auto_tag_dive_computer_imports INTEGER NOT NULL DEFAULT 1',
     );
   }
 
@@ -11365,10 +11391,21 @@ class AppDatabase extends _$AppDatabase {
           await _assertJunctionUpdatedAtColumns();
         }
         if (from < 207) await reportProgress();
+        // v208: diver_settings.auto_tag_dive_computer_imports (issue #998).
+        // Column-only rung, no backfill. Existing rows default to on, so a
+        // device that upgrades keeps auto-tagging its dive computer
+        // downloads until the diver turns it off.
+        if (from < 208) {
+          await _assertAutoTagDiveComputerImportsColumn();
+        }
+        if (from < 208) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
         await customStatement('PRAGMA foreign_keys = ON');
+
+        // v208 backstop: re-assert diver_settings.auto_tag_dive_computer_imports.
+        await _assertAutoTagDiveComputerImportsColumn();
 
         // v207 backstop: re-assert the gear junctions' updated_at. A device
         // stranded without it has no age signal on those rows, so a stale

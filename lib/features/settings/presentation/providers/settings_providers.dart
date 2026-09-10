@@ -314,6 +314,12 @@ class AppSettings {
   /// (issue #1193). Applies to the card view modes only; the table ignores it.
   final bool groupTripsInDiveList;
 
+  /// Auto-tag every dive downloaded from a dive computer with a
+  /// "{device} Import {date}" tag (issue #998). Read by the import wizard
+  /// when it pre-populates the review step's tag field; does not affect
+  /// file-based imports (UDDF, FIT, HealthKit, cloud adapters).
+  final bool autoTagDiveComputerImports;
+
   /// Which layout to use for the site list
   final ListViewMode siteListViewMode;
 
@@ -581,6 +587,7 @@ class AppSettings {
     this.cardColorAttribute = CardColorAttribute.none,
     this.diveListViewMode = ListViewMode.detailed,
     this.groupTripsInDiveList = false,
+    this.autoTagDiveComputerImports = true,
     this.siteListViewMode = ListViewMode.detailed,
     this.tripListViewMode = ListViewMode.detailed,
     this.equipmentListViewMode = ListViewMode.detailed,
@@ -753,6 +760,7 @@ class AppSettings {
     CardColorAttribute? cardColorAttribute,
     ListViewMode? diveListViewMode,
     bool? groupTripsInDiveList,
+    bool? autoTagDiveComputerImports,
     ListViewMode? siteListViewMode,
     ListViewMode? tripListViewMode,
     ListViewMode? equipmentListViewMode,
@@ -903,6 +911,8 @@ class AppSettings {
       cardColorAttribute: cardColorAttribute ?? this.cardColorAttribute,
       diveListViewMode: diveListViewMode ?? this.diveListViewMode,
       groupTripsInDiveList: groupTripsInDiveList ?? this.groupTripsInDiveList,
+      autoTagDiveComputerImports:
+          autoTagDiveComputerImports ?? this.autoTagDiveComputerImports,
       siteListViewMode: siteListViewMode ?? this.siteListViewMode,
       tripListViewMode: tripListViewMode ?? this.tripListViewMode,
       equipmentListViewMode:
@@ -1800,6 +1810,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setGroupTripsInDiveList(bool value) async {
     state = state.copyWith(groupTripsInDiveList: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAutoTagDiveComputerImports(bool value) async {
+    state = state.copyWith(autoTagDiveComputerImports: value);
     await _saveSettings();
   }
 
