@@ -1413,6 +1413,69 @@ void main() {
 
         expect(notifier.state.importTags.length, equals(1));
       });
+
+      // Issue #998: repeated Bluetooth downloads from a dive computer
+      // otherwise pile up one dated tag per session, so this is opt-out
+      // specifically for that source.
+      test('skips the default tag for a dive computer source when the setting '
+          'is off', () {
+        when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
+        when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
+        final diveComputerNotifier = ImportWizardNotifier(
+          mockAdapter,
+          tagRepository: mockTagRepo,
+          diverId: 'diver-1',
+          autoTagDiveComputerImports: false,
+        );
+        addTearDown(diveComputerNotifier.dispose);
+        final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
+        diveComputerNotifier.setBundle(bundle);
+
+        diveComputerNotifier.initializeDefaultTag();
+
+        expect(diveComputerNotifier.state.importTags, isEmpty);
+      });
+
+      test('still adds the default tag for a dive computer source when the '
+          'setting is on', () {
+        when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
+        when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
+        final diveComputerNotifier = ImportWizardNotifier(
+          mockAdapter,
+          tagRepository: mockTagRepo,
+          diverId: 'diver-1',
+        );
+        addTearDown(diveComputerNotifier.dispose);
+        final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
+        diveComputerNotifier.setBundle(bundle);
+
+        diveComputerNotifier.initializeDefaultTag();
+
+        expect(diveComputerNotifier.state.importTags.length, equals(1));
+      });
+
+      test(
+        'ignores the setting for a non-dive-computer source, even when off',
+        () {
+          // mockAdapter defaults to ImportSourceType.uddf in setUp.
+          when(
+            mockAdapter.defaultTagName,
+          ).thenReturn('test.uddf Import 2026-03-26');
+          final fileNotifier = ImportWizardNotifier(
+            mockAdapter,
+            tagRepository: mockTagRepo,
+            diverId: 'diver-1',
+            autoTagDiveComputerImports: false,
+          );
+          addTearDown(fileNotifier.dispose);
+          final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
+          fileNotifier.setBundle(bundle);
+
+          fileNotifier.initializeDefaultTag();
+
+          expect(fileNotifier.state.importTags.length, equals(1));
+        },
+      );
     });
 
     group('addImportTag', () {
