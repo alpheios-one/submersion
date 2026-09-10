@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+
+const _log = LoggerService('BathymetryRepository');
 
 /// Cache-first bathymetry access. Grids cache per quantized 0.02 degree
 /// coordinate cell (nearby sites, re-pinned sites, and site-less GPS dives
@@ -112,15 +115,24 @@ class BathymetryRepository {
   /// The scene must survive ANY cache/fetch failure (a broken table, an
   /// unexpected parser error) by degrading to synthesized terrain — so
   /// every failure becomes a null grid, treated as transient (no caching).
+  ///
+  /// Logged via [LoggerService] rather than a debug-only `assert`/`print` —
+  /// the previous debug-only logging meant a release build (including a
+  /// TestFlight/Play Store beta) had no way to tell "no data because
+  /// nothing covers this coordinate" apart from "swissBATHY3D itself is
+  /// failing for a diagnosable reason", both of which render identically as
+  /// "keine Daten verfügbar" in the UI. [LoggerService] writes to the
+  /// persistent log file and the in-app debug log viewer in every build
+  /// mode, so this failure is now inspectable without a debug build.
   Future<BathymetryGrid?> _guardedLoad(String key, GeoPoint center) async {
     try {
       return await _load(key, center);
-    } catch (e) {
-      assert(() {
-        // ignore: avoid_print
-        print('BathymetryRepository.getGrid($key) degraded to null: $e');
-        return true;
-      }());
+    } catch (e, stackTrace) {
+      _log.warning(
+        'getGrid($key) degraded to null',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
