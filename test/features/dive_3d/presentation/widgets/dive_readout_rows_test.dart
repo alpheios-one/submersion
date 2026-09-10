@@ -22,13 +22,8 @@ void main() {
     ttss: [null, 600],
     tankPressures: {
       't1': [
-        TankPressurePoint(id: 'p1', tankId: 't1', timestamp: 0, pressure: 200),
-        TankPressurePoint(
-          id: 'p2',
-          tankId: 't1',
-          timestamp: 100,
-          pressure: 100,
-        ),
+        TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+        TankPressurePoint(tankId: 't1', timestamp: 100, pressure: 100),
       ],
     },
     gasSwitches: [],
@@ -90,18 +85,8 @@ void main() {
       tankPressures: {
         'empty': [],
         't2': [
-          TankPressurePoint(
-            id: 'p1',
-            tankId: 't2',
-            timestamp: 0,
-            pressure: 200,
-          ),
-          TankPressurePoint(
-            id: 'p2',
-            tankId: 't2',
-            timestamp: 100,
-            pressure: 100,
-          ),
+          TankPressurePoint(tankId: 't2', timestamp: 0, pressure: 200),
+          TankPressurePoint(tankId: 't2', timestamp: 100, pressure: 100),
         ],
       },
       gasSwitches: [],
@@ -135,18 +120,8 @@ void main() {
         tankPressures: {
           'empty': [],
           't2': [
-            TankPressurePoint(
-              id: 'p1',
-              tankId: 't2',
-              timestamp: 0,
-              pressure: 200,
-            ),
-            TankPressurePoint(
-              id: 'p2',
-              tankId: 't2',
-              timestamp: 100,
-              pressure: 100,
-            ),
+            TankPressurePoint(tankId: 't2', timestamp: 0, pressure: 200),
+            TankPressurePoint(tankId: 't2', timestamp: 100, pressure: 100),
           ],
         },
         gasSwitches: [],

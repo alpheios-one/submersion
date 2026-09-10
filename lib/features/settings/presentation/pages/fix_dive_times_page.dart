@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/data/services/dive_time_migration_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 class FixDiveTimesPage extends ConsumerStatefulWidget {
@@ -112,8 +113,11 @@ class _FixDiveTimesPageState extends ConsumerState<FixDiveTimesPage> {
     if (picked == null) return;
     setState(() {
       _rangeStart = DateTime.utc(picked.year, picked.month, picked.day);
-      _rangeStartController.text =
-          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      // Read-only display of the picked bound: the real value lives in
+      // _rangeStart, so this follows Manage - Units (#1512).
+      _rangeStartController.text = UnitFormatter(
+        ref.read(settingsProvider),
+      ).formatDate(picked);
     });
     await _loadDives();
   }
@@ -136,8 +140,9 @@ class _FixDiveTimesPageState extends ConsumerState<FixDiveTimesPage> {
         59,
         59,
       );
-      _rangeEndController.text =
-          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      _rangeEndController.text = UnitFormatter(
+        ref.read(settingsProvider),
+      ).formatDate(picked);
     });
     await _loadDives();
   }
@@ -246,13 +251,11 @@ class _FixDiveTimesPageState extends ConsumerState<FixDiveTimesPage> {
         title: Text(context.l10n.settings_fixDiveTimes_title),
         actions: [
           if (_dives.isNotEmpty)
-            TextButton(
+            AppBarTextAction(
+              label: allSelected
+                  ? context.l10n.settings_fixDiveTimes_deselectAll
+                  : context.l10n.settings_fixDiveTimes_selectAll,
               onPressed: _toggleSelectAll,
-              child: Text(
-                allSelected
-                    ? context.l10n.settings_fixDiveTimes_deselectAll
-                    : context.l10n.settings_fixDiveTimes_selectAll,
-              ),
             ),
         ],
       ),

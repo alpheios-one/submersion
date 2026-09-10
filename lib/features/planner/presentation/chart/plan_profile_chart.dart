@@ -177,7 +177,7 @@ class _PlanProfileChartState extends ConsumerState<PlanProfileChart> {
       final result = dragVertex(
         ordered: ordered,
         vertexIndex: index,
-        newDepthMeters: segment.endDepth + delta,
+        newDepthMeters: segment.targetDepth + delta,
         newTimeSeconds: _endTimeOf(ordered, index),
         depthUnitScale: geometry.depthUnitScale,
       );
@@ -387,7 +387,7 @@ class _PlanProfileChartState extends ConsumerState<PlanProfileChart> {
                           painter: PlanChartBackdropPainter(
                             geometry: geometry,
                             palette: palette,
-                            ceiling: series.ceiling,
+                            ceiling: ghost?.ceiling ?? series.ceiling,
                             depthUnitScale: units.convertDepth(1),
                             depthAxisLabel: units.depthSymbol,
                             timeAxisLabel:

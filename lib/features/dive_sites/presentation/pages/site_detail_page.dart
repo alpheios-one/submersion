@@ -22,8 +22,10 @@ import 'package:submersion/features/site_scape/presentation/site_features_sectio
 import 'package:submersion/features/site_scape/presentation/site_scape_view.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/responsive_section_pair.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/site_difficulty_display.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
@@ -39,6 +41,7 @@ import 'package:submersion/features/tides/presentation/widgets/tide_section.dart
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
 
 class SiteDetailPage extends ConsumerStatefulWidget {
   final String siteId;
@@ -159,6 +162,12 @@ class _SiteDetailContent extends ConsumerStatefulWidget {
 }
 
 class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
+  /// Every card on this page pads to the same inset. Tighter than Material's
+  /// usual 16 because this page stacks well over a dozen cards, and at 16 the
+  /// padding alone cost more vertical space than several of the cards' own
+  /// content.
+  static const _cardPadding = EdgeInsets.all(12);
+
   final MapController _previewController = MapController();
   final MapController _fullController = MapController();
 
@@ -167,6 +176,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     final site = widget.site;
     final siteId = widget.siteId;
     final embedded = widget.embedded;
+    final hasHazards = site.hazards != null && site.hazards!.isNotEmpty;
+    final difficultyAndRating = _pairOrSingle(
+      site.difficulty != null ? _buildDifficultySection(context, site) : null,
+      _buildRatingSection(context, site),
+    );
+    final hazardsAndAccess = _pairOrSingle(
+      hasHazards ? _buildHazardsSection(context, site) : null,
+      _hasAccessInfo(site) ? _buildAccessSection(context, site) : null,
+    );
+
     final body = SingleChildScrollView(
       controller: DetailScrollController.maybeOf(context),
       padding: const EdgeInsets.all(16),
@@ -176,33 +195,31 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           // Map Section (if coordinates exist)
           if (site.hasCoordinates) ...[
             _buildMapSection(context, ref, site),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
 
-          // Basic Info Section (Name + Location String)
-          _buildBasicInfoSection(context, site),
-          const SizedBox(height: 16),
-
-          // Dive Count Section
-          _buildDiveCountSection(context, ref, site),
-          const SizedBox(height: 16),
+          // Dives at this Site: the count and the aggregates derived from
+          // those dives. High on the page because "how many dives have I
+          // logged here" is the question this page exists to answer.
+          _buildDiveStatisticsSection(context, ref, site),
+          const SizedBox(height: 12),
 
           // Description Section
           _buildDescriptionSection(context, site),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Location Details Section
           _buildLocationSection(context, ref, site),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Depth Information Section
           _buildDepthSection(context, ref, site),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Altitude Section (only if altitude is set)
           if (site.altitude != null) ...[
             _buildAltitudeSection(context, ref, site),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
 
           // Site Features Section (diver-placed annotations; placement happens
@@ -214,7 +231,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               onAddFeature: () =>
                   _showFullscreenMap(context, ref, site, startPlacing: true),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
 
           // Tide Section (only for non-freshwater sites with coordinates:
@@ -222,13 +239,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           // not leak in)
           if (site.hasCoordinates && site.waterType != WaterType.fresh) ...[
             TideSection(location: site.location!),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
 
           // Reef Section (only if site has coordinates)
           if (site.hasCoordinates) ...[
             ReefSection(location: site.location!, waterType: site.waterType),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
           ],
 
           // Marine Life Section
@@ -237,7 +254,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             location: site.location,
             waterType: site.waterType,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Site Media Section (attachments + dive photos)
           SiteMediaSection(
@@ -255,33 +272,23 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             onOpenDocument: (item) =>
                 DocumentOpenHelper.open(context, ref, item),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Difficulty Section
-          if (site.difficulty != null) ...[
-            _buildDifficultySection(context, site),
-            const SizedBox(height: 16),
+          // Difficulty + Rating, and Hazards + Access: four short cards that
+          // waste most of a wide pane on their own.
+          if (difficultyAndRating != null) ...[
+            difficultyAndRating,
+            const SizedBox(height: 12),
           ],
 
-          // Rating Section
-          _buildRatingSection(context, site),
-          const SizedBox(height: 16),
-
-          // Hazards Section
-          if (site.hazards != null && site.hazards!.isNotEmpty) ...[
-            _buildHazardsSection(context, site),
-            const SizedBox(height: 16),
-          ],
-
-          // Access & Logistics Section
-          if (_hasAccessInfo(site)) ...[
-            _buildAccessSection(context, site),
-            const SizedBox(height: 16),
+          if (hazardsAndAccess != null) ...[
+            hazardsAndAccess,
+            const SizedBox(height: 12),
           ],
 
           // Notes Section
           _buildNotesSection(context, site),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -317,6 +324,18 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     );
   }
 
+  /// Puts two short cards side by side when both have content and the pane is
+  /// wide enough, and falls back to whichever one has content.
+  ///
+  /// The presence gates live here rather than inside the cards: a pair with
+  /// an empty half lays out a blank column beside a half-width card.
+  Widget? _pairOrSingle(Widget? first, Widget? second) {
+    if (first != null && second != null) {
+      return ResponsiveSectionPair(first: first, second: second);
+    }
+    return first ?? second;
+  }
+
   Widget _buildEmbeddedHeader(
     BuildContext context,
     WidgetRef ref,
@@ -342,16 +361,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             ),
             const SizedBox(width: 8),
           ],
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: colorScheme.primaryContainer,
-            child: Icon(
-              Icons.location_on,
-              size: 20,
-              color: colorScheme.onPrimaryContainer,
-            ),
-          ),
-          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -623,180 +632,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     );
   }
 
-  Widget _buildBasicInfoSection(BuildContext context, DiveSite site) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: colorScheme.primaryContainer,
-              child: Icon(
-                Icons.location_on,
-                color: colorScheme.onPrimaryContainer,
-                size: 28,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    site.name,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (site.locationString.isNotEmpty)
-                    Text(
-                      site.locationString,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDiveCountSection(
-    BuildContext context,
-    WidgetRef ref,
-    DiveSite site,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final diveCountAsync = ref.watch(siteDiveCountProvider(site.id));
-
-    return diveCountAsync.when(
-      data: (diveCount) {
-        return Card(
-          clipBehavior: Clip.antiAlias,
-          child: Semantics(
-            button: diveCount > 0,
-            label: diveCount > 0
-                ? context.l10n.diveSites_detail_semantics_viewDivesAtSite
-                : null,
-            child: InkWell(
-              onTap: diveCount > 0
-                  ? () {
-                      ref.read(diveFilterProvider.notifier).state =
-                          DiveFilterState(siteId: site.id);
-                      context.go('/dives');
-                    }
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    ExcludeSemantics(
-                      child: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: colorScheme.primaryContainer,
-                        child: Icon(
-                          Icons.scuba_diving,
-                          color: colorScheme.onPrimaryContainer,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.l10n.diveSites_detail_section_divesAtSite,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            diveCount == 0
-                                ? context.l10n.diveSites_detail_diveCount_zero
-                                : diveCount == 1
-                                ? context.l10n.diveSites_detail_diveCount_one
-                                : context.l10n.diveSites_detail_diveCount_other(
-                                    diveCount,
-                                  ),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: colorScheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Career terrain is built from the dives at this site,
-                    // so it belongs to this card rather than the page
-                    // chrome. Unconditional, as it was in the app bar:
-                    // it draws from dive profiles, not site coordinates.
-                    IconButton(
-                      key: const ValueKey('siteCareerTerrainButton'),
-                      icon: const Icon(Icons.view_in_ar),
-                      tooltip: context.l10n.dive3d_career_title,
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => CareerTerrainPage(
-                            query: careerSiteQuery(site.id),
-                            title: site.name,
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (diveCount > 0)
-                      Icon(
-                        Icons.chevron_right,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-      loading: () => Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.scuba_diving,
-                  color: colorScheme.onPrimaryContainer,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Expanded(
-                child: SizedBox(
-                  height: 20,
-                  width: 100,
-                  child: LinearProgressIndicator(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      error: (_, _) => const SizedBox.shrink(),
-    );
-  }
-
   Widget _buildDescriptionSection(BuildContext context, DiveSite site) {
     final colorScheme = Theme.of(context).colorScheme;
     final hasDescription = site.description.isNotEmpty;
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -840,7 +682,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -928,6 +770,34 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     );
   }
 
+  /// A statistics row that opens the dive its value was taken from.
+  ///
+  /// [diveId] and the value go null together (see [SiteDiveStatistics]), so a
+  /// "Not available" row can never render as a dead link.
+  Widget _buildStatRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value, {
+    required bool isEmpty,
+    String? diveId,
+  }) => _buildDetailRow(
+    context,
+    icon,
+    label,
+    value,
+    isEmpty: isEmpty,
+    isLink: diveId != null,
+    onTap: diveId == null ? null : () => context.push('/dives/$diveId'),
+  );
+
+  /// One label/value row.
+  ///
+  /// [onTap] means two different things depending on [isLink]: a link row
+  /// opens the dive the value came from and shows a chevron, while a plain
+  /// tappable row copies the value and shows a copy glyph. They need
+  /// different trailing glyphs and different semantics labels, so a screen
+  /// reader does not announce "copy to clipboard" over a navigation.
   Widget _buildDetailRow(
     BuildContext context,
     IconData icon,
@@ -935,37 +805,53 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     String value, {
     bool isEmpty = false,
     VoidCallback? onTap,
+    bool isLink = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    // Label and value share one line rather than stacking. Both halves are
+    // flexible and the value may run to a second line before it ellipsizes,
+    // so a long value (a coordinate pair, a wrapped place name) degrades
+    // instead of overflowing.
     final content = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(icon, size: 18, color: colorScheme.onSurfaceVariant),
+          ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: isEmpty ? colorScheme.onSurfaceVariant : null,
-                    fontStyle: isEmpty ? FontStyle.italic : null,
-                  ),
-                ),
-              ],
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
-          if (onTap != null)
-            Icon(Icons.copy, size: 16, color: colorScheme.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isEmpty ? colorScheme.onSurfaceVariant : null,
+                fontStyle: isEmpty ? FontStyle.italic : null,
+              ),
+            ),
+          ),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            Icon(
+              isLink ? Icons.chevron_right : Icons.copy,
+              size: isLink ? 18 : 16,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ],
         ],
       ),
     );
@@ -973,7 +859,9 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     if (onTap != null) {
       return Semantics(
         button: true,
-        label: context.l10n.diveSites_detail_semantics_copyToClipboard(label),
+        label: isLink
+            ? context.l10n.diveSites_detail_semantics_openLinkedDive(label)
+            : context.l10n.diveSites_detail_semantics_copyToClipboard(label),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(8),
@@ -993,6 +881,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
         site.exitMethod != null;
   }
 
+  /// The site's depth: what it is rated for, and what dives actually found.
+  ///
+  /// [DiveSite.minDepth]/[DiveSite.maxDepth] are entered by hand and describe
+  /// the site; the reached depths are derived from the dives logged there and
+  /// are never written back. They used to sit in separate cards, which put
+  /// two unrelated "max depth" numbers on one page with nothing tying them
+  /// together, so they are shown together and labelled apart.
   Widget _buildDepthSection(
     BuildContext context,
     WidgetRef ref,
@@ -1001,6 +896,18 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     final colorScheme = Theme.of(context).colorScheme;
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
+    // `.value` (Riverpod's own) rather than the project's `valueOrNull`
+    // helper: that helper is `when(loading: () => null)`, and `when` skips the
+    // loading branch on a refresh but NOT on a reload
+    // (skipLoadingOnReload defaults to false). This provider watches
+    // validatedCurrentDiverIdProvider, so switching diver is a real reload,
+    // and the helper would blank the reached depths mid-reload even though
+    // the previous values are still there.
+    final stats = ref.watch(siteDiveStatisticsProvider(site.id)).value;
+    // Gated on there being dives at all, not on the depths being present: a
+    // site with dives that recorded no depth is told so, rather than being
+    // shown a card that silently omits the question.
+    final hasReachedDepths = stats != null && stats.hasData;
     final hasMinDepth = site.minDepth != null;
     final hasMaxDepth = site.maxDepth != null;
     final hasDepthInfo = hasMinDepth || hasMaxDepth;
@@ -1023,7 +930,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1115,10 +1022,239 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                     ),
                 ],
               ),
+            if (hasReachedDepths) ...[
+              const Divider(height: 24),
+              Text(
+                context.l10n.diveSites_detail_depth_reachedHeading,
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: colorScheme.primary),
+              ),
+              _buildStatRow(
+                context,
+                Icons.arrow_downward,
+                context.l10n.diveSites_detail_stats_maxDepth,
+                stats.maxDepthReached == null
+                    ? context.l10n.diveSites_detail_stats_notAvailable
+                    : units.formatDepth(stats.maxDepthReached),
+                isEmpty: stats.maxDepthReached == null,
+                diveId: stats.deepestDiveId,
+              ),
+              _buildStatRow(
+                context,
+                Icons.arrow_upward,
+                context.l10n.diveSites_detail_stats_minDepth,
+                stats.minDepthReached == null
+                    ? context.l10n.diveSites_detail_stats_notAvailable
+                    : units.formatDepth(stats.minDepthReached),
+                isEmpty: stats.minDepthReached == null,
+                diveId: stats.shallowestDiveId,
+              ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  /// The dives logged at this site: how many, and the aggregates derived
+  /// from them.
+  ///
+  /// Merged from what used to be two cards. The count and the statistics
+  /// describe the same set of dives, and splitting them put two unrelated
+  /// "max depth" numbers on one page with nothing tying them together.
+  Widget _buildDiveStatisticsSection(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final units = UnitFormatter(ref.watch(settingsProvider));
+    final statsAsync = ref.watch(siteDiveStatisticsProvider(site.id));
+
+    // The headline count and the footer link both describe the dive list this
+    // card opens, which is not scoped by DiveStatsScope, so they come from the
+    // unscoped provider. Sourcing them from SiteDiveStatistics.diveCount would
+    // promise fewer dives than the list then shows for any diver who has
+    // excluded a dive from statistics.
+    // `.value` for the same reason as the depth card: it retains the last
+    // known count across a reload instead of dropping to the placeholder.
+    final countAsync = ref.watch(siteDiveCountProvider(site.id));
+    final totalDiveCount = countAsync.value;
+
+    // Null while the count is still in flight. Defaulting it to 0 would make
+    // a site with dives read "No dives logged yet" for a frame, which is a
+    // wrong answer rather than a missing one.
+    // A null count is not the same as a count of zero, and a failed count is
+    // not the same as one still arriving. A retained value wins over both, so
+    // a reload keeps showing the last known count; a failure that left
+    // nothing cached says so, because a spinner there would never resolve.
+    Widget countLine() {
+      final style = Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant);
+
+      if (totalDiveCount == null) {
+        if (countAsync.hasError) {
+          return Text(
+            context.l10n.diveSites_detail_stats_notAvailable,
+            style: style?.copyWith(fontStyle: FontStyle.italic),
+          );
+        }
+        return const SizedBox(
+          height: 20,
+          width: 100,
+          child: LinearProgressIndicator(),
+        );
+      }
+
+      return Text(
+        totalDiveCount == 0
+            ? context.l10n.diveSites_detail_diveCount_zero
+            : totalDiveCount == 1
+            ? context.l10n.diveSites_detail_diveCount_one
+            : context.l10n.diveSites_detail_diveCount_other(totalDiveCount),
+        style: style,
+      );
+    }
+
+    Widget footer() => Align(
+      alignment: AlignmentDirectional.centerEnd,
+      child: TextButton.icon(
+        key: const ValueKey('siteViewAllDivesButton'),
+        onPressed: () {
+          ref.read(diveFilterProvider.notifier).state = DiveFilterState(
+            siteId: site.id,
+          );
+          context.go('/dives');
+        },
+        icon: const Icon(Icons.list_alt, size: 18),
+        label: Text(
+          context.l10n.diveSites_detail_stats_viewAllDives(totalDiveCount ?? 0),
+        ),
+      ),
+    );
+
+    // Unlike the statistics rows, the card itself is unconditional: it carries
+    // the dive count, which a site with no dives still needs to state.
+    Widget shell(List<Widget> statisticsRows) => Card(
+      child: Padding(
+        padding: _cardPadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.scuba_diving, size: 20, color: colorScheme.primary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    context.l10n.diveSites_detail_section_divesAtSite,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                // Career terrain is built from the dives at this site, so it
+                // belongs to this card rather than the page chrome.
+                // Unconditional, as it was in the app bar: it draws from dive
+                // profiles, not site coordinates.
+                IconButton(
+                  key: const ValueKey('siteCareerTerrainButton'),
+                  icon: const Icon(Icons.view_in_ar),
+                  tooltip: context.l10n.dive3d_career_title,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => CareerTerrainPage(
+                        query: careerSiteQuery(site.id),
+                        title: site.name,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            countLine(),
+            ...statisticsRows,
+            if ((totalDiveCount ?? 0) > 0) ...[
+              const Divider(height: 16),
+              footer(),
+            ],
+          ],
+        ),
+      ),
+    );
+
+    return statsAsync.when(
+      data: (stats) {
+        final notAvailable = context.l10n.diveSites_detail_stats_notAvailable;
+
+        if (!stats.hasData) return shell(const []);
+
+        return shell([
+          const Divider(height: 24),
+          Text(
+            context.l10n.diveSites_detail_section_diveStatistics,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(color: colorScheme.primary),
+          ),
+          _buildStatRow(
+            context,
+            Icons.timer,
+            context.l10n.diveSites_detail_stats_longestDive,
+            _formatStatsDuration(notAvailable, stats.longestDiveSeconds),
+            isEmpty: stats.longestDiveSeconds == null,
+            diveId: stats.longestDiveId,
+          ),
+          // No single dive holds the mean, so this row stays inert.
+          _buildStatRow(
+            context,
+            Icons.hourglass_bottom,
+            context.l10n.diveSites_detail_stats_avgDuration,
+            _formatStatsDuration(
+              notAvailable,
+              stats.averageDurationSeconds?.round(),
+            ),
+            isEmpty: stats.averageDurationSeconds == null,
+          ),
+          _buildStatRow(
+            context,
+            Icons.event,
+            context.l10n.diveSites_detail_stats_firstDive,
+            units.formatDate(stats.firstDiveAt),
+            isEmpty: stats.firstDiveAt == null,
+            diveId: stats.firstDiveId,
+          ),
+          _buildStatRow(
+            context,
+            Icons.event_available,
+            context.l10n.diveSites_detail_stats_lastDive,
+            units.formatDate(stats.lastDiveAt),
+            isEmpty: stats.lastDiveAt == null,
+            diveId: stats.lastDiveId,
+          ),
+        ]);
+      },
+      // The count and the footer link come from the unscoped count, which is
+      // already resolved, so they render regardless: a slow or failed
+      // aggregate must not cost the diver the way through to their dives.
+      // Only the statistics rows wait.
+      loading: () => shell(const []),
+      error: (_, _) => shell(const []),
+    );
+  }
+
+  /// "Xh Ym" for durations >= 1 hour, "Xmin" otherwise, or [notAvailable]
+  /// when [seconds] is null (issue #1018/#1038: a dive with neither runtime
+  /// nor bottom time contributes nothing to the duration aggregate).
+  String _formatStatsDuration(String notAvailable, int? seconds) {
+    if (seconds == null || seconds <= 0) return notAvailable;
+    final totalMinutes = seconds ~/ 60;
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+    if (hours > 0) return '${hours}h ${minutes}m';
+    return '${minutes}min';
   }
 
   Widget _buildAltitudeSection(
@@ -1182,7 +1318,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1273,7 +1409,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            altitudeGroup.displayName,
+                            altitudeGroup.localizedName(context.l10n),
                             style: Theme.of(context).textTheme.titleSmall
                                 ?.copyWith(
                                   fontWeight: FontWeight.w600,
@@ -1335,7 +1471,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1380,7 +1516,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      site.difficulty!.displayName,
+                      site.difficulty!.localizedName(context.l10n),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: getDifficultyColor(site.difficulty!),
@@ -1402,7 +1538,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     return Card(
       color: colorScheme.errorContainer.withValues(alpha: 0.3),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1431,7 +1567,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1502,7 +1638,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1558,7 +1694,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: _cardPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

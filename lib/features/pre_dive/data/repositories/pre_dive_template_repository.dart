@@ -242,6 +242,8 @@ class PreDiveTemplateRepository {
                 valueMin: Value(entry.item.valueMin),
                 valueMax: Value(entry.item.valueMax),
                 isRequired: Value(entry.item.isRequired),
+                equipmentId: Value(entry.item.equipmentId),
+                sourceItemId: Value(entry.item.sourceItemId),
                 createdAt: Value(existingCreatedAt[entry.id] ?? now),
                 updatedAt: Value(now),
               ),
@@ -296,10 +298,57 @@ class PreDiveTemplateRepository {
         builtinKey: null,
       ),
     );
+    // Ids are minted here rather than left to saveItems, because a
+    // cellLinearity item's sourceItemId points at a sibling and has to be
+    // rewritten to that sibling's NEW id. Leaving it to saveItems would
+    // clone the template with every air/linearity pair silently unlinked,
+    // which is the most likely way a diver first meets this feature.
+    final newIdByOldId = {for (final i in items) i.id: _uuid.v4()};
     await saveItems(clone.id, [
-      for (final i in items) i.copyWith(id: '', templateId: clone.id),
+      for (final i in items)
+        i.copyWith(
+          id: newIdByOldId[i.id],
+          templateId: clone.id,
+          sourceItemId: i.sourceItemId == null
+              ? null
+              : newIdByOldId[i.sourceItemId],
+        ),
     ]);
     return clone;
+  }
+
+  /// Persists the diver's session-start equipment choice for one 'equipment'
+  /// item so the next session pre-fills the same device. Not exposed via the
+  /// template editor: the only writer is the start-session flow. Callers
+  /// must skip this for built-in templates -- their items are shared across
+  /// every diver, so writing one diver's equipment there would leak across
+  /// divers; a built-in template's equipment choice lives only in that run's
+  /// session items.
+  Future<void> updateItemEquipment(String itemId, String? equipmentId) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(
+        _db.preDiveChecklistTemplateItems,
+      )..where((t) => t.id.equals(itemId))).write(
+        PreDiveChecklistTemplateItemsCompanion(
+          equipmentId: Value(equipmentId),
+          updatedAt: Value(now),
+        ),
+      );
+      await _syncRepository.markRecordPending(
+        entityType: _itemEntity,
+        recordId: itemId,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to update pre-dive template item equipment link',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
 
   /// Guard shared by update/delete/saveItems: built-ins are read-only.
@@ -341,6 +390,8 @@ class PreDiveTemplateRepository {
     valueMin: row.valueMin,
     valueMax: row.valueMax,
     isRequired: row.isRequired,
+    equipmentId: row.equipmentId,
+    sourceItemId: row.sourceItemId,
     createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
   );

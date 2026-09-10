@@ -3,6 +3,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_sample_units.dart';
 
 /// Convert a Pigeon ParsedDive to the app's DownloadedDive format.
 ///
@@ -69,7 +70,7 @@ DownloadedDive parsedDiveToDownloaded(
             setpoint: s.setpoint,
             ppo2: s.ppo2,
             cns: s.cns,
-            rbt: s.rbt,
+            rbt: libdcRbtToSeconds(s.rbt),
             decoType: s.decoType,
             decoTime: s.decoTime,
             decoDepth: s.decoDepth,

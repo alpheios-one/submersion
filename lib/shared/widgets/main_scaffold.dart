@@ -12,7 +12,12 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/global_drop_target.dart';
 import 'package:submersion/shared/widgets/nav/nav_destinations.dart';
-import 'package:submersion/shared/widgets/nav/nav_primary_provider.dart';
+import 'package:submersion/shared/widgets/nav/nav_order_provider.dart';
+
+/// Fraction of the screen height the phone overflow ("More") sheet may fill.
+///
+/// The remainder is scrim the user can tap to dismiss the sheet.
+const double _moreSheetMaxHeight = 0.85;
 
 class MainScaffold extends ConsumerStatefulWidget {
   final Widget child;
@@ -26,11 +31,6 @@ class MainScaffold extends ConsumerStatefulWidget {
 class _MainScaffoldState extends ConsumerState<MainScaffold> {
   /// When true, the user has manually collapsed the rail (overrides auto-extend)
   bool _isCollapsed = false;
-
-  /// Wide-screen rail destinations: every routable destination in canonical
-  /// order. The `more` sentinel is a phone-only overflow control.
-  List<NavDestination> get _railDestinations =>
-      kNavDestinations.where((d) => d.id != 'more').toList(growable: false);
 
   /// Builds a per-destination accent color lookup for the navigation surfaces.
   ///
@@ -52,17 +52,19 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     return (id) => accents?.of(id);
   }
 
+  /// [railDestinations] is only read when [isWideScreen] is true, so phone
+  /// builds may pass an empty list rather than subscribing to the rail order.
   int _calculateSelectedIndex(
     BuildContext context, {
     required bool isWideScreen,
+    required List<NavDestination> railDestinations,
   }) {
     final location = GoRouterState.of(context).uri.path;
 
     if (isWideScreen) {
-      // Wide-screen rail: ordered by kNavDestinations.
-      final rail = _railDestinations;
-      for (var i = 0; i < rail.length; i++) {
-        if (location.startsWith(rail[i].route)) return i;
+      // Wide-screen rail: pinned Home, then the user's saved rail order.
+      for (var i = 0; i < railDestinations.length; i++) {
+        if (location.startsWith(railDestinations[i].route)) return i;
       }
       return 0;
     }
@@ -76,10 +78,22 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     return primary.length - 1; // fall through to More (index 4)
   }
 
+  /// Handles a tap on the rail or the bottom bar.
+  ///
+  /// [destinations] is the list that rendered the tapped control, captured in
+  /// the same build. Re-reading the provider here instead would let the order
+  /// change between render and tap and resolve [index] against a different
+  /// list, routing somewhere the user did not tap. The window is real: the
+  /// download confirmation below suspends this method for as long as the user
+  /// takes to answer, and a sync applying a remote settings change or a
+  /// cold-start load landing in that gap would swap the list out.
   Future<void> _onDestinationSelected(
     int index, {
-    required bool isWideScreen,
+    required List<NavDestination> destinations,
   }) async {
+    if (index < 0 || index >= destinations.length) return;
+    final destination = destinations[index];
+
     // Guard: if a download is in progress, confirm before navigating away
     final isDownloading = ref.read(downloadNotifierProvider).isDownloading;
     if (isDownloading) {
@@ -89,19 +103,14 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
       if (!mounted) return;
     }
 
-    if (isWideScreen) {
-      final rail = _railDestinations;
-      if (index >= 0 && index < rail.length) {
-        context.go(rail[index].route);
-      }
-    } else {
-      final primary = ref.read(navPrimaryDestinationsProvider);
-      if (index == primary.length - 1) {
-        _showMoreMenu(context);
-        return;
-      }
-      context.go(primary[index].route);
+    // The bottom bar's last entry is the `more` sentinel, which opens the
+    // overflow sheet rather than routing. The rail never contains it.
+    if (destination.id == 'more') {
+      _showMoreMenu(context);
+      return;
     }
+    if (destination.route.isEmpty) return;
+    context.go(destination.route);
   }
 
   void _showMoreMenu(BuildContext context) {
@@ -110,8 +119,25 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // Scroll-controlled means the sheet has no height ceiling, and a dozen
+      // overflow destinations are taller than a phone screen. Left alone the
+      // sheet grew to y=0, putting its title and close button under the
+      // Android status bar (issue #1480). The safe area keeps it clear of the
+      // status bar and cutouts; the height cap leaves a strip of scrim above
+      // it so tapping outside stays an obvious way out.
+      useSafeArea: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * _moreSheetMaxHeight,
+      ),
+      // Not redundant with useSafeArea: that inserts SafeArea(bottom: false),
+      // so the sheet deliberately runs to the bottom edge of the screen. This
+      // one supplies the bottom inset the outer one skips, keeping the last
+      // tile clear of the home indicator. Nothing is applied twice -- a
+      // SafeArea strips the padding it consumes out of the MediaQuery, so the
+      // horizontal insets are already zero by the time this one reads them.
       builder: (sheetContext) => SafeArea(
         child: Column(
+          key: const ValueKey('navOverflowSheetBody'),
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
@@ -193,9 +219,17 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     final isWideScreen = screenWidth >= 800;
     final isDesktopExtended = screenWidth >= 1200;
     final navAccent = _navAccentLookup(context);
+    // Watched only on wide screens: building this provider kicks off a
+    // settings read for the rail order, and a phone never renders a rail.
+    // Riverpod rebuilds subscriptions each build, so a resize into rail
+    // width picks it up on that build.
+    final railDestinations = isWideScreen
+        ? ref.watch(navRailDestinationsProvider)
+        : const <NavDestination>[];
     final selectedIndex = _calculateSelectedIndex(
       context,
       isWideScreen: isWideScreen,
+      railDestinations: railDestinations,
     );
 
     if (isWideScreen) {
@@ -242,10 +276,10 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
                             onDestinationSelected: (index) =>
                                 _onDestinationSelected(
                                   index,
-                                  isWideScreen: true,
+                                  destinations: railDestinations,
                                 ),
                             destinations: [
-                              for (final destination in _railDestinations)
+                              for (final destination in railDestinations)
                                 NavigationRailDestination(
                                   icon: Icon(
                                     destination.icon,
@@ -302,7 +336,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     return NavigationBar(
       selectedIndex: selectedIndex,
       onDestinationSelected: (index) =>
-          _onDestinationSelected(index, isWideScreen: false),
+          _onDestinationSelected(index, destinations: primary),
       destinations: [
         for (final destination in primary)
           NavigationDestination(

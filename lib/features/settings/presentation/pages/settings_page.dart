@@ -7,22 +7,31 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/core/utils/currency.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
 import 'package:submersion/features/settings/presentation/widgets/notification_permission_card.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
+import 'package:submersion/features/settings/presentation/pages/equipment_condition_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/widgets/coordinate_format_picker.dart';
+import 'package:submersion/features/dive_sites/domain/services/site_location_backfill_service.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/place_name_language_picker.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/settings/presentation/widgets/bathymetry_refresh_tile.dart';
+import 'package:submersion/features/settings/presentation/widgets/nav_customization_tile.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/notification_service.dart';
@@ -53,7 +62,9 @@ import 'package:submersion/features/auto_update/domain/entities/update_status.da
 import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_mode_provider.dart';
 import 'package:submersion/features/settings/presentation/pages/debug_log_viewer_page.dart';
+import 'package:submersion/features/settings/presentation/widgets/gtr_reserve_dialog.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/settings/presentation/format_enum_display.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// The URL for the GitHub issues page, used by [launchReportIssue].
@@ -152,6 +163,8 @@ class SettingsPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'equipmentCondition':
+        return const EquipmentConditionSettingsPage();
       case 'security':
         return const SecuritySettingsPage();
       case 'units':
@@ -243,6 +256,7 @@ const settingsSectionDedicatedRoutes = <String, String>{
   'profile': '/settings/diver-profile',
   'appearance': '/settings/appearance',
   'safety': '/settings/safety',
+  'equipmentCondition': '/settings/equipment-condition',
   'debug': '/settings/debug-logs',
 };
 
@@ -306,6 +320,8 @@ class SettingsSectionDetailPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'equipmentCondition':
+        return const EquipmentConditionSettingsPage();
       case 'security':
         return const SecuritySettingsPage();
       case 'units':
@@ -385,6 +401,8 @@ class _MobileSettingsTile extends StatelessWidget {
       'dataSources' => context.l10n.settings_section_dataSources_title,
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
       'safety' => context.l10n.settings_section_safety_title,
+      'equipmentCondition' =>
+        context.l10n.settings_section_equipmentCondition_title,
       'security' => context.l10n.settings_section_security_title,
       'debug' => context.l10n.settings_section_debug_title,
       _ => section.title,
@@ -403,6 +421,8 @@ class _MobileSettingsTile extends StatelessWidget {
       'about' => context.l10n.settings_section_about_subtitle,
       'dataSources' => context.l10n.settings_section_dataSources_subtitle,
       'safety' => context.l10n.settings_section_safety_subtitle,
+      'equipmentCondition' =>
+        context.l10n.settings_section_equipmentCondition_subtitle,
       'security' => context.l10n.settings_section_security_subtitle,
       'debug' => context.l10n.settings_section_debug_subtitle,
       _ => section.subtitle,
@@ -535,6 +555,20 @@ class _UnitsSectionContent extends ConsumerWidget {
                 const Divider(height: 1),
                 _buildUnitTile(
                   context,
+                  title: context.l10n.settings_units_waterType,
+                  value: _plannerWaterTypeLabel(
+                    context,
+                    settings.defaultPlannerWaterType,
+                  ),
+                  onTap: () => _showPlannerWaterTypePicker(
+                    context,
+                    ref,
+                    settings.defaultPlannerWaterType,
+                  ),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
                   title: context.l10n.settings_units_defaultCurrency,
                   value: settings.defaultCurrency,
                   onTap: () => _showCurrencyPicker(
@@ -584,7 +618,7 @@ class _UnitsSectionContent extends ConsumerWidget {
                     ],
                   ),
                   onTap: () =>
-                      showPlaceNameLanguagePicker(context, ref, settings),
+                      unawaited(_pickPlaceNameLanguage(context, ref, settings)),
                 ),
               ],
             ),
@@ -601,7 +635,7 @@ class _UnitsSectionContent extends ConsumerWidget {
                 _buildUnitTile(
                   context,
                   title: context.l10n.settings_units_timeFormat,
-                  value: settings.timeFormat.displayName,
+                  value: settings.timeFormat.localizedName(context.l10n),
                   onTap: () =>
                       _showTimeFormatPicker(context, ref, settings.timeFormat),
                 ),
@@ -1013,6 +1047,63 @@ class _UnitsSectionContent extends ConsumerWidget {
     );
   }
 
+  String _plannerWaterTypeLabel(BuildContext context, PlannerWaterType type) {
+    final l10n = context.l10n;
+    return switch (type) {
+      PlannerWaterType.salt => WaterType.salt.localizedName(l10n),
+      PlannerWaterType.fresh => WaterType.fresh.localizedName(l10n),
+      PlannerWaterType.custom => l10n.decoCalculator_waterType_custom,
+    };
+  }
+
+  void _showPlannerWaterTypePicker(
+    BuildContext context,
+    WidgetRef ref,
+    PlannerWaterType current,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final l10n = context.l10n;
+        Widget option(PlannerWaterType value, String title) {
+          return ListTile(
+            title: Text(title),
+            trailing: current == value
+                ? Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.primary,
+                  )
+                : null,
+            onTap: () {
+              ref
+                  .read(settingsProvider.notifier)
+                  .setDefaultPlannerWaterType(value);
+              Navigator.of(dialogContext).pop();
+            },
+          );
+        }
+
+        return AlertDialog(
+          title: Text(l10n.settings_units_dialog_waterType),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              option(PlannerWaterType.salt, WaterType.salt.localizedName(l10n)),
+              option(
+                PlannerWaterType.fresh,
+                WaterType.fresh.localizedName(l10n),
+              ),
+              option(
+                PlannerWaterType.custom,
+                l10n.decoCalculator_waterType_custom,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _showCurrencyPicker(
     BuildContext context,
     WidgetRef ref,
@@ -1072,7 +1163,7 @@ class _UnitsSectionContent extends ConsumerWidget {
           children: TimeFormat.values.map((format) {
             final isSelected = format == currentFormat;
             return ListTile(
-              title: Text(format.displayName),
+              title: Text(format.localizedName(context.l10n)),
               subtitle: Text(format.example),
               trailing: isSelected
                   ? Icon(
@@ -1174,14 +1265,35 @@ class _DecompressionSectionContent extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Card(
-            child: ListTile(
-              leading: const Icon(Icons.percent),
-              title: Text(context.l10n.settings_decompression_cnsMethodTitle),
-              subtitle: Text(
-                _cnsMethodLabel(context, settings.cnsCalculationMethod),
-              ),
-              trailing: const Icon(Icons.edit),
-              onTap: () => _showCnsMethodPicker(context, ref, settings),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.percent),
+                  title: Text(
+                    context.l10n.settings_decompression_cnsMethodTitle,
+                  ),
+                  subtitle: Text(
+                    _cnsMethodLabel(context, settings.cnsCalculationMethod),
+                  ),
+                  trailing: const Icon(Icons.edit),
+                  onTap: () => _showCnsMethodPicker(context, ref, settings),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.speed),
+                  title: Text(
+                    context.l10n.settings_decompression_ppO2LimitsTitle,
+                  ),
+                  subtitle: Text(
+                    context.l10n.settings_decompression_ppO2LimitsSubtitle(
+                      formatRoundedForInput(settings.ppO2MaxWorking, 1),
+                      formatRoundedForInput(settings.ppO2MaxDeco, 1),
+                    ),
+                  ),
+                  trailing: const Icon(Icons.edit),
+                  onTap: () => _showPpO2LimitPicker(context, ref, settings),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -1232,6 +1344,17 @@ class _DecompressionSectionContent extends ConsumerWidget {
                       .read(settingsProvider.notifier)
                       .setDefaultTtsSource(source),
                 ),
+                const Divider(height: 1),
+                _buildSourceDropdownTile(
+                  context,
+                  title: context.l10n.settings_decompression_gtrSource,
+                  value: settings.defaultGtrSource,
+                  onChanged: (source) => ref
+                      .read(settingsProvider.notifier)
+                      .setDefaultGtrSource(source),
+                ),
+                const Divider(height: 1),
+                _buildGtrReserveTile(context, ref, settings),
                 const Divider(height: 1),
                 _buildSourceDropdownTile(
                   context,
@@ -1360,6 +1483,42 @@ class _DecompressionSectionContent extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  /// Reserve pressure the calculated GTR counts down to, shown and edited in
+  /// the diver's pressure unit, stored in bar.
+  Widget _buildGtrReserveTile(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) {
+    final units = UnitFormatter(settings);
+    return ListTile(
+      dense: true,
+      title: Text(context.l10n.settings_decompression_gtrReserve),
+      subtitle: Text(context.l10n.settings_decompression_gtrReserve_subtitle),
+      trailing: Text(units.formatPressure(settings.gtrReservePressure)),
+      onTap: () => _showGtrReserveDialog(context, ref, settings),
+    );
+  }
+
+  Future<void> _showGtrReserveDialog(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) async {
+    final units = UnitFormatter(settings);
+    final entered = await showDialog<double>(
+      context: context,
+      builder: (_) => GtrReserveDialog(
+        initialValue: units.convertPressure(settings.gtrReservePressure),
+        unitSymbol: units.pressureSymbol,
+      ),
+    );
+    if (entered == null || !entered.isFinite || entered <= 0) return;
+    await ref
+        .read(settingsProvider.notifier)
+        .setGtrReservePressure(units.pressureToBar(entered));
   }
 
   String _cnsMethodLabel(BuildContext context, CnsCalculationMethod method) {
@@ -1612,6 +1771,23 @@ class _DecompressionSectionContent extends ConsumerWidget {
     );
   }
 
+  void _showPpO2LimitPicker(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _PpO2LimitDialog(
+        initialWorking: settings.ppO2MaxWorking,
+        initialMax: settings.ppO2MaxDeco,
+        onSave: (working, max) {
+          ref.read(settingsProvider.notifier).setPpO2Limits(working, max);
+        },
+      ),
+    );
+  }
+
   void _showEndLimitDialog(
     BuildContext context,
     WidgetRef ref,
@@ -1853,6 +2029,10 @@ class _AppearanceSectionContentState
                     }).toList(),
                   ),
                 ),
+                const Divider(height: 1),
+                const BathymetryRefreshTile(leading: Icon(Icons.refresh)),
+                const Divider(height: 1),
+                const NavCustomizationTile(),
               ],
             ),
           ),
@@ -2282,6 +2462,36 @@ class _ManageSectionContent extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => context.push('/tank-presets'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.sensors),
+                  title: Text(context.l10n.settings_manage_transmitters),
+                  subtitle: Text(
+                    context.l10n.settings_manage_transmitters_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/transmitters'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.fitness_center),
+                  title: Text(context.l10n.settings_manage_weightPresets),
+                  subtitle: Text(
+                    context.l10n.settings_manage_weightPresets_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/weight-presets'),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.gas_meter),
+                  title: Text(context.l10n.settings_section_trimixMixer_title),
+                  subtitle: Text(
+                    context.l10n.settings_section_trimixMixer_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push(kTrimixMixerSettingsRoute),
                 ),
                 const Divider(height: 1),
                 ListTile(
@@ -3203,11 +3413,12 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
       ),
     };
 
+    // #1512: this stamp was hand-rolled as M/D/YYYY with a 24-hour clock, so
+    // it ignored both the date and the time preference.
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final lastCheck = prefs.lastCheckTime;
     final lastCheckText = lastCheck != null
-        ? '${lastCheck.month}/${lastCheck.day}/${lastCheck.year} '
-              '${lastCheck.hour.toString().padLeft(2, '0')}:'
-              '${lastCheck.minute.toString().padLeft(2, '0')}'
+        ? units.formatDateTime(lastCheck, l10n: context.l10n)
         : context.l10n.settings_updates_never;
 
     return Card(
@@ -3767,4 +3978,206 @@ class _GradientFactorDialogState extends State<_GradientFactorDialog> {
       ],
     );
   }
+}
+
+/// Picks the two ppO2 ceilings (working and maximum) that drive MOD, gas
+/// planning and the oxygen toxicity warnings. Kept to the values a dive
+/// computer actually offers, and holds max >= working.
+class _PpO2LimitDialog extends StatefulWidget {
+  final double initialWorking;
+  final double initialMax;
+  final void Function(double working, double max) onSave;
+
+  const _PpO2LimitDialog({
+    required this.initialWorking,
+    required this.initialMax,
+    required this.onSave,
+  });
+
+  @override
+  State<_PpO2LimitDialog> createState() => _PpO2LimitDialogState();
+}
+
+class _PpO2LimitDialogState extends State<_PpO2LimitDialog> {
+  // Generated from the notifier's own bounds so the offered options can never
+  // drift from what setPpO2Limits will accept (0.1-bar grid).
+  static final List<double> _workingOptions = _tenths(
+    SettingsNotifier.ppO2WorkingMin,
+    SettingsNotifier.ppO2Ceiling,
+  );
+  static final List<double> _maxOptions = _tenths(
+    SettingsNotifier.ppO2MaxMin,
+    SettingsNotifier.ppO2Ceiling,
+  );
+
+  static List<double> _tenths(double min, double max) {
+    final lo = (min * 10).round();
+    final hi = (max * 10).round();
+    return [for (var i = lo; i <= hi; i++) i / 10.0];
+  }
+
+  late double _working;
+  late double _max;
+
+  /// Snap a stored value (which may carry float noise or sit off the grid
+  /// after a clamp) to the nearest offered option.
+  static double _snap(double value, List<double> options) =>
+      options.reduce((a, b) => (a - value).abs() <= (b - value).abs() ? a : b);
+
+  @override
+  void initState() {
+    super.initState();
+    _working = _snap(widget.initialWorking, _workingOptions);
+    _max = _snap(widget.initialMax, _maxOptions);
+    if (_max < _working) _max = _working;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return AlertDialog(
+      title: Text(context.l10n.settings_decompression_ppO2Dialog_title),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      context.l10n.settings_decompression_ppO2Dialog_info,
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildRow(
+              context,
+              label: context.l10n.settings_decompression_ppO2Dialog_working,
+              hint: context.l10n.settings_decompression_ppO2Dialog_workingHint,
+              value: _working,
+              options: _workingOptions,
+              onChanged: (v) => setState(() {
+                _working = v;
+                if (_max < _working) _max = _snap(_working, _maxOptions);
+              }),
+            ),
+            const SizedBox(height: 12),
+            _buildRow(
+              context,
+              label: context.l10n.settings_decompression_ppO2Dialog_max,
+              hint: context.l10n.settings_decompression_ppO2Dialog_maxHint,
+              value: _max,
+              options: _maxOptions,
+              onChanged: (v) => setState(() {
+                _max = v;
+                if (_working > _max) _working = v;
+              }),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.settings_decompression_dialog_cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            widget.onSave(_working, _max);
+            Navigator.of(context).pop();
+          },
+          child: Text(context.l10n.settings_decompression_dialog_save),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRow(
+    BuildContext context, {
+    required String label,
+    required String hint,
+    required double value,
+    required List<double> options,
+    required ValueChanged<double> onChanged,
+  }) {
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                hint,
+                style: textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        DropdownButton<double>(
+          value: value,
+          onChanged: (v) {
+            if (v != null) onChanged(v);
+          },
+          items: [
+            for (final o in options)
+              DropdownMenuItem(
+                value: o,
+                child: Text('${formatRoundedForInput(o, 1)} bar'),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Picks the place name language and, when it changed, offers to look the
+/// diver's sites up again in the new language.
+///
+/// Without that offer a change quietly splits the database: sites geocoded
+/// before it keep their old names, so statistics group one region under two
+/// spellings (issue #1187). The refresh flow asks for confirmation itself,
+/// so a diver who only wants the language changed can decline.
+Future<void> _pickPlaceNameLanguage(
+  BuildContext context,
+  WidgetRef ref,
+  AppSettings settings,
+) async {
+  final previous = settings.placeNameLanguage;
+  final chosen = await showPlaceNameLanguagePicker(context, ref, settings);
+  if (chosen == null || chosen == previous || !context.mounted) return;
+  await showSiteLocationBackfillFlow(
+    context,
+    ref,
+    mode: SiteLocationLookupMode.refreshAll,
+  );
 }

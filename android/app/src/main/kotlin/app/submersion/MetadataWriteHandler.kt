@@ -1,30 +1,23 @@
 package app.submersion
 
-import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
-import android.media.MediaMetadataRetriever
-import android.media.MediaMuxer
 import android.net.Uri
-import android.os.Build
-import android.os.Environment
 import android.provider.MediaStore
 import androidx.exifinterface.media.ExifInterface
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.util.UUID
 
 /**
- * Handles writing dive metadata to photos and videos via platform channel (Android).
+ * Handles writing dive metadata to photos via platform channel (Android).
  *
- * Supports:
- * - JPEG/PNG photos via ExifInterface
- * - MP4/MOV videos via MediaMuxer (creates new file with metadata)
+ * Supports JPEG/PNG photos via ExifInterface, written in place.
+ *
+ * Videos are refused. Writing to one cannot be done in place: it meant
+ * remuxing a copy, inserting a new MediaStore entry and deleting the original.
+ * Submersion must never delete a user's original media (issue #1472), so the
+ * path was removed rather than made non-destructive.
  */
 class MetadataWriteHandler(
     context: Context,
@@ -45,14 +38,13 @@ class MetadataWriteHandler(
                 val metadata = call.argument<Map<String, Any>>("metadata")
                 val description = call.argument<String>("description")
                 val isVideo = call.argument<Boolean>("isVideo")
-                val keepOriginal = call.argument<Boolean>("keepOriginal") ?: false
 
                 if (assetId == null || metadata == null || description == null || isVideo == null) {
                     result.error("INVALID_ARGS", "Missing required arguments", null)
                     return
                 }
 
-                writeMetadata(assetId, metadata, description, isVideo, keepOriginal, result)
+                writeMetadata(assetId, metadata, description, isVideo, result)
             }
             else -> result.notImplemented()
         }
@@ -63,7 +55,6 @@ class MetadataWriteHandler(
         metadata: Map<String, Any>,
         description: String,
         isVideo: Boolean,
-        keepOriginal: Boolean,
         result: MethodChannel.Result
     ) {
         try {
@@ -74,17 +65,54 @@ class MetadataWriteHandler(
                 return
             }
 
-            val contentUri = if (isVideo) {
-                ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, mediaId)
-            } else {
-                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
+            // A video cannot be edited in place. The old path remuxed a copy,
+            // inserted a new MediaStore entry and deleted the original, which
+            // Submersion must never do (issue #1472). Refuse instead; the UI
+            // does not offer the action for a video, so this is reached only
+            // by a mislabelled asset.
+            if (isVideo) {
+                result.error("VIDEO_UNSUPPORTED", "Writing metadata to a video is not supported.", null)
+                return
             }
 
-            if (isVideo) {
-                writeVideoMetadata(contentUri, mediaId, metadata, description, keepOriginal, result)
-            } else {
-                writePhotoMetadata(contentUri, metadata, description, result)
+            // Trust MediaStore over the caller. writePhotoMetadata opens the
+            // asset "rw" and hands the descriptor to ExifInterface, so a video
+            // that reached it would be written into. Proceed only for
+            // something MediaStore itself calls an image.
+            //
+            // Ask through the Files collection, not Images. Images is a view
+            // over MediaProvider's files table filtered to media_type=IMAGE, so
+            // a video's id appended to it resolves to no row and getType
+            // returns null: the mislabelled video this check exists to catch
+            // would report ASSET_NOT_FOUND rather than VIDEO_UNSUPPORTED. Files
+            // is the unfiltered view, so it answers for an id from any
+            // collection, which is what the iOS and macOS twins get for free
+            // from PHAsset.fetchAssets(withLocalIdentifiers:).
+            //
+            // The volume is spelled out rather than using MediaStore
+            // .VOLUME_EXTERNAL, which is API 29 and this module's minSdk is 26.
+            val filesUri =
+                ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), mediaId)
+            val mimeType = appContext.contentResolver.getType(filesUri)
+            if (mimeType == null) {
+                result.error("ASSET_NOT_FOUND", "Asset not found with ID: $assetId", null)
+                return
             }
+            if (!mimeType.startsWith("image/")) {
+                val code =
+                    if (mimeType.startsWith("video/")) "VIDEO_UNSUPPORTED" else "UNSUPPORTED_FORMAT"
+                result.error(code, "Writing metadata to $mimeType is not supported.", null)
+                return
+            }
+
+            // Write through the Images collection. MediaProvider derives
+            // media_type from the MIME type, so anything it reports as image/*
+            // is in that collection, and the narrower URI keeps the descriptor
+            // this opens scoped to the images the app is allowed to touch.
+            val contentUri =
+                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, mediaId)
+
+            writePhotoMetadata(contentUri, metadata, description, result)
         } catch (e: Exception) {
             result.error("WRITE_FAILED", "Failed to write metadata: ${e.message}", null)
         }
@@ -135,165 +163,6 @@ class MetadataWriteHandler(
             result.error("PERMISSION_DENIED", "Storage permission denied", null)
         } catch (e: Exception) {
             result.error("WRITE_FAILED", "Failed to write EXIF: ${e.message}", null)
-        }
-    }
-
-    // MARK: - Video Metadata
-
-    private fun writeVideoMetadata(
-        contentUri: Uri,
-        mediaId: Long,
-        metadata: Map<String, Any>,
-        description: String,
-        keepOriginal: Boolean,
-        result: MethodChannel.Result
-    ) {
-        try {
-            val resolver = appContext.contentResolver
-
-            // Get the original file path
-            val projection = arrayOf(MediaStore.Video.Media.DATA, MediaStore.Video.Media.DISPLAY_NAME)
-            val cursor = resolver.query(contentUri, projection, null, null, null)
-
-            if (cursor == null || !cursor.moveToFirst()) {
-                result.error("ASSET_NOT_FOUND", "Video not found", null)
-                cursor?.close()
-                return
-            }
-
-            val dataIndex = cursor.getColumnIndex(MediaStore.Video.Media.DATA)
-            val nameIndex = cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME)
-            val originalPath = cursor.getString(dataIndex)
-            val displayName = cursor.getString(nameIndex)
-            cursor.close()
-
-            // Create a temporary output file
-            val tempDir = appContext.cacheDir
-            val outputFile = File(tempDir, "temp_${UUID.randomUUID()}.mp4")
-
-            // Copy video with metadata using MediaMuxer
-            val success = copyVideoWithMetadata(
-                originalPath,
-                outputFile.absolutePath,
-                metadata,
-                description
-            )
-
-            if (!success) {
-                outputFile.delete()
-                result.error("WRITE_FAILED", "Failed to add metadata to video", null)
-                return
-            }
-
-            // Insert the new video into MediaStore
-            val newVideoUri = insertVideoToMediaStore(
-                resolver,
-                outputFile,
-                displayName,
-                description,
-                metadata
-            )
-
-            // Clean up temp file
-            outputFile.delete()
-
-            if (newVideoUri == null) {
-                result.error("WRITE_FAILED", "Failed to save new video to library", null)
-                return
-            }
-
-            // Delete original if user chose not to keep it
-            if (!keepOriginal) {
-                try {
-                    resolver.delete(contentUri, null, null)
-                } catch (e: Exception) {
-                    // Log but don't fail if delete doesn't work
-                    android.util.Log.w("MetadataWriteHandler", "Could not delete original: ${e.message}")
-                }
-            }
-
-            result.success(true)
-        } catch (e: SecurityException) {
-            result.error("PERMISSION_DENIED", "Storage permission denied", null)
-        } catch (e: Exception) {
-            result.error("WRITE_FAILED", "Failed to write video metadata: ${e.message}", null)
-        }
-    }
-
-    private fun copyVideoWithMetadata(
-        inputPath: String,
-        outputPath: String,
-        metadata: Map<String, Any>,
-        description: String
-    ): Boolean {
-        // For Android, we can't easily add custom metadata to MP4 files without re-encoding.
-        // The best approach is to use MediaMuxer to remux the video, but it has limitations.
-        // For now, we'll copy the file and update what we can via MediaStore.
-
-        // Simple file copy (MediaStore metadata will be set separately)
-        return try {
-            FileInputStream(inputPath).use { input ->
-                FileOutputStream(outputPath).use { output ->
-                    input.copyTo(output)
-                }
-            }
-            true
-        } catch (e: Exception) {
-            android.util.Log.e("MetadataWriteHandler", "Failed to copy video: ${e.message}")
-            false
-        }
-    }
-
-    private fun insertVideoToMediaStore(
-        resolver: ContentResolver,
-        videoFile: File,
-        displayName: String,
-        description: String,
-        metadata: Map<String, Any>
-    ): Uri? {
-        val values = ContentValues().apply {
-            put(MediaStore.Video.Media.DISPLAY_NAME, displayName)
-            put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
-            put(MediaStore.Video.Media.DESCRIPTION, description)
-
-            // Add GPS coordinates if available
-            val lat = metadata["latitude"] as? Number
-            val lon = metadata["longitude"] as? Number
-            if (lat != null && lon != null) {
-                put(MediaStore.Video.Media.LATITUDE, lat.toDouble())
-                put(MediaStore.Video.Media.LONGITUDE, lon.toDouble())
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES)
-                put(MediaStore.Video.Media.IS_PENDING, 1)
-            }
-        }
-
-        val uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values)
-            ?: return null
-
-        try {
-            // Copy file content to the new MediaStore entry
-            resolver.openOutputStream(uri)?.use { output ->
-                FileInputStream(videoFile).use { input ->
-                    input.copyTo(output)
-                }
-            }
-
-            // Mark as no longer pending (Android Q+)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val updateValues = ContentValues().apply {
-                    put(MediaStore.Video.Media.IS_PENDING, 0)
-                }
-                resolver.update(uri, updateValues, null, null)
-            }
-
-            return uri
-        } catch (e: Exception) {
-            // Clean up on failure
-            resolver.delete(uri, null, null)
-            throw e
         }
     }
 }

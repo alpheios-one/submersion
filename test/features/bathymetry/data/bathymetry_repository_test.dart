@@ -32,7 +32,8 @@ class ScriptedSource implements BathymetrySource {
   @override
   bool get global => true;
   @override
-  bool covers(GeoPoint center) => true;
+  Future<SourceCapability?> probe(GeoPoint center) async =>
+      const SourceCapability(cellSizeMeters: 100, detail: 'fake');
   @override
   Future<BathymetryGrid> fetch(GeoPoint c, {required double spanMeters}) async {
     calls++;
@@ -58,14 +59,51 @@ class ScriptedSource implements BathymetrySource {
   }
 }
 
+/// Records every center it was asked to fetch, tagging each returned grid
+/// with the call's index -- so a test can tell which fetch call produced
+/// which cached grid.
+class CenterRecordingSource implements BathymetrySource {
+  final List<GeoPoint> centers = [];
+
+  @override
+  String get id => 'recorder';
+  @override
+  bool get global => true;
+  @override
+  Future<SourceCapability?> probe(GeoPoint center) async =>
+      const SourceCapability(cellSizeMeters: 100, detail: 'recorder');
+  @override
+  Future<BathymetryGrid> fetch(GeoPoint c, {required double spanMeters}) async {
+    centers.add(c);
+    return BathymetryGrid(
+      originLat: 0,
+      originLon: 0,
+      cellSizeLatDeg: 0.004,
+      cellSizeLonDeg: 0.004,
+      rows: 2,
+      cols: 2,
+      depthsMeters: const [10, 20, 30, 40],
+      sourceId: 'recorder',
+      resolutionMeters: centers.length.toDouble(),
+      fetchedAt: DateTime.utc(2026, 7, 28),
+    );
+  }
+}
+
 void main() {
   const bonaire = GeoPoint(12.16, -68.29);
+  // Both inside Walensee's bounding box (see swiss_lake_levels.dart), both
+  // floor onto the SAME 0.02 degree cell (47.12, 9.14) despite being real,
+  // distinct dive sites in different 1 km swissBATHY3D tiles -- exactly the
+  // Bug 10 scenario (Betlis vs. Murg West rendering the same mesh).
+  const betlis = GeoPoint(47.135503, 9.144546);
+  const murgWest = GeoPoint(47.138, 9.148);
 
   late LocalCacheDatabase db;
   setUp(() => db = LocalCacheDatabase(NativeDatabase.memory()));
   tearDown(() => db.close());
 
-  BathymetryRepository repo(ScriptedSource source) => BathymetryRepository(
+  BathymetryRepository repo(BathymetrySource source) => BathymetryRepository(
     db: db,
     resolver: BathymetryResolver(sources: [source]),
   );
@@ -74,13 +112,14 @@ void main() {
     final q = BathymetryRepository.quantize(bonaire);
     expect(q.lat, closeTo(12.16, 1e-9));
     expect(q.lon, closeTo(-68.30, 1e-9)); // -68.29 floors DOWN to -68.30
-    // The key carries the request span so a span change refetches instead
-    // of serving a smaller cached area forever.
-    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30@8000');
+    // The key carries the request span and the selection generation, so a
+    // change to either refetches instead of serving the old cached answer
+    // forever.
+    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30@8000v2');
     // Nearby coordinates share the key.
     expect(
       BathymetryRepository.keyFor(const GeoPoint(12.171, -68.281)),
-      '12.16,-68.30@8000',
+      '12.16,-68.30@8000v2',
     );
   });
 
@@ -92,6 +131,71 @@ void main() {
     final second = await r.getGrid(bonaire);
     expect(second!.depthsMeters, first.depthsMeters);
     expect(source.calls, 1);
+  });
+
+  group('swissBATHY3D lakes bypass the 0.02 degree cell (Bug 10)', () {
+    test('quantumDegFor/quantize/keyFor use the raw coordinate inside a lake, '
+        'not a floored cell', () {
+      expect(BathymetryRepository.quantumDegFor(betlis), 0);
+      final q = BathymetryRepository.quantize(betlis);
+      expect(q.lat, betlis.latitude);
+      expect(q.lon, betlis.longitude);
+
+      // Two distinct real sites this close together now get distinct
+      // keys...
+      expect(
+        BathymetryRepository.keyFor(betlis),
+        isNot(BathymetryRepository.keyFor(murgWest)),
+      );
+
+      // ...even though the OLD, pauschal 0.02 rule would have floored
+      // both onto the exact same cell (confirming this is a genuine
+      // same-cell collision, not a fabricated test scenario).
+      double floor002(double v) => (v / 0.02).floorToDouble() * 0.02;
+      expect(
+        floor002(betlis.latitude),
+        closeTo(floor002(murgWest.latitude), 1e-9),
+      );
+      expect(
+        floor002(betlis.longitude),
+        closeTo(floor002(murgWest.longitude), 1e-9),
+      );
+    });
+
+    test(
+      'two real sites in the same 0.02 cell but different swissBATHY3D '
+      'tiles fetch and cache independently, each at its own coordinate',
+      () async {
+        final source = CenterRecordingSource();
+        final r = repo(source);
+
+        final gridA = await r.getGrid(betlis);
+        final gridB = await r.getGrid(murgWest);
+
+        expect(source.centers, [betlis, murgWest]);
+        expect(gridA!.resolutionMeters, isNot(gridB!.resolutionMeters));
+        final rows = await db.select(db.bathymetryCache).get();
+        expect(rows, hasLength(2)); // two rows, not one shared row
+      },
+    );
+
+    test(
+      'non-swiss coordinates in the same 0.02 cell still share one cached '
+      'fetch (regression guard: the other three sources are unaffected)',
+      () async {
+        final source = CenterRecordingSource();
+        final r = repo(source);
+
+        final first = await r.getGrid(bonaire);
+        final second = await r.getGrid(const GeoPoint(12.171, -68.281));
+
+        expect(first, isNotNull);
+        expect(second, isNotNull);
+        expect(source.centers, hasLength(1)); // still coalesced, as before
+        final rows = await db.select(db.bathymetryCache).get();
+        expect(rows, hasLength(1));
+      },
+    );
   });
 
   test('definitive empty is cached as a negative answer', () async {
@@ -202,5 +306,21 @@ void main() {
     final grid = await repo(source).getGrid(bonaire);
     expect(grid!.rows, lessThanOrEqualTo(120));
     expect(grid.cols, lessThanOrEqualTo(120));
+  });
+
+  test('the cache key carries the selection generation', () {
+    final key = BathymetryRepository.keyFor(const GeoPoint(12.16, -68.29));
+    expect(key, endsWith('@8000v2'));
+  });
+
+  test('a row written under the previous generation is not reused', () {
+    // An install upgrading from the pre-selection-change build must MISS
+    // its old rows, or every already-visited site keeps serving the grid
+    // the old resolver chose. Cached rows never expire.
+    const p = GeoPoint(12.16, -68.29);
+    final q = BathymetryRepository.quantize(p);
+    final legacyKey =
+        '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}@8000';
+    expect(BathymetryRepository.keyFor(p), isNot(legacyKey));
   });
 }

@@ -1,7 +1,8 @@
 /// The customizable home screen cards. Declaration order is the default
 /// display order and must match the pre-customization dashboard layout.
-/// The urgent banner is deliberately absent: it is pinned and always
-/// renders above all customizable content when triggered.
+/// Every card here is hideable, with one override: DashboardPage forces
+/// [HomeCardType.gaugeStrip] back on while a dive-safety alert is live, so
+/// GaugeStrip's hardened chips cannot be hidden by hiding their host card.
 enum HomeCardType {
   hero,
   gaugeStrip,
@@ -9,11 +10,13 @@ enum HomeCardType {
   recentDives,
   quickActions,
   milestones,
-  photoRibbon,
-  onThisDay,
   yearInReview,
-  activeCourses,
+  // photoRibbon and recentSitesMap are declared adjacent so the default
+  // layout pairs them side by side at desktop widths (see home_layout.dart).
+  photoRibbon,
   recentSitesMap,
+  onThisDay,
+  activeCourses,
 }
 
 /// Turns a stored order (HomeCardType.name strings from SharedPreferences)

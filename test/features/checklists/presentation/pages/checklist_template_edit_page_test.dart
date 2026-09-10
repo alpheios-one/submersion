@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/theme/full_themes/tropical_theme.dart';
 import 'package:submersion/features/checklists/data/repositories/checklist_template_repository.dart';
 import 'package:submersion/features/checklists/domain/entities/checklist_template.dart';
 import 'package:submersion/features/checklists/presentation/pages/checklist_template_edit_page.dart';
@@ -152,6 +154,98 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Drysuit'), findsOneWidget);
     expect(find.text('Wetsuit'), findsNothing);
+  });
+
+  testWidgets('the page titles itself for add versus edit', (tester) async {
+    await setUpTestDatabase();
+    addTearDown(tearDownTestDatabase);
+
+    await tester.pumpWidget(
+      testApp(
+        child: const ChecklistTemplateEditPage(),
+        locale: const Locale('en'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'Add Template'), findsOneWidget);
+
+    final repo = ChecklistTemplateRepository();
+    final created = await repo.createTemplate(
+      ChecklistTemplate(
+        id: '',
+        name: 'Packing',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
+
+    await tester.pumpWidget(
+      testApp(
+        child: ChecklistTemplateEditPage(templateId: created.id),
+        locale: const Locale('en'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'Edit Template'), findsOneWidget);
+  });
+
+  testWidgets('the item dialog titles itself for add versus edit', (
+    tester,
+  ) async {
+    await setUpTestDatabase();
+    addTearDown(tearDownTestDatabase);
+
+    final repo = ChecklistTemplateRepository();
+    final created = await repo.createTemplate(
+      ChecklistTemplate(
+        id: '',
+        name: 'Packing',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
+    await repo.saveItems(created.id, [
+      ChecklistTemplateItem(
+        id: '',
+        templateId: created.id,
+        title: 'Wetsuit',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    ]);
+
+    await tester.pumpWidget(
+      testApp(
+        child: ChecklistTemplateEditPage(templateId: created.id),
+        locale: const Locale('en'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Tapping an existing row edits it, so the dialog must not say "Add item".
+    // Scoped to the dialog because the page itself carries an "Add item"
+    // button underneath it.
+    await tester.tap(find.text('Wetsuit'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Edit item'),
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(TextButton, 'Add item'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Add item'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('saving a new template with items persists them via the '
@@ -353,4 +447,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'the Save action stays visible on the tropical app bar when creating a '
+    'new template (#1231)',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: tropicalLight,
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: const ChecklistTemplateEditPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final style = tester
+          .renderObject<RenderParagraph>(find.text('Save'))
+          .text
+          .style;
+      expect(style?.color, isNotNull);
+      expect(
+        style!.color,
+        isNot(tropicalLight.appBarTheme.backgroundColor),
+        reason:
+            'a bare TextButton paints colorScheme.primary, which this theme '
+            'sets to its own app bar background, so the diver sees no Save '
+            'button at all',
+      );
+    },
+  );
 }

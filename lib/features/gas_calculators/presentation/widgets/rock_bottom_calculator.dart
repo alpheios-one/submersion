@@ -351,12 +351,18 @@ class RockBottomCalculator extends ConsumerWidget {
                             color: colorScheme.primary,
                           ),
                           const SizedBox(width: 8),
-                          Text(
-                            context
-                                .l10n
-                                .gasCalculators_rockBottom_emergencyAscentBreakdown,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
+                          // Expanded so the heading wraps rather than
+                          // overflowing in a narrow detail pane. It is a
+                          // section title, so wrapping keeps it whole where
+                          // an ellipsis would eat it.
+                          Expanded(
+                            child: Text(
+                              context
+                                  .l10n
+                                  .gasCalculators_rockBottom_emergencyAscentBreakdown,
+                              style: textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],

@@ -35,6 +35,14 @@ class ProfileLegendState {
   /// from [showAscentRateColors], which tints the depth line by velocity band.
   final bool showAscentRateLine;
   final bool showEvents;
+
+  /// Whether the app's own auto-detected events (`EventSource.computed`) are
+  /// drawn. A sub-filter of [showEvents]: event markers appear only when
+  /// [showEvents] is on, and among those this one hides the computed events
+  /// while keeping the computer's own and user events. Seeded off for a dive
+  /// that carries imported events so a computer download shows just the
+  /// computer's events by default (issue #1523).
+  final bool showComputedEvents;
   final bool showMaxDepthMarker;
   final bool showPressureMarkers;
   final bool showGasSwitchMarkers;
@@ -54,6 +62,9 @@ class ProfileLegendState {
   final bool showCns;
   final bool showOtu;
 
+  /// Gas time remaining line. Seeds from [AppSettings.defaultShowGtr].
+  final bool showGtr;
+
   /// Raw O2 cell output lines (issue #810). Seeds from the persisted
   /// [AppSettings.defaultShowO2CellMv] default (issue #1235).
   final bool showO2CellMv;
@@ -67,8 +78,10 @@ class ProfileLegendState {
   final MetricDataSource ttsSource;
   final MetricDataSource cnsSource;
   final MetricDataSource decoStopSource;
+  final MetricDataSource gtrSource;
 
-  // Per-tank pressure visibility (keyed by tank ID)
+  // Per-tank visibility (keyed by tank ID). Hides the tank's pressure trace
+  // on multi-tank dives and its gas-switch markers on gas-switch dives.
   final Map<String, bool> showTankPressure;
 
   // Gas timeline strip visibility
@@ -96,6 +109,7 @@ class ProfileLegendState {
     this.showAscentRateColors = false,
     this.showAscentRateLine = false,
     this.showEvents = true,
+    this.showComputedEvents = true,
     this.showMaxDepthMarker = true,
     this.showPressureMarkers = true,
     this.showGasSwitchMarkers = true,
@@ -113,10 +127,12 @@ class ProfileLegendState {
     this.showCns = false,
     this.showOtu = false,
     this.showO2CellMv = false,
+    this.showGtr = false,
     this.ndlSource = MetricDataSource.calculated,
     this.ttsSource = MetricDataSource.calculated,
     this.cnsSource = MetricDataSource.calculated,
     this.decoStopSource = MetricDataSource.calculated,
+    this.gtrSource = MetricDataSource.calculated,
     this.showTankPressure = const {},
     this.showGas = true,
     this.sectionExpanded = const {
@@ -158,6 +174,7 @@ class ProfileLegendState {
     if (showCns) count++;
     if (showOtu) count++;
     if (showO2CellMv) count++;
+    if (showGtr) count++;
     count += showTankPressure.values.where((v) => v).length;
     return count;
   }
@@ -178,6 +195,7 @@ class ProfileLegendState {
     bool? showAscentRateColors,
     bool? showAscentRateLine,
     bool? showEvents,
+    bool? showComputedEvents,
     bool? showMaxDepthMarker,
     bool? showPressureMarkers,
     bool? showGasSwitchMarkers,
@@ -195,10 +213,12 @@ class ProfileLegendState {
     bool? showCns,
     bool? showOtu,
     bool? showO2CellMv,
+    bool? showGtr,
     MetricDataSource? ndlSource,
     MetricDataSource? ttsSource,
     MetricDataSource? cnsSource,
     MetricDataSource? decoStopSource,
+    MetricDataSource? gtrSource,
     Map<String, bool>? showTankPressure,
     bool? showGas,
     Map<String, bool>? sectionExpanded,
@@ -218,6 +238,7 @@ class ProfileLegendState {
       showAscentRateColors: showAscentRateColors ?? this.showAscentRateColors,
       showAscentRateLine: showAscentRateLine ?? this.showAscentRateLine,
       showEvents: showEvents ?? this.showEvents,
+      showComputedEvents: showComputedEvents ?? this.showComputedEvents,
       showMaxDepthMarker: showMaxDepthMarker ?? this.showMaxDepthMarker,
       showPressureMarkers: showPressureMarkers ?? this.showPressureMarkers,
       showGasSwitchMarkers: showGasSwitchMarkers ?? this.showGasSwitchMarkers,
@@ -235,10 +256,12 @@ class ProfileLegendState {
       showCns: showCns ?? this.showCns,
       showOtu: showOtu ?? this.showOtu,
       showO2CellMv: showO2CellMv ?? this.showO2CellMv,
+      showGtr: showGtr ?? this.showGtr,
       ndlSource: ndlSource ?? this.ndlSource,
       ttsSource: ttsSource ?? this.ttsSource,
       cnsSource: cnsSource ?? this.cnsSource,
       decoStopSource: decoStopSource ?? this.decoStopSource,
+      gtrSource: gtrSource ?? this.gtrSource,
       showTankPressure: showTankPressure ?? this.showTankPressure,
       showGas: showGas ?? this.showGas,
       sectionExpanded: sectionExpanded ?? this.sectionExpanded,
@@ -263,6 +286,7 @@ class ProfileLegendState {
           showAscentRateColors == other.showAscentRateColors &&
           showAscentRateLine == other.showAscentRateLine &&
           showEvents == other.showEvents &&
+          showComputedEvents == other.showComputedEvents &&
           showMaxDepthMarker == other.showMaxDepthMarker &&
           showPressureMarkers == other.showPressureMarkers &&
           showGasSwitchMarkers == other.showGasSwitchMarkers &&
@@ -280,10 +304,12 @@ class ProfileLegendState {
           showCns == other.showCns &&
           showOtu == other.showOtu &&
           showO2CellMv == other.showO2CellMv &&
+          showGtr == other.showGtr &&
           ndlSource == other.ndlSource &&
           ttsSource == other.ttsSource &&
           cnsSource == other.cnsSource &&
           decoStopSource == other.decoStopSource &&
+          gtrSource == other.gtrSource &&
           mapEquals(showTankPressure, other.showTankPressure) &&
           showGas == other.showGas &&
           metricsFollowViewport == other.metricsFollowViewport &&
@@ -302,6 +328,7 @@ class ProfileLegendState {
     showAscentRateColors,
     showAscentRateLine,
     showEvents,
+    showComputedEvents,
     showMaxDepthMarker,
     showPressureMarkers,
     showGasSwitchMarkers,
@@ -319,10 +346,12 @@ class ProfileLegendState {
     showCns,
     showOtu,
     showO2CellMv,
+    showGtr,
     ndlSource,
     ttsSource,
     cnsSource,
     decoStopSource,
+    gtrSource,
     ...showTankPressure.entries,
     showGas,
     metricsFollowViewport,
@@ -374,10 +403,12 @@ class ProfileLegend extends _$ProfileLegend {
           defaultShowSurfaceGf: s.defaultShowSurfaceGf,
           defaultShowMeanDepth: s.defaultShowMeanDepth,
           defaultShowTts: s.defaultShowTts,
+          defaultShowGtr: s.defaultShowGtr,
           defaultShowCns: s.defaultShowCns,
           defaultShowOtu: s.defaultShowOtu,
           defaultNdlSource: s.defaultNdlSource,
           defaultTtsSource: s.defaultTtsSource,
+          defaultGtrSource: s.defaultGtrSource,
           defaultCnsSource: s.defaultCnsSource,
           defaultDecoStopSource: s.defaultDecoStopSource,
           profileMetricsFollowViewport: s.profileMetricsFollowViewport,
@@ -413,10 +444,12 @@ class ProfileLegend extends _$ProfileLegend {
       showTts: settings.defaultShowTts,
       showCns: settings.defaultShowCns,
       showOtu: settings.defaultShowOtu,
+      showGtr: settings.defaultShowGtr,
       ndlSource: settings.defaultNdlSource,
       ttsSource: settings.defaultTtsSource,
       cnsSource: settings.defaultCnsSource,
       decoStopSource: settings.defaultDecoStopSource,
+      gtrSource: settings.defaultGtrSource,
       metricsFollowViewport: settings.profileMetricsFollowViewport,
     );
   }
@@ -487,6 +520,32 @@ class ProfileLegend extends _$ProfileLegend {
     state = state.copyWith(showEvents: !state.showEvents);
   }
 
+  /// Records that the user has explicitly set the computed-events toggle, so
+  /// [seedComputedEventsVisibility] stops overriding their choice.
+  bool _computedEventsUserSet = false;
+
+  /// True until the user first toggles computed-events visibility this session.
+  /// While true the chart mirrors [seedComputedEventsVisibility]'s decision on
+  /// its own first frame, so the computed markers never flash before the
+  /// post-frame seed lands (issue #1523).
+  bool get computedEventsFollowsDive => !_computedEventsUserSet;
+
+  void toggleComputedEvents() {
+    _computedEventsUserSet = true;
+    state = state.copyWith(showComputedEvents: !state.showComputedEvents);
+  }
+
+  /// Seed the computed-events toggle from the dive: off when the dive carries
+  /// the computer's own (imported) events, on otherwise (issue #1523). A no-op
+  /// once the user has touched the toggle this session.
+  void seedComputedEventsVisibility({required bool diveHasImportedEvents}) {
+    if (_computedEventsUserSet) return;
+    final visible = !diveHasImportedEvents;
+    if (state.showComputedEvents != visible) {
+      state = state.copyWith(showComputedEvents: visible);
+    }
+  }
+
   void toggleMaxDepthMarker() {
     state = state.copyWith(showMaxDepthMarker: !state.showMaxDepthMarker);
   }
@@ -544,6 +603,10 @@ class ProfileLegend extends _$ProfileLegend {
     state = state.copyWith(showTts: !state.showTts);
   }
 
+  void toggleGtr() {
+    state = state.copyWith(showGtr: !state.showGtr);
+  }
+
   void toggleCns() {
     state = state.copyWith(showCns: !state.showCns);
   }
@@ -567,6 +630,10 @@ class ProfileLegend extends _$ProfileLegend {
 
   void setTtsSource(MetricDataSource source) {
     state = state.copyWith(ttsSource: source);
+  }
+
+  void setGtrSource(MetricDataSource source) {
+    state = state.copyWith(gtrSource: source);
   }
 
   void setCnsSource(MetricDataSource source) {
@@ -625,6 +692,7 @@ class ProfileLegend extends _$ProfileLegend {
 
   /// Reset all toggles to their default values
   void reset() {
+    _computedEventsUserSet = false;
     state = const ProfileLegendState();
   }
 }

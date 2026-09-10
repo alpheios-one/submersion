@@ -8,10 +8,38 @@ import 'package:geocoding/geocoding.dart';
 
 import 'package:submersion/core/services/geocoding/nominatim_throttle.dart';
 import 'package:submersion/core/services/geocoding/place_lookup.dart';
+import 'package:submersion/core/services/geocoding/sea_area_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
 /// Check if we're on a mobile platform (iOS/Android)
 bool get _isMobile => !kIsWeb && (Platform.isIOS || Platform.isAndroid);
+
+/// Nominatim (and, following it, the platform geocoders) reports a handful of
+/// administrative "states" that only restate the country: the mainland part of
+/// a country that also holds overseas territories. Stored as a region they
+/// render as "Metropolitan France, France". Treat them as no region at all.
+const _pseudoRegions = <String>{
+  'metropolitan france',
+  'european netherlands',
+  'continental portugal',
+  'mainland portugal',
+  'metropolitan denmark',
+  'european spain',
+  'peninsular spain',
+};
+
+/// A region string with the country-restating pseudo-regions above removed,
+/// and a region that merely repeats [country] dropped too. Returns null when
+/// nothing meaningful is left, so callers can `?? next candidate`.
+@visibleForTesting
+String? normalizeGeocodedRegion(String? region, {String? country}) {
+  final trimmed = region?.trim();
+  if (trimmed == null || trimmed.isEmpty) return null;
+  final lower = trimmed.toLowerCase();
+  if (_pseudoRegions.contains(lower)) return null;
+  if (country != null && country.trim().toLowerCase() == lower) return null;
+  return trimmed;
+}
 
 /// Nominatim answered with something other than 200. "Nothing here" is a
 /// 200 with an error body, so a non-200 is the service itself (rate limit,
@@ -88,8 +116,9 @@ class LocationService {
 
   /// Nominatim reverse-geocode URI for the natural layer, which answers with
   /// the lake, bay or strait a point lies in. zoom=14 keeps the answer to a
-  /// named feature rather than the whole region. Nominatim has no ocean
-  /// polygons, so open-sea points come back "Unable to geocode".
+  /// named feature rather than the whole region. Nominatim has no ocean or
+  /// sea polygons, so open-sea points come back "Unable to geocode"; the
+  /// bundled table in [SeaAreaService] covers those instead.
   static Uri buildNaturalFeatureUri(
     double latitude,
     double longitude, {
@@ -320,7 +349,10 @@ class LocationService {
             return await _withBodyOfWater(
               PlaceLookup(
                 country: place.country,
-                region: place.administrativeArea,
+                region: normalizeGeocodedRegion(
+                  place.administrativeArea,
+                  country: place.country,
+                ),
                 locality: place.locality,
               ),
               latitude,
@@ -362,10 +394,22 @@ class LocationService {
       if (address == null) return const PlaceLookup.empty();
 
       final country = address['country'] as String?;
+      // Normalize each candidate, not just the first non-null one: if
+      // `state` is a pseudo-region it is dropped and `province` / `region`
+      // still get their turn.
       final region =
-          address['state'] as String? ??
-          address['province'] as String? ??
-          address['region'] as String?;
+          normalizeGeocodedRegion(
+            address['state'] as String?,
+            country: country,
+          ) ??
+          normalizeGeocodedRegion(
+            address['province'] as String?,
+            country: country,
+          ) ??
+          normalizeGeocodedRegion(
+            address['region'] as String?,
+            country: country,
+          );
       final locality =
           address['city'] as String? ??
           address['town'] as String? ??
@@ -396,11 +440,30 @@ class LocationService {
   }
 
   /// Best-effort: any failure here leaves the address result untouched.
+  ///
+  /// The bundled ocean and sea table answers first. OpenStreetMap has no
+  /// ocean or sea polygons at all, so the natural layer used to answer
+  /// "Unable to geocode" for any point in open salt water and to snap to
+  /// the nearest land feature near a coast, which left the body of water
+  /// empty for most dive sites. Asking the table first also spares
+  /// Nominatim a throttled request per marine site, and works with no
+  /// signal.
+  ///
+  /// Inland and coastal fresh water is the other way round: lakes, quarries
+  /// and fjord interiors are not in the IHO table, and the natural layer
+  /// names them well, so a miss there falls through to the network.
   Future<String?> _lookupBodyOfWater(
     double latitude,
     double longitude,
     String languageCode,
   ) async {
+    final index = await SeaAreaService.load();
+    final sea = index?.nameAt(latitude, longitude, languageCode: languageCode);
+    if (sea != null) {
+      _log.info('Sea area table: $sea');
+      return sea;
+    }
+
     try {
       final json = await _fetchNominatimJson(
         buildNaturalFeatureUri(latitude, longitude, languageCode: languageCode),
@@ -477,10 +540,21 @@ class LocationService {
               final addressDetails =
                   result['address'] as Map<String, dynamic>? ?? {};
               final country = addressDetails['country'] as String?;
+              // Normalize each candidate so a pseudo-region `state` falls
+              // through to `province` / `region` (same as the reverse path).
               final region =
-                  addressDetails['state'] as String? ??
-                  addressDetails['province'] as String? ??
-                  addressDetails['region'] as String?;
+                  normalizeGeocodedRegion(
+                    addressDetails['state'] as String?,
+                    country: country,
+                  ) ??
+                  normalizeGeocodedRegion(
+                    addressDetails['province'] as String?,
+                    country: country,
+                  ) ??
+                  normalizeGeocodedRegion(
+                    addressDetails['region'] as String?,
+                    country: country,
+                  );
               final locality =
                   addressDetails['city'] as String? ??
                   addressDetails['town'] as String? ??

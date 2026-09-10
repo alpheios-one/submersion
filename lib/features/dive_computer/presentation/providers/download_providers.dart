@@ -5,15 +5,18 @@ import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/screen_awake.dart';
 
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_computer/data/services/dive_import_service.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_dive_mapper.dart';
+import 'package:submersion/features/dive_computer/domain/entities/clock_sync.dart';
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/domain/services/first_sync_cutoff.dart';
+import 'package:submersion/features/dive_computer/presentation/providers/clock_sync_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
@@ -21,6 +24,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
+import 'package:submersion/features/transmitters/presentation/providers/transmitter_providers.dart';
 
 /// Provider for the dive computer repository.
 final diveComputerRepositoryProvider = Provider<DiveComputerRepository>((ref) {
@@ -38,6 +42,7 @@ final diveImportServiceProvider = Provider<DiveImportService>((ref) {
     // Read at import time, not provider build time, so a toggle flipped in
     // Settings applies to the very next download (issue #386).
     defaultTankPresetForImports: () => loadDefaultTankPresetForDownloads(ref),
+    transmitterMatcherForImports: () => loadTransmitterMatcher(ref),
   );
 });
 
@@ -76,6 +81,11 @@ class DownloadState {
   final String? firmwareVersion;
   final DateTime? sinceCutoff;
 
+  /// Outcome of the clock sync that ran after this download (issue #1216).
+  /// Null until a completion event arrives; [ClockSyncStatus.notRequested]
+  /// when the download completed without asking for one.
+  final ClockSyncStatus? clockSyncStatus;
+
   const DownloadState({
     this.phase = DownloadPhase.initializing,
     this.progress,
@@ -86,6 +96,7 @@ class DownloadState {
     this.serialNumber,
     this.firmwareVersion,
     this.sinceCutoff,
+    this.clockSyncStatus,
   });
 
   DownloadState copyWith({
@@ -98,7 +109,9 @@ class DownloadState {
     String? serialNumber,
     String? firmwareVersion,
     DateTime? sinceCutoff,
+    ClockSyncStatus? clockSyncStatus,
     bool clearError = false,
+    bool clearClockSyncStatus = false,
   }) {
     return DownloadState(
       phase: phase ?? this.phase,
@@ -110,6 +123,9 @@ class DownloadState {
       serialNumber: serialNumber ?? this.serialNumber,
       firmwareVersion: firmwareVersion ?? this.firmwareVersion,
       sinceCutoff: sinceCutoff ?? this.sinceCutoff,
+      clockSyncStatus: clearClockSyncStatus
+          ? null
+          : (clockSyncStatus ?? this.clockSyncStatus),
     );
   }
 
@@ -147,8 +163,15 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   final DiveComputerRepository _repository;
   StreamSubscription<pigeon.DownloadEvent>? _downloadSubscription;
 
+  /// Held for the length of a download so the idle timer cannot lock the
+  /// screen and suspend the transfer mid-dive (issue #1646). Taken in
+  /// [startDownload]; released on every path that ends the download, and in
+  /// [dispose] as a backstop. Null when no download is running.
+  ScreenAwakeHold? _screenAwake;
+
   // Stored for device info persistence after download completes.
   DiveComputer? _computer;
+  DiscoveredDevice? _device;
 
   /// Reads the diver's surfacing-pressure preference at the moment a dive
   /// arrives (issue #1092). A getter rather than a value so a settings change
@@ -156,13 +179,22 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   /// the default, on.
   final bool Function()? _trimTankPressureAtSurfacing;
 
+  /// Whether a download should set the computer's clock afterwards, given
+  /// the saved computer's id (null for a device not saved yet). A callback
+  /// rather than a value so a switch flipped between downloads applies to
+  /// the next one without rebuilding the notifier. Null means never
+  /// (issue #1216).
+  final bool Function(String? computerId)? _resolveClockSync;
+
   DownloadNotifier({
     required pigeon.DiveComputerService service,
     required DiveComputerRepository repository,
     bool Function()? trimTankPressureAtSurfacing,
+    bool Function(String? computerId)? resolveClockSync,
   }) : _service = service,
        _repository = repository,
        _trimTankPressureAtSurfacing = trimTankPressureAtSurfacing,
+       _resolveClockSync = resolveClockSync,
        super(const DownloadState());
 
   /// Set whether to download new dives only.
@@ -188,11 +220,19 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
     DiveComputer? computer,
   }) async {
     _computer = computer;
+    _device = device;
+
+    // Hold the screen awake for the whole transfer. If startDownload runs
+    // again while a hold is already active, reuse it rather than stacking a
+    // second one; each terminal path clears the field so the next run
+    // acquires a fresh hold.
+    _screenAwake ??= ScreenAwake.acquire();
 
     try {
       state = state.copyWith(
         phase: DownloadPhase.connecting,
         clearError: true,
+        clearClockSyncStatus: true,
         downloadedDives: [],
         progress: DownloadProgress.connecting(),
       );
@@ -221,7 +261,12 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         }
       }
 
-      await _service.startDownload(device.toPigeon(), fingerprint: fingerprint);
+      final syncClock = _resolveClockSync?.call(computer?.id) ?? false;
+      await _service.startDownload(
+        device.toPigeon(),
+        fingerprint: fingerprint,
+        syncClock: syncClock,
+      );
     } catch (e, stackTrace) {
       _log.error(
         'Download failed',
@@ -233,6 +278,7 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
       // cannot mutate state after a synchronous start failure.
       _downloadSubscription?.cancel();
       _downloadSubscription = null;
+      _releaseScreenAwake();
       state = state.copyWith(
         phase: DownloadPhase.error,
         errorMessage: 'Download failed: $e',
@@ -264,15 +310,18 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         :final totalDives,
         :final serialNumber,
         :final firmwareVersion,
+        :final clockSyncStatus,
       ):
         state = state.copyWith(
           phase: DownloadPhase.complete,
           progress: DownloadProgress.complete(totalDives),
           serialNumber: serialNumber,
           firmwareVersion: firmwareVersion,
+          clockSyncStatus: ClockSyncStatus.fromWireName(clockSyncStatus),
         );
         _downloadSubscription?.cancel();
         _downloadSubscription = null;
+        _releaseScreenAwake();
         // Persist device info on the computer record.
         _persistDeviceInfo(serialNumber, firmwareVersion);
       case pigeon.DownloadErrorEvent(:final error):
@@ -287,30 +336,103 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
         );
         _downloadSubscription?.cancel();
         _downloadSubscription = null;
+        _releaseScreenAwake();
     }
   }
 
-  /// Persist device info (serial number, firmware version) on the computer
-  /// record after a successful download.
+  /// Persist device info (serial number, firmware version) and the Bluetooth
+  /// address the download actually used on the computer record after a
+  /// successful download.
+  ///
+  /// The saved-computer flow may have picked the device by make and model
+  /// alone (issue #1423), so a reported serial that disagrees with the stored
+  /// one means another physical computer answered. Nothing from that unit
+  /// belongs on this record: not its serial, firmware, or address.
   Future<void> _persistDeviceInfo(
-    String? serialNumber,
-    String? firmwareVersion,
+    String? reportedSerialNumber,
+    String? reportedFirmwareVersion,
   ) async {
     final computer = _computer;
     if (computer == null) return;
 
-    try {
-      if (serialNumber != null || firmwareVersion != null) {
-        final updated = computer.copyWith(
-          serialNumber: serialNumber ?? computer.serialNumber,
-          firmwareVersion: firmwareVersion ?? computer.firmwareVersion,
-        );
-        await _repository.updateComputer(updated);
-        _computer = updated;
-      }
-    } catch (e) {
-      debugPrint('[DownloadNotifier] Device info persist failed: $e');
+    // A backend that reports '' rather than null must not blank out values
+    // stored by an earlier download.
+    final serialNumber = _nonBlank(reportedSerialNumber);
+    final firmwareVersion = _nonBlank(reportedFirmwareVersion);
+    final storedSerial = _nonBlank(computer.serialNumber);
+    if (storedSerial != null &&
+        serialNumber != null &&
+        storedSerial != serialNumber) {
+      _log.warning(
+        'Downloaded from ${_device?.name} (${_device?.address}) with serial '
+        '$serialNumber, but ${computer.displayName} is serial $storedSerial; '
+        'leaving its record untouched',
+        category: LogCategory.bluetooth,
+      );
+      return;
     }
+
+    try {
+      final address = _addressToRebind(computer);
+      if (serialNumber == null && firmwareVersion == null && address == null) {
+        return;
+      }
+      final updated = computer.copyWith(
+        serialNumber: serialNumber ?? computer.serialNumber,
+        firmwareVersion: firmwareVersion ?? computer.firmwareVersion,
+        bluetoothAddress: address ?? computer.bluetoothAddress,
+      );
+      await _repository.updateComputer(updated);
+      // Nothing awaits this method: it is fired from the completion event so
+      // the UI is not held behind a write. A startDownload for another
+      // computer can therefore land while the write is in flight, and
+      // refreshing the field unconditionally would point it back at this
+      // record, leaving the newer download to persist its serial and address
+      // onto the wrong one. Only the call that still owns the field may
+      // refresh it.
+      if (identical(_computer, computer)) _computer = updated;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Device info persist failed for ${computer.displayName}',
+        category: LogCategory.database,
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  static String? _nonBlank(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
+  }
+
+  /// The address to store for [computer] after downloading from [_device],
+  /// or null when the stored one should stay.
+  ///
+  /// A stored Bluetooth address is host-local and can go stale (issue #1423:
+  /// iOS mints a new CoreBluetooth identifier when the computer rotates its
+  /// address), so a completed download is the moment to remember the address
+  /// that worked. The caller has already confirmed the serial, or has none to
+  /// compare.
+  String? _addressToRebind(DiveComputer computer) {
+    final device = _device;
+    if (device == null) return null;
+    final isBluetooth =
+        device.connectionType == DeviceConnectionType.ble ||
+        device.connectionType == DeviceConnectionType.bluetoothClassic;
+    if (!isBluetooth) return null;
+
+    final stored = computer.bluetoothAddress;
+    if (stored != null && bluetoothAddressesMatch(stored, device.address)) {
+      return null;
+    }
+
+    _log.info(
+      'Rebinding ${computer.displayName} from address $stored to '
+      '${device.address}',
+      category: LogCategory.bluetooth,
+    );
+    return device.address;
   }
 
   /// Submit a PIN code for BLE authentication.
@@ -325,20 +447,36 @@ class DownloadNotifier extends StateNotifier<DownloadState> {
   Future<void> cancelDownload() async {
     _downloadSubscription?.cancel();
     _downloadSubscription = null;
-    await _service.cancelDownload();
-    state = state.copyWith(phase: DownloadPhase.cancelled);
+    // Keep the screen-awake hold through the platform round trip -- the UI is
+    // still on the download screen until it returns -- but release it in a
+    // finally so a throwing cancel can't strand the hold.
+    try {
+      await _service.cancelDownload();
+      state = state.copyWith(phase: DownloadPhase.cancelled);
+    } finally {
+      _releaseScreenAwake();
+    }
   }
 
   /// Reset the download state.
   void reset() {
     _downloadSubscription?.cancel();
     _downloadSubscription = null;
+    _releaseScreenAwake();
     state = const DownloadState();
+  }
+
+  /// Drops the screen-awake hold if one is held. Idempotent, so every path
+  /// that ends a download can call it without tracking which fired first.
+  void _releaseScreenAwake() {
+    _screenAwake?.release();
+    _screenAwake = null;
   }
 
   @override
   void dispose() {
     _downloadSubscription?.cancel();
+    _releaseScreenAwake();
     super.dispose();
   }
 }
@@ -354,6 +492,10 @@ final downloadNotifierProvider =
         repository: repository,
         trimTankPressureAtSurfacing: () =>
             ref.read(settingsProvider).trimTankPressureAtSurfacing,
+        // Read at download time, not provider build time, so a switch flipped
+        // on the computers list applies to the very next download.
+        resolveClockSync: (computerId) =>
+            ref.read(clockSyncSettingsNotifierProvider).resolve(computerId),
       );
     });
 

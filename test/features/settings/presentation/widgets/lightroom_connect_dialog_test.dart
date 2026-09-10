@@ -8,9 +8,14 @@ import 'package:submersion/core/services/lightroom/lightroom_auth_store.dart';
 import 'package:submersion/features/settings/presentation/widgets/lightroom_connect_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../support/clipboard_recorder.dart';
 import '../../../../support/fake_keychain_storage.dart';
 
 void main() {
+  const browserError =
+      'Could not open your browser. Use Copy link and paste the address '
+      'into your browser.';
+
   AdobeImsAuthManager manager(MockClient mock) => AdobeImsAuthManager(
     store: LightroomAuthStore(storage: InMemoryKeychain()),
     httpClient: mock,
@@ -32,6 +37,10 @@ void main() {
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -130,6 +139,10 @@ void main() {
     var openResult = false;
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -160,10 +173,7 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('Could not open your browser. Try the Reopen browser button.'),
-      findsOneWidget,
-    );
+    expect(find.text(browserError), findsOneWidget);
 
     openResult = true;
     await tester.tap(find.text('Reopen browser'));
@@ -171,9 +181,24 @@ void main() {
 
     expect(opened, hasLength(2));
     expect(opened[0], opened[1], reason: 'same verifier, same URL');
+    expect(find.text(browserError), findsNothing);
+  });
+
+  testWidgets('Copy link puts the authorize URL on the clipboard', (
+    tester,
+  ) async {
+    final calls = recordClipboardCalls();
+
+    final opened = <Uri>[];
+    await pumpDialog(tester, manager(happyMock()), opened: opened);
+
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
+
+    expect(copiedText(calls), opened.single.toString());
     expect(
-      find.text('Could not open your browser. Try the Reopen browser button.'),
-      findsNothing,
+      find.text('Link copied. Paste it into your browser to authorize.'),
+      findsOneWidget,
     );
   });
 
@@ -183,6 +208,10 @@ void main() {
     final opened = <Uri>[];
     await tester.pumpWidget(
       MaterialApp(
+        // flutter_test forwards the HOST locale list, so an unpinned
+        // MaterialApp renders these dialogs translated on a non-English dev
+        // machine and every English expectation below misses.
+        locale: const Locale('en'),
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -214,6 +243,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(opened, isEmpty);
+    expect(
+      find.text('Enter your Adobe client ID before connecting.'),
+      findsOneWidget,
+    );
+    // The same escape hatch as Dropbox: with no authorize URI to copy, the
+    // button must report the auth error rather than throwing.
+    await tester.tap(find.text('Copy link'));
+    await tester.pumpAndSettle();
     expect(
       find.text('Enter your Adobe client ID before connecting.'),
       findsOneWidget,

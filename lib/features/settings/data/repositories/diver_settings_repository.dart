@@ -10,7 +10,9 @@ import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -86,6 +88,7 @@ class DiverSettingsRepository {
               altitudeUnit: Value(s.altitudeUnit.name),
               gasConsumptionDisplay: Value(s.gasConsumptionDisplay.name),
               gasModel: Value(s.gasModel.name),
+              defaultPlannerWaterType: Value(s.defaultPlannerWaterType.name),
               defaultCurrency: Value(s.defaultCurrency),
               visibilityScalePreset: Value(s.visibilityScalePreset.name),
               visibilityScaleExcellentM: Value(s.visibilityScaleExcellentM),
@@ -121,6 +124,9 @@ class DiverSettingsRepository {
                 _encodeDisabledRules(s.safetyReviewDisabledRules),
               ),
               noFlyPreset: Value(s.noFlyPreset.dbValue),
+              coldWaterThresholdC: Value(s.coldWaterThresholdC),
+              deepDiveThresholdM: Value(s.deepDiveThresholdM),
+              highO2ThresholdPercent: Value(s.highO2ThresholdPercent),
               hiddenChamberIds: Value(_encodeDisabledRules(s.hiddenChamberIds)),
               emergencyRegion: Value(s.emergencyRegion),
               showAscentRateColors: Value(s.showAscentRateColors),
@@ -135,10 +141,13 @@ class DiverSettingsRepository {
               defaultDecoStopSource: Value(s.defaultDecoStopSource.toInt()),
               defaultTtsSource: Value(s.defaultTtsSource.toInt()),
               defaultCnsSource: Value(s.defaultCnsSource.toInt()),
+              defaultGtrSource: Value(s.defaultGtrSource.toInt()),
+              gtrReservePressure: Value(s.gtrReservePressure),
               cnsCalculationMethod: Value(s.cnsCalculationMethod.dbValue),
               showDepthColoredDiveCards: Value(s.showDepthColoredDiveCards),
               cardColorAttribute: Value(s.cardColorAttribute.name),
               diveListViewMode: Value(s.diveListViewMode.name),
+              groupTripsInDiveList: Value(s.groupTripsInDiveList),
               siteListViewMode: Value(s.siteListViewMode.name),
               tripListViewMode: Value(s.tripListViewMode.name),
               equipmentListViewMode: Value(s.equipmentListViewMode.name),
@@ -176,6 +185,7 @@ class DiverSettingsRepository {
               defaultShowSurfaceGf: Value(s.defaultShowSurfaceGf),
               defaultShowMeanDepth: Value(s.defaultShowMeanDepth),
               defaultShowTts: Value(s.defaultShowTts),
+              defaultShowGtr: Value(s.defaultShowGtr),
               defaultShowCns: Value(s.defaultShowCns),
               defaultShowOtu: Value(s.defaultShowOtu),
               defaultShowGasSwitchMarkers: Value(s.defaultShowGasSwitchMarkers),
@@ -207,6 +217,7 @@ class DiverSettingsRepository {
               diveDetailSections: Value(
                 DiveDetailSectionConfig.sectionsToJson(s.diveDetailSections),
               ),
+              diveDetailLayout: Value(s.diveDetailLayout.name),
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
@@ -251,6 +262,7 @@ class DiverSettingsRepository {
           altitudeUnit: Value(settings.altitudeUnit.name),
           gasConsumptionDisplay: Value(settings.gasConsumptionDisplay.name),
           gasModel: Value(settings.gasModel.name),
+          defaultPlannerWaterType: Value(settings.defaultPlannerWaterType.name),
           defaultCurrency: Value(settings.defaultCurrency),
           visibilityScalePreset: Value(settings.visibilityScalePreset.name),
           visibilityScaleExcellentM: Value(settings.visibilityScaleExcellentM),
@@ -286,6 +298,9 @@ class DiverSettingsRepository {
             _encodeDisabledRules(settings.safetyReviewDisabledRules),
           ),
           noFlyPreset: Value(settings.noFlyPreset.dbValue),
+          coldWaterThresholdC: Value(settings.coldWaterThresholdC),
+          deepDiveThresholdM: Value(settings.deepDiveThresholdM),
+          highO2ThresholdPercent: Value(settings.highO2ThresholdPercent),
           hiddenChamberIds: Value(
             _encodeDisabledRules(settings.hiddenChamberIds),
           ),
@@ -302,10 +317,13 @@ class DiverSettingsRepository {
           defaultDecoStopSource: Value(settings.defaultDecoStopSource.toInt()),
           defaultTtsSource: Value(settings.defaultTtsSource.toInt()),
           defaultCnsSource: Value(settings.defaultCnsSource.toInt()),
+          defaultGtrSource: Value(settings.defaultGtrSource.toInt()),
+          gtrReservePressure: Value(settings.gtrReservePressure),
           cnsCalculationMethod: Value(settings.cnsCalculationMethod.dbValue),
           showDepthColoredDiveCards: Value(settings.showDepthColoredDiveCards),
           cardColorAttribute: Value(settings.cardColorAttribute.name),
           diveListViewMode: Value(settings.diveListViewMode.name),
+          groupTripsInDiveList: Value(settings.groupTripsInDiveList),
           siteListViewMode: Value(settings.siteListViewMode.name),
           tripListViewMode: Value(settings.tripListViewMode.name),
           equipmentListViewMode: Value(settings.equipmentListViewMode.name),
@@ -345,6 +363,7 @@ class DiverSettingsRepository {
           defaultShowSurfaceGf: Value(settings.defaultShowSurfaceGf),
           defaultShowMeanDepth: Value(settings.defaultShowMeanDepth),
           defaultShowTts: Value(settings.defaultShowTts),
+          defaultShowGtr: Value(settings.defaultShowGtr),
           defaultShowCns: Value(settings.defaultShowCns),
           defaultShowOtu: Value(settings.defaultShowOtu),
           defaultShowGasSwitchMarkers: Value(
@@ -382,6 +401,7 @@ class DiverSettingsRepository {
           diveDetailSections: Value(
             DiveDetailSectionConfig.sectionsToJson(settings.diveDetailSections),
           ),
+          diveDetailLayout: Value(settings.diveDetailLayout.name),
           updatedAt: Value(now),
         ),
       );
@@ -462,6 +482,9 @@ class DiverSettingsRepository {
         row.gasConsumptionDisplay,
       ),
       gasModel: GasModel.fromName(row.gasModel),
+      defaultPlannerWaterType:
+          PlannerWaterType.values.asNameMap()[row.defaultPlannerWaterType] ??
+          PlannerWaterType.salt,
       defaultCurrency: row.defaultCurrency,
       visibilityScalePreset: _parseVisibilityScalePreset(
         row.visibilityScalePreset,
@@ -499,6 +522,9 @@ class DiverSettingsRepository {
         row.safetyReviewDisabledRules,
       ),
       noFlyPreset: NoFlyPreset.fromDbValue(row.noFlyPreset),
+      coldWaterThresholdC: row.coldWaterThresholdC,
+      deepDiveThresholdM: row.deepDiveThresholdM,
+      highO2ThresholdPercent: row.highO2ThresholdPercent,
       hiddenChamberIds: _decodeDisabledRules(row.hiddenChamberIds),
       emergencyRegion: row.emergencyRegion,
       showAscentRateColors: row.showAscentRateColors,
@@ -518,11 +544,14 @@ class DiverSettingsRepository {
       ),
       defaultTtsSource: MetricDataSource.fromInt(row.defaultTtsSource),
       defaultCnsSource: MetricDataSource.fromInt(row.defaultCnsSource),
+      defaultGtrSource: MetricDataSource.fromInt(row.defaultGtrSource),
+      gtrReservePressure: row.gtrReservePressure,
       cnsCalculationMethod: CnsCalculationMethod.fromDbValue(
         row.cnsCalculationMethod,
       ),
       cardColorAttribute: CardColorAttribute.fromName(row.cardColorAttribute),
       diveListViewMode: ListViewMode.fromName(row.diveListViewMode),
+      groupTripsInDiveList: row.groupTripsInDiveList,
       siteListViewMode: ListViewMode.fromName(row.siteListViewMode),
       tripListViewMode: ListViewMode.fromName(row.tripListViewMode),
       equipmentListViewMode: ListViewMode.fromName(row.equipmentListViewMode),
@@ -556,6 +585,7 @@ class DiverSettingsRepository {
       defaultShowSurfaceGf: row.defaultShowSurfaceGf,
       defaultShowMeanDepth: row.defaultShowMeanDepth,
       defaultShowTts: row.defaultShowTts,
+      defaultShowGtr: row.defaultShowGtr,
       defaultShowCns: row.defaultShowCns,
       defaultShowOtu: row.defaultShowOtu,
       defaultShowGasSwitchMarkers: row.defaultShowGasSwitchMarkers,
@@ -581,6 +611,7 @@ class DiverSettingsRepository {
       diveDetailSections: DiveDetailSectionConfig.sectionsFromJson(
         row.diveDetailSections,
       ),
+      diveDetailLayout: DiveDetailLayout.fromName(row.diveDetailLayout),
     );
   }
 

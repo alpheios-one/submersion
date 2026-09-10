@@ -211,4 +211,19 @@ void main() {
       },
     );
   });
+
+  test('reports each part as it lands, as (downloaded, total)', () async {
+    final parts = [bytes('a'), bytes('b'), bytes('c')];
+    final seen = <(int, int)>[];
+    final path = await sink.assemble(
+      name: 'base',
+      partCount: 3,
+      wholeChecksum: null,
+      partChecksums: [for (final p in parts) BaseChunker.checksum(p)],
+      downloadPart: (i) async => parts[i],
+      onPartDownloaded: (downloaded, total) => seen.add((downloaded, total)),
+    );
+    expect(path, isNotNull);
+    expect(seen, [(1, 3), (2, 3), (3, 3)]);
+  });
 }

@@ -1,28 +1,30 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/data_quality/data/services/quality_prefilters.dart';
 import 'package:submersion/features/data_quality/domain/detectors/quality_detector_registry.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 
 import '../../../helpers/test_database.dart';
 
 void main() {
-  late AppDatabase db;
   late DiveRepository diveRepo;
+  late ProfileSeriesRepository profileSeries;
   late QualityPrefilters prefilters;
 
   setUp(() async {
-    db = await setUpTestDatabase();
+    await setUpTestDatabase();
     diveRepo = DiveRepository();
+    profileSeries = ProfileSeriesRepository();
     prefilters = QualityPrefilters();
   });
   tearDown(tearDownTestDatabase);
 
-  test('registry contains all 11 detectors with unique ids', () {
+  test('registry contains all 12 detectors with unique ids', () {
     final ids = kQualityDetectors.map((d) => d.id).toList();
-    expect(ids.toSet(), hasLength(11));
+    expect(ids.toSet(), hasLength(12));
     expect(
       ids.toSet(),
       containsAll({
@@ -36,10 +38,18 @@ void main() {
         'pressure_anomaly',
         'gas_mod',
         'tank_assignment',
+        'unknown_transmitter',
         'source_conflict',
       }),
     );
-    expect(qualityDetectorVersions()['duplicate'], 1);
+    // Each bump is what raises the "new checks are available" banner, so an
+    // existing library gets the new fact on a rescan rather than keeping a
+    // button the fact would have withheld. v2 records `sameComputer` on every
+    // duplicate pair, so a Consolidate that cannot work is not offered. v4
+    // withholds `redundantDiveId` when the copy it would delete carries the
+    // diver's own entries (#1720), and the repair mapping refuses to act on a
+    // pre-v4 finding, so the rescan is what restores the repair.
+    expect(qualityDetectorVersions()['duplicate'], 4);
   });
 
   test('profile detectors only get dives that have profiles', () async {
@@ -70,9 +80,10 @@ void main() {
     await diveRepo.createDive(domain.Dive(id: 'np-only', dateTime: entry));
     // A demoted/secondary source leaves only non-primary samples; the context
     // builder loads is_primary=1 only, so this dive has no series to detect on.
-    await db.customStatement(
-      'INSERT INTO dive_profiles (id, dive_id, timestamp, depth, is_primary) '
-      "VALUES ('np-1', 'np-only', 0, 12.0, 0)",
+    await profileSeries.insertSeries(
+      diveId: 'np-only',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 0, depth: 12.0)],
     );
     final candidates = await prefilters.candidatesByDetector();
     expect(candidates['sample_gap'], isNot(contains('np-only')));

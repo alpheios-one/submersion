@@ -186,6 +186,7 @@ class DiveComputerHostApiImpl(
     override fun startDownload(
         device: DiscoveredDevice,
         fingerprint: String?,
+        syncClock: Boolean,
         callback: (Result<Unit>) -> Unit
     ) {
         callback(Result.success(Unit))
@@ -202,6 +203,7 @@ class DiveComputerHostApiImpl(
                     model = device.model,
                     name = device.name,
                     fingerprint = decodeFingerprint(fingerprint),
+                    syncClock = syncClock,
                 )
             )
             return
@@ -213,12 +215,17 @@ class DiveComputerHostApiImpl(
             // instead of an uncaught Throwable that kills the executor thread
             // and the app (issue #318).
             try {
-                performDownload(device, fingerprint)
+                performDownload(device, fingerprint, syncClock)
             } catch (t: Throwable) {
                 NativeLogger.e(
                     TAG, "LDC",
                     "download crashed: ${t.javaClass.simpleName}: ${t.message}"
                 )
+                // Do not leave a GATT client registered behind the crash: its
+                // notification subscription would survive into the next
+                // attempt and double every packet (issue #285).
+                activeBleStream?.close()
+                activeBleStream = null
                 reportError(
                     "download_error",
                     "Download failed unexpectedly (${t.javaClass.simpleName})."
@@ -241,7 +248,12 @@ class DiveComputerHostApiImpl(
         activeBleStream?.submitPinCode(pinCode)
     }
 
-    private fun performDownload(device: DiscoveredDevice, fingerprint: String? = null, isRetry: Boolean = false) {
+    private fun performDownload(
+        device: DiscoveredDevice,
+        fingerprint: String? = null,
+        syncClock: Boolean = false,
+        isRetry: Boolean = false
+    ) {
         // Fail clearly if the native library never loaded, rather than crashing
         // on the first native call below (issue #318).
         if (!nativeLibraryReady()) return
@@ -259,7 +271,7 @@ class DiveComputerHostApiImpl(
         // Each branch owns its own session cleanup.
         when (device.transport) {
             TransportType.BLE ->
-                performBleDownload(device, sessionPtr, fingerprint, isRetry)
+                performBleDownload(device, sessionPtr, fingerprint, syncClock, isRetry)
             TransportType.SERIAL, TransportType.USB -> {
                 // Unreachable: serial/USB downloads are intercepted in
                 // startDownload and run in the :dc process (issue #318). Guard
@@ -315,6 +327,7 @@ class DiveComputerHostApiImpl(
         device: DiscoveredDevice,
         sessionPtr: Long,
         fingerprint: String?,
+        syncClock: Boolean,
         isRetry: Boolean
     ) {
         // Connect BLE.
@@ -370,7 +383,7 @@ class DiveComputerHostApiImpl(
                     // (status 147). Give both sides a moment to settle
                     // before the retry.
                     Thread.sleep(BOND_REPAIR_SETTLE_MS)
-                    performDownload(device, fingerprint, isRetry = true)
+                    performDownload(device, fingerprint, syncClock, isRetry = true)
                     return
                 }
                 NativeLogger.e(
@@ -433,15 +446,16 @@ class DiveComputerHostApiImpl(
 
         // Run the download.
         val errorBuf = ByteArray(256)
-        NativeLogger.d(TAG, "LDC", "nativeDownloadRun: vendor=${device.vendor} product=${device.product} model=${device.model} name=${device.name}")
+        val infoOut = IntArray(3)
+        NativeLogger.d(TAG, "LDC", "nativeDownloadRun: vendor=${device.vendor} product=${device.product} model=${device.model} name=${device.name} syncClock=$syncClock")
         val result = try {
             LibdcWrapper.nativeDownloadRun(
                 sessionPtr,
                 device.vendor, device.product,
                 device.model.toInt(), LIBDC_TRANSPORT_BLE,
                 bleStream, device.name,
-                fingerprintBytes,
-                downloadCallback, errorBuf
+                fingerprintBytes, syncClock,
+                downloadCallback, errorBuf, infoOut
             )
         } catch (e: Throwable) {
             NativeLogger.e(TAG, "LDC", "nativeDownloadRun threw: ${e.message}")
@@ -449,18 +463,41 @@ class DiveComputerHostApiImpl(
         }
         NativeLogger.d(TAG, "LDC", "nativeDownloadRun returned: $result")
 
+        // Capture the status that explains the failure BEFORE tearing the
+        // stream down, as the connect path above does: close() disconnects,
+        // and the resulting callback can overwrite it with a fresh (benign)
+        // status, which would silently skip the stale-bond repair below.
+        val downloadDisconnectStatus = bleStream.lastDisconnectStatus
+
+        // The native side closes the iostream, and with it this GATT client,
+        // on every path libdivecomputer returns through; this call is then a
+        // no-op. It is here for the path that never reaches that close: the
+        // JNI call throwing. A client left registered after a failed attempt
+        // keeps its notification subscription in the Bluetooth stack, so the
+        // next attempt against the same computer sees every packet delivered
+        // twice (issue #285, Android trace). close() is idempotent.
+        bleStream.close()
+
         // Report completion or error.
         if (result == 0) {
-            mainHandler.post { flutterApi.onDownloadComplete(0, null, null) { } }
+            // Serial and firmware were never reported from Android before
+            // this; they ride the same out-array as the clock sync outcome.
+            val serial = libdcUnsignedOrNull(infoOut[0])
+            val firmware = libdcUnsignedOrNull(infoOut[1])
+            val clockSync = libdcClockSyncStatusName(infoOut[2])
+                .takeIf { it != "not_requested" }
+            NativeLogger.i(TAG, "LDC", "Device info: serial=$serial firmware=$firmware clockSync=${clockSync ?: "not_requested"}")
+            mainHandler.post {
+                flutterApi.onDownloadComplete(0, serial, firmware, clockSync) { }
+            }
         } else if (result != LIBDC_STATUS_CANCELLED) {
             // If the download failed because the remote device rejected our
             // encryption keys (GATT status 5), the bond is stale. Remove
             // it so that a fresh pairing can be negotiated on retry.
             if (!isRetry &&
-                bleStream.lastDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
+                downloadDisconnectStatus == GATT_INSUFFICIENT_AUTHENTICATION
             ) {
                 NativeLogger.w(TAG, "BLE", "Auth failure (GATT status 5), removing stale bond and retrying")
-                bleStream.close()
                 if (bleStream.removeBond()) {
                     activeBleStream = null
                     LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
@@ -469,7 +506,7 @@ class DiveComputerHostApiImpl(
                     // immediate reconnect after removeBond fails to
                     // establish (status 147).
                     Thread.sleep(BOND_REPAIR_SETTLE_MS)
-                    performDownload(device, fingerprint, isRetry = true)
+                    performDownload(device, fingerprint, syncClock, isRetry = true)
                     return
                 }
                 // Bond removal failed; fall through and surface the
@@ -499,7 +536,8 @@ class DiveComputerHostApiImpl(
     private fun performUsbSerialDownload(
         device: DiscoveredDevice,
         sessionPtr: Long,
-        fingerprint: String?
+        fingerprint: String?,
+        syncClock: Boolean = false
     ) {
         val usbManager = context.getSystemService(Context.USB_SERVICE) as? UsbManager
         val drivers: List<UsbSerialDriver> = usbManager?.let {
@@ -555,6 +593,7 @@ class DiveComputerHostApiImpl(
             NativeLogger.d(TAG, "SER", "nativeDownloadRun (serial): ${driver.device.deviceName}")
 
             val errorBuf = ByteArray(256)
+            val infoOut = IntArray(3)
             var thrownMsg: String? = null
             NativeTrace.d(
                 "nativeDownloadRun begin vendor=${device.vendor} " +
@@ -566,8 +605,8 @@ class DiveComputerHostApiImpl(
                     device.vendor, device.product,
                     device.model.toInt(), LIBDC_TRANSPORT_SERIAL,
                     stream, device.name,
-                    fingerprintBytes,
-                    downloadCallback, errorBuf
+                    fingerprintBytes, syncClock,
+                    downloadCallback, errorBuf, infoOut
                 )
             } catch (e: Throwable) {
                 NativeTrace.e("nativeDownloadRun threw: ${e.message}")
@@ -613,7 +652,7 @@ class DiveComputerHostApiImpl(
             !anyOpened ->
                 reportError("connect_failed", "No dive computer found. Ports tried:\n$probeLog")
             lastResult == 0 || lastResult == LIBDC_STATUS_CANCELLED ->
-                mainHandler.post { flutterApi.onDownloadComplete(0, null, null) { } }
+                mainHandler.post { flutterApi.onDownloadComplete(0, null, null, null) { } }
             drivers.size > 1 ->
                 reportError("connect_failed", "No dive computer found. Ports tried:\n$probeLog")
             else ->
@@ -664,6 +703,7 @@ class DiveComputerHostApiImpl(
                 startPressureBar = if (tk[3] > 0) tk[3] else null,
                 endPressureBar = if (tk[4] > 0) tk[4] else null,
                 usage = if (tk[5].toLong() == 0L) null else tk[5].toLong(),
+                transmitterSerial = tk.getOrNull(6)?.toLong()?.takeIf { it != 0L },
             )
         }
 
@@ -693,7 +733,7 @@ class DiveComputerHostApiImpl(
             if (e[1] == 0L) return@mapNotNull null  // skip EVENT_NONE
             DiveEvent(
                 timeSeconds = e[0] / 1000,
-                type = mapEventType(e[1].toInt()),
+                type = libdcEventTypeName(e[1].toInt()),
                 data = mapOf("flags" to e[2].toString(), "value" to e[3].toString())
             )
         }
@@ -849,34 +889,5 @@ class DiveComputerHostApiImpl(
                 "latest version."
         )
         return false
-    }
-
-    private fun mapEventType(type: Int): String = when (type) {
-        0 -> "none"
-        1 -> "deco"
-        2 -> "ascent"
-        3 -> "ceiling"
-        4 -> "workload"
-        5 -> "transmitter"
-        6 -> "violation"
-        7 -> "bookmark"
-        8 -> "surface"
-        9 -> "safetystop"
-        10 -> "gaschange"
-        11 -> "safetystop_voluntary"
-        12 -> "safetystop_mandatory"
-        13 -> "deepstop"
-        14 -> "ceiling_safetystop"
-        15 -> "floor"
-        16 -> "divetime"
-        17 -> "maxdepth"
-        18 -> "OLF"
-        19 -> "PO2"
-        20 -> "airtime"
-        21 -> "rgbm"
-        22 -> "heading"
-        23 -> "tissuelevel"
-        24 -> "gaschange2"
-        else -> "unknown_$type"
     }
 }

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/data/services/gas_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 
 void main() {
   late GasAnalysisService service;
@@ -29,7 +30,7 @@ void main() {
       avgDepth: avgDepth,
       tanks: tanks,
       profile: profile,
-      equipment: const [],
+      gear: looseGear(const []),
       notes: '',
       photoIds: const [],
       sightings: const [],
@@ -240,7 +241,6 @@ void main() {
           'stale-uuid': [
             for (var t = 0; t <= 40 * 60; t += 60)
               TankPressurePoint(
-                id: 'p$t',
                 tankId: 'stale-uuid',
                 timestamp: t,
                 // Linear drain 200 -> 60 bar over the dive.
@@ -280,7 +280,6 @@ void main() {
         'tank-A': [
           for (var t = 0; t <= 40 * 60; t += 60)
             TankPressurePoint(
-              id: 'a$t',
               tankId: 'tank-A',
               timestamp: t,
               pressure: 210 - (150 * t / (40 * 60)),
@@ -326,7 +325,6 @@ void main() {
           return [
             for (var t = firstTs; t <= 40 * 60; t += 60)
               TankPressurePoint(
-                id: '$key-$t',
                 tankId: key,
                 timestamp: t,
                 pressure: 200 - drain * (t - firstTs) / (40 * 60 - firstTs),

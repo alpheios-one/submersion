@@ -76,6 +76,21 @@ class MediaLibraryRepository {
     if (tripId != null) {
       where = where & d.tripId.equals(tripId);
     }
+    final speciesId = filter.speciesId;
+    if (speciesId != null) {
+      // Correlated EXISTS rather than a join: a photo tagged with several
+      // species must still come back once.
+      final ms = _db.mediaSpecies;
+      where =
+          where &
+          existsQuery(
+            _db.selectOnly(ms)
+              ..addColumns([ms.id])
+              ..where(
+                ms.mediaId.equalsExp(m.id) & ms.speciesId.equals(speciesId),
+              ),
+          );
+    }
     // taken_at is stored as wall-clock-as-UTC millis, so a bound picked in
     // local time has to be normalised the same way before it can be
     // compared -- otherwise the window slides by the host's UTC offset.

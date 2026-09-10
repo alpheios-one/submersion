@@ -514,6 +514,12 @@ class SyncState {
   /// page renders the localized `device <shortId>` label instead -- resolving
   /// it here is impossible because a notifier has no BuildContext.
   final List<({String? name, String shortId})> skippedPeerLabels;
+
+  /// Peers whose changeset read threw during the last pull, as (name,
+  /// shortId) pairs. Their data did not merge this run; the cursor stayed put
+  /// so the next sync retries. Drives the read-failed banner; cleared when a
+  /// fresh sync starts. Same null-name contract as [skippedPeerLabels].
+  final List<({String? name, String shortId})> readFailedPeerLabels;
   final bool isAuthenticated;
   final bool firstSyncAwaitingConfirmation;
 
@@ -557,6 +563,7 @@ class SyncState {
     this.conflicts = 0,
     this.newerSchemaPeerLabels = const [],
     this.skippedPeerLabels = const [],
+    this.readFailedPeerLabels = const [],
     this.isAuthenticated = false,
     this.firstSyncAwaitingConfirmation = false,
     this.postRestoreSyncing = false,
@@ -576,6 +583,7 @@ class SyncState {
     int? conflicts,
     List<({String? name, String shortId})>? newerSchemaPeerLabels,
     List<({String? name, String shortId})>? skippedPeerLabels,
+    List<({String? name, String shortId})>? readFailedPeerLabels,
     bool? isAuthenticated,
     bool? firstSyncAwaitingConfirmation,
     bool? postRestoreSyncing,
@@ -597,6 +605,7 @@ class SyncState {
       newerSchemaPeerLabels:
           newerSchemaPeerLabels ?? this.newerSchemaPeerLabels,
       skippedPeerLabels: skippedPeerLabels ?? this.skippedPeerLabels,
+      readFailedPeerLabels: readFailedPeerLabels ?? this.readFailedPeerLabels,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       firstSyncAwaitingConfirmation:
           firstSyncAwaitingConfirmation ?? this.firstSyncAwaitingConfirmation,
@@ -1226,6 +1235,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         progress: 0.0,
         newerSchemaPeerLabels: const [],
         skippedPeerLabels: const [],
+        readFailedPeerLabels: const [],
         firstSyncAwaitingConfirmation: false,
         replaceAwaitingAdoption: false,
         needsPassphrase: false,
@@ -1301,6 +1311,10 @@ class SyncNotifier extends StateNotifier<SyncState> {
               result.newerSchemaPeerNames,
             ),
             skippedPeerLabels: skippedPeerLabels(result),
+            readFailedPeerLabels: heldPeerLabels(
+              result.readFailedPeerDeviceIds,
+              result.readFailedPeerNames,
+            ),
             progress: 1.0,
           );
           // Mark this provider established and consume any post-restore intent:
@@ -1471,11 +1485,29 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// the anchored identity, so a clone survives everything short of this.
   /// The retired identity's cloud file is removed best-effort: after the id
   /// changes it would otherwise be merged back as a stale "peer" forever.
+  ///
+  /// That removal is guarded, because the retired id's files are only
+  /// redundant while another device still publishes the library. When it is
+  /// the account's sole publisher -- an install that inherited an earlier
+  /// install's id (#1541), or any single-device user whose local library is
+  /// empty or damaged -- those files ARE the library, and deleting them would
+  /// destroy it (#1551). They are kept instead: an orphaned peer log that the
+  /// identity just minted can pull, which costs one redundant merge at worst.
   Future<void> resetSyncState() async {
     final oldDeviceId = await _syncRepository.getDeviceId();
     await _syncService.resetSyncState();
-    await _ref.read(syncInitializerProvider).adoptFreshIdentity();
-    await _syncService.deleteDeviceSyncFile(oldDeviceId);
+    final initializer = _ref.read(syncInitializerProvider);
+    await initializer.adoptFreshIdentity();
+    // The question is about the RETIRED id, which is no longer this device's,
+    // so it is passed explicitly rather than inferred from the current one.
+    final provider = _ref.read(cloudStorageProviderProvider);
+    if (provider != null &&
+        await initializer.anotherDevicePublishesLibrary(
+          oldDeviceId,
+          provider,
+        )) {
+      await _syncService.deleteDeviceSyncFile(oldDeviceId);
+    }
     // Reset is the manual escape hatch: drop any stuck replace intent and
     // un-pause an awaiting-adoption state.
     await _ref.read(libraryEpochStoreProvider).clearPendingReplace();
@@ -1486,8 +1518,8 @@ class SyncNotifier extends StateNotifier<SyncState> {
   }
 
   /// Comprehensive local repair: the full [resetSyncState] (fresh identity,
-  /// this device's cloud file removed, pending-replace/awaiting-adoption
-  /// cleared) PLUS the last-accepted epoch marker and leftover base temp files,
+  /// this device's cloud file removed unless it is the account's only library,
+  /// pending-replace/awaiting-adoption cleared) PLUS the last-accepted epoch marker and leftover base temp files,
   /// ending with any error cleared. The guaranteed local escape from a wedged
   /// sync (issue #509); dive data is never touched.
   Future<void> repairSync() async {

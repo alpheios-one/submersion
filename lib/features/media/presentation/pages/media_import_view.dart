@@ -13,6 +13,7 @@ import 'package:submersion/features/media/presentation/pages/media_import_review
 import 'package:submersion/features/media/presentation/pages/photo_picker_page.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/media/presentation/helpers/offer_site_review_after_import.dart';
 
 /// The Import console section: launches the three-tab picker with no dive
 /// context, then hands the picked assets to [MediaImportReviewPage]. Nothing
@@ -52,7 +53,8 @@ class MediaImportView extends ConsumerWidget {
   /// Imports the resolved assets, one service call per dive and per site.
   /// A failing group never blocks another: a throw inside one group is
   /// recorded against that group's assets and the loop moves on.
-  @visibleForTesting
+  ///
+  /// Shared with the species import, which tags the rows this creates.
   static Future<ImportReviewResult> importResolved({
     required MediaImportService service,
     required DiveRepository diveRepository,
@@ -74,6 +76,7 @@ class MediaImportView extends ConsumerWidget {
     }
 
     var linked = 0;
+    final importedIds = <String>[];
     final failures = <String, String>{};
 
     void failGroup(List<AssetInfo> group, Object reason) {
@@ -94,6 +97,7 @@ class MediaImportView extends ConsumerWidget {
           dive: dive,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -106,6 +110,7 @@ class MediaImportView extends ConsumerWidget {
           siteId: key,
         );
         linked += result.imported.length;
+        importedIds.addAll(result.imported.map((m) => m.id));
         failures.addAll(result.failures);
       } catch (e) {
         failGroup(value, e);
@@ -113,8 +118,10 @@ class MediaImportView extends ConsumerWidget {
     }
     return ImportReviewResult(
       linked: linked,
+      linkedDiveIds: byDive.keys.toList(),
       skipped: assets.length - targets.length,
       failures: failures,
+      importedIds: importedIds,
     );
   }
 
@@ -136,12 +143,22 @@ class MediaImportView extends ConsumerWidget {
       MaterialPageRoute<void>(
         builder: (_) => MediaImportReviewPage(
           candidates: candidates,
-          onConfirm: (targets) => importResolved(
-            service: ref.read(mediaImportServiceProvider),
-            diveRepository: ref.read(diveRepositoryProvider),
-            assets: assets,
-            targets: targets,
-          ),
+          onConfirm: (targets) async {
+            final result = await importResolved(
+              service: ref.read(mediaImportServiceProvider),
+              diveRepository: ref.read(diveRepositoryProvider),
+              assets: assets,
+              targets: targets,
+            );
+            if (context.mounted) {
+              await offerSiteReviewAfterImport(
+                context,
+                ref,
+                result.linkedDiveIds,
+              );
+            }
+            return result;
+          },
         ),
       ),
     );

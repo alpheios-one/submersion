@@ -7,6 +7,7 @@ import 'package:submersion/core/services/cloud_storage/icloud_native_service.dar
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/settings/presentation/pages/s3_config_page.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/cloud_provider_authenticate.dart';
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/features/setup_wizard/domain/setup_wizard_models.dart';
 import 'package:submersion/features/setup_wizard/presentation/providers/setup_wizard_providers.dart';
@@ -32,6 +33,10 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
 
   Future<void> _connect(CloudProviderType type) async {
     final notifier = ref.read(setupWizardProvider(widget.mode).notifier);
+    // Captured before any await: this controller is container-owned, so it
+    // still rolls the selection back if the step is disposed mid-connect,
+    // where reading it off `ref` would throw instead.
+    final selection = ref.read(selectedCloudProviderTypeProvider.notifier);
     setState(() => _connecting = true);
     try {
       if (type == CloudProviderType.dropbox) {
@@ -44,10 +49,40 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
         ref.invalidate(dropboxAuthDataProvider);
         if (connected != true) return;
       }
+      if (!mounted) return;
       // Activation contract mirrored from CloudSyncPage._selectProvider.
-      ref.read(selectedCloudProviderTypeProvider.notifier).state = type;
-      final instance = cloudProviderInstanceFor(type);
-      await instance.authenticate();
+      selection.state = type;
+      // Resolve the backend the way that page does, rather than reaching for
+      // the raw singleton: this provider applies account-first credential
+      // resolution and the custom-folder check, so the singleton shortcut
+      // quietly broke the contract the comment above claims.
+      final instance = ref.read(cloudStorageProviderProvider);
+      if (instance == null) {
+        // Report it the way CloudSyncPage does, rather than throwing: routing
+        // this through setup_sync_error would print the exception's own type
+        // name into the snackbar alongside the message.
+        selection.state = null;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.settings_cloudSync_provider_initFailed(
+                _providerName(type),
+              ),
+            ),
+          ),
+        );
+        return;
+      }
+      // Desktop Google Drive authenticates through the system browser, which
+      // can take as long as the user does. The shared helper keeps a
+      // cancellable wait dialog up so the wizard does not sit frozen with no
+      // way out; every other provider and platform authenticates directly.
+      await authenticateWithBrowserWait(context, instance, type);
+      // A desktop browser round trip is user-paced and can easily outlast
+      // this step (the user backs out of the wizard while the browser is
+      // up). Both `ref` and the autoDispose draft notifier throw once that
+      // happens, so stop here rather than at the first of them.
+      if (!mounted) return;
       await ref.read(syncInitializerProvider).saveProvider(type);
       ref.read(syncStateProvider.notifier).refreshState();
       notifier.setConnectedProvider(type);
@@ -59,10 +94,15 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
             .peerSyncFiles(instance);
         if (peers.isNotEmpty && mounted) widget.onLibraryFound!();
       }
+    } on CloudAuthCancelled {
+      // A deliberate cancel: undo the pending selection silently so the cards
+      // come back, with no error shown for a choice the user made.
+      selection.state = null;
+      if (mounted) notifier.setConnectedProvider(null);
     } catch (e) {
-      ref.read(selectedCloudProviderTypeProvider.notifier).state = null;
-      notifier.setConnectedProvider(null);
+      selection.state = null;
       if (mounted) {
+        notifier.setConnectedProvider(null);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(context.l10n.setup_sync_error(e))),
         );
@@ -116,6 +156,13 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
     final iCloudAvailable =
         isApple && iCloudAvailability != ICloudAvailability.unsupported;
     final dropboxConfigured = ref.watch(dropboxConfiguredProvider);
+    // Google Drive is offered wherever it can actually authenticate. On a
+    // desktop build without the Desktop-app OAuth client compiled in it is
+    // hidden rather than shown broken, the same treatment an unconfigured
+    // Dropbox already gets. Read through .value so a provider reload does
+    // not flash the card away.
+    final googleDriveAvailable =
+        ref.watch(googleDriveAvailableProvider).value ?? false;
 
     // The draft holds the connected provider in both modes: seeded from the
     // active provider on settings re-entry, set by the connect flow at first
@@ -245,6 +292,15 @@ class _BackupSyncStepState extends ConsumerState<BackupSyncStep> {
                     l10n.settings_cloudSync_provider_icloud_unsupportedSubtitle,
                   ),
                 ),
+              ),
+            if (googleDriveAvailable)
+              _providerCard(
+                theme: theme,
+                icon: Icons.add_to_drive,
+                name: 'Google Drive',
+                onTap: _connecting
+                    ? null
+                    : () => _connect(CloudProviderType.googledrive),
               ),
             if (dropboxConfigured)
               _providerCard(

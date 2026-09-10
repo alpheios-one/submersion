@@ -26,8 +26,18 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// dive_consolidation_builder.dart / dive_consolidation_service.dart for the
 /// overlapping/consolidation path.
 class CombineDivesDialog extends ConsumerStatefulWidget {
-  const CombineDivesDialog({super.key, required this.diveIds});
+  const CombineDivesDialog({
+    super.key,
+    required this.diveIds,
+    this.consolidateOnly = false,
+  });
   final List<String> diveIds;
+
+  /// When true the selection is known to be a suspected duplicate (the data
+  /// quality inbox's Consolidate repair, #1690), so a sequential
+  /// classification is reported as "these dives don't overlap" instead of
+  /// being offered as a sequential combine.
+  final bool consolidateOnly;
   @override
   ConsumerState<CombineDivesDialog> createState() => _CombineDivesDialogState();
 }
@@ -111,6 +121,10 @@ class _CombineDivesDialogState extends ConsumerState<CombineDivesDialog> {
             context.l10n.diveLog_combine_error,
           ),
           null => const Center(child: CircularProgressIndicator()),
+          MergeSequential() when widget.consolidateOnly => _buildErrorPanel(
+            context,
+            context.l10n.diveLog_consolidate_error_notOverlapping,
+          ),
           final MergeSequential seq => _buildPreview(context, seq),
           MergeOverlapping() => _buildConsolidationPanel(context),
           final MergeInvalid invalid => _buildErrorPanel(
@@ -565,11 +579,12 @@ class _CombineDivesDialogState extends ConsumerState<CombineDivesDialog> {
   }
 
   /// Applies the consolidation via [runDiveConsolidation] (apply + Undo
-  /// SnackBar + error mapping, shared with the per-dive "Merge with another
-  /// dive" flow). The dialog closes immediately; [runDiveConsolidation] only
-  /// touches [context] synchronously before its first `await`, so doing that
-  /// after [Navigator.pop] is safe (the dialog's element isn't actually
-  /// unmounted until the pop's exit transition finishes).
+  /// SnackBar + error mapping, shared with the data quality inbox's
+  /// "consolidate duplicate" repair). The dialog closes immediately;
+  /// [runDiveConsolidation] only touches [context] synchronously before its
+  /// first `await`, so doing that after [Navigator.pop] is safe (the dialog's
+  /// element isn't actually unmounted until the pop's exit transition
+  /// finishes).
   void _confirmConsolidation(ConsolidationReady ready) {
     final container = ProviderScope.containerOf(context, listen: false);
     final service = ref.read(diveConsolidationServiceProvider);
@@ -669,7 +684,9 @@ class _CombineDivesDialogState extends ConsumerState<CombineDivesDialog> {
 Future<DiveMergeOutcome?> showCombineDivesDialog({
   required BuildContext context,
   required List<String> diveIds,
+  bool consolidateOnly = false,
 }) => showDialog<DiveMergeOutcome>(
   context: context,
-  builder: (_) => CombineDivesDialog(diveIds: diveIds),
+  builder: (_) =>
+      CombineDivesDialog(diveIds: diveIds, consolidateOnly: consolidateOnly),
 );

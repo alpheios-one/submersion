@@ -9,6 +9,8 @@ import 'package:submersion/features/dive_centers/domain/entities/dive_center.dar
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
@@ -38,7 +40,20 @@ class Dive extends Equatable {
   final String? tripId;
   final List<DiveTank> tanks;
   final List<DiveProfilePoint> profile;
-  final List<EquipmentItem> equipment;
+
+  /// The gear on this dive, one link per junction row with the item and
+  /// where it came from (issue #1487). [equipment] is the flat view.
+  final List<GearLink> gear;
+
+  /// The gear as a flat item list, for readers that do not care about
+  /// assemblies or sets.
+  List<EquipmentItem> get equipment => [for (final g in gear) g.item];
+
+  /// Provenance only, the shape the expander and the tree helpers take.
+  List<GearProvenance> get gearProvenance => [
+    for (final g in gear) g.provenance,
+  ];
+
   final String notes;
   final List<String> photoIds;
   final List<MarineSighting> sightings;
@@ -118,6 +133,15 @@ class Dive extends Equatable {
   final double? weightingFeedbackKg;
   // Favorites and tags (v1.1/v1.5)
   final bool isFavorite;
+
+  /// Excluded from every descriptive statistic, its count included (#526).
+  /// The dive stays fully visible and editable in the logbook.
+  final bool excludedFromStats;
+
+  /// Excluded from SAC/RMV and gas-mix aggregates only (#1272), for a dive
+  /// whose gas number is unrepresentative. Implied by [excludedFromStats];
+  /// the implication is applied in SQL by DiveStatsScope, not stored here.
+  final bool excludedFromGasStats;
   final List<Tag> tags;
 
   // Dive mode (v1.5) - OC, CCR, or SCR
@@ -195,7 +219,7 @@ class Dive extends Equatable {
     this.tripId,
     this.tanks = const [],
     this.profile = const [],
-    this.equipment = const [],
+    this.gear = const [],
     this.notes = '',
     this.photoIds = const [],
     this.sightings = const [],
@@ -233,6 +257,8 @@ class Dive extends Equatable {
     this.weightingFeedback,
     this.weightingFeedbackKg,
     this.isFavorite = false,
+    this.excludedFromStats = false,
+    this.excludedFromGasStats = false,
     this.tags = const [],
     // CCR/SCR fields (v1.5)
     this.diveMode = DiveMode.oc,
@@ -273,6 +299,36 @@ class Dive extends Equatable {
 
   /// Effective start time of the dive (entryTime if set, otherwise dateTime)
   DateTime get effectiveEntryTime => entryTime ?? dateTime;
+
+  /// Water type of the dive, falling back to the assigned site's (issue
+  /// #1427).
+  ///
+  /// [waterType] is snapped from the site when a site is assigned (see
+  /// `waterTypeAfterSiteAssign`), but dives logged or imported before that,
+  /// and dives whose site gained its water type later, still carry null. The
+  /// site's answer is the best one available for those, so displays and
+  /// statistics read this rather than [waterType]. A value the diver set on
+  /// the dive always wins: a site's water type is a default, not a fact about
+  /// every dive made there.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  WaterType? get effectiveWaterType => waterType ?? site?.waterType;
+
+  /// Entry method of the dive, falling back to the assigned site's (issue
+  /// #1427). The entry-method twin of [effectiveWaterType], with the same
+  /// reasoning: the site's value is snapped onto a dive when the site is
+  /// assigned (issue #1104), so only dives predating that, or whose site was
+  /// filled in later, are left without one.
+  ///
+  /// [exitMethod] has no such getter on purpose. Its snap-on-assign rule turns
+  /// on whether the diver has unlinked exit from entry, and that flag is dive
+  /// form state which is never persisted, so a read-time fallback cannot
+  /// reproduce it. See `entryExitAfterSiteAssign`.
+  ///
+  /// Requires [site] to be hydrated; a dive loaded without its site reports
+  /// only its own value.
+  EntryMethod? get effectiveEntryMethod => entryMethod ?? site?.entryMethod;
 
   /// User-defined name, normalized for display: trimmed, with empty or
   /// whitespace-only values treated as unset (null). In-app writes never
@@ -467,14 +523,16 @@ class Dive extends Equatable {
   /// ascent (US Navy convention): the descent counts; stops shallower
   /// than the depth threshold (safety stops, shallow deco) do not, while
   /// deeper stops still count. See [BottomTimeCalculator] for the
-  /// threshold rule.
+  /// threshold rule. The result is bounded by [runtime] when one is set,
+  /// so a profile that outlasts the dive cannot report a bottom time longer
+  /// than the dive itself.
   ///
   /// Returns null if profile data is insufficient for calculation.
   Duration? calculateBottomTimeFromProfile() {
     final seconds = BottomTimeCalculator.secondsFromSamples([
       for (final point in profile)
         (timestamp: point.timestamp, depth: point.depth),
-    ]);
+    ], totalDurationSeconds: runtime?.inSeconds);
     return seconds == null ? null : Duration(seconds: seconds);
   }
 
@@ -547,7 +605,7 @@ class Dive extends Equatable {
     String? tripId,
     List<DiveTank>? tanks,
     List<DiveProfilePoint>? profile,
-    List<EquipmentItem>? equipment,
+    List<GearLink>? gear,
     String? notes,
     List<String>? photoIds,
     List<MarineSighting>? sightings,
@@ -585,6 +643,8 @@ class Dive extends Equatable {
     WeightingFeedback? weightingFeedback,
     double? weightingFeedbackKg,
     bool? isFavorite,
+    bool? excludedFromStats,
+    bool? excludedFromGasStats,
     List<Tag>? tags,
     // CCR/SCR fields
     DiveMode? diveMode,
@@ -642,7 +702,7 @@ class Dive extends Equatable {
       tripId: tripId ?? this.tripId,
       tanks: tanks ?? this.tanks,
       profile: profile ?? this.profile,
-      equipment: equipment ?? this.equipment,
+      gear: gear ?? this.gear,
       notes: notes ?? this.notes,
       photoIds: photoIds ?? this.photoIds,
       sightings: sightings ?? this.sightings,
@@ -680,6 +740,8 @@ class Dive extends Equatable {
       weightingFeedback: weightingFeedback ?? this.weightingFeedback,
       weightingFeedbackKg: weightingFeedbackKg ?? this.weightingFeedbackKg,
       isFavorite: isFavorite ?? this.isFavorite,
+      excludedFromStats: excludedFromStats ?? this.excludedFromStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       tags: tags ?? this.tags,
       // CCR/SCR fields
       diveMode: diveMode ?? this.diveMode,
@@ -740,7 +802,7 @@ class Dive extends Equatable {
     tripId,
     tanks,
     profile,
-    equipment,
+    gear,
     notes,
     photoIds,
     sightings,
@@ -778,6 +840,8 @@ class Dive extends Equatable {
     weightingFeedback,
     weightingFeedbackKg,
     isFavorite,
+    excludedFromStats,
+    excludedFromGasStats,
     tags,
     // CCR/SCR fields
     diveMode,
@@ -979,20 +1043,18 @@ class DiveProfilePoint extends Equatable {
 /// Used for multi-tank dives with AI transmitters providing
 /// continuous pressure data for each tank
 class TankPressurePoint extends Equatable {
-  final String id;
   final String tankId;
   final int timestamp; // seconds from dive start
   final double pressure; // bar
 
   const TankPressurePoint({
-    required this.id,
     required this.tankId,
     required this.timestamp,
     required this.pressure,
   });
 
   @override
-  List<Object?> get props => [id, tankId, timestamp, pressure];
+  List<Object?> get props => [tankId, timestamp, pressure];
 }
 
 /// Tank configuration for a dive
@@ -1013,6 +1075,27 @@ class DiveTank extends Equatable {
   /// Null means the tank is unattributed (single-source dive, or a manually
   /// entered/edited tank not tied to a specific computer).
   final String? computerId;
+
+  /// Serial number of the air-integration transmitter that reported this
+  /// tank's pressures, as the dive computer logged it. Null for manually
+  /// entered tanks and for computers that do not report one.
+  ///
+  /// This is the cylinder's physical identity across computers: two logs of
+  /// the same dive whose tanks carry the same serial were read from the same
+  /// transmitter, whatever gas mix each computer had programmed.
+  final String? transmitterSerial;
+
+  /// Parsed tank index this row's computer-owned data comes from (v200). Null
+  /// on rows from before v200 means "same as order"; -1 (kNoSourceTankIndex
+  /// in tank_source_index.dart) means the row takes no parsed tank.
+  /// Computer-owned identity, like [computerId] and [transmitterSerial]:
+  /// user edits never rewrite it.
+  final int? sourceTankIndex;
+
+  /// The regulator this cylinder was breathed through (v202), so high-O2
+  /// contact reaches the regulator's service clocks. User-authored: the
+  /// tank editor sets it and downloads never touch it.
+  final String? regulatorEquipmentId;
 
   /// Deco gas-switch depth override in meters (planning only); null = auto
   /// (MOD at the deco pO2). Subsurface per-cylinder "Deco switch at", v120.
@@ -1040,6 +1123,9 @@ class DiveTank extends Equatable {
     this.order = 0,
     this.presetName,
     this.computerId,
+    this.transmitterSerial,
+    this.sourceTankIndex,
+    this.regulatorEquipmentId,
     this.decoSwitchDepth,
     this.isTravelGas = false,
   });
@@ -1066,6 +1152,12 @@ class DiveTank extends Equatable {
     String? presetName,
     bool clearPresetName = false,
     String? computerId,
+    String? transmitterSerial,
+    bool clearTransmitterSerial = false,
+    int? sourceTankIndex,
+    bool clearSourceTankIndex = false,
+    String? regulatorEquipmentId,
+    bool clearRegulatorEquipmentId = false,
     double? decoSwitchDepth,
     bool clearDecoSwitchDepth = false,
     bool? isTravelGas,
@@ -1083,6 +1175,15 @@ class DiveTank extends Equatable {
       order: order ?? this.order,
       presetName: clearPresetName ? null : (presetName ?? this.presetName),
       computerId: computerId ?? this.computerId,
+      transmitterSerial: clearTransmitterSerial
+          ? null
+          : (transmitterSerial ?? this.transmitterSerial),
+      sourceTankIndex: clearSourceTankIndex
+          ? null
+          : (sourceTankIndex ?? this.sourceTankIndex),
+      regulatorEquipmentId: clearRegulatorEquipmentId
+          ? null
+          : (regulatorEquipmentId ?? this.regulatorEquipmentId),
       decoSwitchDepth: clearDecoSwitchDepth
           ? null
           : (decoSwitchDepth ?? this.decoSwitchDepth),
@@ -1104,6 +1205,9 @@ class DiveTank extends Equatable {
     order,
     presetName,
     computerId,
+    transmitterSerial,
+    sourceTankIndex,
+    regulatorEquipmentId,
     decoSwitchDepth,
     isTravelGas,
   ];

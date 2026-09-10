@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/dropbox_storage_provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/utils/browser_launch.dart';
 
 /// The copy-paste OAuth dialog: opens the Dropbox authorize page in the
 /// system browser and exchanges the pasted code. Pops `true` on success.
 ///
-/// [openUri] is injectable for widget tests; production uses url_launcher.
+/// Copy link is always offered, not just after a failed launch: on Linux a
+/// stale GIO scheme handler makes the launch report success and show nothing
+/// (Debian 13), so there is no error state to hang the escape hatch off.
+///
+/// [openUri] is injectable for widget tests; production uses [openInBrowser].
 class DropboxConnectDialog extends StatefulWidget {
   const DropboxConnectDialog({required this.provider, this.openUri, super.key});
 
@@ -20,9 +26,12 @@ class DropboxConnectDialog extends StatefulWidget {
 }
 
 class _DropboxConnectDialogState extends State<DropboxConnectDialog> {
+  static final _log = LoggerService.forClass(DropboxConnectDialog);
+
   final _codeController = TextEditingController();
   Uri? _authorizeUri;
   String? _errorText;
+  bool _linkCopied = false;
   bool _connecting = false;
 
   @override
@@ -40,34 +49,72 @@ class _DropboxConnectDialogState extends State<DropboxConnectDialog> {
     super.dispose();
   }
 
-  Future<void> _openBrowser() async {
+  /// The pending authorize URI, generated on first use.
+  ///
+  /// The same URI is reused by Reopen browser and Copy link: a second
+  /// [DropboxStorageProvider.beginAuthorization] would replace the pending
+  /// PKCE verifier, and the code from the page already open would then fail
+  /// the exchange. Returns null after reporting an auth error inline.
+  Uri? _pendingAuthorizeUri() {
     try {
-      final uri = _authorizeUri ??= widget.provider.beginAuthorization();
-      final open =
-          widget.openUri ??
-          (Uri u) => launchUrl(u, mode: LaunchMode.externalApplication);
-      final opened = await open(uri);
-      if (!mounted) return;
-      // launchUrl reports failure by returning false, not only by throwing;
-      // leaving that silent strands the user on a dialog whose instructions
-      // claim a browser page is open. A successful (re)open clears any
-      // stale error from an earlier failed attempt.
-      setState(
-        () => _errorText = opened
-            ? null
-            : context.l10n.settings_cloudSync_dropbox_connect_browserFailed,
-      );
+      return _authorizeUri ??= widget.provider.beginAuthorization();
     } on CloudStorageException catch (e) {
-      // The dialog is barrier-dismissible; the open can outlive this State.
-      if (!mounted) return;
-      setState(() => _errorText = e.displayMessage);
-    } catch (e) {
-      // launchUrl can throw a raw PlatformException (e.g. no browser
-      // available); surface it the same way instead of leaving the dialog
-      // silently stuck.
-      if (!mounted) return;
-      setState(() => _errorText = e.toString());
+      // The dialog is barrier-dismissible; this can outlive the State.
+      if (mounted) setState(() => _errorText = e.displayMessage);
+      return null;
     }
+  }
+
+  Future<void> _openBrowser() async {
+    final uri = _pendingAuthorizeUri();
+    if (uri == null) return;
+
+    bool opened;
+    try {
+      opened = await (widget.openUri ?? openInBrowser)(uri);
+    } catch (e) {
+      // Off Linux, url_launcher reports "no handler" by throwing a raw
+      // PlatformException. Its toString() named no action a diver could
+      // take, so the failure reads the same either way and the detail goes
+      // to the log.
+      _log.warning('Could not open the Dropbox authorize page: $e');
+      opened = false;
+    }
+    if (!mounted) return;
+    // launchUrl reports failure by returning false, not only by throwing;
+    // leaving that silent strands the user on a dialog whose instructions
+    // claim a browser page is open. A successful (re)open clears any
+    // stale error from an earlier failed attempt.
+    setState(
+      () => _errorText = opened
+          ? null
+          : context.l10n.settings_oauth_connect_browserFailed,
+    );
+  }
+
+  /// Copies the authorize URL so the user can open it by hand.
+  Future<void> _copyLink() async {
+    final uri = _pendingAuthorizeUri();
+    if (uri == null) return;
+    try {
+      await Clipboard.setData(ClipboardData(text: uri.toString()));
+    } on Exception catch (e) {
+      // A platform-channel call, so it can throw. Letting that escape the
+      // button handler would hand a dead button to the one user who needs
+      // this most: the one whose browser never opened.
+      _log.warning('Could not copy the authorize link: $e');
+      if (!mounted) return;
+      setState(
+        () => _errorText = context.l10n.settings_oauth_connect_copyFailed,
+      );
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _linkCopied = true;
+      // The user now has the link, so the launch failure is spent advice.
+      _errorText = null;
+    });
   }
 
   Future<void> _connect() async {
@@ -115,13 +162,31 @@ class _DropboxConnectDialogState extends State<DropboxConnectDialog> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return AlertDialog(
+      // Scrollable so the copy-link row cannot push the code field off a
+      // short window; the actions stay pinned below it.
+      scrollable: true,
       title: Text(l10n.settings_cloudSync_dropbox_connect_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.settings_cloudSync_dropbox_connect_instructions),
-          const SizedBox(height: 16),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              onPressed: _connecting ? null : _copyLink,
+              icon: const Icon(Icons.link, size: 18),
+              label: Text(l10n.settings_oauth_connect_copyLink),
+            ),
+          ),
+          if (_linkCopied)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                l10n.settings_oauth_connect_linkCopied,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           TextField(
             controller: _codeController,
             autofocus: true,

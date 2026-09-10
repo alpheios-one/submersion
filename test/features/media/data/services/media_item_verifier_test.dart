@@ -39,11 +39,22 @@ class _StubResolver implements MediaSourceResolver {
   Future<VerifyResult> verify(MediaItem item) async => _result;
 }
 
+/// One narrow verification write, as the verifier asked for it.
+typedef _Stamp = ({DateTime verifiedAt, bool? isOrphaned});
+
+/// Captures the narrow write and nothing else. `updateMedia` is deliberately
+/// left unstubbed: a whole-row write from a caller's snapshot would roll back
+/// the cloud stamps an upload put on the row since, so reaching for it here
+/// must fail the test.
 class _CapturingRepository implements MediaRepository {
-  final List<MediaItem> written = [];
+  final List<_Stamp> written = [];
 
   @override
-  Future<void> updateMedia(MediaItem item) async => written.add(item);
+  Future<void> stampVerification(
+    String id, {
+    required DateTime verifiedAt,
+    bool? isOrphaned,
+  }) async => written.add((verifiedAt: verifiedAt, isOrphaned: isOrphaned));
 
   @override
   dynamic noSuchMethod(Invocation invocation) =>
@@ -84,7 +95,7 @@ void main() {
 
       expect(result, VerifyResult.available);
       expect(repository.written.single.isOrphaned, isFalse);
-      expect(repository.written.single.lastVerifiedAt, stamp);
+      expect(repository.written.single.verifiedAt, stamp);
     },
   );
 
@@ -93,7 +104,7 @@ void main() {
 
     expect(result, VerifyResult.notFound);
     expect(repository.written.single.isOrphaned, isTrue);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   // notFound is the ONLY positive finding. Everything below describes a
@@ -108,8 +119,8 @@ void main() {
     ).verify(_item(isOrphaned: false));
 
     expect(result, VerifyResult.unauthenticated);
-    expect(repository.written.single.isOrphaned, isFalse);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.isOrphaned, isNull);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   test('fromOtherDevice stamps the date but never orphans', () async {
@@ -121,14 +132,14 @@ void main() {
     ).verify(_item(isOrphaned: false));
 
     expect(result, VerifyResult.fromOtherDevice);
-    expect(repository.written.single.isOrphaned, isFalse);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.isOrphaned, isNull);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   test('neither clears an existing orphan flag', () async {
     await build(VerifyResult.fromOtherDevice).verify(_item(isOrphaned: true));
 
-    expect(repository.written.single.isOrphaned, isTrue);
+    expect(repository.written.single.isOrphaned, isNull);
   });
 
   // volumeOffline and transientError are recoverable conditions, not dead
@@ -143,16 +154,16 @@ void main() {
       ).verify(_item(isOrphaned: false));
 
       expect(result, VerifyResult.volumeOffline);
-      expect(repository.written.single.isOrphaned, isFalse);
-      expect(repository.written.single.lastVerifiedAt, stamp);
+      expect(repository.written.single.isOrphaned, isNull);
+      expect(repository.written.single.verifiedAt, stamp);
     },
   );
 
   test('transientError does not clear an existing orphan flag', () async {
     await build(VerifyResult.transientError).verify(_item(isOrphaned: true));
 
-    expect(repository.written.single.isOrphaned, isTrue);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.isOrphaned, isNull);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   // accessDenied is the one that used to arrive as notFound. A revoked photo
@@ -165,8 +176,8 @@ void main() {
     ).verify(_item(isOrphaned: false));
 
     expect(result, VerifyResult.accessDenied);
-    expect(repository.written.single.isOrphaned, isFalse);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.isOrphaned, isNull);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   test('accessDenied does not clear an existing orphan flag either', () async {
@@ -174,8 +185,8 @@ void main() {
     // the flag in either direction.
     await build(VerifyResult.accessDenied).verify(_item(isOrphaned: true));
 
-    expect(repository.written.single.isOrphaned, isTrue);
-    expect(repository.written.single.lastVerifiedAt, stamp);
+    expect(repository.written.single.isOrphaned, isNull);
+    expect(repository.written.single.verifiedAt, stamp);
   });
 
   // A row whose source type has no registered resolver is a programmer

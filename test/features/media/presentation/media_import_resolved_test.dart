@@ -121,6 +121,8 @@ void main() {
     expect(out.linked, 3);
     expect(out.skipped, 1);
     expect(out.failures, isEmpty);
+    // Species import tags what was created, so the ids must come back.
+    expect(out.importedIds, ['row-a', 'row-b', 'row-c']);
   });
 
   test(

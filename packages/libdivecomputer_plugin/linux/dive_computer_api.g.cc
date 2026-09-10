@@ -899,6 +899,7 @@ struct _LibdivecomputerPluginTankInfo {
   double* start_pressure_bar;
   double* end_pressure_bar;
   int64_t* usage;
+  int64_t* transmitter_serial;
 };
 
 G_DEFINE_TYPE(LibdivecomputerPluginTankInfo, libdivecomputer_plugin_tank_info, G_TYPE_OBJECT)
@@ -909,6 +910,7 @@ static void libdivecomputer_plugin_tank_info_dispose(GObject* object) {
   g_clear_pointer(&self->start_pressure_bar, g_free);
   g_clear_pointer(&self->end_pressure_bar, g_free);
   g_clear_pointer(&self->usage, g_free);
+  g_clear_pointer(&self->transmitter_serial, g_free);
   G_OBJECT_CLASS(libdivecomputer_plugin_tank_info_parent_class)->dispose(object);
 }
 
@@ -919,7 +921,7 @@ static void libdivecomputer_plugin_tank_info_class_init(LibdivecomputerPluginTan
   G_OBJECT_CLASS(klass)->dispose = libdivecomputer_plugin_tank_info_dispose;
 }
 
-LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new(int64_t index, int64_t gas_mix_index, double* volume_liters, double* start_pressure_bar, double* end_pressure_bar, int64_t* usage) {
+LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new(int64_t index, int64_t gas_mix_index, double* volume_liters, double* start_pressure_bar, double* end_pressure_bar, int64_t* usage, int64_t* transmitter_serial) {
   LibdivecomputerPluginTankInfo* self = LIBDIVECOMPUTER_PLUGIN_TANK_INFO(g_object_new(libdivecomputer_plugin_tank_info_get_type(), nullptr));
   self->index = index;
   self->gas_mix_index = gas_mix_index;
@@ -950,6 +952,13 @@ LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new(int64_t inde
   }
   else {
     self->usage = nullptr;
+  }
+  if (transmitter_serial != nullptr) {
+    self->transmitter_serial = static_cast<int64_t*>(malloc(sizeof(int64_t)));
+    *self->transmitter_serial = *transmitter_serial;
+  }
+  else {
+    self->transmitter_serial = nullptr;
   }
   return self;
 }
@@ -984,6 +993,11 @@ int64_t* libdivecomputer_plugin_tank_info_get_usage(LibdivecomputerPluginTankInf
   return self->usage;
 }
 
+int64_t* libdivecomputer_plugin_tank_info_get_transmitter_serial(LibdivecomputerPluginTankInfo* self) {
+  g_return_val_if_fail(LIBDIVECOMPUTER_PLUGIN_IS_TANK_INFO(self), nullptr);
+  return self->transmitter_serial;
+}
+
 static FlValue* libdivecomputer_plugin_tank_info_to_list(LibdivecomputerPluginTankInfo* self) {
   FlValue* values = fl_value_new_list();
   fl_value_append_take(values, fl_value_new_int(self->index));
@@ -992,6 +1006,7 @@ static FlValue* libdivecomputer_plugin_tank_info_to_list(LibdivecomputerPluginTa
   fl_value_append_take(values, self->start_pressure_bar != nullptr ? fl_value_new_float(*self->start_pressure_bar) : fl_value_new_null());
   fl_value_append_take(values, self->end_pressure_bar != nullptr ? fl_value_new_float(*self->end_pressure_bar) : fl_value_new_null());
   fl_value_append_take(values, self->usage != nullptr ? fl_value_new_int(*self->usage) : fl_value_new_null());
+  fl_value_append_take(values, self->transmitter_serial != nullptr ? fl_value_new_int(*self->transmitter_serial) : fl_value_new_null());
   return values;
 }
 
@@ -1028,7 +1043,14 @@ static LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new_from_
     usage_value = fl_value_get_int(value5);
     usage = &usage_value;
   }
-  return libdivecomputer_plugin_tank_info_new(index, gas_mix_index, volume_liters, start_pressure_bar, end_pressure_bar, usage);
+  FlValue* value6 = fl_value_get_list_value(values, 6);
+  int64_t* transmitter_serial = nullptr;
+  int64_t transmitter_serial_value;
+  if (fl_value_get_type(value6) != FL_VALUE_TYPE_NULL) {
+    transmitter_serial_value = fl_value_get_int(value6);
+    transmitter_serial = &transmitter_serial_value;
+  }
+  return libdivecomputer_plugin_tank_info_new(index, gas_mix_index, volume_liters, start_pressure_bar, end_pressure_bar, usage, transmitter_serial);
 }
 
 struct _LibdivecomputerPluginDiveEvent {
@@ -2413,8 +2435,10 @@ static void libdivecomputer_plugin_dive_computer_host_api_start_download_cb(FlBa
   LibdivecomputerPluginDiscoveredDevice* device = LIBDIVECOMPUTER_PLUGIN_DISCOVERED_DEVICE(fl_value_get_custom_value_object(value0));
   FlValue* value1 = fl_value_get_list_value(message_, 1);
   const gchar* fingerprint = fl_value_get_string(value1);
+  FlValue* value2 = fl_value_get_list_value(message_, 2);
+  gboolean sync_clock = fl_value_get_bool(value2);
   g_autoptr(LibdivecomputerPluginDiveComputerHostApiResponseHandle) handle = libdivecomputer_plugin_dive_computer_host_api_response_handle_new(channel, response_handle);
-  self->vtable->start_download(device, fingerprint, handle, self->user_data);
+  self->vtable->start_download(device, fingerprint, sync_clock, handle, self->user_data);
 }
 
 static void libdivecomputer_plugin_dive_computer_host_api_cancel_download_cb(FlBasicMessageChannel* channel, FlValue* message_, FlBasicMessageChannelResponseHandle* response_handle, gpointer user_data) {
@@ -3023,11 +3047,12 @@ static void libdivecomputer_plugin_dive_computer_flutter_api_on_download_complet
   g_task_return_pointer(task, result, g_object_unref);
 }
 
-void libdivecomputer_plugin_dive_computer_flutter_api_on_download_complete(LibdivecomputerPluginDiveComputerFlutterApi* self, int64_t total_dives, const gchar* serial_number, const gchar* firmware_version, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data) {
+void libdivecomputer_plugin_dive_computer_flutter_api_on_download_complete(LibdivecomputerPluginDiveComputerFlutterApi* self, int64_t total_dives, const gchar* serial_number, const gchar* firmware_version, const gchar* clock_sync_status, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data) {
   g_autoptr(FlValue) args = fl_value_new_list();
   fl_value_append_take(args, fl_value_new_int(total_dives));
   fl_value_append_take(args, serial_number != nullptr ? fl_value_new_string(serial_number) : fl_value_new_null());
   fl_value_append_take(args, firmware_version != nullptr ? fl_value_new_string(firmware_version) : fl_value_new_null());
+  fl_value_append_take(args, clock_sync_status != nullptr ? fl_value_new_string(clock_sync_status) : fl_value_new_null());
   g_autofree gchar* channel_name = g_strdup_printf("dev.flutter.pigeon.libdivecomputer_plugin.DiveComputerFlutterApi.onDownloadComplete%s", self->suffix);
   g_autoptr(LibdivecomputerPluginMessageCodec) codec = libdivecomputer_plugin_message_codec_new();
   FlBasicMessageChannel* channel = fl_basic_message_channel_new(self->messenger, channel_name, FL_MESSAGE_CODEC(codec));

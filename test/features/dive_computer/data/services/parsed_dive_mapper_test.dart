@@ -658,7 +658,8 @@ void main() {
       expect(sample.setpoint, 1.3);
       expect(sample.ppo2, 1.28);
       expect(sample.cns, 15.5);
-      expect(sample.rbt, 45);
+      // libdc reports RBT in minutes; the app stores seconds.
+      expect(sample.rbt, 45 * 60);
       expect(sample.decoType, 2);
       expect(sample.decoTime, 180);
       expect(sample.decoDepth, 6.0);

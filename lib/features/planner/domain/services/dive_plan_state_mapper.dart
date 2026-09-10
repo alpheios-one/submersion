@@ -1,4 +1,5 @@
 import 'package:submersion/features/dive_planner/domain/entities/plan_result.dart';
+import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 
@@ -6,10 +7,9 @@ import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
 /// [domain.DivePlan] aggregate.
 ///
 /// The UI state carries a subset of the aggregate; [existing] preserves
-/// fields the state does not know about (rates, water type, air breaks)
-/// across an edit-save cycle so a plan touched by the UI does not lose
-/// them. Mode, setpoints, contingency config, and dive links travel WITH
-/// the state.
+/// fields the state does not know about (air breaks) across an edit-save
+/// cycle so a plan touched by the UI does not lose them. Mode, setpoints,
+/// contingency config, water type, and dive links travel WITH the state.
 domain.DivePlan divePlanFromState(
   DivePlanState state, {
   domain.DivePlan? existing,
@@ -32,6 +32,10 @@ domain.DivePlan divePlanFromState(
     clearSiteId: state.siteId == null,
     altitude: state.altitude,
     clearAltitude: state.altitude == null,
+    waterType: state.waterType,
+    clearWaterType: state.waterType == null,
+    salinityPpt: state.salinityPpt,
+    clearSalinityPpt: state.salinityPpt == null,
     startDateTime: state.startDateTime,
     clearStartDateTime: state.startDateTime == null,
     mode: state.mode,
@@ -55,6 +59,10 @@ domain.DivePlan divePlanFromState(
     gfHigh: state.gfHigh,
     sacBottom: state.sacRate,
     ascentRate: state.ascentRate,
+    intermediateAscentRate: state.intermediateAscentRate,
+    shallowAscentRate: state.shallowAscentRate,
+    finalAscentRate: state.finalAscentRate,
+    lastStopDepth: state.lastStopDepth,
     descentRate: state.descentRate,
     reservePressure: state.reservePressure,
     surfaceInterval: state.surfaceInterval,
@@ -62,6 +70,7 @@ domain.DivePlan divePlanFromState(
     segments: state.segments,
     tanks: state.tanks,
     equipmentIds: state.equipmentIds,
+    gearProvenance: state.gearProvenance,
     plannedWeightKg: state.plannedWeightKg,
     plannedWeightPlacement: state.plannedWeightPlacement,
     clearPlannedWeight: state.plannedWeightKg == null,
@@ -71,13 +80,24 @@ domain.DivePlan divePlanFromState(
 }
 
 /// Restores the legacy planner state from a persisted plan.
+///
+/// Segments are sorted by `order` on the way in. The state's list order is
+/// the planner's working order - the segment list renders it, the reorder
+/// handler indexes into it, and `SegmentChain` chains it - so a plan whose
+/// list arrives out of sequence (a `.subplan` file carries its own `order`
+/// values alongside the array) would otherwise show and edit a different
+/// profile from the one the engine computes, which sorts.
 DivePlanState stateFromDivePlan(domain.DivePlan plan) {
+  final segments = List<PlanSegment>.from(plan.segments)
+    ..sort((a, b) => a.order.compareTo(b.order));
   return DivePlanState(
     id: plan.id,
     name: plan.name,
     notes: plan.notes,
     siteId: plan.siteId,
     altitude: plan.altitude,
+    waterType: plan.waterType,
+    salinityPpt: plan.salinityPpt,
     startDateTime: plan.startDateTime,
     mode: plan.mode,
     setpointLow: plan.setpointLow,
@@ -93,12 +113,17 @@ DivePlanState stateFromDivePlan(domain.DivePlan plan) {
     gfHigh: plan.gfHigh,
     sacRate: plan.sacBottom,
     ascentRate: plan.ascentRate,
+    intermediateAscentRate: plan.intermediateAscentRate,
+    shallowAscentRate: plan.shallowAscentRate,
+    finalAscentRate: plan.finalAscentRate,
+    lastStopDepth: plan.lastStopDepth,
     descentRate: plan.descentRate,
     reservePressure: plan.reservePressure,
     surfaceInterval: plan.surfaceInterval,
-    segments: plan.segments,
+    segments: segments,
     tanks: plan.tanks,
     equipmentIds: plan.equipmentIds,
+    gearProvenance: plan.gearProvenance,
     plannedWeightKg: plan.plannedWeightKg,
     plannedWeightPlacement: plan.plannedWeightPlacement,
     isDirty: false,

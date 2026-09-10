@@ -5,11 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis_auth/auth_io.dart' as gauth;
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/desktop_oauth_authenticator.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_client_config.dart';
 import 'package:submersion/core/services/cloud_storage/google_drive/google_drive_token_store.dart';
 import 'package:submersion/core/services/cloud_storage/http_timeouts.dart';
+import 'package:submersion/core/services/logger_service.dart';
 
 class _MemoryTokenStore implements GoogleDriveTokenStore {
   gauth.AccessCredentials? stored;
@@ -79,6 +81,7 @@ void main() {
   DesktopOAuthAuthenticator authenticator({
     gauth.AccessCredentials? consentResult,
     List<_FakeRefreshingClient>? builtClients,
+    bool browserOpens = true,
   }) => DesktopOAuthAuthenticator(
     tokenStore: store,
     obtainConsent: (clientId, scopes, client, prompt) async {
@@ -94,8 +97,91 @@ void main() {
       return fake;
     },
     baseClientFactory: baseClient,
-    launchBrowser: (url) async {},
+    launchBrowser: (url) async => browserOpens,
   );
+
+  group('consent browser hand-off', () {
+    test(
+      'keeps the consent URL out of the log when the browser opened',
+      () async {
+        // The URL carries the PKCE challenge and the state parameter. On the
+        // happy path it is a very long line nobody reads and a needless copy
+        // of the request's one-time secrets.
+        final captured = <LogEntry>[];
+        final sub = LoggerService.logStream.listen(captured.add);
+        addTearDown(sub.cancel);
+
+        await authenticator(
+          consentResult: creds(refreshToken: 'rt'),
+        ).authenticate();
+        await pumpEventQueue();
+
+        expect(
+          captured.where((e) => e.message.contains('accounts.google.com')),
+          isEmpty,
+        );
+      },
+    );
+
+    test('a browser that never opens is logged, not swallowed', () async {
+      // openInBrowser reports "nothing took the URL" by returning false, not
+      // by throwing, and the loopback flow then parks on the redirect. With
+      // the result discarded this read as a hang with nothing in the log.
+      final captured = <LogEntry>[];
+      final sub = LoggerService.logStream.listen(captured.add);
+      addTearDown(sub.cancel);
+
+      await authenticator(
+        consentResult: creds(refreshToken: 'rt'),
+        browserOpens: false,
+      ).authenticate();
+      await pumpEventQueue();
+
+      expect(
+        captured.where(
+          (e) =>
+              e.level == LogLevel.error &&
+              e.message.contains('open the Google consent page'),
+        ),
+        isNotEmpty,
+        reason: 'a false return must reach the log like a thrown failure does',
+      );
+      // And the URL itself, which is the only way to finish consent by hand
+      // on a desktop that cannot open a browser at all.
+      expect(
+        captured.where((e) => e.message.contains('accounts.google.com')),
+        isNotEmpty,
+      );
+    });
+  });
+
+  group('silent sign-in', () {
+    test('two concurrent callers install one client and close none', () async {
+      // The `_authClient != null` guard is read BEFORE the token store await,
+      // so without single-flighting both callers get past it, both install,
+      // and the second install closes the client the first one already handed
+      // to GoogleDriveStorageProvider (and to the media store). Every later
+      // Drive call then fails with "Client is already closed" for the life of
+      // the process, because authClient is still non-null so nothing rebuilds.
+      //
+      // Two callers is the ordinary case, not a corner: the Cloud Sync page
+      // fires an unawaited refreshState() -> isAuthenticated() while a launch
+      // sync is already inside its own isAuthenticated().
+      store.stored = creds(refreshToken: 'rt-1');
+      final built = <_FakeRefreshingClient>[];
+      final auth = authenticator(builtClients: built);
+
+      final results = await Future.wait([
+        auth.attemptSilentAuth(),
+        auth.attemptSilentAuth(),
+      ]);
+
+      expect(results, [true, true]);
+      expect(built, hasLength(1), reason: 'the second caller must reuse');
+      expect(built.single.closed, isFalse);
+      expect(auth.authClient, same(built.single));
+    });
+  });
 
   group('client credentials', () {
     // Google rejects the token exchange for Desktop-app clients with
@@ -114,7 +200,7 @@ void main() {
         buildClient: (clientId, credentials, base) =>
             _FakeRefreshingClient(credentials),
         baseClientFactory: baseClient,
-        launchBrowser: (url) async {},
+        launchBrowser: (url) async => true,
       );
       await auth.authenticate();
       return seen;
@@ -156,7 +242,7 @@ void main() {
         capturedBase = base;
         return _FakeRefreshingClient(credentials);
       },
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
 
     expect(await auth.attemptSilentAuth(), isTrue);
@@ -231,7 +317,7 @@ void main() {
       buildClient: (clientId, credentials, base) =>
           _FakeRefreshingClient(credentials),
       baseClientFactory: baseClient,
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
 
     expect(auth.authenticate(), throwsA(isA<CloudStorageException>()));
@@ -278,7 +364,7 @@ void main() {
           _FakeRefreshingClient(credentials),
       baseClientFactory: () =>
           MockClient((request) async => throw Exception('offline')),
-      launchBrowser: (url) async {},
+      launchBrowser: (url) async => true,
     );
     await auth.attemptSilentAuth();
 

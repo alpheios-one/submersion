@@ -314,6 +314,7 @@ class TankInfo {
     this.startPressureBar,
     this.endPressureBar,
     this.usage,
+    this.transmitterSerial,
   });
 
   int index;
@@ -330,6 +331,12 @@ class TankInfo {
   /// 3=sidemount); null when the computer reported no usage (DC_USAGE_NONE).
   int? usage;
 
+  /// Serial number of the air-integration transmitter that reported this
+  /// tank's pressures (`dc_tank_t.serial`, a fork extension); null when the
+  /// computer reported none. Identifies the physical cylinder across
+  /// computers paired to the same transmitter.
+  int? transmitterSerial;
+
   Object encode() {
     return <Object?>[
       index,
@@ -338,6 +345,7 @@ class TankInfo {
       startPressureBar,
       endPressureBar,
       usage,
+      transmitterSerial,
     ];
   }
 
@@ -350,6 +358,7 @@ class TankInfo {
       startPressureBar: result[3] as double?,
       endPressureBar: result[4] as double?,
       usage: result[5] as int?,
+      transmitterSerial: result[6] as int?,
     );
   }
 }
@@ -750,6 +759,7 @@ class DiveComputerHostApi {
   Future<void> startDownload(
     DiscoveredDevice device,
     String? fingerprint,
+    bool syncClock,
   ) async {
     final String pigeonVar_channelName =
         'dev.flutter.pigeon.libdivecomputer_plugin.DiveComputerHostApi.startDownload$pigeonVar_messageChannelSuffix';
@@ -760,7 +770,7 @@ class DiveComputerHostApi {
           binaryMessenger: pigeonVar_binaryMessenger,
         );
     final List<Object?>? pigeonVar_replyList =
-        await pigeonVar_channel.send(<Object?>[device, fingerprint])
+        await pigeonVar_channel.send(<Object?>[device, fingerprint, syncClock])
             as List<Object?>?;
     if (pigeonVar_replyList == null) {
       throw _createConnectionError(pigeonVar_channelName);
@@ -903,6 +913,7 @@ abstract class DiveComputerFlutterApi {
     int totalDives,
     String? serialNumber,
     String? firmwareVersion,
+    String? clockSyncStatus,
   );
 
   void onError(DiveComputerError error);
@@ -1068,11 +1079,13 @@ abstract class DiveComputerFlutterApi {
           );
           final String? arg_serialNumber = (args[1] as String?);
           final String? arg_firmwareVersion = (args[2] as String?);
+          final String? arg_clockSyncStatus = (args[3] as String?);
           try {
             api.onDownloadComplete(
               arg_totalDives!,
               arg_serialNumber,
               arg_firmwareVersion,
+              arg_clockSyncStatus,
             );
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {

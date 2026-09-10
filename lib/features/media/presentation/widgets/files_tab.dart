@@ -12,6 +12,7 @@ import 'package:submersion/features/media/domain/value_objects/media_attach_targ
 import 'package:submersion/features/media/presentation/providers/files_tab_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/file_review_pane.dart';
+import 'package:submersion/features/media/presentation/helpers/offer_site_review_after_import.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Files tab in the photo picker.
@@ -314,21 +315,26 @@ class FilesTab extends ConsumerWidget {
   // exercised by manual desktop smoke tests + by the notifier unit tests.
   Future<void> _commit(BuildContext context, WidgetRef ref) async {
     final notifier = ref.read(filesTabNotifierProvider.notifier);
+    // Captured with the messenger and navigator: all three read from context,
+    // which must not be touched after the await below.
+    final l10n = context.l10n;
     // The picker uses a bare Scaffold, so this resolves to the root
     // ScaffoldMessenger, which outlives the pop below and shows the snackbar
     // on the dive-detail view we return to.
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    // Captured with the messenger and navigator: all three read from context,
-    // which must not be touched after the await below.
-    final l10n = context.l10n;
+    // commit() clears the staged state, so snapshot the dives first.
+    final diveIds = ref
+        .read(filesTabNotifierProvider)
+        .match
+        .matched
+        .keys
+        .toList();
     final created = await notifier.commit(target: target);
     if (!context.mounted) return;
-    // Return to the detail view now that the files are linked; the grid
-    // refreshes reactively via mediaForDiveProvider's watchDiveDetailChanges,
-    // and mediaForSiteProvider's invalidateSelfWhen(watchMediaChanges) does
-    // the same for a site.
-    navigator.pop();
+    // Both snackbars go to the root messenger and so are enqueued before the
+    // pop, which is what keeps `ref` and `context` alive for the site-review
+    // offer below; the messenger outlives the pop either way.
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -342,6 +348,20 @@ class FilesTab extends ConsumerWidget {
         ),
       ),
     );
+    if (!_isSiteSession) {
+      await offerSiteReviewAfterImport(
+        context,
+        ref,
+        diveIds,
+        messenger: messenger,
+      );
+    }
+    if (!context.mounted) return;
+    // Return to the detail view now that the files are linked; the grid
+    // refreshes reactively via mediaForDiveProvider's watchDiveDetailChanges,
+    // and mediaForSiteProvider's invalidateSelfWhen(watchMediaChanges) does
+    // the same for a site.
+    navigator.pop();
   }
 
   // coverage:ignore-end

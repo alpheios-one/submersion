@@ -42,6 +42,24 @@ void main() {
     );
   }
 
+  /// Seeds a real equipment row for a template item to link to.
+  ///
+  /// equipment_id is deliberately a plain nullable column with no SQL-level
+  /// foreign key (built-in templates are reseeded on every open, and a real
+  /// FK breaks isolated migration fixtures that omit the equipment table), so
+  /// nothing in the schema forces this row to exist. It is seeded anyway
+  /// because these tests assert the application-level link round-trips
+  /// against a row that genuinely exists.
+  Future<void> seedEquipment(String id) async {
+    final db = DatabaseService.instance.database;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await db.customStatement(
+      'INSERT INTO equipment (id, name, type, created_at, updated_at) '
+      'VALUES (?, ?, ?, ?, ?)',
+      [id, id, 'other', now, now],
+    );
+  }
+
   domain.PreDiveChecklistTemplateItem item(
     String templateId,
     String title, {
@@ -87,6 +105,69 @@ void main() {
     expect(items[1].valueMin, 8.5);
     expect(items[1].isRequired, isTrue);
   });
+
+  test('saveItems round-trips the remembered equipment link', () async {
+    await seedEquipment('g1');
+    final tpl = await repository.createTemplate(template());
+    await repository.saveItems(tpl.id, [
+      item(
+        tpl.id,
+        'Computer check',
+      ).copyWith(itemType: domain.PreDiveItemType.equipment, equipmentId: 'g1'),
+    ]);
+    final items = await repository.getItemsForTemplate(tpl.id);
+    expect(items.single.itemType, domain.PreDiveItemType.equipment);
+    expect(items.single.equipmentId, 'g1');
+  });
+
+  test(
+    'updateItemEquipment persists the choice without touching content',
+    () async {
+      await seedEquipment('g1');
+      final tpl = await repository.createTemplate(template());
+      await repository.saveItems(tpl.id, [
+        item(
+          tpl.id,
+          'Computer check',
+        ).copyWith(itemType: domain.PreDiveItemType.equipment),
+      ]);
+      final saved = await repository.getItemsForTemplate(tpl.id);
+      expect(saved.single.equipmentId, isNull);
+
+      await repository.updateItemEquipment(saved.single.id, 'g1');
+      final updated = await repository.getItemsForTemplate(tpl.id);
+      expect(updated.single.equipmentId, 'g1');
+      expect(updated.single.title, 'Computer check');
+
+      await repository.updateItemEquipment(saved.single.id, null);
+      final cleared = await repository.getItemsForTemplate(tpl.id);
+      expect(cleared.single.equipmentId, isNull);
+    },
+  );
+
+  test(
+    'updateItemEquipment is allowed on built-in templates, unlike saveItems',
+    () async {
+      await seedEquipment('g1');
+      final builtIn = await repository.createTemplate(
+        template(name: 'Built-in').copyWith(isBuiltIn: true, builtinKey: 'k'),
+      );
+      // saveItems itself rejects built-ins; seed the item with a direct
+      // write so this test isolates updateItemEquipment's own guard-free
+      // behavior.
+      final db = DatabaseService.instance.database;
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db.customStatement(
+        'INSERT INTO pre_dive_checklist_template_items '
+        '(id, template_id, title, created_at, updated_at) '
+        "VALUES ('bi1', '${builtIn.id}', 'Computer check', $now, $now)",
+      );
+
+      await repository.updateItemEquipment('bi1', 'g1');
+      final items = await repository.getItemsForTemplate(builtIn.id);
+      expect(items.single.equipmentId, 'g1');
+    },
+  );
 
   test('deleteTemplate tombstones the template and each item', () async {
     final tpl = await repository.createTemplate(template());
@@ -168,4 +249,73 @@ void main() {
       expect(names, isNot(contains('Theirs')));
     },
   );
+
+  group('cell linearity link (#986)', () {
+    domain.PreDiveChecklistTemplateItem linked(
+      String templateId, {
+      required String id,
+      required String title,
+      domain.PreDiveItemType type = domain.PreDiveItemType.value,
+      String? sourceItemId,
+      int order = 0,
+    }) {
+      final now = DateTime.now();
+      return domain.PreDiveChecklistTemplateItem(
+        id: id,
+        templateId: templateId,
+        title: title,
+        sortOrder: order,
+        itemType: type,
+        sourceItemId: sourceItemId,
+        createdAt: now,
+        updatedAt: now,
+      );
+    }
+
+    test('saveItems persists sourceItemId', () async {
+      final tpl = await repository.createTemplate(template());
+      await repository.saveItems(tpl.id, [
+        linked(tpl.id, id: 'air1', title: 'Cell 1 mV in air'),
+        linked(
+          tpl.id,
+          id: 'o2-1',
+          title: 'Cell 1 mV in O2',
+          type: domain.PreDiveItemType.cellLinearity,
+          sourceItemId: 'air1',
+          order: 1,
+        ),
+      ]);
+      final items = await repository.getItemsForTemplate(tpl.id);
+      final linearity = items.firstWhere((i) => i.id == 'o2-1');
+      expect(linearity.sourceItemId, 'air1');
+      expect(linearity.itemType, domain.PreDiveItemType.cellLinearity);
+    });
+
+    test('cloneTemplate remaps the link to the new ids', () async {
+      final tpl = await repository.createTemplate(template());
+      await repository.saveItems(tpl.id, [
+        linked(tpl.id, id: 'air1', title: 'Cell 1 mV in air'),
+        linked(
+          tpl.id,
+          id: 'o2-1',
+          title: 'Cell 1 mV in O2',
+          type: domain.PreDiveItemType.cellLinearity,
+          sourceItemId: 'air1',
+          order: 1,
+        ),
+      ]);
+
+      final clone = await repository.cloneTemplate(tpl.id, newName: 'My CCR');
+      final items = await repository.getItemsForTemplate(clone.id);
+      final air = items.firstWhere((i) => i.title == 'Cell 1 mV in air');
+      final linearity = items.firstWhere((i) => i.title == 'Cell 1 mV in O2');
+
+      expect(air.id, isNot('air1'), reason: 'the clone gets fresh ids');
+      expect(
+        linearity.sourceItemId,
+        air.id,
+        reason: 'the link must follow the remap, not dangle at the old id',
+      );
+    });
+  });
 }

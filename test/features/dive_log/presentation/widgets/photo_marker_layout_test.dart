@@ -1,10 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
 MediaItem _media({
   String id = 'm1',
   MediaType type = MediaType.photo,
+  MediaSourceType sourceType = MediaSourceType.platformGallery,
   MediaEnrichment? enrichment,
 }) {
   final now = DateTime.utc(2026, 1, 1);
@@ -12,6 +14,7 @@ MediaItem _media({
     id: id,
     diveId: 'dive-1',
     mediaType: type,
+    sourceType: sourceType,
     takenAt: now,
     createdAt: now,
     updatedAt: now,
@@ -77,6 +80,20 @@ void main() {
         expect(markers, isEmpty);
       },
     );
+
+    // Issue #1358: a buddy signature's file_type is 'buddy_signature', which
+    // parses to MediaType.photo, so the old MediaType-only guard let one
+    // through as a dive photo. It is a signature by source type instead.
+    test('excludes a buddy signature, which types as a photo', () {
+      final markers = photoMarkersFromMedia([
+        _media(
+          id: 'bs1',
+          sourceType: MediaSourceType.signature,
+          enrichment: _enrichment(),
+        ),
+      ], maxProfileSeconds: 3600);
+      expect(markers, isEmpty);
+    });
 
     test('clamps elapsed seconds into the profile range and sorts by time', () {
       final markers = photoMarkersFromMedia([

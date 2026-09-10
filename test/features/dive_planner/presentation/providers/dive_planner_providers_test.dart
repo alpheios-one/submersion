@@ -1,27 +1,36 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/deco/entities/dive_environment.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_planner/data/services/plan_calculator_service.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_result.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
+import 'package:submersion/features/equipment/domain/services/gear_tree.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   // Null means "leave at the AppSettings default", so these fixtures cannot
   // drift away from the real defaults.
-  _TestSettingsNotifier({PressureUnit? pressureUnit, int? gfLow, int? gfHigh})
-    : super(
-        const AppSettings().copyWith(
-          pressureUnit: pressureUnit,
-          gfLow: gfLow,
-          gfHigh: gfHigh,
-        ),
-      );
+  _TestSettingsNotifier({
+    PressureUnit? pressureUnit,
+    int? gfLow,
+    int? gfHigh,
+    PlannerWaterType? plannerWater,
+  }) : super(
+         const AppSettings().copyWith(
+           pressureUnit: pressureUnit,
+           gfLow: gfLow,
+           gfHigh: gfHigh,
+           defaultPlannerWaterType: plannerWater,
+         ),
+       );
 
   void updatePressureUnitForTest(PressureUnit unit) {
     state = state.copyWith(pressureUnit: unit);
@@ -29,6 +38,10 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 
   void updateGradientFactorsForTest(int low, int high) {
     state = state.copyWith(gfLow: low, gfHigh: high);
+  }
+
+  void updatePlannerWaterForTest(PlannerWaterType type) {
+    state = state.copyWith(defaultPlannerWaterType: type);
   }
 
   @override
@@ -54,6 +67,182 @@ void main() {
       final state = container.read(divePlanNotifierProvider);
       // 500 psi ≈ 34.47 bar
       expect(state.reservePressure, closeTo(34.47, 0.5));
+    });
+
+    test('a new plan starts on salt water', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        container.read(divePlanNotifierProvider).waterType,
+        WaterType.salt,
+      );
+    });
+
+    test('a new plan starts on the diver default water type', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) =>
+                _TestSettingsNotifier(plannerWater: PlannerWaterType.fresh),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        container.read(divePlanNotifierProvider).waterType,
+        WaterType.fresh,
+      );
+    });
+
+    test('a new plan starts on custom salinity when that is the default', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) =>
+                _TestSettingsNotifier(plannerWater: PlannerWaterType.custom),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.waterType, isNull);
+      expect(state.salinityPpt, DiveEnvironment.typicalSeaSalinityPpt);
+    });
+
+    test('an untouched plan follows later planner water settings', () {
+      final settingsNotifier = _TestSettingsNotifier();
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      expect(
+        container.read(divePlanNotifierProvider).waterType,
+        WaterType.salt,
+      );
+
+      settingsNotifier.updatePlannerWaterForTest(PlannerWaterType.fresh);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.waterType, WaterType.fresh);
+      expect(state.salinityPpt, isNull);
+      expect(state.isDirty, isFalse);
+    });
+
+    test('an untouched plan adopts a later custom water default', () {
+      final settingsNotifier = _TestSettingsNotifier();
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      container.read(divePlanNotifierProvider);
+      settingsNotifier.updatePlannerWaterForTest(PlannerWaterType.custom);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.waterType, isNull);
+      expect(state.salinityPpt, DiveEnvironment.typicalSeaSalinityPpt);
+      expect(state.isDirty, isFalse);
+    });
+
+    test('adopting the current water type is a no-op', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      final before = container.read(divePlanNotifierProvider);
+      notifier.adoptPlannerWaterIfPristine(PlannerWaterType.salt);
+      expect(container.read(divePlanNotifierProvider).id, before.id);
+      expect(container.read(divePlanNotifierProvider).isDirty, isFalse);
+    });
+
+    test('a hand-tuned plan ignores later planner water settings', () {
+      final settingsNotifier = _TestSettingsNotifier();
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .updateWaterType(WaterType.fresh);
+
+      settingsNotifier.updatePlannerWaterForTest(PlannerWaterType.custom);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.waterType, WaterType.fresh);
+      expect(state.salinityPpt, isNull);
+    });
+
+    test('a plan with segments ignores later planner water settings', () {
+      final settingsNotifier = _TestSettingsNotifier();
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .addSimplePlan(maxDepth: 30.0, bottomTimeMinutes: 20);
+      // addSimplePlan is a structural edit; keep water salt, then prove
+      // settings cannot rewrite it.
+      expect(
+        container.read(divePlanNotifierProvider).waterType,
+        WaterType.salt,
+      );
+
+      settingsNotifier.updatePlannerWaterForTest(PlannerWaterType.fresh);
+
+      expect(
+        container.read(divePlanNotifierProvider).waterType,
+        WaterType.salt,
+      );
+    });
+
+    test('newPlan re-reads planner water from the diver settings', () {
+      final settingsNotifier = _TestSettingsNotifier();
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      notifier.updateWaterType(WaterType.fresh);
+      settingsNotifier.updatePlannerWaterForTest(PlannerWaterType.custom);
+      notifier.newPlan();
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.waterType, isNull);
+      expect(state.salinityPpt, DiveEnvironment.typicalSeaSalinityPpt);
+    });
+
+    test('selectCustomSalinity seeds EN13319 when water type is unset', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      notifier.updateWaterType(null);
+      notifier.selectCustomSalinity();
+      expect(container.read(divePlanNotifierProvider).waterType, isNull);
+      expect(
+        container.read(divePlanNotifierProvider).salinityPpt,
+        DiveEnvironment.typicalSeaSalinityPpt,
+      );
     });
 
     test('uses 50 bar reserve when pressure unit is bar', () {
@@ -86,9 +275,7 @@ void main() {
           segments: [
             PlanSegment(
               id: 'seg-1',
-              type: SegmentType.bottom,
-              startDepth: 20,
-              endDepth: 20,
+              targetDepth: 20,
               durationSeconds: 30 * 60,
               tankId: tank.id,
               gasMix: tank.gasMix,
@@ -103,6 +290,94 @@ void main() {
       expect(dive.runtime, isNotNull);
       expect(dive.runtime!.inSeconds, 30 * 60);
       expect(dive.isPlanned, isTrue);
+    });
+
+    test(
+      'updateWaterType stores water type, marks dirty, and toDive copies it',
+      () {
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(divePlanNotifierProvider.notifier);
+        expect(
+          container.read(divePlanNotifierProvider).waterType,
+          WaterType.salt,
+        );
+
+        notifier.updateWaterType(WaterType.fresh);
+        expect(
+          container.read(divePlanNotifierProvider).waterType,
+          WaterType.fresh,
+        );
+        expect(container.read(divePlanNotifierProvider).isDirty, isTrue);
+        expect(notifier.toDive().waterType, WaterType.fresh);
+
+        notifier.updateWaterType(null);
+        expect(container.read(divePlanNotifierProvider).waterType, isNull);
+      },
+    );
+
+    test('selectCustomSalinity seeds from the current type and clears it', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      notifier.updateWaterType(WaterType.fresh);
+      notifier.selectCustomSalinity();
+      expect(container.read(divePlanNotifierProvider).waterType, isNull);
+      expect(container.read(divePlanNotifierProvider).salinityPpt, 0.0);
+
+      notifier.updateSalinityPpt(20);
+      expect(container.read(divePlanNotifierProvider).salinityPpt, 20);
+      notifier.updateWaterType(WaterType.salt);
+      expect(container.read(divePlanNotifierProvider).salinityPpt, isNull);
+    });
+
+    test('plan results follow custom salinity', () {
+      int ttsForSalinity(double ppt) {
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(divePlanNotifierProvider.notifier);
+        notifier.addSimplePlan(maxDepth: 45.0, bottomTimeMinutes: 25);
+        notifier.updateSalinityPpt(ppt);
+        return container.read(planResultsProvider).ttsAtBottom;
+      }
+
+      expect(ttsForSalinity(40), greaterThan(ttsForSalinity(0)));
+    });
+
+    test('plan results follow the plan water type', () {
+      int ttsForWaterType(WaterType waterType) {
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(divePlanNotifierProvider.notifier);
+        notifier.addSimplePlan(maxDepth: 45.0, bottomTimeMinutes: 25);
+        notifier.updateWaterType(waterType);
+        return container.read(planResultsProvider).ttsAtBottom;
+      }
+
+      expect(
+        ttsForWaterType(WaterType.salt),
+        greaterThan(ttsForWaterType(WaterType.fresh)),
+      );
     });
 
     test(
@@ -316,6 +591,54 @@ void main() {
 
       notifier.setLinkedDive(null);
       expect(notifier.state.linkedDiveId, isNull);
+    });
+
+    test('setEquipmentIds keeps provenance in step with the ids (#1487)', () {
+      final notifier = DivePlanNotifier(PlanCalculatorService());
+      addTearDown(notifier.dispose);
+
+      notifier.setGear(
+        const ['reg', 'hose'],
+        const [
+          GearProvenance(equipmentId: 'reg', viaSetId: 'winter'),
+          GearProvenance(
+            equipmentId: 'hose',
+            viaEquipmentId: 'reg',
+            viaSetId: 'winter',
+          ),
+        ],
+      );
+      // The id-only setter: a surviving id keeps its row, a new id starts
+      // loose, a dropped id takes its row with it.
+      notifier.setEquipmentIds(const ['reg', 'mask']);
+
+      final rows = notifier.state.gearProvenance;
+      expect(rows.map((p) => p.equipmentId), ['reg', 'mask']);
+      expect(rows[0].viaSetId, 'winter');
+      expect(rows[1].isTopLevel, isTrue);
+      expect(rows[1].viaSetId, isNull);
+    });
+
+    test('fullGearProvenance gives every id a row so an assembly whose own '
+        'row is missing still rolls up (#1487)', () {
+      final notifier = DivePlanNotifier(PlanCalculatorService());
+      addTearDown(notifier.dispose);
+
+      // A sparse list: the wing's row names the bcd as parent, but the bcd
+      // has no row of its own. Read raw, the wing is an orphan and nothing
+      // rolls up, so buoyancy would count the bcd and the wing.
+      final state = notifier.state.copyWith(
+        equipmentIds: const ['bcd', 'wing'],
+        gearProvenance: const [
+          GearProvenance(equipmentId: 'wing', viaEquipmentId: 'bcd'),
+        ],
+      );
+
+      final full = state.fullGearProvenance;
+      expect(full.map((p) => p.equipmentId), ['bcd', 'wing']);
+      expect(full[0].isTopLevel, isTrue);
+      expect(full[1].viaEquipmentId, 'bcd');
+      expect(GearTree.rolledUpIds(full), {'bcd'});
     });
   });
 }

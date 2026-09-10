@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/deco/schedule_policy.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
 
 /// Breathing mode of a saved dive plan.
 ///
@@ -33,6 +34,11 @@ class DivePlan extends Equatable {
   final double? altitude;
   final WaterType? waterType;
 
+  /// Custom salinity in ppt. When set, this wins over [waterType] for deco
+  /// density - including when [waterType] is null. With both null the planner
+  /// falls back to salt water, its default for a new plan.
+  final double? salinityPpt;
+
   /// Planned start time; null = "now" at planning. Drives repetitive tissue
   /// init and overlap detection (v120).
   final DateTime? startDateTime;
@@ -41,7 +47,23 @@ class DivePlan extends Equatable {
   final int gfLow;
   final int gfHigh;
   final double descentRate;
+
+  /// Working ascent rate in m/min: leaving the bottom for the first stop.
   final double ascentRate;
+
+  /// Ascent rate in m/min between intermediate (deeper than 9 m) stops -
+  /// slower than [ascentRate], because a diver climbing the stop grid is not
+  /// leaving the bottom.
+  final double intermediateAscentRate;
+
+  /// Ascent rate in m/min between shallow (9 m and above) stops.
+  final double shallowAscentRate;
+
+  /// Ascent rate in m/min from the last stop to the surface. The shallowest
+  /// part of the ascent is where a depth change costs the most pressure
+  /// change, so it is the slowest of the four.
+  final double finalAscentRate;
+
   final double lastStopDepth;
   final int gasSwitchStopSeconds;
   final AirBreakPolicy? airBreaks;
@@ -75,6 +97,11 @@ class DivePlan extends Equatable {
   // Gear & Weights (v104): equipment attached to the plan plus the accepted
   // weight-prediction snapshot (placement keyed by WeightType.name -> kg).
   final List<String> equipmentIds;
+
+  /// Where each id in [equipmentIds] came from (issue #1487): the assembly
+  /// it was attached through and the set applied. An id with no entry is a
+  /// top-level row added by hand.
+  final List<GearProvenance> gearProvenance;
   final double? plannedWeightKg;
   final Map<String, double>? plannedWeightPlacement;
 
@@ -88,11 +115,15 @@ class DivePlan extends Equatable {
     this.mode = PlanMode.oc,
     this.altitude,
     this.waterType,
+    this.salinityPpt,
     this.startDateTime,
     required this.gfLow,
     required this.gfHigh,
     this.descentRate = 18.0,
     this.ascentRate = 9.0,
+    this.intermediateAscentRate = 6.0,
+    this.shallowAscentRate = 3.0,
+    this.finalAscentRate = 1.0,
     this.lastStopDepth = 3.0,
     this.gasSwitchStopSeconds = 0,
     this.airBreaks,
@@ -113,6 +144,7 @@ class DivePlan extends Equatable {
     this.segments = const [],
     this.tanks = const [],
     this.equipmentIds = const [],
+    this.gearProvenance = const [],
     this.plannedWeightKg,
     this.plannedWeightPlacement,
   });
@@ -129,11 +161,13 @@ class DivePlan extends Equatable {
   double get sacStressedEffective => sacStressed ?? sacBottom * 2.5;
 
   /// Deepest point across the user-authored segments (0 if none).
+  ///
+  /// Only targets need checking: every leg starts where the previous one
+  /// finished, so a start depth is always some earlier segment's target.
   double get maxDepth {
     double deepest = 0;
     for (final segment in segments) {
-      if (segment.startDepth > deepest) deepest = segment.startDepth;
-      if (segment.endDepth > deepest) deepest = segment.endDepth;
+      if (segment.targetDepth > deepest) deepest = segment.targetDepth;
     }
     return deepest;
   }
@@ -150,13 +184,18 @@ class DivePlan extends Equatable {
     double? altitude,
     bool clearAltitude = false,
     WaterType? waterType,
+    double? salinityPpt,
     DateTime? startDateTime,
     bool clearStartDateTime = false,
     bool clearWaterType = false,
+    bool clearSalinityPpt = false,
     int? gfLow,
     int? gfHigh,
     double? descentRate,
     double? ascentRate,
+    double? intermediateAscentRate,
+    double? shallowAscentRate,
+    double? finalAscentRate,
     double? lastStopDepth,
     int? gasSwitchStopSeconds,
     AirBreakPolicy? airBreaks,
@@ -188,6 +227,7 @@ class DivePlan extends Equatable {
     List<PlanSegment>? segments,
     List<DiveTank>? tanks,
     List<String>? equipmentIds,
+    List<GearProvenance>? gearProvenance,
     double? plannedWeightKg,
     bool clearPlannedWeight = false,
     Map<String, double>? plannedWeightPlacement,
@@ -205,10 +245,15 @@ class DivePlan extends Equatable {
           ? null
           : (startDateTime ?? this.startDateTime),
       waterType: clearWaterType ? null : (waterType ?? this.waterType),
+      salinityPpt: clearSalinityPpt ? null : (salinityPpt ?? this.salinityPpt),
       gfLow: gfLow ?? this.gfLow,
       gfHigh: gfHigh ?? this.gfHigh,
       descentRate: descentRate ?? this.descentRate,
       ascentRate: ascentRate ?? this.ascentRate,
+      intermediateAscentRate:
+          intermediateAscentRate ?? this.intermediateAscentRate,
+      shallowAscentRate: shallowAscentRate ?? this.shallowAscentRate,
+      finalAscentRate: finalAscentRate ?? this.finalAscentRate,
       lastStopDepth: lastStopDepth ?? this.lastStopDepth,
       gasSwitchStopSeconds: gasSwitchStopSeconds ?? this.gasSwitchStopSeconds,
       airBreaks: clearAirBreaks ? null : (airBreaks ?? this.airBreaks),
@@ -243,6 +288,7 @@ class DivePlan extends Equatable {
       segments: segments ?? this.segments,
       tanks: tanks ?? this.tanks,
       equipmentIds: equipmentIds ?? this.equipmentIds,
+      gearProvenance: gearProvenance ?? this.gearProvenance,
       plannedWeightKg: clearPlannedWeight
           ? null
           : (plannedWeightKg ?? this.plannedWeightKg),
@@ -263,11 +309,15 @@ class DivePlan extends Equatable {
     mode,
     altitude,
     waterType,
+    salinityPpt,
     startDateTime,
     gfLow,
     gfHigh,
     descentRate,
     ascentRate,
+    intermediateAscentRate,
+    shallowAscentRate,
+    finalAscentRate,
     lastStopDepth,
     gasSwitchStopSeconds,
     airBreaks?.o2Seconds,
@@ -289,6 +339,7 @@ class DivePlan extends Equatable {
     segments,
     tanks,
     equipmentIds,
+    gearProvenance,
     plannedWeightKg,
     plannedWeightPlacement,
   ];

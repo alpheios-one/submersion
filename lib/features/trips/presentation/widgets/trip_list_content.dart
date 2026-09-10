@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -9,6 +8,7 @@ import 'package:submersion/core/constants/sort_options_display.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -298,9 +298,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     );
   }
 
-  Future<void> _confirmAndDelete() async {
+  Future<BulkActionOutcome> _confirmAndDelete() async {
     final ids = _selectedIds.toList();
-    if (ids.isEmpty) return;
+    if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -322,7 +322,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(tripListNotifierProvider.notifier);
@@ -332,12 +332,13 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       await notifier.deleteTrip(id);
     }
 
-    if (!mounted) return;
+    if (!mounted) return BulkActionOutcome.completed;
     messenger.showSnackBar(
       SnackBar(
         content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
       ),
     );
+    return BulkActionOutcome.completed;
   }
 
   /// One tap policy for every trip row.
@@ -784,7 +785,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
 }
 
 /// List item widget for displaying a trip
-class TripListTile extends StatelessWidget {
+class TripListTile extends ConsumerWidget {
   final TripWithStats tripWithStats;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -805,9 +806,9 @@ class TripListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final trip = tripWithStats.trip;
-    final dateFormat = DateFormat.yMMMd();
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final theme = Theme.of(context);
 
     final subtitleStr = trip.subtitle != null ? ', ${trip.subtitle}' : '';
@@ -821,7 +822,7 @@ class TripListTile extends StatelessWidget {
     // to match the compact tile and because a translated "to" would need an
     // ARB key per locale to read correctly.
     final dateRangeStr =
-        '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}';
+        '${units.formatDate(trip.startDate)} - ${units.formatDate(trip.endDate)}';
     final tripLabel =
         '${trip.name}, $dateRangeStr$subtitleStr, $diveCountStr$runtimeStr';
 
@@ -899,7 +900,7 @@ class TripListTile extends StatelessWidget {
               // Date range takes the subtitle role from the ListTile above,
               // matching the dive card's date line.
               Text(
-                '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
+                '${units.formatDate(trip.startDate)} - ${units.formatDate(trip.endDate)}',
               ),
               if (trip.subtitle != null)
                 Text(
@@ -1050,7 +1051,7 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
               itemCount: trips.length,
               itemBuilder: (context, index) {
                 final trip = trips[index];
-                final dateFormat = DateFormat.yMMMd();
+                final units = UnitFormatter(ref.watch(settingsProvider));
                 return ListTile(
                   // Same text theme roles as TripListTile so search results do
                   // not fall back to ListTile's bodyLarge title default.
@@ -1085,7 +1086,7 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
                   ),
                   title: Text(trip.name),
                   subtitle: Text(
-                    '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
+                    '${units.formatDate(trip.startDate)} - ${units.formatDate(trip.endDate)}',
                   ),
                   onTap: () {
                     close(context, trip);

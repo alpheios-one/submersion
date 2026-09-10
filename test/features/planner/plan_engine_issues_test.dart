@@ -30,14 +30,16 @@ domain.DivePlan _airPlan({
     reservePressure: reservePressure,
     tanks: tankList,
     segments: [
-      PlanSegment.descent(
+      PlanSegment.travel(
         id: 'seg-1',
+        fromDepth: 0,
         targetDepth: depth,
         tankId: tankId,
         gasMix: _air,
         order: 0,
+        ratePerMinute: 18.0,
       ),
-      PlanSegment.bottom(
+      PlanSegment.hold(
         id: 'seg-2',
         depth: depth,
         durationMinutes: minutes,
@@ -79,12 +81,14 @@ void main() {
         gfHigh: 80,
         tanks: const [tank],
         segments: [
-          PlanSegment.descent(
+          PlanSegment.travel(
             id: 'seg-1',
+            fromDepth: 0,
             targetDepth: 60.0,
             tankId: 'back',
             gasMix: tx1070,
             order: 0,
+            ratePerMinute: 18.0,
           ),
         ],
         createdAt: DateTime(2026, 7, 5),
@@ -167,16 +171,17 @@ void main() {
 
   group('PlanEngine consumption', () {
     test('no-deco plan matches hand-computed liters', () {
-      // 30 m / 10 min air, GF 40/80: no stops.
-      // descent 100 s at avg 15 m (2.5 bar) on bottom SAC 15: 62.5 L
-      // bottom 10 min at 4.0 bar on 15: 600 L
-      // direct ascent 200 s at avg 15 m (2.5 bar) on deco SAC 12: 100 L
-      // total 762.5 L
+      // 30 m / 10 min air, GF 40/80: no stops. Unset water type is salt
+      // (1025 kg/m3), so 15 m is 2.508 bar and 30 m is 4.016 bar.
+      // descent 100 s at avg 15 m on bottom SAC 15: 62.7 L
+      // bottom 10 min at 4.016 bar on 15: 602.3 L
+      // direct ascent 200 s at avg 15 m on deco SAC 12: 100.3 L
+      // total 765.3 L
       final outcome = engine.compute(_airPlan(depth: 30.0, minutes: 10));
       expect(outcome.stops, isEmpty);
-      expect(outcome.tankUsages.single.litersUsed, closeTo(762.5, 1.0));
+      expect(outcome.tankUsages.single.litersUsed, closeTo(765.3, 1.0));
       // Compressibility: remaining is BELOW the ideal-gas figure.
-      const idealRemaining = 232 - 762.5 / 24.0;
+      const idealRemaining = 232 - 765.3 / 24.0;
       expect(
         outcome.tankUsages.single.remainingPressure!,
         lessThan(idealRemaining + 0.01),

@@ -23,6 +23,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion_saf/submersion_saf.dart';
 
 // =============================================================================
@@ -47,6 +48,9 @@ final backupServiceProvider = Provider<BackupService>((ref) {
     encryptionKeyStore: ref.watch(encryptionKeyStoreProvider),
     syncPreferences: ref.watch(syncPreferencesProvider),
     backupEncryptionKeyStore: ref.watch(backupEncryptionKeyStoreProvider),
+    seedVersionStore: PrefsBuiltInSpeciesSeedVersionStore(
+      ref.watch(sharedPreferencesProvider),
+    ),
   );
 });
 

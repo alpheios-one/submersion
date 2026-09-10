@@ -40,6 +40,7 @@ domain.DivePlan _fullPlan() {
     mode: domain.PlanMode.oc,
     altitude: 700.0,
     waterType: WaterType.salt,
+    salinityPpt: 33.0,
     gfLow: 45,
     gfHigh: 80,
     descentRate: 20.0,
@@ -56,14 +57,16 @@ domain.DivePlan _fullPlan() {
     turnPressureRule: domain.TurnPressureRule.thirds,
     tanks: const [tank1, tank2],
     segments: [
-      PlanSegment.descent(
+      PlanSegment.travel(
         id: 'seg-1',
+        fromDepth: 0,
         targetDepth: 60.0,
         tankId: 'tank-1',
         gasMix: backGas,
         order: 0,
+        ratePerMinute: 18.0,
       ),
-      PlanSegment.bottom(
+      PlanSegment.hold(
         id: 'seg-2',
         depth: 60.0,
         durationMinutes: 25,
@@ -102,6 +105,7 @@ void main() {
       expect(loaded.mode, domain.PlanMode.oc);
       expect(loaded.altitude, 700.0);
       expect(loaded.waterType, WaterType.salt);
+      expect(loaded.salinityPpt, 33.0);
       expect(loaded.gfLow, 45);
       expect(loaded.gfHigh, 80);
       expect(loaded.descentRate, 20.0);
@@ -122,7 +126,7 @@ void main() {
       expect(loaded.tanks.last.isTravelGas, isTrue);
       expect(loaded.tanks.first.isTravelGas, isFalse);
       expect(loaded.segments, hasLength(2));
-      expect(loaded.segments.first.type, SegmentType.descent);
+      expect(loaded.segments.first.targetDepth, 60.0);
       expect(loaded.segments.last.durationSeconds, 25 * 60);
     });
 

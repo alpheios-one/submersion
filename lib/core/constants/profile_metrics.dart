@@ -72,7 +72,7 @@ enum ProfileRightAxisMetric {
   gasDensity(
     displayName: 'Gas Density',
     shortName: 'Density',
-    color: Colors.brown,
+    color: Color(0xFF827717),
     unitSuffix: 'g/L',
     category: ProfileMetricCategory.gasAnalysis,
   ),
@@ -124,6 +124,15 @@ enum ProfileRightAxisMetric {
     // Cyan 800 - the ppO2 family, darker; individual cells shade from here.
     color: Color(0xFF00838F),
     unitSuffix: 'mV',
+    category: ProfileMetricCategory.gasAnalysis,
+  ),
+  gtr(
+    displayName: 'GTR',
+    shortName: 'GTR',
+    // Green 800 - apart from NDL's yellow-green and SAC's teal, the two
+    // lines it is most likely to share a chart with.
+    color: Color(0xFF2E7D32),
+    unitSuffix: 'min',
     category: ProfileMetricCategory.gasAnalysis,
   );
 
@@ -202,4 +211,5 @@ typedef MetricSourceInfo = ({
   MetricDataSource ttsActual,
   MetricDataSource cnsActual,
   MetricDataSource decoStopActual,
+  MetricDataSource gtrActual,
 });

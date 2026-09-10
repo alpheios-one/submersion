@@ -12,79 +12,13 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_p
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
+import 'package:submersion/features/import_wizard/data/services/import_provider_invalidator.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 
-// ---------------------------------------------------------------------------
-// Testable mirror of invalidateImportRelatedProviders.
-//
-// Rather than calling the real function (which requires a live Ref and
-// database), tests use this local helper that accepts a plain callback so the
-// exact set of invalidated providers can be recorded and asserted.
-// The mapping must stay in sync with the production implementation in
-// lib/features/import_wizard/data/services/import_provider_invalidator.dart.
-// ---------------------------------------------------------------------------
-void _invalidateWithCallback(
-  void Function(Object) invalidate,
-  Set<ImportEntityType> importedTypes,
-) {
-  if (importedTypes.isEmpty) return;
-
-  for (final type in importedTypes) {
-    switch (type) {
-      case ImportEntityType.dives:
-        invalidate(diveListNotifierProvider);
-        invalidate(paginatedDiveListProvider);
-        invalidate(allDiveComputersProvider);
-
-      case ImportEntityType.sites:
-        invalidate(sitesProvider);
-        invalidate(sitesWithCountsProvider);
-        invalidate(siteListNotifierProvider);
-
-      case ImportEntityType.buddies:
-        invalidate(allBuddiesProvider);
-
-      case ImportEntityType.equipment:
-        invalidate(allEquipmentProvider);
-        invalidate(activeEquipmentProvider);
-        invalidate(retiredEquipmentProvider);
-        invalidate(serviceDueEquipmentProvider);
-        invalidate(equipmentListNotifierProvider);
-
-      case ImportEntityType.equipmentSets:
-        invalidate(equipmentSetsProvider);
-
-      case ImportEntityType.trips:
-        invalidate(allTripsProvider);
-
-      case ImportEntityType.diveCenters:
-        invalidate(allDiveCentersProvider);
-
-      case ImportEntityType.certifications:
-        invalidate(allCertificationsProvider);
-
-      case ImportEntityType.courses:
-        invalidate(allCoursesProvider);
-
-      case ImportEntityType.tags:
-        invalidate(tagsProvider);
-
-      case ImportEntityType.diveTypes:
-        invalidate(diveTypesProvider);
-
-      case ImportEntityType.media:
-        // Photos land on dives that may already be on screen.
-        invalidate(mediaForDiveProvider);
-        invalidate(mediaCountForDiveProvider);
-        invalidate(mediaListNotifierProvider);
-    }
-  }
-}
-
 List<Object> _record(Set<ImportEntityType> types) {
   final recorded = <Object>[];
-  _invalidateWithCallback((p) => recorded.add(p), types);
+  invalidateImportRelatedProviders((p) => recorded.add(p as Object), types);
   return recorded;
 }
 
@@ -106,16 +40,26 @@ void main() {
     });
 
     test(
-      'dives invalidates diveListNotifierProvider, paginatedDiveListProvider,'
-      ' and allDiveComputersProvider',
+      'dives invalidates every dive-facing list, count and record provider',
       () {
         final recorded = _record({ImportEntityType.dives});
 
         expect(recorded, contains(diveListNotifierProvider));
         expect(recorded, contains(paginatedDiveListProvider));
+        expect(recorded, contains(divesProvider));
+        expect(recorded, contains(diveStatisticsProvider));
+        expect(recorded, contains(diveRecordsProvider));
+        expect(recorded, contains(nextDiveNumberProvider));
         expect(recorded, contains(allDiveComputersProvider));
       },
     );
+
+    test('dives also refreshes the site counts and list that dives feed', () {
+      final recorded = _record({ImportEntityType.dives});
+
+      expect(recorded, contains(sitesWithCountsProvider));
+      expect(recorded, contains(siteListNotifierProvider));
+    });
 
     test('sites invalidates sitesProvider, sitesWithCountsProvider, and'
         ' siteListNotifierProvider', () {
@@ -136,7 +80,9 @@ void main() {
       expect(recorded, contains(allEquipmentProvider));
       expect(recorded, contains(activeEquipmentProvider));
       expect(recorded, contains(retiredEquipmentProvider));
-      expect(recorded, contains(serviceDueEquipmentProvider));
+      // The service-due list derives from this base evaluation; invalidating
+      // the leaf would replay cached clock verdicts.
+      expect(recorded, contains(activeEquipmentClocksProvider));
       expect(recorded, contains(equipmentListNotifierProvider));
     });
 
@@ -178,6 +124,14 @@ void main() {
         _record({ImportEntityType.diveTypes}),
         contains(diveTypesProvider),
       );
+    });
+
+    test('media invalidates the per-dive media providers', () {
+      final recorded = _record({ImportEntityType.media});
+
+      expect(recorded, contains(mediaForDiveProvider));
+      expect(recorded, contains(mediaCountForDiveProvider));
+      expect(recorded, contains(mediaListNotifierProvider));
     });
 
     test('multiple entity types each trigger their own providers', () {

@@ -4,5 +4,7 @@ String bathymetrySourceDisplayName(String id) => switch (id) {
   'gmrt' => 'GMRT',
   'emodnet' => 'EMODnet',
   'etopo2022' => 'ETOPO 2022',
+  'noaa_dem' => 'NOAA NCEI',
+  'swissbathy3d' => 'swissBATHY3D (© swisstopo)',
   _ => id,
 };

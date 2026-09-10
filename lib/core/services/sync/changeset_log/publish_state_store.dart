@@ -57,6 +57,19 @@ class PublishStateStore {
         );
   }
 
+  /// Whether a publish row exists for any provider. Written by the first
+  /// base publish or adopt, so a true here is proof this device has synced
+  /// even when it never had a peer (a single-device cloud library leaves no
+  /// peer cursor, only this row).
+  Future<bool> hasAny() async {
+    final row =
+        await (_db.selectOnly(_db.localPublishStates)
+              ..addColumns([_db.localPublishStates.provider])
+              ..limit(1))
+            .getSingleOrNull();
+    return row != null;
+  }
+
   /// Drop publish state for [provider] -- used on backend switch so the device
   /// republishes a base as if new on the new backend.
   Future<void> resetForProvider(String provider) async {

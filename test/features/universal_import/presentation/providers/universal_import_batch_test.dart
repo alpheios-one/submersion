@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_step_failure.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/picked_import_file.dart';
@@ -252,7 +253,12 @@ void main() {
       picker.nextPickPaths = [a, b];
       await notifier.pickFiles();
 
-      await notifier.confirmSource();
+      // The failure is raised, not just recorded: the wizard has to know the
+      // step failed or it advances to a review with nothing in it.
+      await expectLater(
+        notifier.confirmSource(),
+        throwsA(isA<ImportStepFailure>()),
+      );
 
       expect(notifier.state.error, isNotNull);
       expect(notifier.state.currentStep, isNot(ImportWizardStep.review));

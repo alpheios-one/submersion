@@ -5,9 +5,11 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/marine_life/domain/entities/seen_species.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/seen_species_tile.dart';
+import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../media/presentation/support/media_widget_harness.dart';
 
 SeenSpecies _whaleShark() => SeenSpecies(
   species: const Species(
@@ -118,5 +120,36 @@ void main() {
 
     await tester.tap(find.byType(ListTile));
     expect(tapped, isTrue);
+  });
+
+  testWidgets('a cover photo replaces the category avatar', (tester) async {
+    final cover = testMediaItem(id: 'p1', diveId: 'd1');
+    await tester.pumpWidget(
+      await mediaTestApp(
+        home: Scaffold(
+          body: SeenSpeciesTile(entry: _whaleShark(), cover: cover),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MediaItemView), findsOneWidget);
+    expect(find.byType(CircleAvatar), findsNothing);
+    expect(find.text('Whale Shark'), findsOneWidget);
+  });
+
+  testWidgets('without a cover the category avatar stays', (tester) async {
+    final overrides = await getBaseOverrides();
+    await tester.pumpWidget(
+      testApp(
+        locale: const Locale('en'),
+        overrides: overrides,
+        child: SeenSpeciesTile(entry: _whaleShark()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MediaItemView), findsNothing);
+    expect(find.byType(CircleAvatar), findsOneWidget);
   });
 }

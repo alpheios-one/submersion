@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
+import 'package:submersion/features/equipment/data/repositories/service_schedule_repository.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 
@@ -260,6 +261,72 @@ void main() {
           EquipmentStatus.needsService,
           reason: 'reactivating is not a declaration that the item is fit',
         );
+      });
+
+      test('sold gear drops out of the active list like retired', () async {
+        await repository.createEquipment(createTestEquipment(name: 'Kept Reg'));
+        // A synced row can carry status=sold with isActive never flipped.
+        await repository.createEquipment(
+          createTestEquipment(
+            name: 'Sold Reg',
+            status: EquipmentStatus.sold,
+            isActive: true,
+          ),
+        );
+
+        expect((await repository.getActiveEquipment()).map((e) => e.name), [
+          'Kept Reg',
+        ]);
+        expect(
+          (await repository.getEquipmentByStatus(
+            EquipmentStatus.sold,
+          )).map((e) => e.name),
+          ['Sold Reg'],
+        );
+      });
+
+      test('sold gear is not lumped in with retired gear', () async {
+        await repository.createEquipment(
+          createTestEquipment(name: 'Retired Reg', isActive: false),
+        );
+        await repository.createEquipment(
+          createTestEquipment(
+            name: 'Sold Reg',
+            status: EquipmentStatus.sold,
+            isActive: false,
+          ),
+        );
+
+        // Sold is isActive=false too, but it is its own terminal state:
+        // it must not surface under the retired list or the Retired filter.
+        expect((await repository.getRetiredEquipment()).map((e) => e.name), [
+          'Retired Reg',
+        ]);
+        expect(
+          (await repository.getEquipmentByStatus(
+            EquipmentStatus.retired,
+          )).map((e) => e.name),
+          ['Retired Reg'],
+        );
+      });
+
+      test('reactivateEquipment clears a sold status', () async {
+        final item = await repository.createEquipment(
+          createTestEquipment(
+            name: 'Bought It Back',
+            status: EquipmentStatus.sold,
+            isActive: false,
+          ),
+        );
+
+        await repository.reactivateEquipment(item.id);
+
+        final stored = await repository.getEquipmentById(item.id);
+        expect(stored!.isActive, isTrue);
+        expect(stored.status, EquipmentStatus.active);
+        expect((await repository.getActiveEquipment()).map((e) => e.name), [
+          'Bought It Back',
+        ]);
       });
 
       test('a non-retired status filter matches only that status', () async {
@@ -569,36 +636,46 @@ void main() {
       });
     });
 
-    group('getEquipmentWithServiceDue', () {
-      test('should return equipment with service overdue', () async {
-        // Equipment with service overdue
-        await repository.createEquipment(
-          createTestEquipment(
-            name: 'Overdue Reg',
-            lastServiceDate: DateTime.now().subtract(const Duration(days: 400)),
-            serviceIntervalDays: 365,
-          ),
-        );
+    group('legacy service interval', () {
+      test(
+        'createEquipment mirrors a legacy interval onto the service ledger',
+        () async {
+          final created = await repository.createEquipment(
+            createTestEquipment(
+              name: 'Imported Reg',
+              lastServiceDate: DateTime(2020, 6, 1),
+              serviceIntervalDays: 365,
+            ),
+          );
 
-        // Equipment not due
-        await repository.createEquipment(
-          createTestEquipment(
-            name: 'Fresh Reg',
-            lastServiceDate: DateTime.now().subtract(const Duration(days: 30)),
-            serviceIntervalDays: 365,
-          ),
-        );
+          final schedules = await ServiceScheduleRepository()
+              .getSchedulesForEquipment(created.id);
+          final legacy = schedules.firstWhere(
+            (s) => s.id == 'legacy-svc-${created.id}',
+          );
 
-        // Equipment with no service date
-        await repository.createEquipment(
-          createTestEquipment(name: 'No Service Date'),
-        );
+          expect(legacy.serviceKindId, equals('general-service'));
+          expect(legacy.intervalDays, equals(365));
+          expect(legacy.anchorDate, equals(DateTime(2020, 6, 1)));
+        },
+      );
 
-        final results = await repository.getEquipmentWithServiceDue();
+      test(
+        'createEquipment adds no legacy clock without an interval',
+        () async {
+          final created = await repository.createEquipment(
+            createTestEquipment(name: 'Plain Reg'),
+          );
 
-        expect(results.length, equals(1));
-        expect(results[0].name, equals('Overdue Reg'));
-      });
+          final schedules = await ServiceScheduleRepository()
+              .getSchedulesForEquipment(created.id);
+
+          expect(
+            schedules.where((s) => s.id == 'legacy-svc-${created.id}'),
+            isEmpty,
+          );
+        },
+      );
     });
   });
 }

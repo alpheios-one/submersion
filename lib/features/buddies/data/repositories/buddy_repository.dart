@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
@@ -15,6 +16,7 @@ import 'package:submersion/features/dive_roles/data/repositories/dive_role_repos
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/certifications/data/repositories/certification_repository.dart';
 import 'package:submersion/features/certifications/domain/certification_primary.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 
 // Re-export merge types so callers can import from buddy_repository.dart
 export 'package:submersion/features/buddies/data/repositories/buddy_merge_repository.dart'
@@ -149,6 +151,7 @@ class BuddyRepository {
           row.data['certification_agency'] as String?,
         ),
         photoPath: row.data['photo_path'] as String?,
+        photo: row.data['photo'] as Uint8List?,
         notes: (row.data['notes'] as String?) ?? '',
         isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -179,6 +182,7 @@ class BuddyRepository {
               email: Value(buddy.email),
               phone: Value(buddy.phone),
               photoPath: Value(buddy.photoPath),
+              photo: Value(buddy.photo),
               notes: Value(buddy.notes),
               isFavorite: Value(buddy.isFavorite),
               createdAt: Value(now.millisecondsSinceEpoch),
@@ -241,6 +245,7 @@ class BuddyRepository {
             row.data['certification_agency'] as String?,
           ),
           photoPath: row.data['photo_path'] as String?,
+          photo: row.data['photo'] as Uint8List?,
           notes: (row.data['notes'] as String?) ?? '',
           isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -289,6 +294,7 @@ class BuddyRepository {
           email: Value(buddy.email),
           phone: Value(buddy.phone),
           photoPath: Value(buddy.photoPath),
+          photo: Value(buddy.photo),
           notes: Value(buddy.notes),
           isFavorite: Value(buddy.isFavorite),
           updatedAt: Value(now),
@@ -382,6 +388,7 @@ class BuddyRepository {
           row.data['certification_agency'] as String?,
         ),
         photoPath: row.data['photo_path'] as String?,
+        photo: row.data['photo'] as Uint8List?,
         notes: (row.data['notes'] as String?) ?? '',
         isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
         createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -444,6 +451,7 @@ class BuddyRepository {
         email: b.email,
         phone: b.phone,
         photoPath: b.photoPath,
+        photo: b.photo,
         notes: b.notes,
         isFavorite: b.isFavorite,
         createdAt: DateTime.fromMillisecondsSinceEpoch(b.createdAt),
@@ -798,7 +806,8 @@ class BuddyRepository {
                  COUNT(*) AS dive_count,
                  MAX(d.dive_date_time) AS last_dive
           FROM dive_buddies db
-          LEFT JOIN dives d ON d.id = db.dive_id
+          INNER JOIN dives d ON d.id = db.dive_id
+                            ${DiveStatsScope.and(alias: 'd')}
           GROUP BY db.buddy_id
         ) dc ON b.id = dc.buddy_id
         $where
@@ -834,6 +843,7 @@ class BuddyRepository {
             row.data['certification_agency'] as String?,
           ),
           photoPath: row.data['photo_path'] as String?,
+          photo: row.data['photo'] as Uint8List?,
           notes: (row.data['notes'] as String?) ?? '',
           isFavorite: (row.data['is_favorite'] as int? ?? 0) == 1,
           createdAt: DateTime.fromMillisecondsSinceEpoch(
@@ -943,14 +953,17 @@ class BuddyRepository {
     }
   }
 
-  /// Get dive count for a buddy
+  /// Get dive count for a buddy, as shown on the buddy card and detail
+  /// header. Honours [DiveStatsScope], so a dive the diver excluded from
+  /// statistics does not inflate "N dives with this buddy".
   Future<int> getDiveCountForBuddy(String buddyId) async {
     final result = await _db
         .customSelect(
           '''
       SELECT COUNT(*) as count
-      FROM dive_buddies
-      WHERE buddy_id = ?
+      FROM dive_buddies db
+      INNER JOIN dives d ON d.id = db.dive_id
+      WHERE db.buddy_id = ?${DiveStatsScope.and(alias: 'd')}
     ''',
           variables: [Variable.withString(buddyId)],
         )
@@ -971,6 +984,7 @@ class BuddyRepository {
   /// unstable tail would change *which* dives the preview shows, not merely
   /// their order.
   /// The join also drops links whose dive row no longer exists.
+  // stats-scope-exempt: drives the buddy's displayed dive list, like the logbook
   Future<List<String>> getDiveIdsForBuddy(String buddyId) async {
     final results = await _db
         .customSelect(
@@ -1004,7 +1018,7 @@ class BuddyRepository {
         MAX(d.dive_date_time) as last_dive
       FROM dives d
       INNER JOIN dive_buddies db ON d.id = db.dive_id
-      WHERE db.buddy_id = ?
+      WHERE db.buddy_id = ?${DiveStatsScope.and(alias: 'd')}
     ''',
           variables: [Variable.withString(buddyId)],
         )
@@ -1032,7 +1046,7 @@ class BuddyRepository {
       FROM dives d
       INNER JOIN dive_buddies db ON d.id = db.dive_id
       INNER JOIN dive_sites ds ON d.site_id = ds.id
-      WHERE db.buddy_id = ?
+      WHERE db.buddy_id = ?${DiveStatsScope.and(alias: 'd')}
       GROUP BY d.site_id
       ORDER BY count DESC
       LIMIT 1
@@ -1093,6 +1107,9 @@ class BuddyRepository {
       return b.copyWith(
         certificationLevel: primary?.level,
         certificationAgency: primary?.agency,
+        certificationTitle: primary == null
+            ? null
+            : certificationTitle(primary),
       );
     }).toList();
   }
@@ -1108,7 +1125,9 @@ class BuddyRepository {
       // _withPrimaryCerts overwrites these on the read paths.
       certificationLevel: null,
       certificationAgency: null,
+      certificationTitle: null,
       photoPath: row.photoPath,
+      photo: row.photo,
       notes: row.notes,
       isFavorite: row.isFavorite,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),

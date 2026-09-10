@@ -43,13 +43,15 @@ void main() {
       const gas = GasMix(o2: 21);
       final plan = _plan(
         segments: [
-          PlanSegment.descent(
+          PlanSegment.travel(
             id: 's1',
+            fromDepth: 0,
             targetDepth: 42.0,
             tankId: 't1',
             gasMix: gas,
+            ratePerMinute: 18.0,
           ),
-          PlanSegment.bottom(
+          PlanSegment.hold(
             id: 's2',
             depth: 42.0,
             durationMinutes: 20,
@@ -85,7 +87,7 @@ void main() {
     test('copyWith carries every field through', () {
       const gas = GasMix(o2: 32);
       const tank = DiveTank(id: 't1', volume: 11.1, gasMix: gas);
-      final segment = PlanSegment.bottom(
+      final segment = PlanSegment.hold(
         id: 's1',
         depth: 30,
         durationMinutes: 20,
@@ -102,6 +104,7 @@ void main() {
         mode: PlanMode.ccr,
         altitude: 1500.0,
         waterType: WaterType.fresh,
+        salinityPpt: 18.0,
         gfLow: 35,
         gfHigh: 75,
         descentRate: 20.0,
@@ -136,6 +139,7 @@ void main() {
       expect(updated.mode, PlanMode.ccr);
       expect(updated.altitude, 1500.0);
       expect(updated.waterType, WaterType.fresh);
+      expect(updated.salinityPpt, 18.0);
       expect(updated.gfLow, 35);
       expect(updated.gfHigh, 75);
       expect(updated.descentRate, 20.0);
@@ -166,6 +170,7 @@ void main() {
         siteId: 'site',
         altitude: 100,
         waterType: WaterType.salt,
+        salinityPpt: 22.0,
         airBreaks: const AirBreakPolicy(),
         sacDeco: 12,
         sacStressed: 40,
@@ -182,6 +187,7 @@ void main() {
         clearSiteId: true,
         clearAltitude: true,
         clearWaterType: true,
+        clearSalinityPpt: true,
         clearAirBreaks: true,
         clearSacDeco: true,
         clearSacStressed: true,
@@ -197,6 +203,7 @@ void main() {
       expect(cleared.siteId, isNull);
       expect(cleared.altitude, isNull);
       expect(cleared.waterType, isNull);
+      expect(cleared.salinityPpt, isNull);
       expect(cleared.airBreaks, isNull);
       expect(cleared.sacDeco, isNull);
       expect(cleared.sacStressed, isNull);

@@ -412,6 +412,199 @@ void main() {
     });
   });
 
+  group('Import dives (auto numbering)', () {
+    setUp(() {
+      when(
+        mockDiveRepo.createDive(any),
+      ).thenAnswer((inv) async => inv.positionalArguments[0] as Dive);
+      when(mockDiveRepo.saveComputerReading(any)).thenAnswer((_) async {});
+    });
+
+    test('numbers an undated dive by the date it is stored with', () async {
+      // A dive whose datetime could not be parsed is stored at the import
+      // clock, which makes it the most recent dive in the batch. Numbering
+      // used to sort it as if it were dated year zero and hand it the lowest
+      // number, contradicting the date written to the row (#239).
+      final data = UddfImportResult(
+        dives: [
+          {'maxDepth': 12.0},
+          {'dateTime': DateTime.utc(2020, 3, 4, 9, 0), 'maxDepth': 18.0},
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(dives: {0, 1}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final dives = verify(
+        mockDiveRepo.createDive(captureAny),
+      ).captured.cast<Dive>();
+      expect(dives.firstWhere((d) => d.maxDepth == 18.0).diveNumber, 1);
+      expect(dives.firstWhere((d) => d.maxDepth == 12.0).diveNumber, 2);
+    });
+
+    test('numbers dives sharing a timestamp in file order', () async {
+      // A logbook of dives entered by hand carries no times, so a whole day
+      // of them ties at midnight, and the numbering must follow the file.
+      // List.sort makes no stability guarantee: small batches happen to keep
+      // their input order today, so this one is deliberately large enough
+      // that ties are observably reordered without the tie-breaker.
+      const undatedCount = 60;
+      final data = UddfImportResult(
+        dives: [
+          {'dateTime': DateTime.utc(2020, 3, 4, 9, 0), 'maxDepth': 1000.0},
+          for (var i = 0; i < undatedCount; i++) {'maxDepth': i.toDouble()},
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: UddfImportSelections(
+          dives: {for (var i = 0; i <= undatedCount; i++) i},
+        ),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final dives = verify(
+        mockDiveRepo.createDive(captureAny),
+      ).captured.cast<Dive>();
+      expect(dives.firstWhere((d) => d.maxDepth == 1000.0).diveNumber, 1);
+      for (var i = 0; i < undatedCount; i++) {
+        expect(
+          dives.firstWhere((d) => d.maxDepth == i.toDouble()).diveNumber,
+          i + 2,
+          reason: 'undated dive at file position $i',
+        );
+      }
+    });
+  });
+
+  group('Import dives (deco dive type default)', () {
+    setUp(() {
+      when(
+        mockDiveRepo.createDive(any),
+      ).thenAnswer((inv) async => inv.positionalArguments[0] as Dive);
+      when(mockDiveRepo.saveComputerReading(any)).thenAnswer((_) async {});
+    });
+
+    Future<Dive> importSingleDive(Map<String, dynamic> diveData) async {
+      await importer.import(
+        data: UddfImportResult(dives: [diveData]),
+        selections: const UddfImportSelections(dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+      return verify(mockDiveRepo.createDive(captureAny)).captured.single
+          as Dive;
+    }
+
+    test(
+      'a profile with a deco ceiling defaults the type to technical',
+      () async {
+        final dive = await importSingleDive({
+          'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+          'maxDepth': 42.0,
+          'duration': const Duration(seconds: 3600),
+          'profile': <Map<String, dynamic>>[
+            {'timestamp': 0, 'depth': 1.5, 'ceiling': 0.0},
+            {'timestamp': 600, 'depth': 42.0, 'ceiling': 6.0},
+          ],
+        });
+        expect(dive.diveTypeIds, ['technical']);
+      },
+    );
+
+    test(
+      'exhausted NDL with TTS at depth defaults the type to technical',
+      () async {
+        final dive = await importSingleDive({
+          'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+          'maxDepth': 35.0,
+          'duration': const Duration(seconds: 3600),
+          'profile': <Map<String, dynamic>>[
+            {'timestamp': 0, 'depth': 30.0, 'ndl': 300, 'tts': 120},
+            {'timestamp': 900, 'depth': 32.0, 'ndl': 0, 'tts': 600},
+          ],
+        });
+        expect(dive.diveTypeIds, ['technical']);
+      },
+    );
+
+    test('a decoStopStart event defaults the type to technical', () async {
+      final dive = await importSingleDive({
+        'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+        'maxDepth': 40.0,
+        'duration': const Duration(seconds: 3600),
+        'events': <Map<String, dynamic>>[
+          {'eventType': 'decoStopStart', 'timestamp': 1800},
+        ],
+      });
+      expect(dive.diveTypeIds, ['technical']);
+    });
+
+    test('a decoStopStart event under profileEvents (UDDF source key) defaults '
+        'the type to technical', () async {
+      final dive = await importSingleDive({
+        'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+        'maxDepth': 40.0,
+        'duration': const Duration(seconds: 3600),
+        'profileEvents': <Map<String, dynamic>>[
+          {'eventType': 'decoStopStart', 'timestamp': 1800},
+        ],
+      });
+      expect(dive.diveTypeIds, ['technical']);
+    });
+
+    test('a no-deco profile keeps the recreational default', () async {
+      final dive = await importSingleDive({
+        'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+        'maxDepth': 18.0,
+        'duration': const Duration(seconds: 2700),
+        'profile': <Map<String, dynamic>>[
+          {'timestamp': 0, 'depth': 1.0, 'ndl': 3600},
+          {'timestamp': 600, 'depth': 18.0, 'ndl': 1500, 'tts': 120},
+        ],
+      });
+      expect(dive.diveTypeIds, ['recreational']);
+    });
+
+    test(
+      'an explicit dive type from the source wins over deco detection',
+      () async {
+        final dive = await importSingleDive({
+          'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+          'maxDepth': 42.0,
+          'duration': const Duration(seconds: 3600),
+          'diveType': 'training',
+          'profile': <Map<String, dynamic>>[
+            {'timestamp': 600, 'depth': 42.0, 'ceiling': 6.0},
+          ],
+        });
+        expect(dive.diveTypeIds, ['training']);
+      },
+    );
+
+    test(
+      'explicit dive type ids from the source win over deco detection',
+      () async {
+        final dive = await importSingleDive({
+          'dateTime': DateTime.utc(2025, 10, 13, 11, 24, 0),
+          'maxDepth': 42.0,
+          'duration': const Duration(seconds: 3600),
+          'diveTypeIds': ['cave', 'night'],
+          'profile': <Map<String, dynamic>>[
+            {'timestamp': 600, 'depth': 42.0, 'ceiling': 6.0},
+          ],
+        });
+        expect(dive.diveTypeIds, ['cave', 'night']);
+      },
+    );
+  });
+
   group('Import equipment', () {
     test('imports equipment with type parsing', () async {
       when(mockEquipmentRepo.createEquipment(any)).thenAnswer(

@@ -7,6 +7,7 @@ import 'package:submersion/features/checklists/domain/entities/checklist_templat
 import 'package:submersion/features/checklists/presentation/providers/checklist_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 
 /// Create/edit page for a checklist template and its items.
 class ChecklistTemplateEditPage extends ConsumerStatefulWidget {
@@ -123,11 +124,15 @@ class _ChecklistTemplateEditPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.checklists_templates_pageTitle),
+        title: Text(
+          widget.isEditing
+              ? context.l10n.checklists_templates_editTemplate
+              : context.l10n.checklists_templates_addTemplate,
+        ),
         actions: [
-          TextButton(
+          AppBarTextAction(
+            label: context.l10n.common_action_save,
             onPressed: _loading ? null : _save,
-            child: Text(context.l10n.common_action_save),
           ),
         ],
       ),
@@ -279,7 +284,11 @@ class _ChecklistItemDialogState extends State<_ChecklistItemDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(context.l10n.checklists_template_addItem),
+      title: Text(
+        widget.item == null
+            ? context.l10n.checklists_template_addItem
+            : context.l10n.checklists_item_edit,
+      ),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -296,18 +305,21 @@ class _ChecklistItemDialogState extends State<_ChecklistItemDialog> {
                     ? context.l10n.checklists_item_titleRequired
                     : null,
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _categoryController,
                 decoration: InputDecoration(
                   labelText: context.l10n.checklists_item_categoryLabel,
                 ),
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _notesController,
                 decoration: InputDecoration(
                   labelText: context.l10n.checklists_item_notesLabel,
                 ),
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _offsetController,
                 keyboardType: TextInputType.number,

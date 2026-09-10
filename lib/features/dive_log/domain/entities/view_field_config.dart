@@ -30,10 +30,7 @@ class TableColumnConfig extends Equatable {
 
   factory TableColumnConfig.fromJson(Map<String, dynamic> json) {
     return TableColumnConfig(
-      field: DiveField.values.firstWhere(
-        (e) => e.name == json['field'] as String,
-        orElse: () => DiveField.diveNumber,
-      ),
+      field: diveFieldFromName(json['field'] as String) ?? DiveField.diveNumber,
       width: (json['width'] as num).toDouble(),
       isPinned: json['isPinned'] as bool,
     );
@@ -117,9 +114,7 @@ class TableViewConfig extends Equatable {
     final sortFieldName = json['sortField'] as String?;
     DiveField? sortField;
     if (sortFieldName != null) {
-      sortField = DiveField.values
-          .where((e) => e.name == sortFieldName)
-          .firstOrNull;
+      sortField = diveFieldFromName(sortFieldName);
     }
     return TableViewConfig(
       columns: (json['columns'] as List<dynamic>)
@@ -155,10 +150,7 @@ class CardSlotConfig extends Equatable {
   factory CardSlotConfig.fromJson(Map<String, dynamic> json) {
     return CardSlotConfig(
       slotId: json['slotId'] as String,
-      field: DiveField.values.firstWhere(
-        (e) => e.name == json['field'] as String,
-        orElse: () => DiveField.diveNumber,
-      ),
+      field: diveFieldFromName(json['field'] as String) ?? DiveField.diveNumber,
     );
   }
 
@@ -251,11 +243,7 @@ class CardViewConfig extends Equatable {
           .toList(),
       extraFields:
           (json['extraFields'] as List<dynamic>?)
-              ?.map(
-                (f) => DiveField.values
-                    .where((e) => e.name == f as String)
-                    .firstOrNull,
-              )
+              ?.map((f) => diveFieldFromName(f as String))
               .whereType<DiveField>()
               .toList() ??
           [],

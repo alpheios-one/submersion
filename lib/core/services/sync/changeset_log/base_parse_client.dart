@@ -17,12 +17,24 @@ class BaseParseException implements Exception {
 /// decoded rows back, pull-backpressured (one ≤500-row batch per [nextDataBatch]).
 /// Operations are sequential — one in flight at a time.
 class BaseParseClient {
-  BaseParseClient._(this._isolate, this._toWorker, this._fromWorker, this._sub);
+  BaseParseClient._(
+    this._isolate,
+    this._toWorker,
+    this._fromWorker,
+    this._sub,
+    this.onProgress,
+  );
 
   final Isolate _isolate;
   final SendPort _toWorker;
   final ReceivePort _fromWorker;
   final StreamSubscription<dynamic> _sub;
+
+  /// Receives the worker's byte-progress heartbeats: bytes of the file
+  /// consumed so far in the current pass, and the file's total length.
+  /// Settable after [spawn] so a caller can attach it to a client it obtained
+  /// through an injected spawn hook.
+  void Function(int bytes, int total)? onProgress;
 
   // Buffered request/response mailbox: messages that arrive before a reader is
   // waiting are queued, so a batch sent before the first [nextDataBatch] pull is
@@ -40,9 +52,13 @@ class BaseParseClient {
   /// handshake within [handshakeTimeout]. The port, subscription, and isolate
   /// it created are torn down before the error propagates.
   ///
+  /// [onProgress] receives the worker's byte-progress heartbeats (bytes of the
+  /// file consumed so far in the current pass, and the file's total length).
+  ///
   /// [entryPoint] and [handshakeTimeout] are injectable for tests only.
   static Future<BaseParseClient> spawn(
     String filePath, {
+    void Function(int bytes, int total)? onProgress,
     @visibleForTesting
     void Function(List<Object>) entryPoint = baseParseWorkerMain,
     @visibleForTesting Duration handshakeTimeout = const Duration(seconds: 10),
@@ -99,7 +115,13 @@ class BaseParseClient {
         errorsAreFatal: false,
       );
       final toWorker = await ready.future;
-      client = BaseParseClient._(isolate, toWorker, fromWorker, sub);
+      client = BaseParseClient._(
+        isolate,
+        toWorker,
+        fromWorker,
+        sub,
+        onProgress,
+      );
     } catch (_) {
       // Spawn failed, the worker errored before handshake, or it timed out:
       // tear down so we never leak the port/subscription/isolate, then rethrow
@@ -128,15 +150,29 @@ class BaseParseClient {
     }
   }
 
-  /// Per-message backstop: after the handshake, a worker can still die or hang
+  /// Inactivity backstop: after the handshake, a worker can still die or hang
   /// without delivering an `onError` (e.g. an OS OOM kill), which would leave a
   /// waiting pull blocked forever and hang the whole sync. Time out and surface
   /// a [BaseParseException] so the caller (readScalarsAndDeletions /
   /// nextDataBatch) falls back to the inline parser. Injectable for tests.
+  ///
+  /// This bounds worker SILENCE, not reply latency. A single reply (pass 1 over
+  /// a 730 MB base, or a data batch that must skip a giant table first) can
+  /// legitimately take minutes; the worker's progress heartbeats restart this
+  /// window each time they arrive, so only a worker that has stopped reading
+  /// the file trips it (issue #1421).
   @visibleForTesting
   static Duration messageTimeout = const Duration(seconds: 60);
 
-  Future<Map<dynamic, dynamic>> _nextMessage() {
+  Future<Map<dynamic, dynamic>> _nextMessage() async {
+    while (true) {
+      final m = await _nextRawMessage();
+      if (m['type'] != 'progress') return m;
+      onProgress?.call(m['bytes'] as int, m['total'] as int);
+    }
+  }
+
+  Future<Map<dynamic, dynamic>> _nextRawMessage() {
     if (_queue.isNotEmpty) return Future.value(_queue.removeAt(0));
     final c = Completer<Map<dynamic, dynamic>>();
     _waiters.add(c);

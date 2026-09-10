@@ -5,11 +5,16 @@ import CoreLocation
 import ImageIO
 import MobileCoreServices
 
-/// Handles writing dive metadata to photos and videos via platform channel.
+/// Handles writing dive metadata to photos via platform channel.
 ///
-/// Supports:
-/// - JPEG/HEIC/HEIF photos via CGImageDestination
-/// - MOV/MP4 videos via AVFoundation
+/// Supports JPEG/HEIC/HEIF photos via CGImageDestination, edited in place so
+/// the asset keeps its identity and the user keeps Revert to Original.
+///
+/// Videos are refused. Writing to one cannot be done in place: it meant
+/// exporting a copy, creating a new asset and deleting the original.
+/// Submersion must never delete a user's original media (issue #1472), so the
+/// path was removed rather than made non-destructive. Live Photos are refused
+/// for a related reason (issue #795).
 class MetadataWriteHandler: NSObject {
     private let channel: FlutterMethodChannel
 
@@ -34,14 +39,11 @@ class MetadataWriteHandler: NSObject {
                 return
             }
 
-            let keepOriginal = args["keepOriginal"] as? Bool ?? false
-
             writeMetadata(
                 assetId: assetId,
                 metadata: metadata,
                 description: description,
                 isVideo: isVideo,
-                keepOriginal: keepOriginal,
                 result: result
             )
 
@@ -55,7 +57,6 @@ class MetadataWriteHandler: NSObject {
         metadata: [String: Any],
         description: String,
         isVideo: Bool,
-        keepOriginal: Bool,
         result: @escaping FlutterResult
     ) {
         // Check photo library authorization
@@ -80,6 +81,23 @@ class MetadataWriteHandler: NSObject {
             return
         }
 
+        // Trust the library over the caller: a video mislabelled as a photo
+        // would otherwise fall through to the photo path.
+        if isVideo || asset.mediaType == .video {
+            // A video cannot be edited in place. The old path exported a copy,
+            // created a new asset and deleted the original, which Submersion
+            // must never do (issue #1472). Refuse instead; the UI does not
+            // offer the action for a video, so this is reached only by a
+            // mislabelled asset.
+            NSLog("[MetadataWriteHandler] Asset is a video; metadata writing is not supported")
+            result(FlutterError(
+                code: "VIDEO_UNSUPPORTED",
+                message: "Writing metadata to a video is not supported.",
+                details: nil
+            ))
+            return
+        }
+
         // Check if asset is editable
         guard asset.canPerform(.properties) else {
             result(FlutterError(
@@ -90,9 +108,7 @@ class MetadataWriteHandler: NSObject {
             return
         }
 
-        if isVideo {
-            writeVideoMetadata(asset: asset, metadata: metadata, description: description, keepOriginal: keepOriginal, result: result)
-        } else if asset.mediaSubtypes.contains(.photoLive) {
+        if asset.mediaSubtypes.contains(.photoLive) {
             // A Live Photo is a still paired with a short video. Photos' content
             // editing session expects the output to represent both resources, so
             // the plain-image round-trip in writePhotoMetadata is rejected with
@@ -261,171 +277,6 @@ class MetadataWriteHandler: NSObject {
             return kUTTypeJPEG
         default:
             return kUTTypeJPEG
-        }
-    }
-
-    // MARK: - Video Metadata
-
-    private func writeVideoMetadata(
-        asset: PHAsset,
-        metadata: [String: Any],
-        description: String,
-        keepOriginal: Bool,
-        result: @escaping FlutterResult
-    ) {
-        let options = PHVideoRequestOptions()
-        options.isNetworkAccessAllowed = true
-        options.version = .current
-
-        PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { [weak self] avAsset, audioMix, info in
-            guard let self = self, let urlAsset = avAsset as? AVURLAsset else {
-                DispatchQueue.main.async {
-                    result(FlutterError(
-                        code: "WRITE_FAILED",
-                        message: "Could not get video asset",
-                        details: nil
-                    ))
-                }
-                return
-            }
-
-            self.writeVideoMetadataToAsset(
-                asset: asset,
-                videoURL: urlAsset.url,
-                metadata: metadata,
-                description: description,
-                keepOriginal: keepOriginal,
-                result: result
-            )
-        }
-    }
-
-    private func writeVideoMetadataToAsset(
-        asset: PHAsset,
-        videoURL: URL,
-        metadata: [String: Any],
-        description: String,
-        keepOriginal: Bool,
-        result: @escaping FlutterResult
-    ) {
-        // Create AVAsset for reading
-        let avAsset = AVAsset(url: videoURL)
-
-        // Create export session
-        guard let exportSession = AVAssetExportSession(asset: avAsset, presetName: AVAssetExportPresetPassthrough) else {
-            DispatchQueue.main.async {
-                result(FlutterError(
-                    code: "WRITE_FAILED",
-                    message: "Could not create export session",
-                    details: nil
-                ))
-            }
-            return
-        }
-
-        // Create temporary output URL
-        let tempDir = FileManager.default.temporaryDirectory
-        let outputURL = tempDir.appendingPathComponent(UUID().uuidString + ".mov")
-
-        exportSession.outputURL = outputURL
-        exportSession.outputFileType = .mov
-
-        // Create metadata items
-        var metadataItems: [AVMutableMetadataItem] = []
-
-        // Add description
-        let descItem = AVMutableMetadataItem()
-        descItem.key = AVMetadataKey.commonKeyDescription as NSString
-        descItem.keySpace = .common
-        descItem.value = description as NSString
-        metadataItems.append(descItem)
-
-        // Add location if available
-        if let lat = metadata["latitude"] as? Double,
-           let lon = metadata["longitude"] as? Double {
-            let locationItem = AVMutableMetadataItem()
-            locationItem.key = AVMetadataKey.commonKeyLocation as NSString
-            locationItem.keySpace = .common
-            locationItem.value = "\(lat >= 0 ? "+" : "")\(lat)\(lon >= 0 ? "+" : "")\(lon)/" as NSString
-            metadataItems.append(locationItem)
-        }
-
-        // Add title with site name
-        if let siteName = metadata["siteName"] as? String {
-            let titleItem = AVMutableMetadataItem()
-            titleItem.key = AVMetadataKey.commonKeyTitle as NSString
-            titleItem.keySpace = .common
-            titleItem.value = siteName as NSString
-            metadataItems.append(titleItem)
-        }
-
-        exportSession.metadata = metadataItems
-
-        exportSession.exportAsynchronously {
-            switch exportSession.status {
-            case .completed:
-                // Import the modified video back to Photos
-                PHPhotoLibrary.shared().performChanges({
-                    let creationRequest = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: outputURL)
-                    creationRequest?.creationDate = asset.creationDate
-                    creationRequest?.location = asset.location
-                }) { success, error in
-                    // Clean up temp file
-                    try? FileManager.default.removeItem(at: outputURL)
-
-                    if success {
-                        // Delete original if user chose not to keep it
-                        if !keepOriginal {
-                            PHPhotoLibrary.shared().performChanges({
-                                PHAssetChangeRequest.deleteAssets([asset] as NSArray)
-                            }) { _, deleteError in
-                                // Log but don't fail the operation if delete fails
-                                if let deleteError = deleteError {
-                                    print("Warning: Could not delete original video: \(deleteError.localizedDescription)")
-                                }
-                                DispatchQueue.main.async {
-                                    result(true)
-                                }
-                            }
-                        } else {
-                            DispatchQueue.main.async {
-                                result(true)
-                            }
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            result(FlutterError(
-                                code: "WRITE_FAILED",
-                                message: error?.localizedDescription ?? "Failed to save video",
-                                details: nil
-                            ))
-                        }
-                    }
-                }
-
-            case .failed:
-                try? FileManager.default.removeItem(at: outputURL)
-                DispatchQueue.main.async {
-                    result(FlutterError(
-                        code: "WRITE_FAILED",
-                        message: exportSession.error?.localizedDescription ?? "Export failed",
-                        details: nil
-                    ))
-                }
-
-            case .cancelled:
-                try? FileManager.default.removeItem(at: outputURL)
-                DispatchQueue.main.async {
-                    result(FlutterError(
-                        code: "WRITE_FAILED",
-                        message: "Export was cancelled",
-                        details: nil
-                    ))
-                }
-
-            default:
-                break
-            }
         }
     }
 }

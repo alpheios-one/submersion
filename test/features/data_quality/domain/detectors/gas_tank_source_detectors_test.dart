@@ -17,11 +17,13 @@ domain.DiveTank tank({
   double o2 = 21.0,
   int order = 0,
   double? volume = 12,
+  String? transmitterSerial,
 }) => domain.DiveTank(
   id: id,
   volume: volume,
   gasMix: domain.GasMix(o2: o2, he: 0),
   order: order,
+  transmitterSerial: transmitterSerial,
 );
 
 GasSwitch sw({
@@ -110,6 +112,56 @@ void main() {
       expect(out.single.params['peakPpO2'], closeTo(1.7, 1e-9));
     });
 
+    test('honours a lowered diver ppO2 ceiling for the sustained run', () {
+      // EAN32 at 35 m: ppO2 = 0.32 * 4.5 = 1.44. Clean on the default 1.6
+      // ceiling, a warning for a diver who set their max to 1.4.
+      final dive = makeTestDive(tanks: [tank(o2: 32)]);
+      final samples = flatProfile(depth: 35);
+      expect(det.detect(makeContext(dive: dive, samples: samples)), isEmpty);
+
+      final out = det.detect(
+        makeContext(dive: dive, samples: samples, ppO2MaxBar: 1.4),
+      );
+      expect(out, hasLength(1));
+      expect(out.single.severity, QualitySeverity.warning);
+      expect(out.single.params['peakPpO2'], closeTo(1.44, 1e-9));
+    });
+
+    test('honours a lowered diver ppO2 ceiling for the switch MOD', () {
+      // MOD(1.4, 0.50) = 18 m; a switch at 22 m is past it only once the
+      // diver's ceiling drops from the default 1.6 (MOD 22 m) to 1.4.
+      final tanks = [
+        tank(id: 'back', o2: 21),
+        tank(id: 'deco', o2: 50, order: 1),
+      ];
+      final dive = makeTestDive(tanks: tanks);
+      final switches = [sw(id: 'gs1', t: 1200, tankId: 'deco', depth: 22)];
+
+      expect(
+        det.detect(
+          makeContext(
+            dive: dive,
+            samples: flatProfile(depth: 18),
+            gasSwitches: switches,
+          ),
+        ),
+        isEmpty,
+      );
+
+      final out = det.detect(
+        makeContext(
+          dive: dive,
+          samples: flatProfile(depth: 18),
+          gasSwitches: switches,
+          ppO2MaxBar: 1.4,
+        ),
+      );
+      final modFinding = out.singleWhere(
+        (f) => f.params.containsKey('modMeters'),
+      );
+      expect(modFinding.params['modMeters'], closeTo(18.0, 1e-9));
+    });
+
     test('a brief ppO2 excursion under the sustain window is not flagged', () {
       // One 1.7-bar sample, then shallow: the run is 0 s < ppO2SustainSeconds.
       final ctx = makeContext(
@@ -189,6 +241,106 @@ void main() {
           ],
         ),
         pressures: {'a': series, 'b': series},
+      );
+      final out = det.detect(ctx);
+      expect(out, hasLength(1));
+      expect(out.single.params['meanDiffBar'], 0.0);
+    });
+
+    test('two tanks on the same transmitter serial are twins, no series '
+        'needed', () {
+      // Two computers paired to one transmitter, consolidated before the
+      // serial gate existed: the same cylinder sits on the dive twice. The
+      // serial alone is proof, whatever the pressure series look like.
+      final ctx = makeContext(
+        dive: makeTestDive(
+          tanks: [
+            tank(id: 'a', o2: 31, transmitterSerial: '180777'),
+            tank(id: 'b', o2: 32, order: 1, transmitterSerial: '180777'),
+          ],
+        ),
+      );
+      final out = det.detect(ctx);
+      expect(out, hasLength(1));
+      expect(out.single.params['tankIdA'], 'a');
+      expect(out.single.params['tankIdB'], 'b');
+      expect(out.single.params['sameTransmitter'], isTrue);
+    });
+
+    test('tanks on different transmitter serials are never twins, even with '
+        'identical series', () {
+      // Twin cylinders on the same mix each carry their own transmitter;
+      // matching curves are a coincidence, not a double assignment.
+      final series = [
+        for (var t = 0; t <= 1200; t += 60)
+          QualityPressureSample(t: t, bar: 200 - t * 0.05),
+      ];
+      final ctx = makeContext(
+        dive: makeTestDive(
+          tanks: [
+            tank(id: 'a', transmitterSerial: '180777'),
+            tank(id: 'b', order: 1, transmitterSerial: '180778'),
+          ],
+        ),
+        pressures: {'a': series, 'b': series},
+      );
+      expect(det.detect(ctx), isEmpty);
+    });
+
+    test('twin series logged on offset cadences are still matched', () {
+      // Two computers at 10 s cadence, consolidated with a 3 s offset: no
+      // two samples share a timestamp, but the curves are the same. Nearest
+      // samples within the gap tolerance must be compared.
+      final a = [
+        for (var t = 0; t <= 1200; t += 10)
+          QualityPressureSample(t: t, bar: 200 - t * 0.05),
+      ];
+      final b = [
+        for (var t = 3; t <= 1200; t += 10)
+          QualityPressureSample(t: t, bar: 200 - t * 0.05),
+      ];
+      final ctx = makeContext(
+        dive: makeTestDive(
+          tanks: [
+            tank(id: 'a'),
+            tank(id: 'b', order: 1),
+          ],
+        ),
+        pressures: {'a': a, 'b': b},
+      );
+      final out = det.detect(ctx);
+      expect(out, hasLength(1));
+      expect(out.single.params['meanDiffBar'], lessThan(1.0));
+    });
+
+    test('a zero sentinel serial on two tanks is not a shared transmitter', () {
+      final ctx = makeContext(
+        dive: makeTestDive(
+          tanks: [
+            tank(id: 'a', transmitterSerial: '0'),
+            tank(id: 'b', order: 1, transmitterSerial: ' 0 '),
+          ],
+        ),
+      );
+      expect(det.detect(ctx), isEmpty);
+    });
+
+    test('twin series are matched even when a series arrives out of order', () {
+      // Sorting is skipped for already-ordered input; this pins that an
+      // unordered series is still put in time order before the walk.
+      final a = [
+        for (var t = 0; t <= 1200; t += 60)
+          QualityPressureSample(t: t, bar: 200 - t * 0.05),
+      ];
+      final b = a.reversed.toList();
+      final ctx = makeContext(
+        dive: makeTestDive(
+          tanks: [
+            tank(id: 'a'),
+            tank(id: 'b', order: 1),
+          ],
+        ),
+        pressures: {'a': a, 'b': b},
       );
       final out = det.detect(ctx);
       expect(out, hasLength(1));

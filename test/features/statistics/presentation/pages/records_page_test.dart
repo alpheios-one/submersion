@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
@@ -16,6 +17,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
@@ -44,6 +46,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAccentNavIcons(bool value) async =>
       state = state.copyWith(accentNavIcons: value);
+
+  @override
+  Future<void> setGroupTripsInDiveList(bool value) async =>
+      state = state.copyWith(groupTripsInDiveList: value);
 
   @override
   Future<void> setAccentSectionHeaders(bool value) async =>
@@ -105,6 +111,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setGasModel(GasModel model) async =>
       state = state.copyWith(gasModel: model);
+
+  @override
+  Future<void> setDefaultPlannerWaterType(PlannerWaterType type) async =>
+      state = state.copyWith(defaultPlannerWaterType: type);
 
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
@@ -179,6 +189,9 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setPpO2MaxDeco(double value) async =>
       state = state.copyWith(ppO2MaxDeco: value);
   @override
+  Future<void> setPpO2Limits(double working, double max) async =>
+      state = state.copyWith(ppO2MaxWorking: working, ppO2MaxDeco: max);
+  @override
   Future<void> setCnsWarningThreshold(int value) async =>
       state = state.copyWith(cnsWarningThreshold: value);
   @override
@@ -196,6 +209,15 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSafetyReviewEnabled(bool value) async =>
       state = state.copyWith(safetyReviewEnabled: value);
+  @override
+  Future<void> setColdWaterThresholdC(double value) async =>
+      state = state.copyWith(coldWaterThresholdC: value);
+  @override
+  Future<void> setDeepDiveThresholdM(double value) async =>
+      state = state.copyWith(deepDiveThresholdM: value);
+  @override
+  Future<void> setHighO2ThresholdPercent(double value) async =>
+      state = state.copyWith(highO2ThresholdPercent: value);
   @override
   Future<void> setNoFlyPreset(NoFlyPreset preset) async =>
       state = state.copyWith(noFlyPreset: preset);
@@ -443,6 +465,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setDefaultShowGtr(bool value) async =>
+      state = state.copyWith(defaultShowGtr: value);
+
+  @override
+  Future<void> setDefaultGtrSource(MetricDataSource value) async =>
+      state = state.copyWith(defaultGtrSource: value);
+
+  @override
+  Future<void> setGtrReservePressure(double value) async =>
+      state = state.copyWith(gtrReservePressure: value);
   @override
   Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
       state = state.copyWith(defaultShowEstimatedTankPressure: value);
@@ -459,6 +493,22 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> resetDiveDetailSections() async =>
       state = state.copyWith(clearDiveDetailSections: true);
+  @override
+  Future<void> setDiveDetailLayout(DiveDetailLayout layout) async =>
+      state = state.copyWith(diveDetailLayout: layout);
+
+  @override
+  Future<void> setDiveDetailSectionExpanded(
+    DiveDetailSectionId id,
+    bool expanded,
+  ) async {
+    state = state.copyWith(
+      diveDetailSections: [
+        for (final section in state.diveDetailSections)
+          section.id == id ? section.copyWith(expanded: expanded) : section,
+      ],
+    );
+  }
 
   @override
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>

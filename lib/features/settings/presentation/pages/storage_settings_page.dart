@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:submersion/core/constants/app_directories.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/domain/entities/storage_config.dart';
@@ -144,6 +146,17 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
                     storageState.lastMigrationResult!,
                   ),
                 ],
+
+                const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.pie_chart_outline),
+                  title: Text(context.l10n.settings_storageUsage_tile_title),
+                  subtitle: Text(
+                    context.l10n.settings_storageUsage_tile_subtitle,
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.pushNamed('storageUsage'),
+                ),
 
                 // Danger Zone
                 const SizedBox(height: 16),
@@ -442,7 +455,7 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
 
     // Generate a timestamped backup path
     final appDir = await getApplicationDocumentsDirectory();
-    final backupDir = p.join(appDir.path, 'Submersion', 'Backups');
+    final backupDir = p.join(appDir.path, kAppDocumentsFolder, 'Backups');
     final timestamp = DateFormat('yyyy-MM-dd_HHmmss').format(DateTime.now());
     final backupPath = p.join(backupDir, 'pre_reset_$timestamp.db');
 

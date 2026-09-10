@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
-import 'package:submersion/core/accessibility/focus_helpers.dart';
 
 void main() {
   group('SemanticWidgetExtensions', () {
@@ -119,37 +118,6 @@ void main() {
     test('omits unit when null', () {
       final label = statLabel(name: 'Dive count', value: '50');
       expect(label, 'Dive count: 50');
-    });
-  });
-
-  group('FocusableCard semantic integration', () {
-    testWidgets('provides descriptive label for screen readers', (
-      tester,
-    ) async {
-      final expectedLabel = listItemLabel(
-        title: 'Dive 42',
-        subtitle: 'Blue Hole',
-        status: '32m, 48 min',
-      );
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: FocusableCard(
-              semanticLabel: expectedLabel,
-              onTap: () {},
-              child: const Text('Dive 42'),
-            ),
-          ),
-        ),
-      );
-
-      // Find our Semantics widget by matching the label
-      final semantics = tester.widgetList<Semantics>(find.byType(Semantics));
-      final ours = semantics.where((s) => s.properties.label == expectedLabel);
-      expect(ours, hasLength(1));
-      expect(ours.first.properties.button, isTrue);
-      expect(expectedLabel, 'Dive 42, Blue Hole, 32m, 48 min');
     });
   });
 }

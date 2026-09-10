@@ -4,6 +4,7 @@ import 'package:http/testing.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/card_color.dart';
@@ -15,10 +16,12 @@ import 'package:submersion/features/data_quality/presentation/providers/quality_
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -28,6 +31,8 @@ import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.da
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
+import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/trips/domain/entities/trip_day_weather.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_day_weather_providers.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
@@ -67,6 +72,10 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setGasModel(GasModel model) async =>
       state = state.copyWith(gasModel: model);
+
+  @override
+  Future<void> setDefaultPlannerWaterType(PlannerWaterType type) async =>
+      state = state.copyWith(defaultPlannerWaterType: type);
 
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
@@ -153,6 +162,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setPpO2MaxDeco(double value) async =>
       state = state.copyWith(ppO2MaxDeco: value);
   @override
+  Future<void> setPpO2Limits(double working, double max) async =>
+      state = state.copyWith(ppO2MaxWorking: working, ppO2MaxDeco: max);
+  @override
   Future<void> setCnsWarningThreshold(int value) async =>
       state = state.copyWith(cnsWarningThreshold: value);
   @override
@@ -170,6 +182,15 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSafetyReviewEnabled(bool value) async =>
       state = state.copyWith(safetyReviewEnabled: value);
+  @override
+  Future<void> setColdWaterThresholdC(double value) async =>
+      state = state.copyWith(coldWaterThresholdC: value);
+  @override
+  Future<void> setDeepDiveThresholdM(double value) async =>
+      state = state.copyWith(deepDiveThresholdM: value);
+  @override
+  Future<void> setHighO2ThresholdPercent(double value) async =>
+      state = state.copyWith(highO2ThresholdPercent: value);
   @override
   Future<void> setNoFlyPreset(NoFlyPreset preset) async =>
       state = state.copyWith(noFlyPreset: preset);
@@ -317,6 +338,10 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setShowMapBackgroundOnDiveCards(bool value) async =>
       state = state.copyWith(showMapBackgroundOnDiveCards: value);
+
+  @override
+  Future<void> setGroupTripsInDiveList(bool value) async =>
+      state = state.copyWith(groupTripsInDiveList: value);
   @override
   Future<void> setShowMapBackgroundOnSiteCards(bool value) async =>
       state = state.copyWith(showMapBackgroundOnSiteCards: value);
@@ -392,6 +417,18 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultShowO2CellMv(bool value) async =>
       state = state.copyWith(defaultShowO2CellMv: value);
+
+  @override
+  Future<void> setDefaultShowGtr(bool value) async =>
+      state = state.copyWith(defaultShowGtr: value);
+
+  @override
+  Future<void> setDefaultGtrSource(MetricDataSource value) async =>
+      state = state.copyWith(defaultGtrSource: value);
+
+  @override
+  Future<void> setGtrReservePressure(double value) async =>
+      state = state.copyWith(gtrReservePressure: value);
   @override
   Future<void> setDefaultShowEstimatedTankPressure(bool value) async =>
       state = state.copyWith(defaultShowEstimatedTankPressure: value);
@@ -438,6 +475,23 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> resetDiveDetailSections() async =>
       state = state.copyWith(clearDiveDetailSections: true);
+  @override
+  Future<void> setDiveDetailLayout(DiveDetailLayout layout) async =>
+      state = state.copyWith(diveDetailLayout: layout);
+
+  @override
+  Future<void> setDiveDetailSectionExpanded(
+    DiveDetailSectionId id,
+    bool expanded,
+  ) async {
+    state = state.copyWith(
+      diveDetailSections: [
+        for (final section in state.diveDetailSections)
+          section.id == id ? section.copyWith(expanded: expanded) : section,
+      ],
+    );
+  }
+
   @override
   Future<void> setShowDataSourceBadges(bool value) async =>
       state = state.copyWith(showDataSourceBadges: value);
@@ -528,7 +582,7 @@ Dive createTestDiveWithBottomTime({
     waterTemp: waterTemp,
     tanks: const [],
     profile: const [],
-    equipment: const [],
+    gear: looseGear(const []),
     notes: '',
     photoIds: const [],
     sightings: const [],
@@ -547,6 +601,7 @@ Future<List<Override>> getBaseOverrides({
   http.Client? weatherHttpClient,
   PreDiveSession? linkedPreDiveSession,
   Map<int, TripDayWeather>? tripDayWeather,
+  List<TankPresetEntity>? tankPresets,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -585,5 +640,9 @@ Future<List<Override>> getBaseOverrides({
       (ref, tripId) async => tripDayWeather ?? const {},
     ),
     tripDayWeatherBackfillProvider.overrideWith((ref, tripId) async {}),
+    // The trimix mixer's cylinder dropdown reads the diver's global tank
+    // presets (issue #1335 follow-up); without this it reaches the real
+    // repository and a database widget tests do not have.
+    tankPresetsProvider.overrideWith((ref) async => tankPresets ?? const []),
   ];
 }

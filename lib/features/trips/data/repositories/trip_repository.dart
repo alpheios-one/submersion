@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/data/visibility/visibility_filter.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
@@ -257,6 +258,7 @@ class TripRepository {
   /// pre-existing, debounced-downstream behavior and is left as-is. This
   /// method's own notify is deferred until after the transaction commits so
   /// listeners never observe a rolled-back delete as "changed".
+  // stats-scope-exempt: deletion cascade
   Future<void> deleteTrip(String id) async {
     try {
       _log.info('Deleting trip: $id');
@@ -306,6 +308,8 @@ class TripRepository {
       if (diverId != null) Variable.withString(diverId),
     ];
     final results = await _db.customSelect('''
+      -- stats-scope-exempt: drives the trip's displayed dive list, which
+      -- shows excluded dives like the logbook does
       SELECT id FROM dives
       WHERE trip_id = ?
       $diverClause
@@ -329,7 +333,7 @@ class TripRepository {
       SELECT COUNT(*) as count
       FROM dives
       WHERE trip_id = ?
-      $diverClause
+      $diverClause${DiveStatsScope.and(alias: 'dives')}
     ''', variables: variables).getSingle();
 
     return result.data['count'] as int? ?? 0;
@@ -377,6 +381,7 @@ class TripRepository {
 
   /// Find dives within a trip's date range that are either unassigned
   /// or assigned to a different trip (excludes dives already on this trip).
+  // stats-scope-exempt: trip assignment candidates, a list the diver picks from
   Future<List<DiveCandidate>> findCandidateDivesForTrip({
     required String tripId,
     required DateTime startDate,
@@ -525,7 +530,7 @@ class TripRepository {
         AVG(max_depth) as avg_depth
       FROM dives
       WHERE trip_id = ?
-      $diverClause
+      $diverClause${DiveStatsScope.and(alias: 'dives')}
     ''', variables: variables).getSingle();
 
     return domain.TripWithStats(
@@ -584,9 +589,13 @@ class TripRepository {
     // Build the JOIN condition: always match trip_id, and also match
     // diver_id when a specific diver is requested so that stats on shared
     // trips reflect only that diver's dives.
+    // The statistics scope goes in the ON clause, not a WHERE: this is a
+    // LEFT JOIN and a WHERE would turn it inner, dropping every trip that
+    // has no in-scope dives instead of showing it with a zero count.
+    final scope = DiveStatsScope.and(alias: 'd');
     final joinClause = diverId != null
-        ? 'LEFT JOIN dives d ON d.trip_id = t.id AND d.diver_id = ?'
-        : 'LEFT JOIN dives d ON d.trip_id = t.id';
+        ? 'LEFT JOIN dives d ON d.trip_id = t.id AND d.diver_id = ?$scope'
+        : 'LEFT JOIN dives d ON d.trip_id = t.id$scope';
 
     // When diverId is provided, prepend its variable before the visibility
     // filter variables so the positional binding lines up with joinClause.

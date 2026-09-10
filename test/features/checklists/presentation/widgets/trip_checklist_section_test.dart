@@ -318,5 +318,115 @@ void main() {
       );
       expect(saveItem.enabled, isFalse);
     });
+
+    testWidgets('clear-checklist wipes every item after confirmation', (
+      tester,
+    ) async {
+      for (final title in ['Fins', 'Mask', 'Passport']) {
+        await checklistRepository.createItem(
+          TripChecklistItem(
+            id: '',
+            tripId: trip.id,
+            title: title,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        );
+      }
+      await pumpSection(tester);
+      expect(find.text('Fins'), findsOneWidget);
+
+      await tester.tap(find.byType(PopupMenuButton<String>).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Clear checklist...'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Delete all 3 items from this checklist? '
+          'Templates are not affected.',
+        ),
+        findsOneWidget,
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Clear'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Fins'), findsNothing);
+      expect(await checklistRepository.getByTripId(trip.id), isEmpty);
+      // The section is still mounted here, so the mounted guard around the
+      // confirmation must not swallow it.
+      expect(find.text('3 items removed'), findsOneWidget);
+    });
+
+    testWidgets('cancelling the clear-checklist dialog keeps every item', (
+      tester,
+    ) async {
+      await checklistRepository.createItem(
+        TripChecklistItem(
+          id: '',
+          tripId: trip.id,
+          title: 'Fins',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      await pumpSection(tester);
+
+      await tester.tap(find.byType(PopupMenuButton<String>).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Clear checklist...'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Fins'), findsOneWidget);
+      expect(await checklistRepository.getByTripId(trip.id), hasLength(1));
+    });
+
+    testWidgets('clear-checklist is disabled in the overflow menu when the '
+        'checklist is empty', (tester) async {
+      await pumpSection(tester);
+
+      await tester.tap(find.byType(PopupMenuButton<String>).first);
+      await tester.pumpAndSettle();
+
+      final clearItem = tester.widget<PopupMenuItem<String>>(
+        find.ancestor(
+          of: find.text('Clear checklist...'),
+          matching: find.byType(PopupMenuItem<String>),
+        ),
+      );
+      expect(clearItem.enabled, isFalse);
+    });
+  });
+
+  testWidgets('categories differing only in case form one group', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          tripChecklistProvider('t1').overrideWith(
+            (ref) async => [
+              _item(id: 'i1', title: 'Service regulator', category: 'Diving'),
+              _item(id: 'i2', title: 'Pack fins', category: 'diving'),
+              _item(id: 'i3', title: 'Book flights', category: 'Bookings'),
+            ],
+          ),
+        ],
+        child: SingleChildScrollView(
+          child: TripChecklistSection(trip: _trip(upcoming: true)),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // One heading, labelled with the casing that appeared first.
+    expect(find.text('Diving'), findsOneWidget);
+    expect(find.text('diving'), findsNothing);
+    expect(find.text('Service regulator'), findsOneWidget);
+    expect(find.text('Pack fins'), findsOneWidget);
+    expect(find.text('Bookings'), findsOneWidget);
   });
 }

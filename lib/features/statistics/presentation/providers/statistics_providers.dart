@@ -21,6 +21,19 @@ final statisticsRepositoryProvider = Provider<StatisticsRepository>((ref) {
   return StatisticsRepository(gasModel: ref.watch(gasModelProvider));
 });
 
+/// How many dives the diver has explicitly excluded from statistics.
+///
+/// Backs the Overview footnote, which exists so the statistics dive count and
+/// the logbook dive count differing is self-explaining rather than a support
+/// ticket six months later. Deliberately unaffected by the Statistics filter:
+/// it describes a persistent property of the logbook, not the current view.
+final excludedDiveCountProvider = FutureProvider<int>((ref) async {
+  final repository = ref.watch(statisticsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  ref.invalidateSelfWhen(repository.watchStatisticsChanges());
+  return repository.countExcludedDives(diverId: currentDiverId);
+});
+
 /// Overview totals scoped by the Statistics filter. Kept separate from
 /// diveStatisticsProvider so the home dashboard and dive-log summary (which
 /// read diveStatisticsProvider) stay unfiltered.
@@ -87,12 +100,12 @@ final sacTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
   final filter = ref.watch(statisticsFilterProvider);
 
   if (lane == GasConsumptionLane.rmv) {
-    return repository.getSacVolumeTrend(
+    return repository.getSacVolumePerDive(
       diverId: currentDiverId,
       filter: filter,
     );
   } else {
-    return repository.getSacPressureTrend(
+    return repository.getSacPressurePerDive(
       diverId: currentDiverId,
       filter: filter,
     );
@@ -183,10 +196,7 @@ final depthProgressionTrendProvider = FutureProvider<List<TrendDataPoint>>((
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getDepthProgressionTrend(
-    diverId: currentDiverId,
-    filter: filter,
-  );
+  return repository.getDepthPerDive(diverId: currentDiverId, filter: filter);
 });
 
 final bottomTimeTrendProvider = FutureProvider<List<TrendDataPoint>>((
@@ -196,7 +206,10 @@ final bottomTimeTrendProvider = FutureProvider<List<TrendDataPoint>>((
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getBottomTimeTrend(diverId: currentDiverId, filter: filter);
+  return repository.getBottomTimePerDive(
+    diverId: currentDiverId,
+    filter: filter,
+  );
 });
 
 final divesPerYearProvider = FutureProvider<List<({int year, int count})>>((
@@ -293,6 +306,24 @@ final temperatureByMonthProvider =
         filter: filter,
       );
     });
+
+/// Water temperature as a per-dive time series.
+///
+/// Sibling of [temperatureByMonthProvider], which stays a twelve-bucket
+/// seasonal climatology. A travelling diver needs the series; a diver with one
+/// home region gets real value from the season (issue #299).
+final waterTempTrendProvider = FutureProvider<List<TrendDataPoint>>((
+  ref,
+) async {
+  _keepAliveWithExpiry(ref);
+  final repository = ref.watch(statisticsRepositoryProvider);
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final filter = ref.watch(statisticsFilterProvider);
+  return repository.getWaterTempPerDive(
+    diverId: currentDiverId,
+    filter: filter,
+  );
+});
 
 // ============================================================================
 // Social & Buddies Providers
@@ -401,11 +432,11 @@ final bestSitesForMarineLifeProvider = FutureProvider<List<RankingItem>>((
 
 /// Per-species statistics (sightings, depth range, sites, first/last seen).
 ///
-/// Deliberately UNFILTERED: its only consumer is the Marine Life
-/// species-detail page (route `/species/:id`), which is not a Statistics-tab
-/// surface and has no filter UI. Watching [statisticsFilterProvider] here
-/// would silently scope each species' detail stats to whatever filter is
-/// currently active on the (unrelated) Statistics tab.
+/// Deliberately UNFILTERED: its only consumer is the species detail page
+/// (route `/species/:id`), which is not a Statistics-tab surface and has no
+/// filter UI. Watching [statisticsFilterProvider] here would silently scope
+/// each species' detail stats to whatever filter is currently active on the
+/// (unrelated) Statistics tab.
 final speciesStatisticsProvider =
     FutureProvider.family<SpeciesStatistics, String>((ref, speciesId) async {
       _keepAliveWithExpiry(ref);
@@ -487,7 +518,7 @@ final weightTrendProvider = FutureProvider<List<TrendDataPoint>>((ref) async {
   final repository = ref.watch(statisticsRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
   final filter = ref.watch(statisticsFilterProvider);
-  return repository.getWeightTrend(diverId: currentDiverId, filter: filter);
+  return repository.getWeightPerDive(diverId: currentDiverId, filter: filter);
 });
 
 // ============================================================================

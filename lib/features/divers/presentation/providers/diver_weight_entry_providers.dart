@@ -1,3 +1,4 @@
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/data/repositories/diver_weight_entry_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver_weight_entry.dart';
@@ -32,4 +33,21 @@ final latestDiverWeightProvider = FutureProvider<DiverWeightEntry?>((
 ) async {
   final entries = await ref.watch(diverWeightEntriesProvider.future);
   return entries.isEmpty ? null : entries.first;
+});
+
+/// The active diver's most recent recorded height in centimetres: the newest
+/// entry that carries a plausible one. Height is optional per entry and
+/// changes far more slowly than weight, so a newer weight-only entry must not
+/// discard it. Implausible stored values (the history page never validated
+/// height) are skipped so they neither prefill the planner nor reach the
+/// calibration.
+final latestDiverHeightProvider = FutureProvider<double?>((ref) async {
+  final entries = await ref.watch(diverWeightEntriesProvider.future);
+  for (final entry in entries) {
+    final height = entry.heightCm;
+    if (height != null && BodyComposition.isPlausibleHeight(height)) {
+      return height;
+    }
+  }
+  return null;
 });

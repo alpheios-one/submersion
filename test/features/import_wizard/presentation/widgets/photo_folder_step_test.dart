@@ -19,14 +19,34 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// is seeded directly so the widget's rendering is what is under test.
 void main() {
   late ProviderContainer container;
+  late SharedPreferences prefs;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     container = ProviderContainer(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
     );
   });
+
+  /// Rebuilds the container with the folder-writability probe answering
+  /// [writable]. The real probe touches the filesystem, and a `testWidgets`
+  /// body never completes real IO, so an injected answer is the only way to
+  /// drive the picker path here.
+  void answerProbe(bool writable) {
+    container.dispose();
+    container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        universalImportNotifierProvider.overrideWith(
+          (ref) => UniversalImportNotifier(
+            ref,
+            folderWriteProbe: (_) async => writable,
+          ),
+        ),
+      ],
+    );
+  }
 
   tearDown(() {
     container.dispose();
@@ -64,6 +84,16 @@ void main() {
           ],
         },
       ),
+    );
+  }
+
+  void seedBundled(int count) {
+    final notifier = container.read(universalImportNotifierProvider.notifier);
+    notifier.state = notifier.state.copyWith(
+      payload: const ImportPayload(entities: {}),
+      photoPathsByBaseName: {
+        'dive1': [for (var i = 0; i < count; i++) '/tmp/x/p$i.jpg'],
+      },
     );
   }
 
@@ -188,4 +218,158 @@ void main() {
       expect(find.text('1 photo referenced in this logbook'), findsOneWidget);
     });
   });
+
+  testWidgets('shows the bundled count and asks where to save them', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(3);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('3 photos bundled in the archive'), findsOneWidget);
+      expect(find.text('Choose where to save photos...'), findsOneWidget);
+      expect(find.textContaining('never keeps its own copy'), findsOneWidget);
+      // No referenced photos, so no folder-to-resolve question.
+      expect(find.text('Choose photo folder...'), findsNothing);
+    });
+  });
+
+  testWidgets('picking a destination records it on the state', (tester) async {
+    const dest = '/Users/eric/Pictures/Dives';
+    await withPlatform(TargetPlatform.macOS, () async {
+      answerProbe(true);
+      seedBundled(1);
+
+      await tester.pumpWidget(
+        host(PhotoFolderStep(pickDestinationOverride: () async => dest)),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Choose where to save photos...'));
+      await tester.pump();
+
+      expect(find.text(dest), findsOneWidget);
+      expect(
+        container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
+        dest,
+      );
+    });
+  });
+
+  testWidgets('skipping clears a chosen destination', (tester) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedBundled(1);
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(bundledPhotoFolderPath: '/x');
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      await tester.tap(find.text('Skip photos'));
+      await tester.pump();
+
+      final state = container.read(universalImportNotifierProvider);
+      expect(state.photosSkipped, isTrue);
+      expect(state.bundledPhotoFolderPath, isNull);
+    });
+  });
+
+  testWidgets('states the mobile limitation once for bundled photos', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.iOS, () async {
+      seedBundled(2);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('Choose where to save photos...'), findsNothing);
+      expect(
+        find.textContaining('Run this import on a computer'),
+        findsOneWidget,
+      );
+      expect(find.text('2 photos bundled in the archive'), findsOneWidget);
+    });
+  });
+
+  testWidgets('shows the scanning state while a folder resolves', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      seedPictures(1);
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(isLoading: true);
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      expect(find.text('Scanning folder...'), findsOneWidget);
+      expect(find.text('Choose photo folder...'), findsNothing);
+    });
+  });
+
+  testWidgets('an unwritable destination is refused with a message', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.macOS, () async {
+      answerProbe(false);
+      seedBundled(1);
+
+      await tester.pumpWidget(
+        host(const PhotoFolderStep(pickDestinationOverride: _pickUnwritable)),
+      );
+      await tester.pump();
+
+      await tester.tap(find.text('Choose where to save photos...'));
+      await tester.pump();
+
+      expect(
+        container.read(universalImportNotifierProvider).bundledPhotoFolderPath,
+        isNull,
+      );
+      expect(
+        find.text("That folder can't be written to. Choose another one."),
+        findsOneWidget,
+      );
+    });
+  });
+
+  testWidgets('mobile explains the limitation once for both kinds', (
+    tester,
+  ) async {
+    await withPlatform(TargetPlatform.iOS, () async {
+      final notifier = container.read(universalImportNotifierProvider.notifier);
+      notifier.state = notifier.state.copyWith(
+        payload: ImportPayload(
+          entities: {
+            ImportEntityType.dives: [
+              {'uddfId': 'd0', 'dateTime': DateTime(2025, 1, 15)},
+            ],
+            ImportEntityType.media: [
+              {'filename': '/p/a.jpg', '_diveIndex': 0},
+            ],
+          },
+        ),
+        photoPathsByBaseName: const {
+          'dive1': ['/tmp/x/p0.jpg'],
+        },
+      );
+
+      await tester.pumpWidget(host(const PhotoFolderStep()));
+      await tester.pump();
+
+      // Both counts are stated, so nothing is silently dropped, and the
+      // explanation appears once rather than under each heading.
+      expect(find.text('1 photo referenced in this logbook'), findsOneWidget);
+      expect(find.text('1 photo bundled in the archive'), findsOneWidget);
+      expect(
+        find.textContaining('Run this import on a computer'),
+        findsOneWidget,
+      );
+    });
+  });
 }
+
+Future<String?> _pickUnwritable() async => '/somewhere/read-only';

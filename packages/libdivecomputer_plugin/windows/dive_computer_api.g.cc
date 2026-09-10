@@ -862,13 +862,15 @@ TankInfo::TankInfo(
   const double* volume_liters,
   const double* start_pressure_bar,
   const double* end_pressure_bar,
-  const int64_t* usage)
+  const int64_t* usage,
+  const int64_t* transmitter_serial)
  : index_(index),
     gas_mix_index_(gas_mix_index),
     volume_liters_(volume_liters ? std::optional<double>(*volume_liters) : std::nullopt),
     start_pressure_bar_(start_pressure_bar ? std::optional<double>(*start_pressure_bar) : std::nullopt),
     end_pressure_bar_(end_pressure_bar ? std::optional<double>(*end_pressure_bar) : std::nullopt),
-    usage_(usage ? std::optional<int64_t>(*usage) : std::nullopt) {}
+    usage_(usage ? std::optional<int64_t>(*usage) : std::nullopt),
+    transmitter_serial_(transmitter_serial ? std::optional<int64_t>(*transmitter_serial) : std::nullopt) {}
 
 int64_t TankInfo::index() const {
   return index_;
@@ -940,15 +942,29 @@ void TankInfo::set_usage(int64_t value_arg) {
 }
 
 
+const int64_t* TankInfo::transmitter_serial() const {
+  return transmitter_serial_ ? &(*transmitter_serial_) : nullptr;
+}
+
+void TankInfo::set_transmitter_serial(const int64_t* value_arg) {
+  transmitter_serial_ = value_arg ? std::optional<int64_t>(*value_arg) : std::nullopt;
+}
+
+void TankInfo::set_transmitter_serial(int64_t value_arg) {
+  transmitter_serial_ = value_arg;
+}
+
+
 EncodableList TankInfo::ToEncodableList() const {
   EncodableList list;
-  list.reserve(6);
+  list.reserve(7);
   list.push_back(EncodableValue(index_));
   list.push_back(EncodableValue(gas_mix_index_));
   list.push_back(volume_liters_ ? EncodableValue(*volume_liters_) : EncodableValue());
   list.push_back(start_pressure_bar_ ? EncodableValue(*start_pressure_bar_) : EncodableValue());
   list.push_back(end_pressure_bar_ ? EncodableValue(*end_pressure_bar_) : EncodableValue());
   list.push_back(usage_ ? EncodableValue(*usage_) : EncodableValue());
+  list.push_back(transmitter_serial_ ? EncodableValue(*transmitter_serial_) : EncodableValue());
   return list;
 }
 
@@ -971,6 +987,10 @@ TankInfo TankInfo::FromEncodableList(const EncodableList& list) {
   auto& encodable_usage = list[5];
   if (!encodable_usage.IsNull()) {
     decoded.set_usage(std::get<int64_t>(encodable_usage));
+  }
+  auto& encodable_transmitter_serial = list[6];
+  if (!encodable_transmitter_serial.IsNull()) {
+    decoded.set_transmitter_serial(std::get<int64_t>(encodable_transmitter_serial));
   }
   return decoded;
 }
@@ -1849,7 +1869,13 @@ void DiveComputerHostApi::SetUp(
           const auto& device_arg = std::any_cast<const DiscoveredDevice&>(std::get<CustomEncodableValue>(encodable_device_arg));
           const auto& encodable_fingerprint_arg = args.at(1);
           const auto* fingerprint_arg = std::get_if<std::string>(&encodable_fingerprint_arg);
-          api->StartDownload(device_arg, fingerprint_arg, [reply](std::optional<FlutterError>&& output) {
+          const auto& encodable_sync_clock_arg = args.at(2);
+          if (encodable_sync_clock_arg.IsNull()) {
+            reply(WrapError("sync_clock_arg unexpectedly null."));
+            return;
+          }
+          const auto& sync_clock_arg = std::get<bool>(encodable_sync_clock_arg);
+          api->StartDownload(device_arg, fingerprint_arg, sync_clock_arg, [reply](std::optional<FlutterError>&& output) {
             if (output.has_value()) {
               reply(WrapError(output.value()));
               return;
@@ -2117,6 +2143,7 @@ void DiveComputerFlutterApi::OnDownloadComplete(
   int64_t total_dives_arg,
   const std::string* serial_number_arg,
   const std::string* firmware_version_arg,
+  const std::string* clock_sync_status_arg,
   std::function<void(void)>&& on_success,
   std::function<void(const FlutterError&)>&& on_error) {
   const std::string channel_name = "dev.flutter.pigeon.libdivecomputer_plugin.DiveComputerFlutterApi.onDownloadComplete" + message_channel_suffix_;
@@ -2125,6 +2152,7 @@ void DiveComputerFlutterApi::OnDownloadComplete(
     EncodableValue(total_dives_arg),
     serial_number_arg ? EncodableValue(*serial_number_arg) : EncodableValue(),
     firmware_version_arg ? EncodableValue(*firmware_version_arg) : EncodableValue(),
+    clock_sync_status_arg ? EncodableValue(*clock_sync_status_arg) : EncodableValue(),
   });
   channel.Send(encoded_api_arguments, [channel_name, on_success = std::move(on_success), on_error = std::move(on_error)](const uint8_t* reply, size_t reply_size) {
     std::unique_ptr<EncodableValue> response = GetCodec().DecodeMessage(reply, reply_size);

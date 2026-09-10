@@ -31,9 +31,11 @@ import 'package:submersion/features/dive_sites/presentation/widgets/compact_site
 import 'package:submersion/features/dive_sites/presentation/widgets/dense_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_filter_sheet.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_list_tile.dart';
+import 'package:submersion/features/dive_sites/domain/services/site_location_backfill_service.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_location_backfill_dialog.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/dive_sites/presentation/site_difficulty_display.dart';
 
 /// Content widget for the site list, used in master-detail layout.
 class SiteListContent extends ConsumerStatefulWidget {
@@ -246,14 +248,15 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     _handleItemTap(sites[index].site);
   }
 
-  Future<void> _startMerge() async {
+  Future<BulkActionOutcome> _startMerge() async {
     final selectedCount = _selectedIds.length;
     final result = await context.push<SiteMergeResult>(
       '/sites/merge',
       extra: _selectedIds.toList(),
     );
 
-    if (!mounted || result == null) return;
+    if (result == null) return BulkActionOutcome.cancelled;
+    if (!mounted) return BulkActionOutcome.completed;
 
     _mergeSnapshot = result.snapshot;
     final mergedId = result.survivorId;
@@ -298,9 +301,10 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
         ),
       );
     }
+    return BulkActionOutcome.completed;
   }
 
-  Future<void> _confirmAndDelete() async {
+  Future<BulkActionOutcome> _confirmAndDelete() async {
     final count = _selectedIds.length;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -369,7 +373,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
           ),
         );
       }
+      return BulkActionOutcome.completed;
     }
+    return BulkActionOutcome.cancelled;
   }
 
   void _showSortSheet(BuildContext context) {
@@ -517,7 +523,21 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                         } else if (value == 'import') {
                           context.push('/sites/import');
                         } else if (value == 'fill_location_details') {
-                          unawaited(showSiteLocationBackfillFlow(context, ref));
+                          unawaited(
+                            showSiteLocationBackfillFlow(
+                              context,
+                              ref,
+                              mode: SiteLocationLookupMode.fillMissing,
+                            ),
+                          );
+                        } else if (value == 'refresh_place_names') {
+                          unawaited(
+                            showSiteLocationBackfillFlow(
+                              context,
+                              ref,
+                              mode: SiteLocationLookupMode.refreshAll,
+                            ),
+                          );
                         } else if (value.startsWith('view_')) {
                           final mode = ListViewMode.fromName(
                             value.replaceFirst('view_', ''),
@@ -567,6 +587,18 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                                 context
                                     .l10n
                                     .diveSites_list_menu_fillLocationDetails,
+                              ),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'refresh_place_names',
+                            child: ListTile(
+                              leading: const Icon(Icons.translate),
+                              title: Text(
+                                context
+                                    .l10n
+                                    .diveSites_list_menu_refreshPlaceNames,
                               ),
                               contentPadding: EdgeInsets.zero,
                             ),
@@ -787,7 +819,21 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value == 'fill_location_details') {
-                unawaited(showSiteLocationBackfillFlow(context, ref));
+                unawaited(
+                  showSiteLocationBackfillFlow(
+                    context,
+                    ref,
+                    mode: SiteLocationLookupMode.fillMissing,
+                  ),
+                );
+              } else if (value == 'refresh_place_names') {
+                unawaited(
+                  showSiteLocationBackfillFlow(
+                    context,
+                    ref,
+                    mode: SiteLocationLookupMode.refreshAll,
+                  ),
+                );
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
                   value.replaceFirst('view_', ''),
@@ -822,6 +868,16 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                     leading: const Icon(Icons.travel_explore),
                     title: Text(
                       context.l10n.diveSites_list_menu_fillLocationDetails,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'refresh_place_names',
+                  child: ListTile(
+                    leading: const Icon(Icons.translate),
+                    title: Text(
+                      context.l10n.diveSites_list_menu_refreshPlaceNames,
                     ),
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -1064,7 +1120,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               ),
             if (filter.difficulty != null)
               _buildFilterChip(
-                filter.difficulty!.displayName,
+                filter.difficulty!.localizedName(context.l10n),
                 () => ref.read(siteFilterProvider.notifier).state = filter
                     .copyWith(clearDifficulty: true),
               ),

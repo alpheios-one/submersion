@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
+import 'package:submersion/core/presentation/startup_theme.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
@@ -371,6 +372,78 @@ void main() {
           .read(settingsProvider.notifier)
           .setShowDataSourceBadges(false);
       expect(container.read(settingsProvider).showDataSourceBadges, isFalse);
+    });
+
+    test(
+      'setPpO2Limits clamps to the picker grid and holds max >= working',
+      () async {
+        container.read(settingsProvider.notifier);
+        await waitForInit();
+
+        final notifier = container.read(settingsProvider.notifier);
+
+        // Off-grid values (working below 1.2, max below 1.4) are pulled onto
+        // the selectable range rather than persisted as-is.
+        await notifier.setPpO2Limits(0.9, 1.1);
+        expect(container.read(settingsProvider).ppO2MaxWorking, 1.2);
+        expect(container.read(settingsProvider).ppO2MaxDeco, 1.4);
+
+        // A max below the working ceiling is raised to it.
+        await notifier.setPpO2Limits(1.6, 1.4);
+        expect(container.read(settingsProvider).ppO2MaxWorking, 1.6);
+        expect(container.read(settingsProvider).ppO2MaxDeco, 1.6);
+
+        // In-range values pass through untouched.
+        await notifier.setPpO2Limits(1.3, 1.5);
+        expect(container.read(settingsProvider).ppO2MaxWorking, 1.3);
+        expect(container.read(settingsProvider).ppO2MaxDeco, 1.5);
+      },
+    );
+
+    test('the individual ppO2 setters clamp to the same picker grid', () async {
+      container.read(settingsProvider.notifier);
+      await waitForInit();
+
+      final notifier = container.read(settingsProvider.notifier);
+
+      await notifier.setPpO2MaxWorking(0.8);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.2);
+      await notifier.setPpO2MaxWorking(2.0);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.6);
+      await notifier.setPpO2MaxWorking(1.4);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.4);
+
+      await notifier.setPpO2MaxDeco(1.0);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.4);
+      await notifier.setPpO2MaxDeco(2.0);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.6);
+      await notifier.setPpO2MaxDeco(1.5);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.5);
+    });
+
+    test('the individual ppO2 setters hold deco >= working', () async {
+      container.read(settingsProvider.notifier);
+      await waitForInit();
+
+      final notifier = container.read(settingsProvider.notifier);
+
+      // Raising working past deco carries deco up with it.
+      await notifier.setPpO2Limits(1.2, 1.4);
+      await notifier.setPpO2MaxWorking(1.6);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.6);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.6);
+
+      // Lowering deco below working pulls working down with it.
+      await notifier.setPpO2Limits(1.5, 1.6);
+      await notifier.setPpO2MaxDeco(1.4);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.4);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.4);
+
+      // A setter that does not cross the other bound leaves it untouched.
+      await notifier.setPpO2Limits(1.3, 1.6);
+      await notifier.setPpO2MaxWorking(1.4);
+      expect(container.read(settingsProvider).ppO2MaxWorking, 1.4);
+      expect(container.read(settingsProvider).ppO2MaxDeco, 1.6);
     });
 
     test('setDefaultShowAscentRateLine persists the new default', () async {
@@ -780,6 +853,37 @@ void main() {
 
       await notifier.setThemeMode(ThemeMode.system);
       expect(prefs.getString(cachedThemeModeKey), 'system');
+    });
+
+    test('hydration writes the default theme preset into prefs', () {
+      final prefs = container.read(sharedPreferencesProvider);
+      expect(prefs.getString(cachedThemePresetKey), 'submersion');
+    });
+
+    test('setThemePresetId mirrors the new preset into prefs', () async {
+      // The splash reads this mirror to theme its error screens, so a diver
+      // who switched presets must not meet the previous one on next launch.
+      final notifier = container.read(settingsProvider.notifier);
+      final prefs = container.read(sharedPreferencesProvider);
+
+      await notifier.setThemePresetId('console');
+      expect(prefs.getString(cachedThemePresetKey), 'console');
+
+      await notifier.setThemePresetId('deep');
+      expect(prefs.getString(cachedThemePresetKey), 'deep');
+    });
+
+    test('a preset this build cannot resolve is mirrored unchanged', () async {
+      // A database written by a beta build can name a preset the running
+      // build does not ship. The mirror keeps the diver's actual choice, so
+      // a build that ships it again honours it on its first launch; the
+      // splash resolves the fallback at read time instead.
+      final notifier = container.read(settingsProvider.notifier);
+      final prefs = container.read(sharedPreferencesProvider);
+
+      await notifier.setThemePresetId('kelp');
+
+      expect(prefs.getString(cachedThemePresetKey), 'kelp');
     });
   });
 }

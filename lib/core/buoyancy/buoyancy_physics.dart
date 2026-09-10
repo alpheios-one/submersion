@@ -1,5 +1,6 @@
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
+import 'package:submersion/core/deco/entities/dive_environment.dart';
 
 /// Empty-tank buoyancy and dry mass keyed by TankPresets name.
 ///
@@ -10,6 +11,7 @@ const Map<String, ({double emptyBuoyancyKg, double dryMassKg})> kTankCatalog = {
   'al40': (emptyBuoyancyKg: 0.9, dryMassKg: 6.8),
   'al63': (emptyBuoyancyKg: 1.2, dryMassKg: 12.2),
   'al80': (emptyBuoyancyKg: 1.7, dryMassKg: 14.2),
+  'al100': (emptyBuoyancyKg: 1.6, dryMassKg: 18.4),
   'hp80': (emptyBuoyancyKg: -1.3, dryMassKg: 13.0),
   'hp100': (emptyBuoyancyKg: -1.0, dryMassKg: 15.0),
   'hp120': (emptyBuoyancyKg: -1.4, dryMassKg: 18.0),
@@ -17,8 +19,8 @@ const Map<String, ({double emptyBuoyancyKg, double dryMassKg})> kTankCatalog = {
   'steel10': (emptyBuoyancyKg: -1.2, dryMassKg: 12.5),
   'steel12': (emptyBuoyancyKg: -1.4, dryMassKg: 14.5),
   'steel15': (emptyBuoyancyKg: -1.8, dryMassKg: 17.5),
-  'al30Stage': (emptyBuoyancyKg: 0.5, dryMassKg: 5.5),
-  'al40Stage': (emptyBuoyancyKg: 0.9, dryMassKg: 6.8),
+  'al30stage': (emptyBuoyancyKg: 0.5, dryMassKg: 5.5),
+  'al40stage': (emptyBuoyancyKg: 0.9, dryMassKg: 6.8),
 };
 
 /// Deterministic buoyancy terms for weight prediction: never learned,
@@ -53,12 +55,22 @@ class BuoyancyPhysics {
 
   /// Lead-equivalent shift vs the salt-water baseline, scaled by the total
   /// displaced mass (body + rig). Negative in fresh water: less lead needed.
+  ///
+  /// [salinityPpt] wins over [waterType], matching
+  /// [DiveEnvironment.forConditions]: a plan on a custom salinity must shift
+  /// by its own density rather than by the named type it fell back to.
   static double waterTermKg({
     required WaterType? waterType,
     required double totalMassKg,
+    double? salinityPpt,
   }) {
-    if (waterType == null) return 0.0;
-    return totalMassKg * (_density(waterType) / densitySaltKgL - 1.0);
+    final densityKgL = salinityPpt != null
+        ? DiveEnvironment.densityFromSalinityPpt(salinityPpt) / 1000.0
+        : waterType == null
+        ? null
+        : _density(waterType);
+    if (densityKgL == null) return 0.0;
+    return totalMassKg * (densityKgL / densitySaltKgL - 1.0);
   }
 
   /// Near-empty buoyancy of one tank: the catalog (or per-material

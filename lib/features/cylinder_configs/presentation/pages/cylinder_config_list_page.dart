@@ -7,11 +7,13 @@ import 'package:submersion/features/cylinder_configs/presentation/providers/cyli
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_checkbox_slot.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/tank_enum_display.dart';
 
 /// Lists every configuration, grouped by owning rebreather with generic gas
 /// plans last.
@@ -143,9 +145,9 @@ class _CylinderConfigListPageState
     );
   }
 
-  Future<void> _confirmAndDelete() async {
+  Future<BulkActionOutcome> _confirmAndDelete() async {
     final ids = _selectedIds.toList();
-    if (ids.isEmpty) return;
+    if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -167,7 +169,7 @@ class _CylinderConfigListPageState
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
     final repo = ref.read(cylinderConfigRepositoryProvider);
@@ -175,13 +177,14 @@ class _CylinderConfigListPageState
     for (final id in ids) {
       await repo.deleteConfig(id);
     }
-    if (!mounted) return;
+    if (!mounted) return BulkActionOutcome.completed;
     ref.invalidate(cylinderConfigsProvider);
     messenger.showSnackBar(
       SnackBar(
         content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
       ),
     );
+    return BulkActionOutcome.completed;
   }
 }
 
@@ -261,7 +264,9 @@ class _ConfigTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final roles = config.items.map((i) => i.tankRole.displayName).join(', ');
+    final roles = config.items
+        .map((i) => i.tankRole.localizedName(context.l10n))
+        .join(', ');
     return ListTile(
       // ListTile reserves leading width for any non-null child, however wide
       // that child actually draws, so a zero-width slot would still indent the

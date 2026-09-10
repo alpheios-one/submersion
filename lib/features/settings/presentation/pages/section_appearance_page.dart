@@ -688,6 +688,7 @@ class SectionAppearancePage extends ConsumerWidget {
       ProfileRightAxisMetric.surfaceGf => l10n.enum_profileMetric_surfaceGf,
       ProfileRightAxisMetric.meanDepth => l10n.enum_profileMetric_meanDepth,
       ProfileRightAxisMetric.tts => l10n.enum_profileMetric_tts,
+      ProfileRightAxisMetric.gtr => l10n.enum_profileMetric_gtr,
       ProfileRightAxisMetric.cns => l10n.enum_profileMetric_cns,
       ProfileRightAxisMetric.otu => l10n.enum_profileMetric_otu,
       ProfileRightAxisMetric.o2CellMv => l10n.enum_profileMetric_o2CellMv,

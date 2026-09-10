@@ -11,17 +11,19 @@ import 'package:submersion/features/dashboard/presentation/providers/gauge_provi
 import 'package:submersion/features/dashboard/presentation/providers/milestone_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/media_ribbon_providers.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/dashboard_grid.dart';
-import 'package:submersion/features/dashboard/presentation/widgets/urgent_banner.dart';
+import 'package:submersion/features/dashboard/presentation/widgets/gauge_strip.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Dashboard home page: monitor-first status gauges over a responsive
 /// card grid that reflows from one phone column to a 3-column desktop
 /// layout (one ordered block list drives both). The user's card order and
-/// visibility come from settings; the urgent banner is pinned on top.
+/// visibility come from settings, except that a live safety alert forces
+/// the gauge strip to render (see [_hasSafetyAlert]).
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
@@ -35,7 +37,7 @@ class DashboardPage extends ConsumerWidget {
     bool show<T>(AsyncValue<T> value, bool Function(T data) hasContent) =>
         value.maybeWhen(data: hasContent, orElse: () => false);
 
-    final alerts = ref.watch(dashboardAlertsProvider);
+    final gauges = ref.watch(dashboardGaugesProvider);
     final milestones = ref.watch(milestonesProvider);
     final media = ref.watch(recentMediaProvider);
     final onThisDay = ref.watch(onThisDayProvider);
@@ -60,26 +62,33 @@ class DashboardPage extends ConsumerWidget {
       _ => true,
     };
 
-    final visibleCards = [
-      for (final card in reconcileHomeCardOrder(homeCardOrder))
+    // A live safety alert overrides the diver's choice to hide the gauge
+    // strip: hardened chips are useless if the whole card they live in can
+    // be switched off. Keyed off the same provider the strip itself reads,
+    // so there is one definition of what counts as urgent.
+    final forceGaugeStrip = show(gauges, _hasSafetyAlert);
+
+    final orderedCards = reconcileHomeCardOrder(homeCardOrder);
+
+    // The cards the diver actually asked for. Tracked separately from
+    // visibleCards so a forced gauge strip cannot masquerade as "you still
+    // have cards" and suppress the all-hidden CTA.
+    final chosenCards = [
+      for (final card in orderedCards)
         if (!hiddenHomeCards.contains(card.name) && hasContent(card)) card,
     ];
 
-    final showUrgent = show(
-      alerts,
-      (a) =>
-          a.serviceClocksDue.any(
-            (c) => c.status.severity == ServiceClockSeverity.overdue,
-          ) ||
-          a.insuranceExpired,
-    );
-
-    // The urgent banner is pinned: never hideable, never reorderable,
-    // always above all customizable content.
-    final entries = <DashboardEntry>[
-      if (showUrgent) const FullBlock(UrgentBanner()),
-      ...buildDashboardEntries(visibleCards),
+    // The forced strip keeps its natural position in the order rather than
+    // being pinned to the top: it is a card that came back, not a banner.
+    final visibleCards = [
+      for (final card in orderedCards)
+        if ((!hiddenHomeCards.contains(card.name) ||
+                (card == HomeCardType.gaugeStrip && forceGaugeStrip)) &&
+            hasContent(card))
+          card,
     ];
+
+    final entries = buildDashboardEntries(visibleCards);
 
     return Scaffold(
       body: SafeArea(
@@ -87,7 +96,6 @@ class DashboardPage extends ConsumerWidget {
           onRefresh: () async {
             ref.invalidate(diveStatisticsProvider);
             ref.invalidate(recentDivesProvider);
-            ref.invalidate(dashboardAlertsProvider);
             ref.invalidate(dashboardGaugesProvider);
             ref.invalidate(daysSinceLastDiveProvider);
             ref.invalidate(dashboardQuickStatsProvider);
@@ -105,14 +113,17 @@ class DashboardPage extends ConsumerWidget {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
-            // Keyed off visibleCards, not entries: entries includes the
-            // pinned urgent banner, which must not suppress the
-            // all-cards-hidden CTA (it renders above it instead).
-            child: visibleCards.isEmpty
+            // Keyed off chosenCards, not visibleCards: a strip forced back
+            // by a safety alert renders above the CTA rather than replacing
+            // it, so the diver keeps the route to re-enable their cards.
+            child: chosenCards.isEmpty
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (showUrgent) const UrgentBanner(),
+                      if (forceGaugeStrip) ...[
+                        const GaugeStrip(),
+                        const SizedBox(height: 16),
+                      ],
                       const _AllCardsHiddenState(),
                     ],
                   )
@@ -122,6 +133,38 @@ class DashboardPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Whether the gauge strip is currently carrying a dive-safety fact the diver
+/// cannot dismiss: lapsed gear service, an expired insurance policy, or a
+/// flight window that is shut.
+///
+/// GaugeStrip hardens these three chip types against the hidden-chips setting;
+/// this is the matching guard one level up, so hiding the whole strip card
+/// cannot suppress them either. Currency and backup-age chips can also go red
+/// but are deliberately absent: they are habit nags, and hiding one is a
+/// legitimate choice.
+bool _hasSafetyAlert(DashboardGauges g) {
+  final insurance = g.insurance;
+  // Mirrors GaugeStrip's expired branch, which only fires on a real policy:
+  // a diver with no insurance recorded gets a neutral chip, not an alert, so
+  // it must not force the strip open either.
+  final expiredPolicy =
+      insurance != null &&
+      insurance.providerLabel != null &&
+      insurance.isExpired;
+  // Overflow counts as overdue gear in its own right. With the shipped caps
+  // it can only be positive alongside a shown overdue gauge, so this clause
+  // is currently redundant; it is here so the guard states the same rule
+  // GaugeStrip does (an alert-tone "+N more overdue" chip), rather than
+  // depending on the cap values to keep the two in agreement.
+  return g.gearOverdueOverflow > 0 ||
+      g.gearGauges.any(
+        (gauge) => gauge.status.severity == ServiceClockSeverity.overdue,
+      ) ||
+      expiredPolicy ||
+      g.flightWindow?.state == FlightWindowState.closed ||
+      g.flightWindow?.state == FlightWindowState.conflict;
 }
 
 /// Shown when the user has hidden every home card: points at the settings

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:submersion/core/providers/provider.dart';
 
+import 'package:submersion/features/dive_computer/domain/entities/clock_sync.dart';
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
@@ -10,6 +10,8 @@ import 'package:submersion/features/dive_computer/presentation/widgets/pin_code_
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/core/utils/log_failure.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Widget for the download step of the discovery wizard.
 class DownloadStepWidget extends ConsumerStatefulWidget {
@@ -224,6 +226,9 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
             (downloadState.progress!.percentage * 100).toStringAsFixed(0),
           )
         : '';
+    final clockSyncText = downloadState.isComplete
+        ? _clockSyncText(context, downloadState.clockSyncStatus)
+        : null;
 
     return Semantics(
       label: context.l10n.diveComputer_downloadStep_progressSemanticLabel(
@@ -254,6 +259,18 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: colorScheme.primary,
+                ),
+              ),
+            if (clockSyncText != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  clockSyncText,
+                  key: const ValueKey('clock_sync_result'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             const SizedBox(height: 16),
@@ -333,10 +350,27 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
   /// when the diver's log already has dives. Lets them skip re-downloading
   /// dives they already logged by hand or from another source, instead of
   /// silently pulling the device's full history.
+  /// One line about the clock sync that ran after the download (issue
+  /// #1216), or null when none was requested so the layout reserves no
+  /// space for it.
+  String? _clockSyncText(BuildContext context, ClockSyncStatus? status) {
+    return switch (status) {
+      ClockSyncStatus.synced =>
+        context.l10n.diveComputer_downloadStep_clockSynced,
+      ClockSyncStatus.unsupported =>
+        context.l10n.diveComputer_downloadStep_clockSyncUnsupported,
+      ClockSyncStatus.failed =>
+        context.l10n.diveComputer_downloadStep_clockSyncFailed,
+      ClockSyncStatus.notRequested || null => null,
+    };
+  }
+
   Widget _buildCutoffPrompt(BuildContext context) {
     final theme = Theme.of(context);
     final cutoff = _cutoff!;
-    final dateLabel = DateFormat.yMMMd().format(cutoff);
+    final dateLabel = UnitFormatter(
+      ref.watch(settingsProvider),
+    ).formatDate(cutoff);
 
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -595,11 +629,10 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     ThemeData theme,
     ColorScheme colorScheme,
   ) {
-    final date = dive.startTime;
-    final dateStr =
-        '${date.month}/${date.day}/${date.year} '
-        '${date.hour.toString().padLeft(2, '0')}:'
-        '${date.minute.toString().padLeft(2, '0')}';
+    // #1512: hand-rolled M/D/YYYY with a 24-hour clock ignored both the date
+    // and the time preference.
+    final units = UnitFormatter(ref.watch(settingsProvider));
+    final dateStr = units.formatDateTimeBullet(dive.startTime);
     final durationMin = dive.durationSeconds ~/ 60;
 
     // Build detail chips
@@ -678,6 +711,19 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     final l10n = context.l10n;
     if (state.errorCode == 'no_serial_ports') {
       return l10n.diveComputer_download_noSerialPortsFound;
+    }
+    // A USB HID computer (the Scubapro G2 family, the Suunto EON Steel family)
+    // has no serial port to go looking for, so the serial wording above would
+    // send the diver hunting for the wrong thing (issue #1271). The native
+    // message names the model too, but only in English, so the name is taken
+    // from the device here and the sentence around it is localized.
+    if (state.errorCode == 'no_usb_device') {
+      final model =
+          widget.device?.recognizedModel?.fullName ??
+          widget.device?.displayName;
+      if (model != null) {
+        return l10n.diveComputer_download_noUsbDeviceFound(model);
+      }
     }
     // Apple platforms expose no API for deleting a pairing record, so a stale
     // one can only be cleared by the diver in Bluetooth settings. Say so

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:submersion/shared/utils/byte_format.dart';
 
 /// Represents a downloaded offline map region.
 class CachedRegion extends Equatable {
@@ -37,16 +38,11 @@ class CachedRegion extends Equatable {
   LatLng get center => LatLng((minLat + maxLat) / 2, (minLng + maxLng) / 2);
 
   /// Human-readable size string.
-  String get formattedSize {
-    if (sizeBytes < 1024) return '$sizeBytes B';
-    if (sizeBytes < 1024 * 1024) {
-      return '${(sizeBytes / 1024).toStringAsFixed(1)} KB';
-    }
-    if (sizeBytes < 1024 * 1024 * 1024) {
-      return '${(sizeBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(sizeBytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
-  }
+  ///
+  /// Only meaningful for a region that owns its tiles. A region downloaded
+  /// before per-region stores carries a size that was never measured, and the
+  /// UI shows it as unknown rather than rendering this.
+  String get formattedSize => formatBytes(sizeBytes);
 
   CachedRegion copyWith({
     String? id,

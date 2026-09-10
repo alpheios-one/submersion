@@ -15,13 +15,27 @@ class TimeShiftRepair extends QualityRepairAction {
   final bool offerImportWide;
 }
 
+/// Merge a likely duplicate pair as one dive recorded by two computers.
+///
+/// Carries the pair only. Which recording survives (and so supplies the notes,
+/// site, rating and manual edits) is a judgment call, so the executor opens
+/// the combine dialog's primary selector rather than choosing here (#1690).
 class ConsolidateDuplicateRepair extends QualityRepairAction {
-  const ConsolidateDuplicateRepair({
-    required this.targetDiveId,
-    required this.secondaryDiveId,
+  const ConsolidateDuplicateRepair(this.diveIds);
+  final List<String> diveIds;
+}
+
+/// Delete the redundant copy of a dive downloaded twice from one computer.
+/// The pair cannot be consolidated (that folds a SECOND computer's recording
+/// in), so the fix is to keep the richer recording and drop the other; which
+/// is which was decided by the detector and is carried here.
+class DeleteDuplicateRepair extends QualityRepairAction {
+  const DeleteDuplicateRepair({
+    required this.keepDiveId,
+    required this.deleteDiveId,
   });
-  final String targetDiveId;
-  final String secondaryDiveId;
+  final String keepDiveId;
+  final String deleteDiveId;
 }
 
 class CombineSplitRepair extends QualityRepairAction {
@@ -148,6 +162,12 @@ class GoToDiveRepair extends QualityRepairAction {
   final String diveId;
 }
 
+/// Navigate to the transmitter editor prefilled with [serial].
+class AssignTransmitterRepair extends QualityRepairAction {
+  const AssignTransmitterRepair(this.serial);
+  final String serial;
+}
+
 double? _num(Map<String, Object?> p, String k) => (p[k] as num?)?.toDouble();
 
 /// Pure mapping from a finding to its offered repairs (spec's repair table).
@@ -189,12 +209,39 @@ List<QualityRepairAction> repairOptionsFor(QualityFinding f) {
       return [GoToDiveRepair(diveId)];
 
     case 'duplicate':
+      // Consolidation folds a SECOND computer's recording into the dive.
+      // DiveConsolidationBuilder rejects a pair that shares one physical
+      // computer, so offering the repair there is a button that can only
+      // ever fail; the card falls back to its no-automatic-fix row instead.
+      // Findings written before the detector reported this (no key at all)
+      // stay repairable until a rescan fills the fact in.
+      final consolidatable = p['sameComputer'] != true;
+      // A same-computer pair's fix is to delete the redundant copy, and the
+      // detector names it (see DuplicateDetector's redundantDuplicate). Only
+      // trusted when it names one side of THIS pair: a stale or foreign id
+      // must never volunteer a dive.
+      final redundant = p['redundantDiveId'] as String?;
+      // Detector 3 named the redundant copy on recording richness alone, so
+      // it could name the copy holding the diver's gear and notes (#1720).
+      // Detector 4 withholds the name in that case, but findings already on
+      // disk carry the old verdict: an unread key would be a guess, so the
+      // repair waits for the rescan the version bump offers. Unlike
+      // `sameComputer`, an absent fact CANNOT default to repairable here --
+      // this repair deletes a dive.
+      final checkedForDiverData = f.detectorVersion >= 4;
+      final deletable =
+          !consolidatable &&
+          checkedForDiverData &&
+          related != null &&
+          (redundant == diveId || redundant == related);
       return [
-        if (related != null)
-          ConsolidateDuplicateRepair(
-            targetDiveId: diveId,
-            secondaryDiveId: related,
+        if (deletable)
+          DeleteDuplicateRepair(
+            keepDiveId: redundant == diveId ? related : diveId,
+            deleteDiveId: redundant!,
           ),
+        if (related != null && consolidatable)
+          ConsolidateDuplicateRepair([diveId, related]),
         if (related != null) GoToDiveRepair(related),
         GoToDiveRepair(diveId),
       ];
@@ -302,6 +349,13 @@ List<QualityRepairAction> repairOptionsFor(QualityFinding f) {
 
     case 'gas_mod':
       return [GoToDiveRepair(diveId)];
+
+    case 'unknown_transmitter':
+      final serial = p['serial'] as String?;
+      return [
+        if (serial != null) AssignTransmitterRepair(serial),
+        GoToDiveRepair(diveId),
+      ];
 
     case 'tank_assignment':
       final a = p['tankIdA'] as String?;

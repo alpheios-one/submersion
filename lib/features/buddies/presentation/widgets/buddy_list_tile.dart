@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/constants/buddy_field.dart';
@@ -13,6 +12,7 @@ import 'package:submersion/features/dive_roles/presentation/dive_role_display.da
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/buddies/presentation/buddy_certification_l10n.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/entity_card/card_slot_resolver.dart';
 import 'package:submersion/shared/widgets/entity_card/entity_card_extra_fields.dart';
@@ -105,18 +105,13 @@ class BuddyListTile extends ConsumerWidget {
         ? null
         : (roleMap?[usualRoleId] ?? DiveRole.synthetic(usualRoleId));
 
-    final certParts = <String>[
-      if (buddy.certificationLevel != null)
-        buddy.certificationLevel!.displayName,
-      if (buddy.certificationAgency != null)
-        buddy.certificationAgency!.displayName,
-    ];
+    final certLine = buddyCertificationLineL10n(buddy, context.l10n);
 
     final trailer = <Widget>[
-      if (certParts.isNotEmpty)
+      if (certLine != null)
         _BuddyChip(
           icon: Icons.card_membership,
-          label: certParts.join(' · '),
+          label: certLine,
           color: agencyColor ?? statColor,
         ),
       if (usualRole != null)
@@ -290,30 +285,12 @@ class _BuddyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final path = buddy.photoPath;
-    final photo = path == null || path.isEmpty ? null : File(path);
-    final hasPhoto = photo != null && photo.existsSync();
-    final avatar = CircleAvatar(
-      radius: ringColor == null ? 20 : 18,
+    return ProfileAvatar(
+      photo: buddy.photo,
+      initials: buddy.initials,
       backgroundColor: backgroundColor,
-      backgroundImage: hasPhoto ? FileImage(photo) : null,
-      child: hasPhoto
-          ? null
-          : Text(
-              buddy.initials,
-              style: TextStyle(
-                color: foregroundColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-    );
-    if (ringColor == null) return avatar;
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: ringColor!, width: 2),
-      ),
-      child: avatar,
+      foregroundColor: foregroundColor,
+      ringColor: ringColor,
     );
   }
 }

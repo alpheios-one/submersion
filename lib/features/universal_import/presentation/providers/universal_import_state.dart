@@ -41,6 +41,7 @@ class UniversalImportState {
     this.photoPathsByBaseName = const {},
     this.unmatchedPhotoCount = 0,
     this.photoFolderPath,
+    this.bundledPhotoFolderPath,
     this.photoResolution,
     this.photosSkipped = false,
     this.zipTempDirPaths = const [],
@@ -91,6 +92,12 @@ class UniversalImportState {
   /// Outcome of resolving the payload's media entries against
   /// [photoFolderPath]. Null when no folder has been picked.
   final ImportMediaResolution? photoResolution;
+
+  /// Folder the user chose for photos bundled in an imported archive
+  /// ([photoPathsByBaseName]). They are copied out of the archive's temp
+  /// folder into this one and linked from there, so they live somewhere the
+  /// user manages rather than inside the app. Null until chosen.
+  final String? bundledPhotoFolderPath;
 
   /// True once the user has explicitly chosen to import without photos.
   /// Distinct from a null [photoResolution], which only means undecided.
@@ -189,6 +196,8 @@ class UniversalImportState {
     int? unmatchedPhotoCount,
     String? photoFolderPath,
     bool clearPhotoFolderPath = false,
+    String? bundledPhotoFolderPath,
+    bool clearBundledPhotoFolderPath = false,
     ImportMediaResolution? photoResolution,
     bool clearPhotoResolution = false,
     bool? photosSkipped,
@@ -207,6 +216,7 @@ class UniversalImportState {
     ImportPayload? payload,
     bool clearPayload = false,
     ImportDuplicateResult? duplicateResult,
+    bool clearDuplicateResult = false,
     Map<ImportEntityType, Set<int>>? selections,
     Map<ImportEntityType, int>? importCounts,
     String? importPhase,
@@ -236,6 +246,9 @@ class UniversalImportState {
       photoResolution: clearPhotoResolution
           ? null
           : (photoResolution ?? this.photoResolution),
+      bundledPhotoFolderPath: clearBundledPhotoFolderPath
+          ? null
+          : (bundledPhotoFolderPath ?? this.bundledPhotoFolderPath),
       photosSkipped: photosSkipped ?? this.photosSkipped,
       zipTempDirPaths: zipTempDirPaths ?? this.zipTempDirPaths,
       parseCurrent: parseCurrent ?? this.parseCurrent,
@@ -264,7 +277,9 @@ class UniversalImportState {
           ? null
           : (fieldMapping ?? this.fieldMapping),
       payload: clearPayload ? null : (payload ?? this.payload),
-      duplicateResult: duplicateResult ?? this.duplicateResult,
+      duplicateResult: clearDuplicateResult
+          ? null
+          : (duplicateResult ?? this.duplicateResult),
       selections: selections ?? this.selections,
       importCounts: importCounts ?? this.importCounts,
       importPhase: importPhase ?? this.importPhase,

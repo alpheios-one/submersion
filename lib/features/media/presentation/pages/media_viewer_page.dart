@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,7 +15,9 @@ import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/services/lightroom/lightroom_api_client.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/chart_tank_pressures_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
@@ -37,10 +38,13 @@ import 'package:submersion/features/media/presentation/widgets/perdix_overlay/pe
 import 'package:submersion/features/media/presentation/widgets/write_metadata_dialog.dart';
 import 'package:submersion/features/media/presentation/widgets/mini_dive_profile_overlay.dart';
 import 'package:submersion/features/media/presentation/widgets/media_info_sheet.dart';
+import 'package:submersion/features/media/presentation/widgets/media_species_chips_row.dart';
+import 'package:submersion/features/media/presentation/widgets/media_species_sheet.dart';
 import 'package:submersion/features/media/presentation/widgets/set_media_time_dialog.dart';
 import 'package:submersion/features/media_store/presentation/widgets/media_reupload_button.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/media/presentation/match_confidence_display.dart';
 
 /// Full-screen media viewer with pinch-to-zoom and swipe navigation over an
 /// arbitrary media list (a dive's media, a trip's flat list, or a library
@@ -314,7 +318,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
           // Non-null once mediaList is known non-empty. Every consumer below
           // reads the hydrated record: the mini profile, the Perdix gate, the
-          // toolbar's Go-to-dive and hasEnrichment flags, the bottom
+          // toolbar's Go-to-dive and write-metadata flags, the bottom
           // depth/temp/elapsed chips and the info sheet.
           final currentItem = hydratedItem!;
           final enrichment = currentItem.enrichment;
@@ -380,7 +384,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             final gasSwitches =
                 ref.watch(gasSwitchesProvider(currentDiveId)).value ?? const [];
             final tankPressures = ref
-                .watch(tankPressuresProvider(currentDiveId))
+                .watch(activeSourceTankPressuresProvider(currentDiveId))
                 .value;
             final primarySource =
                 dataSources.where((s) => s.isPrimary).firstOrNull ??
@@ -394,8 +398,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             final activeProfile = activeSource == null
                 ? null
                 : sourceProfiles[activeSource.id];
-            final perdixProfile =
-                (dataSources.length >= 2 && activeProfile != null)
+            // Sources that never overlap in time are consecutive halves of
+            // one dive a Combine stitched together, not alternative
+            // recordings of it: the face reads the whole dive, not the
+            // active half (#1451). Mirrors the detail and fullscreen pages.
+            final isMultiSource = usesPerSourceRendering(
+              dataSources,
+              sourceProfiles.values,
+            );
+            final perdixProfile = (isMultiSource && activeProfile != null)
                 ? activeProfile.points
                 : dive?.profile ?? const [];
             // Rebuilt only on page-level setState (page swipes, toggles),
@@ -478,6 +489,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onShare: (anchor) =>
                         _shareCurrentPhoto(currentItem, anchor),
                     onWriteMetadata: () => _writeMetadataToPhoto(currentItem),
+                    onTagSpecies: () =>
+                        showMediaSpeciesSheet(context, currentItem),
                     // The viewer is deliberately NOT popped first: leaving it
                     // on the stack is what lets Back return the user to the
                     // photo they launched from, with its page index, zoom and
@@ -485,7 +498,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onGoToDive: widget.showGoToDive && currentDiveId != null
                         ? () => context.pushOrReturnTo('/dives/$currentDiveId')
                         : null,
-                    hasEnrichment: enrichment?.depthMeters != null,
+                    canWriteMetadata:
+                        enrichment?.depthMeters != null && !currentItem.isVideo,
                     showPerdixToggle: perdixToggleAvailable,
                     perdixEnabled: settings.perdixOverlayEnabled,
                     onTogglePerdix: () => ref
@@ -678,17 +692,15 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
     // Show confirmation dialog
     debugPrint('[MediaViewerPage] Showing confirmation dialog...');
-    final dialogResult = await showWriteMetadataDialog(
+    final confirmed = await showWriteMetadataDialog(
       context: context,
       item: item,
       settings: settings,
       siteName: siteName,
     );
 
-    debugPrint(
-      '[MediaViewerPage] Dialog result: confirmed=${dialogResult.confirmed}',
-    );
-    if (!dialogResult.confirmed || !mounted) return;
+    debugPrint('[MediaViewerPage] Dialog result: confirmed=$confirmed');
+    if (!confirmed || !mounted) return;
 
     // Show loading indicator. The navigator is captured up front so the
     // dialog can still be dismissed if this page is unmounted while the
@@ -729,7 +741,6 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
         platformAssetId: item.platformAssetId!,
         metadata: metadata,
         isVideo: isVideo,
-        keepOriginal: dialogResult.keepOriginal,
       );
       debugPrint('[MediaViewerPage] writeMetadata returned: $success');
 
@@ -741,11 +752,9 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       debugPrint('[MediaViewerPage] About to show success/error message...');
       if (success) {
         debugPrint('[MediaViewerPage] Calling _showSuccess...');
-        _showSuccess(
-          isVideo
-              ? l10n.media_photoViewer_diveDataWrittenToVideo
-              : l10n.media_photoViewer_diveDataWrittenToPhoto,
-        );
+        // Only photos get here: the service refuses a video before the
+        // platform channel.
+        _showSuccess(l10n.media_photoViewer_diveDataWrittenToPhoto);
         debugPrint('[MediaViewerPage] _showSuccess completed');
 
         // Invalidate the image cache so the photo reloads with updated metadata
@@ -762,11 +771,13 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       dismissLoadingDialog();
       // The service's messages are English-only; substitute a translation for
       // the codes we have one for and fall back to its text otherwise.
-      _showError(
-        e.code == metadataWriteLivePhotoUnsupportedCode
-            ? l10n.media_writeMetadata_livePhotoUnsupported
-            : e.message,
-      );
+      _showError(switch (e.code) {
+        metadataWriteLivePhotoUnsupportedCode =>
+          l10n.media_writeMetadata_livePhotoUnsupported,
+        metadataWriteVideoUnsupportedCode =>
+          l10n.media_writeMetadata_videoUnsupported,
+        _ => e.message,
+      });
     } catch (e) {
       debugPrint('[MediaViewerPage] Exception: $e');
       dismissLoadingDialog();
@@ -1329,7 +1340,13 @@ class _TopOverlay extends StatelessWidget {
   final VoidCallback onClose;
   final void Function(Rect? anchor) onShare;
   final VoidCallback onWriteMetadata;
-  final bool hasEnrichment;
+  final VoidCallback onTagSpecies;
+
+  /// Whether the write-dive-data action is offered. Needs enrichment depth to
+  /// have anything to write, and a photo to write it to: videos cannot be
+  /// edited in place, and replacing one would destroy the original
+  /// (issue #1472).
+  final bool canWriteMetadata;
 
   /// Whether the Perdix overlay toggle is shown (media synced to a profile).
   final bool showPerdixToggle;
@@ -1352,7 +1369,8 @@ class _TopOverlay extends StatelessWidget {
     required this.onClose,
     required this.onShare,
     required this.onWriteMetadata,
-    required this.hasEnrichment,
+    required this.onTagSpecies,
+    required this.canWriteMetadata,
     required this.showPerdixToggle,
     required this.perdixEnabled,
     required this.onTogglePerdix,
@@ -1408,7 +1426,7 @@ class _TopOverlay extends StatelessWidget {
                     onPressed: onGoToDive,
                   ),
                 // Write metadata button (only shown if photo has dive data)
-                if (hasEnrichment)
+                if (canWriteMetadata)
                   IconButton(
                     icon: const Icon(Icons.edit_note, color: Colors.white),
                     tooltip:
@@ -1434,6 +1452,12 @@ class _TopOverlay extends StatelessWidget {
                     tooltip: context.l10n.media_lightroom_openInLightroom,
                     onPressed: onOpenInLightroom,
                   ),
+                IconButton(
+                  key: const ValueKey('viewer_species'),
+                  icon: const Icon(Icons.sell_outlined, color: Colors.white),
+                  tooltip: context.l10n.media_species_actionTooltip,
+                  onPressed: onTagSpecies,
+                ),
                 IconButton(
                   icon: const Icon(Icons.info_outline, color: Colors.white),
                   tooltip: context.l10n.media_info_title,
@@ -1491,8 +1515,6 @@ class _BottomMetadataOverlay extends StatelessWidget {
         item.enrichment?.isWithinDiveWindow(profileLengthSeconds) ?? false;
     final enrichment = positioned ? item.enrichment : null;
     final formatter = UnitFormatter(settings);
-    final timeFormat = DateFormat.jm();
-    final dateFormat = DateFormat.yMMMd();
 
     return Positioned(
       bottom: 0,
@@ -1540,6 +1562,7 @@ class _BottomMetadataOverlay extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                 ],
+                MediaSpeciesChipsRow(mediaId: item.id),
                 // Metadata row
                 Row(
                   children: [
@@ -1595,7 +1618,7 @@ class _BottomMetadataOverlay extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '${dateFormat.format(item.takenAt)} at ${timeFormat.format(item.takenAt)}',
+                      formatter.formatDateTime(item.takenAt, l10n: l10n),
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 14,
@@ -1621,7 +1644,9 @@ class _BottomMetadataOverlay extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          enrichment.matchConfidence.displayName,
+                          enrichment.matchConfidence.localizedName(
+                            context.l10n,
+                          ),
                           style: const TextStyle(
                             color: Colors.orange,
                             fontSize: 10,

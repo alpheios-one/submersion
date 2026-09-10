@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:equatable/equatable.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/buoyancy_physics.dart';
 import 'package:submersion/core/buoyancy/gear_feature.dart';
 import 'package:submersion/core/buoyancy/ridge_regression.dart';
@@ -38,19 +39,24 @@ class RigSpec extends Equatable {
   final WaterType? waterType;
   final double? bodyWeightKg;
 
+  /// Diver height for the body-composition term. Null falls back to the
+  /// height the model was fitted with, like [bodyWeightKg].
+  final double? heightCm;
+
   const RigSpec({
     this.gear = const [],
     this.tanks = const [],
     this.waterType,
     this.bodyWeightKg,
+    this.heightCm,
   });
 
   @override
-  List<Object?> get props => [gear, tanks, waterType, bodyWeightKg];
+  List<Object?> get props => [gear, tanks, waterType, bodyWeightKg, heightCm];
 }
 
 /// Where a breakdown term's value came from.
-enum TermSource { measured, userSpec, typeDefault, physics }
+enum TermSource { measured, userSpec, typeDefault, physics, bodyComposition }
 
 class PredictionTerm extends Equatable {
   final String label;
@@ -111,14 +117,34 @@ class WeightPredictionEngine {
   /// returns null for ids that must not become features (lead/tank items,
   /// or per the caller's policy). Deleted gear should be given a weak
   /// zero-prior feature by the caller so its dives still inform the fit.
+  ///
+  /// [heightCm] enables the body-composition (BMI) term. It is treated like
+  /// a physics term: subtracted before the regression so the personal
+  /// intercept explains only what neither physics nor BMI can, then added
+  /// back by [FittedWeightModel.predict]. It needs a real [bodyWeightKg];
+  /// the default body mass would fabricate a BMI.
   static FittedWeightModel fit({
     required List<WeightObservation> observations,
     required GearFeature? Function(String equipmentId) gearById,
     double? bodyWeightKg,
+    double? heightCm,
     DateTime? now,
   }) {
     final effectiveNow = now ?? DateTime.now();
     final bodyMass = bodyWeightKg ?? BuoyancyPhysics.defaultBodyMassKg;
+    // The stored height must mean "a term was subtracted": an implausible
+    // height, or a height without a real body weight, subtracts nothing and
+    // is forgotten so predict cannot add a term the fit never removed.
+    final subtractsBodyComposition =
+        bodyWeightKg != null &&
+        BodyComposition.bmi(weightKg: bodyWeightKg, heightCm: heightCm) != null;
+    final fitHeightCm = subtractsBodyComposition ? heightCm : null;
+    final bodyCompositionKg = subtractsBodyComposition
+        ? BodyComposition.leadTermKg(
+            bodyMassKg: bodyWeightKg,
+            heightCm: fitHeightCm,
+          )
+        : 0.0;
 
     // Collect the distinct gear features seen in history.
     final featuresById = <String, GearFeature>{};
@@ -157,7 +183,7 @@ class WeightPredictionEngine {
       final corrected =
           observation.carriedKg + _feedbackAdjustment(observation);
       final physics = _observationPhysics(observation, bodyMass, featuresById);
-      y.add(corrected - physics);
+      y.add(corrected - physics - bodyCompositionKg);
 
       final row = List.filled(featureIds.length + 1, 0.0);
       row[0] = 1.0;
@@ -219,6 +245,7 @@ class WeightPredictionEngine {
       supportingDives: supportingDives,
       residualStdKg: residualStd,
       bodyWeightKg: bodyWeightKg,
+      heightCm: fitHeightCm,
     );
   }
 
@@ -298,6 +325,19 @@ class FittedWeightModel {
   final double residualStdKg;
   final double? bodyWeightKg;
 
+  /// Height the model was fitted with, kept only when the fit actually
+  /// subtracted a body-composition term; the fallback for rigs that omit it.
+  final double? heightCm;
+
+  /// Whether [predict] may add a body-composition term. True when the fit
+  /// subtracted one (fitted with a height) or had no observations to
+  /// subtract from, so the coefficients are still the priors. A model
+  /// calibrated on history WITHOUT a height has already absorbed the diver's
+  /// real body composition into the intercept; adding the term on top would
+  /// double count it.
+  bool get bodyCompositionCalibrated =>
+      heightCm != null || supportingDives == 0;
+
   const FittedWeightModel._({
     required this.personalCoefficient,
     required this.coefficientsById,
@@ -305,6 +345,7 @@ class FittedWeightModel {
     required this.supportingDives,
     required this.residualStdKg,
     required this.bodyWeightKg,
+    required this.heightCm,
   });
 
   WeightPrediction predict(RigSpec rig) {
@@ -321,6 +362,26 @@ class FittedWeightModel {
             : TermSource.typeDefault,
       ),
     );
+
+    // Mirrors the subtraction in [WeightPredictionEngine.fit]; a rig may
+    // carry a different body than the calibration did.
+    final knownBodyMass = rig.bodyWeightKg ?? bodyWeightKg;
+    final height = rig.heightCm ?? heightCm;
+    if (bodyCompositionCalibrated &&
+        knownBodyMass != null &&
+        BodyComposition.bmi(weightKg: knownBodyMass, heightCm: height) !=
+            null) {
+      terms.add(
+        PredictionTerm(
+          label: BodyComposition.termLabel,
+          kg: BodyComposition.leadTermKg(
+            bodyMassKg: knownBodyMass,
+            heightCm: height,
+          ),
+          source: TermSource.bodyComposition,
+        ),
+      );
+    }
 
     var gearDryMass = 0.0;
     for (final gear in rig.gear) {

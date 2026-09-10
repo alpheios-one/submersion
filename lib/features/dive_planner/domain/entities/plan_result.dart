@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     show PlanMode, TurnPressureRule;
 
@@ -493,8 +495,23 @@ class DivePlanState extends Equatable {
   /// Surface air consumption rate in L/min.
   final double sacRate;
 
-  /// Ascent rate in meters per minute (Subsurface parity, G7/G8).
+  /// Working ascent rate in meters per minute: off the bottom, up to the
+  /// first decompression stop.
   final double ascentRate;
+
+  /// Ascent rate in meters per minute between intermediate stops, deeper
+  /// than 9 m.
+  final double intermediateAscentRate;
+
+  /// Ascent rate in meters per minute between shallow stops, 9 m and above.
+  final double shallowAscentRate;
+
+  /// Ascent rate in meters per minute from the last stop to the surface.
+  final double finalAscentRate;
+
+  /// Shallowest decompression stop in meters (3 or 6), which is also where
+  /// [finalAscentRate] takes over from the other ascent rates.
+  final double lastStopDepth;
 
   /// Descent rate in meters per minute.
   final double descentRate;
@@ -516,6 +533,14 @@ class DivePlanState extends Equatable {
 
   /// Altitude above sea level in meters (for altitude diving).
   final double? altitude;
+
+  /// Water type for decompression (density). Null falls back to salt water,
+  /// the planner default - not EN13319 - and is overridden by [salinityPpt].
+  final WaterType? waterType;
+
+  /// Custom salinity in ppt. When set, this wins over [waterType] for deco
+  /// density.
+  final double? salinityPpt;
 
   /// Planned start time; null = "now". Drives repetitive tissue init (v120).
   final DateTime? startDateTime;
@@ -544,6 +569,24 @@ class DivePlanState extends Equatable {
   /// Equipment attached to the plan (Gear & Weights, v104).
   final List<String> equipmentIds;
 
+  /// Where each id in [equipmentIds] came from (issue #1487): the assembly
+  /// it was attached through and the set applied.
+  final List<GearProvenance> gearProvenance;
+
+  /// One provenance row per attached id, in [equipmentIds] order. An id
+  /// with no row (a state assembled before provenance existed) is a loose
+  /// top-level row. Readers that walk the tree must use this rather than
+  /// [gearProvenance]: a missing assembly row would leave its parts as
+  /// orphans with nothing rolled up, and buoyancy would count the assembly
+  /// and its parts.
+  List<GearProvenance> get fullGearProvenance {
+    final byId = {for (final p in gearProvenance) p.equipmentId: p};
+    return [
+      for (final id in equipmentIds)
+        byId[id] ?? GearProvenance(equipmentId: id),
+    ];
+  }
+
   /// Accepted weight-prediction snapshot; placement keyed by
   /// WeightType.name -> kg.
   final double? plannedWeightKg;
@@ -570,6 +613,10 @@ class DivePlanState extends Equatable {
     this.gfHigh = kFallbackGfHigh,
     this.sacRate = 15.0,
     this.ascentRate = 9.0,
+    this.intermediateAscentRate = 6.0,
+    this.shallowAscentRate = 3.0,
+    this.finalAscentRate = 1.0,
+    this.lastStopDepth = 3.0,
     this.descentRate = 18.0,
     this.surfaceInterval,
     this.initialTissueState,
@@ -577,6 +624,8 @@ class DivePlanState extends Equatable {
     this.linkedDiveId,
     this.siteId,
     this.altitude,
+    this.waterType,
+    this.salinityPpt,
     this.startDateTime,
     this.mode = PlanMode.oc,
     this.setpointLow,
@@ -588,6 +637,7 @@ class DivePlanState extends Equatable {
     this.turnPressureFraction,
     this.reservePressure = kDefaultReservePressureBar,
     this.equipmentIds = const [],
+    this.gearProvenance = const [],
     this.plannedWeightKg,
     this.plannedWeightPlacement,
     this.notes = '',
@@ -610,12 +660,14 @@ class DivePlanState extends Equatable {
   }
 
   /// Maximum depth in the plan.
+  ///
+  /// Only targets need checking: every leg starts where the previous one
+  /// finished, so a start depth is always some earlier segment's target.
   double get maxDepth {
     if (segments.isEmpty) return 0;
     double max = 0;
     for (final seg in segments) {
-      if (seg.startDepth > max) max = seg.startDepth;
-      if (seg.endDepth > max) max = seg.endDepth;
+      if (seg.targetDepth > max) max = seg.targetDepth;
     }
     return max;
   }
@@ -633,6 +685,10 @@ class DivePlanState extends Equatable {
     int? gfHigh,
     double? sacRate,
     double? ascentRate,
+    double? intermediateAscentRate,
+    double? shallowAscentRate,
+    double? finalAscentRate,
+    double? lastStopDepth,
     double? descentRate,
     Duration? surfaceInterval,
     List<TissueCompartment>? initialTissueState,
@@ -640,6 +696,8 @@ class DivePlanState extends Equatable {
     String? linkedDiveId,
     String? siteId,
     double? altitude,
+    WaterType? waterType,
+    double? salinityPpt,
     DateTime? startDateTime,
     bool clearStartDateTime = false,
     PlanMode? mode,
@@ -653,6 +711,7 @@ class DivePlanState extends Equatable {
     bool clearTurnPressureRule = false,
     double? reservePressure,
     List<String>? equipmentIds,
+    List<GearProvenance>? gearProvenance,
     double? plannedWeightKg,
     Map<String, double>? plannedWeightPlacement,
     bool clearPlannedWeight = false,
@@ -666,6 +725,8 @@ class DivePlanState extends Equatable {
     bool clearLinkedDiveId = false,
     bool clearSiteId = false,
     bool clearAltitude = false,
+    bool clearWaterType = false,
+    bool clearSalinityPpt = false,
     bool clearSetpoints = false,
   }) {
     return DivePlanState(
@@ -677,6 +738,11 @@ class DivePlanState extends Equatable {
       gfHigh: gfHigh ?? this.gfHigh,
       sacRate: sacRate ?? this.sacRate,
       ascentRate: ascentRate ?? this.ascentRate,
+      intermediateAscentRate:
+          intermediateAscentRate ?? this.intermediateAscentRate,
+      shallowAscentRate: shallowAscentRate ?? this.shallowAscentRate,
+      finalAscentRate: finalAscentRate ?? this.finalAscentRate,
+      lastStopDepth: lastStopDepth ?? this.lastStopDepth,
       descentRate: descentRate ?? this.descentRate,
       surfaceInterval: clearSurfaceInterval
           ? null
@@ -692,6 +758,8 @@ class DivePlanState extends Equatable {
           : (linkedDiveId ?? this.linkedDiveId),
       siteId: clearSiteId ? null : (siteId ?? this.siteId),
       altitude: clearAltitude ? null : (altitude ?? this.altitude),
+      waterType: clearWaterType ? null : (waterType ?? this.waterType),
+      salinityPpt: clearSalinityPpt ? null : (salinityPpt ?? this.salinityPpt),
       startDateTime: clearStartDateTime
           ? null
           : (startDateTime ?? this.startDateTime),
@@ -711,6 +779,7 @@ class DivePlanState extends Equatable {
           : (turnPressureFraction ?? this.turnPressureFraction),
       reservePressure: reservePressure ?? this.reservePressure,
       equipmentIds: equipmentIds ?? this.equipmentIds,
+      gearProvenance: gearProvenance ?? this.gearProvenance,
       plannedWeightKg: clearPlannedWeight
           ? null
           : (plannedWeightKg ?? this.plannedWeightKg),
@@ -734,6 +803,10 @@ class DivePlanState extends Equatable {
     gfHigh,
     sacRate,
     ascentRate,
+    intermediateAscentRate,
+    shallowAscentRate,
+    finalAscentRate,
+    lastStopDepth,
     descentRate,
     surfaceInterval,
     initialTissueState,
@@ -741,6 +814,8 @@ class DivePlanState extends Equatable {
     linkedDiveId,
     siteId,
     altitude,
+    waterType,
+    salinityPpt,
     startDateTime,
     mode,
     setpointLow,
@@ -752,6 +827,7 @@ class DivePlanState extends Equatable {
     turnPressureFraction,
     reservePressure,
     equipmentIds,
+    gearProvenance,
     plannedWeightKg,
     plannedWeightPlacement,
     notes,

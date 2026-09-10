@@ -14,7 +14,13 @@ import '../../../helpers/test_database.dart';
 /// clear-the-reference).
 void main() {
   // SQL table name -> sync entityType, for every entity the merge applies
-  // (mirrors SyncService's mergeOrder).
+  // (mirrors SyncService's mergeOrder). `diveProfiles` / `tankPressureProfiles`
+  // are deliberately absent: their tables (`dive_profiles` /
+  // `tank_pressure_profiles`) were dropped in v183, so there is no live FK
+  // for this test to check; SyncService.parentRefs has no entry for either
+  // any more (an inbound row now stages in a per-connection TEMP table with
+  // no declared FK, and the packer's own orphan check does the equivalent
+  // guard at pack time).
   const syncedTables = <String, String>{
     'divers': 'divers',
     'dives': 'dives',
@@ -37,6 +43,9 @@ void main() {
     'quality_findings': 'qualityFindings',
     'dive_types': 'diveTypes',
     'tank_presets': 'tankPresets',
+    'weight_presets': 'weightPresets',
+    'weight_preset_entries': 'weightPresetEntries',
+    'transmitters': 'transmitters',
     'dive_computers': 'diveComputers',
     'species': 'species',
     'tags': 'tags',
@@ -47,17 +56,16 @@ void main() {
     'dive_equipment': 'diveEquipment',
     'dive_tags': 'diveTags',
     'dive_buddies': 'diveBuddies',
-    'dive_profiles': 'diveProfiles',
     'dive_profile_events': 'diveProfileEvents',
     'gas_switches': 'gasSwitches',
     'dive_custom_fields': 'diveCustomFields',
     'dive_data_sources': 'diveDataSources',
     'site_species': 'siteSpecies',
+    'media_species': 'mediaSpecies',
     'site_features': 'siteFeatures',
     'csv_presets': 'csvPresets',
     'view_configs': 'viewConfigs',
     'field_presets': 'fieldPresets',
-    'tank_pressure_profiles': 'tankPressureProfiles',
     'tide_records': 'tideRecords',
     'sightings': 'sightings',
     'incidents': 'incidents',
@@ -79,6 +87,7 @@ void main() {
     'diver_weight_entries': 'diverWeightEntries',
     'dive_roles': 'diveRoles',
     'equipment_attributes': 'equipmentAttributes',
+    'equipment_components': 'equipmentComponents',
     'dive_dive_types': 'diveDiveTypes',
     'dive_safety_reviews': 'diveSafetyReviews',
     'dive_safety_findings': 'diveSafetyFindings',
@@ -90,6 +99,8 @@ void main() {
     'pre_dive_checklist_template_items': 'preDiveChecklistTemplateItems',
     'pre_dive_sessions': 'preDiveSessions',
     'pre_dive_session_items': 'preDiveSessionItems',
+    'dive_profile_series': 'diveProfileSeries',
+    'tank_pressure_series': 'tankPressureSeries',
   };
 
   // Parent table -> entityType for parents a user can delete (and thus
@@ -106,6 +117,8 @@ void main() {
     'tags': 'tags',
     'dive_types': 'diveTypes',
     'tank_presets': 'tankPresets',
+    'weight_presets': 'weightPresets',
+    'transmitters': 'transmitters',
     'dive_centers': 'diveCenters',
     'species': 'species',
     'dive_computers': 'diveComputers',

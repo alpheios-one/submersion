@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
@@ -160,7 +162,11 @@ void main() {
     );
   }
 
-  Future<String> insertTestProfile({
+  /// One single-sample series per call. Every test in this file that seeded
+  /// `dive_profiles` rows exercised one of the five writers this plan moved
+  /// onto series storage (`restoreOriginalProfile`, `setPrimaryDataSource`),
+  /// so the legacy row helper this replaced has no callers left.
+  Future<String> insertTestSeries({
     required String diveId,
     String? sourceTag,
     bool isPrimary = true,
@@ -170,18 +176,14 @@ void main() {
   }) async {
     final tag = sourceTag ?? 'default';
     final id = 'profile-$tag-$timestamp-${diveId.hashCode}';
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion(
-            id: Value(id),
-            diveId: Value(diveId),
-            computerId: Value(computerId),
-            isPrimary: Value(isPrimary),
-            timestamp: Value(timestamp),
-            depth: Value(depth),
-          ),
-        );
+    await ProfileSeriesRepository().insertSeries(
+      id: id,
+      diveId: diveId,
+      computerId: computerId,
+      isPrimary: isPrimary,
+      samples: [ProfileSample(timestamp: timestamp, depth: depth)],
+      now: 1000,
+    );
     return id;
   }
 
@@ -1179,15 +1181,15 @@ void main() {
       () async {
         final diveId = await insertTestDive(id: 'dive-restore-single');
 
-        // Original profiles (will be demoted to non-primary before edit).
-        await insertTestProfile(
+        // Original series (will be demoted to non-primary before edit).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'orig-1',
           isPrimary: false,
           timestamp: 0,
           depth: 10.0,
         );
-        await insertTestProfile(
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'orig-2',
           isPrimary: false,
@@ -1195,15 +1197,15 @@ void main() {
           depth: 20.0,
         );
 
-        // Edited profiles (currently primary, computerId=null).
-        await insertTestProfile(
+        // Edited series (currently primary, computerId=null).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'edited-1',
           isPrimary: true,
           timestamp: 0,
           depth: 12.0,
         );
-        await insertTestProfile(
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'edited-2',
           isPrimary: true,
@@ -1213,17 +1215,16 @@ void main() {
 
         await repository.restoreOriginalProfile(diveId);
 
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
+        final series = await ProfileSeriesRepository().getSeriesForDive(diveId);
 
-        // Edited profiles should be deleted, originals restored to primary.
-        expect(profiles.length, equals(2));
-        for (final p in profiles) {
-          expect(p.isPrimary, isTrue);
+        // Edited series should be deleted, originals restored to primary.
+        expect(series.length, equals(2));
+        for (final s in series) {
+          expect(s.isPrimary, isTrue);
         }
         // Verify we have the original depths.
-        final depths = profiles.map((p) => p.depth).toList()..sort();
+        final depths = series.map((s) => s.samples.single.depth).toList()
+          ..sort();
         expect(depths, equals([10.0, 20.0]));
       },
     );
@@ -1262,8 +1263,8 @@ void main() {
           ),
         );
 
-        // Original primary computer profiles (demoted to non-primary).
-        await insertTestProfile(
+        // Original primary computer series (demoted to non-primary).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'comp-orig-1',
           isPrimary: false,
@@ -1271,7 +1272,7 @@ void main() {
           depth: 10.0,
           computerId: computerId,
         );
-        await insertTestProfile(
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'comp-orig-2',
           isPrimary: false,
@@ -1280,8 +1281,8 @@ void main() {
           computerId: computerId,
         );
 
-        // Secondary computer profiles (should remain non-primary).
-        await insertTestProfile(
+        // Secondary computer series (should remain non-primary).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'sec-1',
           isPrimary: false,
@@ -1290,8 +1291,8 @@ void main() {
           // No computerId - secondary computer.
         );
 
-        // Edited profiles (primary, computerId=null).
-        await insertTestProfile(
+        // Edited series (primary, computerId=null).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'edited-1',
           isPrimary: true,
@@ -1301,22 +1302,20 @@ void main() {
 
         await repository.restoreOriginalProfile(diveId);
 
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
+        final series = await ProfileSeriesRepository().getSeriesForDive(diveId);
 
-        // Edited profile deleted. Primary computer profiles restored.
-        // Secondary computer profile remains non-primary.
-        final primaryProfiles = profiles.where((p) => p.isPrimary).toList();
-        final nonPrimaryProfiles = profiles.where((p) => !p.isPrimary).toList();
+        // Edited series deleted. Primary computer series restored.
+        // Secondary computer series remains non-primary.
+        final primarySeries = series.where((s) => s.isPrimary).toList();
+        final nonPrimarySeries = series.where((s) => !s.isPrimary).toList();
 
-        expect(primaryProfiles.length, equals(2));
-        for (final p in primaryProfiles) {
-          expect(p.computerId, equals(computerId));
+        expect(primarySeries.length, equals(2));
+        for (final s in primarySeries) {
+          expect(s.computerId, equals(computerId));
         }
 
-        expect(nonPrimaryProfiles.length, equals(1));
-        expect(nonPrimaryProfiles.first.depth, equals(9.5));
+        expect(nonPrimarySeries.length, equals(1));
+        expect(nonPrimarySeries.first.samples.single.depth, equals(9.5));
       },
     );
 
@@ -1335,15 +1334,15 @@ void main() {
           ),
         );
 
-        // Original profiles (non-primary).
-        await insertTestProfile(
+        // Original series (non-primary).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'orig-a',
           isPrimary: false,
           timestamp: 0,
           depth: 15.0,
         );
-        await insertTestProfile(
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'orig-b',
           isPrimary: false,
@@ -1351,8 +1350,8 @@ void main() {
           depth: 25.0,
         );
 
-        // Edited profiles (primary, to be deleted).
-        await insertTestProfile(
+        // Edited series (primary, to be deleted).
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'edited',
           isPrimary: true,
@@ -1362,14 +1361,12 @@ void main() {
 
         await repository.restoreOriginalProfile(diveId);
 
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
+        final series = await ProfileSeriesRepository().getSeriesForDive(diveId);
 
-        // Edited profile deleted. Remaining profiles all promoted.
-        expect(profiles.length, equals(2));
-        for (final p in profiles) {
-          expect(p.isPrimary, isTrue);
+        // Edited series deleted. Remaining series all promoted.
+        expect(series.length, equals(2));
+        for (final s in series) {
+          expect(s.isPrimary, isTrue);
         }
       },
     );
@@ -1728,8 +1725,8 @@ void main() {
         ),
       );
 
-      // Insert profiles for both computers.
-      await insertTestProfile(
+      // Insert series for both computers.
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'a-1',
         isPrimary: true,
@@ -1737,7 +1734,7 @@ void main() {
         depth: 10.0,
         computerId: compAId,
       );
-      await insertTestProfile(
+      await insertTestSeries(
         diveId: diveId,
         sourceTag: 'b-1',
         isPrimary: false,
@@ -1752,20 +1749,18 @@ void main() {
         computerReadingId: 'ds-b',
       );
 
-      final profiles = await (db.select(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId))).get();
+      final series = await ProfileSeriesRepository().getSeriesForDive(diveId);
 
-      final compAProfiles = profiles.where((p) => p.computerId == compAId);
-      final compBProfiles = profiles.where((p) => p.computerId == compBId);
+      final compASeries = series.where((s) => s.computerId == compAId);
+      final compBSeries = series.where((s) => s.computerId == compBId);
 
-      // Computer A profiles should be demoted.
-      for (final p in compAProfiles) {
-        expect(p.isPrimary, isFalse);
+      // Computer A series should be demoted.
+      for (final s in compASeries) {
+        expect(s.isPrimary, isFalse);
       }
-      // Computer B profiles should be promoted.
-      for (final p in compBProfiles) {
-        expect(p.isPrimary, isTrue);
+      // Computer B series should be promoted.
+      for (final s in compBSeries) {
+        expect(s.isPrimary, isTrue);
       }
     });
 
@@ -1794,8 +1789,8 @@ void main() {
           ),
         );
 
-        // Insert a profile with no computerId.
-        await insertTestProfile(
+        // Insert a series with no computerId.
+        await insertTestSeries(
           diveId: diveId,
           sourceTag: 'p1',
           isPrimary: true,
@@ -1814,18 +1809,16 @@ void main() {
         final promoted = sources.firstWhere((s) => s.id == 'reading-no-comp');
         expect(promoted.isPrimary, isTrue);
 
-        // The unattributed null-computerId row belongs to whichever source is
-        // primary, so promoting a null-computerId reading takes it along.
+        // The unattributed null-computerId series belongs to whichever source
+        // is primary, so promoting a null-computerId reading takes it along.
         //
         // This asserted the opposite until issue #1149 ("no profiles are
         // re-promoted"), which is precisely the stranding: the dive kept its
         // samples but every is_primary consumer -- getDiveProfile,
         // getAscentDescentRates, the data-quality prefilters -- skipped it.
-        final profiles = await (db.select(
-          db.diveProfiles,
-        )..where((t) => t.diveId.equals(diveId))).get();
+        final series = await ProfileSeriesRepository().getSeriesForDive(diveId);
 
-        expect(profiles.where((p) => p.isPrimary), isNotEmpty);
+        expect(series.where((s) => s.isPrimary), isNotEmpty);
       },
     );
   });

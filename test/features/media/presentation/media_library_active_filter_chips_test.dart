@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -23,6 +26,13 @@ void main() {
     updatedAt: DateTime(2026, 1, 1),
   );
 
+  const species = Species(
+    id: 'sp1',
+    commonName: 'Blue Grouper',
+    category: SpeciesCategory.fish,
+    isBuiltIn: false,
+  );
+
   late ProviderContainer container;
 
   setUp(() {
@@ -30,6 +40,7 @@ void main() {
       overrides: [
         sitesProvider.overrideWith((ref) async => [site]),
         allTripsProvider.overrideWith((ref) async => [trip]),
+        allSpeciesProvider.overrideWith((ref) async => [species]),
       ],
     );
     addTearDown(container.dispose);
@@ -93,6 +104,28 @@ void main() {
     final filter = container.read(mediaLibraryFilterProvider);
     expect(filter.siteId, isNull);
     expect(filter.mediaType, MediaType.photo);
+  });
+
+  testWidgets('the species chip shows the name and clears only itself', (
+    tester,
+  ) async {
+    container.read(mediaLibraryFilterProvider.notifier).state =
+        const MediaLibraryFilter(siteId: 'site-1', speciesId: 'sp1');
+    await pump(tester);
+
+    expect(find.text('Blue Grouper'), findsOneWidget);
+    final chip = find.ancestor(
+      of: find.text('Blue Grouper'),
+      matching: find.byType(InputChip),
+    );
+    await tester.tap(
+      find.descendant(of: chip, matching: find.byIcon(Icons.clear)),
+    );
+    await tester.pumpAndSettle();
+
+    final filter = container.read(mediaLibraryFilterProvider);
+    expect(filter.speciesId, isNull);
+    expect(filter.siteId, 'site-1');
   });
 
   testWidgets('the source chip shows the localized label, not the enum', (

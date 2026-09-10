@@ -91,7 +91,6 @@ void main() {
         (type: 'divers', table: db.divers.actualTableName),
         (type: 'diverSettings', table: db.diverSettings.actualTableName),
         (type: 'dives', table: db.dives.actualTableName),
-        (type: 'diveProfiles', table: db.diveProfiles.actualTableName),
         (type: 'diveTanks', table: db.diveTanks.actualTableName),
         (type: 'diveWeights', table: db.diveWeights.actualTableName),
         (type: 'diveSites', table: db.diveSites.actualTableName),
@@ -136,10 +135,6 @@ void main() {
         (type: 'diveTypes', table: db.diveTypes.actualTableName),
         (type: 'tankPresets', table: db.tankPresets.actualTableName),
         (type: 'diveComputers', table: db.diveComputers.actualTableName),
-        (
-          type: 'tankPressureProfiles',
-          table: db.tankPressureProfiles.actualTableName,
-        ),
         (type: 'tideRecords', table: db.tideRecords.actualTableName),
         (type: 'settings', table: db.settings.actualTableName),
         (type: 'species', table: db.species.actualTableName),
@@ -152,6 +147,7 @@ void main() {
         (type: 'diveCustomFields', table: db.diveCustomFields.actualTableName),
         (type: 'diveDataSources', table: db.diveDataSources.actualTableName),
         (type: 'siteSpecies', table: db.siteSpecies.actualTableName),
+        (type: 'mediaSpecies', table: db.mediaSpecies.actualTableName),
         (type: 'csvPresets', table: db.csvPresets.actualTableName),
         (type: 'viewConfigs', table: db.viewConfigs.actualTableName),
         (type: 'fieldPresets', table: db.fieldPresets.actualTableName),
@@ -196,6 +192,35 @@ void main() {
       );
     },
   );
+
+  test('a dive tank transmitter serial survives fetch and upsert', () async {
+    // Sync ships whole dive_tanks rows through the generated toJson/fromJson,
+    // so the v194 column needs no serializer change; this pins that a peer
+    // receives and stores the serial rather than silently dropping it.
+    await db.customStatement('PRAGMA foreign_keys = OFF');
+    await db
+        .into(db.diveTanks)
+        .insert(
+          const DiveTanksCompanion(
+            id: Value('tank-serial'),
+            diveId: Value('d1'),
+            transmitterSerial: Value('180777'),
+          ),
+        );
+
+    final row = await serializer.fetchRecord('diveTanks', 'tank-serial');
+    expect(row!['transmitterSerial'], '180777');
+
+    await (db.delete(
+      db.diveTanks,
+    )..where((t) => t.id.equals('tank-serial'))).go();
+    await serializer.upsertRecord('diveTanks', row);
+
+    final restored = await (db.select(
+      db.diveTanks,
+    )..where((t) => t.id.equals('tank-serial'))).getSingle();
+    expect(restored.transmitterSerial, '180777');
+  });
 
   test('upsertRecords composite-key junctions apply without a PK id', () async {
     await db.customStatement('PRAGMA foreign_keys = OFF');

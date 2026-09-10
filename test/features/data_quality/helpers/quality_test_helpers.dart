@@ -35,15 +35,26 @@ DiveQualityContext makeContext({
   Map<String, List<QualityPressureSample>> pressures = const {},
   List<QualityNeighbor> neighbors = const [],
   List<GasSwitch> gasSwitches = const [],
+  double ppO2MaxBar = 1.6,
+  int? primarySampleCount,
+  Set<String> knownTransmitterSerials = const {},
+  // Fixtures describe a pristine download unless they say otherwise. Pass
+  // null to model "nobody checked", which the delete-duplicate verdict treats
+  // as a reason to withhold itself (#1720).
+  bool? carriesDiverData = false,
 }) => DiveQualityContext(
   dive: dive,
   now: now ?? DateTime.utc(2026, 7, 17, 12),
   sources: sources,
   primarySamples: samples,
+  primarySampleCount: primarySampleCount,
+  carriesDiverData: carriesDiverData,
   tanks: dive.tanks,
   pressuresByTankId: pressures,
   gasSwitches: gasSwitches,
   neighbors: neighbors,
+  ppO2MaxBar: ppO2MaxBar,
+  knownTransmitterSerials: knownTransmitterSerials,
 );
 
 /// Descend to [depth] at t=0..60, hold, surface in the last minute.

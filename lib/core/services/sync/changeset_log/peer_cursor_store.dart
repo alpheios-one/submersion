@@ -48,6 +48,18 @@ class PeerCursorStore {
         );
   }
 
+  /// Whether any peer cursor exists for any provider. A cursor is written the
+  /// first time this device consumes a peer's log, so a true here is proof
+  /// the device has synced against at least one other device.
+  Future<bool> hasAny() async {
+    final row =
+        await (_db.selectOnly(_db.syncPeerCursors)
+              ..addColumns([_db.syncPeerCursors.peerDeviceId])
+              ..limit(1))
+            .getSingleOrNull();
+    return row != null;
+  }
+
   /// Drop every cursor for [provider] -- used on backend switch and on
   /// stale-restore recovery so the device re-pulls each peer from scratch.
   Future<void> resetForProvider(String provider) async {

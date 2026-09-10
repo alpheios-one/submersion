@@ -33,6 +33,31 @@ void _workerReadyThenSilent(List<Object> args) {
   cmdPort.listen((_) {}); // stay alive, but never reply
 }
 
+/// Test worker that answers 'deletions' only after a long scan, but sends a
+/// progress heartbeat every 100 ms while it works, the shape of a real worker
+/// grinding through a multi-hundred-MB base.
+void _workerSlowWithHeartbeats(List<Object> args) {
+  final toMain = args[0] as SendPort;
+  final cmdPort = ReceivePort();
+  toMain.send(<String, Object>{'type': 'ready', 'port': cmdPort.sendPort});
+  cmdPort.listen((msg) async {
+    if ((msg as Map)['cmd'] != 'deletions') return;
+    for (var i = 1; i <= 10; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      toMain.send(<String, Object>{
+        'type': 'progress',
+        'bytes': i * 10,
+        'total': 100,
+      });
+    }
+    toMain.send(<String, Object>{
+      'type': 'deletions',
+      'exportedAt': 5,
+      'rows': <Object>[],
+    });
+  });
+}
+
 void main() {
   late Directory tmp;
   setUp(() => tmp = Directory.systemTemp.createTempSync('s3base'));
@@ -238,4 +263,66 @@ void main() {
       throwsA(isA<BaseParseException>()),
     );
   });
+
+  test(
+    'progress heartbeats keep a slow worker alive past the message timeout',
+    () async {
+      // A 730 MB base takes a single pass well over 60 s on a phone. The
+      // timeout must measure worker SILENCE, not reply latency: as long as the
+      // worker keeps reporting bytes consumed, the pull waits for it instead
+      // of degrading to the UI-isolate parse (issue #1421).
+      final f = _writeBase(tmp, {
+        'exportedAt': 1,
+        'deletions': <String, dynamic>{},
+        'data': <String, dynamic>{},
+      });
+      final original = BaseParseClient.messageTimeout;
+      BaseParseClient.messageTimeout = const Duration(milliseconds: 300);
+      final seen = <(int, int)>[];
+      try {
+        final client = await BaseParseClient.spawn(
+          f.path,
+          entryPoint: _workerSlowWithHeartbeats,
+          onProgress: (bytes, total) => seen.add((bytes, total)),
+        );
+        final r = await client.readScalarsAndDeletions();
+        await client.dispose();
+        expect(r.exportedAt, 5);
+      } finally {
+        BaseParseClient.messageTimeout = original;
+      }
+      expect(seen.length, 10);
+      expect(seen.last, (100, 100));
+    },
+  );
+
+  test(
+    'the real worker reports bytes consumed, ending at the file length',
+    () async {
+      final f = _writeBase(tmp, {
+        'exportedAt': 1,
+        'deletions': <String, dynamic>{},
+        'data': {
+          'dives': [
+            for (var i = 0; i < 50; i++) {'id': 'd$i', 'updatedAt': i},
+          ],
+        },
+      });
+      final length = f.lengthSync();
+      final seen = <(int, int)>[];
+      final client = await BaseParseClient.spawn(
+        f.path,
+        onProgress: (bytes, total) => seen.add((bytes, total)),
+      );
+      await client.readScalarsAndDeletions();
+      expect(seen, isNotEmpty, reason: 'pass 1 must report progress');
+      expect(seen.last, (length, length));
+
+      seen.clear();
+      client.startDataRows({'dives'});
+      while (await client.nextDataBatch() != null) {}
+      await client.dispose();
+      expect(seen.last, (length, length));
+    },
+  );
 }

@@ -71,12 +71,19 @@ Future<({String json, String? hlc})> _layout(AppDatabase db, String id) async {
 }
 
 void main() {
-  test('v170 is in the migration ladder and is the compatibility floor', () {
+  test('v170 is in the migration ladder and raised the compatibility floor to '
+      'at least 170', () {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(170));
     expect(AppDatabase.migrationVersions, contains(170));
     // Renaming a synced column and changing its value set are both breaking
-    // under the #1089 rules, so peers below 170 are held until they update.
-    expect(AppDatabase.minimumCompatibleSchemaVersion, 170);
+    // under the #1089 rules, so peers below 170 were held until they
+    // updated. A later rung is free to raise the floor further (plan 2d's
+    // packed profile series did, to 183), so this only pins the floor v170
+    // itself established, not whatever a later migration adds on top.
+    expect(
+      AppDatabase.minimumCompatibleSchemaVersion,
+      greaterThanOrEqualTo(170),
+    );
   });
 
   test(

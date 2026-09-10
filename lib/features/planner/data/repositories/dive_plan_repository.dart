@@ -12,6 +12,9 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
+import 'package:submersion/features/planner/domain/entities/segment_phase.dart';
+import 'package:submersion/features/planner/domain/services/segment_chain.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 
@@ -59,6 +62,7 @@ class DivePlanRepository {
     final removedTankIds = <String>[];
     final removedSegmentIds = <String>[];
     final addedEquipmentIds = <String>[];
+    final changedEquipmentIds = <String>[];
     final removedEquipmentIds = <String>[];
 
     try {
@@ -97,16 +101,19 @@ class DivePlanRepository {
                 ),
               );
         }
-        for (var i = 0; i < plan.segments.length; i++) {
+        // Resolved so the retired geometry columns can still be written with
+        // true values; see _segmentCompanion.
+        final legs = const SegmentChain().resolve(plan.segments);
+        for (var i = 0; i < legs.length; i++) {
           await _db
               .into(_db.divePlanSegments)
               .insertOnConflictUpdate(
                 _segmentCompanion(
-                  plan.segments[i],
+                  legs[i],
                   plan.id,
                   i,
                   now,
-                  createdAt: segmentCreatedAt[plan.segments[i].id],
+                  createdAt: segmentCreatedAt[legs[i].segment.id],
                 ),
               );
         }
@@ -128,24 +135,42 @@ class DivePlanRepository {
           )..where((t) => t.id.equals(id))).go();
         }
 
-        // Equipment junction: diff-based insert/delete (composite PK, no
-        // per-row timestamps to preserve).
+        // Equipment junction: diff-based upsert/delete (composite PK, no
+        // per-row timestamps to preserve). A row whose provenance changed
+        // is rewritten in place (issue #1487).
         final existingEqRows = await (_db.select(
           _db.divePlanEquipment,
         )..where((e) => e.planId.equals(plan.id))).get();
-        final existingEqIds = existingEqRows.map((r) => r.equipmentId).toSet();
+        final existingEqById = {
+          for (final r in existingEqRows) r.equipmentId: r,
+        };
+        final provenanceById = {
+          for (final p in plan.gearProvenance) p.equipmentId: p,
+        };
         final keptEqIds = plan.equipmentIds.toSet();
-        addedEquipmentIds.addAll(keptEqIds.difference(existingEqIds));
-        removedEquipmentIds.addAll(existingEqIds.difference(keptEqIds));
-        for (final id in addedEquipmentIds) {
+        removedEquipmentIds.addAll(
+          existingEqById.keys.toSet().difference(keptEqIds),
+        );
+        for (final id in keptEqIds) {
+          final p = provenanceById[id];
+          final current = existingEqById[id];
+          if (current == null) {
+            addedEquipmentIds.add(id);
+          } else if (current.viaEquipmentId == p?.viaEquipmentId &&
+              current.viaSetId == p?.viaSetId) {
+            continue;
+          } else {
+            changedEquipmentIds.add(id);
+          }
           await _db
               .into(_db.divePlanEquipment)
-              .insert(
-                db.DivePlanEquipmentCompanion.insert(
-                  planId: plan.id,
-                  equipmentId: id,
+              .insertOnConflictUpdate(
+                db.DivePlanEquipmentCompanion(
+                  planId: Value(plan.id),
+                  equipmentId: Value(id),
+                  viaEquipmentId: Value(p?.viaEquipmentId),
+                  viaSetId: Value(p?.viaSetId),
                 ),
-                mode: InsertMode.insertOrIgnore,
               );
         }
         for (final id in removedEquipmentIds) {
@@ -189,7 +214,7 @@ class DivePlanRepository {
           recordId: id,
         );
       }
-      for (final id in addedEquipmentIds) {
+      for (final id in [...addedEquipmentIds, ...changedEquipmentIds]) {
         await _syncRepository.markRecordPending(
           entityType: 'divePlanEquipment',
           recordId: '${plan.id}|$id',
@@ -239,6 +264,14 @@ class DivePlanRepository {
         tankRows,
         segmentRows,
         equipmentIds: equipmentRows.map((r) => r.equipmentId).toList(),
+        gearProvenance: [
+          for (final r in equipmentRows)
+            GearProvenance(
+              equipmentId: r.equipmentId,
+              viaEquipmentId: r.viaEquipmentId,
+              viaSetId: r.viaSetId,
+            ),
+        ],
       );
     } catch (e, stackTrace) {
       _log.error('Failed to load plan $id', error: e, stackTrace: stackTrace);
@@ -360,10 +393,6 @@ class DivePlanRepository {
           (s) => s.copyWith(
             id: _uuid.v4(),
             tankId: tankIdMap[s.tankId] ?? s.tankId,
-            switchToTankId: s.switchToTankId != null
-                ? tankIdMap[s.switchToTankId]
-                : null,
-            clearSwitchToTankId: s.switchToTankId == null,
           ),
         )
         .toList();
@@ -415,10 +444,14 @@ class DivePlanRepository {
             : null,
       ),
       waterType: Value(plan.waterType?.name),
+      salinityPpt: Value(plan.salinityPpt),
       gfLow: Value(plan.gfLow),
       gfHigh: Value(plan.gfHigh),
       descentRate: Value(plan.descentRate),
       ascentRate: Value(plan.ascentRate),
+      intermediateAscentRate: Value(plan.intermediateAscentRate),
+      shallowAscentRate: Value(plan.shallowAscentRate),
+      finalAscentRate: Value(plan.finalAscentRate),
       lastStopDepth: Value(plan.lastStopDepth),
       gasSwitchStopSeconds: Value(plan.gasSwitchStopSeconds),
       airBreakO2Seconds: Value(plan.airBreaks?.o2Seconds),
@@ -482,25 +515,46 @@ class DivePlanRepository {
     );
   }
 
+  /// The `SegmentType` name an older build would have stored for [phase].
+  ///
+  /// `level` was `bottom` and `stop` was `decoStop`; `safetyStop` and
+  /// `gasSwitch` are never produced, since neither was ever distinguishable
+  /// from the geometry.
+  static String _legacyTypeName(SegmentPhase phase) => switch (phase) {
+    SegmentPhase.descent => 'descent',
+    SegmentPhase.level => 'bottom',
+    SegmentPhase.stop => 'decoStop',
+    SegmentPhase.ascent => 'ascent',
+  };
+
   db.DivePlanSegmentsCompanion _segmentCompanion(
-    PlanSegment segment,
+    ResolvedLeg leg,
     String planId,
     int sortOrder,
     int now, {
     int? createdAt,
   }) {
+    final segment = leg.segment;
+    // `end_depth` carries the target depth, which is what it always meant.
+    //
+    // `type`, `start_depth` and `rate` are no longer *read* back - the phase,
+    // the start depth and the rate are all derived from the chain on load -
+    // but they are still written, from the resolved leg. Two reasons: they
+    // are NOT NULL columns with no default, so a destructive table rebuild
+    // would be needed to stop writing them; and filling them from the chain
+    // keeps them true, so an older build (or a sync peer) reading this row
+    // still sees the profile the diver authored rather than a placeholder.
     return db.DivePlanSegmentsCompanion(
       id: Value(segment.id),
       planId: Value(planId),
-      type: Value(segment.type.name),
-      startDepth: Value(segment.startDepth),
-      endDepth: Value(segment.endDepth),
+      type: Value(_legacyTypeName(leg.phase)),
+      startDepth: Value(leg.startDepth),
+      endDepth: Value(segment.targetDepth),
       durationSeconds: Value(segment.durationSeconds),
       tankId: Value(segment.tankId),
       gasO2: Value(segment.gasMix.o2),
       gasHe: Value(segment.gasMix.he),
-      rate: Value(segment.rate),
-      switchToTankId: Value(segment.switchToTankId),
+      rate: Value(leg.rate),
       setpointBar: Value(segment.setpointBar),
       diveModeOverride: Value(segment.diveModeOverride?.name),
       sortOrder: Value(sortOrder),
@@ -514,6 +568,7 @@ class DivePlanRepository {
     List<db.DivePlanTank> tankRows,
     List<db.DivePlanSegment> segmentRows, {
     List<String> equipmentIds = const [],
+    List<GearProvenance> gearProvenance = const [],
   }) {
     return domain.DivePlan(
       id: row.id,
@@ -530,10 +585,14 @@ class DivePlanRepository {
       waterType: row.waterType != null
           ? WaterType.values.byName(row.waterType!)
           : null,
+      salinityPpt: row.salinityPpt,
       gfLow: row.gfLow,
       gfHigh: row.gfHigh,
       descentRate: row.descentRate,
       ascentRate: row.ascentRate,
+      intermediateAscentRate: row.intermediateAscentRate,
+      shallowAscentRate: row.shallowAscentRate,
+      finalAscentRate: row.finalAscentRate,
       lastStopDepth: row.lastStopDepth,
       gasSwitchStopSeconds: row.gasSwitchStopSeconds,
       airBreaks:
@@ -562,6 +621,7 @@ class DivePlanRepository {
           : null,
       turnPressureFraction: row.turnPressureFraction,
       equipmentIds: equipmentIds,
+      gearProvenance: gearProvenance,
       plannedWeightKg: row.plannedWeightKg,
       plannedWeightPlacement: row.plannedWeightPlacement != null
           ? (jsonDecode(row.plannedWeightPlacement!) as Map<String, dynamic>)
@@ -589,16 +649,16 @@ class DivePlanRepository {
           .toList(),
       segments: segmentRows
           .map(
+            // Reads `end_depth` as the target and ignores the retired
+            // columns. The old `SegmentType.values.byName(s.type)` threw on an
+            // unrecognised name, so a row written by a newer build could crash
+            // the load; there is nothing left here to throw.
             (s) => PlanSegment(
               id: s.id,
-              type: SegmentType.values.byName(s.type),
-              startDepth: s.startDepth,
-              endDepth: s.endDepth,
+              targetDepth: s.endDepth,
               durationSeconds: s.durationSeconds,
               tankId: s.tankId,
               gasMix: GasMix(o2: s.gasO2, he: s.gasHe),
-              rate: s.rate,
-              switchToTankId: s.switchToTankId,
               setpointBar: s.setpointBar,
               diveModeOverride: s.diveModeOverride != null
                   ? domain.PlanMode.values.byName(s.diveModeOverride!)

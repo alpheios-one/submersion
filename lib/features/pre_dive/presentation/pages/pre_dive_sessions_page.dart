@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/domain/models/pre_dive_session_filter.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -189,7 +190,7 @@ class _ActiveFilterBar extends ConsumerWidget {
       PreDiveSessionStatus.aborted => l10n.preDive_sessions_statusAborted,
     };
 
-    final materialL10n = MaterialLocalizations.of(context);
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
@@ -233,9 +234,9 @@ class _ActiveFilterBar extends ConsumerWidget {
                 if (filter.dateRange != null)
                   Chip(
                     label: Text(
-                      '${materialL10n.formatMediumDate(filter.dateRange!.start)}'
+                      '${units.formatDate(filter.dateRange!.start)}'
                       ' - '
-                      '${materialL10n.formatMediumDate(filter.dateRange!.end)}',
+                      '${units.formatDate(filter.dateRange!.end)}',
                     ),
                     visualDensity: VisualDensity.compact,
                     deleteIcon: const Icon(Icons.close, size: 16),
@@ -343,16 +344,52 @@ class _SessionTile extends ConsumerWidget {
 
   const _SessionTile({required this.session});
 
-  String _statusLabel(BuildContext context) {
-    return switch (session.status) {
-      PreDiveSessionStatus.inProgress =>
-        context.l10n.preDive_sessions_statusInProgress,
-      PreDiveSessionStatus.completed =>
-        context.l10n.preDive_sessions_statusCompleted,
-      PreDiveSessionStatus.aborted =>
-        context.l10n.preDive_sessions_statusAborted,
-    };
+  /// Status and its timestamp.
+  ///
+  /// A finished run is stamped the moment it is completed or aborted, and
+  /// that stamp is what decides which dive the run auto-links to, so it is
+  /// the timestamp worth showing, with the time of day rather than just the
+  /// date. When it is there, status and time fold into one phrase.
+  ///
+  /// The stamp is only meaningful once the run is over, so the status, not
+  /// the presence of the stamp, decides which time is shown. A row still in
+  /// progress reports its start whatever `completedAt` holds: that pairing is
+  /// contradictory data, and reading a finish time out of it would quietly
+  /// misreport the run rather than expose the contradiction.
+  ///
+  /// A terminal row with no usable stamp (legacy or sync-applied data) falls
+  /// back to two parts rather than one: the start, which is the only time
+  /// certainly true of it, followed by the status. Folding the two facts into
+  /// a single phrase must never cost one of them, and "Started ..." alone on
+  /// a completed run hides what actually happened. Nothing is appended for a
+  /// run still going, where the phrase already says it.
+  ///
+  /// [l10n] reaches [UnitFormatter.formatDateTime] so the connector between
+  /// date and time is translated; without it the formatter falls back to a
+  /// hardcoded English "at" and a German tile reads "14.11.2023 at 09:12".
+  String _whenLabel(BuildContext context, UnitFormatter units) {
+    final l10n = context.l10n;
+    final running = session.status == PreDiveSessionStatus.inProgress;
+    final finishedAt = running ? null : session.completedAt;
+    if (finishedAt != null) {
+      final when = units.formatDateTime(finishedAt, l10n: l10n);
+      return session.status == PreDiveSessionStatus.aborted
+          ? l10n.preDive_sessions_abortedAt(when)
+          : l10n.preDive_sessions_completedAt(when);
+    }
+    final started = l10n.preDive_sessions_startedAt(
+      units.formatDateTime(session.startedAt, l10n: l10n),
+    );
+    return running ? started : '$started - ${_statusLabel(context)}';
   }
+
+  String _statusLabel(BuildContext context) => switch (session.status) {
+    PreDiveSessionStatus.inProgress =>
+      context.l10n.preDive_sessions_statusInProgress,
+    PreDiveSessionStatus.completed =>
+      context.l10n.preDive_sessions_statusCompleted,
+    PreDiveSessionStatus.aborted => context.l10n.preDive_sessions_statusAborted,
+  };
 
   /// Attaches this run to a dive the diver picks (#1066). The automatic
   /// linker only reaches back three hours from the dive, so a build check run
@@ -400,9 +437,7 @@ class _SessionTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final flagged =
         ref.watch(preDiveSessionStatsProvider).value?[session.id]?.flagged ?? 0;
-    final startedDate = MaterialLocalizations.of(
-      context,
-    ).formatMediumDate(session.startedAt);
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     final hasLinkedDive = session.diveId != null;
 
@@ -428,8 +463,7 @@ class _SessionTile extends ConsumerWidget {
         children: [
           Text(
             [
-              startedDate,
-              _statusLabel(context),
+              _whenLabel(context, units),
               if (flagged > 0) l10n.preDive_runner_flaggedBadge(flagged),
             ].join(' - '),
           ),

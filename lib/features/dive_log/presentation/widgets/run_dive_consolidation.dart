@@ -8,12 +8,15 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Applies a dive consolidation via [service] and shows the resulting
 /// success-with-undo or error SnackBar.
 ///
-/// Shared by the per-dive "Merge with another dive" flow
-/// ([MergeDiveDialog]/`dive_detail_page.dart`) and the multi-select combine
-/// dialog's consolidation panel ([CombineDivesDialog]) so there is a single
-/// copy of the apply/undo/SnackBar logic (Task 7 review finding; moved out of
-/// dive_detail_page.dart in Task 9 to avoid a widget depending on the page
-/// file).
+/// Two callers share this: the multi-select combine dialog's consolidation
+/// panel (`combine_dives_dialog.dart`, which pops itself and then calls this
+/// without awaiting) and the data quality inbox's "consolidate duplicate"
+/// repair (`data_quality_inbox_page.dart`, which awaits it). It lives in its
+/// own file rather than in the dialog so the apply/undo/SnackBar logic is not
+/// tied to one widget.
+///
+/// Only [context] is read synchronously, before the first `await`, so a caller
+/// may dismiss its own route first.
 Future<void> runDiveConsolidation({
   required BuildContext context,
   required DiveConsolidationService service,
@@ -85,16 +88,22 @@ Future<void> runDiveConsolidation({
 /// Maps a [DiveConsolidationService.apply] failure to user-visible text.
 ///
 /// `apply` throws [ArgumentError] whose message either starts with
-/// `sameComputer` (the service's own FK-level guard) or is
+/// `sameComputer` (the service's own FK-level guard) or embeds
 /// `DiveConsolidationBuilder.build`'s `ConsolidationInvalid(reason.name)`
-/// wrapper, which encodes the invalid-consolidation reason by name. Only the
-/// reasons that are actually surfaced with distinct copy are matched here;
-/// anything else -- including tooFewDives/mixedDivers, which do not have
-/// dedicated error strings -- falls back to the generic error text.
+/// wrapper, which encodes the invalid-consolidation reason by name. Both
+/// shapes are matched by substring: the wrapper prefixes the reason with
+/// `build() requires a consolidatable selection; got `, so a `startsWith`
+/// test could never see it, and a same-computer re-download -- which
+/// `classify` rejects on serial, long before the service reaches the
+/// computer FK -- reported only the generic "nothing was changed" text.
+///
+/// Only the reasons that are actually surfaced with distinct copy are
+/// matched here; anything else -- including tooFewDives/mixedDivers, which
+/// do not have dedicated error strings -- falls back to the generic text.
 String consolidationErrorText(AppLocalizations l10n, Object error) {
   if (error is ArgumentError) {
     final message = error.message?.toString() ?? '';
-    if (message.startsWith('sameComputer')) {
+    if (message.contains('sameComputer')) {
       return l10n.diveLog_consolidate_error_sameComputer;
     }
     if (message.contains('notOverlapping')) {

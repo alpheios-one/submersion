@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_arrangement_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -9,14 +10,21 @@ import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/export/excel/maintenance_excel_export_service.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/export/uddf/uddf_source_fetch.dart';
+import 'package:submersion/core/services/export/pdf/diver_photo_loader.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_profile_series.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_factory.dart';
 import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
 import 'package:submersion/features/signatures/domain/entities/signature.dart';
+import 'package:submersion/features/dive_log/data/repositories/series_id_chunks.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_component_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
@@ -155,6 +163,19 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
   ExportNotifier(this._exportService, this._ref) : super(const ExportState());
 
+  /// Each assembly's part names in template order, for the Components
+  /// column of the equipment CSV and the Excel sheet (issue #1487).
+  Future<Map<String, List<String>>> _componentNamesFor(
+    List<EquipmentItem> equipment,
+  ) async {
+    final rows = await _ref
+        .read(equipmentComponentRepositoryProvider)
+        .getAllComponents();
+    return ComponentsIndex.fromRows(
+      rows,
+    ).namesByParent({for (final e in equipment) e.id: e});
+  }
+
   /// Localizations for the status messages this notifier publishes.
   ///
   /// A provider has no BuildContext, so the persisted locale setting is
@@ -232,7 +253,10 @@ class ExportNotifier extends StateNotifier<ExportState> {
         );
         return;
       }
-      final path = await _exportService.exportEquipmentToCsv(equipment);
+      final path = await _exportService.exportEquipmentToCsv(
+        equipment,
+        componentNames: await _componentNamesFor(equipment),
+      );
       state = state.copyWith(
         status: ExportStatus.success,
         message: _l10n.settings_export_success_equipment,
@@ -319,6 +343,34 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
     // Get current diver for personalization
     final diver = await _ref.read(currentDiverProvider.future);
+    final diverPhoto = await _ref.read(diverPhotoLoaderProvider)(
+      diver?.photoPath,
+    );
+
+    // Depth profiles, for the templates that chart them. getAllDives skips
+    // profile hydration for performance, so they are loaded here, in one
+    // batched query, and thinned before any template sees them.
+    Map<String, PdfProfileSeries>? profiles;
+    if (exportOptions.template == PdfTemplate.detailed) {
+      state = state.copyWith(
+        message: _l10n.settings_export_progress_loadingProfiles,
+      );
+      // Chunked and thinned as we go. Loading every dive's raw samples first
+      // and downsampling afterwards would hold the whole logbook's sample set
+      // in memory at once, which is exactly what the thinning exists to avoid.
+      const chunkSize = 50;
+      final repository = _ref.read(diveRepositoryProvider);
+      final ids = dives.map((d) => d.id).toList();
+      final thinned = <String, PdfProfileSeries>{};
+
+      for (final chunk in seriesIdChunks(ids, size: chunkSize)) {
+        final raw = await repository.getMergedProfilesForDives(chunk);
+        for (final entry in raw.entries) {
+          thinned[entry.key] = PdfProfileSeries.downsampled(entry.value);
+        }
+      }
+      profiles = thinned;
+    }
 
     // Initialize fonts for proper Unicode support
     state = state.copyWith(
@@ -339,21 +391,36 @@ class ExportNotifier extends StateNotifier<ExportState> {
     // times follow the diver's preferences (#964); the file name stays ISO.
     final settings = _ref.read(settingsProvider);
 
+    // The arrangement notifier starts at the defaults and adopts the stored
+    // value asynchronously, so reading it straight away would export the
+    // defaults over a saved preference whenever nothing in the session had
+    // instantiated it yet. Awaiting the first load is what the sibling path
+    // in PdfExportService gets by reading the repository directly.
+    await _ref.read(equipmentArrangementNotifierProvider.notifier).loaded;
+
     return builder.buildPdf(
       dives: dives,
+      // The logbook is a document a human reads, so gear follows the diver's
+      // arrangement (#1486, #1576).
+      gearArrangement: _ref.read(equipmentArrangementProvider),
       pageSize: exportOptions.pageSize,
       dates: PdfDateFormatter(
         dateFormat: settings.dateFormat,
         timeFormat: settings.timeFormat,
       ),
+      units: UnitFormatter(settings),
       title: _l10n.settings_export_pdfDocumentTitle,
       diveSignatures: diveSignatures.isNotEmpty ? diveSignatures : null,
       certifications: certifications,
       diver: diver,
+      profiles: profiles,
+      diverPhoto: diverPhoto,
+      includeVerificationAreas: exportOptions.includeVerificationAreas,
     );
   }
 
-  Future<void> exportDivesToUddf() async {
+  Future<void> exportDivesToUddf([UddfExportOptions? options]) async {
+    final exportOptions = options ?? const UddfExportOptions();
     state = state.copyWith(
       status: ExportStatus.exporting,
       message: _l10n.settings_export_progress_uddf,
@@ -389,6 +456,10 @@ class ExportNotifier extends StateNotifier<ExportState> {
       )).where((r) => !r.isBuiltIn).toList();
       final diveComputers = await _ref.read(allDiveComputersProvider.future);
       final equipmentSets = await _ref.read(equipmentSetsProvider.future);
+      // Assembly templates ride with the equipment (issue #1487).
+      final components = await _ref
+          .read(equipmentComponentRepositoryProvider)
+          .getAllComponents();
 
       // Fetch courses
       final courses = await _ref.read(allCoursesProvider.future);
@@ -478,12 +549,18 @@ class ExportNotifier extends StateNotifier<ExportState> {
         customDiveRoles: customDiveRoles,
         diveComputers: diveComputers,
         equipmentSets: equipmentSets,
+        components: components,
         serviceRecords: allServiceRecords,
         courses: courses,
         diveWeights: diveWeights,
         diveGasSwitches: diveGasSwitches,
         diveProfileEvents: diveProfileEvents,
         diveTankPressures: diveTankPressures,
+        dataSources: await _ref.read(uddfSourceFetchProvider)(
+          dives.map((d) => d.id).toList(growable: false),
+          exportOptions,
+        ),
+        options: exportOptions,
       );
       state = state.copyWith(
         status: ExportStatus.success,
@@ -536,6 +613,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dives: dives,
         sites: sites,
         equipment: equipment,
+        componentNames: await _componentNamesFor(equipment),
         depthUnit: settings.depthUnit,
         temperatureUnit: settings.temperatureUnit,
         pressureUnit: settings.pressureUnit,
@@ -642,6 +720,7 @@ class ExportNotifier extends StateNotifier<ExportState> {
         dives: dives,
         sites: sites,
         equipment: equipment,
+        componentNames: await _componentNamesFor(equipment),
         depthUnit: settings.depthUnit,
         temperatureUnit: settings.temperatureUnit,
         pressureUnit: settings.pressureUnit,
@@ -936,7 +1015,10 @@ class ExportNotifier extends StateNotifier<ExportState> {
       state = state.copyWith(
         message: _l10n.settings_export_progress_chooseLocation,
       );
-      final path = await _exportService.saveEquipmentCsvToFile(equipment);
+      final path = await _exportService.saveEquipmentCsvToFile(
+        equipment,
+        componentNames: await _componentNamesFor(equipment),
+      );
 
       if (path == null) {
         state = state.copyWith(
@@ -963,7 +1045,8 @@ class ExportNotifier extends StateNotifier<ExportState> {
 
   /// Save comprehensive UDDF to a user-selected location.
   /// Collects all data (same as share) so the export round-trips correctly.
-  Future<void> saveUddfToFile() async {
+  Future<void> saveUddfToFile([UddfExportOptions? options]) async {
+    final exportOptions = options ?? const UddfExportOptions();
     state = state.copyWith(
       status: ExportStatus.exporting,
       message: _l10n.settings_export_progress_preparingUddf,
@@ -997,6 +1080,10 @@ class ExportNotifier extends StateNotifier<ExportState> {
       )).where((r) => !r.isBuiltIn).toList();
       final diveComputers = await _ref.read(allDiveComputersProvider.future);
       final equipmentSets = await _ref.read(equipmentSetsProvider.future);
+      // Assembly templates ride with the equipment (issue #1487).
+      final components = await _ref
+          .read(equipmentComponentRepositoryProvider)
+          .getAllComponents();
       final courses = await _ref.read(allCoursesProvider.future);
 
       // Fetch service records for all equipment
@@ -1083,12 +1170,18 @@ class ExportNotifier extends StateNotifier<ExportState> {
         customDiveRoles: customDiveRoles,
         diveComputers: diveComputers,
         equipmentSets: equipmentSets,
+        components: components,
         serviceRecords: allServiceRecords,
         courses: courses,
         diveWeights: diveWeights,
         diveGasSwitches: diveGasSwitches,
         diveProfileEvents: diveProfileEvents,
         diveTankPressures: diveTankPressures,
+        dataSources: await _ref.read(uddfSourceFetchProvider)(
+          dives.map((d) => d.id).toList(growable: false),
+          exportOptions,
+        ),
+        options: exportOptions,
       );
 
       if (path == null) {

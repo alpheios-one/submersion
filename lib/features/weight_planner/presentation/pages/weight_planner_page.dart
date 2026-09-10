@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/buoyancy/body_composition.dart';
 import 'package:submersion/core/buoyancy/gear_feature.dart';
 import 'package:submersion/core/buoyancy/placement_predictor.dart';
 import 'package:submersion/core/buoyancy/weight_prediction_engine.dart';
@@ -14,6 +15,10 @@ import 'package:submersion/features/divers/domain/entities/diver_weight_entry.da
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_weight_entry_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
+import 'package:submersion/features/equipment/domain/services/gear_expander.dart';
+import 'package:submersion/features/equipment/domain/services/gear_tree.dart';
+import 'package:submersion/features/equipment/presentation/helpers/gear_expansion.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/core/buoyancy/buoyancy_physics.dart';
 import 'package:submersion/core/buoyancy/buoyancy_twin.dart';
@@ -44,6 +49,10 @@ class WeightPlannerPage extends ConsumerStatefulWidget {
 
 class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   final List<EquipmentItem> _gear = [];
+
+  /// Where each item in [_gear] came from: the assembly it was attached
+  /// through and the set applied (issue #1487).
+  final List<GearProvenance> _gearProvenance = [];
   final List<TankPresetEntity> _tanks = [];
   WaterType _water = WaterType.salt;
   // Committed values feed the (synthetic-profile) twin. The `_draft` fields
@@ -54,7 +63,11 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   double? _maxDepthDraft;
   int? _bottomMinutesDraft;
   final _bodyWeightController = TextEditingController();
+  final _heightCmController = TextEditingController();
+  final _heightFeetController = TextEditingController();
+  final _heightInchesController = TextEditingController();
   bool _bodyWeightSeeded = false;
+  bool _heightSeeded = false;
   bool _tanksSeeded = false;
   String? _deltaText;
   Timer? _deltaTimer;
@@ -63,6 +76,9 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   void dispose() {
     _deltaTimer?.cancel();
     _bodyWeightController.dispose();
+    _heightCmController.dispose();
+    _heightFeetController.dispose();
+    _heightInchesController.dispose();
     super.dispose();
   }
 
@@ -72,6 +88,24 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
   double? _bodyWeightKg(UnitFormatter units) {
     final parsed = parseUserDecimal(_bodyWeightController.text);
     return parsed != null ? units.weightToKg(parsed) : null;
+  }
+
+  /// Entered height in centimetres, or null when the field(s) are empty or
+  /// implausible (an inches-only entry, a typo), so the prediction falls back
+  /// to the profile height and nothing unusable reaches the profile.
+  double? _heightCm(UnitFormatter units) {
+    final double? cm;
+    if (units.heightIsMetric) {
+      cm = parseUserDecimal(_heightCmController.text);
+    } else {
+      final feet = parseUserDecimal(_heightFeetController.text);
+      final inches = parseUserDecimal(_heightInchesController.text);
+      cm = (feet == null && inches == null)
+          ? null
+          : units.feetInchesToCm(feet ?? 0, inches ?? 0);
+    }
+    if (cm == null || !BodyComposition.isPlausibleHeight(cm)) return null;
+    return cm;
   }
 
   WeightPrediction? _predict(FittedWeightModel? model, UnitFormatter units) {
@@ -92,6 +126,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
         tanks: tanks,
         waterType: _water,
         bodyWeightKg: _bodyWeightKg(units),
+        heightCm: _heightCm(units),
       ),
     );
   }
@@ -127,6 +162,8 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
       model: model,
       waterType: _water,
       bodyWeightKg: _bodyWeightKg(units),
+      heightCm: _heightCm(units),
+      rolledUpIds: GearTree.rolledUpIds(_gearProvenance),
     );
     final input = TwinInput(
       profile: _squareProfile(),
@@ -251,6 +288,58 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     }
   }
 
+  /// Ids in [_gear] that are parts of an assembly also in [_gear], as the
+  /// tree places them: an orphaned row stays a visible chip.
+  Set<String> get _partIds => GearTree.partIds(_gearProvenance);
+
+  /// Parts under each assembly id, for the chip label.
+  Map<String, int> get _partCounts => GearTree.partCounts(_gearProvenance);
+
+  /// Every add funnels here so an assembly expands into its parts the same
+  /// way it does on a dive (issue #1487). The prediction delta is shown
+  /// once, after the parts have arrived.
+  Future<void> _addGear(
+    UnitFormatter units,
+    List<EquipmentItem> items, {
+    String? viaSetId,
+  }) async {
+    final merged = [
+      ..._gear,
+      for (final item in items)
+        if (!_gear.any((g) => g.id == item.id)) item,
+    ];
+    final expansion = await expandGearOnPage(
+      ref,
+      additions: [
+        for (final i in items) (equipmentId: i.id, viaSetId: viaSetId),
+      ],
+      existing: _gearProvenance,
+      existingItems: merged,
+    );
+    if (!mounted) return;
+    _mutate(units, () {
+      _gear
+        ..clear()
+        ..addAll(merged)
+        ..addAll(expansion.newItems);
+      _gearProvenance
+        ..clear()
+        ..addAll(expansion.provenance);
+    });
+  }
+
+  /// Removes [item] and every part attached through it.
+  void _removeGear(UnitFormatter units, EquipmentItem item) {
+    _mutate(units, () {
+      final gone = GearExpander.subtreeIds(_gearProvenance, item.id);
+      _gear.removeWhere((g) => gone.contains(g.id));
+      final kept = GearExpander.removeSubtree(_gearProvenance, item.id);
+      _gearProvenance
+        ..clear()
+        ..addAll(kept);
+    });
+  }
+
   Future<void> _saveBodyWeightToProfile(UnitFormatter units) async {
     final kg = _bodyWeightKg(units);
     final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
@@ -264,6 +353,7 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
             diverId: diverId,
             measuredAt: now,
             weightKg: kg,
+            heightCm: _heightCm(units),
             createdAt: now,
             updatedAt: now,
           ),
@@ -289,14 +379,41 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
     // Prefill body weight from the newest profile entry, once.
     final latestWeight = ref.watch(latestDiverWeightProvider).valueOrNull;
     if (!_bodyWeightSeeded && latestWeight != null) {
+      // One-shot, and consumed whether or not it is used: see the height
+      // seed below for why a late arrival must not clobber a typed value.
       _bodyWeightSeeded = true;
-      // Rounded to a tenth, then rendered by the locale formatter: a
-      // toStringAsFixed seed would put a dot in the field that the parser in
-      // [_bodyWeightKg] reads as a grouping separator under de/es/it.
-      final shown = units.convertWeight(latestWeight.weightKg);
-      _bodyWeightController.text = formatDecimalForInput(
-        (shown * 10).roundToDouble() / 10,
-      );
+      if (_bodyWeightController.text.isEmpty) {
+        // Rounded to a tenth, then rendered by the locale formatter: a
+        // toStringAsFixed seed would put a dot in the field that the parser
+        // in [_bodyWeightKg] reads as a grouping separator under de/es/it.
+        final shown = units.convertWeight(latestWeight.weightKg);
+        _bodyWeightController.text = formatDecimalForInput(
+          (shown * 10).roundToDouble() / 10,
+        );
+      }
+    }
+    // Prefill height from the newest profile entry that records one, once.
+    // Whole centimetres or whole inches need no locale formatting.
+    final latestHeight = ref.watch(latestDiverHeightProvider).valueOrNull;
+    if (!_heightSeeded && latestHeight != null) {
+      // The seed is a one-shot chance, consumed whether or not it is used:
+      // the provider can resolve after the diver has started typing (the
+      // prediction card is still loading while it does), and a late seed
+      // must not clobber an in-progress edit.
+      _heightSeeded = true;
+      final fieldsAreEmpty = units.heightIsMetric
+          ? _heightCmController.text.isEmpty
+          : _heightFeetController.text.isEmpty &&
+                _heightInchesController.text.isEmpty;
+      if (fieldsAreEmpty) {
+        if (units.heightIsMetric) {
+          _heightCmController.text = '${latestHeight.round()}';
+        } else {
+          final split = units.cmToFeetInches(latestHeight);
+          _heightFeetController.text = '${split.feet}';
+          _heightInchesController.text = '${split.inches}';
+        }
+      }
     }
     // Start with one tank once presets load.
     final presets = ref.watch(tankPresetsProvider).valueOrNull;
@@ -325,9 +442,19 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
 
     final savedWeightKg = latestWeight?.weightKg;
     final enteredKg = _bodyWeightKg(units);
-    final showSave =
+    final enteredHeight = _heightCm(units);
+    final weightDiffers =
         enteredKg != null &&
         (savedWeightKg == null || (enteredKg - savedWeightKg).abs() > 0.05);
+    // Half a centimetre absorbs the whole-inch rounding of an imperial seed.
+    final heightDiffers =
+        enteredHeight != null &&
+        (latestHeight == null || (enteredHeight - latestHeight).abs() > 0.5);
+    // A profile entry always carries a weight, so height alone cannot save.
+    final showSave = enteredKg != null && (weightDiffers || heightDiffers);
+    final bmi = enteredKg == null
+        ? null
+        : BodyComposition.bmi(weightKg: enteredKg, heightCm: enteredHeight);
 
     final content = SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -351,21 +478,21 @@ class _WeightPlannerPageState extends ConsumerState<WeightPlannerPage> {
           const SizedBox(height: 8),
           RigComposer(
             gear: _gear,
+            partIds: _partIds,
+            partCounts: _partCounts,
             tanks: _tanks,
             waterType: _water,
             bodyWeightController: _bodyWeightController,
+            heightCmController: _heightCmController,
+            heightFeetController: _heightFeetController,
+            heightInchesController: _heightInchesController,
+            bmi: bmi,
             units: units,
             showSaveBodyWeight: showSave,
-            onGearAdded: (item) => _mutate(units, () => _gear.add(item)),
-            onGearSetAdded: (items) => _mutate(units, () {
-              for (final item in items) {
-                if (!_gear.any((g) => g.id == item.id)) {
-                  _gear.add(item);
-                }
-              }
-            }),
-            onGearRemoved: (item) =>
-                _mutate(units, () => _gear.removeWhere((g) => g.id == item.id)),
+            onGearAdded: (item) => _addGear(units, [item]),
+            onGearSetAdded: (set, items) =>
+                _addGear(units, items, viaSetId: set.id),
+            onGearRemoved: (item) => _removeGear(units, item),
             onTankAdded: (preset) => _mutate(units, () => _tanks.add(preset)),
             onTankRemoved: (index) =>
                 _mutate(units, () => _tanks.removeAt(index)),

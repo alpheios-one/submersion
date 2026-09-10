@@ -249,6 +249,236 @@ void main() {
     });
   });
 
+  group('firstContactLibraryState', () {
+    // An install can end up owning the cloud files some earlier install on the
+    // same machine published, most routinely on macOS, where replacing the
+    // .app leaves ~/Library/Preferences (and with it the device-id anchor)
+    // in place. Every one of those files then classifies as "ours" rather than
+    // a peer's, so the account lists as empty and the setup wizard offers
+    // Start Fresh over a live library.
+    test(
+      'adopts a fresh identity so a self-owned library is pullable',
+      () async {
+        final inheritedId = await repository.getDeviceId();
+        await provider.uploadFile(_payload, peerFileName(inheritedId));
+        await provider.uploadFile(
+          _payload,
+          ChangesetLogLayout.basePartName(inheritedId, 1, 0),
+        );
+
+        // The plain classification cannot see it: it is all "ours".
+        expect(
+          await initializer.peerLibraryState(provider),
+          PeerLibraryState.none,
+        );
+
+        final state = await initializer.firstContactLibraryState(
+          provider,
+          localLibraryIsEmpty: true,
+        );
+
+        expect(state, PeerLibraryState.pullable);
+        expect(
+          await repository.getDeviceId(),
+          isNot(inheritedId),
+          reason:
+              'the files can only be pulled as a peer\'s, so this install has '
+              'to stop claiming the retired identity',
+        );
+      },
+    );
+
+    test(
+      'leaves the identity alone when this device holds a library',
+      () async {
+        final ownId = await repository.getDeviceId();
+        await provider.uploadFile(_payload, peerFileName(ownId));
+
+        final state = await initializer.firstContactLibraryState(
+          provider,
+          localLibraryIsEmpty: false,
+        );
+
+        expect(
+          state,
+          PeerLibraryState.none,
+          reason: 'our own manifest beside our own library is the normal case',
+        );
+        expect(
+          await repository.getDeviceId(),
+          ownId,
+          reason:
+              'a device that still holds its library must keep the identity '
+              'that published it, or its own log is orphaned',
+        );
+      },
+    );
+
+    test('lists the account exactly once, recovery included', () async {
+      // The Connect step waits on this, and listFiles is a network round trip
+      // on every real provider, so the recovery must not cost extra listings.
+      final inheritedId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(inheritedId));
+      provider.operationLog.clear();
+
+      await initializer.firstContactLibraryState(
+        provider,
+        localLibraryIsEmpty: true,
+      );
+
+      expect(provider.operationLog.where((op) => op == 'list').length, 1);
+    });
+
+    test('lists the account exactly once for an empty account', () async {
+      provider.operationLog.clear();
+
+      await initializer.firstContactLibraryState(
+        provider,
+        localLibraryIsEmpty: true,
+      );
+
+      expect(provider.operationLog.where((op) => op == 'list').length, 1);
+    });
+
+    test('leaves a real peer library untouched', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName('deviceB'));
+
+      final state = await initializer.firstContactLibraryState(
+        provider,
+        localLibraryIsEmpty: true,
+      );
+
+      expect(state, PeerLibraryState.pullable);
+      expect(
+        await repository.getDeviceId(),
+        ownId,
+        reason: 'a pullable peer needs no identity surgery',
+      );
+    });
+
+    test('leaves a genuinely empty account empty', () async {
+      final ownId = await repository.getDeviceId();
+
+      final state = await initializer.firstContactLibraryState(
+        provider,
+        localLibraryIsEmpty: true,
+      );
+
+      expect(state, PeerLibraryState.none);
+      expect(await repository.getDeviceId(), ownId);
+    });
+  });
+
+  // Reset Sync State retires an identity and then deletes its cloud files.
+  // That is only safe while someone else still holds the library (#1551).
+  group('anotherDevicePublishesLibrary', () {
+    test('is true when a peer publishes a manifest', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(_payload, peerFileName('deviceB'));
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isTrue,
+      );
+    });
+
+    test('is false when the retired id is the only publisher', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(
+        _payload,
+        ChangesetLogLayout.basePartName(ownId, 1, 0),
+      );
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isFalse,
+      );
+    });
+
+    test('is false when the other device has no manifest yet', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(
+        _payload,
+        ChangesetLogLayout.basePartName('deviceB', 1, 0),
+      );
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isFalse,
+      );
+    });
+
+    test('is false when the only other file is a retirement marker', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(
+        _payload,
+        ChangesetLogLayout.retiredMarkerName('deviceB'),
+      );
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isFalse,
+      );
+    });
+
+    test('is false when a manifest-shaped name carries no device id', () async {
+      // isManifest() matches on prefix and suffix alone, so a malformed name
+      // passes it while deviceIdOf() yields null. Counting that as a peer
+      // would license deleting the retired id's files -- possibly the only
+      // library -- on the strength of a file no device ever published.
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(
+        _payload,
+        '${ChangesetLogLayout.prefix}.manifest.json',
+      );
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isFalse,
+      );
+    });
+
+    test('is false when the listing stalls', () async {
+      // resetSyncState runs behind a non-dismissible progress dialog, so an
+      // unbounded listing would strand the user; and a listing that never
+      // answered is not evidence of a second copy.
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(_payload, peerFileName('deviceB'));
+      provider.hangOperations = true;
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(
+          ownId,
+          provider,
+          timeout: const Duration(milliseconds: 20),
+        ),
+        isFalse,
+      );
+    });
+
+    test('is false when the listing cannot be read', () async {
+      final ownId = await repository.getDeviceId();
+      await provider.uploadFile(_payload, peerFileName(ownId));
+      await provider.uploadFile(_payload, peerFileName('deviceB'));
+      provider.failLists = true;
+
+      expect(
+        await initializer.anotherDevicePublishesLibrary(ownId, provider),
+        isFalse,
+        reason:
+            'an unreadable listing is not evidence of a second copy, and the '
+            'caller deletes on a true',
+      );
+    });
+  });
+
   group('checkSyncOnLaunch provider persistence', () {
     test('saveProvider then getLastProvider round-trips', () async {
       expect(initializer.getLastProvider(), isNull);

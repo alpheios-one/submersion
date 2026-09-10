@@ -51,7 +51,7 @@ bool planIsPersisted(String id, List<domain.DivePlanSummary> summaries) =>
 /// - >= 1160 px: editor pane, chart column, results pane (side panes
 ///   collapsible with remembered state)
 /// - 760-1160 px: chart column + results pane; the editor lives in a drawer
-/// - < 760 px: phone Chart + Tab Deck (Plan / Tanks / Setup / Results)
+/// - < 760 px: phone Chart + Tab Deck (Tanks / Plan / Setup / Results)
 class PlanCanvasPage extends ConsumerStatefulWidget {
   const PlanCanvasPage({super.key, this.planId});
 
@@ -418,9 +418,13 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
 
   Widget _buildPhone(BoxConstraints constraints) {
     final tab = ref.watch(plannerPhoneTabProvider);
+    // Tanks first: the gas is chosen before the profile that breathes it, and
+    // the deck's default index of 0 therefore opens on Tanks. Setup and
+    // Results keep indices 2 and 3, which _focusSetup and the issues chip
+    // write directly.
     final tabs = [
-      context.l10n.divePlanner_tab_plan,
       context.l10n.divePlanner_label_tanks,
+      context.l10n.divePlanner_tab_plan,
       context.l10n.plannerCanvas_tab_setup,
       context.l10n.divePlanner_tab_results,
     ];
@@ -429,61 +433,69 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
     final chartHeight = (constraints.maxHeight * 0.30)
         .clamp(160.0, 260.0)
         .toDouble();
-    return Column(
-      children: [
-        SizedBox(
-          height: chartHeight,
-          child: Stack(
-            children: [
-              const Positioned.fill(
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: PlanProfileChart(),
+    // A single CustomScrollView so the chart and tab selector scroll away
+    // with the rest of the page instead of staying pinned and eating the
+    // viewport (#1428).
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: chartHeight,
+            child: Stack(
+              children: [
+                const Positioned.fill(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: PlanProfileChart(),
+                  ),
                 ),
-              ),
-              PlanChartReadouts(
-                onIssuesTap: () =>
-                    ref.read(plannerPhoneTabProvider.notifier).state = 3,
-              ),
-              const Positioned(
-                left: 8,
-                right: 56,
-                bottom: 8,
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: ContingencyChips(overlay: true),
+                PlanChartReadouts(
+                  onIssuesTap: () =>
+                      ref.read(plannerPhoneTabProvider.notifier).state = 3,
                 ),
-              ),
-              Positioned(
-                right: 10,
-                bottom: 10,
-                child: IconButton.filledTonal(
-                  icon: const Icon(Icons.open_in_full, size: 18),
-                  // PUSH (not go): back returns to this canvas with its
-                  // state on the stack, instead of closing the app (#647).
-                  onPressed: () => context.push('/planning/dive-planner/chart'),
+                const Positioned(
+                  left: 8,
+                  right: 56,
+                  bottom: 8,
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: ContingencyChips(overlay: true),
+                  ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: 10,
+                  bottom: 10,
+                  child: IconButton.filledTonal(
+                    icon: const Icon(Icons.open_in_full, size: 18),
+                    // PUSH (not go): back returns to this canvas with its
+                    // state on the stack, instead of closing the app (#647).
+                    onPressed: () =>
+                        context.push('/planning/dive-planner/chart'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: SegmentedButton<int>(
-            segments: [
-              for (var i = 0; i < tabs.length; i++)
-                ButtonSegment(value: i, label: Text(tabs[i])),
-            ],
-            selected: {tab},
-            showSelectedIcon: false,
-            onSelectionChanged: (selection) =>
-                ref.read(plannerPhoneTabProvider.notifier).state =
-                    selection.first,
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SegmentedButton<int>(
+              segments: [
+                for (var i = 0; i < tabs.length; i++)
+                  ButtonSegment(value: i, label: Text(tabs[i])),
+              ],
+              selected: {tab},
+              showSelectedIcon: false,
+              onSelectionChanged: (selection) =>
+                  ref.read(plannerPhoneTabProvider.notifier).state =
+                      selection.first,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        Expanded(child: _phoneTabBody(tab)),
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        SliverToBoxAdapter(child: _phoneTabBody(tab)),
       ],
     );
   }
@@ -491,23 +503,26 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
   Widget _phoneTabBody(int tab) {
     switch (tab) {
       case 0:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [SegmentList()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: PlanTankList(),
         );
       case 1:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [PlanTankList()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: SegmentList(),
         );
       case 2:
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          children: const [PlanSetupAccordion()],
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: PlanSetupAccordion(),
         );
       case 3:
       default:
-        return PlanResultsPane(controller: _wideResultsController);
+        return PlanResultsPane(
+          controller: _wideResultsController,
+          shrinkWrap: true,
+        );
     }
   }
 
@@ -549,7 +564,7 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
       lostGasLabel: l10n.plannerCanvas_contingency_lostGas,
       rangeTable: l10n.plannerCanvas_range_title,
       bailout: l10n.plannerCanvas_bailout_title,
-      stop: l10n.plannerCanvas_table_stop,
+      duration: l10n.plannerCanvas_table_duration,
       depth: l10n.plannerCanvas_table_depth,
       runtime: l10n.plannerCanvas_table_runtime,
       gas: l10n.plannerCanvas_table_gas,
@@ -633,7 +648,9 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
           depthLabel: suggestedDepth > 0
               ? units.formatDepth(suggestedDepth)
               : null,
-          date: planState.startDateTime ?? DateTime.now(),
+          dateLabel: units.formatMonthDay(
+            planState.startDateTime ?? DateTime.now(),
+          ),
           fallbackLabel: l10n.plannerCanvas_name_defaultFallback,
         ),
         title: l10n.plannerCanvas_name_dialogTitle,

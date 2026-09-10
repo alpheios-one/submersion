@@ -6,6 +6,8 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/core/deco/ascent_rate_calculator.dart';
+import 'package:submersion/core/deco/entities/o2_exposure.dart';
+import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/data/services/profile_surface_lead_in.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_colors.dart';
@@ -17,6 +19,7 @@ import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_legend_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_cell_readout.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_metric_colors.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_timeline_strip.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
@@ -74,6 +77,65 @@ class _AllMetricsSettingsNotifier extends StateNotifier<AppSettings>
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+/// Minimal [ProfileAnalysis] for a [ChartSourceOverlay.analysis] in tests:
+/// only the fields relevant to the overlay renderers under test are
+/// non-empty; everything else is a valid-but-empty placeholder so
+/// ProfileAnalysis's many required fields don't need repeating per test.
+ProfileAnalysis _minimalOverlayAnalysis({
+  required int length,
+  List<double>? ceilingCurve,
+  List<double>? decoStopCurve,
+  List<int>? ndlCurve,
+  List<int>? ttsCurve,
+  List<double>? ppO2Curve,
+  List<double>? ppN2Curve,
+  List<double>? ppHeCurve,
+  List<double>? modCurve,
+  List<double>? densityCurve,
+  List<double>? gfCurve,
+  List<double>? surfaceGfCurve,
+  List<double>? meanDepthCurve,
+  List<int?>? gtrCurve,
+  List<double>? cnsCurve,
+  List<double>? otuCurve,
+}) {
+  return ProfileAnalysis(
+    ascentRates: const [],
+    ascentRateStats: const AscentRateStats(
+      maxAscentRate: 0,
+      maxDescentRate: 0,
+      averageAscentRate: 0,
+      averageDescentRate: 0,
+      violationCount: 0,
+      criticalViolationCount: 0,
+      timeInViolation: 0,
+    ),
+    ascentRateViolations: const [],
+    events: const [],
+    ceilingCurve: ceilingCurve ?? const [],
+    ndlCurve: ndlCurve ?? const [],
+    decoStatuses: const [],
+    o2Exposure: const O2Exposure(otu: 0),
+    ppO2Curve: ppO2Curve ?? const [],
+    ppN2Curve: ppN2Curve,
+    ppHeCurve: ppHeCurve,
+    modCurve: modCurve,
+    densityCurve: densityCurve,
+    gfCurve: gfCurve,
+    surfaceGfCurve: surfaceGfCurve,
+    meanDepthCurve: meanDepthCurve,
+    gtrCurve: gtrCurve,
+    cnsCurve: cnsCurve,
+    otuCurve: otuCurve,
+    decoStopCurve: decoStopCurve ?? const [],
+    ttsCurve: ttsCurve,
+    maxDepth: 0,
+    averageDepth: 0,
+    maxDepthTimestamp: 0,
+    durationSeconds: length * 30,
+  );
 }
 
 List<DiveProfilePoint> _makeProfile({int points = 10}) {
@@ -295,8 +357,8 @@ void main() {
     ) async {
       const tank = DiveTank(id: 't1', gasMix: GasMix(o2: 21), order: 0);
       const points = [
-        TankPressurePoint(id: 'e0', tankId: 't1', timestamp: 0, pressure: 200),
-        TankPressurePoint(id: 'e1', tankId: 't1', timestamp: 270, pressure: 60),
+        TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+        TankPressurePoint(tankId: 't1', timestamp: 270, pressure: 60),
       ];
 
       await tester.pumpWidget(
@@ -340,12 +402,7 @@ void main() {
         final profile = _makeProfile(points: 40);
         final flatPressures = <TankPressurePoint>[
           for (var i = 0; i < 40; i++)
-            TankPressurePoint(
-              id: 'p$i',
-              tankId: 't1',
-              timestamp: i * 30,
-              pressure: 0.0,
-            ),
+            TankPressurePoint(tankId: 't1', timestamp: i * 30, pressure: 0.0),
         ];
 
         await tester.pumpWidget(
@@ -386,8 +443,8 @@ void main() {
       const tank = DiveTank(id: 't1', gasMix: GasMix(o2: 21), order: 0);
       // A straight two-point estimate spanning the whole profile (0..570s).
       const points = [
-        TankPressurePoint(id: 'e0', tankId: 't1', timestamp: 0, pressure: 200),
-        TankPressurePoint(id: 'e1', tankId: 't1', timestamp: 570, pressure: 60),
+        TankPressurePoint(tankId: 't1', timestamp: 0, pressure: 200),
+        TankPressurePoint(tankId: 't1', timestamp: 570, pressure: 60),
       ];
       List<TooltipRow>? rows;
 
@@ -506,7 +563,7 @@ void main() {
           .lineBarsData;
       expect(bars.length, withoutOverlay + 1);
       final overlayBar = bars.last;
-      expect(overlayBar.color, Colors.purple);
+      expect(overlayBar.color, overlayTint(ProfileMetricColors.depth, 0));
       expect(overlayBar.dashArray, [6, 4]);
       expect(overlayBar.spots.length, 6);
       // Depth bar 0 is still the active source.
@@ -792,7 +849,7 @@ void main() {
 
         // Overlay depth bar is appended last and DOES get one.
         final overlayBar = bars.last;
-        expect(overlayBar.color, Colors.purple);
+        expect(overlayBar.color, overlayTint(ProfileMetricColors.depth, 0));
         expect(overlayBar.spots.first, const FlSpot(0, 0));
         expect(overlayBar.spots.length, other.length + 1);
         expect(overlayBar.spots[1].x, 10);
@@ -815,32 +872,12 @@ void main() {
         ];
         const pressures = {
           'back': [
-            TankPressurePoint(
-              id: 'b0',
-              tankId: 'back',
-              timestamp: 10,
-              pressure: 200,
-            ),
-            TankPressurePoint(
-              id: 'b1',
-              tankId: 'back',
-              timestamp: 100,
-              pressure: 80,
-            ),
+            TankPressurePoint(tankId: 'back', timestamp: 10, pressure: 200),
+            TankPressurePoint(tankId: 'back', timestamp: 100, pressure: 80),
           ],
           'deco': [
-            TankPressurePoint(
-              id: 'd0',
-              tankId: 'deco',
-              timestamp: 60,
-              pressure: 200,
-            ),
-            TankPressurePoint(
-              id: 'd1',
-              tankId: 'deco',
-              timestamp: 100,
-              pressure: 150,
-            ),
+            TankPressurePoint(tankId: 'deco', timestamp: 60, pressure: 200),
+            TankPressurePoint(tankId: 'deco', timestamp: 100, pressure: 150),
           ],
         };
 
@@ -975,7 +1012,6 @@ void main() {
         'tank-1': List.generate(
           10,
           (i) => TankPressurePoint(
-            id: 'tp-1-$i',
             tankId: 'tank-1',
             timestamp: i * 30,
             pressure: 200.0 - i * 5,
@@ -984,7 +1020,6 @@ void main() {
         'tank-2': List.generate(
           10,
           (i) => TankPressurePoint(
-            id: 'tp-2-$i',
             tankId: 'tank-2',
             timestamp: i * 30,
             pressure: 180.0 - i * 4,
@@ -1014,7 +1049,6 @@ void main() {
         'tank-1': List.generate(
           5,
           (i) => TankPressurePoint(
-            id: 'tp-$i',
             tankId: 'tank-1',
             timestamp: i * 30,
             pressure: 200.0 - i * 10,
@@ -1843,6 +1877,60 @@ void main() {
       expect(find.byType(DiveProfileChart), findsOneWidget);
     });
 
+    testWidgets('hides a gas-switch marker once its cylinder is toggled off', (
+      tester,
+    ) async {
+      final profile = makeRichProfile();
+      GasSwitchWithTank switchTo(String tankId, int timestamp, double o2) =>
+          GasSwitchWithTank(
+            gasSwitch: GasSwitch(
+              id: 'gs-$tankId',
+              diveId: 'dive-1',
+              timestamp: timestamp,
+              tankId: tankId,
+              createdAt: DateTime(2026, 1, 1),
+            ),
+            tankName: tankId,
+            gasMix: 'EAN${(o2 * 100).round()}',
+            o2Fraction: o2,
+          );
+      final gasSwitches = [
+        switchTo('tank-1', 120, 0.32),
+        switchTo('tank-2', 240, 0.50),
+      ];
+
+      await tester.pumpWidget(
+        _buildChart(profile: profile, gasSwitches: gasSwitches),
+      );
+      await tester.pumpAndSettle();
+
+      // Gas-switch markers are the only bars drawn as a single transparent,
+      // zero-width spot carrying a dot painter.
+      int markerCount() => tester
+          .widget<LineChart>(find.byType(LineChart).first)
+          .data
+          .lineBarsData
+          .where(
+            (b) =>
+                b.color == Colors.transparent &&
+                b.barWidth == 0 &&
+                b.spots.length == 1 &&
+                b.dotData.show,
+          )
+          .length;
+      expect(markerCount(), 2);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileChart)),
+      );
+      container
+          .read(profileLegendProvider.notifier)
+          .toggleTankPressure('tank-1');
+      await tester.pumpAndSettle();
+
+      expect(markerCount(), 1);
+    });
+
     testWidgets('renders with playback timestamp cursor', (tester) async {
       final profile = makeRichProfile();
 
@@ -1886,7 +1974,6 @@ void main() {
         'tank-1': List.generate(
           10,
           (i) => TankPressurePoint(
-            id: 'tp-$i',
             tankId: 'tank-1',
             timestamp: i * 30,
             pressure: 200.0 - i * 8,
@@ -2036,7 +2123,6 @@ void main() {
               'tank-1': List.generate(
                 10,
                 (i) => TankPressurePoint(
-                  id: 'tp-$i',
                   tankId: 'tank-1',
                   timestamp: i * 30,
                   pressure: 200.0 - i * 8,
@@ -2644,7 +2730,6 @@ void main() {
               'tank-1': List.generate(
                 20,
                 (i) => TankPressurePoint(
-                  id: 'tp-$i',
                   tankId: 'tank-1',
                   timestamp: i * 30,
                   pressure: 200.0 - i * 5,
@@ -2727,7 +2812,6 @@ void main() {
               'tank-a': List.generate(
                 20,
                 (i) => TankPressurePoint(
-                  id: 'tpa-$i',
                   tankId: 'tank-a',
                   timestamp: i * 30,
                   pressure: 200.0 - i * 2,
@@ -2736,7 +2820,6 @@ void main() {
               'tank-b': List.generate(
                 20,
                 (i) => TankPressurePoint(
-                  id: 'tpb-$i',
                   tankId: 'tank-b',
                   timestamp: i * 30,
                   pressure: 210.0 - i * 3,
@@ -2799,7 +2882,6 @@ void main() {
             'tank-a': List.generate(
               20,
               (i) => TankPressurePoint(
-                id: 'tpa-$i',
                 tankId: 'tank-a',
                 timestamp: i * 30,
                 pressure: 200.0 - i * 2,
@@ -3237,7 +3319,6 @@ void main() {
               'tank-1': List.generate(
                 20,
                 (i) => TankPressurePoint(
-                  id: 'tp-$i',
                   tankId: 'tank-1',
                   timestamp: i * 30,
                   pressure: 200.0 - i * 5,
@@ -3671,7 +3752,7 @@ void main() {
 
       List<LineChartBarData> ceilingBars() => chartData(
         tester,
-      ).lineBarsData.where((b) => b.color == const Color(0xFFD32F2F)).toList();
+      ).lineBarsData.where((b) => b.color == const Color(0xFF7B1FA2)).toList();
 
       expect(ceilingBars(), isNotEmpty, reason: 'ceiling line renders');
       expect(ceilingBars().first.spots.every((s) => s.y == -6.0), isTrue);
@@ -4164,6 +4245,29 @@ void main() {
         );
       },
     );
+
+    testWidgets('touched spot indicator ignores a stale out-of-range index', (
+      tester,
+    ) async {
+      // Regression: consolidating two dives can shorten the profile mid
+      // touch, leaving spotIndexes from a previous frame's (longer) bar
+      // data. fl_chart's own defaultTouchedIndicators indexes
+      // barData.spots directly and throws a RangeError on a stale index;
+      // getTouchedSpotIndicator must drop it instead of forwarding it.
+      final profile = _makeProfile(points: 12);
+      await tester.pumpWidget(
+        buildWithLegend(profile: profile, ascentRates: const []),
+      );
+      await tester.pumpAndSettle();
+
+      final data = primaryChartData(tester);
+      final bar = data.lineBarsData.first;
+      final indicator = data.lineTouchData.getTouchedSpotIndicator;
+
+      expect(() => indicator(bar, [bar.spots.length + 685]), returnsNormally);
+      expect(indicator(bar, [bar.spots.length + 685]).single, isNull);
+      expect(indicator(bar, const [-1]).single, isNull);
+    });
 
     testWidgets('tooltip builds when hovering a non-first velocity segment', (
       tester,
@@ -4658,9 +4762,10 @@ void main() {
       'a dense source overlay decimates its depth, temperature, ceiling and '
       'NDL series to the point budget',
       (tester) async {
-        // Exercises _decimatedOverlayIndices' over-budget branch and all four
-        // overlay series builders (depth / temp / ceiling / NDL), whose
-        // envelope closures only execute when the overlay exceeds the budget.
+        // Exercises _decimatedOverlayIndices'/_decimatedOverlayCurveIndices'
+        // over-budget branch and all four overlay series builders (depth /
+        // temp / ceiling / NDL), whose envelope closures only execute when
+        // the overlay exceeds the budget.
         const n = 5000;
         final overlayPoints = List<DiveProfilePoint>.generate(
           n,
@@ -4668,8 +4773,6 @@ void main() {
             timestamp: i * 10,
             depth: 10.0 + (i % 11) * 1.0,
             temperature: 20.0 + (i % 5) * 0.5,
-            ceiling: 1.0 + (i % 7) * 0.5,
-            ndl: (i % 9) * 60,
           ),
         );
         // Active source small; its temperature seeds the shared temp scale.
@@ -4680,6 +4783,11 @@ void main() {
             depth: i * 2.0,
             temperature: 21.0,
           ),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: n,
+          ceilingCurve: List.generate(n, (i) => 1.0 + (i % 7) * 0.5),
+          ndlCurve: List.generate(n, (i) => (i % 9) * 60),
         );
 
         await tester.pumpWidget(
@@ -4693,6 +4801,7 @@ void main() {
                 color: Colors.orange,
                 computerId: 'comp-b',
                 points: overlayPoints,
+                analysis: overlayAnalysis,
               ),
             ],
           ),
@@ -4729,6 +4838,470 @@ void main() {
       },
     );
 
+    testWidgets(
+      'an overlay with a computed TTS curve draws its own TTS line, not the '
+      'raw device field',
+      (tester) async {
+        // The raw per-point `tts` field is deliberately left null here: the
+        // overlay must read overlay.analysis.ttsCurve (already resolved
+        // computer-vs-calculated the same way the active line is), not the
+        // raw device field, so a jagged raw TTS reading a computer logs does
+        // not draw a jagged overlay line while the active line shows the
+        // smoothed calculated value.
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          20,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 20.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 20,
+          ttsCurve: List.generate(20, (i) => (20 - i) * 60),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(DiveProfileChart)),
+        );
+        container.read(profileLegendProvider.notifier).toggleTts();
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any((b) => b.color == overlayTint(ProfileMetricColors.tts, 0)),
+          isTrue,
+          reason: 'overlay TTS line renders as a tint of the TTS colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay with a computed deco-stop curve draws its own band',
+      (tester) async {
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          ceilingCurve: List.filled(10, 3.0),
+          decoStopCurve: List.filled(10, 6.0),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any(
+            (b) =>
+                b.aboveBarData.show &&
+                b.aboveBarData.color ==
+                    overlayTint(
+                      ProfileMetricColors.decoStops,
+                      0,
+                    ).withValues(alpha: 0.18),
+          ),
+          isTrue,
+          reason:
+              'overlay deco-stop band fills in a tint of the deco-stop colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay with a computed ceiling curve draws its own ceiling line, '
+      'not the raw device field',
+      (tester) async {
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          ceilingCurve: List.filled(10, 4.0),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any(
+            (b) => b.color == overlayTint(ProfileMetricColors.ceiling, 0),
+          ),
+          isTrue,
+          reason:
+              'overlay ceiling line renders as a tint of the ceiling colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay with a computed ppO2 curve draws its own ppO2 line, not '
+      'the active source\'s curve, and draws nothing when the overlay has '
+      'no analysis or an empty curve',
+      (tester) async {
+        // Representative of the band-normalized, clamped-with-surface-lead-in
+        // family (ppN2/ppHe/density share this shape).
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          ppO2Curve: List.filled(10, 1.2),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(DiveProfileChart)),
+        );
+        container.read(profileLegendProvider.notifier).togglePpO2();
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any((b) => b.color == overlayTint(ProfileMetricColors.ppO2, 0)),
+          isTrue,
+          reason: 'overlay ppO2 line renders as a tint of the ppO2 colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay draws no ppO2 line when its analysis is null or its ppO2 '
+      'curve is empty',
+      (tester) async {
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+
+        for (final analysis in [
+          null,
+          _minimalOverlayAnalysis(length: 10, ppO2Curve: const []),
+        ]) {
+          await tester.pumpWidget(
+            _buildChart(
+              profile: active,
+              overlays: [
+                ChartSourceOverlay(
+                  sourceId: 'src-b',
+                  name: 'Overlay',
+                  color: Colors.teal,
+                  computerId: 'comp-b',
+                  points: overlayPoints,
+                  analysis: analysis,
+                ),
+              ],
+            ),
+          );
+          await tester.pumpAndSettle();
+
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(DiveProfileChart)),
+          );
+          container.read(profileLegendProvider.notifier).togglePpO2();
+          await tester.pumpAndSettle();
+
+          final bars = tester
+              .widget<LineChart>(find.byType(LineChart).first)
+              .data
+              .lineBarsData;
+
+          expect(
+            bars.any(
+              (b) => b.color == overlayTint(ProfileMetricColors.ppO2, 0),
+            ),
+            isFalse,
+            reason:
+                'no overlay ppO2 line when analysis is $analysis '
+                '(null or empty curve)',
+          );
+
+          // Reset the toggle for the next iteration.
+          container.read(profileLegendProvider.notifier).togglePpO2();
+          await tester.pumpAndSettle();
+        }
+      },
+    );
+
+    testWidgets(
+      'an overlay with a computed MOD curve draws its own MOD line in the '
+      'active profile\'s depth unit, not the active source\'s curve',
+      (tester) async {
+        // Representative of the unit-converted (units.convertDepth), flat
+        // surface lead-in family (mean depth shares this shape).
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          modCurve: List.filled(10, 45.0),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(DiveProfileChart)),
+        );
+        container.read(profileLegendProvider.notifier).toggleMod();
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any((b) => b.color == overlayTint(ProfileMetricColors.mod, 0)),
+          isTrue,
+          reason: 'overlay MOD line renders as a tint of the MOD colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay with a computed GF% curve draws its own GF% line, not the '
+      "active source's curve",
+      (tester) async {
+        // Representative of the percent-band family (surface GF%, CNS%, OTU
+        // share this shape).
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          gfCurve: List.generate(10, (i) => 20.0 + i * 5),
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(DiveProfileChart)),
+        );
+        container.read(profileLegendProvider.notifier).toggleGf();
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        expect(
+          bars.any((b) => b.color == overlayTint(ProfileMetricColors.gf, 0)),
+          isTrue,
+          reason: 'overlay GF% line renders as a tint of the GF colour',
+        );
+      },
+    );
+
+    testWidgets(
+      'an overlay with a nullable GTR curve draws its own GTR line with a '
+      'break where the value is blanked, not the active source\'s curve',
+      (tester) async {
+        final overlayPoints = List<DiveProfilePoint>.generate(
+          10,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: 25.0),
+        );
+        final active = List<DiveProfilePoint>.generate(
+          8,
+          (i) => DiveProfilePoint(timestamp: i * 30, depth: i * 2.0),
+        );
+        // A blank in the middle of the curve must break the line rather than
+        // bridge across it or read as zero.
+        final gtrCurve = <int?>[
+          600,
+          580,
+          560,
+          null,
+          null,
+          500,
+          480,
+          460,
+          440,
+          420,
+        ];
+        final overlayAnalysis = _minimalOverlayAnalysis(
+          length: 10,
+          gtrCurve: gtrCurve,
+        );
+
+        await tester.pumpWidget(
+          _buildChart(
+            profile: active,
+            overlays: [
+              ChartSourceOverlay(
+                sourceId: 'src-b',
+                name: 'Overlay',
+                color: Colors.purple,
+                computerId: 'comp-b',
+                points: overlayPoints,
+                analysis: overlayAnalysis,
+              ),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(DiveProfileChart)),
+        );
+        container.read(profileLegendProvider.notifier).toggleGtr();
+        await tester.pumpAndSettle();
+
+        final bars = tester
+            .widget<LineChart>(find.byType(LineChart).first)
+            .data
+            .lineBarsData;
+
+        final gtrBar = bars.firstWhere(
+          (b) => b.color == overlayTint(ProfileMetricColors.gtr, 0),
+          orElse: () => throw StateError('overlay GTR line not found'),
+        );
+        expect(
+          gtrBar.spots.any((s) => s == FlSpot.nullSpot),
+          isTrue,
+          reason: 'the blank pair in the middle of the curve breaks the line',
+        );
+      },
+    );
+
     testWidgets('enabling MOD builds the decimated MOD line for a dense '
         'profile', (tester) async {
       // The MOD line is gated on the legend showMod toggle (default off), so
@@ -4754,7 +5327,7 @@ void main() {
           .lineBarsData
           .where(
             (b) =>
-                b.color == Colors.deepOrange &&
+                b.color == const Color(0xFFFFB300) &&
                 b.dashArray != null &&
                 b.dashArray!.length == 2 &&
                 b.dashArray!.first == 8 &&

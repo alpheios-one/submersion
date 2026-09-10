@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/constants/dive_detail_layout.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -17,11 +18,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/gas_model.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
+import 'package:submersion/core/presentation/startup_theme.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
@@ -136,6 +139,10 @@ class AppSettings {
   /// calculators (issue #828).
   final GasModel gasModel;
 
+  /// Default water type for a new dive plan. Salt unless the diver picks
+  /// fresh or a custom salinity in Settings > Units.
+  final PlannerWaterType defaultPlannerWaterType;
+
   /// ISO 4217 code used as the default currency for new priced items
   /// (e.g. equipment purchase price).
   final String defaultCurrency;
@@ -231,6 +238,11 @@ class AppSettings {
   /// Flying-after-diving conservatism preset
   final NoFlyPreset noFlyPreset;
 
+  /// Exposure thresholds for service clocks (v202), stored metric.
+  final double coldWaterThresholdC;
+  final double deepDiveThresholdM;
+  final double highO2ThresholdPercent;
+
   /// Bundled chamber ids hidden from the emergency card
   final Set<String> hiddenChamberIds;
 
@@ -278,6 +290,15 @@ class AppSettings {
   /// Default data source for CNS metric (computer or calculated)
   final MetricDataSource defaultCnsSource;
 
+  /// Default data source for GTR (gas time remaining): the computer's own
+  /// reading or the app's calculation.
+  final MetricDataSource defaultGtrSource;
+
+  /// Tank pressure (bar) the calculated GTR counts down to, i.e. what the
+  /// diver wants left on surfacing. Mirrors the reserve setting on an
+  /// air-integrated computer.
+  final double gtrReservePressure;
+
   /// Algorithm used for calculated CNS%; see
   /// docs/plans/2026-07-16-cns-calculation-method-setting-design.md
   final CnsCalculationMethod cnsCalculationMethod;
@@ -288,6 +309,10 @@ class AppSettings {
 
   /// Which layout to use for the dive list
   final ListViewMode diveListViewMode;
+
+  /// Fold consecutive same-trip dives under a trip header in the dive list
+  /// (issue #1193). Applies to the card view modes only; the table ignores it.
+  final bool groupTripsInDiveList;
 
   /// Which layout to use for the site list
   final ListViewMode siteListViewMode;
@@ -389,6 +414,9 @@ class AppSettings {
   /// Default visibility for TTS on dive profile
   final bool defaultShowTts;
 
+  /// Default visibility for GTR on dive profile
+  final bool defaultShowGtr;
+
   /// Default visibility for CNS% on dive profile
   final bool defaultShowCns;
 
@@ -444,6 +472,9 @@ class AppSettings {
   /// Ordered list of dive detail section visibility preferences
   final List<DiveDetailSectionConfig> diveDetailSections;
 
+  /// How the dive detail page arranges the sections it shows.
+  final DiveDetailLayout diveDetailLayout;
+
   /// Home dashboard gauge-strip chip types the user has hidden.
   /// Ids are [HomeChipType.name] values; empty means all chips shown.
   /// Device-local, not per-diver.
@@ -490,6 +521,7 @@ class AppSettings {
     this.altitudeUnit = AltitudeUnit.meters,
     this.gasConsumptionDisplay = GasConsumptionDisplay.both,
     this.gasModel = GasModel.real,
+    this.defaultPlannerWaterType = PlannerWaterType.salt,
     this.defaultCurrency = 'USD',
     this.visibilityScalePreset = VisibilityScalePreset.tropical,
     this.visibilityScaleExcellentM,
@@ -523,6 +555,9 @@ class AppSettings {
     this.safetyReviewEnabled = true,
     this.safetyReviewDisabledRules = const {},
     this.noFlyPreset = NoFlyPreset.standard,
+    this.coldWaterThresholdC = 10.0,
+    this.deepDiveThresholdM = 30.0,
+    this.highO2ThresholdPercent = 40.0,
     this.hiddenChamberIds = const {},
     this.emergencyRegion,
     this.showAscentRateColors = false,
@@ -538,10 +573,14 @@ class AppSettings {
     this.defaultDecoStopSource = MetricDataSource.calculated,
     this.defaultTtsSource = MetricDataSource.calculated,
     this.defaultCnsSource = MetricDataSource.calculated,
+    this.defaultGtrSource = MetricDataSource.calculated,
+    // Same default as the planner's reserve and defaultGtrReserveBar.
+    this.gtrReservePressure = 50.0,
     this.cnsCalculationMethod = CnsCalculationMethod.shearwater,
     // Appearance defaults
     this.cardColorAttribute = CardColorAttribute.none,
     this.diveListViewMode = ListViewMode.detailed,
+    this.groupTripsInDiveList = false,
     this.siteListViewMode = ListViewMode.detailed,
     this.tripListViewMode = ListViewMode.detailed,
     this.equipmentListViewMode = ListViewMode.detailed,
@@ -575,6 +614,7 @@ class AppSettings {
     this.defaultShowSurfaceGf = false,
     this.defaultShowMeanDepth = false,
     this.defaultShowTts = false,
+    this.defaultShowGtr = false,
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
@@ -599,6 +639,7 @@ class AppSettings {
     this.showDetailsPaneCertifications = false,
     this.showDetailsPaneCourses = false,
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
+    this.diveDetailLayout = DiveDetailLayout.detailed,
     this.hiddenHomeChips = const <String>{},
     this.homeCardOrder = const <String>[],
     this.hiddenHomeCards = const <String>{},
@@ -653,6 +694,7 @@ class AppSettings {
     AltitudeUnit? altitudeUnit,
     GasConsumptionDisplay? gasConsumptionDisplay,
     GasModel? gasModel,
+    PlannerWaterType? defaultPlannerWaterType,
     String? defaultCurrency,
     VisibilityScalePreset? visibilityScalePreset,
     double? visibilityScaleExcellentM,
@@ -686,6 +728,9 @@ class AppSettings {
     bool? safetyReviewEnabled,
     Set<String>? safetyReviewDisabledRules,
     NoFlyPreset? noFlyPreset,
+    double? coldWaterThresholdC,
+    double? deepDiveThresholdM,
+    double? highO2ThresholdPercent,
     Set<String>? hiddenChamberIds,
     String? emergencyRegion,
     bool clearEmergencyRegion = false,
@@ -702,9 +747,12 @@ class AppSettings {
     MetricDataSource? defaultDecoStopSource,
     MetricDataSource? defaultTtsSource,
     MetricDataSource? defaultCnsSource,
+    MetricDataSource? defaultGtrSource,
+    double? gtrReservePressure,
     CnsCalculationMethod? cnsCalculationMethod,
     CardColorAttribute? cardColorAttribute,
     ListViewMode? diveListViewMode,
+    bool? groupTripsInDiveList,
     ListViewMode? siteListViewMode,
     ListViewMode? tripListViewMode,
     ListViewMode? equipmentListViewMode,
@@ -738,6 +786,7 @@ class AppSettings {
     bool? defaultShowSurfaceGf,
     bool? defaultShowMeanDepth,
     bool? defaultShowTts,
+    bool? defaultShowGtr,
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
@@ -762,6 +811,7 @@ class AppSettings {
     bool? showDetailsPaneCourses,
     List<DiveDetailSectionConfig>? diveDetailSections,
     bool clearDiveDetailSections = false,
+    DiveDetailLayout? diveDetailLayout,
     Set<String>? hiddenHomeChips,
     List<String>? homeCardOrder,
     Set<String>? hiddenHomeCards,
@@ -783,6 +833,8 @@ class AppSettings {
       gasConsumptionDisplay:
           gasConsumptionDisplay ?? this.gasConsumptionDisplay,
       gasModel: gasModel ?? this.gasModel,
+      defaultPlannerWaterType:
+          defaultPlannerWaterType ?? this.defaultPlannerWaterType,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       visibilityScalePreset:
           visibilityScalePreset ?? this.visibilityScalePreset,
@@ -823,6 +875,10 @@ class AppSettings {
       safetyReviewDisabledRules:
           safetyReviewDisabledRules ?? this.safetyReviewDisabledRules,
       noFlyPreset: noFlyPreset ?? this.noFlyPreset,
+      coldWaterThresholdC: coldWaterThresholdC ?? this.coldWaterThresholdC,
+      deepDiveThresholdM: deepDiveThresholdM ?? this.deepDiveThresholdM,
+      highO2ThresholdPercent:
+          highO2ThresholdPercent ?? this.highO2ThresholdPercent,
       hiddenChamberIds: hiddenChamberIds ?? this.hiddenChamberIds,
       emergencyRegion: clearEmergencyRegion
           ? null
@@ -841,9 +897,12 @@ class AppSettings {
           defaultDecoStopSource ?? this.defaultDecoStopSource,
       defaultTtsSource: defaultTtsSource ?? this.defaultTtsSource,
       defaultCnsSource: defaultCnsSource ?? this.defaultCnsSource,
+      defaultGtrSource: defaultGtrSource ?? this.defaultGtrSource,
+      gtrReservePressure: gtrReservePressure ?? this.gtrReservePressure,
       cnsCalculationMethod: cnsCalculationMethod ?? this.cnsCalculationMethod,
       cardColorAttribute: cardColorAttribute ?? this.cardColorAttribute,
       diveListViewMode: diveListViewMode ?? this.diveListViewMode,
+      groupTripsInDiveList: groupTripsInDiveList ?? this.groupTripsInDiveList,
       siteListViewMode: siteListViewMode ?? this.siteListViewMode,
       tripListViewMode: tripListViewMode ?? this.tripListViewMode,
       equipmentListViewMode:
@@ -889,6 +948,7 @@ class AppSettings {
       defaultShowSurfaceGf: defaultShowSurfaceGf ?? this.defaultShowSurfaceGf,
       defaultShowMeanDepth: defaultShowMeanDepth ?? this.defaultShowMeanDepth,
       defaultShowTts: defaultShowTts ?? this.defaultShowTts,
+      defaultShowGtr: defaultShowGtr ?? this.defaultShowGtr,
       defaultShowCns: defaultShowCns ?? this.defaultShowCns,
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
@@ -926,6 +986,7 @@ class AppSettings {
       diveDetailSections: clearDiveDetailSections
           ? DiveDetailSectionConfig.defaultSections
           : (diveDetailSections ?? this.diveDetailSections),
+      diveDetailLayout: diveDetailLayout ?? this.diveDetailLayout,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
       homeCardOrder: homeCardOrder ?? this.homeCardOrder,
       hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
@@ -1134,7 +1195,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           perdixOverlayY: perdixOverlayY,
           seascapeAppearance: seascapeAppearance,
         );
-        await _writeCachedThemeMode(prefs);
+        await _writeCachedTheme(prefs);
         return;
       }
 
@@ -1175,7 +1236,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         await prefs.remove(SettingsKeys.seascapeAppearance);
       }
 
-      await _writeCachedThemeMode(prefs);
+      await _writeCachedTheme(prefs);
 
       // Schedule notifications with the loaded settings
       _scheduleNotificationsIfNeeded();
@@ -1250,7 +1311,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     if (perdixY != null) {
       await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
     }
-    await _writeCachedThemeMode(prefs);
+    await _writeCachedTheme(prefs);
 
     final diverId = _validatedDiverId;
     if (diverId == null) {
@@ -1266,14 +1327,22 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _repository.updateSettingsForDiver(diverId, state);
   }
 
-  /// Mirrors the effective theme mode into SharedPreferences so the startup
-  /// splash and setup wizard (which render before the database opens) can
-  /// resolve dark mode. See [resolveStartupBrightness].
-  Future<void> _writeCachedThemeMode(SharedPreferences prefs) async {
+  /// Mirrors the effective theme into SharedPreferences so the startup splash
+  /// and setup wizard (which render before the database opens) can resolve
+  /// both halves of it. See [resolveStartupBrightness] for the mode and
+  /// [resolveStartupThemePreset] for the preset.
+  Future<void> _writeCachedTheme(SharedPreferences prefs) async {
     await prefs.setString(
       cachedThemeModeKey,
       cachedThemeModeValue(state.themeMode),
     );
+    // Mirrored raw, not normalised through AppThemeRegistry. Normalising on
+    // write would be lossy in the one case that matters: a database written
+    // by a beta build can name a preset this build does not ship, and the
+    // splash renders before hydration, so a build that ships that preset
+    // again would meet a default already burned into the mirror. Reading is
+    // where an unknown id is resolved; see [resolveStartupThemePreset].
+    await prefs.setString(cachedThemePresetKey, state.themePresetId);
   }
 
   Future<void> setDepthUnit(DepthUnit unit) async {
@@ -1308,6 +1377,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setGasModel(GasModel model) async {
     state = state.copyWith(gasModel: model);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultPlannerWaterType(PlannerWaterType type) async {
+    state = state.copyWith(defaultPlannerWaterType: type);
     await _saveSettings();
   }
 
@@ -1443,15 +1517,55 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// Selectable range for the working ppO2, matching the settings picker.
+  static const double ppO2WorkingMin = 1.2;
+
+  /// Selectable range for the maximum (deco/contingency) ppO2, matching the
+  /// settings picker. Both ceilings share the same upper bound.
+  static const double ppO2MaxMin = 1.4;
+  static const double ppO2Ceiling = 1.6;
+
   Future<void> setPpO2MaxWorking(double value) async {
-    final clamped = value.clamp(1.0, 1.6);
-    state = state.copyWith(ppO2MaxWorking: clamped);
+    final clampedWorking = value.clamp(ppO2WorkingMin, ppO2Ceiling);
+    // Hold deco >= working, the same invariant [setPpO2Limits] keeps: a
+    // working ceiling raised past the current deco ceiling carries deco up
+    // with it, so the pair can never express "critical below warning".
+    final clampedDeco = state.ppO2MaxDeco < clampedWorking
+        ? clampedWorking
+        : state.ppO2MaxDeco;
+    state = state.copyWith(
+      ppO2MaxWorking: clampedWorking,
+      ppO2MaxDeco: clampedDeco,
+    );
     await _saveSettings();
   }
 
   Future<void> setPpO2MaxDeco(double value) async {
-    final clamped = value.clamp(1.2, 1.6);
-    state = state.copyWith(ppO2MaxDeco: clamped);
+    final clampedDeco = value.clamp(ppO2MaxMin, ppO2Ceiling);
+    // Hold working <= deco: a deco ceiling lowered below the current working
+    // ceiling pulls working down with it. clampedDeco is >= ppO2MaxMin (1.4),
+    // itself above ppO2WorkingMin (1.2), so working stays on the grid.
+    final clampedWorking = state.ppO2MaxWorking > clampedDeco
+        ? clampedDeco
+        : state.ppO2MaxWorking;
+    state = state.copyWith(
+      ppO2MaxWorking: clampedWorking,
+      ppO2MaxDeco: clampedDeco,
+    );
+    await _saveSettings();
+  }
+
+  /// Set both ppO2 ceilings at once, holding deco >= working, in a single
+  /// persisted write. Both are clamped to the picker's selectable range.
+  Future<void> setPpO2Limits(double working, double max) async {
+    final clampedWorking = working.clamp(ppO2WorkingMin, ppO2Ceiling);
+    final clampedMax = max
+        .clamp(ppO2MaxMin, ppO2Ceiling)
+        .clamp(clampedWorking, ppO2Ceiling);
+    state = state.copyWith(
+      ppO2MaxWorking: clampedWorking,
+      ppO2MaxDeco: clampedMax,
+    );
     await _saveSettings();
   }
 
@@ -1486,6 +1600,33 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   Future<void> setSafetyReviewEnabled(bool value) async {
     state = state.copyWith(safetyReviewEnabled: value);
     await _saveSettings();
+  }
+
+  Future<void> setColdWaterThresholdC(double value) =>
+      _commitThreshold(state.copyWith(coldWaterThresholdC: value));
+
+  /// A negative depth line would count every dive with a depth as deep.
+  Future<void> setDeepDiveThresholdM(double value) => _commitThreshold(
+    state.copyWith(deepDiveThresholdM: value < 0 ? 0.0 : value),
+  );
+
+  /// An O2 fraction outside 0 to 100 percent is not a mix that exists.
+  Future<void> setHighO2ThresholdPercent(double value) => _commitThreshold(
+    state.copyWith(highO2ThresholdPercent: value.clamp(0.0, 100.0).toDouble()),
+  );
+
+  /// Applies a threshold change and persists it, restoring the previous
+  /// state when the write fails so the editing page's error and retry match
+  /// what storage actually holds.
+  Future<void> _commitThreshold(AppSettings next) async {
+    final previous = state;
+    state = next;
+    try {
+      await _saveSettings();
+    } catch (_) {
+      state = previous;
+      rethrow;
+    }
   }
 
   /// Show or hide one home gauge-strip chip type (id = HomeChipType.name).
@@ -1630,6 +1771,16 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultGtrSource(MetricDataSource value) async {
+    state = state.copyWith(defaultGtrSource: value);
+    await _saveSettings();
+  }
+
+  Future<void> setGtrReservePressure(double value) async {
+    state = state.copyWith(gtrReservePressure: value);
+    await _saveSettings();
+  }
+
   Future<void> setCnsCalculationMethod(CnsCalculationMethod value) async {
     state = state.copyWith(cnsCalculationMethod: value);
     await _saveSettings();
@@ -1644,6 +1795,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDiveListViewMode(ListViewMode mode) async {
     state = state.copyWith(diveListViewMode: mode);
+    await _saveSettings();
+  }
+
+  Future<void> setGroupTripsInDiveList(bool value) async {
+    state = state.copyWith(groupTripsInDiveList: value);
     await _saveSettings();
   }
 
@@ -1812,6 +1968,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultShowGtr(bool value) async {
+    state = state.copyWith(defaultShowGtr: value);
+    await _saveSettings();
+  }
+
   Future<void> setDefaultShowCns(bool value) async {
     state = state.copyWith(defaultShowCns: value);
     await _saveSettings();
@@ -1895,6 +2056,30 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> resetDiveDetailSections() async {
     state = state.copyWith(clearDiveDetailSections: true);
+    await _saveSettings();
+  }
+
+  Future<void> setDiveDetailLayout(DiveDetailLayout layout) async {
+    state = state.copyWith(diveDetailLayout: layout);
+    await _saveSettings();
+  }
+
+  /// Record whether [id] shows unfolded in the list layout.
+  ///
+  /// Fold state rides in the section list rather than a column of its own,
+  /// so this rewrites that list with the one entry changed.
+  Future<void> setDiveDetailSectionExpanded(
+    DiveDetailSectionId id,
+    bool expanded,
+  ) async {
+    final sections = state.diveDetailSections;
+    if (!sections.any((s) => s.id == id && s.expanded != expanded)) return;
+    state = state.copyWith(
+      diveDetailSections: [
+        for (final section in sections)
+          section.id == id ? section.copyWith(expanded: expanded) : section,
+      ],
+    );
     await _saveSettings();
   }
 
@@ -2270,6 +2455,10 @@ final defaultShowTtsProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.defaultShowTts));
 });
 
+final defaultShowGtrProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultShowGtr));
+});
+
 final defaultShowCnsProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.defaultShowCns));
 });
@@ -2302,6 +2491,16 @@ final tissueVizModeProvider = Provider<TissueVizMode>((ref) {
 final diveListViewModeProvider = StateProvider<ListViewMode>((ref) {
   final settings = ref.read(settingsProvider);
   return settings.diveListViewMode;
+});
+
+/// Runtime-scoped "group trips" toggle for the dive list (issue #1193).
+///
+/// Same contract as [diveListViewModeProvider] directly above, and for the
+/// same reason: seeded once with `ref.read` so a write to any other setting
+/// cannot stomp a session override.
+final diveListGroupTripsProvider = StateProvider<bool>((ref) {
+  final settings = ref.read(settingsProvider);
+  return settings.groupTripsInDiveList;
 });
 
 final siteListViewModeProvider = StateProvider<ListViewMode>((ref) {

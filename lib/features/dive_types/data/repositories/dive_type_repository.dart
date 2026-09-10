@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/database/dive_stats_scope.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
@@ -366,6 +367,7 @@ class DiveTypeRepository {
         FROM dive_types dt
         LEFT JOIN dive_dive_types ddt ON dt.id = ddt.dive_type_id
         LEFT JOIN dives d ON d.id = ddt.dive_id $diverJoinFilter
+                         ${DiveStatsScope.and(alias: 'd')}
         $whereClause
         GROUP BY dt.id
         ORDER BY dt.sort_order, dt.name
@@ -411,6 +413,9 @@ class DiveTypeRepository {
       final result = await _db
           .customSelect(
             '''
+        -- stats-scope-exempt: deletion guard. Must see EVERY referencing
+        -- dive, excluded ones included, or deleting this type would strand
+        -- a foreign key on a dive the diver still has.
         SELECT COUNT(*) as count FROM dive_dive_types WHERE dive_type_id = ?
       ''',
             variables: [Variable.withString(id)],

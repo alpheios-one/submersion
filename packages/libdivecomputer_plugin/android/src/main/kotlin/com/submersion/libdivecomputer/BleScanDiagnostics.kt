@@ -75,10 +75,25 @@ class BleScanDiagnostics {
          * logged as a nameless `(...)`, and -- because the dedupe key is
          * `address|name` -- would collide with the key used for devices that
          * advertised no name at all.
+         *
+         * The name is also cut at the first NUL and stripped of surrounding
+         * whitespace (issue #723). The Shearwater Perdix 3 pads its Complete
+         * Local Name with the C string terminator and Android's scan record
+         * parser keeps it. Every other platform hands the name to C as a
+         * real NUL-terminated string, so the terminator silently ends the
+         * name there; on Android it reached the native matcher as JNI's
+         * two-byte modified-UTF-8 encoding of U+0000, and the exact
+         * strcasecmp against "Perdix 3" failed. Padding of either kind can
+         * never be part of a descriptor product name, so dropping it cannot
+         * cost a match.
          */
         fun resolveName(scanRecordName: String?, deviceName: String?): String? =
-            scanRecordName?.takeIf { it.isNotEmpty() }
-                ?: deviceName?.takeIf { it.isNotEmpty() }
+            sanitizeName(scanRecordName) ?: sanitizeName(deviceName)
+
+        private fun sanitizeName(name: String?): String? =
+            name?.substringBefore(NUL)?.trim()?.takeIf { it.isNotEmpty() }
+
+        private val NUL = 0.toChar()
 
         // Mirrors android.bluetooth.le.ScanCallback. Duplicated rather than
         // referenced so this class stays free of Android imports.

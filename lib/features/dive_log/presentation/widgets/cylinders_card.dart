@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/constants/gas_consumption_display.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/async_value_extensions.dart';
+import 'package:submersion/core/utils/number_display.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/cylinder_sac.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/services/source_name_resolver.dart';
+import 'package:submersion/features/dive_log/domain/services/transmitter_serial.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_analysis_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/tank_series_reassign_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/transmitters/domain/entities/transmitter.dart';
+import 'package:submersion/features/transmitters/presentation/providers/transmitter_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -52,6 +58,13 @@ class CylindersCard extends ConsumerWidget {
     // a single-source dive never needs attribution.
     final showSourceBadges = dataSources.length >= 2;
     final computerNames = _computerDisplayNames(context, dataSources);
+    // Serials with a registry entry get a plain caption; the rest get an
+    // Assign chip (issue #1365). Read through `.value`, which keeps the
+    // previous list while a diver change reloads the provider; `valueOrNull`
+    // would drop to an empty registry and flash the chip for every tank.
+    final knownSerials = Transmitter.knownSerials(
+      ref.watch(transmittersProvider).value ?? const <Transmitter>[],
+    );
 
     return Card(
       child: Padding(
@@ -74,12 +87,42 @@ class CylindersCard extends ConsumerWidget {
                 sourceName: showSourceBadges && entry.value.computerId != null
                     ? computerNames[entry.value.computerId]
                     : null,
+                knownSerials: knownSerials,
               ),
             ),
+            if (_canReassign(dive, tankPressures))
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.swap_vert),
+                  label: Text(context.l10n.diveLog_tank_reassignSeries),
+                  onPressed: () => showTankSeriesReassignSheet(
+                    context,
+                    ref,
+                    dive: dive,
+                    tankPressures: tankPressures ?? const {},
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
+  }
+
+  /// Two or more of this dive's tanks carry a series from one computer
+  /// (issue #1314): only then is there anything to move.
+  static bool _canReassign(
+    Dive dive,
+    Map<String, List<TankPressurePoint>>? tankPressures,
+  ) {
+    if (tankPressures == null) return false;
+    final byComputer = <String?, int>{};
+    for (final tank in dive.tanks) {
+      if ((tankPressures[tank.id] ?? const []).isEmpty) continue;
+      byComputer[tank.computerId] = (byComputer[tank.computerId] ?? 0) + 1;
+    }
+    return byComputer.values.any((n) => n >= 2);
   }
 
   Widget _tankRow(
@@ -89,8 +132,11 @@ class CylindersCard extends ConsumerWidget {
     required CylinderSac? cylinderSac,
     required Map<String, List<TankPressurePoint>>? tankPressures,
     required String? sourceName,
+    required Set<String> knownSerials,
   }) {
     final theme = Theme.of(context);
+    final serial = normalizeTransmitterSerial(tank.transmitterSerial);
+    final serialKnown = serial != null && knownSerials.contains(serial);
 
     final pressures = _resolveTankPressures(
       tank: tank,
@@ -111,7 +157,7 @@ class CylindersCard extends ConsumerWidget {
               '${units.volumeSymbol}'
         : '';
     final used = pressureUsed != null && pressureUsed > 0
-        ? ' (${units.formatPressure(pressureUsed)}$volumeUsed used)'
+        ? ' ${context.l10n.diveLog_tank_gasUsed('${units.formatPressure(pressureUsed)}$volumeUsed')}'
         : '';
 
     // Preset display name, falling back to formatted volume.
@@ -131,7 +177,11 @@ class CylindersCard extends ConsumerWidget {
         ? tank.name!
         : context.l10n.diveLog_tank_title(index + 1);
 
-    final modDepth = units.formatDepth(tank.gasMix.mod(), decimals: 0);
+    final workingPpO2 = settings.ppO2MaxWorking;
+    final modDepth = units.formatDepth(
+      tank.gasMix.mod(ppO2: workingPpO2),
+      decimals: 0,
+    );
     final mndValue = tank.gasMix.mnd(
       endLimit: settings.endLimit,
       o2Narcotic: settings.o2Narcotic,
@@ -139,7 +189,11 @@ class CylindersCard extends ConsumerWidget {
     final mndDepth = mndValue.isFinite
         ? units.formatDepth(mndValue, decimals: 0)
         : '--';
-    final modMndText = context.l10n.diveLog_tank_modMndInfo(modDepth, mndDepth);
+    final modMndText = context.l10n.diveLog_tank_modMndInfo(
+      modDepth,
+      formatFixedForDisplay(workingPpO2, 1),
+      mndDepth,
+    );
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
@@ -164,8 +218,33 @@ class CylindersCard extends ConsumerWidget {
               color: theme.colorScheme.tertiary,
             ),
           ),
+          if (serial != null)
+            Row(
+              children: [
+                Text(
+                  context.l10n.transmitters_serial(serial),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                if (!serialKnown) ...[
+                  const SizedBox(width: 8),
+                  ActionChip(
+                    visualDensity: VisualDensity.compact,
+                    label: Text(context.l10n.diveLog_tank_assignTransmitter),
+                    onPressed: () => context.push(
+                      Uri(
+                        path: '/transmitters/new',
+                        queryParameters: {'serial': serial},
+                      ).toString(),
+                    ),
+                  ),
+                ],
+              ],
+            ),
         ],
       ),
+      isThreeLine: serial != null,
       trailing: _trailingBlock(context.l10n, theme, cylinderSac, sourceName),
     );
   }

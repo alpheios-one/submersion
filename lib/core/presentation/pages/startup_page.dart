@@ -6,12 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/app.dart' show resolveAppLocale;
 import 'package:submersion/app.dart';
+import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/services/storage/scratch_sweep.dart';
+import 'package:submersion/core/services/sync/changeset_log/local_only_tombstone_gc.dart';
+import 'package:submersion/core/services/sync/changeset_log/peer_cursor_store.dart';
+import 'package:submersion/core/services/sync/changeset_log/publish_state_store.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_engine_preflight.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
@@ -20,6 +26,7 @@ import 'package:submersion/core/presentation/pages/lock_escape_dialogs.dart';
 import 'package:submersion/core/presentation/pages/lock_screen_view.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/startup_failure.dart';
+import 'package:submersion/core/presentation/startup_theme.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
 import 'package:submersion/core/presentation/widgets/startup_failure_view.dart';
@@ -37,17 +44,23 @@ import 'package:submersion/core/services/security/database_security_sidecar.dart
 import 'package:submersion/core/services/security/locked_database_escape.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
+import 'package:submersion/core/theme/app_theme_registry.dart';
 import 'package:submersion/core/utils/app_version.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
+import 'package:submersion/features/backup/data/services/backup_schema_probe.dart';
 import 'package:submersion/features/backup/data/services/backup_target.dart';
+import 'package:submersion/features/backup/data/services/downgrade_restore_candidates.dart';
+import 'package:submersion/features/backup/data/services/pre_downgrade_backup_service.dart';
 import 'package:submersion/features/backup/data/services/pre_migration_backup_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
 import 'package:submersion/features/backup/domain/entities/backup_type.dart';
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
+import 'package:submersion/features/marine_life/data/services/builtin_species_seed_version_store.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/data/services/scanned_logs_migration.dart';
 import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
 import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
@@ -128,6 +141,21 @@ class StartupWrapper extends StatefulWidget {
   })?
   preMigrationBackupFactory;
 
+  /// Optional override for the pre-downgrade backup service factory (tests,
+  /// which must not copy real database files).
+  @visibleForTesting
+  final PreDowngradeBackupService Function({
+    required String livePath,
+    required BackupPreferences preferences,
+  })?
+  preDowngradeBackupFactory;
+
+  /// Optional override for the `PRAGMA user_version` probe run against a
+  /// candidate backup before it is offered (used in tests, whose fixture
+  /// "backups" are text files no SQLite build would open).
+  @visibleForTesting
+  final int? Function(String path)? downgradeCandidateProbeOverride;
+
   /// Optional override for the database engine preflight (used in tests to
   /// simulate a build whose native library does not resolve).
   @visibleForTesting
@@ -151,6 +179,8 @@ class StartupWrapper extends StatefulWidget {
     this.schemaVersionProbeOverride,
     this.closeAppOverride,
     this.preMigrationBackupFactory,
+    this.preDowngradeBackupFactory,
+    this.downgradeCandidateProbeOverride,
     this.enginePreflightOverride,
     this.restoreOverride,
   });
@@ -189,6 +219,13 @@ class _StartupWrapperState extends State<StartupWrapper>
   /// backups by hand. Backup *settings* are unreachable from the splash: it
   /// runs before the router and the database exist.
   String? _backupsDirectory;
+
+  /// The pre-upgrade safety copy offered on the schema-mismatch screen, or
+  /// null when the registry holds none this build could open. Separate from
+  /// [_recoveryBackup] because the two are chosen by opposite rules: the
+  /// terminal failure screen wants the NEWEST copy, while a mismatch needs
+  /// the newest copy that is still OLD enough to open here.
+  BackupRecord? _downgradeBackup;
 
   StartupRestoreStatus _restoreStatus = StartupRestoreStatus.idle;
   String? _restoreError;
@@ -337,6 +374,7 @@ class _StartupWrapperState extends State<StartupWrapper>
           _dbVersion = e.storedSchemaVersion;
           _appVersion = e.supportedSchemaVersion;
         });
+        await _loadDowngradeOption();
       }
     } on DatabaseLockedException {
       // The cached/typed key did not open the file (e.g. a keychain restored
@@ -665,6 +703,17 @@ class _StartupWrapperState extends State<StartupWrapper>
     await timeStartupStep('tileCache', () async {
       try {
         await TileCacheService.instance.initialize();
+        // Age-sweep the browse cache. Not awaited: it is an indexed delete
+        // that nothing downstream depends on, and blocking first frame on
+        // housekeeping is how a splash screen grows a 20-second hang. Scoped
+        // to the browse store, so a downloaded offline region is never swept.
+        unawaited(
+          TileCacheService.instance
+              .removeOldTiles(TileCacheService.browseTileMaxAge)
+              .catchError((Object e) {
+                debugPrint('Browse tile age sweep failed (will retry): $e');
+              }),
+        );
       } catch (e) {
         debugPrint('Warning: Tile cache initialization failed: $e');
       }
@@ -672,7 +721,11 @@ class _StartupWrapperState extends State<StartupWrapper>
 
     await timeStartupStep('speciesSeed', () async {
       final speciesRepository = SpeciesRepository();
-      await speciesRepository.seedBuiltInSpecies();
+      await speciesRepository.seedBuiltInSpecies(
+        versionStore: PrefsBuiltInSpeciesSeedVersionStore(
+          await SharedPreferences.getInstance(),
+        ),
+      );
     });
 
     // Unlinked-media sweep, every launch. Fire-and-forget: it must not delay
@@ -700,6 +753,71 @@ class _StartupWrapperState extends State<StartupWrapper>
         debugPrint(
           'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
         );
+      }
+    }());
+
+    // Scanned-page folder migration (issue #1645), every launch. The common
+    // case is one directory stat that finds nothing; on an install that
+    // still has `<documents>/scanned_logs/` it moves the pages under
+    // `Submersion` and relinks their rows. Fire-and-forget like the media
+    // sweep above, but with no try/catch: run() folds every failure into
+    // its report by contract, so the report is the only diagnostic.
+    unawaited(() async {
+      final report = await ScannedLogsMigration(
+        relocateRows: (from, to) =>
+            mediaRepository.relocateLocalFile(from: from, to: to),
+      ).run();
+      if (report.outcome != ScannedLogsMigrationOutcome.noLegacyData) {
+        debugPrint('Scanned logs migration: $report');
+      }
+    }());
+
+    // Tombstone GC for a library that never syncs, every launch. The cloud
+    // path runs GC at the tail of a successful sync, which a device with no
+    // provider never reaches, so its deletion log otherwise grows forever.
+    // Gated on there being no trace of a prior sync: a device that synced
+    // and then went local-only still owes its peers those tombstones. Same
+    // fire-and-forget shape as the media sweep above, for the same reasons.
+    unawaited(() async {
+      try {
+        final db = DatabaseService.instance.database;
+        await LocalOnlyTombstoneGc(
+          syncRepository: SyncRepository(database: db),
+          peerCursors: PeerCursorStore(db),
+          publishStates: PublishStateStore(db),
+        ).run();
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Local-only tombstone GC failed (will retry): $e\n$stackTrace',
+        );
+      }
+    }());
+
+    // Scratch-file sweep, at most once a day. Unlike the media sweep above,
+    // whose probe is one indexed SELECT, this walks the filesystem, so it
+    // carries a stamp rather than running unguarded on every launch. Same
+    // fire-and-forget shape: housekeeping must never delay first frame, and
+    // a failure is a whole launch away from its retry.
+    unawaited(() async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final stampMs = prefs.getInt(kScratchSweepStampKey);
+        final lastSweptAt = stampMs == null
+            ? null
+            : DateTime.fromMillisecondsSinceEpoch(stampMs);
+        final now = DateTime.now();
+        if (!shouldSweepScratch(lastSweptAt: lastSweptAt, now: now)) return;
+
+        await StorageScratchSweep(
+          temporaryDirectory: getTemporaryDirectory,
+          supportDirectory: getApplicationSupportDirectory,
+        ).run(now: now);
+
+        // Stamped after the pass, so a sweep that throws part way retries
+        // tomorrow rather than being recorded as done.
+        await prefs.setInt(kScratchSweepStampKey, now.millisecondsSinceEpoch);
+      } catch (e, stackTrace) {
+        debugPrint('Scratch sweep failed (will retry): $e\n$stackTrace');
       }
     }());
     // coverage:ignore-end
@@ -871,13 +989,171 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
   }
 
+  /// Finds a pre-upgrade safety copy the diver could go BACK to, for the
+  /// schema-mismatch screen.
+  ///
+  /// Everything this needs is already in memory when the mismatch is raised:
+  /// `main.dart` loads SharedPreferences before it opens the database, and
+  /// the backup registry lives there precisely so it survives a database swap
+  /// (issue #1589). No restore UI is reachable from here -- it lives behind
+  /// the database that will not open.
+  ///
+  /// The registry only records what a copy CLAIMED to hold. Opening it is
+  /// what proves the claim, so each candidate is probed before it is offered:
+  /// a button that fails the same way the database just did would leave the
+  /// diver exactly where this screen already left them.
+  ///
+  /// Best-effort and silent on failure, like [_loadRecoveryOptions]: a second
+  /// failure here must degrade to the plain mismatch screen rather than
+  /// replace one terminal state with another.
+  Future<void> _loadDowngradeOption() async {
+    try {
+      final history = BackupPreferences(widget.prefs).getHistory();
+      final candidates = downgradeRestoreCandidates(
+        history,
+        supportedSchemaVersion: _appVersion,
+      );
+
+      for (final record in candidates) {
+        // Non-null by construction: downgradeRestoreCandidates drops records
+        // without a plain local path.
+        final path = record.localPath!;
+        // Synchronous stat, matching _loadRecoveryOptions: the set is a
+        // handful of registry entries read once on an already-terminal
+        // screen, and the async form left the widget tests covering this
+        // screen pumping until their timeout.
+        if (!File(path).existsSync()) continue;
+        final stored = _probeCandidateSchema(path);
+        if (stored == null) continue;
+
+        // Two separate questions, and the offer needs both.
+        //
+        // Can this build open the file at all? The selector already applied
+        // this bound to what the registry CLAIMS; re-applying it to what the
+        // file actually holds is what makes the claim load-bearing.
+        if (stored > _appVersion) continue;
+
+        // Is it the copy the card is about to describe? The card names
+        // record.fromSchemaVersion and toSchemaVersion, so a file whose own
+        // user_version disagrees with the claim would have the screen promise
+        // to undo one upgrade and restore a database from another. For a
+        // pre-migration copy the two are equal by construction: the service
+        // records fromSchemaVersion from the live file's user_version at copy
+        // time, and settling the journal mode does not change it. A
+        // discrepancy therefore means the registry and the file have come
+        // apart -- a replaced file, or a hand-edited registry -- and the
+        // honest move on a data-loss path is to offer nothing rather than
+        // something mislabelled.
+        if (stored != record.fromSchemaVersion) {
+          debugPrint(
+            'Skipping backup at $path: it holds schema v$stored but the '
+            'registry claims v${record.fromSchemaVersion}',
+          );
+          continue;
+        }
+
+        if (!mounted) return;
+        setState(() => _downgradeBackup = record);
+        return;
+      }
+    } catch (e) {
+      debugPrint('Startup downgrade options unavailable: $e');
+    }
+  }
+
+  /// Reads the schema version a candidate backup actually holds.
+  ///
+  /// The real work lives in [probeBackupSchemaVersion], which owns the
+  /// keyed-then-unkeyed fallback and is tested directly; this only supplies
+  /// the live key and the test seam.
+  int? _probeCandidateSchema(String path) {
+    final probeOverride = widget.downgradeCandidateProbeOverride;
+    if (probeOverride != null) return probeOverride(path);
+
+    return probeBackupSchemaVersion(
+      path,
+      keyHex: DatabaseService.instance.databaseKeyHex,
+      onDiagnostic: debugPrint,
+    );
+  }
+
+  /// Copies the newer-schema database into the backups folder and registers
+  /// it, BEFORE the downgrade restore swaps it away.
+  ///
+  /// [DatabaseService.restore] deletes its own `.pre-restore` copy once the
+  /// swap succeeds, so without this step accepting the offer would be the
+  /// moment every dive logged in the newer build stopped existing. A throw
+  /// here aborts the restore, which costs the diver nothing they had a
+  /// moment ago.
+  Future<void> _preserveNewerDatabase() async {
+    final prefs = BackupPreferences(widget.prefs);
+    final dbPath = await widget.locationService.getDatabasePath();
+
+    final PreDowngradeBackupService service;
+    final String appVersion;
+    BackupDirLease? lease;
+    if (widget.preDowngradeBackupFactory != null) {
+      service = widget.preDowngradeBackupFactory!(
+        livePath: dbPath,
+        preferences: prefs,
+      );
+      appVersion = '0.0.0.0';
+    } else {
+      final info = await PackageInfo.fromPlatform();
+      appVersion = formatAppVersion(info);
+      service = PreDowngradeBackupService(
+        livePathProvider: () async => dbPath,
+        // Resolved lazily inside the provider, for the same reason
+        // _runPreMigrationBackup does it: resolution touches the filesystem
+        // and can throw, and inside the provider that throw is recoverable
+        // through fallbackBackupsDirProvider.
+        backupsDirProvider: () async {
+          lease = await BackupService.resolveBackupsDirectoryLeased(prefs);
+          return lease!.path;
+        },
+        fallbackBackupsDirProvider:
+            BackupService.resolveDefaultBackupsDirectory,
+        preferences: prefs,
+        databaseKeyHexProvider: () => DatabaseService.instance.databaseKeyHex,
+      );
+    }
+
+    try {
+      await service.preserve(
+        storedSchemaVersion: _dbVersion,
+        appVersion: appVersion,
+      );
+    } finally {
+      await lease?.release();
+    }
+  }
+
+  /// Goes back to [_downgradeBackup], keeping the newer database first.
+  ///
+  /// The order is the whole point: preserve, then swap. A failure to preserve
+  /// leaves the diver on the mismatch screen with both files intact, which is
+  /// strictly better than a completed downgrade that lost the newer one.
+  Future<void> _restoreFromDowngradeBackup() =>
+      _restoreAtStartup(_downgradeBackup, before: _preserveNewerDatabase);
+
   /// Swaps [_recoveryBackup] in for the live database, then resumes startup.
   ///
   /// Safe here precisely because startup failed: the database is closed, so
   /// [DatabaseService.restore] does its staged swap without contending with an
   /// open connection, and it rolls the original file back if the swap fails.
-  Future<void> _restoreFromStartupBackup() async {
-    final record = _recoveryBackup;
+  Future<void> _restoreFromStartupBackup() =>
+      _restoreAtStartup(_recoveryBackup);
+
+  /// Shared body of both startup restores: swap [record] in, then resume
+  /// startup from the top.
+  ///
+  /// [before] runs while the screen already shows progress and before
+  /// anything is swapped, so a throw from it aborts with the live database
+  /// untouched.
+  Future<void> _restoreAtStartup(
+    BackupRecord? record, {
+    Future<void> Function()? before,
+  }) async {
     final path = record?.localPath;
     if (path == null) return;
     if (_restoreStatus == StartupRestoreStatus.running) return;
@@ -899,6 +1175,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
 
     try {
+      await before?.call();
       if (widget.restoreOverride != null) {
         await widget.restoreOverride!(path, onProgress);
       } else {
@@ -921,6 +1198,11 @@ class _StartupWrapperState extends State<StartupWrapper>
         _state = _StartupState.initializing;
         _errorMessage = '';
         _recoveryBackup = null;
+        _downgradeBackup = null;
+        // Cleared so the relaunch shows the splash rather than the screen the
+        // diver just acted on. The reopen re-raises the mismatch if the swap
+        // somehow left a newer file in place.
+        _isVersionMismatch = false;
       });
       await _runInitialization();
     } catch (e) {
@@ -960,40 +1242,50 @@ class _StartupWrapperState extends State<StartupWrapper>
     StartupFailureView.previousReleasesUrl,
   );
 
-  Future<void> _openPreviousReleases() async {
-    // Same reasoning as _showBackupsFolder: a refused hand-off shows up as a
-    // false return at least as often as an exception, and an unlogged one
-    // makes the button look broken. The address is rendered beneath the
-    // button either way, so the diver keeps a usable route.
+  /// Hands [uri] to the browser, reporting both ways the hand-off can fail.
+  ///
+  /// Same reasoning as _showBackupsFolder: a refused hand-off shows up as a
+  /// false return at least as often as an exception, and an unlogged one makes
+  /// the button look broken. Every caller renders its address on screen too,
+  /// so the diver keeps a usable route either way, and leaving them on this
+  /// screen is the only safe fallback: the database is untouched and must stay
+  /// that way.
+  ///
+  /// [label] names the destination in the log line, since the three terminal
+  /// screens offer three different release pages.
+  Future<void> _openReleasePage(Uri uri, String label) async {
     try {
       final launched = await launchUrl(
-        _previousReleasesUri,
+        uri,
         mode: LaunchMode.externalApplication,
       );
       if (!launched) {
-        debugPrint(
-          'Could not open the releases page: launchUrl returned false',
-        );
+        debugPrint('Could not open the $label page: launchUrl returned false');
       }
     } catch (e) {
-      debugPrint('Could not open the releases page: $e');
+      debugPrint('Could not open the $label page: $e');
     }
   }
+
+  Future<void> _openPreviousReleases() =>
+      _openReleasePage(_previousReleasesUri, 'releases');
 
   static final Uri _latestReleaseUri = Uri.parse(
     VersionMismatchView.latestReleaseUrl,
   );
 
-  Future<void> _openLatestRelease() async {
-    try {
-      await launchUrl(_latestReleaseUri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      // Leaving the user on this screen is the only safe fallback: the
-      // database is untouched and must stay that way. VersionMismatchView
-      // renders this same URL beneath the button, so a launch failure still
-      // leaves the user an address they can type in manually.
-    }
-  }
+  Future<void> _openLatestRelease() =>
+      _openReleasePage(_latestReleaseUri, 'latest stable release');
+
+  static final Uri _betaReleasesUri = Uri.parse(
+    VersionMismatchView.betaReleasesUrl,
+  );
+
+  /// The other half of the version-mismatch screen's answer (#1588). When a
+  /// beta build wrote the file, the stable page above is the build that just
+  /// refused it; this is where the build that can open it actually lives.
+  Future<void> _openBetaReleases() =>
+      _openReleasePage(_betaReleasesUri, 'beta builds');
 
   void _quitApp() {
     if (widget.closeAppOverride != null) {
@@ -1040,6 +1332,21 @@ class _StartupWrapperState extends State<StartupWrapper>
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtitleColor = isDark ? Colors.white70 : Colors.black54;
 
+    // The splash paints its plain text from the palette above, but every
+    // themed descendant (the restore Card, the buttons, the progress
+    // indicators, the escape-hatch dialogs) reads Theme.of instead. A
+    // MaterialApp with no theme gets Flutter's default, which is always
+    // LIGHT: in dark mode that put a near-white card surface under white
+    // text and made the restore offer unreadable. The theme therefore has to
+    // follow the same brightness the palette does.
+    //
+    // The preset comes from the same pre-database mirror the brightness does,
+    // so a diver on Console or Deep is not handed an ocean-blue error screen.
+    final splashTheme = AppThemeRegistry.resolveTheme(
+      resolveStartupThemePreset(widget.prefs),
+      brightness,
+    );
+
     final isReady = _state == _StartupState.ready;
 
     // Splash layer: stays at full opacity while initializing/migrating/error,
@@ -1058,6 +1365,7 @@ class _StartupWrapperState extends State<StartupWrapper>
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
                 navigatorKey: _splashNavigatorKey,
+                theme: splashTheme,
                 // The splash runs before the database (and therefore the
                 // diver's saved locale preference) is readable, so it can
                 // only resolve the system locale. Without these delegates
@@ -1223,7 +1531,14 @@ class _StartupWrapperState extends State<StartupWrapper>
         textColor: textColor,
         subtitleColor: subtitleColor,
         onDownloadLatest: _openLatestRelease,
+        onOpenBetaBuilds: _openBetaReleases,
         onClose: _closeApp,
+        restoreCandidate: _downgradeBackup,
+        onRestoreBackup: _downgradeBackup == null
+            ? null
+            : _restoreFromDowngradeBackup,
+        restoreStatus: _restoreStatus,
+        restoreError: _restoreError,
       );
     }
 

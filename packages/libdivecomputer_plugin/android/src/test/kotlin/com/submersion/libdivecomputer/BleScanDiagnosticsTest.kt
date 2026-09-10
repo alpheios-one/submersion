@@ -12,7 +12,15 @@ import org.junit.Test
 // and could not produce it, because every failure mode ahead of that line
 // returned silently. These tests pin the behaviour that makes an
 // unsupported -- or unnamed -- dive computer visible in the debug log.
+//
+// The resolveName tests also cover issue #723, where a supported computer
+// was visible in that log but still unmatched because its advertised name
+// carried a trailing NUL.
 class BleScanDiagnosticsTest {
+
+    // Spelled out rather than escaped so the terminator is obvious in the
+    // assertions below.
+    private val NUL = 0.toChar().toString()
 
     @Test
     fun unmatchedNamedDeviceIsDescribedWithAddressAndName() {
@@ -133,6 +141,43 @@ class BleScanDiagnosticsTest {
     @Test
     fun anEmptyScanRecordNameFallsBackToTheDeviceName() {
         assertEquals("Suunto D5", BleScanDiagnostics.resolveName("", "Suunto D5"))
+    }
+
+    @Test
+    fun aTrailingNulInTheAdvertisedNameIsStripped() {
+        // Issue #723: the Shearwater Perdix 3 pads its Complete Local Name
+        // with the C string terminator, and Android's scan record parser
+        // keeps it. JNI encodes U+0000 as two non-zero bytes, so the exact
+        // strcasecmp in libdivecomputer never saw "Perdix 3" and the
+        // computer was logged as "Unmatched device ... (Perdix 3 )".
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName("Perdix 3$NUL", null))
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName(null, "Perdix 3$NUL"))
+    }
+
+    @Test
+    fun theNameEndsAtTheFirstNulLikeEveryOtherPlatform() {
+        // iOS, macOS, Windows and Linux hand the name to C as a real
+        // NUL-terminated string, so anything after the terminator is
+        // invisible there. Mirror that rather than only trimming the end.
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName("Perdix 3$NUL$NUL", null))
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName("Perdix 3${NUL}junk", null))
+    }
+
+    @Test
+    fun surroundingWhitespacePaddingIsStripped() {
+        // The same log had a camera advertising "EOSR7_fabian    ": padding
+        // is common in fixed-width name fields and can never be part of a
+        // descriptor product name.
+        assertEquals("EOSR7_fabian", BleScanDiagnostics.resolveName("EOSR7_fabian    ", null))
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName(" Perdix 3  ", null))
+    }
+
+    @Test
+    fun aNameThatIsOnlyPaddingCountsAsAbsent() {
+        assertNull(BleScanDiagnostics.resolveName(NUL, null))
+        assertNull(BleScanDiagnostics.resolveName("   ", ""))
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName(" ", "Perdix 3"))
+        assertEquals("Perdix 3", BleScanDiagnostics.resolveName(NUL, "Perdix 3"))
     }
 
     @Test

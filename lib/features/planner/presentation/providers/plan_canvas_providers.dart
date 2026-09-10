@@ -1,3 +1,4 @@
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/deco/entities/dive_environment.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -6,6 +7,7 @@ import 'package:submersion/features/dive_planner/presentation/providers/dive_pla
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 import 'package:submersion/features/planner/domain/entities/plan_outcome.dart';
+import 'package:submersion/features/planner/domain/services/segment_chain.dart';
 import 'package:submersion/features/planner/domain/services/bailout_solver.dart';
 import 'package:submersion/features/planner/domain/services/contingency_service.dart';
 import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
@@ -42,6 +44,8 @@ final planOutcomeProvider = Provider<PlanOutcome>((ref) {
     // is off-gassed at the same surface pressure the plan is computed at.
     environment: DiveEnvironment.forConditions(
       altitudeMeters: (state.altitude ?? 0) > 0 ? state.altitude : null,
+      waterType: state.waterType ?? WaterType.salt,
+      salinityPpt: state.salinityPpt,
     ),
   );
   return engine.compute(divePlanFromState(state), startState: startState);
@@ -142,12 +146,14 @@ PlanCanvasSeries buildCanvasSeries({
 
   final profile = <CanvasPoint>[];
   var t = 0.0;
-  for (final segment in sorted) {
-    if (profile.isEmpty || profile.last.depth != segment.startDepth) {
-      profile.add(CanvasPoint(t, segment.startDepth));
-    }
-    t += segment.durationSeconds;
-    profile.add(CanvasPoint(t, segment.endDepth));
+  // Legs are contiguous by construction now, so the old guard against a
+  // depth discontinuity (which used to emit an extra point for a jump the
+  // engine integrated as an instant depth change) has nothing to catch: only
+  // the very first leg needs its start boundary.
+  for (final leg in const SegmentChain().resolve(sorted)) {
+    if (profile.isEmpty) profile.add(CanvasPoint(t, leg.startDepth));
+    t += leg.durationSeconds;
+    profile.add(CanvasPoint(t, leg.endDepth));
   }
 
   // Computed ascent tail: travel to each stop, hold, then surface.
@@ -197,29 +203,13 @@ PlanCanvasSeries buildCanvasSeries({
     profile.add(CanvasPoint(outcome.runtimeSeconds.toDouble(), 0));
   }
 
-  // Ceiling approximation: segment-end ceilings plus the stop staircase.
-  final ceiling = <CanvasPoint>[];
-  for (final segmentOutcome in outcome.segmentOutcomes) {
-    if (segmentOutcome.ceilingAtEnd > 0) {
-      ceiling.add(
-        CanvasPoint(
-          segmentOutcome.endRuntime.toDouble(),
-          segmentOutcome.ceilingAtEnd,
-        ),
-      );
-    }
-  }
-  for (final stop in outcome.stops) {
-    ceiling.add(
-      CanvasPoint(stop.arrivalRuntimeSeconds.toDouble(), stop.depthMeters),
-    );
-    ceiling.add(
-      CanvasPoint(
-        (stop.arrivalRuntimeSeconds + stop.durationSeconds).toDouble(),
-        stop.depthMeters,
-      ),
-    );
-  }
+  // The finely-sampled ceiling curve (see PlanEngine._ceilingTrace): a
+  // continuous rise as tissues load and fall as each stop clears, rather
+  // than a staircase pinned to the stops' own depths.
+  final ceiling = <CanvasPoint>[
+    for (final point in outcome.ceilingTrace)
+      CanvasPoint(point.$1.toDouble(), point.$2),
+  ];
 
   return PlanCanvasSeries(
     profile: profile,

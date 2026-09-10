@@ -119,6 +119,23 @@ List<BuddyWithDiveCount> applyBuddyWithDiveCountSorting(
         return sort.direction == SortDirection.ascending
             ? comparison
             : -comparison;
+      case BuddySortField.lastDive:
+        final aDate = a.lastDiveAt;
+        final bDate = b.lastDiveAt;
+        // Buddies never dived with sort last in either direction, so the
+        // interesting rows (people you actually dive with) stay on top.
+        if (aDate == null || bDate == null) {
+          if (aDate == null && bDate == null) return byNameAscending(a, b);
+          return aDate == null ? 1 : -1;
+        }
+        final comparison = aDate.compareTo(bDate);
+        if (comparison == 0) {
+          // Deterministic tie-break, same reasoning as diveCount above.
+          return byNameAscending(a, b);
+        }
+        return sort.direction == SortDirection.ascending
+            ? comparison
+            : -comparison;
     }
   });
 
@@ -133,17 +150,17 @@ List<Buddy> applyBuddySorting(
   final sorted = List<Buddy>.from(buddies);
 
   sorted.sort((a, b) {
-    int comparison;
-    // For text fields, invert direction (user expects descending = A→Z)
-    final invertForText = sort.field == BuddySortField.name;
-
-    switch (sort.field) {
-      case BuddySortField.name:
-        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
-      case BuddySortField.diveCount:
-        // Dive count not available in basic Buddy entity, sort by name as fallback
-        comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
-    }
+    // Every field compares names here: the plain Buddy entity carries neither
+    // a dive count nor a last-dive date, so those two fall back to the
+    // alphabet. Only the direction differs between the fields, so that is all
+    // the switch decides. It stays exhaustive, so a new BuddySortField has to
+    // be considered in this function too.
+    final comparison = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+    final invertForText = switch (sort.field) {
+      // For text fields, invert direction (user expects descending = A→Z)
+      BuddySortField.name => true,
+      BuddySortField.diveCount || BuddySortField.lastDive => false,
+    };
 
     if (invertForText) {
       return sort.direction == SortDirection.ascending

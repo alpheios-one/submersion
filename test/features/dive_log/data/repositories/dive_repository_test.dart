@@ -8,10 +8,13 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
@@ -177,6 +180,27 @@ void main() {
         expect(fetchedDive.tanks[0].gasMix.o2, equals(32.0));
       });
 
+      test(
+        'should keep a tank transmitter serial through create and read',
+        () async {
+          final dive = createTestDive(
+            tanks: [
+              const DiveTank(
+                id: '',
+                gasMix: GasMix(o2: 32.0),
+                order: 0,
+                transmitterSerial: '180777',
+              ),
+            ],
+          );
+
+          final createdDive = await repository.createDive(dive);
+          final fetchedDive = await repository.getDiveById(createdDive.id);
+
+          expect(fetchedDive!.tanks.single.transmitterSerial, '180777');
+        },
+      );
+
       test('should create a dive with site', () async {
         final site = await siteRepository.createSite(
           const DiveSite(id: '', name: 'Test Site'),
@@ -274,7 +298,7 @@ void main() {
           ),
         );
         await repository.createDive(
-          createTestDive(diveNumber: 1).copyWith(equipment: [gear]),
+          createTestDive(diveNumber: 1).copyWith(gear: looseGear([gear])),
         );
 
         final result = await repository.getAllDives();
@@ -329,6 +353,65 @@ void main() {
     });
 
     group('updateDive', () {
+      test(
+        'keeps a stored transmitter serial when the edited tank omits it',
+        () async {
+          // The serial is computer-owned, like computerId: an edit flow that
+          // rebuilds the tank without it must not wipe what the download wrote.
+          final created = await repository.createDive(
+            createTestDive(
+              tanks: [
+                const DiveTank(
+                  id: '',
+                  gasMix: GasMix(o2: 32.0),
+                  order: 0,
+                  transmitterSerial: '180777',
+                ),
+              ],
+            ),
+          );
+          final loaded = (await repository.getDiveById(created.id))!;
+          final edited = loaded.copyWith(
+            tanks: [
+              loaded.tanks.single.copyWith(
+                startPressure: 210.0,
+                clearTransmitterSerial: true,
+              ),
+            ],
+          );
+
+          await repository.updateDive(edited);
+          final result = (await repository.getDiveById(created.id))!;
+
+          expect(result.tanks.single.startPressure, 210.0);
+          expect(result.tanks.single.transmitterSerial, '180777');
+        },
+      );
+
+      test(
+        'stores the transmitter serial on a tank added by an update',
+        () async {
+          final created = await repository.createDive(createTestDive());
+          final loaded = (await repository.getDiveById(created.id))!;
+
+          await repository.updateDive(
+            loaded.copyWith(
+              tanks: [
+                const DiveTank(
+                  id: 'added-tank',
+                  gasMix: GasMix(o2: 32.0),
+                  order: 0,
+                  transmitterSerial: '180777',
+                ),
+              ],
+            ),
+          );
+          final result = (await repository.getDiveById(created.id))!;
+
+          expect(result.tanks.single.transmitterSerial, '180777');
+        },
+      );
+
       test('should update dive fields', () async {
         final dive = await repository.createDive(
           createTestDive(
@@ -455,18 +538,13 @@ void main() {
         expect(createdDive!.tanks.length, equals(1));
         final tankId = createdDive.tanks[0].id;
 
-        // Insert tank pressure profiles
-        await database
-            .into(database.tankPressureProfiles)
-            .insert(
-              db.TankPressureProfilesCompanion(
-                id: const Value('profile1'),
-                diveId: Value(dive.id),
-                tankId: Value(tankId),
-                timestamp: const Value(0),
-                pressure: const Value(200.0),
-              ),
-            );
+        // Insert the tank's pressure series
+        final tankSeries = TankPressureSeriesRepository();
+        await tankSeries.insertSeries(
+          diveId: dive.id,
+          tankId: tankId,
+          samples: const [TankPressureSample(timestamp: 0, pressure: 200.0)],
+        );
 
         // Insert gas switches
         await database
@@ -482,10 +560,8 @@ void main() {
             );
 
         // Verify initial data
-        var pressureProfiles = await (database.select(
-          database.tankPressureProfiles,
-        )..where((t) => t.diveId.equals(dive.id))).get();
-        expect(pressureProfiles.length, equals(1));
+        var pressureSeries = await tankSeries.getSeriesForDive(dive.id);
+        expect(pressureSeries.length, equals(1));
 
         var gasSwitches = await (database.select(
           database.gasSwitches,
@@ -501,15 +577,13 @@ void main() {
 
         await repository.updateDive(updatedDive);
 
-        // Verify that tank_pressure_profiles and gas_switches are still present
-        pressureProfiles = await (database.select(
-          database.tankPressureProfiles,
-        )..where((t) => t.diveId.equals(dive.id))).get();
+        // Verify that the pressure series and gas_switches are still present
+        pressureSeries = await tankSeries.getSeriesForDive(dive.id);
         expect(
-          pressureProfiles.length,
+          pressureSeries.length,
           equals(1),
           reason:
-              'Tank pressure profiles should not be deleted when updating dive',
+              'Tank pressure series should not be deleted when updating dive',
         );
 
         gasSwitches = await (database.select(
@@ -522,7 +596,7 @@ void main() {
         );
 
         // Verify the data is unchanged
-        expect(pressureProfiles[0].pressure, equals(200.0));
+        expect(pressureSeries[0].samples.single.pressure, equals(200.0));
         expect(gasSwitches[0].timestamp, equals(300));
       });
     });

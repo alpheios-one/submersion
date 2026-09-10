@@ -15,7 +15,9 @@ import 'package:submersion/features/equipment/domain/entities/equipment_item.dar
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_attribute_form_section.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_custom_fields_section.dart';
+import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_enum_display.dart';
 
 class EquipmentEditPage extends ConsumerStatefulWidget {
   final String? equipmentId;
@@ -52,6 +54,7 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
   EquipmentType _selectedType = EquipmentType.regulator;
   EquipmentStatus _selectedStatus = EquipmentStatus.active;
   DateTime? _purchaseDate;
+  String? _parentEquipmentId;
   bool _isLoading = false;
   bool _isInitialized = false;
   bool _hasChanges = false;
@@ -138,13 +141,16 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
     _purchaseCurrencyController.text = _initialCurrencyCode;
     _notesController.text = equipment.notes;
     _selectedType = equipment.type;
-    // A legacy row can carry isActive=false with a non-retired status.
+    // A legacy row can carry isActive=false with a non-terminal status.
     // Show it as Retired so the form states the item's real condition --
-    // otherwise saving would silently reactivate it (#636).
-    _selectedStatus = !equipment.isActive
+    // otherwise saving would silently reactivate it (#636). "Sold" is the
+    // other status that means gone, so keep it rather than overwrite it.
+    _selectedStatus =
+        !equipment.isActive && equipment.status != EquipmentStatus.sold
         ? EquipmentStatus.retired
         : equipment.status;
     _purchaseDate = equipment.purchaseDate;
+    _parentEquipmentId = equipment.parentEquipmentId;
     _customReminderEnabled = equipment.customReminderEnabled;
     _customReminderDays = equipment.customReminderDays ?? const [7, 14, 30];
   }
@@ -156,6 +162,35 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
       context.pop();
     }
   }
+
+  /// [_parentEquipmentId] only when it names an active item whose type can
+  /// hold [type]; a stale choice from a previous type is never written.
+  String? _validParentIdFor(EquipmentType type) {
+    final id = _parentEquipmentId;
+    if (id == null) return null;
+    // While the active list is still loading (or failed) the id is kept as
+    // is: a quick open-and-save must not drop a link the page never got to
+    // check.
+    final items = ref.read(activeEquipmentProvider).valueOrNull;
+    if (items == null) return id;
+    final allowed = _parentTypesFor(type);
+    return items.any((e) => e.id == id && allowed.contains(e.type)) ? id : null;
+  }
+
+  /// Which item types can hold a child of [type]. Empty means the type is
+  /// not a child type and the picker is hidden.
+  static Set<EquipmentType> _parentTypesFor(EquipmentType type) =>
+      switch (type) {
+        EquipmentType.o2Cell => const {EquipmentType.rebreather},
+        EquipmentType.battery => const {
+          EquipmentType.computer,
+          EquipmentType.transmitter,
+          EquipmentType.light,
+          EquipmentType.dpv,
+          EquipmentType.rebreather,
+        },
+        _ => const {},
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -234,13 +269,18 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             items: EquipmentType.values.map((type) {
               return DropdownMenuItem(
                 value: type,
-                child: Text(type.displayName),
+                child: Text(type.localizedName(context.l10n)),
               );
             }).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
                   _selectedType = value;
+                  // A parent chosen for the old type may not hold the new
+                  // one (a computer holds a battery, never an O2 cell), and
+                  // the picker would show "none" while the stale id was
+                  // still written on save. Start the choice over.
+                  _parentEquipmentId = null;
                   _hasChanges = true;
                 });
               }
@@ -258,7 +298,7 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             items: EquipmentStatus.values.map((status) {
               return DropdownMenuItem(
                 value: status,
-                child: Text(status.displayName),
+                child: Text(status.localizedName(context.l10n)),
               );
             }).toList(),
             onChanged: (value) {
@@ -271,6 +311,48 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             },
           ),
           const SizedBox(height: 16),
+
+          // Parent item, for the child types only (v202).
+          if (_parentTypesFor(_selectedType).isNotEmpty) ...[
+            Builder(
+              builder: (context) {
+                final candidates =
+                    (ref.watch(activeEquipmentProvider).valueOrNull ??
+                            const <EquipmentItem>[])
+                        .where(
+                          (e) =>
+                              e.id != widget.equipmentId &&
+                              _parentTypesFor(_selectedType).contains(e.type),
+                        )
+                        .toList();
+                final known = candidates.any((e) => e.id == _parentEquipmentId);
+                return DropdownButtonFormField<String?>(
+                  key: const Key('equipment-parent-picker'),
+                  initialValue: known ? _parentEquipmentId : null,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.equipment_edit_parentLabel,
+                    prefixIcon: const Icon(Icons.account_tree_outlined),
+                  ),
+                  items: [
+                    DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text(context.l10n.equipment_edit_parentNone),
+                    ),
+                    for (final e in candidates)
+                      DropdownMenuItem<String?>(
+                        value: e.id,
+                        child: Text(e.name),
+                      ),
+                  ],
+                  onChanged: (value) => setState(() {
+                    _parentEquipmentId = value;
+                    _hasChanges = true;
+                  }),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Name
           TextFormField(
@@ -428,25 +510,16 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
                 : context.l10n.equipment_edit_appBar_newTitle,
           ),
           actions: [
-            if (_isLoading)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              )
-            else
-              Tooltip(
-                message: context.l10n.equipment_edit_appBar_saveTooltip,
-                child: TextButton(
-                  onPressed: () => _saveEquipment(existingEquipment),
-                  child: Text(context.l10n.equipment_edit_appBar_saveButton),
-                ),
+            Tooltip(
+              message: context.l10n.equipment_edit_appBar_saveTooltip,
+              child: AppBarTextAction(
+                label: context.l10n.equipment_edit_appBar_saveButton,
+                onPressed: _isLoading
+                    ? null
+                    : () => _saveEquipment(existingEquipment),
+                busy: _isLoading,
               ),
+            ),
           ],
         ),
         body: body,
@@ -574,8 +647,12 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               onPressed: _selectPurchaseDate,
               icon: const Icon(Icons.calendar_today),
               label: Text(
+                // #1512: hand-rolled M/D/YYYY ignored the diver's preference,
+                // which the detail page for the same field already honours.
                 _purchaseDate != null
-                    ? '${_purchaseDate!.month}/${_purchaseDate!.day}/${_purchaseDate!.year}'
+                    ? UnitFormatter(
+                        ref.watch(settingsProvider),
+                      ).formatDate(_purchaseDate)
                     : context.l10n.equipment_edit_selectDate,
               ),
               style: OutlinedButton.styleFrom(
@@ -659,6 +736,25 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            // Purchase record (issue #1517): SKU, retailer and the product
+            // listing, kept with the date and price because they are all
+            // parts of the same receipt an insurer asks for.
+            EquipmentAttributeFormSection(
+              key: ValueKey('purchase-attrs-${_selectedType.name}'),
+              type: _selectedType,
+              group: AttributeGroup.purchase,
+              values: _attrValues,
+              units: UnitFormatter(ref.watch(settingsProvider)),
+              onChanged: (attr) => setState(() {
+                _attrValues[attr.key] = attr;
+                _hasChanges = true;
+              }),
+              onCleared: (key) => setState(() {
+                _attrValues.remove(key);
+                _hasChanges = true;
+              }),
             ),
           ],
         ),
@@ -848,6 +944,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
             ? null
             : _serialController.text.trim(),
         purchaseDate: _purchaseDate,
+        parentEquipmentId: _parentTypesFor(_selectedType).isEmpty
+            ? null
+            : _validParentIdFor(_selectedType),
         // Blank means "no price"; anything unreadable was already stopped by
         // the field validator, so null here can only mean blank.
         purchasePrice: parseUserDecimal(_purchasePriceController.text),
@@ -859,9 +958,11 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
         lastServiceDate: existingEquipment?.lastServiceDate,
         serviceIntervalDays: existingEquipment?.serviceIntervalDays,
         notes: _notesController.text.trim(),
-        // Retiring via the status dropdown must deactivate the item, or it
-        // keeps appearing in active-gear pickers (#636).
-        isActive: _selectedStatus != EquipmentStatus.retired,
+        // Retiring or selling via the status dropdown must deactivate the
+        // item, or it keeps appearing in active-gear pickers (#636).
+        isActive:
+            _selectedStatus != EquipmentStatus.retired &&
+            _selectedStatus != EquipmentStatus.sold,
         // Only attributes in the SELECTED type's catalog are kept: switching
         // type drops out-of-catalog values at save time (form = source of
         // truth), plus non-empty custom fields with re-packed sort order.

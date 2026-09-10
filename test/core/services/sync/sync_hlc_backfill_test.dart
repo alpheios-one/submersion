@@ -105,6 +105,44 @@ void main() {
     );
   }
 
+  /// A packed series row with no hlc, the shape the v182 migration leaves on
+  /// a device that had nothing to publish to, and the shape any series write
+  /// that did not reach its `markRecordPending` would leave behind. Every
+  /// NOT NULL column without a default is named explicitly.
+  Future<void> seedUnstampedSeries() async {
+    await db.customStatement(
+      "INSERT INTO dives (id, dive_date_time, created_at, updated_at) "
+      "VALUES ('d-series', 1000, 1000, 1000)",
+    );
+    await db.customStatement(
+      "INSERT INTO dive_tanks (id, dive_id) VALUES ('tank-1', 'd-series')",
+    );
+    await db.customStatement(
+      'INSERT INTO dive_profile_series (id, dive_id, sample_count, '
+      'start_timestamp, end_timestamp, max_depth, first_depth, last_depth, '
+      'codec_version, samples, created_at, updated_at) '
+      "VALUES ('ps-1', 'd-series', 1, 0, 0, 1.0, 1.0, 1.0, 1, X'00', "
+      '1000, 1000)',
+    );
+    await db.customStatement(
+      'INSERT INTO tank_pressure_series (id, dive_id, tank_id, sample_count, '
+      'start_timestamp, end_timestamp, codec_version, samples, created_at, '
+      "updated_at) VALUES ('ts-1', 'd-series', 'tank-1', 1, 0, 0, 1, X'00', "
+      '1000, 1000)',
+    );
+  }
+
+  test('stamps and publishes null-hlc series rows', () async {
+    await seedUnstampedSeries();
+
+    await SyncRepository().backfillMissingHlc();
+
+    expect(await hlcOf('dive_profile_series', 'ps-1'), isNotNull);
+    expect(await hlcOf('tank_pressure_series', 'ts-1'), isNotNull);
+    expect(await pendingIdsFor('diveProfileSeries'), contains('ps-1'));
+    expect(await pendingIdsFor('tankPressureSeries'), contains('ts-1'));
+  });
+
   test(
     'stamps hlc + a pending sync record on null-hlc enrichment rows',
     () async {
@@ -138,6 +176,32 @@ void main() {
     expect(await hlcOf('cylinder_configs', 'cfg-1'), isNotNull);
     expect(await hlcOf('cylinder_config_items', 'item-1'), isNotNull);
     expect(await hlcOf('equipment_set_geofences', 'fence-1'), isNotNull);
+  });
+
+  /// A species tag written before v195, when media_species had no clock of
+  /// its own. The photo and species it points at exist; only the tag's hlc
+  /// is missing, exactly as an affected build left it (issue #1638).
+  Future<void> seedLegacyMediaSpeciesTag() async {
+    await seedLegacyEnrichment('e-tag');
+    await db.customStatement(
+      "INSERT INTO species (id, common_name, category, is_built_in) "
+      "VALUES ('sp-1', 'Grouper', 'fish', 0)",
+    );
+    await db.customStatement(
+      'INSERT INTO media_species (id, media_id, species_id, created_at) '
+      "VALUES ('tag-1', 'm1', 'sp-1', 1000)",
+    );
+  }
+
+  test('stamps and publishes species tags written before v195', () async {
+    await seedLegacyMediaSpeciesTag();
+
+    await SyncRepository().backfillMissingHlc();
+
+    // Without this the diver's existing tags stay invisible to the
+    // incremental export until the tag is removed and re-added.
+    expect(await hlcOf('media_species', 'tag-1'), isNotNull);
+    expect(await pendingIdsFor('mediaSpecies'), contains('tag-1'));
   });
 
   test('marks the backfilled rows pending so they publish', () async {

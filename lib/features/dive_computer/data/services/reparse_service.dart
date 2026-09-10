@@ -2,11 +2,21 @@ import 'package:drift/drift.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/data/repositories/tank_pressure_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart'
+    as codec;
+import 'package:submersion/features/dive_log/domain/codecs/tank_pressure_series_codec.dart'
+    show TankPressureSample;
 import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
+import 'package:submersion/features/dive_computer/data/services/dive_parser.dart';
+import 'package:submersion/features/dive_computer/data/services/transmitter_registry_matcher.dart';
 import 'package:submersion/features/dive_log/domain/services/tank_pressure_series.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_sample_units.dart';
 
 /// Service responsible for applying re-parsed dive computer data back to the
 /// database while respecting the computer-authored vs user-authored field
@@ -24,7 +34,42 @@ class ReparseService {
   /// with the live download path.
   final bool trimTankPressureAtSurfacing;
 
-  ReparseService({required this.db, this.trimTankPressureAtSurfacing = true});
+  /// The diver's transmitter registry, read per re-parsed dive so an entry
+  /// saved a moment ago applies. Null (or a failing load) means no mapping.
+  final TransmitterMatcherLoader? _transmitterMatcherLoader;
+
+  ReparseService({
+    required this.db,
+    this.trimTankPressureAtSurfacing = true,
+    TransmitterMatcherLoader? transmitterMatcherLoader,
+    ProfileSeriesRepository? profileSeries,
+    TankPressureSeriesRepository? tankSeries,
+  }) : _transmitterMatcherLoader = transmitterMatcherLoader,
+       _profileSeries =
+           profileSeries ??
+           ProfileSeriesRepository(
+             database: db,
+             syncRepository: SyncRepository(database: db),
+           ),
+       _tankSeries =
+           tankSeries ??
+           TankPressureSeriesRepository(
+             database: db,
+             syncRepository: SyncRepository(database: db),
+           );
+
+  final ProfileSeriesRepository _profileSeries;
+  final TankPressureSeriesRepository _tankSeries;
+
+  Future<TransmitterMatcher> _loadMatcher() async {
+    final loader = _transmitterMatcherLoader;
+    if (loader == null) return const TransmitterMatcher.empty();
+    try {
+      return await loader();
+    } catch (_) {
+      return const TransmitterMatcher.empty();
+    }
+  }
 
   /// Apply a freshly parsed dive to the database, updating only
   /// computer-authored fields and preserving user-authored fields.
@@ -133,9 +178,7 @@ class ReparseService {
         await (db.delete(
           db.gasSwitches,
         )..where((t) => t.diveId.equals(diveId))).go();
-        await (db.delete(
-          db.tankPressureProfiles,
-        )..where((t) => t.diveId.equals(diveId))).go();
+        await _tankSeries.deleteForDive(diveId);
 
         // Re-insert events from parsed data
         await _insertEvents(
@@ -466,7 +509,10 @@ class ReparseService {
   }) async {
     final diveDateTimeMs = _parsedEntryTime(parsed).millisecondsSinceEpoch;
     final exitTimeMs = diveDateTimeMs + (parsed.durationSeconds * 1000);
-    final bottomTimeSeconds = _calculateBottomTimeFromSamples(parsed.samples);
+    final bottomTimeSeconds = _calculateBottomTimeFromSamples(
+      parsed.samples,
+      totalDurationSeconds: parsed.durationSeconds,
+    );
     final waterTemp = _minWaterTemp(parsed);
 
     await (db.update(db.dives)..where((t) => t.id.equals(diveId))).write(
@@ -524,62 +570,52 @@ class ReparseService {
     required int timeOffset,
   }) async {
     // Delete existing profiles for this (diveId, computerId)
-    if (computerId != null) {
-      await (db.delete(db.diveProfiles)..where(
-            (t) => t.diveId.equals(diveId) & t.computerId.equals(computerId),
-          ))
-          .go();
-    } else {
-      await (db.delete(
-        db.diveProfiles,
-      )..where((t) => t.diveId.equals(diveId) & t.computerId.isNull())).go();
-    }
+    await _profileSeries.deleteByComputer(diveId, computerId);
 
     // Re-insert from parsed samples
-    await db.batch((batch) {
-      for (final s in parsed.samples) {
-        batch.insert(
-          db.diveProfiles,
-          DiveProfilesCompanion(
-            id: Value(_uuid.v4()),
-            diveId: Value(diveId),
-            computerId: Value(computerId),
-            // Re-parsing rewrites this source's samples in place, so the
-            // replacements belong to the same source row (issue #1149).
-            sourceId: Value(sourceId),
-            isPrimary: Value(isPrimary),
-            timestamp: Value(s.timeSeconds + timeOffset),
-            depth: Value(s.depthMeters),
-            temperature: Value(s.temperatureCelsius),
-            heartRate: Value(s.heartRate),
-            heading: Value(s.heading),
-            setpoint: Value(s.setpoint),
-            ppO2: Value(s.ppo2),
-            cns: Value(s.cns),
-            ndl: Value(s.decoType == 0 ? s.decoTime : null),
-            ceiling: Value(
-              s.decoType != null && s.decoType != 0 ? s.decoDepth : null,
-            ),
-            rbt: Value(s.rbt),
-            decoType: Value(s.decoType),
-            tts: Value(s.tts),
-            o2Sensor1: Value(s.o2Sensor1),
-            o2Sensor2: Value(s.o2Sensor2),
-            o2Sensor3: Value(s.o2Sensor3),
-            o2Sensor4: Value(s.o2Sensor4),
-            o2Sensor5: Value(s.o2Sensor5),
-            o2Sensor6: Value(s.o2Sensor6),
-            o2SensorMv1: Value(s.o2SensorMv1),
-            o2SensorMv2: Value(s.o2SensorMv2),
-            o2SensorMv3: Value(s.o2SensorMv3),
-            o2SensorMv4: Value(s.o2SensorMv4),
-            o2SensorMv5: Value(s.o2SensorMv5),
-            o2SensorMv6: Value(s.o2SensorMv6),
-          ),
-        );
-      }
-    });
+    if (parsed.samples.isNotEmpty) {
+      await _profileSeries.insertSeries(
+        diveId: diveId,
+        computerId: computerId,
+        sourceId: sourceId,
+        isPrimary: isPrimary,
+        samples: [
+          for (final s in parsed.samples) _sampleFromParsed(s, timeOffset),
+        ],
+      );
+    }
   }
+
+  codec.ProfileSample _sampleFromParsed(
+    pigeon.ProfileSample s,
+    int timeOffset,
+  ) => codec.ProfileSample(
+    timestamp: s.timeSeconds + timeOffset,
+    depth: s.depthMeters,
+    temperature: s.temperatureCelsius,
+    heartRate: s.heartRate,
+    heading: s.heading,
+    setpoint: s.setpoint,
+    ppO2: s.ppo2,
+    cns: s.cns,
+    ndl: s.decoType == 0 ? s.decoTime : null,
+    ceiling: s.decoType != null && s.decoType != 0 ? s.decoDepth : null,
+    rbt: libdcRbtToSeconds(s.rbt),
+    decoType: s.decoType,
+    tts: s.tts,
+    o2Sensor1: s.o2Sensor1,
+    o2Sensor2: s.o2Sensor2,
+    o2Sensor3: s.o2Sensor3,
+    o2Sensor4: s.o2Sensor4,
+    o2Sensor5: s.o2Sensor5,
+    o2Sensor6: s.o2Sensor6,
+    o2SensorMv1: s.o2SensorMv1,
+    o2SensorMv2: s.o2SensorMv2,
+    o2SensorMv3: s.o2SensorMv3,
+    o2SensorMv4: s.o2SensorMv4,
+    o2SensorMv5: s.o2SensorMv5,
+    o2SensorMv6: s.o2SensorMv6,
+  );
 
   Future<void> _insertEvents({
     required String diveId,
@@ -593,7 +629,10 @@ class ReparseService {
 
     await db.batch((batch) {
       for (final e in parsed.events) {
-        final eventType = _mapEventTypeString(e.type);
+        final eventType = _mapEventTypeString(
+          e.type,
+          flags: int.tryParse(e.data?['flags'] ?? ''),
+        );
         if (eventType == null) continue;
 
         batch.insert(
@@ -670,22 +709,43 @@ class ReparseService {
             .get();
 
     // Build a map of existing tanks by tankOrder
-    final existingByOrder = {for (final t in existingTanks) t.tankOrder: t};
+    final matcher = await _loadMatcher();
+    final parsedTanks = applyTransmitterRegistry(
+      resolveParsedTanks(
+        parsed,
+        trimAtSurfacing: trimTankPressureAtSurfacing,
+      ).map(DiveParser.tankDataFrom).toList(),
+      matcher,
+      computerId: computerId,
+    );
 
-    // Build a set of new tank orders from parsed
+    // Which existing row takes parsed tank [index]. A row's source index wins
+    // (a reassignment, issue #1314); rows from before v200 carry null and
+    // fall back to their order, as the old path did. The fallback accepts
+    // rows attributed to this computer or to none (legacy and manual rows),
+    // never another computer's row on a multi-source dive. A row marked
+    // kNoSourceTankIndex takes nothing.
+    final matchedIds = <String>{};
+    DiveTank? existingFor(int index) {
+      for (final t in existingTanks) {
+        if (matchedIds.contains(t.id)) continue;
+        if (t.computerId != computerId) continue;
+        if (t.sourceTankIndex == index) return t;
+      }
+      for (final t in existingTanks) {
+        if (matchedIds.contains(t.id)) continue;
+        if (t.computerId != null && t.computerId != computerId) continue;
+        if (t.sourceTankIndex == null && t.tankOrder == index) return t;
+      }
+      return null;
+    }
+
     final newTankOrders = <int>{};
-
-    // Gas-mix linking and tankless synthesis (computers that report gas
-    // mixes but no tank records) live in the shared resolver so this path
-    // cannot drift from the live-download mapper.
-    for (final tank in resolveParsedTanks(
-      parsed,
-      trimAtSurfacing: trimTankPressureAtSurfacing,
-    )) {
+    for (final tank in parsedTanks) {
       newTankOrders.add(tank.index);
-
-      final existing = existingByOrder[tank.index];
+      final existing = existingFor(tank.index);
       if (existing != null) {
+        matchedIds.add(existing.id);
         tankIdsByIndex[tank.index] = existing.id;
         // Update existing tank: overwrite computer fields, preserve user fields
         await (db.update(
@@ -704,12 +764,23 @@ class ReparseService {
             endPressure: Value(tank.endPressure),
             o2Percent: Value(tank.o2Percent),
             hePercent: Value(tank.hePercent),
+            // The transmitter serial is computer-owned and written
+            // unconditionally, so a re-parse is how a tank downloaded
+            // before the serial was stored gains it (and a parse that stops
+            // reporting one clears the stale value).
+            transmitterSerial: Value(tank.transmitterSerial),
+            // A legacy row gains its explicit source index here; a row that
+            // already has one keeps it.
+            sourceTankIndex: existing.sourceTankIndex == null
+                ? Value(tank.index)
+                : const Value.absent(),
             // tankName, presetName, equipmentId, tankRole, tankMaterial
-            // are user-authored -- NOT touched
+            // are user-authored -- NOT touched, so the registry is not
+            // applied to an existing row either.
           ),
         );
       } else {
-        // New tank: insert with defaults
+        // New tank: insert with defaults, registry applied.
         final newTankId = _uuid.v4();
         tankIdsByIndex[tank.index] = newTankId;
         await db
@@ -720,19 +791,29 @@ class ReparseService {
                 diveId: Value(diveId),
                 computerId: Value(computerId),
                 volume: Value(tank.volumeLiters),
+                workingPressure: Value.absentIfNull(tank.workingPressure),
+                tankMaterial: Value.absentIfNull(tank.material),
+                presetName: Value.absentIfNull(tank.presetName),
+                equipmentId: Value.absentIfNull(tank.equipmentId),
+                tankName: Value.absentIfNull(tank.tankName),
                 startPressure: Value(tank.startPressure),
                 endPressure: Value(tank.endPressure),
                 o2Percent: Value(tank.o2Percent),
                 hePercent: Value(tank.hePercent),
                 tankOrder: Value(tank.index),
                 tankRole: Value(tank.role ?? 'backGas'),
+                transmitterSerial: Value(tank.transmitterSerial),
+                sourceTankIndex: Value(tank.index),
               ),
             );
       }
     }
 
-    // Delete tanks that exist in DB but not in parsed
+    // Delete tanks that exist in DB but were neither matched nor kept by
+    // order (the pre-v200 rule, so manual rows on a re-parsed dive behave as
+    // before).
     for (final existing in existingTanks) {
+      if (matchedIds.contains(existing.id)) continue;
       if (!newTankOrders.contains(existing.tankOrder)) {
         await (db.delete(
           db.diveTanks,
@@ -772,25 +853,22 @@ class ReparseService {
     if (pressuresByTank.isEmpty) return;
 
     // Insert the pressure time-series for each known tank.
-    await db.batch((batch) {
-      for (final entry in pressuresByTank.entries) {
-        final tankId = tankIdsByIndex[entry.key];
-        if (tankId == null) continue;
-        for (final point in entry.value) {
-          batch.insert(
-            db.tankPressureProfiles,
-            TankPressureProfilesCompanion.insert(
-              id: _uuid.v4(),
-              diveId: diveId,
-              tankId: tankId,
-              computerId: Value(computerId),
+    for (final entry in pressuresByTank.entries) {
+      final tankId = tankIdsByIndex[entry.key];
+      if (tankId == null || entry.value.isEmpty) continue;
+      await _tankSeries.insertSeries(
+        diveId: diveId,
+        tankId: tankId,
+        computerId: computerId,
+        samples: [
+          for (final point in entry.value)
+            TankPressureSample(
               timestamp: point.timestamp,
               pressure: point.pressure,
             ),
-          );
-        }
-      }
-    });
+        ],
+      );
+    }
 
     // Backfill start/end pressure from the profile when the parsed tank summary
     // didn't provide explicit values.
@@ -831,16 +909,18 @@ class ReparseService {
   /// Calculate bottom time from profile samples.
   ///
   /// Delegates to [BottomTimeCalculator], mirroring
-  /// DiveComputerRepositoryImpl._calculateBottomTimeFromPoints: bottom time
+  /// DiveComputerRepository._calculateBottomTimeFromPoints: bottom time
   /// runs from surface departure to the start of the final ascent, so
-  /// multilevel dives count their shallower segments. Returns null if
-  /// insufficient data.
+  /// multilevel dives count their shallower segments, and never exceeds
+  /// [totalDurationSeconds], the computer's own reported runtime. Returns
+  /// null if insufficient data.
   static int? _calculateBottomTimeFromSamples(
-    List<pigeon.ProfileSample> samples,
-  ) {
+    List<pigeon.ProfileSample> samples, {
+    required int totalDurationSeconds,
+  }) {
     return BottomTimeCalculator.secondsFromSamples([
       for (final s in samples) (timestamp: s.timeSeconds, depth: s.depthMeters),
-    ]);
+    ], totalDurationSeconds: totalDurationSeconds);
   }
 
   /// Minimum water temperature for this parse, in Celsius.
@@ -876,7 +956,7 @@ class ReparseService {
   }
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.
-  static String? _mapEventTypeString(String type) {
+  static String? _mapEventTypeString(String type, {int? flags}) {
     switch (type) {
       case 'safetystop':
       case 'safetystop_voluntary':
@@ -884,7 +964,11 @@ class ReparseService {
         return 'safetyStopStart';
       case 'deco':
       case 'deepstop':
-        return 'decoStopStart';
+        // libdivecomputer reports the two ends of a stop as one event type
+        // with SAMPLE_FLAGS_BEGIN (1) or SAMPLE_FLAGS_END (2); an event with
+        // neither is a bare marker and reads as the start. Mirrors the
+        // download path in dive_computer_repository_impl.dart.
+        return flags == kLibdcSampleFlagsEnd ? 'decoStopEnd' : 'decoStopStart';
       case 'violation':
         return 'decoViolation';
       case 'gaschange':
@@ -899,6 +983,11 @@ class ReparseService {
         return 'decoViolation';
       case 'PO2':
         return 'ppO2High';
+      case 'rbt':
+      case 'airtime':
+        // Remaining bottom time (Uwatec) and air time (Suunto) alarms both
+        // mean the gas supply is running short at the current rate.
+        return 'lowGas';
       default:
         return null;
     }
@@ -911,6 +1000,7 @@ class ReparseService {
       case 'ppO2High':
         return 'alert';
       case 'ascentRateWarning':
+      case 'lowGas':
         return 'warning';
       default:
         return 'info';

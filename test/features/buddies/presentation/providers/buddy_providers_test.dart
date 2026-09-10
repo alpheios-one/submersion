@@ -39,10 +39,12 @@ BuddyWithDiveCount _withCount(
   String name, {
   int diveCount = 0,
   bool isFavorite = false,
+  DateTime? lastDiveAt,
 }) {
   return BuddyWithDiveCount(
     buddy: _makeBuddy(id: name, name: name).copyWith(isFavorite: isFavorite),
     diveCount: diveCount,
+    lastDiveAt: lastDiveAt,
   );
 }
 
@@ -344,6 +346,152 @@ void main() {
       );
 
       expect(buddies, original);
+    });
+  });
+
+  group('applyBuddyWithDiveCountSorting by last dive (issue #1264)', () {
+    test('descending puts the most recently dived-with buddy first', () {
+      final buddies = [
+        _withCount('Old', lastDiveAt: DateTime(2022, 3, 1)),
+        _withCount('Recent', lastDiveAt: DateTime(2026, 8, 15)),
+        _withCount('Mid', lastDiveAt: DateTime(2024, 6, 10)),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), ['Recent', 'Mid', 'Old']);
+    });
+
+    test('ascending reverses the dated order', () {
+      final buddies = [
+        _withCount('Old', lastDiveAt: DateTime(2022, 3, 1)),
+        _withCount('Recent', lastDiveAt: DateTime(2026, 8, 15)),
+        _withCount('Mid', lastDiveAt: DateTime(2024, 6, 10)),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), ['Old', 'Mid', 'Recent']);
+    });
+
+    test('buddies never dived with sort last in both directions', () {
+      final buddies = [
+        _withCount('Never'),
+        _withCount('Recent', lastDiveAt: DateTime(2026, 8, 15)),
+        _withCount('Old', lastDiveAt: DateTime(2022, 3, 1)),
+      ];
+
+      final descending = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.descending,
+        ),
+      );
+      final ascending = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(descending.map((b) => b.buddy.name), ['Recent', 'Old', 'Never']);
+      expect(ascending.map((b) => b.buddy.name), ['Old', 'Recent', 'Never']);
+    });
+
+    test('ties break alphabetically for a deterministic order', () {
+      final sameDay = DateTime(2025, 1, 1);
+      final buddies = [
+        _withCount('Charlie', lastDiveAt: sameDay),
+        _withCount('Alice', lastDiveAt: sameDay),
+        _withCount('Neither B'),
+        _withCount('Neither A'),
+      ];
+
+      final sorted = applyBuddyWithDiveCountSorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.descending,
+        ),
+      );
+
+      expect(sorted.map((b) => b.buddy.name), [
+        'Alice',
+        'Charlie',
+        'Neither A',
+        'Neither B',
+      ]);
+    });
+  });
+
+  group('applyBuddySorting fallback (plain Buddy, no aggregates)', () {
+    test('lastDive falls back to name sorting, like diveCount', () {
+      final buddies = [
+        _makeBuddy(id: 'c', name: 'Charlie'),
+        _makeBuddy(id: 'a', name: 'Alice'),
+        _makeBuddy(id: 'b', name: 'Bob'),
+      ];
+
+      final descending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.descending,
+        ),
+      );
+      final ascending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.lastDive,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(ascending.map((b) => b.name), ['Alice', 'Bob', 'Charlie']);
+      expect(descending.map((b) => b.name), ['Charlie', 'Bob', 'Alice']);
+    });
+
+    test('name keeps its inverted direction, unlike the fallbacks', () {
+      // The name field reads descending as A to Z, which is the opposite of
+      // what the fallback fields above do. Pinned because the two now share
+      // one comparison and only the inversion tells them apart.
+      final buddies = [
+        _makeBuddy(id: 'c', name: 'Charlie'),
+        _makeBuddy(id: 'a', name: 'Alice'),
+        _makeBuddy(id: 'b', name: 'Bob'),
+      ];
+
+      final descending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.name,
+          direction: SortDirection.descending,
+        ),
+      );
+      final ascending = applyBuddySorting(
+        buddies,
+        const SortState(
+          field: BuddySortField.name,
+          direction: SortDirection.ascending,
+        ),
+      );
+
+      expect(descending.map((b) => b.name), ['Alice', 'Bob', 'Charlie']);
+      expect(ascending.map((b) => b.name), ['Charlie', 'Bob', 'Alice']);
     });
   });
 

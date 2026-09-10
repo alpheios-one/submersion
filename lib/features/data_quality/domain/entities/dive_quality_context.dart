@@ -1,3 +1,4 @@
+import 'package:submersion/features/data_quality/domain/quality_thresholds.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -28,6 +29,8 @@ class QualityNeighbor {
     this.computerSerial,
     this.firstSampleDepth,
     this.lastSampleDepth,
+    this.sampleCount,
+    this.carriesDiverData,
   });
 
   final String id;
@@ -38,6 +41,16 @@ class QualityNeighbor {
   final String? computerSerial;
   final double? firstSampleDepth;
   final double? lastSampleDepth;
+
+  /// Samples stored across the neighbor's primary series, from the same
+  /// column [DiveQualityContext.primarySampleCount] reads, so the two sides
+  /// of a pair are compared on one measure. Null when unknown.
+  final int? sampleCount;
+
+  /// Whether the diver has written anything of their own onto this dive, from
+  /// the same measure [DiveQualityContext.carriesDiverData] reads. Null when
+  /// unknown. See that field for what counts.
+  final bool? carriesDiverData;
 }
 
 /// Everything a detector may look at for one dive. Built once per dive per
@@ -49,18 +62,54 @@ class DiveQualityContext {
     required this.now,
     this.sources = const [],
     this.primarySamples = const [],
+    this.primarySampleCount,
+    this.carriesDiverData,
     this.tanks = const [],
     this.pressuresByTankId = const {},
     this.gasSwitches = const [],
     this.neighbors = const [],
+    this.ppO2MaxBar = QualityThresholds.ppO2WarnBar,
+    this.knownTransmitterSerials = const {},
   });
 
   final domain.Dive dive;
   final DateTime now;
   final List<DiveDataSource> sources;
   final List<QualitySample> primarySamples;
+
+  /// Samples stored across the dive's primary series, as the series report
+  /// them. Deliberately not `primarySamples.length`: that list is sanitized
+  /// and merged, and a neighbor's count comes straight from the stored
+  /// column, so comparing the two would make a pair's richer side depend on
+  /// which dive the scan happened to start from. Null when unknown.
+  final int? primarySampleCount;
+
+  /// Whether the diver has written anything of their own onto this dive:
+  /// gear, buddies, tags, marine life, weights, media, custom fields, notes,
+  /// a rating, a favourite mark, or a link to a site, trip, dive centre or
+  /// course. Deliberately excludes everything a dive computer download
+  /// produces by itself (tanks, dive types, profile series and their events),
+  /// so it reads as "a human has been here" rather than "this row is
+  /// populated".
+  ///
+  /// A pair's two sides must be measured the same way or the verdict would
+  /// depend on which dive the scan reached first, so this comes from the same
+  /// query [QualityNeighbor.carriesDiverData] does rather than from the
+  /// hydrated entity. Null when unknown.
+  final bool? carriesDiverData;
+
   final List<domain.DiveTank> tanks;
   final Map<String, List<QualityPressureSample>> pressuresByTankId;
   final List<GasSwitch> gasSwitches;
   final List<QualityNeighbor> neighbors;
+
+  /// The diver's maximum (deco / contingency) ppO2 ceiling in bar, from
+  /// decompression settings. Detectors treat a recorded gas/depth combination
+  /// as suspect above this, and genuinely wrong further above it. Defaults to
+  /// [QualityThresholds.ppO2WarnBar] (1.6) when settings are unavailable.
+  final double ppO2MaxBar;
+
+  /// Normalized serials of the diver's registered transmitters (issue #1365),
+  /// so a detector can tell a downloaded tank nobody has assigned yet.
+  final Set<String> knownTransmitterSerials;
 }

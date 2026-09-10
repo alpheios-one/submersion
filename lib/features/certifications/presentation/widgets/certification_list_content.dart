@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/sort_options_display.dart';
-import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -25,6 +24,8 @@ import 'package:submersion/features/certifications/domain/constants/certificatio
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/certifications/presentation/certification_title_l10n.dart';
+import 'package:submersion/features/certifications/presentation/certification_agency_display.dart';
 
 /// Content widget for the certification list, used in master-detail layout.
 class CertificationListContent extends ConsumerStatefulWidget {
@@ -303,9 +304,9 @@ class _CertificationListContentState
     _handleItemTap(cert);
   }
 
-  Future<void> _confirmAndDelete() async {
+  Future<BulkActionOutcome> _confirmAndDelete() async {
     final ids = _selectedIds.toList();
-    if (ids.isEmpty) return;
+    if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -327,7 +328,7 @@ class _CertificationListContentState
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(certificationListNotifierProvider.notifier);
@@ -335,12 +336,13 @@ class _CertificationListContentState
     for (final id in ids) {
       await notifier.deleteCertification(id);
     }
-    if (!mounted) return;
+    if (!mounted) return BulkActionOutcome.completed;
     messenger.showSnackBar(
       SnackBar(
         content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
       ),
     );
+    return BulkActionOutcome.completed;
   }
 
   Widget _buildTableModeScaffold(
@@ -713,7 +715,7 @@ class _CertificationListContentState
 }
 
 /// List item widget for displaying a certification
-class CertificationListTile extends StatelessWidget {
+class CertificationListTile extends ConsumerWidget {
   final Certification certification;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -732,8 +734,9 @@ class CertificationListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     final statusLabel = certification.isExpired
         ? ', Expired'
@@ -741,11 +744,11 @@ class CertificationListTile extends StatelessWidget {
         ? ', Expiring in ${certification.daysUntilExpiry} days'
         : '';
     final issueDateLabel = certification.issueDate != null
-        ? ', issued ${DateFormat.yMMMd().format(certification.issueDate!)}'
+        ? ', issued ${units.formatDate(certification.issueDate)}'
         : '';
     // Only non-null when a custom name owns the title, so the level is spoken
     // exactly once either way.
-    final level = certificationSubtitle(certification);
+    final level = certificationSubtitleL10n(certification, context.l10n);
     final levelLabel = level != null ? ', $level' : '';
 
     return Semantics(
@@ -753,8 +756,8 @@ class CertificationListTile extends StatelessWidget {
       // it would leave "Open Water" with no issuing agency. The title is
       // derived rather than raw so the agency is not said twice.
       label:
-          '${certification.agency.displayName} '
-          '${certificationTitle(certification)}'
+          '${certification.agency.localizedName(context.l10n)} '
+          '${certificationTitleL10n(certification, context.l10n)}'
           '$levelLabel$issueDateLabel$statusLabel',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -769,8 +772,8 @@ class CertificationListTile extends StatelessWidget {
             onChanged: onCheckChanged,
             child: _buildLeadingIcon(context),
           ),
-          title: Text(certificationTitle(certification)),
-          subtitle: _buildSubtitle(context),
+          title: Text(certificationTitleL10n(certification, context.l10n)),
+          subtitle: _buildSubtitle(context, units),
           trailing: _buildTrailing(context),
         ),
       ),
@@ -787,12 +790,14 @@ class CertificationListTile extends StatelessWidget {
       ),
       child: Center(
         child: Text(
-          certification.agency.displayName.substring(
-            0,
-            certification.agency.displayName.length > 4
-                ? 4
-                : certification.agency.displayName.length,
-          ),
+          certification.agency
+              .localizedName(context.l10n)
+              .substring(
+                0,
+                certification.agency.localizedName(context.l10n).length > 4
+                    ? 4
+                    : certification.agency.localizedName(context.l10n).length,
+              ),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             fontWeight: FontWeight.bold,
@@ -803,13 +808,13 @@ class CertificationListTile extends StatelessWidget {
     );
   }
 
-  Widget? _buildSubtitle(BuildContext context) {
+  Widget? _buildSubtitle(BuildContext context, UnitFormatter units) {
     final parts = <String>[];
     // Carries the level too when the title is a custom name, which is the
     // only place the level can show on this tile.
-    parts.add(certificationAgencyAndLevel(certification));
+    parts.add(certificationCredentialsLineL10n(certification, context.l10n));
     if (certification.issueDate != null) {
-      parts.add(DateFormat.yMMMd().format(certification.issueDate!));
+      parts.add(units.formatDate(certification.issueDate));
     }
     return Text(parts.join(' - '));
   }

@@ -1,12 +1,13 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:submersion/core/services/images/profile_photo_codec.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/certification_levels.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -16,7 +17,11 @@ import 'package:submersion/features/certifications/domain/certification_title.da
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_option.dart';
+import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
+import 'package:submersion/features/certifications/presentation/certification_level_display.dart';
+import 'package:submersion/features/certifications/presentation/certification_title_l10n.dart';
+import 'package:submersion/features/certifications/presentation/certification_agency_display.dart';
 
 class CertificationEditPage extends ConsumerStatefulWidget {
   final String? certificationId;
@@ -32,6 +37,13 @@ class CertificationEditPage extends ConsumerStatefulWidget {
   final Certification? initialCertification;
   final void Function(Certification result)? onStaged;
 
+  /// Test seam: replaces the platform image picker, which has no Dart-side
+  /// entry point a fake can be injected through. Receives the source and
+  /// returns the raw bytes plus a declared name, or null when the user
+  /// cancels. Mirrors [OcrScanPage.pickImageOverride].
+  final Future<({Uint8List bytes, String name})?> Function(ImageSource source)?
+  pickPhotoOverride;
+
   const CertificationEditPage({
     super.key,
     this.certificationId,
@@ -40,6 +52,7 @@ class CertificationEditPage extends ConsumerStatefulWidget {
     this.onCancel,
     this.initialCertification,
     this.onStaged,
+    @visibleForTesting this.pickPhotoOverride,
   }) : assert(
          onStaged == null || certificationId == null,
          'Staging mode (onStaged) prefills from initialCertification and never '
@@ -66,6 +79,12 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
 
   CertificationAgency _agency = CertificationAgency.padi;
   CertificationLevel? _level;
+
+  /// Recognitions this card grants beyond ([_agency], [_level]). Rendered as
+  /// equal rows in the credential list -- ([_agency], [_level]) is just row 0,
+  /// not a primary. Saved to Certification.additionalCredentials.
+  final List<_Cred> _extraCredentials = [];
+
   DateTime? _issueDate;
   DateTime? _expiryDate;
   Uint8List? _photoFront;
@@ -121,6 +140,9 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     _notesController.text = cert.notes;
     _agency = cert.agency;
     _level = cert.level;
+    _extraCredentials
+      ..clear()
+      ..addAll(cert.additionalCredentials.map((c) => _Cred(c.agency, c.level)));
 
     _issueDate = cert.issueDate;
     _expiryDate = cert.expiryDate;
@@ -146,6 +168,11 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
         setState(() {
           _agency = cert.agency;
           _level = cert.level;
+          _extraCredentials
+            ..clear()
+            ..addAll(
+              cert.additionalCredentials.map((c) => _Cred(c.agency, c.level)),
+            );
           _issueDate = cert.issueDate;
           _expiryDate = cert.expiryDate;
           _photoFront = cert.photoFront;
@@ -199,18 +226,48 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     if (source == null) return null;
 
     try {
-      final picked = await _imagePicker.pickImage(
-        source: source,
-        maxWidth: 2000,
-        maxHeight: 2000,
-        imageQuality: 85,
+      // No maxWidth / maxHeight / imageQuality here: image_picker_macos,
+      // image_picker_windows and image_picker_linux all document those
+      // arguments as silently ignored, so a desktop pick entered the database
+      // at full size and rode into every sync changeset as base64. The cap is
+      // enforced below instead, in Dart, where it holds on every platform.
+      final ({Uint8List bytes, String name})? source_;
+      if (widget.pickPhotoOverride != null) {
+        source_ = await widget.pickPhotoOverride!(source);
+      } else {
+        final picked = await _imagePicker.pickImage(source: source);
+        // Read through the XFile handle, not File(picked.path). A picked file
+        // is a HANDLE: on Android SAF the path can be unusable, and
+        // image_picker makes no promise it addresses a real filesystem entry.
+        source_ = picked == null
+            ? null
+            : (bytes: await picked.readAsBytes(), name: picked.name);
+      }
+
+      if (source_ == null) return null;
+
+      final encoded = await encodeStoredImage(
+        ImageEncodeRequest.fromBytes(
+          bytes: source_.bytes,
+          spec: ImageEncodeSpec.certificationCard,
+          declaredName: source_.name,
+        ),
       );
-
-      if (picked == null) return null;
-
-      // Read the file bytes directly
-      final file = File(picked.path);
-      return await file.readAsBytes();
+      if (encoded.outcome != ImageEncodeOutcome.encoded) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                encoded.outcome == ImageEncodeOutcome.tooLarge
+                    ? context.l10n.profilePhoto_error_tooLarge
+                    : context.l10n.profilePhoto_error_undecodable,
+              ),
+            ),
+          );
+        }
+        return null;
+      }
+      return encoded.bytes;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -348,6 +405,118 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     super.dispose();
   }
 
+  CertificationAgency _agencyAt(int i) =>
+      i == 0 ? _agency : _extraCredentials[i - 1].agency;
+  CertificationLevel? _levelAt(int i) =>
+      i == 0 ? _level : _extraCredentials[i - 1].level;
+
+  void _setAgencyAt(int i, CertificationAgency agency) {
+    setState(() {
+      // A level from another agency's catalog is reset -- a visible
+      // consequence of the user's own switch.
+      final level = _levelAt(i);
+      final resetLevel =
+          level != null &&
+          !CertificationLevelCatalog.levelsFor(agency).contains(level);
+      if (i == 0) {
+        _agency = agency;
+        if (resetLevel) _level = null;
+      } else {
+        _extraCredentials[i - 1].agency = agency;
+        if (resetLevel) _extraCredentials[i - 1].level = null;
+      }
+      _hasChanges = true;
+    });
+  }
+
+  void _setLevelAt(int i, CertificationLevel? level) {
+    setState(() {
+      if (i == 0) {
+        _level = level;
+      } else {
+        _extraCredentials[i - 1].level = level;
+      }
+      _hasChanges = true;
+    });
+  }
+
+  void _removeCredentialAt(int i) {
+    setState(() {
+      if (i == 0) {
+        // Promote the next recognition into row 0 so the card keeps one.
+        final next = _extraCredentials.removeAt(0);
+        _agency = next.agency;
+        _level = next.level;
+      } else {
+        _extraCredentials.removeAt(i - 1);
+      }
+      _hasChanges = true;
+    });
+  }
+
+  /// One (agency, level) row. Every row is equal; the trailing remove button
+  /// is shown only when the card has more than one recognition.
+  Widget _credentialRow(BuildContext context, int i) {
+    final agency = _agencyAt(i);
+    final level = _levelAt(i);
+    final canRemove = _extraCredentials.isNotEmpty;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DropdownButtonFormField<CertificationAgency>(
+                key: ValueKey('cred-agency-$i'),
+                initialValue: agency,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: context.l10n.certifications_edit_label_agency,
+                  prefixIcon: const Icon(Icons.business),
+                  isDense: true,
+                ),
+                items: CertificationAgency.values
+                    .map(
+                      (a) => DropdownMenuItem(
+                        value: a,
+                        child: Text(a.localizedName(context.l10n)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) _setAgencyAt(i, value);
+                },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<CertificationOption>(
+                // The key forces a remount when the agency changes or the
+                // level is reset externally, so initialValue is re-read.
+                key: ValueKey('cred-level-$i-${agency.name}-${level?.name}'),
+                initialValue: CertificationOption.value(level),
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText:
+                      context.l10n.certifications_edit_label_certification,
+                  prefixIcon: const Icon(Icons.workspace_premium),
+                  isDense: true,
+                ),
+                items: _certificationItems(context, agency, level),
+                onChanged: (option) => _setLevelAt(i, option?.level),
+              ),
+            ],
+          ),
+        ),
+        if (canRemove)
+          IconButton(
+            icon: const Icon(Icons.close),
+            tooltip: context.l10n.certifications_edit_removeRecognition,
+            onPressed: () => _removeCredentialAt(i),
+          ),
+      ],
+    );
+  }
+
   /// Items for the certification dropdown, grouped into the agency's
   /// progression ladder and the cross-agency specialties.
   ///
@@ -357,13 +526,14 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
   /// the clear-selection choice, not for any correctness reason.
   List<DropdownMenuItem<CertificationOption>> _certificationItems(
     BuildContext context,
+    CertificationAgency agency,
+    CertificationLevel? level,
   ) {
     final theme = Theme.of(context);
-    final ladder = CertificationLevelCatalog.ladderFor(_agency);
-    final specialties = CertificationLevelCatalog.specialtiesFor(_agency);
+    final ladder = CertificationLevelCatalog.ladderFor(agency);
+    final specialties = CertificationLevelCatalog.specialtiesFor(agency);
 
     // A stored value from another agency's catalog still has to render.
-    final level = _level;
     final extra =
         (level != null &&
             level != CertificationLevel.other &&
@@ -388,7 +558,7 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
     DropdownMenuItem<CertificationOption> item(CertificationLevel value) =>
         DropdownMenuItem<CertificationOption>(
           value: CertificationOption.value(value),
-          child: Text(value.displayName),
+          child: Text(value.localizedName(context.l10n)),
         );
 
     return [
@@ -418,58 +588,25 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Agency dropdown
-                  DropdownButtonFormField<CertificationAgency>(
-                    initialValue: _agency,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.certifications_edit_label_agency,
-                      prefixIcon: const Icon(Icons.business),
-                    ),
-                    items: CertificationAgency.values.map((agency) {
-                      return DropdownMenuItem(
-                        value: agency,
-                        child: Text(agency.displayName),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _agency = value;
-                          // A level from another agency's catalog is reset -
-                          // a visible consequence of the user's own switch.
-                          if (_level != null &&
-                              !CertificationLevelCatalog.levelsFor(
-                                value,
-                              ).contains(_level)) {
-                            _level = null;
-                          }
-                          _hasChanges = true;
-                        });
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Certification dropdown (options depend on the agency)
-                  DropdownButtonFormField<CertificationOption>(
-                    // DropdownButtonFormField keeps its selection in its own
-                    // FormFieldState; the key forces a remount when the
-                    // agency changes or the level is reset externally, so
-                    // initialValue is re-read.
-                    key: ValueKey('level-${_agency.name}-${_level?.name}'),
-                    initialValue: CertificationOption.value(_level),
-                    decoration: InputDecoration(
-                      labelText:
-                          context.l10n.certifications_edit_label_certification,
-                      prefixIcon: const Icon(Icons.workspace_premium),
-                    ),
-                    items: _certificationItems(context),
-                    onChanged: (option) {
-                      setState(() {
-                        _level = option?.level;
+                  // Credential list: each row is an equal (agency, level)
+                  // recognition the card grants. Row 0 is stored in
+                  // _agency/_level, the rest in _extraCredentials -- no primary.
+                  for (var i = 0; i < 1 + _extraCredentials.length; i++) ...[
+                    _credentialRow(context, i),
+                    const SizedBox(height: 16),
+                  ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => setState(() {
+                        _extraCredentials.add(_Cred(_agency, null));
                         _hasChanges = true;
-                      });
-                    },
+                      }),
+                      icon: const Icon(Icons.add),
+                      label: Text(
+                        context.l10n.certifications_edit_addRecognition,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
 
@@ -481,7 +618,11 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
                       labelText:
                           context.l10n.certifications_edit_label_nameOnCard,
                       prefixIcon: const Icon(Icons.card_membership),
-                      hintText: derivedCertificationTitle(_agency, _level),
+                      hintText: derivedCertificationTitleL10n(
+                        _agency,
+                        _level,
+                        context.l10n,
+                      ),
                       helperText:
                           context.l10n.certifications_edit_helper_nameOnCard,
                     ),
@@ -761,22 +902,11 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
                 : context.l10n.certifications_edit_appBar_add,
           ),
           actions: [
-            if (_isSaving)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-              )
-            else
-              TextButton(
-                onPressed: _saveCertification,
-                child: Text(context.l10n.certifications_edit_button_save),
-              ),
+            AppBarTextAction(
+              label: context.l10n.certifications_edit_button_save,
+              onPressed: _isSaving ? null : _saveCertification,
+              busy: _isSaving,
+            ),
           ],
         ),
         body: body,
@@ -894,6 +1024,11 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
         name: _nameController.text.trim(),
         agency: _agency,
         level: _level,
+        additionalCredentials: _extraCredentials
+            .map(
+              (c) => CertificationCredential(agency: c.agency, level: c.level),
+            )
+            .toList(),
         cardNumber: _cardNumberController.text.trim().isEmpty
             ? null
             : _cardNumberController.text.trim(),
@@ -940,6 +1075,11 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
         name: _nameController.text.trim(),
         agency: _agency,
         level: _level,
+        additionalCredentials: _extraCredentials
+            .map(
+              (c) => CertificationCredential(agency: c.agency, level: c.level),
+            )
+            .toList(),
         cardNumber: _cardNumberController.text.trim().isEmpty
             ? null
             : _cardNumberController.text.trim(),
@@ -1006,7 +1146,14 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
   }
 }
 
-class _DatePickerField extends StatelessWidget {
+/// A mutable (agency, level) pair while the credential list is being edited.
+class _Cred {
+  CertificationAgency agency;
+  CertificationLevel? level;
+  _Cred(this.agency, this.level);
+}
+
+class _DatePickerField extends ConsumerWidget {
   final String label;
   final DateTime? value;
   final IconData icon;
@@ -1022,14 +1169,15 @@ class _DatePickerField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final units = UnitFormatter(ref.watch(settingsProvider));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Semantics(
           button: true,
           label: value != null
-              ? '$label: ${DateFormat.yMMMd().format(value!)}. Tap to change'
+              ? '$label: ${units.formatDate(value)}. Tap to change'
               : '$label: not set. Tap to select',
           child: InkWell(
             onTap: () => _pickDate(context),
@@ -1048,7 +1196,7 @@ class _DatePickerField extends StatelessWidget {
               ),
               child: Text(
                 value != null
-                    ? DateFormat.yMMMd().format(value!)
+                    ? units.formatDate(value)
                     : context.l10n.certifications_edit_datePicker_tapToSelect,
                 style: TextStyle(
                   color: value != null

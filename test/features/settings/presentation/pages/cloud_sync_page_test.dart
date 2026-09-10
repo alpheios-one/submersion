@@ -574,6 +574,31 @@ void main() {
     });
   });
 
+  group('errorDisplayText', () {
+    test('drops the class-name prefix from a CloudStorageException', () {
+      // The banner in the reported screenshots read "CloudStorageException:
+      // Google Sign-In was cancelled (...)". CloudStorageException documents
+      // displayMessage as the snackbar-safe form for exactly this reason.
+      const error = CloudStorageException('Sign-in was refused');
+
+      expect(errorDisplayText(error), 'Sign-in was refused');
+      expect(errorDisplayText(error), isNot(contains('CloudStorageException')));
+    });
+
+    test('keeps the underlying cause, which carries the detail', () {
+      const error = CloudStorageException(
+        'Sign-in was refused',
+        '[16] Account reauth failed.',
+      );
+
+      expect(errorDisplayText(error), contains('Account reauth failed'));
+    });
+
+    test('falls back to toString for any other error', () {
+      expect(errorDisplayText(StateError('boom')), contains('boom'));
+    });
+  });
+
   group('connectionErrorMessage', () {
     final l10n = AppLocalizationsEn();
 
@@ -1117,11 +1142,14 @@ void main() {
       await tester.tap(find.text(cancelLabel));
       await tester.pumpAndSettle();
 
-      // Dialog gone, selection cleared (no connected check icon), and the
-      // connection-failed snackbar shown.
+      // Dialog gone and the selection cleared (no connected check icon).
+      // No error is shown: cancelling is a decision, not a failure, so the
+      // helper raises CloudAuthCancelled and the page rolls back quietly
+      // rather than surfacing a red connection-failed snackbar carrying an
+      // untranslated English fragment.
       expect(find.text('Continue in your browser'), findsNothing);
       expect(find.byIcon(Icons.check_circle), findsNothing);
-      expect(find.textContaining('connection failed'), findsOneWidget);
+      expect(find.textContaining('connection failed'), findsNothing);
 
       // The abandoned flow's eventual error must be swallowed; nothing
       // may surface after the user has already cancelled.

@@ -576,12 +576,13 @@ G_DECLARE_FINAL_TYPE(LibdivecomputerPluginTankInfo, libdivecomputer_plugin_tank_
  * start_pressure_bar: field in this object.
  * end_pressure_bar: field in this object.
  * usage: field in this object.
+ * transmitter_serial: field in this object.
  *
  * Creates a new #TankInfo object.
  *
  * Returns: a new #LibdivecomputerPluginTankInfo
  */
-LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new(int64_t index, int64_t gas_mix_index, double* volume_liters, double* start_pressure_bar, double* end_pressure_bar, int64_t* usage);
+LibdivecomputerPluginTankInfo* libdivecomputer_plugin_tank_info_new(int64_t index, int64_t gas_mix_index, double* volume_liters, double* start_pressure_bar, double* end_pressure_bar, int64_t* usage, int64_t* transmitter_serial);
 
 /**
  * libdivecomputer_plugin_tank_info_get_index
@@ -643,6 +644,19 @@ double* libdivecomputer_plugin_tank_info_get_end_pressure_bar(LibdivecomputerPlu
  * Returns: the field value.
  */
 int64_t* libdivecomputer_plugin_tank_info_get_usage(LibdivecomputerPluginTankInfo* object);
+
+/**
+ * libdivecomputer_plugin_tank_info_get_transmitter_serial
+ * @object: a #LibdivecomputerPluginTankInfo.
+ *
+ * Serial number of the air-integration transmitter that reported this
+ * tank's pressures (`dc_tank_t.serial`, a fork extension); null when the
+ * computer reported none. Identifies the physical cylinder across
+ * computers paired to the same transmitter.
+ *
+ * Returns: the field value.
+ */
+int64_t* libdivecomputer_plugin_tank_info_get_transmitter_serial(LibdivecomputerPluginTankInfo* object);
 
 /**
  * LibdivecomputerPluginDiveEvent:
@@ -1215,7 +1229,7 @@ typedef struct {
   void (*get_device_descriptors)(LibdivecomputerPluginDiveComputerHostApiResponseHandle* response_handle, gpointer user_data);
   void (*start_discovery)(LibdivecomputerPluginTransportType transport, LibdivecomputerPluginDiveComputerHostApiResponseHandle* response_handle, gpointer user_data);
   LibdivecomputerPluginDiveComputerHostApiStopDiscoveryResponse* (*stop_discovery)(gpointer user_data);
-  void (*start_download)(LibdivecomputerPluginDiscoveredDevice* device, const gchar* fingerprint, LibdivecomputerPluginDiveComputerHostApiResponseHandle* response_handle, gpointer user_data);
+  void (*start_download)(LibdivecomputerPluginDiscoveredDevice* device, const gchar* fingerprint, gboolean sync_clock, LibdivecomputerPluginDiveComputerHostApiResponseHandle* response_handle, gpointer user_data);
   LibdivecomputerPluginDiveComputerHostApiCancelDownloadResponse* (*cancel_download)(gpointer user_data);
   LibdivecomputerPluginDiveComputerHostApiSubmitPinCodeResponse* (*submit_pin_code)(const gchar* pin_code, gpointer user_data);
   LibdivecomputerPluginDiveComputerHostApiGetLibdivecomputerVersionResponse* (*get_libdivecomputer_version)(gpointer user_data);
@@ -1774,12 +1788,13 @@ LibdivecomputerPluginDiveComputerFlutterApiOnDiveDownloadedResponse* libdivecomp
  * @total_dives: parameter for this method.
  * @serial_number: (allow-none): parameter for this method.
  * @firmware_version: (allow-none): parameter for this method.
+ * @clock_sync_status: (allow-none): parameter for this method.
  * @cancellable: (allow-none): a #GCancellable or %NULL.
  * @callback: (scope async): (allow-none): a #GAsyncReadyCallback to call when the call is complete or %NULL to ignore the response.
  * @user_data: (closure): user data to pass to @callback.
  *
  */
-void libdivecomputer_plugin_dive_computer_flutter_api_on_download_complete(LibdivecomputerPluginDiveComputerFlutterApi* api, int64_t total_dives, const gchar* serial_number, const gchar* firmware_version, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data);
+void libdivecomputer_plugin_dive_computer_flutter_api_on_download_complete(LibdivecomputerPluginDiveComputerFlutterApi* api, int64_t total_dives, const gchar* serial_number, const gchar* firmware_version, const gchar* clock_sync_status, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer user_data);
 
 /**
  * libdivecomputer_plugin_dive_computer_flutter_api_on_download_complete_finish:

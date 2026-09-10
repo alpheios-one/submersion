@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:submersion/shared/widgets/profile_photo/profile_avatar.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/constants/sort_options_display.dart';
@@ -9,6 +10,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/buddies/presentation/buddy_certification_l10n.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/dive_role_display.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
@@ -198,15 +200,14 @@ class _BuddyChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InputChip(
-      avatar: CircleAvatar(
+      avatar: ProfileAvatar(
+        photo: buddyWithRole.buddy.photo,
+        initials: buddyWithRole.buddy.initials,
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        child: Text(
-          buddyWithRole.buddy.initials,
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
-          ),
+        textStyle: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.onSecondaryContainer,
         ),
       ),
       label: Column(
@@ -261,14 +262,23 @@ class _MeChip extends ConsumerWidget {
             context.l10n,
           );
     return InputChip(
-      avatar: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Icon(
-          Icons.person,
-          size: 14,
-          color: Theme.of(context).colorScheme.onPrimaryContainer,
-        ),
-      ),
+      // The active diver's own chip. Falls back to the generic person icon
+      // rather than initials when there is no photo, preserving how this chip
+      // has always looked.
+      avatar: diver?.photo != null
+          ? ProfileAvatar(
+              photo: diver!.photo,
+              initials: diver.initials,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            )
+          : CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: Icon(
+                Icons.person,
+                size: 14,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
       label: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -612,27 +622,32 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
             .firstOrNull;
 
         return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: isSelected
-                ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: isSelected
-                ? Icon(
+          // Selection wins over the photo: a checked row must read as checked
+          // at a glance, which a face would undercut.
+          leading: isSelected
+              ? CircleAvatar(
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
+                  child: Icon(
                     Icons.check,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  )
-                : Text(
-                    buddy.initials,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
                   ),
-          ),
+                )
+              : ProfileAvatar(
+                  photo: buddy.photo,
+                  initials: buddy.initials,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
+                  foregroundColor: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant,
+                ),
           title: Text(buddy.name),
-          subtitle: buddy.certificationLevel == null
+          subtitle: buddyCertificationLineL10n(buddy, context.l10n) == null
               ? null
-              : Text(buddy.certificationLevel!.displayName),
+              : Text(buddyCertificationLineL10n(buddy, context.l10n)!),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

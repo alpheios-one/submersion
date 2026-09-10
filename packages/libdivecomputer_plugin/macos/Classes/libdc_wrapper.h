@@ -88,6 +88,36 @@ int libdc_descriptor_lookup_model(unsigned int transport, unsigned int model,
                                   libdc_descriptor_info_t *info);
 
 // ============================================================
+// USB HID Discovery Helpers
+// ============================================================
+
+// Transport bitmask of the descriptor identified by vendor/product/model.
+// Returns 0 when no descriptor matches, which is also a valid "no transports"
+// answer; callers only ever test individual bits, so the two are equivalent.
+//
+// The USB HID download path uses this to decide whether a model is worth
+// looking for on the HID bus before it probes serial ports (issue #1271).
+unsigned int libdc_descriptor_transports(const char *vendor, const char *product,
+                                         unsigned int model);
+
+// Whether the descriptor identified by vendor/product/model accepts a USB HID
+// device with this vendor and product id. Returns 1 for a match, 0 otherwise.
+//
+// The id tables live in libdivecomputer's own filter functions
+// (dc_filter_uwatec, dc_filter_suunto), reachable through the public
+// dc_descriptor_filter(). Asking libdivecomputer rather than copying the
+// tables here means new HID hardware arrives with a submodule bump.
+//
+// A descriptor that does not declare DC_TRANSPORT_USBHID rejects every id.
+// That has to be decided from the transport bitmask rather than from the
+// filter: a filter with no USB HID branch (dc_filter_shearwater, for one)
+// falls through to "accept", so the filter alone would say yes for hardware
+// that has no HID interface at all.
+int libdc_usbhid_match(const char *vendor, const char *product,
+                       unsigned int model,
+                       unsigned short vid, unsigned short pid);
+
+// ============================================================
 // Custom I/O Callbacks (for BLE bridge)
 // ============================================================
 
@@ -174,7 +204,7 @@ typedef struct {
     double o2_sensor[6];       // per-cell ppO2 in bar (NAN if that cell absent)
     unsigned int o2_sensor_mv[6]; // per-cell raw output in mV (UINT32_MAX if absent)
     double cns;                // percentage 0-100 (NAN if unavailable)
-    unsigned int rbt;          // remaining bottom time in seconds (UINT32_MAX if unavailable)
+    unsigned int rbt;          // remaining bottom time in MINUTES as libdc reports it (UINT32_MAX if unavailable); Dart converts to seconds
     // Decompression status at this sample
     unsigned int deco_type;    // 0=NDL, 1=safetystop, 2=decostop, 3=deepstop (UINT32_MAX if unavailable)
     unsigned int deco_time;    // seconds (NDL seconds or stop time remaining)
@@ -194,7 +224,42 @@ typedef struct {
     double beginpressure;      // bar
     double endpressure;        // bar
     unsigned int usage;        // dc_usage_t (0=none, 1=oxygen, 2=diluent, 3=sidemount)
+    unsigned int serial;       // air-integration transmitter serial, 0 when not reported
 } libdc_tank_t;
+
+// Name of a libdivecomputer sample event type (parser_sample_event_t), in
+// the spelling the Dart layer switches on ("ascent", "ceiling", ...). This is
+// the single table every platform binding must use: the per-platform copies
+// it replaced had all skipped SAMPLE_EVENT_RBT, shifting every later code by
+// one so ascent-rate alarms were reported as ceiling breaches. Returns
+// "unknown" for codes outside the enum. Statically allocated (do not free).
+const char *libdc_event_type_name(unsigned int type);
+
+// Outcome of the optional clock sync that runs after a successful download
+// (issue #1216). NOT_REQUESTED also covers a download that failed or was
+// cancelled, because the sync never runs then.
+typedef enum {
+    LIBDC_CLOCK_SYNC_NOT_REQUESTED = 0,
+    LIBDC_CLOCK_SYNC_SYNCED = 1,
+    LIBDC_CLOCK_SYNC_UNSUPPORTED = 2,
+    LIBDC_CLOCK_SYNC_FAILED = 3,
+} libdc_clock_sync_status_t;
+
+// Wire name for a clock sync status: "not_requested", "synced",
+// "unsupported" or "failed" ("unknown" outside the enum). This is the single
+// table every binding must report through; the Dart side switches on it.
+// Statically allocated (do not free).
+const char *libdc_clock_sync_status_name(libdc_clock_sync_status_t status);
+
+// Sets the device clock to the host's current local time (with the host UTC
+// offset) when `requested` and `download_succeeded` are both non-zero.
+// Returns NOT_REQUESTED without touching the device otherwise, SYNCED on
+// success, UNSUPPORTED when the backend has no timesync, FAILED (and logs a
+// warning through the log callback) for any other libdivecomputer status.
+struct dc_device_t;
+libdc_clock_sync_status_t libdc_sync_device_clock(struct dc_device_t *device,
+                                                   int requested,
+                                                   int download_succeeded);
 
 #define LIBDC_MAX_EVENTS 256
 
@@ -282,6 +347,9 @@ libdc_download_session_t *libdc_download_session_new(void);
 
 // Run the download. Blocks until complete or cancelled.
 // Returns 0 on success, non-zero on error.
+// sync_clock: non-zero to set the device clock to the host's local time after
+// a successful download (issue #1216). The result lands in clock_sync_out
+// (may be NULL) and never affects the return code or error_buf.
 // serial_out/firmware_out receive device info from DC_EVENT_DEVINFO (may be NULL).
 // error_buf receives a human-readable error message (optional, may be NULL).
 int libdc_download_run(
@@ -290,9 +358,11 @@ int libdc_download_run(
     unsigned int transport,
     const libdc_io_callbacks_t *io_callbacks,
     const unsigned char *fingerprint, unsigned int fsize,
+    int sync_clock,
     const libdc_download_callbacks_t *callbacks,
     unsigned int *serial_out,
     unsigned int *firmware_out,
+    libdc_clock_sync_status_t *clock_sync_out,
     char *error_buf, size_t error_buf_size);
 
 // Cancel a running download (thread-safe).

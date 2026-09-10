@@ -12,34 +12,9 @@
 namespace libdivecomputer_plugin {
 
 std::string MapEventType(unsigned int type) {
-    switch (type) {
-        case 0: return "none";
-        case 1: return "deco";
-        case 2: return "ascent";
-        case 3: return "ceiling";
-        case 4: return "workload";
-        case 5: return "transmitter";
-        case 6: return "violation";
-        case 7: return "bookmark";
-        case 8: return "surface";
-        case 9: return "safetystop";
-        case 10: return "gaschange";
-        case 11: return "safetystop_voluntary";
-        case 12: return "safetystop_mandatory";
-        case 13: return "deepstop";
-        case 14: return "ceiling_safetystop";
-        case 15: return "floor";
-        case 16: return "divetime";
-        case 17: return "maxdepth";
-        case 18: return "OLF";
-        case 19: return "PO2";
-        case 20: return "airtime";
-        case 21: return "rgbm";
-        case 22: return "heading";
-        case 23: return "tissuelevel";
-        case 24: return "gaschange2";
-        default: return "unknown_" + std::to_string(type);
-    }
+    // One shared table for every platform; see libdc_event_type_name in
+    // libdc_wrapper.h for why this is no longer a local switch.
+    return libdc_event_type_name(type);
 }
 
 ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
@@ -225,6 +200,9 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
         std::optional<int64_t> opt_usage =
             (tk.usage == 0) ? std::nullopt
                             : std::optional<int64_t>(static_cast<int64_t>(tk.usage));
+        std::optional<int64_t> opt_serial =
+            (tk.serial == 0) ? std::nullopt
+                             : std::optional<int64_t>(static_cast<int64_t>(tk.serial));
 
         tanks.push_back(flutter::CustomEncodableValue(TankInfo(
             static_cast<int64_t>(i),
@@ -232,7 +210,8 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
             opt_vol ? &*opt_vol : nullptr,
             opt_begin ? &*opt_begin : nullptr,
             opt_end ? &*opt_end : nullptr,
-            opt_usage ? &*opt_usage : nullptr)));
+            opt_usage ? &*opt_usage : nullptr,
+            opt_serial ? &*opt_serial : nullptr)));
     }
 
     // Convert events.

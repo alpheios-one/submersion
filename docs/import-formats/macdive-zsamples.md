@@ -1,11 +1,15 @@
 # MacDive `ZDIVE.ZSAMPLES` / `ZDIVE.ZRAWDATA` Binary Format — Investigation Findings
 
-**Status:** `ZRAWDATA` is **SOLVED** — see "Update 2026-08-09" at the end of this document. It is the raw Shearwater download stream stored *still compressed*; decompressing it with libdivecomputer's own two passes yields Petrel Native Format, and 266/267 dives in the reference corpus decode against ground truth. MacDive SQLite profile import works for Shearwater dives as of that date.
+**Status:** BOTH COLUMNS SOLVED. `ZRAWDATA` since 2026-08-09 (see "Update 2026-08-09"); `ZSAMPLES` since 2026-09-02 (see "Update 2026-09-02: ZSAMPLES solved" at the end). `ZSAMPLES` is TEA in ECB mode under a key fixed in the MacDive binary, not AES under a per-dive key, and every one of the 350 blobs in the reference library decodes sample-for-sample against MacDive's own exports. MacDive SQLite profile import now covers every dive MacDive itself drew a profile for, on every platform, with `ZRAWDATA` still preferred where it parses because it carries more channels.
 
-`ZSAMPLES` remains NO-GO (AES-encrypted with a per-dive key, documented below) but is now moot: every Shearwater dive that has `ZSAMPLES` also has `ZRAWDATA`. Non-Shearwater dives have neither and still need MacDive's XML export.
+The "`ZSAMPLES` remains NO-GO (AES-encrypted with a per-dive key)" conclusion that stood here from 2026-04-23 to 2026-09-02 was wrong; the sections that reached it are retained below, unedited, as a record of how a fixed-key ECB cipher was misread as per-dive AES.
+
+**Second correction (see "Update 2026-09-01" below):** the per-model tables both earlier updates produced are gone. `ZCOMPUTER` is now resolved against libdivecomputer's own descriptor list, so any model it supports is attempted and the result is sanity-checked rather than trusted. Read that section before adding anything model-specific here.
+
+**Correction (see "Update 2026-08-29" below):** the claim in the previous paragraph that "non-Shearwater dives have neither [`ZSAMPLES` nor `ZRAWDATA`] and still need MacDive's XML export" was never actually tested against Suunto computers — the investigation corpus contained none. It turns out at least three Suunto models (EON Steel, EON Steel Black, Cobra) do populate `ZRAWDATA`, and unlike Shearwater's, theirs needs no decompression at all.
 
 The 2026-04-24 "ZRAWDATA pivot invalidated" section below is **historically inaccurate** and is retained only to show how the wrong conclusion was reached.
-**Date:** 2026-04-23 (initial), 2026-04-24 (ZRAWDATA invalidation), 2026-08-09 (ZRAWDATA solved)
+**Date:** 2026-04-23 (initial), 2026-04-24 (ZRAWDATA invalidation), 2026-08-09 (ZRAWDATA solved), 2026-08-29 (Suunto ZRAWDATA confirmed), 2026-09-01 (model allowlist removed), 2026-09-02 (ZSAMPLES solved)
 **Author:** Eric Griffin
 **Spec:** `docs/superpowers/specs/2026-04-23-macdive-sqlite-profile-decoding-design.md`
 **Plan:** `docs/superpowers/plans/2026-04-23-macdive-zsamples-phase-1-spike.md`
@@ -474,3 +478,320 @@ Model number does not matter within the Petrel family: "Petrel 2" (3) and "Tern"
 ### Caller-facing trap
 
 `libdc_parse_raw_dive` returned **rc = 0 with an empty error buffer** on the failed compressed parse, having produced a zeroed dive — `extract_dive_fields` swallows per-field failures. Any caller must validate sample count or max depth rather than trusting the return code, or a regression in the decompression step lands silently as a wave of empty dives. `MacDiveDiveMapper._attachProfile` treats an empty sample list as failure for exactly this reason.
+
+## Update 2026-08-29: Suunto `ZRAWDATA` also confirmed
+
+The 2026-08-09 update solved `ZRAWDATA` for Shearwater but restated, unchallenged, the original spike's conclusion that non-Shearwater computers carry no `ZRAWDATA` at all. That conclusion was never actually tested against Suunto — the 540-dive investigation corpus (see "Per-computer presence" above) contained Shearwater, Oceanic Matrix Master, and no-computer dives only, never a Suunto one.
+
+A Submersion user's real MacDive database contains Suunto dives, and their `ZRAWDATA` **is** populated. Unlike Shearwater's stream, Suunto's is stored **uncompressed**, already in the exact byte layout libdivecomputer's own parsers expect for that computer family — no RLE/XOR decompression pass needed, confirmed by feeding the raw blob straight into `parseRawDiveData` and getting correct profile samples back.
+
+Confirmed by model (against real MacDive `ZRAWDATA`, not just the vendor name):
+
+| MacDive `ZCOMPUTER` string | libdivecomputer product | Native format |
+|---|---|---|
+| `Suunto EON Steel` | EON Steel | SBEM |
+| `Suunto EON Steel Black` | EON Steel Black | SBEM |
+| `Suunto Cobra` | Cobra | Vyper dive-header |
+
+Implemented in `MacDiveDiveMapper._suuntoVendorProduct` / `_attachProfile` (`lib/features/universal_import/data/services/macdive_dive_mapper.dart`): the mapper now branches on vendor, running `ShearwaterRawDecompressor` only for Shearwater and passing every other recognized vendor's bytes straight to `parse`. See [submersion-app/submersion#1399](https://github.com/submersion-app/submersion/issues/1399) and the fix PR.
+
+**Superseded by the 2026-09-01 update below:** `_suuntoVendorProduct` no longer exists, and no table entry is needed to support another model. The paragraph is kept for the reasoning it records.
+
+**Not yet validated (as of 2026-08-29):** other Suunto models likely follow the same uncompressed-native-format pattern (Suunto's own product line shares firmware lineage), but no real `ZRAWDATA` from any other Suunto model has been confirmed. Computers outside the three above still fall through to the "no `ZRAWDATA`" warning path — a future contributor with real data from another Suunto model should add it to `_suuntoVendorProduct` only after confirming its `ZRAWDATA` parses cleanly, per the caller-facing trap noted above (a failed native parse can silently return a zeroed dive rather than an error).
+
+## Update 2026-09-01: the model allowlist is gone
+
+Two rounds of this feature landed as one-model-at-a-time table entries: #961
+added Shearwater, #1400 added three Suunto models. Both were correct about the
+bytes and wrong about the scope, because both recorded a *data* limit ("we only
+had blobs for these") as a *format* limit ("only these have usable
+`ZRAWDATA`"). A user with a Suunto D5, a Mares Puck, or an Oceanic Geo hit the
+warning path with a perfectly decodable blob sitting in the database. #1436
+removed the tables rather than adding a third entry.
+
+### What resolution does now
+
+`ZDIVE.ZCOMPUTER` is matched against libdivecomputer's own descriptor list,
+read once per import through `DiveComputerHostApi.getDeviceDescriptors()` and
+indexed by `DiveComputerDescriptorIndex`
+(`lib/features/universal_import/data/services/dive_computer_descriptor_index.dart`).
+Every model the vendored submodule supports is a candidate, and the set grows
+on its own when the submodule advances.
+
+Matching rules, in order:
+
+1. Case and whitespace are ignored, the same tolerance the native BLE-name
+   matcher applies (`strcasecmp_nospace` in `libdc_wrapper.c`), so "Puck4"
+   matches the product "Puck 4".
+2. The name is matched a whole token at a time from the front, longest first,
+   so "Suunto EON Steel Black" prefers its own descriptor over the shorter
+   "Suunto EON Steel", and a decorated name falls back to the longest known
+   prefix.
+3. A name matching nothing resolves to nothing. This is load-bearing:
+   "Oceanic Matrix Master" pairs a real libdivecomputer vendor with a product
+   that does not exist there, and "No Computer" is not a device at all.
+
+The #1400 note that Suunto has "no prefix convention to strip" was not quite
+right. All three of its entries were exactly `"Suunto " + <libdivecomputer
+product>`, the same shape as `"Shearwater Teric"`; the convention was already
+general, which is why one matcher now covers both.
+
+### Ambiguous product names
+
+libdivecomputer declares seven `(vendor, product)` pairs more than once, with
+different model numbers:
+
+| Vendor | Product | Models |
+|---|---|---|
+| Aeris | Elite T3 | 0x4259, 0x4455 |
+| Aeris | Epic | 0x4257, 0x4453 |
+| Aqualung | i100 | 0x464E, 0x4745 |
+| Aqualung | i200C | 0x4649, 0x4749 |
+| Oceanic | OC1 | 0x434E, 0x4449, 0x4451 |
+| Suunto | Zoop Novo | 0x1E, 0x1F |
+| Uwatec | Aladin 2G | 0x13, 0x15 |
+
+Each set sits within one family, so the parser is the same either way, but the
+model number reaches the parser and can steer header layout. The mapper tries
+each candidate in declaration order and keeps the first whose parse passes the
+sanity check below. Passing a real model number also means
+`find_descriptor`'s `model == 0` wildcard (`libdc_download.c`) is no longer
+load-bearing for this path.
+
+### The parse is checked, not trusted
+
+Attempting any recognised model makes a structurally plausible parse of the
+wrong bytes a live possibility, which the "caller-facing trap" above already
+warned about in its narrower form. `RawProfileSanityCheck`
+(`lib/features/universal_import/data/services/raw_profile_sanity_check.dart`)
+gates every result: samples must exist, sample times must be non-negative and
+non-decreasing, depth must sit within (-3 m, 350 m], duration within 24 h, and
+the parsed depth and duration must not contradict MacDive's own scalars for
+the same dive by more than a factor of five.
+
+That last tolerance is deliberately gross. MacDive routinely omits its units
+row, so a whole logbook can be read as feet when it is metres (#912) - a 3.28x
+error in the recorded scalar that says nothing about whether the raw bytes
+decoded correctly. A tighter bound would discard good profiles to catch bad
+ones that the absolute limits already catch. The two sides of that comparison
+are not symmetric: a recorded value of zero is MacDive saying it has no figure
+and cannot reject anything, while a parsed depth of zero is libdivecomputer
+asserting the diver never left the surface, which against a recorded 30 m dive
+is exactly the wrong-format parse this check exists to catch. A rejected parse falls back to
+exactly the behaviour an unrecognised computer already had: it counts toward
+one aggregated warning pointing at MacDive's XML export.
+
+### Vendor pre-passes
+
+Shearwater remains the only vendor whose `ZRAWDATA` needs work before the
+parser sees it, and it is the exception rather than the rule: libdivecomputer
+decompresses inside its own device layer (`shearwater_common.c:550` and `:567`),
+so any host that downloads through libdivecomputer ends up holding native
+bytes. MacDive storing the compressed stream tells us its Shearwater download
+path is its own. The transform is now a vendor-keyed entry in
+`MacDiveDiveMapper._rawPrePasses`, so a second such vendor is one line.
+
+### Correcting the per-computer presence table
+
+The table under "Per-computer presence" is still accurate as a count, but the
+conclusion drawn from it was not. Presence of `ZRAWDATA` tracks **how the dive
+entered MacDive** - a native download versus manual entry or a file import -
+not which vendor made the computer. The corpus happened to contain Shearwater
+dives that MacDive downloaded and Oceanic dives that it did not, and that
+coincidence read as a vendor rule for two releases running.
+
+### Confirming a new family
+
+The generic path means no code change is needed to support another computer.
+What is still worth doing, when someone has real data, is proving a family
+decodes:
+
+1. Pull one `ZRAWDATA` blob for the dive:
+   `sqlite3 MacDive.sqlite "SELECT writefile('blob.bin', ZRAWDATA) FROM ZDIVE WHERE Z_PK = <pk>;"`
+2. Feed it to `libdc_parse_raw_dive` with the vendor, product and model the
+   descriptor list gives for that `ZCOMPUTER` string. The native harness in
+   `packages/libdivecomputer_plugin/test/native/test_parse_raw_dive.c` is the
+   template; `fixtures/dive1_raw.bin` shows the shape.
+3. Check the result against what MacDive shows for the dive: max depth,
+   duration and sample count, not just a zero return code.
+4. Commit the blob as a fixture with an assertion on real decoded values.
+   Anonymise it first if it carries a serial number.
+
+**Still missing:** no anonymised Suunto `ZRAWDATA` exists in this repository,
+so the #1400 tests continue to stub `parseRaw` and prove byte pass-through and
+name resolution rather than a real decode. The Shearwater path does have real
+bytes (`shearwater_raw_decompressor_test.dart` pins the Dart port against a
+blob generated from the 540-dive corpus). A contributor with a real Suunto
+database can close that gap by following the recipe above; it needs data, not
+a design change.
+
+## Update 2026-09-02: ZSAMPLES solved
+
+The per-dive AES conclusion above was wrong, and it was wrong for a reason
+worth recording: every piece of evidence in the spike was read through the
+assumption that CommonCrypto was the codec. The `CCCryptorCreate` imports the
+spike found belong to minizip's zip-password support (the same symbol table
+carries `createZipFileAtPath:...password:AES:`), and the functions around them
+are minizip's `mz_crypt_apple.c` verbatim, error codes included. The sample
+codec never touches CommonCrypto.
+
+### Where the codec lives
+
+MacDive 2.16.3 keeps it in an Objective-C class, `MDSampleUtils`:
+
+| Selector | Role |
+|---|---|
+| `sampleDataForArrayOfSamples:withOptions:` | encoder |
+| `sampleArrayFromData:` | dispatcher on the version word |
+| `sampleArrayFromDataV2:` | decoder for versions 2 to 4 |
+| `sampleArrayFromDataV1:` | decoder for version 1 |
+| `optionsFromData:` | reads the options word |
+
+`-[MDDive sampleOptions]` supplies the options word from the dive, and
+`-[MDDive samples]` runs the blob through `sampleArrayFromData:` and caches
+the result in an `NSCache`. Two small C functions next to the class do the
+cipher work. Their round function is
+`((v << 4) + k0) ^ (v + sum) ^ ((v >> 5) + k1)` with `sum` stepping by
+`0x9E3779B9` for 32 rounds: classic TEA, not XTEA (XTEA indexes the key by
+`sum`; this does not). The key is four 32-bit words in `__TEXT,__const`:
+
+```
+k0 = 0x00000086   k1 = 0x00000016   k2 = 0x00000080   k3 = 0x00000060
+```
+
+That the cipher is TEA also explains every "structural" observation the spike
+made. TEA has 64-bit blocks, so the "8-byte semi-constant markers" were ECB
+blocks whose plaintext repeated; the 28-byte record does not divide by 8, so
+block alignment alternated between odd and even samples and produced the
+"alternating sync word"; and the dominant `84b90aa09fbb1ecc` body prefix is
+nothing more than the encryption of `(time 0.0, depth 0.0)`, the first record
+of every dive that starts at the surface. The markers did not "transfer across
+dives" because the spike compared depth *buckets*, and identical 8-byte
+plaintext blocks (which need identical float bit patterns across two fields)
+are rare between different dives.
+
+### The format
+
+```text
+offset  size  meaning
+0       4     u32le version: 1, or 2..4 (every blob seen in the wild says 4)
+4       4     u32le options bitmask (versions 2..4 only)
+8       n*8   TEA-ECB ciphertext, a whole number of 8-byte blocks
+```
+
+Decrypt the body under the key above, little-endian words. The plaintext is:
+
+```text
+[records][zero padding to an 8-byte boundary][one more 8-byte block]
+```
+
+and the **last four bytes of the plaintext hold the byte length of the record
+run**. MacDive's encoder allocates `((len + 7) / 8 + 1)` blocks, copies the
+packed records in, stores `len` in the final word, and encrypts; its decoder
+decrypts everything, then reads that word to know where the records stop.
+
+Records are fixed width for a given options word: `time` and `depth` as
+32-bit floats, then one 4-byte field per set option bit, **in this order**
+(which is the encoder's emission order, not bit order):
+
+| Order | Bit | Field | Type | Unit as stored |
+|---:|---:|---|---|---|
+| 1 | 0 | pressure | f32 | diver's display unit (psi or bar) |
+| 2 | 5 | pressure2 (second transmitter) | f32 | same as pressure |
+| 3 | 1 | heart rate | i32 | bpm |
+| 4 | 2 | NDT | i32 | minutes |
+| 5 | 3 | ppO2 | f32 | bar |
+| 6 | 4 | temperature | f32 | Celsius |
+| 7 | 6 | next stop depth | f32 | metres |
+| 8 | 7 | TTS | i32 | minutes |
+
+Only bits 0 to 7 are consulted. The stride is therefore `8 + 4 * popcount(options & 0xFF)`,
+which is exactly the 12/16/20/24/28 ladder the spike measured: the five
+options words in the reference library are 16, 24, 25, 156 and 157.
+
+Depth and temperature are SI like every other Core Data column of that kind;
+pressure follows the display unit like `ZTANKANDGAS.ZAIRSTART` does, so the
+same `MacDiveUnitConverter.coreData` handles both. A zero pressure, ppO2 or
+heart rate is MacDive's "no reading".
+
+Following the display unit means these pressures inherit #912 whole: a library
+with no `SystemOfUnits` row resolves by inference, and a library that also
+records no cylinders used to give the inference nothing to work with, so psi
+passed through as bar. The sample pressures are themselves a strong witness
+(the same 600 ceiling separates 200-300 bar from 2400-3500 psi), so
+`MacDiveUnitInference` reads them as its last tier, after the cylinder columns
+that cost nothing to look at. Decoding costs a TEA pass per dive, so the scan
+stops at `sampleScanDiveLimit` dives or at the first reading that can only be
+psi. That bound leaves `unknown` reachable for a library whose only pressures
+sit past it, and there `_samplePoint` drops the pressure channel rather than
+charting a number it cannot place - the dive keeps every other channel, and
+before ZSAMPLES were readable it had none of them.
+
+### Failing closed
+
+The structural checks (version word in range, body a whole number of cipher
+blocks, a length trailer inside the buffer and divisible by the stride) do not
+prove the stride itself is right. A future record layout stamped with a
+version this decoder claims, or an options bit above the low byte that a newer
+encoder emits a field for, would misalign every read while still dividing the
+run. Fields read at the wrong offset are floats built from unrelated bytes, so
+the decoder also holds each record's time and depth to the bounds
+`RawProfileSanityCheck` applies on the raw path (-3 to 350 m, 0 to 24 h) and
+returns null for the whole blob otherwise. The upper bound on time does double
+duty: Dart's `double.round()` saturates at the int64 limit instead of throwing,
+so an unbounded huge time would multiply out into a negative `Duration` rather
+than an obviously wrong one.
+
+Version 1 has no options word and no encryption: after the 4-byte version
+come 24-byte records of time, depth, pressure (f32), NDT (i32), ppO2 (f32)
+and temperature (f32). No version 1 blob exists in the reference library; the
+decoder supports it because the MacDive binary still does.
+
+### Verification
+
+Against the 540-dive reference library and MacDive's own exports of it:
+
+- All 350 `ZSAMPLES` blobs decode; the length trailer and stride checks pass
+  on every one. Two blobs are the 16-byte header-plus-length-block form of an
+  empty sample array.
+- Depth and time match the UDDF export sample-for-sample on all 348 non-empty
+  dives once the export's own additions are discounted: MacDive's UDDF writer
+  prepends a synthetic `(0 s, 0 m)` point when a dive's first sample is below
+  the surface and appends one after the last sample when the dive ends below
+  it. That accounts for exactly the 1-2 extra waypoints on 268 dives.
+- Temperature matches the UDDF Kelvin values (as Celsius) on every dive that
+  carries it; pressure matches the XML export's psi on all 257 dives with bit
+  0; NDT matches the XML export's minutes on all 268 dives with bit 2; ppO2
+  matches on all 340 dives with bit 3.
+- An independent Python encoder built from the disassembly reproduces real
+  ciphertext byte for byte; the Dart decoder's fixtures come from it.
+
+TTS, heart rate, second-transmitter pressure and next-stop depth appear in no
+export MacDive produces, so their units are read from the decoder's setter
+types and value ranges (TTS 0 to 9 on recreational dives, so minutes) rather
+than cross-checked against ground truth.
+
+### Where it landed
+
+- `lib/features/universal_import/data/services/tea_block_cipher.dart`
+- `lib/features/universal_import/data/services/macdive_samples_decoder.dart`
+- `lib/features/universal_import/data/services/macdive_sqlite_sample.dart`
+- `MacDiveDiveMapper._attachSamples`, the fallback behind the `ZRAWDATA`
+  path. The raw download keeps precedence because libdivecomputer yields
+  channels `ZSAMPLES` never carries (per-cell ppO2, deco settings, events);
+  the samples cover every dive without usable raw bytes and every platform
+  without the native channel. The "MacDive format Submersion cannot read"
+  warning is gone; only a dive with unreadable bytes in both columns is
+  reported.
+
+  It reports a `_SamplesOutcome` rather than a bool because an empty sample
+  array is MacDive saying it drew no profile, which is the whole story only
+  when `ZSAMPLES` was the dive's only source. A dive whose raw parse was
+  rejected and whose `ZSAMPLES` is empty still lost a profile, and it is
+  counted: toward the platform warning when the native channel was never
+  reachable (an XML export cannot rescue what MacDive never drew), toward the
+  XML-export warning otherwise.
+
+The ratio of the two columns in the reference library: 267 dives have both,
+83 have only `ZSAMPLES`, and 190 have neither. Those 83 were the entire
+"needs the XML export" population and no longer are.

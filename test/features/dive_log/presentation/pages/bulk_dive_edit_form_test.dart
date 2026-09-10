@@ -16,6 +16,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -72,10 +73,13 @@ void main() {
       await pumpBulk(tester);
 
       // 4 Logistics + 9 Conditions + 6 Weather + 6 Rebreather + 1 Buddies
-      // (my role, #1220) + 1 Notes gates.
+      // (my role, #1220) + 1 Notes + 2 statistics-exclusion gates (#526,
+      // #1272) = 29.
       // (dive type moved from a scalar gate to the collection lane, #414)
-      expect(find.byType(BulkFieldGate), findsNWidgets(27));
+      expect(find.byType(BulkFieldGate), findsNWidgets(29));
       expect(find.text('Favorite'), findsOneWidget);
+      expect(find.text('Exclude from statistics'), findsOneWidget);
+      expect(find.text('Exclude from gas statistics'), findsOneWidget);
       // Only the 3 owned collections (weights, tanks, sightings) still use a
       // mode selector; the 4 reference collections (tags, diveTypes,
       // equipment, buddies) use the tri-state membership editor.
@@ -97,7 +101,7 @@ void main() {
           id: 'd1',
           dateTime: DateTime(2026, 1, 1),
           notes: '',
-          equipment: const [reg],
+          gear: looseGear(const [reg]),
         ),
       );
       await repository.createDive(
@@ -583,7 +587,7 @@ void main() {
           id: 'coll-1',
           dateTime: DateTime(2026, 1, 1),
           notes: '',
-          equipment: const [reg],
+          gear: looseGear(const [reg]),
         ),
       );
       final overrides = await getBaseOverrides();

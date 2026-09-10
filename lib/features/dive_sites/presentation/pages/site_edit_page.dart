@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/environment_en
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/site_difficulty_display.dart';
 import 'package:submersion/features/dive_sites/domain/services/site_location_merge.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/edit_sections/access_safety_section.dart';
@@ -227,20 +228,21 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   }
 
   /// Writes [lookup] into the country, region, city and body of water
-  /// fields. With [overwrite] false only empty fields change (the rule lives
-  /// in [mergeMissingLocationDetails]); with it true every found value
-  /// replaces the current one. Returns whether any field changed. Callers
+  /// fields. With [overwrite] false only empty fields change; with it true a
+  /// found value replaces a differing one. The rule lives in
+  /// [mergeLocationDetails]. Returns whether any field changed. Callers
   /// decide whether that dirties the form.
   bool _applyPlaceLookup(PlaceLookup lookup, {required bool overwrite}) {
-    final current = overwrite
-        ? const SiteLocationDetails()
-        : SiteLocationDetails(
-            country: _countryController.text,
-            region: _regionController.text,
-            city: _cityController.text,
-            bodyOfWater: _bodyOfWaterController.text,
-          );
-    final merged = mergeMissingLocationDetails(current: current, found: lookup);
+    final merged = mergeLocationDetails(
+      current: SiteLocationDetails(
+        country: _countryController.text,
+        region: _regionController.text,
+        city: _cityController.text,
+        bodyOfWater: _bodyOfWaterController.text,
+      ),
+      found: lookup,
+      overwrite: overwrite,
+    );
     if (merged == null) return false;
 
     var changed = false;
@@ -914,8 +916,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
         _maxDepthController.text.isNotEmpty)
       '${_minDepthController.text.isEmpty ? '?' : _minDepthController.text}'
           '-${_maxDepthController.text.isEmpty ? '?' : _maxDepthController.text}',
-    if (_difficulty != null) _difficulty!.displayName,
-    if (_waterType != null) _waterType!.displayName,
+    if (_difficulty != null) _difficulty!.localizedName(context.l10n),
+    if (_waterType != null) _waterType!.localizedName(context.l10n),
     if (_rating > 0) '★' * _rating.round(),
   ].join(' · ');
 

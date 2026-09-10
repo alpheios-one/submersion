@@ -30,9 +30,18 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_provi
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
+import 'package:submersion/features/equipment/domain/services/gear_expander.dart';
+import 'package:submersion/features/equipment/domain/services/gear_tree.dart';
+import 'package:submersion/features/equipment/presentation/helpers/gear_expansion.dart';
+import 'package:submersion/features/equipment/presentation/widgets/assembly_chips.dart';
+import 'package:submersion/features/equipment/presentation/widgets/equipment_arrange_sheet.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_gear_tree_view.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
 import 'package:submersion/features/equipment/domain/services/equipment_set_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/geofence_suggestion_banner.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/site_suggestion_card.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
@@ -58,6 +67,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_log/presentation/providers/outlier_suggestion_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/custom_field_input_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/tank_enum_display.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/buddies_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/conditions_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/experience_section.dart';
@@ -66,10 +76,15 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_menu.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/statistics_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/computer_source_sheet.dart';
+import 'package:submersion/features/weight_presets/domain/entities/weight_preset.dart';
+import 'package:submersion/features/weight_presets/presentation/providers/weight_preset_providers.dart';
+import 'package:submersion/features/weight_presets/presentation/widgets/name_prompt_dialog.dart';
+import 'package:submersion/features/weight_presets/presentation/widgets/weight_preset_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/edit_sighting_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_membership_editor.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_picker_sheet.dart';
@@ -88,9 +103,6 @@ import 'package:submersion/features/weather/presentation/providers/weather_provi
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/courses/presentation/widgets/course_picker.dart';
-import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/widgets/photo_gps_suggestion_banner.dart';
-import 'package:submersion/features/media/presentation/widgets/quick_site_from_gps_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_type_multi_select_field.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/add_section_row.dart';
@@ -114,6 +126,8 @@ import 'package:submersion/features/tank_presets/domain/entities/tank_preset_ent
 import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/core/utils/log_failure.dart';
+import 'package:submersion/features/weight_planner/presentation/widgets/weight_enum_display.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/altitude_group_label.dart';
 
 const _createNewSiteSentinel = '__create_new__';
 const _createNewDiveCenterSentinel = '__create_new_dive_center__';
@@ -127,11 +141,24 @@ const _createNewTripSentinel = '__create_new_trip__';
 /// under de/es/it that dot is the GROUPING separator, so a diver who opened a
 /// dive and saved it untouched would store ten times the depth (#1091).
 ///
-/// This page keeps trailing zeros (a weight seeds as "2.0"), so it uses
+/// This page keeps trailing zeros (a depth seeds as "12.0"), so it uses
 /// [formatFixedForInput] rather than the trailing-zero-dropping
 /// [formatRoundedForInput] the other forms use.
 String _seedDecimal(double value, int fractionDigits) =>
     formatFixedForInput(value, fractionDigits);
+
+/// A weight already converted to the diver's display unit, rendered for
+/// seeding an editable field.
+///
+/// Weight has no pinned display precision the way depth and temperature do: a
+/// diver trims with 0.25 kg (or fractional-lb) increments, so seeding at one
+/// decimal snapped a stored 0.65 kg to "0.7", and opening a dive and saving it
+/// untouched then persisted the rounded value (#1609). Three decimals in the
+/// display unit covers the increments a diver actually trims with (0.25 kg,
+/// fractional lb) while still hiding the float tail a kg-to-lb conversion
+/// leaves; trailing zeros are dropped so a clean 2 kg still seeds as "2".
+String _seedWeight(double displayValue) =>
+    formatRoundedForInput(displayValue, 3);
 
 /// [value] rendered for seeding a whole-number field, paired with
 /// [parseUserInt]. Grouping is off, so this is digit-only text.
@@ -200,6 +227,13 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   List<String> _selectedDiveTypeIds = const ['recreational'];
   Visibility _selectedVisibility = Visibility.unknown;
   int _rating = 0;
+  // Statistics exclusion (#526 / #1272). Kept independent: unticking the
+  // master flag must restore the diver's own gas-only choice rather than
+  // having silently overwritten it.
+  bool _excludedFromStats = false;
+  bool _excludedFromGasStats = false;
+  bool _bulkExcludedFromStats = false;
+  bool _bulkExcludedFromGasStats = false;
   DiveSite? _selectedSite;
   Trip? _selectedTrip;
   DiveCenter? _selectedDiveCenter;
@@ -208,6 +242,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Set<String> _originalSightingIds =
       {}; // Track original IDs to detect deletions
   List<EquipmentItem> _selectedEquipment = [];
+
+  /// Where each selected item came from: the assembly it was attached
+  /// through and the set applied (issue #1487). Read through [_gearRows].
+  List<GearProvenance> _gearProvenance = [];
   List<BuddyWithRole> _selectedBuddies = [];
   Set<String> _originalBuddyIds = {};
   String? _diverRoleId;
@@ -294,7 +332,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   bool _isCapturingLocation = false;
 
   // GPS suggestion from photos
-  bool _gpsSuggestionDismissed = false;
 
   /// Smart-collapse expansion state, keyed by group. Defaults are computed
   /// at the call sites (new dive vs editing); user toggles override them
@@ -668,6 +705,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               ? _seedDecimal(units.convertDepth(dive.visibilityMeters!), 0)
               : '';
           _rating = dive.rating ?? 0;
+          _excludedFromStats = dive.excludedFromStats;
+          _excludedFromGasStats = dive.excludedFromGasStats;
           _selectedSite = dive.site;
           _selectedTrip = dive.trip;
           _selectedDiveCenter = dive.diveCenter;
@@ -680,8 +719,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             _tanksDirty = true;
           }
 
-          // Load equipment
+          // Load equipment with its provenance
           _selectedEquipment = List.from(dive.equipment);
+          _gearProvenance = dive.gearProvenance;
 
           // Load conditions fields
           _currentDirection = dive.currentDirection;
@@ -736,7 +776,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _weightingFeedback = dive.weightingFeedback;
           _weightingFeedbackAmountController.text =
               dive.weightingFeedbackKg != null
-              ? _seedDecimal(units.convertWeight(dive.weightingFeedbackKg!), 1)
+              ? _seedWeight(units.convertWeight(dive.weightingFeedbackKg!))
               : '';
 
           // Load tags
@@ -897,6 +937,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                 _buildExperienceSection(),
                 if (_showCourseSection) _buildCourseGroupSection(),
                 if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
+                _buildStatisticsSection(),
                 AddSectionRow(
                   entries: [
                     if (!_showCourseSection)
@@ -1050,6 +1091,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: l10n.diveLog_edit_section_rating,
                   value: _rating,
                   onChanged: (v) => setState(() => _rating = v),
+                  clearTooltip: l10n.common_action_clearRating,
                 ),
               ),
               _gatedRow(
@@ -1058,6 +1100,23 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   label: context.l10n.diveLog_bulkEdit_fieldFavorite,
                   value: _bulkFavorite,
                   onChanged: (v) => setState(() => _bulkFavorite = v),
+                ),
+              ),
+              _gatedRow(
+                BulkField.excludedFromStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromStats,
+                  value: _bulkExcludedFromStats,
+                  onChanged: (v) => setState(() => _bulkExcludedFromStats = v),
+                ),
+              ),
+              _gatedRow(
+                BulkField.excludedFromGasStats,
+                FormRow.toggle(
+                  label: context.l10n.diveLog_bulkEdit_fieldExcludeFromGasStats,
+                  value: _bulkExcludedFromGasStats,
+                  onChanged: (v) =>
+                      setState(() => _bulkExcludedFromGasStats = v),
                 ),
               ),
             ],
@@ -1112,6 +1171,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       diverRoleId: _diverRoleId,
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
+      excludedFromStats: _bulkExcludedFromStats,
+      excludedFromGasStats: _bulkExcludedFromGasStats,
       waterType: _waterType?.name,
       visibilityMeters: _visibilityMetersInput(units),
       currentDirection: _currentDirection?.name,
@@ -1356,6 +1417,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             label: Text(l10n.diveLog_edit_useSet),
           ),
           onChanged: (d) => setState(() => _equipmentDelta = d),
+          // Assembly and part-of chips, as on the equipment list (#1487).
+          trailingBuilder: (item) => AssemblyChips(itemId: item.id),
         ),
         BulkMembershipEditor(
           title: l10n.diveLog_edit_group_buddies,
@@ -1578,7 +1641,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             child: _enumDropdown<WaterType>(
               value: _waterType,
               options: WaterType.values,
-              label: (v) => v.displayName,
+              label: (v) => v.localizedName(context.l10n),
               onChanged: (v) => setState(() => _waterType = v),
             ),
           ),
@@ -1765,7 +1828,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             child: _enumDropdown<DiveMode>(
               value: _diveMode,
               options: DiveMode.values,
-              label: (v) => v.displayName,
+              label: (v) => v.localizedName(context.l10n),
               onChanged: (v) => setState(() => _diveMode = v ?? DiveMode.oc),
             ),
           ),
@@ -2188,14 +2251,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
       );
     }
-    if (widget.diveId != null && !_gpsSuggestionDismissed) {
+    if (widget.diveId != null) {
       children.add(
-        PhotoGpsSuggestionBanner(
+        SiteSuggestionCard(
           diveId: widget.diveId!,
           currentSite: _selectedSite,
-          onCreateSite: () => _createSiteFromPhotoGps(),
-          onUpdateSite: (gps) => _updateSiteWithPhotoGps(gps),
-          onDismiss: () => setState(() => _gpsSuggestionDismissed = true),
+          onSiteChanged: (site) => setState(() => _assignSite(site)),
         ),
       );
     }
@@ -2207,81 +2268,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         children: children,
       ),
     );
-  }
-
-  Future<void> _createSiteFromPhotoGps() async {
-    final gps = await ref.read(divePhotoGpsProvider(widget.diveId!).future);
-    if (gps == null || !mounted) return;
-
-    final newSite = await QuickSiteFromGpsDialog.show(
-      context,
-      latitude: gps.latitude,
-      longitude: gps.longitude,
-    );
-
-    if (newSite != null && mounted) {
-      // Create the site via the notifier
-      final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-      final createdSite = await siteNotifier.addSite(newSite);
-
-      setState(() {
-        _assignSite(createdSite);
-        _gpsSuggestionDismissed = true;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.l10n.diveLog_edit_createdSite(createdSite.name),
-            ),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
-    if (_selectedSite == null) return;
-
-    var updatedSite = _selectedSite!.copyWith(location: gps);
-    // A site gaining coordinates should also gain its altitude, so later dives
-    // there resolve locally without a lookup.
-    double? lookedUpAltitude;
-    if (updatedSite.altitude == null) {
-      lookedUpAltitude = await ref
-          .read(elevationServiceProvider)
-          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
-      if (!mounted) return;
-      if (lookedUpAltitude != null) {
-        updatedSite = updatedSite.copyWith(altitude: lookedUpAltitude);
-      }
-    }
-
-    // Patch only the coordinate columns: _selectedSite may be a partially
-    // hydrated entity, and a whole-entity update would wipe the rest
-    // (issue #1187).
-    final siteNotifier = ref.read(siteListNotifierProvider.notifier);
-    await siteNotifier.updateSiteCoordinates(
-      updatedSite.id,
-      gps,
-      altitude: lookedUpAltitude,
-    );
-
-    setState(() {
-      _selectedSite = updatedSite;
-      _gpsSuggestionDismissed = true;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.diveLog_edit_addedGps(updatedSite.name)),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
   /// Assigns [site] to the dive and snaps the water type and the entry/exit
@@ -2568,6 +2554,42 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  Widget _buildStatisticsSection() {
+    return StatisticsSection(
+      // Collapsed unless this dive is already excluded, so the setting stays
+      // out of the way of the dives that are just dives.
+      expanded: _isExpanded(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      onToggle: () => _toggleSection(
+        'statistics',
+        defaultValue: _excludedFromStats || _excludedFromGasStats,
+      ),
+      excludedFromStats: _excludedFromStats,
+      excludedFromGasStats: _excludedFromGasStats,
+      onExcludedFromStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+      onExcludedFromGasStatsChanged: (v) {
+        _markDirty();
+        setState(() {
+          _excludedFromGasStats = v;
+          _pinStatisticsOpen();
+        });
+      },
+    );
+  }
+
+  /// The section's default expansion follows the two flags, so clearing the
+  /// last one would otherwise shut the group under the diver's finger. Once
+  /// they have touched a toggle, expansion is theirs to decide.
+  void _pinStatisticsOpen() => _expanded['statistics'] = true;
+
   Widget _buildExperienceSection() {
     return ExperienceSection(
       expanded: _isExpanded('experience', defaultValue: false),
@@ -2629,12 +2651,22 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// Opens the previously-used-tag picker (#1171) over [selected], so tagging
   /// stays consistent without having to recall earlier spellings. Reports the
   /// merged list (existing plus newly picked) through [onPicked].
+  ///
+  /// [host] is the context the sheet is pushed from, so it decides which
+  /// navigator owns the picker. It defaults to the page, which is right when
+  /// Browse sits on the form itself. A caller whose Browse action lives inside
+  /// a dialog must pass that dialog's context instead: `showDialog` defaults
+  /// to the root navigator while `showModalBottomSheet` defaults to the
+  /// nearest one, which under the app's `ShellRoute` is the shell navigator
+  /// sitting *below* the dialog. Pushed from the page, the picker would open
+  /// behind the dialog with the dialog's barrier eating every tap (#1366).
   void _showTagPickerFor({
     required List<Tag> selected,
     required ValueChanged<List<Tag>> onPicked,
+    BuildContext? host,
   }) {
     showModalBottomSheet<void>(
-      context: context,
+      context: host ?? context,
       isScrollControlled: true,
       builder: (sheetContext) => DraggableScrollableSheet(
         initialChildSize: 0.7,
@@ -2839,8 +2871,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     return [
       l10n.diveLog_edit_summary_tanks(_tanks.length),
       ?mix,
+      // Top-level rows as the tree view places them: an assembly's parts
+      // sit inside its row and an orphaned row is promoted (#1487).
       if (_selectedEquipment.isNotEmpty)
-        l10n.diveLog_edit_summary_items(_selectedEquipment.length),
+        l10n.diveLog_edit_summary_items(GearTree.topLevelCount(_gearRows)),
     ].join(' · ');
   }
 
@@ -3198,7 +3232,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       // Re-check emptiness after the await: the diver may have manually added
       // gear while the provider resolved, and auto-apply must never overwrite.
       if (items.isEmpty || !mounted || _selectedEquipment.isNotEmpty) return;
-      setState(() => _selectedEquipment = [...items]);
+      await _addGear(items, viaSetId: best!.id, markDirty: false);
     } catch (_) {
       // Equipment sets unavailable; skip best-effort auto-apply.
     }
@@ -3228,7 +3262,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         );
         final items = best?.items ?? const [];
         if (items.isNotEmpty && _selectedEquipment.isEmpty) {
-          setState(() => _selectedEquipment = [...items]);
+          await _addGear(items, viaSetId: best!.id, markDirty: false);
         }
         return;
       }
@@ -3267,6 +3301,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               icon: Icons.add,
               onPressed: _showEquipmentPicker,
             ),
+            FormOverlineAction(
+              label: context.l10n.equipment_arrange_title,
+              icon: Icons.sort,
+              onPressed: () => showEquipmentArrangeSheet(context),
+            ),
           ],
         ),
         if (_geofenceSuggestion != null)
@@ -3276,14 +3315,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               setName: _geofenceSuggestion!.name,
               locationLabel: _selectedSite?.name,
               onApply: () {
-                setState(() {
-                  _markDirty();
-                  final ids = _selectedEquipment.map((e) => e.id).toSet();
-                  for (final item in _geofenceSuggestion!.items ?? const []) {
-                    if (!ids.contains(item.id)) _selectedEquipment.add(item);
-                  }
-                  _geofenceSuggestion = null;
-                });
+                final suggestion = _geofenceSuggestion!;
+                setState(() => _geofenceSuggestion = null);
+                _addGear(suggestion.items ?? const [], viaSetId: suggestion.id);
               },
               onDismiss: () => setState(() {
                 _dismissedSuggestionSetIds.add(_geofenceSuggestion!.id);
@@ -3299,35 +3333,22 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ...List.generate(_selectedEquipment.length, (index) {
-                  final item = _selectedEquipment[index];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer,
-                      child: Icon(
-                        equipmentTypeIcon(item.type),
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        size: 20,
-                      ),
-                    ),
-                    title: Text(item.name),
-                    subtitle: Text(item.type.displayName),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.close, size: 18),
-                      tooltip:
-                          context.l10n.diveLog_edit_tooltip_removeEquipment,
-                      onPressed: () {
-                        setState(() {
-                          _markDirty();
-                          _selectedEquipment.removeAt(index);
-                        });
-                      },
-                    ),
-                  );
-                }),
+                // Rendered through the diver's arrangement inside set bands,
+                // assemblies collapsed (#1486, #1576, #1487). Removals are
+                // by id, never by display index: a render position addresses
+                // a different item under an arrangement. _selectedEquipment
+                // keeps its own order as the source of truth for saving;
+                // sorting it would write a pointless reordering of
+                // dive_equipment on every save.
+                DiveGearTreeView(
+                  links: gearLinksFor(_selectedEquipment, _gearRows),
+                  onRemoveSet: (setId) =>
+                      _setGear(GearExpander.removeSet(_gearRows, setId)),
+                  onRemoveSubtree: (id) =>
+                      _setGear(GearExpander.removeSubtree(_gearRows, id)),
+                  onRemovePart: (id) =>
+                      _setGear(GearExpander.removePart(_gearRows, id)),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -3346,7 +3367,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                       onPressed: () {
                         setState(() {
                           _markDirty();
-                          _selectedEquipment.clear();
+                          _selectedEquipment = [];
+                          _gearProvenance = [];
                         });
                       },
                       child: Text(context.l10n.diveLog_edit_clearAllEquipment),
@@ -3358,6 +3380,59 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
       ],
     );
+  }
+
+  /// One provenance row per selected item: an item that arrived without a
+  /// row (an older code path) is a loose top-level row.
+  List<GearProvenance> get _gearRows {
+    final byId = {for (final p in _gearProvenance) p.equipmentId: p};
+    return [
+      for (final e in _selectedEquipment)
+        byId[e.id] ?? GearProvenance(equipmentId: e.id),
+    ];
+  }
+
+  /// Every way gear reaches this page funnels here so an assembly expands
+  /// identically whether it came from the picker, a set, a geofence
+  /// suggestion or the on-empty default (issue #1487).
+  Future<void> _addGear(
+    List<EquipmentItem> items, {
+    String? viaSetId,
+    bool markDirty = true,
+  }) async {
+    if (items.isEmpty) return;
+    final merged = [
+      ..._selectedEquipment,
+      for (final item in items)
+        if (!_selectedEquipment.any((e) => e.id == item.id)) item,
+    ];
+    final expansion = await expandGearOnPage(
+      ref,
+      additions: [
+        for (final i in items) (equipmentId: i.id, viaSetId: viaSetId),
+      ],
+      existing: _gearRows,
+      existingItems: merged,
+    );
+    if (!mounted) return;
+    setState(() {
+      if (markDirty) _markDirty();
+      _selectedEquipment = [...merged, ...expansion.newItems];
+      _gearProvenance = expansion.provenance;
+    });
+  }
+
+  /// Applies a removal: [rows] is the gear that stays, with provenance.
+  void _setGear(List<GearProvenance> rows) {
+    final keep = {for (final p in rows) p.equipmentId};
+    setState(() {
+      _markDirty();
+      _gearProvenance = rows;
+      _selectedEquipment = [
+        for (final e in _selectedEquipment)
+          if (keep.contains(e.id)) e,
+      ];
+    });
   }
 
   void _showEquipmentPicker() {
@@ -3373,13 +3448,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           scrollController: scrollController,
           selectedEquipmentIds: _selectedEquipment.map((e) => e.id).toSet(),
           onEquipmentSelected: (equipment) {
-            setState(() {
-              // Add if not already selected
-              if (!_selectedEquipment.any((e) => e.id == equipment.id)) {
-                _selectedEquipment.add(equipment);
-              }
-            });
             Navigator.of(context).pop();
+            _addGear([equipment]);
           },
         ),
       ),
@@ -3398,15 +3468,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         builder: (context, scrollController) => EquipmentSetPickerSheet(
           scrollController: scrollController,
           onSetSelected: (set, items) {
-            setState(() {
-              // Add all items from set that aren't already selected
-              for (final item in items) {
-                if (!_selectedEquipment.any((e) => e.id == item.id)) {
-                  _selectedEquipment.add(item);
-                }
-              }
-            });
             Navigator.of(context).pop();
+            _addGear(items, viaSetId: set.id);
           },
         ),
       ),
@@ -3571,7 +3634,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
           actions: [
             TextButton(
+              // `ctx` is inside the dialog route, so the picker lands on the
+              // same (root) navigator and opens above the dialog (#1366).
               onPressed: () => _showTagPickerFor(
+                host: ctx,
                 selected: picked,
                 onPicked: (tags) => setSt(() => picked = tags),
               ),
@@ -3737,6 +3803,12 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
 
   void _saveEquipmentAsSet() {
     if (_selectedEquipment.isEmpty) return;
+    // A set holds top-level rows only: an assembly re-expands into its
+    // parts when the set is applied (issue #1487).
+    final topLevelIds = [
+      for (final g in gearLinksFor(_selectedEquipment, _gearRows))
+        if (g.isTopLevel) g.item.id,
+    ];
 
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
@@ -3751,7 +3823,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           children: [
             Text(
               context.l10n.diveLog_edit_saveAsSetDialog_content(
-                _selectedEquipment.length,
+                topLevelIds.length,
               ),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
@@ -3804,7 +3876,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   id: '',
                   name: name,
                   description: descriptionController.text.trim(),
-                  equipmentIds: _selectedEquipment.map((e) => e.id).toList(),
+                  equipmentIds: topLevelIds,
                   createdAt: DateTime.now(),
                   updatedAt: DateTime.now(),
                 );
@@ -3887,7 +3959,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
 
   String _conditionsSummary(UnitFormatter units) {
     return [
-      if (_waterType != null) _waterType!.displayName,
+      if (_waterType != null) _waterType!.localizedName(context.l10n),
       if (_waterTempController.text.isNotEmpty)
         '${_waterTempController.text} ${units.temperatureSymbol}',
       // Through the formatter rather than hand-concatenated, so the summary
@@ -3953,7 +4025,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         label: l10n.diveLog_edit_label_waterType,
         value: _waterType,
         values: WaterType.values,
-        displayName: (v) => v.displayName,
+        displayName: (v) => v.localizedName(l10n),
         onChanged: (v) => setState(() => _waterType = v),
       ),
       EnumPickerRow<CurrentDirection>(
@@ -4279,6 +4351,19 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               : context.l10n.diveLog_edit_weightTotal(
                   units.formatWeight(totalWeight),
                 ),
+          actions: [
+            FormOverlineAction(
+              label: context.l10n.diveLog_edit_weightPreset_use,
+              icon: Icons.fitness_center,
+              onPressed: _applyWeightPreset,
+            ),
+            if (_weights.any((w) => w.amountKg > 0))
+              FormOverlineAction(
+                label: context.l10n.diveLog_edit_weightPreset_save,
+                icon: Icons.bookmark_add_outlined,
+                onPressed: _saveWeightsAsPreset,
+              ),
+          ],
         ),
         if (_weights.isNotEmpty)
           Padding(
@@ -4388,6 +4473,67 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  /// Apply a saved weight preset (issue #1609): opens the picker and replaces
+  /// the current weight rows with editable copies of the preset's entries.
+  Future<void> _applyWeightPreset() async {
+    final preset = await showModalBottomSheet<WeightPreset>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (sheetContext, scrollController) =>
+            WeightPresetPickerSheet(scrollController: scrollController),
+      ),
+    );
+    if (preset == null || !mounted) return;
+    setState(() {
+      _markDirty();
+      _weights = preset.toDiveWeights(
+        diveId: widget.diveId ?? '',
+        newId: _uuid.v4,
+      );
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.diveLog_edit_weightPreset_applied)),
+    );
+  }
+
+  /// Save the current weighting as a named, reusable preset (issue #1609).
+  Future<void> _saveWeightsAsPreset() async {
+    // Resolve the diver the same way weightPresetsProvider does -- fall back to
+    // the default diver when the current-diver pref is unset, so "Save as
+    // preset" works wherever "Use preset" does.
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+    if (diverId == null || !mounted) return;
+    final name = await NamePromptDialog.show(
+      context,
+      title: context.l10n.diveLog_edit_weightPreset_saveTitle,
+      label: context.l10n.diveLog_edit_weightPreset_nameLabel,
+      confirmLabel: context.l10n.common_action_save,
+    );
+    if (name == null || !mounted) return;
+
+    final weights = _weights.where((w) => w.amountKg > 0).toList();
+    if (weights.isEmpty) return;
+    await ref
+        .read(weightPresetRepositoryProvider)
+        .createFromWeights(
+          diverId: diverId,
+          displayName: name,
+          weights: weights,
+        );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.diveLog_edit_weightPreset_saved(name)),
+        ),
+      );
+    }
+  }
+
   Widget _buildWeightEntryRow(
     int index,
     DiveWeight weight,
@@ -4411,7 +4557,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               items: WeightType.values.map((type) {
                 return DropdownMenuItem(
                   value: type,
-                  child: Text(type.displayName),
+                  child: Text(type.localizedName(context.l10n)),
                 );
               }).toList(),
               onChanged: (value) {
@@ -4427,9 +4573,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           Expanded(
             flex: 1,
             child: TextFormField(
-              initialValue: displayAmount > 0
-                  ? _seedDecimal(displayAmount, 1)
-                  : '',
+              initialValue: displayAmount > 0 ? _seedWeight(displayAmount) : '',
               decoration: InputDecoration(
                 labelText: units.weightSymbol,
                 isDense: true,
@@ -4912,7 +5056,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         diveCenter: _selectedDiveCenter,
         courseId: _selectedCourse?.id,
         tanks: _tanks,
-        equipment: _selectedEquipment,
+        gear: gearLinksFor(_selectedEquipment, _gearRows),
         // Conditions fields
         currentDirection: _currentDirection,
         currentStrength: _currentStrength,
@@ -4959,6 +5103,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
             .toList(),
         // Preserve favorite status when editing
         isFavorite: _existingDive?.isFavorite ?? false,
+        excludedFromStats: _excludedFromStats,
+        excludedFromGasStats: _excludedFromGasStats,
         // Preserve dive profile data (time series from dive computer)
         profile: _existingDive?.profile ?? const [],
         // Preserve photo associations
@@ -4966,6 +5112,24 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         // Preserve legacy buddy/divemaster text fields
         buddy: _existingDive?.buddy,
         diveMaster: _existingDive?.diveMaster,
+        // Fields this form has no widget for. Every column updateDive does
+        // write, it writes unconditionally, with no merge against the stored
+        // row, so anything not carried through here is reset to the entity
+        // default on every save (issue #1392). Columns it deliberately omits
+        // (computerId, the entry/exit location pair) are not at risk and are
+        // not listed. The census test in dive_edit_save_field_census_test.dart
+        // fails when a new field is added to the writer without a carry here.
+        isPlanned: _existingDive?.isPlanned ?? false,
+        diveComputerModel: _existingDive?.diveComputerModel,
+        diveComputerSerial: _existingDive?.diveComputerSerial,
+        diveComputerFirmware: _existingDive?.diveComputerFirmware,
+        decoAlgorithm: _existingDive?.decoAlgorithm,
+        decoConservatism: _existingDive?.decoConservatism,
+        gradientFactorLow: _existingDive?.gradientFactorLow,
+        gradientFactorHigh: _existingDive?.gradientFactorHigh,
+        weatherCode: _existingDive?.weatherCode,
+        importId: _existingDive?.importId,
+        surfaceInterval: _existingDive?.surfaceInterval,
         diverRoleId: _diverRoleId,
         // CCR/SCR rebreather settings
         diveMode: _diveMode,
@@ -5194,7 +5358,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final group = AltitudeGroup.fromAltitude(altitudeMeters);
 
     if (group == AltitudeGroup.seaLevel) return null;
-    return '${group.displayName} - ${group.rangeDescription}';
+    return '${group.localizedName(context.l10n)} - ${group.localizedRange(context.l10n)}';
   }
 
   /// Get warning color for altitude dives based on altitude group.

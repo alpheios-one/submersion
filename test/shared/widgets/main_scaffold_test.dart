@@ -4,9 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/equipment/domain/models/equipment_arrangement.dart';
 import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/auto_update/domain/entities/update_status.dart';
 import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
+import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
 import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
@@ -14,6 +16,7 @@ import 'package:submersion/features/settings/data/repositories/app_settings_repo
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/shared/widgets/main_scaffold.dart';
+import 'package:submersion/shared/widgets/nav/nav_order_provider.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_preferences.dart';
 
 Future<Widget> _buildTestApp({
@@ -110,6 +113,24 @@ class _StubDownloadNotifier extends StateNotifier<DownloadState>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Reports a download in flight, so tapping a destination raises the exit
+/// confirmation and suspends the tap handler while the dialog is up.
+class _DownloadingStubNotifier extends StateNotifier<DownloadState>
+    implements DownloadNotifier {
+  _DownloadingStubNotifier()
+    : super(const DownloadState(phase: DownloadPhase.downloading));
+
+  bool cancelled = false;
+
+  @override
+  Future<void> cancelDownload() async {
+    cancelled = true;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 /// Stub settings notifier so the accent tests can drive the toggles without
 /// touching the database.
 class _StubSettingsNotifier extends StateNotifier<AppSettings>
@@ -122,7 +143,21 @@ class _StubSettingsNotifier extends StateNotifier<AppSettings>
 
 /// Fake AppSettingsRepository used by the nav customization tests.
 class _FakeRepo implements AppSettingsRepository {
+  /// The gear arrangement is not exercised by these tests; the notifier falls
+  /// back to EquipmentArrangement.defaults when the read returns null.
+  @override
+  Future<EquipmentArrangement?> getEquipmentArrangement() async => null;
+
+  @override
+  Future<void> setEquipmentArrangement(
+    EquipmentArrangement arrangement,
+  ) async {}
+
+  /// Phone order (bottom-bar slots first, then the More menu).
   List<String>? stored;
+
+  /// Wide-screen rail order, stored under its own key.
+  List<String>? storedRail;
 
   /// No database, so nothing ever ticks.
   @override
@@ -133,6 +168,21 @@ class _FakeRepo implements AppSettingsRepository {
   @override
   Future<void> setNavPrimaryIds(List<String> ids) async {
     stored = List<String>.from(ids);
+  }
+
+  /// How many times the rail order was read, so a phone-width build can
+  /// assert it never subscribed to a surface it does not render.
+  int railReads = 0;
+
+  @override
+  Future<List<String>?> getNavRailIdsRaw() async {
+    railReads++;
+    return storedRail;
+  }
+
+  @override
+  Future<void> setNavRailIds(List<String> ids) async {
+    storedRail = List<String>.from(ids);
   }
 
   @override
@@ -217,9 +267,9 @@ void main() {
       await tester.pumpWidget(await _buildTestApp());
       await tester.pumpAndSettle();
 
-      // GPS Log is rail index 13 (after Transfer, before Settings).
+      // GPS Log is rail index 14 (after Transfer, before Settings).
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      rail.onDestinationSelected!(13);
+      rail.onDestinationSelected!(14);
       await tester.pumpAndSettle();
 
       expect(find.text('GPS Log Page'), findsOneWidget);
@@ -227,7 +277,7 @@ void main() {
       final selected = tester
           .widget<NavigationRail>(find.byType(NavigationRail))
           .selectedIndex;
-      expect(selected, 13);
+      expect(selected, 14);
     });
 
     testWidgets('recording strip appears while a GPS session is active', (
@@ -280,6 +330,8 @@ void main() {
   group('MainScaffold mobile nav customization', () {
     Future<({Widget app, GoRouter router})> buildHarnessWithRouter({
       required AppSettingsRepository repo,
+      EdgeInsets systemPadding = EdgeInsets.zero,
+      DownloadNotifier Function()? downloadNotifier,
     }) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
@@ -356,7 +408,7 @@ void main() {
             (ref) => _StubUpdateStatusNotifier(),
           ),
           downloadNotifierProvider.overrideWith(
-            (ref) => _StubDownloadNotifier(),
+            (ref) => downloadNotifier?.call() ?? _StubDownloadNotifier(),
           ),
           settingsProvider.overrideWith(
             (ref) => _StubSettingsNotifier(const AppSettings()),
@@ -367,14 +419,26 @@ void main() {
           locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          // MaterialApp.builder wraps the Navigator, so padding stated here
+          // is what the modal route's own SafeArea sees.
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(padding: systemPadding),
+            child: child!,
+          ),
         ),
       );
 
       return (app: app, router: router);
     }
 
-    Future<Widget> buildHarness({required AppSettingsRepository repo}) async {
-      final result = await buildHarnessWithRouter(repo: repo);
+    Future<Widget> buildHarness({
+      required AppSettingsRepository repo,
+      EdgeInsets systemPadding = EdgeInsets.zero,
+    }) async {
+      final result = await buildHarnessWithRouter(
+        repo: repo,
+        systemPadding: systemPadding,
+      );
       return result.app;
     }
 
@@ -449,7 +513,7 @@ void main() {
       expect(find.widgetWithText(NavigationDestination, 'Trips'), findsNothing);
     });
 
-    testWidgets('wide-screen rail still shows all 15 default destinations', (
+    testWidgets('wide-screen rail still shows all 16 default destinations', (
       tester,
     ) async {
       // Wide viewport (desktop-extended so rail labels are rendered as Text).
@@ -462,12 +526,13 @@ void main() {
       await tester.pumpWidget(await buildHarness(repo: repo));
       await tester.pumpAndSettle();
 
-      // The wide-screen rail is NOT customized, so it keeps the default
-      // 15-entry order regardless of stored primary-ids customization.
+      // The rail reads its own storage key, which this repo leaves unset, so
+      // it keeps the default 16-entry order no matter how the phone bottom
+      // bar was customized. That independence is the point of the two keys.
       // NavigationRailDestination is a descriptor (not a Widget), so inspect
       // the NavigationRail.destinations list directly.
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.destinations, hasLength(15));
+      expect(rail.destinations, hasLength(16));
 
       String labelOf(NavigationRailDestination d) {
         final label = d.label;
@@ -487,12 +552,177 @@ void main() {
         'Dive Centers',
         'Certifications',
         'Courses',
+        'Species',
         'Statistics',
         'Planning',
         'Transfer',
         'GPS Log',
         'Settings',
       ]);
+    });
+
+    testWidgets('a phone build never reads the rail order', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final repo = _FakeRepo();
+      await tester.pumpWidget(await buildHarness(repo: repo));
+      await tester.pumpAndSettle();
+
+      // Building the rail provider would kick off a settings read for an
+      // order this layout never renders.
+      expect(repo.railReads, 0);
+    });
+
+    testWidgets('a rail-width build does read the rail order', (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final repo = _FakeRepo();
+      await tester.pumpWidget(await buildHarness(repo: repo));
+      await tester.pumpAndSettle();
+
+      expect(repo.railReads, greaterThan(0));
+    });
+
+    testWidgets('wide-screen rail renders the stored rail order', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // A partial stored value: normalization keeps these three at the top and
+      // appends the rest in canonical order.
+      final repo = _FakeRepo()
+        ..storedRail = ['settings', 'statistics', 'dives'];
+      await tester.pumpWidget(await buildHarness(repo: repo));
+      await tester.pumpAndSettle();
+
+      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+      expect(rail.destinations, hasLength(16));
+
+      String labelOf(NavigationRailDestination d) {
+        final label = d.label;
+        if (label is Text) return label.data ?? '';
+        return label.toString();
+      }
+
+      final labels = rail.destinations.map(labelOf).toList();
+      // Home stays pinned at the top; the stored order follows it.
+      expect(labels.take(4).toList(), [
+        'Home',
+        'Settings',
+        'Statistics',
+        'Dives',
+      ]);
+      // Nothing is lost: every destination still has a rail row.
+      expect(labels.toSet(), hasLength(16));
+    });
+
+    testWidgets('rail customization leaves the phone bottom bar alone', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final repo = _FakeRepo()
+        ..storedRail = ['settings', 'statistics', 'dives'];
+      await tester.pumpWidget(await buildHarness(repo: repo));
+      await tester.pumpAndSettle();
+
+      // Phone order is unset, so the bottom bar keeps its defaults even though
+      // the rail was rearranged.
+      for (final label in const ['Home', 'Dives', 'Sites', 'Trips', 'More']) {
+        expect(
+          find.widgetWithText(NavigationDestination, label),
+          findsOneWidget,
+          reason: '$label should still occupy a default bottom-bar slot',
+        );
+      }
+      expect(
+        find.widgetWithText(NavigationDestination, 'Settings'),
+        findsNothing,
+      );
+    });
+
+    testWidgets('tapping a reordered rail item navigates to its route', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // 'transfer' is canonically near the end; pulling it to the top proves
+      // the tap handler indexes into the stored order, not the canonical one.
+      final repo = _FakeRepo()..storedRail = ['transfer'];
+      final harness = await buildHarnessWithRouter(repo: repo);
+      await tester.pumpWidget(harness.app);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Transfer'));
+      await tester.pumpAndSettle();
+
+      expect(
+        harness.router.routerDelegate.currentConfiguration.uri.path,
+        '/transfer',
+      );
+    });
+
+    testWidgets('an order change mid-tap does not reroute the tap', (
+      tester,
+    ) async {
+      // The tap handler suspends on the download confirmation. If it resolved
+      // the index against the provider afterwards instead of against the list
+      // that rendered the rail, an order change arriving in that gap would
+      // send the user somewhere they never tapped.
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final repo = _FakeRepo();
+      final download = _DownloadingStubNotifier();
+      final harness = await buildHarnessWithRouter(
+        repo: repo,
+        downloadNotifier: () => download,
+      );
+      await tester.pumpWidget(harness.app);
+      await tester.pumpAndSettle();
+
+      // Rail renders the canonical order, so index 1 is Dives.
+      await tester.tap(find.text('Dives'));
+      await tester.pump();
+      expect(find.text('Leave'), findsOneWidget, reason: 'dialog should be up');
+
+      // While the dialog is up, a sync applies a different rail order.
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavigationRail)),
+      );
+      await container.read(navRailOrderNotifierProvider.notifier).setOrder([
+        'transfer',
+        'gps-log',
+      ]);
+      await tester.pump();
+
+      await tester.tap(find.text('Leave'));
+      await tester.pumpAndSettle();
+
+      // Dives is what was tapped, so Dives is where we land, even though
+      // index 1 now means Transfer.
+      expect(
+        harness.router.routerDelegate.currentConfiguration.uri.path,
+        '/dives',
+      );
+      expect(download.cancelled, isTrue);
     });
 
     testWidgets('tapping a customized primary item navigates to its route', (
@@ -535,21 +765,112 @@ void main() {
       await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
       await tester.pumpAndSettle();
 
-      // The overflow sheet should contain the items NOT in primary.
-      expect(find.widgetWithText(ListTile, 'Dives'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Sites'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Trips'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Dive Centers'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Certifications'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Courses'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Planning'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Transfer'), findsOneWidget);
-      expect(find.widgetWithText(ListTile, 'Settings'), findsOneWidget);
+      // The overflow sheet should contain the items NOT in primary. The sheet
+      // is height-capped, so the tiles past the fold have to be scrolled to;
+      // reaching them all is itself the guard that none is stranded.
+      final sheetList = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byType(Scrollable),
+      );
+      for (final label in const [
+        'Dives',
+        'Sites',
+        'Trips',
+        'Dive Centers',
+        'Certifications',
+        'Courses',
+        'Planning',
+        'Transfer',
+        'Settings',
+      ]) {
+        final tile = find.widgetWithText(ListTile, label);
+        await tester.scrollUntilVisible(tile, 100, scrollable: sheetList);
+        expect(tile, findsOneWidget);
+      }
 
       // Items now in primary should NOT appear in the overflow sheet.
       expect(find.widgetWithText(ListTile, 'Equipment'), findsNothing);
       expect(find.widgetWithText(ListTile, 'Buddies'), findsNothing);
       expect(find.widgetWithText(ListTile, 'Statistics'), findsNothing);
+    });
+
+    // Issue #1480: the overflow sheet is scroll-controlled, and a dozen
+    // destinations are taller than a phone screen, so the sheet grew until it
+    // touched y=0 and its header sat under the Android status bar.
+    testWidgets('overflow sheet stops short of the top edge on a phone', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(360, 560);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(await buildHarness(repo: _FakeRepo()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      expect(tester.getRect(find.byType(BottomSheet)).top, greaterThan(0));
+    });
+
+    // `useSafeArea: true` inserts `SafeArea(bottom: false)`, so it covers top,
+    // left and right and deliberately lets the sheet run to the bottom edge.
+    // The SafeArea in the builder supplies the bottom inset the outer one
+    // skips; it is not a double application, because a SafeArea strips the
+    // padding it consumes out of the MediaQuery it hands down.
+    testWidgets('overflow sheet applies every system inset exactly once', (
+      tester,
+    ) async {
+      const insets = EdgeInsets.only(top: 44, left: 30, right: 30, bottom: 34);
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        await buildHarness(repo: _FakeRepo(), systemPadding: insets),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      final screen = tester.getRect(find.byType(MaterialApp));
+      final sheet = tester.getRect(find.byType(BottomSheet));
+      final body = tester.getRect(
+        find.byKey(const ValueKey('navOverflowSheetBody')),
+      );
+
+      expect(sheet.left, insets.left);
+      expect(sheet.right, screen.right - insets.right);
+      expect(sheet.top, greaterThanOrEqualTo(insets.top));
+      expect(sheet.bottom, screen.bottom);
+      expect(body.bottom, screen.bottom - insets.bottom);
+      expect(body.left, sheet.left);
+      expect(body.right, sheet.right);
+    });
+
+    testWidgets('overflow sheet close action survives scrolling the list', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(360, 560);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(await buildHarness(repo: _FakeRepo()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(NavigationDestination, 'More'));
+      await tester.pumpAndSettle();
+
+      final closeButton = find.widgetWithIcon(IconButton, Icons.close);
+      final before = tester.getRect(closeButton);
+      await tester.drag(find.byType(ListView), const Offset(0, -200));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(closeButton), before);
+
+      await tester.tap(closeButton);
+      await tester.pumpAndSettle();
+      expect(find.byType(BottomSheet), findsNothing);
     });
   });
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
@@ -6,6 +8,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/equipment/domain/entities/overdue_service_entry.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_checklist_template.dart'
     as domain;
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart'
@@ -28,8 +31,10 @@ class PreDiveSessionRepository {
   );
 
   /// Inserts the session plus its item snapshots in one transaction. Items
-  /// arrive with blank id/sessionId (from SessionItemComposer); ids are
-  /// assigned here. Sync bookkeeping runs after the transaction commits.
+  /// arrive with a blank sessionId, and either a blank id (assigned here) or
+  /// one the caller already minted. SessionItemComposer mints its own so it
+  /// can write the cell-linearity link between two items it builds in the
+  /// same pass. Sync bookkeeping runs after the transaction commits.
   Future<domain.PreDiveSession> startSession({
     required domain.PreDiveChecklistTemplate template,
     required List<domain.PreDiveSessionItem> items,
@@ -64,7 +69,10 @@ class PreDiveSessionRepository {
               ),
             );
         for (final item in items) {
-          final itemId = _uuid.v4();
+          // Honour an id the caller already minted, so a cell-linearity
+          // item's sourceItemId still names a row that exists. Matches the
+          // shape saveItems uses for template items.
+          final itemId = item.id.isEmpty ? _uuid.v4() : item.id;
           itemIds.add(itemId);
           await _db
               .into(_db.preDiveSessionItems)
@@ -86,6 +94,11 @@ class PreDiveSessionRepository {
                   note: Value(item.note),
                   completedAt: Value(item.completedAt?.millisecondsSinceEpoch),
                   equipmentId: Value(item.equipmentId),
+                  overdueServices: Value(
+                    _encodeOverdueServices(item.overdueServices),
+                  ),
+                  sourceItemId: Value(item.sourceItemId),
+                  sourceValueNumber: Value(item.sourceValueNumber),
                   createdAt: Value(now),
                   updatedAt: Value(now),
                 ),
@@ -344,6 +357,15 @@ class PreDiveSessionRepository {
   /// leaving pending and cleared when resetting to pending. Value/note
   /// parameters are only written when provided so partial updates preserve
   /// stored values.
+  ///
+  /// [overdueServices] freezes the item's overdue-service list at the moment
+  /// it leaves pending; omit it on a call that only edits the note or value
+  /// without changing [state] (the caller passes the item's current,
+  /// unchanged [domain.PreDiveSessionItem.overdueServices] back in that case)
+  /// so the frozen snapshot survives untouched. A transition to
+  /// [domain.PreDiveItemState.pending] always clears the snapshot back to
+  /// null regardless of what is passed, so the runner UI falls back to a
+  /// live-computed overdue list again.
   Future<void> updateItemState({
     required String sessionId,
     required String itemId,
@@ -351,18 +373,19 @@ class PreDiveSessionRepository {
     double? valueNumber,
     String? valueText,
     String? note,
+    List<OverdueServiceEntry>? overdueServices,
+    double? sourceValueNumber,
   }) async {
     try {
       await _assertMutable(sessionId);
       final now = DateTime.now().millisecondsSinceEpoch;
+      final isPending = state == domain.PreDiveItemState.pending;
       await (_db.update(_db.preDiveSessionItems)
             ..where((t) => t.id.equals(itemId) & t.sessionId.equals(sessionId)))
           .write(
             PreDiveSessionItemsCompanion(
               state: Value(state.name),
-              completedAt: Value(
-                state == domain.PreDiveItemState.pending ? null : now,
-              ),
+              completedAt: Value(isPending ? null : now),
               valueNumber: valueNumber == null
                   ? const Value.absent()
                   : Value(valueNumber),
@@ -370,6 +393,18 @@ class PreDiveSessionRepository {
                   ? const Value.absent()
                   : Value(valueText),
               note: note == null ? const Value.absent() : Value(note),
+              overdueServices: Value(
+                isPending ? null : _encodeOverdueServices(overdueServices),
+              ),
+              // Frozen alongside overdueServices and cleared by the same
+              // rule: a reset returns the item to pending, where a stale
+              // frozen reading would be a lie. A call that passes nothing
+              // (a note edit, say) leaves the existing figure untouched.
+              sourceValueNumber: isPending
+                  ? const Value(null)
+                  : (sourceValueNumber == null
+                        ? const Value.absent()
+                        : Value(sourceValueNumber)),
               updatedAt: Value(now),
             ),
           );
@@ -543,7 +578,26 @@ class PreDiveSessionRepository {
             ? null
             : DateTime.fromMillisecondsSinceEpoch(row.completedAt!),
         equipmentId: row.equipmentId,
+        overdueServices: _decodeOverdueServices(row.overdueServices),
+        sourceItemId: row.sourceItemId,
+        sourceValueNumber: row.sourceValueNumber,
         createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
       );
+
+  /// Null in, null out: "no frozen snapshot" (pending, or not passed by the
+  /// caller) stays represented as a SQL NULL rather than an empty JSON array,
+  /// so it stays distinguishable from "resolved with nothing overdue".
+  String? _encodeOverdueServices(List<OverdueServiceEntry>? entries) =>
+      entries == null
+      ? null
+      : jsonEncode(entries.map((e) => e.toJson()).toList());
+
+  List<OverdueServiceEntry>? _decodeOverdueServices(String? raw) {
+    if (raw == null) return null;
+    final decoded = jsonDecode(raw) as List;
+    return decoded
+        .map((e) => OverdueServiceEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
 }

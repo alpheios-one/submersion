@@ -13,11 +13,12 @@ private const val RUNNER_LIBDC_STATUS_CANCELLED = -10
  * (see SerialDownloadClient). Adapted from DiveComputerHostApiImpl's in-process
  * serial download; emits results through the AIDL callback instead of Pigeon.
  *
- * NOTE: convertParsedDive / mapEventType below are duplicated verbatim from
- * DiveComputerHostApiImpl (they read the native dive pointer, which is valid in
+ * NOTE: convertParsedDive below is duplicated verbatim from
+ * DiveComputerHostApiImpl (it reads the native dive pointer, which is valid in
  * whichever process owns it). FOLLOW-UP: once this branch builds in CI, extract
- * them into a shared `DiveConverter` object used by both the BLE (in-process)
- * and serial (:dc) paths, to remove the duplication.
+ * it into a shared `DiveConverter` object used by both the BLE (in-process)
+ * and serial (:dc) paths, to remove the duplication. The event-name table has
+ * already been extracted (see libdcEventTypeName).
  */
 class SerialDownloadRunner(private val context: Context) {
 
@@ -92,6 +93,7 @@ class SerialDownloadRunner(private val context: Context) {
         var anyOpened = false
         var lastResult = -1
         var lastErrorMsg = ""
+        var lastInfo = IntArray(3)
 
         for (driver in drivers) {
             synchronized(diveBufferLock) { bufferedDives.clear() }
@@ -109,13 +111,15 @@ class SerialDownloadRunner(private val context: Context) {
             }
             anyOpened = true
             val errorBuf = ByteArray(256)
+            val infoOut = IntArray(3)
             var thrownMsg: String? = null
-            NativeTrace.d("nativeDownloadRun begin vendor=${request.vendor} product=${request.product} model=${request.model}")
+            NativeTrace.d("nativeDownloadRun begin vendor=${request.vendor} product=${request.product} model=${request.model} syncClock=${request.syncClock}")
             val result = try {
                 LibdcWrapper.nativeDownloadRun(
                     session, request.vendor, request.product,
                     request.model.toInt(), RUNNER_LIBDC_TRANSPORT_SERIAL,
-                    stream, request.name, fingerprintBytes, downloadCallback, errorBuf
+                    stream, request.name, fingerprintBytes, request.syncClock,
+                    downloadCallback, errorBuf, infoOut
                 )
             } catch (e: Throwable) {
                 NativeTrace.e("nativeDownloadRun threw: ${e.message}")
@@ -125,6 +129,7 @@ class SerialDownloadRunner(private val context: Context) {
             NativeTrace.d("nativeDownloadRun returned rc=$result")
             stream.close()
             lastResult = result
+            lastInfo = infoOut
             lastErrorMsg = String(errorBuf, Charsets.UTF_8).takeWhile { it.code != 0 }
                 .ifEmpty { thrownMsg ?: "Download failed (rc=$result)" }
             if (result == 0 || result == RUNNER_LIBDC_STATUS_CANCELLED) break
@@ -142,7 +147,12 @@ class SerialDownloadRunner(private val context: Context) {
             !anyOpened ->
                 cb.onError("connect_failed", "No dive computer found. Ports tried:\n$probeLog")
             lastResult == 0 || lastResult == RUNNER_LIBDC_STATUS_CANCELLED ->
-                cb.onComplete(divesToFlush.size.toLong())
+                cb.onComplete(
+                    divesToFlush.size.toLong(),
+                    libdcUnsignedOrNull(lastInfo[0]),
+                    libdcUnsignedOrNull(lastInfo[1]),
+                    libdcClockSyncStatusName(lastInfo[2]).takeIf { it != "not_requested" },
+                )
             drivers.size > 1 ->
                 cb.onError("connect_failed", "No dive computer found. Ports tried:\n$probeLog")
             else ->
@@ -187,7 +197,9 @@ class SerialDownloadRunner(private val context: Context) {
                 gasMixIndex = tk[0].toLong(),
                 volumeLiters = if (tk[1] > 0) tk[1] else null,
                 startPressureBar = if (tk[3] > 0) tk[3] else null,
-                endPressureBar = if (tk[4] > 0) tk[4] else null
+                endPressureBar = if (tk[4] > 0) tk[4] else null,
+                usage = if (tk[5].toLong() == 0L) null else tk[5].toLong(),
+                transmitterSerial = tk.getOrNull(6)?.toLong()?.takeIf { it != 0L },
             )
         }
 
@@ -217,7 +229,7 @@ class SerialDownloadRunner(private val context: Context) {
             if (e[1] == 0L) return@mapNotNull null  // skip EVENT_NONE
             DiveEvent(
                 timeSeconds = e[0] / 1000,
-                type = mapEventType(e[1].toInt()),
+                type = libdcEventTypeName(e[1].toInt()),
                 data = mapOf("flags" to e[2].toString(), "value" to e[3].toString())
             )
         }
@@ -271,34 +283,5 @@ class SerialDownloadRunner(private val context: Context) {
             rawData = rawData,
             rawFingerprint = rawFingerprint
         )
-    }
-
-    private fun mapEventType(type: Int): String = when (type) {
-        0 -> "none"
-        1 -> "deco"
-        2 -> "ascent"
-        3 -> "ceiling"
-        4 -> "workload"
-        5 -> "transmitter"
-        6 -> "violation"
-        7 -> "bookmark"
-        8 -> "surface"
-        9 -> "safetystop"
-        10 -> "gaschange"
-        11 -> "safetystop_voluntary"
-        12 -> "safetystop_mandatory"
-        13 -> "deepstop"
-        14 -> "ceiling_safetystop"
-        15 -> "floor"
-        16 -> "divetime"
-        17 -> "maxdepth"
-        18 -> "OLF"
-        19 -> "PO2"
-        20 -> "airtime"
-        21 -> "rgbm"
-        22 -> "heading"
-        23 -> "tissuelevel"
-        24 -> "gaschange2"
-        else -> "unknown_$type"
     }
 }

@@ -10,10 +10,12 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/dive_planner/data/services/plan_calculator_service.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_result.dart';
 import 'package:submersion/features/dive_planner/domain/entities/plan_segment.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_provenance.dart';
 import 'package:submersion/features/planner/data/repositories/dive_plan_repository.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
+import 'package:submersion/features/planner/domain/services/segment_chain.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_repository_providers.dart';
 
 const _uuid = Uuid();
@@ -66,6 +68,7 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
   final PlanCalculatorService _calculator;
   final double Function() _getDefaultReservePressure;
   final PlanGradientFactors Function() _getDefaultGradientFactors;
+  final PlannerWaterType Function() _getDefaultPlannerWaterType;
   final DivePlanRepository? _repository;
 
   /// The persisted aggregate this state was loaded from (or last saved as);
@@ -92,6 +95,7 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     double reservePressure = DivePlanState.kDefaultReservePressureBar,
     double Function()? getDefaultReservePressure,
     PlanGradientFactors Function()? getDefaultGradientFactors,
+    PlannerWaterType Function()? getDefaultPlannerWaterType,
     DivePlanRepository? repository,
   }) {
     return DivePlanNotifier._(
@@ -100,6 +104,8 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
           getDefaultReservePressure ?? (() => reservePressure),
       getDefaultGradientFactors:
           getDefaultGradientFactors ?? _fallbackGradientFactors,
+      getDefaultPlannerWaterType:
+          getDefaultPlannerWaterType ?? (() => PlannerWaterType.salt),
       repository: repository,
     );
   }
@@ -108,26 +114,42 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     this._calculator, {
     required double Function() getDefaultReservePressure,
     required PlanGradientFactors Function() getDefaultGradientFactors,
+    required PlannerWaterType Function() getDefaultPlannerWaterType,
     DivePlanRepository? repository,
   }) : _getDefaultReservePressure = getDefaultReservePressure,
        _getDefaultGradientFactors = getDefaultGradientFactors,
+       _getDefaultPlannerWaterType = getDefaultPlannerWaterType,
        _repository = repository,
        super(
          _createInitialState(
            reservePressure: getDefaultReservePressure(),
            getGradientFactors: getDefaultGradientFactors,
+           plannerWaterType: getDefaultPlannerWaterType(),
          ),
        );
 
   static PlanGradientFactors _fallbackGradientFactors() =>
       (low: DivePlanState.kFallbackGfLow, high: DivePlanState.kFallbackGfHigh);
 
+  static ({WaterType? waterType, double? salinityPpt}) _waterFieldsFor(
+    PlannerWaterType type,
+  ) => switch (type) {
+    PlannerWaterType.salt => (waterType: WaterType.salt, salinityPpt: null),
+    PlannerWaterType.fresh => (waterType: WaterType.fresh, salinityPpt: null),
+    PlannerWaterType.custom => (
+      waterType: null,
+      salinityPpt: DiveEnvironment.typicalSeaSalinityPpt,
+    ),
+  };
+
   static DivePlanState _createInitialState({
     required double reservePressure,
     required PlanGradientFactors Function() getGradientFactors,
+    required PlannerWaterType plannerWaterType,
   }) {
     final now = DateTime.now();
     final gradientFactors = getGradientFactors();
+    final water = _waterFieldsFor(plannerWaterType);
     return DivePlanState(
       id: _uuid.v4(),
       name: 'New Dive Plan',
@@ -136,6 +158,8 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
       gfLow: gradientFactors.low,
       gfHigh: gradientFactors.high,
       reservePressure: reservePressure,
+      waterType: water.waterType,
+      salinityPpt: water.salinityPpt,
       createdAt: now,
       updatedAt: now,
     );
@@ -164,6 +188,7 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     state = _createInitialState(
       reservePressure: _getDefaultReservePressure(),
       getGradientFactors: _getDefaultGradientFactors,
+      plannerWaterType: _getDefaultPlannerWaterType(),
     );
   }
 
@@ -185,6 +210,22 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     state = state.copyWith(
       gfLow: gradientFactors.low,
       gfHigh: gradientFactors.high,
+    );
+  }
+
+  /// Move an untouched plan onto the diver's current planner water default.
+  void adoptPlannerWaterIfPristine(PlannerWaterType type) {
+    if (isPersisted || state.isDirty || state.segments.isNotEmpty) return;
+    final water = _waterFieldsFor(type);
+    if (state.waterType == water.waterType &&
+        state.salinityPpt == water.salinityPpt) {
+      return;
+    }
+    state = state.copyWith(
+      waterType: water.waterType,
+      clearWaterType: water.waterType == null,
+      salinityPpt: water.salinityPpt,
+      clearSalinityPpt: water.salinityPpt == null,
     );
   }
 
@@ -310,14 +351,19 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
 
     final tank = state.tanks.first;
     final segments = <PlanSegment>[
-      PlanSegment.descent(
+      // Descends at the plan's own rate. The old call used PlanSegment
+      // .descent without passing one, so the quick plan always dropped at
+      // the factory's hardcoded 18 m/min and ignored the rate slider.
+      PlanSegment.travel(
         id: _uuid.v4(),
+        fromDepth: 0,
         targetDepth: maxDepth,
+        ratePerMinute: state.descentRate,
         tankId: tank.id,
         gasMix: tank.gasMix,
         order: 0,
       ),
-      PlanSegment.bottom(
+      PlanSegment.hold(
         id: _uuid.v4(),
         depth: maxDepth,
         durationMinutes: bottomTimeMinutes,
@@ -349,9 +395,23 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
   }
 
   /// Replace the equipment attached to the plan (Gear & Weights, v104).
+  ///
+  /// Provenance follows the ids so the two never drift (#1487): an id that
+  /// survives keeps its row, a new id starts as a loose row, and a dropped
+  /// id takes its row with it.
   void setEquipmentIds(List<String> ids) {
+    final byId = {for (final p in state.gearProvenance) p.equipmentId: p};
+    setGear(ids, [
+      for (final id in ids) byId[id] ?? GearProvenance(equipmentId: id),
+    ]);
+  }
+
+  /// Replace the gear and its provenance in one step, so the ids and their
+  /// assembly and set pointers never disagree (issue #1487).
+  void setGear(List<String> ids, List<GearProvenance> provenance) {
     state = state.copyWith(
       equipmentIds: ids,
+      gearProvenance: provenance,
       isDirty: true,
       updatedAt: DateTime.now(),
     );
@@ -437,11 +497,42 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     );
   }
 
-  /// Update ascent and/or descent rate in meters per minute.
-  void updateRates({double? ascent, double? descent}) {
+  /// Update any of the four ascent rates, or the descent rate, in meters per
+  /// minute. [intermediate] applies between stops deeper than 9 m, [shallow]
+  /// between the 9 m and shallower stops, and [finalStretch] from the last
+  /// stop to the surface.
+  void updateRates({
+    double? ascent,
+    double? intermediate,
+    double? shallow,
+    double? finalStretch,
+    double? descent,
+  }) {
     state = state.copyWith(
       ascentRate: ascent,
+      intermediateAscentRate: intermediate,
+      shallowAscentRate: shallow,
+      finalAscentRate: finalStretch,
       descentRate: descent,
+      isDirty: true,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Shallowest metres allowed for the last deco stop.
+  static const double minLastStopDepth = 3.0;
+
+  /// Deepest metres allowed for the last deco stop.
+  static const double maxLastStopDepth = 6.0;
+
+  /// Set where the final decompression stop is held, 3 to 6 m. It need not
+  /// sit on the 3 m grid: the schedule follows the grid down to 6 m and then
+  /// holds this depth.
+  void updateLastStopDepth(double meters) {
+    final clamped = meters.clamp(minLastStopDepth, maxLastStopDepth);
+    if (clamped == state.lastStopDepth) return;
+    state = state.copyWith(
+      lastStopDepth: clamped,
       isDirty: true,
       updatedAt: DateTime.now(),
     );
@@ -462,6 +553,46 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     state = state.copyWith(
       altitude: altitude,
       clearAltitude: altitude == null,
+      isDirty: true,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Update water type for decompression density. Null clears the choice and
+  /// leaves the plan on the planner's salt-water fallback.
+  /// Clears a custom salinity so a preset is not mixed with an override.
+  void updateWaterType(WaterType? waterType) {
+    state = state.copyWith(
+      waterType: waterType,
+      clearWaterType: waterType == null,
+      clearSalinityPpt: true,
+      isDirty: true,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Switch to custom salinity (ppt). Seeds seawater (35 ppt) when the plan
+  /// has no value yet, or the equivalent of a leftover brackish type.
+  void selectCustomSalinity() {
+    final seed =
+        state.salinityPpt ??
+        (state.waterType == null
+            ? DiveEnvironment.typicalSeaSalinityPpt
+            : DiveEnvironment.salinityPptFromDensity(
+                DiveEnvironment.forConditions(
+                  waterType: state.waterType,
+                ).waterDensityKgM3,
+              ));
+    updateSalinityPpt(seed);
+  }
+
+  /// Custom salinity in ppt. Clears [DivePlanState.waterType] so density
+  /// comes only from this value.
+  void updateSalinityPpt(double? salinityPpt) {
+    state = state.copyWith(
+      salinityPpt: salinityPpt,
+      clearSalinityPpt: salinityPpt == null,
+      clearWaterType: true,
       isDirty: true,
       updatedAt: DateTime.now(),
     );
@@ -614,11 +745,10 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     double totalDepthTime = 0;
     int totalTime = 0;
 
-    for (final segment in state.segments) {
-      if (segment.startDepth > maxDepth) maxDepth = segment.startDepth;
-      if (segment.endDepth > maxDepth) maxDepth = segment.endDepth;
-      totalDepthTime += segment.avgDepth * segment.durationSeconds;
-      totalTime += segment.durationSeconds;
+    for (final leg in const SegmentChain().resolve(state.segments)) {
+      if (leg.endDepth > maxDepth) maxDepth = leg.endDepth;
+      totalDepthTime += leg.avgDepth * leg.durationSeconds;
+      totalTime += leg.durationSeconds;
     }
 
     final avgDepth = totalTime > 0 ? totalDepthTime / totalTime : 0.0;
@@ -634,6 +764,7 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
       profile: profilePoints,
       notes: state.notes,
       altitude: state.altitude,
+      waterType: state.waterType,
       gradientFactorLow: state.gfLow,
       gradientFactorHigh: state.gfHigh,
       isPlanned: true,
@@ -672,6 +803,8 @@ final divePlanNotifierProvider =
         reservePressure: defaultReserve(),
         getDefaultReservePressure: defaultReserve,
         getDefaultGradientFactors: defaultGradientFactors,
+        getDefaultPlannerWaterType: () =>
+            read(settingsProvider).defaultPlannerWaterType,
         repository: read(divePlanRepositoryProvider),
       );
 
@@ -681,6 +814,10 @@ final divePlanNotifierProvider =
       ref.listen<PlanGradientFactors>(
         planGradientFactorSettingsProvider,
         (_, next) => notifier.adoptGradientFactorsIfPristine(next),
+      );
+      ref.listen<PlannerWaterType>(
+        settingsProvider.select((s) => s.defaultPlannerWaterType),
+        (_, next) => notifier.adoptPlannerWaterIfPristine(next),
       );
 
       return notifier;
@@ -715,10 +852,13 @@ final planResultsProvider = Provider<PlanResult>((ref) {
     sacRate: state.sacRate,
     reservePressure: state.reservePressure,
     initialTissueState: state.initialTissueState,
-    // Altitude finally reaches the deco math; 0 keeps the legacy sea-level
-    // surface pressure. Water type comes to the planner in Phase 2.
+    // Altitude 0 keeps the legacy sea-level surface pressure. Null water
+    // type is salt, matching the planner default - though a custom salinity,
+    // when set, overrides either one (see DiveEnvironment's precedence).
     environment: DiveEnvironment.forConditions(
       altitudeMeters: (state.altitude ?? 0) > 0 ? state.altitude : null,
+      waterType: state.waterType ?? WaterType.salt,
+      salinityPpt: state.salinityPpt,
     ),
   );
 });

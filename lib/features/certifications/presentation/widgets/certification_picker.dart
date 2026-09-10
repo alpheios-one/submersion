@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
-import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
+import 'package:submersion/features/certifications/presentation/certification_title_l10n.dart';
+import 'package:submersion/features/certifications/presentation/certification_agency_display.dart';
 
 /// A widget for selecting a certification to link to a course.
 class CertificationPicker extends ConsumerWidget {
@@ -39,11 +41,22 @@ class CertificationPicker extends ConsumerWidget {
       title: Text(
         (selectedCertification == null
                 ? null
-                : certificationTitle(selectedCertification!)) ??
+                : certificationTitleL10n(
+                    selectedCertification!,
+                    context.l10n,
+                  )) ??
             context.l10n.certifications_picker_noSelection,
       ),
       subtitle: selectedCertification != null
-          ? Text(certificationAgencyAndLevel(selectedCertification!))
+          ? Text(
+              // Every recognition the card grants, not just the row's own
+              // agency -- an FFESSM N1 that is also a CMAS 1-star reads as
+              // both here.
+              certificationCredentialsLineL10n(
+                selectedCertification!,
+                context.l10n,
+              ),
+            )
           : Text(context.l10n.certifications_picker_hint),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -186,20 +199,30 @@ class CertificationPickerSheet extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final cert = sortedCerts[index];
                   final isSelected = selectedCertification?.id == cert.id;
-                  final dateFormat = DateFormat.yMMMd();
+                  final units = UnitFormatter(ref.watch(settingsProvider));
 
                   // Only non-null when a custom name owns the title, so the
                   // level is spoken exactly once either way.
-                  final level = certificationSubtitle(cert);
+                  final level = certificationSubtitleL10n(cert, context.l10n);
                   final levelLabel = level != null ? ', $level' : '';
                   // Keep the agency: this label replaces the tile's own
                   // semantics, including the subtitle that shows the agency
                   // visually. The title is derived so it is not said twice.
+                  // A multi-credential card also names its other recognitions,
+                  // matching what the visible subtitle now shows.
+                  final alsoRecognized = additionalCredentialsLineL10n(
+                    cert,
+                    context.l10n,
+                  );
+                  final alsoLabel = alsoRecognized != null
+                      ? ', $alsoRecognized'
+                      : '';
                   final certName =
-                      '${cert.agency.displayName} '
-                      '${certificationTitle(cert)}$levelLabel';
+                      '${cert.agency.localizedName(context.l10n)} '
+                      '${certificationTitleL10n(cert, context.l10n)}$levelLabel'
+                      '$alsoLabel';
                   final certLabel = cert.issueDate != null
-                      ? '$certName, issued ${dateFormat.format(cert.issueDate!)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
+                      ? '$certName, issued ${units.formatDate(cert.issueDate)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
                       : '$certName${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}';
 
                   return Semantics(
@@ -225,11 +248,14 @@ class CertificationPickerSheet extends ConsumerWidget {
                               : Colors.green,
                         ),
                       ),
-                      title: Text(certificationTitle(cert)),
+                      title: Text(certificationTitleL10n(cert, context.l10n)),
                       subtitle: Text(
                         cert.issueDate != null
-                            ? '${certificationAgencyAndLevel(cert)} - ${dateFormat.format(cert.issueDate!)}'
-                            : certificationAgencyAndLevel(cert),
+                            ? '${certificationCredentialsLineL10n(cert, context.l10n)} - ${units.formatDate(cert.issueDate)}'
+                            : certificationCredentialsLineL10n(
+                                cert,
+                                context.l10n,
+                              ),
                       ),
                       trailing: isSelected
                           ? Icon(Icons.check_circle, color: colorScheme.primary)

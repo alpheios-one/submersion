@@ -145,6 +145,22 @@ class SyncInitializer {
           sentinelDeviceId != deviceId;
 
       if (restoreDetected) {
+        // A database with no sync history has no baseline to rewind and no
+        // stale tombstones to clear, so there is nothing for a rebaseline to
+        // repair: this is a fresh install, not a restore. Preserving the
+        // anchored id here would be actively harmful: this install would then
+        // own every file the previous install published, so its own cloud
+        // library would list as "ours" rather than a peer's and the account
+        // would read as empty. Keep the identity we minted and re-point the
+        // anchors at it instead.
+        if (!await _syncRepository.hasSyncHistory()) {
+          _log.info(
+            'Anchors name a previous install but this database has never '
+            'synced; keeping the freshly minted identity',
+          );
+          await _establishAnchors(deviceId);
+          return DeviceIdentityStatus.freshInstall;
+        }
         _log.warning(
           'On-disk database is not the one we last wrote (restore/overwrite '
           'detected); re-baselining sync and restoring the live identity',
@@ -388,19 +404,122 @@ class SyncInitializer {
     CloudStorageProvider provider,
   ) async {
     final deviceId = await _syncRepository.getDeviceId();
+    return (await _changesetLogFiles(
+      provider,
+    )).where((f) => ChangesetLogLayout.deviceIdOf(f.name) != deviceId).toList();
+  }
+
+  /// Every changeset-log artifact on the account, this device's own included.
+  /// One listing, so callers that need both halves of the split can take the
+  /// snapshot once instead of paying a second network round trip.
+  Future<List<CloudFileInfo>> _changesetLogFiles(
+    CloudStorageProvider provider,
+  ) async {
     final files = await provider.listFiles(
       namePattern: ChangesetLogLayout.prefix,
     );
-    return files
-        .where((f) => ChangesetLogLayout.isOurs(f.name))
-        .where((f) => ChangesetLogLayout.deviceIdOf(f.name) != deviceId)
-        .toList();
+    return files.where((f) => ChangesetLogLayout.isOurs(f.name)).toList();
   }
 
   /// What a peer listing says about this account, in one round trip.
   Future<PeerLibraryState> peerLibraryState(
     CloudStorageProvider provider,
   ) async => classifyPeerFiles(await peerLogFiles(provider));
+
+  /// Whether some device OTHER than [deviceId] publishes a pullable library on
+  /// [provider]. The licence for deleting [deviceId]'s cloud files when this
+  /// install retires that identity (Reset Sync State, and the Repair Sync that
+  /// wraps it): those files are only redundant while a second copy exists.
+  ///
+  /// Without this check the retirement cleanup is destructive exactly where
+  /// the user is most likely to reach for it. An install that inherited an
+  /// earlier install's device id owns the whole cloud library under that id
+  /// (issue #1541, routine on macOS where replacing the .app leaves the
+  /// device-id anchor in ~/Library/Preferences), and the screen it lands on --
+  /// "No library found" -- is the one that points at Repair Sync. The same
+  /// exposure covers any single-device user whose local library is empty or
+  /// damaged. Leaving the files behind instead costs one stale peer log, which
+  /// the freshly minted identity simply pulls; deleting them costs the library
+  /// (issue #1551).
+  ///
+  /// Only a manifest counts, and only one filed under a device id that parses.
+  /// A half-finished publish (base parts, no manifest) is not a library anyone
+  /// can pull, and a retirement marker is a tombstone, so [classifyPeerFiles]
+  /// rules both out. A listing we could not read is not evidence of a second
+  /// copy either, so a failure answers false -- as does one that stalls past
+  /// [timeout], which also keeps reset from hanging behind its non-dismissible
+  /// progress dialog.
+  Future<bool> anotherDevicePublishesLibrary(
+    String deviceId,
+    CloudStorageProvider provider, {
+    @visibleForTesting Duration timeout = const Duration(seconds: 8),
+  }) async {
+    try {
+      final files = await _changesetLogFiles(provider).timeout(timeout);
+      final others = files.where((f) {
+        final id = ChangesetLogLayout.deviceIdOf(f.name);
+        // A name that parses to no device id was published by no device.
+        // isManifest matches on prefix and suffix alone, so "ssv1..manifest
+        // .json" would otherwise pass as a peer's library and license the
+        // delete. Elsewhere an unparseable name is merely pulled and ignored;
+        // here it would cost the library, so it is dropped.
+        return id != null && id != deviceId;
+      }).toList();
+      return classifyPeerFiles(others) == PeerLibraryState.pullable;
+    } catch (e) {
+      _log.warning(
+        'Could not list the account while retiring $deviceId; keeping its '
+        'cloud files: $e',
+      );
+      return false;
+    }
+  }
+
+  /// What the account holds, from the point of view of an install that has no
+  /// library of its own yet, i.e. the setup wizard's Connect step.
+  ///
+  /// Differs from [peerLibraryState] in one case: the listing is empty of
+  /// PEER files but the account does hold a changeset log under OUR OWN device
+  /// id. That happens whenever an install inherits an earlier install's
+  /// identity, which is routine on macOS, where replacing the .app leaves
+  /// ~/Library/Preferences, and with it the device-id anchor, in place. Every
+  /// file the earlier install published then reads as "ours", the account
+  /// lists as empty, and the wizard offers Start Fresh over a live library.
+  ///
+  /// The files can only be pulled as a peer's, so the fix is to stop claiming
+  /// the retired identity: mint a fresh one and re-classify. Guarded on
+  /// [localLibraryIsEmpty] because a device that still holds the library it
+  /// published must keep the identity that published it, or it orphans its own
+  /// log. Nothing is deleted either way.
+  Future<PeerLibraryState> firstContactLibraryState(
+    CloudStorageProvider provider, {
+    required bool localLibraryIsEmpty,
+  }) async {
+    // One listing serves every branch below, including the re-classification
+    // after an identity swap: the Connect step waits on this, and listFiles is
+    // a network round trip on every real provider.
+    final files = await _changesetLogFiles(provider);
+    final deviceId = await _syncRepository.getDeviceId();
+    bool isOurOwn(CloudFileInfo f) =>
+        ChangesetLogLayout.deviceIdOf(f.name) == deviceId;
+
+    final state = classifyPeerFiles(files.where((f) => !isOurOwn(f)).toList());
+    if (state != PeerLibraryState.none || !localLibraryIsEmpty) return state;
+
+    final ours = files.where(isOurOwn).toList();
+    if (classifyPeerFiles(ours) == PeerLibraryState.none) return state;
+
+    _log.warning(
+      'The account holds a library under this install\'s own device id while '
+      'it has no library locally; adopting a fresh identity so those files '
+      'can be pulled as a peer\'s',
+    );
+    await adoptFreshIdentity();
+    // The id just minted is brand new, so no file in the snapshot can carry
+    // it: every one of them belongs to a peer now, and re-classifying is
+    // local work.
+    return classifyPeerFiles(files);
+  }
 
   /// Classifies a peer listing. Static and visible for testing for the same
   /// reason as SyncNotifier.skippedPeerLabels: it is pure, and the rule
@@ -461,6 +580,14 @@ enum DeviceIdentityStatus {
   /// or a changed device id: a restore replaced the database. Sync was
   /// re-baselined and the live identity restored.
   rebaselined,
+
+  /// The anchors named a previous install, but the on-disk database has no
+  /// sync history at all: a fresh install on a machine whose preferences
+  /// outlived the old one (routine on macOS, where replacing the .app leaves
+  /// ~/Library/Preferences untouched). This install keeps the identity it
+  /// minted and the anchors are re-pointed at it, so the previous install's
+  /// cloud files stay visible as a peer's.
+  freshInstall,
 
   /// The reconcile could not run (e.g. the metadata lookup failed). Launch
   /// continues regardless.

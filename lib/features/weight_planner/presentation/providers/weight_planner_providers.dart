@@ -58,13 +58,14 @@ final weightObservationsProvider = FutureProvider<List<WeightObservation>>((
 });
 
 /// The fitted per-diver weight model. Refits whenever the history, the
-/// gear list, or the body-weight history changes.
+/// gear list, or the body-weight history (weight or height) changes.
 final weightCalibrationProvider = FutureProvider<FittedWeightModel>((
   ref,
 ) async {
   final observations = await ref.watch(weightObservationsProvider.future);
   final equipment = await ref.watch(allEquipmentProvider.future);
   final latestWeight = await ref.watch(latestDiverWeightProvider.future);
+  final latestHeight = await ref.watch(latestDiverHeightProvider.future);
 
   final itemsById = {for (final item in equipment) item.id: item};
 
@@ -76,6 +77,7 @@ final weightCalibrationProvider = FutureProvider<FittedWeightModel>((
       return gearFeatureFor(item);
     },
     bodyWeightKg: latestWeight?.weightKg,
+    heightCm: latestHeight,
   );
 });
 

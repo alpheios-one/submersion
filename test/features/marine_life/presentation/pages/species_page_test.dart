@@ -6,9 +6,13 @@ import 'package:submersion/features/marine_life/domain/entities/seen_species.dar
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/pages/species_page.dart';
 import 'package:submersion/features/marine_life/presentation/providers/seen_species_providers.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/providers/species_media_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../media/presentation/support/media_widget_harness.dart';
 
 final _whaleShark = SeenSpecies(
   species: const Species(
@@ -67,6 +71,7 @@ Future<void> _pumpPage(
   WidgetTester tester,
   List<SeenSpecies> entries, {
   Locale locale = const Locale('en'),
+  Map<String, MediaItem> covers = const {},
 }) async {
   final overrides = await getBaseOverrides();
   await tester.pumpWidget(
@@ -75,7 +80,9 @@ Future<void> _pumpPage(
       locale: locale,
       overrides: [
         ...overrides,
+        mediaResolverOverride(),
         seenSpeciesProvider.overrideWith((ref) async => entries),
+        speciesCoverMediaProvider.overrideWith((ref) async => covers),
       ],
     ),
   );
@@ -190,5 +197,18 @@ void main() {
     await tester.pump();
     expect(find.text('Walhai'), findsOneWidget);
     expect(find.text('Green Sea Turtle'), findsNothing);
+  });
+
+  testWidgets('tiles show the cover photo only for species that have one', (
+    tester,
+  ) async {
+    await _pumpPage(
+      tester,
+      [_whaleShark, _turtle],
+      covers: {'sp_whale_shark': testMediaItem(id: 'p1', diveId: 'd1')},
+    );
+
+    expect(find.byType(MediaItemView), findsOneWidget);
+    expect(find.byType(CircleAvatar), findsOneWidget);
   });
 }

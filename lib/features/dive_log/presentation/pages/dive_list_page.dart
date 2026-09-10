@@ -991,6 +991,30 @@ class DiveListTile extends ConsumerWidget {
                                   ),
                                 ),
                               ],
+                              // Statistics exclusion (#526 / #1272). Explains
+                              // why this dive is missing from the totals
+                              // without the diver having to open it.
+                              if (summary?.excludedFromStats == true ||
+                                  summary?.excludedFromGasStats == true) ...[
+                                const SizedBox(width: 6),
+                                Tooltip(
+                                  key: const Key('dive-excluded-badge'),
+                                  message: summary!.excludedFromStats
+                                      ? context
+                                            .l10n
+                                            .diveLog_badge_excludedFromStats
+                                      : context
+                                            .l10n
+                                            .diveLog_badge_excludedFromGasStats,
+                                  child: Icon(
+                                    summary!.excludedFromStats
+                                        ? Icons.bar_chart_outlined
+                                        : Icons.local_gas_station_outlined,
+                                    size: 16,
+                                    color: colorScheme.outline,
+                                  ),
+                                ),
+                              ],
                               if ((summary?.safetyFindingCount ?? 0) > 0 &&
                                   ref.watch(safetyReviewEnabledProvider)) ...[
                                 const SizedBox(width: 6),

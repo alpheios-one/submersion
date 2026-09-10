@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -7,23 +8,40 @@ import 'package:submersion/features/dive_log/presentation/widgets/environment_en
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_picker_sheet.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/equipment_set_picker_sheet.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The rig inputs for a weight prediction: gear chips (with set/item
-/// pickers), tank preset rows, water type, and body weight. Shared by the
-/// Weight Planner tool; the plan editor derives tanks/water from the plan.
+/// pickers), tank preset rows, water type, body weight, and optional height
+/// (centimetres, or feet and inches under imperial depth units). Shared by
+/// the Weight Planner tool; the plan editor derives tanks/water from the plan.
 class RigComposer extends ConsumerWidget {
   final List<EquipmentItem> gear;
   final List<TankPresetEntity> tanks;
   final WaterType waterType;
   final TextEditingController bodyWeightController;
+  final TextEditingController heightCmController;
+  final TextEditingController heightFeetController;
+  final TextEditingController heightInchesController;
+
+  /// BMI derived from the entered weight and height; null hides the readout.
+  final double? bmi;
   final UnitFormatter units;
   final bool showSaveBodyWeight;
   final ValueChanged<EquipmentItem> onGearAdded;
-  final ValueChanged<List<EquipmentItem>> onGearSetAdded;
+  final void Function(EquipmentSet set, List<EquipmentItem> items)
+  onGearSetAdded;
   final ValueChanged<EquipmentItem> onGearRemoved;
+
+  /// Ids in [gear] that are parts of an assembly also in [gear]; they show
+  /// inside the assembly's chip as a count rather than as chips of their
+  /// own (issue #1487).
+  final Set<String> partIds;
+
+  /// Number of parts under each assembly id, for the chip label.
+  final Map<String, int> partCounts;
   final ValueChanged<TankPresetEntity> onTankAdded;
   final ValueChanged<int> onTankRemoved;
   final void Function(int index, TankPresetEntity preset) onTankChanged;
@@ -37,11 +55,17 @@ class RigComposer extends ConsumerWidget {
     required this.tanks,
     required this.waterType,
     required this.bodyWeightController,
+    required this.heightCmController,
+    required this.heightFeetController,
+    required this.heightInchesController,
+    this.bmi,
     required this.units,
     required this.showSaveBodyWeight,
     required this.onGearAdded,
     required this.onGearSetAdded,
     required this.onGearRemoved,
+    this.partIds = const {},
+    this.partCounts = const {},
     required this.onTankAdded,
     required this.onTankRemoved,
     required this.onTankChanged,
@@ -83,7 +107,7 @@ class RigComposer extends ConsumerWidget {
         builder: (context, scrollController) => EquipmentSetPickerSheet(
           scrollController: scrollController,
           onSetSelected: (set, items) {
-            onGearSetAdded(items);
+            onGearSetAdded(set, items);
             Navigator.of(context).pop();
           },
         ),
@@ -143,10 +167,18 @@ class RigComposer extends ConsumerWidget {
                 runSpacing: 4,
                 children: [
                   for (final item in gear)
-                    InputChip(
-                      label: Text(item.name),
-                      onDeleted: () => onGearRemoved(item),
-                    ),
+                    if (!partIds.contains(item.id))
+                      InputChip(
+                        label: Text(switch (partCounts[item.id]) {
+                          final n? when n > 0 =>
+                            context.l10n.equipment_assemblyChip_label(
+                              n,
+                              item.name,
+                            ),
+                          _ => item.name,
+                        }),
+                        onDeleted: () => onGearRemoved(item),
+                      ),
                 ],
               ),
             const SizedBox(height: 12),
@@ -231,9 +263,67 @@ class RigComposer extends ConsumerWidget {
               ),
               onChanged: (_) => onChanged(),
             ),
+            const SizedBox(height: 12),
+            _heightFields(context),
+            if (bmi != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  context.l10n.tools_weight_bmiHelper(
+                    NumberFormat.decimalPatternDigits(
+                      locale: Localizations.localeOf(context).toString(),
+                      decimalDigits: 1,
+                    ).format(bmi),
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Height entry in the diver's units. Mirrors the body-weight history
+  /// dialog: one centimetre field, or feet and inches side by side.
+  Widget _heightFields(BuildContext context) {
+    if (units.heightIsMetric) {
+      return TextField(
+        controller: heightCmController,
+        decoration: InputDecoration(
+          labelText: context.l10n.tools_weight_heightOptional,
+          suffixText: 'cm',
+        ),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        onChanged: (_) => onChanged(),
+      );
+    }
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: heightFeetController,
+            decoration: InputDecoration(
+              labelText: context.l10n.bodyWeight_heightFeetLabel,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: false),
+            onChanged: (_) => onChanged(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: TextField(
+            controller: heightInchesController,
+            decoration: InputDecoration(
+              labelText: context.l10n.bodyWeight_heightInchesLabel,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: false),
+            onChanged: (_) => onChanged(),
+          ),
+        ),
+      ],
     );
   }
 }

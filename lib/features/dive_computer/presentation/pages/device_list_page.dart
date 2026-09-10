@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_computer/presentation/providers/clock_sync_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/utils/last_download_formatter.dart';
+import 'package:submersion/features/dive_computer/presentation/widgets/dive_computer_merge_sheet.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
@@ -57,9 +62,19 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
               ? SelectionAppBar(
                   controller: _selection,
                   selectableIds: visibleIds,
-                  // Delete only: favourite reads as singular, and a multi-device
-                  // download would be a new flow rather than a lifted action.
-                  actions: const [],
+                  // Merge and delete: favourite reads as singular, and a
+                  // multi-device download would be a new flow rather than a
+                  // lifted action.
+                  actions: [
+                    BulkAction(
+                      id: 'merge',
+                      icon: Icons.merge_type,
+                      label:
+                          context.l10n.diveComputer_list_selection_mergeTooltip,
+                      minCount: 2,
+                      onInvoke: _startMerge,
+                    ),
+                  ],
                   shell: SelectionBarShell.appBar,
                   onDelete: _confirmAndDelete,
                 )
@@ -79,39 +94,53 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
                     ),
                   ],
                 ),
-          body: computersAsync.when(
-            data: (computers) {
-              if (computers.isEmpty) {
-                return _buildEmptyState(context, colorScheme);
-              }
-              return _buildComputerList(context, ref, computers);
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.l10n.diveComputer_list_loadFailed,
-                    style: theme.textTheme.titleMedium,
+          body: Column(
+            children: [
+              _buildClockSyncSwitch(context, ref),
+              const Divider(height: 1),
+              Expanded(
+                child: computersAsync.when(
+                  data: (computers) {
+                    if (computers.isEmpty) {
+                      return _buildEmptyState(context, colorScheme);
+                    }
+                    return _buildComputerList(context, ref, computers);
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: colorScheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          context.l10n.diveComputer_list_loadFailed,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          error.toString(),
+                          style: theme.textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: () =>
+                              ref.invalidate(allDiveComputersProvider),
+                          icon: const Icon(Icons.refresh),
+                          label: Text(context.l10n.diveComputer_list_retry),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    error.toString(),
-                    style: theme.textTheme.bodySmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () => ref.invalidate(allDiveComputersProvider),
-                    icon: const Icon(Icons.refresh),
-                    label: Text(context.l10n.diveComputer_list_retry),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
           floatingActionButton: selection.isActive
               ? null
@@ -125,9 +154,40 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
     );
   }
 
-  Future<void> _confirmAndDelete() async {
+  /// Folds the checked computers into one (#645). The sheet owns the
+  /// confirmation; this only reports the outcome and leaves selection mode.
+  Future<BulkActionOutcome> _startMerge() async {
+    final ids = _selectedIds;
+    final computers = [
+      for (final computer
+          in ref.read(allDiveComputersProvider).value ?? const <DiveComputer>[])
+        if (ids.contains(computer.id)) computer,
+    ];
+    if (computers.length < 2) return BulkActionOutcome.cancelled;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await DiveComputerMergeSheet.show(context, computers);
+    if (result == null) return BulkActionOutcome.cancelled;
+    if (!mounted) return BulkActionOutcome.completed;
+
+    _selection.exit();
+    final survivor = computers.firstWhere((c) => c.id == result.survivorId);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          context.l10n.diveComputer_merge_snackbar(
+            result.mergedComputerIds.length,
+            survivor.displayName,
+          ),
+        ),
+      ),
+    );
+    return BulkActionOutcome.completed;
+  }
+
+  Future<BulkActionOutcome> _confirmAndDelete() async {
     final ids = _selectedIds.toList();
-    if (ids.isEmpty) return;
+    if (ids.isEmpty) return BulkActionOutcome.cancelled;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -149,7 +209,7 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !mounted) return BulkActionOutcome.cancelled;
 
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(diveComputerNotifierProvider.notifier);
@@ -157,11 +217,31 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
     for (final id in ids) {
       await notifier.delete(id);
     }
-    if (!mounted) return;
+    if (!mounted) return BulkActionOutcome.completed;
     messenger.showSnackBar(
       SnackBar(
         content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
       ),
+    );
+    return BulkActionOutcome.completed;
+  }
+
+  /// Installation-local: whether downloads from THIS device set each
+  /// computer's clock (issue #1216). Lives here rather than in Settings so it
+  /// sits beside the per-computer override on the detail page.
+  Widget _buildClockSyncSwitch(BuildContext context, WidgetRef ref) {
+    final enabled = ref.watch(
+      clockSyncSettingsNotifierProvider.select((s) => s.globalEnabled),
+    );
+    return SwitchListTile(
+      key: const ValueKey('clock_sync_global_switch'),
+      secondary: const Icon(Icons.schedule),
+      title: Text(context.l10n.diveComputer_clockSync_globalTitle),
+      subtitle: Text(context.l10n.diveComputer_clockSync_globalSubtitle),
+      value: enabled,
+      onChanged: (value) => ref
+          .read(clockSyncSettingsNotifierProvider.notifier)
+          .setGlobalEnabled(value),
     );
   }
 
@@ -294,7 +374,7 @@ class _DeviceListPageState extends ConsumerState<DeviceListPage> {
 }
 
 /// Card widget displaying a single dive computer.
-class _ComputerCard extends StatelessWidget {
+class _ComputerCard extends ConsumerWidget {
   final DiveComputer computer;
   final VoidCallback onTap;
   final VoidCallback onDownload;
@@ -312,9 +392,10 @@ class _ComputerCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final units = UnitFormatter(ref.watch(settingsProvider));
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -409,7 +490,11 @@ class _ComputerCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            formatLastDownload(context, computer.lastDownload),
+                            formatLastDownload(
+                              context,
+                              computer.lastDownload,
+                              units: units,
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),

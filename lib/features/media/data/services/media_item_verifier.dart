@@ -70,15 +70,20 @@ class MediaItemVerifier {
       // fires for every Lightroom row when the account is disconnected, the
       // second for a row whose bytes live on another machine. Orphaning
       // either would report a reachability problem as data loss.
+      //
+      // Narrow writes, never `updateMedia`: [item] is the caller's snapshot,
+      // and an upload finishing after it was taken has stamped the row since.
+      // Writing the snapshot back would roll those stamps to null and sync
+      // the rollback, which is how a second device ends up believing a
+      // backed-up photo has no backup.
       if (result != VerifyResult.available && result != VerifyResult.notFound) {
-        await _repository.updateMedia(item.copyWith(lastVerifiedAt: stamp));
+        await _repository.stampVerification(item.id, verifiedAt: stamp);
         return result;
       }
-      await _repository.updateMedia(
-        item.copyWith(
-          isOrphaned: result == VerifyResult.notFound,
-          lastVerifiedAt: stamp,
-        ),
+      await _repository.stampVerification(
+        item.id,
+        verifiedAt: stamp,
+        isOrphaned: result == VerifyResult.notFound,
       );
     } on Object {
       return VerifyResult.transientError;

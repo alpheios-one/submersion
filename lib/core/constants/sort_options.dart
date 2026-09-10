@@ -33,7 +33,8 @@ enum SiteSortField {
   rating('Rating', Icons.star),
   difficulty('Difficulty', Icons.trending_up),
   depth('Max Depth', Icons.vertical_align_bottom),
-  diveCount('Dive Count', Icons.scuba_diving);
+  diveCount('Dive Count', Icons.scuba_diving),
+  lastDived('Last Dived', Icons.history);
 
   final String displayName;
   final IconData icon;
@@ -64,10 +65,28 @@ enum EquipmentSortField {
   const EquipmentSortField(this.displayName, this.icon);
 }
 
+/// Sort fields for the items inside a gear list on a dive.
+///
+/// Distinct from [EquipmentSortField], which serves the Equipment page and
+/// carries a `serviceDue` field needing an urgency map the dive surfaces do
+/// not load. Type is absent here because ordering by type is the separate
+/// primary axis of an `EquipmentArrangement`.
+enum EquipmentItemSortField {
+  name('Name', Icons.sort_by_alpha),
+  purchaseDate('Purchase Date', Icons.shopping_bag),
+  dateAdded('Date Added', Icons.playlist_add),
+  lastServiceDate('Last Service', Icons.build);
+
+  final String displayName;
+  final IconData icon;
+  const EquipmentItemSortField(this.displayName, this.icon);
+}
+
 /// Sort fields for Buddies
 enum BuddySortField {
   name('Name', Icons.sort_by_alpha),
-  diveCount('Dive Count', Icons.scuba_diving);
+  diveCount('Dive Count', Icons.scuba_diving),
+  lastDive('Last Dive', Icons.history);
 
   final String displayName;
   final IconData icon;

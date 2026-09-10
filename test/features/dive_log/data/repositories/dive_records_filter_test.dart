@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 
@@ -65,7 +66,13 @@ void main() {
           DivesCompanion(
             id: Value(id),
             diverId: Value(diverId),
-            diveDateTime: Value(date.millisecondsSinceEpoch),
+            // dive_date_time holds a wall clock flagged as UTC (the digits
+            // on the computer face, stored verbatim), so the fixture has to
+            // write the same frame the app does. Passing a LOCAL DateTime's
+            // raw epoch would shift the stored wall clock by the machine's
+            // UTC offset and quietly move these dives to another day under
+            // any non-UTC zone (issue #1368).
+            diveDateTime: Value(asWallClockUtc(date).millisecondsSinceEpoch),
             siteId: Value(siteId),
             maxDepth: Value(maxDepth),
             waterTemp: Value(waterTemp),

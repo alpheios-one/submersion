@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:xml/xml.dart';
 import 'package:submersion/core/services/export/uddf/uddf_export_builders.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 
 void main() {
   group('UddfExportBuilders.buildDiveElement', () {
@@ -18,7 +19,7 @@ void main() {
         waterTemp: 22.0,
         tanks: const [],
         profile: const [], // Empty profile!
-        equipment: const [],
+        gear: looseGear(const []),
         notes: '',
         photoIds: const [],
         sightings: const [],
@@ -71,19 +72,16 @@ void main() {
         final tankPressures = {
           'tank-1': [
             const TankPressurePoint(
-              id: 'tp1',
               tankId: 'tank-1',
               timestamp: 0,
               pressure: 200.0,
             ),
             const TankPressurePoint(
-              id: 'tp2',
               tankId: 'tank-1',
               timestamp: 60,
               pressure: 190.0,
             ),
             const TankPressurePoint(
-              id: 'tp3',
               tankId: 'tank-1',
               timestamp: 120,
               pressure: 180.0,
@@ -141,7 +139,6 @@ void main() {
         final tankPressures = {
           'tank-1': [
             const TankPressurePoint(
-              id: 'tp1',
               tankId: 'tank-1',
               timestamp: 61, // 1 second off - should match
               pressure: 195.0,
@@ -190,7 +187,6 @@ void main() {
         final tankPressures = {
           'tank-1': [
             const TankPressurePoint(
-              id: 'tp1',
               tankId: 'tank-1',
               timestamp: 65, // 5 seconds off - should NOT match
               pressure: 195.0,
@@ -282,13 +278,11 @@ void main() {
           final tankPressures = {
             'tank-1': [
               const TankPressurePoint(
-                id: 'tp1',
                 tankId: 'tank-1',
                 timestamp: 58, // diff=2
                 pressure: 190.0,
               ),
               const TankPressurePoint(
-                id: 'tp2',
                 tankId: 'tank-1',
                 timestamp: 61, // diff=1 - closer
                 pressure: 188.0,
@@ -341,7 +335,6 @@ void main() {
         final tankPressures = {
           'tank-1': [
             const TankPressurePoint(
-              id: 'tp1',
               tankId: 'tank-1',
               timestamp: 60,
               pressure: 200.0,
@@ -349,7 +342,6 @@ void main() {
           ],
           'tank-2': [
             const TankPressurePoint(
-              id: 'tp2',
               tankId: 'tank-2',
               timestamp: 60,
               pressure: 150.0,
@@ -383,6 +375,89 @@ void main() {
         expect(xml, contains('20000000.0'));
         // 150.0 bar -> 15000000.0 Pa
         expect(xml, contains('15000000.0'));
+      });
+
+      test(
+        'writes the transmitter serial as an app-specific tankdata child',
+        () {
+          // UDDF 3.2 has no element for an AI transmitter serial; it rides in
+          // the same app-specific slot as tankrole/tankorder so a round trip
+          // through our own export keeps the cylinder identity.
+          final dive = Dive(
+            id: 'dive-serial',
+            diveNumber: 1,
+            dateTime: DateTime(2026, 3, 28, 10, 0),
+            bottomTime: const Duration(minutes: 30),
+            maxDepth: 20.0,
+            tanks: const [
+              DiveTank(id: 'tank-1', transmitterSerial: '180777'),
+              DiveTank(id: 'tank-2'),
+            ],
+          );
+
+          final builder = XmlBuilder();
+          builder.element(
+            'root',
+            nest: () {
+              UddfExportBuilders.buildDiveElement(
+                builder,
+                dive,
+                null,
+                const [],
+                const [],
+                const [],
+                const [],
+                null,
+                const [],
+              );
+            },
+          );
+
+          final xml = builder.buildDocument().toXmlString();
+
+          expect(
+            xml,
+            contains('<transmitterserial>180777</transmitterserial>'),
+          );
+          expect('transmitterserial'.allMatches(xml), hasLength(2));
+        },
+      );
+
+      test('does not write a blank or zero transmitter serial', () {
+        final dive = Dive(
+          id: 'dive-serial-0',
+          diveNumber: 1,
+          dateTime: DateTime(2026, 3, 28, 10, 0),
+          bottomTime: const Duration(minutes: 30),
+          maxDepth: 20.0,
+          tanks: const [
+            DiveTank(id: 'tank-1', transmitterSerial: '0'),
+            DiveTank(id: 'tank-2', transmitterSerial: '  '),
+          ],
+        );
+
+        final builder = XmlBuilder();
+        builder.element(
+          'root',
+          nest: () {
+            UddfExportBuilders.buildDiveElement(
+              builder,
+              dive,
+              null,
+              const [],
+              const [],
+              const [],
+              const [],
+              null,
+              const [],
+            );
+          },
+        );
+
+        expect(
+          builder.buildDocument().toXmlString(),
+          isNot(contains('transmitterserial')),
+        );
       });
 
       test('no tankpressure elements when tankPressures is null', () {

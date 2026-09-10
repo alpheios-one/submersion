@@ -21,6 +21,13 @@ class DiveSummary extends Equatable {
   final double? waterTemp;
   final int? rating;
   final bool isFavorite;
+
+  /// Excluded from every descriptive statistic (#526). Surfaced in the
+  /// dive list so the diver can see which dives are not being counted.
+  final bool excludedFromStats;
+
+  /// Excluded from SAC/RMV and gas-mix aggregates only (#1272).
+  final bool excludedFromGasStats;
   final DiveMode diveMode;
   final List<String> diveTypeIds;
   final List<Tag> tags;
@@ -31,6 +38,13 @@ class DiveSummary extends Equatable {
   final String? siteRegion;
   final double? siteLatitude;
   final double? siteLongitude;
+
+  // Trip fields (from LEFT JOIN trips). Four scalars, deliberately not a Trip
+  // object: a list row must never drag a full entity behind it.
+  final String? tripId;
+  final String? tripName;
+  final DateTime? tripStartDate;
+  final DateTime? tripEndDate;
 
   // Cursor field for pagination: COALESCE(entry_time, dive_date_time)
   final int sortTimestamp;
@@ -51,6 +65,8 @@ class DiveSummary extends Equatable {
     this.waterTemp,
     this.rating,
     this.isFavorite = false,
+    this.excludedFromStats = false,
+    this.excludedFromGasStats = false,
     this.diveMode = DiveMode.oc,
     this.diveTypeIds = const ['recreational'],
     this.tags = const [],
@@ -59,6 +75,10 @@ class DiveSummary extends Equatable {
     this.siteRegion,
     this.siteLatitude,
     this.siteLongitude,
+    this.tripId,
+    this.tripName,
+    this.tripStartDate,
+    this.tripEndDate,
     required this.sortTimestamp,
     this.safetyFindingCount = 0,
   });
@@ -82,6 +102,8 @@ class DiveSummary extends Equatable {
       waterTemp: dive.waterTemp,
       rating: dive.rating,
       isFavorite: dive.isFavorite,
+      excludedFromStats: dive.excludedFromStats,
+      excludedFromGasStats: dive.excludedFromGasStats,
       diveMode: dive.diveMode,
       diveTypeIds: dive.diveTypeIds,
       tags: dive.tags,
@@ -90,6 +112,10 @@ class DiveSummary extends Equatable {
       siteRegion: dive.site?.region,
       siteLatitude: dive.site?.location?.latitude,
       siteLongitude: dive.site?.location?.longitude,
+      tripId: dive.tripId ?? dive.trip?.id,
+      tripName: dive.trip?.name,
+      tripStartDate: dive.trip?.startDate,
+      tripEndDate: dive.trip?.endDate,
       sortTimestamp: ts.millisecondsSinceEpoch,
       // Optimistic conversions can't know the count; the next DB read
       // corrects it.
@@ -133,6 +159,8 @@ class DiveSummary extends Equatable {
     double? waterTemp,
     int? rating,
     bool? isFavorite,
+    bool? excludedFromStats,
+    bool? excludedFromGasStats,
     DiveMode? diveMode,
     List<String>? diveTypeIds,
     List<Tag>? tags,
@@ -141,6 +169,10 @@ class DiveSummary extends Equatable {
     String? siteRegion,
     double? siteLatitude,
     double? siteLongitude,
+    String? tripId,
+    String? tripName,
+    DateTime? tripStartDate,
+    DateTime? tripEndDate,
     int? sortTimestamp,
     int? safetyFindingCount,
   }) {
@@ -156,6 +188,8 @@ class DiveSummary extends Equatable {
       waterTemp: waterTemp ?? this.waterTemp,
       rating: rating ?? this.rating,
       isFavorite: isFavorite ?? this.isFavorite,
+      excludedFromStats: excludedFromStats ?? this.excludedFromStats,
+      excludedFromGasStats: excludedFromGasStats ?? this.excludedFromGasStats,
       diveMode: diveMode ?? this.diveMode,
       diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       tags: tags ?? this.tags,
@@ -164,6 +198,10 @@ class DiveSummary extends Equatable {
       siteRegion: siteRegion ?? this.siteRegion,
       siteLatitude: siteLatitude ?? this.siteLatitude,
       siteLongitude: siteLongitude ?? this.siteLongitude,
+      tripId: tripId ?? this.tripId,
+      tripName: tripName ?? this.tripName,
+      tripStartDate: tripStartDate ?? this.tripStartDate,
+      tripEndDate: tripEndDate ?? this.tripEndDate,
       sortTimestamp: sortTimestamp ?? this.sortTimestamp,
       safetyFindingCount: safetyFindingCount ?? this.safetyFindingCount,
     );
@@ -182,6 +220,8 @@ class DiveSummary extends Equatable {
     waterTemp,
     rating,
     isFavorite,
+    excludedFromStats,
+    excludedFromGasStats,
     diveMode,
     diveTypeIds,
     tags,
@@ -190,6 +230,10 @@ class DiveSummary extends Equatable {
     siteRegion,
     siteLatitude,
     siteLongitude,
+    tripId,
+    tripName,
+    tripStartDate,
+    tripEndDate,
     sortTimestamp,
     safetyFindingCount,
   ];
@@ -223,12 +267,19 @@ class PaginatedDiveListState extends Equatable {
   final DiveSummaryCursor? nextCursor;
   final int totalCount;
 
+  /// The last attempt to load another page failed.
+  ///
+  /// Distinguishes "still fetching" from "gave up", so the list can offer a
+  /// retry instead of a spinner that will never resolve on its own (#1610).
+  final bool loadMoreFailed;
+
   const PaginatedDiveListState({
     this.dives = const [],
     this.isLoadingMore = false,
     this.hasMore = true,
     this.nextCursor,
     this.totalCount = 0,
+    this.loadMoreFailed = false,
   });
 
   PaginatedDiveListState copyWith({
@@ -238,6 +289,7 @@ class PaginatedDiveListState extends Equatable {
     DiveSummaryCursor? nextCursor,
     int? totalCount,
     bool clearNextCursor = false,
+    bool? loadMoreFailed,
   }) {
     return PaginatedDiveListState(
       dives: dives ?? this.dives,
@@ -245,6 +297,7 @@ class PaginatedDiveListState extends Equatable {
       hasMore: hasMore ?? this.hasMore,
       nextCursor: clearNextCursor ? null : (nextCursor ?? this.nextCursor),
       totalCount: totalCount ?? this.totalCount,
+      loadMoreFailed: loadMoreFailed ?? this.loadMoreFailed,
     );
   }
 
@@ -255,5 +308,6 @@ class PaginatedDiveListState extends Equatable {
     hasMore,
     nextCursor,
     totalCount,
+    loadMoreFailed,
   ];
 }

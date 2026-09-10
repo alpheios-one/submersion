@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/repositories/profile_series_repository.dart';
+import 'package:submersion/features/dive_log/domain/codecs/profile_sample.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
@@ -63,18 +65,13 @@ void main() {
     await repository.createDive(
       createTestDiveWithBottomTime(id: diveId, diveNumber: 1),
     );
-    for (final (i, depth) in const [(0, 0.0), (1, 18.0), (2, 0.0)]) {
-      await db
-          .into(db.diveProfiles)
-          .insert(
-            DiveProfilesCompanion.insert(
-              id: '$diveId-p$i',
-              diveId: diveId,
-              timestamp: i * 600,
-              depth: depth,
-            ),
-          );
-    }
+    await ProfileSeriesRepository().insertSeries(
+      diveId: diveId,
+      samples: [
+        for (final (i, depth) in const [(0, 0.0), (1, 18.0), (2, 0.0)])
+          ProfileSample(timestamp: i * 600, depth: depth),
+      ],
+    );
   }
 
   Future<void> insertMediaRow(String id, {String? diveId}) async {
@@ -246,16 +243,11 @@ void main() {
     final baseline = rebuilds;
 
     // A profile edit, import, or sync pull rewriting samples.
-    await db
-        .into(db.diveProfiles)
-        .insert(
-          DiveProfilesCompanion.insert(
-            id: 'd1-p9',
-            diveId: 'd1',
-            timestamp: 1500,
-            depth: 10.0,
-          ),
-        );
+    await ProfileSeriesRepository().insertSeries(
+      diveId: 'd1',
+      isPrimary: false,
+      samples: const [ProfileSample(timestamp: 1500, depth: 10.0)],
+    );
 
     await settle(() => rebuilds > baseline);
 

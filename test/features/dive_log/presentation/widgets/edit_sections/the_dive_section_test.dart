@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
-import 'package:submersion/shared/widgets/forms/stat_strip.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
@@ -52,9 +51,6 @@ void main() {
           ),
         ),
       );
-
-      // Hero strip is gone.
-      expect(find.byType(StatStrip), findsNothing);
 
       // Top three rows in order: Dive #, Entry, Exit.
       double top(Finder f) => tester.getTopLeft(f).dy;

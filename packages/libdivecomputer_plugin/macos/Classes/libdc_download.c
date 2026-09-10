@@ -60,6 +60,11 @@ typedef struct {
     unsigned int current_deco_time;
     double current_deco_depth;
     unsigned int current_deco_tts;
+    // Water temperature, carried the same way: a computer that logs depth (or,
+    // on the Suunto Nautic, high-rate IMU) far more often than temperature is
+    // not saying the water temperature is unknown between readings. Without
+    // this the temperature trace is mostly gaps on such computers.
+    double current_temp;
     libdc_sample_t current_sample;
     // GPS reported as profile samples (see DC_SAMPLE_LOCATION below). Fixes
     // are only collected here and resolved once the whole profile has been
@@ -149,6 +154,51 @@ static int is_usable_location(double latitude, double longitude) {
            longitude >= -180.0 && longitude <= 180.0;
 }
 
+const char *libdc_event_type_name(unsigned int type) {
+    // Switch on the enum symbols, never on literal codes: each symbol's value
+    // is owned by libdivecomputer's parser.h, and the native test
+    // (test_event_type_names.c) walks the whole enum against this table.
+    switch (type) {
+    case SAMPLE_EVENT_NONE: return "none";
+    case SAMPLE_EVENT_DECOSTOP: return "deco";
+    case SAMPLE_EVENT_RBT: return "rbt";
+    case SAMPLE_EVENT_ASCENT: return "ascent";
+    case SAMPLE_EVENT_CEILING: return "ceiling";
+    case SAMPLE_EVENT_WORKLOAD: return "workload";
+    case SAMPLE_EVENT_TRANSMITTER: return "transmitter";
+    case SAMPLE_EVENT_VIOLATION: return "violation";
+    case SAMPLE_EVENT_BOOKMARK: return "bookmark";
+    case SAMPLE_EVENT_SURFACE: return "surface";
+    case SAMPLE_EVENT_SAFETYSTOP: return "safetystop";
+    case SAMPLE_EVENT_GASCHANGE: return "gaschange";
+    case SAMPLE_EVENT_SAFETYSTOP_VOLUNTARY: return "safetystop_voluntary";
+    case SAMPLE_EVENT_SAFETYSTOP_MANDATORY: return "safetystop_mandatory";
+    case SAMPLE_EVENT_DEEPSTOP: return "deepstop";
+    case SAMPLE_EVENT_CEILING_SAFETYSTOP: return "ceiling_safetystop";
+    case SAMPLE_EVENT_FLOOR: return "floor";
+    case SAMPLE_EVENT_DIVETIME: return "divetime";
+    case SAMPLE_EVENT_MAXDEPTH: return "maxdepth";
+    case SAMPLE_EVENT_OLF: return "OLF";
+    case SAMPLE_EVENT_PO2: return "PO2";
+    case SAMPLE_EVENT_AIRTIME: return "airtime";
+    case SAMPLE_EVENT_RGBM: return "rgbm";
+    case SAMPLE_EVENT_HEADING: return "heading";
+    case SAMPLE_EVENT_TISSUELEVEL: return "tissuelevel";
+    case SAMPLE_EVENT_GASCHANGE2: return "gaschange2";
+    default: return "unknown";
+    }
+}
+
+const char *libdc_clock_sync_status_name(libdc_clock_sync_status_t status) {
+    switch (status) {
+    case LIBDC_CLOCK_SYNC_NOT_REQUESTED: return "not_requested";
+    case LIBDC_CLOCK_SYNC_SYNCED: return "synced";
+    case LIBDC_CLOCK_SYNC_UNSUPPORTED: return "unsupported";
+    case LIBDC_CLOCK_SYNC_FAILED: return "failed";
+    default: return "unknown";
+    }
+}
+
 static void push_event(libdc_parsed_dive_t *dive,
                         unsigned int time_ms,
                         unsigned int type,
@@ -220,7 +270,8 @@ static void sample_callback(dc_sample_type_t type,
         // the surface. fill_missing_depths() resolves the NANs once the whole
         // profile is known -- no NAN depth ever leaves this file.
         state->current_sample.depth = NAN;
-        state->current_sample.temperature = NAN;
+        // Carry temperature forward (NAN only until the first reading).
+        state->current_sample.temperature = state->current_temp;
         state->current_sample.pressure = NAN;
         state->current_sample.tank = UINT32_MAX;
         for (unsigned int t = 0; t < LIBDC_MAX_TANKS; t++) {
@@ -252,6 +303,7 @@ static void sample_callback(dc_sample_type_t type,
         state->current_sample.depth = value->depth;
         break;
     case DC_SAMPLE_TEMPERATURE:
+        state->current_temp = value->temperature;
         state->current_sample.temperature = value->temperature;
         break;
     case DC_SAMPLE_PRESSURE:
@@ -556,6 +608,7 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
                 dive->tanks[i].beginpressure = tk.beginpressure;
                 dive->tanks[i].endpressure = tk.endpressure;
                 dive->tanks[i].usage = tk.usage;
+                dive->tanks[i].serial = tk.serial;
             }
         }
         dive->tank_count = tank_count;
@@ -568,6 +621,7 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
     sample_state.current_deco_type = UINT32_MAX;  // no obligation reported yet
     sample_state.current_deco_depth = NAN;
     sample_state.current_deco_tts = UINT32_MAX;
+    sample_state.current_temp = NAN;  // no reading yet
     sample_state.has_field_entry = has_field_entry;
     sample_state.has_field_exit = has_field_exit;
     dc_parser_samples_foreach(parser, sample_callback, &sample_state);
@@ -768,6 +822,45 @@ static void libdc_logfunc_wrapper(dc_context_t *context, dc_loglevel_t loglevel,
     }
 }
 
+libdc_clock_sync_status_t libdc_sync_device_clock(struct dc_device_t *device,
+                                                   int requested,
+                                                   int download_succeeded) {
+    if (!requested || !download_succeeded) {
+        return LIBDC_CLOCK_SYNC_NOT_REQUESTED;
+    }
+
+    // Host wall-clock time with the host's UTC offset filled in. Each backend
+    // applies its own conversion (Shearwater sends UTC to a Teric and local
+    // time to everything else, Mares strips the offset, OSTC sends the raw
+    // fields), so no timezone logic lives here.
+    dc_datetime_t now;
+    memset(&now, 0, sizeof(now));
+    if (dc_datetime_localtime(&now, dc_datetime_now()) == NULL) {
+        if (g_log_callback != NULL) {
+            g_log_callback((int)DC_LOGLEVEL_WARNING,
+                           "Clock sync failed: host time unavailable",
+                           g_log_userdata);
+        }
+        return LIBDC_CLOCK_SYNC_FAILED;
+    }
+
+    dc_status_t status = dc_device_timesync(device, &now);
+    if (status == DC_STATUS_SUCCESS) {
+        return LIBDC_CLOCK_SYNC_SYNCED;
+    }
+    if (status == DC_STATUS_UNSUPPORTED) {
+        // The normal answer for most models, not an error.
+        return LIBDC_CLOCK_SYNC_UNSUPPORTED;
+    }
+    if (g_log_callback != NULL) {
+        char msg[96];
+        snprintf(msg, sizeof(msg),
+                 "Clock sync failed (libdivecomputer status %d)", (int)status);
+        g_log_callback((int)DC_LOGLEVEL_WARNING, msg, g_log_userdata);
+    }
+    return LIBDC_CLOCK_SYNC_FAILED;
+}
+
 libdc_download_session_t *libdc_download_session_new(void) {
     libdc_download_session_t *session = calloc(1, sizeof(*session));
     if (session == NULL) {
@@ -811,9 +904,11 @@ int libdc_download_run(
     unsigned int transport,
     const libdc_io_callbacks_t *io_callbacks,
     const unsigned char *fingerprint, unsigned int fsize,
+    int sync_clock,
     const libdc_download_callbacks_t *callbacks,
     unsigned int *serial_out,
     unsigned int *firmware_out,
+    libdc_clock_sync_status_t *clock_sync_out,
     char *error_buf, size_t error_buf_size)
 {
     if (session == NULL || vendor == NULL || product == NULL ||
@@ -900,6 +995,14 @@ int libdc_download_run(
     // 7. Download dives.
     status = dc_device_foreach(device, dive_callback, &state);
 
+    // 7b. Optional clock sync, only after a fully successful download so a
+    // slow or failing timesync can never cost the diver their dives, and
+    // never after a cancel (issue #1216). Its outcome is reported separately
+    // and never changes `result` or the error buffer.
+    libdc_clock_sync_status_t clock_sync = libdc_sync_device_clock(
+        device, sync_clock,
+        status == DC_STATUS_SUCCESS && !session->cancelled);
+
     int result = 0;
     if (status != DC_STATUS_SUCCESS) {
         if (session->cancelled) {
@@ -925,6 +1028,9 @@ int libdc_download_run(
     }
     if (firmware_out != NULL) {
         *firmware_out = state.firmware;
+    }
+    if (clock_sync_out != NULL) {
+        *clock_sync_out = clock_sync;
     }
 
     // 9. Cleanup.

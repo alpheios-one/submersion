@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/data_quality/data/services/diver_data_query.dart';
 import 'package:submersion/features/data_quality/data/services/quality_repair_executor.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/data_quality/domain/detectors/quality_detector_registry.dart';
@@ -14,12 +15,14 @@ import 'package:submersion/features/data_quality/domain/repairs/quality_repair_a
 import 'package:submersion/features/data_quality/data/services/profile_repair_service.dart';
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
 import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
+import 'package:submersion/features/data_quality/presentation/widgets/delete_duplicate_dialog.dart';
+import 'package:submersion/features/data_quality/presentation/widgets/dive_identity_label.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_card.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_finding_message.dart';
 import 'package:submersion/features/data_quality/presentation/widgets/quality_unit_formatters.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/pickers/reassign_tank_picker.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/combine_dives_dialog.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/run_dive_consolidation.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -56,6 +59,16 @@ class DataQualityInboxPage extends ConsumerStatefulWidget {
 }
 
 class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
+  /// Material's own SnackBar default, restated because the framework keeps
+  /// the constant private.
+  static const Duration _defaultUndoWindow = Duration(seconds: 4);
+
+  /// The window a repair that deletes a dive gets instead. Undo is the only
+  /// way back from it, and a diver working through a batch of findings has
+  /// dismissed the snackbar and moved on well before four seconds are up
+  /// (#1729).
+  static const Duration _destructiveUndoWindow = Duration(seconds: 10);
+
   ({int done, int total})? _scanProgress;
   bool _cancelRequested = false;
 
@@ -93,17 +106,28 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
     }
   }
 
-  Future<void> _runAction(QualityFinding f, QualityRepairAction action) async {
+  /// [identityOf] names a dive the way the page's headers do; it comes from
+  /// build, where the identity lookup is already watched, so a confirmation
+  /// can name both dives of a pair without a second read.
+  Future<void> _runAction(
+    QualityFinding f,
+    QualityRepairAction action, {
+    required DiveIdentityLabel? Function(String? diveId) identityOf,
+  }) async {
     final executor = QualityRepairExecutor();
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
 
-    Future<void> withUndo(Future<RepairResult> Function() run) async {
+    Future<void> withUndo(
+      Future<RepairResult> Function() run, {
+      Duration undoWindow = _defaultUndoWindow,
+    }) async {
       try {
         final result = await run();
         final undo = result.undo;
         messenger.showSnackBar(
           SnackBar(
+            duration: undoWindow,
             content: Text(
               result.changed
                   ? l10n.dataQuality_repair_applied
@@ -142,16 +166,37 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
             findingId: f.id,
           ),
         );
-      case ConsolidateDuplicateRepair(
-        :final targetDiveId,
-        :final secondaryDiveId,
-      ):
-        await runDiveConsolidation(
+      case ConsolidateDuplicateRepair(:final diveIds):
+        // The dialog owns the survivor choice, and runDiveConsolidation
+        // queues the rescan once apply has resolved. Queueing one here on
+        // return would scan the pre-merge rows: the dialog pops before the
+        // merge completes.
+        await showCombineDivesDialog(
           context: context,
-          service: ref.read(diveConsolidationServiceProvider),
-          targetDiveId: targetDiveId,
-          secondaryDiveIds: [secondaryDiveId],
-          onConsolidated: () => scheduleQualityScan([targetDiveId]),
+          diveIds: diveIds,
+          consolidateOnly: true,
+        );
+      case DeleteDuplicateRepair(:final keepDiveId, :final deleteDiveId):
+        // Destructive, so it names both dives, says what the copy it deletes
+        // carries, and waits for an explicit yes before the executor writes
+        // anything. The counts are read here rather than in build: one dive,
+        // once, on the tap that could lose it.
+        final carries = await DiverDataQuery().forDive(deleteDiveId);
+        if (!mounted) return;
+        final confirmed = await showDeleteDuplicateDialog(
+          context,
+          keep: identityOf(keepDiveId),
+          delete: identityOf(deleteDiveId),
+          carries: carries,
+        );
+        if (confirmed != true) return;
+        await withUndo(
+          () => executor.deleteDuplicate(
+            keepDiveId: keepDiveId,
+            deleteDiveId: deleteDiveId,
+            findingId: f.id,
+          ),
+          undoWindow: _destructiveUndoWindow,
         );
       case CombineSplitRepair(:final diveIds):
         await showCombineDivesDialog(context: context, diveIds: diveIds);
@@ -165,10 +210,21 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
           ),
         );
       case SplitSourceRepair(:final diveId, :final sourceId):
-        final newId = await ref
-            .read(diveSplitServiceProvider)
-            .split(diveId: diveId, sourceId: sourceId);
-        scheduleQualityScan([diveId, newId]);
+        // Split does not return a RepairResult, so withUndo cannot wrap it.
+        // It still has to report a failure: it refuses a source that no
+        // longer belongs to the dive, and a dive whose stored series this
+        // build cannot decode. Left unwrapped, the tap did nothing visible
+        // and the finding stayed open forever.
+        try {
+          final newId = await ref
+              .read(diveSplitServiceProvider)
+              .split(diveId: diveId, sourceId: sourceId);
+          scheduleQualityScan([diveId, newId]);
+        } catch (e) {
+          messenger.showSnackBar(
+            SnackBar(content: Text(l10n.diveLog_sources_splitFailed)),
+          );
+        }
       case DespikeRepair(:final diveId):
         await withUndo(
           () => executor.applyProfileRepair(
@@ -293,6 +349,15 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
         );
       case CompareSourcesRepair(:final diveId):
         if (context.mounted) context.push('/dives/$diveId');
+      case AssignTransmitterRepair(:final serial):
+        if (context.mounted) {
+          context.push(
+            Uri(
+              path: '/transmitters/new',
+              queryParameters: {'serial': serial},
+            ).toString(),
+          );
+        }
       case GoToDiveRepair(:final diveId):
         if (context.mounted) context.push('/dives/$diveId');
     }
@@ -329,15 +394,53 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
               (widget.filterDiveId == null || widget.filterDiveId!.isEmpty)
               ? null
               : widget.filterDiveId!.split(',').toSet();
-          final open = [
+          // Everything this page could ever show: open, and within the dive
+          // filter. The chip is applied separately below, deliberately -- it
+          // changes as the diver taps, while the dive filter is fixed for the
+          // life of the page.
+          final scoped = [
             for (final f in all)
               if (f.status == QualityStatus.open &&
-                  categoriesFor(chip).contains(f.category) &&
                   (filterIds == null ||
                       filterIds.contains(f.diveId) ||
                       filterIds.contains(f.relatedDiveId)))
                 f,
           ];
+          final open = [
+            for (final f in scoped)
+              if (categoriesFor(chip).contains(f.category)) f,
+          ];
+          // Keyed off the scoped set, not the visible one: narrowing by the
+          // fixed dive filter keeps a deep link (from the import summary, say)
+          // from loading identities for the whole library, while keeping the
+          // chip out of the key so switching chips reuses one cached lookup.
+          final divesAsync = ref.watch(
+            qualityFindingDivesProvider(qualityFindingDivesKey(scoped)),
+          );
+          // `.value` rather than the `valueOrNull` extension: both keep the
+          // previous map across a self-invalidate (a refresh skips the loading
+          // branch), but only `.value` keeps it across a genuine reload or a
+          // failed read. The names map has a dependency that really does
+          // change -- switching the active diver reloads the saved-computer
+          // list -- and blinking the identities out is worse than showing the
+          // last good ones for a frame.
+          final dives = divesAsync.value;
+          // Reading the names costs a diver lookup plus a computers-table
+          // read, so only pay it when some finding actually names a computer.
+          final computerNames = scoped.any((f) => f.computerId != null)
+              ? ref.watch(qualityComputerNamesProvider).value ?? const {}
+              : const <String, String>{};
+          // Only the identity lines wait on that lookup; the findings
+          // themselves render immediately from the stream that already
+          // resolved.
+          DiveIdentityLabel? identity(String? diveId) =>
+              (dives == null || diveId == null)
+              ? null
+              : buildDiveIdentityLabel(
+                  summary: dives[diveId],
+                  l10n: l10n,
+                  formatters: formatters,
+                );
           return Column(
             children: [
               if (_scanProgress != null)
@@ -365,12 +468,20 @@ class _DataQualityInboxPageState extends ConsumerState<DataQualityInboxPage> {
                     : ListView(
                         children: [
                           for (final group in _groupByDive(open)) ...[
-                            _DiveGroupHeader(diveId: group.diveId),
+                            _DiveGroupHeader(
+                              label: identity(group.diveId),
+                              loading: divesAsync.isLoading,
+                              onTap: () =>
+                                  context.push('/dives/${group.diveId}'),
+                            ),
                             for (final f in group.findings)
                               QualityFindingCard(
                                 finding: f,
                                 formatters: formatters,
-                                onRepair: (a) => _runAction(f, a),
+                                relatedDive: identity(f.relatedDiveId),
+                                computerName: computerNames[f.computerId],
+                                onRepair: (a) =>
+                                    _runAction(f, a, identityOf: identity),
                                 onDismiss: () => ref
                                     .read(qualityFindingsRepositoryProvider)
                                     .setStatus(f.id, QualityStatus.dismissed),
@@ -537,20 +648,58 @@ class _EmptyState extends ConsumerWidget {
   }
 }
 
-class _DiveGroupHeader extends ConsumerWidget {
-  const _DiveGroupHeader({required this.diveId});
-  final String diveId;
+/// Names the dive a group of findings belongs to.
+///
+/// Reads as a dive the diver can recognize (number, site, when, how deep and
+/// how long) rather than as the dive's uuid, which is what it showed before:
+/// the old fallback chain ended at the raw id, and a downloaded dive with no
+/// custom name and no assigned site reached that end every time.
+class _DiveGroupHeader extends StatelessWidget {
+  const _DiveGroupHeader({
+    required this.label,
+    required this.loading,
+    required this.onTap,
+  });
+
+  /// Null while the identities are still being read. Rendering the "dive is
+  /// gone" copy in that gap would accuse the log of losing a dive that is
+  /// merely a frame away.
+  final DiveIdentityLabel? label;
+  final bool loading;
+  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dive = ref.watch(diveProvider(diveId)).value;
-    final title = dive?.effectiveName ?? dive?.site?.name ?? diveId;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final stats = label?.stats;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label?.headline ??
+                  (loading
+                      ? context.l10n.common_label_loading
+                      // Not loading and still no identity means the lookup
+                      // itself failed. Say we cannot name the dive rather
+                      // than leaving a blank line above its findings.
+                      : context.l10n.dataQuality_dive_unknown),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: scheme.primary,
+              ),
+            ),
+            if (stats != null)
+              Text(
+                stats,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -619,31 +768,5 @@ Future<({Duration offset, bool importWide})?> showTimeShiftSheet(
         ),
       );
     },
-  );
-}
-
-/// Simple picker listing the dive's other tanks for a series reassignment.
-Future<String?> showReassignTankPicker(
-  BuildContext context,
-  WidgetRef ref, {
-  required String diveId,
-  required String excludeTankId,
-}) async {
-  final dive = await ref.read(diveProvider(diveId).future);
-  if (dive == null || !context.mounted) return null;
-  final candidates = dive.tanks.where((t) => t.id != excludeTankId).toList();
-  if (candidates.isEmpty) return null;
-  return showDialog<String>(
-    context: context,
-    builder: (context) => SimpleDialog(
-      title: Text(context.l10n.dataQuality_repairLabel_reassignSeries),
-      children: [
-        for (final t in candidates)
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(context).pop(t.id),
-            child: Text(t.name ?? 'Tank ${t.order + 1}'),
-          ),
-      ],
-    ),
   );
 }

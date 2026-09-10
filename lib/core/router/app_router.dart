@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:submersion/core/accessibility/app_shortcuts.dart';
 import 'package:submersion/core/constants/feature_flags.dart';
@@ -108,11 +110,14 @@ import 'package:submersion/features/safety/presentation/pages/incident_edit_page
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/emergency_card_page.dart';
+import 'package:submersion/features/settings/presentation/pages/equipment_condition_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/language_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/nav_customization_page.dart';
 import 'package:submersion/features/settings/presentation/pages/theme_gallery_page.dart';
 import 'package:submersion/features/settings/presentation/pages/storage_settings_page.dart';
+import 'package:submersion/features/backup/presentation/pages/unrecognized_backups_page.dart';
+import 'package:submersion/features/settings/presentation/pages/storage_usage_page.dart';
 import 'package:submersion/features/settings/presentation/pages/diver_profile_hub_page.dart';
 import 'package:submersion/features/settings/presentation/pages/personal_info_edit_page.dart';
 import 'package:submersion/features/settings/presentation/pages/emergency_contacts_edit_page.dart';
@@ -129,7 +134,11 @@ import 'package:submersion/features/transfer/presentation/pages/transfer_page.da
 import 'package:submersion/features/dive_types/presentation/pages/dive_types_page.dart';
 import 'package:submersion/features/dive_roles/presentation/pages/dive_roles_page.dart';
 import 'package:submersion/features/tank_presets/presentation/pages/tank_presets_page.dart';
+import 'package:submersion/features/weight_presets/presentation/pages/weight_preset_editor_page.dart';
+import 'package:submersion/features/weight_presets/presentation/pages/weight_presets_page.dart';
 import 'package:submersion/features/tank_presets/presentation/pages/tank_preset_edit_page.dart';
+import 'package:submersion/features/transmitters/presentation/pages/transmitter_edit_page.dart';
+import 'package:submersion/features/transmitters/presentation/pages/transmitters_page.dart';
 import 'package:submersion/features/marine_life/presentation/pages/species_manage_page.dart';
 import 'package:submersion/features/marine_life/presentation/pages/species_page.dart';
 import 'package:submersion/features/tags/presentation/pages/tag_manage_page.dart';
@@ -142,6 +151,11 @@ import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_
 import 'package:submersion/features/gps_log/presentation/pages/gps_track_map_page.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
 import 'package:submersion/features/deco_calculator/presentation/pages/deco_calculator_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/gas_calculator_tools.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_settings_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_invoice_archive_detail_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/blender_invoice_archive_page.dart';
+import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculator_detail_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculators_page.dart';
 import 'package:submersion/features/dive_computer/presentation/pages/device_list_page.dart';
 import 'package:submersion/features/dive_computer/presentation/pages/device_detail_page.dart';
@@ -149,6 +163,8 @@ import 'package:submersion/features/dive_computer/presentation/providers/downloa
     show diveImportServiceProvider;
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/import_wizard/data/adapters/dive_computer_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/garmin_cloud_adapter.dart';
+import 'package:submersion/features/import_wizard/data/adapters/suunto_cloud_adapter.dart';
 import 'package:submersion/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_compare_page.dart';
@@ -276,6 +292,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'gas-calculators',
                 name: 'gasCalculators',
                 builder: (context, state) => const GasCalculatorsPage(),
+                // The six calculators are children, not tabs. On a narrow
+                // window each is pushed as its own page; in split view they
+                // ride in ?calc= instead and these routes go unused.
+                routes: [
+                  for (final id in kGasCalculatorIds)
+                    GoRoute(
+                      path: id,
+                      builder: (context, state) =>
+                          GasCalculatorDetailPage(toolId: id),
+                    ),
+                ],
+              ),
+              // The blender's paid-invoice archive is a SIBLING of the
+              // generated calculator routes above, not a child of the
+              // 'blender' entry: that entry is built inside the loop and has
+              // no routes: list of its own to extend. Declared after the loop
+              // for the same reason 'dive-planner/:planId' is declared after
+              // its subtree - static routes still win matching regardless of
+              // declaration order here, but this keeps the generated block
+              // readable as one unit.
+              GoRoute(
+                path: 'gas-calculators/blender/invoices',
+                name: 'blenderInvoiceArchive',
+                builder: (context, state) => const BlenderInvoiceArchivePage(),
+                routes: [
+                  GoRoute(
+                    path: ':invoiceId',
+                    name: 'blenderInvoiceArchiveDetail',
+                    builder: (context, state) =>
+                        BlenderInvoiceArchiveDetailPage(
+                          invoiceId: state.pathParameters['invoiceId']!,
+                        ),
+                  ),
+                ],
               ),
               GoRoute(
                 path: 'weight-calculator',
@@ -596,6 +646,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     initialName: extra?['name'] as String?,
                     initialEmail: extra?['email'] as String?,
                     initialPhone: extra?['phone'] as String?,
+                    initialPhoto: extra?['photo'] as Uint8List?,
                   );
                 },
               ),
@@ -876,6 +927,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) =>
                     const _UniversalImportWizardRoute(),
               ),
+              GoRoute(
+                path: 'import-cloud/suunto',
+                name: 'importFromCloudSuunto',
+                builder: (context, state) =>
+                    const _SuuntoCloudImportWizardRoute(),
+              ),
+              GoRoute(
+                path: 'import-cloud/garmin',
+                name: 'importFromCloudGarmin',
+                builder: (context, state) =>
+                    const _GarminCloudImportWizardRoute(),
+              ),
             ],
           ),
 
@@ -971,6 +1034,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const StorageSettingsPage(),
               ),
               GoRoute(
+                path: 'storage-usage',
+                name: 'storageUsage',
+                builder: (context, state) => const StorageUsagePage(),
+                routes: [
+                  GoRoute(
+                    path: 'unrecognized-backups',
+                    name: 'unrecognizedBackups',
+                    builder: (context, state) =>
+                        const UnrecognizedBackupsPage(),
+                  ),
+                ],
+              ),
+              GoRoute(
                 path: 'data-quality',
                 name: 'dataQualitySettings',
                 builder: (context, state) => const DataQualitySettingsPage(),
@@ -1057,6 +1133,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'safety',
                 name: 'safetySettings',
                 builder: (context, state) => const SafetySettingsPage(),
+              ),
+              GoRoute(
+                path: 'equipment-condition',
+                name: 'equipmentConditionSettings',
+                builder: (context, state) =>
+                    const EquipmentConditionSettingsPage(),
               ),
               GoRoute(
                 path: 'default-metrics',
@@ -1160,6 +1242,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const DebugLogViewerPage(),
               ),
               GoRoute(
+                path: 'trimix-mixer',
+                name: 'trimixMixerSettings',
+                builder: (context, state) => const BlenderSettingsPage(),
+              ),
+              GoRoute(
                 path: 'media-sources',
                 name: 'mediaSources',
                 builder: (context, state) => const MediaSourcesPage(),
@@ -1256,6 +1343,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const DiveRolesPage(),
           ),
 
+          // Transmitter registry (issue #1365)
+          GoRoute(
+            path: '/transmitters',
+            name: 'transmitters',
+            builder: (context, state) => const TransmittersPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                name: 'newTransmitter',
+                builder: (context, state) => TransmitterEditPage(
+                  initialSerial: state.uri.queryParameters['serial'],
+                ),
+              ),
+              GoRoute(
+                path: ':transmitterId/edit',
+                name: 'editTransmitter',
+                builder: (context, state) => TransmitterEditPage(
+                  transmitterId: state.pathParameters['transmitterId'],
+                ),
+              ),
+            ],
+          ),
+
           // Tank Presets Management
           GoRoute(
             path: '/tank-presets',
@@ -1271,6 +1381,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: ':presetId/edit',
                 name: 'editTankPreset',
                 builder: (context, state) => TankPresetEditPage(
+                  presetId: state.pathParameters['presetId'],
+                ),
+              ),
+            ],
+          ),
+
+          // Weight Presets Management (issue #1609, #1663)
+          GoRoute(
+            path: '/weight-presets',
+            name: 'weightPresets',
+            builder: (context, state) => const WeightPresetsPage(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                name: 'newWeightPreset',
+                builder: (context, state) => const WeightPresetEditorPage(),
+              ),
+              GoRoute(
+                path: ':presetId/edit',
+                name: 'editWeightPreset',
+                builder: (context, state) => WeightPresetEditorPage(
                   presetId: state.pathParameters['presetId'],
                 ),
               ),
@@ -1342,7 +1473,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/species',
             name: 'species',
-            builder: (context, state) => const SpeciesPage(),
+            // A nav destination: the rail and bottom bar reach it with `go`,
+            // so it cross-fades like its siblings instead of animating in.
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SpeciesPage(),
+            ),
             routes: [
               GoRoute(
                 path: 'manage',
@@ -1531,7 +1667,14 @@ class _DiveComputerDiscoveryWizardRoute extends ConsumerWidget {
 
 /// Wrapper that creates a [DiveComputerAdapter] for quick download
 /// from a known (previously paired) computer.
-class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
+///
+/// The adapter is created once per route instance and reused across
+/// rebuilds. [diveComputerByIdProvider] re-emits on every dive_computers
+/// table tick, and a completed download writes that table (device serial
+/// and firmware), so this widget rebuilds in the middle of the wizard. A
+/// fresh adapter built here on every rebuild would carry none of the
+/// downloaded dives, and the wizard's Review step would list nothing.
+class _DiveComputerDownloadWizardRoute extends ConsumerStatefulWidget {
   const _DiveComputerDownloadWizardRoute({
     required this.computerId,
     this.forceFullDownload = false,
@@ -1541,13 +1684,28 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
   final bool forceFullDownload;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final diverId = ref.watch(currentDiverIdProvider) ?? '';
-    final importService = ref.watch(diveImportServiceProvider);
-    final computerRepo = ref.watch(diveComputerRepositoryProvider);
-    final diveRepo = ref.watch(diveRepositoryProvider);
-    final consolidationService = ref.watch(diveConsolidationServiceProvider);
-    final computerAsync = ref.watch(diveComputerByIdProvider(computerId));
+  ConsumerState<_DiveComputerDownloadWizardRoute> createState() =>
+      _DiveComputerDownloadWizardRouteState();
+}
+
+class _DiveComputerDownloadWizardRouteState
+    extends ConsumerState<_DiveComputerDownloadWizardRoute> {
+  DiveComputerAdapter? _adapter;
+
+  @override
+  void didUpdateWidget(_DiveComputerDownloadWizardRoute oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.computerId != widget.computerId ||
+        oldWidget.forceFullDownload != widget.forceFullDownload) {
+      _adapter = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final computerAsync = ref.watch(
+      diveComputerByIdProvider(widget.computerId),
+    );
 
     return computerAsync.when(
       data: (computer) {
@@ -1561,18 +1719,21 @@ class _DiveComputerDownloadWizardRoute extends ConsumerWidget {
             ),
           );
         }
-        return UnifiedImportWizard(
-          adapter: DiveComputerAdapter(
-            importService: importService,
-            computerRepository: computerRepo,
-            diveRepository: diveRepo,
-            consolidationService: consolidationService,
-            diverId: diverId,
-            knownComputer: computer,
-            ref: ref,
-            forceFullDownload: forceFullDownload,
-          ),
+        final adapter = _adapter ??= DiveComputerAdapter(
+          importService: ref.read(diveImportServiceProvider),
+          computerRepository: ref.read(diveComputerRepositoryProvider),
+          diveRepository: ref.read(diveRepositoryProvider),
+          consolidationService: ref.read(diveConsolidationServiceProvider),
+          diverId: ref.read(currentDiverIdProvider) ?? '',
+          knownComputer: computer,
+          ref: ref,
+          forceFullDownload: widget.forceFullDownload,
         );
+        // A new adapter is a new session: key the wizard on it so the reset
+        // in didUpdateWidget starts the wizard over instead of handing a
+        // fresh adapter to a wizard mid-flow (which pins the one it started
+        // with).
+        return UnifiedImportWizard(key: ObjectKey(adapter), adapter: adapter);
       },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -1595,6 +1756,59 @@ class _UniversalImportWizardRoute extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return UnifiedImportWizard(adapter: UniversalAdapter(ref: ref));
+  }
+}
+
+/// Wrapper that creates a [SuuntoCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Suunto cloud (app.suunto.com)
+/// account.
+class _SuuntoCloudImportWizardRoute extends ConsumerWidget {
+  const _SuuntoCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: SuuntoCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
+  }
+}
+
+/// Wrapper that creates a [GarminCloudAdapter] with dependencies from
+/// Riverpod, for importing dives from a Garmin Connect account.
+class _GarminCloudImportWizardRoute extends ConsumerWidget {
+  const _GarminCloudImportWizardRoute();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final diverId = ref.watch(currentDiverIdProvider) ?? '';
+    final importService = ref.watch(diveImportServiceProvider);
+    final computerRepo = ref.watch(diveComputerRepositoryProvider);
+    final diveRepo = ref.watch(diveRepositoryProvider);
+    final consolidationService = ref.watch(diveConsolidationServiceProvider);
+
+    return UnifiedImportWizard(
+      adapter: GarminCloudAdapter(
+        importService: importService,
+        computerRepository: computerRepo,
+        diveRepository: diveRepo,
+        consolidationService: consolidationService,
+        diverId: diverId,
+        ref: ref,
+      ),
+    );
   }
 }
 
