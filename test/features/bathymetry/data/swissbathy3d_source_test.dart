@@ -594,7 +594,11 @@ nodata_value -9999
           _zipOfMultiple({
             // Matches the requested tile (2685_1240, see zurichseePoint's
             // own tile fixture at the top of this file).
-            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(2685, 1240, 111.0),
+            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+              2685,
+              1240,
+              111.0,
+            ),
             // 15 tiles away -- well outside the ±1 neighborhood -- and
             // deliberately not valid ESRI ASCII grid content at all. If
             // this entry is ever decompressed and handed to
@@ -649,13 +653,21 @@ nodata_value -9999
         downloadCalls++;
         return http.Response.bytes(
           _zipOfMultiple({
-            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(2685, 1240, 111.0),
+            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+              2685,
+              1240,
+              111.0,
+            ),
             // 3 tiles east: outside tile 2685's own ±1 neighborhood
             // (2684-2686), so the pre-fix (sharing a single filtered
             // result across every tile in the fetch) would have this
             // entry available only to whichever tile's request happened
             // to trigger the download first.
-            'swissBATHY3D_CHLV95_LN02_2688_1240.asc': tileAsc(2688, 1240, 222.0),
+            'swissBATHY3D_CHLV95_LN02_2688_1240.asc': tileAsc(
+              2688,
+              1240,
+              222.0,
+            ),
           }),
           200,
         );
@@ -675,14 +687,8 @@ nodata_value -9999
       final west = await tileCache.read('2685_1240');
       final east = await tileCache.read('2688_1240');
       const referenceLevel = 405.92; // Zürichsee
-      expect(
-        west!.grid.depthAt(0, 0),
-        closeTo(referenceLevel - 111.0, 1e-9),
-      );
-      expect(
-        east!.grid.depthAt(0, 0),
-        closeTo(referenceLevel - 222.0, 1e-9),
-      );
+      expect(west!.grid.depthAt(0, 0), closeTo(referenceLevel - 111.0, 1e-9));
+      expect(east!.grid.depthAt(0, 0), closeTo(referenceLevel - 222.0, 1e-9));
     });
 
     test('falls through to the next STAC candidate when the first one\'s '
