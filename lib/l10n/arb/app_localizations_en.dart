@@ -13,6 +13,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not open your browser. Use Copy link and paste the address into your browser.';
 
   @override
+  String equipment_assemblyChip_label(Object count, Object name) {
+    return '$name (+$count)';
+  }
+
+  @override
   String get equipment_components_add => 'Add component';
 
   @override
@@ -2733,6 +2738,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'Begin';
+
+  @override
+  String get diveLog_gear_collapse => 'Hide parts';
+
+  @override
+  String get diveLog_gear_expand => 'Show parts';
+
+  @override
+  String get diveLog_gear_removeAssembly => 'Remove assembly and its parts';
+
+  @override
+  String get diveLog_gear_removePart => 'Remove part';
+
+  @override
+  String get diveLog_gear_removeSet => 'Remove set from this dive';
+
+  @override
+  String get diveLog_gear_unknownSet => 'Set';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>

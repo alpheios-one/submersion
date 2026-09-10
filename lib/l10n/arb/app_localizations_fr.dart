@@ -13,6 +13,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d\'ouvrir le navigateur. Utilisez Copier le lien et collez l\'adresse dans votre navigateur.';
 
   @override
+  String equipment_assemblyChip_label(Object count, Object name) {
+    return '$name (+$count)';
+  }
+
+  @override
   String get equipment_components_add => 'Ajouter un composant';
 
   @override
@@ -2795,6 +2800,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'Commencer';
+
+  @override
+  String get diveLog_gear_collapse => 'Masquer les pièces';
+
+  @override
+  String get diveLog_gear_expand => 'Afficher les pièces';
+
+  @override
+  String get diveLog_gear_removeAssembly => 'Retirer l\'ensemble et ses pièces';
+
+  @override
+  String get diveLog_gear_removePart => 'Retirer la pièce';
+
+  @override
+  String get diveLog_gear_removeSet => 'Retirer le kit de cette plongée';
+
+  @override
+  String get diveLog_gear_unknownSet => 'Kit';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>

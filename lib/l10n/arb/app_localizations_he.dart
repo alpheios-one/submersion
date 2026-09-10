@@ -13,6 +13,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא ניתן לפתוח את הדפדפן. השתמש בהעתקת קישור והדבק את הכתובת בדפדפן שלך.';
 
   @override
+  String equipment_assemblyChip_label(Object count, Object name) {
+    return '$name (+$count)';
+  }
+
+  @override
   String get equipment_components_add => 'הוספת רכיב';
 
   @override
@@ -2708,6 +2713,24 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'התחל';
+
+  @override
+  String get diveLog_gear_collapse => 'הסתרת חלקים';
+
+  @override
+  String get diveLog_gear_expand => 'הצגת חלקים';
+
+  @override
+  String get diveLog_gear_removeAssembly => 'הסרת המכלול וחלקיו';
+
+  @override
+  String get diveLog_gear_removePart => 'הסרת חלק';
+
+  @override
+  String get diveLog_gear_removeSet => 'הסרת הסט מהצלילה הזו';
+
+  @override
+  String get diveLog_gear_unknownSet => 'סט';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>

@@ -13,6 +13,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'تعذر فتح المتصفح. استخدم نسخ الرابط والصق العنوان في متصفحك.';
 
   @override
+  String equipment_assemblyChip_label(Object count, Object name) {
+    return '$name (+$count)';
+  }
+
+  @override
   String get equipment_components_add => 'إضافة مكوّن';
 
   @override
@@ -2731,6 +2736,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'بدء';
+
+  @override
+  String get diveLog_gear_collapse => 'إخفاء الأجزاء';
+
+  @override
+  String get diveLog_gear_expand => 'إظهار الأجزاء';
+
+  @override
+  String get diveLog_gear_removeAssembly => 'إزالة التجميعة وأجزائها';
+
+  @override
+  String get diveLog_gear_removePart => 'إزالة الجزء';
+
+  @override
+  String get diveLog_gear_removeSet => 'إزالة الطقم من هذه الغطسة';
+
+  @override
+  String get diveLog_gear_unknownSet => 'طقم';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
