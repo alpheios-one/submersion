@@ -152,6 +152,54 @@ class DiveRepository {
       .tableUpdates(TableUpdateQuery.onTable(_db.dives))
       .debounce(changeTickDebounce);
 
+  /// Change-tick for the dive LIST: fires when a table the list renders from
+  /// is written.
+  ///
+  /// A [DiveSummary] is assembled from THREE queries, not one, which is what
+  /// makes this set larger than it first looks: the paginated summary SELECT,
+  /// a batched tag fetch (`getTagsForDives`, joining `tags` and `dive_tags`),
+  /// and a batched dive-type fetch (`_diveTypesForDives`, over
+  /// `dive_dive_types`). Every one of those feeds a visible part of the row,
+  /// so every one belongs here.
+  ///
+  /// Broader than [watchDivesChanges], which watches only `dives`. The
+  /// paginated summary query LEFT JOINs `dive_sites` and `trips` to render the
+  /// site line and the trip group header (#1193), and carries a correlated
+  /// count over `dive_safety_findings` for the row's finding badge. All of
+  /// these change what the list displays without touching `dives` at all, so
+  /// on the dives-only tick a trip rename, a site rename, a synced safety
+  /// review or a tag rename stayed on screen stale until some unrelated dive
+  /// write shook the list.
+  ///
+  /// Deliberately NOT [watchDiveDetailChanges]: that also watches tank
+  /// pressures, gas switches, equipment and media, none of which the list
+  /// reads, and every one of which would reload the whole list for nothing.
+  ///
+  /// One known gap, taken on purpose. `dive_profile_series` and
+  /// `dive_profile_events` appear in the query's `readsFrom` because the
+  /// decompression filter joins them (see [decoSignalCondition]), so with that
+  /// filter active a profile write can change which dives match. They are left
+  /// out because a profile import writes thousands of sample rows and would
+  /// otherwise reload the whole list behind every one of them, to correct a
+  /// filter most sessions never switch on. This is no worse than the
+  /// dives-only tick it replaces.
+  Stream<void> watchDiveListChanges() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          TableUpdateQuery.onTable(_db.dives),
+          TableUpdateQuery.onTable(_db.diveSites),
+          TableUpdateQuery.onTable(_db.trips),
+          TableUpdateQuery.onTable(_db.diveSafetyFindings),
+          // Row chips: tag membership and tag names, and the dive-type
+          // badges. The type NAMES resolve through their own provider, so
+          // only the junction is needed for them.
+          TableUpdateQuery.onTable(_db.diveTags),
+          TableUpdateQuery.onTable(_db.tags),
+          TableUpdateQuery.onTable(_db.diveDiveTypes),
+        ]),
+      )
+      .debounce(changeTickDebounce);
+
   /// Aggregate change-tick for the dive DETAIL page: fires when ANY table that
   /// feeds a dive's detail view is written -- including a sync applying remote
   /// changes directly to the DB (which bypasses the notifier paths that
@@ -2108,6 +2156,10 @@ class DiveRepository {
             's.name AS site_name, s.country AS site_country, '
             's.region AS site_region, s.latitude AS site_latitude, '
             's.longitude AS site_longitude, '
+            // Trip identity for the list's group headers (#1193). Four
+            // scalars off a primary-key lookup, not a hydrated Trip.
+            't.id AS trip_id, t.name AS trip_name, '
+            't.start_date AS trip_start_date, t.end_date AS trip_end_date, '
             // Correlated count keyed by d.id so SQLite uses
             // idx_dive_safety_findings_dive_id and only counts findings for the
             // page's dives, instead of grouping the whole findings table.
@@ -2117,6 +2169,7 @@ class DiveRepository {
             'AS safety_finding_count '
             'FROM dives d '
             'LEFT JOIN dive_sites s ON d.site_id = s.id '
+            'LEFT JOIN trips t ON d.trip_id = t.id '
             '$whereClause '
             'ORDER BY $orderByClause '
             'LIMIT ? $offsetClause';
@@ -2129,6 +2182,8 @@ class DiveRepository {
               readsFrom: {
                 _db.dives,
                 _db.diveSites,
+                // Renaming a trip changes a header the list is showing.
+                _db.trips,
                 _db.diveSafetyFindings,
                 _db.diveProfileSeries,
                 _db.diveProfileEvents,
@@ -2837,6 +2892,9 @@ class DiveRepository {
           's.name AS site_name, s.country AS site_country, '
           's.region AS site_region, s.latitude AS site_latitude, '
           's.longitude AS site_longitude, '
+          // Trip identity for the list's group headers (#1193).
+          't.id AS trip_id, t.name AS trip_name, '
+          't.start_date AS trip_start_date, t.end_date AS trip_end_date, '
           // Correlated count keyed by d.id so SQLite uses
           // idx_dive_safety_findings_dive_id and only counts findings for the
           // requested dives, instead of grouping the whole findings table.
@@ -2846,6 +2904,7 @@ class DiveRepository {
           'AS safety_finding_count '
           'FROM dives d '
           'LEFT JOIN dive_sites s ON d.site_id = s.id '
+          'LEFT JOIN trips t ON d.trip_id = t.id '
           'WHERE d.id IN ($placeholders) '
           'ORDER BY sort_timestamp DESC, '
           'COALESCE(d.dive_number, 0) DESC, d.id DESC',
@@ -2853,7 +2912,12 @@ class DiveRepository {
             ...safetyCountArgs,
             for (final id in ids) Variable<String>(id),
           ],
-          readsFrom: {_db.dives, _db.diveSites, _db.diveSafetyFindings},
+          readsFrom: {
+            _db.dives,
+            _db.diveSites,
+            _db.trips,
+            _db.diveSafetyFindings,
+          },
         )
         .get();
 
@@ -2863,6 +2927,39 @@ class DiveRepository {
     final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
     final diveTypesByDive = await _diveTypesForDives(diveIds);
     return _mapSummaryRows(rows, tagsByDive, diveTypesByDive);
+  }
+
+  /// Total dives per trip, keyed by trip id, for the dive list's group
+  /// headers (#1193).
+  ///
+  /// One grouped count for the whole list rather than a query per header, and
+  /// deliberately unfiltered: the header contrasts how many of a trip are in
+  /// the list right now against the trip's real size, so this side of that
+  /// comparison has to ignore the view filter. Trips with no dives are absent
+  /// rather than zero, which is what the header wants anyway.
+  // stats-scope-exempt: a structural count for list chrome, not a statistic.
+  Future<Map<String, int>> getTripDiveCounts({String? diverId}) async {
+    // Scoped to the active diver like every other list query: without it a
+    // shared library counts other divers' dives into the header and reads
+    // more rows than the list will ever show.
+    final whereClauses = <String>['trip_id IS NOT NULL'];
+    final args = <Variable<Object>>[];
+    if (diverId != null) {
+      whereClauses.add('diver_id = ?');
+      args.add(Variable(diverId));
+    }
+
+    final rows = await _db
+        .customSelect(
+          'SELECT trip_id, COUNT(*) AS n FROM dives '
+          'WHERE ${whereClauses.join(' AND ')} GROUP BY trip_id',
+          variables: args,
+          readsFrom: {_db.dives},
+        )
+        .get();
+    return {
+      for (final row in rows) row.read<String>('trip_id'): row.read<int>('n'),
+    };
   }
 
   /// Shared row mapper for the summary SELECT column list (used by
@@ -2905,11 +3002,19 @@ class DiveRepository {
         siteRegion: row.readNullable<String>('site_region'),
         siteLatitude: row.readNullable<double>('site_latitude'),
         siteLongitude: row.readNullable<double>('site_longitude'),
+        tripId: row.readNullable<String>('trip_id'),
+        tripName: row.readNullable<String>('trip_name'),
+        tripStartDate: _epochOrNull(row.readNullable<int>('trip_start_date')),
+        tripEndDate: _epochOrNull(row.readNullable<int>('trip_end_date')),
         sortTimestamp: row.read<int>('sort_timestamp'),
         safetyFindingCount: row.readNullable<int>('safety_finding_count') ?? 0,
       );
     }).toList();
   }
+
+  /// Trip dates are stored as epoch milliseconds; null stays null.
+  static DateTime? _epochOrNull(int? ms) =>
+      ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms);
 
   // ============================================================================
   // Statistics
