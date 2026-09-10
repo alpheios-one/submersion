@@ -20312,6 +20312,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tags_manage_title => 'Étiquettes';
 
   @override
+  String get tags_manage_diveComputerSection => 'Ordinateur de plongée';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Étiqueter automatiquement les téléchargements de l\'ordinateur de plongée';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Chaque plongée téléchargée depuis un ordinateur de plongée reçoit une étiquette avec le nom de l\'appareil et la date';
+
+  @override
   String get tags_manage_searchHint => 'Rechercher des étiquettes...';
 
   @override

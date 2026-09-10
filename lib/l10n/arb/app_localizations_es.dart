@@ -20236,6 +20236,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
+  String get tags_manage_diveComputerSection => 'Ordenador de buceo';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Etiquetar automaticamente las descargas del ordenador de buceo';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Cada inmersion descargada de un ordenador de buceo recibe una etiqueta con el nombre del dispositivo y la fecha';
+
+  @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
 
   @override

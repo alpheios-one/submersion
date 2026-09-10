@@ -20224,6 +20224,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tags_manage_title => 'Tag';
 
   @override
+  String get tags_manage_diveComputerSection => 'Computer subacqueo';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Tagga automaticamente i download dal computer subacqueo';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Ogni immersione scaricata da un computer subacqueo riceve un tag con il nome del dispositivo e la data';
+
+  @override
   String get tags_manage_searchHint => 'Cerca tag...';
 
   @override

@@ -19849,6 +19849,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tags_manage_title => 'الوسوم';
 
   @override
+  String get tags_manage_diveComputerSection => 'كمبيوتر الغوص';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'وسم عمليات استيراد كمبيوتر الغوص تلقائيا';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'تحصل كل غوصة يتم تنزيلها من كمبيوتر الغوص على وسم يحمل اسم الجهاز والتاريخ';
+
+  @override
   String get tags_manage_searchHint => 'البحث في الوسوم...';
 
   @override

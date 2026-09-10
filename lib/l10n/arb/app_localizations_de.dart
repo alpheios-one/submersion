@@ -20180,6 +20180,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
+  String get tags_manage_diveComputerSection => 'Tauchcomputer';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Tauchcomputer-Importe automatisch taggen';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Beim Auslesen des Tauchcomputers erhält jeder importierte Tauchgang ein Tag mit Gerätename und Datum';
+
+  @override
   String get tags_manage_searchHint => 'Tags suchen...';
 
   @override

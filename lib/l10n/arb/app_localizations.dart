@@ -33270,6 +33270,24 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get tags_manage_title;
 
+  /// Section header above the auto-tag-imports switch on the tag management screen
+  ///
+  /// In en, this message translates to:
+  /// **'Dive computer'**
+  String get tags_manage_diveComputerSection;
+
+  /// Switch title for auto-tagging dive computer downloads
+  ///
+  /// In en, this message translates to:
+  /// **'Tag dive computer imports automatically'**
+  String get tags_manage_autoTagDiveComputerImports;
+
+  /// Switch subtitle for auto-tagging dive computer downloads
+  ///
+  /// In en, this message translates to:
+  /// **'Each dive downloaded from a dive computer gets a tag with the device name and date'**
+  String get tags_manage_autoTagDiveComputerImports_subtitle;
+
   /// No description provided for @tags_manage_searchHint.
   ///
   /// In en, this message translates to:

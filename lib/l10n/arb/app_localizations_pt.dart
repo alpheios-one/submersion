@@ -20231,6 +20231,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
+  String get tags_manage_diveComputerSection => 'Computador de mergulho';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Marcar automaticamente os downloads do computador de mergulho';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Cada mergulho baixado de um computador de mergulho recebe uma etiqueta com o nome do dispositivo e a data';
+
+  @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
 
   @override

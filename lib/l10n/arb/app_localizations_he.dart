@@ -19704,6 +19704,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tags_manage_title => 'תגיות';
 
   @override
+  String get tags_manage_diveComputerSection => 'מחשב צלילה';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'תיוג אוטומטי של ייבוא ממחשב צלילה';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'כל צלילה שהורדה ממחשב צלילה מקבלת תגית עם שם המכשיר והתאריך';
+
+  @override
   String get tags_manage_searchHint => 'חיפוש תגיות...';
 
   @override

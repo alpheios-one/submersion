@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
@@ -89,6 +90,10 @@ class _TagManagePageState extends ConsumerState<TagManagePage> {
                 ),
           body: Column(
             children: [
+              // Hidden during selection: this is a settings control, not
+              // part of the list being acted on, and the space is better
+              // spent on the list itself while a bulk action is in progress.
+              if (!selection.isActive) _buildAutoTagSection(),
               // Search stays visible during selection: narrowing the list
               // mid-selection is a supported move, and the selection prunes
               // to whatever remains.
@@ -105,6 +110,41 @@ class _TagManagePageState extends ConsumerState<TagManagePage> {
           ),
         ),
       ),
+    );
+  }
+
+  /// Whether the import wizard auto-tags dive computer downloads (issue
+  /// #998), plus its switch.
+  ///
+  /// Placed above the search bar, not as a wizard step, so the choice is a
+  /// standing preference rather than something re-decided at every download.
+  Widget _buildAutoTagSection() {
+    final settings = ref.watch(settingsProvider);
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Text(
+            context.l10n.tags_manage_diveComputerSection,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ),
+        SwitchListTile(
+          title: Text(context.l10n.tags_manage_autoTagDiveComputerImports),
+          subtitle: Text(
+            context.l10n.tags_manage_autoTagDiveComputerImports_subtitle,
+          ),
+          value: settings.autoTagDiveComputerImports,
+          onChanged: (value) {
+            ref
+                .read(settingsProvider.notifier)
+                .setAutoTagDiveComputerImports(value);
+          },
+        ),
+        const Divider(height: 1),
+      ],
     );
   }
 

@@ -20166,6 +20166,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tags_manage_title => 'Címkék';
 
   @override
+  String get tags_manage_diveComputerSection => 'Búvárszámítógép';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Búvárszámítógép-importok automatikus címkézése';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Minden búvárszámítógépről letöltött merülés címkét kap az eszköz nevével és a dátummal';
+
+  @override
   String get tags_manage_searchHint => 'Címkék keresése...';
 
   @override

@@ -20053,6 +20053,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
+  String get tags_manage_diveComputerSection => 'Duikcomputer';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Duikcomputer-imports automatisch taggen';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Elke duik die van een duikcomputer wordt gedownload krijgt een tag met de apparaatnaam en datum';
+
+  @override
   String get tags_manage_searchHint => 'Tags zoeken...';
 
   @override

@@ -19159,6 +19159,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_manage_title => '标签';
 
   @override
+  String get tags_manage_diveComputerSection => '潜水电脑';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports => '自动为潜水电脑导入的记录打标签';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      '从潜水电脑下载的每次潜水都会获得包含设备名称和日期的标签';
+
+  @override
   String get tags_manage_searchHint => '搜索标签...';
 
   @override

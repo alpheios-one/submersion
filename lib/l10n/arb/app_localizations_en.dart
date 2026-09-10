@@ -19872,6 +19872,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
+  String get tags_manage_diveComputerSection => 'Dive computer';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports =>
+      'Tag dive computer imports automatically';
+
+  @override
+  String get tags_manage_autoTagDiveComputerImports_subtitle =>
+      'Each dive downloaded from a dive computer gets a tag with the device name and date';
+
+  @override
   String get tags_manage_searchHint => 'Search tags...';
 
   @override

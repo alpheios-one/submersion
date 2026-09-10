@@ -12325,6 +12325,18 @@
   },
   "tags_hint_addTags": "Add tags...",
   "tags_manage_title": "Tags",
+  "tags_manage_diveComputerSection": "Dive computer",
+  "@tags_manage_diveComputerSection": {
+    "description": "Section header above the auto-tag-imports switch on the tag management screen"
+  },
+  "tags_manage_autoTagDiveComputerImports": "Tag dive computer imports automatically",
+  "@tags_manage_autoTagDiveComputerImports": {
+    "description": "Switch title for auto-tagging dive computer downloads"
+  },
+  "tags_manage_autoTagDiveComputerImports_subtitle": "Each dive downloaded from a dive computer gets a tag with the device name and date",
+  "@tags_manage_autoTagDiveComputerImports_subtitle": {
+    "description": "Switch subtitle for auto-tagging dive computer downloads"
+  },
   "tags_manage_searchHint": "Search tags...",
   "tags_manage_diveCount": "{count, plural, =0{0 dives} =1{1 dive} other{{count} dives}}",
   "@tags_manage_diveCount": {
