@@ -1,4 +1,6 @@
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_point_codec.dart'
+    show kMaxNavTrackPointCount;
 
 /// A route as parsed from a file, before a dive link, an anchor, or a
 /// drift correction has been applied. Everything downstream of this type
@@ -53,16 +55,9 @@ class NavTrackParseException implements Exception {
   String toString() => 'NavTrackParseException: $message';
 }
 
-/// The largest number of samples a route parser will accept.
-///
-/// 131,072 (1 << 17) covers over 36 hours of one-hertz samples -- an order
-/// of magnitude beyond any dive -- while still bounding allocation from
-/// peer-supplied bytes (a parsed file, an imported CSV). The eventual
-/// points codec enforces the same cap on encode and decode; this is the
-/// parse-time half of that guarantee.
-const int kMaxNavTrackPointCount = 1 << 17;
-
-/// Rejects a parsed sample count over [kMaxNavTrackPointCount], with a
+/// Rejects a parsed sample count over [kMaxNavTrackPointCount] (defined by
+/// `nav_track_point_codec.dart`, which enforces the same cap on encode and
+/// decode; this is the parse-time half of that guarantee), with a
 /// message a diver can act on, raised while they still have the file in
 /// front of them.
 void validateNavTrackPointCount(int count) {
