@@ -10610,6 +10610,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'Kivonva';
 
   @override
+  String get enum_equipmentStatus_sold => 'Eladva';
+
+  @override
   String get enum_equipmentType_backplate => 'Hátlemez';
 
   @override

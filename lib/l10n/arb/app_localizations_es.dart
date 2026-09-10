@@ -10636,6 +10636,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_equipmentStatus_retired => 'Retirado';
 
   @override
+  String get enum_equipmentStatus_sold => 'Vendido';
+
+  @override
   String get enum_equipmentType_backplate => 'Placa dorsal';
 
   @override

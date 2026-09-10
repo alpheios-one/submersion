@@ -17800,6 +17800,12 @@ abstract class AppLocalizations {
   /// **'Retired'**
   String get enum_equipmentStatus_retired;
 
+  /// No description provided for @enum_equipmentStatus_sold.
+  ///
+  /// In en, this message translates to:
+  /// **'Sold'**
+  String get enum_equipmentStatus_sold;
+
   /// No description provided for @enum_equipmentType_backplate.
   ///
   /// In en, this message translates to:
