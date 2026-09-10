@@ -260,6 +260,7 @@ lib/features/nav_track/
   domain/entities/nav_track.dart               # NavTrack, NavTrackPoint, NavTrackSource, NavTrackCorrection (copyWith)
   domain/nav_track_point_codec.dart            # gzipped JSON tuples, bounded inflate, caps
   domain/nav_track_stats.dart                  # pure: distance, max/avg speed, max depth from points
+  domain/nav_track_segmenter.dart              # pure: classify samples (underwater/reckoned/GPS-fixed/out-of-water), find fix events
   domain/nav_track_matcher.dart                # pure: candidate dives for a route by time window
   domain/nav_track_corrector.dart              # pure: rotation + proportional drift correction with trust mark
   domain/nav_track_georef.dart                 # pure: local ENU <-> lat/lon around the anchor
