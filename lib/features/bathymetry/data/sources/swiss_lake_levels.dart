@@ -39,11 +39,24 @@ class SwissLakeLevel {
 ///
 /// Mean-level figures are from the Bundesamt für Energie (BFE) publication
 /// "Naturseen der Schweiz" (as of 1 January 1983, averages of annual series
-/// through 1980): https://pubdb.bfe.admin.ch/de/publication/download/925
+/// through 1980): https://pubdb.bfe.admin.ch/de/publication/download/925 —
+/// except where individually noted below, for lakes added later that BFE
+/// publication does not cover; those instead cite BAFU's hydrodaten.admin.ch
+/// long-term station means (1991-2025).
 ///
 /// These are historical long-term averages, not real-time gauge readings —
-/// appropriate for this app's coarse LN02-to-depth conversion, since
-/// regulated lakes barely drift from their mean level over time.
+/// appropriate for this app's coarse LN02-to-depth conversion, since most of
+/// these lakes barely drift from their mean level over time. Lungernsee is
+/// the one exception in this table (see its own entry below) — a heavily
+/// regulated reservoir whose real level swings roughly 40 m across a year,
+/// far beyond what a single mean can approximate.
+///
+/// This list was cross-checked (2026-09-10) against every item the
+/// swissBATHY3D STAC collection actually publishes — three lakes previously
+/// listed here (Greifensee, Lago di Lugano, Pfäffikersee) turned out to have
+/// no matching STAC item at all (always "no data", not a bug), and five
+/// published lakes were missing from this list entirely (Lac de Joux,
+/// Lungernsee, Silsersee, Silvaplanersee, Rotsee) — both corrected here.
 const List<SwissLakeLevel> swissLakeLevels = [
   SwissLakeLevel(
     name: 'Genfersee (Lac Léman)',
@@ -134,22 +147,6 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLon: 8.90,
   ),
   SwissLakeLevel(
-    name: 'Lago di Lugano',
-    meanLevelMeters: 270.49,
-    minLat: 45.85,
-    maxLat: 46.05,
-    minLon: 8.85,
-    maxLon: 9.10,
-  ),
-  SwissLakeLevel(
-    name: 'Greifensee',
-    meanLevelMeters: 435.14,
-    minLat: 47.32,
-    maxLat: 47.39,
-    minLon: 8.65,
-    maxLon: 8.72,
-  ),
-  SwissLakeLevel(
     name: 'Hallwilersee',
     meanLevelMeters: 448.67,
     minLat: 47.24,
@@ -174,14 +171,6 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLon: 8.20,
   ),
   SwissLakeLevel(
-    name: 'Pfäffikersee',
-    meanLevelMeters: 536.98,
-    minLat: 47.34,
-    maxLat: 47.38,
-    minLon: 8.77,
-    maxLon: 8.82,
-  ),
-  SwissLakeLevel(
     name: 'Ägerisee',
     meanLevelMeters: 723.89,
     minLat: 47.11,
@@ -204,6 +193,63 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLat: 46.92,
     minLon: 8.20,
     maxLon: 8.26,
+  ),
+  // BAFU hydrodaten.admin.ch station 2007, long-term mean 1991-2025.
+  SwissLakeLevel(
+    name: 'Lac de Joux',
+    meanLevelMeters: 1004.03,
+    minLat: 46.61,
+    maxLat: 46.68,
+    minLon: 6.24,
+    maxLon: 6.35,
+  ),
+  // No BAFU long-term station mean available (heavily regulated reservoir,
+  // not a natural-lake gauge series): Elektrizitätswerke Obwalden's own
+  // concession fixes the level between 648.74 m (winter drawdown) and
+  // 688.74 m, with 687.50-688.50 m required through the summer months —
+  // roughly a 40 m annual swing, far beyond what a single mean can capture.
+  // Per an explicit product decision, this uses the summer-operating
+  // midpoint (688.00 m) rather than a misleading year-round average, since
+  // diving here mostly happens in summer -- depths computed from this level
+  // are still meaningfully wrong outside the May-October operating window.
+  SwissLakeLevel(
+    name: 'Lungernsee',
+    meanLevelMeters: 688.00,
+    minLat: 46.78,
+    maxLat: 46.82,
+    minLon: 8.14,
+    maxLon: 8.18,
+  ),
+  // BAFU hydrodaten.admin.ch station 2072, long-term mean 1991-2025.
+  SwissLakeLevel(
+    name: 'Silsersee',
+    meanLevelMeters: 1796.65,
+    minLat: 46.40,
+    maxLat: 46.45,
+    minLon: 9.69,
+    maxLon: 9.77,
+  ),
+  // BAFU hydrodaten.admin.ch station 2073, long-term mean 1991-2025.
+  SwissLakeLevel(
+    name: 'Silvaplanersee',
+    meanLevelMeters: 1790.57,
+    minLat: 46.43,
+    maxLat: 46.47,
+    minLon: 9.76,
+    maxLon: 9.81,
+  ),
+  // No BAFU long-term station series found; 419 m is the figure
+  // consistently reported by general geographic references (swisstopo map
+  // data), not the specific BFE 1983 publication the rest of this table
+  // cites. A small, unregulated natural lake, so unlike Lungernsee a
+  // single mean is still an appropriate approximation here.
+  SwissLakeLevel(
+    name: 'Rotsee',
+    meanLevelMeters: 419.00,
+    minLat: 47.06,
+    maxLat: 47.08,
+    minLon: 8.29,
+    maxLon: 8.33,
   ),
 ];
 

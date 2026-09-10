@@ -23,7 +23,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// [parseSwissLv95Grid] handles both conversions, using each lake's mean
 /// water level from [swissLakeLevels].
 ///
-/// Covers only the ~20 lakes in [swissLakeLevels] (a coordinate elsewhere in
+/// Covers only the lakes in [swissLakeLevels] (a coordinate elsewhere in
 /// Switzerland is dry land, out of scope for a bathymetry source). Each
 /// covered coordinate maps to exactly one LV95 1-km tile, cached by
 /// [SwissBathyTileCacheRepository] so a tile's data is downloaded at most
@@ -772,7 +772,9 @@ class SwissBathy3dSource implements BathymetrySource {
         final entryN = int.parse(match.group(2)!);
         if ((entryE - tileE).abs() > 1 || (entryN - tileN).abs() > 1) continue;
       }
-      texts.add(utf8.decode(entry.readBytes() ?? const [], allowMalformed: true));
+      texts.add(
+        utf8.decode(entry.readBytes() ?? const [], allowMalformed: true),
+      );
     }
     return texts;
   }

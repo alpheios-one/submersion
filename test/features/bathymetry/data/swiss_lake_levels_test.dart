@@ -29,8 +29,11 @@ void main() {
     test('every lake has a plausible mean level and a non-inverted bbox', () {
       for (final lake in swissLakeLevels) {
         expect(
+          // Upper bound covers the Engadin lakes (Silsersee/Silvaplanersee,
+          // ~1790-1797 m) with headroom for future additions, not just the
+          // lowland lakes this table started with.
           lake.meanLevelMeters,
-          inInclusiveRange(190.0, 800.0),
+          inInclusiveRange(190.0, 2000.0),
           reason: lake.name,
         );
         expect(lake.minLat, lessThan(lake.maxLat), reason: lake.name);
