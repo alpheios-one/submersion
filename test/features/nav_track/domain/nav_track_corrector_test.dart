@@ -1,0 +1,298 @@
+import 'dart:math' as math;
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_georef.dart';
+
+NavTrackPoint _p({
+  int timestamp = 0,
+  double north = 0,
+  double east = 0,
+  double depth = 0,
+  double? distance,
+  double? speed,
+  double? temperature,
+}) => NavTrackPoint(
+  timestamp: timestamp,
+  north: north,
+  east: east,
+  depth: depth,
+  distance: distance,
+  speed: speed,
+  temperature: temperature,
+);
+
+double _dist(double n1, double e1, double n2, double e2) {
+  final dn = n2 - n1;
+  final de = e2 - e1;
+  return math.sqrt(dn * dn + de * de);
+}
+
+void main() {
+  // A simple straight-line route: 5 samples, 100 m apart, heading due
+  // north (constant east=0), 20 s apart, so cumulative distance and time
+  // both grow uniformly and every property is easy to reason about.
+  List<NavTrackPoint> straightRoute() => [
+    for (var i = 0; i < 5; i++)
+      _p(timestamp: i * 20, north: i * 100.0, east: 0, distance: i * 100.0),
+  ];
+
+  group('NavTrackCorrector.apply with endMode none', () {
+    test('is the identity when no rotation is applied either', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(),
+      );
+      for (var i = 0; i < points.length; i++) {
+        expect(corrected[i].east, points[i].east);
+        expect(corrected[i].north, points[i].north);
+        expect(corrected[i].depth, points[i].depth);
+        expect(corrected[i].timestamp, points[i].timestamp);
+      }
+    });
+
+    test('still applies rotation even with no drift correction', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(headingOffsetDeg: 90),
+      );
+      // A 90-degree clockwise rotation turns "due north" into "due east".
+      expect(corrected.last.east, closeTo(400, 1e-6));
+      expect(corrected.last.north, closeTo(0, 1e-6));
+    });
+  });
+
+  group('NavTrackCorrector rotation', () {
+    test('preserves distances between consecutive points', () {
+      final points = straightRoute();
+      final rawSteps = [
+        for (var i = 1; i < points.length; i++)
+          _dist(
+            points[i - 1].north,
+            points[i - 1].east,
+            points[i].north,
+            points[i].east,
+          ),
+      ];
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(headingOffsetDeg: 37),
+      );
+      final correctedSteps = [
+        for (var i = 1; i < corrected.length; i++)
+          _dist(
+            corrected[i - 1].north,
+            corrected[i - 1].east,
+            corrected[i].north,
+            corrected[i].east,
+          ),
+      ];
+      for (var i = 0; i < rawSteps.length; i++) {
+        expect(correctedSteps[i], closeTo(rawSteps[i], 1e-6));
+      }
+    });
+
+    test('360 degrees is the identity', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(headingOffsetDeg: 360),
+      );
+      for (var i = 0; i < points.length; i++) {
+        expect(corrected[i].east, closeTo(points[i].east, 1e-6));
+        expect(corrected[i].north, closeTo(points[i].north, 1e-6));
+      }
+    });
+  });
+
+  group('NavTrackCorrector.apply with endMode sameAsStart', () {
+    test('closes the loop: the last point lands on the (rotated) start', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.sameAsStart),
+      );
+      expect(corrected.last.east, closeTo(corrected.first.east, 1e-9));
+      expect(corrected.last.north, closeTo(corrected.first.north, 1e-9));
+    });
+
+    test('distributes the correction proportionally to distance travelled '
+        'when trust is zero (the classic rubber band)', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.sameAsStart),
+      );
+      // Raw north values are 0, 100, 200, 300, 400; the residual (-400) is
+      // spread proportionally to distance, so at the midpoint (index 2,
+      // half the total distance) half the residual has been applied.
+      expect(corrected[2].north, closeTo(200 - 200, 1e-6));
+      expect(corrected[1].north, closeTo(100 - 100, 1e-6));
+    });
+  });
+
+  group('NavTrackCorrector.apply with a trust fraction', () {
+    test('leaves the prefix up to the trust mark bit-identical', () {
+      final points = straightRoute();
+      const trustAtHalf = 0.5; // trusted up to 200 m of 400 m total
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: trustAtHalf,
+        ),
+      );
+      // Samples 0, 1, 2 sit at cumulative distance 0, 100, 200 -- at or
+      // before the 200 m trust mark -- and must be untouched.
+      expect(corrected[0].north, points[0].north);
+      expect(corrected[1].north, points[1].north);
+      expect(corrected[2].north, points[2].north);
+      // Sample 4, past the trust mark, must have moved toward the target.
+      expect(corrected[4].north, isNot(points[4].north));
+      expect(corrected[4].north, closeTo(0, 1e-6)); // sameAsStart -> origin
+    });
+
+    test('a trust fraction of 1 leaves the whole route untouched', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 1,
+        ),
+      );
+      for (var i = 0; i < points.length; i++) {
+        expect(corrected[i].north, points[i].north);
+        expect(corrected[i].east, points[i].east);
+      }
+    });
+  });
+
+  group('NavTrackCorrector.apply with endMode point', () {
+    test('lands the route end on the map point, via the anchor', () {
+      const anchor = GeoPoint(47.0, 8.0);
+      final endPoint = offsetToGeoPoint(anchor, east: 30, north: 40);
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        NavTrackCorrection(
+          anchor: anchor,
+          endMode: NavTrackEndMode.point,
+          endPoint: endPoint,
+        ),
+      );
+      expect(corrected.last.east, closeTo(30, 1e-6));
+      expect(corrected.last.north, closeTo(40, 1e-6));
+    });
+  });
+
+  group('NavTrackCorrector.apply device distance vs path length', () {
+    test('prefers the device distance channel when it is monotone', () {
+      // Device distance is deliberately NOT proportional to the straight-
+      // line path length (as if the diver looped around), so the trust
+      // fraction picks a different cutoff sample depending on which
+      // distance measure is used -- proving which one won.
+      final points = [
+        _p(timestamp: 0, north: 0, east: 0, distance: 0),
+        _p(
+          timestamp: 10,
+          north: 100,
+          east: 0,
+          distance: 10,
+        ), // tiny device reading
+        _p(timestamp: 20, north: 200, east: 0, distance: 1000), // big jump
+      ];
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0.5,
+        ),
+      );
+      // Device distance: 0, 10, 1000 -> half of 1000 is 500, so sample 1
+      // (distance 10) is well before the trust mark and stays untouched;
+      // the path-length distance (0, 100, 200) would instead put the trust
+      // mark between samples 0 and 1, corrupting sample 1.
+      expect(corrected[1].north, points[1].north);
+    });
+
+    test('falls back to path length when device distance is not monotone', () {
+      final points = [
+        _p(timestamp: 0, north: 0, east: 0, distance: 0),
+        _p(
+          timestamp: 10,
+          north: 100,
+          east: 0,
+          distance: 50,
+        ), // goes backwards later
+        _p(timestamp: 20, north: 200, east: 0, distance: 40), // < previous
+      ];
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0.5,
+        ),
+      );
+      // Path length: 0, 100, 200 -- half of 200 is 100, so sample 1 sits
+      // exactly at the trust mark and stays untouched; sample 2 is fully
+      // corrected onto the origin.
+      expect(corrected[1].north, points[1].north);
+      expect(corrected[2].north, closeTo(0, 1e-6));
+    });
+
+    test('falls back to path length when any distance reading is missing', () {
+      final points = [
+        _p(timestamp: 0, north: 0, east: 0, distance: 0),
+        _p(timestamp: 10, north: 100, east: 0), // no distance reading
+        _p(timestamp: 20, north: 200, east: 0, distance: 999),
+      ];
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0.5,
+        ),
+      );
+      expect(corrected[1].north, points[1].north);
+    });
+  });
+
+  group('NavTrackCorrector.apply with endMode gpsFix', () {
+    test(
+      'lands the reckoned route on the recording\'s own GPS-fixed sample',
+      () {
+        final points = [
+          _p(timestamp: 0, north: 0, east: 0, depth: 5, distance: 0),
+          _p(timestamp: 2, north: 100, east: 0, depth: 0, distance: 100),
+          // A genuine fix event: >50 m in <=5 s at the surface.
+          _p(timestamp: 4, north: 500, east: 20, depth: 0, distance: 100),
+        ];
+        final corrected = NavTrackCorrector.apply(
+          points,
+          const NavTrackCorrection(endMode: NavTrackEndMode.gpsFix),
+        );
+        // The reckoned prefix (before the fix event) should now end exactly
+        // on the fix sample's own position.
+        expect(corrected[1].north, closeTo(500, 1e-6));
+        expect(corrected[1].east, closeTo(20, 1e-6));
+      },
+    );
+
+    test('falls back to no correction when the recording has no fix event', () {
+      final points = straightRoute();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.gpsFix),
+      );
+      for (var i = 0; i < points.length; i++) {
+        expect(corrected[i].north, points[i].north);
+        expect(corrected[i].east, points[i].east);
+      }
+    });
+  });
+}
