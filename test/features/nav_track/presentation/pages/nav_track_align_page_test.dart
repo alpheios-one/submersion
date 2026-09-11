@@ -186,6 +186,46 @@ void main() {
     expect(repository.lastCorrection?.anchor, const GeoPoint(47.1, 8.3));
   });
 
+  testWidgets(
+    'the "From site" chip still works after other controls triggered a '
+    'rebuild (regression: the chip used to sit behind a FutureBuilder '
+    'whose Future was recreated on every setState, one Flutter anti-'
+    'pattern independent of whether it ever visibly broke the chip)',
+    (tester) async {
+      const site = DiveSite(
+        id: 'site-1',
+        name: 'Test Site',
+        location: GeoPoint(47.1, 8.3),
+      );
+      final repository = await _pump(
+        tester,
+        route: _route(siteId: 'site-1'),
+        site: site,
+      );
+
+      // Trigger a handful of rebuilds via setState before using the chip.
+      final sliderFinder = find.byKey(
+        const ValueKey('nav-track-align-trust-slider'),
+      );
+      await tester.drag(sliderFinder, const Offset(20, 0));
+      await tester.pump();
+      await tester.drag(sliderFinder, const Offset(-10, 0));
+      await tester.pump();
+
+      final chipFinder = find.byKey(
+        const ValueKey('nav-track-align-from-site'),
+      );
+      expect(chipFinder, findsOneWidget);
+      await tester.tap(chipFinder);
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-save')));
+      await tester.pumpAndSettle();
+
+      expect(repository.lastCorrection?.anchor, const GeoPoint(47.1, 8.3));
+    },
+  );
+
   testWidgets('the end mode dropdown switches to "same as start"', (
     tester,
   ) async {

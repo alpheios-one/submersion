@@ -404,18 +404,23 @@ class _ControlsPanel extends ConsumerWidget {
   final double totalDistance;
   final double trustedDistance;
 
-  Future<GeoPoint?> _diveEntryLocation(WidgetRef ref) async {
+  /// The linked dive's entry fix, watched through the existing
+  /// `diveProvider` family rather than re-`read` inside a fresh `Future`
+  /// handed to a `FutureBuilder` on every build: `_updateCorrection` calls
+  /// `setState` on every drag, slider move and rotation tap, so a
+  /// per-build `Future` would be recreated (and re-awaited) constantly.
+  /// `ref.watch` instead reads the provider's already-cached value and only
+  /// rebuilds this widget when the dive itself actually changes.
+  GeoPoint? _diveEntryLocation(WidgetRef ref) {
     final diveId = route.diveId;
     if (diveId == null) return null;
-    final dive = await ref.read(diveProvider(diveId).future);
-    return dive?.entryLocation;
+    return ref.watch(diveProvider(diveId)).value?.entryLocation;
   }
 
-  Future<GeoPoint?> _siteLocation(WidgetRef ref) async {
+  GeoPoint? _siteLocation(WidgetRef ref) {
     final siteId = route.siteId;
     if (siteId == null) return null;
-    final site = await ref.read(siteProvider(siteId).future);
-    return site?.location;
+    return ref.watch(siteProvider(siteId)).value?.location;
   }
 
   int _trustedDurationSeconds() {
@@ -450,36 +455,24 @@ class _ControlsPanel extends ConsumerWidget {
                   onPressed: () => state._startPlacing(_Placing.start),
                   child: Text(l10n.navTrack_align_setStartOnMap),
                 ),
-                FutureBuilder<GeoPoint?>(
-                  future: _diveEntryLocation(ref),
-                  builder: (context, snapshot) {
-                    final location = snapshot.data;
-                    if (location == null) return const SizedBox.shrink();
-                    return ActionChip(
-                      key: const ValueKey('nav-track-align-from-dive-entry'),
-                      label: Text(l10n.navTrack_align_fromDiveEntry),
-                      onPressed: () => state._updateCorrection(
-                        (c) => c.copyWith(anchor: location),
-                        route,
-                      ),
-                    );
-                  },
-                ),
-                FutureBuilder<GeoPoint?>(
-                  future: _siteLocation(ref),
-                  builder: (context, snapshot) {
-                    final location = snapshot.data;
-                    if (location == null) return const SizedBox.shrink();
-                    return ActionChip(
-                      key: const ValueKey('nav-track-align-from-site'),
-                      label: Text(l10n.navTrack_align_fromSite),
-                      onPressed: () => state._updateCorrection(
-                        (c) => c.copyWith(anchor: location),
-                        route,
-                      ),
-                    );
-                  },
-                ),
+                if (_diveEntryLocation(ref) case final location?)
+                  ActionChip(
+                    key: const ValueKey('nav-track-align-from-dive-entry'),
+                    label: Text(l10n.navTrack_align_fromDiveEntry),
+                    onPressed: () => state._updateCorrection(
+                      (c) => c.copyWith(anchor: location),
+                      route,
+                    ),
+                  ),
+                if (_siteLocation(ref) case final location?)
+                  ActionChip(
+                    key: const ValueKey('nav-track-align-from-site'),
+                    label: Text(l10n.navTrack_align_fromSite),
+                    onPressed: () => state._updateCorrection(
+                      (c) => c.copyWith(anchor: location),
+                      route,
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 8),
