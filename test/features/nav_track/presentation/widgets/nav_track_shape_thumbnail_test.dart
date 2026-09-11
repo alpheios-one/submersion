@@ -33,7 +33,7 @@ void main() {
 
   testWidgets('respects a custom size', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Scaffold(
           body: Center(
             child: NavTrackShapeThumbnail(points: _points, size: 80),

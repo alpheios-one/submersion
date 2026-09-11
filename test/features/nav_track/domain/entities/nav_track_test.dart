@@ -95,7 +95,7 @@ void main() {
 
     test('is the GeoPoint when both coordinates are set', () {
       final anchor = _track(anchorLatitude: 47.1, anchorLongitude: 8.2).anchor;
-      expect(anchor, GeoPoint(47.1, 8.2));
+      expect(anchor, const GeoPoint(47.1, 8.2));
     });
   });
 
@@ -108,7 +108,7 @@ void main() {
 
     test('is the GeoPoint when both coordinates are set', () {
       final endPoint = _track(endLatitude: 46.5, endLongitude: 7.5).endPoint;
-      expect(endPoint, GeoPoint(46.5, 7.5));
+      expect(endPoint, const GeoPoint(46.5, 7.5));
     });
   });
 
@@ -124,9 +124,9 @@ void main() {
         headingOffsetDeg: 12.5,
       );
       final correction = track.correction;
-      expect(correction.anchor, GeoPoint(47.1, 8.2));
+      expect(correction.anchor, const GeoPoint(47.1, 8.2));
       expect(correction.endMode, NavTrackEndMode.point);
-      expect(correction.endPoint, GeoPoint(46.5, 7.5));
+      expect(correction.endPoint, const GeoPoint(46.5, 7.5));
       expect(correction.trustFraction, 0.4);
       expect(correction.headingOffsetDeg, 12.5);
     });

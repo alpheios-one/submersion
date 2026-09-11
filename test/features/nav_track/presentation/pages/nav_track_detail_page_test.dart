@@ -302,10 +302,10 @@ void main() {
           ...overrides,
           navTrackByIdProvider('r1').overrideWith((ref) => completer.future),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const NavTrackDetailPage(trackId: 'r1'),
+          home: NavTrackDetailPage(trackId: 'r1'),
         ),
       ),
     );
@@ -329,10 +329,10 @@ void main() {
             'r1',
           ).overrideWith((ref) async => Future<NavTrack?>.error('boom')),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const NavTrackDetailPage(trackId: 'r1'),
+          home: NavTrackDetailPage(trackId: 'r1'),
         ),
       ),
     );
@@ -351,10 +351,10 @@ void main() {
           ...overrides,
           navTrackByIdProvider('r1').overrideWith((ref) async => null),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const NavTrackDetailPage(trackId: 'r1'),
+          home: NavTrackDetailPage(trackId: 'r1'),
         ),
       ),
     );
