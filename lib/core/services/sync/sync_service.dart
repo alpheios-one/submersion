@@ -1310,6 +1310,7 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (type: 'gpsTracks', records: data.gpsTracks, hasUpdatedAt: true),
+          (type: 'navTracks', records: data.navTracks, hasUpdatedAt: true),
           (type: 'divePlans', records: data.divePlans, hasUpdatedAt: true),
           (
             type: 'divePlanTanks',
@@ -2232,6 +2233,7 @@ class SyncService {
     'preDiveSessions': true,
     'preDiveSessionItems': true,
     'gpsTracks': true,
+    'navTracks': true,
     'divePlans': true,
     'divePlanTanks': true,
     'divePlanSegments': true,
