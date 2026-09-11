@@ -104,6 +104,26 @@ class CorrectedNavTrackPoint {
 class NavTrackCorrector {
   const NavTrackCorrector._();
 
+  /// The last index of [points] that [apply] treats as part of the active
+  /// correction range for every mode but [NavTrackEndMode.none] -- the
+  /// last [NavTrackSampleKind.underwater] or
+  /// [NavTrackSampleKind.surfaceReckoned] sample, i.e. everything up to
+  /// but excluding a GPS-fix event.
+  ///
+  /// Exposed so presentation code that needs a distance axis over "the
+  /// part of the route the correction actually reaches" (the alignment
+  /// page's trust slider) shares exactly this boundary instead of
+  /// computing its own over the full raw recording: a recording with a
+  /// GPS-fix event is dominated by the jump and the post-surfacing wobble,
+  /// so a slider computed over the whole thing disagrees with where
+  /// [apply] actually freezes the route, making an "already frozen"
+  /// prefix look like it is still moving as the diver drags the slider.
+  static int activeRangeEndIndex(List<NavTrackPoint> points) {
+    if (points.isEmpty) return 0;
+    final kinds = NavTrackSegmenter.classify(points).kinds;
+    return _lastActiveIndex(kinds, points.length);
+  }
+
   static List<CorrectedNavTrackPoint> apply(
     List<NavTrackPoint> points,
     NavTrackCorrection correction,

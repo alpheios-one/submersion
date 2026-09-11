@@ -468,6 +468,29 @@ void main() {
   });
 
   testWidgets(
+    '"Open 3D" saves the in-progress correction before navigating, so the '
+    '3D view (which reloads the route from the repository) reflects what '
+    'is currently being edited rather than the last-saved state (item 22)',
+    (tester) async {
+      final repository = await _pump(tester, route: _route());
+
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-align-place-start')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-set-here')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-3d')));
+      await tester.pumpAndSettle();
+
+      expect(repository.lastRouteId, 'r1');
+      expect(repository.lastCorrection, isNotNull);
+      expect(find.text('ROUTE_3D_PAGE'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'typing a rotation value into the field updates headingOffsetDeg',
     (tester) async {
       final repository = await _pump(tester, route: _route());

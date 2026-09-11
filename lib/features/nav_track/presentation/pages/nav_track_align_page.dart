@@ -33,11 +33,16 @@ enum _Placing { none, start, end }
 
 /// Cumulative distance per point, in metres, from the route's own first
 /// sample -- presentation-local because the trust slider is the only reader
-/// that needs it purely as a distance axis (unlike `NavTrackCorrector`,
-/// which needs it truncated at the gpsFix cutoff and prefers the device's
-/// own distance channel; duplicating that nuance here would only make the
-/// slider's numbers disagree with the correction actually applied for no
-/// benefit, so this always uses path length over every raw sample).
+/// that needs it purely as a distance axis.
+///
+/// Callers that feed this the trust slider's axis must first truncate
+/// [points] to [NavTrackCorrector.activeRangeEndIndex]: passing the whole
+/// raw recording would let a GPS-fix event's jump and post-surfacing
+/// wobble dominate the total, so the slider's "trusted up to" position
+/// would disagree with where [NavTrackCorrector.apply] actually freezes
+/// the route -- the prefix would look like it keeps moving as the diver
+/// drags the slider, when the correction itself has already stopped
+/// touching it.
 List<double> cumulativeDistances(List<NavTrackPoint> points) {
   final result = List<double>.filled(points.length, 0);
   for (var i = 1; i < points.length; i++) {
@@ -190,11 +195,24 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
     updatedAt: base.updatedAt,
   );
 
+  Future<void> _persistCorrection(NavTrack route) => ref
+      .read(navTrackRepositoryProvider)
+      .updateCorrection(route.id, _correction);
+
   Future<void> _save(NavTrack route) async {
-    await ref
-        .read(navTrackRepositoryProvider)
-        .updateCorrection(route.id, _correction);
+    await _persistCorrection(route);
     if (mounted) context.pop();
+  }
+
+  /// Saves the in-progress correction, then opens the 3D view for it.
+  ///
+  /// The 3D page loads the route fresh from the repository, so without
+  /// saving first it would show whatever was last persisted -- not
+  /// necessarily what the diver is currently looking at on this page.
+  Future<void> _openIn3d(NavTrack route) async {
+    await _persistCorrection(route);
+    if (!mounted) return;
+    context.push('/nav-routes/${route.id}/3d');
   }
 
   void _startPlacing(_Placing target) => setState(() => _placing = target);
@@ -272,7 +290,10 @@ class _AlignPageBody extends ConsumerWidget {
     final transientRoute = state._transientRoute(route);
     final fixEvents = NavTrackSegmenter.classify(route.points).fixEvents;
     final hasFix = fixEvents.isNotEmpty;
-    final cumulative = cumulativeDistances(route.points);
+    final activeEnd = NavTrackCorrector.activeRangeEndIndex(route.points);
+    final cumulative = cumulativeDistances(
+      route.points.sublist(0, activeEnd + 1),
+    );
     final totalDistance = cumulative.isEmpty ? 0.0 : cumulative.last;
     final trustedDistance = correction.trustFraction * totalDistance;
 
@@ -295,7 +316,7 @@ class _AlignPageBody extends ConsumerWidget {
             key: const ValueKey('nav-track-align-3d'),
             icon: const Icon(Icons.view_in_ar),
             tooltip: l10n.navTrack_common_open3dTooltip,
-            onPressed: () => context.push('/nav-routes/${route.id}/3d'),
+            onPressed: () => state._openIn3d(route),
           ),
         ],
       ),
@@ -491,7 +512,10 @@ class _ControlsPanel extends ConsumerWidget {
 
   int _trustedDurationSeconds() {
     if (route.points.isEmpty || totalDistance <= 0) return 0;
-    final cumulative = cumulativeDistances(route.points);
+    final activeEnd = NavTrackCorrector.activeRangeEndIndex(route.points);
+    final cumulative = cumulativeDistances(
+      route.points.sublist(0, activeEnd + 1),
+    );
     final index = trustCutoffIndex(cumulative, trustedDistance);
     return route.points[index].timestamp - route.points.first.timestamp;
   }
