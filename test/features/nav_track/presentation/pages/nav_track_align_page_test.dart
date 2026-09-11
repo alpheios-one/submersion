@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -9,6 +13,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/nav_track/data/repositories/nav_track_repository.dart';
+import 'package:submersion/features/nav_track/data/services/parsers/seacraft_enc_csv_parser.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
@@ -493,4 +498,88 @@ void main() {
       expect(repository.lastCorrection?.headingOffsetDeg, 0.5);
     },
   );
+
+  group('GPS-fix dots stay put under rotation and trust (item 1)', () {
+    // The real fixture with a genuine surface GPS fix event (011.DAT.csv,
+    // spec "A surface GPS fix inside the same file"): the yellow dots must
+    // render from the raw recording, never from NavTrackCorrector.apply,
+    // so neither headingOffsetDeg nor trustFraction may move them.
+    final track = parseSeacraftEncCsv(
+      File(
+        'test/fixtures/nav_tracks/seacraft_enc3_gps_fix.csv',
+      ).readAsBytesSync(),
+    );
+
+    NavTrack fixRoute() => NavTrack(
+      id: 'r-fix',
+      source: NavTrackSource.seacraftEnc,
+      sourceRef: 'fix.csv',
+      startTime: track.points.first.timestamp * 1000,
+      endTime: track.points.last.timestamp * 1000,
+      pointCount: track.points.length,
+      points: track.points,
+      anchorLatitude: 47.1,
+      anchorLongitude: 8.3,
+      createdAt: DateTime(2026, 9, 6),
+      updatedAt: DateTime(2026, 9, 6),
+    );
+
+    LatLng firstGpsFixDotPosition(WidgetTester tester) {
+      final markerLayers = tester
+          .widgetList<MarkerLayer>(find.byType(MarkerLayer))
+          .where(
+            (layer) => layer.markers.any((m) => m.width == 6 && m.height == 6),
+          )
+          .toList();
+      expect(
+        markerLayers,
+        isNotEmpty,
+        reason: 'expected a GPS-fix dots layer to be rendered',
+      );
+      return markerLayers.first.markers.first.point;
+    }
+
+    testWidgets('changing headingOffsetDeg does not move a GPS-fix dot', (
+      tester,
+    ) async {
+      await _pump(tester, route: fixRoute());
+
+      final before = firstGpsFixDotPosition(tester);
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-rotate-up')));
+      await tester.pump();
+      // A single 0.5 degree step barely moves anything; use a large,
+      // unambiguous rotation instead.
+      final fieldFinder = find.byKey(
+        const ValueKey('nav-track-align-rotation-field'),
+      );
+      await tester.enterText(fieldFinder, '90');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      final after = firstGpsFixDotPosition(tester);
+
+      expect(after.latitude, closeTo(before.latitude, 1e-9));
+      expect(after.longitude, closeTo(before.longitude, 1e-9));
+    });
+
+    testWidgets('changing trustFraction does not move a GPS-fix dot', (
+      tester,
+    ) async {
+      await _pump(tester, route: fixRoute());
+
+      final before = firstGpsFixDotPosition(tester);
+
+      await tester.drag(
+        find.byKey(const ValueKey('nav-track-align-trust-slider')),
+        const Offset(120, 0),
+      );
+      await tester.pump();
+
+      final after = firstGpsFixDotPosition(tester);
+
+      expect(after.latitude, closeTo(before.latitude, 1e-9));
+      expect(after.longitude, closeTo(before.longitude, 1e-9));
+    });
+  });
 }

@@ -325,11 +325,7 @@ class _AlignPageBody extends ConsumerWidget {
                         BathymetryDepthOverlayLayer(location: anchor),
                       NavTrackPolylineLayer(route: transientRoute),
                       if (anchor != null && hasFix)
-                        _GpsFixDotsLayer(
-                          route: route,
-                          anchor: anchor,
-                          correction: correction,
-                        ),
+                        _GpsFixDotsLayer(route: route, anchor: anchor),
                       if (anchor != null && state._terrainResult != null)
                         _ConflictDotsLayer(
                           route: route,
@@ -888,35 +884,42 @@ class _TrustGlyph extends StatelessWidget {
   }
 }
 
+/// Renders the device's own GPS-fixed samples as yellow dots.
+///
+/// Deliberately built from the RAW `route.points`, never from
+/// `NavTrackCorrector.apply`: a `gpsFixed` sample is the console's own
+/// GPS-derived position (see the design spec, "Segments and GPS fixes"),
+/// already the truth the dead-reckoned path is being corrected *against*,
+/// not part of the path being corrected. Rotating it by `headingOffsetDeg`
+/// or shifting it by the trust/end-point rubber band would apply a
+/// correction for the console's dead-reckoning error to a position that
+/// never went through dead reckoning in the first place. The dot only ever
+/// moves when the anchor itself moves, since it is still expressed as a
+/// local (north, east) offset from the recording's own origin.
 class _GpsFixDotsLayer extends StatelessWidget {
-  const _GpsFixDotsLayer({
-    required this.route,
-    required this.anchor,
-    required this.correction,
-  });
+  const _GpsFixDotsLayer({required this.route, required this.anchor});
 
   final NavTrack route;
   final GeoPoint anchor;
-  final NavTrackCorrection correction;
 
   @override
   Widget build(BuildContext context) {
     final kinds = NavTrackSegmenter.classify(route.points).kinds;
-    final corrected = NavTrackCorrector.apply(route.points, correction);
+    final points = route.points;
     final markers = <Marker>[
-      for (var i = 0; i < corrected.length; i++)
+      for (var i = 0; i < points.length; i++)
         if (kinds[i] == NavTrackSampleKind.gpsFixed)
           Marker(
             point: LatLng(
               offsetToGeoPoint(
                 anchor,
-                east: corrected[i].east,
-                north: corrected[i].north,
+                east: points[i].east,
+                north: points[i].north,
               ).latitude,
               offsetToGeoPoint(
                 anchor,
-                east: corrected[i].east,
-                north: corrected[i].north,
+                east: points[i].east,
+                north: points[i].north,
               ).longitude,
             ),
             width: 6,
