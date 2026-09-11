@@ -12,6 +12,7 @@ import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/utils/lv95_transform.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_bathy_tile_cache_repository.dart';
+import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_stac_client.dart';
 import 'package:submersion/features/bathymetry/data/sources/swissbathy3d_source.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
@@ -305,6 +306,86 @@ nodata_value -9999
         expect(grid.depthAt(1, 3), closeTo(405.92 - 410.0, 1e-6));
         // The east tile's nodata sentinel survives stitching as a gap.
         expect(grid.depthAt(0, 3), isNull);
+      },
+    );
+
+    test(
+      'a wide-span fetch converts each tile with ITS OWN lake\'s reference '
+      'level, not the fetch center\'s (regression: Rotsee vs. '
+      'Vierwaldstättersee, ~14.6 m depth error, Copilot review on #1756)',
+      () async {
+        // Real registered bboxes: Rotsee (a small, real, physically separate
+        // lake) sits entirely inside Vierwaldstättersee's bounding box, so a
+        // Rotsee-centered 8 km fetch reaches tiles that are genuinely
+        // Vierwaldstättersee, not Rotsee -- confirmed live via
+        // findSwissLake: tile 2666_1213 (this fetch's center) is Rotsee,
+        // tile 2666_1215 (2 km north, still within the requested span) is
+        // Vierwaldstättersee.
+        const rotseeTileE = 2666;
+        const rotseeTileN = 1213;
+        const vierwaldstaetterTileN = 1215;
+        final center = Lv95Transform.toWgs84(
+          (rotseeTileE + 0.5) * 1000,
+          (rotseeTileN + 0.5) * 1000,
+        );
+        final centerPoint = GeoPoint(center.latitude, center.longitude);
+        expect(findSwissLake(centerPoint)?.name, 'Rotsee');
+
+        // Both tiles carry the exact same raw LN02 elevation (400.0), so any
+        // difference in the resulting depth can only come from which lake's
+        // mean level was applied to convert it -- isolating the bug from
+        // every other moving part.
+        String tileAsc(int tileE, int tileN) =>
+            'ncols 2\n'
+            'nrows 2\n'
+            'xllcorner ${tileE * 1000}\n'
+            'yllcorner ${tileN * 1000}\n'
+            'cellsize 500\n'
+            'nodata_value -9999\n'
+            '400.0 400.0\n'
+            '400.0 400.0\n';
+
+        final source = buildSource((req) async {
+          if (req.url.path.endsWith('/items')) {
+            final bbox = _requestedBbox(req);
+            final centerLat = (bbox[1] + bbox[3]) / 2;
+            final isVierwaldstaetterTile =
+                centerLat >
+                Lv95Transform.toWgs84(
+                  (rotseeTileE + 0.5) * 1000,
+                  (rotseeTileN + 1.5) * 1000,
+                ).latitude;
+            final href = isVierwaldstaetterTile
+                ? 'https://example.org/vw_tile.zip'
+                : 'https://example.org/rotsee_tile.zip';
+            return http.Response(
+              jsonEncode({
+                'features': [
+                  {
+                    'bbox': bbox,
+                    'assets': {
+                      'grid': {'href': href},
+                    },
+                  },
+                ],
+              }),
+              200,
+            );
+          }
+          final body = req.url.path.endsWith('vw_tile.zip')
+              ? tileAsc(rotseeTileE, vierwaldstaetterTileN)
+              : tileAsc(rotseeTileE, rotseeTileN);
+          return http.Response.bytes(_zipOf('tile.asc', body), 200);
+        });
+
+        final grid = await source.fetch(centerPoint, spanMeters: 8000);
+
+        final depths = grid.depthsMeters.whereType<double>().toSet();
+        // Rotsee: 419.00 - 400.0. Vierwaldstättersee: 433.58 - 400.0. Before
+        // the fix, every tile used the center's Rotsee level, so only the
+        // first value would ever appear.
+        expect(depths, contains(closeTo(419.00 - 400.0, 1e-6)));
+        expect(depths, contains(closeTo(433.58 - 400.0, 1e-6)));
       },
     );
 

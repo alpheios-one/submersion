@@ -211,7 +211,21 @@ class SwissBathy3dSource implements BathymetrySource {
       coord,
     ) async {
       try {
-        return await _fetchTile(coord.tileE, coord.tileN, lake, sharedZipBytes);
+        // The lake resolved at the fetch CENTER is only a default: an 8 km
+        // span can reach tiles that actually belong to a different,
+        // overlapping-bbox lake (e.g. Rotsee vs. Vierwaldstättersee), whose
+        // mean water level can differ by 10+ m. Re-resolving per tile keeps
+        // each tile's LN02-to-depth conversion honest; falling back to the
+        // center's lake only for a tile whose own center misses every
+        // registered bbox (a real edge tile of the requested lake).
+        final tileLake =
+            findSwissLake(_tileCenterWgs84(coord.tileE, coord.tileN)) ?? lake;
+        return await _fetchTile(
+          coord.tileE,
+          coord.tileN,
+          tileLake,
+          sharedZipBytes,
+        );
       } on BathymetryFetchException {
         // One tile's transient failure (network timeout, a bad STAC
         // response) must not sink the whole stitched fetch when
@@ -586,13 +600,7 @@ class SwissBathy3dSource implements BathymetrySource {
       final tileN = parts.length == 2 ? int.tryParse(parts[1]) : null;
       if (tileE == null || tileN == null) return null;
 
-      final tileCenter = Lv95Transform.toWgs84(
-        (tileE + 0.5) * tileSizeMeters,
-        (tileN + 0.5) * tileSizeMeters,
-      );
-      final lake = findSwissLake(
-        GeoPoint(tileCenter.latitude, tileCenter.longitude),
-      );
+      final lake = findSwissLake(_tileCenterWgs84(tileE, tileN));
       if (lake == null) return null; // should not happen for a real 'ok' tile
 
       final result = await _checkAndMaybeUpdate(
@@ -708,6 +716,14 @@ class SwissBathy3dSource implements BathymetrySource {
     throw BathymetryFetchException(
       'no known swissBATHY3D collection id resolved: $lastNotFound',
     );
+  }
+
+  static GeoPoint _tileCenterWgs84(int tileE, int tileN) {
+    final center = Lv95Transform.toWgs84(
+      (tileE + 0.5) * tileSizeMeters,
+      (tileN + 0.5) * tileSizeMeters,
+    );
+    return GeoPoint(center.latitude, center.longitude);
   }
 
   static List<double> _tileBboxWgs84(int tileE, int tileN) {
