@@ -11268,6 +11268,7 @@
   "navTrack_align_fromDiveEntry": "Depuis l'entrée de la plongée",
   "navTrack_align_fromSite": "Depuis le site",
   "navTrack_align_fromGps": "Depuis le GPS",
+  "navTrack_align_startLabel": "Début : ",
   "navTrack_align_endLabel": "Fin : ",
   "navTrack_align_endMode_none": "Aucune",
   "navTrack_align_endMode_sameAsStart": "Identique au départ",

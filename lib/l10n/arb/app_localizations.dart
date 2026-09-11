@@ -62782,6 +62782,12 @@ abstract class AppLocalizations {
   /// **'From GPS'**
   String get navTrack_align_fromGps;
 
+  /// No description provided for @navTrack_align_startLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start: '**
+  String get navTrack_align_startLabel;
+
   /// No description provided for @navTrack_align_endLabel.
   ///
   /// In en, this message translates to:

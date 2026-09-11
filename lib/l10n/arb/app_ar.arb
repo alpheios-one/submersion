@@ -11268,6 +11268,7 @@
   "navTrack_align_fromDiveEntry": "من نقطة دخول الغطسة",
   "navTrack_align_fromSite": "من موقع الغوص",
   "navTrack_align_fromGps": "من GPS",
+  "navTrack_align_startLabel": "البداية: ",
   "navTrack_align_endLabel": "النهاية: ",
   "navTrack_align_endMode_none": "بلا",
   "navTrack_align_endMode_sameAsStart": "مثل البداية",

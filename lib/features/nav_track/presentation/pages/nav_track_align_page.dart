@@ -508,48 +508,57 @@ class _ControlsPanel extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Wrap(
-              spacing: 8,
-              runSpacing: 4,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                FilledButton.tonal(
-                  key: const ValueKey('nav-track-align-place-start'),
-                  onPressed: () => state._startPlacing(_Placing.start),
-                  child: Text(l10n.navTrack_align_setStartOnMap),
+                Text(l10n.navTrack_align_startLabel),
+                const SizedBox(height: 4),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    FilledButton.tonal(
+                      key: const ValueKey('nav-track-align-place-start'),
+                      onPressed: () => state._startPlacing(_Placing.start),
+                      child: Text(l10n.navTrack_align_setStartOnMap),
+                    ),
+                    if (_diveEntryLocation(ref) case final location?)
+                      ActionChip(
+                        key: const ValueKey('nav-track-align-from-dive-entry'),
+                        label: Text(l10n.navTrack_align_fromDiveEntry),
+                        onPressed: () => state._updateCorrection(
+                          (c) => c.copyWith(anchor: location),
+                          route,
+                        ),
+                      ),
+                    if (_siteLocation(ref) case final location?)
+                      ActionChip(
+                        key: const ValueKey('nav-track-align-from-site'),
+                        label: Text(l10n.navTrack_align_fromSite),
+                        onPressed: () => state._updateCorrection(
+                          (c) => c.copyWith(anchor: location),
+                          route,
+                        ),
+                      ),
+                    if (_preDiveFixStartSuggestion(ref) case final location?)
+                      ActionChip(
+                        key: const ValueKey('nav-track-align-from-gps'),
+                        label: Text(l10n.navTrack_align_fromGps),
+                        onPressed: () => state._updateCorrection(
+                          (c) => c.copyWith(anchor: location),
+                          route,
+                        ),
+                      ),
+                  ],
                 ),
-                if (_diveEntryLocation(ref) case final location?)
-                  ActionChip(
-                    key: const ValueKey('nav-track-align-from-dive-entry'),
-                    label: Text(l10n.navTrack_align_fromDiveEntry),
-                    onPressed: () => state._updateCorrection(
-                      (c) => c.copyWith(anchor: location),
-                      route,
-                    ),
-                  ),
-                if (_siteLocation(ref) case final location?)
-                  ActionChip(
-                    key: const ValueKey('nav-track-align-from-site'),
-                    label: Text(l10n.navTrack_align_fromSite),
-                    onPressed: () => state._updateCorrection(
-                      (c) => c.copyWith(anchor: location),
-                      route,
-                    ),
-                  ),
-                if (_preDiveFixStartSuggestion(ref) case final location?)
-                  ActionChip(
-                    key: const ValueKey('nav-track-align-from-gps'),
-                    label: Text(l10n.navTrack_align_fromGps),
-                    onPressed: () => state._updateCorrection(
-                      (c) => c.copyWith(anchor: location),
-                      route,
-                    ),
-                  ),
               ],
             ),
             const SizedBox(height: 8),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.navTrack_align_endLabel),
+                const SizedBox(height: 4),
                 DropdownButton<NavTrackEndMode>(
                   key: const ValueKey('nav-track-align-end-mode'),
                   value: correction.endMode,

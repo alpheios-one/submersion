@@ -447,6 +447,17 @@ void main() {
     },
   );
 
+  testWidgets(
+    'shows a "Start:" heading above the start-point actions, mirroring '
+    'the "End:" heading above the end-mode dropdown (item 2)',
+    (tester) async {
+      await _pump(tester, route: _route());
+
+      expect(find.text('Start: '), findsOneWidget);
+      expect(find.text('End: '), findsOneWidget);
+    },
+  );
+
   testWidgets('cancel pops without saving', (tester) async {
     final repository = await _pump(tester, route: _route());
 

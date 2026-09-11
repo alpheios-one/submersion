@@ -11268,6 +11268,7 @@
   "navTrack_align_fromDiveEntry": "Dal punto di ingresso dell'immersione",
   "navTrack_align_fromSite": "Dal sito",
   "navTrack_align_fromGps": "Dal GPS",
+  "navTrack_align_startLabel": "Inizio: ",
   "navTrack_align_endLabel": "Fine: ",
   "navTrack_align_endMode_none": "Nessuna",
   "navTrack_align_endMode_sameAsStart": "Uguale all'inizio",

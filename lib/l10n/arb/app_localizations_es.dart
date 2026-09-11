@@ -38467,6 +38467,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_align_fromGps => 'Desde GPS';
 
   @override
+  String get navTrack_align_startLabel => 'Inicio: ';
+
+  @override
   String get navTrack_align_endLabel => 'Fin: ';
 
   @override

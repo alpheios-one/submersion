@@ -36180,6 +36180,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_align_fromGps => '来自 GPS';
 
   @override
+  String get navTrack_align_startLabel => '起点：';
+
+  @override
   String get navTrack_align_endLabel => '终点：';
 
   @override

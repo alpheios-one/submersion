@@ -23216,6 +23216,7 @@
   "navTrack_align_fromDiveEntry": "From dive entry",
   "navTrack_align_fromSite": "From site",
   "navTrack_align_fromGps": "From GPS",
+  "navTrack_align_startLabel": "Start: ",
   "navTrack_align_endLabel": "End: ",
   "navTrack_align_endMode_none": "None",
   "navTrack_align_endMode_sameAsStart": "Same as start",

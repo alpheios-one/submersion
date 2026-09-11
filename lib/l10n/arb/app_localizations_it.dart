@@ -38422,6 +38422,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navTrack_align_fromGps => 'Dal GPS';
 
   @override
+  String get navTrack_align_startLabel => 'Inizio: ';
+
+  @override
   String get navTrack_align_endLabel => 'Fine: ';
 
   @override
