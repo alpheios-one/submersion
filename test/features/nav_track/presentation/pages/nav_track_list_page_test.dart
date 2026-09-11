@@ -3,8 +3,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/nav_track/data/repositories/nav_track_repository.dart';
+import 'package:submersion/features/nav_track/data/services/nav_track_match_service.dart';
+import 'package:submersion/features/nav_track/data/services/nav_track_service_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_list_page.dart';
@@ -14,6 +18,39 @@ import 'package:submersion/features/nav_track/presentation/widgets/nav_track_sha
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
+
+/// Records `delete` calls instead of touching a real database.
+class _RecordingNavTrackRepository extends NavTrackRepository {
+  String? deletedId;
+
+  @override
+  Future<void> delete(String routeId) async {
+    deletedId = routeId;
+  }
+}
+
+/// Stubs `sweep()` with a canned result, or an error, instead of running a
+/// real sweep against a database.
+class _FakeNavTrackMatchService extends NavTrackMatchService {
+  _FakeNavTrackMatchService({this.error})
+    : super(
+        routeRepository: NavTrackRepository(),
+        diveRepository: DiveRepository(),
+      );
+
+  final Object? error;
+  int callCount = 0;
+
+  @override
+  Future<({List<String> linked, List<String> needsChoice})> sweep({
+    List<String>? limitToRouteIds,
+    List<String>? limitToDiveIds,
+  }) async {
+    callCount++;
+    if (error != null) throw error!;
+    return (linked: const <String>[], needsChoice: const <String>[]);
+  }
+}
 
 List<NavTrackPoint> _hydratedPoints() => [
   for (var i = 0; i < 5; i++)
@@ -53,18 +90,23 @@ NavTrack _route({
   updatedAt: DateTime(2026, 8, 22),
 );
 
-Future<void> _pump(
+Future<_RecordingNavTrackRepository> _pump(
   WidgetTester tester, {
   required List<NavTrack> routes,
   Dive? linkedDive,
   Map<String, NavTrack>? hydrated,
+  NavTrackMatchService? matchService,
 }) async {
   final overrides = await getBaseOverrides();
+  final repository = _RecordingNavTrackRepository();
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
         ...overrides,
         allNavTracksProvider.overrideWith((ref) async => routes),
+        navTrackRepositoryProvider.overrideWithValue(repository),
+        if (matchService != null)
+          navTrackMatchServiceProvider.overrideWithValue(matchService),
         if (linkedDive != null)
           diveProvider(linkedDive.id).overrideWith((ref) async => linkedDive),
         if (hydrated != null)
@@ -81,6 +123,7 @@ Future<void> _pump(
     ),
   );
   await tester.pumpAndSettle();
+  return repository;
 }
 
 void main() {
@@ -220,4 +263,90 @@ void main() {
       expect(layer.route.points, hydratedRoute.points);
     },
   );
+
+  group('delete', () {
+    testWidgets('cancelling the dialog does not delete', (tester) async {
+      final repository = await _pump(
+        tester,
+        routes: [_route(id: 'r1', name: 'Wreck dive')],
+      );
+
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete "Wreck dive"?'), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(repository.deletedId, isNull);
+    });
+
+    testWidgets('confirming the dialog deletes through the repository', (
+      tester,
+    ) async {
+      final repository = await _pump(
+        tester,
+        routes: [_route(id: 'r1', name: 'Wreck dive')],
+      );
+
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(repository.deletedId, 'r1');
+    });
+  });
+
+  group('match now', () {
+    testWidgets('shows a success snackbar when the sweep succeeds', (
+      tester,
+    ) async {
+      final service = _FakeNavTrackMatchService();
+      await _pump(tester, routes: const [], matchService: service);
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-match')));
+      await tester.pumpAndSettle();
+
+      expect(service.callCount, 1);
+      expect(find.text('Routes matched to dives.'), findsOneWidget);
+    });
+
+    testWidgets('shows an error snackbar when the sweep throws', (
+      tester,
+    ) async {
+      final service = _FakeNavTrackMatchService(error: Exception('boom'));
+      await _pump(tester, routes: const [], matchService: service);
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-match')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Could not match routes.'), findsOneWidget);
+    });
+  });
+
+  group('master-detail (wide) layout', () {
+    Future<void> widen(WidgetTester tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(1400, 900);
+    }
+
+    testWidgets('shows the no-map-routes message with no anchored routes', (
+      tester,
+    ) async {
+      await widen(tester);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await _pump(
+        tester,
+        routes: [_route(id: 'r1', name: 'Wreck dive')],
+      );
+
+      expect(find.text('No routes are placed on the map yet.'), findsOneWidget);
+      expect(find.byType(FlutterMap), findsNothing);
+    });
+  });
 }
