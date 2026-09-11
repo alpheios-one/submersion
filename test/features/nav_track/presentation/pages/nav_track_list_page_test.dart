@@ -147,6 +147,52 @@ void main() {
   );
 
   testWidgets(
+    'the list row\'s duration stops at the last dead-reckoned sample, not '
+    'the raw recording span (item 8: a GPS-fix jump and the post-surfacing '
+    'tail must not inflate the displayed duration)',
+    (tester) async {
+      final points = [
+        const NavTrackPoint(timestamp: 0, north: 0, east: 0, depth: 5),
+        // Last active sample: 600 s (10 min) after the first.
+        const NavTrackPoint(
+          timestamp: 600,
+          north: 50,
+          east: 0,
+          depth: 0.1,
+          distance: 50,
+        ),
+        // Fix event: >50 m step in <=5 s at the surface -- gpsFixed from
+        // here on, and NOT part of the active dead-reckoned range.
+        const NavTrackPoint(
+          timestamp: 602,
+          north: 500,
+          east: 0,
+          depth: 0.1,
+          distance: 50,
+        ),
+        // The raw recording keeps going for another hour after the fix.
+        const NavTrackPoint(
+          timestamp: 4200,
+          north: 505,
+          east: 0,
+          depth: 0.1,
+          distance: 50,
+        ),
+      ];
+      final listRow = _route(id: 'r1', name: 'Wreck dive').copyWith(
+        startTime: points.first.timestamp * 1000,
+        endTime: points.last.timestamp * 1000,
+      );
+      final hydratedRoute = listRow.copyWith(points: points);
+      await _pump(tester, routes: [listRow], hydrated: {'r1': hydratedRoute});
+
+      // Active range: 10 min. Raw span: 1h 10min. Only the former may show.
+      expect(find.textContaining('10min'), findsOneWidget);
+      expect(find.textContaining('1h 10min'), findsNothing);
+    },
+  );
+
+  testWidgets(
     'an anchored route\'s map overlay actually renders the route, not an '
     'empty polyline (item 9: the map pane must hydrate points per row too)',
     (tester) async {

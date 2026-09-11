@@ -11,6 +11,7 @@ import 'package:submersion/features/nav_track/data/services/nav_track_import_ser
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_service_providers.dart';
 import 'package:submersion/features/nav_track/presentation/nav_track_parse_error_text.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
@@ -327,8 +328,26 @@ class NavTrackListRow extends ConsumerWidget {
         : l10n.navTrack_common_diveById(diveId);
   }
 
-  String _formatDuration(AppLocalizations l10n) {
-    final seconds = ((route.endTime - route.startTime) / 1000).round();
+  /// Duration up to the last dead-reckoned sample, matching the same active
+  /// range `NavTrackStats.of` and the 3D/2D ribbons already stop at --
+  /// `route.endTime` is the raw recording's own last timestamp, which on a
+  /// file with a surface GPS fix (011.DAT.csv) includes the post-surfacing
+  /// walk, not just the dive. Falls back to the raw `endTime - startTime`
+  /// span while [hydratedPoints] has not hydrated yet (or is genuinely too
+  /// short to classify), so the row shows a number immediately rather than
+  /// flashing "0min" before the per-row fetch resolves.
+  String _formatDuration(
+    AppLocalizations l10n,
+    List<NavTrackPoint> hydratedPoints,
+  ) {
+    final int seconds;
+    if (hydratedPoints.length >= 2) {
+      final activeEnd = NavTrackCorrector.activeRangeEndIndex(hydratedPoints);
+      seconds =
+          hydratedPoints[activeEnd].timestamp - hydratedPoints.first.timestamp;
+    } else {
+      seconds = ((route.endTime - route.startTime) / 1000).round();
+    }
     final d = Duration(seconds: seconds < 0 ? 0 : seconds);
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
@@ -344,12 +363,12 @@ class NavTrackListRow extends ConsumerWidget {
     // route.points is always empty here: allNavTracksProvider reads with
     // includePoints: false so the list query never decodes every route's
     // blob just to render a row (design spec "Points codec"). The shape
-    // thumbnail needs actual points, so an unanchored row hydrates just
-    // its own route on demand -- the same per-row cost the map pane pays
-    // for anchored routes.
-    final hydratedPoints = route.anchor == null
-        ? ref.watch(navTrackByIdProvider(route.id)).value?.points ?? const []
-        : const <NavTrackPoint>[];
+    // thumbnail (unanchored rows) and the duration figure (every row --
+    // stopping at the active dead-reckoned range needs the samples) both
+    // need actual points, so every row hydrates its own route on demand --
+    // the same per-row cost the map pane pays for anchored routes.
+    final hydratedPoints =
+        ref.watch(navTrackByIdProvider(route.id)).value?.points ?? const [];
     return ListTile(
       selected: selected,
       leading: route.anchor == null
@@ -363,7 +382,7 @@ class NavTrackListRow extends ConsumerWidget {
           if (route.totalDistance != null)
             units.formatDistance(route.totalDistance!),
           if (route.maxDepth != null) units.formatDepth(route.maxDepth),
-          _formatDuration(l10n),
+          _formatDuration(l10n, hydratedPoints),
         ].join(' · '),
       ),
       trailing: Row(
