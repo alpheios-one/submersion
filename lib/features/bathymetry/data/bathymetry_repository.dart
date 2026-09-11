@@ -129,9 +129,18 @@ class BathymetryRepository {
   /// TestFlight/Play Store beta) had no way to tell "no data because
   /// nothing covers this coordinate" apart from "swissBATHY3D itself is
   /// failing for a diagnosable reason", both of which render identically as
-  /// "keine Daten verfügbar" in the UI. [LoggerService] writes to the
-  /// persistent log file and the in-app debug log viewer in every build
-  /// mode, so this failure is now inspectable without a debug build.
+  /// "keine Daten verfügbar" in the UI.
+  ///
+  /// [LoggerService]'s persistent file backend and the in-app debug log
+  /// viewer are still gated behind the user's own "Debug-Modus" setting
+  /// (see `main.dart`), on purpose — bathymetry log lines embed GPS
+  /// coordinates, so writing them to disk for every install by default
+  /// would be a real privacy cost most users never asked for (Copilot
+  /// review). The fix here is still a genuine improvement over the old
+  /// `assert`: it no longer requires a DEBUG BUILD, which a real user's
+  /// installed release/beta app can never be — only that the user (or a
+  /// support conversation walking them through it) flips Debug-Modus on in
+  /// Settings before reproducing, in any build.
   Future<BathymetryGrid?> _guardedLoad(String key, GeoPoint center) async {
     try {
       return await _load(key, center);

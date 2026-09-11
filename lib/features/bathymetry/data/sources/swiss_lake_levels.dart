@@ -75,12 +75,31 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLon: 9.70,
   ),
   SwissLakeLevel(
+    name: 'Murtensee',
+    meanLevelMeters: 429.21,
+    minLat: 46.88,
+    maxLat: 46.96,
+    minLon: 7.05,
+    maxLon: 7.14,
+  ),
+  // Listed AFTER Murtensee: Neuenburgersee's real STAC bbox substantially
+  // overlaps Murtensee's (they are connected via the Broye canal), so
+  // Murtensee -- the smaller, more specific lake -- must be checked first
+  // or every Murtensee coordinate would silently resolve to
+  // Neuenburgersee's 429.20 m instead of Murtensee's own 429.21 m
+  // (self-check following the Copilot review pattern for Rotsee).
+  SwissLakeLevel(
     name: 'Neuenburgersee',
     meanLevelMeters: 429.20,
     minLat: 46.75,
     maxLat: 47.10,
+    // maxLon tightened from 7.10: real bbox ends 7.0720, overlapping
+    // Bielersee's real bbox (starts 7.0695) by the width of the
+    // connecting Zihlkanal. Split at the midpoint rather than reordering
+    // -- unlike Murtensee, neither lake is clearly "more specific" for a
+    // canal coordinate.
     minLon: 6.66,
-    maxLon: 7.10,
+    maxLon: 7.07,
   ),
   // No BAFU long-term station series found; 419 m is the figure
   // consistently reported by general geographic references (swisstopo map
@@ -105,22 +124,6 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLon: 8.33,
   ),
   SwissLakeLevel(
-    name: 'Vierwaldstättersee',
-    meanLevelMeters: 433.58,
-    minLat: 46.92,
-    maxLat: 47.13,
-    minLon: 8.30,
-    maxLon: 8.65,
-  ),
-  SwissLakeLevel(
-    name: 'Zürichsee',
-    meanLevelMeters: 405.92,
-    minLat: 47.13,
-    maxLat: 47.36,
-    minLon: 8.55,
-    maxLon: 8.85,
-  ),
-  SwissLakeLevel(
     name: 'Zugersee',
     meanLevelMeters: 413.59,
     minLat: 47.10,
@@ -128,20 +131,54 @@ const List<SwissLakeLevel> swissLakeLevels = [
     minLon: 8.44,
     maxLon: 8.53,
   ),
+  // Listed AFTER Zugersee: Vierwaldstättersee's real bbox extends to
+  // lat 47.0822, genuinely overlapping Zugersee's real bbox (starts
+  // 47.0538) -- Zugersee, the smaller/more specific lake, must be
+  // checked first (self-check following the Copilot review pattern for
+  // Rotsee).
+  SwissLakeLevel(
+    name: 'Vierwaldstättersee',
+    meanLevelMeters: 433.58,
+    minLat: 46.92,
+    // maxLat tightened from 47.13: real bbox ends 47.0822, and the
+    // previous, more generous value had no real coverage to justify it --
+    // it only produced table-only overlaps with Zürichsee and Ägerisee
+    // (neither of which overlaps Vierwaldstättersee's real bbox at all).
+    maxLat: 47.09,
+    minLon: 8.30,
+    maxLon: 8.65,
+  ),
+  SwissLakeLevel(
+    name: 'Zürichsee',
+    meanLevelMeters: 405.92,
+    // minLat tightened from 47.13: real bbox starts 47.1946, well clear of
+    // both Vierwaldstättersee's and Ägerisee's real bboxes -- the previous
+    // value only produced table-only overlaps with both.
+    minLat: 47.19,
+    maxLat: 47.36,
+    minLon: 8.55,
+    maxLon: 8.85,
+  ),
   SwissLakeLevel(
     name: 'Thunersee',
     meanLevelMeters: 557.66,
     minLat: 46.63,
     maxLat: 46.75,
     minLon: 7.63,
-    maxLon: 7.87,
+    // maxLon tightened from 7.87: real bbox ends 7.8444, with a real gap
+    // (not a canal connection) before Brienzersee's real bbox starts
+    // 7.8569 -- a pure table-rounding artifact, unlike the
+    // Neuenburgersee/Bielersee or Rotsee/Vierwaldstättersee overlaps.
+    maxLon: 7.85,
   ),
   SwissLakeLevel(
     name: 'Brienzersee',
     meanLevelMeters: 563.74,
     minLat: 46.66,
     maxLat: 46.76,
-    minLon: 7.86,
+    // minLon tightened from 7.86 down to 7.856 -- 7.86 clipped a small
+    // sliver of Brienzersee's own real coverage (real bbox starts 7.8569).
+    minLon: 7.856,
     maxLon: 8.08,
   ),
   SwissLakeLevel(
@@ -149,7 +186,9 @@ const List<SwissLakeLevel> swissLakeLevels = [
     meanLevelMeters: 429.15,
     minLat: 47.02,
     maxLat: 47.16,
-    minLon: 7.05,
+    // minLon tightened from 7.05 -- see Neuenburgersee's comment on this
+    // same overlap.
+    minLon: 7.075,
     maxLon: 7.25,
   ),
   SwissLakeLevel(
@@ -199,14 +238,6 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLat: 47.16,
     minLon: 8.60,
     maxLon: 8.65,
-  ),
-  SwissLakeLevel(
-    name: 'Murtensee',
-    meanLevelMeters: 429.21,
-    minLat: 46.88,
-    maxLat: 46.96,
-    minLon: 7.05,
-    maxLon: 7.14,
   ),
   SwissLakeLevel(
     name: 'Sarnersee',
