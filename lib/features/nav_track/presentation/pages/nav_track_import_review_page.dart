@@ -229,12 +229,13 @@ class _NavTrackImportReviewPageState
       _error = null;
     });
     try {
-      if (_replaceDuplicate && preview.duplicateOfRouteId != null) {
-        await ref
-            .read(navTrackRepositoryProvider)
-            .delete(preview.duplicateOfRouteId!);
-      }
       final name = _nameController.text.trim();
+      // Commit the replacement before touching the duplicate it replaces:
+      // a database/codec/sync failure in commit() must leave the prior
+      // recording in place, since the review action was "replace", not
+      // "delete then maybe get a new one". Deleting first and only then
+      // committing would permanently lose the original route on any
+      // failure in between.
       final id = await ref
           .read(navTrackImportServiceProvider)
           .commit(
@@ -246,6 +247,11 @@ class _NavTrackImportReviewPageState
             deviceName: _equipmentName,
             equipmentId: _equipmentId,
           );
+      if (_replaceDuplicate && preview.duplicateOfRouteId != null) {
+        await ref
+            .read(navTrackRepositoryProvider)
+            .delete(preview.duplicateOfRouteId!);
+      }
       if (!mounted) return;
       // Literal path: the routes-area detail page lives in another agent's
       // work on this branch and is not yet guaranteed to exist under this

@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/nav_track/data/repositories/nav_track_repository.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
@@ -17,6 +18,7 @@ import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_import_flow_providers.dart';
+import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -107,6 +109,7 @@ Future<void> _pumpWithRouter(
   required NavTrackImportPreview preview,
   NavTrackImportService? service,
   List<EquipmentItem>? equipment,
+  NavTrackRepository? repository,
 }) async {
   final base = await getBaseOverrides();
   final router = GoRouter(
@@ -135,6 +138,8 @@ Future<void> _pumpWithRouter(
           navTrackImportServiceProvider.overrideWithValue(service),
         if (equipment != null)
           activeEquipmentProvider.overrideWith((ref) async => equipment),
+        if (repository != null)
+          navTrackRepositoryProvider.overrideWithValue(repository),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -169,6 +174,43 @@ class _RecordingImportService implements NavTrackImportService {
   }) async {
     lastEquipmentId = equipmentId;
     return 'new-route-id';
+  }
+}
+
+/// Records whether/how often `delete` was called, without touching a real
+/// database -- the base class's other methods are never exercised by the
+/// tests that use this fake.
+class _RecordingRepository extends NavTrackRepository {
+  int deleteCallCount = 0;
+  final List<String> deletedIds = [];
+
+  @override
+  Future<void> delete(String routeId) async {
+    deleteCallCount++;
+    deletedIds.add(routeId);
+  }
+}
+
+/// A `commit` that always fails, to prove a duplicate is not deleted ahead
+/// of a commit that never lands.
+class _ThrowingImportService implements NavTrackImportService {
+  @override
+  Future<NavTrackImportPreview> prepare(
+    Uint8List bytes, {
+    String? fileName,
+  }) async => throw UnimplementedError();
+
+  @override
+  Future<String> commit({
+    required ParsedNavTrack parsed,
+    required String sourceRef,
+    Dive? dive,
+    String? siteId,
+    String? name,
+    String? deviceName,
+    String? equipmentId,
+  }) async {
+    throw StateError('commit failed');
   }
 }
 
@@ -329,6 +371,56 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(service.lastEquipmentId, isNull);
+  });
+
+  testWidgets(
+    'does not delete the duplicate route when replacing it and commit fails '
+    '(a failed commit must leave the original route in place)',
+    (tester) async {
+      final repository = _RecordingRepository();
+      final service = _ThrowingImportService();
+      await _pumpWithRouter(
+        tester,
+        preview: _preview(duplicateOfRouteId: 'existing-route'),
+        service: service,
+        repository: repository,
+      );
+
+      await tester.tap(find.byType(Checkbox));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('nav-track-import-save')));
+      await tester.pumpAndSettle();
+
+      expect(repository.deleteCallCount, 0);
+      // The page stays put (no navigation to a route that was never
+      // created) and surfaces the failure instead.
+      expect(find.text('ROUTE_DETAIL_PAGE'), findsNothing);
+    },
+  );
+
+  testWidgets('deletes the duplicate route only after a successful commit', (
+    tester,
+  ) async {
+    final repository = _RecordingRepository();
+    final service = _RecordingImportService();
+    await _pumpWithRouter(
+      tester,
+      preview: _preview(duplicateOfRouteId: 'existing-route'),
+      service: service,
+      repository: repository,
+    );
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('nav-track-import-save')));
+    await tester.pumpAndSettle();
+
+    expect(repository.deleteCallCount, 1);
+    expect(repository.deletedIds, ['existing-route']);
   });
 
   testWidgets('shows a parse-error message when the preview future rejects', (
