@@ -32,6 +32,8 @@ class ScriptedSource implements BathymetrySource {
   @override
   bool get global => true;
   @override
+  double get minKnownFraction => 0.60;
+  @override
   Future<SourceCapability?> probe(GeoPoint center) async =>
       const SourceCapability(cellSizeMeters: 100, detail: 'fake');
   @override
@@ -69,6 +71,8 @@ class CenterRecordingSource implements BathymetrySource {
   String get id => 'recorder';
   @override
   bool get global => true;
+  @override
+  double get minKnownFraction => 0.60;
   @override
   Future<SourceCapability?> probe(GeoPoint center) async =>
       const SourceCapability(cellSizeMeters: 100, detail: 'recorder');

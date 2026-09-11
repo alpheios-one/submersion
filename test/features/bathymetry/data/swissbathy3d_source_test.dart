@@ -2108,6 +2108,9 @@ class _FakeFallbackSource implements BathymetrySource {
   bool get global => true;
 
   @override
+  double get minKnownFraction => 0.60;
+
+  @override
   Future<SourceCapability?> probe(GeoPoint center) async =>
       const SourceCapability(cellSizeMeters: 100, detail: 'fallback');
 

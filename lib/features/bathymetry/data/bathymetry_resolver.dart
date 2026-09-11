@@ -32,12 +32,6 @@ class BathymetryResolution {
 class BathymetryResolver {
   static const double minWetFraction = 0.10;
 
-  /// A grid must actually have readings. EMODnet's Caribbean tile answers
-  /// 99.96% wet on 48% coverage, and the missing half renders as a flat
-  /// slab at the waterline. Coverage that thin is not usable terrain, and
-  /// it is not an answer about the water either.
-  static const double minKnownFraction = 0.60;
-
   /// How much finer a source must be to jump ahead of the declared list
   /// order. Declared resolution is a claim, so only a MATERIAL difference
   /// may override the curated tier order: NOAA CUDEM at 3.4 m preempts
@@ -62,13 +56,16 @@ class BathymetryResolver {
     for (final source in ordered) {
       try {
         final grid = await source.fetch(center, spanMeters: defaultSpanMeters);
-        if (grid.knownFraction < minKnownFraction) {
+        if (grid.knownFraction < source.minKnownFraction) {
           // Nominally fine, actually absent. Deliberately NOT treated as a
           // dry answer: a grid this empty proves nothing about the water,
-          // and caching it as 'empty' would pin the cell forever.
+          // and caching it as 'empty' would pin the cell forever. The
+          // floor itself is per-source -- see [BathymetrySource.
+          // minKnownFraction]'s doc for why the same number is wrong for a
+          // regional, already-confirmed-covered source like swissBATHY3D.
           _log.debug(
             '${source.id} rejected at ${center.latitude},${center.longitude}: '
-            'knownFraction ${grid.knownFraction} < $minKnownFraction',
+            'knownFraction ${grid.knownFraction} < ${source.minKnownFraction}',
           );
           continue;
         }

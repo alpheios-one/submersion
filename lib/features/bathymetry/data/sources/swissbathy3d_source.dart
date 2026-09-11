@@ -127,6 +127,21 @@ class SwissBathy3dSource implements BathymetrySource {
   @override
   bool get global => false;
 
+  /// 0, not the resolver default (see [BathymetrySource.minKnownFraction]'s
+  /// doc): a coordinate reaches this source only after [covers] already
+  /// confirmed it sits inside a real, listed Swiss lake, so a cell this
+  /// source leaves unknown within the requested span is confirmed dry
+  /// land (a real STAC lookup found no covering tile there), not an
+  /// uncertain survey gap. [BathymetryResolver.minWetFraction]'s floor on
+  /// [BathymetryGrid.wetFraction] -- effectively 100% here, since every
+  /// known cell in a swissBATHY3D grid is a real lake-bed reading -- is
+  /// what actually guards against a spurious near-empty grid; this floor
+  /// would only reject genuine, narrow-lake dive sites (Walensee,
+  /// Vierwaldstättersee's fjord-like bays) whose real coverage is
+  /// legitimately a small fraction of an 8 km square request.
+  @override
+  double get minKnownFraction => 0.0;
+
   /// Not part of [BathymetrySource] -- a synchronous, no-network check used
   /// by [SwissLakeDepthService] and [BathymetryRepository.quantumDegFor],
   /// which need an answer ahead of (and independent from) the resolver's
