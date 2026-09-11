@@ -48,6 +48,19 @@ List<double> cumulativeDistances(List<NavTrackPoint> points) {
   return result;
 }
 
+/// The index of the first point whose cumulative distance reaches
+/// [trustedDistance] -- the point the trust slider's cutoff marker sits on
+/// -- or the last index when none does (the whole route is within the
+/// trusted range). Shared by the trust readout's duration and the map
+/// marker so the two never disagree about which sample the slider points
+/// at.
+int trustCutoffIndex(List<double> cumulative, double trustedDistance) {
+  for (var i = 0; i < cumulative.length; i++) {
+    if (cumulative[i] >= trustedDistance) return i;
+  }
+  return cumulative.isEmpty ? 0 : cumulative.length - 1;
+}
+
 /// The alignment page (spec 2026-09-10-underwater-nav-track-design.md, "The
 /// alignment page"): start point, end point, trust slider, rotation and the
 /// terrain check, all against a transient in-memory [NavTrackCorrection]
@@ -324,6 +337,14 @@ class _AlignPageBody extends ConsumerWidget {
                           correction: correction,
                           result: state._terrainResult!,
                         ),
+                      if (anchor != null && route.points.length >= 2)
+                        _TrustMarkerLayer(
+                          route: route,
+                          anchor: anchor,
+                          correction: correction,
+                          cumulative: cumulative,
+                          trustedDistance: trustedDistance,
+                        ),
                       if (anchor != null)
                         _DraggableMarker(
                           point: anchor,
@@ -426,12 +447,8 @@ class _ControlsPanel extends ConsumerWidget {
   int _trustedDurationSeconds() {
     if (route.points.isEmpty || totalDistance <= 0) return 0;
     final cumulative = cumulativeDistances(route.points);
-    for (var i = 0; i < cumulative.length; i++) {
-      if (cumulative[i] >= trustedDistance) {
-        return route.points[i].timestamp - route.points.first.timestamp;
-      }
-    }
-    return route.points.last.timestamp - route.points.first.timestamp;
+    final index = trustCutoffIndex(cumulative, trustedDistance);
+    return route.points[index].timestamp - route.points.first.timestamp;
   }
 
   @override
@@ -641,6 +658,76 @@ class _DraggableMarker extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Marks the point on the route where the trust slider's cutoff sits: the
+/// sample whose cumulative distance first reaches `trustFraction *
+/// totalDistance` (design spec "The alignment page": "the trust point
+/// marked on the route"). Rendered as a diamond, distinct from the green
+/// start and red end glyphs, and moves live as the slider is dragged since
+/// it reads straight from the in-progress [correction].
+class _TrustMarkerLayer extends StatelessWidget {
+  const _TrustMarkerLayer({
+    required this.route,
+    required this.anchor,
+    required this.correction,
+    required this.cumulative,
+    required this.trustedDistance,
+  });
+
+  final NavTrack route;
+  final GeoPoint anchor;
+  final NavTrackCorrection correction;
+  final List<double> cumulative;
+  final double trustedDistance;
+
+  @override
+  Widget build(BuildContext context) {
+    final corrected = NavTrackCorrector.apply(route.points, correction);
+    final index = trustCutoffIndex(cumulative, trustedDistance);
+    if (index >= corrected.length) return const SizedBox.shrink();
+    final p = corrected[index];
+    final geo = offsetToGeoPoint(anchor, east: p.east, north: p.north);
+    return MarkerLayer(
+      markers: [
+        Marker(
+          point: LatLng(geo.latitude, geo.longitude),
+          width: 20,
+          height: 20,
+          child: Tooltip(
+            message: context.l10n.navTrack_align_trustSummary(
+              trustedDistance.toStringAsFixed(0),
+              ((route.points[index].timestamp - route.points.first.timestamp) /
+                      60)
+                  .round(),
+            ),
+            child: const _TrustGlyph(
+              key: ValueKey('nav-track-align-trust-marker'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A small orange diamond -- visually distinct from the round green start
+/// and red end glyphs -- marking the trust slider's cutoff point.
+class _TrustGlyph extends StatelessWidget {
+  const _TrustGlyph({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: math.pi / 4,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          border: Border.all(color: Colors.white, width: 1.5),
+        ),
+      ),
     );
   }
 }

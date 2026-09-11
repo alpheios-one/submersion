@@ -262,6 +262,33 @@ void main() {
     },
   );
 
+  testWidgets('moving the trust slider moves the trust marker on the route', (
+    tester,
+  ) async {
+    await _pump(tester, route: _route());
+
+    // Place the start marker so the route (and the trust marker) renders.
+    await tester.tap(find.byKey(const ValueKey('nav-track-align-place-start')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('nav-track-align-set-here')));
+    await tester.pump();
+
+    final trustMarkerFinder = find.byKey(
+      const ValueKey('nav-track-align-trust-marker'),
+    );
+    expect(trustMarkerFinder, findsOneWidget);
+    final before = tester.getCenter(trustMarkerFinder);
+
+    final sliderFinder = find.byKey(
+      const ValueKey('nav-track-align-trust-slider'),
+    );
+    await tester.drag(sliderFinder, const Offset(150, 0));
+    await tester.pump();
+
+    final after = tester.getCenter(trustMarkerFinder);
+    expect(after, isNot(before));
+  });
+
   testWidgets('reset correction clears the anchor and end mode', (
     tester,
   ) async {
