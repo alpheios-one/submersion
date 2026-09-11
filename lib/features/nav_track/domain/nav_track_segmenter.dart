@@ -181,15 +181,27 @@ class NavTrackSegmenter {
   ///
   /// A GPS receiver typically takes a little while after surfacing to
   /// converge; the first one or two readings right after a fix event's
-  /// jump can still be noisy. This finds the earliest sample within the
-  /// run after which every later sample (that one included) stays within
-  /// [_stabilizationRadiusMeters] of every other -- measured as the
-  /// bounding-box diagonal, which only grows as more (earlier) samples are
-  /// added, so a single backward scan from the end of the run finds it --
-  /// and returns the centroid of that stable cluster. Falls back to
-  /// averaging the run's last [_stabilizationMinSamples] samples (or fewer,
-  /// for a short run) when no cluster of at least that many samples stays
-  /// within the radius.
+  /// jump can still be noisy. This scans forward from the fix event and
+  /// finds the EARLIEST run of at least [_stabilizationMinSamples]
+  /// consecutive samples whose positions all stay within
+  /// [_stabilizationRadiusMeters] of one another (bounding-box diagonal),
+  /// then returns the centroid of that cluster, extended as far forward as
+  /// it stays within the radius.
+  ///
+  /// Deliberately anchored to the EARLIEST stable cluster, not the run's
+  /// tail: a diver who climbs out and walks around on land while the
+  /// console keeps recording produces a second, later "stable" cluster
+  /// wherever they stop (e.g. at a car), which is not the exit point. A
+  /// backward scan from the run's end would lock onto that later cluster
+  /// instead; this forward scan commits to the first genuine settle and
+  /// ignores whatever the position does afterwards. Uses position data
+  /// only -- no temperature or distance-freeze signal, which would need
+  /// tuning per device and says nothing about where the diver actually
+  /// came out of the water.
+  ///
+  /// Falls back to the longest stable-or-partial run found (or a single
+  /// sample, for a run shorter than [_stabilizationMinSamples]) when
+  /// nothing reaches the minimum sample count.
   static ({double north, double east}) stabilizedFixPosition(
     List<NavTrackPoint> points,
     NavTrackFixEvent event,
@@ -204,42 +216,47 @@ class NavTrackSegmenter {
     }
     final runStart = event.index;
 
-    var minNorth = points[runEnd - 1].north;
-    var maxNorth = minNorth;
-    var minEast = points[runEnd - 1].east;
-    var maxEast = minEast;
-    var stableStart = runEnd - 1;
+    var bestStart = runStart;
+    var bestLength = 1;
 
-    for (var k = runEnd - 2; k >= runStart; k--) {
-      final north = points[k].north;
-      final east = points[k].east;
-      final candidateMinNorth = math.min(minNorth, north);
-      final candidateMaxNorth = math.max(maxNorth, north);
-      final candidateMinEast = math.min(minEast, east);
-      final candidateMaxEast = math.max(maxEast, east);
-      final dn = candidateMaxNorth - candidateMinNorth;
-      final de = candidateMaxEast - candidateMinEast;
-      if (math.sqrt(dn * dn + de * de) > _stabilizationRadiusMeters) break;
-      minNorth = candidateMinNorth;
-      maxNorth = candidateMaxNorth;
-      minEast = candidateMinEast;
-      maxEast = candidateMaxEast;
-      stableStart = k;
-    }
+    for (var i = runStart; i < runEnd; i++) {
+      var minNorth = points[i].north;
+      var maxNorth = minNorth;
+      var minEast = points[i].east;
+      var maxEast = minEast;
+      var length = 1;
 
-    var clusterStart = stableStart;
-    if (runEnd - clusterStart < _stabilizationMinSamples) {
-      clusterStart = math.max(runStart, runEnd - _stabilizationMinSamples);
+      for (var j = i + 1; j < runEnd; j++) {
+        final north = points[j].north;
+        final east = points[j].east;
+        final candidateMinNorth = math.min(minNorth, north);
+        final candidateMaxNorth = math.max(maxNorth, north);
+        final candidateMinEast = math.min(minEast, east);
+        final candidateMaxEast = math.max(maxEast, east);
+        final dn = candidateMaxNorth - candidateMinNorth;
+        final de = candidateMaxEast - candidateMinEast;
+        if (math.sqrt(dn * dn + de * de) > _stabilizationRadiusMeters) break;
+        minNorth = candidateMinNorth;
+        maxNorth = candidateMaxNorth;
+        minEast = candidateMinEast;
+        maxEast = candidateMaxEast;
+        length++;
+      }
+
+      if (length > bestLength) {
+        bestStart = i;
+        bestLength = length;
+      }
+      if (length >= _stabilizationMinSamples) break;
     }
 
     var sumNorth = 0.0;
     var sumEast = 0.0;
-    for (var i = clusterStart; i < runEnd; i++) {
+    for (var i = bestStart; i < bestStart + bestLength; i++) {
       sumNorth += points[i].north;
       sumEast += points[i].east;
     }
-    final count = runEnd - clusterStart;
-    return (north: sumNorth / count, east: sumEast / count);
+    return (north: sumNorth / bestLength, east: sumEast / bestLength);
   }
 
   static NavTrackSampleKind _depthKind(double depth) =>

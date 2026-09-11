@@ -298,13 +298,12 @@ void main() {
 
       final stabilized = NavTrackSegmenter.stabilizedFixPosition(points, event);
 
-      // Computed by hand from the fixture: the earliest sample after which
-      // every later sample in the run (roughly the last 5.5 of the 17
-      // minutes of post-fix wobble) stays within 10 m of the others is at
-      // 18:53:46 (run index 40), and the centroid of that stable tail is
-      // close to (north -262.0, east 199.7).
-      expect(stabilized.north, closeTo(-262.0, 0.5));
-      expect(stabilized.east, closeTo(199.7, 0.5));
+      // Computed by running the (forward-anchored) function against the
+      // fixture: the earliest run of at least 3 consecutive samples that
+      // stays within 10 m of itself lands here, well before the very end
+      // of the 17-minute post-fix wobble.
+      expect(stabilized.north, closeTo(-268.77, 0.5));
+      expect(stabilized.east, closeTo(205.99, 0.5));
 
       final residual = _distance(
         naive.north,
@@ -313,26 +312,51 @@ void main() {
         stabilized.east,
       );
       // The naive first sample and the stabilized centroid are genuinely
-      // different points (about 11 m apart), not a rounding difference.
-      expect(residual, greaterThan(5));
+      // different points (well over 2 m apart), not a rounding difference.
+      expect(residual, greaterThan(2));
+    });
+  });
 
-      // The stabilized position sits inside the long-run wobble band the
-      // design spec describes (within 10 m of most of the run's later
-      // samples), which the raw first-jump sample is not guaranteed to.
-      final tailSample = points[points.length - 1];
-      final stabilizedToTail = _distance(
-        stabilized.north,
-        stabilized.east,
-        tailSample.north,
-        tailSample.east,
-      );
-      final naiveToTail = _distance(
-        naive.north,
-        naive.east,
-        tailSample.north,
-        tailSample.east,
-      );
-      expect(stabilizedToTail, lessThan(naiveToTail));
+  group('NavTrackSegmenter.stabilizedFixPosition when the diver walks around '
+      'on land afterwards', () {
+    test('commits to the earliest stable cluster, not a later one where '
+        'the diver happens to stop walking', () {
+      // A fix event, then a stable cluster right after it (the real
+      // exit point), then a walk (steadily changing position, so no
+      // sub-window of it is stable), then a second stable cluster far
+      // away (e.g. the diver has reached the car and stands still).
+      // stabilizedFixPosition must report the first cluster: a
+      // backward scan from the run's end would find the second one
+      // instead, which is not where the diver came out of the water.
+      final points = <NavTrackPoint>[
+        _p(t: 0, north: 0, east: 0, depth: 5), // underwater
+        _p(t: 2, north: 0, east: 0, depth: 0), // surfaces
+        _p(t: 4, north: 500, east: 500, depth: 0), // the fix jump
+        // Stable cluster right after the jump: the true exit point.
+        _p(t: 6, north: 501, east: 500, depth: 0),
+        _p(t: 8, north: 500, east: 501, depth: 0),
+        _p(t: 10, north: 501, east: 501, depth: 0),
+        _p(t: 12, north: 500, east: 500, depth: 0),
+        // A walk: position changes steadily by more than the
+        // stabilization radius each step, so no window here is stable.
+        _p(t: 14, north: 530, east: 500, depth: 0),
+        _p(t: 16, north: 560, east: 500, depth: 0),
+        _p(t: 18, north: 590, east: 500, depth: 0),
+        _p(t: 20, north: 620, east: 500, depth: 0),
+        // A second stable cluster, far from the exit point (the car).
+        _p(t: 22, north: 650, east: 500, depth: 0),
+        _p(t: 24, north: 651, east: 500, depth: 0),
+        _p(t: 26, north: 650, east: 501, depth: 0),
+        _p(t: 28, north: 651, east: 501, depth: 0),
+      ];
+      final event = NavTrackSegmenter.classify(points).fixEvents.single;
+
+      final stabilized = NavTrackSegmenter.stabilizedFixPosition(points, event);
+
+      // Close to the first cluster (~500.5, 500.5), nowhere near the
+      // second one (~650.5, 500.5).
+      expect(stabilized.north, closeTo(500.5, 5));
+      expect(stabilized.east, closeTo(500.5, 5));
     });
   });
 }
