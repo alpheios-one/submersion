@@ -38530,6 +38530,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTrack_align_fromSite => 'Depuis le site';
 
   @override
+  String get navTrack_align_fromGps => 'Depuis le GPS';
+
+  @override
   String get navTrack_align_endLabel => 'Fin : ';
 
   @override

@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "Start auf der Karte setzen",
   "navTrack_align_fromDiveEntry": "Vom Einstiegspunkt des Tauchgangs",
   "navTrack_align_fromSite": "Vom Tauchplatz",
+  "navTrack_align_fromGps": "Von GPS",
   "navTrack_align_endLabel": "Ende: ",
   "navTrack_align_endMode_none": "Keins",
   "navTrack_align_endMode_sameAsStart": "Wie der Start",

@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "在地图上设置起点",
   "navTrack_align_fromDiveEntry": "来自潜水入水点",
   "navTrack_align_fromSite": "来自潜点",
+  "navTrack_align_fromGps": "来自 GPS",
   "navTrack_align_endLabel": "终点：",
   "navTrack_align_endMode_none": "无",
   "navTrack_align_endMode_sameAsStart": "与起点相同",

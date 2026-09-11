@@ -38266,6 +38266,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_align_fromSite => 'A merülőhelyről';
 
   @override
+  String get navTrack_align_fromGps => 'GPS-ből';
+
+  @override
   String get navTrack_align_endLabel => 'Vég: ';
 
   @override

@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "Poner inicio en el mapa",
   "navTrack_align_fromDiveEntry": "Desde la entrada de la inmersión",
   "navTrack_align_fromSite": "Desde el punto de buceo",
+  "navTrack_align_fromGps": "Desde GPS",
   "navTrack_align_endLabel": "Fin: ",
   "navTrack_align_endMode_none": "Ninguno",
   "navTrack_align_endMode_sameAsStart": "Igual que el inicio",

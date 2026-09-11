@@ -38156,6 +38156,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_align_fromSite => 'Vanaf duikstek';
 
   @override
+  String get navTrack_align_fromGps => 'Vanaf gps';
+
+  @override
   String get navTrack_align_endLabel => 'Einde: ';
 
   @override

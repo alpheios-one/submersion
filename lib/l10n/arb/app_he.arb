@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "קבע התחלה על המפה",
   "navTrack_align_fromDiveEntry": "מנקודת הכניסה לצלילה",
   "navTrack_align_fromSite": "מאתר הצלילה",
+  "navTrack_align_fromGps": "מ-GPS",
   "navTrack_align_endLabel": "סיום: ",
   "navTrack_align_endMode_none": "ללא",
   "navTrack_align_endMode_sameAsStart": "זהה להתחלה",

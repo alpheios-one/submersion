@@ -37650,6 +37650,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_align_fromSite => 'מאתר הצלילה';
 
   @override
+  String get navTrack_align_fromGps => 'מ-GPS';
+
+  @override
   String get navTrack_align_endLabel => 'סיום: ';
 
   @override

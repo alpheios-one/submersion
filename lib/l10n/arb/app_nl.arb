@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "Start op kaart plaatsen",
   "navTrack_align_fromDiveEntry": "Vanaf duikinstappunt",
   "navTrack_align_fromSite": "Vanaf duikstek",
+  "navTrack_align_fromGps": "Vanaf gps",
   "navTrack_align_endLabel": "Einde: ",
   "navTrack_align_endMode_none": "Geen",
   "navTrack_align_endMode_sameAsStart": "Zelfde als start",

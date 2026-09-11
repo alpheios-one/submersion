@@ -444,6 +444,55 @@ class _ControlsPanel extends ConsumerWidget {
     return ref.watch(siteProvider(siteId)).value?.location;
   }
 
+  /// A start suggestion built from the route's own pre-dive GPS fix, when it
+  /// has one (item 3: the segmenter detects a fix event anywhere in the
+  /// recording, so a jump before the diver ever descends -- not seen in any
+  /// fixture so far, but not hardcoded away either -- is classified exactly
+  /// like the far more common post-dive one).
+  ///
+  /// The ENC CSV never carries an absolute coordinate (see the design spec's
+  /// "Ground truth" section), so the pre-dive fix's own position -- even
+  /// [NavTrackSegmenter.stabilizedFixPosition]'s better estimate of it -- is
+  /// still only a local offset from the recording's origin, not a place on
+  /// the map. This suggestion is only available at all because a known
+  /// absolute location already exists to anchor that offset against (the
+  /// linked dive's entry fix, or the site pin): it back-solves the origin's
+  /// map position so that, once placed there, the stabilized fix position
+  /// itself lands on that known location -- the same reasoning as "the diver
+  /// surfaced roughly where the site pin already says", just applied to the
+  /// start instead of the end. Ignores the route's own rotation setting
+  /// (rarely non-zero this early in alignment); the diver reviews the result
+  /// on the map like any other suggestion.
+  GeoPoint? _preDiveFixStartSuggestion(WidgetRef ref) {
+    final points = route.points;
+    if (points.length < 2) return null;
+    final segmentation = NavTrackSegmenter.classify(points);
+    final firstUnderwaterIndex = segmentation.kinds.indexOf(
+      NavTrackSampleKind.underwater,
+    );
+    NavTrackFixEvent? preDiveFix;
+    for (final event in segmentation.fixEvents) {
+      if (firstUnderwaterIndex == -1 || event.index < firstUnderwaterIndex) {
+        preDiveFix = event;
+        break;
+      }
+    }
+    if (preDiveFix == null) return null;
+
+    final reference = _diveEntryLocation(ref) ?? _siteLocation(ref);
+    if (reference == null) return null;
+
+    final stabilized = NavTrackSegmenter.stabilizedFixPosition(
+      points,
+      preDiveFix,
+    );
+    return offsetToGeoPoint(
+      reference,
+      east: -stabilized.east,
+      north: -stabilized.north,
+    );
+  }
+
   int _trustedDurationSeconds() {
     if (route.points.isEmpty || totalDistance <= 0) return 0;
     final cumulative = cumulativeDistances(route.points);
@@ -485,6 +534,15 @@ class _ControlsPanel extends ConsumerWidget {
                   ActionChip(
                     key: const ValueKey('nav-track-align-from-site'),
                     label: Text(l10n.navTrack_align_fromSite),
+                    onPressed: () => state._updateCorrection(
+                      (c) => c.copyWith(anchor: location),
+                      route,
+                    ),
+                  ),
+                if (_preDiveFixStartSuggestion(ref) case final location?)
+                  ActionChip(
+                    key: const ValueKey('nav-track-align-from-gps'),
+                    label: Text(l10n.navTrack_align_fromGps),
                     onPressed: () => state._updateCorrection(
                       (c) => c.copyWith(anchor: location),
                       route,

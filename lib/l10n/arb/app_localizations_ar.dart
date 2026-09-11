@@ -38026,6 +38026,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_align_fromSite => 'من موقع الغوص';
 
   @override
+  String get navTrack_align_fromGps => 'من GPS';
+
+  @override
   String get navTrack_align_endLabel => 'النهاية: ';
 
   @override

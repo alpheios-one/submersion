@@ -12,6 +12,7 @@ import 'package:submersion/features/nav_track/data/repositories/nav_track_reposi
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_georef.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_align_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -223,6 +224,100 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.lastCorrection?.anchor, const GeoPoint(47.1, 8.3));
+    },
+  );
+
+  testWidgets(
+    'the "From GPS" chip appears for a route with a pre-dive fix and sets '
+    'the anchor from the site pin, back-solved through the fix (item 3)',
+    (tester) async {
+      const site = DiveSite(
+        id: 'site-1',
+        name: 'Test Site',
+        location: GeoPoint(47.1, 8.3),
+      );
+      final preDiveFixPoints = [
+        const NavTrackPoint(timestamp: 1755856800, north: 0, east: 0, depth: 0),
+        // A pre-dive GPS re-calibration jump, before any underwater sample.
+        const NavTrackPoint(
+          timestamp: 1755856802,
+          north: 100,
+          east: 0,
+          depth: 0,
+        ),
+        const NavTrackPoint(
+          timestamp: 1755856804,
+          north: 100,
+          east: 0,
+          depth: 0,
+        ),
+        // Now descending: ends the fixed run.
+        const NavTrackPoint(
+          timestamp: 1755856806,
+          north: 100,
+          east: 0,
+          depth: 5,
+        ),
+        const NavTrackPoint(
+          timestamp: 1755856808,
+          north: 105,
+          east: 2,
+          depth: 8,
+        ),
+      ];
+      final route = NavTrack(
+        id: 'r1',
+        siteId: 'site-1',
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'r1.csv',
+        startTime: 1755856800000,
+        endTime: 1755856808000,
+        pointCount: preDiveFixPoints.length,
+        points: preDiveFixPoints,
+        createdAt: DateTime(2026, 8, 22),
+        updatedAt: DateTime(2026, 8, 22),
+      );
+
+      final repository = await _pump(tester, route: route, site: site);
+
+      final chipFinder = find.byKey(const ValueKey('nav-track-align-from-gps'));
+      expect(chipFinder, findsOneWidget);
+      await tester.tap(chipFinder);
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-save')));
+      await tester.pumpAndSettle();
+
+      final anchor = repository.lastCorrection?.anchor;
+      expect(anchor, isNotNull);
+      // The stabilized fix position is (north: 100, east: 0), so the
+      // suggested anchor is the site pin shifted 100 m back (south) --
+      // definitely not the site pin itself.
+      expect(anchor, isNot(site.location));
+      final backToFix = offsetToGeoPoint(anchor!, east: 0, north: 100);
+      expect(backToFix.latitude, closeTo(site.location!.latitude, 1e-6));
+      expect(backToFix.longitude, closeTo(site.location!.longitude, 1e-6));
+    },
+  );
+
+  testWidgets(
+    'the "From GPS" chip does not appear for a route with no pre-dive fix',
+    (tester) async {
+      const site = DiveSite(
+        id: 'site-1',
+        name: 'Test Site',
+        location: GeoPoint(47.1, 8.3),
+      );
+      await _pump(
+        tester,
+        route: _route(siteId: 'site-1'),
+        site: site,
+      );
+
+      expect(
+        find.byKey(const ValueKey('nav-track-align-from-gps')),
+        findsNothing,
+      );
     },
   );
 

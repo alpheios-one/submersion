@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "Definir início no mapa",
   "navTrack_align_fromDiveEntry": "Da entrada do mergulho",
   "navTrack_align_fromSite": "Do ponto de mergulho",
+  "navTrack_align_fromGps": "Do GPS",
   "navTrack_align_endLabel": "Fim: ",
   "navTrack_align_endMode_none": "Nenhum",
   "navTrack_align_endMode_sameAsStart": "Igual ao início",

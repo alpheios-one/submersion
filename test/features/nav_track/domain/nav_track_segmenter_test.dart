@@ -182,6 +182,30 @@ void main() {
       expect(result.fixEvents.length, 1);
     });
 
+    test('a jump right at the start, before the diver ever descends, is a fix '
+        'event like any other (item 3: no existing fixture shows this, but '
+        'the segmenter must already support it generically)', () {
+      final points = [
+        _p(t: 0, north: 0, east: 0, depth: 0), // at the surface, pre-dive
+        // A genuine pre-dive GPS re-calibration, before the first
+        // underwater sample.
+        _p(t: 2, north: 300, east: 0, depth: 0),
+        _p(t: 4, north: 302, east: 1, depth: 0),
+        _p(t: 6, north: 302, east: 5, depth: 5), // now descending
+        _p(t: 8, north: 305, east: 8, depth: 12),
+      ];
+      final result = NavTrackSegmenter.classify(points);
+      expect(result.fixEvents.length, 1);
+      final event = result.fixEvents.single;
+      expect(event.index, 1);
+      final firstUnderwaterIndex = result.kinds.indexOf(
+        NavTrackSampleKind.underwater,
+      );
+      // The whole point of a "pre-dive" fix: it happens strictly before
+      // the diver is ever classified as underwater.
+      expect(firstUnderwaterIndex, greaterThan(event.index));
+    });
+
     test('leaving the water and re-descending starts a fresh underwater run '
         'after the fixed run ends', () {
       final points = [

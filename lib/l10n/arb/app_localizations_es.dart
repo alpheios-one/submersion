@@ -38464,6 +38464,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_align_fromSite => 'Desde el punto de buceo';
 
   @override
+  String get navTrack_align_fromGps => 'Desde GPS';
+
+  @override
   String get navTrack_align_endLabel => 'Fin: ';
 
   @override

@@ -11267,6 +11267,7 @@
   "navTrack_align_setStartOnMap": "Kezdőpont a térképen",
   "navTrack_align_fromDiveEntry": "A merülés belépési pontjából",
   "navTrack_align_fromSite": "A merülőhelyről",
+  "navTrack_align_fromGps": "GPS-ből",
   "navTrack_align_endLabel": "Vég: ",
   "navTrack_align_endMode_none": "Nincs",
   "navTrack_align_endMode_sameAsStart": "Azonos a kezdőponttal",
