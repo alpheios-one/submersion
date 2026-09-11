@@ -1911,6 +1911,44 @@ nodata_value -9999
       expect(grid.sourceId, 'swissbathy3d');
       expect(itemCalls, 1);
     });
+
+    test("a tile whose own center CURRENTLY resolves to a different lake than "
+        "the one it was cached under is invalidated by the sweep even though "
+        "findSwissLake(tileCenter) now returns non-null (regression: verifies "
+        "the sweep's main lake!=null branch, not just the deleteIfLevelUnknown "
+        "null branch, actually catches a tile that used to belong to a "
+        "different, e.g. since-corrected-bbox lake -- Copilot review, round "
+        "3)", () async {
+      // zurichseeTileCenter's own tile (2685_1240, see the fixture header
+      // above) currently resolves to Zürichsee (405.92 m). Seeded directly
+      // as though it were still cached under Walensee's level (419.07 m)
+      // -- e.g. from before some past bbox correction moved this tile from
+      // one lake's registered bbox to another's.
+      const tileKey = '2685_1240';
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: tileKey,
+              status: 'empty',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+              referenceLevelMeters: const Value(419.07),
+            ),
+          );
+
+      final source = buildSource((_) async => http.Response('', 404));
+
+      final summary = await source.refreshAllCachedTiles();
+      // Deleted via read()'s own mismatch check inside the sweep's
+      // lake!=null branch -- no network call needed for a pure local
+      // invalidation.
+      expect(summary.total, 0);
+
+      final row = await (db.select(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
+      expect(row, isNull);
+    });
   });
 
   group('SwissBathy3dSource in the resolver chain', () {
