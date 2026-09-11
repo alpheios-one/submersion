@@ -13,6 +13,7 @@ import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_import_flow_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
@@ -79,6 +80,8 @@ Future<void> _pump(
           navTrackImportServiceProvider.overrideWithValue(service),
       ],
       child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: NavTrackImportReviewPage(
           bytes: Uint8List(0),
           fileName: '005.DAT.csv',
@@ -190,6 +193,8 @@ void main() {
           navTrackImportServiceProvider.overrideWithValue(failingService),
         ],
         child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: NavTrackImportReviewPage(
             bytes: Uint8List(0),
             fileName: 'bad.csv',

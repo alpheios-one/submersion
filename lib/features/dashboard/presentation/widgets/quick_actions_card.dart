@@ -77,7 +77,7 @@ class QuickActionsCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () => context.push('/nav-routes'),
                 icon: const Icon(Icons.route),
-                label: const Text('Underwater Routes'),
+                label: Text(context.l10n.dashboard_quickActions_navRoutes),
               ),
             ),
             const SizedBox(height: 8),

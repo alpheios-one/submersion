@@ -5,6 +5,7 @@ import 'package:submersion/features/bathymetry/domain/bilinear_depth_interpolati
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_georef.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// A grid resolution at or above this (metres) is too coarse for the
 /// below-seafloor test to mean anything: EMODnet (115 m) and ETOPO (450 m)
@@ -89,17 +90,21 @@ class NavTrackTerrainCheckResult {
   /// A one-line human summary, e.g. "0 points on land, 2 of 3 below the
   /// seafloor (max 13.0 m), 0 unknown", with a caveat appended when the
   /// grid is too coarse for the below-seafloor count to be meaningful.
-  String summaryLine() {
-    final buffer = StringBuffer(
-      '$onLandCount points on land, '
-      '$belowSeafloorCount of $total below the seafloor'
-      '${belowSeafloorCount > 0 ? ' (max ${maxPenetrationMeters.toStringAsFixed(1)} m)' : ''}, '
-      '$unknownCount unknown',
+  String summaryLine(AppLocalizations l10n) {
+    final maxPart = belowSeafloorCount > 0
+        ? l10n.navTrack_terrain_maxPart(maxPenetrationMeters.toStringAsFixed(1))
+        : '';
+    final coarsePart = resolutionSupportsBelowSeafloorCheck
+        ? ''
+        : l10n.navTrack_terrain_coarsePart;
+    return l10n.navTrack_terrain_summary(
+      onLandCount,
+      belowSeafloorCount,
+      total,
+      unknownCount,
+      maxPart,
+      coarsePart,
     );
-    if (!resolutionSupportsBelowSeafloorCheck) {
-      buffer.write(' (coarse bathymetry: only land conflicts checked)');
-    }
-    return buffer.toString();
   }
 }
 

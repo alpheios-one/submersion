@@ -21,6 +21,8 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/shared/providers/map_list_selection_provider.dart';
 import 'package:submersion/shared/widgets/map_list_layout/map_list_scaffold.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 const String kNavTrackSectionKey = 'nav-track-list';
 
@@ -42,6 +44,7 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
   Future<void> _importFile() async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
 
     final file = await FilePicker.pickFile(
       type: FileType.custom,
@@ -59,13 +62,15 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
       _log.warning('Route import rejected: ${e.message}');
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text(navTrackParseErrorText(e))),
+        SnackBar(content: Text(navTrackParseErrorText(l10n, e))),
       );
       return;
     } catch (e, stackTrace) {
       _log.error('Route import failed', error: e, stackTrace: stackTrace);
       if (!mounted) return;
-      messenger.showSnackBar(SnackBar(content: Text('Import failed: $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.navTrack_list_importFailed(e.toString()))),
+      );
       return;
     }
 
@@ -83,6 +88,7 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
 
   Future<void> _matchNow() async {
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     try {
       await ref.read(navTrackMatchServiceProvider).sweep();
     } catch (e, stackTrace) {
@@ -93,30 +99,35 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
       );
       if (!mounted) return;
       messenger.showSnackBar(
-        const SnackBar(content: Text('Could not match routes.')),
+        SnackBar(content: Text(l10n.navTrack_list_matchError)),
       );
       return;
     }
     if (!mounted) return;
     messenger.showSnackBar(
-      const SnackBar(content: Text('Routes matched to dives.')),
+      SnackBar(content: Text(l10n.navTrack_list_matchSuccess)),
     );
   }
 
   Future<void> _deleteRoute(NavTrack route) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete route?'),
-        content: Text('Delete "${route.name ?? route.sourceRef ?? route.id}"?'),
+        title: Text(l10n.navTrack_detail_deleteTitle),
+        content: Text(
+          l10n.navTrack_list_deleteMessage(
+            route.name ?? route.sourceRef ?? route.id,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.navTrack_common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.navTrack_common_delete),
           ),
         ],
       ),
@@ -136,14 +147,14 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
   Widget _importAction() => IconButton(
     key: const ValueKey('nav-track-import'),
     icon: const Icon(Icons.file_open_outlined),
-    tooltip: 'Import route file',
+    tooltip: context.l10n.navTrack_list_importTooltip,
     onPressed: _importFile,
   );
 
   Widget _matchAction() => IconButton(
     key: const ValueKey('nav-track-match'),
     icon: const Icon(Icons.sync),
-    tooltip: 'Match now',
+    tooltip: context.l10n.navTrack_list_matchTooltip,
     onPressed: _matchNow,
   );
 
@@ -152,6 +163,7 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
     final routesAsync = ref.watch(allNavTracksProvider);
     final routes = routesAsync.value ?? const <NavTrack>[];
     final units = UnitFormatter(ref.watch(settingsProvider));
+    final l10n = context.l10n;
 
     if (!ResponsiveBreakpoints.isMasterDetail(context)) {
       return _buildColumn(context, routes, units);
@@ -162,7 +174,7 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
 
     return MapListScaffold(
       sectionKey: kNavTrackSectionKey,
-      title: 'Underwater Routes',
+      title: l10n.navTrack_list_title,
       actions: [_matchAction(), _importAction()],
       listPane: _NavTrackListPane(
         routes: routes,
@@ -175,7 +187,7 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
         onDelete: _deleteRoute,
       ),
       mapPane: anchoredRoutes.isEmpty
-          ? const Center(child: Text('No routes are placed on the map yet.'))
+          ? Center(child: Text(l10n.navTrack_list_noMapRoutes))
           : FlutterMap(
               mapController: _mapController,
               options: const MapOptions(initialZoom: 12),
@@ -192,13 +204,14 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
     List<NavTrack> routes,
     UnitFormatter units,
   ) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Underwater Routes'),
+        title: Text(l10n.navTrack_list_title),
         actions: [_matchAction(), _importAction()],
       ),
       body: routes.isEmpty
-          ? const Center(child: Text('No underwater routes yet.'))
+          ? Center(child: Text(l10n.navTrack_list_empty))
           : ListView.builder(
               itemCount: routes.length,
               itemBuilder: (context, index) {
@@ -236,7 +249,7 @@ class _NavTrackListPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (routes.isEmpty) {
-      return const Center(child: Text('No underwater routes yet.'));
+      return Center(child: Text(context.l10n.navTrack_list_empty));
     }
     return ListView.builder(
       itemCount: routes.length,
@@ -279,27 +292,30 @@ class NavTrackListRow extends ConsumerWidget {
 
   /// `Dive #<n>` once the dive has loaded, its id while it is still
   /// resolving or missing, or "unlinked".
-  String _linkLabel(WidgetRef ref) {
+  String _linkLabel(AppLocalizations l10n, WidgetRef ref) {
     final diveId = route.diveId;
-    if (diveId == null) return 'unlinked';
+    if (diveId == null) return l10n.navTrack_common_unlinked;
     final dive = ref.watch(diveProvider(diveId)).value;
-    if (dive == null) return 'Dive $diveId';
+    if (dive == null) return l10n.navTrack_common_diveById(diveId);
     return dive.diveNumber != null
-        ? 'Dive #${dive.diveNumber}'
-        : 'Dive $diveId';
+        ? l10n.navTrack_common_diveNumber(dive.diveNumber.toString())
+        : l10n.navTrack_common_diveById(diveId);
   }
 
-  String _formatDuration() {
+  String _formatDuration(AppLocalizations l10n) {
     final seconds = ((route.endTime - route.startTime) / 1000).round();
     final d = Duration(seconds: seconds < 0 ? 0 : seconds);
     final h = d.inHours;
     final m = d.inMinutes.remainder(60);
-    return h > 0 ? '${h}h ${m}min' : '${m}min';
+    return h > 0
+        ? l10n.navTrack_list_durationHours(h, m)
+        : l10n.navTrack_list_durationMinutes(m);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final startedAt = DateTime.fromMillisecondsSinceEpoch(route.startTime);
+    final l10n = context.l10n;
     return ListTile(
       selected: selected,
       leading: route.anchor == null
@@ -313,7 +329,7 @@ class NavTrackListRow extends ConsumerWidget {
           if (route.totalDistance != null)
             units.formatDistance(route.totalDistance!),
           if (route.maxDepth != null) units.formatDepth(route.maxDepth),
-          _formatDuration(),
+          _formatDuration(l10n),
         ].join(' · '),
       ),
       trailing: Row(
@@ -322,16 +338,16 @@ class NavTrackListRow extends ConsumerWidget {
           route.diveId == null
               ? Chip(
                   key: const ValueKey('nav-track-link-chip'),
-                  label: Text(_linkLabel(ref)),
+                  label: Text(_linkLabel(l10n, ref)),
                 )
               : ActionChip(
                   key: const ValueKey('nav-track-link-chip'),
-                  label: Text(_linkLabel(ref)),
+                  label: Text(_linkLabel(l10n, ref)),
                   onPressed: () => context.push('/dives/${route.diveId}'),
                 ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete',
+            tooltip: l10n.navTrack_common_delete,
             onPressed: onDelete,
           ),
         ],

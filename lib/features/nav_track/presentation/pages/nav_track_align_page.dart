@@ -26,6 +26,7 @@ import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_terrain_check.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/nav_track/presentation/widgets/nav_track_polyline_layer.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// What the crosshair-and-pan flow is currently placing, or nothing.
 enum _Placing { none, start, end }
@@ -226,15 +227,17 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
   @override
   Widget build(BuildContext context) {
     final routeAsync = ref.watch(navTrackByIdProvider(widget.routeId));
+    final l10n = context.l10n;
     return routeAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => const Scaffold(
-        body: Center(child: Text('Could not load this route.')),
-      ),
+      error: (e, _) =>
+          Scaffold(body: Center(child: Text(l10n.navTrack_common_loadError))),
       data: (route) {
         if (route == null) {
-          return const Scaffold(body: Center(child: Text('Route not found.')));
+          return Scaffold(
+            body: Center(child: Text(l10n.navTrack_common_notFound)),
+          );
         }
         _initFromRoute(route);
         return _AlignPageBody(state: this, route: route);
@@ -263,21 +266,22 @@ class _AlignPageBody extends ConsumerWidget {
     final initialCenter = anchor != null
         ? LatLng(anchor.latitude, anchor.longitude)
         : const LatLng(0, 0);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Align on map'),
+        title: Text(l10n.navTrack_align_title),
         actions: [
           IconButton(
             key: const ValueKey('nav-track-align-reset'),
             icon: const Icon(Icons.restore),
-            tooltip: 'Reset correction',
+            tooltip: l10n.navTrack_align_resetTooltip,
             onPressed: state._resetCorrection,
           ),
           IconButton(
             key: const ValueKey('nav-track-align-3d'),
             icon: const Icon(Icons.view_in_ar),
-            tooltip: 'Open 3D',
+            tooltip: l10n.navTrack_common_open3dTooltip,
             onPressed: () => context.push('/nav-routes/${route.id}/3d'),
           ),
         ],
@@ -361,8 +365,8 @@ class _AlignPageBody extends ConsumerWidget {
                       onPressed: () => state._setPointHere(route),
                       child: Text(
                         state._placing == _Placing.start
-                            ? 'Set start here'
-                            : 'Set end here',
+                            ? l10n.navTrack_align_setStartHere
+                            : l10n.navTrack_align_setEndHere,
                       ),
                     ),
                   ),
@@ -428,6 +432,7 @@ class _ControlsPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trustedMinutes = (_trustedDurationSeconds() / 60).round();
+    final l10n = context.l10n;
     return SafeArea(
       top: false,
       child: Padding(
@@ -443,7 +448,7 @@ class _ControlsPanel extends ConsumerWidget {
                 FilledButton.tonal(
                   key: const ValueKey('nav-track-align-place-start'),
                   onPressed: () => state._startPlacing(_Placing.start),
-                  child: const Text('Set start on map'),
+                  child: Text(l10n.navTrack_align_setStartOnMap),
                 ),
                 FutureBuilder<GeoPoint?>(
                   future: _diveEntryLocation(ref),
@@ -452,7 +457,7 @@ class _ControlsPanel extends ConsumerWidget {
                     if (location == null) return const SizedBox.shrink();
                     return ActionChip(
                       key: const ValueKey('nav-track-align-from-dive-entry'),
-                      label: const Text('From dive entry'),
+                      label: Text(l10n.navTrack_align_fromDiveEntry),
                       onPressed: () => state._updateCorrection(
                         (c) => c.copyWith(anchor: location),
                         route,
@@ -467,7 +472,7 @@ class _ControlsPanel extends ConsumerWidget {
                     if (location == null) return const SizedBox.shrink();
                     return ActionChip(
                       key: const ValueKey('nav-track-align-from-site'),
-                      label: const Text('From site'),
+                      label: Text(l10n.navTrack_align_fromSite),
                       onPressed: () => state._updateCorrection(
                         (c) => c.copyWith(anchor: location),
                         route,
@@ -480,27 +485,27 @@ class _ControlsPanel extends ConsumerWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Text('End: '),
+                Text(l10n.navTrack_align_endLabel),
                 DropdownButton<NavTrackEndMode>(
                   key: const ValueKey('nav-track-align-end-mode'),
                   value: correction.endMode,
                   items: [
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: NavTrackEndMode.none,
-                      child: Text('None'),
+                      child: Text(l10n.navTrack_align_endMode_none),
                     ),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: NavTrackEndMode.sameAsStart,
-                      child: Text('Same as start'),
+                      child: Text(l10n.navTrack_align_endMode_sameAsStart),
                     ),
-                    const DropdownMenuItem(
+                    DropdownMenuItem(
                       value: NavTrackEndMode.point,
-                      child: Text('Place on map'),
+                      child: Text(l10n.navTrack_align_endMode_point),
                     ),
                     if (hasFix)
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: NavTrackEndMode.gpsFix,
-                        child: Text('From GPS fix'),
+                        child: Text(l10n.navTrack_align_endMode_gpsFix),
                       ),
                   ],
                   onChanged: (mode) {
@@ -518,8 +523,10 @@ class _ControlsPanel extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Trust: trusted up to ${trustedDistance.toStringAsFixed(0)} m, '
-              '$trustedMinutes min',
+              l10n.navTrack_align_trustSummary(
+                trustedDistance.toStringAsFixed(0),
+                trustedMinutes,
+              ),
             ),
             Slider(
               key: const ValueKey('nav-track-align-trust-slider'),
@@ -533,7 +540,7 @@ class _ControlsPanel extends ConsumerWidget {
             ),
             Row(
               children: [
-                const Text('Rotation:'),
+                Text(l10n.navTrack_align_rotationLabel),
                 IconButton(
                   key: const ValueKey('nav-track-align-rotate-down'),
                   icon: const Icon(Icons.remove),
@@ -543,7 +550,11 @@ class _ControlsPanel extends ConsumerWidget {
                     route,
                   ),
                 ),
-                Text('${correction.headingOffsetDeg.toStringAsFixed(1)} deg'),
+                Text(
+                  l10n.navTrack_align_rotationDegrees(
+                    correction.headingOffsetDeg.toStringAsFixed(1),
+                  ),
+                ),
                 IconButton(
                   key: const ValueKey('nav-track-align-rotate-up'),
                   icon: const Icon(Icons.add),
@@ -560,7 +571,7 @@ class _ControlsPanel extends ConsumerWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   key: const ValueKey('nav-track-align-terrain-summary'),
-                  state._terrainResult!.summaryLine(),
+                  state._terrainResult!.summaryLine(l10n),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -570,13 +581,13 @@ class _ControlsPanel extends ConsumerWidget {
                 TextButton(
                   key: const ValueKey('nav-track-align-cancel'),
                   onPressed: () => context.pop(),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.navTrack_common_cancel),
                 ),
                 const Spacer(),
                 FilledButton(
                   key: const ValueKey('nav-track-align-save'),
                   onPressed: () => state._save(route),
-                  child: const Text('Save'),
+                  child: Text(l10n.navTrack_common_save),
                 ),
               ],
             ),

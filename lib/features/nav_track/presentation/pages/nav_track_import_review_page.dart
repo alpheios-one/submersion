@@ -16,6 +16,8 @@ import 'package:submersion/features/nav_track/presentation/nav_track_parse_error
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_import_flow_providers.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Pushes the route review page for [bytes] freshly picked/dropped as
 /// [fileName] and returns once the diver leaves it (whether or not they
@@ -157,7 +159,10 @@ class _NavTrackImportReviewPageState
     }
   }
 
-  String _segmentSummary(NavTrackSegmentation segmentation) {
+  String _segmentSummary(
+    AppLocalizations l10n,
+    NavTrackSegmentation segmentation,
+  ) {
     final underwater = segmentation.kinds
         .where((k) => k == NavTrackSampleKind.underwater)
         .length;
@@ -165,17 +170,21 @@ class _NavTrackImportReviewPageState
         .where((k) => k == NavTrackSampleKind.surfaceReckoned)
         .length;
     if (segmentation.fixEvents.isEmpty) {
-      return '$underwater samples underwater, no GPS fix in this recording.';
+      return l10n.navTrack_review_segmentSummaryNoFix(underwater);
     }
     final event = segmentation.fixEvents.first;
     final dNorth = event.afterNorth - event.beforeNorth;
     final dEast = event.afterEast - event.beforeEast;
     final vector = math.sqrt(dNorth * dNorth + dEast * dEast).round();
-    return '$underwater samples underwater, $surface surface samples, '
-        'GPS fix ${vector}m from the reckoned end.';
+    return l10n.navTrack_review_segmentSummaryWithFix(
+      underwater,
+      surface,
+      vector,
+    );
   }
 
   Future<void> _save(NavTrackImportPreview preview) async {
+    final l10n = context.l10n;
     setState(() {
       _busy = true;
       _error = null;
@@ -206,12 +215,12 @@ class _NavTrackImportReviewPageState
     } on NavTrackParseException catch (e) {
       setState(() {
         _busy = false;
-        _error = navTrackParseErrorText(e);
+        _error = navTrackParseErrorText(l10n, e);
       });
     } catch (e) {
       setState(() {
         _busy = false;
-        _error = 'Could not save this route: $e';
+        _error = l10n.navTrack_review_saveError(e.toString());
       });
     }
   }
@@ -219,9 +228,10 @@ class _NavTrackImportReviewPageState
   @override
   Widget build(BuildContext context) {
     final units = UnitFormatter(ref.watch(settingsProvider));
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Import Underwater Route')),
+      appBar: AppBar(title: Text(l10n.navTrack_review_title)),
       body: FutureBuilder<NavTrackImportPreview>(
         future: _previewFuture,
         builder: (context, snapshot) {
@@ -231,8 +241,8 @@ class _NavTrackImportReviewPageState
           final error = snapshot.error;
           if (error != null) {
             final message = error is NavTrackParseException
-                ? navTrackParseErrorText(error)
-                : 'This file could not be imported: $error';
+                ? navTrackParseErrorText(l10n, error)
+                : l10n.navTrack_review_importError(error.toString());
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -242,7 +252,7 @@ class _NavTrackImportReviewPageState
           }
           final preview = snapshot.data!;
           _initializeDiveChoice(preview);
-          return _buildReview(context, units, preview);
+          return _buildReview(context, l10n, units, preview);
         },
       ),
     );
@@ -250,6 +260,7 @@ class _NavTrackImportReviewPageState
 
   Widget _buildReview(
     BuildContext context,
+    AppLocalizations l10n,
     UnitFormatter units,
     NavTrackImportPreview preview,
   ) {
@@ -270,7 +281,7 @@ class _NavTrackImportReviewPageState
         Text(preview.sourceRef, style: theme.textTheme.titleMedium),
         const SizedBox(height: 4),
         Text(
-          'Seacraft ENC log',
+          l10n.navTrack_review_sourceLabel,
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -278,16 +289,16 @@ class _NavTrackImportReviewPageState
         const SizedBox(height: 16),
         TextField(
           controller: _deviceController,
-          decoration: const InputDecoration(
-            labelText: 'Device (optional)',
+          decoration: InputDecoration(
+            labelText: l10n.navTrack_review_deviceHint,
             isDense: true,
           ),
         ),
         const SizedBox(height: 12),
         TextField(
           controller: _nameController,
-          decoration: const InputDecoration(
-            labelText: 'Name (optional)',
+          decoration: InputDecoration(
+            labelText: l10n.navTrack_review_nameHint,
             isDense: true,
           ),
         ),
@@ -295,30 +306,26 @@ class _NavTrackImportReviewPageState
         _SummaryGrid(units: units, preview: preview, start: start, end: end),
         const SizedBox(height: 16),
         Text(
-          _segmentSummary(preview.segmentation),
+          _segmentSummary(l10n, preview.segmentation),
           key: const ValueKey('nav-track-segment-summary'),
           style: theme.textTheme.bodyMedium,
         ),
         if (preview.hasNoMovement) ...[
           const SizedBox(height: 12),
-          const _WarningCard(
-            key: ValueKey('nav-track-warning-no-movement'),
-            text:
-                'No movement recorded: distance and speed stay at zero '
-                'throughout this file.',
+          _WarningCard(
+            key: const ValueKey('nav-track-warning-no-movement'),
+            text: l10n.navTrack_review_warningNoMovement,
           ),
         ],
         if (preview.duplicateOfRouteId != null) ...[
           const SizedBox(height: 12),
           _WarningCard(
             key: const ValueKey('nav-track-warning-duplicate'),
-            text:
-                'This looks like a route already imported from the same '
-                'file.',
+            text: l10n.navTrack_review_warningDuplicate,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Replace'),
+                Text(l10n.navTrack_review_replaceLabel),
                 Checkbox(
                   value: _replaceDuplicate,
                   onChanged: (v) =>
@@ -329,7 +336,10 @@ class _NavTrackImportReviewPageState
           ),
         ],
         const SizedBox(height: 24),
-        Text('Link to dive', style: theme.textTheme.titleSmall),
+        Text(
+          l10n.navTrack_review_linkToDive,
+          style: theme.textTheme.titleSmall,
+        ),
         const SizedBox(height: 8),
         _DiveLinkPicker(
           candidates: preview.candidateDives,
@@ -338,13 +348,13 @@ class _NavTrackImportReviewPageState
           onChanged: (dive) => setState(() => _selectedDive = dive),
         ),
         const SizedBox(height: 24),
-        Text('Dive site', style: theme.textTheme.titleSmall),
+        Text(l10n.navTrack_review_diveSite, style: theme.textTheme.titleSmall),
         const SizedBox(height: 4),
         ListTile(
           key: const ValueKey('nav-track-site-picker'),
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.place_outlined),
-          title: Text(_siteName ?? 'No site chosen'),
+          title: Text(_siteName ?? l10n.navTrack_review_noSiteChosen),
           trailing: const Icon(Icons.chevron_right),
           onTap: _pickSite,
         ),
@@ -356,7 +366,7 @@ class _NavTrackImportReviewPageState
         FilledButton(
           key: const ValueKey('nav-track-import-save'),
           onPressed: _busy ? null : () => _save(preview),
-          child: const Text('Save'),
+          child: Text(l10n.navTrack_common_save),
         ),
       ],
     );
@@ -378,18 +388,28 @@ class _SummaryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final stats = preview.stats;
     final duration = Duration(seconds: stats.durationSeconds);
     final durationText =
         '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
     final rows = <(String, String)>[
-      ('Start', '${units.formatDate(start)} ${units.formatTime(start)}'),
-      ('End', '${units.formatDate(end)} ${units.formatTime(end)}'),
-      ('Duration', durationText),
-      ('Distance', units.formatDistance(stats.totalDistance)),
-      ('Max depth', units.formatDepth(stats.maxDepth)),
+      (
+        l10n.navTrack_review_row_start,
+        '${units.formatDate(start)} ${units.formatTime(start)}',
+      ),
+      (
+        l10n.navTrack_review_row_end,
+        '${units.formatDate(end)} ${units.formatTime(end)}',
+      ),
+      (l10n.navTrack_review_row_duration, durationText),
+      (
+        l10n.navTrack_review_row_distance,
+        units.formatDistance(stats.totalDistance),
+      ),
+      (l10n.navTrack_review_row_maxDepth, units.formatDepth(stats.maxDepth)),
       if (stats.maxSpeed != null)
-        ('Max speed', units.formatSpeed(stats.maxSpeed!)),
+        (l10n.navTrack_review_row_maxSpeed, units.formatSpeed(stats.maxSpeed!)),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -434,17 +454,18 @@ class _DiveLinkPicker extends StatelessWidget {
   // delegate to it instead of its own RadioListTile column.
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return RadioGroup<String?>(
       groupValue: selected?.id,
       onChanged: (id) =>
           onChanged(candidates.where((d) => d.id == id).firstOrNull),
       child: Column(
         children: [
-          const RadioListTile<String?>(
-            key: ValueKey('nav-track-link-unlinked'),
+          RadioListTile<String?>(
+            key: const ValueKey('nav-track-link-unlinked'),
             value: null,
             dense: true,
-            title: Text('Leave unlinked'),
+            title: Text(l10n.navTrack_review_leaveUnlinked),
           ),
           for (final dive in candidates)
             RadioListTile<String?>(

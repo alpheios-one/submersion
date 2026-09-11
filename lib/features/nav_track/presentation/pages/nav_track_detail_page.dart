@@ -13,6 +13,8 @@ import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/nav_track/presentation/widgets/nav_track_polyline_layer.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One route: stats, an inline map when anchored, its dive link, correction
 /// status, and 3D (spec 2026-09-10-underwater-nav-track-design.md, "The
@@ -27,20 +29,21 @@ class NavTrackDetailPage extends ConsumerWidget {
     WidgetRef ref,
     NavTrack route,
   ) async {
+    final l10n = context.l10n;
     final controller = TextEditingController(text: route.name ?? '');
     final newName = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Rename route'),
+        title: Text(l10n.navTrack_detail_renameTitle),
         content: TextField(controller: controller, autofocus: true),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.navTrack_common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('Save'),
+            child: Text(l10n.navTrack_common_save),
           ),
         ],
       ),
@@ -60,19 +63,20 @@ class NavTrackDetailPage extends ConsumerWidget {
     WidgetRef ref,
     NavTrack route,
   ) async {
+    final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete route?'),
-        content: const Text('This cannot be undone.'),
+        title: Text(l10n.navTrack_detail_deleteTitle),
+        content: Text(l10n.navTrack_detail_deleteMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l10n.navTrack_common_cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.navTrack_common_delete),
           ),
         ],
       ),
@@ -100,6 +104,7 @@ class NavTrackDetailPage extends ConsumerWidget {
                 ),
       );
     if (!context.mounted) return;
+    final l10n = context.l10n;
     final chosen = await showModalBottomSheet<Dive>(
       context: context,
       builder: (context) => ListView(
@@ -107,7 +112,11 @@ class NavTrackDetailPage extends ConsumerWidget {
         children: [
           for (final dive in sorted.take(20))
             ListTile(
-              title: Text('Dive #${dive.diveNumber ?? dive.id}'),
+              title: Text(
+                l10n.navTrack_common_diveNumber(
+                  (dive.diveNumber ?? dive.id).toString(),
+                ),
+              ),
               subtitle: Text(
                 UnitFormatter(
                   ref.read(settingsProvider),
@@ -124,12 +133,13 @@ class NavTrackDetailPage extends ConsumerWidget {
         .link(route.id, chosen.id, linkMode: NavTrackLinkMode.manual);
   }
 
-  String _correctionStatus(NavTrack route) {
+  String _correctionStatus(AppLocalizations l10n, NavTrack route) {
     return switch (route.endMode) {
-      NavTrackEndMode.none => 'No correction applied yet.',
-      NavTrackEndMode.sameAsStart => 'End set to same as start.',
-      NavTrackEndMode.point => 'End point set on the map.',
-      NavTrackEndMode.gpsFix => 'End set from the recording\'s GPS fix.',
+      NavTrackEndMode.none => l10n.navTrack_detail_correctionStatus_none,
+      NavTrackEndMode.sameAsStart =>
+        l10n.navTrack_detail_correctionStatus_sameAsStart,
+      NavTrackEndMode.point => l10n.navTrack_detail_correctionStatus_point,
+      NavTrackEndMode.gpsFix => l10n.navTrack_detail_correctionStatus_gpsFix,
     };
   }
 
@@ -137,32 +147,38 @@ class NavTrackDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final routeAsync = ref.watch(navTrackByIdProvider(trackId));
     final units = UnitFormatter(ref.watch(settingsProvider));
+    final l10n = context.l10n;
 
     return routeAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) => const Scaffold(
-        body: Center(child: Text('Could not load this route.')),
-      ),
+      error: (e, _) =>
+          Scaffold(body: Center(child: Text(l10n.navTrack_common_loadError))),
       data: (route) {
         if (route == null) {
-          return const Scaffold(body: Center(child: Text('Route not found.')));
+          return Scaffold(
+            body: Center(child: Text(l10n.navTrack_common_notFound)),
+          );
         }
         final stats = NavTrackStats.of(route.points);
         return Scaffold(
           appBar: AppBar(
-            title: Text(route.name ?? route.sourceRef ?? 'Route'),
+            title: Text(
+              route.name ??
+                  route.sourceRef ??
+                  l10n.navTrack_detail_defaultTitle,
+            ),
             actions: [
               IconButton(
                 key: const ValueKey('nav-track-align'),
                 icon: const Icon(Icons.tune),
-                tooltip: 'Align on map',
+                tooltip: l10n.navTrack_align_title,
                 onPressed: () => context.push('/nav-routes/${route.id}/align'),
               ),
               IconButton(
                 key: const ValueKey('nav-track-open-3d'),
                 icon: const Icon(Icons.view_in_ar),
-                tooltip: 'Open 3D',
+                tooltip: l10n.navTrack_common_open3dTooltip,
                 onPressed: () => context.push('/nav-routes/${route.id}/3d'),
               ),
               PopupMenuButton<String>(
@@ -177,10 +193,19 @@ class NavTrackDetailPage extends ConsumerWidget {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'rename', child: Text('Rename')),
+                  PopupMenuItem(
+                    value: 'rename',
+                    child: Text(l10n.navTrack_detail_menuRename),
+                  ),
                   if (route.diveId != null)
-                    const PopupMenuItem(value: 'unlink', child: Text('Unlink')),
-                  const PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    PopupMenuItem(
+                      value: 'unlink',
+                      child: Text(l10n.navTrack_common_unlink),
+                    ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Text(l10n.navTrack_common_delete),
+                  ),
                 ],
               ),
             ],
@@ -202,7 +227,7 @@ class NavTrackDetailPage extends ConsumerWidget {
                     children: [
                       const Icon(Icons.tune, size: 20),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(_correctionStatus(route))),
+                      Expanded(child: Text(_correctionStatus(l10n, route))),
                     ],
                   ),
                 ),
@@ -211,11 +236,9 @@ class NavTrackDetailPage extends ConsumerWidget {
               SizedBox(
                 height: 220,
                 child: route.anchor == null
-                    ? const Card(
+                    ? Card(
                         child: Center(
-                          child: Text(
-                            'Set the start point to see this on a map.',
-                          ),
+                          child: Text(l10n.navTrack_detail_noMapYet),
                         ),
                       )
                     : ClipRRect(
@@ -254,27 +277,48 @@ class _StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duration = Duration(seconds: stats.durationSeconds);
+    final l10n = context.l10n;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (route.deviceName != null) Text('Device: ${route.deviceName}'),
-            Text('Distance: ${units.formatDistance(stats.totalDistance)}'),
-            Text('Max depth: ${units.formatDepth(stats.maxDepth)}'),
-            if (stats.maxSpeed != null)
-              Text('Max speed: ${units.formatSpeed(stats.maxSpeed!)}'),
-            if (stats.avgSpeed != null)
-              Text('Avg speed: ${units.formatSpeed(stats.avgSpeed!)}'),
+            if (route.deviceName != null)
+              Text(l10n.navTrack_detail_device(route.deviceName!)),
             Text(
-              'Duration: ${duration.inHours}h ${duration.inMinutes.remainder(60)}min',
+              l10n.navTrack_detail_distance(
+                units.formatDistance(stats.totalDistance),
+              ),
+            ),
+            Text(
+              l10n.navTrack_detail_maxDepth(units.formatDepth(stats.maxDepth)),
+            ),
+            if (stats.maxSpeed != null)
+              Text(
+                l10n.navTrack_detail_maxSpeed(
+                  units.formatSpeed(stats.maxSpeed!),
+                ),
+              ),
+            if (stats.avgSpeed != null)
+              Text(
+                l10n.navTrack_detail_avgSpeed(
+                  units.formatSpeed(stats.avgSpeed!),
+                ),
+              ),
+            Text(
+              l10n.navTrack_detail_duration(
+                duration.inHours,
+                duration.inMinutes.remainder(60),
+              ),
             ),
             if (route.points.isNotEmpty &&
                 route.points.first.batteryVolts != null)
               Text(
-                'Battery: ${route.points.first.batteryVolts!.toStringAsFixed(2)} V'
-                ' -> ${_lastBattery(route)?.toStringAsFixed(2) ?? '?'} V',
+                l10n.navTrack_detail_battery(
+                  route.points.first.batteryVolts!.toStringAsFixed(2),
+                  _lastBattery(route)?.toStringAsFixed(2) ?? '?',
+                ),
               ),
           ],
         ),
@@ -298,16 +342,17 @@ class _LinkCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final diveId = route.diveId;
     if (diveId == null) {
       return Card(
         child: ListTile(
           key: const ValueKey('nav-track-no-dive'),
           leading: const Icon(Icons.link_off),
-          title: const Text('No dive linked'),
+          title: Text(l10n.navTrack_detail_noDiveLinked),
           trailing: TextButton(
             onPressed: onChooseDive,
-            child: const Text('Choose dive'),
+            child: Text(l10n.navTrack_detail_chooseDive),
           ),
         ),
       );
@@ -319,8 +364,11 @@ class _LinkCard extends ConsumerWidget {
         leading: const Icon(Icons.link),
         title: Text(
           diveAsync.value != null
-              ? 'Dive #${diveAsync.value!.diveNumber ?? diveAsync.value!.id}'
-              : 'Dive $diveId',
+              ? l10n.navTrack_common_diveNumber(
+                  (diveAsync.value!.diveNumber ?? diveAsync.value!.id)
+                      .toString(),
+                )
+              : l10n.navTrack_common_diveById(diveId),
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push('/dives/$diveId'),

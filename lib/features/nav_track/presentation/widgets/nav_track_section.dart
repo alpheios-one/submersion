@@ -18,6 +18,7 @@ import 'package:submersion/features/nav_track/presentation/providers/nav_track_i
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/nav_track/presentation/widgets/nav_track_shape_thumbnail.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The dive detail "Underwater Route" section (spec
 /// 2026-09-10-underwater-nav-track-design.md, "Dive detail section"):
@@ -62,6 +63,7 @@ class NavTrackSection extends ConsumerWidget {
   Future<void> _importFile(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
+    final l10n = context.l10n;
     final log = LoggerService.forClass(NavTrackSection);
 
     final file = await FilePicker.pickFile(
@@ -79,12 +81,14 @@ class NavTrackSection extends ConsumerWidget {
     } on NavTrackParseException catch (e) {
       log.warning('Route import rejected: ${e.message}');
       messenger.showSnackBar(
-        SnackBar(content: Text(navTrackParseErrorText(e))),
+        SnackBar(content: Text(navTrackParseErrorText(l10n, e))),
       );
       return;
     } catch (e, stackTrace) {
       log.error('Route import failed', error: e, stackTrace: stackTrace);
-      messenger.showSnackBar(SnackBar(content: Text('Import failed: $e')));
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.navTrack_list_importFailed(e.toString()))),
+      );
       return;
     }
 
@@ -106,13 +110,14 @@ class NavTrackSection extends ConsumerWidget {
     final unlinkedAsync = ref.watch(unlinkedNavTracksProvider);
     final routes = routesAsync.value ?? const <NavTrack>[];
     final isExpanded = ref.watch(navTrackSectionExpandedProvider);
+    final l10n = context.l10n;
 
     final subtitle = routes.isEmpty
-        ? 'No route linked'
-        : '${routes.length} route${routes.length == 1 ? '' : 's'}';
+        ? l10n.navTrack_section_noRouteLinked
+        : l10n.navTrack_section_routeCount(routes.length);
 
     return CollapsibleCardSection(
-      title: 'Underwater Route',
+      title: l10n.navTrack_section_title,
       icon: Icons.route,
       collapsedSubtitle: subtitle,
       isExpanded: isExpanded,
@@ -128,7 +133,7 @@ class NavTrackSection extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Divider(),
-                const Text('No route linked'),
+                Text(l10n.navTrack_section_noRouteLinked),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -137,12 +142,12 @@ class NavTrackSection extends ConsumerWidget {
                       OutlinedButton(
                         key: const ValueKey('nav-track-link-button'),
                         onPressed: () => _linkRoute(context, ref),
-                        child: const Text('Link route'),
+                        child: Text(l10n.navTrack_section_linkButton),
                       ),
                     OutlinedButton(
                       key: const ValueKey('nav-track-import-button'),
                       onPressed: () => _importFile(context, ref),
-                      child: const Text('Import file'),
+                      child: Text(l10n.navTrack_section_importButton),
                     ),
                   ],
                 ),
@@ -174,6 +179,7 @@ class _RouteRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final units = UnitFormatter(ref.watch(settingsProvider));
     final stats = NavTrackStats.of(route.points);
+    final l10n = context.l10n;
     return Card(
       key: ValueKey('nav-track-row-${route.id}'),
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -186,7 +192,7 @@ class _RouteRow extends ConsumerWidget {
             units.formatDistance(stats.totalDistance),
             units.formatDepth(stats.maxDepth),
             if (stats.maxSpeed != null) units.formatSpeed(stats.maxSpeed!),
-            if (route.isPrimary) 'primary',
+            if (route.isPrimary) l10n.navTrack_section_primaryTag,
           ].join(' · '),
         ),
         trailing: PopupMenuButton<String>(
@@ -203,13 +209,22 @@ class _RouteRow extends ConsumerWidget {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(value: 'open', child: Text('Open route')),
-            const PopupMenuItem(value: '3d', child: Text('Open 3D seascape')),
-            const PopupMenuItem(value: 'unlink', child: Text('Unlink')),
+            PopupMenuItem(
+              value: 'open',
+              child: Text(l10n.navTrack_section_menuOpen),
+            ),
+            PopupMenuItem(
+              value: '3d',
+              child: Text(l10n.navTrack_section_menuOpen3d),
+            ),
+            PopupMenuItem(
+              value: 'unlink',
+              child: Text(l10n.navTrack_common_unlink),
+            ),
             if (!route.isPrimary)
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'primary',
-                child: Text('Make primary'),
+                child: Text(l10n.navTrack_section_menuMakePrimary),
               ),
           ],
         ),

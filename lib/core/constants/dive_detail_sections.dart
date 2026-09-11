@@ -153,11 +153,7 @@ enum DiveDetailSectionId {
       tide => l10n.diveDetailSection_tide_name,
       reefHealth => l10n.diveDetailSection_reefHealth_name,
       surfaceGps => l10n.diveDetailSection_surfaceGps_name,
-      // No l10n keys exist yet for this section (a later l10n pass adds
-      // them, as decided for the dive detail section in
-      // 2026-09-10-underwater-nav-track-design.md); plain English stands in
-      // meanwhile, exactly like [displayName] above.
-      navTrack => 'Underwater Route',
+      navTrack => l10n.diveDetailSection_navTrack_name,
       weights => l10n.diveDetailSection_weights_name,
       buoyancy => l10n.diveDetailSection_buoyancy_name,
       tanks => l10n.diveDetailSection_tanks_name,
@@ -187,7 +183,7 @@ enum DiveDetailSectionId {
       tide => l10n.diveDetailSection_tide_description,
       reefHealth => l10n.diveDetailSection_reefHealth_description,
       surfaceGps => l10n.diveDetailSection_surfaceGps_description,
-      navTrack => 'Measured underwater route from a navigation console',
+      navTrack => l10n.diveDetailSection_navTrack_description,
       weights => l10n.diveDetailSection_weights_description,
       buoyancy => l10n.diveDetailSection_buoyancy_description,
       tanks => l10n.diveDetailSection_tanks_description,

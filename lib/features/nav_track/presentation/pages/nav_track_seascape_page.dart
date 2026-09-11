@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/time_scrub_bar.dart';
 import 'package:submersion/features/nav_track/application/nav_track_scene_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The route's own 3D view, with no dive required (spec
 /// 2026-09-10-underwater-nav-track-design.md, "Route seascape").
@@ -65,18 +66,16 @@ class _NavTrackSeascapePageState extends ConsumerState<NavTrackSeascapePage>
   @override
   Widget build(BuildContext context) {
     final sceneAsync = ref.watch(navTrackSceneProvider(widget.trackId));
+    final l10n = context.l10n;
     return Scaffold(
-      appBar: AppBar(title: const Text('Route seascape')),
+      appBar: AppBar(title: Text(l10n.navTrack_seascape_title)),
       body: sceneAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) =>
-            const Center(child: Text('This route has no usable seascape.')),
+        error: (e, _) => Center(child: Text(l10n.navTrack_seascape_noScene)),
         data: (result) {
           final scene = result?.scene;
           if (scene == null || scene.layers.isEmpty) {
-            return const Center(
-              child: Text('This route has no usable seascape.'),
-            );
+            return Center(child: Text(l10n.navTrack_seascape_noScene));
           }
           return Column(
             children: [

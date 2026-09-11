@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Shown by the universal import wizard's file-selection step when
 /// [FormatDetector] recognises a Seacraft ENC navigation console log
@@ -23,6 +24,7 @@ class NavTrackHandoffCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Card(
       key: const ValueKey('nav-track-handoff-card'),
       child: Padding(
@@ -36,7 +38,7 @@ class NavTrackHandoffCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Seacraft ENC navigation log recognised',
+                    l10n.navTrack_handoff_recognized,
                     style: theme.textTheme.titleMedium,
                   ),
                 ),
@@ -44,8 +46,7 @@ class NavTrackHandoffCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'This is an underwater route, not a dive log. It has its own '
-              'place in Submersion, separate from your dive import.',
+              l10n.navTrack_handoff_description,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -60,7 +61,7 @@ class NavTrackHandoffCard extends StatelessWidget {
                   bytes,
                   fileName: fileName,
                 ),
-                child: const Text('Review route'),
+                child: Text(l10n.navTrack_handoff_reviewButton),
               ),
             ),
           ],
