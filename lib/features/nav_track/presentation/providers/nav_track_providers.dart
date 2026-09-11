@@ -43,6 +43,7 @@ final primaryNavTrackForDiveProvider = FutureProvider.family<NavTrack?, String>(
     final primary =
         routes.where((r) => r.isPrimary).firstOrNull ?? routes.first;
     final repository = ref.watch(navTrackRepositoryProvider);
+    ref.invalidateSelfWhen(repository.watchChanges());
     return repository.getById(primary.id, includePoints: true);
   },
 );
