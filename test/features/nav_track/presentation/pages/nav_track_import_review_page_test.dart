@@ -471,6 +471,77 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('shows a generic import-error message for a non-parse failure', (
+    tester,
+  ) async {
+    final base = await getBaseOverrides();
+    final throwingService = _GenericFailingImportService();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          navTrackImportServiceProvider.overrideWithValue(throwingService),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: NavTrackImportReviewPage(
+            bytes: Uint8List(0),
+            fileName: 'bad.csv',
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('This file could not be imported:'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'choosing "no equipment" after picking one clears the selection',
+    (tester) async {
+      const scooter = EquipmentItem(
+        id: 'eq1',
+        name: 'Test Scooter',
+        type: EquipmentType.dpv,
+      );
+      final service = _RecordingImportService();
+      await _pumpWithRouter(
+        tester,
+        preview: _preview(),
+        service: service,
+        equipment: const [scooter],
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-equipment-picker')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Test Scooter'));
+      await tester.pumpAndSettle();
+      expect(find.text('Test Scooter'), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-equipment-picker')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('No equipment'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test Scooter'), findsNothing);
+
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('nav-track-import-save')));
+      await tester.pumpAndSettle();
+
+      expect(service.lastEquipmentId, isNull);
+    },
+  );
 }
 
 class _FailingImportService implements NavTrackImportService {
@@ -483,6 +554,30 @@ class _FailingImportService implements NavTrackImportService {
       'bad file',
       reason: NavTrackParseReason.unreadable,
     );
+  }
+
+  @override
+  Future<String> commit({
+    required ParsedNavTrack parsed,
+    required String sourceRef,
+    Dive? dive,
+    String? siteId,
+    String? name,
+    String? deviceName,
+    String? equipmentId,
+  }) async => throw UnimplementedError();
+}
+
+/// A `prepare` that fails with a plain exception rather than
+/// [NavTrackParseException], to exercise the page's generic import-error
+/// branch (as opposed to the localized parse-reason text).
+class _GenericFailingImportService implements NavTrackImportService {
+  @override
+  Future<NavTrackImportPreview> prepare(
+    Uint8List bytes, {
+    String? fileName,
+  }) async {
+    throw StateError('disk full');
   }
 
   @override
