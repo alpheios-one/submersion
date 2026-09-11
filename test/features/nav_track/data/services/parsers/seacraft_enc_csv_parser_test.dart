@@ -299,6 +299,61 @@ void main() {
       expect(track.points.first.course, isNull);
     });
 
+    test('rejects a NaN value in a required column instead of persisting '
+        'a non-finite coordinate', () {
+      const bad =
+          '$_header\n'
+          '15.1.2025,16:16:07,NaN,0,0,0,0,0,0,0,20,3.9\n'
+          '15.1.2025,16:16:09,0,0,0,0,0,0,0,0,20,3.9\n';
+      expect(
+        () => parseSeacraftEncCsv(_csv(bad)),
+        throwsA(
+          isA<NavTrackParseException>().having(
+            (e) => e.reason,
+            'reason',
+            NavTrackParseReason.badData,
+          ),
+        ),
+      );
+    });
+
+    test('rejects an Infinity value in a required column', () {
+      const bad =
+          '$_header\n'
+          '15.1.2025,16:16:07,0,Infinity,0,0,0,0,0,0,20,3.9\n'
+          '15.1.2025,16:16:09,0,0,0,0,0,0,0,0,20,3.9\n';
+      expect(
+        () => parseSeacraftEncCsv(_csv(bad)),
+        throwsA(
+          isA<NavTrackParseException>().having(
+            (e) => e.reason,
+            'reason',
+            NavTrackParseReason.badData,
+          ),
+        ),
+      );
+    });
+
+    test('nulls out a NaN reading in an optional column instead of '
+        'rejecting the row', () {
+      const ok =
+          '$_header\n'
+          '15.1.2025,16:16:07,0,0,0,0,NaN,0,0,0,20,3.9\n'
+          '15.1.2025,16:16:09,0,0,0,0,0,0,0,0,20,3.9\n';
+      final track = parseSeacraftEncCsv(_csv(ok));
+      expect(track.points.first.pitch, isNull);
+    });
+
+    test('nulls out an Infinity reading in an optional column instead of '
+        'rejecting the row', () {
+      const ok =
+          '$_header\n'
+          '15.1.2025,16:16:07,0,0,0,0,0,0,0,-Infinity,20,3.9\n'
+          '15.1.2025,16:16:09,0,0,0,0,0,0,0,0,20,3.9\n';
+      final track = parseSeacraftEncCsv(_csv(ok));
+      expect(track.points.first.speed, isNull);
+    });
+
     test('rejects an empty file', () {
       expect(
         () => parseSeacraftEncCsv(_csv('')),

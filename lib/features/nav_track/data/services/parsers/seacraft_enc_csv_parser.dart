@@ -86,10 +86,20 @@ ParsedNavTrack parseSeacraftEncCsv(Uint8List bytes) {
       return value.isEmpty ? null : value;
     }
 
+    // `double.tryParse` happily returns `double.nan` for "NaN" and
+    // `double.infinity`/`double.negativeInfinity` for "Infinity"/"-Infinity"
+    // rather than null, so a required column's null check alone lets a
+    // malformed CSV persist a non-finite coordinate or depth that later
+    // turns route statistics, segmentation, correction and map/3D geometry
+    // into NaN or otherwise invalid values. An optional channel degrades to
+    // null instead, consistent with how an out-of-range Course or a
+    // negative BattV already becomes null rather than failing the import.
     double? optionalDouble(int index) {
       final text = cell(index);
       if (text == null) return null;
-      return double.tryParse(text);
+      final value = double.tryParse(text);
+      if (value == null || !value.isFinite) return null;
+      return value;
     }
 
     double requiredDouble(int index, String name) {
@@ -101,7 +111,7 @@ ParsedNavTrack parseSeacraftEncCsv(Uint8List bytes) {
         );
       }
       final value = double.tryParse(text);
-      if (value == null) {
+      if (value == null || !value.isFinite) {
         throw NavTrackParseException(
           'Row $rowNumber: unparseable $name "$text"',
           reason: NavTrackParseReason.badData,
