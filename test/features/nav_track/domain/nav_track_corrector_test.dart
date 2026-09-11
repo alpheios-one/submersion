@@ -1,10 +1,17 @@
+import 'dart:io';
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/nav_track/data/services/parsers/seacraft_enc_csv_parser.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_georef.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
+
+Uint8List _fixture(String name) =>
+    File('test/fixtures/nav_tracks/$name').readAsBytesSync();
 
 NavTrackPoint _p({
   int timestamp = 0,
@@ -293,6 +300,92 @@ void main() {
         expect(corrected[i].north, points[i].north);
         expect(corrected[i].east, points[i].east);
       }
+    });
+  });
+
+  group('NavTrackCorrector.apply on the real fixture with a GPS fix '
+      '(regression: the active range must stop before the fix, not at the '
+      'very last raw sample)', () {
+    late List<NavTrackPoint> points;
+    late int lastPreFixIndex;
+
+    setUp(() {
+      final track = parseSeacraftEncCsv(_fixture('seacraft_enc3_gps_fix.csv'));
+      points = track.points;
+      final kinds = NavTrackSegmenter.classify(points).kinds;
+      lastPreFixIndex = kinds.lastIndexOf(NavTrackSampleKind.underwater);
+      final lastSurfaceReckoned = kinds.lastIndexOf(
+        NavTrackSampleKind.surfaceReckoned,
+      );
+      if (lastSurfaceReckoned > lastPreFixIndex) {
+        lastPreFixIndex = lastSurfaceReckoned;
+      }
+    });
+
+    test('sameAsStart lands the rendered end (last pre-fix sample) on the '
+        'start, not just the very last raw sample', () {
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.sameAsStart),
+      );
+      // This is the sample the polyline/3D ribbon actually ends on
+      // (NavTrackPolylineLayer.kept / NavTrackPathAdapter both stop
+      // here); it must land close to the (rotated) start, not sit
+      // wherever the old full-length denominator happened to leave it.
+      final startEast = corrected.first.east;
+      final startNorth = corrected.first.north;
+      final endEast = corrected[lastPreFixIndex].east;
+      final endNorth = corrected[lastPreFixIndex].north;
+      final residual = math.sqrt(
+        math.pow(endEast - startEast, 2) + math.pow(endNorth - startNorth, 2),
+      );
+      expect(
+        residual,
+        lessThan(1.0),
+        reason:
+            'the last rendered (pre-fix) sample should be within 1 m of '
+            'the start once sameAsStart is applied; residual was '
+            '$residual m',
+      );
+    });
+
+    test('the trust slider visibly moves the pre-fix (rendered) portion of '
+        'the route', () {
+      final corrected0 = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0,
+        ),
+      );
+      final correctedHalf = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0.5,
+        ),
+      );
+      // Compare a sample from deep in the dive (well before the surface
+      // swim, where the device's own cumulative distance is still
+      // actively increasing rather than frozen) between trust 0 and
+      // trust 0.5: with the active range correctly stopped before the
+      // fix, this sample sits clearly past the 0.5 trust mark in
+      // cumulative distance and must move noticeably. Under the old bug
+      // the denominator included the huge post-fix jump, so almost the
+      // whole distance budget lived in the invisible post-fix segment
+      // and this barely moved.
+      const probe = 900;
+      expect(probe, lessThan(lastPreFixIndex));
+      final dEast = correctedHalf[probe].east - corrected0[probe].east;
+      final dNorth = correctedHalf[probe].north - corrected0[probe].north;
+      final moved = math.sqrt(dEast * dEast + dNorth * dNorth);
+      expect(
+        moved,
+        greaterThan(1.0),
+        reason:
+            'moving the trust fraction from 0 to 0.5 should visibly '
+            'move the pre-fix route by more than 1 m; it moved $moved m',
+      );
     });
   });
 }

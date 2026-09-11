@@ -157,25 +157,43 @@ class NavTrackCorrector {
   /// [endPoint], or [NavTrackEndMode.gpsFix] on a recording with no fix
   /// event).
   ///
-  /// For every mode but [NavTrackEndMode.gpsFix] the active range is the
-  /// whole recording. For [NavTrackEndMode.gpsFix] it stops one sample
-  /// before the fix event: everything from the event onward is the
-  /// device's own GPS-derived position, not part of the dead-reckoned
-  /// route to correct, and is excluded from rendering entirely by
-  /// `NavTrackSampleKind` regardless of what this function does with it.
+  /// The active range's ceiling is the same for every mode but [none]: the
+  /// last [NavTrackSampleKind.underwater] or [NavTrackSampleKind.surfaceReckoned]
+  /// sample. On a recording with no fix event this is the last raw sample,
+  /// i.e. the whole recording, same as before. On a recording with a fix
+  /// event (see `NavTrackSegmenter`) it stops one sample before the fix:
+  /// everything from the event onward is the device's own GPS-derived
+  /// position, excluded from rendering entirely by `NavTrackSampleKind`
+  /// (`NavTrackPolylineLayer.kept`, `NavTrackPathAdapter`). Computing the
+  /// cumulative distance denominator over the raw recording's full length
+  /// -- including a 300+ m post-fix jump and the surface wobble that
+  /// follows it -- would swamp the correction budget for the visible
+  /// pre-fix portion of the route, making both `sameAsStart` and the trust
+  /// slider appear to have no effect on what is actually drawn. Using this
+  /// same ceiling for [NavTrackEndMode.point] and [NavTrackEndMode.sameAsStart]
+  /// (previously only [NavTrackEndMode.gpsFix] stopped here) is exactly the
+  /// fix for that.
   static ({double east, double north, int lastActiveIndex})? _resolveTarget(
     List<NavTrackPoint> points,
     List<CorrectedNavTrackPoint> rotated,
     NavTrackCorrection correction,
   ) {
+    if (correction.endMode == NavTrackEndMode.none) return null;
+
+    final segmentation = NavTrackSegmenter.classify(points);
+    final lastActiveIndex = _lastActiveIndex(
+      segmentation.kinds,
+      rotated.length,
+    );
+
     switch (correction.endMode) {
       case NavTrackEndMode.none:
-        return null;
+        return null; // handled above; unreachable here
       case NavTrackEndMode.sameAsStart:
         return (
           east: rotated.first.east,
           north: rotated.first.north,
-          lastActiveIndex: rotated.length - 1,
+          lastActiveIndex: lastActiveIndex,
         );
       case NavTrackEndMode.point:
         final anchor = correction.anchor;
@@ -185,19 +203,35 @@ class NavTrackCorrector {
         return (
           east: offset.east,
           north: offset.north,
-          lastActiveIndex: rotated.length - 1,
+          lastActiveIndex: lastActiveIndex,
         );
       case NavTrackEndMode.gpsFix:
-        final fixEvents = NavTrackSegmenter.classify(points).fixEvents;
-        if (fixEvents.isEmpty) return null;
-        final fixIndex = fixEvents.first.index;
+        if (segmentation.fixEvents.isEmpty) return null;
+        final fixIndex = segmentation.fixEvents.first.index;
         final fixed = rotated[fixIndex];
         return (
           east: fixed.east,
           north: fixed.north,
-          lastActiveIndex: fixIndex - 1,
+          lastActiveIndex: lastActiveIndex,
         );
     }
+  }
+
+  /// The last sample still part of the dead-reckoned swim path: the last
+  /// [NavTrackSampleKind.underwater] or [NavTrackSampleKind.surfaceReckoned]
+  /// entry. Falls back to the last raw sample when [kinds] contains none of
+  /// either (an edge case the parser's `tooShort` check should already
+  /// prevent, but this keeps the corrector from producing a zero-length
+  /// active range instead of failing loudly elsewhere).
+  static int _lastActiveIndex(List<NavTrackSampleKind> kinds, int length) {
+    for (var i = kinds.length - 1; i >= 0; i--) {
+      final kind = kinds[i];
+      if (kind == NavTrackSampleKind.underwater ||
+          kind == NavTrackSampleKind.surfaceReckoned) {
+        return i;
+      }
+    }
+    return length - 1;
   }
 
   static CorrectedNavTrackPoint _rotate(
