@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
 import 'package:submersion/features/bathymetry/data/sources/swiss_lake_levels.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+
+const _log = LoggerService('BathymetryRepository');
 
 /// Cache-first bathymetry access. Grids cache per quantized 0.02 degree
 /// coordinate cell (nearby sites, re-pinned sites, and site-less GPS dives
@@ -39,7 +42,15 @@ class BathymetryRepository {
   /// rows never expire, so without this every already-visited site would
   /// keep serving the grid its old resolver chose. Old rows go inert, the
   /// same way the 4 km rows did when the span went to 8 km.
-  static const String selectionGeneration = 'v2';
+  ///
+  /// v3: the swissBATHY3D lake whitelist changed (Greifensee/Lago di
+  /// Lugano/Pfäffikersee removed, Lac de Joux/Lungernsee/Silsersee/
+  /// Silvaplanersee/Rotsee added) -- without bumping this, a coordinate at
+  /// one of the five newly-covered lakes that had already cached a
+  /// fallback grid from a coarser regional/global source would keep
+  /// serving that stale grid forever instead of re-resolving through
+  /// swissBATHY3D now that it covers it (Copilot review).
+  static const String selectionGeneration = 'v3';
   static const double quantumDeg = 0.02;
 
   final LocalCacheDatabase _db;
@@ -112,15 +123,33 @@ class BathymetryRepository {
   /// The scene must survive ANY cache/fetch failure (a broken table, an
   /// unexpected parser error) by degrading to synthesized terrain — so
   /// every failure becomes a null grid, treated as transient (no caching).
+  ///
+  /// Logged via [LoggerService] rather than a debug-only `assert`/`print` —
+  /// the previous debug-only logging meant a release build (including a
+  /// TestFlight/Play Store beta) had no way to tell "no data because
+  /// nothing covers this coordinate" apart from "swissBATHY3D itself is
+  /// failing for a diagnosable reason", both of which render identically as
+  /// "keine Daten verfügbar" in the UI.
+  ///
+  /// [LoggerService]'s persistent file backend and the in-app debug log
+  /// viewer are still gated behind the user's own "Debug-Modus" setting
+  /// (see `main.dart`), on purpose — bathymetry log lines embed GPS
+  /// coordinates, so writing them to disk for every install by default
+  /// would be a real privacy cost most users never asked for (Copilot
+  /// review). The fix here is still a genuine improvement over the old
+  /// `assert`: it no longer requires a DEBUG BUILD, which a real user's
+  /// installed release/beta app can never be — only that the user (or a
+  /// support conversation walking them through it) flips Debug-Modus on in
+  /// Settings before reproducing, in any build.
   Future<BathymetryGrid?> _guardedLoad(String key, GeoPoint center) async {
     try {
       return await _load(key, center);
-    } catch (e) {
-      assert(() {
-        // ignore: avoid_print
-        print('BathymetryRepository.getGrid($key) degraded to null: $e');
-        return true;
-      }());
+    } catch (e, stackTrace) {
+      _log.warning(
+        'getGrid($key) degraded to null',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

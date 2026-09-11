@@ -548,6 +548,149 @@ nodata_value -9999
       expect(secondGrid.depthAt(0, 0), isNot(thirdGrid.depthAt(0, 0)));
     });
 
+    test('only parses zip entries whose filename-declared tile is near the '
+        'requested one, never a distant entry that happens to share the '
+        'asset -- proven by giving the distant entry unparseable content '
+        'that would blow up the whole fetch if it were ever read', () async {
+      // Regression test for the selective-parse optimization added after a
+      // live measurement found a large lake's asset zip (Bodensee: 751
+      // entries, 237 MB) takes tens of seconds and ~1 GB of RAM to parse in
+      // full just to answer one 1-km tile's query. If the filename-based
+      // prefilter in extractGridZipTextsFiltered ever regresses to "parse
+      // everything regardless of name", this test fails loudly (a
+      // FormatException from the garbage entry) instead of silently, since
+      // functional correctness alone (Bug 15's test) cannot tell "parsed
+      // and discarded" apart from "never parsed".
+      const cellsPerTile = 4;
+      String row(double value) => List.filled(cellsPerTile, value).join(' ');
+      String tileAsc(int tileE, int tileN, double value) =>
+          'ncols $cellsPerTile\n'
+          'nrows $cellsPerTile\n'
+          'xllcorner ${tileE * 1000}\n'
+          'yllcorner ${tileN * 1000}\n'
+          'cellsize 250\n'
+          'nodata_value -9999\n'
+          '${List.filled(cellsPerTile, row(value)).join('\n')}\n';
+
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': [8.0, 46.0, 10.0, 48.0],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/lake_wide.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(
+          _zipOfMultiple({
+            // Matches the requested tile (2685_1240, see zurichseePoint's
+            // own tile fixture at the top of this file).
+            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+              2685,
+              1240,
+              111.0,
+            ),
+            // 15 tiles away -- well outside the ±1 neighborhood -- and
+            // deliberately not valid ESRI ASCII grid content at all. If
+            // this entry is ever decompressed and handed to
+            // EsriAsciiGridParser.parseRaw, the whole fetch throws.
+            'swissBATHY3D_CHLV95_LN02_2700_1240.asc': 'not a valid grid at all',
+          }),
+          200,
+        );
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      expect(downloadCalls, 1);
+      const referenceLevel = 405.92; // Zürichsee
+      expect(grid.depthAt(0, 0), closeTo(referenceLevel - 111.0, 1e-9));
+    });
+
+    test('two distinct tiles requested within one fetch() call that share an '
+        'asset href each resolve their own filename-filtered entry, not a '
+        'neighboring tile\'s (regression: sharing the FILTERED/parsed '
+        'result across tiles -- rather than just the downloaded bytes -- '
+        'would silently starve whichever tile\'s entry was not part of the '
+        'other\'s neighborhood)', () async {
+      const cellsPerTile = 4;
+      String row(double value) => List.filled(cellsPerTile, value).join(' ');
+      String tileAsc(int tileE, int tileN, double value) =>
+          'ncols $cellsPerTile\n'
+          'nrows $cellsPerTile\n'
+          'xllcorner ${tileE * 1000}\n'
+          'yllcorner ${tileN * 1000}\n'
+          'cellsize 250\n'
+          'nodata_value -9999\n'
+          '${List.filled(cellsPerTile, row(value)).join('\n')}\n';
+
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': [8.0, 46.0, 10.0, 48.0],
+                  'assets': {
+                    'grid': {'href': 'https://example.org/shared_lake.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(
+          _zipOfMultiple({
+            'swissBATHY3D_CHLV95_LN02_2685_1240.asc': tileAsc(
+              2685,
+              1240,
+              111.0,
+            ),
+            // 3 tiles east: outside tile 2685's own ±1 neighborhood
+            // (2684-2686), so the pre-fix (sharing a single filtered
+            // result across every tile in the fetch) would have this
+            // entry available only to whichever tile's request happened
+            // to trigger the download first.
+            'swissBATHY3D_CHLV95_LN02_2688_1240.asc': tileAsc(
+              2688,
+              1240,
+              222.0,
+            ),
+          }),
+          200,
+        );
+      });
+
+      final center = Lv95Transform.toWgs84(2687000, 1240500);
+      // Wide enough to span both tile 2685 and tile 2688 (and the tiles in
+      // between/around them) in a single fetch() call, so both requests
+      // share one `sharedZipBytes` entry for this href.
+      await source.fetch(
+        GeoPoint(center.latitude, center.longitude),
+        spanMeters: 2400,
+      );
+      expect(downloadCalls, 1);
+
+      final tileCache = SwissBathyTileCacheRepository(db);
+      final west = await tileCache.read('2685_1240');
+      final east = await tileCache.read('2688_1240');
+      const referenceLevel = 405.92; // Zürichsee
+      expect(west!.grid.depthAt(0, 0), closeTo(referenceLevel - 111.0, 1e-9));
+      expect(east!.grid.depthAt(0, 0), closeTo(referenceLevel - 222.0, 1e-9));
+    });
+
     test('falls through to the next STAC candidate when the first one\'s '
         'declared bbox overlaps but its actual downloaded content does not '
         '(Bug 14)', () async {
@@ -1963,6 +2106,9 @@ class _FakeFallbackSource implements BathymetrySource {
 
   @override
   bool get global => true;
+
+  @override
+  double get minKnownFraction => 0.60;
 
   @override
   Future<SourceCapability?> probe(GeoPoint center) async =>

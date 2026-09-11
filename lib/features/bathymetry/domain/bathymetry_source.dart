@@ -33,6 +33,33 @@ abstract interface class BathymetrySource {
   /// global source proves a coordinate is definitively on land.
   bool get global;
 
+  /// The [BathymetryGrid.knownFraction] floor a fetched grid must clear
+  /// to be trusted, below which the resolver treats it as "not enough
+  /// data to mean anything" and falls through to the next source (see
+  /// [BathymetryResolver.resolve]).
+  ///
+  /// Declared per source, not a single resolver-wide constant, because
+  /// "unknown" means different things for different sources. For a
+  /// GLOBAL survey mosaic (EMODnet's Caribbean tile: 99.96% wet on only
+  /// 48% coverage is the motivating example), an unknown cell means
+  /// "we don't actually know if there is water here" — genuinely
+  /// untrustworthy. For a source scoped to a specific, already-confirmed
+  /// water body (swissBATHY3D: [BathymetrySource.global] is false and
+  /// every requested coordinate already passed [SwissBathy3dSource.covers]
+  /// before this source is even tried), an unknown cell within the
+  /// requested span means "this cell is real, surveyed dry land outside
+  /// the lake" — a fact, not a gap. Applying the same high floor there
+  /// penalizes exactly the lakes the fix is meant to serve: a narrow,
+  /// elongated lake (Walensee, or a fjord-like bay of Vierwaldstättersee)
+  /// legitimately fills only a small fraction of an 8 km square request
+  /// centered on a real, fully-covered dive site, so a floor tuned for
+  /// "is this global mosaic tile trustworthy" silently rejected genuine,
+  /// complete local data and surfaced as "keine Daten verfügbar" with no
+  /// visible reason -- found only once the resolver's own quality-floor
+  /// rejections were logged (see [BathymetryResolver.resolve]'s
+  /// `_log.debug` calls).
+  double get minKnownFraction;
+
   /// What this source can deliver at [center], or null when it does not
   /// cover the point. May make a network call, so a probe that fails for
   /// any reason must return null rather than throw: one unreachable source
