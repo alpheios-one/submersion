@@ -75,6 +75,15 @@ class QuickActionsCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
+                onPressed: () => context.push('/nav-routes'),
+                icon: const Icon(Icons.route),
+                label: const Text('Underwater Routes'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
                 onPressed: () =>
                     context.push('/settings/diver-profile/emergency-card'),
                 icon: const Icon(Icons.emergency_outlined),
