@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/seacraft_enc_csv_parser.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 
 Uint8List _fixture(String name) =>
     File('test/fixtures/nav_tracks/$name').readAsBytesSync();
@@ -72,6 +74,48 @@ void main() {
     test('never rejects the file for exceeding the plausible-depth bench '
         'case (that is a different fixture, not this one)', () {
       expect(track.points.every((p) => p.depth <= 40), isTrue);
+    });
+
+    test('the heading recovered from consecutive north/east deltas agrees '
+        'with Course under x = north, y = east, not the swapped hypothesis '
+        '(pins the parser\'s NED mapping -- ground truth for item 1\'s '
+        'mirrored-route investigation, design spec "Ground truth: the '
+        'Seacraft ENC3 CSV")', () {
+      double bearingOf(double dNorth, double dEast) =>
+          (math.atan2(dEast, dNorth) * 180.0 / math.pi + 360.0) % 360.0;
+      double angularDiff(double a, double b) {
+        final d = (a - b).abs() % 360.0;
+        return d > 180.0 ? 360.0 - d : d;
+      }
+
+      final normalErrors = <double>[];
+      final swappedErrors = <double>[];
+      for (var i = 1; i < track.points.length; i++) {
+        final NavTrackPoint prev = track.points[i - 1];
+        final NavTrackPoint cur = track.points[i];
+        final course = cur.course;
+        if (course == null) continue;
+        final dNorth = cur.north - prev.north;
+        final dEast = cur.east - prev.east;
+        if (math.sqrt(dNorth * dNorth + dEast * dEast) <= 1.0) continue;
+        normalErrors.add(angularDiff(bearingOf(dNorth, dEast), course));
+        // The swapped hypothesis: x = east, y = north.
+        swappedErrors.add(angularDiff(bearingOf(dEast, dNorth), course));
+      }
+
+      expect(normalErrors, isNotEmpty);
+      final meanNormal =
+          normalErrors.reduce((a, b) => a + b) / normalErrors.length;
+      final meanSwapped =
+          swappedErrors.reduce((a, b) => a + b) / swappedErrors.length;
+
+      // Design doc: MAE 4.6 degrees under x = north, y = east; 138
+      // degrees under the swapped hypothesis. A generous margin around
+      // the measured value keeps this a real regression guard without
+      // being brittle to a rounding change elsewhere in the parser.
+      expect(meanNormal, lessThan(10));
+      expect(meanSwapped, greaterThan(100));
+      expect(meanNormal, lessThan(meanSwapped));
     });
   });
 

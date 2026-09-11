@@ -243,6 +243,43 @@ void main() {
     expect(repository.lastCorrection?.trustFraction, 0);
   });
 
+  testWidgets(
+    'dragging the start marker right on screen moves it east, and down '
+    'moves it south',
+    (tester) async {
+      final repository = await _pump(tester, route: _route());
+
+      // Place the start marker at the map's initial centre first.
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-align-place-start')),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-set-here')));
+      await tester.pump();
+
+      final markerFinder = find.byKey(
+        const ValueKey('nav-track-align-start-marker'),
+      );
+      expect(markerFinder, findsOneWidget);
+
+      // Drag right and down on screen.
+      await tester.drag(markerFinder, const Offset(40, 30));
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-save')));
+      await tester.pumpAndSettle();
+
+      const before = GeoPoint(0, 0);
+      final after = repository.lastCorrection?.anchor;
+      expect(after, isNotNull);
+      // Right on screen must increase longitude (east); down must decrease
+      // latitude (south). A north/east or sign mix-up would flip one or
+      // both of these compass directions.
+      expect(after!.longitude, greaterThan(before.longitude));
+      expect(after.latitude, lessThan(before.latitude));
+    },
+  );
+
   testWidgets('cancel pops without saving', (tester) async {
     final repository = await _pump(tester, route: _route());
 

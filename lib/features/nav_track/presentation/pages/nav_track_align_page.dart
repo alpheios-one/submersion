@@ -603,6 +603,16 @@ class _ControlsPanel extends ConsumerWidget {
 /// Web Mercator metres-per-pixel formula rather than any flutter_map
 /// internal API, so it stays independent of the package's camera
 /// implementation.
+///
+/// Uses a raw [Listener] rather than [GestureDetector]'s `onPanUpdate`: a
+/// marker sits on top of `FlutterMap`'s own pan-to-move-the-map gesture, and
+/// a plain [GestureDetector] loses the gesture arena to it almost every
+/// time, so the marker looked draggable but silently never moved (the drag
+/// panned the map underneath it instead) -- easy to miss by eye since a
+/// marker pinned to a lat/lon does not visibly detach from the map while
+/// the whole view pans with it. [Listener] receives every routed pointer
+/// event directly, independent of which [GestureRecognizer] wins the arena
+/// for the same pointer, so the marker now actually moves every time.
 class _DraggableMarker extends StatelessWidget {
   const _DraggableMarker({
     required this.point,
@@ -624,9 +634,10 @@ class _DraggableMarker extends StatelessWidget {
           point: LatLng(point.latitude, point.longitude),
           width: 36,
           height: 36,
-          child: GestureDetector(
+          child: Listener(
             key: ValueKey(keyValue),
-            onPanUpdate: (details) => onDrag(details.delta),
+            behavior: HitTestBehavior.opaque,
+            onPointerMove: (event) => onDrag(event.delta),
             child: Container(
               decoration: BoxDecoration(
                 color: color,
