@@ -226,7 +226,10 @@ class SwissBathy3dSource implements BathymetrySource {
   ) async {
     final tileKey = '${tileE}_$tileN';
 
-    final cached = await _tileCache.read(tileKey);
+    final cached = await _tileCache.read(
+      tileKey,
+      expectedReferenceLevelMeters: lake.meanLevelMeters,
+    );
     if (cached != null) {
       if (!_isStale(cached.checkedAt)) return cached.grid;
       return _refreshIfStale(tileKey, tileE, tileN, lake, cached);
@@ -272,6 +275,7 @@ class SwissBathy3dSource implements BathymetrySource {
       grid,
       sourceDatetime: resolved.asset.datetime,
       sourceHref: resolved.asset.href,
+      referenceLevelMeters: lake.meanLevelMeters,
     );
     return grid;
   }
@@ -477,6 +481,7 @@ class SwissBathy3dSource implements BathymetrySource {
         grid,
         sourceDatetime: resolved.asset.datetime,
         sourceHref: resolved.asset.href,
+        referenceLevelMeters: lake.meanLevelMeters,
       );
       return (grid: grid, outcome: _TileCheckOutcome.updated);
     } on SwissStacException {
@@ -519,9 +524,6 @@ class SwissBathy3dSource implements BathymetrySource {
     final outcomes = await _runBounded(tileKeys, maxConcurrentTileRequests, (
       tileKey,
     ) async {
-      final cached = await _tileCache.read(tileKey);
-      if (cached == null) return null; // evicted/corrupted since listing
-
       final parts = tileKey.split('_');
       final tileE = parts.length == 2 ? int.tryParse(parts[0]) : null;
       final tileN = parts.length == 2 ? int.tryParse(parts[1]) : null;
@@ -535,6 +537,17 @@ class SwissBathy3dSource implements BathymetrySource {
         GeoPoint(tileCenter.latitude, tileCenter.longitude),
       );
       if (lake == null) return null; // should not happen for a real 'ok' tile
+
+      // Computed BEFORE the read so a reference-level mismatch (the lake
+      // table changed since this tile was cached) is caught here too, not
+      // just on the next fetch() visit -- read() drops the row and returns
+      // null in that case, same as corruption.
+      final cached = await _tileCache.read(
+        tileKey,
+        expectedReferenceLevelMeters: lake.meanLevelMeters,
+      );
+      if (cached == null)
+        return null; // evicted/corrupted/mismatched since listing
 
       final result = await _checkAndMaybeUpdate(
         tileKey,

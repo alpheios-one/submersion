@@ -26,11 +26,21 @@ class SwissBathyTileCacheEntry {
   /// Null for tiles cached before this field existed (v15 and earlier).
   final String? sourceHref;
 
+  /// The lake reference level this entry's [grid] depths were computed
+  /// against — see [LocalCacheDatabase]'s `SwissBathyTileCache.
+  /// referenceLevelMeters` doc for why [read] never actually returns an
+  /// entry whose stored level does not match what the caller expects: a
+  /// mismatch (including this being null, from before the field existed)
+  /// deletes the row and returns null instead, so this field is really
+  /// only informative for a caller not passing `expectedReferenceLevelMeters`.
+  final double? referenceLevelMeters;
+
   const SwissBathyTileCacheEntry({
     required this.grid,
     this.sourceDatetime,
     this.checkedAt,
     this.sourceHref,
+    this.referenceLevelMeters,
   });
 }
 
@@ -44,10 +54,19 @@ class SwissBathyTileCacheRepository {
 
   const SwissBathyTileCacheRepository(this._db);
 
-  /// The cached entry for [tileKey], or null when uncached OR when the tile
-  /// is a cached negative ('empty'). Use [hasCachedAnswer] to tell those
-  /// apart from "never looked up".
-  Future<SwissBathyTileCacheEntry?> read(String tileKey) async {
+  /// The cached entry for [tileKey], or null when uncached, when the tile
+  /// is a cached negative ('empty'), OR when [expectedReferenceLevelMeters]
+  /// is given and does not match the level the row was actually cached
+  /// under (see `SwissBathyTileCache.referenceLevelMeters`'s doc) — the row
+  /// is deleted in that case too, exactly like corruption, so the caller
+  /// re-fetches and gets a correctly depth-converted grid instead of
+  /// silently serving stale, wrongly-converted depths forever. Passing null
+  /// (the default) skips this check entirely. Use [hasCachedAnswer] to tell
+  /// "never looked up" apart from any of these deleted-and-null outcomes.
+  Future<SwissBathyTileCacheEntry?> read(
+    String tileKey, {
+    double? expectedReferenceLevelMeters,
+  }) async {
     final row = await (_db.select(
       _db.swissBathyTileCache,
     )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
@@ -56,6 +75,17 @@ class SwissBathyTileCacheRepository {
     if (json == null) {
       // Inconsistent row ('ok' but no grid): delete so callers retry instead
       // of treating it as a cached negative.
+      await (_db.delete(
+        _db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).go();
+      return null;
+    }
+    if (expectedReferenceLevelMeters != null &&
+        row.referenceLevelMeters != expectedReferenceLevelMeters) {
+      // A stored null (pre-v17 row) counts as a mismatch too: there is no
+      // way to tell whether its baked-in depths are still correct without
+      // this field, so it gets the same one-time re-resolution every other
+      // pre-existing-row migration in this table already falls back to.
       await (_db.delete(
         _db.swissBathyTileCache,
       )..where((t) => t.tileKey.equals(tileKey))).go();
@@ -72,6 +102,7 @@ class SwissBathyTileCacheRepository {
             ? null
             : DateTime.fromMillisecondsSinceEpoch(row.checkedAt!),
         sourceHref: row.sourceHref,
+        referenceLevelMeters: row.referenceLevelMeters,
       );
     } catch (_) {
       // Corrupt row: delete so callers retry instead of treating it as a cached negative.
@@ -108,6 +139,7 @@ class SwissBathyTileCacheRepository {
     BathymetryGrid grid, {
     String? sourceDatetime,
     String? sourceHref,
+    required double referenceLevelMeters,
   }) async {
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db
@@ -121,6 +153,7 @@ class SwissBathyTileCacheRepository {
             sourceDatetime: Value(sourceDatetime),
             checkedAt: Value(now),
             sourceHref: Value(sourceHref),
+            referenceLevelMeters: Value(referenceLevelMeters),
           ),
         );
   }

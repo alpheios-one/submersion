@@ -30,7 +30,7 @@ void main() {
         resolutionMeters: 2,
         fetchedAt: DateTime.utc(2026, 1, 1),
       );
-      await repo.writeOk('2726_1221', grid);
+      await repo.writeOk('2726_1221', grid, referenceLevelMeters: 405.92);
 
       final entry = await repo.read('2726_1221');
       expect(entry, isNotNull);
@@ -126,5 +126,115 @@ void main() {
         expect(await repo.hasCachedAnswer('2726_1221'), isTrue);
       },
     );
+
+    test(
+      'a row cached under a different reference level than expected is '
+      'deleted and read() returns null, same as corruption (regression: '
+      'a swiss_lake_levels.dart correction that changes which lake a '
+      'coordinate resolves to, or its documented mean level, must not '
+      'leave a tile serving depths computed against the old level forever)',
+      () async {
+        final grid = BathymetryGrid(
+          originLat: 47.2,
+          originLon: 9.1,
+          cellSizeLatDeg: 0.001,
+          cellSizeLonDeg: 0.001,
+          rows: 2,
+          cols: 2,
+          depthsMeters: [1.0, 2.0, 3.0, 4.0],
+          sourceId: 'swissbathy3d',
+          resolutionMeters: 2,
+          fetchedAt: DateTime.utc(2026, 1, 1),
+        );
+        await repo.writeOk(
+          '2726_1221',
+          grid,
+          referenceLevelMeters: 433.58, // e.g. Vierwaldstättersee
+        );
+
+        final entry = await repo.read(
+          '2726_1221',
+          expectedReferenceLevelMeters: 419.00, // e.g. Rotsee, post-fix
+        );
+        expect(entry, isNull);
+
+        final remaining = await (db.select(
+          db.swissBathyTileCache,
+        )..where((t) => t.tileKey.equals('2726_1221'))).get();
+        expect(remaining, isEmpty);
+        expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+      },
+    );
+
+    test(
+      'a row cached before referenceLevelMeters existed (null) is treated '
+      'as a mismatch too when a caller now expects a specific level -- '
+      'there is no way to tell whether its baked-in depths are still '
+      'correct, so it gets one re-resolution rather than being trusted',
+      () async {
+        await db
+            .into(db.swissBathyTileCache)
+            .insert(
+              SwissBathyTileCacheCompanion.insert(
+                tileKey: '2726_1221',
+                status: 'ok',
+                gridJson: const Value('{}'),
+                fetchedAt: DateTime.now().millisecondsSinceEpoch,
+              ),
+            );
+
+        final entry = await repo.read(
+          '2726_1221',
+          expectedReferenceLevelMeters: 419.00,
+        );
+        expect(entry, isNull);
+        expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+      },
+    );
+
+    test('passing no expectedReferenceLevelMeters skips the check entirely, '
+        'returning the row as-is regardless of what level it was cached '
+        'under', () async {
+      final grid = BathymetryGrid(
+        originLat: 47.2,
+        originLon: 9.1,
+        cellSizeLatDeg: 0.001,
+        cellSizeLonDeg: 0.001,
+        rows: 2,
+        cols: 2,
+        depthsMeters: [1.0, 2.0, 3.0, 4.0],
+        sourceId: 'swissbathy3d',
+        resolutionMeters: 2,
+        fetchedAt: DateTime.utc(2026, 1, 1),
+      );
+      await repo.writeOk('2726_1221', grid, referenceLevelMeters: 433.58);
+
+      final entry = await repo.read('2726_1221');
+      expect(entry, isNotNull);
+      expect(entry!.referenceLevelMeters, 433.58);
+    });
+
+    test('a matching reference level is returned normally', () async {
+      final grid = BathymetryGrid(
+        originLat: 47.2,
+        originLon: 9.1,
+        cellSizeLatDeg: 0.001,
+        cellSizeLonDeg: 0.001,
+        rows: 2,
+        cols: 2,
+        depthsMeters: [1.0, 2.0, 3.0, 4.0],
+        sourceId: 'swissbathy3d',
+        resolutionMeters: 2,
+        fetchedAt: DateTime.utc(2026, 1, 1),
+      );
+      await repo.writeOk('2726_1221', grid, referenceLevelMeters: 419.00);
+
+      final entry = await repo.read(
+        '2726_1221',
+        expectedReferenceLevelMeters: 419.00,
+      );
+      expect(entry, isNotNull);
+      expect(entry!.grid.depthAt(0, 0), 1.0);
+    });
   });
 }

@@ -1953,6 +1953,125 @@ nodata_value -9999
       expect(rows.single.status, 'ok');
     });
   });
+
+  group('SwissBathy3dSource tile cache reference-level mismatch', () {
+    // Regression test for the tile-cache-staleness gap found during
+    // review of the swissBATHY3D lake whitelist correction: a coordinate
+    // whose lake assignment (or documented mean level) changes must not
+    // keep serving a cached grid whose depths were computed against the
+    // OLD reference level forever. Simulates exactly that: the tile is
+    // pre-seeded as if it had been cached under a different lake's level
+    // (433.58, e.g. Vierwaldstättersee) before Zürichsee's own entry
+    // (405.92) covered this coordinate.
+    test('a cached tile whose stored reference level does not match the '
+        'current lake is re-fetched, not served with the stale depth '
+        'conversion', () async {
+      final lv95 = Lv95Transform.fromWgs84(
+        zurichseePoint.latitude,
+        zurichseePoint.longitude,
+      );
+      final tileKey = SwissBathy3dSource.tileKeyFor(lv95);
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: tileKey,
+              status: 'ok',
+              gridJson: const Value('{}'),
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+              checkedAt: Value(DateTime.now().millisecondsSinceEpoch),
+              referenceLevelMeters: const Value(433.58),
+            ),
+          );
+
+      var itemCalls = 0;
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      // The mismatched row forced a real re-fetch instead of an immediate
+      // cache hit.
+      expect(itemCalls, 1);
+      expect(downloadCalls, 1);
+
+      const referenceLevel = 405.92; // Zürichsee
+      expect(grid.depthAt(0, 0), closeTo(referenceLevel - 408.0, 1e-9));
+
+      final rows = await (db.select(
+        db.swissBathyTileCache,
+      )..where((t) => t.tileKey.equals(tileKey))).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.referenceLevelMeters, referenceLevel);
+    });
+
+    test('a cached tile with no stored reference level at all (pre-v17 '
+        'row) is also re-fetched rather than trusted as-is', () async {
+      final lv95 = Lv95Transform.fromWgs84(
+        zurichseePoint.latitude,
+        zurichseePoint.longitude,
+      );
+      final tileKey = SwissBathy3dSource.tileKeyFor(lv95);
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: tileKey,
+              status: 'ok',
+              gridJson: const Value('{}'),
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+              checkedAt: Value(DateTime.now().millisecondsSinceEpoch),
+              // referenceLevelMeters intentionally absent.
+            ),
+          );
+
+      var downloadCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        downloadCalls++;
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+
+      expect(downloadCalls, 1);
+      const referenceLevel = 405.92; // Zürichsee
+      expect(grid.depthAt(0, 0), closeTo(referenceLevel - 408.0, 1e-9));
+    });
+  });
 }
 
 class _FakeFallbackSource implements BathymetrySource {
