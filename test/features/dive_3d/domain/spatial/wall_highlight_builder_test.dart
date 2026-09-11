@@ -106,9 +106,12 @@ void main() {
       expect(mesh!.vertexCount, 4);
       expect(mesh.indices, hasLength(6));
       expect(mesh.opacity, closeTo(0.45, 1e-9));
-      // Vertices ride the terrain surface plus a small lift: the sw corner
-      // sits at yOf(10) + 0.015.
-      expect(mesh.positions[1], closeTo(proj.yOf(10) + 0.015, 1e-5));
+      // Vertices ride the terrain surface plus a small, horizScale-scaled
+      // lift: the sw corner sits at yOf(10) + 0.15 * horizScale.
+      expect(
+        mesh.positions[1],
+        closeTo(proj.yOf(10) + 0.15 * proj.horizScale, 1e-5),
+      );
 
       expect(
         buildWallHighlightMesh(

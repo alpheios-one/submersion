@@ -308,9 +308,14 @@ void main() {
       expect(result.labels, hasLength(1));
       expect(result.labels.single.text, '25 m');
       expect(result.labels.single.anchorsXyz.length, 15);
-      // Anchors ride the contour's scene height: yOf(25) plus lifts.
-      final y = projFor(grid).yOf(25);
-      expect(result.labels.single.anchorsXyz[1], closeTo(y + 0.08, 1e-6));
+      // Anchors ride the contour's scene height: yOf(25) plus the
+      // horizScale-scaled contour and label lifts (0.15 + 0.25 m).
+      final proj = projFor(grid);
+      final y = proj.yOf(25);
+      expect(
+        result.labels.single.anchorsXyz[1],
+        closeTo(y + 0.40 * proj.horizScale, 1e-6),
+      );
     });
 
     test('major contour ribbons are wider than minors', () {
