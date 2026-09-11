@@ -146,6 +146,37 @@ class SwissBathyTileCacheRepository {
     return [for (final row in rows) row.tileKey];
   }
 
+  /// Deletes [tileKey] if its stored [referenceLevelMeters] does not match
+  /// any of [currentLevels], a no-op (never deletes) when it matches one
+  /// of them or the tile is uncached. For a sweep visiting a tile whose
+  /// OWN center no longer resolves to any registered lake -- so there is
+  /// no single current lake to pass to [read]'s normal
+  /// expectedReferenceLevelMeters check -- but which may still hold a
+  /// valid row cached under a lake the fetch that found it fell back to
+  /// (see [SwissBathy3dSource.fetch]'s tileLake fallback). Matching
+  /// against every currently registered level, not just one, is looser
+  /// than [read]'s per-lookup check, but still correctly deletes a row
+  /// whose level belongs to no lake in the CURRENT table at all -- the
+  /// actual staleness signal a lake removal or a documented level
+  /// correction leaves behind.
+  Future<bool> deleteIfLevelUnknown(
+    String tileKey,
+    Iterable<double> currentLevels,
+  ) async {
+    final row = await (_db.select(
+      _db.swissBathyTileCache,
+    )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
+    if (row == null) return false;
+    if (row.referenceLevelMeters != null &&
+        currentLevels.contains(row.referenceLevelMeters)) {
+      return false;
+    }
+    await (_db.delete(
+      _db.swissBathyTileCache,
+    )..where((t) => t.tileKey.equals(tileKey))).go();
+    return true;
+  }
+
   Future<void> writeOk(
     String tileKey,
     BathymetryGrid grid, {

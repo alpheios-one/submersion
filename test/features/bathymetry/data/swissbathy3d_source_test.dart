@@ -1859,6 +1859,58 @@ nodata_value -9999
       expect(summary.total, 0);
       expect(itemCalls, 1); // no extra lookup for the cached negative
     });
+
+    test('a cached negative under a STALE reference level is deleted by the '
+        'sweep, so the next fetch retries instead of staying pinned "no '
+        'data" forever (regression: allTileKeys() now includes empty rows, '
+        'but the sweep itself must actually invalidate a mismatch, not just '
+        'visit it -- Copilot review)', () async {
+      // zurichseePoint resolves to tile 2685_1240 (see gridBody's fixture
+      // header above). Seeded directly as a raw 'empty' row under a
+      // level that is NOT Zürichsee's real 405.92 m, simulating a tile
+      // that was cached before a lake table correction.
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: '2685_1240',
+              status: 'empty',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+              referenceLevelMeters: const Value(433.58), // wrong lake
+            ),
+          );
+
+      var itemCalls = 0;
+      final source = buildSource((req) async {
+        if (req.url.path.endsWith('/items')) {
+          itemCalls++;
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': _requestedBbox(req),
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_grid.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
+        }
+        return http.Response.bytes(_zipOf('tile.asc', gridBody), 200);
+      });
+
+      final summary = await source.refreshAllCachedTiles();
+      expect(summary.total, 0); // deleted, not counted as a freshness hit
+      expect(itemCalls, 0); // pure local invalidation, no network call
+
+      // The stale negative is gone, so a real fetch retries it instead
+      // of hasCachedAnswer() suppressing it.
+      final grid = await source.fetch(zurichseePoint, spanMeters: 100);
+      expect(grid.sourceId, 'swissbathy3d');
+      expect(itemCalls, 1);
+    });
   });
 
   group('SwissBathy3dSource in the resolver chain', () {

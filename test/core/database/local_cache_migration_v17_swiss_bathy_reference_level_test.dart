@@ -83,4 +83,43 @@ void main() {
     // be correct.
     expect(row.referenceLevelMeters, isNull);
   });
+
+  test('a database already stamped at v17 but still v16-shaped (a ladder '
+      'collision: another branch claimed user_version 17 first without '
+      'actually running this migration) is healed by the beforeOpen '
+      'backstop, not just onUpgrade -- onUpgrade never runs here since '
+      'Drift sees no version change to apply (Copilot review)', () async {
+    final db = LocalCacheDatabase(
+      NativeDatabase.memory(
+        setup: (raw) {
+          raw
+            ..execute(
+              'CREATE TABLE swiss_bathy_tile_cache '
+              '(tile_key TEXT NOT NULL, status TEXT NOT NULL, '
+              'grid_json TEXT NULL, fetched_at INTEGER NOT NULL, '
+              'source_datetime TEXT NULL, checked_at INTEGER NULL, '
+              'source_href TEXT NULL, '
+              'PRIMARY KEY (tile_key))',
+            )
+            ..execute(
+              "INSERT INTO swiss_bathy_tile_cache "
+              "(tile_key, status, grid_json, fetched_at, source_datetime, "
+              "checked_at, source_href) "
+              "VALUES ('2665_1212', 'ok', '{}', 1753600000000, "
+              "'2023-01-01T00:00:00Z', 1753600000000, "
+              "'https://example.org/real.zip')",
+            )
+            // Stamped at the CURRENT schema version despite the table
+            // still missing reference_level_meters -- the exact
+            // collision this backstop exists to heal.
+            ..execute('PRAGMA user_version = 17');
+        },
+      ),
+    );
+    addTearDown(db.close);
+    final row = await db.select(db.swissBathyTileCache).getSingle();
+    expect(row.tileKey, '2665_1212');
+    expect(row.sourceHref, 'https://example.org/real.zip');
+    expect(row.referenceLevelMeters, isNull);
+  });
 }

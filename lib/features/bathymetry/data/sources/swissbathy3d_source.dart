@@ -539,10 +539,22 @@ class SwissBathy3dSource implements BathymetrySource {
       final lake = findSwissLake(
         GeoPoint(tileCenter.latitude, tileCenter.longitude),
       );
-      // Orphaned by a bbox tightened enough to no longer cover this tile
-      // at all -- inert (no future fetch() targets it either), left for a
-      // later cleanup rather than handled here.
-      if (lake == null) return null;
+      if (lake == null) {
+        // The tile's OWN center resolves to no current lake, but the row
+        // may still be one fetch() cached under the FETCH CENTER's lake
+        // as a fallback (a real edge tile whose own center misses every
+        // registered bbox -- see fetch()'s tileLake fallback), so there is
+        // no single current lake to pass to read()'s normal per-lookup
+        // check. Delete it only if its stored level belongs to no lake in
+        // the CURRENT table at all -- the actual staleness signal a lake
+        // removal or a documented level correction leaves behind (Copilot
+        // review).
+        await _tileCache.deleteIfLevelUnknown(
+          tileKey,
+          swissLakeLevels.map((l) => l.meanLevelMeters),
+        );
+        return null;
+      }
 
       // Computed BEFORE the read so a reference-level mismatch (the lake
       // table changed since this tile was cached) is caught here too, not
