@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
@@ -42,10 +43,11 @@ List<NavTrackPoint> _points() => const [
   ),
 ];
 
-Dive _dive(String id, DateTime entry) => Dive(
+Dive _dive(String id, DateTime entry, {DiveSite? site}) => Dive(
   id: id,
   dateTime: entry,
   entryTime: entry,
+  site: site,
   tanks: const [],
   profile: const [],
   gear: looseGear(const []),
@@ -238,6 +240,25 @@ void main() {
     );
     expect(group.groupValue, 'd1');
   });
+
+  testWidgets(
+    'pre-fills the site from the pre-selected dive\'s own hydrated site, '
+    'with no further action from the diver',
+    (tester) async {
+      const site = DiveSite(id: 'site-1', name: 'Lake Zurich');
+      final dive = _dive(
+        'd1',
+        DateTime.utc(2025, 1, 15, 16, 16, 7),
+        site: site,
+      );
+      await _pump(tester, preview: _preview(candidateDives: [dive]));
+
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Lake Zurich'), findsOneWidget);
+    },
+  );
 
   testWidgets('leaves the route unlinked when several dives overlap', (
     tester,

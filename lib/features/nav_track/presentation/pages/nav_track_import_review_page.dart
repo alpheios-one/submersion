@@ -91,6 +91,10 @@ class _NavTrackImportReviewPageState
   bool _diveChoiceInitialized = false;
   String? _siteId;
   String? _siteName;
+
+  /// True once the diver has explicitly picked a site through [_pickSite],
+  /// so a later dive selection never silently overwrites their own choice.
+  bool _siteChosenManually = false;
   String? _equipmentId;
   String? _equipmentName;
   bool _replaceDuplicate = false;
@@ -130,6 +134,20 @@ class _NavTrackImportReviewPageState
     _selectedDive ??= preview.candidateDives.length == 1
         ? preview.candidateDives.single
         : null;
+    _applySiteFromSelectedDive();
+  }
+
+  /// Pre-fills the site from [_selectedDive]'s own hydrated site, unless the
+  /// diver has already explicitly picked one through [_pickSite]. Without
+  /// this, accepting or picking a dive that already has a site left the
+  /// route with no default anchor unless the diver picked the same site
+  /// again by hand.
+  void _applySiteFromSelectedDive() {
+    if (_siteChosenManually) return;
+    final site = _selectedDive?.site;
+    if (site == null) return;
+    _siteId = site.id;
+    _siteName = site.name;
   }
 
   Future<void> _pickSite() async {
@@ -157,6 +175,7 @@ class _NavTrackImportReviewPageState
       setState(() {
         _siteId = result.id;
         _siteName = result.name;
+        _siteChosenManually = true;
       });
     }
   }
@@ -392,7 +411,10 @@ class _NavTrackImportReviewPageState
           candidates: preview.candidateDives,
           selected: _selectedDive,
           units: units,
-          onChanged: (dive) => setState(() => _selectedDive = dive),
+          onChanged: (dive) => setState(() {
+            _selectedDive = dive;
+            _applySiteFromSelectedDive();
+          }),
         ),
         const SizedBox(height: 24),
         Text(l10n.navTrack_review_diveSite, style: theme.textTheme.titleSmall),
