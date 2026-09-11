@@ -7308,6 +7308,8 @@
   "@dive3d_seascape_overlay_contours": {},
   "dive3d_seascape_overlay_walls": "Pareti ripide",
   "@dive3d_seascape_overlay_walls": {},
+  "dive3d_seascape_showRoute": "Mostra percorso",
+  "@dive3d_seascape_showRoute": {},
   "dive3d_overlay_water": "Superficie dell'acqua",
   "@dive3d_overlay_water": {},
   "dive3d_seascape_legend_land": "Terra",

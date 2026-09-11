@@ -25374,6 +25374,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Meredek falak';
 
   @override
+  String get dive3d_seascape_showRoute => 'Útvonal megjelenítése';
+
+  @override
   String get dive3d_overlay_water => 'Vízfelszín';
 
   @override

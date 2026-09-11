@@ -25492,6 +25492,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Paredes verticales';
 
   @override
+  String get dive3d_seascape_showRoute => 'Mostrar ruta';
+
+  @override
   String get dive3d_overlay_water => 'Superficie del agua';
 
   @override

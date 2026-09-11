@@ -25571,6 +25571,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Tombants';
 
   @override
+  String get dive3d_seascape_showRoute => 'Afficher l\'itinéraire';
+
+  @override
   String get dive3d_overlay_water => 'Surface de l\'eau';
 
   @override

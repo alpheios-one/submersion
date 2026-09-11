@@ -25,15 +25,28 @@ import 'package:submersion/features/nav_track/domain/nav_track_path_adapter.dart
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
+/// Whether the dive's 3D seascape should draw the linked measured route
+/// (the default) rather than the dead-reckoned estimate, when both are
+/// available. Purely a display toggle for the "Show route" button on
+/// `SpatialSitePage` -- it never affects which path is *stored* or linked,
+/// only which one `spatialReckonedPathProvider` returns for this viewing.
+/// True (show the route) unless a diver has explicitly flipped it, so a
+/// dive with no route linked behaves exactly as before this toggle existed.
+final showMeasuredRouteProvider = StateProvider.family<bool, String>(
+  (ref, diveId) => true,
+);
+
 /// The reconstructed swim path for a dive: a linked underwater route when
-/// one exists and has enough points, else dead reckoning, else null when
-/// the dive has no usable profile either.
+/// one exists, has enough points, and [showMeasuredRouteProvider] has not
+/// been switched off, else dead reckoning, else null when the dive has no
+/// usable profile either.
 final spatialReckonedPathProvider =
     FutureProvider.family<ReckonedPath?, String>((ref, diveId) async {
       final route = await ref.watch(
         primaryNavTrackForDiveProvider(diveId).future,
       );
-      if (route != null && route.points.length >= 2) {
+      final showMeasuredRoute = ref.watch(showMeasuredRouteProvider(diveId));
+      if (route != null && route.points.length >= 2 && showMeasuredRoute) {
         return NavTrackPathAdapter.toReckonedPath(route);
       }
 

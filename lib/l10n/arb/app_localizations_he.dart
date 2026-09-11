@@ -24841,6 +24841,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'קירות תלולים';
 
   @override
+  String get dive3d_seascape_showRoute => 'הצג מסלול';
+
+  @override
   String get dive3d_overlay_water => 'פני המים';
 
   @override

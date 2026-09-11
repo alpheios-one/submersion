@@ -23,6 +23,7 @@ import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/hover_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/time_scrub_bar.dart';
+import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Fullscreen spatial seascape: the dive's reconstructed swim path threaded
@@ -83,6 +84,13 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
       settingsProvider.select((s) => s.seascapeAppearance),
     );
     final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
+    // Only a dive with a linked route can toggle between it and the
+    // dead-reckoned estimate; a dive with none never shows this chip.
+    final hasLinkedRoute =
+        ref.watch(primaryNavTrackForDiveProvider(widget.diveId)).value != null;
+    final showMeasuredRoute = ref.watch(
+      showMeasuredRouteProvider(widget.diveId),
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(context.l10n.dive3d_spatial_title),
@@ -190,38 +198,61 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (result.grid != null)
+                    if (result.grid != null || hasLinkedRoute)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Wrap(
                           spacing: 8,
                           children: [
-                            FilterChip(
-                              label: Text(
-                                context.l10n.dive3d_seascape_overlay_contours,
+                            if (result.grid != null) ...[
+                              FilterChip(
+                                label: Text(
+                                  context.l10n.dive3d_seascape_overlay_contours,
+                                ),
+                                selected: _visible.contains(
+                                  SceneOverlay.contours,
+                                ),
+                                onSelected: (on) => setState(() {
+                                  on
+                                      ? _visible.add(SceneOverlay.contours)
+                                      : _visible.remove(SceneOverlay.contours);
+                                }),
                               ),
-                              selected: _visible.contains(
-                                SceneOverlay.contours,
+                              FilterChip(
+                                label: Text(
+                                  context.l10n.dive3d_seascape_overlay_walls,
+                                ),
+                                selected: _visible.contains(
+                                  SceneOverlay.steepWalls,
+                                ),
+                                onSelected: (on) => setState(() {
+                                  on
+                                      ? _visible.add(SceneOverlay.steepWalls)
+                                      : _visible.remove(
+                                          SceneOverlay.steepWalls,
+                                        );
+                                }),
                               ),
-                              onSelected: (on) => setState(() {
-                                on
-                                    ? _visible.add(SceneOverlay.contours)
-                                    : _visible.remove(SceneOverlay.contours);
-                              }),
-                            ),
-                            FilterChip(
-                              label: Text(
-                                context.l10n.dive3d_seascape_overlay_walls,
+                            ],
+                            if (hasLinkedRoute)
+                              FilterChip(
+                                key: const ValueKey(
+                                  'spatial-site-show-route-toggle',
+                                ),
+                                label: Text(
+                                  context.l10n.dive3d_seascape_showRoute,
+                                ),
+                                selected: showMeasuredRoute,
+                                onSelected: (on) =>
+                                    ref
+                                            .read(
+                                              showMeasuredRouteProvider(
+                                                widget.diveId,
+                                              ).notifier,
+                                            )
+                                            .state =
+                                        on,
                               ),
-                              selected: _visible.contains(
-                                SceneOverlay.steepWalls,
-                              ),
-                              onSelected: (on) => setState(() {
-                                on
-                                    ? _visible.add(SceneOverlay.steepWalls)
-                                    : _visible.remove(SceneOverlay.steepWalls);
-                              }),
-                            ),
                           ],
                         ),
                       ),

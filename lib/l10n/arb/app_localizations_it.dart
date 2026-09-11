@@ -25473,6 +25473,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Pareti ripide';
 
   @override
+  String get dive3d_seascape_showRoute => 'Mostra percorso';
+
+  @override
   String get dive3d_overlay_water => 'Superficie dell\'acqua';
 
   @override

@@ -24147,6 +24147,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => '陡壁';
 
   @override
+  String get dive3d_seascape_showRoute => '显示路线';
+
+  @override
   String get dive3d_overlay_water => '水面';
 
   @override

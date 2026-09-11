@@ -25018,6 +25018,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'جدران شديدة الانحدار';
 
   @override
+  String get dive3d_seascape_showRoute => 'إظهار المسار';
+
+  @override
   String get dive3d_overlay_water => 'سطح الماء';
 
   @override

@@ -16445,6 +16445,8 @@
   "@dive3d_seascape_overlay_contours": {},
   "dive3d_seascape_overlay_walls": "Steep walls",
   "@dive3d_seascape_overlay_walls": {},
+  "dive3d_seascape_showRoute": "Show route",
+  "@dive3d_seascape_showRoute": {},
   "dive3d_overlay_water": "Water surface",
   "@dive3d_overlay_water": {},
   "dive3d_seascape_legend_land": "Land",

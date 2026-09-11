@@ -7308,6 +7308,8 @@
   "@dive3d_seascape_overlay_contours": {},
   "dive3d_seascape_overlay_walls": "Meredek falak",
   "@dive3d_seascape_overlay_walls": {},
+  "dive3d_seascape_showRoute": "Útvonal megjelenítése",
+  "@dive3d_seascape_showRoute": {},
   "dive3d_overlay_water": "Vízfelszín",
   "@dive3d_overlay_water": {},
   "dive3d_seascape_legend_land": "Szárazföld",

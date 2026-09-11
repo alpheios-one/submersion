@@ -41715,6 +41715,12 @@ abstract class AppLocalizations {
   /// **'Steep walls'**
   String get dive3d_seascape_overlay_walls;
 
+  /// No description provided for @dive3d_seascape_showRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Show route'**
+  String get dive3d_seascape_showRoute;
+
   /// No description provided for @dive3d_overlay_water.
   ///
   /// In en, this message translates to:

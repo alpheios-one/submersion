@@ -25275,6 +25275,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_overlay_walls => 'Steile wanden';
 
   @override
+  String get dive3d_seascape_showRoute => 'Route tonen';
+
+  @override
   String get dive3d_overlay_water => 'Wateroppervlak';
 
   @override

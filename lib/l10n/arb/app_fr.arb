@@ -7308,6 +7308,8 @@
   "@dive3d_seascape_overlay_contours": {},
   "dive3d_seascape_overlay_walls": "Tombants",
   "@dive3d_seascape_overlay_walls": {},
+  "dive3d_seascape_showRoute": "Afficher l'itinéraire",
+  "@dive3d_seascape_showRoute": {},
   "dive3d_overlay_water": "Surface de l'eau",
   "@dive3d_overlay_water": {},
   "dive3d_seascape_legend_land": "Terre",
