@@ -58,6 +58,22 @@ class NavTrackCorrection {
     this.trustFraction = 0,
     this.headingOffsetDeg = 0,
   });
+
+  NavTrackCorrection copyWith({
+    GeoPoint? anchor,
+    NavTrackEndMode? endMode,
+    GeoPoint? endPoint,
+    double? trustFraction,
+    double? headingOffsetDeg,
+  }) {
+    return NavTrackCorrection(
+      anchor: anchor ?? this.anchor,
+      endMode: endMode ?? this.endMode,
+      endPoint: endPoint ?? this.endPoint,
+      trustFraction: trustFraction ?? this.trustFraction,
+      headingOffsetDeg: headingOffsetDeg ?? this.headingOffsetDeg,
+    );
+  }
 }
 
 /// One sample after rotation and drift correction: the local frame the 2D

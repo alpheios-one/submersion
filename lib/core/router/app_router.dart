@@ -147,6 +147,7 @@ import 'package:submersion/features/marine_life/presentation/pages/species_detai
 import 'package:submersion/features/planner/presentation/pages/plan_chart_fullscreen_page.dart';
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
+import 'package:submersion/features/nav_track/presentation/pages/nav_track_align_page.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_detail_page.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_list_page.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_seascape_page.dart';
@@ -995,6 +996,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             name: 'navRouteDetail',
             builder: (context, state) =>
                 NavTrackDetailPage(trackId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: '/nav-routes/:id/align',
+            name: 'navRouteAlign',
+            builder: (context, state) =>
+                NavTrackAlignPage(routeId: state.pathParameters['id']!),
           ),
           GoRoute(
             path: '/nav-routes/:id/3d',

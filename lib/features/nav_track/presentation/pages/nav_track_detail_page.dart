@@ -154,6 +154,12 @@ class NavTrackDetailPage extends ConsumerWidget {
             title: Text(route.name ?? route.sourceRef ?? 'Route'),
             actions: [
               IconButton(
+                key: const ValueKey('nav-track-align'),
+                icon: const Icon(Icons.tune),
+                tooltip: 'Align on map',
+                onPressed: () => context.push('/nav-routes/${route.id}/align'),
+              ),
+              IconButton(
                 key: const ValueKey('nav-track-open-3d'),
                 icon: const Icon(Icons.view_in_ar),
                 tooltip: 'Open 3D',
