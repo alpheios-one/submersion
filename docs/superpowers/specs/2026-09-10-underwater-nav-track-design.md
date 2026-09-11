@@ -293,7 +293,7 @@ test/fixtures/nav_tracks/seacraft_enc3_short.csv       # 005
 test/fixtures/nav_tracks/seacraft_enc3_bench.csv       # 002
 ```
 
-### Schema (migration 205)
+### Schema (migration 209, implemented)
 
 ```dart
 /// Measured underwater routes from navigation consoles and IMU-equipped
@@ -402,13 +402,21 @@ class NavTracks extends Table {
 Plus `CREATE INDEX IF NOT EXISTS idx_nav_tracks_dive ON nav_tracks(dive_id)`
 and `idx_nav_tracks_start ON nav_tracks(start_time)` for the matcher.
 
-Migration follows the v145/v204 idiom: `currentSchemaVersion` 204 -> 205,
-`NavTracks` in the `@DriftDatabase` table list, `205` appended to
-`migrationVersions`, one idempotent `_createNavTracksTable()` called from
-`onUpgrade` (`if (from < 205)`) and again from the `beforeOpen` backstop so
-restores and sync-adopts self-heal. `minimumCompatibleSchemaVersion` stays
-at 183; the table is additive. If another branch takes 205 first, use the
-next free rung.
+Implemented at schema version **209**, not 205 as this section originally
+named: by the time this landed, 205 and 206 were claimed by open
+condition-intelligence branches and 208 by the auto-tag-dive-computer-
+imports branch (all visible as sibling worktrees in this repo), exactly
+the collision the "open questions" section below anticipated. Migration
+follows the v202/v203 idiom for a new synced table: `currentSchemaVersion`
+207 -> 209, `NavTracks` in the `@DriftDatabase` table list, `209` appended
+to `migrationVersions`, one idempotent `_assertNavTracksSchema()` (using
+`Migrator.createTable`, itself `IF NOT EXISTS`) called from `onUpgrade`
+(`if (from < 209)`) and again from the `beforeOpen` backstop so restores
+and sync-adopts self-heal. `minimumCompatibleSchemaVersion` stays
+unchanged; the table is additive. `nav_tracks` is also registered in
+`SyncRepository.hlcTargets` (its own schema-driven completeness test
+requires this the moment the column exists, independent of whether a
+write path uses it yet).
 
 Speed is stored in m/s and displayed through the existing
 `AttributeDimension.speedMps` formatting (m/min or ft/min, #1096), so the
@@ -983,9 +991,9 @@ ask).
   section empty and populated states, review page link proposal and offset
   stepper, alignment page start/end/trust interactions with a fake map
   controller, polyline layer renders nothing without an anchor.
-- Sync serializer round trip for `navTracks`; migration smoke from 204 to
-  205 plus the backstop; `arb_parity_test.dart` for the new keys in all 11
-  locales.
+- Sync serializer round trip for `navTracks`; migration smoke from 207 to
+  209 plus the backstop (implemented: `test/core/database/migration_v209_nav_tracks_test.dart`);
+  `arb_parity_test.dart` for the new keys in all 11 locales.
 
 ---
 
@@ -1005,6 +1013,5 @@ deferred rather than open:
    origin is in there, a small follow-up adds a KML importer for routes
    that pre-fills the start point; if not, the site-pin default anchor and
    the manual start point remain the only path, as designed.
-2. If migration 205 is taken by another branch by the time this lands, the
-   next free schema version is used instead; the migration DDL is
-   idempotent either way.
+2. Resolved: the collision happened as anticipated. Implemented at schema
+   version 209 (see the Schema section above), not 205.
