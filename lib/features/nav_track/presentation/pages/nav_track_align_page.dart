@@ -93,6 +93,15 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
   _Placing _placing = _Placing.none;
   NavTrackTerrainCheckResult? _terrainResult;
 
+  /// Bumped every time a new terrain check starts, so a check whose async
+  /// bathymetry fetch is still in flight when a NEWER one starts can tell
+  /// it has been superseded once it finally resolves, and discard its
+  /// result instead of overwriting whatever the newer check already
+  /// applied. Cancelling `_terrainDebounce` only stops a check that has not
+  /// started yet; it cannot cancel `_runTerrainCheck`'s own already-awaited
+  /// `Future`.
+  int _terrainCheckGeneration = 0;
+
   static const Duration _terrainDebounceDuration = Duration(milliseconds: 300);
 
   @override
@@ -142,17 +151,26 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
   }
 
   Future<void> _runTerrainCheck(NavTrack route) async {
+    final generation = ++_terrainCheckGeneration;
     final anchor = _correction.anchor;
     if (anchor == null || route.points.length < 2) {
-      if (mounted) setState(() => _terrainResult = null);
+      if (mounted && generation == _terrainCheckGeneration) {
+        setState(() => _terrainResult = null);
+      }
       return;
     }
     final corrected = NavTrackCorrector.apply(route.points, _correction);
     final grid = await ref.read(
       bathymetryGridProvider(BathymetryRepository.quantize(anchor)).future,
     );
-    if (!mounted || grid == null) {
-      if (mounted) setState(() => _terrainResult = null);
+    // A newer terrain check may have started (and even already applied its
+    // own result) while this one awaited the bathymetry fetch above --
+    // cancelling the debounce timer only stops a check that had not yet
+    // started, not this one's in-flight Future. Discard silently rather
+    // than let a slow, stale fetch clobber a faster, newer result.
+    if (!mounted || generation != _terrainCheckGeneration) return;
+    if (grid == null) {
+      setState(() => _terrainResult = null);
       return;
     }
     setState(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -70,6 +72,7 @@ Future<_RecordingNavTrackRepository> _pump(
   required NavTrack route,
   Dive? linkedDive,
   DiveSite? site,
+  Override? bathymetryOverride,
 }) async {
   final overrides = await getBaseOverrides();
   final repository = _RecordingNavTrackRepository();
@@ -104,7 +107,8 @@ Future<_RecordingNavTrackRepository> _pump(
         if (site != null)
           siteProvider(site.id).overrideWith((ref) async => site),
         // Never hit the real bathymetry cache/network from a widget test.
-        bathymetryGridProvider.overrideWith((ref, cell) async => null),
+        bathymetryOverride ??
+            bathymetryGridProvider.overrideWith((ref, cell) async => null),
       ],
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -530,6 +534,88 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.lastCorrection?.headingOffsetDeg, 0.5);
+    },
+  );
+
+  testWidgets(
+    'discards a stale terrain-check result that resolves after a newer one '
+    '(item 6): moving the start point twice must not let the FIRST, '
+    'slower bathymetry fetch overwrite the SECOND, faster one that already '
+    'landed',
+    (tester) async {
+      final completers =
+          <({double lat, double lon}), Completer<BathymetryGrid?>>{};
+      final grid = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 0.01,
+        cellSizeLonDeg: 0.01,
+        rows: 1,
+        cols: 1,
+        depthsMeters: const [50.0],
+        sourceId: 'test',
+        resolutionMeters: 5, // fine: no "coarse bathymetry" caveat
+        fetchedAt: DateTime(2026, 1, 1),
+      );
+      final coarseGrid = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 0.01,
+        cellSizeLonDeg: 0.01,
+        rows: 1,
+        cols: 1,
+        depthsMeters: const [50.0],
+        sourceId: 'test-coarse',
+        resolutionMeters: 500, // coarse: adds the caveat
+        fetchedAt: DateTime(2026, 1, 1),
+      );
+
+      final dive = Dive(
+        id: 'dive-1',
+        diveNumber: 1,
+        dateTime: DateTime(2026, 8, 22, 10, 8),
+        entryLocation: const GeoPoint(46.9, 7.2),
+      );
+      await _pump(
+        tester,
+        route: _route(diveId: 'dive-1'),
+        linkedDive: dive,
+        bathymetryOverride: bathymetryGridProvider.overrideWith((ref, cell) {
+          final completer = completers.putIfAbsent(cell, () => Completer());
+          return completer.future;
+        }),
+      );
+
+      // First terrain check: the start point at the map's initial centre
+      // (0, 0) -- a different quantized cell from the dive entry below.
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-align-place-start')),
+      );
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-set-here')));
+      await tester.pump(const Duration(milliseconds: 300)); // debounce fires
+      final firstCell = completers.keys.single;
+
+      // Before the first fetch resolves, move the start point again (a
+      // different cell): the second, later terrain check must supersede it.
+      await tester.tap(
+        find.byKey(const ValueKey('nav-track-align-from-dive-entry')),
+      );
+      await tester.pump(const Duration(milliseconds: 300)); // debounce fires
+      expect(completers.length, 2);
+      final secondCell = completers.keys.firstWhere((c) => c != firstCell);
+
+      // The second (newer) request resolves first, with the fine grid.
+      completers[secondCell]!.complete(grid);
+      await tester.pump();
+      expect(find.textContaining('coarse bathymetry'), findsNothing);
+
+      // The first (older, slower) request resolves last, with a coarse
+      // grid. It must be discarded, not overwrite the newer result.
+      completers[firstCell]!.complete(coarseGrid);
+      await tester.pump();
+
+      expect(find.textContaining('coarse bathymetry'), findsNothing);
     },
   );
 
