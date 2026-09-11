@@ -25096,6 +25096,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => 'נתיב משוער (ניווט משוער)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'מסלול מוקלט';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'מסלול מוקלט ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'קרקעית ים מסונתזת';
 
   @override

@@ -25275,6 +25275,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => 'مسار مقدّر (الحساب الاستدلالي)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'مسار مسجّل';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'مسار مسجّل ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'قاع بحر مُركّب';
 
   @override

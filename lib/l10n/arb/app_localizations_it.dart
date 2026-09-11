@@ -25734,6 +25734,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Percorso stimato (navigazione stimata)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Percorso registrato';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Percorso registrato ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Fondale sintetizzato';
 
   @override

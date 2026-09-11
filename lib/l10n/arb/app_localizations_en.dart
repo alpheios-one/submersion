@@ -25299,6 +25299,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => 'Estimated path (dead reckoning)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Recorded route';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Recorded route ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Synthesized seafloor';
 
   @override

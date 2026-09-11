@@ -42201,6 +42201,18 @@ abstract class AppLocalizations {
   /// **'Estimated path (dead reckoning)'**
   String get dive3d_spatial_estimatedPath;
 
+  /// No description provided for @dive3d_spatial_recordedPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded route'**
+  String get dive3d_spatial_recordedPath;
+
+  /// No description provided for @dive3d_spatial_recordedPathWithSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded route ({source})'**
+  String dive3d_spatial_recordedPathWithSource(String source);
+
   /// No description provided for @dive3d_spatial_synthesizedSeafloor.
   ///
   /// In en, this message translates to:

@@ -25683,6 +25683,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Geschätzter Pfad (Koppelnavigation)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Aufgezeichnete Route';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Aufgezeichnete Route ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor =>
       'Synthetisierter Meeresboden';
 

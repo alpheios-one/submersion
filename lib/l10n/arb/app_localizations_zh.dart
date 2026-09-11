@@ -24402,6 +24402,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => '估算路径（航位推算）';
 
   @override
+  String get dive3d_spatial_recordedPath => '记录的路线';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return '记录的路线（$source）';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => '合成海底';
 
   @override

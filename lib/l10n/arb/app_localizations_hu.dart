@@ -25633,6 +25633,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => 'Becsült útvonal (holtszámítás)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Rögzített útvonal';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Rögzített útvonal ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Szintetizált tengerfenék';
 
   @override

@@ -25832,6 +25832,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Trajet estimé (navigation à l\'estime)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Trajet enregistré';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Trajet enregistré ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Fond marin synthétisé';
 
   @override

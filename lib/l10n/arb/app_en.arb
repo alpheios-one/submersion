@@ -16640,6 +16640,16 @@
   "@dive3d_spatial_title": {},
   "dive3d_spatial_estimatedPath": "Estimated path (dead reckoning)",
   "@dive3d_spatial_estimatedPath": {},
+  "dive3d_spatial_recordedPath": "Recorded route",
+  "@dive3d_spatial_recordedPath": {},
+  "dive3d_spatial_recordedPathWithSource": "Recorded route ({source})",
+  "@dive3d_spatial_recordedPathWithSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
   "dive3d_spatial_synthesizedSeafloor": "Synthesized seafloor",
   "@dive3d_spatial_synthesizedSeafloor": {},
   "dive3d_spatial_noPath": "Not enough data to reconstruct the dive path",

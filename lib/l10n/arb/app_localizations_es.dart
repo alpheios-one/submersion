@@ -25753,6 +25753,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ruta estimada (navegación a estima)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Ruta grabada';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Ruta grabada ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Fondo marino sintetizado';
 
   @override

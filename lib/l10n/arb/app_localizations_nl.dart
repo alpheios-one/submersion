@@ -25534,6 +25534,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_spatial_estimatedPath => 'Geschat pad (gegist bestek)';
 
   @override
+  String get dive3d_spatial_recordedPath => 'Opgenomen route';
+
+  @override
+  String dive3d_spatial_recordedPathWithSource(String source) {
+    return 'Opgenomen route ($source)';
+  }
+
+  @override
   String get dive3d_spatial_synthesizedSeafloor => 'Gesynthetiseerde zeebodem';
 
   @override
