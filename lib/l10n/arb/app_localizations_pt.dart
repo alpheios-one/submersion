@@ -38609,9 +38609,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'Registro Seacraft ENC';
 
   @override
-  String get navTrack_review_deviceHint => 'Dispositivo (opcional)';
-
-  @override
   String get navTrack_review_nameHint => 'Nome (opcional)';
 
   @override

@@ -38522,9 +38522,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'Seacraft-ENC-Protokoll';
 
   @override
-  String get navTrack_review_deviceHint => 'Gerät (optional)';
-
-  @override
   String get navTrack_review_nameHint => 'Name (optional)';
 
   @override

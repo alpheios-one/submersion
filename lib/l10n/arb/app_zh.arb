@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "无法保存此路线：{error}",
   "navTrack_review_importError": "无法导入此文件：{error}",
   "navTrack_review_sourceLabel": "Seacraft ENC 日志",
-  "navTrack_review_deviceHint": "设备（可选）",
   "navTrack_review_nameHint": "名称（可选）",
   "navTrack_review_warningNoMovement": "未记录任何移动：整个文件中距离和速度始终为零。",
   "navTrack_review_warningDuplicate": "这看起来像是已从同一文件导入过的路线。",

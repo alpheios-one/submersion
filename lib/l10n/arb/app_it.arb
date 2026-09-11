@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "Impossibile salvare questo percorso: {error}",
   "navTrack_review_importError": "Impossibile importare questo file: {error}",
   "navTrack_review_sourceLabel": "Registro Seacraft ENC",
-  "navTrack_review_deviceHint": "Dispositivo (opzionale)",
   "navTrack_review_nameHint": "Nome (opzionale)",
   "navTrack_review_warningNoMovement": "Nessun movimento registrato: distanza e velocità restano a zero per tutto il file.",
   "navTrack_review_warningDuplicate": "Questo sembra un percorso già importato dallo stesso file.",

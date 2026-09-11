@@ -98,7 +98,6 @@ class _NavTrackImportReviewPageState
   String? _error;
 
   final _nameController = TextEditingController();
-  final _deviceController = TextEditingController();
 
   @override
   void initState() {
@@ -113,7 +112,6 @@ class _NavTrackImportReviewPageState
   @override
   void dispose() {
     _nameController.dispose();
-    _deviceController.dispose();
     super.dispose();
   }
 
@@ -237,7 +235,6 @@ class _NavTrackImportReviewPageState
             .delete(preview.duplicateOfRouteId!);
       }
       final name = _nameController.text.trim();
-      final device = _deviceController.text.trim();
       final id = await ref
           .read(navTrackImportServiceProvider)
           .commit(
@@ -246,7 +243,7 @@ class _NavTrackImportReviewPageState
             dive: _selectedDive,
             siteId: _siteId,
             name: name.isEmpty ? null : name,
-            deviceName: device.isEmpty ? null : device,
+            deviceName: _equipmentName,
             equipmentId: _equipmentId,
           );
       if (!mounted) return;
@@ -329,14 +326,6 @@ class _NavTrackImportReviewPageState
           ),
         ),
         const SizedBox(height: 16),
-        TextField(
-          controller: _deviceController,
-          decoration: InputDecoration(
-            labelText: l10n.navTrack_review_deviceHint,
-            isDense: true,
-          ),
-        ),
-        const SizedBox(height: 12),
         TextField(
           controller: _nameController,
           decoration: InputDecoration(

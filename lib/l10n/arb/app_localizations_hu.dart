@@ -38441,9 +38441,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'Seacraft ENC napló';
 
   @override
-  String get navTrack_review_deviceHint => 'Eszköz (opcionális)';
-
-  @override
   String get navTrack_review_nameHint => 'Név (opcionális)';
 
   @override

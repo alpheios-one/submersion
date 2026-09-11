@@ -368,10 +368,10 @@ class _StatsCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (route.deviceName != null)
-              Text(l10n.navTrack_detail_device(route.deviceName!)),
             if (equipmentName != null)
-              Text(l10n.navTrack_detail_equipment(equipmentName)),
+              Text(l10n.navTrack_detail_equipment(equipmentName))
+            else if (route.deviceName != null)
+              Text(l10n.navTrack_detail_device(route.deviceName!)),
             Text(
               l10n.navTrack_detail_distance(
                 units.formatDistance(stats.totalDistance),

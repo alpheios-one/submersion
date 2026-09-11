@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "Nem sikerült menteni ezt az útvonalat: {error}",
   "navTrack_review_importError": "Nem sikerült importálni ezt a fájlt: {error}",
   "navTrack_review_sourceLabel": "Seacraft ENC napló",
-  "navTrack_review_deviceHint": "Eszköz (opcionális)",
   "navTrack_review_nameHint": "Név (opcionális)",
   "navTrack_review_warningNoMovement": "Nem történt mozgás: a távolság és a sebesség végig nulla marad ebben a fájlban.",
   "navTrack_review_warningDuplicate": "Ez egy már ugyanabból a fájlból importált útvonalnak tűnik.",

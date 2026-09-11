@@ -38705,9 +38705,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'Journal Seacraft ENC';
 
   @override
-  String get navTrack_review_deviceHint => 'Appareil (facultatif)';
-
-  @override
   String get navTrack_review_nameHint => 'Nom (facultatif)';
 
   @override

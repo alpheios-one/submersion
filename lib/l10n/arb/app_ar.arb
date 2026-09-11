@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "تعذر حفظ هذا المسار: {error}",
   "navTrack_review_importError": "تعذر استيراد هذا الملف: {error}",
   "navTrack_review_sourceLabel": "سجل Seacraft ENC",
-  "navTrack_review_deviceHint": "الجهاز (اختياري)",
   "navTrack_review_nameHint": "الاسم (اختياري)",
   "navTrack_review_warningNoMovement": "لم تُسجَّل أي حركة: تبقى المسافة والسرعة عند الصفر طوال هذا الملف.",
   "navTrack_review_warningDuplicate": "يبدو هذا مسارًا تم استيراده مسبقًا من الملف نفسه.",

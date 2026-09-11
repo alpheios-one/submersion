@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "Diese Route konnte nicht gespeichert werden: {error}",
   "navTrack_review_importError": "Diese Datei konnte nicht importiert werden: {error}",
   "navTrack_review_sourceLabel": "Seacraft-ENC-Protokoll",
-  "navTrack_review_deviceHint": "Gerät (optional)",
   "navTrack_review_nameHint": "Name (optional)",
   "navTrack_review_warningNoMovement": "Keine Bewegung aufgezeichnet: Distanz und Geschwindigkeit bleiben in dieser Datei durchgehend bei null.",
   "navTrack_review_warningDuplicate": "Dies sieht nach einer bereits aus derselben Datei importierten Route aus.",

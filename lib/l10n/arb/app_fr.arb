@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "Impossible d'enregistrer ce trajet : {error}",
   "navTrack_review_importError": "Ce fichier n'a pas pu être importé : {error}",
   "navTrack_review_sourceLabel": "Journal Seacraft ENC",
-  "navTrack_review_deviceHint": "Appareil (facultatif)",
   "navTrack_review_nameHint": "Nom (facultatif)",
   "navTrack_review_warningNoMovement": "Aucun mouvement enregistré : la distance et la vitesse restent à zéro tout au long de ce fichier.",
   "navTrack_review_warningDuplicate": "Ceci ressemble à un trajet déjà importé depuis le même fichier.",

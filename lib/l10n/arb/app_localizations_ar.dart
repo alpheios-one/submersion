@@ -38201,9 +38201,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'سجل Seacraft ENC';
 
   @override
-  String get navTrack_review_deviceHint => 'الجهاز (اختياري)';
-
-  @override
   String get navTrack_review_nameHint => 'الاسم (اختياري)';
 
   @override

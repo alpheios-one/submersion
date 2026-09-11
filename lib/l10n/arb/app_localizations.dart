@@ -63039,12 +63039,6 @@ abstract class AppLocalizations {
   /// **'Seacraft ENC log'**
   String get navTrack_review_sourceLabel;
 
-  /// No description provided for @navTrack_review_deviceHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Device (optional)'**
-  String get navTrack_review_deviceHint;
-
   /// No description provided for @navTrack_review_nameHint.
   ///
   /// In en, this message translates to:

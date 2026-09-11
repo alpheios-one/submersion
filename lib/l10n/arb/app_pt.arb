@@ -11309,7 +11309,6 @@
   "navTrack_review_saveError": "Não foi possível salvar esta rota: {error}",
   "navTrack_review_importError": "Não foi possível importar este arquivo: {error}",
   "navTrack_review_sourceLabel": "Registro Seacraft ENC",
-  "navTrack_review_deviceHint": "Dispositivo (opcional)",
   "navTrack_review_nameHint": "Nome (opcional)",
   "navTrack_review_warningNoMovement": "Nenhum movimento registrado: distância e velocidade permanecem em zero durante todo o arquivo.",
   "navTrack_review_warningDuplicate": "Isso parece uma rota já importada do mesmo arquivo.",

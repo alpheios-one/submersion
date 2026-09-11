@@ -23399,7 +23399,6 @@
     }
   },
   "navTrack_review_sourceLabel": "Seacraft ENC log",
-  "navTrack_review_deviceHint": "Device (optional)",
   "navTrack_review_nameHint": "Name (optional)",
   "navTrack_review_warningNoMovement": "No movement recorded: distance and speed stay at zero throughout this file.",
   "navTrack_review_warningDuplicate": "This looks like a route already imported from the same file.",

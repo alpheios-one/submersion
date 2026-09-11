@@ -37824,9 +37824,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'יומן Seacraft ENC';
 
   @override
-  String get navTrack_review_deviceHint => 'מכשיר (אופציונלי)';
-
-  @override
   String get navTrack_review_nameHint => 'שם (אופציונלי)';
 
   @override

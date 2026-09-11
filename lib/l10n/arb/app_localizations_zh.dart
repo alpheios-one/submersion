@@ -36346,9 +36346,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_review_sourceLabel => 'Seacraft ENC 日志';
 
   @override
-  String get navTrack_review_deviceHint => '设备（可选）';
-
-  @override
   String get navTrack_review_nameHint => '名称（可选）';
 
   @override
