@@ -116,16 +116,59 @@ void main() {
       expect(remaining, isEmpty);
     });
 
-    test(
-      'a cached negative ("empty") row is left untouched, not deleted',
-      () async {
-        await repo.writeEmpty('2726_1221');
+    test('a cached negative ("empty") row is left untouched, not deleted, '
+        'when no expected reference level is given or it matches', () async {
+      await repo.writeEmpty('2726_1221', referenceLevelMeters: 419.00);
 
-        final entry = await repo.read('2726_1221');
-        expect(entry, isNull);
-        expect(await repo.hasCachedAnswer('2726_1221'), isTrue);
-      },
-    );
+      final entry = await repo.read('2726_1221');
+      expect(entry, isNull);
+      expect(await repo.hasCachedAnswer('2726_1221'), isTrue);
+
+      final withMatch = await repo.read(
+        '2726_1221',
+        expectedReferenceLevelMeters: 419.00,
+      );
+      expect(withMatch, isNull);
+      expect(await repo.hasCachedAnswer('2726_1221'), isTrue);
+    });
+
+    test('a cached negative ("empty") row under a different reference level '
+        'than expected is deleted, so the tile is retried instead of staying '
+        'a permanent negative (regression: a lake bbox/level correction that '
+        'turns a tile genuinely dry under the OLD lake assignment into real, '
+        'covered water under the new one must not leave it pinned "no data" '
+        'forever, exactly like the analogous "ok" row case above -- Copilot '
+        'review)', () async {
+      await repo.writeEmpty('2726_1221', referenceLevelMeters: 433.58);
+
+      final entry = await repo.read(
+        '2726_1221',
+        expectedReferenceLevelMeters: 419.00,
+      );
+      expect(entry, isNull);
+      expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+    });
+
+    test('a cached negative ("empty") row written before referenceLevelMeters '
+        'existed (null) is treated as a mismatch too when a caller now '
+        'expects a specific level', () async {
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: '2726_1221',
+              status: 'empty',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+      final entry = await repo.read(
+        '2726_1221',
+        expectedReferenceLevelMeters: 419.00,
+      );
+      expect(entry, isNull);
+      expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+    });
 
     test(
       'a row cached under a different reference level than expected is '

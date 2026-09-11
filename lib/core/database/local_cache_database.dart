@@ -545,6 +545,25 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           PRIMARY KEY (tile_key)
         )
       ''');
+      // CREATE TABLE IF NOT EXISTS above is a no-op when the table already
+      // exists -- the exact ladder-collision case this backstop is meant to
+      // heal, e.g. a database stamped at v17 (by a colliding branch that
+      // claimed the same user_version first) whose table still has the v16
+      // shape. The onUpgrade `from < 17` step never runs then, since Drift
+      // reads the already-stamped v17 and sees nothing to upgrade from, so
+      // the column would otherwise stay permanently missing.
+      final swissBathyCols = await customSelect(
+        "PRAGMA table_info('swiss_bathy_tile_cache')",
+      ).get();
+      final swissBathyColumnNames = swissBathyCols
+          .map((c) => c.read<String>('name'))
+          .toSet();
+      if (!swissBathyColumnNames.contains('reference_level_meters')) {
+        await customStatement(
+          'ALTER TABLE swiss_bathy_tile_cache '
+          'ADD COLUMN reference_level_meters REAL NULL',
+        );
+      }
     },
   );
 }

@@ -260,7 +260,10 @@ class SwissBathy3dSource implements BathymetrySource {
       // tile once their real content was checked — deterministic for this
       // tile, so caching it avoids repeating the same lookup (and any
       // shared-href downloads) on every future visit to this coordinate.
-      await _tileCache.writeEmpty(tileKey);
+      await _tileCache.writeEmpty(
+        tileKey,
+        referenceLevelMeters: lake.meanLevelMeters,
+      );
       return null;
     }
 

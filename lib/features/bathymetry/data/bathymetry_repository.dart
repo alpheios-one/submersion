@@ -39,7 +39,15 @@ class BathymetryRepository {
   /// rows never expire, so without this every already-visited site would
   /// keep serving the grid its old resolver chose. Old rows go inert, the
   /// same way the 4 km rows did when the span went to 8 km.
-  static const String selectionGeneration = 'v2';
+  ///
+  /// v4 here (skipping past #1756's v3, which this branch predates) so an
+  /// install that already visited #1756 -- and so already holds a v3 outer
+  /// row -- is still forced back through the resolver once this release's
+  /// inner swiss_bathy_tile_cache reference-level fix ships (Copilot
+  /// review): an unchanged v3 row would otherwise keep being served
+  /// straight from the outer cache and never reach the now-fixed inner
+  /// validation in SwissBathyTileCacheRepository.read.
+  static const String selectionGeneration = 'v4';
   static const double quantumDeg = 0.02;
 
   final LocalCacheDatabase _db;

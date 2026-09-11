@@ -70,22 +70,31 @@ class SwissBathyTileCacheRepository {
     final row = await (_db.select(
       _db.swissBathyTileCache,
     )..where((t) => t.tileKey.equals(tileKey))).getSingleOrNull();
-    if (row == null || row.status != 'ok') return null;
-    final json = row.gridJson;
-    if (json == null) {
-      // Inconsistent row ('ok' but no grid): delete so callers retry instead
-      // of treating it as a cached negative.
+    if (row == null) return null;
+    if (expectedReferenceLevelMeters != null &&
+        row.referenceLevelMeters != expectedReferenceLevelMeters) {
+      // Checked before the status guard below, and so applies to a cached
+      // 'empty' row exactly like an 'ok' one: a lake bbox correction can
+      // turn a tile that was genuinely dry land under the OLD lake
+      // assignment into real, covered water under the new one, so a stale
+      // negative is exactly as unreliable as a stale positive would be.
+      // Without this, [hasCachedAnswer] would keep reporting the tile as
+      // definitively resolved forever, and the caller would never retry it
+      // (Copilot review). A stored null (pre-v17 row) counts as a mismatch
+      // too: there is no way to tell whether its cached answer is still
+      // correct without this field, so it gets the same one-time
+      // re-resolution every other pre-existing-row migration in this table
+      // already falls back to.
       await (_db.delete(
         _db.swissBathyTileCache,
       )..where((t) => t.tileKey.equals(tileKey))).go();
       return null;
     }
-    if (expectedReferenceLevelMeters != null &&
-        row.referenceLevelMeters != expectedReferenceLevelMeters) {
-      // A stored null (pre-v17 row) counts as a mismatch too: there is no
-      // way to tell whether its baked-in depths are still correct without
-      // this field, so it gets the same one-time re-resolution every other
-      // pre-existing-row migration in this table already falls back to.
+    if (row.status != 'ok') return null;
+    final json = row.gridJson;
+    if (json == null) {
+      // Inconsistent row ('ok' but no grid): delete so callers retry instead
+      // of treating it as a cached negative.
       await (_db.delete(
         _db.swissBathyTileCache,
       )..where((t) => t.tileKey.equals(tileKey))).go();
@@ -158,7 +167,10 @@ class SwissBathyTileCacheRepository {
         );
   }
 
-  Future<void> writeEmpty(String tileKey) async {
+  Future<void> writeEmpty(
+    String tileKey, {
+    required double referenceLevelMeters,
+  }) async {
     await _db
         .into(_db.swissBathyTileCache)
         .insertOnConflictUpdate(
@@ -166,6 +178,7 @@ class SwissBathyTileCacheRepository {
             tileKey: tileKey,
             status: 'empty',
             fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            referenceLevelMeters: Value(referenceLevelMeters),
           ),
         );
   }
