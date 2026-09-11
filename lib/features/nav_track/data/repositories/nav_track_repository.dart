@@ -262,11 +262,24 @@ class NavTrackRepository {
         throw StateError('Route $routeId has no linked dive to be primary for');
       }
       final now = DateTime.now().millisecondsSinceEpoch;
-      await _db.transaction(() async {
+      final demotedIds = await _db.transaction(() async {
+        final demoted =
+            await (_db.select(_db.navTracks)..where(
+                  (t) =>
+                      t.diveId.equals(diveId) &
+                      t.id.equals(routeId).not() &
+                      t.isPrimary.equals(true),
+                ))
+                .get();
         await (_db.update(_db.navTracks)..where(
               (t) => t.diveId.equals(diveId) & t.id.equals(routeId).not(),
             ))
-            .write(const NavTracksCompanion(isPrimary: Value(false)));
+            .write(
+              NavTracksCompanion(
+                isPrimary: const Value(false),
+                updatedAt: Value(now),
+              ),
+            );
         await (_db.update(
           _db.navTracks,
         )..where((t) => t.id.equals(routeId))).write(
@@ -275,8 +288,17 @@ class NavTrackRepository {
             updatedAt: Value(now),
           ),
         );
+        return [for (final row in demoted) row.id];
       });
+      // Every demoted route must be marked pending with the same timestamp
+      // too, not only the newly primary one -- otherwise a sibling route's
+      // stale isPrimary: true survives on another device until something
+      // else touches that row, and that device keeps rendering the wrong
+      // route as primary.
       await _markPending(routeId, now);
+      for (final demotedId in demotedIds) {
+        await _markPending(demotedId, now);
+      }
     } catch (e, stackTrace) {
       _log.error(
         'Failed to set nav track $routeId primary',

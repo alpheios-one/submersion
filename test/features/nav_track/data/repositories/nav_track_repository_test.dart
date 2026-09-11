@@ -315,6 +315,48 @@ void main() {
       expect(second!.isPrimary, isTrue);
     });
 
+    test('setPrimary stamps updatedAt and a pending sync record on every '
+        'demoted sibling route too, not only the newly primary one '
+        '(otherwise another device can retain a stale isPrimary: true and '
+        'render a different route as primary)', () async {
+      await _insertMinimalDive(db, 'd1');
+      final firstId = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'a.csv',
+        diveId: 'd1',
+      );
+      final secondId = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'b.csv',
+      );
+      await repo.link(secondId, 'd1', linkMode: NavTrackLinkMode.manual);
+
+      await repo.setPrimary(secondId);
+
+      final demoted = await repo.getById(firstId);
+      final primary = await repo.getById(secondId);
+      expect(demoted!.isPrimary, isFalse);
+      expect(primary!.isPrimary, isTrue);
+      // The demoted row must carry the same updatedAt as the new primary's,
+      // not a stale one, so a peer applying both rows never sees the old
+      // primary's flag survive a partial sync.
+      expect(demoted.updatedAt, primary.updatedAt);
+
+      final demotedPending = await db
+          .customSelect(
+            "SELECT local_updated_at FROM sync_records "
+            "WHERE entity_type = 'navTracks' AND record_id = '$firstId'",
+          )
+          .getSingleOrNull();
+      expect(demotedPending, isNotNull);
+      expect(
+        demotedPending!.read<int>('local_updated_at'),
+        primary.updatedAt.millisecondsSinceEpoch,
+      );
+    });
+
     test('setPrimary throws for a route with no linked dive', () async {
       final id = await repo.insertImportedRoute(
         points: _samplePoints(),
