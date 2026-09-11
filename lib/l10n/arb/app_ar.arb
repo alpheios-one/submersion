@@ -6569,6 +6569,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "لا يمكن حساب استهلاك الهواء و SAC. يمكنك إضافة ضغط البداية والنهاية بتعديل الغطسة.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{يؤثر على غطسة واحدة} other{يؤثر على {count} غطسات}}",
   "universalImport_summary_fileImported": "{count, plural, =1{تم استيراد غطسة واحدة} other{تم استيراد {count} غطسات}}",
+  "universalImport_summary_importAsRoute": "استيراد كمسار",
   "universalImport_summary_fileNeedsIndividualImport": "يتطلب استيرادًا فرديًا",
   "universalImport_summary_fileUnsupported": "تنسيق غير مدعوم",
   "universalImport_summary_fileParseFailed": "فشلت القراءة",

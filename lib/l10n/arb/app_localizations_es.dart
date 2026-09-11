@@ -21915,6 +21915,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'Importar como ruta';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'Requiere importación individual';
 

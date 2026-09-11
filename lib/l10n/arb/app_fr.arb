@@ -6485,6 +6485,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "La consommation d'air et le SAC ne peuvent pas être calculés. Vous pouvez saisir les pressions de début et de fin en modifiant la plongée.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Concerne 1 plongée} other{Concerne {count} plongées}}",
   "universalImport_summary_fileImported": "{count, plural, =1{1 plongée importée} other{{count} plongées importées}}",
+  "universalImport_summary_importAsRoute": "Importer comme route",
   "universalImport_summary_fileNeedsIndividualImport": "Import individuel requis",
   "universalImport_summary_fileUnsupported": "Format non pris en charge",
   "universalImport_summary_fileParseFailed": "Échec de lecture",

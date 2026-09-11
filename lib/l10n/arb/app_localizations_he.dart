@@ -21346,6 +21346,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'ייבוא כמסלול';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'נדרש ייבוא נפרד';
 

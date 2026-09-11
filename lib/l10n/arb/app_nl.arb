@@ -6569,6 +6569,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "Luchtverbruik en SAC kunnen niet worden berekend. Je kunt de begin- en einddruk toevoegen door de duik te bewerken.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Geldt voor 1 duik} other{Geldt voor {count} duiken}}",
   "universalImport_summary_fileImported": "{count, plural, =1{1 duik geïmporteerd} other{{count} duiken geïmporteerd}}",
+  "universalImport_summary_importAsRoute": "Importeren als route",
   "universalImport_summary_fileNeedsIndividualImport": "Afzonderlijke import vereist",
   "universalImport_summary_fileUnsupported": "Niet-ondersteund formaat",
   "universalImport_summary_fileParseFailed": "Lezen mislukt",

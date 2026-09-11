@@ -20753,6 +20753,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => '作为路线导入';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport => '需要单独导入';
 
   @override

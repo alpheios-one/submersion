@@ -36004,6 +36004,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 dive imported} other{{count} dives imported}}'**
   String universalImport_summary_fileImported(num count);
 
+  /// Action on the batch summary row that lets the diver re-open a recognised Seacraft ENC file (excluded from the batch) in the underwater route review page
+  ///
+  /// In en, this message translates to:
+  /// **'Import as route'**
+  String get universalImport_summary_importAsRoute;
+
   /// Per-file summary line for CSV files excluded from the batch
   ///
   /// In en, this message translates to:

@@ -21716,6 +21716,9 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'Importeren als route';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'Afzonderlijke import vereist';
 

@@ -21899,6 +21899,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'Importar como rota';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'Requer importação individual';
 

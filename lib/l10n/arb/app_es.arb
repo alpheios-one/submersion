@@ -6569,6 +6569,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "No se pueden calcular el consumo de aire ni el SAC. Puedes añadir la presión inicial y final editando la inmersión.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{Afecta a 1 inmersión} other{Afecta a {count} inmersiones}}",
   "universalImport_summary_fileImported": "{count, plural, =1{1 inmersión importada} other{{count} inmersiones importadas}}",
+  "universalImport_summary_importAsRoute": "Importar como ruta",
   "universalImport_summary_fileNeedsIndividualImport": "Requiere importación individual",
   "universalImport_summary_fileUnsupported": "Formato no compatible",
   "universalImport_summary_fileParseFailed": "Error de lectura",

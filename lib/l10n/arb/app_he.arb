@@ -6569,6 +6569,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "לא ניתן לחשב צריכת אוויר ו-SAC. אפשר להוסיף לחץ התחלה וסיום בעריכת הצלילה.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{משפיע על צלילה אחת} other{משפיע על {count} צלילות}}",
   "universalImport_summary_fileImported": "{count, plural, =1{צלילה אחת יובאה} other{{count} צלילות יובאו}}",
+  "universalImport_summary_importAsRoute": "ייבוא כמסלול",
   "universalImport_summary_fileNeedsIndividualImport": "נדרש ייבוא נפרד",
   "universalImport_summary_fileUnsupported": "פורמט לא נתמך",
   "universalImport_summary_fileParseFailed": "הקריאה נכשלה",

@@ -6485,6 +6485,7 @@
   "universalImport_summary_noticeNoTankPressureBody": "A levegőfogyasztás és a SAC nem számítható ki. A kezdő és záró nyomást a merülés szerkesztésével adhatod meg.",
   "universalImport_summary_noticeAffectedDives": "{count, plural, =1{1 merülést érint} other{{count} merülést érint}}",
   "universalImport_summary_fileImported": "{count, plural, =1{1 merülés importálva} other{{count} merülés importálva}}",
+  "universalImport_summary_importAsRoute": "Importálás útvonalként",
   "universalImport_summary_fileNeedsIndividualImport": "Egyenkénti importálás szükséges",
   "universalImport_summary_fileUnsupported": "Nem támogatott formátum",
   "universalImport_summary_fileParseFailed": "Beolvasás sikertelen",

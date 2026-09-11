@@ -21833,6 +21833,9 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'Importálás útvonalként';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'Egyenkénti importálás szükséges';
 

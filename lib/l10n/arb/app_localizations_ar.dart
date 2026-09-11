@@ -21499,6 +21499,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_importAsRoute => 'استيراد كمسار';
+
+  @override
   String get universalImport_summary_fileNeedsIndividualImport =>
       'يتطلب استيرادًا فرديًا';
 

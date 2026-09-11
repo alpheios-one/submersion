@@ -13219,6 +13219,7 @@
     }
   },
   "universalImport_summary_fileImported": "{count, plural, =1{1 dive imported} other{{count} dives imported}}",
+  "universalImport_summary_importAsRoute": "Import as route",
   "universalImport_summary_fileNeedsIndividualImport": "Needs individual import",
   "universalImport_summary_fileUnsupported": "Unsupported format",
   "universalImport_summary_fileParseFailed": "Failed to read",
@@ -13376,6 +13377,9 @@
         "type": "num"
       }
     }
+  },
+  "@universalImport_summary_importAsRoute": {
+    "description": "Action on the batch summary row that lets the diver re-open a recognised Seacraft ENC file (excluded from the batch) in the underwater route review page"
   },
   "@universalImport_summary_fileNeedsIndividualImport": {
     "description": "Per-file summary line for CSV files excluded from the batch"
