@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_service_providers.dart';
 import 'package:submersion/features/nav_track/presentation/nav_track_parse_error_text.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
@@ -193,7 +194,10 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
               options: const MapOptions(initialZoom: 12),
               children: [
                 for (final route in anchoredRoutes)
-                  NavTrackPolylineLayer(key: ValueKey(route.id), route: route),
+                  _HydratedNavTrackPolyline(
+                    key: ValueKey(route.id),
+                    routeId: route.id,
+                  ),
               ],
             ),
     );
@@ -226,6 +230,27 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
               },
             ),
     );
+  }
+}
+
+/// Hydrates one anchored route's points before handing it to
+/// [NavTrackPolylineLayer], since [allNavTracksProvider] deliberately reads
+/// with `includePoints: false` (a list of routes, each potentially up to
+/// `kMaxNavTrackPointCount` samples, must not all decode their blobs just to
+/// render a list row -- design spec "Points codec"). Only the rows actually
+/// rendered on the map pane pay this per-row hydration cost, the same
+/// list-vs-detail tradeoff `GpsTrackOverviewMap` makes with its own
+/// per-track geometry provider.
+class _HydratedNavTrackPolyline extends ConsumerWidget {
+  const _HydratedNavTrackPolyline({super.key, required this.routeId});
+
+  final String routeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hydrated = ref.watch(navTrackByIdProvider(routeId)).value;
+    if (hydrated == null) return const SizedBox.shrink();
+    return NavTrackPolylineLayer(route: hydrated);
   }
 }
 
@@ -316,10 +341,19 @@ class NavTrackListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final startedAt = DateTime.fromMillisecondsSinceEpoch(route.startTime);
     final l10n = context.l10n;
+    // route.points is always empty here: allNavTracksProvider reads with
+    // includePoints: false so the list query never decodes every route's
+    // blob just to render a row (design spec "Points codec"). The shape
+    // thumbnail needs actual points, so an unanchored row hydrates just
+    // its own route on demand -- the same per-row cost the map pane pays
+    // for anchored routes.
+    final hydratedPoints = route.anchor == null
+        ? ref.watch(navTrackByIdProvider(route.id)).value?.points ?? const []
+        : const <NavTrackPoint>[];
     return ListTile(
       selected: selected,
       leading: route.anchor == null
-          ? NavTrackShapeThumbnail(points: route.points)
+          ? NavTrackShapeThumbnail(points: hydratedPoints)
           : const Icon(Icons.route),
       title: Text(route.name ?? route.sourceRef ?? route.id),
       subtitle: Text(

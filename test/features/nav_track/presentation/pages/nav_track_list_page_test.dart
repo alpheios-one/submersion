@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_list_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_polyline_layer.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_shape_thumbnail.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
+
+List<NavTrackPoint> _hydratedPoints() => [
+  for (var i = 0; i < 5; i++)
+    NavTrackPoint(
+      timestamp: 1755856800 + i * 10,
+      north: i * 10.0,
+      east: 0,
+      depth: 5,
+    ),
+];
 
 NavTrack _route({
   required String id,
@@ -18,6 +32,8 @@ NavTrack _route({
   String? deviceName,
   double? distance,
   double? maxDepth,
+  double? anchorLatitude,
+  double? anchorLongitude,
 }) => NavTrack(
   id: id,
   diveId: diveId,
@@ -31,6 +47,8 @@ NavTrack _route({
   pointCount: 5,
   totalDistance: distance,
   maxDepth: maxDepth,
+  anchorLatitude: anchorLatitude,
+  anchorLongitude: anchorLongitude,
   createdAt: DateTime(2026, 8, 22),
   updatedAt: DateTime(2026, 8, 22),
 );
@@ -39,6 +57,7 @@ Future<void> _pump(
   WidgetTester tester, {
   required List<NavTrack> routes,
   Dive? linkedDive,
+  Map<String, NavTrack>? hydrated,
 }) async {
   final overrides = await getBaseOverrides();
   await tester.pumpWidget(
@@ -48,6 +67,11 @@ Future<void> _pump(
         allNavTracksProvider.overrideWith((ref) async => routes),
         if (linkedDive != null)
           diveProvider(linkedDive.id).overrideWith((ref) async => linkedDive),
+        if (hydrated != null)
+          for (final entry in hydrated.entries)
+            navTrackByIdProvider(
+              entry.key,
+            ).overrideWith((ref) async => entry.value),
       ],
       child: const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -104,4 +128,50 @@ void main() {
 
     expect(find.text('No underwater routes yet.'), findsOneWidget);
   });
+
+  testWidgets(
+    'an unanchored route\'s shape thumbnail renders the actual route, not '
+    'an empty shape (item 9: the list query omits points, so the thumbnail '
+    'must hydrate them itself rather than reading the unhydrated list row)',
+    (tester) async {
+      final listRow = _route(id: 'r1', name: 'Wreck dive');
+      final hydratedRoute = listRow.copyWith(points: _hydratedPoints());
+      await _pump(tester, routes: [listRow], hydrated: {'r1': hydratedRoute});
+
+      final thumbnail = tester.widget<NavTrackShapeThumbnail>(
+        find.byType(NavTrackShapeThumbnail),
+      );
+      expect(thumbnail.points, isNotEmpty);
+      expect(thumbnail.points, hydratedRoute.points);
+    },
+  );
+
+  testWidgets(
+    'an anchored route\'s map overlay actually renders the route, not an '
+    'empty polyline (item 9: the map pane must hydrate points per row too)',
+    (tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(1400, 900);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final listRow = _route(
+        id: 'r1',
+        name: 'Wreck dive',
+        anchorLatitude: 47.1,
+        anchorLongitude: 8.3,
+      );
+      final hydratedRoute = listRow.copyWith(points: _hydratedPoints());
+      await _pump(tester, routes: [listRow], hydrated: {'r1': hydratedRoute});
+
+      expect(find.byType(FlutterMap), findsOneWidget);
+      final layer = tester.widget<NavTrackPolylineLayer>(
+        find.byType(NavTrackPolylineLayer),
+      );
+      expect(layer.route.points, isNotEmpty);
+      expect(layer.route.points, hydratedRoute.points);
+    },
+  );
 }
