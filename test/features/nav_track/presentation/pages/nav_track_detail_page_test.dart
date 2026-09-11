@@ -31,11 +31,25 @@ class _RecordingNavTrackRepository extends NavTrackRepository {
   String? newName;
   String? unlinkedId;
   String? deletedId;
+  String? linkedRouteId;
+  String? linkedDiveId;
+  NavTrackLinkMode? linkMode;
 
   @override
   Future<void> rename(String routeId, String? name) async {
     renamedId = routeId;
     newName = name;
+  }
+
+  @override
+  Future<void> link(
+    String routeId,
+    String diveId, {
+    required NavTrackLinkMode linkMode,
+  }) async {
+    linkedRouteId = routeId;
+    linkedDiveId = diveId;
+    this.linkMode = linkMode;
   }
 
   @override
@@ -81,6 +95,7 @@ Future<_RecordingNavTrackRepository> _pump(
   EquipmentItem? equipment,
   DiveSite? site,
   GoRouter? router,
+  List<Dive>? allDives,
 }) async {
   final overrides = await getBaseOverrides();
   final repository = _RecordingNavTrackRepository();
@@ -95,6 +110,7 @@ Future<_RecordingNavTrackRepository> _pump(
         equipment.id,
       ).overrideWith((ref) async => equipment),
     if (site != null) siteProvider(site.id).overrideWith((ref) async => site),
+    if (allDives != null) divesProvider.overrideWith((ref) async => allDives),
   ];
   if (router != null) {
     await tester.pumpWidget(
@@ -146,6 +162,31 @@ void main() {
 
     expect(find.byKey(const ValueKey('nav-track-linked-dive')), findsOneWidget);
     expect(find.textContaining('#412'), findsOneWidget);
+  });
+
+  testWidgets('tapping "Choose dive" and picking one links the route to it', (
+    tester,
+  ) async {
+    final candidate = Dive(
+      id: 'dive-9',
+      diveNumber: 9,
+      dateTime: DateTime(2026, 8, 22, 9),
+      entryTime: DateTime(2026, 8, 22, 9),
+    );
+    final repository = await _pump(
+      tester,
+      route: _route(),
+      allDives: [candidate],
+    );
+
+    await tester.tap(find.text('Choose dive'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('#9'));
+    await tester.pumpAndSettle();
+
+    expect(repository.linkedRouteId, 'r1');
+    expect(repository.linkedDiveId, 'dive-9');
+    expect(repository.linkMode, NavTrackLinkMode.manual);
   });
 
   testWidgets('shows the no-correction sentence when nothing was aligned', (
