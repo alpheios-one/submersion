@@ -35,38 +35,33 @@ void main() {
     await tearDownTestDatabase();
   });
 
-  test(
-    'linking a route to a dive makes its 3D scene provider return the '
-    'measured route, not a dead-reckoned estimate',
-    () async {
-      await db.customStatement(
-        "INSERT INTO dives (id, dive_date_time, created_at, updated_at) "
-        "VALUES ('d1', 1700000000000, 1, 1)",
-      );
+  test('linking a route to a dive makes its 3D scene provider return the '
+      'measured route, not a dead-reckoned estimate', () async {
+    await db.customStatement(
+      "INSERT INTO dives (id, dive_date_time, created_at, updated_at) "
+      "VALUES ('d1', 1700000000000, 1, 1)",
+    );
 
-      final points = [
-        for (var i = 0; i < 5; i++)
-          NavTrackPoint(
-            timestamp: 1700000000 + i * 10,
-            north: i * 10.0,
-            east: 0,
-            depth: 5,
-          ),
-      ];
-      final routeId = await repo.insertImportedRoute(
-        points: points,
-        source: NavTrackSource.seacraftEnc,
-        sourceRef: 'real.csv',
-      );
-      await repo.link(routeId, 'd1', linkMode: NavTrackLinkMode.manual);
+    final points = [
+      for (var i = 0; i < 5; i++)
+        NavTrackPoint(
+          timestamp: 1700000000 + i * 10,
+          north: i * 10.0,
+          east: 0,
+          depth: 5,
+        ),
+    ];
+    final routeId = await repo.insertImportedRoute(
+      points: points,
+      source: NavTrackSource.seacraftEnc,
+      sourceRef: 'real.csv',
+    );
+    await repo.link(routeId, 'd1', linkMode: NavTrackLinkMode.manual);
 
-      final path = await container.read(
-        spatialReckonedPathProvider('d1').future,
-      );
+    final path = await container.read(spatialReckonedPathProvider('d1').future);
 
-      expect(path, isNotNull);
-      expect(path!.provenance, PathProvenance.measured);
-      expect(path.points, hasLength(points.length));
-    },
-  );
+    expect(path, isNotNull);
+    expect(path!.provenance, PathProvenance.measured);
+    expect(path.points, hasLength(points.length));
+  });
 }

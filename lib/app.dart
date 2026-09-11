@@ -341,11 +341,7 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
       case IncomingFileOutcome.navigateToNavTrackReview:
         final navContext = rootNavigatorKey.currentContext;
         if (navContext != null && navContext.mounted) {
-          await navigateToNavTrackReview(
-            navContext,
-            bytes,
-            fileName: fileName,
-          );
+          await navigateToNavTrackReview(navContext, bytes, fileName: fileName);
         }
       case IncomingFileOutcome.none:
         break;
