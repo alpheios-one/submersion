@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/nav_track/data/services/parsers/seacraft_enc_csv_parser.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 
 NavTrackPoint _p({
@@ -76,6 +80,29 @@ void main() {
       expect(stats.durationSeconds, 0);
       expect(stats.totalDistance, 0);
       expect(stats.pointCount, 1);
+    });
+
+    test('stops at the last pre-fix-event sample on a recording with a '
+        'surface GPS fix, instead of running to the end of the raw file '
+        '(design spec: "statistics must stop at the last dead-reckoned '
+        'sample")', () {
+      final points = parseSeacraftEncCsv(
+        File(
+          'test/fixtures/nav_tracks/seacraft_enc3_gps_fix.csv',
+        ).readAsBytesSync(),
+      ).points;
+      final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
+      // The fixture does have a fix event partway through, so the active
+      // range must end well before the raw file's last sample.
+      expect(activeEnd, lessThan(points.length - 1));
+      final expectedDuration =
+          points[activeEnd].timestamp - points.first.timestamp;
+      final rawDuration = points.last.timestamp - points.first.timestamp;
+
+      final stats = NavTrackStats.of(points);
+
+      expect(stats.durationSeconds, expectedDuration);
+      expect(stats.durationSeconds, lessThan(rawDuration));
     });
 
     test('handles an empty route', () {

@@ -1,12 +1,20 @@
 import 'dart:math' as math;
 
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 
 /// Summary scalars for a route, computed from its raw samples.
 ///
 /// These are exactly the summary columns `nav_tracks` stores redundantly
 /// alongside the points blob (so a list row or a stat card never needs to
 /// decode it), and this is where those values come from at import time.
+///
+/// Computed over the active range only ([NavTrackCorrector.activeRangeEndIndex]):
+/// a recording with a surface GPS fix (design spec "Ground truth: the
+/// Seacraft ENC3 CSV", 011.DAT.csv) has a GPS-fixed jump and a
+/// post-surfacing/out-of-water tail after that; the design spec requires
+/// statistics to stop at the last dead-reckoned sample, the same boundary
+/// the 3D ribbon and the 2D layer already stop at.
 class NavTrackStats {
   final int pointCount;
   final int durationSeconds;
@@ -47,12 +55,15 @@ class NavTrackStats {
       );
     }
 
-    var maxDepth = points.first.depth;
+    final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
+    final active = points.sublist(0, activeEnd + 1);
+
+    var maxDepth = active.first.depth;
     double? maxSpeed;
     var speedSum = 0.0;
     var speedCount = 0;
 
-    for (final p in points) {
+    for (final p in active) {
       if (p.depth > maxDepth) maxDepth = p.depth;
       final speed = p.speed;
       if (speed != null) {
@@ -64,8 +75,8 @@ class NavTrackStats {
 
     return NavTrackStats(
       pointCount: points.length,
-      durationSeconds: points.last.timestamp - points.first.timestamp,
-      totalDistance: _totalDistance(points),
+      durationSeconds: active.last.timestamp - active.first.timestamp,
+      totalDistance: _totalDistance(active),
       maxDepth: maxDepth,
       maxSpeed: maxSpeed,
       avgSpeed: speedCount == 0 ? null : speedSum / speedCount,
