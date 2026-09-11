@@ -52,6 +52,24 @@ List<double> cumulativeDistances(List<NavTrackPoint> points) {
   return result;
 }
 
+/// The corrected points of the ACTIVE dead-reckoned range only -- up to
+/// [NavTrackCorrector.activeRangeEndIndex] -- for the terrain check and its
+/// conflict-dot overlay. A GPS-fixed/out-of-water tail (a device sitting on
+/// a car dashboard, say) is not part of the diver's swim path and must not
+/// be checked against the seafloor at all: including it would inflate the
+/// "N points on land / below the seafloor" readout with samples that have
+/// nothing to do with where the route actually sits, the same "whole raw
+/// recording" mistake the 3D ribbon, the 2D layer and the summary
+/// statistics elsewhere in this module already avoid.
+List<CorrectedNavTrackPoint> _activeCorrectedPoints(
+  List<NavTrackPoint> points,
+  NavTrackCorrection correction,
+) {
+  final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
+  final corrected = NavTrackCorrector.apply(points, correction);
+  return corrected.sublist(0, (activeEnd + 1).clamp(0, corrected.length));
+}
+
 /// The index of the first point whose cumulative distance reaches
 /// [trustedDistance] -- the point the trust slider's cutoff marker sits on
 /// -- or the last index when none does (the whole route is within the
@@ -159,7 +177,7 @@ class _NavTrackAlignPageState extends ConsumerState<NavTrackAlignPage> {
       }
       return;
     }
-    final corrected = NavTrackCorrector.apply(route.points, _correction);
+    final corrected = _activeCorrectedPoints(route.points, _correction);
     final grid = await ref.read(
       bathymetryGridProvider(BathymetryRepository.quantize(anchor)).future,
     );
@@ -994,7 +1012,9 @@ class _ConflictDotsLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final corrected = NavTrackCorrector.apply(route.points, correction);
+    // Must use the same active-range truncation _runTerrainCheck used to
+    // produce [result], so its indices land on the same points here.
+    final corrected = _activeCorrectedPoints(route.points, correction);
     final conflicts = result.conflictingIndices;
     final markers = <Marker>[
       for (final i in conflicts)

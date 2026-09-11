@@ -619,6 +619,79 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the terrain check only runs over the active dead-reckoned range, not '
+    'the raw recording (proactive finding: a GPS-fixed/out-of-water tail '
+    'must not be checked against the seafloor at all)',
+    (tester) async {
+      final grid = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 0.05,
+        cellSizeLonDeg: 0.05,
+        rows: 1,
+        cols: 1,
+        depthsMeters: const [50.0],
+        sourceId: 'test',
+        resolutionMeters: 5,
+        fetchedAt: DateTime(2026, 1, 1),
+      );
+
+      final route = NavTrack(
+        id: 'r-fix',
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'r-fix.csv',
+        startTime: 0,
+        endTime: 20000,
+        pointCount: 4,
+        anchorLatitude: 0,
+        anchorLongitude: 0,
+        points: const [
+          NavTrackPoint(timestamp: 0, north: 0, east: 0, depth: 5),
+          NavTrackPoint(
+            timestamp: 10,
+            north: 5,
+            east: 0,
+            depth: 0.1,
+            distance: 5,
+          ),
+          // Fix event: >50 m step in <=5 s at the surface -- excluded from
+          // the active range from here on.
+          NavTrackPoint(
+            timestamp: 12,
+            north: 400,
+            east: 0,
+            depth: 0.1,
+            distance: 5,
+          ),
+          NavTrackPoint(
+            timestamp: 20,
+            north: 405,
+            east: 0,
+            depth: 0.1,
+            distance: 5,
+          ),
+        ],
+        createdAt: DateTime(2026, 9, 6),
+        updatedAt: DateTime(2026, 9, 6),
+      );
+
+      await _pump(
+        tester,
+        route: route,
+        bathymetryOverride: bathymetryGridProvider.overrideWith(
+          (ref, cell) async => grid,
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 300)); // debounce fires
+      await tester.pump();
+
+      // Only the 2 pre-fix samples may be checked, never all 4 raw ones.
+      expect(find.textContaining('of 2 below the seafloor'), findsOneWidget);
+      expect(find.textContaining('of 4 below the seafloor'), findsNothing);
+    },
+  );
+
   group('GPS-fix dots stay put under rotation and trust (item 1)', () {
     // The real fixture with a genuine surface GPS fix event (011.DAT.csv,
     // spec "A surface GPS fix inside the same file"): the yellow dots must
