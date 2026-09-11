@@ -177,7 +177,11 @@ List<ContourPolyline> marchGrid({
 /// exceed a shallow contour's own depth and place it above the waterline
 /// for a wide, shallow site (Copilot review). Scaled by horizScale at
 /// each use site instead, so it stays a genuinely small offset relative
-/// to the real terrain regardless of how wide the requested span is.
+/// to the real terrain regardless of how wide the requested span is --
+/// and additionally capped at half the LEVEL's own depth at each use
+/// site, since a shallow custom level (e.g. 0.10 m) could otherwise
+/// still exceed its own depth even after scaling (Copilot review, round
+/// 2).
 const double contourLiftMeters = 0.15;
 const double _labelExtraLiftMeters = 0.25;
 const double _minorHalfWidth = 0.016;
@@ -252,7 +256,12 @@ ContourBuildResult buildContourLayers({
     );
     if (polylines.isEmpty) continue;
 
-    final liftSceneUnits = contourLiftMeters * projection.horizScale;
+    // Capped at half the level's own depth: a shallow custom level (e.g.
+    // 0.10 m) would otherwise still end up lifted above the waterline even
+    // after scaling by horizScale, since the fixed contourLiftMeters can
+    // exceed the depth itself (Copilot review).
+    final liftMeters = math.min(contourLiftMeters, level.depthMeters / 2);
+    final liftSceneUnits = liftMeters * projection.horizScale;
     final y = projection.yOf(level.depthMeters) + liftSceneUnits;
     final sceneLines = <List<double>>[];
     for (final line in polylines) {
@@ -285,7 +294,11 @@ ContourBuildResult buildContourLayers({
       final longest = sceneLines.first;
       final vertexCount = longest.length ~/ 3;
       final anchors = <double>[];
-      final labelLiftSceneUnits = _labelExtraLiftMeters * projection.horizScale;
+      final labelLiftMeters = math.min(
+        _labelExtraLiftMeters,
+        level.depthMeters / 2,
+      );
+      final labelLiftSceneUnits = labelLiftMeters * projection.horizScale;
       for (var k = 0; k < _labelAnchorCount; k++) {
         final vi = vertexCount <= 1
             ? 0

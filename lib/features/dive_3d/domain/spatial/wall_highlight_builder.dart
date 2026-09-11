@@ -79,11 +79,16 @@ MeshData? buildWallHighlightMesh({
       if (slope == null || slope < thresholdDeg) continue;
 
       final base = positions.length ~/ 3;
-      final liftSceneUnits = _wallLiftMeters * projection.horizScale;
       void vertex(double east, double north, double depth) {
+        // Capped at half THIS vertex's own depth: the four corners of a
+        // wall cell can have very different depths, so a shared lift
+        // sized for the deepest corner could still push a shallow corner
+        // (sw/se/nw/ne all confirmed > 0 by wallCellSlopeDegrees above)
+        // above the waterline (Copilot review).
+        final liftMeters = math.min(_wallLiftMeters, depth / 2);
         positions
           ..add(projection.xOf(east))
-          ..add(projection.yOf(depth) + liftSceneUnits)
+          ..add(projection.yOf(depth) + liftMeters * projection.horizScale)
           ..add(projection.zOf(north));
       }
 

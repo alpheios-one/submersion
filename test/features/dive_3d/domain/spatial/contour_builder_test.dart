@@ -369,6 +369,35 @@ void main() {
       expect(result.labels.single.text, '20 m');
     });
 
+    test('a shallow custom level caps its lift at half its own depth, so it '
+        'never renders above the waterline (regression: a valid, positive '
+        'but shallow custom level -- e.g. 0.10 m -- would otherwise still '
+        'end up lifted above Y=0 even after scaling the fixed lift by '
+        'horizScale -- Copilot review, round 2)', () {
+      final grid = gridOf([
+        [0.05, 0.05],
+        [0.20, 0.20],
+      ]);
+      final proj = projFor(grid);
+      final result = buildContourLayers(
+        grid: grid,
+        center: center,
+        projection: proj,
+        appearance: const SeascapeAppearance(
+          contourMode: SeascapeContourMode.custom,
+          customLevels: [SeascapeContourLevel(depthMeters: 0.10)],
+        ),
+        displayUnitInMeters: 1.0,
+        depthSymbol: 'm',
+      );
+      expect(result.layers, hasLength(1));
+      final y = result.layers.single.mesh.positions[1];
+      // Lift capped at half the level's own depth (0.05 m), not the
+      // full, uncapped 0.15 m constant.
+      expect(y, closeTo(proj.yOf(0.10) + 0.05 * proj.horizScale, 1e-6));
+      expect(y, lessThanOrEqualTo(0));
+    });
+
     test('empty result for a flat or too-shallow grid', () {
       final grid = gridOf([
         [1.0, 1.0],
