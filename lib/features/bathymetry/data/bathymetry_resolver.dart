@@ -1,6 +1,9 @@
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+
+const _log = LoggerService('BathymetryResolver');
 
 /// The outcome of walking the source tiers for one coordinate.
 ///
@@ -63,20 +66,38 @@ class BathymetryResolver {
           // Nominally fine, actually absent. Deliberately NOT treated as a
           // dry answer: a grid this empty proves nothing about the water,
           // and caching it as 'empty' would pin the cell forever.
+          _log.debug(
+            '${source.id} rejected at ${center.latitude},${center.longitude}: '
+            'knownFraction ${grid.knownFraction} < $minKnownFraction',
+          );
           continue;
         }
         if (grid.wetFraction >= minWetFraction) {
           return BathymetryResolution.ok(grid);
         }
+        _log.debug(
+          '${source.id} rejected at ${center.latitude},${center.longitude}: '
+          'wetFraction ${grid.wetFraction} < $minWetFraction',
+        );
         // A dry answer only proves "no water here" if the source actually
         // covers everywhere; a regional edge cell proves nothing.
         if (source.global) globalSourceSaidDry = true;
-      } on BathymetryFetchException {
+      } on BathymetryFetchException catch (e) {
         // Transient: fall through to the next source.
-      } catch (_) {
+        _log.warning(
+          '${source.id} fetch failed at ${center.latitude},${center.longitude}',
+          error: e,
+        );
+      } catch (e, stackTrace) {
         // A source blowing up with anything else (a TypeError from an
         // unexpected response shape, an ArgumentError) must not kill the
         // whole scene: treat it exactly like a transient failure.
+        _log.warning(
+          '${source.id} fetch threw unexpectedly at '
+          '${center.latitude},${center.longitude}',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
     return globalSourceSaidDry
