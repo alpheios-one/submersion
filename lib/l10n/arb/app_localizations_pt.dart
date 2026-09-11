@@ -20253,15 +20253,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
-  String get tags_manage_diveComputerSection => 'Computador de mergulho';
+  String get tags_manage_importsSection => 'Importacoes';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'Marcar automaticamente os downloads do computador de mergulho';
+  String get tags_manage_autoTagImports => 'Marcar importacoes automaticamente';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'Cada mergulho baixado de um computador de mergulho recebe uma etiqueta com o nome do dispositivo e a data';
+  String get tags_manage_autoTagImports_subtitle =>
+      'Cada nova importacao comeca com uma etiqueta que indica a origem e a data. Pode alterar isto para uma unica importacao nas opcoes dessa importacao.';
 
   @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
@@ -24828,6 +24827,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'Usar os números de mergulho do arquivo importado em vez de atribuí-los automaticamente';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'Marcar esta importacao automaticamente';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'Comeca com a sua preferencia guardada nas configuracoes de Etiquetas. Altera-la aqui afeta apenas esta importacao.';
 
   @override
   String get universalImport_title_successImported => 'Importados com Sucesso';

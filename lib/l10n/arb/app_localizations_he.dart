@@ -19726,15 +19726,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tags_manage_title => 'תגיות';
 
   @override
-  String get tags_manage_diveComputerSection => 'מחשב צלילה';
+  String get tags_manage_importsSection => 'ייבוא';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'תיוג אוטומטי של ייבוא ממחשב צלילה';
+  String get tags_manage_autoTagImports => 'תיוג אוטומטי של ייבואים';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'כל צלילה שהורדה ממחשב צלילה מקבלת תגית עם שם המכשיר והתאריך';
+  String get tags_manage_autoTagImports_subtitle =>
+      'כל ייבוא חדש מתחיל עם תגית הנושאת את שם המקור והתאריך. אפשר לשנות זאת לייבוא בודד באפשרויות אותו ייבוא.';
 
   @override
   String get tags_manage_searchHint => 'חיפוש תגיות...';
@@ -24210,6 +24209,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'השתמש במספרי הצלילה מהקובץ המיובא במקום להקצות אוטומטית';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'תיוג אוטומטי של ייבוא זה';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'מתחיל מההעדפה השמורה שלך בהגדרות התגיות. שינוי כאן משפיע רק על ייבוא זה.';
 
   @override
   String get universalImport_title_successImported => 'יובאו בהצלחה';

@@ -19181,14 +19181,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_manage_title => '标签';
 
   @override
-  String get tags_manage_diveComputerSection => '潜水电脑';
+  String get tags_manage_importsSection => '导入';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports => '自动为潜水电脑导入的记录打标签';
+  String get tags_manage_autoTagImports => '自动为导入的记录打标签';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      '从潜水电脑下载的每次潜水都会获得包含设备名称和日期的标签';
+  String get tags_manage_autoTagImports_subtitle =>
+      '每次新的导入都会以包含来源和日期的标签开始。可以在该次导入的选项中为单次导入更改此设置。';
 
   @override
   String get tags_manage_searchHint => '搜索标签...';
@@ -23549,6 +23549,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       '使用导入文件中的潜水编号而不是自动分配';
+
+  @override
+  String get universalImport_label_autoTagThisImport => '自动为此次导入打标签';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      '从你在标签设置中保存的偏好开始。在此处更改仅影响此次导入。';
 
   @override
   String get universalImport_title_successImported => '导入成功';

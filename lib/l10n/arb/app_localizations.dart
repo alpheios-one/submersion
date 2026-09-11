@@ -33285,20 +33285,20 @@ abstract class AppLocalizations {
   /// Section header above the auto-tag-imports switch on the tag management screen
   ///
   /// In en, this message translates to:
-  /// **'Dive computer'**
-  String get tags_manage_diveComputerSection;
+  /// **'Imports'**
+  String get tags_manage_importsSection;
 
-  /// Switch title for auto-tagging dive computer downloads
+  /// Switch title for auto-tagging every new import session
   ///
   /// In en, this message translates to:
-  /// **'Tag dive computer imports automatically'**
-  String get tags_manage_autoTagDiveComputerImports;
+  /// **'Tag imports automatically'**
+  String get tags_manage_autoTagImports;
 
-  /// Switch subtitle for auto-tagging dive computer downloads
+  /// Switch subtitle for auto-tagging every new import session
   ///
   /// In en, this message translates to:
-  /// **'Each dive downloaded from a dive computer gets a tag with the device name and date'**
-  String get tags_manage_autoTagDiveComputerImports_subtitle;
+  /// **'Every new import starts with a tag naming the source and date. You can change this for a single import in that import\'s options.'**
+  String get tags_manage_autoTagImports_subtitle;
 
   /// No description provided for @tags_manage_searchHint.
   ///
@@ -40722,6 +40722,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use dive numbers from the imported file instead of auto-assigning'**
   String get universalImport_label_retainDiveNumbersSubtitle;
+
+  /// Switch title for the session-only auto-tag override in the import options sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Tag this import automatically'**
+  String get universalImport_label_autoTagThisImport;
+
+  /// Switch subtitle for the session-only auto-tag override in the import options sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Starts from your saved preference in Tags settings. Changing it here only affects this import.'**
+  String get universalImport_label_autoTagThisImportSubtitle;
 
   /// Title shown when dives are successfully imported
   ///

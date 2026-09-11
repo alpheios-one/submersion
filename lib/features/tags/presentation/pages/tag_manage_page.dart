@@ -113,34 +113,39 @@ class _TagManagePageState extends ConsumerState<TagManagePage> {
     );
   }
 
-  /// Whether the import wizard auto-tags dive computer downloads (issue
+  /// Whether the import wizard auto-tags every new import session (issue
   /// #998), plus its switch.
   ///
   /// Placed above the search bar, not as a wizard step, so the choice is a
-  /// standing preference rather than something re-decided at every download.
+  /// standing preference rather than something re-decided at every import.
+  /// This is only the starting point for a new session -- the review step's
+  /// Import Options sheet lets the diver override it for a single import
+  /// without touching this default.
+  ///
+  /// Watches only [AppSettings.autoTagImports] via `select`, not the whole
+  /// [settingsProvider]: a change to any other setting elsewhere in the app
+  /// would otherwise rebuild this switch for no reason.
   Widget _buildAutoTagSection() {
-    final settings = ref.watch(settingsProvider);
+    final autoTagImports = ref.watch(
+      settingsProvider.select((s) => s.autoTagImports),
+    );
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Text(
-            context.l10n.tags_manage_diveComputerSection,
+            context.l10n.tags_manage_importsSection,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
         SwitchListTile(
-          title: Text(context.l10n.tags_manage_autoTagDiveComputerImports),
-          subtitle: Text(
-            context.l10n.tags_manage_autoTagDiveComputerImports_subtitle,
-          ),
-          value: settings.autoTagDiveComputerImports,
+          title: Text(context.l10n.tags_manage_autoTagImports),
+          subtitle: Text(context.l10n.tags_manage_autoTagImports_subtitle),
+          value: autoTagImports,
           onChanged: (value) {
-            ref
-                .read(settingsProvider.notifier)
-                .setAutoTagDiveComputerImports(value);
+            ref.read(settingsProvider.notifier).setAutoTagImports(value);
           },
         ),
         const Divider(height: 1),

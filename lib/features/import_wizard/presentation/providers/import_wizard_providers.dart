@@ -482,26 +482,24 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   // Import tags
   // -------------------------------------------------------------------------
 
-  /// Pre-populate [importTags] with the adapter's default tag.
+  /// Pre-populate [importTags] with the adapter's default tag, unless
+  /// [autoTagImports] is false (issue #998): repeated imports otherwise pile
+  /// up one dated tag per session, for every source alike (dive computer,
+  /// file-based, cloud). Safe to call multiple times -- skips if a tag with
+  /// the same name already exists.
   ///
-  /// Safe to call multiple times — skips if a tag with the same name already
-  /// exists. For dive computer downloads, also skips entirely when
-  /// [autoTagDiveComputerImports] is false (issue #998): repeated Bluetooth
-  /// downloads otherwise pile up one dated tag per session. File-based and
-  /// cloud sources are unaffected by that setting and always get their
-  /// default tag.
+  /// [autoTagImports] is passed in by the caller rather than captured at
+  /// construction: this method runs well after acquisition, so reading the
+  /// setting here -- instead of baking in whatever `read` returned when the
+  /// wizard's `ProviderScope` was first built -- avoids racing
+  /// [SettingsNotifier]'s async load and picking up a stale or default value
+  /// for a diver switched to mid-session.
   ///
-  /// [autoTagDiveComputerImports] is passed in by the caller rather than
-  /// captured at construction: this method runs well after acquisition, so
-  /// reading the setting here -- instead of baking in whatever `read`
-  /// returned when the wizard's `ProviderScope` was first built -- avoids
-  /// racing [SettingsNotifier]'s async load and picking up a stale or
-  /// default value for a diver switched to mid-session.
-  void initializeDefaultTag({required bool autoTagDiveComputerImports}) {
-    if (_adapter.sourceType == ImportSourceType.diveComputer &&
-        !autoTagDiveComputerImports) {
-      return;
-    }
+  /// This only seeds the session's starting state. The review step's Import
+  /// Options sheet lets the diver flip [isAutoTagForThisImportEnabled] for
+  /// just this one import afterwards, without writing back to the setting.
+  void initializeDefaultTag({required bool autoTagImports}) {
+    if (!autoTagImports) return;
 
     final defaultName = _adapter.defaultTagName;
     final alreadyExists = state.importTags.any(
@@ -515,6 +513,49 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
         TagSelection(name: defaultName),
       ],
     );
+  }
+
+  /// The adapter's default "{source} Import {date}" tag name, for the
+  /// Import Options sheet's live switch (issue #998 follow-up).
+  String get defaultTagName => _adapter.defaultTagName;
+
+  /// Whether [importTags] currently holds this session's default tag,
+  /// case-insensitively by name.
+  ///
+  /// Read by the review step's Import Options sheet to render its "tag this
+  /// import" switch: on when the default tag is present, off when it was
+  /// never added or has been removed, whether via
+  /// [setAutoTagForThisImport] or the tag field's own delete button.
+  bool get isAutoTagForThisImportEnabled => state.importTags.any(
+    (t) => t.name.toLowerCase() == defaultTagName.toLowerCase(),
+  );
+
+  /// Adds or removes this session's default tag, for the Import Options
+  /// sheet's live switch (issue #998 follow-up).
+  ///
+  /// Session-only: unlike the diver's saved [AppSettings.autoTagImports]
+  /// preference that seeds every new import, toggling this never writes
+  /// back to that setting -- it only changes the tag list for the import
+  /// already in progress.
+  void setAutoTagForThisImport(bool enabled) {
+    final defaultName = defaultTagName;
+    final index = state.importTags.indexWhere(
+      (t) => t.name.toLowerCase() == defaultName.toLowerCase(),
+    );
+    if (enabled) {
+      if (index != -1) return;
+      state = state.copyWith(
+        importTags: [
+          ...state.importTags,
+          TagSelection(name: defaultName),
+        ],
+      );
+    } else {
+      if (index == -1) return;
+      final updated = List<TagSelection>.from(state.importTags)
+        ..removeAt(index);
+      state = state.copyWith(importTags: updated);
+    }
   }
 
   /// Add a tag to the import list.

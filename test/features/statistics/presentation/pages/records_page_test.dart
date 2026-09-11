@@ -52,8 +52,8 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
       state = state.copyWith(groupTripsInDiveList: value);
 
   @override
-  Future<void> setAutoTagDiveComputerImports(bool value) async =>
-      state = state.copyWith(autoTagDiveComputerImports: value);
+  Future<void> setAutoTagImports(bool value) async =>
+      state = state.copyWith(autoTagImports: value);
 
   @override
   Future<void> setAccentSectionHeaders(bool value) async =>

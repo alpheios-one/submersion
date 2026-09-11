@@ -20258,15 +20258,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
-  String get tags_manage_diveComputerSection => 'Ordenador de buceo';
+  String get tags_manage_importsSection => 'Importaciones';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'Etiquetar automaticamente las descargas del ordenador de buceo';
+  String get tags_manage_autoTagImports =>
+      'Etiquetar importaciones automaticamente';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'Cada inmersion descargada de un ordenador de buceo recibe una etiqueta con el nombre del dispositivo y la fecha';
+  String get tags_manage_autoTagImports_subtitle =>
+      'Cada nueva importacion comienza con una etiqueta que indica el origen y la fecha. Puedes cambiar esto para una sola importacion en las opciones de esa importacion.';
 
   @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
@@ -24848,6 +24848,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'Usar los números de inmersión del archivo importado en lugar de asignarlos automáticamente';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'Etiquetar esta importacion automaticamente';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'Comienza con tu preferencia guardada en la configuracion de Etiquetas. Cambiarla aqui solo afecta a esta importacion.';
 
   @override
   String get universalImport_title_successImported => 'Importación Exitosa';

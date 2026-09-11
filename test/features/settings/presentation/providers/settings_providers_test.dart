@@ -215,22 +215,22 @@ void main() {
     });
   });
 
-  group('AppSettings autoTagDiveComputerImports', () {
+  group('AppSettings autoTagImports', () {
     test('has true as default', () {
       const settings = AppSettings();
-      expect(settings.autoTagDiveComputerImports, true);
+      expect(settings.autoTagImports, true);
     });
 
-    test('copyWith updates autoTagDiveComputerImports', () {
+    test('copyWith updates autoTagImports', () {
       const settings = AppSettings();
-      final updated = settings.copyWith(autoTagDiveComputerImports: false);
-      expect(updated.autoTagDiveComputerImports, false);
+      final updated = settings.copyWith(autoTagImports: false);
+      expect(updated.autoTagImports, false);
     });
 
     test('copyWith without the field preserves the current value', () {
-      const settings = AppSettings(autoTagDiveComputerImports: false);
+      const settings = AppSettings(autoTagImports: false);
       final updated = settings.copyWith(themePresetId: 'dark');
-      expect(updated.autoTagDiveComputerImports, false);
+      expect(updated.autoTagImports, false);
     });
   });
 }

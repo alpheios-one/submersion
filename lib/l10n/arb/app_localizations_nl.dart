@@ -20075,15 +20075,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
-  String get tags_manage_diveComputerSection => 'Duikcomputer';
+  String get tags_manage_importsSection => 'Imports';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'Duikcomputer-imports automatisch taggen';
+  String get tags_manage_autoTagImports => 'Imports automatisch taggen';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'Elke duik die van een duikcomputer wordt gedownload krijgt een tag met de apparaatnaam en datum';
+  String get tags_manage_autoTagImports_subtitle =>
+      'Elke nieuwe import begint met een tag die de bron en datum vermeldt. Dit kan voor één import worden aangepast in de opties van die import.';
 
   @override
   String get tags_manage_searchHint => 'Tags zoeken...';
@@ -24631,6 +24630,14 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'Gebruik de duiknummers uit het geïmporteerde bestand in plaats van automatisch toewijzen';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'Deze import automatisch taggen';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'Begint met je opgeslagen voorkeur in de Tags-instellingen. Dit hier wijzigen geldt alleen voor deze import.';
 
   @override
   String get universalImport_title_successImported => 'Succesvol geïmporteerd';

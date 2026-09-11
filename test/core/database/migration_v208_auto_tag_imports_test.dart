@@ -9,22 +9,19 @@ void main() {
     expect(AppDatabase.migrationVersions, contains(208));
   });
 
-  test(
-    'a fresh database has diver_settings.auto_tag_dive_computer_imports, on',
-    () async {
-      final db = AppDatabase(NativeDatabase.memory());
-      addTearDown(db.close);
+  test('a fresh database has diver_settings.auto_tag_imports, on', () async {
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
 
-      final cols = await db
-          .customSelect("PRAGMA table_info('diver_settings')")
-          .get();
-      final column = cols.firstWhere(
-        (c) => c.read<String>('name') == 'auto_tag_dive_computer_imports',
-      );
-      expect(column.read<int>('notnull'), 1);
-      expect(column.read<String?>('dflt_value'), contains('1'));
-    },
-  );
+    final cols = await db
+        .customSelect("PRAGMA table_info('diver_settings')")
+        .get();
+    final column = cols.firstWhere(
+      (c) => c.read<String>('name') == 'auto_tag_imports',
+    );
+    expect(column.read<int>('notnull'), 1);
+    expect(column.read<String?>('dflt_value'), contains('1'));
+  });
 
   test(
     'a database stranded before v208 gains the column via beforeOpen',
@@ -47,7 +44,7 @@ void main() {
           .customSelect("PRAGMA table_info('diver_settings')")
           .get();
       final names = cols.map((c) => c.read<String>('name')).toSet();
-      expect(names, contains('auto_tag_dive_computer_imports'));
+      expect(names, contains('auto_tag_imports'));
     },
   );
 

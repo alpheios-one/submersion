@@ -1391,7 +1391,7 @@ void main() {
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
 
-        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
+        notifier.initializeDefaultTag(autoTagImports: true);
 
         expect(notifier.state.importTags.length, equals(1));
         expect(
@@ -1408,54 +1408,90 @@ void main() {
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
 
-        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
-        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
+        notifier.initializeDefaultTag(autoTagImports: true);
+        notifier.initializeDefaultTag(autoTagImports: true);
 
         expect(notifier.state.importTags.length, equals(1));
       });
 
-      // Issue #998: repeated Bluetooth downloads from a dive computer
-      // otherwise pile up one dated tag per session, so this is opt-out
-      // specifically for that source.
-      test('skips the default tag for a dive computer source when the setting '
-          'is off', () {
-        when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
-        when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
+      // Issue #998: repeated imports otherwise pile up one dated tag per
+      // session. Applies uniformly regardless of source -- mockAdapter
+      // defaults to ImportSourceType.uddf in setUp, so this also covers
+      // file-based sources, not just dive computer downloads.
+      test('skips the default tag entirely when the setting is off', () {
+        when(
+          mockAdapter.defaultTagName,
+        ).thenReturn('test.uddf Import 2026-03-26');
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
 
-        notifier.initializeDefaultTag(autoTagDiveComputerImports: false);
+        notifier.initializeDefaultTag(autoTagImports: false);
 
         expect(notifier.state.importTags, isEmpty);
       });
+    });
 
-      test('still adds the default tag for a dive computer source when the '
-          'setting is on', () {
-        when(mockAdapter.sourceType).thenReturn(ImportSourceType.diveComputer);
-        when(mockAdapter.defaultTagName).thenReturn('Perdix Import 2026-03-26');
+    group('defaultTagName / isAutoTagForThisImportEnabled / '
+        'setAutoTagForThisImport', () {
+      setUp(() {
+        when(
+          mockAdapter.defaultTagName,
+        ).thenReturn('test.uddf Import 2026-03-26');
         final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
         notifier.setBundle(bundle);
+      });
 
-        notifier.initializeDefaultTag(autoTagDiveComputerImports: true);
+      test('defaultTagName exposes the adapter default tag name', () {
+        expect(notifier.defaultTagName, equals('test.uddf Import 2026-03-26'));
+      });
+
+      test('isAutoTagForThisImportEnabled is false before the default tag '
+          'is added', () {
+        expect(notifier.isAutoTagForThisImportEnabled, isFalse);
+      });
+
+      test('isAutoTagForThisImportEnabled is true once the default tag is '
+          'present', () {
+        notifier.initializeDefaultTag(autoTagImports: true);
+
+        expect(notifier.isAutoTagForThisImportEnabled, isTrue);
+      });
+
+      test('setAutoTagForThisImport(true) adds the default tag', () {
+        notifier.setAutoTagForThisImport(true);
+
+        expect(notifier.state.importTags.length, equals(1));
+        expect(
+          notifier.state.importTags.first.name,
+          equals('test.uddf Import 2026-03-26'),
+        );
+        expect(notifier.isAutoTagForThisImportEnabled, isTrue);
+      });
+
+      test('setAutoTagForThisImport(true) is a no-op when already present', () {
+        notifier.initializeDefaultTag(autoTagImports: true);
+        notifier.setAutoTagForThisImport(true);
 
         expect(notifier.state.importTags.length, equals(1));
       });
 
-      test(
-        'ignores the setting for a non-dive-computer source, even when off',
-        () {
-          // mockAdapter defaults to ImportSourceType.uddf in setUp.
-          when(
-            mockAdapter.defaultTagName,
-          ).thenReturn('test.uddf Import 2026-03-26');
-          final bundle = buildBundle(diveItems: [makeItem('Dive 1')]);
-          notifier.setBundle(bundle);
+      test('setAutoTagForThisImport(false) removes the default tag, '
+          'leaving other tags untouched', () {
+        notifier.initializeDefaultTag(autoTagImports: true);
+        const manual = TagSelection(name: 'Vacation');
+        notifier.addImportTag(manual);
 
-          notifier.initializeDefaultTag(autoTagDiveComputerImports: false);
+        notifier.setAutoTagForThisImport(false);
 
-          expect(notifier.state.importTags.length, equals(1));
-        },
-      );
+        expect(notifier.state.importTags, equals([manual]));
+        expect(notifier.isAutoTagForThisImportEnabled, isFalse);
+      });
+
+      test('setAutoTagForThisImport(false) is a no-op when already absent', () {
+        notifier.setAutoTagForThisImport(false);
+
+        expect(notifier.state.importTags, isEmpty);
+      });
     });
 
     group('addImportTag', () {

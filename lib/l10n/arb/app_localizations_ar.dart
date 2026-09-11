@@ -19871,15 +19871,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tags_manage_title => 'الوسوم';
 
   @override
-  String get tags_manage_diveComputerSection => 'كمبيوتر الغوص';
+  String get tags_manage_importsSection => 'الاستيراد';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'وسم عمليات استيراد كمبيوتر الغوص تلقائيا';
+  String get tags_manage_autoTagImports => 'وسم الاستيرادات تلقائيا';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'تحصل كل غوصة يتم تنزيلها من كمبيوتر الغوص على وسم يحمل اسم الجهاز والتاريخ';
+  String get tags_manage_autoTagImports_subtitle =>
+      'يبدأ كل استيراد جديد بوسم يحمل اسم المصدر والتاريخ. يمكن تغيير ذلك لعملية استيراد واحدة في خيارات تلك العملية.';
 
   @override
   String get tags_manage_searchHint => 'البحث في الوسوم...';
@@ -24385,6 +24384,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'استخدام أرقام الغطسات من الملف المستورد بدلاً من تعيينها تلقائياً';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'وسم هذا الاستيراد تلقائيا';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'يبدأ من تفضيلك المحفوظ في إعدادات الوسوم. تغييره هنا يؤثر فقط على هذا الاستيراد.';
 
   @override
   String get universalImport_title_successImported => 'تم الاستيراد بنجاح';

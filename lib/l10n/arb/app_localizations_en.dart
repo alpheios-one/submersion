@@ -19894,15 +19894,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
-  String get tags_manage_diveComputerSection => 'Dive computer';
+  String get tags_manage_importsSection => 'Imports';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports =>
-      'Tag dive computer imports automatically';
+  String get tags_manage_autoTagImports => 'Tag imports automatically';
 
   @override
-  String get tags_manage_autoTagDiveComputerImports_subtitle =>
-      'Each dive downloaded from a dive computer gets a tag with the device name and date';
+  String get tags_manage_autoTagImports_subtitle =>
+      'Every new import starts with a tag naming the source and date. You can change this for a single import in that import\'s options.';
 
   @override
   String get tags_manage_searchHint => 'Search tags...';
@@ -24404,6 +24403,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get universalImport_label_retainDiveNumbersSubtitle =>
       'Use dive numbers from the imported file instead of auto-assigning';
+
+  @override
+  String get universalImport_label_autoTagThisImport =>
+      'Tag this import automatically';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'Starts from your saved preference in Tags settings. Changing it here only affects this import.';
 
   @override
   String get universalImport_title_successImported => 'Successfully Imported';

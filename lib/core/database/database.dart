@@ -2053,11 +2053,13 @@ class DiverSettings extends Table {
   BoolColumn get groupTripsInDiveList =>
       boolean().withDefault(const Constant(false))();
 
-  /// Auto-tag every dive downloaded from a dive computer with a
-  /// "{device} Import {date}" tag (v208, issue #998). On by default,
-  /// matching the wizard's long-standing behavior; divers who find the tags
-  /// pile up too fast can turn this off from the tag management screen.
-  BoolColumn get autoTagDiveComputerImports =>
+  /// Pre-populate every import with a "{source} Import {date}" tag (v208,
+  /// issue #998). On by default, matching the wizard's long-standing
+  /// behavior; divers who find the tags pile up too fast can turn this off
+  /// from the tag management screen. This is only the starting point for a
+  /// new import session -- the review step's Import Options sheet lets the
+  /// diver override it for that one import without touching this default.
+  BoolColumn get autoTagImports =>
       boolean().withDefault(const Constant(true))();
   // List view modes for other features (v52)
   TextColumn get siteListViewMode =>
@@ -4420,8 +4422,8 @@ class AppDatabase extends _$AppDatabase {
     // rung takes 207; the list only counts remaining steps for progress
     // reporting and is non-contiguous by design.
     207,
-    // v208: diver_settings.auto_tag_dive_computer_imports (issue #998).
-    // Additive defaulted boolean, no backfill.
+    // v208: diver_settings.auto_tag_imports (issue #998). Additive
+    // defaulted boolean, no backfill.
     208,
   ];
 
@@ -7446,19 +7448,19 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// Idempotent DDL for diver_settings.auto_tag_dive_computer_imports (v208,
-  /// issue #998). Existing rows default to on, matching the wizard's
-  /// prior behavior of always pre-filling an import tag.
-  Future<void> _assertAutoTagDiveComputerImportsColumn() async {
+  /// Idempotent DDL for diver_settings.auto_tag_imports (v208, issue #998).
+  /// Existing rows default to on, matching the wizard's prior behavior of
+  /// always pre-filling an import tag.
+  Future<void> _assertAutoTagImportsColumn() async {
     final cols = await customSelect(
       "PRAGMA table_info('diver_settings')",
     ).get();
     if (cols.isEmpty) return;
     final names = cols.map((c) => c.read<String>('name')).toSet();
-    if (names.contains('auto_tag_dive_computer_imports')) return;
+    if (names.contains('auto_tag_imports')) return;
     await customStatement(
       'ALTER TABLE diver_settings ADD COLUMN '
-      'auto_tag_dive_computer_imports INTEGER NOT NULL DEFAULT 1',
+      'auto_tag_imports INTEGER NOT NULL DEFAULT 1',
     );
   }
 
@@ -11391,12 +11393,12 @@ class AppDatabase extends _$AppDatabase {
           await _assertJunctionUpdatedAtColumns();
         }
         if (from < 207) await reportProgress();
-        // v208: diver_settings.auto_tag_dive_computer_imports (issue #998).
-        // Column-only rung, no backfill. Existing rows default to on, so a
-        // device that upgrades keeps auto-tagging its dive computer
-        // downloads until the diver turns it off.
+        // v208: diver_settings.auto_tag_imports (issue #998). Column-only
+        // rung, no backfill. Existing rows default to on, so a device that
+        // upgrades keeps auto-tagging its imports until the diver turns it
+        // off.
         if (from < 208) {
-          await _assertAutoTagDiveComputerImportsColumn();
+          await _assertAutoTagImportsColumn();
         }
         if (from < 208) await reportProgress();
       },
@@ -11404,8 +11406,8 @@ class AppDatabase extends _$AppDatabase {
         // Enable foreign keys
         await customStatement('PRAGMA foreign_keys = ON');
 
-        // v208 backstop: re-assert diver_settings.auto_tag_dive_computer_imports.
-        await _assertAutoTagDiveComputerImportsColumn();
+        // v208 backstop: re-assert diver_settings.auto_tag_imports.
+        await _assertAutoTagImportsColumn();
 
         // v207 backstop: re-assert the gear junctions' updated_at. A device
         // stranded without it has no age signal on those rows, so a stale

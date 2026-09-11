@@ -318,9 +318,7 @@ class _UnifiedImportWizardBodyState
         ref
             .read(importWizardNotifierProvider.notifier)
             .initializeDefaultTag(
-              autoTagDiveComputerImports: ref
-                  .read(settingsProvider)
-                  .autoTagDiveComputerImports,
+              autoTagImports: ref.read(settingsProvider).autoTagImports,
             );
       }
       await _animateToPage(nextPage);

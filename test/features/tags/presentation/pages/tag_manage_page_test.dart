@@ -135,7 +135,7 @@ Widget _buildTestWidget({
 // ---------------------------------------------------------------------------
 
 void main() {
-  group('auto-tag dive computer imports switch', () {
+  group('auto-tag imports switch', () {
     testWidgets('reflects the on default from settings', (tester) async {
       await tester.pumpWidget(_buildTestWidget(stats: _testStats));
       await tester.pumpAndSettle();
@@ -148,7 +148,7 @@ void main() {
 
     testWidgets('reflects an off value from settings', (tester) async {
       final settingsNotifier = MockSettingsNotifier(
-        const AppSettings(autoTagDiveComputerImports: false),
+        const AppSettings(autoTagImports: false),
       );
       await tester.pumpWidget(
         _buildTestWidget(stats: _testStats, settingsNotifier: settingsNotifier),
@@ -171,7 +171,7 @@ void main() {
       await tester.tap(find.byType(SwitchListTile));
       await tester.pumpAndSettle();
 
-      expect(settingsNotifier.state.autoTagDiveComputerImports, isFalse);
+      expect(settingsNotifier.state.autoTagImports, isFalse);
     });
 
     testWidgets('is hidden while a bulk selection is active', (tester) async {
