@@ -207,11 +207,19 @@ class NavTrackCorrector {
         );
       case NavTrackEndMode.gpsFix:
         if (segmentation.fixEvents.isEmpty) return null;
-        final fixIndex = segmentation.fixEvents.first.index;
-        final fixed = rotated[fixIndex];
+        final fixEvent = segmentation.fixEvents.first;
+        final stabilized = NavTrackSegmenter.stabilizedFixPosition(
+          points,
+          fixEvent,
+        );
+        final target = _rotateNorthEast(
+          stabilized.north,
+          stabilized.east,
+          correction.headingOffsetDeg,
+        );
         return (
-          east: fixed.east,
-          north: fixed.north,
+          east: target.east,
+          north: target.north,
           lastActiveIndex: lastActiveIndex,
         );
     }
@@ -238,25 +246,35 @@ class NavTrackCorrector {
     NavTrackPoint p,
     double headingOffsetDeg,
   ) {
-    if (headingOffsetDeg == 0) {
-      return CorrectedNavTrackPoint(
-        timestamp: p.timestamp,
-        east: p.east,
-        north: p.north,
-        depth: p.depth,
-      );
-    }
+    final r = _rotateNorthEast(p.north, p.east, headingOffsetDeg);
+    return CorrectedNavTrackPoint(
+      timestamp: p.timestamp,
+      east: r.east,
+      north: r.north,
+      depth: p.depth,
+    );
+  }
+
+  /// Rotates a raw (north, east) pair by [headingOffsetDeg], the same
+  /// transform [_rotate] applies to a whole sample. Shared so a target
+  /// derived from raw coordinates (e.g. [NavTrackSegmenter.stabilizedFixPosition])
+  /// can be placed in the same rotated frame as [_rotate]'s output before
+  /// being compared against it.
+  static ({double east, double north}) _rotateNorthEast(
+    double north,
+    double east,
+    double headingOffsetDeg,
+  ) {
+    if (headingOffsetDeg == 0) return (east: east, north: north);
     final theta = headingOffsetDeg * math.pi / 180.0;
     final cosT = math.cos(theta);
     final sinT = math.sin(theta);
-    return CorrectedNavTrackPoint(
-      timestamp: p.timestamp,
-      // A clockwise rotation by theta (matching compass bearings: 0 =
-      // north, 90 = east): a point due north rotates toward due east as
-      // theta grows toward 90.
-      east: p.east * cosT + p.north * sinT,
-      north: p.north * cosT - p.east * sinT,
-      depth: p.depth,
+    // A clockwise rotation by theta (matching compass bearings: 0 = north,
+    // 90 = east): a point due north rotates toward due east as theta grows
+    // toward 90.
+    return (
+      east: east * cosT + north * sinT,
+      north: north * cosT - east * sinT,
     );
   }
 

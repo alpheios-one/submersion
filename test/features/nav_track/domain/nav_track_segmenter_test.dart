@@ -253,6 +253,64 @@ void main() {
       expect(result.kinds.last, NavTrackSampleKind.gpsFixed);
     });
   });
+
+  group('NavTrackSegmenter.stabilizedFixPosition on the real fixture', () {
+    late List<NavTrackPoint> points;
+    late NavTrackFixEvent event;
+
+    setUp(() {
+      final track = parseSeacraftEncCsv(_fixture('seacraft_enc3_gps_fix.csv'));
+      points = track.points;
+      event = NavTrackSegmenter.classify(points).fixEvents.single;
+    });
+
+    test('differs from the naive first-sample target and is a more central '
+        'estimate of where the console actually settled', () {
+      // Ground truth read directly from the fixture: the sample right
+      // after the 367 m jump (18:52:26).
+      final naive = points[event.index];
+      expect(naive.north, closeTo(-271.850342, 1e-6));
+      expect(naive.east, closeTo(204.216934, 1e-6));
+
+      final stabilized = NavTrackSegmenter.stabilizedFixPosition(points, event);
+
+      // Computed by hand from the fixture: the earliest sample after which
+      // every later sample in the run (roughly the last 5.5 of the 17
+      // minutes of post-fix wobble) stays within 10 m of the others is at
+      // 18:53:46 (run index 40), and the centroid of that stable tail is
+      // close to (north -262.0, east 199.7).
+      expect(stabilized.north, closeTo(-262.0, 0.5));
+      expect(stabilized.east, closeTo(199.7, 0.5));
+
+      final residual = _distance(
+        naive.north,
+        naive.east,
+        stabilized.north,
+        stabilized.east,
+      );
+      // The naive first sample and the stabilized centroid are genuinely
+      // different points (about 11 m apart), not a rounding difference.
+      expect(residual, greaterThan(5));
+
+      // The stabilized position sits inside the long-run wobble band the
+      // design spec describes (within 10 m of most of the run's later
+      // samples), which the raw first-jump sample is not guaranteed to.
+      final tailSample = points[points.length - 1];
+      final stabilizedToTail = _distance(
+        stabilized.north,
+        stabilized.east,
+        tailSample.north,
+        tailSample.east,
+      );
+      final naiveToTail = _distance(
+        naive.north,
+        naive.east,
+        tailSample.north,
+        tailSample.east,
+      );
+      expect(stabilizedToTail, lessThan(naiveToTail));
+    });
+  });
 }
 
 double _distance(double n1, double e1, double n2, double e2) {
