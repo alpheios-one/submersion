@@ -132,7 +132,10 @@ class SwissBathyTileCache extends Table {
   /// back to one full re-resolution on its next read -- the only way to
   /// actually correct already-wrongly-cached tiles (e.g. a coordinate that
   /// used to resolve to a coarser neighboring lake's bbox before a
-  /// whitelist correction) rather than merely preventing new ones.
+  /// whitelist correction) rather than merely preventing new ones. Null
+  /// only for rows written before this field existed (v17) -- every 'ok'
+  /// AND 'empty' row written since then stores its actual level, so the
+  /// mismatch check above applies uniformly to both statuses.
   RealColumn get referenceLevelMeters => real().nullable()();
 
   @override

@@ -132,14 +132,17 @@ class SwissBathyTileCacheRepository {
     return row != null;
   }
 
-  /// Every tile key with a usable ('ok') cached grid. Used by the manual
-  /// "reload map data" action, which revalidates every cached tile's
-  /// freshness immediately instead of waiting for each one's individual
-  /// [SwissBathy3dSource.staleCheckInterval] to elapse.
-  Future<List<String>> okTileKeys() async {
-    final rows = await (_db.select(
-      _db.swissBathyTileCache,
-    )..where((t) => t.status.equals('ok'))).get();
+  /// Every cached tile key, 'ok' AND 'empty' alike. Used by the manual
+  /// "reload map data" action, which revalidates every cached tile
+  /// immediately instead of waiting for each one's individual
+  /// [SwissBathy3dSource.staleCheckInterval] to elapse. Negative rows are
+  /// included, not just positive ones: a negative cached under a
+  /// reference level that no longer matches (a lake bbox/level
+  /// correction) is exactly as stale as a positive one would be, and
+  /// [read]'s mismatch check only ever runs for a tile key this sweep
+  /// actually visits.
+  Future<List<String>> allTileKeys() async {
+    final rows = await _db.select(_db.swissBathyTileCache).get();
     return [for (final row in rows) row.tileKey];
   }
 

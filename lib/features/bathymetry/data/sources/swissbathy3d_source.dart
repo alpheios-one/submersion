@@ -518,7 +518,7 @@ class SwissBathy3dSource implements BathymetrySource {
   /// re-downloads that lake's zip at most once for the entire sweep, not
   /// once per affected tile.
   Future<SwissBathyRefreshSummary> refreshAllCachedTiles() async {
-    final tileKeys = await _tileCache.okTileKeys();
+    final tileKeys = await _tileCache.allTileKeys();
 
     final sharedRawGrids = <String, Future<List<RawEsriGrid>>>{};
     Future<List<RawEsriGrid>> download(String href) =>
@@ -539,18 +539,28 @@ class SwissBathy3dSource implements BathymetrySource {
       final lake = findSwissLake(
         GeoPoint(tileCenter.latitude, tileCenter.longitude),
       );
-      if (lake == null) return null; // should not happen for a real 'ok' tile
+      // Orphaned by a bbox tightened enough to no longer cover this tile
+      // at all -- inert (no future fetch() targets it either), left for a
+      // later cleanup rather than handled here.
+      if (lake == null) return null;
 
       // Computed BEFORE the read so a reference-level mismatch (the lake
       // table changed since this tile was cached) is caught here too, not
       // just on the next fetch() visit -- read() drops the row and returns
-      // null in that case, same as corruption.
+      // null in that case, same as corruption. Applies uniformly to an
+      // 'ok' row (dropped, so the next fetch() re-downloads) and an
+      // 'empty' one (dropped, so the next fetch() re-resolves instead of
+      // hasCachedAnswer() suppressing it forever) -- see allTileKeys' doc
+      // for why 'empty' tiles are included in this sweep at all. A still-
+      // valid 'empty' row also reads back null here (it never carries a
+      // grid), so this branch covers "nothing to check" and "just
+      // invalidated" alike; neither needs the freshness check below.
       final cached = await _tileCache.read(
         tileKey,
         expectedReferenceLevelMeters: lake.meanLevelMeters,
       );
       if (cached == null) {
-        return null; // evicted/corrupted/mismatched since listing
+        return null;
       }
 
       final result = await _checkAndMaybeUpdate(
