@@ -207,6 +207,7 @@ class SwissBathy3dSource implements BathymetrySource {
     // for a cold cache spanning dozens of tiles, this keeps a single page
     // view from either taking minutes (one at a time) or hammering the OGD
     // server with dozens of simultaneous requests.
+    var hadTransientTileFailure = false;
     final results = await _runBounded(tileCoords, maxConcurrentTileRequests, (
       coord,
     ) async {
@@ -227,18 +228,35 @@ class SwissBathy3dSource implements BathymetrySource {
           sharedZipBytes,
         );
       } on BathymetryFetchException {
-        // One tile's transient failure (network timeout, a bad STAC
-        // response) must not sink the whole stitched fetch when
-        // neighboring tiles — possibly including the one under the dive
-        // site itself — already succeeded (or are still in flight in
-        // another worker). Treat it as a gap instead; never cached (see
-        // _fetchTile), so the next visit retries just this tile. A span
-        // can cover dozens of 1-km tiles, so this isolation matters far
-        // more here than it did for the single-tile fetch this replaced.
+        // Individually harmless -- the failed tile's own cache stays
+        // untouched (see _fetchTile), so a retry only re-downloads that
+        // one tile, and every OTHER tile's successful download is already
+        // durably cached by this point regardless of what happens next.
+        // But this fetch's own RETURN VALUE must not silently swallow the
+        // failure into an indistinguishable-from-real-shoreline null: with
+        // minKnownFraction at 0.0 (see this class's own override -- every
+        // null this source returns is supposed to be a confirmed land
+        // fact), a span with only a couple of successful wet tiles among
+        // dozens of transiently-failed ones would otherwise pass every
+        // floor and get cached by the outer repository as a complete,
+        // definitive 'ok' answer, permanently starving the failed tiles of
+        // ever being retried (Copilot review). hadTransientTileFailure
+        // flags that below instead.
+        hadTransientTileFailure = true;
         return null;
       }
     });
     final tiles = [for (final tile in results) ?tile];
+
+    if (hadTransientTileFailure) {
+      // Whatever DID succeed is already sitting in the per-tile cache, so
+      // this costs a retry of only the tiles that actually failed, not a
+      // re-download of the whole span -- see the catch block above.
+      throw BathymetryFetchException(
+        'one or more tiles in span failed transiently '
+        'E[$tileEMin..$tileEMax] N[$tileNMin..$tileNMax]',
+      );
+    }
 
     if (tiles.isEmpty) {
       throw BathymetryFetchException(

@@ -1050,15 +1050,20 @@ nodata_value -9999
       expect(downloadCalls, 0);
     });
 
-    test('a transient failure on one tile does not sink neighboring tiles that '
-        'already succeeded', () async {
+    test('a transient failure on one tile fails the whole fetch, even when a '
+        'neighboring tile already succeeded, so the outer repository never '
+        'caches a partial grid as a complete, definitive answer (regression: '
+        'with minKnownFraction at 0.0, a span that mostly failed transiently '
+        'but had one wet tile survive would otherwise pass every floor and '
+        'get cached as "ok", permanently starving the failed tiles of a '
+        'retry -- Copilot review)', () async {
       // Same boundary point/span as the stitching test above: exactly two
-      // tiles. Tile A (west) always succeeds; tile B (east) always returns a
-      // server error, simulating the kind of one-off network hiccup that
-      // becomes likely once a single site view can span dozens of tiles.
-      // Routed by the request's own bbox rather than call order, since
-      // bounded-concurrency fetches no longer guarantee which tile's
-      // request lands first.
+      // tiles. Tile A (west) always succeeds; tile B (east) always
+      // returns a server error, simulating the kind of one-off network
+      // hiccup that becomes likely once a single site view can span
+      // dozens of tiles. Routed by the request's own bbox rather than
+      // call order, since bounded-concurrency fetches no longer guarantee
+      // which tile's request lands first.
       const boundaryPoint = GeoPoint(47.354865314, 8.563694834);
       final boundaryLon = Lv95Transform.toWgs84(2685000, 1245500).longitude;
       const tileAGrid = '''
@@ -1071,14 +1076,28 @@ nodata_value -9999
 400.0 400.0
 400.0 400.0
 ''';
+      const tileBGrid = '''
+ncols 2
+nrows 2
+xllcorner 2685000
+yllcorner 1245000
+cellsize 500
+nodata_value -9999
+410.0 410.0
+410.0 410.0
+''';
 
       var itemCalls = 0;
+      var tileAItemCalls = 0;
+      var tileBItemCalls = 0;
+      var tileADownloads = 0;
       final source = buildSource((req) async {
         if (req.url.path.endsWith('/items')) {
           itemCalls++;
           final bbox = _requestedBbox(req);
           final centerLon = (bbox[0] + bbox[2]) / 2;
           if (centerLon < boundaryLon) {
+            tileAItemCalls++;
             return http.Response(
               jsonEncode({
                 'features': [
@@ -1093,26 +1112,46 @@ nodata_value -9999
               200,
             );
           }
-          return http.Response('server error', 500);
+          tileBItemCalls++;
+          // Fails only on the first attempt -- a one-off network hiccup
+          // that has since recovered by the retry below.
+          if (tileBItemCalls == 1) return http.Response('server error', 500);
+          return http.Response(
+            jsonEncode({
+              'features': [
+                {
+                  'bbox': bbox,
+                  'assets': {
+                    'grid': {'href': 'https://example.org/tile_b.zip'},
+                  },
+                },
+              ],
+            }),
+            200,
+          );
         }
+        if (req.url.path.endsWith('tile_b.zip')) {
+          return http.Response.bytes(_zipOf('tile.asc', tileBGrid), 200);
+        }
+        tileADownloads++;
         return http.Response.bytes(_zipOf('tile.asc', tileAGrid), 200);
       });
 
-      // Must not throw despite the second tile's 500: tile A's data is
-      // still returned instead of the whole fetch failing.
-      final grid = await source.fetch(boundaryPoint, spanMeters: 200);
-
+      await expectLater(
+        source.fetch(boundaryPoint, spanMeters: 200),
+        throwsA(isA<BathymetryFetchException>()),
+      );
       expect(itemCalls, 2);
-      expect(grid.rows, 2);
-      expect(grid.cols, 2);
-      expect(grid.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
+      expect(tileADownloads, 1);
 
-      // The failed tile was never cached as a definitive answer, so a
-      // later retry (e.g. once the network recovers) queries it again
-      // rather than being permanently stuck as "no data".
+      // Tile A's own success is still durably cached even though the
+      // overall fetch threw -- a retry only re-queries the tile that
+      // actually failed, not a full re-download of the whole span.
       final again = await source.fetch(boundaryPoint, spanMeters: 200);
-      expect(itemCalls, 3);
+      expect(tileAItemCalls, 1);
+      expect(tileADownloads, 1);
       expect(again.depthAt(0, 0), closeTo(405.92 - 400.0, 1e-6));
+      expect(again.depthAt(0, 2), closeTo(405.92 - 410.0, 1e-6));
     });
 
     test('throws when every tile in the span fails transiently, so the '
