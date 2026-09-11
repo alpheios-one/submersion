@@ -546,8 +546,9 @@ class SwissBathy3dSource implements BathymetrySource {
         tileKey,
         expectedReferenceLevelMeters: lake.meanLevelMeters,
       );
-      if (cached == null)
+      if (cached == null) {
         return null; // evicted/corrupted/mismatched since listing
+      }
 
       final result = await _checkAndMaybeUpdate(
         tileKey,
