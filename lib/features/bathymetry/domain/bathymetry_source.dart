@@ -44,11 +44,16 @@ abstract interface class BathymetrySource {
   /// 48% coverage is the motivating example), an unknown cell means
   /// "we don't actually know if there is water here" — genuinely
   /// untrustworthy. For a source scoped to a specific, already-confirmed
-  /// water body (swissBATHY3D: [BathymetrySource.global] is false and
-  /// every requested coordinate already passed [SwissBathy3dSource.covers]
-  /// before this source is even tried), an unknown cell within the
-  /// requested span means "this cell is real, surveyed dry land outside
-  /// the lake" — a fact, not a gap. Applying the same high floor there
+  /// water body (swissBATHY3D: [BathymetrySource.global] is false and the
+  /// resolver's [SwissBathy3dSource.probe] already confirmed the fetch
+  /// CENTER sits inside a real, listed lake before this source is even
+  /// tried), an unknown cell within the requested span means "this cell
+  /// is real, surveyed dry land" — a fact, not a gap: every tile the 8 km
+  /// span expands into is independently re-resolved against the same
+  /// lake table and, when a tile's own center sits outside every
+  /// registered bbox, a confirmed STAC lookup found no data there, not an
+  /// unchecked assumption carried over from the center. Applying the same
+  /// high floor there
   /// penalizes exactly the lakes the fix is meant to serve: a narrow,
   /// elongated lake (Walensee, or a fjord-like bay of Vierwaldstättersee)
   /// legitimately fills only a small fraction of an 8 km square request
