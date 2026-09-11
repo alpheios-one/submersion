@@ -280,4 +280,84 @@ void main() {
       expect(entry!.grid.depthAt(0, 0), 1.0);
     });
   });
+
+  group('SwissBathyTileCacheRepository.deleteIfLevelUnknown', () {
+    test('an uncached tile key is a no-op, returns false', () async {
+      final deleted = await repo.deleteIfLevelUnknown('2726_1221', [419.00]);
+      expect(deleted, isFalse);
+    });
+
+    test('a row whose stored level matches one of the current levels is left '
+        'untouched, returns false', () async {
+      await repo.writeEmpty('2726_1221', referenceLevelMeters: 419.00);
+
+      final deleted = await repo.deleteIfLevelUnknown('2726_1221', [
+        433.58,
+        419.00,
+      ]);
+
+      expect(deleted, isFalse);
+      expect(await repo.hasCachedAnswer('2726_1221'), isTrue);
+    });
+
+    test('a row whose stored level matches none of the current levels is '
+        'deleted, returns true (the fallback-cached-tile edge case: the '
+        "tile's own center resolves to no lake, so there is no single "
+        'expected level to check against)', () async {
+      await repo.writeEmpty('2726_1221', referenceLevelMeters: 419.00);
+
+      final deleted = await repo.deleteIfLevelUnknown('2726_1221', [
+        433.58,
+        405.92,
+      ]);
+
+      expect(deleted, isTrue);
+      expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+    });
+
+    test('a row with no stored level at all (pre-v17) is treated as unknown '
+        'and deleted, even against an empty currentLevels list', () async {
+      await db
+          .into(db.swissBathyTileCache)
+          .insert(
+            SwissBathyTileCacheCompanion.insert(
+              tileKey: '2726_1221',
+              status: 'empty',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+
+      final deleted = await repo.deleteIfLevelUnknown(
+        '2726_1221',
+        const <double>[],
+      );
+
+      expect(deleted, isTrue);
+      expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+    });
+
+    test(
+      'also deletes a matching-status "ok" row under an unknown level',
+      () async {
+        final grid = BathymetryGrid(
+          originLat: 47.2,
+          originLon: 9.1,
+          cellSizeLatDeg: 0.001,
+          cellSizeLonDeg: 0.001,
+          rows: 2,
+          cols: 2,
+          depthsMeters: [1.0, 2.0, 3.0, 4.0],
+          sourceId: 'swissbathy3d',
+          resolutionMeters: 2,
+          fetchedAt: DateTime.utc(2026, 1, 1),
+        );
+        await repo.writeOk('2726_1221', grid, referenceLevelMeters: 419.00);
+
+        final deleted = await repo.deleteIfLevelUnknown('2726_1221', [433.58]);
+
+        expect(deleted, isTrue);
+        expect(await repo.hasCachedAnswer('2726_1221'), isFalse);
+      },
+    );
+  });
 }
