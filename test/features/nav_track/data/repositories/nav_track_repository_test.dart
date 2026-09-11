@@ -95,6 +95,36 @@ void main() {
       expect(route.isPrimary, isTrue);
     });
 
+    test('defaults the anchor to the chosen site\'s location (design spec '
+        '"Georeferencing": the site pin is the default anchor)', () async {
+      await db.customStatement(
+        "INSERT INTO dive_sites (id, name, latitude, longitude, "
+        "created_at, updated_at) "
+        "VALUES ('s1', 'Test Site', 47.1, 8.3, 1, 1)",
+      );
+
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: '008.DAT.csv',
+        siteId: 's1',
+      );
+
+      final route = await repo.getById(id);
+      expect(route!.anchor, const GeoPoint(47.1, 8.3));
+    });
+
+    test('leaves the anchor null when no site is chosen', () async {
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: '008.DAT.csv',
+      );
+
+      final route = await repo.getById(id);
+      expect(route!.anchor, isNull);
+    });
+
     test('does not hydrate points on a list read', () async {
       await repo.insertImportedRoute(
         points: _samplePoints(),

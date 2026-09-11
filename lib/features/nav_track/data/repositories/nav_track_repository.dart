@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart'
     as domain;
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
@@ -24,6 +25,13 @@ import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 class NavTrackRepository {
   static const String entityType = 'navTracks';
 
+  /// Injectable seam so a test can hand in a fake site lookup instead of a
+  /// real database-backed [SiteRepository]; production builds the default.
+  NavTrackRepository({SiteRepository? siteRepository})
+    : _siteRepository = siteRepository ?? SiteRepository();
+
+  final SiteRepository _siteRepository;
+
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
@@ -35,6 +43,16 @@ class NavTrackRepository {
   /// Inserts a fully-parsed route in one write, optionally pre-linked to a
   /// dive (the review page's link proposal) and anchored to a site (the
   /// review page's site picker, or inherited from that dive).
+  ///
+  /// When [siteId] resolves to a site with a location, that location is
+  /// written straight into `anchorLatitude`/`anchorLongitude` (design spec
+  /// 2026-09-10-underwater-nav-track-design.md, "Georeferencing": "The
+  /// default anchor is the route's site pin ... so a freshly imported route
+  /// already sits on the right stretch of shore before any correction").
+  /// The stored anchor IS the site pin from the start; a later "Set start
+  /// here" or a drag on the alignment page explicitly overrides it. No site
+  /// chosen, or a site with no coordinates yet, leaves the anchor null, same
+  /// as before.
   Future<String> insertImportedRoute({
     required List<NavTrackPoint> points,
     required domain.NavTrackSource source,
@@ -57,6 +75,9 @@ class NavTrackRepository {
       final now = DateTime.now().millisecondsSinceEpoch;
       final stats = NavTrackStats.of(points);
       final isPrimary = diveId == null || await _shouldBePrimary(diveId);
+      final siteLocation = siteId == null
+          ? null
+          : (await _siteRepository.getSiteById(siteId))?.location;
       await _db
           .into(_db.navTracks)
           .insert(
@@ -82,6 +103,8 @@ class NavTrackRepository {
               maxDepth: Value(stats.maxDepth),
               maxSpeed: Value(stats.maxSpeed),
               avgSpeed: Value(stats.avgSpeed),
+              anchorLatitude: Value(siteLocation?.latitude),
+              anchorLongitude: Value(siteLocation?.longitude),
               points: encodeNavTrackPoints(points),
               createdAt: now,
               updatedAt: now,
