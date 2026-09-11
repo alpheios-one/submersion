@@ -26,8 +26,11 @@ const _junctions = [
 ];
 
 void main() {
-  test('v207 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 207);
+  test('v207 is in the ladder and shipped', () {
+    // Relaxed as v200's own test asked, now that a later rung (v209, the
+    // nav_tracks table) is newer. This one only claims its rung is still
+    // in the ladder.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(207));
     expect(AppDatabase.migrationVersions, contains(207));
   });
 
