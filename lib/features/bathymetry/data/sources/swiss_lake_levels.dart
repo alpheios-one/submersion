@@ -82,6 +82,28 @@ const List<SwissLakeLevel> swissLakeLevels = [
     minLon: 6.66,
     maxLon: 7.10,
   ),
+  // No BAFU long-term station series found; 419 m is the figure
+  // consistently reported by general geographic references (swisstopo map
+  // data), not the specific BFE 1983 publication the rest of this table
+  // cites. A small, unregulated natural lake, so unlike Lungernsee a
+  // single mean is still an appropriate approximation here.
+  //
+  // Listed BEFORE Vierwaldstättersee deliberately: Vierwaldstättersee's own
+  // box is a coarse rectangle drawn around its irregular real shoreline and
+  // sweeps over dry land north of Lucerne where Rotsee actually sits (a
+  // real, physically separate lake, not part of Vierwaldstättersee) --
+  // findSwissLake takes the first bbox match in list order, so without this
+  // ordering every Rotsee coordinate would silently resolve to
+  // Vierwaldstättersee's 433.58 m instead of Rotsee's own 419.00 m, a
+  // ~14.6 m depth error (Copilot review).
+  SwissLakeLevel(
+    name: 'Rotsee',
+    meanLevelMeters: 419.00,
+    minLat: 47.06,
+    maxLat: 47.08,
+    minLon: 8.29,
+    maxLon: 8.33,
+  ),
   SwissLakeLevel(
     name: 'Vierwaldstättersee',
     meanLevelMeters: 433.58,
@@ -232,7 +254,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
     minLat: 46.40,
     maxLat: 46.45,
     minLon: 9.69,
-    maxLon: 9.767,
+    maxLon: 9.766,
   ),
   // BAFU hydrodaten.admin.ch station 2073, long-term mean 1991-2025.
   SwissLakeLevel(
@@ -242,19 +264,6 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLat: 46.47,
     minLon: 9.767,
     maxLon: 9.81,
-  ),
-  // No BAFU long-term station series found; 419 m is the figure
-  // consistently reported by general geographic references (swisstopo map
-  // data), not the specific BFE 1983 publication the rest of this table
-  // cites. A small, unregulated natural lake, so unlike Lungernsee a
-  // single mean is still an appropriate approximation here.
-  SwissLakeLevel(
-    name: 'Rotsee',
-    meanLevelMeters: 419.00,
-    minLat: 47.06,
-    maxLat: 47.08,
-    minLon: 8.29,
-    maxLon: 8.33,
   ),
 ];
 
