@@ -42,7 +42,15 @@ class BathymetryRepository {
   /// rows never expire, so without this every already-visited site would
   /// keep serving the grid its old resolver chose. Old rows go inert, the
   /// same way the 4 km rows did when the span went to 8 km.
-  static const String selectionGeneration = 'v2';
+  ///
+  /// v3: the swissBATHY3D lake whitelist changed (Greifensee/Lago di
+  /// Lugano/Pfäffikersee removed, Lac de Joux/Lungernsee/Silsersee/
+  /// Silvaplanersee/Rotsee added) -- without bumping this, a coordinate at
+  /// one of the five newly-covered lakes that had already cached a
+  /// fallback grid from a coarser regional/global source would keep
+  /// serving that stale grid forever instead of re-resolving through
+  /// swissBATHY3D now that it covers it (Copilot review).
+  static const String selectionGeneration = 'v3';
   static const double quantumDeg = 0.02;
 
   final LocalCacheDatabase _db;

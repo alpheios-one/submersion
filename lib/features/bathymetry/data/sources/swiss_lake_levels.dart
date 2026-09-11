@@ -221,13 +221,18 @@ const List<SwissLakeLevel> swissLakeLevels = [
     maxLon: 8.18,
   ),
   // BAFU hydrodaten.admin.ch station 2072, long-term mean 1991-2025.
+  // maxLon split from Silvaplanersee's minLon at the real gap between their
+  // STAC item bboxes (Silsersee ends 9.7656, Silvaplanersee begins 9.7686)
+  // -- a wider, symmetric buffer on both boxes independently made them
+  // overlap and silently misassigned Silvaplanersee coordinates to
+  // Silsersee's mean level, a ~6 m depth error (Copilot review).
   SwissLakeLevel(
     name: 'Silsersee',
     meanLevelMeters: 1796.65,
     minLat: 46.40,
     maxLat: 46.45,
     minLon: 9.69,
-    maxLon: 9.77,
+    maxLon: 9.767,
   ),
   // BAFU hydrodaten.admin.ch station 2073, long-term mean 1991-2025.
   SwissLakeLevel(
@@ -235,7 +240,7 @@ const List<SwissLakeLevel> swissLakeLevels = [
     meanLevelMeters: 1790.57,
     minLat: 46.43,
     maxLat: 46.47,
-    minLon: 9.76,
+    minLon: 9.767,
     maxLon: 9.81,
   ),
   // No BAFU long-term station series found; 419 m is the figure
