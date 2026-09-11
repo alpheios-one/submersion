@@ -11,7 +11,6 @@ import 'package:submersion/features/dive_log/presentation/widgets/collapsible_se
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
-import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
 import 'package:submersion/features/nav_track/presentation/nav_track_parse_error_text.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_import_review_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_import_flow_providers.dart';
@@ -178,20 +177,29 @@ class _RouteRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final units = UnitFormatter(ref.watch(settingsProvider));
-    final stats = NavTrackStats.of(route.points);
     final l10n = context.l10n;
+    // navTracksForDiveProvider reads with includePoints: false (a dive can
+    // have several linked routes, and this section renders every one of
+    // them), so route.points is always empty here. Distance/depth/speed
+    // come straight from the persisted summary columns rather than
+    // recomputing NavTrackStats.of an empty list, which would silently show
+    // zero for every row; only the shape thumbnail actually needs the raw
+    // samples, so just that is hydrated per row on demand.
+    final hydratedPoints =
+        ref.watch(navTrackByIdProvider(route.id)).value?.points ?? const [];
     return Card(
       key: ValueKey('nav-track-row-${route.id}'),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
-        leading: NavTrackShapeThumbnail(points: route.points),
+        leading: NavTrackShapeThumbnail(points: hydratedPoints),
         title: Text(route.name ?? route.sourceRef ?? route.id),
         subtitle: Text(
           [
             if (route.deviceName != null) route.deviceName!,
-            units.formatDistance(stats.totalDistance),
-            units.formatDepth(stats.maxDepth),
-            if (stats.maxSpeed != null) units.formatSpeed(stats.maxSpeed!),
+            if (route.totalDistance != null)
+              units.formatDistance(route.totalDistance!),
+            if (route.maxDepth != null) units.formatDepth(route.maxDepth),
+            if (route.maxSpeed != null) units.formatSpeed(route.maxSpeed!),
             if (route.isPrimary) l10n.navTrack_section_primaryTag,
           ].join(' · '),
         ),

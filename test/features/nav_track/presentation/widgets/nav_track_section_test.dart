@@ -89,4 +89,17 @@ void main() {
     expect(find.byKey(const ValueKey('nav-track-row-r1')), findsOneWidget);
     expect(find.textContaining('primary'), findsOneWidget);
   });
+
+  testWidgets(
+    'shows the route\'s own stored distance and depth, not zero (proactive '
+    'finding: navTracksForDiveProvider reads with includePoints: false, '
+    'same as the routes-area list before item 9 was fixed -- recomputing '
+    'NavTrackStats.of the empty points list silently zeroed the row)',
+    (tester) async {
+      await _pump(tester, linkedRoutes: [_route(diveId: _dive.id)]);
+
+      expect(find.textContaining('1050'), findsOneWidget);
+      expect(find.textContaining('38'), findsOneWidget);
+    },
+  );
 }
