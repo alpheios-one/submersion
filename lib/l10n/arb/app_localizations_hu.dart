@@ -38405,6 +38405,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Merülés választása';
 
   @override
+  String get navTrack_detail_noSite => 'Nincs merülőhely';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Merülőhely választása';
+
+  @override
   String get navTrack_review_title => 'Vízalatti útvonal importálása';
 
   @override

@@ -6,7 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
@@ -20,12 +22,14 @@ import '../../../../helpers/mock_providers.dart';
 NavTrack _route({
   String? diveId,
   String? equipmentId,
+  String? siteId,
   double? anchorLatitude,
   double? anchorLongitude,
 }) => NavTrack(
   id: 'r1',
   diveId: diveId,
   equipmentId: equipmentId,
+  siteId: siteId,
   linkMode: diveId == null ? null : NavTrackLinkMode.auto,
   source: NavTrackSource.seacraftEnc,
   sourceRef: 'r1.csv',
@@ -43,6 +47,7 @@ Future<void> _pump(
   required NavTrack route,
   Dive? linkedDive,
   EquipmentItem? equipment,
+  DiveSite? site,
 }) async {
   final overrides = await getBaseOverrides();
   await tester.pumpWidget(
@@ -56,6 +61,8 @@ Future<void> _pump(
           equipmentItemProvider(
             equipment.id,
           ).overrideWith((ref) async => equipment),
+        if (site != null)
+          siteProvider(site.id).overrideWith((ref) async => site),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -141,6 +148,55 @@ void main() {
       expect(tileLayer.urlTemplate, container.read(mapTileUrlProvider));
     },
   );
+
+  group('the site row (item 4)', () {
+    testWidgets(
+      'shows a "no site" placeholder and "Choose site" when unset, and no '
+      'longer offers "Change site" from the overflow menu',
+      (tester) async {
+        await _pump(tester, route: _route());
+
+        expect(
+          find.byKey(const ValueKey('nav-track-site-row')),
+          findsOneWidget,
+        );
+        expect(find.text('No site'), findsOneWidget);
+        expect(find.text('Choose site'), findsOneWidget);
+
+        await tester.tap(find.byType(PopupMenuButton<String>));
+        await tester.pumpAndSettle();
+        expect(find.text('Change site'), findsNothing);
+      },
+    );
+
+    testWidgets('shows the site name and "Change site" when a site is set', (
+      tester,
+    ) async {
+      const site = DiveSite(
+        id: 'site-1',
+        name: 'Test Site',
+        location: GeoPoint(47.1, 8.3),
+      );
+      await _pump(
+        tester,
+        route: _route(siteId: 'site-1'),
+        site: site,
+      );
+
+      expect(find.byKey(const ValueKey('nav-track-site-row')), findsOneWidget);
+      expect(find.text('Test Site'), findsOneWidget);
+      expect(find.text('Change site'), findsOneWidget);
+    });
+
+    testWidgets('tapping the action opens the site picker', (tester) async {
+      await _pump(tester, route: _route());
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-change-site')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SitePickerSheet), findsOneWidget);
+    });
+  });
 
   group('navTrackAnchorShouldFollowSiteChange (item 5)', () {
     test('the anchor follows the new site when it was never set', () {

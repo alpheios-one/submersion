@@ -38573,6 +38573,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Escolher mergulho';
 
   @override
+  String get navTrack_detail_noSite => 'Nenhum ponto de mergulho';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Escolher ponto de mergulho';
+
+  @override
   String get navTrack_review_title => 'Importar rota subaquática';
 
   @override

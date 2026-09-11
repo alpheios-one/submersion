@@ -258,8 +258,6 @@ class NavTrackDetailPage extends ConsumerWidget {
                   switch (value) {
                     case 'rename':
                       await _rename(context, ref, route);
-                    case 'changeSite':
-                      await _changeSite(context, ref, route);
                     case 'unlink':
                       await _unlink(ref, route);
                     case 'delete':
@@ -270,11 +268,6 @@ class NavTrackDetailPage extends ConsumerWidget {
                   PopupMenuItem(
                     value: 'rename',
                     child: Text(l10n.navTrack_detail_menuRename),
-                  ),
-                  PopupMenuItem(
-                    key: const ValueKey('nav-track-menu-change-site'),
-                    value: 'changeSite',
-                    child: Text(l10n.navTrack_detail_menuChangeSite),
                   ),
                   if (route.diveId != null)
                     PopupMenuItem(
@@ -297,6 +290,11 @@ class NavTrackDetailPage extends ConsumerWidget {
               _LinkCard(
                 route: route,
                 onChooseDive: () => _chooseDive(context, ref, route),
+              ),
+              const SizedBox(height: 16),
+              _SiteCard(
+                route: route,
+                onChangeSite: () => _changeSite(context, ref, route),
               ),
               const SizedBox(height: 16),
               Card(
@@ -460,6 +458,43 @@ class _LinkCard extends ConsumerWidget {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push('/dives/$diveId'),
+      ),
+    );
+  }
+}
+
+/// The route's dive site row, styled identically to [_LinkCard]'s
+/// "no dive linked" row (icon, label, right-aligned tappable action text):
+/// a site name or a "no site" placeholder on the left, and "Change site" /
+/// "Choose site" on the right, opening the same site-picker flow the
+/// overflow menu's "Change site" item used to trigger (item 4).
+class _SiteCard extends ConsumerWidget {
+  const _SiteCard({required this.route, required this.onChangeSite});
+
+  final NavTrack route;
+  final VoidCallback onChangeSite;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final siteId = route.siteId;
+    final siteName = siteId == null
+        ? null
+        : ref.watch(siteProvider(siteId)).value?.name;
+    return Card(
+      child: ListTile(
+        key: const ValueKey('nav-track-site-row'),
+        leading: const Icon(Icons.place_outlined),
+        title: Text(siteName ?? l10n.navTrack_detail_noSite),
+        trailing: TextButton(
+          key: const ValueKey('nav-track-change-site'),
+          onPressed: onChangeSite,
+          child: Text(
+            siteId == null
+                ? l10n.navTrack_detail_chooseSite
+                : l10n.navTrack_detail_menuChangeSite,
+          ),
+        ),
       ),
     );
   }

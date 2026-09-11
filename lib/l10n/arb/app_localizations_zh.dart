@@ -36310,6 +36310,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_detail_chooseDive => '选择潜水记录';
 
   @override
+  String get navTrack_detail_noSite => '无潜点';
+
+  @override
+  String get navTrack_detail_chooseSite => '选择潜点';
+
+  @override
   String get navTrack_review_title => '导入水下路线';
 
   @override

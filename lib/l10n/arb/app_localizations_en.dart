@@ -37968,6 +37968,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Choose dive';
 
   @override
+  String get navTrack_detail_noSite => 'No site';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Choose site';
+
+  @override
   String get navTrack_review_title => 'Import Underwater Route';
 
   @override

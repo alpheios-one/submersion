@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "Batteria: {start} V -> {end} V",
   "navTrack_detail_noDiveLinked": "Nessuna immersione collegata",
   "navTrack_detail_chooseDive": "Scegli immersione",
+  "navTrack_detail_noSite": "Nessun sito",
+  "navTrack_detail_chooseSite": "Scegli sito",
   "navTrack_review_title": "Importa percorso subacqueo",
   "navTrack_review_segmentSummaryNoFix": "{underwater} campioni subacquei, nessun fix GPS in questa registrazione.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} campioni subacquei, {surface} campioni in superficie, fix GPS a {vector} m dalla fine stimata.",

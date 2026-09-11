@@ -38296,6 +38296,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Duik kiezen';
 
   @override
+  String get navTrack_detail_noSite => 'Geen duikstek';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Duikstek kiezen';
+
+  @override
   String get navTrack_review_title => 'Onderwaterroute importeren';
 
   @override

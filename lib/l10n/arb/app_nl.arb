@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "Batterij: {start} V -> {end} V",
   "navTrack_detail_noDiveLinked": "Geen duik gekoppeld",
   "navTrack_detail_chooseDive": "Duik kiezen",
+  "navTrack_detail_noSite": "Geen duikstek",
+  "navTrack_detail_chooseSite": "Duikstek kiezen",
   "navTrack_review_title": "Onderwaterroute importeren",
   "navTrack_review_segmentSummaryNoFix": "{underwater} metingen onder water, geen GPS-fix in deze opname.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} metingen onder water, {surface} metingen aan de oppervlakte, GPS-fix {vector} m van het berekende einde.",

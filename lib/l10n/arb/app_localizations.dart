@@ -62987,6 +62987,18 @@ abstract class AppLocalizations {
   /// **'Choose dive'**
   String get navTrack_detail_chooseDive;
 
+  /// No description provided for @navTrack_detail_noSite.
+  ///
+  /// In en, this message translates to:
+  /// **'No site'**
+  String get navTrack_detail_noSite;
+
+  /// No description provided for @navTrack_detail_chooseSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose site'**
+  String get navTrack_detail_chooseSite;
+
   /// No description provided for @navTrack_review_title.
   ///
   /// In en, this message translates to:

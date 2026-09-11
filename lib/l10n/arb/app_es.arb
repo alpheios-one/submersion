@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "Batería: {start} V -> {end} V",
   "navTrack_detail_noDiveLinked": "Ninguna inmersión vinculada",
   "navTrack_detail_chooseDive": "Elegir inmersión",
+  "navTrack_detail_noSite": "Sin punto de buceo",
+  "navTrack_detail_chooseSite": "Elegir punto de buceo",
   "navTrack_review_title": "Importar ruta submarina",
   "navTrack_review_segmentSummaryNoFix": "{underwater} muestras bajo el agua, sin fix GPS en esta grabación.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} muestras bajo el agua, {surface} muestras en superficie, fix GPS a {vector} m del final estimado.",

@@ -37788,6 +37788,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'בחר צלילה';
 
   @override
+  String get navTrack_detail_noSite => 'אין אתר צלילה';
+
+  @override
+  String get navTrack_detail_chooseSite => 'בחר אתר';
+
+  @override
   String get navTrack_review_title => 'ייבוא מסלול תת-ימי';
 
   @override

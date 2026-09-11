@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "Akku: {start} V -> {end} V",
   "navTrack_detail_noDiveLinked": "Kein Tauchgang verknüpft",
   "navTrack_detail_chooseDive": "Tauchgang wählen",
+  "navTrack_detail_noSite": "Kein Tauchplatz",
+  "navTrack_detail_chooseSite": "Tauchplatz wählen",
   "navTrack_review_title": "Unterwasser-Route importieren",
   "navTrack_review_segmentSummaryNoFix": "{underwater} Messpunkte unter Wasser, kein GPS-Fix in dieser Aufzeichnung.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} Messpunkte unter Wasser, {surface} Messpunkte an der Oberfläche, GPS-Fix {vector} m vom rekonstruierten Ende entfernt.",

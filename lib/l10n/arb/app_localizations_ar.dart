@@ -38165,6 +38165,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'اختيار غطسة';
 
   @override
+  String get navTrack_detail_noSite => 'لا يوجد موقع غوص';
+
+  @override
+  String get navTrack_detail_chooseSite => 'اختيار موقع';
+
+  @override
   String get navTrack_review_title => 'استيراد مسار تحت الماء';
 
   @override

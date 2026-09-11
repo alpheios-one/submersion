@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "סוללה: {start} וולט -> {end} וולט",
   "navTrack_detail_noDiveLinked": "אין צלילה מקושרת",
   "navTrack_detail_chooseDive": "בחר צלילה",
+  "navTrack_detail_noSite": "אין אתר צלילה",
+  "navTrack_detail_chooseSite": "בחר אתר",
   "navTrack_review_title": "ייבוא מסלול תת-ימי",
   "navTrack_review_segmentSummaryNoFix": "{underwater} דגימות מתחת למים, אין תיקון GPS בהקלטה זו.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} דגימות מתחת למים, {surface} דגימות פני שטח, תיקון GPS במרחק {vector} מ׳ מהסיום המשוער.",

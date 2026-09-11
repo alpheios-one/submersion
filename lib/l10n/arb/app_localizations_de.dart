@@ -38486,6 +38486,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Tauchgang wählen';
 
   @override
+  String get navTrack_detail_noSite => 'Kein Tauchplatz';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Tauchplatz wählen';
+
+  @override
   String get navTrack_review_title => 'Unterwasser-Route importieren';
 
   @override

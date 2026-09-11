@@ -38603,6 +38603,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navTrack_detail_chooseDive => 'Elegir inmersión';
 
   @override
+  String get navTrack_detail_noSite => 'Sin punto de buceo';
+
+  @override
+  String get navTrack_detail_chooseSite => 'Elegir punto de buceo';
+
+  @override
   String get navTrack_review_title => 'Importar ruta submarina';
 
   @override

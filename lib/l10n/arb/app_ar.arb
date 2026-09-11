@@ -11301,6 +11301,8 @@
   "navTrack_detail_battery": "البطارية: {start} فولت -> {end} فولت",
   "navTrack_detail_noDiveLinked": "لا توجد غطسة مرتبطة",
   "navTrack_detail_chooseDive": "اختيار غطسة",
+  "navTrack_detail_noSite": "لا يوجد موقع غوص",
+  "navTrack_detail_chooseSite": "اختيار موقع",
   "navTrack_review_title": "استيراد مسار تحت الماء",
   "navTrack_review_segmentSummaryNoFix": "{underwater} عينات تحت الماء، لا يوجد إصلاح GPS في هذا التسجيل.",
   "navTrack_review_segmentSummaryWithFix": "{underwater} عينات تحت الماء، {surface} عينات على السطح، إصلاح GPS على بعد {vector} م من النهاية المقدَّرة.",
