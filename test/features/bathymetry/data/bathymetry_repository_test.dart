@@ -156,6 +156,12 @@ void main() {
         floor002(betlis.latitude),
         closeTo(floor002(murgWest.latitude), 1e-9),
       );
+
+      // The resolved lake's OWN mean level rides along in the key (Copilot
+      // review): a FUTURE correction to Walensee's documented level in
+      // swiss_lake_levels.dart automatically changes this key too, without
+      // needing a manual selectionGeneration bump for that correction.
+      expect(BathymetryRepository.keyFor(betlis), endsWith('@419.07'));
       expect(
         floor002(betlis.longitude),
         closeTo(floor002(murgWest.longitude), 1e-9),
