@@ -11284,6 +11284,7 @@
   "navTrack_detail_deleteMessage": "此操作无法撤销。",
   "navTrack_detail_defaultTitle": "路线",
   "navTrack_detail_menuRename": "重命名",
+  "navTrack_detail_menuChangeSite": "更改潜点",
   "navTrack_detail_noMapYet": "设置起点以在地图上查看。",
   "navTrack_detail_correctionStatus_none": "尚未应用校正。",
   "navTrack_detail_correctionStatus_sameAsStart": "终点已设置为与起点相同。",

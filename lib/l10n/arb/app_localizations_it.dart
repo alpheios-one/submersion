@@ -38487,6 +38487,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get navTrack_detail_menuRename => 'Rinomina';
 
   @override
+  String get navTrack_detail_menuChangeSite => 'Cambia sito';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Imposta il punto di inizio per vederlo su una mappa.';
 

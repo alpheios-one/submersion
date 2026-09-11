@@ -36243,6 +36243,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navTrack_detail_menuRename => '重命名';
 
   @override
+  String get navTrack_detail_menuChangeSite => '更改潜点';
+
+  @override
   String get navTrack_detail_noMapYet => '设置起点以在地图上查看。';
 
   @override

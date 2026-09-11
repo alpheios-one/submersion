@@ -395,6 +395,76 @@ void main() {
     });
   });
 
+  group('setSite', () {
+    Future<void> insertSite(
+      String id,
+      double lat,
+      double lon, {
+      String name = 'Test Site',
+    }) => db.customStatement(
+      "INSERT INTO dive_sites (id, name, latitude, longitude, "
+      "created_at, updated_at) "
+      "VALUES ('$id', '$name', $lat, $lon, 1, 1)",
+    );
+
+    test('changes the siteId', () async {
+      await insertSite('s1', 47.1, 8.3);
+      await insertSite('s2', 47.2, 8.4);
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'a.csv',
+        siteId: 's1',
+      );
+
+      await repo.setSite(id, 's2');
+
+      expect((await repo.getById(id))!.siteId, 's2');
+    });
+
+    test('writes the new anchor when the caller passes one (the anchor was '
+        'untouched, so it follows the new site)', () async {
+      await insertSite('s1', 47.1, 8.3);
+      await insertSite('s2', 47.2, 8.4);
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'a.csv',
+        siteId: 's1',
+      );
+      expect((await repo.getById(id))!.anchor, const GeoPoint(47.1, 8.3));
+
+      await repo.setSite(id, 's2', anchor: const GeoPoint(47.2, 8.4));
+
+      final route = await repo.getById(id);
+      expect(route!.siteId, 's2');
+      expect(route.anchor, const GeoPoint(47.2, 8.4));
+    });
+
+    test('leaves the stored anchor untouched when the caller passes none (the '
+        'diver had already moved the start point by hand)', () async {
+      await insertSite('s1', 47.1, 8.3);
+      await insertSite('s2', 47.2, 8.4);
+      final id = await repo.insertImportedRoute(
+        points: _samplePoints(),
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'a.csv',
+        siteId: 's1',
+      );
+      // The diver manually moved the start point away from the site pin.
+      await repo.updateCorrection(
+        id,
+        const NavTrackCorrection(anchor: GeoPoint(50.0, 10.0)),
+      );
+
+      await repo.setSite(id, 's2');
+
+      final route = await repo.getById(id);
+      expect(route!.siteId, 's2');
+      expect(route.anchor, const GeoPoint(50.0, 10.0));
+    });
+  });
+
   group('delete', () {
     test('removes the route and logs a tombstone', () async {
       final id = await repo.insertImportedRoute(

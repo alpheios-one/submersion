@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
@@ -113,5 +114,33 @@ void main() {
     await _pump(tester, route: _route());
 
     expect(find.textContaining('Equipment:'), findsNothing);
+  });
+
+  group('navTrackAnchorShouldFollowSiteChange (item 5)', () {
+    test('the anchor follows the new site when it was never set', () {
+      expect(
+        navTrackAnchorShouldFollowSiteChange(null, const GeoPoint(47.1, 8.3)),
+        isTrue,
+      );
+    });
+
+    test('the anchor follows the new site when it still equals the old '
+        'site\'s pin (the diver never moved the start point)', () {
+      const oldSiteLocation = GeoPoint(47.1, 8.3);
+      expect(
+        navTrackAnchorShouldFollowSiteChange(oldSiteLocation, oldSiteLocation),
+        isTrue,
+      );
+    });
+
+    test('the anchor stays when the diver already moved it away from the old '
+        'site\'s pin', () {
+      const oldSiteLocation = GeoPoint(47.1, 8.3);
+      const movedAnchor = GeoPoint(47.2, 8.4);
+      expect(
+        navTrackAnchorShouldFollowSiteChange(movedAnchor, oldSiteLocation),
+        isFalse,
+      );
+    });
   });
 }

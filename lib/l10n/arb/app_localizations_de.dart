@@ -38414,6 +38414,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get navTrack_detail_menuRename => 'Umbenennen';
 
   @override
+  String get navTrack_detail_menuChangeSite => 'Tauchplatz ändern';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Startpunkt setzen, um dies auf einer Karte zu sehen.';
 

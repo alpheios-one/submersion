@@ -38224,6 +38224,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTrack_detail_menuRename => 'Hernoemen';
 
   @override
+  String get navTrack_detail_menuChangeSite => 'Duikstek wijzigen';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Stel het startpunt in om dit op een kaart te zien.';
 

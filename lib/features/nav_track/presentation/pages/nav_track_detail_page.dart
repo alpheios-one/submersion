@@ -7,6 +7,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
@@ -16,6 +19,21 @@ import 'package:submersion/features/nav_track/presentation/widgets/nav_track_pol
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Whether changing a route's site should also move its anchor to the new
+/// site's pin (item 5).
+///
+/// True only when the diver never touched the start point away from the old
+/// site's pin: [currentAnchor] is unset, or still exactly equals
+/// [oldSiteLocation]. If the diver already corrected the start point by
+/// hand, changing the site must not silently move that correction -- the
+/// safer, more predictable rule the design settled on.
+bool navTrackAnchorShouldFollowSiteChange(
+  GeoPoint? currentAnchor,
+  GeoPoint? oldSiteLocation,
+) {
+  return currentAnchor == null || currentAnchor == oldSiteLocation;
+}
 
 /// One route: stats, an inline map when anchored, its dive link, correction
 /// status, and 3D (spec 2026-09-10-underwater-nav-track-design.md, "The
@@ -134,6 +152,58 @@ class NavTrackDetailPage extends ConsumerWidget {
         .link(route.id, chosen.id, linkMode: NavTrackLinkMode.manual);
   }
 
+  /// Opens the same site picker the import review page uses and, on a
+  /// choice, persists the new site.
+  ///
+  /// The anchor follows the new site's pin only when the diver never moved
+  /// the start point away from the old site's pin: the current anchor is
+  /// unset, or still exactly equals the old site's stored location. If the
+  /// diver already corrected the start point by hand, changing the site
+  /// must not silently move that correction (item 5).
+  Future<void> _changeSite(
+    BuildContext context,
+    WidgetRef ref,
+    NavTrack route,
+  ) async {
+    final oldSiteId = route.siteId;
+    final oldSiteLocation = oldSiteId == null
+        ? null
+        : await ref
+              .read(siteProvider(oldSiteId).future)
+              .then((s) => s?.location);
+    if (!context.mounted) return;
+
+    final chosen = await showModalBottomSheet<DiveSite>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (sheetContext, scrollController) => SitePickerSheet(
+          scrollController: scrollController,
+          selectedSiteId: oldSiteId,
+          onSiteSelected: (site) => Navigator.of(sheetContext).pop(site),
+          onCreateNewSite: () => Navigator.of(sheetContext).pop(),
+        ),
+      ),
+    );
+    if (chosen == null) return;
+
+    final followsNewSite = navTrackAnchorShouldFollowSiteChange(
+      route.anchor,
+      oldSiteLocation,
+    );
+    await ref
+        .read(navTrackRepositoryProvider)
+        .setSite(
+          route.id,
+          chosen.id,
+          anchor: followsNewSite ? chosen.location : null,
+        );
+  }
+
   String _correctionStatus(AppLocalizations l10n, NavTrack route) {
     return switch (route.endMode) {
       NavTrackEndMode.none => l10n.navTrack_detail_correctionStatus_none,
@@ -187,6 +257,8 @@ class NavTrackDetailPage extends ConsumerWidget {
                   switch (value) {
                     case 'rename':
                       await _rename(context, ref, route);
+                    case 'changeSite':
+                      await _changeSite(context, ref, route);
                     case 'unlink':
                       await _unlink(ref, route);
                     case 'delete':
@@ -197,6 +269,11 @@ class NavTrackDetailPage extends ConsumerWidget {
                   PopupMenuItem(
                     value: 'rename',
                     child: Text(l10n.navTrack_detail_menuRename),
+                  ),
+                  PopupMenuItem(
+                    key: const ValueKey('nav-track-menu-change-site'),
+                    value: 'changeSite',
+                    child: Text(l10n.navTrack_detail_menuChangeSite),
                   ),
                   if (route.diveId != null)
                     PopupMenuItem(

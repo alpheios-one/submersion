@@ -11284,6 +11284,7 @@
   "navTrack_detail_deleteMessage": "Dies kann nicht rückgängig gemacht werden.",
   "navTrack_detail_defaultTitle": "Route",
   "navTrack_detail_menuRename": "Umbenennen",
+  "navTrack_detail_menuChangeSite": "Tauchplatz ändern",
   "navTrack_detail_noMapYet": "Startpunkt setzen, um dies auf einer Karte zu sehen.",
   "navTrack_detail_correctionStatus_none": "Noch keine Korrektur angewendet.",
   "navTrack_detail_correctionStatus_sameAsStart": "Ende auf gleich wie Start gesetzt.",

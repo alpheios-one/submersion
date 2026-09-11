@@ -38333,6 +38333,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get navTrack_detail_menuRename => 'Átnevezés';
 
   @override
+  String get navTrack_detail_menuChangeSite => 'Merülőhely módosítása';
+
+  @override
   String get navTrack_detail_noMapYet =>
       'Állítsd be a kezdőpontot, hogy ezt térképen lásd.';
 

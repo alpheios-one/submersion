@@ -7,6 +7,8 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
+    show GeoPoint;
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart'
     as domain;
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
@@ -312,6 +314,49 @@ class NavTrackRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to update the correction on nav track $routeId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Changes the dive site linked to [routeId] after import (unlike the
+  /// import review page's site picker, which only ever sets it once).
+  ///
+  /// [anchor], when given, is written as the new anchor too. The caller
+  /// decides whether to pass it: the safe rule (spec 2026-09-10-underwater-
+  /// nav-track-design.md item 5) is that the anchor should follow the new
+  /// site's pin only when the diver never moved the start point away from
+  /// the old site's pin (the current anchor is unset, or still exactly
+  /// equals the old site's stored location) -- never when they already
+  /// corrected it by hand. Passing null leaves the stored anchor untouched
+  /// either way.
+  Future<void> setSite(
+    String routeId,
+    String? siteId, {
+    GeoPoint? anchor,
+  }) async {
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(
+        _db.navTracks,
+      )..where((t) => t.id.equals(routeId))).write(
+        NavTracksCompanion(
+          siteId: Value(siteId),
+          anchorLatitude: anchor != null
+              ? Value(anchor.latitude)
+              : const Value.absent(),
+          anchorLongitude: anchor != null
+              ? Value(anchor.longitude)
+              : const Value.absent(),
+          updatedAt: Value(now),
+        ),
+      );
+      await _markPending(routeId, now);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to change the site on nav track $routeId',
         error: e,
         stackTrace: stackTrace,
       );

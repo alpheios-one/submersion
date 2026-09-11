@@ -11284,6 +11284,7 @@
   "navTrack_detail_deleteMessage": "Isso não pode ser desfeito.",
   "navTrack_detail_defaultTitle": "Rota",
   "navTrack_detail_menuRename": "Renomear",
+  "navTrack_detail_menuChangeSite": "Alterar ponto de mergulho",
   "navTrack_detail_noMapYet": "Defina o ponto de início para ver isso em um mapa.",
   "navTrack_detail_correctionStatus_none": "Nenhuma correção aplicada ainda.",
   "navTrack_detail_correctionStatus_sameAsStart": "Fim definido como igual ao início.",
