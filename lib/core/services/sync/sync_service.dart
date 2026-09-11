@@ -2443,6 +2443,14 @@ class SyncService {
       (field: 'equipmentId', parent: 'equipment', nullable: true),
       (field: 'signerId', parent: 'buddies', nullable: true),
     ],
+    // All three nullable (onDelete: KeyAction.setNull): the recording
+    // outlives a deleted dive, site or equipment item and just loses the
+    // link (spec 2026-09-10-underwater-nav-track-design.md).
+    'navTracks': [
+      (field: 'diveId', parent: 'dives', nullable: true),
+      (field: 'siteId', parent: 'diveSites', nullable: true),
+      (field: 'equipmentId', parent: 'equipment', nullable: true),
+    ],
     'siteSpecies': [
       (field: 'siteId', parent: 'diveSites', nullable: false),
       (field: 'speciesId', parent: 'species', nullable: false),

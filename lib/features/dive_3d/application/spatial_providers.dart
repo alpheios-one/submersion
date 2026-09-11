@@ -21,12 +21,22 @@ import 'package:submersion/features/dive_3d/domain/spatial/spatial_geometry_serv
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/nav_track/domain/nav_track_path_adapter.dart';
+import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
-/// The reconstructed swim path for a dive (dead reckoning), or null when the
-/// dive has no usable profile.
+/// The reconstructed swim path for a dive: a linked underwater route when
+/// one exists and has enough points, else dead reckoning, else null when
+/// the dive has no usable profile either.
 final spatialReckonedPathProvider =
     FutureProvider.family<ReckonedPath?, String>((ref, diveId) async {
+      final route = await ref.watch(
+        primaryNavTrackForDiveProvider(diveId).future,
+      );
+      if (route != null && route.points.length >= 2) {
+        return NavTrackPathAdapter.toReckonedPath(route);
+      }
+
       final dive = await ref.watch(diveProvider(diveId).future);
       if (dive == null) return null;
       final sources = await ref.watch(sourceProfilesProvider(diveId).future);
@@ -85,6 +95,14 @@ class SpatialSceneResult {
   /// compute() isolate).
   final TerrainImagery? imagery;
 
+  /// Where the swim path's shape came from: a linked measured route, dead
+  /// reckoning, or the straight-line fallback. Drives the path caption.
+  final PathProvenance pathProvenance;
+
+  /// A caption detail for [PathProvenance.measured] paths (e.g. the
+  /// route's source label), or null when none is available.
+  final String? pathSourceLabel;
+
   const SpatialSceneResult({
     required this.scene,
     this.bathymetrySourceId,
@@ -93,6 +111,8 @@ class SpatialSceneResult {
     this.grid,
     this.contourLabels = const [],
     this.imagery,
+    this.pathProvenance = PathProvenance.deadReckoned,
+    this.pathSourceLabel,
   });
 }
 
@@ -179,6 +199,8 @@ final spatialGeometryProvider =
         grid: grid,
         contourLabels: built.contourLabels,
         imagery: imagery,
+        pathProvenance: path.provenance,
+        pathSourceLabel: path.sourceLabel,
       );
     });
 

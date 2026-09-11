@@ -1,13 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
+import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
 
 import '../../../helpers/mock_providers.dart';
+
+NavTrack _route({required List<NavTrackPoint> points}) {
+  final now = DateTime(2026, 9, 10);
+  return NavTrack(
+    id: 'route-1',
+    diveId: 'd1',
+    source: NavTrackSource.seacraftEnc,
+    startTime: points.isEmpty ? 0 : points.first.timestamp * 1000,
+    endTime: points.isEmpty ? 0 : points.last.timestamp * 1000,
+    pointCount: points.length,
+    points: points,
+    createdAt: now,
+    updatedAt: now,
+  );
+}
 
 Dive diveWithHeadings({bool withGps = true}) => Dive(
   id: 'd1',
@@ -39,8 +57,9 @@ SourceProfile headingProfile() {
 Future<ProviderContainer> makeContainer({
   required Dive? dive,
   SourceProfile? profile,
+  NavTrack? route,
 }) async {
-  final base = await getBaseOverrides();
+  final base = await getBaseOverrides(primaryNavTrack: route);
   final container = ProviderContainer(
     overrides: [
       ...base,
@@ -140,5 +159,60 @@ void main() {
     );
     final scene = await container.read(spatialGeometryProvider('d1').future);
     expect(scene, isNotNull);
+  });
+
+  group('a linked underwater route', () {
+    List<NavTrackPoint> pointsOf(int count) => [
+      for (var i = 0; i < count; i++)
+        NavTrackPoint(timestamp: i * 10, north: i * 5.0, east: 0, depth: 5),
+    ];
+
+    test('with >=2 points wins over dead reckoning', () async {
+      final container = await makeContainer(
+        dive: diveWithHeadings(),
+        profile: headingProfile(),
+        route: _route(points: pointsOf(3)),
+      );
+
+      final path = await container.read(
+        spatialReckonedPathProvider('d1').future,
+      );
+
+      expect(path, isNotNull);
+      expect(path!.provenance, PathProvenance.measured);
+      expect(path.points, hasLength(3));
+    });
+
+    test('with fewer than 2 points falls back to the estimate', () async {
+      final container = await makeContainer(
+        dive: diveWithHeadings(),
+        profile: headingProfile(),
+        route: _route(points: pointsOf(1)),
+      );
+
+      final path = await container.read(
+        spatialReckonedPathProvider('d1').future,
+      );
+
+      expect(path, isNotNull);
+      expect(path!.provenance, PathProvenance.deadReckoned);
+    });
+
+    test('unlinking (null route) restores the estimate', () async {
+      final container = await makeContainer(
+        dive: diveWithHeadings(),
+        profile: headingProfile(),
+        // No route override at all: primaryNavTrackForDiveProvider defaults
+        // to null via getBaseOverrides, as it would once a route is
+        // unlinked.
+      );
+
+      final path = await container.read(
+        spatialReckonedPathProvider('d1').future,
+      );
+
+      expect(path, isNotNull);
+      expect(path!.provenance, PathProvenance.deadReckoned);
+    });
   });
 }

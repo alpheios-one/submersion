@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
@@ -305,15 +306,26 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
         ],
       ),
     );
-    // The path caption is an always-true honesty label: the swim path is
-    // always an estimate (dead reckoning or straight-line fallback). The
-    // seafloor chip states provenance: real bathymetry when a grid won,
+    // The path caption states provenance: a linked measured route reads as
+    // a recorded route, while dead reckoning and the straight-line
+    // fallback keep the existing honest "estimated" label. The seafloor
+    // chip states its own provenance: real bathymetry when a grid won,
     // otherwise the honest synthesized label.
     final sourceId = result.bathymetrySourceId;
     final resolution = result.bathymetryResolutionMeters;
+    final pathLabel = switch (result.pathProvenance) {
+      PathProvenance.measured =>
+        result.pathSourceLabel != null
+            ? context.l10n.dive3d_spatial_recordedPathWithSource(
+                result.pathSourceLabel!,
+              )
+            : context.l10n.dive3d_spatial_recordedPath,
+      PathProvenance.deadReckoned ||
+      PathProvenance.straightLine => context.l10n.dive3d_spatial_estimatedPath,
+    };
     return Wrap(
       children: [
-        chip(context.l10n.dive3d_spatial_estimatedPath),
+        chip(pathLabel),
         if (sourceId != null && resolution != null)
           chip(
             context.l10n.dive3d_seascape_seafloorSource(
