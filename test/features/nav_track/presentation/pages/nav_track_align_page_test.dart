@@ -355,4 +355,47 @@ void main() {
 
     expect(repository.lastCorrection, isNull);
   });
+
+  testWidgets(
+    'typing a rotation value into the field updates headingOffsetDeg',
+    (tester) async {
+      final repository = await _pump(tester, route: _route());
+
+      final fieldFinder = find.byKey(
+        const ValueKey('nav-track-align-rotation-field'),
+      );
+      await tester.enterText(fieldFinder, '12.5');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-save')));
+      await tester.pumpAndSettle();
+
+      expect(repository.lastCorrection?.headingOffsetDeg, 12.5);
+    },
+  );
+
+  testWidgets(
+    'entering garbage text into the rotation field leaves the prior value '
+    'intact',
+    (tester) async {
+      final repository = await _pump(tester, route: _route());
+
+      // Establish a known non-zero value first via the stepper.
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-rotate-up')));
+      await tester.pump();
+
+      final fieldFinder = find.byKey(
+        const ValueKey('nav-track-align-rotation-field'),
+      );
+      await tester.enterText(fieldFinder, 'not a number');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+
+      await tester.tap(find.byKey(const ValueKey('nav-track-align-save')));
+      await tester.pumpAndSettle();
+
+      expect(repository.lastCorrection?.headingOffsetDeg, 0.5);
+    },
+  );
 }
