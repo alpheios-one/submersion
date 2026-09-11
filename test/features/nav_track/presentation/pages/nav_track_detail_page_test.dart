@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,6 +9,7 @@ import 'package:submersion/features/dive_log/presentation/providers/dive_provide
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_detail_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
@@ -15,7 +17,12 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
-NavTrack _route({String? diveId, String? equipmentId}) => NavTrack(
+NavTrack _route({
+  String? diveId,
+  String? equipmentId,
+  double? anchorLatitude,
+  double? anchorLongitude,
+}) => NavTrack(
   id: 'r1',
   diveId: diveId,
   equipmentId: equipmentId,
@@ -25,6 +32,8 @@ NavTrack _route({String? diveId, String? equipmentId}) => NavTrack(
   startTime: 1755856800000,
   endTime: 1755860400000,
   pointCount: 0,
+  anchorLatitude: anchorLatitude,
+  anchorLongitude: anchorLongitude,
   createdAt: DateTime(2026, 8, 22),
   updatedAt: DateTime(2026, 8, 22),
 );
@@ -115,6 +124,23 @@ void main() {
 
     expect(find.textContaining('Equipment:'), findsNothing);
   });
+
+  testWidgets(
+    'the inline map preview renders a TileLayer with the app\'s tile URL '
+    '(item 3)',
+    (tester) async {
+      await _pump(
+        tester,
+        route: _route(anchorLatitude: 47.1, anchorLongitude: 8.3),
+      );
+
+      final tileLayer = tester.widget<TileLayer>(find.byType(TileLayer));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(NavTrackDetailPage)),
+      );
+      expect(tileLayer.urlTemplate, container.read(mapTileUrlProvider));
+    },
+  );
 
   group('navTrackAnchorShouldFollowSiteChange (item 5)', () {
     test('the anchor follows the new site when it was never set', () {

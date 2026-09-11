@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_p
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
@@ -329,7 +330,10 @@ class NavTrackDetailPage extends ConsumerWidget {
                             ),
                             initialZoom: 15,
                           ),
-                          children: [NavTrackPolylineLayer(route: route)],
+                          children: [
+                            submersionTileLayer(ref),
+                            NavTrackPolylineLayer(route: route),
+                          ],
                         ),
                       ),
               ),
