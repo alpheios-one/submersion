@@ -38118,6 +38118,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String navTrack_detail_equipment(String name) {
+    return 'المعدات: $name';
+  }
+
+  @override
   String navTrack_detail_distance(String value) {
     return 'المسافة: $value';
   }
@@ -38205,6 +38210,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navTrack_review_diveSite => 'موقع الغوص';
+
+  @override
+  String get navTrack_review_equipment => 'المعدات';
+
+  @override
+  String get navTrack_review_noEquipmentChosen => 'بدون معدات';
 
   @override
   String get navTrack_review_noSiteChosen => 'لم يتم اختيار موقع غوص';

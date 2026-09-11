@@ -3,9 +3,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
@@ -70,6 +74,7 @@ Future<void> _pump(
   WidgetTester tester, {
   required NavTrackImportPreview preview,
   NavTrackImportService? service,
+  List<EquipmentItem>? equipment,
 }) async {
   final base = await getBaseOverrides();
   await tester.pumpWidget(
@@ -78,6 +83,8 @@ Future<void> _pump(
         ...base,
         if (service != null)
           navTrackImportServiceProvider.overrideWithValue(service),
+        if (equipment != null)
+          activeEquipmentProvider.overrideWith((ref) async => equipment),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -91,6 +98,78 @@ Future<void> _pump(
     ),
   );
   await tester.pumpAndSettle();
+}
+
+/// Like [_pump], but with a real `GoRouter` so a successful save's
+/// `context.go('/nav-routes/$id')` has somewhere to land.
+Future<void> _pumpWithRouter(
+  WidgetTester tester, {
+  required NavTrackImportPreview preview,
+  NavTrackImportService? service,
+  List<EquipmentItem>? equipment,
+}) async {
+  final base = await getBaseOverrides();
+  final router = GoRouter(
+    initialLocation: '/review',
+    routes: [
+      GoRoute(
+        path: '/review',
+        builder: (context, state) => NavTrackImportReviewPage(
+          bytes: Uint8List(0),
+          fileName: '005.DAT.csv',
+          preview: preview,
+        ),
+      ),
+      GoRoute(
+        path: '/nav-routes/:id',
+        builder: (context, state) =>
+            const Scaffold(body: Text('ROUTE_DETAIL_PAGE')),
+      ),
+    ],
+  );
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        if (service != null)
+          navTrackImportServiceProvider.overrideWithValue(service),
+        if (equipment != null)
+          activeEquipmentProvider.overrideWith((ref) async => equipment),
+      ],
+      child: MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// Records the parameters `commit` was called with, so a test can assert on
+/// them without touching a real database.
+class _RecordingImportService implements NavTrackImportService {
+  String? lastEquipmentId;
+
+  @override
+  Future<NavTrackImportPreview> prepare(
+    Uint8List bytes, {
+    String? fileName,
+  }) async => throw UnimplementedError();
+
+  @override
+  Future<String> commit({
+    required ParsedNavTrack parsed,
+    required String sourceRef,
+    Dive? dive,
+    String? siteId,
+    String? name,
+    String? deviceName,
+    String? equipmentId,
+  }) async {
+    lastEquipmentId = equipmentId;
+    return 'new-route-id';
+  }
 }
 
 void main() {
@@ -177,8 +256,79 @@ void main() {
     tester,
   ) async {
     await _pump(tester, preview: _preview());
+    // The equipment section added above the site section pushes it (and
+    // everything below) out of the default test viewport's cache extent,
+    // so it is not built until scrolled into view -- same as a real user
+    // would need to scroll a phone screen this long.
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('nav-track-site-picker')), findsOneWidget);
     expect(find.text('No site chosen'), findsOneWidget);
+  });
+
+  testWidgets(
+    'shows an equipment picker entry point defaulting to no equipment '
+    'chosen',
+    (tester) async {
+      await _pump(tester, preview: _preview(), equipment: const []);
+      expect(
+        find.byKey(const ValueKey('nav-track-equipment-picker')),
+        findsOneWidget,
+      );
+      expect(find.text('No equipment'), findsOneWidget);
+    },
+  );
+
+  testWidgets('picking equipment and saving persists the chosen equipmentId', (
+    tester,
+  ) async {
+    const scooter = EquipmentItem(
+      id: 'eq1',
+      name: 'Test Scooter',
+      type: EquipmentType.dpv,
+    );
+    final service = _RecordingImportService();
+    await _pumpWithRouter(
+      tester,
+      preview: _preview(),
+      service: service,
+      equipment: const [scooter],
+    );
+
+    await tester.tap(find.byKey(const ValueKey('nav-track-equipment-picker')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Test Scooter'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Test Scooter'), findsOneWidget);
+
+    // Scroll the save button into the test viewport (see the "site picker"
+    // test above for why).
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('nav-track-import-save')));
+    await tester.pumpAndSettle();
+
+    expect(service.lastEquipmentId, 'eq1');
+  });
+
+  testWidgets('saving without picking equipment commits a null equipmentId', (
+    tester,
+  ) async {
+    final service = _RecordingImportService();
+    await _pumpWithRouter(
+      tester,
+      preview: _preview(),
+      service: service,
+      equipment: const [],
+    );
+
+    await tester.drag(find.byType(ListView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('nav-track-import-save')));
+    await tester.pumpAndSettle();
+
+    expect(service.lastEquipmentId, isNull);
   });
 
   testWidgets('shows a parse-error message when the preview future rejects', (
@@ -230,5 +380,6 @@ class _FailingImportService implements NavTrackImportService {
     String? siteId,
     String? name,
     String? deviceName,
+    String? equipmentId,
   }) async => throw UnimplementedError();
 }

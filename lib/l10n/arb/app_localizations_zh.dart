@@ -36263,6 +36263,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String navTrack_detail_equipment(String name) {
+    return '装备：$name';
+  }
+
+  @override
   String navTrack_detail_distance(String value) {
     return '距离：$value';
   }
@@ -36348,6 +36353,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get navTrack_review_diveSite => '潜点';
+
+  @override
+  String get navTrack_review_equipment => '装备';
+
+  @override
+  String get navTrack_review_noEquipmentChosen => '无装备';
 
   @override
   String get navTrack_review_noSiteChosen => '未选择潜点';

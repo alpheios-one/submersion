@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_corrector.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_stats.dart';
@@ -263,7 +264,7 @@ class NavTrackDetailPage extends ConsumerWidget {
   }
 }
 
-class _StatsCard extends StatelessWidget {
+class _StatsCard extends ConsumerWidget {
   const _StatsCard({
     required this.route,
     required this.stats,
@@ -275,9 +276,13 @@ class _StatsCard extends StatelessWidget {
   final UnitFormatter units;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final duration = Duration(seconds: stats.durationSeconds);
     final l10n = context.l10n;
+    final equipmentId = route.equipmentId;
+    final equipmentName = equipmentId == null
+        ? null
+        : ref.watch(equipmentItemProvider(equipmentId)).value?.name;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -286,6 +291,8 @@ class _StatsCard extends StatelessWidget {
           children: [
             if (route.deviceName != null)
               Text(l10n.navTrack_detail_device(route.deviceName!)),
+            if (equipmentName != null)
+              Text(l10n.navTrack_detail_equipment(equipmentName)),
             Text(
               l10n.navTrack_detail_distance(
                 units.formatDistance(stats.totalDistance),

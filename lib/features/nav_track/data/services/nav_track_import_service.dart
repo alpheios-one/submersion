@@ -120,6 +120,7 @@ class NavTrackImportService {
     String? siteId,
     String? name,
     String? deviceName,
+    String? equipmentId,
   }) async {
     final id = await _routeRepository.insertImportedRoute(
       points: parsed.points,
@@ -129,6 +130,7 @@ class NavTrackImportService {
       name: name,
       diveId: dive?.id,
       siteId: siteId,
+      equipmentId: equipmentId,
     );
     if (dive == null) {
       await _matchService.sweep(limitToRouteIds: [id]);

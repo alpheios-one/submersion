@@ -62921,6 +62921,12 @@ abstract class AppLocalizations {
   /// **'Device: {name}'**
   String navTrack_detail_device(String name);
 
+  /// No description provided for @navTrack_detail_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment: {name}'**
+  String navTrack_detail_equipment(String name);
+
   /// No description provided for @navTrack_detail_distance.
   ///
   /// In en, this message translates to:
@@ -63050,6 +63056,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive site'**
   String get navTrack_review_diveSite;
+
+  /// No description provided for @navTrack_review_equipment.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipment'**
+  String get navTrack_review_equipment;
+
+  /// No description provided for @navTrack_review_noEquipmentChosen.
+  ///
+  /// In en, this message translates to:
+  /// **'No equipment'**
+  String get navTrack_review_noEquipmentChosen;
 
   /// No description provided for @navTrack_review_noSiteChosen.
   ///

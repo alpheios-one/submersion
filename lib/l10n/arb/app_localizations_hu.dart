@@ -38358,6 +38358,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String navTrack_detail_equipment(String name) {
+    return 'Felszerelés: $name';
+  }
+
+  @override
   String navTrack_detail_distance(String value) {
     return 'Távolság: $value';
   }
@@ -38445,6 +38450,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get navTrack_review_diveSite => 'Merülőhely';
+
+  @override
+  String get navTrack_review_equipment => 'Felszerelés';
+
+  @override
+  String get navTrack_review_noEquipmentChosen => 'Nincs felszerelés';
 
   @override
   String get navTrack_review_noSiteChosen => 'Nincs kiválasztott merülőhely';

@@ -9,12 +9,14 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/pickers/site_picker_sheet.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/nav_track_segmenter.dart';
 import 'package:submersion/features/nav_track/presentation/nav_track_parse_error_text.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_import_flow_providers.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
+import 'package:submersion/features/nav_track/presentation/widgets/nav_track_equipment_picker_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -89,6 +91,8 @@ class _NavTrackImportReviewPageState
   bool _diveChoiceInitialized = false;
   String? _siteId;
   String? _siteName;
+  String? _equipmentId;
+  String? _equipmentName;
   bool _replaceDuplicate = false;
   bool _busy = false;
   String? _error;
@@ -159,6 +163,43 @@ class _NavTrackImportReviewPageState
     }
   }
 
+  /// Distinguishes "the diver tapped the sheet's own no-equipment row" from
+  /// "the sheet was dismissed without a choice" (backdrop tap, close
+  /// button): [showModalBottomSheet] resolves to null for the latter, so
+  /// the sheet pops this sentinel rather than a bare null for the former,
+  /// and only it clears an existing selection.
+  static const Object _noEquipmentChosen = Object();
+
+  Future<void> _pickEquipment() async {
+    final result = await showModalBottomSheet<Object?>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (sheetContext, scrollController) =>
+            NavTrackEquipmentPickerSheet(
+              scrollController: scrollController,
+              selectedEquipmentId: _equipmentId,
+              onEquipmentSelected: (item) =>
+                  Navigator.of(sheetContext).pop(item ?? _noEquipmentChosen),
+            ),
+      ),
+    );
+    if (result == null) return; // dismissed without a choice
+    setState(() {
+      if (result is EquipmentItem) {
+        _equipmentId = result.id;
+        _equipmentName = result.name;
+      } else {
+        _equipmentId = null;
+        _equipmentName = null;
+      }
+    });
+  }
+
   String _segmentSummary(
     AppLocalizations l10n,
     NavTrackSegmentation segmentation,
@@ -206,6 +247,7 @@ class _NavTrackImportReviewPageState
             siteId: _siteId,
             name: name.isEmpty ? null : name,
             deviceName: device.isEmpty ? null : device,
+            equipmentId: _equipmentId,
           );
       if (!mounted) return;
       // Literal path: the routes-area detail page lives in another agent's
@@ -301,6 +343,16 @@ class _NavTrackImportReviewPageState
             labelText: l10n.navTrack_review_nameHint,
             isDense: true,
           ),
+        ),
+        const SizedBox(height: 12),
+        Text(l10n.navTrack_review_equipment, style: theme.textTheme.titleSmall),
+        ListTile(
+          key: const ValueKey('nav-track-equipment-picker'),
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.directions_boat_filled_outlined),
+          title: Text(_equipmentName ?? l10n.navTrack_review_noEquipmentChosen),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: _pickEquipment,
         ),
         const SizedBox(height: 24),
         _SummaryGrid(units: units, preview: preview, start: start, end: end),

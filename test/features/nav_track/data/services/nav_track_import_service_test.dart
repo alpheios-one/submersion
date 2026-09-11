@@ -207,5 +207,40 @@ void main() {
       final route = await routeRepo.getById(id);
       expect(route!.siteId, 's1');
     });
+
+    test('persists the chosen equipment id', () async {
+      await db.customStatement(
+        "INSERT INTO equipment (id, diver_id, name, type, created_at, updated_at) "
+        "VALUES ('eq1', NULL, 'Test Scooter', 'dpv', 1, 1)",
+      );
+      final preview = await service.prepare(
+        _fixture('seacraft_enc3_short.csv'),
+        fileName: '005.DAT.csv',
+      );
+
+      final id = await service.commit(
+        parsed: preview.parsed,
+        sourceRef: preview.sourceRef,
+        equipmentId: 'eq1',
+      );
+
+      final route = await routeRepo.getById(id);
+      expect(route!.equipmentId, 'eq1');
+    });
+
+    test('leaves equipmentId null when no equipment was chosen', () async {
+      final preview = await service.prepare(
+        _fixture('seacraft_enc3_short.csv'),
+        fileName: '005.DAT.csv',
+      );
+
+      final id = await service.commit(
+        parsed: preview.parsed,
+        sourceRef: preview.sourceRef,
+      );
+
+      final route = await routeRepo.getById(id);
+      expect(route!.equipmentId, isNull);
+    });
   });
 }

@@ -38512,6 +38512,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String navTrack_detail_equipment(String name) {
+    return 'Attrezzatura: $name';
+  }
+
+  @override
   String navTrack_detail_distance(String value) {
     return 'Distanza: $value';
   }
@@ -38599,6 +38604,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get navTrack_review_diveSite => 'Sito di immersione';
+
+  @override
+  String get navTrack_review_equipment => 'Attrezzatura';
+
+  @override
+  String get navTrack_review_noEquipmentChosen => 'Nessuna attrezzatura';
 
   @override
   String get navTrack_review_noSiteChosen => 'Nessun sito scelto';

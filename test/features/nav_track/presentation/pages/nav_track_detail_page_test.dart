@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/presentation/pages/nav_track_detail_page.dart';
 import 'package:submersion/features/nav_track/presentation/providers/nav_track_providers.dart';
@@ -11,9 +14,10 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
-NavTrack _route({String? diveId}) => NavTrack(
+NavTrack _route({String? diveId, String? equipmentId}) => NavTrack(
   id: 'r1',
   diveId: diveId,
+  equipmentId: equipmentId,
   linkMode: diveId == null ? null : NavTrackLinkMode.auto,
   source: NavTrackSource.seacraftEnc,
   sourceRef: 'r1.csv',
@@ -28,6 +32,7 @@ Future<void> _pump(
   WidgetTester tester, {
   required NavTrack route,
   Dive? linkedDive,
+  EquipmentItem? equipment,
 }) async {
   final overrides = await getBaseOverrides();
   await tester.pumpWidget(
@@ -37,6 +42,10 @@ Future<void> _pump(
         navTrackByIdProvider(route.id).overrideWith((ref) async => route),
         if (linkedDive != null)
           diveProvider(linkedDive.id).overrideWith((ref) async => linkedDive),
+        if (equipment != null)
+          equipmentItemProvider(
+            equipment.id,
+          ).overrideWith((ref) async => equipment),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -79,5 +88,30 @@ void main() {
     await _pump(tester, route: _route());
 
     expect(find.text('No correction applied yet.'), findsOneWidget);
+  });
+
+  testWidgets('shows the linked equipment name when equipmentId is set', (
+    tester,
+  ) async {
+    const scooter = EquipmentItem(
+      id: 'eq1',
+      name: 'Test Scooter',
+      type: EquipmentType.dpv,
+    );
+    await _pump(
+      tester,
+      route: _route(equipmentId: 'eq1'),
+      equipment: scooter,
+    );
+
+    expect(find.text('Equipment: Test Scooter'), findsOneWidget);
+  });
+
+  testWidgets('shows no equipment line when equipmentId is not set', (
+    tester,
+  ) async {
+    await _pump(tester, route: _route());
+
+    expect(find.textContaining('Equipment:'), findsNothing);
   });
 }

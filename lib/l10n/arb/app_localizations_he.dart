@@ -37741,6 +37741,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String navTrack_detail_equipment(String name) {
+    return 'ציוד: $name';
+  }
+
+  @override
   String navTrack_detail_distance(String value) {
     return 'מרחק: $value';
   }
@@ -37828,6 +37833,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get navTrack_review_diveSite => 'אתר צלילה';
+
+  @override
+  String get navTrack_review_equipment => 'ציוד';
+
+  @override
+  String get navTrack_review_noEquipmentChosen => 'ללא ציוד';
 
   @override
   String get navTrack_review_noSiteChosen => 'לא נבחר אתר צלילה';
