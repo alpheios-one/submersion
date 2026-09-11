@@ -124,6 +124,11 @@ Widget _buildReviewStep({
   return ProviderScope(
     overrides: [importWizardNotifierProvider.overrideWith((_) => notifier)],
     child: MaterialApp(
+      // flutter_test resolves against the HOST machine's locale list, so an
+      // unpinned MaterialApp renders translated on a non-English machine and
+      // every English literal this file matches on stops matching (issue
+      // #998 follow-up).
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: ReviewStep(onImport: onImport ?? () {})),
@@ -146,6 +151,11 @@ Widget _buildReviewStepWithProviders({
       tagsProvider.overrideWith((_) async => const []),
     ],
     child: MaterialApp(
+      // flutter_test resolves against the HOST machine's locale list, so an
+      // unpinned MaterialApp renders translated on a non-English machine and
+      // every English literal this file matches on stops matching (issue
+      // #998 follow-up).
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: ReviewStep(onImport: onImport ?? () {})),

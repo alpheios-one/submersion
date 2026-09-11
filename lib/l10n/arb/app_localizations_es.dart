@@ -20262,11 +20262,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tags_manage_autoTagImports =>
-      'Etiquetar importaciones automaticamente';
+      'Etiquetar importaciones automáticamente';
 
   @override
   String get tags_manage_autoTagImports_subtitle =>
-      'Cada nueva importacion comienza con una etiqueta que indica el origen y la fecha. Puedes cambiar esto para una sola importacion en las opciones de esa importacion.';
+      'Cada nueva importación comienza con una etiqueta que indica el origen y la fecha. Puedes cambiar esto para una sola importación en las opciones de esa importación.';
 
   @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
@@ -24851,11 +24851,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get universalImport_label_autoTagThisImport =>
-      'Etiquetar esta importacion automaticamente';
+      'Etiquetar esta importación automáticamente';
 
   @override
   String get universalImport_label_autoTagThisImportSubtitle =>
-      'Comienza con tu preferencia guardada en la configuracion de Etiquetas. Cambiarla aqui solo afecta a esta importacion.';
+      'Comienza con tu preferencia guardada en la configuración de Etiquetas. Cambiarla aquí solo afecta a esta importación.';
 
   @override
   String get universalImport_title_successImported => 'Importación Exitosa';

@@ -501,7 +501,7 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   void initializeDefaultTag({required bool autoTagImports}) {
     if (!autoTagImports) return;
 
-    final defaultName = _adapter.defaultTagName;
+    final defaultName = defaultTagName;
     final alreadyExists = state.importTags.any(
       (t) => t.name.toLowerCase() == defaultName.toLowerCase(),
     );
@@ -515,9 +515,22 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     );
   }
 
+  /// Cached on first read, from whichever of [initializeDefaultTag],
+  /// [defaultTagName] or [isAutoTagForThisImportEnabled] runs first.
+  ///
+  /// Adapters build this string from `DateTime.now()`, so re-deriving it on
+  /// every read would drift to tomorrow's date if the review step is left
+  /// open across midnight: the Import Options switch would then compare
+  /// against a name that no longer matches the tag already sitting in
+  /// [importTags], reading as off and adding a second tag when turned back
+  /// on instead of toggling the original.
+  String? _cachedDefaultTagName;
+
   /// The adapter's default "{source} Import {date}" tag name, for the
-  /// Import Options sheet's live switch (issue #998 follow-up).
-  String get defaultTagName => _adapter.defaultTagName;
+  /// Import Options sheet's live switch (issue #998 follow-up). Stable for
+  /// the lifetime of this notifier -- see [_cachedDefaultTagName].
+  String get defaultTagName =>
+      _cachedDefaultTagName ??= _adapter.defaultTagName;
 
   /// Whether [importTags] currently holds this session's default tag,
   /// case-insensitively by name.

@@ -20256,11 +20256,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_manage_importsSection => 'Importacoes';
 
   @override
-  String get tags_manage_autoTagImports => 'Marcar importacoes automaticamente';
+  String get tags_manage_autoTagImports => 'Marcar importações automaticamente';
 
   @override
   String get tags_manage_autoTagImports_subtitle =>
-      'Cada nova importacao comeca com uma etiqueta que indica a origem e a data. Pode alterar isto para uma unica importacao nas opcoes dessa importacao.';
+      'Cada nova importação começa com uma etiqueta que indica a origem e a data. Pode alterar isto para uma única importação nas opções dessa importação.';
 
   @override
   String get tags_manage_searchHint => 'Buscar etiquetas...';
@@ -24830,11 +24830,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get universalImport_label_autoTagThisImport =>
-      'Marcar esta importacao automaticamente';
+      'Marcar esta importação automaticamente';
 
   @override
   String get universalImport_label_autoTagThisImportSubtitle =>
-      'Comeca com a sua preferencia guardada nas configuracoes de Etiquetas. Altera-la aqui afeta apenas esta importacao.';
+      'Começa com a sua preferência guardada nas configurações de Etiquetas. Alterá-la aqui afeta apenas esta importação.';
 
   @override
   String get universalImport_title_successImported => 'Importados com Sucesso';

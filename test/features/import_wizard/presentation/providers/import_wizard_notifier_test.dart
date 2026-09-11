@@ -1492,6 +1492,30 @@ void main() {
 
         expect(notifier.state.importTags, isEmpty);
       });
+
+      test('defaultTagName stays stable even if the adapter would return a '
+          'different name on a later call', () {
+        // Real adapters build this string from DateTime.now(), so a
+        // notifier that re-derived it on every read would drift to a
+        // different name if the review step stayed open across midnight
+        // (issue #998 follow-up). The mock stands in for that drift by
+        // switching its answer after the first call.
+        var callCount = 0;
+        when(mockAdapter.defaultTagName).thenAnswer((_) {
+          callCount++;
+          return callCount == 1
+              ? 'test.uddf Import 2026-03-26'
+              : 'test.uddf Import 2026-03-27';
+        });
+
+        final first = notifier.defaultTagName;
+        notifier.initializeDefaultTag(autoTagImports: true);
+        final second = notifier.defaultTagName;
+
+        expect(first, equals('test.uddf Import 2026-03-26'));
+        expect(second, equals(first));
+        expect(notifier.isAutoTagForThisImportEnabled, isTrue);
+      });
     });
 
     group('addImportTag', () {
