@@ -15,8 +15,7 @@ import 'package:submersion/features/bathymetry/presentation/depth_overlay_toggle
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
-import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
-import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
+import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track_point.dart';
@@ -334,14 +333,7 @@ class _AlignPageBody extends ConsumerWidget {
                       initialZoom: anchor != null ? 15 : 3,
                     ),
                     children: [
-                      TileLayer(
-                        urlTemplate: ref.watch(mapTileUrlProvider),
-                        userAgentPackageName: 'app.submersion',
-                        maxZoom: ref.watch(mapTileMaxZoomProvider),
-                        tileProvider: TileCacheService.instance.isInitialized
-                            ? TileCacheService.instance.getTileProvider()
-                            : null,
-                      ),
+                      submersionTileLayer(ref),
                       if (anchor != null)
                         BathymetryDepthOverlayLayer(location: anchor),
                       NavTrackPolylineLayer(route: transientRoute),
