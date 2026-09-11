@@ -127,6 +127,36 @@ void main() {
       },
     );
 
+    test(
+      'never includes a sample from after a fix event even when the diver '
+      're-descends later in the same recording (a later underwater run '
+      'must not be stitched onto the pre-fix ribbon across the GPS jump)',
+      () {
+        final points = [
+          _p(timestamp: 0, north: 0, east: 0, depth: 5),
+          _p(timestamp: 10, north: 5, east: 0, depth: 0.1, distance: 5),
+          // Fix event: >50 m step in <=5 s at the surface.
+          _p(timestamp: 12, north: 400, east: 0, depth: 0.1, distance: 5),
+          _p(timestamp: 20, north: 405, east: 0, depth: 0.1, distance: 5),
+          // Re-descend: depth rises back above the surface threshold, so
+          // the segmenter classifies this run as `underwater` again --
+          // the adapter must still stop at the first fix event, not
+          // resume the ribbon here.
+          _p(timestamp: 30, north: 410, east: 0, depth: 6, distance: 200),
+          _p(timestamp: 40, north: 420, east: 0, depth: 7, distance: 210),
+        ];
+
+        final path = NavTrackPathAdapter.toReckonedPath(_route(points: points));
+
+        expect(path.points, hasLength(2));
+        expect(path.points.last.north, 5);
+        expect(path.durationSeconds, 10);
+        for (final p in path.points) {
+          expect(p.north, lessThan(400));
+        }
+      },
+    );
+
     test('returns an empty measured path when the route has no points', () {
       final route = _route(points: const []);
 

@@ -245,18 +245,29 @@ class NavTrackCorrector {
     }
   }
 
-  /// The last sample still part of the dead-reckoned swim path: the last
-  /// [NavTrackSampleKind.underwater] or [NavTrackSampleKind.surfaceReckoned]
-  /// entry. Falls back to the last raw sample when [kinds] contains none of
-  /// either (an edge case the parser's `tooShort` check should already
-  /// prevent, but this keeps the corrector from producing a zero-length
-  /// active range instead of failing loudly elsewhere).
+  /// The last sample of the LEADING contiguous run of
+  /// [NavTrackSampleKind.underwater] / [NavTrackSampleKind.surfaceReckoned]
+  /// samples, i.e. the index right before the first
+  /// [NavTrackSampleKind.gpsFixed] / [NavTrackSampleKind.outOfWater] sample.
+  ///
+  /// Deliberately scans forward from the start and stops at the FIRST
+  /// excluded sample, rather than scanning backward for the LAST active
+  /// one: a diver who re-descends after a GPS-fix event (the console
+  /// re-acquires a fix, then the diver keeps swimming) produces more
+  /// `underwater` samples after the fixed run, and scanning from the end
+  /// would land on one of those, well past the jump -- exactly the boundary
+  /// the ribbon must never cross (`NavTrackPathAdapter`,
+  /// `NavTrackPolylineLayer`: "the ribbon never connects across a fix
+  /// event"). Falls back to the last raw sample when [kinds] contains none
+  /// of either kind at all (an edge case the parser's `tooShort` check
+  /// should already prevent, but this keeps the corrector from producing a
+  /// zero-length active range instead of failing loudly elsewhere).
   static int _lastActiveIndex(List<NavTrackSampleKind> kinds, int length) {
-    for (var i = kinds.length - 1; i >= 0; i--) {
+    for (var i = 0; i < kinds.length; i++) {
       final kind = kinds[i];
-      if (kind == NavTrackSampleKind.underwater ||
-          kind == NavTrackSampleKind.surfaceReckoned) {
-        return i;
+      if (kind != NavTrackSampleKind.underwater &&
+          kind != NavTrackSampleKind.surfaceReckoned) {
+        return i == 0 ? length - 1 : i - 1;
       }
     }
     return length - 1;
