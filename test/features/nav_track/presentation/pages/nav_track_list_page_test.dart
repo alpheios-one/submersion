@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -96,8 +97,9 @@ Future<_RecordingNavTrackRepository> _pump(
   Dive? linkedDive,
   Map<String, NavTrack>? hydrated,
   NavTrackMatchService? matchService,
+  MockSettingsNotifier? settingsNotifier,
 }) async {
-  final overrides = await getBaseOverrides();
+  final overrides = await getBaseOverrides(settingsNotifier: settingsNotifier);
   final repository = _RecordingNavTrackRepository();
   await tester.pumpWidget(
     ProviderScope(
@@ -171,6 +173,43 @@ void main() {
 
     expect(find.text('No underwater routes yet.'), findsOneWidget);
   });
+
+  testWidgets(
+    'the list row\'s date uses the wall-clock-as-UTC convention, not the '
+    'host\'s local timezone (route.startTime, like dives.entryTime, is a '
+    'wall-clock-as-UTC epoch)',
+    (tester) async {
+      // 23:30 UTC: on any host east of UTC (including this repo's own dev/CI
+      // offset), a `.fromMillisecondsSinceEpoch` WITHOUT `isUtc: true` rolls
+      // this over to the next local calendar day, changing the digits
+      // `yyyymmdd` renders below. On a host west of UTC it would instead
+      // roll BACK to 2026-03-27 -- either way, only isUtc: true keeps it at
+      // 2026-03-28.
+      final startTime = DateTime.utc(
+        2026,
+        3,
+        28,
+        23,
+        30,
+      ).millisecondsSinceEpoch;
+      final settings = MockSettingsNotifier();
+      await settings.setDateFormat(DateFormatPreference.yyyymmdd);
+
+      await _pump(
+        tester,
+        routes: [
+          _route(
+            id: 'r1',
+            name: 'Wreck dive',
+          ).copyWith(startTime: startTime, endTime: startTime + 600000),
+        ],
+        settingsNotifier: settings,
+      );
+
+      expect(find.textContaining('2026-03-28'), findsOneWidget);
+      expect(find.textContaining('2026-03-29'), findsNothing);
+    },
+  );
 
   testWidgets(
     'an unanchored route\'s shape thumbnail renders the actual route, not '

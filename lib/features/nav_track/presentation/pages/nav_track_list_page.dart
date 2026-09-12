@@ -418,7 +418,14 @@ class NavTrackListRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final startedAt = DateTime.fromMillisecondsSinceEpoch(route.startTime);
+    // route.startTime is wall-clock-as-UTC epoch milliseconds, the same
+    // convention as dives.entryTime: constructing this as a local DateTime
+    // would let the displayed date (and the value UnitFormatter formats)
+    // shift across midnight on a device outside UTC.
+    final startedAt = DateTime.fromMillisecondsSinceEpoch(
+      route.startTime,
+      isUtc: true,
+    );
     final l10n = context.l10n;
     // route.points is always empty here: allNavTracksProvider reads with
     // includePoints: false so the list query never decodes every route's
