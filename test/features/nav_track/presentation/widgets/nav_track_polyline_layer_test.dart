@@ -96,4 +96,50 @@ void main() {
     expect(find.byType(PolylineLayer), findsOneWidget);
     expect(find.byType(MarkerLayer), findsOneWidget);
   });
+
+  testWidgets(
+    'stops at the first fix event even when the diver re-descends later '
+    '(never draws a second tail past the GPS jump)',
+    (tester) async {
+      final route = _route(
+        anchor: const GeoPoint(47.0, 8.0),
+        points: [
+          const NavTrackPoint(timestamp: 0, north: 0, east: 0, depth: 5),
+          const NavTrackPoint(timestamp: 10, north: 5, east: 0, depth: 0.1),
+          // Fix event: >50 m step in <=5 s at the surface.
+          const NavTrackPoint(timestamp: 12, north: 400, east: 0, depth: 0.1),
+          const NavTrackPoint(timestamp: 20, north: 405, east: 0, depth: 0.1),
+          // Re-descend: depth rises back above the surface threshold, so
+          // the segmenter classifies this run as `underwater` again -- the
+          // layer must still stop at the first fix event, not resume
+          // drawing here.
+          const NavTrackPoint(timestamp: 30, north: 410, east: 0, depth: 6),
+          const NavTrackPoint(timestamp: 40, north: 420, east: 0, depth: 7),
+        ],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FlutterMap(
+              options: const MapOptions(initialCenter: LatLng(47.0, 8.0)),
+              children: [NavTrackPolylineLayer(route: route)],
+            ),
+          ),
+        ),
+      );
+
+      final polylines = tester
+          .widget<PolylineLayer>(find.byType(PolylineLayer))
+          .polylines;
+      // Only the one pre-fix segment (north 0 -> 5): none of its points
+      // reach as far north as the re-descended run (north >= 400).
+      expect(polylines, hasLength(1));
+      for (final polyline in polylines) {
+        for (final point in polyline.points) {
+          expect(point.latitude, lessThan(47.001));
+        }
+      }
+    },
+  );
 }

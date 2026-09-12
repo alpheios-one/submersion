@@ -33,6 +33,13 @@ class NavTrackPolylineLayer extends StatelessWidget {
     final kinds = NavTrackSegmenter.classify(points).kinds;
     final corrected = NavTrackCorrector.apply(points, route.correction);
     final maxDepth = route.maxDepth ?? _maxDepthOf(corrected);
+    // Bounded to the active range, not filtered by kind across the whole
+    // recording: a diver who re-descends after a GPS fix produces more
+    // `underwater` samples past the jump, and kind-filtering alone would
+    // draw a second tail there and move the endpoint marker past the fix
+    // (mirrors NavTrackPathAdapter's own boundary for the same reason).
+    final activeStart = NavTrackCorrector.activeRangeStartIndex(points);
+    final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
 
     LatLng geoOf(CorrectedNavTrackPoint p) {
       final geo = offsetToGeoPoint(anchor, east: p.east, north: p.north);
@@ -47,7 +54,7 @@ class NavTrackPolylineLayer extends StatelessWidget {
     LatLng? start;
     LatLng? end;
     CorrectedNavTrackPoint? previous;
-    for (var i = 0; i < corrected.length; i++) {
+    for (var i = activeStart; i <= activeEnd && i < corrected.length; i++) {
       if (!kept(i)) {
         previous = null;
         continue;
