@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/equipment/presentation/widgets/observations_card.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -28,7 +29,12 @@ import 'package:submersion/features/equipment/presentation/utils/equipment_attri
 import 'package:submersion/features/cylinder_configs/presentation/widgets/unit_configurations_card.dart';
 import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_documents_section.dart';
+import 'package:submersion/features/equipment/domain/entities/condition_trend.dart';
+import 'package:submersion/features/equipment/presentation/widgets/children_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/components_card.dart';
+import 'package:submersion/features/equipment/presentation/widgets/condition_findings_card.dart';
+import 'package:submersion/features/equipment/presentation/widgets/condition_trend_card.dart';
+import 'package:submersion/features/equipment/presentation/widgets/exposure_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_clocks_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_history_section.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_record_dialog.dart';
@@ -179,6 +185,24 @@ class _EquipmentDetailContent extends ConsumerWidget {
               serviceKindId: status.kind.id,
             ),
           ),
+          const SizedBox(height: 24),
+          ExposureCard(equipmentId: equipmentId),
+          // The findings and trend cards carry their own top gap and render
+          // nothing when they have nothing to say, so the page never shows
+          // a blank slot for a rule engine.
+          ConditionFindingsCard(equipment: equipment),
+          ConditionTrendCard(equipment: equipment),
+          if (equipment.type == EquipmentType.rebreather)
+            ConditionTrendCard(
+              equipment: equipment,
+              kind: ConditionTrendKind.scrubberMinutes,
+            ),
+          if (childHostTypes.contains(equipment.type)) ...[
+            const SizedBox(height: 24),
+            ChildrenCard(equipment: equipment),
+          ],
+          const SizedBox(height: 24),
+          ObservationsCard(equipment: equipment),
           const SizedBox(height: 24),
           ComponentsCard(equipmentId: equipmentId),
           // Only rebreathers own configurations; every other type would show

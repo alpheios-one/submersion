@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
 void main() {
-  test('v208 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(208));
-    expect(AppDatabase.migrationVersions, contains(208));
+  test('v211 is the current schema version and is in the ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(211));
+    expect(AppDatabase.migrationVersions, contains(211));
   });
 
   test('a fresh database has diver_settings.auto_tag_imports, on', () async {
@@ -24,7 +24,7 @@ void main() {
   });
 
   test(
-    'a database stranded before v208 gains the column via beforeOpen',
+    'a database stranded before v211 gains the column via beforeOpen',
     () async {
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {
