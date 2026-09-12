@@ -71,6 +71,16 @@ Future<_RecordingNavTrackRepository> _pump(
   bool expanded = true,
   GoRouter? router,
 }) async {
+  // Pinned so the English finders below pass regardless of the host's
+  // platform locale: without this, a supported non-English translation can
+  // get selected instead and every finder in this file fails outside
+  // English (mirrors nav_track_import_review_page_test.dart's own pin).
+  tester.platformDispatcher.localesTestValue = const [
+    Locale('de'),
+    Locale('en'),
+  ];
+  addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
   final overrides = await getBaseOverrides();
   final repository = _RecordingNavTrackRepository();
   final effectiveOverrides = [
@@ -87,6 +97,7 @@ Future<_RecordingNavTrackRepository> _pump(
       ProviderScope(
         overrides: effectiveOverrides,
         child: MaterialApp.router(
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -98,6 +109,7 @@ Future<_RecordingNavTrackRepository> _pump(
       ProviderScope(
         overrides: effectiveOverrides,
         child: MaterialApp(
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(body: NavTrackSection(dive: _dive)),
