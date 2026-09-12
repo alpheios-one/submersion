@@ -218,15 +218,24 @@ int _parseTimestamp(String dateText, String timeText, int rowNumber) {
     );
   }
   try {
-    return DateTime.utc(
-          year,
-          month,
-          day,
-          hour,
-          minute,
-          second,
-        ).millisecondsSinceEpoch ~/
-        1000;
+    final result = DateTime.utc(year, month, day, hour, minute, second);
+    // DateTime.utc normalizes an out-of-range component instead of
+    // rejecting it (e.g. 31.2.2026 quietly becomes a date in March), so a
+    // malformed row would otherwise import with a shifted timestamp and
+    // incorrectly participate in dive matching. Verify every field
+    // round-tripped exactly before trusting the result.
+    if (result.year != year ||
+        result.month != month ||
+        result.day != day ||
+        result.hour != hour ||
+        result.minute != minute ||
+        result.second != second) {
+      throw NavTrackParseException(
+        'Row $rowNumber: invalid calendar date/time "$dateText $timeText"',
+        reason: NavTrackParseReason.badData,
+      );
+    }
+    return result.millisecondsSinceEpoch ~/ 1000;
   } on ArgumentError {
     throw NavTrackParseException(
       'Row $rowNumber: unparseable date/time "$dateText $timeText"',

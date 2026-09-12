@@ -247,6 +247,46 @@ void main() {
       );
     });
 
+    test('rejects an impossible calendar date instead of letting DateTime.utc '
+        'silently normalize it into a different date (31.2.2026 -> March)', () {
+      // The bad date is the SECOND row, and it normalizes (under the old,
+      // unvalidated behavior) to a date in March 2026 -- chronologically
+      // AFTER the first row -- so a naive "timestamp goes backwards" check
+      // would not catch it; only validating the calendar fields themselves
+      // does.
+      const bad =
+          '$_header\n'
+          '1.1.2026,16:16:07,0,0,0,0,0,0,0,0,20,3.9\n'
+          '31.2.2026,16:16:09,0,0,0,0,0,0,0,0,20,3.9\n';
+      expect(
+        () => parseSeacraftEncCsv(_csv(bad)),
+        throwsA(
+          isA<NavTrackParseException>()
+              .having((e) => e.reason, 'reason', NavTrackParseReason.badData)
+              .having((e) => e.message, 'message', contains('Row 3')),
+        ),
+      );
+    });
+
+    test('rejects an impossible time-of-day instead of letting DateTime.utc '
+        'silently roll it over to the next day', () {
+      // Same reasoning: 25:00:00 normalizes forward to the next day's
+      // 01:00:00, which still sorts after the first row, so only
+      // validating the time fields themselves catches it.
+      const bad =
+          '$_header\n'
+          '15.1.2025,10:00:00,0,0,0,0,0,0,0,0,20,3.9\n'
+          '15.1.2025,25:00:00,0,0,0,0,0,0,0,0,20,3.9\n';
+      expect(
+        () => parseSeacraftEncCsv(_csv(bad)),
+        throwsA(
+          isA<NavTrackParseException>()
+              .having((e) => e.reason, 'reason', NavTrackParseReason.badData)
+              .having((e) => e.message, 'message', contains('Row 3')),
+        ),
+      );
+    });
+
     test('rejects a timestamp that goes backwards', () {
       const bad =
           '$_header\n'
