@@ -26,8 +26,10 @@ Future<void> _insertMinimalDive(AppDatabase db, String id) {
 }
 
 void main() {
-  test('v209 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 209);
+  test('v209 is in the ladder', () {
+    // Relaxed once v210 (dive_tanks.equipment_id ON DELETE SET NULL) landed
+    // on top; the newest rung owns the exact assertion.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(209));
     expect(AppDatabase.migrationVersions, contains(209));
   });
 
