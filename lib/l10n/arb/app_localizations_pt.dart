@@ -20367,7 +20367,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tags_manage_title => 'Etiquetas';
 
   @override
-  String get tags_manage_importsSection => 'Importacoes';
+  String get tags_manage_importsSection => 'Importações';
 
   @override
   String get tags_manage_autoTagImports => 'Marcar importações automaticamente';
