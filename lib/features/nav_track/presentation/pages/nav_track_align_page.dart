@@ -31,26 +31,31 @@ import 'package:submersion/l10n/l10n_extension.dart';
 enum _Placing { none, start, end }
 
 /// Cumulative distance per point, in metres, from the route's own first
-/// sample -- presentation-local because the trust slider is the only reader
-/// that needs it purely as a distance axis.
+/// sample -- presentation-local wrapper because the trust slider is the
+/// only reader that needs it purely as a distance axis.
+///
+/// Delegates to [NavTrackCorrector.cumulativeDistances] instead of
+/// recomputing geometric path length here: on an ENC log the device's own
+/// `distance` channel and the 2D path length can disagree (a route that
+/// loops back near itself keeps accumulating device distance from the
+/// speed log while its geometric path length barely grows), and the
+/// corrector itself prefers the device channel when it is present and
+/// monotone (see [NavTrackCorrector.apply]). Recomputing path length
+/// independently here would let the slider's trusted metres, cutoff
+/// marker and duration point at a different sample than the correction
+/// actually freezes.
 ///
 /// Callers that feed this the trust slider's axis must first truncate
-/// [points] to [NavTrackCorrector.activeRangeEndIndex]: passing the whole
-/// raw recording would let a GPS-fix event's jump and post-surfacing
-/// wobble dominate the total, so the slider's "trusted up to" position
-/// would disagree with where [NavTrackCorrector.apply] actually freezes
-/// the route -- the prefix would look like it keeps moving as the diver
-/// drags the slider, when the correction itself has already stopped
-/// touching it.
-List<double> cumulativeDistances(List<NavTrackPoint> points) {
-  final result = List<double>.filled(points.length, 0);
-  for (var i = 1; i < points.length; i++) {
-    final dNorth = points[i].north - points[i - 1].north;
-    final dEast = points[i].east - points[i - 1].east;
-    result[i] = result[i - 1] + math.sqrt(dNorth * dNorth + dEast * dEast);
-  }
-  return result;
-}
+/// [points] to the active range
+/// ([NavTrackCorrector.activeRangeStartIndex]..[NavTrackCorrector.activeRangeEndIndex]):
+/// passing the whole raw recording would let a GPS-fix event's jump and
+/// post-surfacing wobble (or a pre-dive calibration) dominate the total,
+/// so the slider's "trusted up to" position would disagree with where
+/// [NavTrackCorrector.apply] actually freezes the route -- the prefix
+/// would look like it keeps moving as the diver drags the slider, when
+/// the correction itself has already stopped touching it.
+List<double> cumulativeDistances(List<NavTrackPoint> points) =>
+    NavTrackCorrector.cumulativeDistances(points);
 
 /// The corrected points of the ACTIVE dead-reckoned range only -- up to
 /// [NavTrackCorrector.activeRangeEndIndex] -- for the terrain check and its

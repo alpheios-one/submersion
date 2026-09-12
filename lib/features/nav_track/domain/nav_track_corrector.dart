@@ -159,11 +159,10 @@ class NavTrackCorrector {
     final target = _resolveTarget(points, rotated, correction);
     if (target == null) return rotated;
 
-    final cumulative = _cumulativeDistance(
+    final cumulative = cumulativeDistances(
       points,
-      rotated,
-      target.start,
-      target.end,
+      start: target.start,
+      end: target.end,
     );
     final sLast = cumulative[target.end];
     final sTrust = correction.trustFraction.clamp(0.0, 1.0) * sLast;
@@ -393,19 +392,31 @@ class NavTrackCorrector {
   /// route that sits still should not accumulate correction meanwhile);
   /// otherwise falls back to the 2D path length of the rotated points
   /// (equivalent to the raw points' path length, since rotation preserves
-  /// distance). The device channel is read relative to `points[start]`, not
-  /// the raw recording's absolute index 0, so a pre-dive calibration
-  /// segment's own distance reading (frozen or otherwise) never leaks into
-  /// the dive's distance budget.
-  static List<double> _cumulativeDistance(
-    List<NavTrackPoint> points,
-    List<CorrectedNavTrackPoint> rotated,
-    int start,
-    int end,
-  ) {
+  /// distance -- so this reads directly from [points]' own north/east and
+  /// needs no rotated copy). The device channel is read relative to
+  /// `points[start]`, not the raw recording's absolute index 0, so a
+  /// pre-dive calibration segment's own distance reading (frozen or
+  /// otherwise) never leaks into the dive's distance budget.
+  ///
+  /// Exposed so presentation code that needs a distance axis over part of
+  /// a route (the alignment page's trust slider) shares exactly this
+  /// distance-source rule instead of unconditionally recomputing geometric
+  /// path length: on an ENC log the device `distance` channel and the 2D
+  /// path length can disagree (a route that loops back near itself keeps
+  /// accumulating device distance from the speed log while its geometric
+  /// path length barely grows), so a slider computed independently could
+  /// point at a different sample than [apply] actually freezes.
+  static List<double> cumulativeDistances(
+    List<NavTrackPoint> points, {
+    int start = 0,
+    int? end,
+  }) {
+    if (points.isEmpty) return const [];
+    final lastIndex = end ?? points.length - 1;
+
     var deviceDistanceUsable = points[start].distance != null;
     if (deviceDistanceUsable) {
-      for (var i = start + 1; i <= end; i++) {
+      for (var i = start + 1; i <= lastIndex; i++) {
         final previous = points[i - 1].distance;
         final current = points[i].distance;
         if (previous == null || current == null || current < previous) {
@@ -415,18 +426,18 @@ class NavTrackCorrector {
       }
     }
 
-    final result = List<double>.filled(rotated.length, 0);
+    final result = List<double>.filled(points.length, 0);
     if (deviceDistanceUsable) {
       final base = points[start].distance!;
-      for (var i = start; i <= end; i++) {
+      for (var i = start; i <= lastIndex; i++) {
         result[i] = points[i].distance! - base;
       }
       return result;
     }
 
-    for (var i = start + 1; i <= end; i++) {
-      final dEast = rotated[i].east - rotated[i - 1].east;
-      final dNorth = rotated[i].north - rotated[i - 1].north;
+    for (var i = start + 1; i <= lastIndex; i++) {
+      final dEast = points[i].east - points[i - 1].east;
+      final dNorth = points[i].north - points[i - 1].north;
       result[i] = result[i - 1] + math.sqrt(dEast * dEast + dNorth * dNorth);
     }
     return result;

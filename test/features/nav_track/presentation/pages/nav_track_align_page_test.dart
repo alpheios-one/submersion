@@ -692,6 +692,73 @@ void main() {
     },
   );
 
+  testWidgets(
+    'the trust slider shares the corrector\'s device-distance-channel '
+    'preference instead of always recomputing geometric path length '
+    '(item 2)',
+    (tester) async {
+      final points = [
+        const NavTrackPoint(
+          timestamp: 0,
+          north: 0,
+          east: 0,
+          depth: 5,
+          distance: 0,
+        ),
+        const NavTrackPoint(
+          timestamp: 10,
+          north: 10,
+          east: 0,
+          depth: 5,
+          distance: 10,
+        ),
+        // Loops back to the previous position -- geometric path length adds
+        // almost nothing here -- while the device's own distance channel
+        // (integrated from the speed log, not from position) keeps
+        // climbing, exactly the ENC console shape the design spec
+        // describes.
+        const NavTrackPoint(
+          timestamp: 20,
+          north: 10,
+          east: 0,
+          depth: 5,
+          distance: 1000,
+        ),
+      ];
+      final route = NavTrack(
+        id: 'r-loop',
+        source: NavTrackSource.seacraftEnc,
+        sourceRef: 'loop.csv',
+        startTime: 0,
+        endTime: 20000,
+        pointCount: points.length,
+        points: points,
+        createdAt: DateTime(2026, 9, 6),
+        updatedAt: DateTime(2026, 9, 6),
+      );
+
+      await _pump(tester, route: route);
+
+      final sliderFinder = find.byKey(
+        const ValueKey('nav-track-align-trust-slider'),
+      );
+      // Drag far enough right to saturate the trust fraction near 1.0.
+      await tester.drag(sliderFinder, const Offset(2000, 0));
+      await tester.pump();
+
+      // Geometric path length over these 3 samples is only 10 m (the loop
+      // back to the same position contributes nothing); the device
+      // distance channel reaches 1000 m. A slider that recomputed
+      // geometric path length instead of sharing the corrector's own
+      // distance-source rule could never show more than ~10 m here.
+      expect(find.textContaining('trusted up to 10 m'), findsNothing);
+      expect(
+        find.textContaining(RegExp(r'trusted up to (9\d\d|1000) m')),
+        findsOneWidget,
+      );
+    },
+  );
+
   group('GPS-fix dots stay put under rotation and trust (item 1)', () {
     // The real fixture with a genuine surface GPS fix event (011.DAT.csv,
     // spec "A surface GPS fix inside the same file"): the yellow dots must
