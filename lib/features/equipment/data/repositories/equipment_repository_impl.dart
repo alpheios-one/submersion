@@ -15,9 +15,11 @@ import 'package:submersion/features/media_store/data/media_deletion_coordinator.
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/services/dive_sensor_summary_service.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/safety/data/repositories/incident_repository.dart';
+import 'package:submersion/features/transmitters/data/repositories/transmitter_repository.dart';
 
 class EquipmentRepository {
   /// Injectable seams mirror [SiteRepository]: tests hand in a coordinator
@@ -126,6 +128,12 @@ class EquipmentRepository {
   Stream<void> watchEquipmentChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.equipment));
 
+  /// Ticks when any item's attributes change (a cell slot, an install
+  /// date). `saveAttributes` and a sync pull write only
+  /// `equipment_attributes`, which [watchEquipmentChanges] does not see.
+  Stream<void> watchAttributeChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.equipmentAttributes));
+
   /// Get all equipment
   Future<List<EquipmentItem>> getAllEquipment({String? diverId}) async {
     try {
@@ -210,13 +218,18 @@ class EquipmentRepository {
   }
 
   /// Active items installed in [parentId] (O2 cells, batteries).
-  Future<List<EquipmentItem>> getChildEquipment(String parentId) async {
+  Future<List<EquipmentItem>> getChildEquipment(
+    String parentId, {
+    bool includeRetired = false,
+  }) async {
     final rows =
         await (_db.select(_db.equipment)
               ..where(
                 (t) =>
                     t.parentEquipmentId.equals(parentId) &
-                    t.isActive.equals(true),
+                    (includeRetired
+                        ? const Constant(true)
+                        : t.isActive.equals(true)),
               )
               ..orderBy([(t) => OrderingTerm.asc(t.name)]))
             .get();
@@ -478,9 +491,17 @@ class EquipmentRepository {
         final observations = await (_db.select(
           _db.equipmentObservations,
         )..where((t) => t.equipmentId.equals(id))).get();
+        // Condition findings sync too and go by the same cascade (condition
+        // phase 3b); the device-local review marker needs no tombstone.
+        final findings = await (_db.select(
+          _db.equipmentFindings,
+        )..where((t) => t.equipmentId.equals(id))).get();
         // Incidents naming the item stay; their gear link is staged, not
         // just nulled by SQLite.
         await IncidentRepository().unlinkFromDeletedEquipment(id);
+        // Registry rows naming the item (as a cylinder or a transmitter)
+        // stay; the link is staged, not just nulled.
+        await TransmitterRepository().unlinkFromDeletedEquipment(id);
         await (_db.delete(_db.equipment)..where((t) => t.id.equals(id))).go();
         for (final s in schedules) {
           await _syncRepository.logDeletion(
@@ -504,6 +525,12 @@ class EquipmentRepository {
           await _syncRepository.logDeletion(
             entityType: 'equipmentObservations',
             recordId: o.id,
+          );
+        }
+        for (final f in findings) {
+          await _syncRepository.logDeletion(
+            entityType: 'equipmentFindings',
+            recordId: f.id,
           );
         }
         await _syncRepository.logDeletion(
@@ -760,7 +787,8 @@ class EquipmentRepository {
   }
 
   /// Every dive this item was on, with what it was exposed to. One SQL union
-  /// over the four link paths (junction, cylinder, regulator, parent),
+  /// over the link paths (junction, cylinder, regulator, a transmitter's
+  /// registered serials, parent),
   /// left-joined to the sensor summary so profile extremes win over the dive
   /// header when a summary exists.
   ///
@@ -787,7 +815,9 @@ class EquipmentRepository {
       final rows = await _db
           .customSelect(
             '''
-        SELECT d.dive_date_time AS date_ms,
+        SELECT d.id AS dive_id,
+               d.updated_at AS updated_at,
+               d.dive_date_time AS date_ms,
                COALESCE(d.runtime, d.bottom_time, 0) AS duration_sec,
                d.dive_mode AS dive_mode,
                d.water_type AS water_type,
@@ -807,6 +837,20 @@ class EquipmentRepository {
               AND t.tank_role IN ('diluent', 'oxygenSupply')
             WHERE de.equipment_id = ?1 AND ?5 = 1
           UNION ALL
+          -- A transmitter item: the tanks that carried a serial the
+          -- registry assigns to it. That link writes no dive_equipment
+          -- row. Only the entry's diver, and a blank or all-zero serial
+          -- (normalizeTransmitterSerial) names no transmitter.
+          SELECT t.dive_id, NULL, 0
+            FROM transmitters r
+            JOIN dive_tanks t
+              ON TRIM(t.transmitter_serial) = TRIM(r.transmitter_serial)
+            JOIN dives rd ON rd.id = t.dive_id
+            WHERE r.transmitter_equipment_id = ?1
+              AND LTRIM(TRIM(r.transmitter_serial), '0') <> ''
+              AND (r.diver_id IS NULL OR rd.diver_id IS NULL
+                OR rd.diver_id = r.diver_id)
+          UNION ALL
           SELECT dive_id, NULL, 1 FROM dive_equipment WHERE equipment_id = ?2
           UNION ALL
           SELECT dive_id, o2_percent, 1 FROM dive_tanks
@@ -820,6 +864,8 @@ class EquipmentRepository {
         ) je
         JOIN dives d ON d.id = je.dive_id
         LEFT JOIN dive_sensor_summaries s ON s.dive_id = d.id
+          AND s.source_updated_at = d.updated_at
+          AND s.engine_version >= ?6
         WHERE (je.via_parent = 0 OR ?3 IS NULL OR d.dive_date_time >= ?3)
           AND (?4 IS NULL OR d.dive_date_time >= ?4)
         GROUP BY d.id
@@ -833,6 +879,10 @@ class EquipmentRepository {
               Variable(installedSince?.millisecondsSinceEpoch),
               Variable(since?.millisecondsSinceEpoch),
               Variable.withInt(rebreatherContact ? 1 : 0),
+              // Only a current summary: one built from an older version of
+              // the dive, or by an older algorithm, is stale until the
+              // sweep rebuilds it, and the header is the truth till then.
+              Variable.withInt(DiveSensorSummaryService.version),
             ],
           )
           .get();
@@ -850,6 +900,8 @@ class EquipmentRepository {
             ? o2Percent / 100.0
             : (rebreatherContact && mode == DiveMode.ccr ? 1.0 : null);
         return EquipmentExposureSample(
+          diveId: r.data['dive_id'] as String,
+          updatedAt: (r.data['updated_at'] as num).toInt(),
           // dives.dive_date_time is epoch millis with wall-clock-as-UTC
           // semantics (see dive_filter_sql.dart); decode with isUtc: true
           // like the other dive-date mappers so the engine's

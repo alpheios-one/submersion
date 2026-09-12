@@ -26645,6 +26645,26 @@ class AppLocalizationsAr extends AppLocalizations {
       'أُعيد بناء ملخصات المستشعرات';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: 'تعذّر تلخيص $dives غطسات',
+      one: 'تعذّر تلخيص غطسة واحدة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: 'تعذّر تحديث نتائج الحالة لـ $items قطع معدات',
+      one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
+    );
+    return '$_temp0؛ $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26656,8 +26676,67 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر تحديث نتائج الحالة لـ $count قطع معدات',
+      one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
+    );
+    return 'أُعيد بناء ملخصات المستشعرات؛ $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'تعذّرت إعادة بناء ملخصات المستشعرات.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'نتائج الحالة';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'يُبلغ عن اتجاهات خرج الخلايا وانقطاعات جهاز الإرسال والمشكلات المسجّلة، مع الأرقام التي تدعمها';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'القواعد';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'خرج الخلية في انخفاض';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'خرج الخلية منخفض';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'الخلية تختلف عن نظيراتها';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'الخلية محدودة التيار عند ppO2 مرتفع';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'انقطاعات جهاز الإرسال في ازدياد';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'انقطاعات جهاز الإرسال مرتفعة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => 'مشكلة متكررة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'مشكلات في الغطسات الباردة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'مشكلات في الغطسات العميقة';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked => 'حوادث مرتبطة';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'تدفق حر';
@@ -38018,6 +38097,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'أسطوانة من المعدات';
+
+  @override
+  String get transmitters_field_transmitterGear => 'جهاز إرسال من المعدات';
 
   @override
   String get transmitters_field_material => 'المادة';

@@ -17297,6 +17297,17 @@
     }
   },
   "equipmentConditionSettings_rebuild_done": "Sensor summaries rebuilt",
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{1 dive could not be summarised} other{{dives} dives could not be summarised}}; condition findings could not be refreshed for {items, plural, =1{1 item} other{{items} items}}",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_doneWithErrors": "Sensor summaries rebuilt; {count, plural, =1{1 dive could not be summarised} other{{count} dives could not be summarised}}",
   "@equipmentConditionSettings_rebuild_doneWithErrors": {
     "placeholders": {
@@ -17305,7 +17316,28 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "Sensor summaries rebuilt; condition findings could not be refreshed for {count, plural, =1{1 item} other{{count} items}}",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "Could not rebuild the sensor summaries.",
+  "equipmentConditionSettings_masterToggle": "Condition findings",
+  "equipmentConditionSettings_masterToggle_subtitle": "Report trends in cell output, transmitter dropouts and reported issues, with the numbers behind them",
+  "equipmentConditionSettings_rulesHeader": "Rules",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "Cell output declining",
+  "equipmentConditionSettings_rule_cellOutputLow": "Cell output low",
+  "equipmentConditionSettings_rule_cellDivergent": "Cell disagrees with its peers",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "Cell current-limited at high ppO2",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "Transmitter dropouts rising",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "Transmitter dropouts high",
+  "equipmentConditionSettings_rule_issueRecurring": "Recurring issue",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "Issues on cold dives",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "Issues on deep dives",
+  "equipmentConditionSettings_rule_incidentLinked": "Linked incidents",
   "equipmentObservation_tag_freeFlow": "Free flow",
   "equipmentObservation_tag_hardBreathing": "Hard breathing",
   "equipmentObservation_tag_wetBreathing": "Wet breathing",
@@ -23215,6 +23247,7 @@
   "transmitters_field_channel": "Channel",
   "transmitters_field_role": "Role",
   "transmitters_field_gear": "Cylinder from gear",
+  "transmitters_field_transmitterGear": "Transmitter from gear",
   "transmitters_field_material": "Material",
   "transmitters_gear_none": "None",
   "transmitters_validation_key": "Enter a transmitter serial, or pick a dive computer and channel",

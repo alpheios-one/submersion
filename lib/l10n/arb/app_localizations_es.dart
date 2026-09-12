@@ -27144,6 +27144,26 @@ class AppLocalizationsEs extends AppLocalizations {
       'Resúmenes de sensores reconstruidos';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives inmersiones no se pudieron resumir',
+      one: '1 inmersión no se pudo resumir',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items equipos',
+      one: '1 equipo',
+    );
+    return '$_temp0; no se pudieron actualizar los hallazgos de estado de $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -27155,8 +27175,69 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count equipos',
+      one: '1 equipo',
+    );
+    return 'Resúmenes de sensores reconstruidos; no se pudieron actualizar los hallazgos de estado de $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'No se pudieron reconstruir los resúmenes de sensores.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Hallazgos de estado';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Informa de tendencias en la salida de las celdas, pérdidas de señal del transmisor y problemas registrados, con las cifras que las respaldan';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Reglas';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Salida de la celda en descenso';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'Salida de la celda baja';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'La celda discrepa de sus pares';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Celda limitada por corriente a ppO2 alta';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Pérdidas de señal del transmisor en aumento';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Pérdidas de señal del transmisor elevadas';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Problema recurrente';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problemas en inmersiones frías';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problemas en inmersiones profundas';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Incidentes vinculados';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'Flujo continuo';
@@ -38458,6 +38539,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'Botella del equipo';
+
+  @override
+  String get transmitters_field_transmitterGear => 'Transmisor del equipo';
 
   @override
   String get transmitters_field_material => 'Material';

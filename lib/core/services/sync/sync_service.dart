@@ -1578,6 +1578,11 @@ class SyncService {
             records: data.equipmentObservations,
             hasUpdatedAt: true,
           ),
+          (
+            type: 'equipmentFindings',
+            records: data.equipmentFindings,
+            hasUpdatedAt: false,
+          ),
         ];
 
     // Precompute the locally-tombstoned parents this payload will REVIVE (a
@@ -2286,6 +2291,7 @@ class SyncService {
     'emergencyChambers': true,
     'incidents': true,
     'equipmentObservations': true,
+    'equipmentFindings': false,
     'gasSwitches': false,
     'diveCustomFields': false,
     // The id is the sha256 of the bytes, so the row is immutable and two
@@ -2381,6 +2387,8 @@ class SyncService {
     // cylinder or computer (set null), so a missing parent must not drop it.
     'transmitters': [
       (field: 'equipmentId', parent: 'equipment', nullable: true),
+      // v206: the transmitter gear item the entry is (condition phase 3b).
+      (field: 'transmitterEquipmentId', parent: 'equipment', nullable: true),
       (field: 'diveComputerId', parent: 'diveComputers', nullable: true),
     ],
     // v202: a child item (O2 cell, battery) points at the item it is installed
@@ -2435,6 +2443,10 @@ class SyncService {
       (field: 'diverId', parent: 'divers', nullable: true),
       (field: 'equipmentId', parent: 'equipment', nullable: false),
       (field: 'diveId', parent: 'dives', nullable: true),
+    ],
+    // v202: condition findings, write-once children of equipment.
+    'equipmentFindings': [
+      (field: 'equipmentId', parent: 'equipment', nullable: false),
     ],
     'diveSafetyReviews': [(field: 'diveId', parent: 'dives', nullable: false)],
     'diveSafetyFindings': [(field: 'diveId', parent: 'dives', nullable: false)],

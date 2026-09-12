@@ -26922,6 +26922,26 @@ class AppLocalizationsNl extends AppLocalizations {
       'Sensorsamenvattingen opnieuw opgebouwd';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives duiken konden niet worden samengevat',
+      one: '1 duik kon niet worden samengevat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '$_temp0; conditiebevindingen voor $_temp1 konden niet worden bijgewerkt';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26933,8 +26953,68 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Sensorsamenvattingen opnieuw opgebouwd; conditiebevindingen voor $_temp0 konden niet worden bijgewerkt';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'De sensorsamenvattingen konden niet opnieuw worden opgebouwd.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Conditiebevindingen';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Meldt trends in celuitvoer, zenderuitval en gemelde problemen, met de cijfers erachter';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Regels';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Celuitvoer daalt';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'Celuitvoer laag';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Cel wijkt af van de andere';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Cel stroombegrensd bij hoge ppO2';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Zenderuitval neemt toe';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Zenderuitval hoog';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Terugkerend probleem';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problemen bij koude duiken';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problemen bij diepe duiken';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Gekoppelde incidenten';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'Vrije flow';
@@ -38152,6 +38232,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'Fles uit uitrusting';
+
+  @override
+  String get transmitters_field_transmitterGear => 'Zender uit uitrusting';
 
   @override
   String get transmitters_field_material => 'Materiaal';

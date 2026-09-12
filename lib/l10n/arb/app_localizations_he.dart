@@ -26457,6 +26457,26 @@ class AppLocalizationsHe extends AppLocalizations {
       'סיכומי החיישנים נבנו מחדש';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives צלילות לא ניתן היה לסכם',
+      one: 'צלילה אחת לא ניתן היה לסכם',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: 'לא ניתן היה לרענן את ממצאי המצב של $items פריטי ציוד',
+      one: 'לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד',
+    );
+    return '$_temp0; $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26468,8 +26488,67 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לא ניתן היה לרענן את ממצאי המצב של $count פריטי ציוד',
+      one: 'לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד',
+    );
+    return 'סיכומי החיישנים נבנו מחדש; $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'לא ניתן היה לבנות מחדש את סיכומי החיישנים.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'ממצאי מצב';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'מדווח על מגמות בפלט התאים, בנפילות המשדר ובתקלות שדווחו, עם המספרים שמאחוריהן';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'כללים';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'פלט התא יורד';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'פלט התא נמוך';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'התא חורג מהאחרים';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'התא מוגבל זרם ב-ppO2 גבוה';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'נפילות המשדר במגמת עלייה';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'נפילות המשדר רבות';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => 'תקלה חוזרת';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'תקלות בצלילות קרות';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'תקלות בצלילות עמוקות';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'אירועים מקושרים';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'זרימה חופשית';
@@ -37644,6 +37723,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'מיכל מהציוד';
+
+  @override
+  String get transmitters_field_transmitterGear => 'משדר מהציוד';
 
   @override
   String get transmitters_field_material => 'חומר';

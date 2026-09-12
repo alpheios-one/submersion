@@ -8247,7 +8247,39 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{1 immersione non è stata riepilogata} other{{dives} immersioni non sono state riepilogate}}; non è stato possibile aggiornare i rilievi sullo stato di {items, plural, =1{1 elemento dell'attrezzatura} other{{items} elementi dell'attrezzatura}}",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "Riepiloghi dei sensori ricostruiti; non è stato possibile aggiornare i rilievi sullo stato di {count, plural, =1{1 elemento dell'attrezzatura} other{{count} elementi dell'attrezzatura}}",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "Impossibile ricostruire i riepiloghi dei sensori.",
+  "equipmentConditionSettings_masterToggle": "Rilievi sullo stato",
+  "equipmentConditionSettings_masterToggle_subtitle": "Segnala le tendenze dell'uscita delle celle, delle perdite di segnale del trasmettitore e dei problemi registrati, con i numeri a supporto",
+  "equipmentConditionSettings_rulesHeader": "Regole",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "Uscita della cella in calo",
+  "equipmentConditionSettings_rule_cellOutputLow": "Uscita della cella bassa",
+  "equipmentConditionSettings_rule_cellDivergent": "La cella discorda dalle altre",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "Cella limitata in corrente ad alta ppO2",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "Perdite di segnale del trasmettitore in aumento",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "Perdite di segnale del trasmettitore elevate",
+  "equipmentConditionSettings_rule_issueRecurring": "Problema ricorrente",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "Problemi nelle immersioni fredde",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "Problemi nelle immersioni profonde",
+  "equipmentConditionSettings_rule_incidentLinked": "Incidenti collegati",
   "equipmentObservation_tag_freeFlow": "Erogazione continua",
   "equipmentObservation_tag_hardBreathing": "Respirazione dura",
   "equipmentObservation_tag_wetBreathing": "Respirazione umida",
@@ -11289,6 +11321,7 @@
   "transmitters_field_channel": "Canale",
   "transmitters_field_role": "Ruolo",
   "transmitters_field_gear": "Bombola dall'attrezzatura",
+  "transmitters_field_transmitterGear": "Trasmettitore dall’attrezzatura",
   "transmitters_field_material": "Materiale",
   "transmitters_gear_none": "Nessuna",
   "transmitters_validation_key": "Inserisci un numero di serie oppure scegli computer e canale",

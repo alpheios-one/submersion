@@ -26674,6 +26674,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sensor summaries rebuilt';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives dives could not be summarised',
+      one: '1 dive could not be summarised',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items items',
+      one: '1 item',
+    );
+    return '$_temp0; condition findings could not be refreshed for $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26685,8 +26705,68 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return 'Sensor summaries rebuilt; condition findings could not be refreshed for $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'Could not rebuild the sensor summaries.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Condition findings';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Report trends in cell output, transmitter dropouts and reported issues, with the numbers behind them';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Rules';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Cell output declining';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'Cell output low';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Cell disagrees with its peers';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Cell current-limited at high ppO2';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Transmitter dropouts rising';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Transmitter dropouts high';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Recurring issue';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Issues on cold dives';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Issues on deep dives';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Linked incidents';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'Free flow';
@@ -37824,6 +37904,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'Cylinder from gear';
+
+  @override
+  String get transmitters_field_transmitterGear => 'Transmitter from gear';
 
   @override
   String get transmitters_field_material => 'Material';

@@ -2015,6 +2015,11 @@ class DiverSettings extends Table {
       real().withDefault(const Constant(30.0))();
   RealColumn get highO2ThresholdPercent =>
       real().withDefault(const Constant(40.0))();
+  // v206: condition engine master toggle and the disabled rule ids (JSON
+  // list of ConditionRuleId.dbValue); null or absent = none disabled.
+  BoolColumn get conditionEngineEnabled =>
+      boolean().withDefault(const Constant(true))();
+  TextColumn get conditionDisabledRules => text().nullable()();
   // Emergency card (v126): hidden bundled chamber ids (JSON list) and a
   // manual region override (ISO country code).
   TextColumn get hiddenChamberIds => text().nullable()();
@@ -2908,6 +2913,15 @@ class Transmitters extends Table {
   TextColumn get tankMaterial => text().nullable()(); // TankMaterial.name
   TextColumn get presetName => text().nullable()();
   TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+
+  /// The transmitter gear item this entry is (condition phase 3b, v206),
+  /// beside [equipmentId], the cylinder it feeds. The dropout rules read an
+  /// item's serials through it.
+  TextColumn get transmitterEquipmentId => text().nullable().references(
     Equipment,
     #id,
     onDelete: KeyAction.setNull,
@@ -4462,6 +4476,11 @@ class AppDatabase extends _$AppDatabase {
     // open, and a rung at or below the shipped version never runs its
     // onUpgrade step.
     204,
+    // 206: condition engine toggles on diver_settings (condition phase 3b).
+    // 205 is unused. v207 shipped in 1.7.8 while this branch was open, so
+    // a device already at 207 skips this step; the beforeOpen backstop
+    // adds the columns there instead.
+    206,
     // v207: an updated_at on the three composite-natural-key gear junctions
     // (issue #1728). 204 landed on main while this branch was open and 205
     // and 206 are claimed by the condition-intelligence branches, so this
@@ -4601,6 +4620,34 @@ class AppDatabase extends _$AppDatabase {
       'service_schedules',
       'exposure_intervals',
       "TEXT NOT NULL DEFAULT '{}'",
+    );
+  }
+
+  /// v206: the condition engine's master and per-rule toggles on
+  /// diver_settings, and the transmitter registry's link to the transmitter
+  /// gear item an entry is (condition phase 3b). Idempotent; called from the
+  /// v206 onUpgrade block and the beforeOpen backstop, which is also how a
+  /// device already past 206 gets the registry link.
+  Future<void> _assertConditionEngineSettingsColumns() async {
+    await _addColumnIfMissing(
+      'diver_settings',
+      'condition_engine_enabled',
+      'INTEGER NOT NULL DEFAULT 1',
+    );
+    await _addColumnIfMissing(
+      'diver_settings',
+      'condition_disabled_rules',
+      'TEXT',
+    );
+    // A partial-schema fixture may lack the equipment table, and with
+    // foreign keys on SQLite then refuses every later insert into a table
+    // whose FK parent is missing; those get a plain column (as v202 does).
+    await _addColumnIfMissing(
+      'transmitters',
+      'transmitter_equipment_id',
+      await _tableExists('equipment')
+          ? 'TEXT REFERENCES equipment(id) ON DELETE SET NULL'
+          : 'TEXT',
     );
   }
 
@@ -11452,6 +11499,15 @@ class AppDatabase extends _$AppDatabase {
           await _assertGroupTripsInDiveListColumn();
         }
         if (from < 204) await reportProgress();
+        // v206: condition engine toggles (condition phase 3b). Column-only
+        // rung on diver_settings, no backfill: the defaults (engine on, no
+        // rules disabled) are what every existing diver wants. A device
+        // already at the shipped v207 skips this step and gets the columns
+        // from the beforeOpen backstop.
+        if (from < 206) {
+          await _assertConditionEngineSettingsColumns();
+        }
+        if (from < 206) await reportProgress();
         // v207: an updated_at on the three composite-natural-key gear
         // junctions (issue #1728), backfilled from the parent each junction
         // rides. Numbered 207 because 205 and 206 are claimed by the
@@ -11684,6 +11740,8 @@ class AppDatabase extends _$AppDatabase {
 
         // v202 backstop: re-assert the condition columns and tables.
         await _assertEquipmentConditionSchema();
+        // v206 backstop: the condition engine toggle columns.
+        await _assertConditionEngineSettingsColumns();
 
         // v204 backstop: re-assert diver_settings.group_trips_in_dive_list.
         await _assertGroupTripsInDiveListColumn();

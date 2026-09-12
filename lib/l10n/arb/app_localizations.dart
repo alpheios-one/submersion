@@ -44679,17 +44679,110 @@ abstract class AppLocalizations {
   /// **'Sensor summaries rebuilt'**
   String get equipmentConditionSettings_rebuild_done;
 
+  /// No description provided for @equipmentConditionSettings_rebuild_doneWithBothErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'{dives, plural, =1{1 dive could not be summarised} other{{dives} dives could not be summarised}}; condition findings could not be refreshed for {items, plural, =1{1 item} other{{items} items}}'**
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  );
+
   /// No description provided for @equipmentConditionSettings_rebuild_doneWithErrors.
   ///
   /// In en, this message translates to:
   /// **'Sensor summaries rebuilt; {count, plural, =1{1 dive could not be summarised} other{{count} dives could not be summarised}}'**
   String equipmentConditionSettings_rebuild_doneWithErrors(int count);
 
+  /// No description provided for @equipmentConditionSettings_rebuild_doneWithFindingErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor summaries rebuilt; condition findings could not be refreshed for {count, plural, =1{1 item} other{{count} items}}'**
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count);
+
   /// No description provided for @equipmentConditionSettings_rebuild_failed.
   ///
   /// In en, this message translates to:
   /// **'Could not rebuild the sensor summaries.'**
   String get equipmentConditionSettings_rebuild_failed;
+
+  /// No description provided for @equipmentConditionSettings_masterToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition findings'**
+  String get equipmentConditionSettings_masterToggle;
+
+  /// No description provided for @equipmentConditionSettings_masterToggle_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report trends in cell output, transmitter dropouts and reported issues, with the numbers behind them'**
+  String get equipmentConditionSettings_masterToggle_subtitle;
+
+  /// No description provided for @equipmentConditionSettings_rulesHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules'**
+  String get equipmentConditionSettings_rulesHeader;
+
+  /// No description provided for @equipmentConditionSettings_rule_cellOutputDeclining.
+  ///
+  /// In en, this message translates to:
+  /// **'Cell output declining'**
+  String get equipmentConditionSettings_rule_cellOutputDeclining;
+
+  /// No description provided for @equipmentConditionSettings_rule_cellOutputLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Cell output low'**
+  String get equipmentConditionSettings_rule_cellOutputLow;
+
+  /// No description provided for @equipmentConditionSettings_rule_cellDivergent.
+  ///
+  /// In en, this message translates to:
+  /// **'Cell disagrees with its peers'**
+  String get equipmentConditionSettings_rule_cellDivergent;
+
+  /// No description provided for @equipmentConditionSettings_rule_cellCurrentLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Cell current-limited at high ppO2'**
+  String get equipmentConditionSettings_rule_cellCurrentLimited;
+
+  /// No description provided for @equipmentConditionSettings_rule_transmitterDropoutRising.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter dropouts rising'**
+  String get equipmentConditionSettings_rule_transmitterDropoutRising;
+
+  /// No description provided for @equipmentConditionSettings_rule_transmitterDropoutHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter dropouts high'**
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh;
+
+  /// No description provided for @equipmentConditionSettings_rule_issueRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring issue'**
+  String get equipmentConditionSettings_rule_issueRecurring;
+
+  /// No description provided for @equipmentConditionSettings_rule_issueColdCorrelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues on cold dives'**
+  String get equipmentConditionSettings_rule_issueColdCorrelated;
+
+  /// No description provided for @equipmentConditionSettings_rule_issueDeepCorrelated.
+  ///
+  /// In en, this message translates to:
+  /// **'Issues on deep dives'**
+  String get equipmentConditionSettings_rule_issueDeepCorrelated;
+
+  /// No description provided for @equipmentConditionSettings_rule_incidentLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked incidents'**
+  String get equipmentConditionSettings_rule_incidentLinked;
 
   /// No description provided for @equipmentObservation_tag_freeFlow.
   ///
@@ -62841,6 +62934,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cylinder from gear'**
   String get transmitters_field_gear;
+
+  /// No description provided for @transmitters_field_transmitterGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Transmitter from gear'**
+  String get transmitters_field_transmitterGear;
 
   /// No description provided for @transmitters_field_material.
   ///

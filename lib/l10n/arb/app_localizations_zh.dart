@@ -25728,6 +25728,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipmentConditionSettings_rebuild_done => '传感器摘要已重建';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives 次潜水无法汇总',
+      one: '1 次潜水无法汇总',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items 件装备的状态发现无法刷新',
+      one: '1 件装备的状态发现无法刷新',
+    );
+    return '$_temp0；$_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -25739,7 +25759,61 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件装备的状态发现无法刷新',
+      one: '1 件装备的状态发现无法刷新',
+    );
+    return '传感器摘要已重建；$_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed => '无法重建传感器摘要。';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => '状态发现';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      '报告电池输出、发射器断连和已记录问题的趋势，并附上背后的数据';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => '规则';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining => '电池输出下降';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => '电池输出偏低';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent => '电池与其他电池不一致';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      '高 ppO2 下电池电流受限';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      '发射器断连增多';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      '发射器断连频繁';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => '反复出现的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated => '冷水潜水中的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated => '深潜中的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked => '关联事件';
 
   @override
   String get equipmentObservation_tag_freeFlow => '自由流';
@@ -36166,6 +36240,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => '来自装备的气瓶';
+
+  @override
+  String get transmitters_field_transmitterGear => '来自装备的无线发射器';
 
   @override
   String get transmitters_field_material => '材质';

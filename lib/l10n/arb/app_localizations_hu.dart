@@ -27020,6 +27020,26 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szenzor-összegzések újraépítve';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives merülést nem sikerült összegezni',
+      one: '1 merülést nem sikerült összegezni',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items felszerelés',
+      one: '1 felszerelés',
+    );
+    return '$_temp0; $_temp1 állapotmegállapításait nem sikerült frissíteni';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -27031,8 +27051,69 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count felszerelés',
+      one: '1 felszerelés',
+    );
+    return 'Szenzor-összegzések újraépítve; $_temp0 állapotmegállapításait nem sikerült frissíteni';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'A szenzor-összegzéseket nem sikerült újraépíteni.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Állapotmegállapítások';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Jelzi a cellakimenet, az adókimaradások és a bejelentett problémák trendjeit, a mögöttük álló számokkal';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Szabályok';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Csökkenő cellakimenet';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'Alacsony cellakimenet';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'A cella eltér a többitől';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Áramkorlátozott cella magas ppO2-nél';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Növekvő adókimaradások';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Sok adókimaradás';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Visszatérő probléma';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problémák hideg merüléseken';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problémák mély merüléseken';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Kapcsolódó események';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'Szabadáramlás';
@@ -38259,6 +38340,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'Palack a felszerelésből';
+
+  @override
+  String get transmitters_field_transmitterGear => 'Jeladó a felszerelésből';
 
   @override
   String get transmitters_field_material => 'Anyag';

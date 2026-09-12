@@ -8247,7 +8247,39 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{تعذّر تلخيص غطسة واحدة} other{تعذّر تلخيص {dives} غطسات}}؛ {items, plural, =1{تعذّر تحديث نتائج الحالة لقطعة معدات واحدة} other{تعذّر تحديث نتائج الحالة لـ {items} قطع معدات}}",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "أُعيد بناء ملخصات المستشعرات؛ {count, plural, =1{تعذّر تحديث نتائج الحالة لقطعة معدات واحدة} other{تعذّر تحديث نتائج الحالة لـ {count} قطع معدات}}",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "تعذّرت إعادة بناء ملخصات المستشعرات.",
+  "equipmentConditionSettings_masterToggle": "نتائج الحالة",
+  "equipmentConditionSettings_masterToggle_subtitle": "يُبلغ عن اتجاهات خرج الخلايا وانقطاعات جهاز الإرسال والمشكلات المسجّلة، مع الأرقام التي تدعمها",
+  "equipmentConditionSettings_rulesHeader": "القواعد",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "خرج الخلية في انخفاض",
+  "equipmentConditionSettings_rule_cellOutputLow": "خرج الخلية منخفض",
+  "equipmentConditionSettings_rule_cellDivergent": "الخلية تختلف عن نظيراتها",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "الخلية محدودة التيار عند ppO2 مرتفع",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "انقطاعات جهاز الإرسال في ازدياد",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "انقطاعات جهاز الإرسال مرتفعة",
+  "equipmentConditionSettings_rule_issueRecurring": "مشكلة متكررة",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "مشكلات في الغطسات الباردة",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "مشكلات في الغطسات العميقة",
+  "equipmentConditionSettings_rule_incidentLinked": "حوادث مرتبطة",
   "equipmentObservation_tag_freeFlow": "تدفق حر",
   "equipmentObservation_tag_hardBreathing": "تنفس صعب",
   "equipmentObservation_tag_wetBreathing": "تنفس رطب",
@@ -11289,6 +11321,7 @@
   "transmitters_field_channel": "القناة",
   "transmitters_field_role": "الدور",
   "transmitters_field_gear": "أسطوانة من المعدات",
+  "transmitters_field_transmitterGear": "جهاز إرسال من المعدات",
   "transmitters_field_material": "المادة",
   "transmitters_gear_none": "لا شيء",
   "transmitters_validation_key": "أدخل رقمًا تسلسليًا، أو اختر كمبيوتر غوص وقناة",

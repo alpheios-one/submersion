@@ -8247,7 +8247,39 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{צלילה אחת לא ניתן היה לסכם} other{{dives} צלילות לא ניתן היה לסכם}}; {items, plural, =1{לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד} other{לא ניתן היה לרענן את ממצאי המצב של {items} פריטי ציוד}}",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "סיכומי החיישנים נבנו מחדש; {count, plural, =1{לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד} other{לא ניתן היה לרענן את ממצאי המצב של {count} פריטי ציוד}}",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "לא ניתן היה לבנות מחדש את סיכומי החיישנים.",
+  "equipmentConditionSettings_masterToggle": "ממצאי מצב",
+  "equipmentConditionSettings_masterToggle_subtitle": "מדווח על מגמות בפלט התאים, בנפילות המשדר ובתקלות שדווחו, עם המספרים שמאחוריהן",
+  "equipmentConditionSettings_rulesHeader": "כללים",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "פלט התא יורד",
+  "equipmentConditionSettings_rule_cellOutputLow": "פלט התא נמוך",
+  "equipmentConditionSettings_rule_cellDivergent": "התא חורג מהאחרים",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "התא מוגבל זרם ב-ppO2 גבוה",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "נפילות המשדר במגמת עלייה",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "נפילות המשדר רבות",
+  "equipmentConditionSettings_rule_issueRecurring": "תקלה חוזרת",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "תקלות בצלילות קרות",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "תקלות בצלילות עמוקות",
+  "equipmentConditionSettings_rule_incidentLinked": "אירועים מקושרים",
   "equipmentObservation_tag_freeFlow": "זרימה חופשית",
   "equipmentObservation_tag_hardBreathing": "נשימה קשה",
   "equipmentObservation_tag_wetBreathing": "נשימה רטובה",
@@ -11289,6 +11321,7 @@
   "transmitters_field_channel": "ערוץ",
   "transmitters_field_role": "תפקיד",
   "transmitters_field_gear": "מיכל מהציוד",
+  "transmitters_field_transmitterGear": "משדר מהציוד",
   "transmitters_field_material": "חומר",
   "transmitters_gear_none": "ללא",
   "transmitters_validation_key": "הזינו מספר סידורי, או בחרו מחשב צלילה וערוץ",

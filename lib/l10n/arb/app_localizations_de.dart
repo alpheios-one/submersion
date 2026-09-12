@@ -27075,6 +27075,26 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sensorzusammenfassungen neu erstellt';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives Tauchgänge konnten nicht zusammengefasst werden',
+      one: '1 Tauchgang konnte nicht zusammengefasst werden',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items Ausrüstungsteile',
+      one: '1 Ausrüstungsteil',
+    );
+    return '$_temp0; Zustandsbefunde für $_temp1 konnten nicht aktualisiert werden';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -27086,8 +27106,69 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Ausrüstungsteile',
+      one: '1 Ausrüstungsteil',
+    );
+    return 'Sensorzusammenfassungen neu erstellt; Zustandsbefunde für $_temp0 konnten nicht aktualisiert werden';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'Die Sensorzusammenfassungen konnten nicht neu erstellt werden.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Zustandsbefunde';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Meldet Trends bei Zellenausgang, Senderaussetzern und gemeldeten Problemen, mit den Zahlen dahinter';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Regeln';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Zellenausgang sinkt';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'Zellenausgang niedrig';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Zelle weicht von den anderen ab';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Zelle strombegrenzt bei hohem ppO2';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Senderaussetzer nehmen zu';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Senderaussetzer hoch';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Wiederkehrendes Problem';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Probleme bei kalten Tauchgängen';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Probleme bei tiefen Tauchgängen';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Verknüpfte Vorfälle';
 
   @override
   String get equipmentObservation_tag_freeFlow => 'Abblasen';
@@ -38340,6 +38421,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get transmitters_field_gear => 'Flasche aus der Ausrüstung';
+
+  @override
+  String get transmitters_field_transmitterGear => 'Sender aus der Ausrüstung';
 
   @override
   String get transmitters_field_material => 'Material';

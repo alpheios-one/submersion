@@ -302,6 +302,7 @@ class SyncData {
   final List<Map<String, dynamic>> emergencyChambers;
   final List<Map<String, dynamic>> incidents;
   final List<Map<String, dynamic>> equipmentObservations;
+  final List<Map<String, dynamic>> equipmentFindings;
   final List<Map<String, dynamic>> gasSwitches;
   final List<Map<String, dynamic>> diveCustomFields;
   final List<Map<String, dynamic>> importedFiles;
@@ -387,6 +388,7 @@ class SyncData {
     this.emergencyChambers = const [],
     this.incidents = const [],
     this.equipmentObservations = const [],
+    this.equipmentFindings = const [],
     this.gasSwitches = const [],
     this.diveCustomFields = const [],
     this.importedFiles = const [],
@@ -471,6 +473,7 @@ class SyncData {
     'emergencyChambers': emergencyChambers,
     'incidents': incidents,
     'equipmentObservations': equipmentObservations,
+    'equipmentFindings': equipmentFindings,
     'gasSwitches': gasSwitches,
     'diveCustomFields': diveCustomFields,
     'importedFiles': importedFiles,
@@ -560,6 +563,7 @@ class SyncData {
       emergencyChambers: _parseList(json['emergencyChambers']),
       incidents: _parseList(json['incidents']),
       equipmentObservations: _parseList(json['equipmentObservations']),
+      equipmentFindings: _parseList(json['equipmentFindings']),
       gasSwitches: _parseList(json['gasSwitches']),
       diveCustomFields: _parseList(json['diveCustomFields']),
       importedFiles: _parseList(json['importedFiles']),
@@ -1002,6 +1006,15 @@ class SyncDataSerializer {
     (
       key: 'equipmentObservations',
       table: _db.equipmentObservations,
+      blob: false,
+      full: null,
+    ),
+    (
+      // No hlc: exported for equipment whose clock advanced, like the
+      // safety findings ride on their dive. equipment_condition_reviews is
+      // device-local and has no entry here on purpose.
+      key: 'equipmentFindings',
+      table: _db.equipmentFindings,
       blob: false,
       full: null,
     ),
@@ -1619,6 +1632,10 @@ class SyncDataSerializer {
         'equipmentObservations',
         () => _exportEquipmentObservations(hlcSince),
       ),
+      equipmentFindings: await _safeExport(
+        'equipmentFindings',
+        () => _exportEquipmentFindings(hlcSince),
+      ),
       gasSwitches: await _safeExport(
         'gasSwitches',
         () => _exportGasSwitches(hlcSince),
@@ -2151,6 +2168,11 @@ class SyncDataSerializer {
       case 'equipmentObservations':
         final row = await (_db.select(
           _db.equipmentObservations,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'equipmentFindings':
+        final row = await (_db.select(
+          _db.equipmentFindings,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
       case 'gasSwitches':
@@ -3204,6 +3226,11 @@ class SyncDataSerializer {
             .into(_db.equipmentObservations)
             .insertOnConflictUpdate(EquipmentObservationRow.fromJson(data));
         return;
+      case 'equipmentFindings':
+        await _db
+            .into(_db.equipmentFindings)
+            .insertOnConflictUpdate(EquipmentFindingRow.fromJson(data));
+        return;
       case 'gasSwitches':
         await _db
             .into(_db.gasSwitches)
@@ -4170,6 +4197,14 @@ class SyncDataSerializer {
           ),
         );
         return;
+      case 'equipmentFindings':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.equipmentFindings,
+            records.map((r) => EquipmentFindingRow.fromJson(r)).toList(),
+          ),
+        );
+        return;
       case 'gasSwitches':
         await _db.batch(
           (b) => b.insertAllOnConflictUpdate(
@@ -4518,6 +4553,8 @@ class SyncDataSerializer {
         return plain(_db.incidents, _db.incidents.id);
       case 'equipmentObservations':
         return plain(_db.equipmentObservations, _db.equipmentObservations.id);
+      case 'equipmentFindings':
+        return plain(_db.equipmentFindings, _db.equipmentFindings.id);
       case 'gasSwitches':
         return plain(_db.gasSwitches, _db.gasSwitches.id);
       case 'diveCustomFields':
@@ -4878,6 +4915,8 @@ class SyncDataSerializer {
         return _db.incidents;
       case 'equipmentObservations':
         return _db.equipmentObservations;
+      case 'equipmentFindings':
+        return _db.equipmentFindings;
       case 'gasSwitches':
         return _db.gasSwitches;
       case 'diveCustomFields':
@@ -5283,6 +5322,11 @@ class SyncDataSerializer {
       case 'equipmentObservations':
         await (_db.delete(
           _db.equipmentObservations,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'equipmentFindings':
+        await (_db.delete(
+          _db.equipmentFindings,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'gasSwitches':
@@ -6493,6 +6537,26 @@ class SyncDataSerializer {
       return rows.map((r) => r.toJson()).toList();
     }
     final rows = await _db.select(_db.emergencyChambers).get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  /// Findings carry no hlc; the repository bumps the parent equipment row
+  /// on every write, so an incremental export follows that clock.
+  Future<List<Map<String, dynamic>>> _exportEquipmentFindings(
+    String? hlcSince,
+  ) async {
+    if (hlcSince != null) {
+      final modified = await (_db.select(
+        _db.equipment,
+      )..where((t) => t.hlc.isBiggerThanValue(hlcSince))).get();
+      final ids = modified.map((e) => e.id).toSet();
+      if (ids.isEmpty) return [];
+      final rows = await (_db.select(
+        _db.equipmentFindings,
+      )..where((t) => t.equipmentId.isIn(ids))).get();
+      return rows.map((r) => r.toJson()).toList();
+    }
+    final rows = await _db.select(_db.equipmentFindings).get();
     return rows.map((r) => r.toJson()).toList();
   }
 

@@ -8247,7 +8247,39 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{1 merülést nem sikerült összegezni} other{{dives} merülést nem sikerült összegezni}}; {items, plural, =1{1 felszerelés} other{{items} felszerelés}} állapotmegállapításait nem sikerült frissíteni",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "Szenzor-összegzések újraépítve; {count, plural, =1{1 felszerelés} other{{count} felszerelés}} állapotmegállapításait nem sikerült frissíteni",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "A szenzor-összegzéseket nem sikerült újraépíteni.",
+  "equipmentConditionSettings_masterToggle": "Állapotmegállapítások",
+  "equipmentConditionSettings_masterToggle_subtitle": "Jelzi a cellakimenet, az adókimaradások és a bejelentett problémák trendjeit, a mögöttük álló számokkal",
+  "equipmentConditionSettings_rulesHeader": "Szabályok",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "Csökkenő cellakimenet",
+  "equipmentConditionSettings_rule_cellOutputLow": "Alacsony cellakimenet",
+  "equipmentConditionSettings_rule_cellDivergent": "A cella eltér a többitől",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "Áramkorlátozott cella magas ppO2-nél",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "Növekvő adókimaradások",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "Sok adókimaradás",
+  "equipmentConditionSettings_rule_issueRecurring": "Visszatérő probléma",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "Problémák hideg merüléseken",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "Problémák mély merüléseken",
+  "equipmentConditionSettings_rule_incidentLinked": "Kapcsolódó események",
   "equipmentObservation_tag_freeFlow": "Szabadáramlás",
   "equipmentObservation_tag_hardBreathing": "Nehéz légzés",
   "equipmentObservation_tag_wetBreathing": "Nedves légzés",
@@ -11289,6 +11321,7 @@
   "transmitters_field_channel": "Csatorna",
   "transmitters_field_role": "Szerep",
   "transmitters_field_gear": "Palack a felszerelésből",
+  "transmitters_field_transmitterGear": "Jeladó a felszerelésből",
   "transmitters_field_material": "Anyag",
   "transmitters_gear_none": "Nincs",
   "transmitters_validation_key": "Adj meg egy sorozatszámot, vagy válassz komputert és csatornát",
