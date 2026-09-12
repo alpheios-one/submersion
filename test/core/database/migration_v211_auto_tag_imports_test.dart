@@ -5,7 +5,9 @@ import 'package:submersion/core/database/database.dart';
 
 void main() {
   test('v211 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(211));
+    // This is the newest rung, so it owns the exact assertion; relax it to
+    // greaterThanOrEqualTo when the next one lands.
+    expect(AppDatabase.currentSchemaVersion, 211);
     expect(AppDatabase.migrationVersions, contains(211));
   });
 

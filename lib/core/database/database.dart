@@ -2108,7 +2108,7 @@ class DiverSettings extends Table {
   BoolColumn get groupTripsInDiveList =>
       boolean().withDefault(const Constant(false))();
 
-  /// Pre-populate every import with a "{source} Import {date}" tag (v208,
+  /// Pre-populate every import with a "{source} Import {date}" tag (v211,
   /// issue #998). On by default, matching the wizard's long-standing
   /// behavior; divers who find the tags pile up too fast can turn this off
   /// from the tag management screen. This is only the starting point for a
@@ -7885,7 +7885,7 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// Idempotent DDL for diver_settings.auto_tag_imports (v208, issue #998).
+  /// Idempotent DDL for diver_settings.auto_tag_imports (v211, issue #998).
   /// Existing rows default to on, matching the wizard's prior behavior of
   /// always pre-filling an import tag.
   Future<void> _assertAutoTagImportsColumn() async {
