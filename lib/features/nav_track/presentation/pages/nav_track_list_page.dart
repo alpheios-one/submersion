@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/nav_track/data/services/nav_track_import_service.dart';
 import 'package:submersion/features/nav_track/data/services/parsers/parsed_nav_track.dart';
 import 'package:submersion/features/nav_track/domain/entities/nav_track.dart';
@@ -42,6 +46,36 @@ class NavTrackListPage extends ConsumerStatefulWidget {
 class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
   final _log = LoggerService.forClass(NavTrackListPage);
   final MapController _mapController = MapController();
+
+  /// Mirrors `GpsTrackOverviewMap`'s own framing latch: `initialCameraFit`
+  /// only ever applies once, behind flutter_map's own first-layout latch, so
+  /// a route arriving or being hydrated after that must be framed
+  /// imperatively instead.
+  bool _mapReady = false;
+  String? _framedOn;
+
+  /// A bounds fit over every anchored route's own start point, padded so a
+  /// single route is not zoomed in past readability. Null when there is
+  /// nothing to frame (the caller only builds the map when this is
+  /// non-null).
+  CameraFit? _cameraFitFor(List<NavTrack> anchoredRoutes) {
+    if (anchoredRoutes.isEmpty) return null;
+    final first = anchoredRoutes.first.anchor!;
+    var minLat = first.latitude, maxLat = first.latitude;
+    var minLon = first.longitude, maxLon = first.longitude;
+    for (final route in anchoredRoutes.skip(1)) {
+      final anchor = route.anchor!;
+      if (anchor.latitude < minLat) minLat = anchor.latitude;
+      if (anchor.latitude > maxLat) maxLat = anchor.latitude;
+      if (anchor.longitude < minLon) minLon = anchor.longitude;
+      if (anchor.longitude > maxLon) maxLon = anchor.longitude;
+    }
+    return CameraFit.bounds(
+      bounds: LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat, maxLon)),
+      padding: const EdgeInsets.all(48),
+      maxZoom: 16.0,
+    );
+  }
 
   Future<void> _importFile() async {
     final messenger = ScaffoldMessenger.of(context);
@@ -173,6 +207,19 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
 
     final selection = ref.watch(mapListSelectionProvider(kNavTrackSectionKey));
     final anchoredRoutes = routes.where((r) => r.anchor != null).toList();
+    final cameraFit = _cameraFitFor(anchoredRoutes);
+
+    // Re-frame when the anchored set changes -- a route arriving, an anchor
+    // being set on the alignment page, or a route being deleted -- the same
+    // signature-latch GpsTrackOverviewMap uses, since initialCameraFit only
+    // ever applies once at first layout.
+    final signature = anchoredRoutes.map((r) => r.id).join(',');
+    if (_mapReady && cameraFit != null && _framedOn != signature) {
+      _framedOn = signature;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _mapController.fitCamera(cameraFit);
+      });
+    }
 
     return MapListScaffold(
       sectionKey: kNavTrackSectionKey,
@@ -188,17 +235,26 @@ class _NavTrackListPageState extends ConsumerState<NavTrackListPage> {
         onOpen: _openRoute,
         onDelete: _deleteRoute,
       ),
-      mapPane: anchoredRoutes.isEmpty
+      mapPane: cameraFit == null
           ? Center(child: Text(l10n.navTrack_list_noMapRoutes))
           : FlutterMap(
               mapController: _mapController,
-              options: const MapOptions(initialZoom: 12),
+              options: MapOptions(
+                onMapReady: () {
+                  _mapReady = true;
+                  _framedOn = signature;
+                },
+                initialCameraFit: cameraFit,
+              ),
               children: [
+                submersionTileLayer(ref),
                 for (final route in anchoredRoutes)
                   _HydratedNavTrackPolyline(
                     key: ValueKey(route.id),
                     routeId: route.id,
                   ),
+                const MapAttribution(),
+                MapCompassButton(controller: _mapController),
               ],
             ),
     );

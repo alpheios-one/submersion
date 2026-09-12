@@ -348,5 +348,65 @@ void main() {
       expect(find.text('No routes are placed on the map yet.'), findsOneWidget);
       expect(find.byType(FlutterMap), findsNothing);
     });
+
+    testWidgets('the map pane has a basemap tile layer (item 7)', (
+      tester,
+    ) async {
+      await widen(tester);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await _pump(
+        tester,
+        routes: [
+          _route(
+            id: 'r1',
+            name: 'Wreck dive',
+            anchorLatitude: 47.1,
+            anchorLongitude: 8.3,
+          ),
+        ],
+      );
+
+      expect(find.byType(FlutterMap), findsOneWidget);
+      expect(find.byType(TileLayer), findsOneWidget);
+    });
+
+    testWidgets(
+      'the map pane fits its camera to the anchored routes rather than '
+      'starting at flutter_map\'s default world view (item 7)',
+      (tester) async {
+        await widen(tester);
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        await _pump(
+          tester,
+          routes: [
+            _route(
+              id: 'r1',
+              name: 'Wreck dive',
+              anchorLatitude: 47.1,
+              anchorLongitude: 8.3,
+            ),
+          ],
+        );
+
+        final map = tester.widget<FlutterMap>(find.byType(FlutterMap));
+        expect(
+          map.options.initialCameraFit,
+          isNotNull,
+          reason:
+              'with anchored routes present, the map must be handed a '
+              'camera fit derived from their positions instead of relying '
+              'on flutter_map\'s uninitialized default (center 0,0, zoom '
+              '13)',
+        );
+      },
+    );
   });
 }
