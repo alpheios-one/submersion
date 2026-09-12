@@ -6979,7 +6979,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'Een nieuw profiel instellen';
 
   @override
-  String get setup_welcome_subtitle => 'Geavanceerd duiklogboek en analyse';
+  String get setup_welcome_subtitle => 'Duik veilig. Log alles.';
 
   @override
   String get setup_welcome_title => 'Welkom bij Submersion';
@@ -15573,8 +15573,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_about_appName => 'Submersion';
 
   @override
-  String get settings_about_description =>
-      'Houd je duiken bij, beheer uitrusting en verken duikstekken.';
+  String get settings_about_description => 'Duik veilig. Log alles.';
 
   @override
   String get settings_about_header => 'Over';
@@ -17140,6 +17139,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'Bevinding';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'Geïmporteerd bestand';
 
   @override
   String get settings_conflict_ref_instructor => 'Instructeur';
@@ -20521,6 +20523,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Exporteer uitrustingsinventaris en onderhoudsinformatie';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'Elke OK-controle en elk gemeld probleem, met duik, labels en notitie';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'Exporteer duiksteklocaties en details';
 
@@ -20537,6 +20543,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'Uitrusting CSV';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle =>
+      'CSV van uitrusting-check-ins';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'Duikstekken CSV';
 
   @override
@@ -20549,6 +20559,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Uitrusting';
+
+  @override
+  String get transfer_csvExport_typeObservations => 'Uitrusting-check-ins';
 
   @override
   String get transfer_csvExport_typeSites => 'Duikstekken';
@@ -24604,6 +24617,38 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'Opnieuw synchroniseren vanuit origineel bestand';
+
+  @override
+  String get diveLog_detail_resyncSuccess =>
+      'Duik bijgewerkt vanuit het originele bestand';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'Kan niet opnieuw synchroniseren: deze duik bestaat niet meer';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'Kan niet opnieuw synchroniseren: er is geen origineel bestand opgeslagen voor deze duik';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'Kan niet opnieuw synchroniseren: deze bestandsindeling wordt niet ondersteund';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'Kan niet opnieuw synchroniseren: het originele bestand staat niet meer op dit apparaat';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'Kan niet opnieuw synchroniseren: het originele bestand bevat geen overeenkomende duik meer';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'Kan niet opnieuw synchroniseren: er is een onverwachte fout opgetreden bij het lezen van het originele bestand';
+
+  @override
   String get universalImport_label_replaceSource => 'Bron vervangen';
 
   @override
@@ -26759,6 +26804,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Bijna-ongevalrapporten synchroniseren tussen je apparaten en zitten in je back-ups, maar nooit in exports of gedeelde logboekpagina\'s.';
 
   @override
+  String get incidentEdit_equipment => 'Betrokken uitrusting';
+
+  @override
+  String get incidentEdit_equipment_none => 'Geen';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'Bij deze duik';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'Alle uitrusting';
+
+  @override
   String get incidentCategory_buoyancy => 'Trim/drijfvermogen';
 
   @override
@@ -26878,6 +26935,26 @@ class AppLocalizationsNl extends AppLocalizations {
       'Sensorsamenvattingen opnieuw opgebouwd';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives duiken konden niet worden samengevat',
+      one: '1 duik kon niet worden samengevat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return '$_temp0; conditiebevindingen voor $_temp1 konden niet worden bijgewerkt';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26889,8 +26966,260 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count uitrustingsstukken',
+      one: '1 uitrustingsstuk',
+    );
+    return 'Sensorsamenvattingen opnieuw opgebouwd; conditiebevindingen voor $_temp0 konden niet worden bijgewerkt';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'De sensorsamenvattingen konden niet opnieuw worden opgebouwd.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Conditiebevindingen';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Meldt trends in celuitvoer, zenderuitval en gemelde problemen, met de cijfers erachter';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Regels';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Celuitvoer daalt';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'Celuitvoer laag';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Cel wijkt af van de andere';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Cel stroombegrensd bij hoge ppO2';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Zenderuitval neemt toe';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Zenderuitval hoog';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Terugkerend probleem';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problemen bij koude duiken';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problemen bij diepe duiken';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Gekoppelde incidenten';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'Vrije flow';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'Zwaar ademen';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'Nat ademen';
+
+  @override
+  String get equipmentObservation_tag_leak => 'Lek';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'Slangschade';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'Inflator zit vast';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'Inflator traag';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'Blaaslek';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'Dumpventiel lekt';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'Nekseal lekt';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'Polsseal lekt';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'Rits lekt';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'Laars lekt';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'Ventiel lekt';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'Naad lekt';
+
+  @override
+  String get equipmentObservation_tag_tear => 'Scheur';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'Naad losgelaten';
+
+  @override
+  String get equipmentObservation_tag_dim => 'Zwak';
+
+  @override
+  String get equipmentObservation_tag_died => 'Uitgevallen';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'Ondergelopen';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'Schakelaarstoring';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'Batterij bijna leeg';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'Schermstoring';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'Verbindingsstoring';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'Signaaluitval';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'Celwaarschuwing';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'Loop lekt';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'Solenoïdestoring';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough =>
+      'Scrubber doorgeslagen';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'Trage reactie';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'Grillig';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'Lage capaciteit';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'Schroefstoring';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'Band gebroken';
+
+  @override
+  String get equipmentObservation_tag_other => 'Overig';
+
+  @override
+  String get equipmentObservation_status_ok => 'OK';
+
+  @override
+  String get equipmentObservation_status_issue => 'Probleem';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'Check-in: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty =>
+      'Nog geen check-ins bij deze duik.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'Nog geen check-ins.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'Check-in toevoegen';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'Check-in bewerken';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'Check-in verwijderen';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm =>
+      'Deze check-in verwijderen?';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'Notitie';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'Wat er gebeurde';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'Waargenomen';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'Duik';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'Geen duik (werkbank)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'Kies een duik';
+
+  @override
+  String get equipmentObservation_sheet_save => 'Opslaan';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'Annuleren';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'Kies minstens één label voor een probleem';
+
+  @override
+  String get equipmentObservation_chip_ok => 'Gecontroleerd, OK';
+
+  @override
+  String get equipmentObservation_chip_issue => 'Probleem gemeld';
+
+  @override
+  String get equipmentObservation_chip_none => 'Inchecken';
+
+  @override
+  String get equipmentObservation_card_title => 'Check-ins';
+
+  @override
+  String get equipmentObservation_card_empty =>
+      'Geen check-ins vastgelegd voor dit item.';
+
+  @override
+  String get equipmentObservation_card_add => 'Check-in toevoegen';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return 'Duik nr. $number';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'Werkbank';
 
   @override
   String get settings_section_security_title => 'App-beveiliging';
@@ -36309,6 +36638,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Uitrusting exporteren naar CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'Uitrusting-check-ins exporteren naar CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'PDF-logboek genereren...';
 
   @override
@@ -36376,6 +36709,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Uitrusting-CSV voorbereiden...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'CSV van uitrusting-check-ins voorbereiden...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'UDDF-bestand voorbereiden...';
 
@@ -36399,6 +36736,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_export_empty_equipment =>
       'Geen uitrusting om te exporteren';
+
+  @override
+  String get settings_export_empty_observations =>
+      'Geen uitrusting-check-ins om te exporteren';
 
   @override
   String get settings_export_empty_data => 'Geen gegevens om te exporteren';
@@ -36439,6 +36780,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_export_success_equipment =>
       'Uitrusting succesvol geëxporteerd';
+
+  @override
+  String get settings_export_success_observations =>
+      'Uitrusting-check-ins geëxporteerd';
 
   @override
   String get settings_export_success_pdf => 'PDF-logboek succesvol gegenereerd';
@@ -36496,6 +36841,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Uitrusting-CSV succesvol opgeslagen';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'CSV van uitrusting-check-ins opgeslagen';
+
+  @override
   String get settings_export_saved_uddf => 'UDDF-bestand succesvol opgeslagen';
 
   @override
@@ -36521,6 +36870,21 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => 'Back-up opslaan';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle => 'Duiken-CSV opslaan';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle =>
+      'Duikstekken-CSV opslaan';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'Uitrusting-CSV opslaan';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'CSV van uitrusting-check-ins opslaan';
 
   @override
   String backup_operation_created(String size) {
@@ -37533,6 +37897,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'Geëxporteerde bestanden';
 
   @override
+  String get settings_storageUsage_group_importedFiles => 'Ruwe importgegevens';
+
+  @override
   String get settings_storageUsage_category_database => 'Duiklogboekdatabase';
 
   @override
@@ -37582,6 +37949,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_storageUsage_category_exports =>
       'Geëxporteerde bestanden';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'Originele importbestanden';
 
   @override
   String get profilePhoto_sheet_title => 'Profielfoto';
@@ -37876,6 +38247,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transmitters_field_gear => 'Fles uit uitrusting';
 
   @override
+  String get transmitters_field_transmitterGear => 'Zender uit uitrusting';
+
+  @override
   String get transmitters_field_material => 'Materiaal';
 
   @override
@@ -38069,9 +38443,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Laatste onderhoud';
 
   @override
-  String get equipment_arrange_title => 'Uitrusting ordenen';
-
-  @override
   String get equipment_arrange_groupByType => 'Groeperen op type';
 
   @override
@@ -38086,9 +38457,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Sorteren op';
-
-  @override
-  String get equipment_arrange_tooltip => 'Uitrusting ordenen';
 
   @override
   String get equipment_arrange_reset => 'Standaardwaarden herstellen';

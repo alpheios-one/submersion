@@ -280,11 +280,15 @@ jobs:
         # already fans out ~10-11 non-test jobs (analyze + 5 builds + scripts +
         # timezone + integration) that share the pool AND gate ci-success, so
         # oversharding queues the builds and makes total CI slower, not
-        # faster. 8 keeps us under the cap while roughly halving test
-        # wall-clock.
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        # faster. The org is on GitHub Team (60 concurrent jobs; it was 8
+        # shards under Free's 20). Each shard pays ~4s per test file (almost
+        # all of it load + coverage, not assertions) plus ~2 min of fixed
+        # setup, so at ~3000 files 16 shards bring a shard to ~14 min, under
+        # the ~19 min Android build that then sets the critical path. More
+        # shards would not shorten CI until that build does.
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
     env:
-      TOTAL_SHARDS: 8
+      TOTAL_SHARDS: 16
     steps:
       - uses: actions/checkout@v7
         with:
@@ -557,6 +561,35 @@ jobs:
         run: |
           python3 -m pip install shapely
           python3 scripts/sea_area_harvester_test.py
+
+      - name: Run brand asset generator tests
+        # The generator draws the social card, banners, lockups and logo mark
+        # from code. Pillow is installed with the same retry as coverage.py;
+        # the tests fail rather than skip without it, so this step cannot go
+        # green having tested nothing. It runs before the dive site step,
+        # whose unretried `pip install -r scripts/requirements.txt` would
+        # otherwise be the one downloading Pillow (it is listed there too). Text needs Pillow's RAQM layout, which
+        # loads the system libfribidi; install it if the runner lacks it.
+        # layout_test.py needs no Pillow.
+        run: |
+          for attempt in 1 2 3; do
+            if python3 -m pip install 'Pillow>=10.1'; then
+              break
+            fi
+            echo "::warning::pip install Pillow failed (attempt $attempt/3)"
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 10))
+            else
+              echo "::error::pip install Pillow failed after 3 attempts"
+              exit 1
+            fi
+          done
+          if ! python3 -c "from PIL import features; raise SystemExit(not features.check('raqm'))"; then
+            sudo apt-get update
+            sudo apt-get install -y libfribidi0
+          fi
+          python3 scripts/brand/layout_test.py
+          python3 scripts/brand/generate_brand_assets_test.py
 
       - name: Run dive site harvester tests
         # The harvester stamps the bundled dive site and dive centre assets.

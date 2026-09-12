@@ -6889,7 +6889,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'إعداد ملف تعريف جديد';
 
   @override
-  String get setup_welcome_subtitle => 'تسجيل وتحليل متقدم للغوص';
+  String get setup_welcome_subtitle => 'غُص بأمان. سجّل كل شيء.';
 
   @override
   String get setup_welcome_title => 'مرحباً بك في Submersion';
@@ -15412,8 +15412,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_about_appName => 'Submersion';
 
   @override
-  String get settings_about_description =>
-      'تتبع غوصاتك، وأدر معداتك، واستكشف مواقع الغوص.';
+  String get settings_about_description => 'غُص بأمان. سجّل كل شيء.';
 
   @override
   String get settings_about_header => 'حول';
@@ -16963,6 +16962,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'الملاحظة';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'ملف مستورد';
 
   @override
   String get settings_conflict_ref_instructor => 'المدرب';
@@ -20317,6 +20319,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تصدير جرد المعدات ومعلومات الصيانة';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'كل فحص سليم وكل مشكلة مُبلَّغ عنها مع الغطسة والوسوم والملاحظة';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'تصدير مواقع الغوص وتفاصيلها';
 
@@ -20333,6 +20339,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'المعدات CSV';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle =>
+      'ملف CSV لفحوصات المعدات';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'المواقع CSV';
 
   @override
@@ -20345,6 +20355,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'المعدات';
+
+  @override
+  String get transfer_csvExport_typeObservations => 'فحوصات المعدات';
 
   @override
   String get transfer_csvExport_typeSites => 'المواقع';
@@ -24358,6 +24371,37 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'إعادة المزامنة من الملف الأصلي';
+
+  @override
+  String get diveLog_detail_resyncSuccess => 'تم تحديث الغطسة من الملف الأصلي';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'تعذّرت إعادة المزامنة: لم تعد هذه الغطسة موجودة';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'تعذّرت إعادة المزامنة: لا يوجد ملف أصلي محفوظ لهذه الغطسة';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'تعذّرت إعادة المزامنة: تنسيق الملف هذا غير مدعوم';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'تعذّرت إعادة المزامنة: الملف الأصلي غير موجود على هذا الجهاز';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'تعذّرت إعادة المزامنة: لم يعد الملف الأصلي يحتوي على غطسة مطابقة';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'تعذّرت إعادة المزامنة: حدث خطأ غير متوقع أثناء قراءة الملف الأصلي';
+
+  @override
   String get universalImport_label_replaceSource => 'استبدال المصدر';
 
   @override
@@ -26486,6 +26530,18 @@ class AppLocalizationsAr extends AppLocalizations {
       'تتزامن تقارير الحوادث الوشيكة بين أجهزتك وتُضمَّن في النسخ الاحتياطية، لكنها لا تُضمَّن أبدًا في التصدير أو صفحات السجل المشتركة.';
 
   @override
+  String get incidentEdit_equipment => 'المعدات المعنية';
+
+  @override
+  String get incidentEdit_equipment_none => 'لا شيء';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'في هذه الغطسة';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'كل المعدات';
+
+  @override
   String get incidentCategory_buoyancy => 'الطفو';
 
   @override
@@ -26602,6 +26658,26 @@ class AppLocalizationsAr extends AppLocalizations {
       'أُعيد بناء ملخصات المستشعرات';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: 'تعذّر تلخيص $dives غطسات',
+      one: 'تعذّر تلخيص غطسة واحدة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: 'تعذّر تحديث نتائج الحالة لـ $items قطع معدات',
+      one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
+    );
+    return '$_temp0؛ $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26613,8 +26689,256 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تعذّر تحديث نتائج الحالة لـ $count قطع معدات',
+      one: 'تعذّر تحديث نتائج الحالة لقطعة معدات واحدة',
+    );
+    return 'أُعيد بناء ملخصات المستشعرات؛ $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'تعذّرت إعادة بناء ملخصات المستشعرات.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'نتائج الحالة';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'يُبلغ عن اتجاهات خرج الخلايا وانقطاعات جهاز الإرسال والمشكلات المسجّلة، مع الأرقام التي تدعمها';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'القواعد';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'خرج الخلية في انخفاض';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'خرج الخلية منخفض';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'الخلية تختلف عن نظيراتها';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'الخلية محدودة التيار عند ppO2 مرتفع';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'انقطاعات جهاز الإرسال في ازدياد';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'انقطاعات جهاز الإرسال مرتفعة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => 'مشكلة متكررة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'مشكلات في الغطسات الباردة';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'مشكلات في الغطسات العميقة';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked => 'حوادث مرتبطة';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'تدفق حر';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'تنفس صعب';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'تنفس رطب';
+
+  @override
+  String get equipmentObservation_tag_leak => 'تسرب';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'تلف الخرطوم';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'نافخ عالق';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'نافخ بطيء';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'تسرب الكيس';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'تسرب صمام التفريغ';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'تسرب عازل الرقبة';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'تسرب عازل المعصم';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'تسرب السحّاب';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'تسرب الحذاء';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'تسرب الصمام';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'تسرب الدرزة';
+
+  @override
+  String get equipmentObservation_tag_tear => 'تمزق';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'انفتاق الدرزة';
+
+  @override
+  String get equipmentObservation_tag_dim => 'خافت';
+
+  @override
+  String get equipmentObservation_tag_died => 'تعطل';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'غمرته المياه';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'عطل المفتاح';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'بطارية منخفضة';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'عطل الشاشة';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'عطل الاتصال';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'انقطاع';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'تحذير الخلية';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'تسرب الحلقة';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'عطل الملف اللولبي';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough => 'اختراق المنظّف';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'استجابة بطيئة';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'غير منتظم';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'سعة منخفضة';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'عطل المروحة';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'انقطع الحزام';
+
+  @override
+  String get equipmentObservation_tag_other => 'أخرى';
+
+  @override
+  String get equipmentObservation_status_ok => 'سليم';
+
+  @override
+  String get equipmentObservation_status_issue => 'مشكلة';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'فحص: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty => 'لا فحوصات لهذه الغطسة بعد.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'لا فحوصات بعد.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'إضافة فحص';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'تعديل الفحص';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'حذف الفحص';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm =>
+      'هل تريد حذف هذا الفحص؟';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'ملاحظة';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'ماذا حدث';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'لوحظ في';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'الغطسة';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'بدون غطسة (على الطاولة)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'اختر غطسة';
+
+  @override
+  String get equipmentObservation_sheet_save => 'حفظ';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'إلغاء';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'اختر وسمًا واحدًا على الأقل للمشكلة';
+
+  @override
+  String get equipmentObservation_chip_ok => 'تم الفحص، سليم';
+
+  @override
+  String get equipmentObservation_chip_issue => 'تم الإبلاغ عن مشكلة';
+
+  @override
+  String get equipmentObservation_chip_none => 'فحص';
+
+  @override
+  String get equipmentObservation_card_title => 'الفحوصات';
+
+  @override
+  String get equipmentObservation_card_empty => 'لا فحوصات مسجلة لهذه القطعة.';
+
+  @override
+  String get equipmentObservation_card_add => 'إضافة فحص';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return 'الغطسة رقم $number';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'على الطاولة';
 
   @override
   String get settings_section_security_title => 'أمان التطبيق';
@@ -36193,6 +36517,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ تصدير المعدات إلى CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'جارٍ تصدير فحوصات المعدات إلى CSV...';
+
+  @override
   String get settings_export_progress_pdf =>
       'جارٍ إنشاء سجل الغوص بصيغة PDF...';
 
@@ -36259,6 +36587,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'جارٍ تحضير ملف CSV للمعدات...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'جارٍ تحضير ملف CSV لفحوصات المعدات...';
+
+  @override
   String get settings_export_progress_preparingUddf => 'جارٍ تحضير ملف UDDF...';
 
   @override
@@ -36280,6 +36612,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_export_empty_equipment => 'لا توجد معدات للتصدير';
+
+  @override
+  String get settings_export_empty_observations => 'لا فحوصات معدات للتصدير';
 
   @override
   String get settings_export_empty_data => 'لا توجد بيانات للتصدير';
@@ -36317,6 +36652,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_export_success_equipment => 'تم تصدير المعدات بنجاح';
+
+  @override
+  String get settings_export_success_observations => 'تم تصدير فحوصات المعدات';
 
   @override
   String get settings_export_success_pdf =>
@@ -36372,6 +36710,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم حفظ ملف CSV للمعدات بنجاح';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'تم حفظ ملف CSV لفحوصات المعدات';
+
+  @override
   String get settings_export_saved_uddf => 'تم حفظ ملف UDDF بنجاح';
 
   @override
@@ -36397,6 +36739,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => 'حفظ النسخة الاحتياطية';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle => 'حفظ ملف CSV للغوصات';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle => 'حفظ ملف CSV للمواقع';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'حفظ ملف CSV للمعدات';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'حفظ ملف CSV لفحوصات المعدات';
 
   @override
   String backup_operation_created(String size) {
@@ -37410,6 +37766,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'الملفات المصدرة';
 
   @override
+  String get settings_storageUsage_group_importedFiles =>
+      'بيانات الاستيراد الخام';
+
+  @override
   String get settings_storageUsage_category_database =>
       'قاعدة بيانات سجل الغوص';
 
@@ -37458,6 +37818,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'الملفات المصدرة';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'ملفات الاستيراد الأصلية';
 
   @override
   String get profilePhoto_sheet_title => 'صورة الملف الشخصي';
@@ -37748,6 +38112,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transmitters_field_gear => 'أسطوانة من المعدات';
 
   @override
+  String get transmitters_field_transmitterGear => 'جهاز إرسال من المعدات';
+
+  @override
   String get transmitters_field_material => 'المادة';
 
   @override
@@ -37938,9 +38305,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'آخر صيانة';
 
   @override
-  String get equipment_arrange_title => 'ترتيب المعدات';
-
-  @override
   String get equipment_arrange_groupByType => 'التجميع حسب النوع';
 
   @override
@@ -37955,9 +38319,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'الترتيب حسب';
-
-  @override
-  String get equipment_arrange_tooltip => 'ترتيب المعدات';
 
   @override
   String get equipment_arrange_reset =>

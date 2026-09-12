@@ -89,6 +89,46 @@ class EquipmentItem extends Equatable {
     return ms == null ? null : DateTime.fromMillisecondsSinceEpoch(ms.round());
   }
 
+  /// From when a child inherits its parent's dives: its install date, or
+  /// its creation when none is set (the design's attribute catalog). Every
+  /// exposure read for a child goes through this, so the clocks, the
+  /// condition engine and the charts all count the same dives.
+  ///
+  /// In the dive-time frame, because the exposure SQL compares it with
+  /// `dive_date_time`, which holds wall-clock time as UTC. The install date
+  /// is a local calendar day (the date picker stores local midnight;
+  /// replacing a child stores the local moment), so it becomes that day's
+  /// midnight in UTC; the creation time is a local instant, so it becomes
+  /// its wall clock in UTC. Comparing the raw instants shifted the boundary
+  /// by the device's UTC offset, counting dives from the evening before east
+  /// of UTC and dropping the install day's early dives west of it.
+  DateTime? get parentDivesFrom {
+    final installed = installedDate;
+    if (installed != null) {
+      return DateTime.utc(installed.year, installed.month, installed.day);
+    }
+    final created = createdAt;
+    if (created == null || created.isUtc) return created;
+    return DateTime.utc(
+      created.year,
+      created.month,
+      created.day,
+      created.hour,
+      created.minute,
+      created.second,
+      created.millisecond,
+      created.microsecond,
+    );
+  }
+
+  /// Still in service: active, and not carrying a terminal status. Older
+  /// rows can be retired or sold with isActive left true, and the
+  /// repository's own active-gear queries treat both statuses as gone.
+  bool get isFitted =>
+      isActive &&
+      status != EquipmentStatus.retired &&
+      status != EquipmentStatus.sold;
+
   /// Wing/BCD rated lift capacity in kg (curated attribute; see the BCD entry
   /// in [EquipmentAttributeCatalog]). Feeds the buoyancy twin's peak-lift
   /// demand comparison; null when unspecified.

@@ -1476,11 +1476,19 @@ class SyncService {
           // append-only and use the blind-upsert merge path (no updatedAt
           // column: diveCustomFields, diveDataSources, siteSpecies,
           // mediaSpecies, fieldPresets). Two carry updatedAt and use the standard
-          // conflict-detection path (csvPresets, viewConfigs). FK ordering
+          // conflict-detection path (csvPresets, viewConfigs). importedFiles
+          // carries updatedAt and still blind-upserts: its id is the sha256
+          // of its bytes, so two devices holding the same id hold the same
+          // row and there is nothing to overlay or conflict over. FK ordering
           // is handled by the deferred-FK transaction wrapping this loop.
           (
             type: 'diveCustomFields',
             records: data.diveCustomFields,
+            hasUpdatedAt: false,
+          ),
+          (
+            type: 'importedFiles',
+            records: data.importedFiles,
             hasUpdatedAt: false,
           ),
           (
@@ -1575,6 +1583,16 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (type: 'incidents', records: data.incidents, hasUpdatedAt: true),
+          (
+            type: 'equipmentObservations',
+            records: data.equipmentObservations,
+            hasUpdatedAt: true,
+          ),
+          (
+            type: 'equipmentFindings',
+            records: data.equipmentFindings,
+            hasUpdatedAt: false,
+          ),
         ];
 
     // Precompute the locally-tombstoned parents this payload will REVIVE (a
@@ -2283,8 +2301,14 @@ class SyncService {
     'diveSafetyFindings': false,
     'emergencyChambers': true,
     'incidents': true,
+    'equipmentObservations': true,
+    'equipmentFindings': false,
     'gasSwitches': false,
     'diveCustomFields': false,
+    // The id is the sha256 of the bytes, so the row is immutable and two
+    // devices that hold the same id hold the same row: nothing to overlay,
+    // nothing to raise a conflict card for (issue #478).
+    'importedFiles': false,
     'diveDataSources': false,
     'siteSpecies': false,
     'mediaSpecies': false,
@@ -2395,6 +2419,13 @@ class SyncService {
     'transmitters': [
       (
         field: 'equipmentId',
+        parent: 'equipment',
+        nullable: true,
+        alsoClear: [],
+      ),
+      // v206: the transmitter gear item the entry is (condition phase 3b).
+      (
+        field: 'transmitterEquipmentId',
         parent: 'equipment',
         nullable: true,
         alsoClear: [],
@@ -2518,6 +2549,26 @@ class SyncService {
     ],
     'tideRecords': [
       (field: 'diveId', parent: 'dives', nullable: false, alsoClear: []),
+    ],
+    // v202: a gear check-in; the item is required, the dive optional.
+    'equipmentObservations': [
+      (field: 'diverId', parent: 'divers', nullable: true, alsoClear: []),
+      (
+        field: 'equipmentId',
+        parent: 'equipment',
+        nullable: false,
+        alsoClear: [],
+      ),
+      (field: 'diveId', parent: 'dives', nullable: true, alsoClear: []),
+    ],
+    // v202: condition findings, write-once children of equipment.
+    'equipmentFindings': [
+      (
+        field: 'equipmentId',
+        parent: 'equipment',
+        nullable: false,
+        alsoClear: [],
+      ),
     ],
     'diveDataSources': [
       (field: 'diveId', parent: 'dives', nullable: false, alsoClear: []),

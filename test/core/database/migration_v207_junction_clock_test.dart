@@ -27,9 +27,9 @@ const _junctions = [
 
 void main() {
   test('v207 is in the ladder and shipped', () {
-    // Relaxed as v200's own test asked, now that a later rung (v209, the
-    // nav_tracks table) is newer. This one only claims its rung is still
-    // in the ladder.
+    // Relaxed as v200's own test asked, now that later rungs (v208, the
+    // imported-file store, issue #478; v209, the nav_tracks table) are
+    // newer. This one only claims its rung is still in the ladder.
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(207));
     expect(AppDatabase.migrationVersions, contains(207));
   });

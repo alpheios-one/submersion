@@ -7033,8 +7033,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'Configurar um novo perfil';
 
   @override
-  String get setup_welcome_subtitle =>
-      'Registro e análise avançada de mergulhos';
+  String get setup_welcome_subtitle => 'Mergulhe com segurança. Registre tudo.';
 
   @override
   String get setup_welcome_title => 'Bem-vindo ao Submersion';
@@ -15696,7 +15695,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_about_description =>
-      'Registre seus mergulhos, gerencie equipamentos e explore pontos de mergulho.';
+      'Mergulhe com segurança. Registre tudo.';
 
   @override
   String get settings_about_header => 'Sobre';
@@ -17278,6 +17277,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'Constatacao';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'Arquivo importado';
 
   @override
   String get settings_conflict_ref_instructor => 'Instrutor';
@@ -20702,6 +20704,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exportar inventario de equipamentos e informacoes de manutencao';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'Cada verificação OK e cada problema reportado, com mergulho, etiquetas e nota';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'Exportar localizacoes e detalhes dos pontos de mergulho';
 
@@ -20718,6 +20724,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV de Equipamentos';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle =>
+      'CSV de verificações de equipamento';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'CSV de Pontos';
 
   @override
@@ -20730,6 +20740,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Equipamentos';
+
+  @override
+  String get transfer_csvExport_typeObservations =>
+      'Verificações de equipamento';
 
   @override
   String get transfer_csvExport_typeSites => 'Pontos';
@@ -24801,6 +24815,38 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'Ressincronizar a partir do arquivo original';
+
+  @override
+  String get diveLog_detail_resyncSuccess =>
+      'Mergulho atualizado a partir do arquivo original';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'Não foi possível ressincronizar: este mergulho não existe mais';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'Não foi possível ressincronizar: nenhum arquivo original foi salvo para este mergulho';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'Não foi possível ressincronizar: este formato de arquivo não é compatível';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'Não foi possível ressincronizar: o arquivo original não está mais neste dispositivo';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'Não foi possível ressincronizar: o arquivo original não contém mais um mergulho correspondente';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'Não foi possível ressincronizar: ocorreu um erro inesperado ao ler o arquivo original';
+
+  @override
   String get universalImport_label_replaceSource => 'Substituir Fonte';
 
   @override
@@ -26958,6 +27004,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Relatos de quase acidentes sincronizam entre seus dispositivos e entram nos backups, mas nunca em exportações ou páginas compartilhadas do logbook.';
 
   @override
+  String get incidentEdit_equipment => 'Equipamento envolvido';
+
+  @override
+  String get incidentEdit_equipment_none => 'Nenhum';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'Neste mergulho';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'Todo o equipamento';
+
+  @override
   String get incidentCategory_buoyancy => 'Flutuabilidade';
 
   @override
@@ -27078,6 +27136,26 @@ class AppLocalizationsPt extends AppLocalizations {
       'Resumos de sensores reconstruídos';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives mergulhos não puderam ser resumidos',
+      one: '1 mergulho não pôde ser resumido',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items equipamentos',
+      one: '1 equipamento',
+    );
+    return '$_temp0; não foi possível atualizar as constatações de estado de $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -27089,8 +27167,262 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count equipamentos',
+      one: '1 equipamento',
+    );
+    return 'Resumos de sensores reconstruídos; não foi possível atualizar as constatações de estado de $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'Não foi possível reconstruir os resumos de sensores.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle =>
+      'Constatações de estado';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Relata tendências na saída das células, falhas de sinal do transmissor e problemas registados, com os números por trás';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Regras';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Saída da célula em queda';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'Saída da célula baixa';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Célula discorda das outras';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Célula limitada por corrente a ppO2 alta';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Falhas de sinal do transmissor a aumentar';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Falhas de sinal do transmissor elevadas';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Problema recorrente';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problemas em mergulhos frios';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problemas em mergulhos profundos';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Incidentes associados';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'Fluxo contínuo';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'Respiração dura';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'Respiração húmida';
+
+  @override
+  String get equipmentObservation_tag_leak => 'Fuga';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'Mangueira danificada';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'Inflador preso';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'Inflador lento';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'Fuga na bexiga';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'Fuga na válvula de purga';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'Fuga no vedante do pescoço';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'Fuga no vedante do pulso';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'Fuga no fecho';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'Fuga na bota';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'Fuga na válvula';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'Fuga na costura';
+
+  @override
+  String get equipmentObservation_tag_tear => 'Rasgo';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'Costura aberta';
+
+  @override
+  String get equipmentObservation_tag_dim => 'Fraco';
+
+  @override
+  String get equipmentObservation_tag_died => 'Avariou';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'Inundado';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'Falha do interruptor';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'Bateria fraca';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'Falha do ecrã';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'Falha de ligação';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'Perda de sinal';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'Aviso de célula';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'Fuga no circuito';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'Falha do solenoide';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough =>
+      'Rutura do absorvente';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'Resposta lenta';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'Errático';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'Pouca capacidade';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'Falha da hélice';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'Fita partida';
+
+  @override
+  String get equipmentObservation_tag_other => 'Outro';
+
+  @override
+  String get equipmentObservation_status_ok => 'OK';
+
+  @override
+  String get equipmentObservation_status_issue => 'Problema';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'Verificação: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty =>
+      'Ainda sem verificações neste mergulho.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'Ainda sem verificações.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'Adicionar verificação';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'Editar verificação';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'Eliminar verificação';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm =>
+      'Eliminar esta verificação?';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'Nota';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'O que aconteceu';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'Observado';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'Mergulho';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'Sem mergulho (bancada)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'Escolher um mergulho';
+
+  @override
+  String get equipmentObservation_sheet_save => 'Guardar';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'Cancelar';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'Escolha pelo menos uma etiqueta para um problema';
+
+  @override
+  String get equipmentObservation_chip_ok => 'Verificado, OK';
+
+  @override
+  String get equipmentObservation_chip_issue => 'Problema reportado';
+
+  @override
+  String get equipmentObservation_chip_none => 'Verificar';
+
+  @override
+  String get equipmentObservation_card_title => 'Verificações';
+
+  @override
+  String get equipmentObservation_card_empty =>
+      'Sem verificações registadas para este item.';
+
+  @override
+  String get equipmentObservation_card_add => 'Adicionar verificação';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return 'Mergulho n.º $number';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'Bancada';
 
   @override
   String get settings_section_security_title => 'Segurança do app';
@@ -36572,6 +36904,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exportando equipamentos para CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'A exportar verificações de equipamento para CSV...';
+
+  @override
   String get settings_export_progress_pdf =>
       'Gerando diário de mergulho em PDF...';
 
@@ -36641,6 +36977,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Preparando CSV de equipamentos...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'A preparar CSV de verificações de equipamento...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'Preparando arquivo UDDF...';
 
@@ -36664,6 +37004,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_export_empty_equipment =>
       'Nenhum equipamento para exportar';
+
+  @override
+  String get settings_export_empty_observations =>
+      'Sem verificações de equipamento para exportar';
 
   @override
   String get settings_export_empty_data => 'Nenhum dado para exportar';
@@ -36704,6 +37048,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_export_success_equipment =>
       'Equipamentos exportados com sucesso';
+
+  @override
+  String get settings_export_success_observations =>
+      'Verificações de equipamento exportadas';
 
   @override
   String get settings_export_success_pdf =>
@@ -36759,6 +37107,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'CSV de equipamentos salvo com sucesso';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'CSV de verificações de equipamento guardado';
+
+  @override
   String get settings_export_saved_uddf => 'Arquivo UDDF salvo com sucesso';
 
   @override
@@ -36784,6 +37136,21 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => 'Salvar Backup';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle =>
+      'Salvar CSV de mergulhos';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle => 'Salvar CSV de pontos';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'Salvar CSV de equipamentos';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'Salvar CSV de verificações de equipamento';
 
   @override
   String backup_operation_created(String size) {
@@ -37804,6 +38171,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'Ficheiros exportados';
 
   @override
+  String get settings_storageUsage_group_importedFiles =>
+      'Dados brutos importados';
+
+  @override
   String get settings_storageUsage_category_database =>
       'Base de dados do registo de mergulhos';
 
@@ -37854,6 +38225,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Ficheiros exportados';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'Ficheiros de importação originais';
 
   @override
   String get profilePhoto_sheet_title => 'Foto do perfil';
@@ -38146,6 +38521,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get transmitters_field_gear => 'Cilindro do equipamento';
 
   @override
+  String get transmitters_field_transmitterGear => 'Transmissor do equipamento';
+
+  @override
   String get transmitters_field_material => 'Material';
 
   @override
@@ -38344,9 +38722,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Última revisão';
 
   @override
-  String get equipment_arrange_title => 'Organizar o equipamento';
-
-  @override
   String get equipment_arrange_groupByType => 'Agrupar por tipo';
 
   @override
@@ -38361,9 +38736,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Ordenar por';
-
-  @override
-  String get equipment_arrange_tooltip => 'Organizar o equipamento';
 
   @override
   String get equipment_arrange_reset => 'Repor predefinições';

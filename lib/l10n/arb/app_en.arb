@@ -3833,7 +3833,7 @@
   "setup_welcome_skipSetup": "Skip setup",
   "setup_welcome_startFresh_subtitle": "Create your diver profile and configure the app",
   "setup_welcome_startFresh_title": "Set up a new profile",
-  "setup_welcome_subtitle": "Advanced dive logging and analytics",
+  "setup_welcome_subtitle": "Dive safe. Log everything.",
   "setup_welcome_title": "Welcome to Submersion",
   "siteMatchReview_title": "Match Sites",
   "siteMatchReview_diveNumber": "Dive #{number}",
@@ -9560,7 +9560,7 @@
   "planning_welcome_title": "Planning Tools",
   "settings_about_aboutSubmersion": "About Submersion",
   "settings_about_appName": "Submersion",
-  "settings_about_description": "Dive deeper.",
+  "settings_about_description": "Dive safe. Log everything.",
   "settings_about_header": "About",
   "settings_about_openSourceLicenses": "Open Source Licenses",
   "settings_about_reportIssue": "Report an Issue",
@@ -10299,6 +10299,7 @@
   "settings_conflict_ref_equipment": "Equipment",
   "settings_conflict_ref_equipmentSet": "Equipment set",
   "settings_conflict_ref_finding": "Finding",
+  "settings_conflict_ref_importedFile": "Imported file",
   "settings_conflict_ref_instructor": "Instructor",
   "settings_conflict_ref_linkedDive": "Linked dive",
   "settings_conflict_ref_media": "Media",
@@ -12514,15 +12515,18 @@
   "transfer_csvExport_dataTypeHeader": "Data Type",
   "transfer_csvExport_descriptionDives": "Export all dive logs as a spreadsheet",
   "transfer_csvExport_descriptionEquipment": "Export equipment inventory and service info",
+  "transfer_csvExport_descriptionObservations": "Every OK check and reported issue, with its dive, tags and note",
   "transfer_csvExport_descriptionSites": "Export dive site locations and details",
   "transfer_csvExport_dialogTitle": "Export CSV",
   "transfer_csvExport_exportButton": "Export CSV",
   "transfer_csvExport_optionDivesTitle": "Dives CSV",
   "transfer_csvExport_optionEquipmentTitle": "Equipment CSV",
+  "transfer_csvExport_optionObservationsTitle": "Gear check-ins CSV",
   "transfer_csvExport_optionSitesTitle": "Sites CSV",
   "transfer_csvExport_semanticLabel": "Export {typeName}",
   "transfer_csvExport_typeDives": "Dives",
   "transfer_csvExport_typeEquipment": "Equipment",
+  "transfer_csvExport_typeObservations": "Gear check-ins",
   "transfer_csvExport_typeSites": "Sites",
   "transfer_detail_backTooltip": "Back to transfer",
   "transfer_export_aboutContent": "Export your dive data in various formats. PDF creates a printable logbook. UDDF is a universal format compatible with most dive logging software. CSV and Excel files can be opened in spreadsheet applications. You can also back up your entire database from Settings > Backup & Restore.",
@@ -15857,6 +15861,38 @@
       }
     }
   },
+  "diveLog_detail_menu_resyncImportedFile": "Resync from original file",
+  "@diveLog_detail_menu_resyncImportedFile": {
+    "description": "Menu item to re-parse a file-imported dive from its originally stored file"
+  },
+  "diveLog_detail_resyncSuccess": "Dive updated from the original file",
+  "@diveLog_detail_resyncSuccess": {
+    "description": "Snackbar shown after a successful resync"
+  },
+  "diveLog_detail_resyncFailed_diveMissing": "Could not resync: this dive no longer exists",
+  "@diveLog_detail_resyncFailed_diveMissing": {
+    "description": "Snackbar shown when a resync cannot run because the dive was deleted meanwhile"
+  },
+  "diveLog_detail_resyncFailed_noStoredFile": "Could not resync: no original file is stored for this dive",
+  "@diveLog_detail_resyncFailed_noStoredFile": {
+    "description": "Snackbar shown when a resync cannot run because no original file is stored for the dive"
+  },
+  "diveLog_detail_resyncFailed_unsupportedFormat": "Could not resync: this file format is not supported",
+  "@diveLog_detail_resyncFailed_unsupportedFormat": {
+    "description": "Snackbar shown when a resync cannot run because the stored file's format has no parser"
+  },
+  "diveLog_detail_resyncFailed_storedFileMissing": "Could not resync: the original file is missing from this device",
+  "@diveLog_detail_resyncFailed_storedFileMissing": {
+    "description": "Snackbar shown when a resync cannot run because the stored original file is gone from disk"
+  },
+  "diveLog_detail_resyncFailed_noMatchingDive": "Could not resync: the original file no longer contains a matching dive",
+  "@diveLog_detail_resyncFailed_noMatchingDive": {
+    "description": "Snackbar shown when the re-parsed original file no longer contains a dive matching this one"
+  },
+  "diveLog_detail_resyncFailed_unexpectedError": "Could not resync: an unexpected error occurred while reading the original file",
+  "@diveLog_detail_resyncFailed_unexpectedError": {
+    "description": "Snackbar shown when reading or parsing the stored original file threw"
+  },
   "universalImport_label_replaceSource": "Replace Source",
   "@universalImport_label_replaceSource": {
     "description": "Label for the replace source duplicate action"
@@ -17224,6 +17260,10 @@
   "incidentEdit_lessonsLearned": "What would help next time (optional)",
   "incidentEdit_save": "Save",
   "incidentEdit_privacyNote": "Near-miss reports sync between your devices and are included in your backups, but are never included in exports or shared logbook pages.",
+  "incidentEdit_equipment": "Equipment involved",
+  "incidentEdit_equipment_none": "None",
+  "incidentEdit_equipment_onThisDive": "On this dive",
+  "incidentEdit_equipment_allGear": "All gear",
   "incidentCategory_buoyancy": "Buoyancy",
   "incidentCategory_gasSupply": "Gas supply",
   "incidentCategory_equipment": "Equipment",
@@ -17273,6 +17313,17 @@
     }
   },
   "equipmentConditionSettings_rebuild_done": "Sensor summaries rebuilt",
+  "equipmentConditionSettings_rebuild_doneWithBothErrors": "{dives, plural, =1{1 dive could not be summarised} other{{dives} dives could not be summarised}}; condition findings could not be refreshed for {items, plural, =1{1 item} other{{items} items}}",
+  "@equipmentConditionSettings_rebuild_doneWithBothErrors": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      },
+      "items": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_doneWithErrors": "Sensor summaries rebuilt; {count, plural, =1{1 dive could not be summarised} other{{count} dives could not be summarised}}",
   "@equipmentConditionSettings_rebuild_doneWithErrors": {
     "placeholders": {
@@ -17281,7 +17332,103 @@
       }
     }
   },
+  "equipmentConditionSettings_rebuild_doneWithFindingErrors": "Sensor summaries rebuilt; condition findings could not be refreshed for {count, plural, =1{1 item} other{{count} items}}",
+  "@equipmentConditionSettings_rebuild_doneWithFindingErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "equipmentConditionSettings_rebuild_failed": "Could not rebuild the sensor summaries.",
+  "equipmentConditionSettings_masterToggle": "Condition findings",
+  "equipmentConditionSettings_masterToggle_subtitle": "Report trends in cell output, transmitter dropouts and reported issues, with the numbers behind them",
+  "equipmentConditionSettings_rulesHeader": "Rules",
+  "equipmentConditionSettings_rule_cellOutputDeclining": "Cell output declining",
+  "equipmentConditionSettings_rule_cellOutputLow": "Cell output low",
+  "equipmentConditionSettings_rule_cellDivergent": "Cell disagrees with its peers",
+  "equipmentConditionSettings_rule_cellCurrentLimited": "Cell current-limited at high ppO2",
+  "equipmentConditionSettings_rule_transmitterDropoutRising": "Transmitter dropouts rising",
+  "equipmentConditionSettings_rule_transmitterDropoutHigh": "Transmitter dropouts high",
+  "equipmentConditionSettings_rule_issueRecurring": "Recurring issue",
+  "equipmentConditionSettings_rule_issueColdCorrelated": "Issues on cold dives",
+  "equipmentConditionSettings_rule_issueDeepCorrelated": "Issues on deep dives",
+  "equipmentConditionSettings_rule_incidentLinked": "Linked incidents",
+  "equipmentObservation_tag_freeFlow": "Free flow",
+  "equipmentObservation_tag_hardBreathing": "Hard breathing",
+  "equipmentObservation_tag_wetBreathing": "Wet breathing",
+  "equipmentObservation_tag_leak": "Leak",
+  "equipmentObservation_tag_hoseDamage": "Hose damage",
+  "equipmentObservation_tag_inflatorStuck": "Inflator stuck",
+  "equipmentObservation_tag_inflatorSlow": "Inflator slow",
+  "equipmentObservation_tag_bladderLeak": "Bladder leak",
+  "equipmentObservation_tag_dumpLeak": "Dump valve leak",
+  "equipmentObservation_tag_leakNeck": "Neck seal leak",
+  "equipmentObservation_tag_leakWrist": "Wrist seal leak",
+  "equipmentObservation_tag_leakZip": "Zip leak",
+  "equipmentObservation_tag_leakBoot": "Boot leak",
+  "equipmentObservation_tag_leakValve": "Valve leak",
+  "equipmentObservation_tag_leakSeam": "Seam leak",
+  "equipmentObservation_tag_tear": "Tear",
+  "equipmentObservation_tag_seamFailure": "Seam failure",
+  "equipmentObservation_tag_dim": "Dim",
+  "equipmentObservation_tag_died": "Died",
+  "equipmentObservation_tag_flooded": "Flooded",
+  "equipmentObservation_tag_switchFault": "Switch fault",
+  "equipmentObservation_tag_batteryLow": "Battery low",
+  "equipmentObservation_tag_screenFault": "Screen fault",
+  "equipmentObservation_tag_connectionFault": "Connection fault",
+  "equipmentObservation_tag_dropout": "Dropout",
+  "equipmentObservation_tag_cellWarning": "Cell warning",
+  "equipmentObservation_tag_loopLeak": "Loop leak",
+  "equipmentObservation_tag_solenoidFault": "Solenoid fault",
+  "equipmentObservation_tag_scrubberBreakthrough": "Scrubber breakthrough",
+  "equipmentObservation_tag_slowResponse": "Slow response",
+  "equipmentObservation_tag_erratic": "Erratic",
+  "equipmentObservation_tag_lowCapacity": "Low capacity",
+  "equipmentObservation_tag_propFault": "Prop fault",
+  "equipmentObservation_tag_strapBroke": "Strap broke",
+  "equipmentObservation_tag_other": "Other",
+  "equipmentObservation_status_ok": "OK",
+  "equipmentObservation_status_issue": "Issue",
+  "equipmentObservation_sheet_title": "Check-in: {item}",
+  "@equipmentObservation_sheet_title": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentObservation_sheet_empty": "No check-ins on this dive yet.",
+  "equipmentObservation_sheet_emptyBench": "No check-ins yet.",
+  "equipmentObservation_sheet_add": "Add check-in",
+  "equipmentObservation_sheet_edit": "Edit check-in",
+  "equipmentObservation_sheet_delete": "Delete check-in",
+  "equipmentObservation_sheet_deleteConfirm": "Delete this check-in?",
+  "equipmentObservation_sheet_noteLabel": "Note",
+  "equipmentObservation_sheet_tagsLabel": "What happened",
+  "equipmentObservation_sheet_dateLabel": "Observed",
+  "equipmentObservation_sheet_diveLabel": "Dive",
+  "equipmentObservation_sheet_noDive": "No dive (bench)",
+  "equipmentObservation_sheet_pickDive": "Choose a dive",
+  "equipmentObservation_sheet_save": "Save",
+  "equipmentObservation_sheet_cancel": "Cancel",
+  "equipmentObservation_sheet_tagRequired": "Pick at least one tag for an issue",
+  "equipmentObservation_chip_ok": "Checked OK",
+  "equipmentObservation_chip_issue": "Issue reported",
+  "equipmentObservation_chip_none": "Check in",
+  "equipmentObservation_card_title": "Check-ins",
+  "equipmentObservation_card_empty": "No check-ins recorded for this item.",
+  "equipmentObservation_card_add": "Add check-in",
+  "equipmentObservation_card_onDive": "Dive #{number}",
+  "@equipmentObservation_card_onDive": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentObservation_card_bench": "Bench",
   "settings_section_security_title": "App Security",
   "settings_section_security_subtitle": "App lock & database encryption",
   "settings_section_trimixMixer_title": "Trimix Mixer",
@@ -22052,6 +22199,7 @@
   "settings_export_progress_divesCsv": "Exporting dives to CSV...",
   "settings_export_progress_sitesCsv": "Exporting sites to CSV...",
   "settings_export_progress_equipmentCsv": "Exporting equipment to CSV...",
+  "settings_export_progress_observationsCsv": "Exporting gear check-ins to CSV...",
   "settings_export_progress_pdf": "Generating PDF logbook...",
   "settings_export_progress_loadingSignatures": "Loading signatures...",
   "settings_export_progress_loadingProfiles": "Loading dive profiles...",
@@ -22070,6 +22218,7 @@
   "settings_export_progress_preparingDivesCsv": "Preparing dives CSV...",
   "settings_export_progress_preparingSitesCsv": "Preparing sites CSV...",
   "settings_export_progress_preparingEquipmentCsv": "Preparing equipment CSV...",
+  "settings_export_progress_preparingObservationsCsv": "Preparing gear check-ins CSV...",
   "settings_export_progress_preparingUddf": "Preparing UDDF file...",
   "settings_export_progress_preparingPdf": "Preparing PDF...",
   "settings_export_progress_selectingBackup": "Selecting backup file...",
@@ -22077,6 +22226,7 @@
   "settings_export_empty_dives": "No dives to export",
   "settings_export_empty_sites": "No sites to export",
   "settings_export_empty_equipment": "No equipment to export",
+  "settings_export_empty_observations": "No gear check-ins to export",
   "settings_export_empty_data": "No data to export",
   "settings_export_empty_diveSites": "No dive sites to export",
   "settings_export_saveFailed": "Save failed: {error}",
@@ -22087,6 +22237,7 @@
   "settings_export_success_dives": "Dives exported successfully",
   "settings_export_success_sites": "Sites exported successfully",
   "settings_export_success_equipment": "Equipment exported successfully",
+  "settings_export_success_observations": "Gear check-ins exported",
   "settings_export_success_pdf": "PDF logbook generated successfully",
   "settings_export_success_uddf": "UDDF file generated successfully",
   "settings_export_success_excel": "Excel file exported successfully",
@@ -22096,6 +22247,7 @@
   "settings_export_saved_divesCsv": "Dives CSV saved successfully",
   "settings_export_saved_sitesCsv": "Sites CSV saved successfully",
   "settings_export_saved_equipmentCsv": "Equipment CSV saved successfully",
+  "settings_export_saved_observationsCsv": "Gear check-ins CSV saved",
   "settings_export_saved_uddf": "UDDF file saved successfully",
   "settings_export_saved_pdf": "PDF saved successfully",
   "settings_export_saved_backup": "Backup saved successfully",
@@ -22105,6 +22257,10 @@
   "settings_export_cancelled_restore": "Restore cancelled",
   "settings_export_pdfDocumentTitle": "Dive Logbook",
   "settings_export_saveBackupDialogTitle": "Save Backup",
+  "settings_export_saveDivesCsvDialogTitle": "Save Dives CSV",
+  "settings_export_saveSitesCsvDialogTitle": "Save Sites CSV",
+  "settings_export_saveEquipmentCsvDialogTitle": "Save Equipment CSV",
+  "settings_export_saveObservationsCsvDialogTitle": "Save Gear Check-ins CSV",
   "backup_operation_created": "Backup created: {size}",
   "backup_operation_backupFailed": "Backup failed: {error}",
   "backup_operation_restoring": "Restoring backup...",
@@ -22909,6 +23065,7 @@
   "settings_storageUsage_group_backups": "Backups",
   "settings_storageUsage_group_temporary": "Temporary Files",
   "settings_storageUsage_group_exports": "Exported Files",
+  "settings_storageUsage_group_importedFiles": "Raw imported data",
   "settings_storageUsage_category_database": "Dive log database",
   "settings_storageUsage_category_localCache": "Local cache database",
   "settings_storageUsage_category_mediaCacheOriginals": "Original photos and videos",
@@ -22923,6 +23080,7 @@
   "settings_storageUsage_category_backups": "Backup files",
   "settings_storageUsage_category_temporary": "Temporary files",
   "settings_storageUsage_category_exports": "Exported files",
+  "settings_storageUsage_category_importedFiles": "Imported logbook files",
   "profilePhoto_sheet_title": "Profile Photo",
   "profilePhoto_source_camera": "Take Photo",
   "profilePhoto_source_library": "Choose from Library",
@@ -23105,6 +23263,7 @@
   "transmitters_field_channel": "Channel",
   "transmitters_field_role": "Role",
   "transmitters_field_gear": "Cylinder from gear",
+  "transmitters_field_transmitterGear": "Transmitter from gear",
   "transmitters_field_material": "Material",
   "transmitters_gear_none": "None",
   "transmitters_validation_key": "Enter a transmitter serial, or pick a dive computer and channel",
@@ -23177,13 +23336,11 @@
   "enum_equipmentItemSortField_purchaseDate": "Purchase date",
   "enum_equipmentItemSortField_dateAdded": "Date added",
   "enum_equipmentItemSortField_lastServiceDate": "Last service",
-  "equipment_arrange_title": "Arrange gear",
   "equipment_arrange_groupByType": "Group by type",
   "equipment_arrange_groupByTypeSubtitle": "Show a heading for each kind of gear",
   "equipment_arrange_typeOrderLabel": "Order types by",
   "equipment_arrange_itemOrderLabel": "Then by",
   "equipment_arrange_itemOrderLabelFlat": "Sort by",
-  "equipment_arrange_tooltip": "Arrange gear",
   "equipment_arrange_reset": "Reset to defaults",
   "equipment_arrange_saveFailed": "Could not save the arrangement",
   "settings_appearance_gearArrangement": "Gear arrangement",

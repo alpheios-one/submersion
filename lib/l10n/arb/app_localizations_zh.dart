@@ -6672,7 +6672,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setup_welcome_startFresh_title => '创建新档案';
 
   @override
-  String get setup_welcome_subtitle => '高级潜水日志与分析';
+  String get setup_welcome_subtitle => '安全潜水，记录一切。';
 
   @override
   String get setup_welcome_title => '欢迎使用 Submersion';
@@ -14943,7 +14943,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_about_appName => 'Submersion';
 
   @override
-  String get settings_about_description => '深入探索。';
+  String get settings_about_description => '安全潜水，记录一切。';
 
   @override
   String get settings_about_header => '关于';
@@ -16416,6 +16416,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => '发现项';
+
+  @override
+  String get settings_conflict_ref_importedFile => '导入的文件';
 
   @override
   String get settings_conflict_ref_instructor => '教练';
@@ -19615,6 +19618,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_csvExport_descriptionEquipment => '导出装备库存和维护信息';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      '每条正常检查和报告的问题，含潜水、标签和备注';
+
+  @override
   String get transfer_csvExport_descriptionSites => '导出潜水点位置和详情';
 
   @override
@@ -19630,6 +19637,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => '装备 CSV';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle => '装备检查记录 CSV';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => '潜水点 CSV';
 
   @override
@@ -19642,6 +19652,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => '装备';
+
+  @override
+  String get transfer_csvExport_typeObservations => '装备检查记录';
 
   @override
   String get transfer_csvExport_typeSites => '潜水点';
@@ -23525,6 +23538,33 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile => '从原始文件重新同步';
+
+  @override
+  String get diveLog_detail_resyncSuccess => '潜水记录已根据原始文件更新';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing => '无法重新同步：该潜水记录已不存在';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile => '无法重新同步：此潜水记录没有保存原始文件';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat => '无法重新同步：不支持此文件格式';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      '无法重新同步：本设备上已找不到原始文件';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      '无法重新同步：原始文件中已没有匹配的潜水记录';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      '无法重新同步：读取原始文件时发生意外错误';
+
+  @override
   String get universalImport_label_replaceSource => '替换源数据';
 
   @override
@@ -25582,6 +25622,18 @@ class AppLocalizationsZh extends AppLocalizations {
       '未遂事件报告在你的设备之间同步并包含在备份中,但绝不会包含在导出或共享的日志页面中。';
 
   @override
+  String get incidentEdit_equipment => '涉及的装备';
+
+  @override
+  String get incidentEdit_equipment_none => '无';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => '本次潜水';
+
+  @override
+  String get incidentEdit_equipment_allGear => '全部装备';
+
+  @override
   String get incidentCategory_buoyancy => '浮力';
 
   @override
@@ -25690,6 +25742,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipmentConditionSettings_rebuild_done => '传感器摘要已重建';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives 次潜水无法汇总',
+      one: '1 次潜水无法汇总',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items 件装备的状态发现无法刷新',
+      one: '1 件装备的状态发现无法刷新',
+    );
+    return '$_temp0；$_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -25701,7 +25773,248 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件装备的状态发现无法刷新',
+      one: '1 件装备的状态发现无法刷新',
+    );
+    return '传感器摘要已重建；$_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed => '无法重建传感器摘要。';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => '状态发现';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      '报告电池输出、发射器断连和已记录问题的趋势，并附上背后的数据';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => '规则';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining => '电池输出下降';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => '电池输出偏低';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent => '电池与其他电池不一致';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      '高 ppO2 下电池电流受限';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      '发射器断连增多';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      '发射器断连频繁';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => '反复出现的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated => '冷水潜水中的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated => '深潜中的问题';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked => '关联事件';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => '自由流';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => '呼吸费力';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => '呼吸进水';
+
+  @override
+  String get equipmentObservation_tag_leak => '泄漏';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => '软管损坏';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => '充气阀卡住';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => '充气阀迟缓';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => '气囊泄漏';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => '排气阀泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => '颈封泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => '腕封泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakZip => '拉链泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => '靴子泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakValve => '阀门泄漏';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => '接缝泄漏';
+
+  @override
+  String get equipmentObservation_tag_tear => '撕裂';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => '接缝开裂';
+
+  @override
+  String get equipmentObservation_tag_dim => '变暗';
+
+  @override
+  String get equipmentObservation_tag_died => '失灵';
+
+  @override
+  String get equipmentObservation_tag_flooded => '进水';
+
+  @override
+  String get equipmentObservation_tag_switchFault => '开关故障';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => '电量低';
+
+  @override
+  String get equipmentObservation_tag_screenFault => '屏幕故障';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => '连接故障';
+
+  @override
+  String get equipmentObservation_tag_dropout => '信号中断';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => '传感器警告';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => '回路泄漏';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => '电磁阀故障';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough => '吸收剂穿透';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => '响应迟缓';
+
+  @override
+  String get equipmentObservation_tag_erratic => '读数不稳';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => '容量偏低';
+
+  @override
+  String get equipmentObservation_tag_propFault => '螺旋桨故障';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => '带子断裂';
+
+  @override
+  String get equipmentObservation_tag_other => '其他';
+
+  @override
+  String get equipmentObservation_status_ok => '正常';
+
+  @override
+  String get equipmentObservation_status_issue => '问题';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return '检查：$item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty => '本次潜水还没有检查记录。';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => '还没有检查记录。';
+
+  @override
+  String get equipmentObservation_sheet_add => '添加检查';
+
+  @override
+  String get equipmentObservation_sheet_edit => '编辑检查';
+
+  @override
+  String get equipmentObservation_sheet_delete => '删除检查';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm => '删除这条检查记录？';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => '备注';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => '发生了什么';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => '观察时间';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => '潜水';
+
+  @override
+  String get equipmentObservation_sheet_noDive => '无潜水（台面）';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => '选择潜水';
+
+  @override
+  String get equipmentObservation_sheet_save => '保存';
+
+  @override
+  String get equipmentObservation_sheet_cancel => '取消';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired => '问题至少要选一个标签';
+
+  @override
+  String get equipmentObservation_chip_ok => '已检查，正常';
+
+  @override
+  String get equipmentObservation_chip_issue => '已报告问题';
+
+  @override
+  String get equipmentObservation_chip_none => '检查';
+
+  @override
+  String get equipmentObservation_card_title => '检查记录';
+
+  @override
+  String get equipmentObservation_card_empty => '该装备没有检查记录。';
+
+  @override
+  String get equipmentObservation_card_add => '添加检查';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return '第 $number 次潜水';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => '台面';
 
   @override
   String get settings_section_security_title => '应用安全';
@@ -34441,6 +34754,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_export_progress_equipmentCsv => '正在将装备导出为 CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv => '正在将装备检查记录导出为 CSV...';
+
+  @override
   String get settings_export_progress_pdf => '正在生成 PDF 潜水日志...';
 
   @override
@@ -34497,6 +34813,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_export_progress_preparingEquipmentCsv => '正在准备装备 CSV...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      '正在准备装备检查记录 CSV...';
+
+  @override
   String get settings_export_progress_preparingUddf => '正在准备 UDDF 文件...';
 
   @override
@@ -34516,6 +34836,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_export_empty_equipment => '没有可导出的装备';
+
+  @override
+  String get settings_export_empty_observations => '没有可导出的装备检查记录';
 
   @override
   String get settings_export_empty_data => '没有可导出的数据';
@@ -34552,6 +34875,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_export_success_equipment => '装备导出成功';
+
+  @override
+  String get settings_export_success_observations => '装备检查记录已导出';
 
   @override
   String get settings_export_success_pdf => 'PDF 潜水日志生成成功';
@@ -34599,6 +34925,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_export_saved_equipmentCsv => '装备 CSV 保存成功';
 
   @override
+  String get settings_export_saved_observationsCsv => '装备检查记录 CSV 已保存';
+
+  @override
   String get settings_export_saved_uddf => 'UDDF 文件保存成功';
 
   @override
@@ -34624,6 +34953,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => '保存备份';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle => '保存潜水记录 CSV';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle => '保存潜水点 CSV';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle => '保存装备 CSV';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle => '保存装备检查记录 CSV';
 
   @override
   String backup_operation_created(String size) {
@@ -35590,6 +35931,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_storageUsage_group_exports => '导出的文件';
 
   @override
+  String get settings_storageUsage_group_importedFiles => '原始导入数据';
+
+  @override
   String get settings_storageUsage_category_database => '潜水日志数据库';
 
   @override
@@ -35630,6 +35974,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => '导出的文件';
+
+  @override
+  String get settings_storageUsage_category_importedFiles => '原始导入文件';
 
   @override
   String get profilePhoto_sheet_title => '个人资料照片';
@@ -35909,6 +36256,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transmitters_field_gear => '来自装备的气瓶';
 
   @override
+  String get transmitters_field_transmitterGear => '来自装备的无线发射器';
+
+  @override
   String get transmitters_field_material => '材质';
 
   @override
@@ -36092,9 +36442,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => '上次保养';
 
   @override
-  String get equipment_arrange_title => '整理装备';
-
-  @override
   String get equipment_arrange_groupByType => '按类型分组';
 
   @override
@@ -36108,9 +36455,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => '排序方式';
-
-  @override
-  String get equipment_arrange_tooltip => '整理装备';
 
   @override
   String get equipment_arrange_reset => '恢复默认';

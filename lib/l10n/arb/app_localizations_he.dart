@@ -6852,7 +6852,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'הגדרת פרופיל חדש';
 
   @override
-  String get setup_welcome_subtitle => 'רישום וניתוח צלילה מתקדם';
+  String get setup_welcome_subtitle => 'צללו בבטחה. רשמו הכול.';
 
   @override
   String get setup_welcome_title => 'ברוכים הבאים ל-Submersion';
@@ -15309,8 +15309,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_about_appName => 'Submersion';
 
   @override
-  String get settings_about_description =>
-      'עקוב אחר הצלילות שלך, נהל ציוד וחקור אתרי צלילה.';
+  String get settings_about_description => 'צללו בבטחה. רשמו הכול.';
 
   @override
   String get settings_about_header => 'אודות';
@@ -16844,6 +16843,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'ממצא';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'קובץ מיובא';
 
   @override
   String get settings_conflict_ref_instructor => 'מדריך';
@@ -20166,6 +20168,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'ייצא מלאי ציוד ופרטי תחזוקה';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'כל בדיקה תקינה וכל בעיה שדווחה, עם הצלילה, התגיות וההערה';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'ייצא מיקומי אתרי צלילה ופרטים';
 
@@ -20182,6 +20188,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'CSV ציוד';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle => 'CSV של בדיקות ציוד';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'CSV אתרים';
 
   @override
@@ -20194,6 +20203,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'ציוד';
+
+  @override
+  String get transfer_csvExport_typeObservations => 'בדיקות ציוד';
 
   @override
   String get transfer_csvExport_typeSites => 'אתרים';
@@ -24184,6 +24196,37 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'סנכרן מחדש מהקובץ המקורי';
+
+  @override
+  String get diveLog_detail_resyncSuccess => 'הצלילה עודכנה מהקובץ המקורי';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'לא ניתן היה לסנכרן מחדש: הצלילה הזו כבר לא קיימת';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'לא ניתן היה לסנכרן מחדש: לא נשמר קובץ מקורי לצלילה הזו';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'לא ניתן היה לסנכרן מחדש: תבנית הקובץ הזו אינה נתמכת';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'לא ניתן היה לסנכרן מחדש: הקובץ המקורי אינו נמצא במכשיר הזה';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'לא ניתן היה לסנכרן מחדש: הקובץ המקורי כבר לא מכיל צלילה תואמת';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'לא ניתן היה לסנכרן מחדש: אירעה שגיאה בלתי צפויה בעת קריאת הקובץ המקורי';
+
+  @override
   String get universalImport_label_replaceSource => 'החלף מקור';
 
   @override
@@ -26300,6 +26343,18 @@ class AppLocalizationsHe extends AppLocalizations {
       'דוחות כמעט-תאונה מסתנכרנים בין המכשירים שלך ונכללים בגיבויים, אך לעולם לא בייצוא או בדפי יומן משותפים.';
 
   @override
+  String get incidentEdit_equipment => 'ציוד מעורב';
+
+  @override
+  String get incidentEdit_equipment_none => 'ללא';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'בצלילה זו';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'כל הציוד';
+
+  @override
   String get incidentCategory_buoyancy => 'ציפה';
 
   @override
@@ -26415,6 +26470,26 @@ class AppLocalizationsHe extends AppLocalizations {
       'סיכומי החיישנים נבנו מחדש';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives צלילות לא ניתן היה לסכם',
+      one: 'צלילה אחת לא ניתן היה לסכם',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: 'לא ניתן היה לרענן את ממצאי המצב של $items פריטי ציוד',
+      one: 'לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד',
+    );
+    return '$_temp0; $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26426,8 +26501,255 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'לא ניתן היה לרענן את ממצאי המצב של $count פריטי ציוד',
+      one: 'לא ניתן היה לרענן את ממצאי המצב של פריט ציוד אחד',
+    );
+    return 'סיכומי החיישנים נבנו מחדש; $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'לא ניתן היה לבנות מחדש את סיכומי החיישנים.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'ממצאי מצב';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'מדווח על מגמות בפלט התאים, בנפילות המשדר ובתקלות שדווחו, עם המספרים שמאחוריהן';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'כללים';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'פלט התא יורד';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'פלט התא נמוך';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'התא חורג מהאחרים';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'התא מוגבל זרם ב-ppO2 גבוה';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'נפילות המשדר במגמת עלייה';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'נפילות המשדר רבות';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring => 'תקלה חוזרת';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'תקלות בצלילות קרות';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'תקלות בצלילות עמוקות';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'אירועים מקושרים';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'זרימה חופשית';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'נשימה קשה';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'נשימה רטובה';
+
+  @override
+  String get equipmentObservation_tag_leak => 'דליפה';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'נזק לצינור';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'מנפח תקוע';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'מנפח איטי';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'דליפה בשלפוחית';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'דליפה בשסתום פריקה';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'דליפה באטם הצוואר';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'דליפה באטם שורש כף היד';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'דליפה ברוכסן';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'דליפה במגף';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'דליפה בשסתום';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'דליפה בתפר';
+
+  @override
+  String get equipmentObservation_tag_tear => 'קרע';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'תפר נפרם';
+
+  @override
+  String get equipmentObservation_tag_dim => 'עמום';
+
+  @override
+  String get equipmentObservation_tag_died => 'הפסיק לפעול';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'הוצף';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'תקלת מתג';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'סוללה חלשה';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'תקלת מסך';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'תקלת חיבור';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'נפילת אות';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'אזהרת תא';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'דליפה בלולאה';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'תקלת סולנואיד';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough => 'פריצת סופג';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'תגובה איטית';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'לא יציב';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'קיבולת נמוכה';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'תקלת מדחף';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'רצועה נקרעה';
+
+  @override
+  String get equipmentObservation_tag_other => 'אחר';
+
+  @override
+  String get equipmentObservation_status_ok => 'תקין';
+
+  @override
+  String get equipmentObservation_status_issue => 'בעיה';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'בדיקה: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty => 'עדיין אין בדיקות בצלילה זו.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'עדיין אין בדיקות.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'הוספת בדיקה';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'עריכת בדיקה';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'מחיקת בדיקה';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm => 'למחוק בדיקה זו?';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'הערה';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'מה קרה';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'נצפה';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'צלילה';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'ללא צלילה (שולחן עבודה)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'בחירת צלילה';
+
+  @override
+  String get equipmentObservation_sheet_save => 'שמירה';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'ביטול';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'בחרו לפחות תגית אחת לבעיה';
+
+  @override
+  String get equipmentObservation_chip_ok => 'נבדק, תקין';
+
+  @override
+  String get equipmentObservation_chip_issue => 'דווחה בעיה';
+
+  @override
+  String get equipmentObservation_chip_none => 'בדיקה';
+
+  @override
+  String get equipmentObservation_card_title => 'בדיקות';
+
+  @override
+  String get equipmentObservation_card_empty => 'לא נרשמו בדיקות לפריט זה.';
+
+  @override
+  String get equipmentObservation_card_add => 'הוספת בדיקה';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return 'צלילה מס\' $number';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'שולחן עבודה';
 
   @override
   String get settings_section_security_title => 'אבטחת האפליקציה';
@@ -35850,6 +36172,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_export_progress_equipmentCsv => 'מייצא ציוד ל-CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'מייצא בדיקות ציוד ל-CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'יוצר יומן צלילות בפורמט PDF...';
 
   @override
@@ -35911,6 +36237,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'מכין CSV של ציוד...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'מכין CSV של בדיקות ציוד...';
+
+  @override
   String get settings_export_progress_preparingUddf => 'מכין קובץ UDDF...';
 
   @override
@@ -35930,6 +36260,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_export_empty_equipment => 'אין ציוד לייצוא';
+
+  @override
+  String get settings_export_empty_observations => 'אין בדיקות ציוד לייצוא';
 
   @override
   String get settings_export_empty_data => 'אין נתונים לייצוא';
@@ -35966,6 +36299,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_export_success_equipment => 'הציוד יוצא בהצלחה';
+
+  @override
+  String get settings_export_success_observations => 'בדיקות הציוד יוצאו';
 
   @override
   String get settings_export_success_pdf =>
@@ -36018,6 +36354,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_export_saved_equipmentCsv => 'CSV של הציוד נשמר בהצלחה';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'קובץ ה-CSV של בדיקות הציוד נשמר';
+
+  @override
   String get settings_export_saved_uddf => 'קובץ UDDF נשמר בהצלחה';
 
   @override
@@ -36043,6 +36383,20 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => 'שמירת גיבוי';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle => 'שמירת CSV של הצלילות';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle => 'שמירת CSV של האתרים';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'שמירת CSV של הציוד';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'שמירת קובץ ה-CSV של בדיקות הציוד';
 
   @override
   String backup_operation_created(String size) {
@@ -37042,6 +37396,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'קבצים שיוצאו';
 
   @override
+  String get settings_storageUsage_group_importedFiles => 'נתוני ייבוא גולמיים';
+
+  @override
   String get settings_storageUsage_category_database =>
       'מסד נתונים של יומן הצלילה';
 
@@ -37091,6 +37448,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'קבצים שיוצאו';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'קובצי הייבוא המקוריים';
 
   @override
   String get profilePhoto_sheet_title => 'תמונת פרופיל';
@@ -37377,6 +37738,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get transmitters_field_gear => 'מיכל מהציוד';
 
   @override
+  String get transmitters_field_transmitterGear => 'משדר מהציוד';
+
+  @override
   String get transmitters_field_material => 'חומר';
 
   @override
@@ -37564,9 +37928,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'טיפול אחרון';
 
   @override
-  String get equipment_arrange_title => 'סידור הציוד';
-
-  @override
   String get equipment_arrange_groupByType => 'קיבוץ לפי סוג';
 
   @override
@@ -37580,9 +37941,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'מיון לפי';
-
-  @override
-  String get equipment_arrange_tooltip => 'סידור הציוד';
 
   @override
   String get equipment_arrange_reset => 'איפוס לברירת המחדל';

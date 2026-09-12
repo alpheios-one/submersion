@@ -7015,7 +7015,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'Új profil beállítása';
 
   @override
-  String get setup_welcome_subtitle => 'Fejlett merülés napló és elemzés';
+  String get setup_welcome_subtitle =>
+      'Merüljön biztonságosan. Rögzítsen mindent.';
 
   @override
   String get setup_welcome_title => 'Üdvözöl a Submersion';
@@ -15644,7 +15645,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_about_description =>
-      'Kövesse nyomon merüleseit, kezelje felszereleset es fedezze fel a merülohelyeket.';
+      'Merüljön biztonságosan. Rögzítsen mindent.';
 
   @override
   String get settings_about_header => 'Rolunk';
@@ -17222,6 +17223,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'Eszrevetel';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'Importált fájl';
 
   @override
   String get settings_conflict_ref_instructor => 'Oktato';
@@ -20636,6 +20640,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Felszereles leltarazasa es szervizinformaciok exportalasa';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'Minden OK ellenőrzés és jelentett probléma a merüléssel, címkékkel és megjegyzéssel';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'Merülohelyek es reszleteik exportalasa';
 
@@ -20652,6 +20660,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'Felszereles CSV';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle =>
+      'Felszerelés-ellenőrzések CSV';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'Merülohelyek CSV';
 
   @override
@@ -20664,6 +20676,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Felszereles';
+
+  @override
+  String get transfer_csvExport_typeObservations => 'Felszerelés-ellenőrzések';
 
   @override
   String get transfer_csvExport_typeSites => 'Merülohelyek';
@@ -24721,6 +24736,38 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'Újraszinkronizálás az eredeti fájlból';
+
+  @override
+  String get diveLog_detail_resyncSuccess =>
+      'A merülés frissítve az eredeti fájlból';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'Nem sikerült újraszinkronizálni: ez a merülés már nem létezik';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'Nem sikerült újraszinkronizálni: ehhez a merüléshez nincs eltárolt eredeti fájl';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'Nem sikerült újraszinkronizálni: ez a fájlformátum nem támogatott';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'Nem sikerült újraszinkronizálni: az eredeti fájl nem található ezen az eszközön';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'Nem sikerült újraszinkronizálni: az eredeti fájl már nem tartalmaz megfelelő merülést';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'Nem sikerült újraszinkronizálni: váratlan hiba történt az eredeti fájl olvasása közben';
+
+  @override
   String get universalImport_label_replaceSource => 'Forrás cseréje';
 
   @override
@@ -26857,6 +26904,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'A kvázibaleset-jelentések szinkronizálódnak az eszközeid között és a mentésekben is szerepelnek, de exportokba vagy megosztott naplóoldalakra soha nem kerülnek.';
 
   @override
+  String get incidentEdit_equipment => 'Érintett felszerelés';
+
+  @override
+  String get incidentEdit_equipment_none => 'Nincs';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'Ezen a merülésen';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'Minden felszerelés';
+
+  @override
   String get incidentCategory_buoyancy => 'Lebegés';
 
   @override
@@ -26976,6 +27035,26 @@ class AppLocalizationsHu extends AppLocalizations {
       'Szenzor-összegzések újraépítve';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives merülést nem sikerült összegezni',
+      one: '1 merülést nem sikerült összegezni',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items felszerelés',
+      one: '1 felszerelés',
+    );
+    return '$_temp0; $_temp1 állapotmegállapításait nem sikerült frissíteni';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26987,8 +27066,260 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count felszerelés',
+      one: '1 felszerelés',
+    );
+    return 'Szenzor-összegzések újraépítve; $_temp0 állapotmegállapításait nem sikerült frissíteni';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'A szenzor-összegzéseket nem sikerült újraépíteni.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Állapotmegállapítások';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Jelzi a cellakimenet, az adókimaradások és a bejelentett problémák trendjeit, a mögöttük álló számokkal';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Szabályok';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Csökkenő cellakimenet';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow =>
+      'Alacsony cellakimenet';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'A cella eltér a többitől';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Áramkorlátozott cella magas ppO2-nél';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Növekvő adókimaradások';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Sok adókimaradás';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Visszatérő probléma';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Problémák hideg merüléseken';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Problémák mély merüléseken';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Kapcsolódó események';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'Szabadáramlás';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'Nehéz légzés';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'Nedves légzés';
+
+  @override
+  String get equipmentObservation_tag_leak => 'Szivárgás';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'Tömlősérülés';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'Inflátor beragadt';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'Inflátor lassú';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'Hólyag szivárog';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'Leeresztő szelep szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'Nyakmandzsetta szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'Csuklómandzsetta szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'Cipzár szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'Csizma szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'Szelep szivárog';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'Varrás szivárog';
+
+  @override
+  String get equipmentObservation_tag_tear => 'Szakadás';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'Varrás szétnyílt';
+
+  @override
+  String get equipmentObservation_tag_dim => 'Halvány';
+
+  @override
+  String get equipmentObservation_tag_died => 'Leállt';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'Beázott';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'Kapcsolóhiba';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'Alacsony akkumulátor';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'Kijelzőhiba';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'Kapcsolati hiba';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'Jelkimaradás';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'Cellafigyelmeztetés';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'Kör szivárog';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'Mágnesszelep-hiba';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough => 'Szűrő áttörés';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'Lassú válasz';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'Ingadozó';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'Alacsony kapacitás';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'Propellerhiba';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'Pánt elszakadt';
+
+  @override
+  String get equipmentObservation_tag_other => 'Egyéb';
+
+  @override
+  String get equipmentObservation_status_ok => 'OK';
+
+  @override
+  String get equipmentObservation_status_issue => 'Probléma';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'Ellenőrzés: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty =>
+      'Ehhez a merüléshez még nincs ellenőrzés.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'Még nincs ellenőrzés.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'Ellenőrzés hozzáadása';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'Ellenőrzés szerkesztése';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'Ellenőrzés törlése';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm =>
+      'Törli ezt az ellenőrzést?';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'Megjegyzés';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'Mi történt';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'Megfigyelve';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'Merülés';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'Nincs merülés (műhely)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'Merülés választása';
+
+  @override
+  String get equipmentObservation_sheet_save => 'Mentés';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'Mégse';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'Problémához válasszon legalább egy címkét';
+
+  @override
+  String get equipmentObservation_chip_ok => 'Ellenőrizve, OK';
+
+  @override
+  String get equipmentObservation_chip_issue => 'Probléma jelentve';
+
+  @override
+  String get equipmentObservation_chip_none => 'Ellenőrzés';
+
+  @override
+  String get equipmentObservation_card_title => 'Ellenőrzések';
+
+  @override
+  String get equipmentObservation_card_empty =>
+      'Ehhez az eszközhöz nincs rögzített ellenőrzés.';
+
+  @override
+  String get equipmentObservation_card_add => 'Ellenőrzés hozzáadása';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return '$number. merülés';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'Műhely';
 
   @override
   String get settings_section_security_title => 'Alkalmazásbiztonság';
@@ -36406,6 +36737,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Felszerelés exportálása CSV-be...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'Felszerelés-ellenőrzések exportálása CSV-be...';
+
+  @override
   String get settings_export_progress_pdf => 'PDF merülési napló készítése...';
 
   @override
@@ -36475,6 +36810,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Felszerelés CSV-fájljának előkészítése...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'Felszerelés-ellenőrzések CSV előkészítése...';
+
+  @override
   String get settings_export_progress_preparingUddf =>
       'UDDF-fájl előkészítése...';
 
@@ -36498,6 +36837,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_export_empty_equipment =>
       'Nincs exportálható felszerelés';
+
+  @override
+  String get settings_export_empty_observations =>
+      'Nincs exportálható felszerelés-ellenőrzés';
 
   @override
   String get settings_export_empty_data => 'Nincs exportálható adat';
@@ -36538,6 +36881,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_export_success_equipment =>
       'A felszerelés exportálása sikerült';
+
+  @override
+  String get settings_export_success_observations =>
+      'Felszerelés-ellenőrzések exportálva';
 
   @override
   String get settings_export_success_pdf =>
@@ -36593,6 +36940,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'A felszerelés CSV-fájlja mentve';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'Felszerelés-ellenőrzések CSV mentve';
+
+  @override
   String get settings_export_saved_uddf => 'Az UDDF-fájl mentve';
 
   @override
@@ -36620,6 +36971,22 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_export_saveBackupDialogTitle =>
       'Biztonsági mentés mentése';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle =>
+      'Merülések CSV-fájljának mentése';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle =>
+      'Merülőhelyek CSV-fájljának mentése';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'Felszerelés CSV-fájljának mentése';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'Felszerelés-ellenőrzések CSV-fájljának mentése';
 
   @override
   String backup_operation_created(String size) {
@@ -37640,6 +38007,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'Exportált fájlok';
 
   @override
+  String get settings_storageUsage_group_importedFiles =>
+      'Nyers importált adatok';
+
+  @override
   String get settings_storageUsage_category_database =>
       'Merülésnapló-adatbázis';
 
@@ -37689,6 +38060,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Exportált fájlok';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'Eredeti importált fájlok';
 
   @override
   String get profilePhoto_sheet_title => 'Profilkép';
@@ -37982,6 +38357,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get transmitters_field_gear => 'Palack a felszerelésből';
 
   @override
+  String get transmitters_field_transmitterGear => 'Jeladó a felszerelésből';
+
+  @override
   String get transmitters_field_material => 'Anyag';
 
   @override
@@ -38178,9 +38556,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Utolsó szerviz';
 
   @override
-  String get equipment_arrange_title => 'Felszerelés rendezése';
-
-  @override
   String get equipment_arrange_groupByType => 'Csoportosítás típus szerint';
 
   @override
@@ -38195,9 +38570,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Rendezés';
-
-  @override
-  String get equipment_arrange_tooltip => 'Felszerelés rendezése';
 
   @override
   String get equipment_arrange_reset => 'Alapértelmezések visszaállítása';
