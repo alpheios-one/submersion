@@ -644,7 +644,7 @@ void main() {
         final dive = await repository.createDive(createTestDive(diveNumber: 1));
         final navTrackRepository = NavTrackRepository();
         final routeId = await navTrackRepository.insertImportedRoute(
-          points: [
+          points: const [
             NavTrackPoint(timestamp: 1700000000, north: 0, east: 0, depth: 5),
             NavTrackPoint(timestamp: 1700000010, north: 10, east: 0, depth: 5),
           ],
