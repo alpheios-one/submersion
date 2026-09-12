@@ -142,12 +142,16 @@ class _NavTrackImportReviewPageState
   /// this, accepting or picking a dive that already has a site left the
   /// route with no default anchor unless the diver picked the same site
   /// again by hand.
+  ///
+  /// Also clears a previously pre-filled site when the newly selected dive
+  /// has none (or none is selected at all): otherwise switching from a
+  /// site-bearing dive to one with no site left the old site attached, even
+  /// though it no longer matches the current selection.
   void _applySiteFromSelectedDive() {
     if (_siteChosenManually) return;
     final site = _selectedDive?.site;
-    if (site == null) return;
-    _siteId = site.id;
-    _siteName = site.name;
+    _siteId = site?.id;
+    _siteName = site?.name;
   }
 
   Future<void> _pickSite() async {

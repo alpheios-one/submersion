@@ -272,6 +272,43 @@ void main() {
     },
   );
 
+  testWidgets(
+    'clears a pre-filled site when switching to a dive with no site',
+    (tester) async {
+      const site = DiveSite(id: 'site-1', name: 'Lake Zurich');
+      final withSite = _dive(
+        'd1',
+        DateTime.utc(2025, 1, 15, 16, 16, 7),
+        site: site,
+      );
+      final withoutSite = _dive('d2', DateTime.utc(2025, 1, 15, 16, 20, 0));
+      await _pump(
+        tester,
+        preview: _preview(candidateDives: [withSite, withoutSite]),
+      );
+
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('nav-track-link-d1')),
+      );
+      await tester.tap(find.byKey(const ValueKey('nav-track-link-d1')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Lake Zurich'));
+      expect(find.text('Lake Zurich'), findsOneWidget);
+
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('nav-track-link-d2')),
+      );
+      await tester.tap(find.byKey(const ValueKey('nav-track-link-d2')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('nav-track-site-picker')),
+      );
+
+      expect(find.text('Lake Zurich'), findsNothing);
+      expect(find.text('No site chosen'), findsOneWidget);
+    },
+  );
+
   testWidgets('leaves the route unlinked when several dives overlap', (
     tester,
   ) async {
