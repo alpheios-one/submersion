@@ -50,7 +50,18 @@ class BathymetryRepository {
   /// fallback grid from a coarser regional/global source would keep
   /// serving that stale grid forever instead of re-resolving through
   /// swissBATHY3D now that it covers it (Copilot review).
-  static const String selectionGeneration = 'v3';
+  ///
+  /// v4 (#1763, already merged): forces a fresh outer read for an install
+  /// that already visited this v3 whitelist fix, so it also reaches
+  /// #1763's inner swiss_bathy_tile_cache reference-level fix instead of
+  /// the outer cache masking it forever.
+  ///
+  /// v5 here: this branch's own cross-lake fix (resolving each tile's
+  /// lake independently instead of the fetch center's lake for all of
+  /// them) changes what some ALREADY-v4-cached Rotsee/Vierwaldstättersee-
+  /// area coordinates should have resolved to, so those rows need one
+  /// more forced re-resolution too.
+  static const String selectionGeneration = 'v5';
   static const double quantumDeg = 0.02;
 
   final LocalCacheDatabase _db;
@@ -86,14 +97,27 @@ class BathymetryRepository {
     // differently must miss the old rows and refetch. Stale rows are inert
     // leftovers in this local-only cache.
     final span = BathymetryResolver.defaultSpanMeters.round();
-    if (quantumDegFor(c) <= 0) {
+    final lake = findSwissLake(c);
+    if (lake != null) {
+      // The lake's OWN mean level rides along in the key, not just
+      // selectionGeneration: _load returns a matching outer row before the
+      // resolver -- and so before SwissBathyTileCacheRepository.read's own
+      // reference-level check -- ever runs again, so a FUTURE correction
+      // to this lake's documented level (independent of any code change,
+      // and so not covered by any one-time generation bump) would
+      // otherwise keep serving the outer cache's stale depths forever
+      // (Copilot review). Folding the level in here means only the
+      // coordinates of the ACTUALLY corrected lake miss, not the whole
+      // cache, and needs no manual bump at all going forward.
+      //
       // Raw coordinate, not a quantized cell corner: needs enough decimals
       // to actually distinguish nearby sites (2 decimals is ~1 km at these
       // latitudes -- exactly the coalescing this branch exists to avoid).
       // See the class doc for the cache-coalescing this gives up, and why
       // that is deferred to issue #1511.
       return '${c.latitude.toStringAsFixed(6)},'
-          '${c.longitude.toStringAsFixed(6)}@$span$selectionGeneration';
+          '${c.longitude.toStringAsFixed(6)}@$span$selectionGeneration'
+          '@${lake.meanLevelMeters}';
     }
     final q = quantize(c);
     return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}'

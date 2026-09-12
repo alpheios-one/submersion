@@ -2646,6 +2646,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_runner_serviceOverdue => 'Service overdue';
 
   @override
+  String get preDive_runner_conditionFindings => 'Condition findings';
+
+  @override
   String get preDive_runner_addNote => 'Add note';
 
   @override
@@ -6905,7 +6908,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setup_welcome_startFresh_title => 'Set up a new profile';
 
   @override
-  String get setup_welcome_subtitle => 'Advanced dive logging and analytics';
+  String get setup_welcome_subtitle => 'Dive safe. Log everything.';
 
   @override
   String get setup_welcome_title => 'Welcome to Submersion';
@@ -15434,7 +15437,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_about_appName => 'Submersion';
 
   @override
-  String get settings_about_description => 'Dive deeper.';
+  String get settings_about_description => 'Dive safe. Log everything.';
 
   @override
   String get settings_about_header => 'About';
@@ -16985,6 +16988,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_conflict_ref_finding => 'Finding';
+
+  @override
+  String get settings_conflict_ref_importedFile => 'Imported file';
 
   @override
   String get settings_conflict_ref_instructor => 'Instructor';
@@ -18753,6 +18759,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statistics_equipment_weightTrend_title => 'Weight Trend';
 
   @override
+  String get statistics_equipment_exposure_title => 'Exposure';
+
+  @override
+  String get statistics_equipment_exposure_error =>
+      'Failed to load exposure data';
+
+  @override
+  String get statistics_equipment_findings_error =>
+      'Failed to load condition findings';
+
+  @override
+  String get statistics_equipment_issues_error =>
+      'Failed to load reported issues';
+
+  @override
+  String get statistics_equipment_exposure_subtitle =>
+      'Totals per item with your thresholds';
+
+  @override
+  String get statistics_equipment_exposure_empty => 'No dives with gear yet';
+
+  @override
+  String get statistics_equipment_findings_title => 'Condition findings';
+
+  @override
+  String get statistics_equipment_findings_subtitle => 'Open findings by rule';
+
+  @override
+  String get statistics_equipment_findings_subtitleAllDives =>
+      'Open findings by rule, across all dives';
+
+  @override
+  String get statistics_equipment_findings_empty => 'No open findings';
+
+  @override
+  String get statistics_equipment_issues_title => 'Reported issues';
+
+  @override
+  String get statistics_equipment_issues_subtitle =>
+      'Most frequent check-in tags';
+
+  @override
+  String get statistics_equipment_issues_empty => 'No issues reported';
+
+  @override
+  String get statistics_equipment_countLabel_items => 'items';
+
+  @override
+  String get statistics_equipment_countLabel_findings => 'findings';
+
+  @override
+  String get statistics_equipment_countLabel_reports => 'reports';
+
+  @override
+  String get statistics_equipment_exposureUnit_days => 'Days';
+
+  @override
+  String get statistics_equipment_exposureUnit_dives => 'Dives';
+
+  @override
+  String get statistics_equipment_countLabel_days => 'days';
+
+  @override
+  String get statistics_equipment_countLabel_dives => 'dives';
+
+  @override
+  String get statistics_equipment_countLabel_hours => 'hours';
+
+  @override
+  String get statistics_equipment_countLabel_saltHours => 'salt-water hours';
+
+  @override
+  String get statistics_equipment_countLabel_coldDives => 'cold dives';
+
+  @override
+  String get statistics_equipment_countLabel_o2Hours => 'high-O2 hours';
+
+  @override
+  String get statistics_equipment_countLabel_deepCycles => 'deep dives';
+
+  @override
+  String get statistics_equipment_countLabel_cycles => 'battery cycles';
+
+  @override
+  String get statistics_equipment_exposureUnit_hours => 'Hours';
+
+  @override
+  String get statistics_equipment_exposureUnit_saltHours => 'Salt-water hours';
+
+  @override
+  String get statistics_equipment_exposureUnit_coldDives => 'Cold dives';
+
+  @override
+  String get statistics_equipment_exposureUnit_o2Hours => 'High-O2 hours';
+
+  @override
+  String get statistics_equipment_exposureUnit_deepCycles => 'Deep dives';
+
+  @override
+  String get statistics_equipment_exposureUnit_cycles => 'Battery cycles';
+
+  @override
   String get statistics_error_loadingStatistics => 'Error loading statistics';
 
   @override
@@ -20338,6 +20446,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Export equipment inventory and service info';
 
   @override
+  String get transfer_csvExport_descriptionObservations =>
+      'Every OK check and reported issue, with its dive, tags and note';
+
+  @override
   String get transfer_csvExport_descriptionSites =>
       'Export dive site locations and details';
 
@@ -20354,6 +20466,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transfer_csvExport_optionEquipmentTitle => 'Equipment CSV';
 
   @override
+  String get transfer_csvExport_optionObservationsTitle => 'Gear check-ins CSV';
+
+  @override
   String get transfer_csvExport_optionSitesTitle => 'Sites CSV';
 
   @override
@@ -20366,6 +20481,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transfer_csvExport_typeEquipment => 'Equipment';
+
+  @override
+  String get transfer_csvExport_typeObservations => 'Gear check-ins';
 
   @override
   String get transfer_csvExport_typeSites => 'Sites';
@@ -21190,6 +21308,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trips_edit_label_capacity => 'Passenger Capacity';
+
+  @override
+  String get trips_edit_sectionTitle_planning => 'Planning';
+
+  @override
+  String get trips_edit_label_expectedDives => 'Expected dives';
+
+  @override
+  String get trips_edit_hint_expectedDives =>
+      'Leave empty to estimate from your recent trips';
+
+  @override
+  String get trips_edit_label_expectedRuntime =>
+      'Expected runtime per dive (minutes)';
+
+  @override
+  String get trips_edit_hint_expectedRuntime =>
+      'Leave empty to estimate from your recent rebreather dives';
+
+  @override
+  String get trips_scrubber_title => 'Scrubber margin';
+
+  @override
+  String trips_scrubber_asOfStart(String date) {
+    return 'as of $date';
+  }
+
+  @override
+  String trips_scrubber_remaining(
+    String minutes,
+    String rated,
+    String consumed,
+  ) {
+    return '$minutes min left before the trip (rated $rated min, $consumed min used since the last repack)';
+  }
+
+  @override
+  String trips_scrubber_remainingNoRepack(
+    String minutes,
+    String rated,
+    String consumed,
+  ) {
+    return '$minutes min left before the trip (rated $rated min, $consumed min used, no repack recorded)';
+  }
+
+  @override
+  String trips_scrubber_expectedDives(int dives) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives expected dives',
+      one: '$dives expected dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_scrubber_fromTrips(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '(from your last $n trips)',
+      one: '(from your last trip)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trips_scrubber_fromOverride => '(set on this trip)';
+
+  @override
+  String trips_scrubber_perDive(String minutes) {
+    return '$minutes min per dive';
+  }
+
+  @override
+  String trips_scrubber_fromDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '(from your last $n rebreather dives)',
+      one: '(from your last rebreather dive)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trips_scrubber_expectedUse(String minutes) {
+    return '$minutes min expected use';
+  }
+
+  @override
+  String trips_scrubber_margin(String minutes) {
+    return '$minutes min margin after the trip';
+  }
+
+  @override
+  String get trips_scrubber_caution =>
+      'Under 20 percent of the rated duration. Plan a repack or carry spare absorbent.';
+
+  @override
+  String get trips_scrubber_noRating =>
+      'No rated duration on this rebreather; add scrubber duration to its attributes or a repack schedule.';
+
+  @override
+  String trips_scrubber_bannerMargin(String minutes) {
+    return '$minutes min scrubber margin';
+  }
+
+  @override
+  String trips_scrubber_bannerCount(int count, String minutes) {
+    return '$count rebreathers, lowest $minutes min scrubber margin';
+  }
 
   @override
   String get trips_edit_sectionTitle_embarkDisembark => 'Embark / Disembark';
@@ -24374,6 +24605,38 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveLog_detail_menu_resyncImportedFile =>
+      'Resync from original file';
+
+  @override
+  String get diveLog_detail_resyncSuccess =>
+      'Dive updated from the original file';
+
+  @override
+  String get diveLog_detail_resyncFailed_diveMissing =>
+      'Could not resync: this dive no longer exists';
+
+  @override
+  String get diveLog_detail_resyncFailed_noStoredFile =>
+      'Could not resync: no original file is stored for this dive';
+
+  @override
+  String get diveLog_detail_resyncFailed_unsupportedFormat =>
+      'Could not resync: this file format is not supported';
+
+  @override
+  String get diveLog_detail_resyncFailed_storedFileMissing =>
+      'Could not resync: the original file is missing from this device';
+
+  @override
+  String get diveLog_detail_resyncFailed_noMatchingDive =>
+      'Could not resync: the original file no longer contains a matching dive';
+
+  @override
+  String get diveLog_detail_resyncFailed_unexpectedError =>
+      'Could not resync: an unexpected error occurred while reading the original file';
+
+  @override
   String get universalImport_label_replaceSource => 'Replace Source';
 
   @override
@@ -26501,6 +26764,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Near-miss reports sync between your devices and are included in your backups, but are never included in exports or shared logbook pages.';
 
   @override
+  String get incidentEdit_equipment => 'Equipment involved';
+
+  @override
+  String get incidentEdit_equipment_none => 'None';
+
+  @override
+  String get incidentEdit_equipment_onThisDive => 'On this dive';
+
+  @override
+  String get incidentEdit_equipment_allGear => 'All gear';
+
+  @override
   String get incidentCategory_buoyancy => 'Buoyancy';
 
   @override
@@ -26570,6 +26845,344 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipmentConditionSettings_title => 'Equipment condition';
 
   @override
+  String get equipmentCondition_children_title => 'Installed parts';
+
+  @override
+  String equipmentCondition_children_slot(int slot) {
+    return 'Slot $slot';
+  }
+
+  @override
+  String equipmentCondition_children_installed(String date, String age) {
+    return 'Installed $date, $age';
+  }
+
+  @override
+  String equipmentCondition_children_ageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: '1 day ago',
+      zero: 'today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_children_ageMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months ago',
+      one: '1 month ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_children_replace => 'Replace';
+
+  @override
+  String get equipmentCondition_children_open => 'Open';
+
+  @override
+  String equipmentCondition_children_replaceTitle(String name) {
+    return 'Replace $name?';
+  }
+
+  @override
+  String equipmentCondition_children_replaceBody(String name, String type) {
+    return '$name is retired today and a new $type takes its place in the same slot. Serial and notes start empty.';
+  }
+
+  @override
+  String get equipmentCondition_children_replaceConfirm => 'Replace';
+
+  @override
+  String get equipmentCondition_children_replaceCancel => 'Cancel';
+
+  @override
+  String equipmentCondition_children_replaced(String name) {
+    return '$name replaced';
+  }
+
+  @override
+  String get equipmentCondition_children_empty =>
+      'No cells or batteries recorded';
+
+  @override
+  String get equipmentCondition_children_add => 'Add';
+
+  @override
+  String get equipmentCondition_findings_title => 'Condition findings';
+
+  @override
+  String equipmentCondition_findings_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count findings',
+      one: '1 finding',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_findings_evidence => 'Evidence dives';
+
+  @override
+  String get equipmentCondition_findings_dismiss => 'Dismiss';
+
+  @override
+  String get equipmentCondition_findings_restore => 'Restore';
+
+  @override
+  String equipmentCondition_findings_showDismissed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count dismissed',
+      one: 'Show 1 dismissed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_evidence_title => 'Evidence dives';
+
+  @override
+  String equipmentCondition_evidence_dive(int number) {
+    return 'Dive $number';
+  }
+
+  @override
+  String get equipmentCondition_evidence_unnumbered => 'Dive';
+
+  @override
+  String equipmentCondition_evidence_minutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get equipmentCondition_trend_title_cellGain => 'Cell output per dive';
+
+  @override
+  String get equipmentCondition_trend_title_gap =>
+      'Transmitter dropouts per dive';
+
+  @override
+  String get equipmentCondition_trend_title_scrubber => 'Scrubber use per dive';
+
+  @override
+  String get equipmentCondition_trend_title_temperature =>
+      'Minimum temperature per dive';
+
+  @override
+  String equipmentCondition_trend_cell(int slot) {
+    return 'Cell $slot';
+  }
+
+  @override
+  String get equipmentCondition_trend_issues => 'Dives with an issue';
+
+  @override
+  String get equipmentCondition_trend_scrubber => 'Scrubber minutes';
+
+  @override
+  String get equipmentCondition_trend_gap => 'Dropout share';
+
+  @override
+  String get equipmentCondition_trend_temperature => 'Minimum temperature';
+
+  @override
+  String get equipmentCondition_trend_axis_minutes => 'min';
+
+  @override
+  String get equipmentCondition_exposure_title => 'Exposure';
+
+  @override
+  String get equipmentCondition_exposure_empty => 'No dives with this item yet';
+
+  @override
+  String equipmentCondition_exposure_footer(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
+  String equipmentCondition_exposure_dives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_hours(String n) {
+    return '$n hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_saltHours(String n) {
+    return '$n salt-water hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_coldDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n cold dives',
+      one: '1 cold dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_o2Hours(String n) {
+    return '$n high-O2 hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_deepCycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n deep dives',
+      one: '1 deep dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_cycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n battery cycles',
+      one: '1 battery cycle',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputDeclining(
+    int slot,
+    String percent,
+    int n,
+    String since,
+  ) {
+    return 'Cell $slot output fell $percent percent across $n dives since $since';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputLow(
+    int slot,
+    String gain,
+    int n,
+  ) {
+    return 'Cell $slot output is $gain mV per bar over the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_cellDivergent(
+    int slot,
+    String bar,
+    int count,
+    int n,
+  ) {
+    return 'Cell $slot disagreed with its peers by up to $bar bar on $count of the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_cellCurrentLimited(
+    int slot,
+    int count,
+    int n,
+    String percent,
+  ) {
+    return 'Cell $slot read low at high ppO2 on $count of the last $n dives, up to $percent percent of samples';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutRising(
+    String recent,
+    String prior,
+    int priorCount,
+  ) {
+    return 'Pressure dropped out for $recent percent of the last 5 dives, up from $prior percent over the $priorCount before';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutHigh(
+    String recent,
+    int n,
+    int count,
+  ) {
+    return 'Pressure dropped out for $recent percent of the last $n dives on average, $count of them above 10 percent';
+  }
+
+  @override
+  String equipmentCondition_finding_issueRecurring(
+    String tag,
+    int count,
+    int n,
+  ) {
+    return '$tag reported $count times in the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_issueColdCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue of $totalIssue dives with an issue were colder than $threshold, over $n dives with this item';
+  }
+
+  @override
+  String equipmentCondition_finding_issueDeepCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue of $totalIssue dives with an issue went beyond $threshold, over $n dives with this item';
+  }
+
+  @override
+  String equipmentCondition_finding_incidentLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count incidents name this item',
+      one: '1 incident names this item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_window(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
   String get equipmentConditionSettings_thresholdsHeader =>
       'Exposure thresholds';
 
@@ -26617,6 +27230,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sensor summaries rebuilt';
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithBothErrors(
+    int dives,
+    int items,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      dives,
+      locale: localeName,
+      other: '$dives dives could not be summarised',
+      one: '1 dive could not be summarised',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      items,
+      locale: localeName,
+      other: '$items items',
+      one: '1 item',
+    );
+    return '$_temp0; condition findings could not be refreshed for $_temp1';
+  }
+
+  @override
   String equipmentConditionSettings_rebuild_doneWithErrors(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -26628,8 +27261,260 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String equipmentConditionSettings_rebuild_doneWithFindingErrors(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+    );
+    return 'Sensor summaries rebuilt; condition findings could not be refreshed for $_temp0';
+  }
+
+  @override
   String get equipmentConditionSettings_rebuild_failed =>
       'Could not rebuild the sensor summaries.';
+
+  @override
+  String get equipmentConditionSettings_masterToggle => 'Condition findings';
+
+  @override
+  String get equipmentConditionSettings_masterToggle_subtitle =>
+      'Report trends in cell output, transmitter dropouts and reported issues, with the numbers behind them';
+
+  @override
+  String get equipmentConditionSettings_rulesHeader => 'Rules';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputDeclining =>
+      'Cell output declining';
+
+  @override
+  String get equipmentConditionSettings_rule_cellOutputLow => 'Cell output low';
+
+  @override
+  String get equipmentConditionSettings_rule_cellDivergent =>
+      'Cell disagrees with its peers';
+
+  @override
+  String get equipmentConditionSettings_rule_cellCurrentLimited =>
+      'Cell current-limited at high ppO2';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutRising =>
+      'Transmitter dropouts rising';
+
+  @override
+  String get equipmentConditionSettings_rule_transmitterDropoutHigh =>
+      'Transmitter dropouts high';
+
+  @override
+  String get equipmentConditionSettings_rule_issueRecurring =>
+      'Recurring issue';
+
+  @override
+  String get equipmentConditionSettings_rule_issueColdCorrelated =>
+      'Issues on cold dives';
+
+  @override
+  String get equipmentConditionSettings_rule_issueDeepCorrelated =>
+      'Issues on deep dives';
+
+  @override
+  String get equipmentConditionSettings_rule_incidentLinked =>
+      'Linked incidents';
+
+  @override
+  String get equipmentObservation_tag_freeFlow => 'Free flow';
+
+  @override
+  String get equipmentObservation_tag_hardBreathing => 'Hard breathing';
+
+  @override
+  String get equipmentObservation_tag_wetBreathing => 'Wet breathing';
+
+  @override
+  String get equipmentObservation_tag_leak => 'Leak';
+
+  @override
+  String get equipmentObservation_tag_hoseDamage => 'Hose damage';
+
+  @override
+  String get equipmentObservation_tag_inflatorStuck => 'Inflator stuck';
+
+  @override
+  String get equipmentObservation_tag_inflatorSlow => 'Inflator slow';
+
+  @override
+  String get equipmentObservation_tag_bladderLeak => 'Bladder leak';
+
+  @override
+  String get equipmentObservation_tag_dumpLeak => 'Dump valve leak';
+
+  @override
+  String get equipmentObservation_tag_leakNeck => 'Neck seal leak';
+
+  @override
+  String get equipmentObservation_tag_leakWrist => 'Wrist seal leak';
+
+  @override
+  String get equipmentObservation_tag_leakZip => 'Zip leak';
+
+  @override
+  String get equipmentObservation_tag_leakBoot => 'Boot leak';
+
+  @override
+  String get equipmentObservation_tag_leakValve => 'Valve leak';
+
+  @override
+  String get equipmentObservation_tag_leakSeam => 'Seam leak';
+
+  @override
+  String get equipmentObservation_tag_tear => 'Tear';
+
+  @override
+  String get equipmentObservation_tag_seamFailure => 'Seam failure';
+
+  @override
+  String get equipmentObservation_tag_dim => 'Dim';
+
+  @override
+  String get equipmentObservation_tag_died => 'Died';
+
+  @override
+  String get equipmentObservation_tag_flooded => 'Flooded';
+
+  @override
+  String get equipmentObservation_tag_switchFault => 'Switch fault';
+
+  @override
+  String get equipmentObservation_tag_batteryLow => 'Battery low';
+
+  @override
+  String get equipmentObservation_tag_screenFault => 'Screen fault';
+
+  @override
+  String get equipmentObservation_tag_connectionFault => 'Connection fault';
+
+  @override
+  String get equipmentObservation_tag_dropout => 'Dropout';
+
+  @override
+  String get equipmentObservation_tag_cellWarning => 'Cell warning';
+
+  @override
+  String get equipmentObservation_tag_loopLeak => 'Loop leak';
+
+  @override
+  String get equipmentObservation_tag_solenoidFault => 'Solenoid fault';
+
+  @override
+  String get equipmentObservation_tag_scrubberBreakthrough =>
+      'Scrubber breakthrough';
+
+  @override
+  String get equipmentObservation_tag_slowResponse => 'Slow response';
+
+  @override
+  String get equipmentObservation_tag_erratic => 'Erratic';
+
+  @override
+  String get equipmentObservation_tag_lowCapacity => 'Low capacity';
+
+  @override
+  String get equipmentObservation_tag_propFault => 'Prop fault';
+
+  @override
+  String get equipmentObservation_tag_strapBroke => 'Strap broke';
+
+  @override
+  String get equipmentObservation_tag_other => 'Other';
+
+  @override
+  String get equipmentObservation_status_ok => 'OK';
+
+  @override
+  String get equipmentObservation_status_issue => 'Issue';
+
+  @override
+  String equipmentObservation_sheet_title(String item) {
+    return 'Check-in: $item';
+  }
+
+  @override
+  String get equipmentObservation_sheet_empty =>
+      'No check-ins on this dive yet.';
+
+  @override
+  String get equipmentObservation_sheet_emptyBench => 'No check-ins yet.';
+
+  @override
+  String get equipmentObservation_sheet_add => 'Add check-in';
+
+  @override
+  String get equipmentObservation_sheet_edit => 'Edit check-in';
+
+  @override
+  String get equipmentObservation_sheet_delete => 'Delete check-in';
+
+  @override
+  String get equipmentObservation_sheet_deleteConfirm =>
+      'Delete this check-in?';
+
+  @override
+  String get equipmentObservation_sheet_noteLabel => 'Note';
+
+  @override
+  String get equipmentObservation_sheet_tagsLabel => 'What happened';
+
+  @override
+  String get equipmentObservation_sheet_dateLabel => 'Observed';
+
+  @override
+  String get equipmentObservation_sheet_diveLabel => 'Dive';
+
+  @override
+  String get equipmentObservation_sheet_noDive => 'No dive (bench)';
+
+  @override
+  String get equipmentObservation_sheet_pickDive => 'Choose a dive';
+
+  @override
+  String get equipmentObservation_sheet_save => 'Save';
+
+  @override
+  String get equipmentObservation_sheet_cancel => 'Cancel';
+
+  @override
+  String get equipmentObservation_sheet_tagRequired =>
+      'Pick at least one tag for an issue';
+
+  @override
+  String get equipmentObservation_chip_ok => 'Checked OK';
+
+  @override
+  String get equipmentObservation_chip_issue => 'Issue reported';
+
+  @override
+  String get equipmentObservation_chip_none => 'Check in';
+
+  @override
+  String get equipmentObservation_card_title => 'Check-ins';
+
+  @override
+  String get equipmentObservation_card_empty =>
+      'No check-ins recorded for this item.';
+
+  @override
+  String get equipmentObservation_card_add => 'Add check-in';
+
+  @override
+  String equipmentObservation_card_onDive(int number) {
+    return 'Dive #$number';
+  }
+
+  @override
+  String get equipmentObservation_card_bench => 'Bench';
 
   @override
   String get settings_section_security_title => 'App Security';
@@ -35998,6 +36883,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Exporting equipment to CSV...';
 
   @override
+  String get settings_export_progress_observationsCsv =>
+      'Exporting gear check-ins to CSV...';
+
+  @override
   String get settings_export_progress_pdf => 'Generating PDF logbook...';
 
   @override
@@ -36064,6 +36953,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Preparing equipment CSV...';
 
   @override
+  String get settings_export_progress_preparingObservationsCsv =>
+      'Preparing gear check-ins CSV...';
+
+  @override
   String get settings_export_progress_preparingUddf => 'Preparing UDDF file...';
 
   @override
@@ -36085,6 +36978,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_export_empty_equipment => 'No equipment to export';
+
+  @override
+  String get settings_export_empty_observations =>
+      'No gear check-ins to export';
 
   @override
   String get settings_export_empty_data => 'No data to export';
@@ -36122,6 +37019,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_export_success_equipment =>
       'Equipment exported successfully';
+
+  @override
+  String get settings_export_success_observations => 'Gear check-ins exported';
 
   @override
   String get settings_export_success_pdf =>
@@ -36175,6 +37075,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Equipment CSV saved successfully';
 
   @override
+  String get settings_export_saved_observationsCsv =>
+      'Gear check-ins CSV saved';
+
+  @override
   String get settings_export_saved_uddf => 'UDDF file saved successfully';
 
   @override
@@ -36200,6 +37104,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_export_saveBackupDialogTitle => 'Save Backup';
+
+  @override
+  String get settings_export_saveDivesCsvDialogTitle => 'Save Dives CSV';
+
+  @override
+  String get settings_export_saveSitesCsvDialogTitle => 'Save Sites CSV';
+
+  @override
+  String get settings_export_saveEquipmentCsvDialogTitle =>
+      'Save Equipment CSV';
+
+  @override
+  String get settings_export_saveObservationsCsvDialogTitle =>
+      'Save Gear Check-ins CSV';
 
   @override
   String backup_operation_created(String size) {
@@ -37199,6 +38117,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_storageUsage_group_exports => 'Exported Files';
 
   @override
+  String get settings_storageUsage_group_importedFiles => 'Raw imported data';
+
+  @override
   String get settings_storageUsage_category_database => 'Dive log database';
 
   @override
@@ -37246,6 +38167,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storageUsage_category_exports => 'Exported files';
+
+  @override
+  String get settings_storageUsage_category_importedFiles =>
+      'Imported logbook files';
 
   @override
   String get profilePhoto_sheet_title => 'Profile Photo';
@@ -37537,6 +38462,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transmitters_field_gear => 'Cylinder from gear';
 
   @override
+  String get transmitters_field_transmitterGear => 'Transmitter from gear';
+
+  @override
   String get transmitters_field_material => 'Material';
 
   @override
@@ -37728,9 +38656,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Last service';
 
   @override
-  String get equipment_arrange_title => 'Arrange gear';
-
-  @override
   String get equipment_arrange_groupByType => 'Group by type';
 
   @override
@@ -37745,9 +38670,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Sort by';
-
-  @override
-  String get equipment_arrange_tooltip => 'Arrange gear';
 
   @override
   String get equipment_arrange_reset => 'Reset to defaults';

@@ -62,6 +62,7 @@ import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
+import 'package:submersion/features/equipment/data/services/sensor_summary_scheduler.dart';
 
 /// True if [d]'s date falls within [r], inclusive of the end calendar day.
 bool inDateRange(DiveSummary d, DateTimeRange r) {
@@ -611,6 +612,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
             try {
               await ref.read(diveMergeServiceProvider).undo(toUndo.snapshot);
               _refreshAfterMerge();
+              // The originals are back and the merged dive is gone; the
+              // condition engine reads their sensor summaries.
+              scheduleSensorSummaryRefresh([
+                ...ids,
+                toUndo.mergedDive.id,
+              ], force: true);
               if (mounted) {
                 // The merged dive no longer exists; clear it from the detail
                 // pane and the row highlight if it is still selected.
@@ -753,6 +760,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     );
     if (choice == null || !mounted) return BulkActionOutcome.cancelled;
     final destination = choice.destination;
+    // Resolved while the context is known to be mounted; used after awaits.
+    final csvSaveTitle = context.l10n.settings_export_saveDivesCsvDialogTitle;
     final uddfOptions = UddfExportOptions(
       includeRawData: choice.includeRawData,
     );
@@ -868,7 +877,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         _BulkExportFormat.csv =>
           sharing
               ? await exportService.exportDivesToCsv(selectedDives)
-              : await exportService.saveDivesCsvToFile(selectedDives),
+              : await exportService.saveDivesCsvToFile(
+                  selectedDives,
+                  dialogTitle: csvSaveTitle,
+                ),
         _BulkExportFormat.uddf =>
           sharing
               ? await exportService.exportDivesToUddf(

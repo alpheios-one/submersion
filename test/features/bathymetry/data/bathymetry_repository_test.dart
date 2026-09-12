@@ -119,11 +119,11 @@ void main() {
     // The key carries the request span and the selection generation, so a
     // change to either refetches instead of serving the old cached answer
     // forever.
-    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30@8000v3');
+    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30@8000v5');
     // Nearby coordinates share the key.
     expect(
       BathymetryRepository.keyFor(const GeoPoint(12.171, -68.281)),
-      '12.16,-68.30@8000v3',
+      '12.16,-68.30@8000v5',
     );
   });
 
@@ -160,6 +160,12 @@ void main() {
         floor002(betlis.latitude),
         closeTo(floor002(murgWest.latitude), 1e-9),
       );
+
+      // The resolved lake's OWN mean level rides along in the key (Copilot
+      // review): a FUTURE correction to Walensee's documented level in
+      // swiss_lake_levels.dart automatically changes this key too, without
+      // needing a manual selectionGeneration bump for that correction.
+      expect(BathymetryRepository.keyFor(betlis), endsWith('@419.07'));
       expect(
         floor002(betlis.longitude),
         closeTo(floor002(murgWest.longitude), 1e-9),
@@ -314,7 +320,7 @@ void main() {
 
   test('the cache key carries the selection generation', () {
     final key = BathymetryRepository.keyFor(const GeoPoint(12.16, -68.29));
-    expect(key, endsWith('@8000v3'));
+    expect(key, endsWith('@8000v5'));
   });
 
   test('a row written under the previous generation is not reused', () {
