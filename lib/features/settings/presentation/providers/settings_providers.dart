@@ -1850,7 +1850,19 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// Waits for [initialLoad] first: until the diver's row lands, [state]
+  /// holds the defaults, and a switch flipped on the tag management screen
+  /// in that window would be overwritten when the load replaces [state],
+  /// silently undoing the diver's choice (issue #998). A failed load is
+  /// already logged by the constructor and leaves the defaults in place,
+  /// so the change still applies on top of them.
   Future<void> setAutoTagImports(bool value) async {
+    try {
+      await _initialLoad;
+    } catch (_) {
+      // See the doc comment: already logged, defaults are the fallback.
+    }
+    if (!mounted) return;
     state = state.copyWith(autoTagImports: value);
     await _saveSettings();
   }

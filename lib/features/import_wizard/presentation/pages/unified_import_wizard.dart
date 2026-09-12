@@ -312,6 +312,8 @@ class _UnifiedImportWizardBodyState
           _duplicateCheckFailed = true;
         }
         if (!mounted) return;
+        await _awaitSettingsLoad();
+        if (!mounted) return;
         ref
             .read(importWizardNotifierProvider.notifier)
             .setBundle(checkedBundle);
@@ -324,6 +326,22 @@ class _UnifiedImportWizardBodyState
       await _animateToPage(nextPage);
     } else if (_currentPage == _reviewIndex) {
       await _startImport();
+    }
+  }
+
+  /// Waits for [SettingsNotifier]'s first load before the review step reads
+  /// the diver's saved auto-tag preference (issue #998).
+  ///
+  /// Until that load lands, [settingsProvider] holds the defaults, where
+  /// auto-tagging is on, so a wizard opened right after launch would ignore
+  /// a saved "off". A failed load is already logged where it started, in
+  /// the notifier's constructor, and leaves those defaults in place: they
+  /// are the documented fallback, so the failure is not re-raised here.
+  Future<void> _awaitSettingsLoad() async {
+    try {
+      await ref.read(settingsProvider.notifier).initialLoad;
+    } catch (_) {
+      // See the doc comment: already logged, defaults are the fallback.
     }
   }
 
