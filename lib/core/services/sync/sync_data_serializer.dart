@@ -5899,26 +5899,36 @@ class SyncDataSerializer {
     return rows.map((r) => r.toJson(serializer: _syncBlobSerializer)).toList();
   }
 
-  /// The stored size, in bytes, of the packed sample blobs an incremental
-  /// changeset would carry above [hlcSince] (everything when it is null).
+  /// The stored size, in bytes, of the packed sample/route blobs an
+  /// incremental changeset would carry above [hlcSince] (everything when it
+  /// is null).
   ///
   /// The changeset export builds its whole payload in memory, base64 and
   /// `jsonEncode` alive at once, which the base path deliberately avoids by
-  /// streaming to a temp file. These two entities are the only ones whose
-  /// rows carry a large blob AND can all move at once: the v182 migration
-  /// stamps every packed row with one freshly issued HLC, so the first
-  /// changeset after the upgrade would otherwise select the entire packed
-  /// corpus into a single unstreamed payload. [ChangesetWriter] asks this
-  /// first and publishes a streamed base instead when the answer is too big.
+  /// streaming to a temp file. These are the entities whose rows carry a
+  /// large blob AND can all move at once: the v182 migration stamps every
+  /// packed profile/pressure row with one freshly issued HLC, so the first
+  /// changeset after that upgrade would otherwise select the entire packed
+  /// corpus into a single unstreamed payload -- and an imported nav_tracks
+  /// route (or several) carries its own large `points` blob the same way.
+  /// [ChangesetWriter] asks this first and publishes a streamed base instead
+  /// when the answer is too big.
   ///
   /// `length()` on a blob column reads the record header, not the payload,
-  /// so this costs a scan of two small tables and no blob reads.
+  /// so this costs a scan of a few small tables and no blob reads.
   Future<int> pendingSeriesBlobBytes(String? hlcSince) async {
+    const blobColumnByTable = {
+      'dive_profile_series': 'samples',
+      'tank_pressure_series': 'samples',
+      'nav_tracks': 'points',
+    };
     var total = 0;
-    for (final table in const ['dive_profile_series', 'tank_pressure_series']) {
-      // Guarded per table: _assertProfileSeriesSchema waits for each series
-      // table's foreign key parents, so a partially built database can reach
-      // a publish without one.
+    for (final entry in blobColumnByTable.entries) {
+      final table = entry.key;
+      final column = entry.value;
+      // Guarded per table: _assertProfileSeriesSchema/_assertNavTracksSchema
+      // wait for each table's foreign key parents, so a partially built
+      // database can reach a publish without one.
       final exists = await _db
           .customSelect(
             "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
@@ -5928,7 +5938,7 @@ class SyncDataSerializer {
       if (exists.isEmpty) continue;
       final row = await _db
           .customSelect(
-            'SELECT COALESCE(SUM(LENGTH(samples)), 0) AS n FROM $table'
+            'SELECT COALESCE(SUM(LENGTH($column)), 0) AS n FROM $table'
             '${hlcSince == null ? '' : ' WHERE hlc > ?'}',
             variables: hlcSince == null
                 ? const []
