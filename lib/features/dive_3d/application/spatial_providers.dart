@@ -47,7 +47,17 @@ final spatialReckonedPathProvider =
       );
       final showMeasuredRoute = ref.watch(showMeasuredRouteProvider(diveId));
       if (route != null && route.points.length >= 2 && showMeasuredRoute) {
-        return NavTrackPathAdapter.toReckonedPath(route);
+        // The raw sample count is not enough: toReckonedPath truncates to
+        // the active underwater/surfaceReckoned range, which can legitimately
+        // adapt down to fewer than two points (e.g. almost the whole
+        // recording turns out to be a pre-dive/post-dive fix run with
+        // barely any real underwater samples). Only an adapted path with at
+        // least two points is usable; otherwise fall through to dead
+        // reckoning below rather than returning a degenerate measured path.
+        final adapted = NavTrackPathAdapter.toReckonedPath(route);
+        if (adapted.points.length >= 2) {
+          return adapted;
+        }
       }
 
       final dive = await ref.watch(diveProvider(diveId).future);
@@ -158,7 +168,21 @@ final spatialGeometryProvider =
           bathymetryGridProvider(BathymetryRepository.quantize(center)).future,
         );
       }
-      final entry = dive?.entryLocation;
+      // A linked, primary route carries its own georeferenced start point
+      // (`anchor`), set by the diver on the alignment page; when the scene
+      // is drawing that measured route, use it in place of the dive's own
+      // entry fix, mirroring what siteSeascapeProvider already does for the
+      // same route one level up. Without this a manually aligned route
+      // renders at the dive's entry location instead of where the diver
+      // actually put it.
+      GeoPoint? entry;
+      if (path.provenance == PathProvenance.measured) {
+        final route = await ref.watch(
+          primaryNavTrackForDiveProvider(diveId).future,
+        );
+        entry = route?.anchor;
+      }
+      entry ??= dive?.entryLocation;
       final anchor = (grid != null && center != null && entry != null)
           ? enuOffsetMeters(center, entry)
           : (east: 0.0, north: 0.0);
