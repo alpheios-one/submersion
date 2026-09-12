@@ -30,8 +30,10 @@ void main() {
     return cols.map((c) => c.read<String>('name')).toSet();
   }
 
-  test('v208 is the current schema version and is in the ladder', () {
-    expect(AppDatabase.currentSchemaVersion, 208);
+  test('v208 is in the ladder and shipped', () {
+    // Relaxed like v207's own test: v209 (the nav_tracks table) landed after
+    // this rung, so this one only claims its rung is still in the ladder.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(208));
     expect(AppDatabase.migrationVersions, contains(208));
   });
 
