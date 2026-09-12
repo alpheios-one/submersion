@@ -37975,9 +37975,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Last service';
 
   @override
-  String get equipment_arrange_title => 'Arrange gear';
-
-  @override
   String get equipment_arrange_groupByType => 'Group by type';
 
   @override
@@ -37992,9 +37989,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Sort by';
-
-  @override
-  String get equipment_arrange_tooltip => 'Arrange gear';
 
   @override
   String get equipment_arrange_reset => 'Reset to defaults';

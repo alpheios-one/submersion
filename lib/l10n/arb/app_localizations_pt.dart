@@ -38581,9 +38581,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Última revisão';
 
   @override
-  String get equipment_arrange_title => 'Organizar o equipamento';
-
-  @override
   String get equipment_arrange_groupByType => 'Agrupar por tipo';
 
   @override
@@ -38598,9 +38595,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Ordenar por';
-
-  @override
-  String get equipment_arrange_tooltip => 'Organizar o equipamento';
 
   @override
   String get equipment_arrange_reset => 'Repor predefinições';

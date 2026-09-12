@@ -38414,9 +38414,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentItemSortField_lastServiceDate => 'Utolsó szerviz';
 
   @override
-  String get equipment_arrange_title => 'Felszerelés rendezése';
-
-  @override
   String get equipment_arrange_groupByType => 'Csoportosítás típus szerint';
 
   @override
@@ -38431,9 +38428,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get equipment_arrange_itemOrderLabelFlat => 'Rendezés';
-
-  @override
-  String get equipment_arrange_tooltip => 'Felszerelés rendezése';
 
   @override
   String get equipment_arrange_reset => 'Alapértelmezések visszaállítása';

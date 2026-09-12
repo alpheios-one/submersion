@@ -63052,12 +63052,6 @@ abstract class AppLocalizations {
   /// **'Last service'**
   String get enum_equipmentItemSortField_lastServiceDate;
 
-  /// No description provided for @equipment_arrange_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Arrange gear'**
-  String get equipment_arrange_title;
-
   /// No description provided for @equipment_arrange_groupByType.
   ///
   /// In en, this message translates to:
@@ -63087,12 +63081,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sort by'**
   String get equipment_arrange_itemOrderLabelFlat;
-
-  /// No description provided for @equipment_arrange_tooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Arrange gear'**
-  String get equipment_arrange_tooltip;
 
   /// No description provided for @equipment_arrange_reset.
   ///
