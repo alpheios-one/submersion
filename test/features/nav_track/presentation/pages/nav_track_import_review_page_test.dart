@@ -80,6 +80,17 @@ Future<void> _pump(
   NavTrackImportService? service,
   List<EquipmentItem>? equipment,
 }) async {
+  // A host locale the app actually translates into, so the English finders
+  // below pass only because the MaterialApp pins `en`. Drop the pin and
+  // every test in this file that asserts on English strings ("No site
+  // chosen", "No equipment", the import errors) would fail on a non-English
+  // host locale, which is the point.
+  tester.platformDispatcher.localesTestValue = const [
+    Locale('de'),
+    Locale('en'),
+  ];
+  addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
   final base = await getBaseOverrides();
   await tester.pumpWidget(
     ProviderScope(
@@ -91,6 +102,7 @@ Future<void> _pump(
           activeEquipmentProvider.overrideWith((ref) async => equipment),
       ],
       child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: NavTrackImportReviewPage(
