@@ -1056,6 +1056,7 @@
   "preDive_runner_flag": "סמן בדגל",
   "preDive_runner_undo": "אפס לממתין",
   "preDive_runner_serviceOverdue": "פג תוקף הטיפול",
+  "preDive_runner_conditionFindings": "ממצאי מצב",
   "preDive_runner_addNote": "הוסף הערה",
   "preDive_runner_enterValue": "הזן ערך",
   "preDive_runner_cellInAir": "באוויר",
@@ -5757,6 +5758,38 @@
   "statistics_equipment_weightTrend_error": "שגיאה בטעינת מגמת משקל",
   "statistics_equipment_weightTrend_subtitle": "סך המשקולות לכל צלילה",
   "statistics_equipment_weightTrend_title": "מגמת משקל",
+  "statistics_equipment_exposure_title": "חשיפה",
+  "statistics_equipment_exposure_error": "טעינת נתוני החשיפה נכשלה",
+  "statistics_equipment_findings_error": "טעינת ממצאי המצב נכשלה",
+  "statistics_equipment_issues_error": "טעינת התקלות שדווחו נכשלה",
+  "statistics_equipment_exposure_subtitle": "סיכומים לכל פריט לפי הספים שלך",
+  "statistics_equipment_exposure_empty": "אין עדיין צלילות עם ציוד",
+  "statistics_equipment_findings_title": "ממצאי מצב",
+  "statistics_equipment_findings_subtitle": "ממצאים פתוחים לפי כלל",
+  "statistics_equipment_findings_subtitleAllDives": "ממצאים פתוחים לפי כלל, בכל הצלילות",
+  "statistics_equipment_findings_empty": "אין ממצאים פתוחים",
+  "statistics_equipment_issues_title": "תקלות שדווחו",
+  "statistics_equipment_issues_subtitle": "תגיות הבדיקה הנפוצות ביותר",
+  "statistics_equipment_issues_empty": "לא דווחו תקלות",
+  "statistics_equipment_countLabel_items": "פריטים",
+  "statistics_equipment_countLabel_findings": "ממצאים",
+  "statistics_equipment_countLabel_reports": "דיווחים",
+  "statistics_equipment_exposureUnit_days": "ימים",
+  "statistics_equipment_exposureUnit_dives": "צלילות",
+  "statistics_equipment_countLabel_days": "ימים",
+  "statistics_equipment_countLabel_dives": "צלילות",
+  "statistics_equipment_countLabel_hours": "שעות",
+  "statistics_equipment_countLabel_saltHours": "שעות במים מלוחים",
+  "statistics_equipment_countLabel_coldDives": "צלילות קרות",
+  "statistics_equipment_countLabel_o2Hours": "שעות ב-O2 גבוה",
+  "statistics_equipment_countLabel_deepCycles": "צלילות עמוקות",
+  "statistics_equipment_countLabel_cycles": "מחזורי סוללה",
+  "statistics_equipment_exposureUnit_hours": "שעות",
+  "statistics_equipment_exposureUnit_saltHours": "שעות במים מלוחים",
+  "statistics_equipment_exposureUnit_coldDives": "צלילות קרות",
+  "statistics_equipment_exposureUnit_o2Hours": "שעות ב-O2 גבוה",
+  "statistics_equipment_exposureUnit_deepCycles": "צלילות עמוקות",
+  "statistics_equipment_exposureUnit_cycles": "מחזורי סוללה",
   "statistics_error_loadingStatistics": "שגיאה בטעינת סטטיסטיקות",
   "statistics_filterBar_clear": "ניקוי מסנן",
   "statistics_filterBar_diveCount": "{count, plural, =1{צלילה אחת} other{{count} צלילות}}",
@@ -6409,6 +6442,119 @@
   "trips_edit_hint_vesselName": "e.g. Ocean Explorer",
   "trips_edit_label_cabinType": "Cabin Type",
   "trips_edit_label_capacity": "Passenger Capacity",
+  "trips_edit_sectionTitle_planning": "תכנון",
+  "trips_edit_label_expectedDives": "צלילות צפויות",
+  "trips_edit_hint_expectedDives": "השאר ריק כדי להעריך מהטיולים האחרונים שלך",
+  "trips_edit_label_expectedRuntime": "זמן ריצה צפוי לכל צלילה (דקות)",
+  "trips_edit_hint_expectedRuntime": "השאר ריק כדי להעריך מצלילות הריברידר האחרונות שלך",
+  "trips_scrubber_title": "מרווח הסופג",
+  "trips_scrubber_asOfStart": "נכון ל-{date}",
+  "@trips_scrubber_asOfStart": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_remaining": "{minutes} דק' נותרו לפני הטיול (נקוב {rated} דק', {consumed} דק' נוצלו מאז המילוי האחרון)",
+  "@trips_scrubber_remaining": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "rated": {
+        "type": "String"
+      },
+      "consumed": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_remainingNoRepack": "{minutes} דק' נותרו לפני הטיול (נקוב {rated} דק', {consumed} דק' נוצלו, לא נרשם מילוי)",
+  "@trips_scrubber_remainingNoRepack": {
+    "description": "The scrubber's remaining minutes when no repack is recorded on or before the trip, so the used minutes count every loop dive on it.",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "rated": {
+        "type": "String"
+      },
+      "consumed": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_expectedDives": "{dives, plural, one{צלילה צפויה אחת} other{{dives} צלילות צפויות}}",
+  "@trips_scrubber_expectedDives": {
+    "placeholders": {
+      "dives": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_scrubber_fromTrips": "{n, plural, one{(לפי הטיול האחרון שלך)} other{(לפי {n} הטיולים האחרונים שלך)}}",
+  "@trips_scrubber_fromTrips": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_scrubber_fromOverride": "(הוגדר בטיול זה)",
+  "trips_scrubber_perDive": "{minutes} דק' לכל צלילה",
+  "@trips_scrubber_perDive": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_fromDives": "{n, plural, one{(לפי צלילת הריברידר האחרונה שלך)} other{(לפי {n} צלילות הריברידר האחרונות שלך)}}",
+  "@trips_scrubber_fromDives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "trips_scrubber_expectedUse": "{minutes} דק' שימוש צפוי",
+  "@trips_scrubber_expectedUse": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_margin": "{minutes} דק' מרווח אחרי הטיול",
+  "@trips_scrubber_margin": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_caution": "מתחת ל-20 אחוז מהמשך הנקוב. תכננו מילוי או קחו סופג רזרבי.",
+  "trips_scrubber_noRating": "אין משך נקוב לריברידר זה; הוסיפו את משך הסופג למאפיינים או לוח זמנים למילוי.",
+  "trips_scrubber_bannerMargin": "{minutes} דק' מרווח סופג",
+  "@trips_scrubber_bannerMargin": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trips_scrubber_bannerCount": "{count} ריברידרים, מרווח הסופג הנמוך ביותר {minutes} דק'",
+  "@trips_scrubber_bannerCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
   "trips_edit_label_disembarkPort": "Disembark Port",
   "trips_edit_label_embarkPort": "Embark Port",
   "trips_edit_label_endDate": "תאריך סיום",
@@ -8223,6 +8369,359 @@
   "settings_section_equipmentCondition_title": "מצב הציוד",
   "settings_section_equipmentCondition_subtitle": "ספי חשיפה לשעוני תחזוקה",
   "equipmentConditionSettings_title": "מצב הציוד",
+  "equipmentCondition_children_title": "חלקים מותקנים",
+  "equipmentCondition_children_slot": "חריץ {slot}",
+  "@equipmentCondition_children_slot": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_installed": "הותקן ב-{date}, {age}",
+  "@equipmentCondition_children_installed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_ageDays": "{days, plural, =0{היום} =1{לפני יום} other{לפני {days} ימים}}",
+  "@equipmentCondition_children_ageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_ageMonths": "{months, plural, =1{לפני חודש} other{לפני {months} חודשים}}",
+  "@equipmentCondition_children_ageMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_replace": "החלפה",
+  "equipmentCondition_children_open": "פתיחה",
+  "equipmentCondition_children_replaceTitle": "להחליף את {name}?",
+  "@equipmentCondition_children_replaceTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceBody": "{name} יוצא משימוש היום ו{type} חדש תופס את מקומו באותו חריץ. המספר הסידורי וההערות מתחילים ריקים.",
+  "@equipmentCondition_children_replaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceConfirm": "החלפה",
+  "equipmentCondition_children_replaceCancel": "ביטול",
+  "equipmentCondition_children_replaced": "{name} הוחלף",
+  "@equipmentCondition_children_replaced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_empty": "לא נרשמו תאים או סוללות",
+  "equipmentCondition_children_add": "הוספה",
+  "equipmentCondition_findings_title": "ממצאי מצב",
+  "equipmentCondition_findings_count": "{count, plural, =1{ממצא אחד} other{{count} ממצאים}}",
+  "@equipmentCondition_findings_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_findings_evidence": "צלילות הראיה",
+  "equipmentCondition_findings_dismiss": "התעלמות",
+  "equipmentCondition_findings_restore": "שחזור",
+  "equipmentCondition_findings_showDismissed": "{count, plural, =1{הצג ממצא אחד שהוסתר} other{הצג {count} ממצאים שהוסתרו}}",
+  "@equipmentCondition_findings_showDismissed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_title": "צלילות הראיה",
+  "equipmentCondition_evidence_dive": "צלילה {number}",
+  "@equipmentCondition_evidence_dive": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_unnumbered": "צלילה",
+  "equipmentCondition_evidence_minutes": "{n} דק'",
+  "@equipmentCondition_evidence_minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_title_cellGain": "פלט התאים לכל צלילה",
+  "equipmentCondition_trend_title_gap": "נפילות המשדר לכל צלילה",
+  "equipmentCondition_trend_title_scrubber": "שימוש בסופג לכל צלילה",
+  "equipmentCondition_trend_title_temperature": "טמפרטורה מזערית לכל צלילה",
+  "equipmentCondition_trend_cell": "תא {slot}",
+  "@equipmentCondition_trend_cell": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_issues": "צלילות עם תקלה",
+  "equipmentCondition_trend_scrubber": "דקות סופג",
+  "equipmentCondition_trend_gap": "שיעור הנפילות",
+  "equipmentCondition_trend_temperature": "טמפרטורה מזערית",
+  "equipmentCondition_trend_axis_minutes": "דק'",
+  "equipmentCondition_exposure_title": "חשיפה",
+  "equipmentCondition_exposure_empty": "אין עדיין צלילות עם פריט זה",
+  "equipmentCondition_exposure_footer": "{n, plural, =1{צלילה אחת} other{{n} צלילות}}, {range}",
+  "@equipmentCondition_exposure_footer": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_dives": "{n, plural, =1{צלילה אחת} other{{n} צלילות}}",
+  "@equipmentCondition_exposure_dives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_hours": "{n} שעות",
+  "@equipmentCondition_exposure_hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_saltHours": "{n} שעות במים מלוחים",
+  "@equipmentCondition_exposure_saltHours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_coldDives": "{n, plural, =1{צלילה קרה אחת} other{{n} צלילות קרות}}",
+  "@equipmentCondition_exposure_coldDives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_o2Hours": "{n} שעות ב-O2 גבוה",
+  "@equipmentCondition_exposure_o2Hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_deepCycles": "{n, plural, =1{צלילה עמוקה אחת} other{{n} צלילות עמוקות}}",
+  "@equipmentCondition_exposure_deepCycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_cycles": "{n, plural, =1{מחזור סוללה אחד} other{{n} מחזורי סוללה}}",
+  "@equipmentCondition_exposure_cycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputDeclining": "פלט תא {slot} ירד ב-{percent} אחוזים לאורך {n} צלילות מאז {since}",
+  "@equipmentCondition_finding_cellOutputDeclining": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "since": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputLow": "פלט תא {slot} הוא {gain} mV לבר ב-{n} הצלילות האחרונות",
+  "@equipmentCondition_finding_cellOutputLow": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellDivergent": "תא {slot} חרג מהאחרים בעד {bar} בר ב-{count} מתוך {n} הצלילות האחרונות",
+  "@equipmentCondition_finding_cellDivergent": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "bar": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellCurrentLimited": "תא {slot} קרא נמוך ב-ppO2 גבוה ב-{count} מתוך {n} הצלילות האחרונות, עד {percent} אחוזים מהדגימות",
+  "@equipmentCondition_finding_cellCurrentLimited": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutRising": "קריאת הלחץ נפלה ב-{recent} אחוזים מ-5 הצלילות האחרונות, לעומת {prior} אחוזים ב-{priorCount} שלפניהן",
+  "@equipmentCondition_finding_transmitterDropoutRising": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "prior": {
+        "type": "String"
+      },
+      "priorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutHigh": "קריאת הלחץ נפלה בממוצע ב-{recent} אחוזים מ-{n} הצלילות האחרונות, {count} מהן מעל 10 אחוזים",
+  "@equipmentCondition_finding_transmitterDropoutHigh": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueRecurring": "{tag} דווח {count} פעמים ב-{n} הצלילות האחרונות",
+  "@equipmentCondition_finding_issueRecurring": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueColdCorrelated": "{insideIssue} מתוך {totalIssue} צלילות עם תקלה היו קרות מ-{threshold}, מתוך {n} צלילות עם פריט זה",
+  "@equipmentCondition_finding_issueColdCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueDeepCorrelated": "{insideIssue} מתוך {totalIssue} צלילות עם תקלה היו עמוקות מ-{threshold}, מתוך {n} צלילות עם פריט זה",
+  "@equipmentCondition_finding_issueDeepCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_incidentLinked": "{count, plural, =1{אירוע אחד מזכיר פריט זה} other{{count} אירועים מזכירים פריט זה}}",
+  "@equipmentCondition_finding_incidentLinked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_window": "{n, plural, =1{צלילה אחת} other{{n} צלילות}}, {range}",
+  "@equipmentCondition_finding_window": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
   "equipmentConditionSettings_thresholdsHeader": "ספי חשיפה",
   "equipmentConditionSettings_thresholdsHelp": "צלילה נחשבת קרה, עמוקה או בחמצן גבוה לשעוני התחזוקה כאשר היא חוצה ספים אלה.",
   "equipmentConditionSettings_coldLabel": "מים קרים מתחת ל",
