@@ -26972,6 +26972,347 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipmentConditionSettings_title => 'Felszerelés állapota';
 
   @override
+  String get equipmentCondition_children_title => 'Beépített alkatrészek';
+
+  @override
+  String equipmentCondition_children_slot(int slot) {
+    return '$slot. hely';
+  }
+
+  @override
+  String equipmentCondition_children_installed(String date, String age) {
+    return 'Beépítve: $date, $age';
+  }
+
+  @override
+  String equipmentCondition_children_ageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days napja',
+      one: '1 napja',
+      zero: 'ma',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_children_ageMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months hónapja',
+      one: '1 hónapja',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_children_replace => 'Csere';
+
+  @override
+  String get equipmentCondition_children_open => 'Megnyitás';
+
+  @override
+  String equipmentCondition_children_replaceTitle(String name) {
+    return 'Cseréli: $name?';
+  }
+
+  @override
+  String equipmentCondition_children_replaceBody(String name, String type) {
+    return 'A(z) $name ma kivonásra kerül, és egy új $type veszi át a helyét ugyanazon a helyen. A sorozatszám és a megjegyzések üresen indulnak.';
+  }
+
+  @override
+  String get equipmentCondition_children_replaceConfirm => 'Csere';
+
+  @override
+  String get equipmentCondition_children_replaceCancel => 'Mégse';
+
+  @override
+  String equipmentCondition_children_replaced(String name) {
+    return '$name kicserélve';
+  }
+
+  @override
+  String get equipmentCondition_children_empty =>
+      'Nincs rögzített cella vagy akkumulátor';
+
+  @override
+  String get equipmentCondition_children_add => 'Hozzáadás';
+
+  @override
+  String get equipmentCondition_findings_title => 'Állapotmegállapítások';
+
+  @override
+  String equipmentCondition_findings_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megállapítás',
+      one: '1 megállapítás',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_findings_evidence => 'Bizonyító merülések';
+
+  @override
+  String get equipmentCondition_findings_dismiss => 'Elvetés';
+
+  @override
+  String get equipmentCondition_findings_restore => 'Visszaállítás';
+
+  @override
+  String equipmentCondition_findings_showDismissed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elvetett mutatása',
+      one: '1 elvetett mutatása',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_evidence_title => 'Bizonyító merülések';
+
+  @override
+  String equipmentCondition_evidence_dive(int number) {
+    return '$number. merülés';
+  }
+
+  @override
+  String get equipmentCondition_evidence_unnumbered => 'Merülés';
+
+  @override
+  String equipmentCondition_evidence_minutes(int n) {
+    return '$n perc';
+  }
+
+  @override
+  String get equipmentCondition_trend_title_cellGain =>
+      'Cellakimenet merülésenként';
+
+  @override
+  String get equipmentCondition_trend_title_gap => 'Adókimaradás merülésenként';
+
+  @override
+  String get equipmentCondition_trend_title_scrubber =>
+      'Szűrőhasználat merülésenként';
+
+  @override
+  String get equipmentCondition_trend_title_temperature =>
+      'Legalacsonyabb hőmérséklet merülésenként';
+
+  @override
+  String equipmentCondition_trend_cell(int slot) {
+    return '$slot. cella';
+  }
+
+  @override
+  String get equipmentCondition_trend_issues => 'Merülések problémával';
+
+  @override
+  String get equipmentCondition_trend_scrubber => 'Szűrőpercek';
+
+  @override
+  String get equipmentCondition_trend_gap => 'Kimaradási arány';
+
+  @override
+  String get equipmentCondition_trend_temperature =>
+      'Legalacsonyabb hőmérséklet';
+
+  @override
+  String get equipmentCondition_trend_axis_minutes => 'perc';
+
+  @override
+  String get equipmentCondition_exposure_title => 'Igénybevétel';
+
+  @override
+  String get equipmentCondition_exposure_empty =>
+      'Még nincs merülés ezzel az eszközzel';
+
+  @override
+  String equipmentCondition_exposure_footer(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
+  String equipmentCondition_exposure_dives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_hours(String n) {
+    return '$n óra';
+  }
+
+  @override
+  String equipmentCondition_exposure_saltHours(String n) {
+    return '$n sósvízi óra';
+  }
+
+  @override
+  String equipmentCondition_exposure_coldDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n hideg merülés',
+      one: '1 hideg merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_o2Hours(String n) {
+    return '$n óra magas O2-vel';
+  }
+
+  @override
+  String equipmentCondition_exposure_deepCycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n mély merülés',
+      one: '1 mély merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_cycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n akkumulátorciklus',
+      one: '1 akkumulátorciklus',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputDeclining(
+    int slot,
+    String percent,
+    int n,
+    String since,
+  ) {
+    return 'A(z) $slot. cella kimenete $percent százalékkal csökkent $n merülés alatt $since óta';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputLow(
+    int slot,
+    String gain,
+    int n,
+  ) {
+    return 'A(z) $slot. cella kimenete $gain mV/bar az utolsó $n merülésen';
+  }
+
+  @override
+  String equipmentCondition_finding_cellDivergent(
+    int slot,
+    String bar,
+    int count,
+    int n,
+  ) {
+    return 'A(z) $slot. cella az utolsó $n merülésből $count alkalommal akár $bar bar-ral eltért a többitől';
+  }
+
+  @override
+  String equipmentCondition_finding_cellCurrentLimited(
+    int slot,
+    int count,
+    int n,
+    String percent,
+  ) {
+    return 'A(z) $slot. cella magas ppO2-nél az utolsó $n merülésből $count alkalommal alacsonyat mért, a minták akár $percent százalékánál';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutRising(
+    String recent,
+    String prior,
+    int priorCount,
+  ) {
+    return 'A nyomásadat az utolsó 5 merülés $recent százalékában kimaradt, az azt megelőző $priorCount merülésen mért $prior százalékhoz képest';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutHigh(
+    String recent,
+    int n,
+    int count,
+  ) {
+    return 'A nyomásadat az utolsó $n merülés átlagosan $recent százalékában kimaradt, ebből $count merülésen 10 százalék felett';
+  }
+
+  @override
+  String equipmentCondition_finding_issueRecurring(
+    String tag,
+    int count,
+    int n,
+  ) {
+    return '$tag: $count alkalommal jelentve az utolsó $n merülésen';
+  }
+
+  @override
+  String equipmentCondition_finding_issueColdCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$totalIssue problémás merülésből $insideIssue volt $threshold alatti hőmérsékletű, $n merülés alapján ezzel az eszközzel';
+  }
+
+  @override
+  String equipmentCondition_finding_issueDeepCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$totalIssue problémás merülésből $insideIssue ment $threshold mélységen túl, $n merülés alapján ezzel az eszközzel';
+  }
+
+  @override
+  String equipmentCondition_finding_incidentLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count esemény említi ezt az eszközt',
+      one: '1 esemény említi ezt az eszközt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_window(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
   String get equipmentConditionSettings_thresholdsHeader =>
       'Terhelési küszöbök';
 

@@ -27075,6 +27075,347 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipmentConditionSettings_title => 'Stato dell\'attrezzatura';
 
   @override
+  String get equipmentCondition_children_title => 'Parti installate';
+
+  @override
+  String equipmentCondition_children_slot(int slot) {
+    return 'Slot $slot';
+  }
+
+  @override
+  String equipmentCondition_children_installed(String date, String age) {
+    return 'Installato il $date, $age';
+  }
+
+  @override
+  String equipmentCondition_children_ageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days giorni fa',
+      one: '1 giorno fa',
+      zero: 'oggi',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_children_ageMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months mesi fa',
+      one: '1 mese fa',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_children_replace => 'Sostituisci';
+
+  @override
+  String get equipmentCondition_children_open => 'Apri';
+
+  @override
+  String equipmentCondition_children_replaceTitle(String name) {
+    return 'Sostituire $name?';
+  }
+
+  @override
+  String equipmentCondition_children_replaceBody(String name, String type) {
+    return '$name viene ritirato oggi e un nuovo elemento di tipo $type ne prende il posto nello stesso slot. Numero di serie e note partono vuoti.';
+  }
+
+  @override
+  String get equipmentCondition_children_replaceConfirm => 'Sostituisci';
+
+  @override
+  String get equipmentCondition_children_replaceCancel => 'Annulla';
+
+  @override
+  String equipmentCondition_children_replaced(String name) {
+    return '$name sostituito';
+  }
+
+  @override
+  String get equipmentCondition_children_empty =>
+      'Nessuna cella o batteria registrata';
+
+  @override
+  String get equipmentCondition_children_add => 'Aggiungi';
+
+  @override
+  String get equipmentCondition_findings_title => 'Rilievi sullo stato';
+
+  @override
+  String equipmentCondition_findings_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rilievi',
+      one: '1 rilievo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_findings_evidence => 'Immersioni a supporto';
+
+  @override
+  String get equipmentCondition_findings_dismiss => 'Ignora';
+
+  @override
+  String get equipmentCondition_findings_restore => 'Ripristina';
+
+  @override
+  String equipmentCondition_findings_showDismissed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Mostra $count ignorati',
+      one: 'Mostra 1 ignorato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_evidence_title => 'Immersioni a supporto';
+
+  @override
+  String equipmentCondition_evidence_dive(int number) {
+    return 'Immersione $number';
+  }
+
+  @override
+  String get equipmentCondition_evidence_unnumbered => 'Immersione';
+
+  @override
+  String equipmentCondition_evidence_minutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get equipmentCondition_trend_title_cellGain =>
+      'Uscita delle celle per immersione';
+
+  @override
+  String get equipmentCondition_trend_title_gap =>
+      'Perdite di segnale del trasmettitore per immersione';
+
+  @override
+  String get equipmentCondition_trend_title_scrubber =>
+      'Uso della calce per immersione';
+
+  @override
+  String get equipmentCondition_trend_title_temperature =>
+      'Temperatura minima per immersione';
+
+  @override
+  String equipmentCondition_trend_cell(int slot) {
+    return 'Cella $slot';
+  }
+
+  @override
+  String get equipmentCondition_trend_issues => 'Immersioni con un problema';
+
+  @override
+  String get equipmentCondition_trend_scrubber => 'Minuti di calce';
+
+  @override
+  String get equipmentCondition_trend_gap => 'Quota di perdite';
+
+  @override
+  String get equipmentCondition_trend_temperature => 'Temperatura minima';
+
+  @override
+  String get equipmentCondition_trend_axis_minutes => 'min';
+
+  @override
+  String get equipmentCondition_exposure_title => 'Esposizione';
+
+  @override
+  String get equipmentCondition_exposure_empty =>
+      'Ancora nessuna immersione con questo articolo';
+
+  @override
+  String equipmentCondition_exposure_footer(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n immersioni',
+      one: '1 immersione',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
+  String equipmentCondition_exposure_dives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n immersioni',
+      one: '1 immersione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_hours(String n) {
+    return '$n ore';
+  }
+
+  @override
+  String equipmentCondition_exposure_saltHours(String n) {
+    return '$n ore in acqua salata';
+  }
+
+  @override
+  String equipmentCondition_exposure_coldDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n immersioni fredde',
+      one: '1 immersione fredda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_o2Hours(String n) {
+    return '$n ore ad alto O2';
+  }
+
+  @override
+  String equipmentCondition_exposure_deepCycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n immersioni profonde',
+      one: '1 immersione profonda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_cycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n cicli batteria',
+      one: '1 ciclo batteria',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputDeclining(
+    int slot,
+    String percent,
+    int n,
+    String since,
+  ) {
+    return 'L\'uscita della cella $slot è calata del $percent per cento in $n immersioni dal $since';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputLow(
+    int slot,
+    String gain,
+    int n,
+  ) {
+    return 'L\'uscita della cella $slot è di $gain mV per bar nelle ultime $n immersioni';
+  }
+
+  @override
+  String equipmentCondition_finding_cellDivergent(
+    int slot,
+    String bar,
+    int count,
+    int n,
+  ) {
+    return 'La cella $slot ha discordato dalle altre fino a $bar bar in $count delle ultime $n immersioni';
+  }
+
+  @override
+  String equipmentCondition_finding_cellCurrentLimited(
+    int slot,
+    int count,
+    int n,
+    String percent,
+  ) {
+    return 'La cella $slot ha letto basso ad alta ppO2 in $count delle ultime $n immersioni, fino al $percent per cento dei campioni';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutRising(
+    String recent,
+    String prior,
+    int priorCount,
+  ) {
+    return 'La pressione è mancata per il $recent per cento delle ultime 5 immersioni, contro il $prior per cento nelle $priorCount precedenti';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutHigh(
+    String recent,
+    int n,
+    int count,
+  ) {
+    return 'La pressione è mancata in media per il $recent per cento delle ultime $n immersioni, $count delle quali oltre il 10 per cento';
+  }
+
+  @override
+  String equipmentCondition_finding_issueRecurring(
+    String tag,
+    int count,
+    int n,
+  ) {
+    return '$tag segnalato $count volte nelle ultime $n immersioni';
+  }
+
+  @override
+  String equipmentCondition_finding_issueColdCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue di $totalIssue immersioni con problemi erano più fredde di $threshold, su $n immersioni con questo articolo';
+  }
+
+  @override
+  String equipmentCondition_finding_issueDeepCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue di $totalIssue immersioni con problemi andavano oltre $threshold, su $n immersioni con questo articolo';
+  }
+
+  @override
+  String equipmentCondition_finding_incidentLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count incidenti citano questo articolo',
+      one: '1 incidente cita questo articolo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_window(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n immersioni',
+      one: '1 immersione',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
   String get equipmentConditionSettings_thresholdsHeader =>
       'Soglie di esposizione';
 

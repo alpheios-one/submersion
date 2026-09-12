@@ -239,6 +239,38 @@ final equipmentItemProvider = FutureProvider.family<EquipmentItem?, String>((
   return repository.getEquipmentById(id);
 });
 
+/// The active children installed in a parent, for the children card
+/// (condition phase 4a): cells by slot, then batteries, then any other part
+/// by type name, each group by name after that. The order is spelled out
+/// rather than read from `EquipmentType.index`, which only records when each
+/// type was added.
+final childEquipmentProvider =
+    FutureProvider.family<List<EquipmentItem>, String>((ref, parentId) async {
+      final repository = ref.watch(equipmentRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+      // Slots and install dates are attributes, written without touching
+      // the equipment row.
+      ref.invalidateSelfWhen(repository.watchAttributeChanges());
+      final children = await repository.getChildEquipment(parentId);
+      int slotOf(EquipmentItem e) => e.cellSlot ?? 1 << 20;
+      int rankOf(EquipmentType t) => switch (t) {
+        EquipmentType.o2Cell => 0,
+        EquipmentType.battery => 1,
+        _ => 2,
+      };
+      // isFitted, not isActive: a legacy row can be retired or sold with
+      // isActive left true, and must not show as an installed part.
+      return children.where((c) => c.isFitted).toList()..sort((a, b) {
+        final byRank = rankOf(a.type).compareTo(rankOf(b.type));
+        if (byRank != 0) return byRank;
+        final byType = a.type.name.compareTo(b.type.name);
+        if (byType != 0) return byType;
+        final bySlot = slotOf(a).compareTo(slotOf(b));
+        if (bySlot != 0) return bySlot;
+        return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      });
+    });
+
 /// Dive count for equipment provider.
 ///
 /// Backs the "Used on N dives" figure. A junction read over `dive_equipment`,
@@ -705,18 +737,6 @@ Future<List<ServiceClockStatus>> _evaluateClocksFor(
   final records = await ref
       .watch(serviceRecordRepositoryProvider)
       .getRecordsForEquipment(item.id);
-  final repository = ref.watch(equipmentRepositoryProvider);
-  final parentId = item.parentEquipmentId;
-  final parent = parentId == null
-      ? null
-      : siblings?.where((s) => s.id == parentId).firstOrNull ??
-            await repository.getEquipmentById(parentId);
-  final children = siblings != null
-      ? siblings.where((s) => s.parentEquipmentId == item.id).toList()
-      : await repository.getChildEquipment(item.id);
-  final isRebreather =
-      item.type == EquipmentType.rebreather ||
-      parent?.type == EquipmentType.rebreather;
   // A transmitter's dives include the tanks that carried its registered
   // serials, and assigning a serial writes only the registry.
   if (item.type == EquipmentType.transmitter) {
@@ -724,16 +744,19 @@ Future<List<ServiceClockStatus>> _evaluateClocksFor(
       ref.watch(transmitterRepositoryProvider).watchTransmittersChanges(),
     );
   }
-  final usage = await repository.getExposureSamplesForEquipment(
-    item.id,
-    parentEquipmentId: parentId,
-    installedSince: item.parentDivesFrom,
-    rebreatherContact: isRebreather,
-  );
+  // The repository's one wiring, shared with the exposure card, the
+  // reminders and the condition engine: fitted parts only, and a replaced
+  // part's dives stop at its successor.
+  final exposure = await ref
+      .watch(equipmentRepositoryProvider)
+      .getItemExposure(item, siblings: siblings);
+  final usage = exposure.samples;
   final classifier = ExposureClassifier(
     thresholds: ref.watch(exposureThresholdsProvider),
-    loopTimeOnly: isRebreather,
-    hasBatteryChild: children.any((c) => c.type == EquipmentType.battery),
+    loopTimeOnly: exposure.isRebreather,
+    hasBatteryChild: exposure.fittedChildren.any(
+      (c) => c.type == EquipmentType.battery,
+    ),
   );
   final window = await ref.watch(serviceDueSoonWindowDaysProvider.future);
   return const ServiceDueEngine().evaluate(
@@ -757,6 +780,13 @@ final serviceClockStatusesProvider =
     ) async {
       final repository = ref.watch(equipmentRepositoryProvider);
       ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+      // The same inputs as the item page's exposure card, so the two never
+      // disagree: install dates and slots live in the attribute table, and
+      // a dive link or profile edit writes no equipment row.
+      ref.invalidateSelfWhen(repository.watchAttributeChanges());
+      ref.invalidateSelfWhen(
+        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+      );
       final item = await repository.getEquipmentById(equipmentId);
       if (item == null) return const [];
       return _evaluateClocksFor(ref, item);
@@ -782,6 +812,10 @@ final activeEquipmentClocksProvider = FutureProvider<List<EquipmentClocks>>((
     validatedCurrentDiverIdProvider.future,
   );
   ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  // Install dates and slots decide which dives a part owns. Rare writes,
+  // unlike the dive detail stream (media ticks it), which would re-evaluate
+  // every item's clocks far too often for a list-wide provider.
+  ref.invalidateSelfWhen(repository.watchAttributeChanges());
 
   final items = await repository.getActiveEquipment(diverId: validatedDiverId);
   final kinds = await ref.watch(serviceKindRepositoryProvider).getAllKinds();

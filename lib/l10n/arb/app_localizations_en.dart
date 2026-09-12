@@ -26627,6 +26627,344 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipmentConditionSettings_title => 'Equipment condition';
 
   @override
+  String get equipmentCondition_children_title => 'Installed parts';
+
+  @override
+  String equipmentCondition_children_slot(int slot) {
+    return 'Slot $slot';
+  }
+
+  @override
+  String equipmentCondition_children_installed(String date, String age) {
+    return 'Installed $date, $age';
+  }
+
+  @override
+  String equipmentCondition_children_ageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: '1 day ago',
+      zero: 'today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_children_ageMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months months ago',
+      one: '1 month ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_children_replace => 'Replace';
+
+  @override
+  String get equipmentCondition_children_open => 'Open';
+
+  @override
+  String equipmentCondition_children_replaceTitle(String name) {
+    return 'Replace $name?';
+  }
+
+  @override
+  String equipmentCondition_children_replaceBody(String name, String type) {
+    return '$name is retired today and a new $type takes its place in the same slot. Serial and notes start empty.';
+  }
+
+  @override
+  String get equipmentCondition_children_replaceConfirm => 'Replace';
+
+  @override
+  String get equipmentCondition_children_replaceCancel => 'Cancel';
+
+  @override
+  String equipmentCondition_children_replaced(String name) {
+    return '$name replaced';
+  }
+
+  @override
+  String get equipmentCondition_children_empty =>
+      'No cells or batteries recorded';
+
+  @override
+  String get equipmentCondition_children_add => 'Add';
+
+  @override
+  String get equipmentCondition_findings_title => 'Condition findings';
+
+  @override
+  String equipmentCondition_findings_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count findings',
+      one: '1 finding',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_findings_evidence => 'Evidence dives';
+
+  @override
+  String get equipmentCondition_findings_dismiss => 'Dismiss';
+
+  @override
+  String get equipmentCondition_findings_restore => 'Restore';
+
+  @override
+  String equipmentCondition_findings_showDismissed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Show $count dismissed',
+      one: 'Show 1 dismissed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_evidence_title => 'Evidence dives';
+
+  @override
+  String equipmentCondition_evidence_dive(int number) {
+    return 'Dive $number';
+  }
+
+  @override
+  String get equipmentCondition_evidence_unnumbered => 'Dive';
+
+  @override
+  String equipmentCondition_evidence_minutes(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get equipmentCondition_trend_title_cellGain => 'Cell output per dive';
+
+  @override
+  String get equipmentCondition_trend_title_gap =>
+      'Transmitter dropouts per dive';
+
+  @override
+  String get equipmentCondition_trend_title_scrubber => 'Scrubber use per dive';
+
+  @override
+  String get equipmentCondition_trend_title_temperature =>
+      'Minimum temperature per dive';
+
+  @override
+  String equipmentCondition_trend_cell(int slot) {
+    return 'Cell $slot';
+  }
+
+  @override
+  String get equipmentCondition_trend_issues => 'Dives with an issue';
+
+  @override
+  String get equipmentCondition_trend_scrubber => 'Scrubber minutes';
+
+  @override
+  String get equipmentCondition_trend_gap => 'Dropout share';
+
+  @override
+  String get equipmentCondition_trend_temperature => 'Minimum temperature';
+
+  @override
+  String get equipmentCondition_trend_axis_minutes => 'min';
+
+  @override
+  String get equipmentCondition_exposure_title => 'Exposure';
+
+  @override
+  String get equipmentCondition_exposure_empty => 'No dives with this item yet';
+
+  @override
+  String equipmentCondition_exposure_footer(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
+  String equipmentCondition_exposure_dives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_hours(String n) {
+    return '$n hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_saltHours(String n) {
+    return '$n salt-water hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_coldDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n cold dives',
+      one: '1 cold dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_o2Hours(String n) {
+    return '$n high-O2 hours';
+  }
+
+  @override
+  String equipmentCondition_exposure_deepCycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n deep dives',
+      one: '1 deep dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_cycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n battery cycles',
+      one: '1 battery cycle',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputDeclining(
+    int slot,
+    String percent,
+    int n,
+    String since,
+  ) {
+    return 'Cell $slot output fell $percent percent across $n dives since $since';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputLow(
+    int slot,
+    String gain,
+    int n,
+  ) {
+    return 'Cell $slot output is $gain mV per bar over the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_cellDivergent(
+    int slot,
+    String bar,
+    int count,
+    int n,
+  ) {
+    return 'Cell $slot disagreed with its peers by up to $bar bar on $count of the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_cellCurrentLimited(
+    int slot,
+    int count,
+    int n,
+    String percent,
+  ) {
+    return 'Cell $slot read low at high ppO2 on $count of the last $n dives, up to $percent percent of samples';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutRising(
+    String recent,
+    String prior,
+    int priorCount,
+  ) {
+    return 'Pressure dropped out for $recent percent of the last 5 dives, up from $prior percent over the $priorCount before';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutHigh(
+    String recent,
+    int n,
+    int count,
+  ) {
+    return 'Pressure dropped out for $recent percent of the last $n dives on average, $count of them above 10 percent';
+  }
+
+  @override
+  String equipmentCondition_finding_issueRecurring(
+    String tag,
+    int count,
+    int n,
+  ) {
+    return '$tag reported $count times in the last $n dives';
+  }
+
+  @override
+  String equipmentCondition_finding_issueColdCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue of $totalIssue dives with an issue were colder than $threshold, over $n dives with this item';
+  }
+
+  @override
+  String equipmentCondition_finding_issueDeepCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$insideIssue of $totalIssue dives with an issue went beyond $threshold, over $n dives with this item';
+  }
+
+  @override
+  String equipmentCondition_finding_incidentLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count incidents name this item',
+      one: '1 incident names this item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_window(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n dives',
+      one: '1 dive',
+    );
+    return '$_temp0, $range';
+  }
+
+  @override
   String get equipmentConditionSettings_thresholdsHeader =>
       'Exposure thresholds';
 

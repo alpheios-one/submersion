@@ -25685,6 +25685,341 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipmentConditionSettings_title => '装备状况';
 
   @override
+  String get equipmentCondition_children_title => '已安装部件';
+
+  @override
+  String equipmentCondition_children_slot(int slot) {
+    return '插槽 $slot';
+  }
+
+  @override
+  String equipmentCondition_children_installed(String date, String age) {
+    return '安装于 $date，$age';
+  }
+
+  @override
+  String equipmentCondition_children_ageDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days 天前',
+      one: '1 天前',
+      zero: '今天',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_children_ageMonths(int months) {
+    String _temp0 = intl.Intl.pluralLogic(
+      months,
+      locale: localeName,
+      other: '$months 个月前',
+      one: '1 个月前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_children_replace => '更换';
+
+  @override
+  String get equipmentCondition_children_open => '打开';
+
+  @override
+  String equipmentCondition_children_replaceTitle(String name) {
+    return '更换 $name？';
+  }
+
+  @override
+  String equipmentCondition_children_replaceBody(String name, String type) {
+    return '$name 将于今天退役，新的$type将在同一插槽中取代它。序列号和备注将从空白开始。';
+  }
+
+  @override
+  String get equipmentCondition_children_replaceConfirm => '更换';
+
+  @override
+  String get equipmentCondition_children_replaceCancel => '取消';
+
+  @override
+  String equipmentCondition_children_replaced(String name) {
+    return '已更换 $name';
+  }
+
+  @override
+  String get equipmentCondition_children_empty => '未记录任何电池或电芯';
+
+  @override
+  String get equipmentCondition_children_add => '添加';
+
+  @override
+  String get equipmentCondition_findings_title => '状态发现';
+
+  @override
+  String equipmentCondition_findings_count(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 项发现',
+      one: '1 项发现',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_findings_evidence => '证据潜水';
+
+  @override
+  String get equipmentCondition_findings_dismiss => '忽略';
+
+  @override
+  String get equipmentCondition_findings_restore => '恢复';
+
+  @override
+  String equipmentCondition_findings_showDismissed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '显示 $count 项已忽略',
+      one: '显示 1 项已忽略',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipmentCondition_evidence_title => '证据潜水';
+
+  @override
+  String equipmentCondition_evidence_dive(int number) {
+    return '第 $number 次潜水';
+  }
+
+  @override
+  String get equipmentCondition_evidence_unnumbered => '潜水';
+
+  @override
+  String equipmentCondition_evidence_minutes(int n) {
+    return '$n 分钟';
+  }
+
+  @override
+  String get equipmentCondition_trend_title_cellGain => '每次潜水的电池输出';
+
+  @override
+  String get equipmentCondition_trend_title_gap => '每次潜水的发射器断连';
+
+  @override
+  String get equipmentCondition_trend_title_scrubber => '每次潜水的吸收剂用量';
+
+  @override
+  String get equipmentCondition_trend_title_temperature => '每次潜水的最低温度';
+
+  @override
+  String equipmentCondition_trend_cell(int slot) {
+    return '电池 $slot';
+  }
+
+  @override
+  String get equipmentCondition_trend_issues => '有问题的潜水';
+
+  @override
+  String get equipmentCondition_trend_scrubber => '吸收剂分钟数';
+
+  @override
+  String get equipmentCondition_trend_gap => '断连占比';
+
+  @override
+  String get equipmentCondition_trend_temperature => '最低温度';
+
+  @override
+  String get equipmentCondition_trend_axis_minutes => '分钟';
+
+  @override
+  String get equipmentCondition_exposure_title => '使用暴露';
+
+  @override
+  String get equipmentCondition_exposure_empty => '尚无使用此装备的潜水';
+
+  @override
+  String equipmentCondition_exposure_footer(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次潜水',
+      one: '1 次潜水',
+    );
+    return '$_temp0，$range';
+  }
+
+  @override
+  String equipmentCondition_exposure_dives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次潜水',
+      one: '1 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_hours(String n) {
+    return '$n 小时';
+  }
+
+  @override
+  String equipmentCondition_exposure_saltHours(String n) {
+    return '$n 小时盐水';
+  }
+
+  @override
+  String equipmentCondition_exposure_coldDives(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次冷水潜水',
+      one: '1 次冷水潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_o2Hours(String n) {
+    return '$n 小时高氧';
+  }
+
+  @override
+  String equipmentCondition_exposure_deepCycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次深潜',
+      one: '1 次深潜',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_exposure_cycles(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次电池循环',
+      one: '1 次电池循环',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputDeclining(
+    int slot,
+    String percent,
+    int n,
+    String since,
+  ) {
+    return '自 $since 起，$n 次潜水中电池 $slot 的输出下降了 $percent%';
+  }
+
+  @override
+  String equipmentCondition_finding_cellOutputLow(
+    int slot,
+    String gain,
+    int n,
+  ) {
+    return '最近 $n 次潜水中电池 $slot 的输出为 $gain mV/bar';
+  }
+
+  @override
+  String equipmentCondition_finding_cellDivergent(
+    int slot,
+    String bar,
+    int count,
+    int n,
+  ) {
+    return '最近 $n 次潜水中有 $count 次电池 $slot 与其他电池的偏差达 $bar bar';
+  }
+
+  @override
+  String equipmentCondition_finding_cellCurrentLimited(
+    int slot,
+    int count,
+    int n,
+    String percent,
+  ) {
+    return '最近 $n 次潜水中有 $count 次电池 $slot 在高 ppO2 下读数偏低，最多占样本的 $percent%';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutRising(
+    String recent,
+    String prior,
+    int priorCount,
+  ) {
+    return '最近 5 次潜水中压力信号中断占 $recent%，此前 $priorCount 次为 $prior%';
+  }
+
+  @override
+  String equipmentCondition_finding_transmitterDropoutHigh(
+    String recent,
+    int n,
+    int count,
+  ) {
+    return '最近 $n 次潜水中压力信号中断平均占 $recent%，其中 $count 次超过 10%';
+  }
+
+  @override
+  String equipmentCondition_finding_issueRecurring(
+    String tag,
+    int count,
+    int n,
+  ) {
+    return '最近 $n 次潜水中 $tag 被记录了 $count 次';
+  }
+
+  @override
+  String equipmentCondition_finding_issueColdCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$totalIssue 次出现问题的潜水中有 $insideIssue 次低于 $threshold，基于使用此装备的 $n 次潜水';
+  }
+
+  @override
+  String equipmentCondition_finding_issueDeepCorrelated(
+    int insideIssue,
+    int totalIssue,
+    String threshold,
+    int n,
+  ) {
+    return '$totalIssue 次出现问题的潜水中有 $insideIssue 次超过 $threshold，基于使用此装备的 $n 次潜水';
+  }
+
+  @override
+  String equipmentCondition_finding_incidentLinked(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 起事件涉及此装备',
+      one: '1 起事件涉及此装备',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String equipmentCondition_finding_window(int n, String range) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n 次潜水',
+      one: '1 次潜水',
+    );
+    return '$_temp0，$range';
+  }
+
+  @override
   String get equipmentConditionSettings_thresholdsHeader => '暴露阈值';
 
   @override

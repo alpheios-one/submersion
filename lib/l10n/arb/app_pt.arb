@@ -8216,6 +8216,359 @@
   "settings_section_equipmentCondition_title": "Estado do equipamento",
   "settings_section_equipmentCondition_subtitle": "Limites de exposição para os relógios de manutenção",
   "equipmentConditionSettings_title": "Estado do equipamento",
+  "equipmentCondition_children_title": "Peças instaladas",
+  "equipmentCondition_children_slot": "Ranhura {slot}",
+  "@equipmentCondition_children_slot": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_installed": "Instalado a {date}, {age}",
+  "@equipmentCondition_children_installed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_ageDays": "{days, plural, =0{hoje} =1{há 1 dia} other{há {days} dias}}",
+  "@equipmentCondition_children_ageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_ageMonths": "{months, plural, =1{há 1 mês} other{há {months} meses}}",
+  "@equipmentCondition_children_ageMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_replace": "Substituir",
+  "equipmentCondition_children_open": "Abrir",
+  "equipmentCondition_children_replaceTitle": "Substituir {name}?",
+  "@equipmentCondition_children_replaceTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceBody": "{name} é retirado hoje e um novo {type} ocupa o seu lugar na mesma ranhura. O número de série e as notas começam vazios.",
+  "@equipmentCondition_children_replaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceConfirm": "Substituir",
+  "equipmentCondition_children_replaceCancel": "Cancelar",
+  "equipmentCondition_children_replaced": "{name} substituído",
+  "@equipmentCondition_children_replaced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_empty": "Sem células ou baterias registadas",
+  "equipmentCondition_children_add": "Adicionar",
+  "equipmentCondition_findings_title": "Constatações de estado",
+  "equipmentCondition_findings_count": "{count, plural, =1{1 constatação} other{{count} constatações}}",
+  "@equipmentCondition_findings_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_findings_evidence": "Mergulhos de evidência",
+  "equipmentCondition_findings_dismiss": "Dispensar",
+  "equipmentCondition_findings_restore": "Repor",
+  "equipmentCondition_findings_showDismissed": "{count, plural, =1{Mostrar 1 dispensada} other{Mostrar {count} dispensadas}}",
+  "@equipmentCondition_findings_showDismissed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_title": "Mergulhos de evidência",
+  "equipmentCondition_evidence_dive": "Mergulho {number}",
+  "@equipmentCondition_evidence_dive": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_unnumbered": "Mergulho",
+  "equipmentCondition_evidence_minutes": "{n} min",
+  "@equipmentCondition_evidence_minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_title_cellGain": "Saída das células por mergulho",
+  "equipmentCondition_trend_title_gap": "Falhas de sinal do transmissor por mergulho",
+  "equipmentCondition_trend_title_scrubber": "Uso do absorvente por mergulho",
+  "equipmentCondition_trend_title_temperature": "Temperatura mínima por mergulho",
+  "equipmentCondition_trend_cell": "Célula {slot}",
+  "@equipmentCondition_trend_cell": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_issues": "Mergulhos com um problema",
+  "equipmentCondition_trend_scrubber": "Minutos de absorvente",
+  "equipmentCondition_trend_gap": "Percentagem de falhas",
+  "equipmentCondition_trend_temperature": "Temperatura mínima",
+  "equipmentCondition_trend_axis_minutes": "min",
+  "equipmentCondition_exposure_title": "Exposição",
+  "equipmentCondition_exposure_empty": "Ainda não há mergulhos com este item",
+  "equipmentCondition_exposure_footer": "{n, plural, =1{1 mergulho} other{{n} mergulhos}}, {range}",
+  "@equipmentCondition_exposure_footer": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_dives": "{n, plural, =1{1 mergulho} other{{n} mergulhos}}",
+  "@equipmentCondition_exposure_dives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_hours": "{n} horas",
+  "@equipmentCondition_exposure_hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_saltHours": "{n} horas em água salgada",
+  "@equipmentCondition_exposure_saltHours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_coldDives": "{n, plural, =1{1 mergulho frio} other{{n} mergulhos frios}}",
+  "@equipmentCondition_exposure_coldDives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_o2Hours": "{n} horas com O2 elevado",
+  "@equipmentCondition_exposure_o2Hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_deepCycles": "{n, plural, =1{1 mergulho profundo} other{{n} mergulhos profundos}}",
+  "@equipmentCondition_exposure_deepCycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_cycles": "{n, plural, =1{1 ciclo de bateria} other{{n} ciclos de bateria}}",
+  "@equipmentCondition_exposure_cycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputDeclining": "A saída da célula {slot} caiu {percent} por cento em {n} mergulhos desde {since}",
+  "@equipmentCondition_finding_cellOutputDeclining": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "since": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputLow": "A saída da célula {slot} é de {gain} mV por bar nos últimos {n} mergulhos",
+  "@equipmentCondition_finding_cellOutputLow": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellDivergent": "A célula {slot} discordou das outras até {bar} bar em {count} dos últimos {n} mergulhos",
+  "@equipmentCondition_finding_cellDivergent": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "bar": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellCurrentLimited": "A célula {slot} leu baixo a ppO2 alta em {count} dos últimos {n} mergulhos, até {percent} por cento das amostras",
+  "@equipmentCondition_finding_cellCurrentLimited": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutRising": "A pressão falhou durante {recent} por cento dos últimos 5 mergulhos, contra {prior} por cento nos {priorCount} anteriores",
+  "@equipmentCondition_finding_transmitterDropoutRising": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "prior": {
+        "type": "String"
+      },
+      "priorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutHigh": "A pressão falhou em média durante {recent} por cento dos últimos {n} mergulhos, {count} deles acima de 10 por cento",
+  "@equipmentCondition_finding_transmitterDropoutHigh": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueRecurring": "{tag} registado {count} vezes nos últimos {n} mergulhos",
+  "@equipmentCondition_finding_issueRecurring": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueColdCorrelated": "{insideIssue} de {totalIssue} mergulhos com problemas foram mais frios do que {threshold}, em {n} mergulhos com este item",
+  "@equipmentCondition_finding_issueColdCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueDeepCorrelated": "{insideIssue} de {totalIssue} mergulhos com problemas foram além de {threshold}, em {n} mergulhos com este item",
+  "@equipmentCondition_finding_issueDeepCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_incidentLinked": "{count, plural, =1{1 incidente refere este item} other{{count} incidentes referem este item}}",
+  "@equipmentCondition_finding_incidentLinked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_window": "{n, plural, =1{1 mergulho} other{{n} mergulhos}}, {range}",
+  "@equipmentCondition_finding_window": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
   "equipmentConditionSettings_thresholdsHeader": "Limites de exposição",
   "equipmentConditionSettings_thresholdsHelp": "Um mergulho conta como frio, profundo ou com O2 elevado para os relógios de manutenção quando ultrapassa estes limites.",
   "equipmentConditionSettings_coldLabel": "Água fria abaixo de",

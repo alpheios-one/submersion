@@ -8216,6 +8216,359 @@
   "settings_section_equipmentCondition_title": "حالة المعدات",
   "settings_section_equipmentCondition_subtitle": "حدود التعرض لساعات الصيانة",
   "equipmentConditionSettings_title": "حالة المعدات",
+  "equipmentCondition_children_title": "الأجزاء المركّبة",
+  "equipmentCondition_children_slot": "الفتحة {slot}",
+  "@equipmentCondition_children_slot": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_installed": "رُكّب في {date}، {age}",
+  "@equipmentCondition_children_installed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_ageDays": "{days, plural, =0{اليوم} =1{قبل يوم واحد} other{قبل {days} أيام}}",
+  "@equipmentCondition_children_ageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_ageMonths": "{months, plural, =1{قبل شهر واحد} other{قبل {months} أشهر}}",
+  "@equipmentCondition_children_ageMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_replace": "استبدال",
+  "equipmentCondition_children_open": "فتح",
+  "equipmentCondition_children_replaceTitle": "هل تريد استبدال {name}؟",
+  "@equipmentCondition_children_replaceTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceBody": "سيُسحب {name} اليوم ويحل محله {type} جديد في الفتحة نفسها. يبدأ الرقم التسلسلي والملاحظات فارغين.",
+  "@equipmentCondition_children_replaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceConfirm": "استبدال",
+  "equipmentCondition_children_replaceCancel": "إلغاء",
+  "equipmentCondition_children_replaced": "تم استبدال {name}",
+  "@equipmentCondition_children_replaced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_empty": "لا توجد خلايا أو بطاريات مسجّلة",
+  "equipmentCondition_children_add": "إضافة",
+  "equipmentCondition_findings_title": "نتائج الحالة",
+  "equipmentCondition_findings_count": "{count, plural, =1{نتيجة واحدة} other{{count} نتائج}}",
+  "@equipmentCondition_findings_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_findings_evidence": "غطسات الدليل",
+  "equipmentCondition_findings_dismiss": "تجاهل",
+  "equipmentCondition_findings_restore": "استعادة",
+  "equipmentCondition_findings_showDismissed": "{count, plural, =1{إظهار نتيجة متجاهلة واحدة} other{إظهار {count} نتائج متجاهلة}}",
+  "@equipmentCondition_findings_showDismissed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_title": "غطسات الدليل",
+  "equipmentCondition_evidence_dive": "الغطسة {number}",
+  "@equipmentCondition_evidence_dive": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_unnumbered": "غطسة",
+  "equipmentCondition_evidence_minutes": "{n} دقيقة",
+  "@equipmentCondition_evidence_minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_title_cellGain": "خرج الخلايا لكل غطسة",
+  "equipmentCondition_trend_title_gap": "انقطاعات جهاز الإرسال لكل غطسة",
+  "equipmentCondition_trend_title_scrubber": "استهلاك المنظّف لكل غطسة",
+  "equipmentCondition_trend_title_temperature": "أدنى درجة حرارة لكل غطسة",
+  "equipmentCondition_trend_cell": "الخلية {slot}",
+  "@equipmentCondition_trend_cell": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_issues": "غطسات بها مشكلة",
+  "equipmentCondition_trend_scrubber": "دقائق المنظّف",
+  "equipmentCondition_trend_gap": "نسبة الانقطاع",
+  "equipmentCondition_trend_temperature": "أدنى درجة حرارة",
+  "equipmentCondition_trend_axis_minutes": "دقيقة",
+  "equipmentCondition_exposure_title": "التعرّض",
+  "equipmentCondition_exposure_empty": "لا توجد غطسات بهذه القطعة بعد",
+  "equipmentCondition_exposure_footer": "{n, plural, =1{غطسة واحدة} other{{n} غطسات}}، {range}",
+  "@equipmentCondition_exposure_footer": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_dives": "{n, plural, =1{غطسة واحدة} other{{n} غطسات}}",
+  "@equipmentCondition_exposure_dives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_hours": "{n} ساعات",
+  "@equipmentCondition_exposure_hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_saltHours": "{n} ساعات في المياه المالحة",
+  "@equipmentCondition_exposure_saltHours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_coldDives": "{n, plural, =1{غطسة باردة واحدة} other{{n} غطسات باردة}}",
+  "@equipmentCondition_exposure_coldDives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_o2Hours": "{n} ساعات بأكسجين مرتفع",
+  "@equipmentCondition_exposure_o2Hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_deepCycles": "{n, plural, =1{غطسة عميقة واحدة} other{{n} غطسات عميقة}}",
+  "@equipmentCondition_exposure_deepCycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_cycles": "{n, plural, =1{دورة بطارية واحدة} other{{n} دورات بطارية}}",
+  "@equipmentCondition_exposure_cycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputDeclining": "انخفض خرج الخلية {slot} بنسبة {percent} بالمئة عبر {n} غطسة منذ {since}",
+  "@equipmentCondition_finding_cellOutputDeclining": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "since": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputLow": "خرج الخلية {slot} هو {gain} مللي فولت لكل بار خلال آخر {n} غطسة",
+  "@equipmentCondition_finding_cellOutputLow": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellDivergent": "اختلفت الخلية {slot} عن نظيراتها بما يصل إلى {bar} بار في {count} من آخر {n} غطسة",
+  "@equipmentCondition_finding_cellDivergent": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "bar": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellCurrentLimited": "قرأت الخلية {slot} قيمة منخفضة عند ppO2 مرتفع في {count} من آخر {n} غطسة، بما يصل إلى {percent} بالمئة من العينات",
+  "@equipmentCondition_finding_cellCurrentLimited": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutRising": "انقطعت قراءة الضغط في {recent} بالمئة من آخر 5 غطسات، مقارنة بنسبة {prior} بالمئة في الغطسات {priorCount} السابقة",
+  "@equipmentCondition_finding_transmitterDropoutRising": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "prior": {
+        "type": "String"
+      },
+      "priorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutHigh": "انقطعت قراءة الضغط في المتوسط في {recent} بالمئة من آخر {n} غطسة، منها {count} فوق 10 بالمئة",
+  "@equipmentCondition_finding_transmitterDropoutHigh": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueRecurring": "تم الإبلاغ عن {tag} {count} مرات في آخر {n} غطسة",
+  "@equipmentCondition_finding_issueRecurring": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueColdCorrelated": "{insideIssue} من {totalIssue} غطسات فيها مشكلة كانت أبرد من {threshold}، على مدى {n} غطسة بهذه القطعة",
+  "@equipmentCondition_finding_issueColdCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueDeepCorrelated": "{insideIssue} من {totalIssue} غطسات فيها مشكلة كانت أعمق من {threshold}، على مدى {n} غطسة بهذه القطعة",
+  "@equipmentCondition_finding_issueDeepCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_incidentLinked": "{count, plural, =1{حادث واحد يذكر هذه القطعة} other{{count} حوادث تذكر هذه القطعة}}",
+  "@equipmentCondition_finding_incidentLinked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_window": "{n, plural, =1{غطسة واحدة} other{{n} غطسات}}، {range}",
+  "@equipmentCondition_finding_window": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
   "equipmentConditionSettings_thresholdsHeader": "حدود التعرض",
   "equipmentConditionSettings_thresholdsHelp": "تُحتسب الغطسة باردة أو عميقة أو بأكسجين مرتفع لساعات الصيانة عندما تتجاوز هذه الحدود.",
   "equipmentConditionSettings_coldLabel": "ماء بارد تحت",

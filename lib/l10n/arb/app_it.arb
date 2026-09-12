@@ -8216,6 +8216,359 @@
   "settings_section_equipmentCondition_title": "Stato dell'attrezzatura",
   "settings_section_equipmentCondition_subtitle": "Soglie di esposizione per i contatori di manutenzione",
   "equipmentConditionSettings_title": "Stato dell'attrezzatura",
+  "equipmentCondition_children_title": "Parti installate",
+  "equipmentCondition_children_slot": "Slot {slot}",
+  "@equipmentCondition_children_slot": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_installed": "Installato il {date}, {age}",
+  "@equipmentCondition_children_installed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_ageDays": "{days, plural, =0{oggi} =1{1 giorno fa} other{{days} giorni fa}}",
+  "@equipmentCondition_children_ageDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_ageMonths": "{months, plural, =1{1 mese fa} other{{months} mesi fa}}",
+  "@equipmentCondition_children_ageMonths": {
+    "placeholders": {
+      "months": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_children_replace": "Sostituisci",
+  "equipmentCondition_children_open": "Apri",
+  "equipmentCondition_children_replaceTitle": "Sostituire {name}?",
+  "@equipmentCondition_children_replaceTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceBody": "{name} viene ritirato oggi e un nuovo elemento di tipo {type} ne prende il posto nello stesso slot. Numero di serie e note partono vuoti.",
+  "@equipmentCondition_children_replaceBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_replaceConfirm": "Sostituisci",
+  "equipmentCondition_children_replaceCancel": "Annulla",
+  "equipmentCondition_children_replaced": "{name} sostituito",
+  "@equipmentCondition_children_replaced": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_children_empty": "Nessuna cella o batteria registrata",
+  "equipmentCondition_children_add": "Aggiungi",
+  "equipmentCondition_findings_title": "Rilievi sullo stato",
+  "equipmentCondition_findings_count": "{count, plural, =1{1 rilievo} other{{count} rilievi}}",
+  "@equipmentCondition_findings_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_findings_evidence": "Immersioni a supporto",
+  "equipmentCondition_findings_dismiss": "Ignora",
+  "equipmentCondition_findings_restore": "Ripristina",
+  "equipmentCondition_findings_showDismissed": "{count, plural, =1{Mostra 1 ignorato} other{Mostra {count} ignorati}}",
+  "@equipmentCondition_findings_showDismissed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_title": "Immersioni a supporto",
+  "equipmentCondition_evidence_dive": "Immersione {number}",
+  "@equipmentCondition_evidence_dive": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_evidence_unnumbered": "Immersione",
+  "equipmentCondition_evidence_minutes": "{n} min",
+  "@equipmentCondition_evidence_minutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_title_cellGain": "Uscita delle celle per immersione",
+  "equipmentCondition_trend_title_gap": "Perdite di segnale del trasmettitore per immersione",
+  "equipmentCondition_trend_title_scrubber": "Uso della calce per immersione",
+  "equipmentCondition_trend_title_temperature": "Temperatura minima per immersione",
+  "equipmentCondition_trend_cell": "Cella {slot}",
+  "@equipmentCondition_trend_cell": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_trend_issues": "Immersioni con un problema",
+  "equipmentCondition_trend_scrubber": "Minuti di calce",
+  "equipmentCondition_trend_gap": "Quota di perdite",
+  "equipmentCondition_trend_temperature": "Temperatura minima",
+  "equipmentCondition_trend_axis_minutes": "min",
+  "equipmentCondition_exposure_title": "Esposizione",
+  "equipmentCondition_exposure_empty": "Ancora nessuna immersione con questo articolo",
+  "equipmentCondition_exposure_footer": "{n, plural, =1{1 immersione} other{{n} immersioni}}, {range}",
+  "@equipmentCondition_exposure_footer": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_dives": "{n, plural, =1{1 immersione} other{{n} immersioni}}",
+  "@equipmentCondition_exposure_dives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_hours": "{n} ore",
+  "@equipmentCondition_exposure_hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_saltHours": "{n} ore in acqua salata",
+  "@equipmentCondition_exposure_saltHours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_coldDives": "{n, plural, =1{1 immersione fredda} other{{n} immersioni fredde}}",
+  "@equipmentCondition_exposure_coldDives": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_o2Hours": "{n} ore ad alto O2",
+  "@equipmentCondition_exposure_o2Hours": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_exposure_deepCycles": "{n, plural, =1{1 immersione profonda} other{{n} immersioni profonde}}",
+  "@equipmentCondition_exposure_deepCycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_exposure_cycles": "{n, plural, =1{1 ciclo batteria} other{{n} cicli batteria}}",
+  "@equipmentCondition_exposure_cycles": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputDeclining": "L'uscita della cella {slot} è calata del {percent} per cento in {n} immersioni dal {since}",
+  "@equipmentCondition_finding_cellOutputDeclining": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "since": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellOutputLow": "L'uscita della cella {slot} è di {gain} mV per bar nelle ultime {n} immersioni",
+  "@equipmentCondition_finding_cellOutputLow": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "gain": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellDivergent": "La cella {slot} ha discordato dalle altre fino a {bar} bar in {count} delle ultime {n} immersioni",
+  "@equipmentCondition_finding_cellDivergent": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "bar": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_cellCurrentLimited": "La cella {slot} ha letto basso ad alta ppO2 in {count} delle ultime {n} immersioni, fino al {percent} per cento dei campioni",
+  "@equipmentCondition_finding_cellCurrentLimited": {
+    "placeholders": {
+      "slot": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutRising": "La pressione è mancata per il {recent} per cento delle ultime 5 immersioni, contro il {prior} per cento nelle {priorCount} precedenti",
+  "@equipmentCondition_finding_transmitterDropoutRising": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "prior": {
+        "type": "String"
+      },
+      "priorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_transmitterDropoutHigh": "La pressione è mancata in media per il {recent} per cento delle ultime {n} immersioni, {count} delle quali oltre il 10 per cento",
+  "@equipmentCondition_finding_transmitterDropoutHigh": {
+    "placeholders": {
+      "recent": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueRecurring": "{tag} segnalato {count} volte nelle ultime {n} immersioni",
+  "@equipmentCondition_finding_issueRecurring": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueColdCorrelated": "{insideIssue} di {totalIssue} immersioni con problemi erano più fredde di {threshold}, su {n} immersioni con questo articolo",
+  "@equipmentCondition_finding_issueColdCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_issueDeepCorrelated": "{insideIssue} di {totalIssue} immersioni con problemi andavano oltre {threshold}, su {n} immersioni con questo articolo",
+  "@equipmentCondition_finding_issueDeepCorrelated": {
+    "placeholders": {
+      "insideIssue": {
+        "type": "int"
+      },
+      "totalIssue": {
+        "type": "int"
+      },
+      "threshold": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_incidentLinked": "{count, plural, =1{1 incidente cita questo articolo} other{{count} incidenti citano questo articolo}}",
+  "@equipmentCondition_finding_incidentLinked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "equipmentCondition_finding_window": "{n, plural, =1{1 immersione} other{{n} immersioni}}, {range}",
+  "@equipmentCondition_finding_window": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
   "equipmentConditionSettings_thresholdsHeader": "Soglie di esposizione",
   "equipmentConditionSettings_thresholdsHelp": "Un'immersione conta come fredda, profonda o ad alto O2 per i contatori di manutenzione quando supera queste soglie.",
   "equipmentConditionSettings_coldLabel": "Acqua fredda sotto",
