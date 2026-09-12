@@ -191,6 +191,19 @@ class NavTrackRepository {
   /// Links [routeId] to [diveId]. The route becomes primary for that dive
   /// unless another route is already linked to it and primary -- "the
   /// first link sets it".
+  ///
+  /// Used by both the auto-match sweep and every manual link picker, so this
+  /// is the one place to make linking inherit the dive's existing site and
+  /// location as the route's own default anchor when the route does not
+  /// already have one (design spec 2026-09-10-underwater-nav-track-design.md
+  /// item 5; the schema's own doc comment on `siteId` already describes this
+  /// as intended: "The dive site chosen at import (or taken from the linked
+  /// dive)"). Deliberately the opposite direction from Decision 2 in the same
+  /// spec, which forbids a route ever writing INTO the dive's entry/exit
+  /// coordinates automatically -- this only ever reads the dive's EXISTING
+  /// site/location into the route, and only when the route has neither a
+  /// site nor an anchor of its own yet, so a route the diver already
+  /// positioned is never overwritten.
   Future<void> link(
     String routeId,
     String diveId, {
@@ -202,6 +215,10 @@ class NavTrackRepository {
         diveId,
         excludingRouteId: routeId,
       );
+      final route = await getById(routeId, includePoints: false);
+      final inherited = route == null
+          ? null
+          : await _siteAndAnchorToInherit(route, diveId);
       await (_db.update(
         _db.navTracks,
       )..where((t) => t.id.equals(routeId))).write(
@@ -209,6 +226,15 @@ class NavTrackRepository {
           diveId: Value(diveId),
           linkMode: Value(linkMode.wireValue),
           isPrimary: Value(isPrimary),
+          siteId: inherited == null
+              ? const Value.absent()
+              : Value(inherited.siteId),
+          anchorLatitude: inherited?.anchor == null
+              ? const Value.absent()
+              : Value(inherited!.anchor!.latitude),
+          anchorLongitude: inherited?.anchor == null
+              ? const Value.absent()
+              : Value(inherited!.anchor!.longitude),
           updatedAt: Value(now),
         ),
       );
@@ -221,6 +247,30 @@ class NavTrackRepository {
       );
       rethrow;
     }
+  }
+
+  /// The dive's existing site/location to write into [route] as part of
+  /// linking it to [diveId], or null when there is nothing to inherit or
+  /// [route] already has a site or an anchor of its own (never overwritten).
+  Future<({String? siteId, GeoPoint? anchor})?> _siteAndAnchorToInherit(
+    domain.NavTrack route,
+    String diveId,
+  ) async {
+    if (route.siteId != null || route.anchor != null) return null;
+    final diveRow = await (_db.select(
+      _db.dives,
+    )..where((t) => t.id.equals(diveId))).getSingleOrNull();
+    if (diveRow == null) return null;
+    if (diveRow.siteId != null) {
+      final site = await _siteRepository.getSiteById(diveRow.siteId!);
+      return (siteId: diveRow.siteId, anchor: site?.location);
+    }
+    final entryLat = diveRow.entryLatitude;
+    final entryLon = diveRow.entryLongitude;
+    if (entryLat != null && entryLon != null) {
+      return (siteId: null, anchor: GeoPoint(entryLat, entryLon));
+    }
+    return null;
   }
 
   /// Unlinks [routeId] from whatever dive it was linked to. The recording
