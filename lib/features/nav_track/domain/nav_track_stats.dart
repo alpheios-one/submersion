@@ -55,8 +55,9 @@ class NavTrackStats {
       );
     }
 
+    final activeStart = NavTrackCorrector.activeRangeStartIndex(points);
     final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
-    final active = points.sublist(0, activeEnd + 1);
+    final active = points.sublist(activeStart, activeEnd + 1);
 
     var maxDepth = active.first.depth;
     double? maxSpeed;

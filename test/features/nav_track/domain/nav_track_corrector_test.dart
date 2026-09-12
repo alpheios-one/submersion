@@ -388,4 +388,141 @@ void main() {
       );
     });
   });
+
+  group('NavTrackCorrector.activeRangeStartIndex / activeRangeEndIndex '
+      '(regression: a fix event can happen BEFORE the real dive too, not '
+      'only after it)', () {
+    // A pre-dive GPS re-calibration (index 0 -> 1, a >50 m jump at the
+    // surface in <=5 s), then the real dive, no fix afterwards.
+    List<NavTrackPoint> preDiveFixOnly() => [
+      _p(timestamp: 0, north: 0, east: 0, depth: 0),
+      _p(timestamp: 2, north: 300, east: 0, depth: 0), // pre-dive fix jump
+      _p(timestamp: 4, north: 302, east: 1, depth: 0),
+      _p(timestamp: 6, north: 302, east: 5, depth: 5), // descending
+      _p(timestamp: 8, north: 305, east: 8, depth: 12),
+      _p(timestamp: 10, north: 310, east: 10, depth: 20),
+    ];
+
+    // No fix event anywhere in the recording.
+    List<NavTrackPoint> noFixAtAll() => straightRoute();
+
+    // A post-dive-only fix, mirroring the existing gps_fix fixture but as a
+    // small synthetic example so the scenario is self-contained here too.
+    List<NavTrackPoint> postDiveFixOnly() => [
+      _p(timestamp: 0, north: 0, east: 0, depth: 5),
+      _p(timestamp: 20, north: 0, east: 0, depth: 10),
+      _p(timestamp: 40, north: 0, east: 0, depth: 0), // surfaces
+      _p(timestamp: 42, north: 300, east: 0, depth: 0), // post-dive fix jump
+      _p(timestamp: 44, north: 302, east: 1, depth: 0),
+    ];
+
+    // A pre-dive fix, the real dive, then a post-dive fix.
+    List<NavTrackPoint> fixBeforeAndAfter() => [
+      _p(timestamp: 0, north: 0, east: 0, depth: 0),
+      _p(timestamp: 2, north: 300, east: 0, depth: 0), // pre-dive fix
+      _p(timestamp: 4, north: 302, east: 1, depth: 0),
+      _p(timestamp: 6, north: 302, east: 5, depth: 5), // descending
+      _p(timestamp: 8, north: 305, east: 8, depth: 12),
+      _p(timestamp: 10, north: 305, east: 8, depth: 0), // surfaces
+      _p(timestamp: 12, north: 700, east: 100, depth: 0), // post-dive fix
+      _p(timestamp: 14, north: 702, east: 101, depth: 0),
+    ];
+
+    test('no fix at all: start is 0, end is the last raw sample', () {
+      final points = noFixAtAll();
+      expect(NavTrackCorrector.activeRangeStartIndex(points), 0);
+      expect(NavTrackCorrector.activeRangeEndIndex(points), points.length - 1);
+    });
+
+    test('post-dive fix only: start is still 0, end stops before the fix '
+        '(regression guard for the original fix this refines)', () {
+      final points = postDiveFixOnly();
+      expect(NavTrackCorrector.activeRangeStartIndex(points), 0);
+      // Index 2 is the last surfaceReckoned sample before the jump to index 3.
+      expect(NavTrackCorrector.activeRangeEndIndex(points), 2);
+    });
+
+    test('pre-dive fix only: start skips both the lone pre-dive surface '
+        'sample AND the fix-event run itself, landing on the real dive; '
+        'end runs to the last raw sample', () {
+      final points = preDiveFixOnly();
+      // Index 0 is the lone pre-dive surface sample, indices 1-2 are the
+      // fix event's gpsFixed run; index 3 is where real diving (depth > the
+      // surface threshold) begins.
+      expect(NavTrackCorrector.activeRangeStartIndex(points), 3);
+      expect(NavTrackCorrector.activeRangeEndIndex(points), points.length - 1);
+    });
+
+    test('fix before and after: start skips the pre-dive fix run, end stops '
+        'before the post-dive fix', () {
+      final points = fixBeforeAndAfter();
+      // Indices 0-2 are the pre-dive surface sample and its fix-event run;
+      // index 3 is where the real dive (depth > threshold) begins.
+      expect(NavTrackCorrector.activeRangeStartIndex(points), 3);
+      // Index 5 is the last surfaceReckoned sample before the second jump.
+      expect(NavTrackCorrector.activeRangeEndIndex(points), 5);
+    });
+  });
+
+  group('NavTrackCorrector.apply with a pre-dive fix (regression: the whole '
+      'active range, not just its end, must exclude a pre-dive GPS '
+      'calibration)', () {
+    // Same shape as activeRangeStartIndex's preDiveFixOnly above, but with a
+    // clean straight-line real dive so the sameAsStart target is easy to
+    // reason about: real dive samples run north 0, 100, 200 with the
+    // pre-dive fix sample sitting far away at north 900.
+    List<NavTrackPoint> preDiveFixThenStraightDive() => [
+      _p(timestamp: 0, north: 0, east: 0, depth: 0), // pre-dive, at origin
+      _p(timestamp: 2, north: 900, east: 0, depth: 0), // pre-dive fix jump
+      _p(timestamp: 4, north: 900, east: 0, depth: 5), // dive starts here
+      _p(timestamp: 24, north: 1000, east: 0, depth: 8),
+      _p(timestamp: 44, north: 1100, east: 0, depth: 3),
+    ];
+
+    test('sameAsStart lands the end on the DIVE start (index 2), not the '
+        'raw recording\'s first sample (index 0, the pre-dive fix origin)', () {
+      final points = preDiveFixThenStraightDive();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.sameAsStart),
+      );
+      // The dive's own start (index 2) must stay put -- it defines the
+      // target -- while the last sample lands on it.
+      expect(corrected[2].north, closeTo(900, 1e-6));
+      expect(corrected.last.north, closeTo(corrected[2].north, 1e-6));
+      expect(corrected.last.east, closeTo(corrected[2].east, 1e-6));
+    });
+
+    test('the pre-dive calibration sample itself is left untouched by the '
+        'correction (it sits outside the active range entirely)', () {
+      final points = preDiveFixThenStraightDive();
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(endMode: NavTrackEndMode.sameAsStart),
+      );
+      // Index 0 and 1 are the pre-dive samples (before the fix and the fix
+      // sample itself); neither is part of the active range, so both must
+      // come through as plain rotated raw values, not shifted toward the
+      // sameAsStart target.
+      expect(corrected[0].north, points[0].north);
+      expect(corrected[1].north, points[1].north);
+    });
+
+    test('the trust fraction is measured over the dive\'s own distance, not '
+        'inflated by the pre-dive jump', () {
+      final points = preDiveFixThenStraightDive();
+      // Dive distance: index 2 -> 3 -> 4 is 100 m then 100 m, 200 m total.
+      // Trust 0.5 should freeze the first 100 m of the DIVE (index 3), not
+      // be swamped by the 900 m pre-dive jump.
+      final corrected = NavTrackCorrector.apply(
+        points,
+        const NavTrackCorrection(
+          endMode: NavTrackEndMode.sameAsStart,
+          trustFraction: 0.5,
+        ),
+      );
+      expect(corrected[3].north, points[3].north);
+      expect(corrected[4].north, isNot(points[4].north));
+    });
+  });
 }

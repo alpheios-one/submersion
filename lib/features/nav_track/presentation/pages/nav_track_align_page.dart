@@ -65,9 +65,13 @@ List<CorrectedNavTrackPoint> _activeCorrectedPoints(
   List<NavTrackPoint> points,
   NavTrackCorrection correction,
 ) {
+  final activeStart = NavTrackCorrector.activeRangeStartIndex(points);
   final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
   final corrected = NavTrackCorrector.apply(points, correction);
-  return corrected.sublist(0, (activeEnd + 1).clamp(0, corrected.length));
+  return corrected.sublist(
+    activeStart.clamp(0, corrected.length),
+    (activeEnd + 1).clamp(0, corrected.length),
+  );
 }
 
 /// The index of the first point whose cumulative distance reaches
@@ -325,9 +329,10 @@ class _AlignPageBody extends ConsumerWidget {
     final transientRoute = state._transientRoute(route);
     final fixEvents = NavTrackSegmenter.classify(route.points).fixEvents;
     final hasFix = fixEvents.isNotEmpty;
+    final activeStart = NavTrackCorrector.activeRangeStartIndex(route.points);
     final activeEnd = NavTrackCorrector.activeRangeEndIndex(route.points);
     final cumulative = cumulativeDistances(
-      route.points.sublist(0, activeEnd + 1),
+      route.points.sublist(activeStart, activeEnd + 1),
     );
     final totalDistance = cumulative.isEmpty ? 0.0 : cumulative.last;
     final trustedDistance = correction.trustFraction * totalDistance;
@@ -387,6 +392,7 @@ class _AlignPageBody extends ConsumerWidget {
                           route: route,
                           anchor: anchor,
                           correction: correction,
+                          activeStart: activeStart,
                           cumulative: cumulative,
                           trustedDistance: trustedDistance,
                         ),
@@ -444,6 +450,7 @@ class _AlignPageBody extends ConsumerWidget {
             route: route,
             correction: correction,
             hasFix: hasFix,
+            activeStart: activeStart,
             totalDistance: totalDistance,
             trustedDistance: trustedDistance,
           ),
@@ -459,6 +466,7 @@ class _ControlsPanel extends ConsumerWidget {
     required this.route,
     required this.correction,
     required this.hasFix,
+    required this.activeStart,
     required this.totalDistance,
     required this.trustedDistance,
   });
@@ -467,6 +475,7 @@ class _ControlsPanel extends ConsumerWidget {
   final NavTrack route;
   final NavTrackCorrection correction;
   final bool hasFix;
+  final int activeStart;
   final double totalDistance;
   final double trustedDistance;
 
@@ -542,10 +551,11 @@ class _ControlsPanel extends ConsumerWidget {
     if (route.points.isEmpty || totalDistance <= 0) return 0;
     final activeEnd = NavTrackCorrector.activeRangeEndIndex(route.points);
     final cumulative = cumulativeDistances(
-      route.points.sublist(0, activeEnd + 1),
+      route.points.sublist(activeStart, activeEnd + 1),
     );
-    final index = trustCutoffIndex(cumulative, trustedDistance);
-    return route.points[index].timestamp - route.points.first.timestamp;
+    final relativeIndex = trustCutoffIndex(cumulative, trustedDistance);
+    final index = activeStart + relativeIndex;
+    return route.points[index].timestamp - route.points[activeStart].timestamp;
   }
 
   @override
@@ -886,6 +896,7 @@ class _TrustMarkerLayer extends StatelessWidget {
     required this.route,
     required this.anchor,
     required this.correction,
+    required this.activeStart,
     required this.cumulative,
     required this.trustedDistance,
   });
@@ -893,13 +904,15 @@ class _TrustMarkerLayer extends StatelessWidget {
   final NavTrack route;
   final GeoPoint anchor;
   final NavTrackCorrection correction;
+  final int activeStart;
   final List<double> cumulative;
   final double trustedDistance;
 
   @override
   Widget build(BuildContext context) {
     final corrected = NavTrackCorrector.apply(route.points, correction);
-    final index = trustCutoffIndex(cumulative, trustedDistance);
+    final relativeIndex = trustCutoffIndex(cumulative, trustedDistance);
+    final index = activeStart + relativeIndex;
     if (index >= corrected.length) return const SizedBox.shrink();
     final p = corrected[index];
     final geo = offsetToGeoPoint(anchor, east: p.east, north: p.north);
@@ -912,7 +925,8 @@ class _TrustMarkerLayer extends StatelessWidget {
           child: Tooltip(
             message: context.l10n.navTrack_align_trustSummary(
               trustedDistance.toStringAsFixed(0),
-              ((route.points[index].timestamp - route.points.first.timestamp) /
+              ((route.points[index].timestamp -
+                          route.points[activeStart].timestamp) /
                       60)
                   .round(),
             ),

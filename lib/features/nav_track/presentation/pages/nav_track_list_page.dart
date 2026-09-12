@@ -342,9 +342,13 @@ class NavTrackListRow extends ConsumerWidget {
   ) {
     final int seconds;
     if (hydratedPoints.length >= 2) {
+      final activeStart = NavTrackCorrector.activeRangeStartIndex(
+        hydratedPoints,
+      );
       final activeEnd = NavTrackCorrector.activeRangeEndIndex(hydratedPoints);
       seconds =
-          hydratedPoints[activeEnd].timestamp - hydratedPoints.first.timestamp;
+          hydratedPoints[activeEnd].timestamp -
+          hydratedPoints[activeStart].timestamp;
     } else {
       seconds = ((route.endTime - route.startTime) / 1000).round();
     }

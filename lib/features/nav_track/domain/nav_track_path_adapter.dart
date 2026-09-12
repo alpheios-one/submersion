@@ -33,14 +33,16 @@ class NavTrackPathAdapter {
     }
 
     final corrected = NavTrackCorrector.apply(points, route.correction);
-    // Stop at the first excluded boundary (a fix event or an out-of-water
-    // run) rather than filtering by kind across the whole recording: a
-    // diver who re-descends after a GPS fix produces more `underwater`
-    // samples past the jump, and filtering by kind alone would stitch those
-    // back onto the pre-fix ribbon, drawing straight across the very jump
-    // this adapter must never span. `NavTrackCorrector.activeRangeEndIndex`
-    // is the same "active range" boundary the corrector itself already
-    // stops proportional correction at, reused here for consistency.
+    // Stop at the active range's boundaries (a pre-dive fix event before,
+    // a post-dive one after) rather than filtering by kind across the
+    // whole recording: a diver who re-descends after a GPS fix produces
+    // more `underwater` samples past the jump, and filtering by kind alone
+    // would stitch those back onto the pre-fix ribbon, drawing straight
+    // across the very jump this adapter must never span.
+    // `NavTrackCorrector.activeRangeStartIndex`/`activeRangeEndIndex` is the
+    // same "active range" boundary the corrector itself already stops
+    // proportional correction at, reused here for consistency.
+    final activeStart = NavTrackCorrector.activeRangeStartIndex(points);
     final activeEnd = NavTrackCorrector.activeRangeEndIndex(points);
 
     final kept = <ReckonedPoint>[];
@@ -49,7 +51,7 @@ class NavTrackPathAdapter {
     var minNorth = double.infinity, maxNorth = double.negativeInfinity;
     var maxDepth = 0.0;
 
-    for (var i = 0; i <= activeEnd && i < corrected.length; i++) {
+    for (var i = activeStart; i <= activeEnd && i < corrected.length; i++) {
       final p = corrected[i];
       startTimestamp ??= p.timestamp;
       final timeSeconds = (p.timestamp - startTimestamp).toDouble();

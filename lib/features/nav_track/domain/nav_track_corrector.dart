@@ -104,11 +104,33 @@ class CorrectedNavTrackPoint {
 class NavTrackCorrector {
   const NavTrackCorrector._();
 
+  /// The first index of [points] that [apply] treats as part of the active
+  /// correction range -- the start of the real dive.
+  ///
+  /// Usually 0. When the recording opens with a GPS-fix event *before* the
+  /// diver ever descends (the console re-acquires a surface fix, then the
+  /// diver dives -- see `NavTrackSegmenter`'s own generic fix-event
+  /// detection, which does not assume a fix can only happen after the
+  /// dive), everything up to and including that pre-dive fix run is a
+  /// calibration, not the diver's swim path, and is skipped: [start] then
+  /// lands on the first sample of the real dive.
+  ///
+  /// Exposed for the same reason as [activeRangeEndIndex]: presentation
+  /// code that needs "the part of the route the correction actually
+  /// reaches" (the alignment page's trust slider, the terrain check) must
+  /// share this boundary instead of assuming the active range always
+  /// starts at 0.
+  static int activeRangeStartIndex(List<NavTrackPoint> points) {
+    if (points.isEmpty) return 0;
+    final segmentation = NavTrackSegmenter.classify(points);
+    return _activeRange(segmentation, points.length).start;
+  }
+
   /// The last index of [points] that [apply] treats as part of the active
   /// correction range for every mode but [NavTrackEndMode.none] -- the
   /// last [NavTrackSampleKind.underwater] or
-  /// [NavTrackSampleKind.surfaceReckoned] sample, i.e. everything up to
-  /// but excluding a GPS-fix event.
+  /// [NavTrackSampleKind.surfaceReckoned] sample of the real dive, i.e.
+  /// everything up to but excluding a post-dive GPS-fix event.
   ///
   /// Exposed so presentation code that needs a distance axis over "the
   /// part of the route the correction actually reaches" (the alignment
@@ -120,8 +142,8 @@ class NavTrackCorrector {
   /// prefix look like it is still moving as the diver drags the slider.
   static int activeRangeEndIndex(List<NavTrackPoint> points) {
     if (points.isEmpty) return 0;
-    final kinds = NavTrackSegmenter.classify(points).kinds;
-    return _lastActiveIndex(kinds, points.length);
+    final segmentation = NavTrackSegmenter.classify(points);
+    return _activeRange(segmentation, points.length).end;
   }
 
   static List<CorrectedNavTrackPoint> apply(
@@ -140,9 +162,10 @@ class NavTrackCorrector {
     final cumulative = _cumulativeDistance(
       points,
       rotated,
-      target.lastActiveIndex,
+      target.start,
+      target.end,
     );
-    final sLast = cumulative[target.lastActiveIndex];
+    final sLast = cumulative[target.end];
     final sTrust = correction.trustFraction.clamp(0.0, 1.0) * sLast;
     final denominator = sLast - sTrust;
 
@@ -153,13 +176,13 @@ class NavTrackCorrector {
       return rotated;
     }
 
-    final last = rotated[target.lastActiveIndex];
+    final last = rotated[target.end];
     final residualEast = target.east - last.east;
     final residualNorth = target.north - last.north;
 
     return [
       for (var i = 0; i < rotated.length; i++)
-        if (i > target.lastActiveIndex || cumulative[i] <= sTrust)
+        if (i < target.start || i > target.end || cumulative[i] <= sTrust)
           rotated[i]
         else
           _shift(
@@ -170,30 +193,25 @@ class NavTrackCorrector {
     ];
   }
 
-  /// The correction target and the last index the proportional correction
-  /// applies to, or null when [correction] resolves to no correction at
-  /// all (mode [NavTrackEndMode.none], or a mode whose inputs are
-  /// incomplete: [NavTrackEndMode.point] without both [anchor] and
-  /// [endPoint], or [NavTrackEndMode.gpsFix] on a recording with no fix
-  /// event).
+  /// The correction target and the active range (start and end index) the
+  /// proportional correction applies to, or null when [correction] resolves
+  /// to no correction at all (mode [NavTrackEndMode.none], or a mode whose
+  /// inputs are incomplete: [NavTrackEndMode.point] without both [anchor]
+  /// and [endPoint], or [NavTrackEndMode.gpsFix] on a recording with no
+  /// fix event after the active range).
   ///
-  /// The active range's ceiling is the same for every mode but [none]: the
-  /// last [NavTrackSampleKind.underwater] or [NavTrackSampleKind.surfaceReckoned]
-  /// sample. On a recording with no fix event this is the last raw sample,
-  /// i.e. the whole recording, same as before. On a recording with a fix
-  /// event (see `NavTrackSegmenter`) it stops one sample before the fix:
-  /// everything from the event onward is the device's own GPS-derived
-  /// position, excluded from rendering entirely by `NavTrackSampleKind`
-  /// (`NavTrackPolylineLayer.kept`, `NavTrackPathAdapter`). Computing the
-  /// cumulative distance denominator over the raw recording's full length
-  /// -- including a 300+ m post-fix jump and the surface wobble that
-  /// follows it -- would swamp the correction budget for the visible
-  /// pre-fix portion of the route, making both `sameAsStart` and the trust
-  /// slider appear to have no effect on what is actually drawn. Using this
-  /// same ceiling for [NavTrackEndMode.point] and [NavTrackEndMode.sameAsStart]
-  /// (previously only [NavTrackEndMode.gpsFix] stopped here) is exactly the
-  /// fix for that.
-  static ({double east, double north, int lastActiveIndex})? _resolveTarget(
+  /// The active range is the same for every mode but [none]: see
+  /// [_activeRange]. On a recording with no fix event this is the whole
+  /// recording, same as before. On a recording with a pre-dive and/or
+  /// post-dive fix event it excludes both: everything before the real dive
+  /// (a pre-dive GPS calibration) and everything from a post-dive fix
+  /// onward is the device's own GPS-derived position, excluded from
+  /// rendering entirely by `NavTrackSampleKind` (`NavTrackPolylineLayer.kept`,
+  /// `NavTrackPathAdapter`). Computing the cumulative distance denominator
+  /// (or the [NavTrackEndMode.sameAsStart] target) over samples outside
+  /// this range would swamp the correction budget, or anchor "the start"
+  /// on a sample that is not actually where the dive began.
+  static ({double east, double north, int start, int end})? _resolveTarget(
     List<NavTrackPoint> points,
     List<CorrectedNavTrackPoint> rotated,
     NavTrackCorrection correction,
@@ -201,19 +219,18 @@ class NavTrackCorrector {
     if (correction.endMode == NavTrackEndMode.none) return null;
 
     final segmentation = NavTrackSegmenter.classify(points);
-    final lastActiveIndex = _lastActiveIndex(
-      segmentation.kinds,
-      rotated.length,
-    );
+    final range = _activeRange(segmentation, rotated.length);
 
     switch (correction.endMode) {
       case NavTrackEndMode.none:
         return null; // handled above; unreachable here
       case NavTrackEndMode.sameAsStart:
+        final startPoint = rotated[range.start];
         return (
-          east: rotated.first.east,
-          north: rotated.first.north,
-          lastActiveIndex: lastActiveIndex,
+          east: startPoint.east,
+          north: startPoint.north,
+          start: range.start,
+          end: range.end,
         );
       case NavTrackEndMode.point:
         final anchor = correction.anchor;
@@ -223,14 +240,25 @@ class NavTrackCorrector {
         return (
           east: offset.east,
           north: offset.north,
-          lastActiveIndex: lastActiveIndex,
+          start: range.start,
+          end: range.end,
         );
       case NavTrackEndMode.gpsFix:
-        if (segmentation.fixEvents.isEmpty) return null;
-        final fixEvent = segmentation.fixEvents.first;
+        // The first fix event that occurs AFTER the active range, i.e. a
+        // post-dive fix -- never a pre-dive one that [_activeRange] already
+        // skipped past to find [range.start]. Fix events are in file order,
+        // so the first one past [range.end] is also the earliest.
+        NavTrackFixEvent? postDiveFix;
+        for (final event in segmentation.fixEvents) {
+          if (event.index > range.end) {
+            postDiveFix = event;
+            break;
+          }
+        }
+        if (postDiveFix == null) return null;
         final stabilized = NavTrackSegmenter.stabilizedFixPosition(
           points,
-          fixEvent,
+          postDiveFix,
         );
         final target = _rotateNorthEast(
           stabilized.north,
@@ -240,37 +268,83 @@ class NavTrackCorrector {
         return (
           east: target.east,
           north: target.north,
-          lastActiveIndex: lastActiveIndex,
+          start: range.start,
+          end: range.end,
         );
     }
   }
 
-  /// The last sample of the LEADING contiguous run of
+  /// The active range of [segmentation]'s classified samples: the start and
+  /// end index of the real dive, i.e. the contiguous run of
   /// [NavTrackSampleKind.underwater] / [NavTrackSampleKind.surfaceReckoned]
-  /// samples, i.e. the index right before the first
-  /// [NavTrackSampleKind.gpsFixed] / [NavTrackSampleKind.outOfWater] sample.
+  /// samples that make up the actual dive, excluding any pre-dive GPS
+  /// calibration at the start and any post-dive fix event/out-of-water tail
+  /// at the end.
   ///
-  /// Deliberately scans forward from the start and stops at the FIRST
-  /// excluded sample, rather than scanning backward for the LAST active
-  /// one: a diver who re-descends after a GPS-fix event (the console
-  /// re-acquires a fix, then the diver keeps swimming) produces more
-  /// `underwater` samples after the fixed run, and scanning from the end
-  /// would land on one of those, well past the jump -- exactly the boundary
-  /// the ribbon must never cross (`NavTrackPathAdapter`,
-  /// `NavTrackPolylineLayer`: "the ribbon never connects across a fix
-  /// event"). Falls back to the last raw sample when [kinds] contains none
-  /// of either kind at all (an edge case the parser's `tooShort` check
-  /// should already prevent, but this keeps the corrector from producing a
+  /// A fix event can happen before the diver ever descends (the console
+  /// re-acquires a surface fix, then the diver dives) as well as after (the
+  /// far more common case: the console re-acquires GPS once the diver
+  /// surfaces). Both must be excluded from the active range, not just the
+  /// trailing one: including a pre-dive calibration would make `sameAsStart`
+  /// anchor on the recording's very first sample -- which may sit wherever
+  /// the console was before the diver even entered the water -- instead of
+  /// where the dive actually began, and would let a large pre-dive jump
+  /// swamp the trust-fraction distance budget the same way an unexcluded
+  /// post-dive jump used to.
+  ///
+  /// A pre-dive fix is identified by occurring at or before the first
+  /// [NavTrackSampleKind.underwater] sample in the whole recording (the
+  /// same test the alignment page's own pre-dive-fix start suggestion
+  /// uses): real diving has not started yet, so any fix event up to that
+  /// point -- and everything before it, including the leading
+  /// [NavTrackSampleKind.surfaceReckoned] sample(s) that sit before the
+  /// jump itself -- is calibration, not the swim path. [start] then lands
+  /// on the first active sample once that fix event's
+  /// [NavTrackSampleKind.gpsFixed]/[NavTrackSampleKind.outOfWater] run ends.
+  /// From [start], [end] is the last sample of the following contiguous
+  /// active run: the index right before the next excluded sample (a
+  /// post-dive fix event), or the last raw sample when there is none.
+  ///
+  /// Falls back to the whole recording when no active sample can be found
+  /// at all (an edge case the parser's `tooShort` check should already
+  /// prevent, but this keeps the corrector from producing a degenerate
   /// zero-length active range instead of failing loudly elsewhere).
-  static int _lastActiveIndex(List<NavTrackSampleKind> kinds, int length) {
-    for (var i = 0; i < kinds.length; i++) {
-      final kind = kinds[i];
-      if (kind != NavTrackSampleKind.underwater &&
-          kind != NavTrackSampleKind.surfaceReckoned) {
-        return i == 0 ? length - 1 : i - 1;
+  static ({int start, int end}) _activeRange(
+    NavTrackSegmentation segmentation,
+    int length,
+  ) {
+    final kinds = segmentation.kinds;
+    if (kinds.isEmpty) return (start: 0, end: length > 0 ? length - 1 : 0);
+
+    bool isActive(NavTrackSampleKind kind) =>
+        kind == NavTrackSampleKind.underwater ||
+        kind == NavTrackSampleKind.surfaceReckoned;
+
+    final firstUnderwaterIndex = kinds.indexOf(NavTrackSampleKind.underwater);
+
+    var start = 0;
+    if (firstUnderwaterIndex > 0) {
+      NavTrackFixEvent? preDiveFix;
+      for (final event in segmentation.fixEvents) {
+        if (event.index <= firstUnderwaterIndex) preDiveFix = event;
+      }
+      if (preDiveFix != null) {
+        start = preDiveFix.index;
+        while (start < kinds.length && !isActive(kinds[start])) {
+          start++;
+        }
       }
     }
-    return length - 1;
+
+    if (start >= kinds.length || !isActive(kinds[start])) {
+      return (start: 0, end: length - 1);
+    }
+
+    var end = start;
+    while (end + 1 < kinds.length && isActive(kinds[end + 1])) {
+      end++;
+    }
+    return (start: start, end: end);
   }
 
   static CorrectedNavTrackPoint _rotate(
@@ -309,7 +383,9 @@ class NavTrackCorrector {
     );
   }
 
-  /// Cumulative distance for indices `0..upToIndex` inclusive.
+  /// Cumulative distance for indices `start..end` inclusive, zero-based at
+  /// [start] (`result[start] == 0`); indices outside `start..end` are left
+  /// at 0 and are never read by [apply].
   ///
   /// Prefers the device's own `distance` channel when every sample in that
   /// range has one and they are non-decreasing (a scooter's dead-reckoning
@@ -317,15 +393,19 @@ class NavTrackCorrector {
   /// route that sits still should not accumulate correction meanwhile);
   /// otherwise falls back to the 2D path length of the rotated points
   /// (equivalent to the raw points' path length, since rotation preserves
-  /// distance).
+  /// distance). The device channel is read relative to `points[start]`, not
+  /// the raw recording's absolute index 0, so a pre-dive calibration
+  /// segment's own distance reading (frozen or otherwise) never leaks into
+  /// the dive's distance budget.
   static List<double> _cumulativeDistance(
     List<NavTrackPoint> points,
     List<CorrectedNavTrackPoint> rotated,
-    int upToIndex,
+    int start,
+    int end,
   ) {
-    var deviceDistanceUsable = points[0].distance != null;
+    var deviceDistanceUsable = points[start].distance != null;
     if (deviceDistanceUsable) {
-      for (var i = 1; i <= upToIndex; i++) {
+      for (var i = start + 1; i <= end; i++) {
         final previous = points[i - 1].distance;
         final current = points[i].distance;
         if (previous == null || current == null || current < previous) {
@@ -334,12 +414,17 @@ class NavTrackCorrector {
         }
       }
     }
+
+    final result = List<double>.filled(rotated.length, 0);
     if (deviceDistanceUsable) {
-      return [for (var i = 0; i <= upToIndex; i++) points[i].distance!];
+      final base = points[start].distance!;
+      for (var i = start; i <= end; i++) {
+        result[i] = points[i].distance! - base;
+      }
+      return result;
     }
 
-    final result = List<double>.filled(upToIndex + 1, 0);
-    for (var i = 1; i <= upToIndex; i++) {
+    for (var i = start + 1; i <= end; i++) {
       final dEast = rotated[i].east - rotated[i - 1].east;
       final dNorth = rotated[i].north - rotated[i - 1].north;
       result[i] = result[i - 1] + math.sqrt(dEast * dEast + dNorth * dNorth);
