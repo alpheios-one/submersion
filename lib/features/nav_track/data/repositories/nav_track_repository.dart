@@ -404,6 +404,56 @@ class NavTrackRepository {
     }
   }
 
+  /// Ids of every route currently linked to [diveId].
+  ///
+  /// Call this BEFORE the dive row is deleted and pass the result to
+  /// [normalizeAfterDiveDeletion] after the delete completes: the `nav_tracks
+  /// .dive_id` foreign key's own `SET NULL` action fires as part of the
+  /// delete itself, so by the time the dive is gone there is no way to tell
+  /// "was linked to this dive" from "was never linked" by querying
+  /// `nav_tracks` alone.
+  Future<List<String>> routeIdsLinkedToDive(String diveId) async {
+    final rows = await (_db.select(
+      _db.navTracks,
+    )..where((t) => t.diveId.equals(diveId))).get();
+    return [for (final row in rows) row.id];
+  }
+
+  /// Normalizes routes whose linked dive was just deleted.
+  ///
+  /// The `nav_tracks.dive_id` foreign key's `SET NULL` action already
+  /// cleared `diveId` for these rows as part of the dive delete, but that is
+  /// a single-column database-level action: it cannot also restore the
+  /// schema invariant that `linkMode` is null exactly when `diveId` is null,
+  /// reset `isPrimary` to its default, or mark the rows pending for sync.
+  /// This does the rest, treating the dive-tombstone unlink as an ordinary
+  /// route update rather than leaving it as a bare foreign-key side effect.
+  Future<void> normalizeAfterDiveDeletion(List<String> routeIds) async {
+    if (routeIds.isEmpty) return;
+    try {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(
+        _db.navTracks,
+      )..where((t) => t.id.isIn(routeIds))).write(
+        NavTracksCompanion(
+          linkMode: const Value(null),
+          isPrimary: const Value(true),
+          updatedAt: Value(now),
+        ),
+      );
+      for (final routeId in routeIds) {
+        await _markPending(routeId, now);
+      }
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to normalize nav tracks after dive deletion: $routeIds',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   Future<void> delete(String routeId) async {
     try {
       await (_db.delete(

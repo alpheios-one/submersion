@@ -46,6 +46,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_component.dart';
+import 'package:submersion/features/nav_track/data/repositories/nav_track_repository.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_link.dart';
 import 'package:submersion/features/equipment/domain/entities/gear_history_rewrite.dart';
@@ -124,6 +125,7 @@ class DiveRepository {
   final BuddyRepository _buddyRepository = BuddyRepository();
   late final DiveCustomFieldRepository _customFieldRepository =
       DiveCustomFieldRepository(_db);
+  final NavTrackRepository _navTrackRepository = NavTrackRepository();
 
   // ============================================================================
   // CRUD Operations
@@ -1936,7 +1938,13 @@ class DiveRepository {
     try {
       _log.info('Deleting dive: $id');
       if (cascadeMedia) await _cascadeMediaForDiveDeletion([id]);
+      // Captured before the delete: the nav_tracks.dive_id FK's own SET NULL
+      // fires as part of the dive row's removal, so afterwards there is no
+      // way to tell which routes it just unlinked from which were already
+      // unlinked.
+      final linkedRouteIds = await _navTrackRepository.routeIdsLinkedToDive(id);
       await (_db.delete(_db.dives)..where((t) => t.id.equals(id))).go();
+      await _navTrackRepository.normalizeAfterDiveDeletion(linkedRouteIds);
       await _syncRepository.logDeletion(entityType: 'dives', recordId: id);
       SyncEventBus.notifyLocalChange();
       _log.info('Deleted dive: $id');
@@ -1961,7 +1969,16 @@ class DiveRepository {
     try {
       _log.info('Bulk deleting ${ids.length} dives');
       if (cascadeMedia) await _cascadeMediaForDiveDeletion(ids);
+      // See deleteDive: must be captured before the delete removes the
+      // dives that the nav_tracks.dive_id FK's SET NULL is about to unlink.
+      final linkedRouteIds = <String>[];
+      for (final id in ids) {
+        linkedRouteIds.addAll(
+          await _navTrackRepository.routeIdsLinkedToDive(id),
+        );
+      }
       await (_db.delete(_db.dives)..where((t) => t.id.isIn(ids))).go();
+      await _navTrackRepository.normalizeAfterDiveDeletion(linkedRouteIds);
       for (final id in ids) {
         await _syncRepository.logDeletion(entityType: 'dives', recordId: id);
       }
