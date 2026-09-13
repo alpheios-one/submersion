@@ -1427,6 +1427,7 @@
   "certifications_wallet_options_share": "Share",
   "certifications_wallet_options_viewDetails": "View Details",
   "certifications_wallet_tooltip_add": "Add certification",
+  "certifications_wallet_tooltip_moreOptions": "More options",
   "certifications_wallet_tooltip_share": "Share certification",
   "@certifications_detail_dialog_deleteContent": {
     "placeholders": {

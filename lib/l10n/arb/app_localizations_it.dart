@@ -2547,6 +2547,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'Aggiungi certificazione';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'Altre opzioni';
+
+  @override
   String get certifications_wallet_tooltip_share => 'Condividi certificazione';
 
   @override

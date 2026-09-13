@@ -4103,6 +4103,12 @@ abstract class AppLocalizations {
   /// **'Add certification'**
   String get certifications_wallet_tooltip_add;
 
+  /// No description provided for @certifications_wallet_tooltip_moreOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'More options'**
+  String get certifications_wallet_tooltip_moreOptions;
+
   /// No description provided for @certifications_wallet_tooltip_share.
   ///
   /// In en, this message translates to:

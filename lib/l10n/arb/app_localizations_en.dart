@@ -2503,6 +2503,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'Add certification';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'More options';
+
+  @override
   String get certifications_wallet_tooltip_share => 'Share certification';
 
   @override

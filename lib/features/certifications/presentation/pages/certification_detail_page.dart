@@ -751,30 +751,25 @@ class _CertificationDetailContent extends ConsumerWidget {
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                if (certification.photoFront != null)
-                  Expanded(
-                    child: _buildPhotoThumbnail(
-                      context,
-                      imageData: certification.photoFront!,
-                      label:
-                          context.l10n.certifications_detail_photoLabel_front,
-                    ),
-                  ),
-                if (certification.photoFront != null &&
-                    certification.photoBack != null)
-                  const SizedBox(width: 16),
-                if (certification.photoBack != null)
-                  Expanded(
-                    child: _buildPhotoThumbnail(
-                      context,
-                      imageData: certification.photoBack!,
-                      label: context.l10n.certifications_detail_photoLabel_back,
-                    ),
-                  ),
-              ],
-            ),
+            // Stacked full-width, not side by side: at card-width thumbnails
+            // a photographed card is too small to read (issue #966), and
+            // BoxFit.contain (not cover) shows the whole card instead of
+            // cropping it.
+            if (certification.photoFront != null)
+              _buildPhotoThumbnail(
+                context,
+                imageData: certification.photoFront!,
+                label: context.l10n.certifications_detail_photoLabel_front,
+              ),
+            if (certification.photoFront != null &&
+                certification.photoBack != null)
+              const SizedBox(height: 16),
+            if (certification.photoBack != null)
+              _buildPhotoThumbnail(
+                context,
+                imageData: certification.photoBack!,
+                label: context.l10n.certifications_detail_photoLabel_back,
+              ),
           ],
         ),
       ),
@@ -798,7 +793,8 @@ class _CertificationDetailContent extends ConsumerWidget {
           child: GestureDetector(
             onTap: () => _showFullscreenPhoto(context, imageData, label),
             child: AspectRatio(
-              aspectRatio: 1.6,
+              // Matches CertificationEcard.aspectRatio (CR80 credit card).
+              aspectRatio: 1.586,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
@@ -807,7 +803,7 @@ class _CertificationDetailContent extends ConsumerWidget {
                 clipBehavior: Clip.antiAlias,
                 child: Image.memory(
                   imageData,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Center(
                       child: Column(

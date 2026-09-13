@@ -2534,6 +2534,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'Certificering toevoegen';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'Meer opties';
+
+  @override
   String get certifications_wallet_tooltip_share => 'Certificering delen';
 
   @override

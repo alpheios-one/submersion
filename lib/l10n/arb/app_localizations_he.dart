@@ -2479,6 +2479,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'הוסף הסמכה';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'אפשרויות נוספות';
+
+  @override
   String get certifications_wallet_tooltip_share => 'שתף הסמכה';
 
   @override

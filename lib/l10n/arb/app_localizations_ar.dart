@@ -2498,6 +2498,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'إضافة شهادة';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => 'خيارات إضافية';
+
+  @override
   String get certifications_wallet_tooltip_share => 'مشاركة الشهادة';
 
   @override

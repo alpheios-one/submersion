@@ -2396,6 +2396,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_wallet_tooltip_add => '添加证书';
 
   @override
+  String get certifications_wallet_tooltip_moreOptions => '更多选项';
+
+  @override
   String get certifications_wallet_tooltip_share => '分享证书';
 
   @override
