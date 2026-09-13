@@ -13270,6 +13270,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Invoice not found.';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Delete this invoice';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Delete invoice?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'This cannot be undone.';
+
+  @override
   String get gasCalculators_blender_defaults => 'Default settings and billing';
 
   @override

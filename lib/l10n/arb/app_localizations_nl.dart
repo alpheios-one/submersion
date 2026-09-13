@@ -13387,6 +13387,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Factuur niet gevonden.';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Delete this invoice';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Delete invoice?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'This cannot be undone.';
+
+  @override
   String get gasCalculators_blender_defaults =>
       'Standaardinstellingen en facturering';
 

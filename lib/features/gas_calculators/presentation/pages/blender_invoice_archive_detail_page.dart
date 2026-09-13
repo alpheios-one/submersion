@@ -5,6 +5,7 @@ import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_archived_invoice_tile.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_billed_line_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -61,6 +62,22 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
             units.formatDate(invoice.date),
           ),
         ),
+        actions: [
+          IconButton(
+            key: const Key('blender-archived-invoice-detail-delete'),
+            icon: const Icon(Icons.delete_outline),
+            tooltip: l10n.gasCalculators_blender_invoiceArchiveDelete,
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              await deleteArchivedInvoice(context, ref, invoiceId);
+              if (!ref
+                  .read(blenderArchivedInvoicesProvider)
+                  .any((i) => i.id == invoiceId)) {
+                navigator.pop();
+              }
+            },
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

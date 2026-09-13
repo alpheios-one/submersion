@@ -13167,6 +13167,18 @@ class AppLocalizationsHe extends AppLocalizations {
       'החשבונית לא נמצאה.';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Delete this invoice';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Delete invoice?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'This cannot be undone.';
+
+  @override
   String get gasCalculators_blender_defaults => 'הגדרות ברירת מחדל וחיוב';
 
   @override

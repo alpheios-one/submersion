@@ -13453,6 +13453,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'A számla nem található.';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Delete this invoice';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Delete invoice?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'This cannot be undone.';
+
+  @override
   String get gasCalculators_blender_defaults =>
       'Alapértelmezett beállítások és számlázás';
 

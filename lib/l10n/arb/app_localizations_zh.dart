@@ -12852,6 +12852,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_invoiceArchiveNotFound => '未找到该账单。';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Delete this invoice';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Delete invoice?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'This cannot be undone.';
+
+  @override
   String get gasCalculators_blender_defaults => '默认设置与计费';
 
   @override

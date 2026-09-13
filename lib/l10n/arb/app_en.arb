@@ -7688,6 +7688,9 @@
   "gasCalculators_blender_invoiceArchiveIncomplete": "Incomplete",
   "gasCalculators_blender_invoiceArchiveUntitled": "Untitled",
   "gasCalculators_blender_invoiceArchiveNotFound": "Invoice not found.",
+  "gasCalculators_blender_invoiceArchiveDelete": "Delete this invoice",
+  "gasCalculators_blender_invoiceArchiveDeleteTitle": "Delete invoice?",
+  "gasCalculators_blender_invoiceArchiveDeleteBody": "This cannot be undone.",
   "@gasCalculators_blender_invoiceArchiveFillCount": {
     "placeholders": {
       "count": {

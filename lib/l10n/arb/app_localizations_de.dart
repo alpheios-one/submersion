@@ -13475,6 +13475,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Rechnung nicht gefunden.';
 
   @override
+  String get gasCalculators_blender_invoiceArchiveDelete =>
+      'Diese Rechnung löschen';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle =>
+      'Rechnung löschen?';
+
+  @override
+  String get gasCalculators_blender_invoiceArchiveDeleteBody =>
+      'Dies kann nicht rückgängig gemacht werden.';
+
+  @override
   String get gasCalculators_blender_defaults =>
       'Standardeinstellungen und Abrechnung';
 

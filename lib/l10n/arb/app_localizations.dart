@@ -22635,6 +22635,24 @@ abstract class AppLocalizations {
   /// **'Invoice not found.'**
   String get gasCalculators_blender_invoiceArchiveNotFound;
 
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this invoice'**
+  String get gasCalculators_blender_invoiceArchiveDelete;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete invoice?'**
+  String get gasCalculators_blender_invoiceArchiveDeleteTitle;
+
+  /// No description provided for @gasCalculators_blender_invoiceArchiveDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get gasCalculators_blender_invoiceArchiveDeleteBody;
+
   /// No description provided for @gasCalculators_blender_defaults.
   ///
   /// In en, this message translates to:
