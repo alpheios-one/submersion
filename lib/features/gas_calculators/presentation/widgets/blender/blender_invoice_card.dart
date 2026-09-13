@@ -190,6 +190,8 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                   ),
                   const SizedBox(height: 4),
                 ],
+                if (fills.any((f) => f.lines.isNotEmpty))
+                  BlenderBilledLineHeader(units: units),
                 for (final f in fills)
                   _fillLine(context, f, currency, units, decimals),
               ],

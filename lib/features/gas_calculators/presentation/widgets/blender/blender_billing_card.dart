@@ -128,6 +128,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
   void _saveFill(BuildContext context, BillingResult billing, String currency) {
     final target = ref.read(blenderTargetMixProvider);
     final label = formatPreciseMix(context, target);
+    final cylinderLiters = ref.read(blenderCylinderLitersProvider);
     final fill = BilledFill(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       label: label,
@@ -138,6 +139,7 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
             addedBar: line.addedBar,
             cost: line.cost,
             freeGasLiters: line.freeGasLiters,
+            cylinderLiters: cylinderLiters,
           ),
       ],
       total: billing.total,

@@ -191,6 +191,14 @@ class UnitFormatter {
     return '${formatFixedForDisplay(converted, decimals)} ${settings.volumeUnit.symbol}';
   }
 
+  /// [formatVolume] without the trailing unit symbol, for a table cell whose
+  /// column header already carries it (issue #1876).
+  String formatVolumeValue(double? value, {int decimals = 0}) {
+    if (value == null) return '--';
+    final converted = VolumeUnit.liters.convert(value, settings.volumeUnit);
+    return formatFixedForDisplay(converted, decimals);
+  }
+
   /// Format a cylinder's size - handles gas capacity conversion for imperial.
   /// Pass [ratedCapacityCuft] (from a preset) for accurate display;
   /// otherwise falls back to ideal-gas calculation from volume and pressure.

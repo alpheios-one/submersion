@@ -90,6 +90,8 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
                 style: theme.textTheme.bodyMedium,
               ),
             ),
+          if (invoice.fills.any((f) => f.lines.isNotEmpty))
+            BlenderBilledLineHeader(units: units),
           for (final fill in invoice.fills)
             _fillSection(theme, fill, currency, units, decimals),
           const Divider(height: 24),

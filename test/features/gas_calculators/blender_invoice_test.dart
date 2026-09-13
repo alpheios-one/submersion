@@ -93,7 +93,13 @@ void main() {
         id: 'a',
         label: 'Tx 18/45',
         lines: [
-          BilledGasLine(gas: 'O₂', addedBar: 10, cost: 10, freeGasLiters: 30),
+          BilledGasLine(
+            gas: 'O₂',
+            addedBar: 10,
+            cost: 10,
+            freeGasLiters: 30,
+            cylinderLiters: 12,
+          ),
           BilledGasLine(gas: 'He', addedBar: 80, cost: 20, freeGasLiters: 240),
         ],
         total: 35,
@@ -103,6 +109,7 @@ void main() {
       )!;
       expect(decoded.label, 'Tx 18/45');
       expect(decoded.lines, hasLength(2));
+      expect(decoded.lines[0].cylinderLiters, 12);
       expect(decoded.lines[1].gas, 'He');
       expect(decoded.lines[1].freeGasLiters, 240);
       expect(decoded.total, 35);
@@ -116,6 +123,20 @@ void main() {
         jsonDecode(jsonEncode(line.toJson())) as Map<String, dynamic>,
       )!;
       expect(decoded.freeGasLiters, isNull);
+    });
+
+    test('a line saved before #1876 has no cylinder size, and that survives '
+        'a round trip', () {
+      const line = BilledGasLine(
+        gas: 'O₂',
+        addedBar: 10,
+        cost: 10,
+        freeGasLiters: 30,
+      );
+      final decoded = BilledGasLine.fromJson(
+        jsonDecode(jsonEncode(line.toJson())) as Map<String, dynamic>,
+      )!;
+      expect(decoded.cylinderLiters, isNull);
     });
 
     test('a manual line has no itemisation', () {
@@ -320,6 +341,9 @@ void main() {
       expect(find.text('Tx 18/45'), findsWidgets);
       // The volume is frozen at save time (#1335), not just the pressure.
       expect(fills.single.lines.every((l) => l.freeGasLiters != null), isTrue);
+      // The cylinder size in effect at save time is frozen too (#1876), so
+      // the invoice can itemise which bottle each fill went into.
+      expect(fills.single.lines.every((l) => l.cylinderLiters == 3), isTrue);
     });
 
     testWidgets('two fills add up', (tester) async {
@@ -632,8 +656,64 @@ void main() {
       ];
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('30 L'), findsOneWidget);
+      // The unit sits in the column header now, not repeated per cell.
+      expect(find.text('30'), findsOneWidget);
     });
+
+    testWidgets(
+      'a saved line shows the cylinder size it was filled into, with a '
+      'header for the column',
+      (tester) async {
+        final ref = await _pump(tester);
+        ref.read(blenderBilledFillsProvider.notifier).state = const [
+          BilledFill(
+            id: 'a',
+            label: 'Tx 18/45',
+            lines: [
+              BilledGasLine(
+                gas: 'O₂',
+                addedBar: 10,
+                cost: 10,
+                freeGasLiters: 30,
+                // Distinct from the default cylinder-volume field's value,
+                // so this assertion cannot pass by matching that field.
+                cylinderLiters: 15,
+              ),
+            ],
+            total: 10,
+          ),
+        ];
+        await tester.pumpAndSettle();
+
+        expect(find.text('15'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'a line saved before #1876 shows a dash for the cylinder size, not '
+      'a crash or a guessed value',
+      (tester) async {
+        final ref = await _pump(tester);
+        ref.read(blenderBilledFillsProvider.notifier).state = const [
+          BilledFill(
+            id: 'a',
+            label: 'Tx 18/45',
+            lines: [
+              BilledGasLine(
+                gas: 'O₂',
+                addedBar: 10,
+                cost: 10,
+                freeGasLiters: 30,
+              ),
+            ],
+            total: 10,
+          ),
+        ];
+        await tester.pumpAndSettle();
+
+        expect(find.text('—'), findsOneWidget);
+      },
+    );
 
     testWidgets('an older line with no volume falls back to pressure', (
       tester,

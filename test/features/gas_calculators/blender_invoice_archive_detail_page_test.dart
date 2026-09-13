@@ -85,8 +85,9 @@ void main() {
         expect(find.textContaining('Mar 5, 2026'), findsOneWidget);
         expect(find.textContaining('Billed to: Ada'), findsOneWidget);
         expect(find.text('Tx 18/45'), findsOneWidget);
-        // The line saved with a volume shows litres...
-        expect(find.textContaining('30 L'), findsOneWidget);
+        // The line saved with a volume shows litres, unit in the column
+        // header rather than repeated per cell...
+        expect(find.text('30'), findsOneWidget);
         // ...while the line saved before #1335 falls back to pressure.
         expect(find.textContaining('bar'), findsWidgets);
         expect(find.text('Total'), findsOneWidget);
