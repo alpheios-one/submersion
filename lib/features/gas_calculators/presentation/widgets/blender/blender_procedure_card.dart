@@ -75,8 +75,7 @@ class BlenderProcedureCard extends ConsumerWidget {
             const SizedBox(height: 4),
             _temperatureSummary(context, units, fillTemp, settledTemp),
             const SizedBox(height: 12),
-            for (final step in result.steps)
-              _stepLine(context, step, units, decimals),
+            _stepTable(context, result.steps, units, decimals),
             // Only worth saying when the two temperatures differ. At equal
             // temperatures the last step already reads the target, and a
             // "settles to" line would restate it.
@@ -128,15 +127,68 @@ class BlenderProcedureCard extends ConsumerWidget {
     );
   }
 
-  Widget _stepLine(
+  /// A `DataTable` with the units in its header, wrapped in horizontal
+  /// scrolling for narrow screens rather than squeezing four columns into
+  /// less width than they need (issue #1876) -- the same pattern
+  /// `data_sources_section.dart` uses for its own dense table.
+  Widget _stepTable(
+    BuildContext context,
+    List<BlendStep> steps,
+    UnitFormatter units,
+    int decimals,
+  ) {
+    final onPrimaryContainer = Theme.of(context).colorScheme.onPrimaryContainer;
+    final textStyle = Theme.of(
+      context,
+    ).textTheme.bodyLarge?.copyWith(color: onPrimaryContainer);
+    final headingStyle = Theme.of(
+      context,
+    ).textTheme.labelLarge?.copyWith(color: onPrimaryContainer);
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        headingRowHeight: 32,
+        dataRowMinHeight: 36,
+        dataRowMaxHeight: 44,
+        dividerThickness: 0,
+        headingTextStyle: headingStyle,
+        dataTextStyle: textStyle,
+        columns: [
+          DataColumn(
+            label: Text(context.l10n.gasCalculators_blender_stepColumnAction),
+          ),
+          DataColumn(
+            label: Text(
+              '${context.l10n.gasCalculators_blender_stepColumnAdded} '
+              '(${units.pressureSymbol})',
+            ),
+            numeric: true,
+          ),
+          DataColumn(
+            label: Text(
+              '${context.l10n.gasCalculators_blender_stepColumnPressure} '
+              '(${units.pressureSymbol})',
+            ),
+            numeric: true,
+          ),
+          DataColumn(
+            label: Text(context.l10n.gasCalculators_blender_stepColumnMix),
+          ),
+        ],
+        rows: [
+          for (final step in steps) _stepRow(context, step, units, decimals),
+        ],
+      ),
+    );
+  }
+
+  DataRow _stepRow(
     BuildContext context,
     BlendStep step,
     UnitFormatter units,
     int decimals,
   ) {
-    final style = Theme.of(context).textTheme.bodyLarge?.copyWith(
-      color: Theme.of(context).colorScheme.onPrimaryContainer,
-    );
     final action = step.fillGas == null
         ? context.l10n.gasCalculators_blender_stepStartLabel
         : context.l10n.gasCalculators_blender_stepAdd(
@@ -146,34 +198,15 @@ class BlenderProcedureCard extends ConsumerWidget {
         ? ''
         : '+${units.formatPressureValue(step.addedBar, decimals: decimals)}';
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(flex: 5, child: Text(action, style: style)),
-          Expanded(
-            flex: 4,
-            child: Text(added, style: style, textAlign: TextAlign.end),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(
-              units.formatPressure(step.pressureBar, decimals: decimals),
-              style: style,
-              textAlign: TextAlign.end,
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Text(
-              formatPreciseMix(context, step.resultingMix),
-              style: style,
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
-      ),
+    return DataRow(
+      cells: [
+        DataCell(Text(action)),
+        DataCell(Text(added)),
+        DataCell(
+          Text(units.formatPressureValue(step.pressureBar, decimals: decimals)),
+        ),
+        DataCell(Text(formatPreciseMix(context, step.resultingMix))),
+      ],
     );
   }
 

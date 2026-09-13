@@ -13213,6 +13213,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_stepStartLabel => 'Kezdés';
 
   @override
+  String get gasCalculators_blender_stepColumnAction => 'Action';
+
+  @override
+  String get gasCalculators_blender_stepColumnAdded => 'Added';
+
+  @override
+  String get gasCalculators_blender_stepColumnPressure => 'Pressure';
+
+  @override
+  String get gasCalculators_blender_stepColumnMix => 'Mix';
+
+  @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
     return '$temperature hőmérsékleten $pressure lesz';
   }

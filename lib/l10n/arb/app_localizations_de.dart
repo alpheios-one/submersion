@@ -13234,6 +13234,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_stepStartLabel => 'Start';
 
   @override
+  String get gasCalculators_blender_stepColumnAction => 'Aktion';
+
+  @override
+  String get gasCalculators_blender_stepColumnAdded => 'Hinzufügen';
+
+  @override
+  String get gasCalculators_blender_stepColumnPressure => 'Druck';
+
+  @override
+  String get gasCalculators_blender_stepColumnMix => 'Mix';
+
+  @override
   String gasCalculators_blender_settlesTo(String pressure, String temperature) {
     return 'Endet bei $pressure bei $temperature';
   }

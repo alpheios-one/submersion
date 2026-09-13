@@ -22251,6 +22251,30 @@ abstract class AppLocalizations {
   /// **'Start'**
   String get gasCalculators_blender_stepStartLabel;
 
+  /// No description provided for @gasCalculators_blender_stepColumnAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Action'**
+  String get gasCalculators_blender_stepColumnAction;
+
+  /// No description provided for @gasCalculators_blender_stepColumnAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get gasCalculators_blender_stepColumnAdded;
+
+  /// No description provided for @gasCalculators_blender_stepColumnPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get gasCalculators_blender_stepColumnPressure;
+
+  /// No description provided for @gasCalculators_blender_stepColumnMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Mix'**
+  String get gasCalculators_blender_stepColumnMix;
+
   /// No description provided for @gasCalculators_blender_settlesTo.
   ///
   /// In en, this message translates to:
