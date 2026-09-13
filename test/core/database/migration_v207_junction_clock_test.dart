@@ -27,9 +27,11 @@ const _junctions = [
 
 void main() {
   test('v207 is in the ladder and shipped', () {
-    // Relaxed as v200's own test asked, now that later rungs (v208, the
-    // imported-file store, issue #478; v209, the nav_tracks table) are
-    // newer. This one only claims its rung is still in the ladder.
+    // greaterThanOrEqualTo, not an exact match: later rungs (v208's
+    // imported-file store, v209's nav_tracks table, v210's tank-link fix,
+    // v211's auto-tag-imports, and others since) legitimately raise
+    // currentSchemaVersion further, and that must not break this test --
+    // only v207's own presence in the ladder matters here.
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(207));
     expect(AppDatabase.migrationVersions, contains(207));
   });

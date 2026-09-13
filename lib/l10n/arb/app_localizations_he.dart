@@ -21,6 +21,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_components_add => 'הוספת רכיב';
 
   @override
+  String get equipment_components_containsSection => 'מכיל';
+
+  @override
   String equipment_components_count(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -41,6 +44,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get equipment_components_empty =>
       'אין רכיבים. הוסיפו את החלקים שמהם מורכב הפריט.';
+
+  @override
+  String get equipment_components_emptyLeaf =>
+      'אין לו חלקים משלו. הוסיפו אותם אם הפריט מורכב מפריטים אחרים.';
 
   @override
   String equipment_components_historyAlsoPast(num count) {
@@ -96,6 +103,14 @@ class AppLocalizationsHe extends AppLocalizations {
       one: 'חלק ממכלול אחד',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_partOfSection => 'חלק מתוך';
+
+  @override
+  String equipment_components_partOfSubtitle(Object rigs, Object role) {
+    return '$role, ב-$rigs';
   }
 
   @override
@@ -5819,6 +5834,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_equipmentPicker_allSelected => 'כל הציוד כבר נבחר';
 
   @override
+  String get diveLog_equipmentPicker_allSpare => 'הציוד הנותר מסומן כרזרבי';
+
+  @override
   String diveLog_equipmentPicker_errorLoading(Object error) {
     return 'שגיאה בטעינת ציוד: $error';
   }
@@ -5828,6 +5846,10 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_equipmentPicker_removeToAdd => 'הסר פריטים להוספת אחרים';
+
+  @override
+  String get diveLog_equipmentPicker_spareHint =>
+      'שנה את סטטוס הפריט לפעיל כדי להוסיף אותו לצלילה';
 
   @override
   String get diveLog_equipmentPicker_title => 'הוספת ציוד';
@@ -10511,6 +10533,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_equipmentStatus_sold => 'נמכר';
 
   @override
+  String get enum_equipmentStatus_spare => 'רזרבי';
+
+  @override
   String get enum_equipmentType_backplate => 'פלטת גב';
 
   @override
@@ -11218,6 +11243,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_detail_errorTitle => 'שגיאה';
 
   @override
+  String get equipment_detail_installedInLabel => 'מותקן ב';
+
+  @override
   String get equipment_detail_lastServiceLabel => 'טיפול אחרון';
 
   @override
@@ -11240,6 +11268,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_detail_ownedForLabel => 'בבעלות';
+
+  @override
+  String equipment_detail_parentWithStatus(String name, String status) {
+    return '$name ($status)';
+  }
 
   @override
   String get equipment_detail_purchaseDateLabel => 'תאריך רכישה';
@@ -11295,6 +11328,11 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String equipment_serviceClocks_overdueSince(String date) {
     return 'באיחור מאז $date';
+  }
+
+  @override
+  String equipment_serviceClocks_countingSince(String date) {
+    return 'נספר מאז $date';
   }
 
   @override
@@ -11472,7 +11510,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_anchorHint =>
-      'בשימוש כאשר עדיין אין רשומת טיפול מסוג זה';
+      'השעון סופר מתאריך זה עד שתתעד טיפול חדש יותר.';
 
   @override
   String get equipment_scheduleDialog_clearAnchor => 'ניקוי תאריך הבסיס';
@@ -11637,6 +11675,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get equipment_detail_tripsSemanticLabel =>
       'צפה בטיולים המשתמשים בציוד זה';
+
+  @override
+  String get equipment_detail_wasInstalledInLabel => 'היה מותקן ב';
 
   @override
   String get equipment_edit_appBar_editTitle => 'ערוך ציוד';
@@ -11904,6 +11945,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get equipment_list_activeFilter_clear => 'נקה';
+
+  @override
+  String equipment_list_activeFilter_attribute(String field, String values) {
+    return '$field: $values';
+  }
 
   @override
   String get equipment_filter_title => 'סנן ציוד';
@@ -19830,6 +19876,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tags_manage_title => 'תגיות';
 
   @override
+  String get tags_manage_importsSection => 'ייבוא';
+
+  @override
+  String get tags_manage_autoTagImports => 'תיוג אוטומטי של ייבואים';
+
+  @override
+  String get tags_manage_autoTagImports_subtitle =>
+      'כל ייבוא חדש מתחיל עם תגית הנושאת את שם המקור והתאריך. אפשר לשנות זאת לייבוא בודד באפשרויות אותו ייבוא.';
+
+  @override
   String get tags_manage_searchHint => 'חיפוש תגיות...';
 
   @override
@@ -20357,6 +20413,20 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_export_optionSaveSubtitle => 'בחר היכן לשמור במכשיר שלך';
+
+  @override
+  String get transfer_export_includeGear => 'כלול ציוד';
+
+  @override
+  String get transfer_export_includeGearSubtitle =>
+      'מוסיף את הציוד ואת מחשב הצלילה ששימשו בכל צלילה. פרטי הרכישה אינם נכללים.';
+
+  @override
+  String get transfer_export_includeParticipants => 'כלול משתתפי צלילה';
+
+  @override
+  String get transfer_export_includeParticipantsSubtitle =>
+      'מוסיף שותפים, מדריכים ואת תפקידיהם בכל צלילה, לפי שם והסמכה. פרטי הקשר אינם נכללים.';
 
   @override
   String get transfer_export_includeRawData =>
@@ -24462,6 +24532,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'השתמש במספרי הצלילה מהקובץ המיובא במקום להקצות אוטומטית';
 
   @override
+  String get universalImport_label_autoTagThisImport =>
+      'תיוג אוטומטי של ייבוא זה';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'מתחיל מההעדפה השמורה שלך בהגדרות התגיות. שינוי כאן משפיע רק על ייבוא זה.';
+
+  @override
   String get universalImport_title_successImported => 'יובאו בהצלחה';
 
   @override
@@ -25599,6 +25677,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_hose_length_m => 'אורך הצינור';
 
   @override
+  String get attrLabel_hose_type => 'סוג צינור';
+
+  @override
   String get attrLabel_plate_material => 'חומר הפלטה';
 
   @override
@@ -25932,6 +26013,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrChoice_connection_yoke => 'יוק (INT)';
 
   @override
+  String get attrChoice_hose_type_lp => 'LP (לחץ נמוך)';
+
+  @override
+  String get attrChoice_hose_type_hp => 'HP (לחץ גבוה)';
+
+  @override
+  String get attrChoice_hose_type_lpi => 'מנפח (LPI)';
+
+  @override
   String get attrChoice_bcd_style_jacket => 'ז\'קט';
 
   @override
@@ -26196,6 +26286,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionSuitThickness => 'עובי חליפה (מ\"מ)';
+
+  @override
+  String get diveLog_filter_sectionGearAttributes => 'מאפייני ציוד';
+
+  @override
+  String get diveLog_filter_gearCategory => 'קטגוריית ציוד';
+
+  @override
+  String get diveLog_filter_gearCategoryAny => 'כל קטגוריה';
 
   @override
   String get diveLog_filter_thicknessMin => 'מינ\'';

@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Add component'**
   String get equipment_components_add;
 
+  /// No description provided for @equipment_components_containsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Contains'**
+  String get equipment_components_containsSection;
+
   /// No description provided for @equipment_components_count.
   ///
   /// In en, this message translates to:
@@ -157,6 +163,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No components. Add the parts this item is assembled from.'**
   String get equipment_components_empty;
+
+  /// No description provided for @equipment_components_emptyLeaf.
+  ///
+  /// In en, this message translates to:
+  /// **'No parts of its own. Add them if this item is assembled from others.'**
+  String get equipment_components_emptyLeaf;
 
   /// No description provided for @equipment_components_historyAlsoPast.
   ///
@@ -211,6 +223,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Part of 1 assembly} other{Part of {count} assemblies}}'**
   String equipment_components_partOfCount(num count);
+
+  /// No description provided for @equipment_components_partOfSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Part of'**
+  String get equipment_components_partOfSection;
+
+  /// No description provided for @equipment_components_partOfSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{role}, in {rigs}'**
+  String equipment_components_partOfSubtitle(Object rigs, Object role);
 
   /// No description provided for @equipment_components_pickerConfirm.
   ///
@@ -9765,6 +9789,12 @@ abstract class AppLocalizations {
   /// **'All equipment already selected'**
   String get diveLog_equipmentPicker_allSelected;
 
+  /// No description provided for @diveLog_equipmentPicker_allSpare.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining gear is marked Spare'**
+  String get diveLog_equipmentPicker_allSpare;
+
   /// No description provided for @diveLog_equipmentPicker_errorLoading.
   ///
   /// In en, this message translates to:
@@ -9782,6 +9812,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove items to add different ones'**
   String get diveLog_equipmentPicker_removeToAdd;
+
+  /// No description provided for @diveLog_equipmentPicker_spareHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Set an item\'s status to Active to add it to a dive'**
+  String get diveLog_equipmentPicker_spareHint;
 
   /// No description provided for @diveLog_equipmentPicker_title.
   ///
@@ -17950,6 +17986,12 @@ abstract class AppLocalizations {
   /// **'Sold'**
   String get enum_equipmentStatus_sold;
 
+  /// No description provided for @enum_equipmentStatus_spare.
+  ///
+  /// In en, this message translates to:
+  /// **'Spare'**
+  String get enum_equipmentStatus_spare;
+
   /// No description provided for @enum_equipmentType_backplate.
   ///
   /// In en, this message translates to:
@@ -19288,6 +19330,12 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get equipment_detail_errorTitle;
 
+  /// No description provided for @equipment_detail_installedInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed in'**
+  String get equipment_detail_installedInLabel;
+
   /// No description provided for @equipment_detail_lastServiceLabel.
   ///
   /// In en, this message translates to:
@@ -19335,6 +19383,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Owned For'**
   String get equipment_detail_ownedForLabel;
+
+  /// No description provided for @equipment_detail_parentWithStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} ({status})'**
+  String equipment_detail_parentWithStatus(String name, String status);
 
   /// No description provided for @equipment_detail_purchaseDateLabel.
   ///
@@ -19437,6 +19491,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Overdue since {date}'**
   String equipment_serviceClocks_overdueSince(String date);
+
+  /// No description provided for @equipment_serviceClocks_countingSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Counting since {date}'**
+  String equipment_serviceClocks_countingSince(String date);
 
   /// No description provided for @equipment_serviceClocks_overdue.
   ///
@@ -19705,7 +19765,7 @@ abstract class AppLocalizations {
   /// No description provided for @equipment_scheduleDialog_anchorHint.
   ///
   /// In en, this message translates to:
-  /// **'Used when no service record of this kind exists yet'**
+  /// **'The clock counts from this date until you log a newer service.'**
   String get equipment_scheduleDialog_anchorHint;
 
   /// No description provided for @equipment_scheduleDialog_clearAnchor.
@@ -19953,6 +20013,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View trips using this equipment'**
   String get equipment_detail_tripsSemanticLabel;
+
+  /// No description provided for @equipment_detail_wasInstalledInLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Was installed in'**
+  String get equipment_detail_wasInstalledInLabel;
 
   /// No description provided for @equipment_edit_appBar_editTitle.
   ///
@@ -20439,6 +20505,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get equipment_list_activeFilter_clear;
+
+  /// Active-filter chip for an equipment attribute filter. {field} is the field name (e.g. Hose type), {values} the selected options joined with commas.
+  ///
+  /// In en, this message translates to:
+  /// **'{field}: {values}'**
+  String equipment_list_activeFilter_attribute(String field, String values);
 
   /// No description provided for @equipment_filter_title.
   ///
@@ -33486,6 +33558,24 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get tags_manage_title;
 
+  /// Section header above the auto-tag-imports switch on the tag management screen
+  ///
+  /// In en, this message translates to:
+  /// **'Imports'**
+  String get tags_manage_importsSection;
+
+  /// Switch title for auto-tagging every new import session
+  ///
+  /// In en, this message translates to:
+  /// **'Tag imports automatically'**
+  String get tags_manage_autoTagImports;
+
+  /// Switch subtitle for auto-tagging every new import session
+  ///
+  /// In en, this message translates to:
+  /// **'Every new import starts with a tag naming the source and date. You can change this for a single import in that import\'s options.'**
+  String get tags_manage_autoTagImports_subtitle;
+
   /// No description provided for @tags_manage_searchHint.
   ///
   /// In en, this message translates to:
@@ -34323,6 +34413,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose where to save on your device'**
   String get transfer_export_optionSaveSubtitle;
+
+  /// No description provided for @transfer_export_includeGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Include gear'**
+  String get transfer_export_includeGear;
+
+  /// No description provided for @transfer_export_includeGearSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds the equipment and dive computer used on each dive. Purchase details are left out.'**
+  String get transfer_export_includeGearSubtitle;
+
+  /// No description provided for @transfer_export_includeParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'Include dive participants'**
+  String get transfer_export_includeParticipants;
+
+  /// No description provided for @transfer_export_includeParticipantsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adds buddies, guides and their roles on each dive, by name and certification. Contact details are left out.'**
+  String get transfer_export_includeParticipantsSubtitle;
 
   /// No description provided for @transfer_export_includeRawData.
   ///
@@ -41109,6 +41223,18 @@ abstract class AppLocalizations {
   /// **'Use dive numbers from the imported file instead of auto-assigning'**
   String get universalImport_label_retainDiveNumbersSubtitle;
 
+  /// Switch title for the session-only auto-tag override in the import options sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Tag this import automatically'**
+  String get universalImport_label_autoTagThisImport;
+
+  /// Switch subtitle for the session-only auto-tag override in the import options sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Starts from your saved preference in Tags settings. Changing it here only affects this import.'**
+  String get universalImport_label_autoTagThisImportSubtitle;
+
   /// Title shown when dives are successfully imported
   ///
   /// In en, this message translates to:
@@ -43031,6 +43157,12 @@ abstract class AppLocalizations {
   /// **'Hose length'**
   String get attrLabel_hose_length_m;
 
+  /// No description provided for @attrLabel_hose_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Hose type'**
+  String get attrLabel_hose_type;
+
   /// No description provided for @attrLabel_plate_material.
   ///
   /// In en, this message translates to:
@@ -43697,6 +43829,24 @@ abstract class AppLocalizations {
   /// **'Yoke (INT)'**
   String get attrChoice_connection_yoke;
 
+  /// No description provided for @attrChoice_hose_type_lp.
+  ///
+  /// In en, this message translates to:
+  /// **'LP (low pressure)'**
+  String get attrChoice_hose_type_lp;
+
+  /// No description provided for @attrChoice_hose_type_hp.
+  ///
+  /// In en, this message translates to:
+  /// **'HP (high pressure)'**
+  String get attrChoice_hose_type_hp;
+
+  /// No description provided for @attrChoice_hose_type_lpi.
+  ///
+  /// In en, this message translates to:
+  /// **'LPI (inflator)'**
+  String get attrChoice_hose_type_lpi;
+
   /// No description provided for @attrChoice_bcd_style_jacket.
   ///
   /// In en, this message translates to:
@@ -44218,6 +44368,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Suit thickness (mm)'**
   String get diveLog_filter_sectionSuitThickness;
+
+  /// No description provided for @diveLog_filter_sectionGearAttributes.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear attributes'**
+  String get diveLog_filter_sectionGearAttributes;
+
+  /// No description provided for @diveLog_filter_gearCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear category'**
+  String get diveLog_filter_gearCategory;
+
+  /// No description provided for @diveLog_filter_gearCategoryAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any category'**
+  String get diveLog_filter_gearCategoryAny;
 
   /// No description provided for @diveLog_filter_thicknessMin.
   ///

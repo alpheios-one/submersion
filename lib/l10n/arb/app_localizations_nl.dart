@@ -21,6 +21,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_components_add => 'Onderdeel toevoegen';
 
   @override
+  String get equipment_components_containsSection => 'Bevat';
+
+  @override
   String equipment_components_count(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -41,6 +44,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get equipment_components_empty =>
       'Geen onderdelen. Voeg de delen toe waaruit dit item is opgebouwd.';
+
+  @override
+  String get equipment_components_emptyLeaf =>
+      'Geen eigen onderdelen. Voeg ze toe als dit item uit andere is opgebouwd.';
 
   @override
   String equipment_components_historyAlsoPast(num count) {
@@ -96,6 +103,14 @@ class AppLocalizationsNl extends AppLocalizations {
       one: 'Onderdeel van 1 samenstel',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_partOfSection => 'Onderdeel van';
+
+  @override
+  String equipment_components_partOfSubtitle(Object rigs, Object role) {
+    return '$role, in $rigs';
   }
 
   @override
@@ -5927,6 +5942,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alle uitrusting al geselecteerd';
 
   @override
+  String get diveLog_equipmentPicker_allSpare =>
+      'Resterende uitrusting is gemarkeerd als reserve';
+
+  @override
   String diveLog_equipmentPicker_errorLoading(Object error) {
     return 'Fout bij laden van uitrusting: $error';
   }
@@ -5937,6 +5956,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get diveLog_equipmentPicker_removeToAdd =>
       'Verwijder items om andere toe te voegen';
+
+  @override
+  String get diveLog_equipmentPicker_spareHint =>
+      'Zet de status van een item op Actief om het aan een duik toe te voegen';
 
   @override
   String get diveLog_equipmentPicker_title => 'Uitrusting toevoegen';
@@ -10682,6 +10705,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_equipmentStatus_sold => 'Verkocht';
 
   @override
+  String get enum_equipmentStatus_spare => 'Reserve';
+
+  @override
   String get enum_equipmentType_backplate => 'Backplate';
 
   @override
@@ -11390,6 +11416,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_detail_errorTitle => 'Fout';
 
   @override
+  String get equipment_detail_installedInLabel => 'Geplaatst in';
+
+  @override
   String get equipment_detail_lastServiceLabel => 'Laatste service';
 
   @override
@@ -11413,6 +11442,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_detail_ownedForLabel => 'In bezit sinds';
+
+  @override
+  String equipment_detail_parentWithStatus(String name, String status) {
+    return '$name ($status)';
+  }
 
   @override
   String get equipment_detail_purchaseDateLabel => 'Aankoopdatum';
@@ -11468,6 +11502,11 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String equipment_serviceClocks_overdueSince(String date) {
     return 'Achterstallig sinds $date';
+  }
+
+  @override
+  String equipment_serviceClocks_countingSince(String date) {
+    return 'Telt sinds $date';
   }
 
   @override
@@ -11649,7 +11688,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_anchorHint =>
-      'Wordt gebruikt zolang er nog geen servicerecord van dit type bestaat';
+      'De klok telt vanaf deze datum tot je een nieuwere service vastlegt.';
 
   @override
   String get equipment_scheduleDialog_clearAnchor => 'Referentiedatum wissen';
@@ -11813,6 +11852,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get equipment_detail_tripsSemanticLabel =>
       'Bekijk reizen met deze uitrusting';
+
+  @override
+  String get equipment_detail_wasInstalledInLabel => 'Was geplaatst in';
 
   @override
   String get equipment_edit_appBar_editTitle => 'Uitrusting bewerken';
@@ -12090,6 +12132,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get equipment_list_activeFilter_clear => 'Wissen';
+
+  @override
+  String equipment_list_activeFilter_attribute(String field, String values) {
+    return '$field: $values';
+  }
 
   @override
   String get equipment_filter_title => 'Uitrusting filteren';
@@ -20184,6 +20231,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tags_manage_title => 'Tags';
 
   @override
+  String get tags_manage_importsSection => 'Imports';
+
+  @override
+  String get tags_manage_autoTagImports => 'Imports automatisch taggen';
+
+  @override
+  String get tags_manage_autoTagImports_subtitle =>
+      'Elke nieuwe import begint met een tag die de bron en datum vermeldt. Dit kan voor één import worden aangepast in de opties van die import.';
+
+  @override
   String get tags_manage_searchHint => 'Tags zoeken...';
 
   @override
@@ -20720,6 +20777,20 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get transfer_export_optionSaveSubtitle =>
       'Kies waar je wilt opslaan op je apparaat';
+
+  @override
+  String get transfer_export_includeGear => 'Uitrusting opnemen';
+
+  @override
+  String get transfer_export_includeGearSubtitle =>
+      'Voegt de uitrusting en duikcomputer toe die bij elke duik zijn gebruikt. Aankoopgegevens worden weggelaten.';
+
+  @override
+  String get transfer_export_includeParticipants => 'Deelnemers opnemen';
+
+  @override
+  String get transfer_export_includeParticipantsSubtitle =>
+      'Voegt buddies, gidsen en hun rollen bij elke duik toe, met naam en brevet. Contactgegevens worden weggelaten.';
 
   @override
   String get transfer_export_includeRawData =>
@@ -24890,6 +24961,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gebruik de duiknummers uit het geïmporteerde bestand in plaats van automatisch toewijzen';
 
   @override
+  String get universalImport_label_autoTagThisImport =>
+      'Deze import automatisch taggen';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'Begint met je opgeslagen voorkeur in de Tags-instellingen. Dit hier wijzigen geldt alleen voor deze import.';
+
+  @override
   String get universalImport_title_successImported => 'Succesvol geïmporteerd';
 
   @override
@@ -26055,6 +26134,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_hose_length_m => 'Slanglengte';
 
   @override
+  String get attrLabel_hose_type => 'Slangtype';
+
+  @override
   String get attrLabel_plate_material => 'Plaatmateriaal';
 
   @override
@@ -26389,6 +26471,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrChoice_connection_yoke => 'Beugel (INT)';
 
   @override
+  String get attrChoice_hose_type_lp => 'MD (middendruk)';
+
+  @override
+  String get attrChoice_hose_type_hp => 'HD (hoge druk)';
+
+  @override
+  String get attrChoice_hose_type_lpi => 'Inflatorslang (LPI)';
+
+  @override
   String get attrChoice_bcd_style_jacket => 'Jacket';
 
   @override
@@ -26654,6 +26745,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionSuitThickness => 'Pakdikte (mm)';
+
+  @override
+  String get diveLog_filter_sectionGearAttributes => 'Uitrustingskenmerken';
+
+  @override
+  String get diveLog_filter_gearCategory => 'Uitrustingscategorie';
+
+  @override
+  String get diveLog_filter_gearCategoryAny => 'Elke categorie';
 
   @override
   String get diveLog_filter_thicknessMin => 'Min';

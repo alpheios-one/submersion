@@ -1585,8 +1585,9 @@ class ServiceKinds extends Table {
 }
 
 /// One service clock per (equipment item, service kind). Next-due is always
-/// computed from the newest ServiceRecord of the kind (anchorDate/purchase
-/// fallbacks) -- never stored, so dive logging does not churn sync rows.
+/// computed (baseline date, else the newest ServiceRecord of the kind, else
+/// purchase and creation dates) -- never stored, so dive logging does not
+/// churn sync rows.
 @DataClassName('ServiceScheduleRow')
 class ServiceSchedules extends Table {
   TextColumn get id => text()();
@@ -1611,9 +1612,16 @@ class ServiceSchedules extends Table {
   RealColumn get defaultCost => real().nullable()();
   TextColumn get defaultCurrency => text().nullable()();
 
-  /// Baseline when no ServiceRecord of this kind exists yet (e.g. last hydro
-  /// before app adoption). Fallback chain: purchaseDate, then createdAt.
+  /// The diver's baseline date: where the clock counts from (e.g. last hydro
+  /// before app adoption). It outranks the ServiceRecords of the kind until
+  /// one logged after [anchorSetAt] is dated on or after it. Fallback chain
+  /// with no baseline: newest record, purchaseDate, then createdAt.
   IntColumn get anchorDate => integer().nullable()();
+
+  /// v213: when the diver set [anchorDate]. Null on every baseline set
+  /// before v213 (and on legacy clocks), which keeps the pre-v213 rule for
+  /// them: any record of the kind outranks the baseline.
+  IntColumn get anchorSetAt => integer().nullable()();
   BoolColumn get enabled => boolean().withDefault(const Constant(true))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -2210,6 +2218,15 @@ class DiverSettings extends Table {
   /// the list, so existing divers opt in rather than being reorganised.
   BoolColumn get groupTripsInDiveList =>
       boolean().withDefault(const Constant(false))();
+
+  /// Pre-populate every import with a "{source} Import {date}" tag (v211,
+  /// issue #998). On by default, matching the wizard's long-standing
+  /// behavior; divers who find the tags pile up too fast can turn this off
+  /// from the tag management screen. This is only the starting point for a
+  /// new import session -- the review step's Import Options sheet lets the
+  /// diver override it for that one import without touching this default.
+  BoolColumn get autoTagImports =>
+      boolean().withDefault(const Constant(true))();
   // List view modes for other features (v52)
   TextColumn get siteListViewMode =>
       text().withDefault(const Constant('detailed'))();
@@ -4177,7 +4194,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 210;
+  static const int currentSchemaVersion = 213;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -4752,6 +4769,15 @@ class AppDatabase extends _$AppDatabase {
     // Also an hlc column on the 19 child tables exported through their
     // parent, so a stale copy from a peer cannot overwrite a newer edit.
     210,
+    // v211: diver_settings.auto_tag_imports (issue #998). Additive defaulted
+    // boolean, no backfill. Renumbered from 208: main's own v208 (issue
+    // #478) and v210 (#1769) landed while this branch was open, and a rung
+    // at or below the shipped version never runs its onUpgrade step.
+    211,
+    // v213: service_schedules.anchor_set_at, so a baseline date the diver
+    // sets outranks the service records logged before it. Column-only, no
+    // backfill. 212 is claimed by #1639 (planner gas options), still open.
+    213,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -7203,6 +7229,25 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// Idempotent DDL for v213's `service_schedules.anchor_set_at`: when the
+  /// diver set the clock's baseline date. Null (every existing row) keeps
+  /// the pre-v213 rule, under which any record of the kind outranks the
+  /// baseline; see `clockAnchorFromServices`. Called from the v213
+  /// onUpgrade block and the beforeOpen backstop. Self-guarding for partial
+  /// fixture databases.
+  Future<void> _assertServiceScheduleAnchorSetAtColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('service_schedules')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('anchor_set_at')) {
+      await customStatement(
+        'ALTER TABLE service_schedules ADD COLUMN anchor_set_at INTEGER',
+      );
+    }
+  }
+
   /// v163: default_show_estimated_tank_pressure on diver_settings (issue
   /// #731). Synthesized "(est.)" pressure lines previously had no off switch.
   /// Defaults to 1 so existing databases keep drawing them.
@@ -7993,6 +8038,22 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'ALTER TABLE diver_settings ADD COLUMN group_trips_in_dive_list '
       'INTEGER NOT NULL DEFAULT 0',
+    );
+  }
+
+  /// Idempotent DDL for diver_settings.auto_tag_imports (v211, issue #998).
+  /// Existing rows default to on, matching the wizard's prior behavior of
+  /// always pre-filling an import tag.
+  Future<void> _assertAutoTagImportsColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (names.contains('auto_tag_imports')) return;
+    await customStatement(
+      'ALTER TABLE diver_settings ADD COLUMN '
+      'auto_tag_imports INTEGER NOT NULL DEFAULT 1',
     );
   }
 
@@ -11959,8 +12020,26 @@ class AppDatabase extends _$AppDatabase {
           await _assertChildHlcColumns();
         }
         if (from < 210) await reportProgress();
+        // v211: diver_settings.auto_tag_imports (issue #998). Column-only
+        // rung, no backfill. Existing rows default to on, so a device that
+        // upgrades keeps auto-tagging its imports until the diver turns it
+        // off. Renumbered from 208: main's own v208 (issue #478) and v210
+        // (#1769) landed while this branch was open.
+        if (from < 211) {
+          await _assertAutoTagImportsColumn();
+        }
+        if (from < 211) await reportProgress();
+        // v213: service_schedules.anchor_set_at. Column-only, no backfill:
+        // a null keeps the pre-v213 rule for every existing baseline.
+        if (from < 213) {
+          await _assertServiceScheduleAnchorSetAtColumn();
+        }
+        if (from < 213) await reportProgress();
       },
       beforeOpen: (details) async {
+        // v211 backstop: re-assert diver_settings.auto_tag_imports.
+        await _assertAutoTagImportsColumn();
+
         // v210 backstop: the dive_tanks equipment link sets null on delete.
         // First, while foreign keys are still off: the rebuild it may do
         // drops the table, which with enforcement on would cascade into the
@@ -12211,6 +12290,11 @@ class AppDatabase extends _$AppDatabase {
         // to it (issue #478; same parallel-branch version-collision
         // self-heal).
         await _assertImportedFilesSchema();
+
+        // v213 backstop: re-assert service_schedules.anchor_set_at (same
+        // parallel-branch version-collision self-heal). Every read of a
+        // schedule selects it.
+        await _assertServiceScheduleAnchorSetAtColumn();
 
         // v160 backstop: re-assert service_kinds.default_category. A device
         // that reached 160 or higher through a parallel branch never enters

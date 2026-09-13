@@ -20,6 +20,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/equipment/domain/models/equipment_filter_state.dart';
 import 'package:submersion/features/equipment/domain/models/equipment_picker_filter.dart';
+import 'package:submersion/features/equipment/domain/services/battery_cycles.dart';
 import 'package:submersion/features/equipment/domain/services/exposure_classifier.dart';
 import 'package:submersion/features/equipment/domain/services/service_due_engine.dart';
 import 'package:submersion/features/equipment/presentation/providers/exposure_thresholds_provider.dart';
@@ -47,6 +48,9 @@ final activeEquipmentProvider = FutureProvider<List<EquipmentItem>>((
     validatedCurrentDiverIdProvider.future,
   );
   ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  // The list filters on hydrated attributes (#1805), and saveAttributes
+  // or a sync pull writes only equipment_attributes.
+  ref.invalidateSelfWhen(repository.watchAttributeChanges());
   return repository.getActiveEquipment(diverId: validatedDiverId);
 });
 
@@ -73,6 +77,9 @@ final equipmentByStatusProvider =
         validatedCurrentDiverIdProvider.future,
       );
       ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+      // The list filters on hydrated attributes (#1805), and saveAttributes
+      // or a sync pull writes only equipment_attributes.
+      ref.invalidateSelfWhen(repository.watchAttributeChanges());
       if (status == null) {
         return repository.getAllEquipment(diverId: validatedDiverId);
       }
@@ -92,6 +99,9 @@ final allEquipmentProvider = FutureProvider<List<EquipmentItem>>((ref) async {
   );
 
   ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  // The list filters on hydrated attributes (#1805), and saveAttributes
+  // or a sync pull writes only equipment_attributes.
+  ref.invalidateSelfWhen(repository.watchAttributeChanges());
 
   return repository.getAllEquipment(diverId: validatedDiverId);
 });
@@ -575,6 +585,9 @@ class ServiceRecordNotifier
   }
 
   Future<ServiceRecord> addRecord(ServiceRecord record) async {
+    // A newer service takes a clock over from its baseline by the shared
+    // rule (clockAnchorFromServices) without the baseline being erased, so
+    // deleting that service later hands the clock back to the baseline.
     final newRecord = await _repository.createRecord(record);
     await refresh();
     return newRecord;
@@ -719,6 +732,20 @@ final serviceDueSoonWindowDaysProvider = FutureProvider<int>((ref) async {
   return repository.getDueSoonWindowDays(diverId: validatedDiverId);
 });
 
+/// Re-evaluates a clock provider when a service record or a schedule
+/// changes by any route. The notifiers invalidate after their own writes,
+/// but a record or schedule applied by sync writes neither, and a service
+/// can move a clock's anchor (see `clockAnchorFromServices`). Rare writes,
+/// so cheap even for the list-wide evaluation.
+void _invalidateOnServiceLedgerChanges(Ref ref) {
+  ref.invalidateSelfWhen(
+    ref.watch(serviceRecordRepositoryProvider).watchServiceRecordsChanges(),
+  );
+  ref.invalidateSelfWhen(
+    ref.watch(serviceScheduleRepositoryProvider).watchSchedulesChanges(),
+  );
+}
+
 /// Evaluates every enabled clock on [item] at this moment. [siblings] is the
 /// active gear list when the caller already has it, so the parent and
 /// children lookups cost no query per item.
@@ -751,9 +778,15 @@ Future<List<ServiceClockStatus>> _evaluateClocksFor(
       .watch(equipmentRepositoryProvider)
       .getItemExposure(item, siblings: siblings);
   final usage = exposure.samples;
+  final kindsById = {for (final k in allKinds) k.id: k};
   final classifier = ExposureClassifier(
     thresholds: ref.watch(exposureThresholdsProvider),
     loopTimeOnly: exposure.isRebreather,
+    countsCycles: accruesBatteryCycles(
+      type: item.type,
+      schedules: schedules,
+      kindsById: kindsById,
+    ),
     hasBatteryChild: exposure.fittedChildren.any(
       (c) => c.type == EquipmentType.battery,
     ),
@@ -761,7 +794,7 @@ Future<List<ServiceClockStatus>> _evaluateClocksFor(
   final window = await ref.watch(serviceDueSoonWindowDaysProvider.future);
   return const ServiceDueEngine().evaluate(
     schedules: schedules,
-    kindsById: {for (final k in allKinds) k.id: k},
+    kindsById: kindsById,
     records: records,
     usage: usage,
     classifier: classifier,
@@ -787,6 +820,7 @@ final serviceClockStatusesProvider =
       ref.invalidateSelfWhen(
         ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
       );
+      _invalidateOnServiceLedgerChanges(ref);
       final item = await repository.getEquipmentById(equipmentId);
       if (item == null) return const [];
       return _evaluateClocksFor(ref, item);
@@ -816,6 +850,7 @@ final activeEquipmentClocksProvider = FutureProvider<List<EquipmentClocks>>((
   // unlike the dive detail stream (media ticks it), which would re-evaluate
   // every item's clocks far too often for a list-wide provider.
   ref.invalidateSelfWhen(repository.watchAttributeChanges());
+  _invalidateOnServiceLedgerChanges(ref);
 
   final items = await repository.getActiveEquipment(diverId: validatedDiverId);
   final kinds = await ref.watch(serviceKindRepositoryProvider).getAllKinds();
@@ -895,6 +930,7 @@ final tripServiceAlertsProvider = FutureProvider.family<List<DueClock>, String>(
       validatedCurrentDiverIdProvider.future,
     );
     ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+    _invalidateOnServiceLedgerChanges(ref);
 
     final items = await repository.getActiveEquipment(
       diverId: validatedDiverId,

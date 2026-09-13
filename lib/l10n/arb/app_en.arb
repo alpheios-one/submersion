@@ -2,10 +2,12 @@
   "settings_oauth_connect_browserFailed": "Could not open your browser. Use Copy link and paste the address into your browser.",
   "equipment_assemblyChip_label": "{name} (+{count})",
   "equipment_components_add": "Add component",
+  "equipment_components_containsSection": "Contains",
   "equipment_components_count": "{count, plural, =1{1 component} other{{count} components}}",
   "equipment_components_cycleError": "That item already contains this one, so it cannot be added as a component.",
   "equipment_components_editRole": "Edit role",
   "equipment_components_empty": "No components. Add the parts this item is assembled from.",
+  "equipment_components_emptyLeaf": "No parts of its own. Add them if this item is assembled from others.",
   "equipment_components_historyAlsoPast": "{count, plural, =1{Also update 1 dive} other{Also update {count} dives}}",
   "equipment_components_historyAskAdded": "Add the new part to those dives as well, or only from now on?",
   "equipment_components_historyAskRemoved": "Remove the part from those dives as well, or only from now on?",
@@ -15,6 +17,8 @@
   "equipment_components_historyTitle": "Update past dives?",
   "equipment_components_partOf": "Part of {name}",
   "equipment_components_partOfCount": "{count, plural, =1{Part of 1 assembly} other{Part of {count} assemblies}}",
+  "equipment_components_partOfSection": "Part of",
+  "equipment_components_partOfSubtitle": "{role}, in {rigs}",
   "equipment_components_pickerConfirm": "{count, plural, =0{Add} =1{Add 1} other{Add {count}}}",
   "equipment_components_pickerEmpty": "No other active gear can be added here.",
   "equipment_components_pickerReplaceConfirm": "Replace",
@@ -3335,9 +3339,11 @@
   "diveLog_empty_title": "No dives logged yet",
   "diveLog_equipmentPicker_addFromTab": "Add equipment from the Equipment tab",
   "diveLog_equipmentPicker_allSelected": "All equipment already selected",
+  "diveLog_equipmentPicker_allSpare": "Remaining gear is marked Spare",
   "diveLog_equipmentPicker_errorLoading": "Error loading equipment: {error}",
   "diveLog_equipmentPicker_noEquipment": "No equipment yet",
   "diveLog_equipmentPicker_removeToAdd": "Remove items to add different ones",
+  "diveLog_equipmentPicker_spareHint": "Set an item's status to Active to add it to a dive",
   "diveLog_equipmentPicker_title": "Add Equipment",
   "diveLog_equipmentSetPicker_createHint": "Create sets in Equipment > Sets",
   "diveLog_equipmentSetPicker_emptySet": "Empty set",
@@ -6288,6 +6294,7 @@
   "enum_equipmentStatus_needsService": "Needs Service",
   "enum_equipmentStatus_retired": "Retired",
   "enum_equipmentStatus_sold": "Sold",
+  "enum_equipmentStatus_spare": "Spare",
   "enum_equipmentType_backplate": "Backplate",
   "enum_equipmentType_bcd": "BCD",
   "enum_equipmentType_boots": "Boots",
@@ -6509,6 +6516,7 @@
   "equipment_detail_editTooltipShort": "Edit",
   "equipment_detail_errorMessage": "Error: {error}",
   "equipment_detail_errorTitle": "Error",
+  "equipment_detail_installedInLabel": "Installed in",
   "equipment_detail_lastServiceLabel": "Last Service",
   "equipment_detail_loadingTitle": "Loading...",
   "equipment_detail_modelLabel": "Model",
@@ -6517,6 +6525,17 @@
   "equipment_detail_notFoundTitle": "Equipment Not Found",
   "equipment_detail_notesTitle": "Notes",
   "equipment_detail_ownedForLabel": "Owned For",
+  "equipment_detail_parentWithStatus": "{name} ({status})",
+  "@equipment_detail_parentWithStatus": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
   "equipment_detail_purchaseDateLabel": "Purchase Date",
   "equipment_detail_purchasePriceLabel": "Purchase Price",
   "equipment_detail_retiredChip": "Retired",
@@ -6542,6 +6561,14 @@
   },
   "equipment_serviceClocks_overdueSince": "Overdue since {date}",
   "@equipment_serviceClocks_overdueSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "equipment_serviceClocks_countingSince": "Counting since {date}",
+  "@equipment_serviceClocks_countingSince": {
     "placeholders": {
       "date": {
         "type": "String"
@@ -6683,7 +6710,7 @@
     }
   },
   "equipment_scheduleDialog_anchorDate": "Baseline date",
-  "equipment_scheduleDialog_anchorHint": "Used when no service record of this kind exists yet",
+  "equipment_scheduleDialog_anchorHint": "The clock counts from this date until you log a newer service.",
   "equipment_scheduleDialog_clearAnchor": "Clear baseline date",
   "equipment_scheduleDialog_save": "Save",
   "equipment_scheduleDialog_cancel": "Cancel",
@@ -6811,6 +6838,7 @@
   "equipment_detail_tripsCountSingular": "{count} trip",
   "equipment_detail_tripsLabel": "Trips",
   "equipment_detail_tripsSemanticLabel": "View trips using this equipment",
+  "equipment_detail_wasInstalledInLabel": "Was installed in",
   "equipment_edit_appBar_editTitle": "Edit Equipment",
   "equipment_edit_appBar_newTitle": "New Equipment",
   "equipment_edit_appBar_saveButton": "Save",
@@ -6892,6 +6920,18 @@
   "equipment_list_typeFilterAll": "All Types",
   "equipment_list_filterTooltip": "Filter equipment",
   "equipment_list_activeFilter_clear": "Clear",
+  "equipment_list_activeFilter_attribute": "{field}: {values}",
+  "@equipment_list_activeFilter_attribute": {
+    "description": "Active-filter chip for an equipment attribute filter. {field} is the field name (e.g. Hose type), {values} the selected options joined with commas.",
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "values": {
+        "type": "String"
+      }
+    }
+  },
   "equipment_filter_title": "Filter Equipment",
   "equipment_filter_clearAll": "Clear All",
   "equipment_filter_apply": "Apply Filters",
@@ -12375,6 +12415,18 @@
   },
   "tags_hint_addTags": "Add tags...",
   "tags_manage_title": "Tags",
+  "tags_manage_importsSection": "Imports",
+  "@tags_manage_importsSection": {
+    "description": "Section header above the auto-tag-imports switch on the tag management screen"
+  },
+  "tags_manage_autoTagImports": "Tag imports automatically",
+  "@tags_manage_autoTagImports": {
+    "description": "Switch title for auto-tagging every new import session"
+  },
+  "tags_manage_autoTagImports_subtitle": "Every new import starts with a tag naming the source and date. You can change this for a single import in that import's options.",
+  "@tags_manage_autoTagImports_subtitle": {
+    "description": "Switch subtitle for auto-tagging every new import session"
+  },
   "tags_manage_searchHint": "Search tags...",
   "tags_manage_diveCount": "{count, plural, =0{0 dives} =1{1 dive} other{{count} dives}}",
   "@tags_manage_diveCount": {
@@ -12575,6 +12627,10 @@
   "transfer_export_kmlTitle": "Google Earth KML",
   "transfer_export_multiFormatHeader": "Multi-Format Export",
   "transfer_export_optionSaveSubtitle": "Choose where to save on your device",
+  "transfer_export_includeGear": "Include gear",
+  "transfer_export_includeGearSubtitle": "Adds the equipment and dive computer used on each dive. Purchase details are left out.",
+  "transfer_export_includeParticipants": "Include dive participants",
+  "transfer_export_includeParticipantsSubtitle": "Adds buddies, guides and their roles on each dive, by name and certification. Contact details are left out.",
   "transfer_export_includeRawData": "Include raw dive computer data",
   "transfer_export_includeRawDataSubtitle": "Keeps the original bytes from your dive computer so the file can be re-parsed later. Makes the file larger.",
   "transfer_export_optionSaveTitle": "Save to File",
@@ -16063,6 +16119,14 @@
   "@universalImport_label_retainDiveNumbersSubtitle": {
     "description": "Switch subtitle for retaining dive numbers"
   },
+  "universalImport_label_autoTagThisImport": "Tag this import automatically",
+  "@universalImport_label_autoTagThisImport": {
+    "description": "Switch title for the session-only auto-tag override in the import options sheet"
+  },
+  "universalImport_label_autoTagThisImportSubtitle": "Starts from your saved preference in Tags settings. Changing it here only affects this import.",
+  "@universalImport_label_autoTagThisImportSubtitle": {
+    "description": "Switch subtitle for the session-only auto-tag override in the import options sheet"
+  },
   "universalImport_title_successImported": "Successfully Imported",
   "@universalImport_title_successImported": {
     "description": "Title shown when dives are successfully imported"
@@ -16976,6 +17040,7 @@
   "media_unavailablePlaceholder_stillFetching": "Still loading. Tap to retry.",
   "media_unavailablePlaceholder_accessDenied": "No photo library access",
   "attrLabel_hose_length_m": "Hose length",
+  "attrLabel_hose_type": "Hose type",
   "attrLabel_plate_material": "Plate material",
   "attrLabel_size": "Size",
   "attrLabel_thickness_mm": "Thickness (mm)",
@@ -17087,6 +17152,9 @@
   "attrChoice_valve_type_convertible": "Convertible",
   "attrChoice_connection_din": "DIN",
   "attrChoice_connection_yoke": "Yoke (INT)",
+  "attrChoice_hose_type_lp": "LP (low pressure)",
+  "attrChoice_hose_type_hp": "HP (high pressure)",
+  "attrChoice_hose_type_lpi": "LPI (inflator)",
   "attrChoice_bcd_style_jacket": "Jacket",
   "attrChoice_bcd_style_back_inflate": "Back-inflate",
   "attrChoice_bcd_style_wing": "Wing",
@@ -17174,6 +17242,9 @@
   "statistics_progression_divesBySuitThickness_empty": "No dives with a suit thickness recorded",
   "statistics_progression_divesBySuitThickness_error": "Could not load suit thickness data",
   "diveLog_filter_sectionSuitThickness": "Suit thickness (mm)",
+  "diveLog_filter_sectionGearAttributes": "Gear attributes",
+  "diveLog_filter_gearCategory": "Gear category",
+  "diveLog_filter_gearCategoryAny": "Any category",
   "diveLog_filter_thicknessMin": "Min",
   "diveLog_filter_thicknessMax": "Max",
   "safetySettings_noFlyHeader": "Flying after diving",

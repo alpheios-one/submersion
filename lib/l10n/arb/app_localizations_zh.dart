@@ -21,6 +21,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_components_add => '添加组件';
 
   @override
+  String get equipment_components_containsSection => '包含';
+
+  @override
   String equipment_components_count(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -39,6 +42,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_components_empty => '暂无组件。请添加构成此装备的部件。';
+
+  @override
+  String get equipment_components_emptyLeaf => '没有自己的部件。如果此装备由其他装备组成，请添加它们。';
 
   @override
   String equipment_components_historyAlsoPast(num count) {
@@ -91,6 +97,14 @@ class AppLocalizationsZh extends AppLocalizations {
       one: '属于 1 个组合',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_partOfSection => '属于';
+
+  @override
+  String equipment_components_partOfSubtitle(Object rigs, Object role) {
+    return '$role，位于 $rigs';
   }
 
   @override
@@ -5669,6 +5683,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_equipmentPicker_allSelected => '所有装备已选择';
 
   @override
+  String get diveLog_equipmentPicker_allSpare => '剩余装备均标记为备用';
+
+  @override
   String diveLog_equipmentPicker_errorLoading(Object error) {
     return '加载装备出错：$error';
   }
@@ -5678,6 +5695,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_equipmentPicker_removeToAdd => '移除项目以添加新项目';
+
+  @override
+  String get diveLog_equipmentPicker_spareHint => '将物品状态设为活跃即可添加到潜水';
 
   @override
   String get diveLog_equipmentPicker_title => '添加装备';
@@ -10264,6 +10284,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_equipmentStatus_sold => '已售出';
 
   @override
+  String get enum_equipmentStatus_spare => '备用';
+
+  @override
   String get enum_equipmentType_backplate => '背板';
 
   @override
@@ -10965,6 +10988,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_detail_errorTitle => '错误';
 
   @override
+  String get equipment_detail_installedInLabel => '安装于';
+
+  @override
   String get equipment_detail_lastServiceLabel => '最近维护';
 
   @override
@@ -10987,6 +11013,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_detail_ownedForLabel => '拥有为';
+
+  @override
+  String equipment_detail_parentWithStatus(String name, String status) {
+    return '$name（$status）';
+  }
 
   @override
   String get equipment_detail_purchaseDateLabel => '购买日期';
@@ -11041,6 +11072,11 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String equipment_serviceClocks_overdueSince(String date) {
     return '自 $date 起逾期';
+  }
+
+  @override
+  String equipment_serviceClocks_countingSince(String date) {
+    return '自 $date 起计算';
   }
 
   @override
@@ -11209,7 +11245,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_scheduleDialog_anchorDate => '基准日期';
 
   @override
-  String get equipment_scheduleDialog_anchorHint => '在尚无此类维护记录时使用';
+  String get equipment_scheduleDialog_anchorHint => '时钟从此日期开始计算，直到记录更新的维护。';
 
   @override
   String get equipment_scheduleDialog_clearAnchor => '清除基准日期';
@@ -11366,6 +11402,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_detail_tripsSemanticLabel => '查看使用此装备的旅行';
+
+  @override
+  String get equipment_detail_wasInstalledInLabel => '曾安装于';
 
   @override
   String get equipment_edit_appBar_editTitle => '编辑装备';
@@ -11623,6 +11662,11 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get equipment_list_activeFilter_clear => '清除';
+
+  @override
+  String equipment_list_activeFilter_attribute(String field, String values) {
+    return '$field：$values';
+  }
 
   @override
   String get equipment_filter_title => '筛选装备';
@@ -19284,6 +19328,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tags_manage_title => '标签';
 
   @override
+  String get tags_manage_importsSection => '导入';
+
+  @override
+  String get tags_manage_autoTagImports => '自动为导入的记录打标签';
+
+  @override
+  String get tags_manage_autoTagImports_subtitle =>
+      '每次新的导入都会以包含来源和日期的标签开始。可以在该次导入的选项中为单次导入更改此设置。';
+
+  @override
   String get tags_manage_searchHint => '搜索标签...';
 
   @override
@@ -19803,6 +19857,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transfer_export_optionSaveSubtitle => '选择保存到设备上的位置';
+
+  @override
+  String get transfer_export_includeGear => '包含装备';
+
+  @override
+  String get transfer_export_includeGearSubtitle => '添加每次潜水使用的装备和潜水电脑。不包含购买信息。';
+
+  @override
+  String get transfer_export_includeParticipants => '包含潜水参与者';
+
+  @override
+  String get transfer_export_includeParticipantsSubtitle =>
+      '添加每次潜水的潜伴、导潜及其角色，仅含姓名和证书。不包含联系方式。';
 
   @override
   String get transfer_export_includeRawData => '包含潜水电脑原始数据';
@@ -23789,6 +23856,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '使用导入文件中的潜水编号而不是自动分配';
 
   @override
+  String get universalImport_label_autoTagThisImport => '自动为此次导入打标签';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      '从你在标签设置中保存的偏好开始。在此处更改仅影响此次导入。';
+
+  @override
   String get universalImport_title_successImported => '导入成功';
 
   @override
@@ -24882,6 +24956,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_hose_length_m => '软管长度';
 
   @override
+  String get attrLabel_hose_type => '软管类型';
+
+  @override
   String get attrLabel_plate_material => '背板材质';
 
   @override
@@ -25215,6 +25292,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrChoice_connection_yoke => '卡箍式 (INT)';
 
   @override
+  String get attrChoice_hose_type_lp => 'LP（低压）';
+
+  @override
+  String get attrChoice_hose_type_hp => 'HP（高压）';
+
+  @override
+  String get attrChoice_hose_type_lpi => '充气管（LPI）';
+
+  @override
   String get attrChoice_bcd_style_jacket => '夹克式';
 
   @override
@@ -25476,6 +25562,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionSuitThickness => '潜水服厚度（毫米）';
+
+  @override
+  String get diveLog_filter_sectionGearAttributes => '装备属性';
+
+  @override
+  String get diveLog_filter_gearCategory => '装备类别';
+
+  @override
+  String get diveLog_filter_gearCategoryAny => '任意类别';
 
   @override
   String get diveLog_filter_thicknessMin => '最小';

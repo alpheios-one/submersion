@@ -21,6 +21,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_components_add => 'إضافة مكوّن';
 
   @override
+  String get equipment_components_containsSection => 'يحتوي على';
+
+  @override
   String equipment_components_count(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -41,6 +44,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get equipment_components_empty =>
       'لا توجد مكوّنات. أضف الأجزاء التي يتكوّن منها هذا العنصر.';
+
+  @override
+  String get equipment_components_emptyLeaf =>
+      'لا يحتوي على أجزاء خاصة به. أضفها إذا كان هذا العنصر يتكوّن من عناصر أخرى.';
 
   @override
   String equipment_components_historyAlsoPast(num count) {
@@ -96,6 +103,14 @@ class AppLocalizationsAr extends AppLocalizations {
       one: 'جزء من تجميعة واحدة',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get equipment_components_partOfSection => 'جزء من';
+
+  @override
+  String equipment_components_partOfSubtitle(Object rigs, Object role) {
+    return '$role، في $rigs';
   }
 
   @override
@@ -5850,6 +5865,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تم اختيار جميع المعدات بالفعل';
 
   @override
+  String get diveLog_equipmentPicker_allSpare =>
+      'المعدات المتبقية مصنفة كاحتياطية';
+
+  @override
   String diveLog_equipmentPicker_errorLoading(Object error) {
     return 'خطأ في تحميل المعدات: $error';
   }
@@ -5860,6 +5879,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveLog_equipmentPicker_removeToAdd =>
       'أزل عناصر لإضافة عناصر مختلفة';
+
+  @override
+  String get diveLog_equipmentPicker_spareHint =>
+      'غيّر حالة العنصر إلى نشط لإضافته إلى غطسة';
 
   @override
   String get diveLog_equipmentPicker_title => 'إضافة معدات';
@@ -10570,6 +10593,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentStatus_sold => 'تم بيعه';
 
   @override
+  String get enum_equipmentStatus_spare => 'احتياطي';
+
+  @override
   String get enum_equipmentType_backplate => 'لوحة ظهر';
 
   @override
@@ -11277,6 +11303,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_detail_errorTitle => 'خطأ';
 
   @override
+  String get equipment_detail_installedInLabel => 'مركّب في';
+
+  @override
   String get equipment_detail_lastServiceLabel => 'آخر صيانة';
 
   @override
@@ -11300,6 +11329,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get equipment_detail_ownedForLabel => 'مدة الملكية';
+
+  @override
+  String equipment_detail_parentWithStatus(String name, String status) {
+    return '$name ($status)';
+  }
 
   @override
   String get equipment_detail_purchaseDateLabel => 'تاريخ الشراء';
@@ -11355,6 +11389,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String equipment_serviceClocks_overdueSince(String date) {
     return 'متأخر منذ $date';
+  }
+
+  @override
+  String equipment_serviceClocks_countingSince(String date) {
+    return 'يُحتسب منذ $date';
   }
 
   @override
@@ -11534,7 +11573,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get equipment_scheduleDialog_anchorHint =>
-      'يُستخدم عندما لا يوجد بعد سجل صيانة من هذا النوع';
+      'تعدّ الساعة من هذا التاريخ حتى تسجّل صيانة أحدث.';
 
   @override
   String get equipment_scheduleDialog_clearAnchor => 'مسح تاريخ الأساس';
@@ -11701,6 +11740,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get equipment_detail_tripsSemanticLabel =>
       'عرض الرحلات باستخدام هذه المعدات';
+
+  @override
+  String get equipment_detail_wasInstalledInLabel => 'كان مركّبًا في';
 
   @override
   String get equipment_edit_appBar_editTitle => 'تعديل المعدات';
@@ -11971,6 +12013,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get equipment_list_activeFilter_clear => 'مسح';
+
+  @override
+  String equipment_list_activeFilter_attribute(String field, String values) {
+    return '$field: $values';
+  }
 
   @override
   String get equipment_filter_title => 'تصفية المعدات';
@@ -19979,6 +20026,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tags_manage_title => 'الوسوم';
 
   @override
+  String get tags_manage_importsSection => 'الاستيراد';
+
+  @override
+  String get tags_manage_autoTagImports => 'وسم الاستيرادات تلقائيا';
+
+  @override
+  String get tags_manage_autoTagImports_subtitle =>
+      'يبدأ كل استيراد جديد بوسم يحمل اسم المصدر والتاريخ. يمكن تغيير ذلك لعملية استيراد واحدة في خيارات تلك العملية.';
+
+  @override
   String get tags_manage_searchHint => 'البحث في الوسوم...';
 
   @override
@@ -20515,6 +20572,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_export_optionSaveSubtitle => 'اختر مكان الحفظ على جهازك';
+
+  @override
+  String get transfer_export_includeGear => 'تضمين المعدات';
+
+  @override
+  String get transfer_export_includeGearSubtitle =>
+      'يضيف المعدات وكمبيوتر الغوص المستخدمة في كل غطسة. تُستبعد تفاصيل الشراء.';
+
+  @override
+  String get transfer_export_includeParticipants => 'تضمين المشاركين في الغطس';
+
+  @override
+  String get transfer_export_includeParticipantsSubtitle =>
+      'يضيف الرفاق والمرشدين وأدوارهم في كل غطسة، بالاسم والشهادة. تُستبعد بيانات الاتصال.';
 
   @override
   String get transfer_export_includeRawData =>
@@ -24651,6 +24722,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'استخدام أرقام الغطسات من الملف المستورد بدلاً من تعيينها تلقائياً';
 
   @override
+  String get universalImport_label_autoTagThisImport =>
+      'وسم هذا الاستيراد تلقائيا';
+
+  @override
+  String get universalImport_label_autoTagThisImportSubtitle =>
+      'يبدأ من تفضيلك المحفوظ في إعدادات الوسوم. تغييره هنا يؤثر فقط على هذا الاستيراد.';
+
+  @override
   String get universalImport_title_successImported => 'تم الاستيراد بنجاح';
 
   @override
@@ -25795,6 +25874,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_hose_length_m => 'طول الخرطوم';
 
   @override
+  String get attrLabel_hose_type => 'نوع الخرطوم';
+
+  @override
   String get attrLabel_plate_material => 'مادة اللوحة';
 
   @override
@@ -26128,6 +26210,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrChoice_connection_yoke => 'يوك (INT)';
 
   @override
+  String get attrChoice_hose_type_lp => 'LP (ضغط منخفض)';
+
+  @override
+  String get attrChoice_hose_type_hp => 'HP (ضغط عالٍ)';
+
+  @override
+  String get attrChoice_hose_type_lpi => 'منفاخ (LPI)';
+
+  @override
   String get attrChoice_bcd_style_jacket => 'جاكيت';
 
   @override
@@ -26393,6 +26484,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get diveLog_filter_sectionSuitThickness => 'سماكة البدلة (مم)';
+
+  @override
+  String get diveLog_filter_sectionGearAttributes => 'خصائص المعدات';
+
+  @override
+  String get diveLog_filter_gearCategory => 'فئة المعدات';
+
+  @override
+  String get diveLog_filter_gearCategoryAny => 'أي فئة';
 
   @override
   String get diveLog_filter_thicknessMin => 'الأدنى';
