@@ -158,6 +158,7 @@
   "gasCalculators_blender_payTitle": "Rechnung als bezahlt markieren?",
   "gasCalculators_blender_payBody": "Dies archiviert alle {count} gespeicherten Füllungen und beginnt eine neue Rechnung.",
   "gasCalculators_blender_editLine": "{label} bearbeiten",
+  "gasCalculators_blender_lineActions": "Aktionen für {label}",
   "gasCalculators_blender_deleteLine": "{label} löschen",
   "gasCalculators_blender_fillAdded": "{mix} zur Rechnung hinzugefügt",
   "gasCalculators_blender_billedIncomplete": "Mindestens eine Position hat keinen Preis, die Summe ist daher unvollständig.",

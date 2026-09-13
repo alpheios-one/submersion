@@ -150,8 +150,9 @@ void main() {
     }
 
     final metric = await totalFor(VolumeUnit.liters, '1');
-    // 1 per 100 L is 28.3168 per 100 cu ft.
-    final imperial = await totalFor(VolumeUnit.cubicFeet, '28.3168');
+    // 1 per 100 L is 28.3168 per 100 cu ft, rounded to the field's two-decimal
+    // cap (issue #1876) -- the 0.001 tolerance below easily absorbs that.
+    final imperial = await totalFor(VolumeUnit.cubicFeet, '28.32');
 
     expect(imperial, closeTo(metric, metric * 0.001));
   });

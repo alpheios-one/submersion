@@ -717,38 +717,37 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              // Compact so a label, an amount and two actions still fit the
-              // narrowest phone the app supports.
+              // A single overflow menu instead of two separate icons: on the
+              // narrowest phones two full-size IconButtons plus the label and
+              // total left no room to breathe (issue #1876 follow-up).
               SizedBox(
                 width: kBilledLineTrailingWidth,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 18),
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
+                child: PopupMenuButton<_FillLineAction>(
+                  key: Key('blender-fill-line-menu-${fill.id}'),
+                  icon: const Icon(Icons.more_vert, size: 18),
+                  tooltip: context.l10n.gasCalculators_blender_lineActions(
+                    fill.label,
+                  ),
+                  onSelected: (action) => switch (action) {
+                    _FillLineAction.edit => _editLine(fill),
+                    _FillLineAction.delete => _delete(fill),
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _FillLineAction.edit,
+                      child: Text(
+                        context.l10n.gasCalculators_blender_editLine(
+                          fill.label,
+                        ),
                       ),
-                      tooltip: context.l10n.gasCalculators_blender_editLine(
-                        fill.label,
-                      ),
-                      onPressed: () => _editLine(fill),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 18),
-                      visualDensity: VisualDensity.compact,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minWidth: 32,
-                        minHeight: 32,
+                    PopupMenuItem(
+                      value: _FillLineAction.delete,
+                      child: Text(
+                        context.l10n.gasCalculators_blender_deleteLine(
+                          fill.label,
+                        ),
                       ),
-                      tooltip: context.l10n.gasCalculators_blender_deleteLine(
-                        fill.label,
-                      ),
-                      onPressed: () => _delete(fill),
                     ),
                   ],
                 ),
@@ -922,6 +921,9 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     saveBlenderPreferences(ref);
   }
 }
+
+/// The two actions offered by a fill line's overflow menu.
+enum _FillLineAction { edit, delete }
 
 /// What the edit sheet hands back.
 class _LineEdit {

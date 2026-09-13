@@ -7681,6 +7681,14 @@
   "gasCalculators_blender_payBody": "This archives all {count} saved fills and starts a new bill.",
   "gasCalculators_blender_editLine": "Edit {label}",
   "gasCalculators_blender_deleteLine": "Delete {label}",
+  "gasCalculators_blender_lineActions": "Actions for {label}",
+  "@gasCalculators_blender_lineActions": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_blender_fillAdded": "{mix} added to the bill",
   "gasCalculators_blender_billedIncomplete": "One or more lines have no price, so this total is incomplete.",
   "gasCalculators_blender_billedTotal": "Total",

@@ -7,7 +7,9 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_decimal_digits_formatter.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_responsive_field_row.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_section_title.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_volume_conversion.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -113,24 +115,21 @@ class BlenderFillGasesCard extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 4),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Oxygen and helium are fixed at 100% purity, so the fraction
-            // isn't shown at all for those roles -- not even as read-only
-            // text (issue #44 follow-up): a fixed value nobody can change
-            // is not information a diver needs on this card. Only the topup
-            // role's mix is configurable, and gets the full row width when
-            // it's the only field on it.
-            if (role == BlenderGasRole.topup) ...[
-              Expanded(child: _topupO2Field(context, ref)),
-              const SizedBox(width: 8),
-            ],
-            Expanded(child: _priceField(context, ref, role, units)),
+        // Oxygen and helium are fixed at 100% purity, so the fraction isn't
+        // shown at all for those roles -- not even as read-only text (issue
+        // #44 follow-up): a fixed value nobody can change is not information
+        // a diver needs on this card. Only the topup role's mix is
+        // configurable, so its row carries a third field. All three fields
+        // sit side by side when there is room, and stack on a narrow screen
+        // (issue #1876), the same for every role rather than singling
+        // Topup's mix field out with its own fixed-width pairing.
+        BlenderResponsiveFieldRow(
+          fields: [
+            if (role == BlenderGasRole.topup) _topupO2Field(context, ref),
+            _priceField(context, ref, role, units),
+            _flushVolumeField(context, ref, role, units),
           ],
         ),
-        const SizedBox(height: 8),
-        _flushVolumeField(context, ref, role, units),
       ],
     );
   }
@@ -140,14 +139,17 @@ class BlenderFillGasesCard extends ConsumerWidget {
       key: const Key('blender-topup-o2'),
       controller: topupO2Controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+        const BlenderDecimalDigitsFormatter(),
+      ],
       decoration: InputDecoration(
         labelText: '${context.l10n.gasCalculators_blender_o2} (%)',
         isDense: true,
         border: const OutlineInputBorder(),
       ),
       onChanged: (v) => ref.read(blenderTopupO2PercentProvider.notifier).state =
-          (parseUserDecimal(v) ?? 0.0).clamp(0.0, 100.0),
+          (smartParseUserDecimal(v) ?? 0.0).clamp(0.0, 100.0),
       onEditingComplete: () => saveBlenderPreferences(ref),
       onSubmitted: (_) => saveBlenderPreferences(ref),
     );
@@ -168,6 +170,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+          const BlenderDecimalDigitsFormatter(),
         ],
         decoration: InputDecoration(
           labelText: context.l10n.gasCalculators_blender_unitPrice(
@@ -185,13 +188,14 @@ class BlenderFillGasesCard extends ConsumerWidget {
   }
 
   /// The error to show under a decimal field when [text] is non-blank but
-  /// cannot be read as a number in the active locale -- e.g. a diver typing
-  /// "." under a German locale, where '.' is the grouping separator rather
-  /// than the decimal one, and `parseUserDecimal` deliberately refuses to
-  /// guess (#1091). Without this the field just silently kept the diver's old
-  /// price instead of saying why.
+  /// still cannot be read after [smartParseUserDecimal] has already
+  /// corrected an unambiguous wrong-separator keystroke -- the one shape
+  /// left is genuinely malformed (e.g. two separators), not a diver's `.`
+  /// under a German locale, which is corrected automatically (#1876).
   String? _invalidNumberText(BuildContext context, String text) {
-    if (text.trim().isEmpty || parseUserDecimal(text) != null) return null;
+    if (text.trim().isEmpty || smartParseUserDecimal(text) != null) {
+      return null;
+    }
     return context.l10n.gasCalculators_blender_invalidNumber(
       localeNumberFormat().symbols.DECIMAL_SEP,
     );
@@ -219,7 +223,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
     AppSettings settings,
   ) {
     if (text.trim().isEmpty) return null;
-    final parsed = parseUserDecimal(text);
+    final parsed = smartParseUserDecimal(text);
     if (parsed == null) {
       return index < previous.length ? previous[index] : null;
     }
@@ -242,6 +246,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         inputFormatters: [
           FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+          const BlenderDecimalDigitsFormatter(),
         ],
         decoration: InputDecoration(
           labelText:
@@ -286,7 +291,7 @@ class BlenderFillGasesCard extends ConsumerWidget {
     AppSettings settings,
   ) {
     if (text.trim().isEmpty) return 0;
-    final parsed = parseUserDecimal(text);
+    final parsed = smartParseUserDecimal(text);
     if (parsed == null) {
       return index < previous.length ? previous[index].volumeLiters : 0;
     }

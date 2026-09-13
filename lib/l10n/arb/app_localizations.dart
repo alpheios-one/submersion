@@ -22593,6 +22593,12 @@ abstract class AppLocalizations {
   /// **'Delete {label}'**
   String gasCalculators_blender_deleteLine(String label);
 
+  /// No description provided for @gasCalculators_blender_lineActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions for {label}'**
+  String gasCalculators_blender_lineActions(String label);
+
   /// No description provided for @gasCalculators_blender_fillAdded.
   ///
   /// In en, this message translates to:

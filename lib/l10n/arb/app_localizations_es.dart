@@ -13451,6 +13451,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String gasCalculators_blender_lineActions(String label) {
+    return 'Actions for $label';
+  }
+
+  @override
   String gasCalculators_blender_fillAdded(String mix) {
     return '$mix añadido a la factura';
   }

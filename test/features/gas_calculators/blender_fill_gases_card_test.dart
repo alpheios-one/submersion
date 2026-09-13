@@ -279,13 +279,15 @@ void main() {
     expect(o2Volume.controller?.text, '40');
   });
 
-  testWidgets('a dot under a German locale shows an inline error and keeps the '
-      'previous price instead of silently discarding it', (tester) async {
-    // Under de, '.' is the grouping separator, not the decimal one, so
-    // "12.5" is unreadable rather than 12,5 (#1091's fix). The field must
-    // say so instead of quietly wiping out the stored price.
+  testWidgets('a dot under a German locale is auto-corrected to the price it '
+      'unambiguously means, with no error', (tester) async {
+    // Under de, '.' is the grouping separator, not the decimal one, but
+    // "12.5" cannot be a well-formed grouping either way (a group of one
+    // digit), so it unambiguously means 12,5 -- smartParseUserDecimal
+    // corrects it rather than discarding it (#1091's original fix stays
+    // intact for the genuinely ambiguous shapes).
     Intl.defaultLocale = 'de';
-    await _pump(
+    final ref = await _pump(
       tester,
       overrides: [
         blenderGasPricesProvider.overrideWith((ref) => const [9.5, null, null]),
@@ -301,25 +303,38 @@ void main() {
     final field = tester.widget<TextField>(
       find.byKey(const Key('blender-gas-price-o2')),
     );
-    expect(field.decoration?.errorText, isNotNull);
+    expect(field.decoration?.errorText, isNull);
+    expect(
+      ref.read(blenderGasPricesProvider)[BlenderGasRole.o2.index],
+      closeTo(12.5, 0.001),
+    );
   });
 
-  testWidgets('a dot under a German locale shows an inline error on the flush '
-      'volume field too', (tester) async {
-    Intl.defaultLocale = 'de';
-    await _pump(tester);
+  testWidgets(
+    'a dot under a German locale is auto-corrected on the flush volume '
+    'field too',
+    (tester) async {
+      Intl.defaultLocale = 'de';
+      final ref = await _pump(tester);
 
-    await tester.enterText(
-      find.byKey(const Key('blender-flush-fee-volume-o2')),
-      '12.5',
-    );
-    await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('blender-flush-fee-volume-o2')),
+        '12.5',
+      );
+      await tester.pump();
 
-    final field = tester.widget<TextField>(
-      find.byKey(const Key('blender-flush-fee-volume-o2')),
-    );
-    expect(field.decoration?.errorText, isNotNull);
-  });
+      final field = tester.widget<TextField>(
+        find.byKey(const Key('blender-flush-fee-volume-o2')),
+      );
+      expect(field.decoration?.errorText, isNull);
+      expect(
+        ref
+            .read(blenderFlushFeeGasesProvider)[BlenderGasRole.o2.index]
+            .volumeLiters,
+        closeTo(12.5, 0.001),
+      );
+    },
+  );
 
   testWidgets('a valid comma decimal under a German locale clears the error', (
     tester,

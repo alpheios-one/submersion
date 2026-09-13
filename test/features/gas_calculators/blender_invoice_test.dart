@@ -365,7 +365,9 @@ void main() {
       ];
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Delete Tx 18/45'));
+      await tester.tap(find.byTooltip('Actions for Tx 18/45'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete Tx 18/45'));
       await tester.pumpAndSettle();
 
       expect(ref.read(blenderBilledFillsProvider), isEmpty);
@@ -466,7 +468,9 @@ void main() {
       ];
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Edit Tx 21/35'));
+      await tester.tap(find.byTooltip('Actions for Tx 21/35'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit Tx 21/35'));
       await tester.pumpAndSettle();
 
       final o2Field = tester.widget<TextField>(
@@ -504,7 +508,9 @@ void main() {
       ];
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byTooltip('Edit Tx 18/45'));
+      await tester.tap(find.byTooltip('Actions for Tx 18/45'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit Tx 18/45'));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('blender-line-cylinder')), findsNothing);
