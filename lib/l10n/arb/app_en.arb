@@ -7652,6 +7652,7 @@
   "gasCalculators_blender_flushFeeModePerFill": "Once per fill",
   "gasCalculators_blender_flushFeeVolume": "Purge volume",
   "gasCalculators_blender_flushFeeColumnGas": "Gas",
+  "gasCalculators_blender_cylinderColumnShort": "Cylinder",
   "gasCalculators_blender_flushFeeLine": "{gas} hose purge",
   "@gasCalculators_blender_flushFeeLine": {
     "placeholders": {

@@ -12749,6 +12749,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
 
   @override
+  String get gasCalculators_blender_cylinderColumnShort => 'Cylinder';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return '$gas 管路吹扫';
   }

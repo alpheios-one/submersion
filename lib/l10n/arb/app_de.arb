@@ -137,6 +137,7 @@
   "gasCalculators_blender_flushFeeModePerFill": "Einmal pro Füllung",
   "gasCalculators_blender_flushFeeVolume": "Spülvolumen",
   "gasCalculators_blender_flushFeeColumnGas": "Gas",
+  "gasCalculators_blender_cylinderColumnShort": "Flasche",
   "gasCalculators_blender_flushFeeLine": "{gas}-Schlauchspülung",
   "gasCalculators_blender_billed": "Abgerechnet",
   "gasCalculators_blender_billedDate": "Gasbezug vom {date}",

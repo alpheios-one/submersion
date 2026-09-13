@@ -13364,6 +13364,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
 
   @override
+  String get gasCalculators_blender_cylinderColumnShort => 'Flasche';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return '$gas-Schlauchspülung';
   }

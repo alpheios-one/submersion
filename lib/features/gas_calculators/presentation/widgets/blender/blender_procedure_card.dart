@@ -4,6 +4,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_blender_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_formatting.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_table_style.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -127,10 +128,13 @@ class BlenderProcedureCard extends ConsumerWidget {
     );
   }
 
-  /// A `DataTable` with the units in its header, wrapped in horizontal
-  /// scrolling for narrow screens rather than squeezing four columns into
-  /// less width than they need (issue #1876) -- the same pattern
-  /// `data_sources_section.dart` uses for its own dense table.
+  /// A flexible `Row`/`Expanded` table with the units in its header, so the
+  /// columns compress in place on a narrow screen instead of overflowing
+  /// off-screen the way `DataTable`'s fixed column widths did (issue #1876
+  /// follow-up: the diver could not read the pressure or mix columns at all
+  /// on a phone).
+  static const List<int> _flex = [5, 4, 5, 5];
+
   Widget _stepTable(
     BuildContext context,
     List<BlendStep> steps,
@@ -138,56 +142,68 @@ class BlenderProcedureCard extends ConsumerWidget {
     int decimals,
   ) {
     final onPrimaryContainer = Theme.of(context).colorScheme.onPrimaryContainer;
-    final textStyle = Theme.of(
+    final headerStyle = blenderTableHeaderStyle(
       context,
-    ).textTheme.bodyLarge?.copyWith(color: onPrimaryContainer);
-    final headingStyle = Theme.of(
+      color: onPrimaryContainer,
+    );
+    final valueStyle = blenderTableValueStyle(
       context,
-    ).textTheme.labelLarge?.copyWith(color: onPrimaryContainer);
+      color: onPrimaryContainer,
+    );
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowHeight: 32,
-        dataRowMinHeight: 36,
-        dataRowMaxHeight: 44,
-        dividerThickness: 0,
-        headingTextStyle: headingStyle,
-        dataTextStyle: textStyle,
-        columns: [
-          DataColumn(
-            label: Text(context.l10n.gasCalculators_blender_stepColumnAction),
-          ),
-          DataColumn(
-            label: Text(
-              '${context.l10n.gasCalculators_blender_stepColumnAdded} '
-              '(${units.pressureSymbol})',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: _flex[0],
+              child: Text(
+                context.l10n.gasCalculators_blender_stepColumnAction,
+                style: headerStyle,
+              ),
             ),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text(
-              '${context.l10n.gasCalculators_blender_stepColumnPressure} '
-              '(${units.pressureSymbol})',
+            Expanded(
+              flex: _flex[1],
+              child: Text(
+                '${context.l10n.gasCalculators_blender_stepColumnAdded} '
+                '(${units.pressureSymbol})',
+                style: headerStyle,
+                textAlign: TextAlign.end,
+              ),
             ),
-            numeric: true,
-          ),
-          DataColumn(
-            label: Text(context.l10n.gasCalculators_blender_stepColumnMix),
-          ),
-        ],
-        rows: [
-          for (final step in steps) _stepRow(context, step, units, decimals),
-        ],
-      ),
+            Expanded(
+              flex: _flex[2],
+              child: Text(
+                '${context.l10n.gasCalculators_blender_stepColumnPressure} '
+                '(${units.pressureSymbol})',
+                style: headerStyle,
+                textAlign: TextAlign.end,
+              ),
+            ),
+            Expanded(
+              flex: _flex[3],
+              child: Text(
+                context.l10n.gasCalculators_blender_stepColumnMix,
+                style: headerStyle,
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        for (final step in steps)
+          _stepRow(context, step, units, decimals, valueStyle),
+      ],
     );
   }
 
-  DataRow _stepRow(
+  Widget _stepRow(
     BuildContext context,
     BlendStep step,
     UnitFormatter units,
     int decimals,
+    TextStyle? style,
   ) {
     final action = step.fillGas == null
         ? context.l10n.gasCalculators_blender_stepStartLabel
@@ -198,15 +214,37 @@ class BlenderProcedureCard extends ConsumerWidget {
         ? ''
         : '+${units.formatPressureValue(step.addedBar, decimals: decimals)}';
 
-    return DataRow(
-      cells: [
-        DataCell(Text(action)),
-        DataCell(Text(added)),
-        DataCell(
-          Text(units.formatPressureValue(step.pressureBar, decimals: decimals)),
-        ),
-        DataCell(Text(formatPreciseMix(context, step.resultingMix))),
-      ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: _flex[0],
+            child: Text(action, style: style),
+          ),
+          Expanded(
+            flex: _flex[1],
+            child: Text(added, style: style, textAlign: TextAlign.end),
+          ),
+          Expanded(
+            flex: _flex[2],
+            child: Text(
+              units.formatPressureValue(step.pressureBar, decimals: decimals),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+          Expanded(
+            flex: _flex[3],
+            child: Text(
+              formatPreciseMix(context, step.resultingMix),
+              style: style,
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

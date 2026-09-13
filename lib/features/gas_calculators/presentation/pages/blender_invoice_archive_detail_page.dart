@@ -91,7 +91,7 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
               ),
             ),
           if (invoice.fills.any((f) => f.lines.isNotEmpty))
-            BlenderBilledLineHeader(units: units),
+            BlenderBilledLineHeader(units: units, currency: currency),
           for (final fill in invoice.fills)
             _fillSection(theme, fill, currency, units, decimals),
           const Divider(height: 24),
@@ -133,7 +133,15 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
         children: [
           Row(
             children: [
+              // Aligned to the same columns as BlenderBilledLineHeader and
+              // BlenderBilledLineRow below, matching the running invoice's
+              // title row (issue #1876 follow-up).
               Expanded(
+                flex:
+                    kBilledLineFlex[0] +
+                    kBilledLineFlex[1] +
+                    kBilledLineFlex[2] +
+                    kBilledLineFlex[3],
                 child: Text(
                   fill.label,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -142,12 +150,17 @@ class BlenderInvoiceArchiveDetailPage extends ConsumerWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Text(
-                fill.total == null ? '' : formatMoney(fill.total!, currency),
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                flex: kBilledLineFlex[4],
+                child: Text(
+                  fill.total == null ? '' : formatMoney(fill.total!, currency),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.end,
                 ),
               ),
+              const SizedBox(width: kBilledLineTrailingWidth),
             ],
           ),
           for (final line in fill.lines)

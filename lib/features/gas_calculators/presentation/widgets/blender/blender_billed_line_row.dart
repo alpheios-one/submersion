@@ -1,41 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:submersion/core/utils/currency.dart';
+import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/billed_fill.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/blender/blender_table_style.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The flex ratios [BlenderBilledLineRow] and [BlenderBilledLineHeader] share,
 /// so the header's units line up over the values they label.
-const List<int> _kBilledLineFlex = [3, 3, 3, 3, 3];
+const List<int> kBilledLineFlex = [3, 3, 3, 3, 3];
+
+/// The width a fill's title row reserves for its edit/delete icons, so the
+/// label and total before it occupy the same width [kBilledLineFlex]'s
+/// columns fill in the header and data rows below -- otherwise the total
+/// lands to the left of where the "cost" column above it actually sits
+/// (issue #1876 follow-up). Two compact `IconButton`s at their effective 40px
+/// width apiece (the 32px `minWidth` constraint plus the button's own
+/// default padding), no gap between them.
+const double kBilledLineTrailingWidth = 80;
 
 /// The column header for a block of [BlenderBilledLineRow]s, units included
 /// so they are not repeated on every line (issue #1876). Shown once above
 /// each fill's itemisation, in [BlenderInvoiceCard] and the read-only archive
 /// detail view.
 class BlenderBilledLineHeader extends StatelessWidget {
-  const BlenderBilledLineHeader({super.key, required this.units});
+  const BlenderBilledLineHeader({
+    super.key,
+    required this.units,
+    required this.currency,
+  });
 
   final UnitFormatter units;
+  final String currency;
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.labelSmall?.copyWith(
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
-    );
+    final style = blenderTableHeaderStyle(context);
     final l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 2, bottom: 2),
       child: Row(
         children: [
           Expanded(
-            flex: _kBilledLineFlex[0],
+            flex: kBilledLineFlex[0],
             child: Text(
               l10n.gasCalculators_blender_flushFeeColumnGas,
               style: style,
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[1],
+            flex: kBilledLineFlex[1],
             child: Text(
               '${l10n.gasCalculators_blender_stepColumnAdded} '
               '(${units.pressureSymbol})',
@@ -44,7 +57,7 @@ class BlenderBilledLineHeader extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[2],
+            flex: kBilledLineFlex[2],
             child: Text(
               units.volumeSymbol,
               style: style,
@@ -52,18 +65,20 @@ class BlenderBilledLineHeader extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[3],
+            flex: kBilledLineFlex[3],
             child: Text(
-              l10n.gasCalculators_blender_cylinderVolume,
+              '${l10n.gasCalculators_blender_cylinderColumnShort} '
+              '(${units.volumeSymbol})',
               style: style,
               textAlign: TextAlign.end,
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[4],
-            child: Text('', style: style, textAlign: TextAlign.end),
+            flex: kBilledLineFlex[4],
+            child: Text(currency, style: style, textAlign: TextAlign.end),
           ),
+          const SizedBox(width: kBilledLineTrailingWidth),
         ],
       ),
     );
@@ -91,17 +106,17 @@ class BlenderBilledLineRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodySmall;
+    final style = blenderTableValueStyle(context);
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 2),
       child: Row(
         children: [
           Expanded(
-            flex: _kBilledLineFlex[0],
+            flex: kBilledLineFlex[0],
             child: Text(line.gas, style: style),
           ),
           Expanded(
-            flex: _kBilledLineFlex[1],
+            flex: kBilledLineFlex[1],
             child: Text(
               '+${units.formatPressureValue(line.addedBar, decimals: decimals)}',
               style: style,
@@ -109,7 +124,7 @@ class BlenderBilledLineRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[2],
+            flex: kBilledLineFlex[2],
             child: Text(
               // Volume when this line has one (every fill saved since
               // #1335); pressure-only rows saved before that fall back to a
@@ -123,7 +138,7 @@ class BlenderBilledLineRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[3],
+            flex: kBilledLineFlex[3],
             child: Text(
               line.cylinderLiters != null
                   ? units.formatVolumeValue(line.cylinderLiters!)
@@ -133,13 +148,14 @@ class BlenderBilledLineRow extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: _kBilledLineFlex[4],
+            flex: kBilledLineFlex[4],
             child: Text(
-              line.cost == null ? '' : formatMoney(line.cost!, currency),
+              line.cost == null ? '' : formatFixedForInput(line.cost!, 2),
               style: style,
               textAlign: TextAlign.end,
             ),
           ),
+          const SizedBox(width: kBilledLineTrailingWidth),
         ],
       ),
     );

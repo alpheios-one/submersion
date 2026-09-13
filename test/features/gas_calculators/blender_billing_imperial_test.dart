@@ -165,8 +165,9 @@ void main() {
     final liters = ref.read(blenderBillingProvider).lines.first.freeGasLiters;
     final expected = (liters * _cuftPerLiter).toStringAsFixed(0);
 
-    // Converting twice printed "0 cuft" for hundreds of litres of gas.
-    expect(find.text('$expected cuft'), findsWidgets);
+    // Converting twice printed "0" for hundreds of litres of gas. The unit
+    // sits in the column header now, not repeated per cell.
+    expect(find.text(expected), findsWidgets);
     expect(expected, isNot('0'));
   });
 }
