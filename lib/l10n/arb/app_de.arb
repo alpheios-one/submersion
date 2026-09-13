@@ -4226,6 +4226,7 @@
   "gasCalculators_mod_aboutModBody": "Weniger O₂ = tiefere MOD = kürzere Nullzeit",
   "gasCalculators_mod_inputParameters": "Eingabeparameter",
   "gasCalculators_mod_maximumOperatingDepth": "Maximale Einsatztiefe",
+  "gasCalculators_mod_semanticsLabel": "Maximale Einsatztiefe: {depth} {unit} bei {ppo2} bar ppO2 mit {o2}% Sauerstoff",
   "gasCalculators_mod_oxygenO2": "Sauerstoff (O₂)",
   "gasCalculators_mod_ppO2Conservative": "Konservatives Limit für längere Grundzeit",
   "gasCalculators_mod_ppO2Maximum": "Maximales Limit nur für Dekostopps",

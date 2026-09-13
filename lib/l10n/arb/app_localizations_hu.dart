@@ -12973,6 +12973,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Maximum működési mélység';
 
   @override
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  ) {
+    return 'Maximum Operating Depth: $depth $unit at $ppo2 bar ppO2 with $o2% oxygen';
+  }
+
+  @override
   String get gasCalculators_mod_oxygenO2 => 'Oxigén (O₂)';
 
   @override

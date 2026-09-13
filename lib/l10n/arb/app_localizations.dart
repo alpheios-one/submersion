@@ -21846,6 +21846,17 @@ abstract class AppLocalizations {
   /// **'Maximum Operating Depth'**
   String get gasCalculators_mod_maximumOperatingDepth;
 
+  /// No description provided for @gasCalculators_mod_semanticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum Operating Depth: {depth} {unit} at {ppo2} bar ppO2 with {o2}% oxygen'**
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  );
+
   /// No description provided for @gasCalculators_mod_oxygenO2.
   ///
   /// In en, this message translates to:

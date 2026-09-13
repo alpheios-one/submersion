@@ -12397,6 +12397,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_mod_maximumOperatingDepth => '最大作业深度';
 
   @override
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  ) {
+    return 'Maximum Operating Depth: $depth $unit at $ppo2 bar ppO2 with $o2% oxygen';
+  }
+
+  @override
   String get gasCalculators_mod_oxygenO2 => '氧气 (O₂)';
 
   @override

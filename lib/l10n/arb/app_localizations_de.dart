@@ -12994,6 +12994,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Maximale Einsatztiefe';
 
   @override
+  String gasCalculators_mod_semanticsLabel(
+    String depth,
+    String unit,
+    String ppo2,
+    String o2,
+  ) {
+    return 'Maximale Einsatztiefe: $depth $unit bei $ppo2 bar ppO2 mit $o2% Sauerstoff';
+  }
+
+  @override
   String get gasCalculators_mod_oxygenO2 => 'Sauerstoff (O₂)';
 
   @override

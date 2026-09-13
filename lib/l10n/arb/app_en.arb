@@ -7480,6 +7480,23 @@
   "gasCalculators_mod_aboutModBody": "Lower O₂ = deeper MOD = shorter NDL",
   "gasCalculators_mod_inputParameters": "Input Parameters",
   "gasCalculators_mod_maximumOperatingDepth": "Maximum Operating Depth",
+  "gasCalculators_mod_semanticsLabel": "Maximum Operating Depth: {depth} {unit} at {ppo2} bar ppO2 with {o2}% oxygen",
+  "@gasCalculators_mod_semanticsLabel": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "ppo2": {
+        "type": "String"
+      },
+      "o2": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_mod_oxygenO2": "Oxygen (O₂)",
   "gasCalculators_mod_ppO2Conservative": "Conservative limit for extended bottom time",
   "gasCalculators_mod_ppO2Maximum": "Maximum limit for decompression stops only",
