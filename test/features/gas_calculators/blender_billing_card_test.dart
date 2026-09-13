@@ -303,27 +303,27 @@ void main() {
         ];
         await tester.pumpAndSettle();
 
-        final o2Row = find.byKey(const Key('blender-flush-fee-row-o2'));
-        expect(o2Row, findsOneWidget);
+        // The gas label, its purge volume and its price all sit in the same
+        // DataRow (see BlenderBillingCard._flushFeeGasRow), so finding each
+        // cell by its own key -- gas-specific and therefore unambiguous -- is
+        // what a table's own alignment already guarantees, without needing to
+        // scope through a row ancestor the way the old Row-per-gas layout did.
+        final table = find.byType(DataTable);
         expect(
-          find.descendant(of: o2Row, matching: find.textContaining('O₂')),
+          find.descendant(of: table, matching: find.textContaining('O₂')),
           findsOneWidget,
         );
         expect(
-          find.descendant(
-            of: o2Row,
-            matching: find.byKey(const Key('blender-flush-fee-volume-o2')),
-          ),
+          find.byKey(const Key('blender-flush-fee-volume-o2')),
           findsOneWidget,
         );
         expect(
-          find.descendant(
-            of: o2Row,
-            matching: find.byKey(const Key('blender-flush-fee-price-o2')),
-          ),
+          find.byKey(const Key('blender-flush-fee-price-o2')),
           findsOneWidget,
         );
-        expect(find.textContaining('CHF/100'), findsWidgets);
+        // The unit and currency now sit once in the column headers instead
+        // of being repeated on every row.
+        expect(find.textContaining('CHF/100'), findsOneWidget);
         expect(find.text('Price'), findsNothing);
       },
     );

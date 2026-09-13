@@ -414,70 +414,90 @@ class _BlenderBillingCardState extends ConsumerState<BlenderBillingCard> {
               },
             ),
           ),
-          for (var i = 0; i < BlenderGasRole.values.length; i++)
-            _flushFeeGasRow(context, ref, i, settings, units, currency),
+          _flushFeeTable(context, ref, settings, units, currency),
         ],
       ],
     );
   }
 
-  /// One tab-aligned row per gas: label, purge volume, price -- all three
-  /// rows lined up on the same columns (issue #44 follow-up) instead of the
-  /// former two stacked label/value blocks. Both figures are entered once,
-  /// next to their bank on the Fill gases settings card, and shown here as
-  /// plain text rather than a second, easily-drifting entry point for the
-  /// same numbers.
-  Widget _flushFeeGasRow(
+  /// A table of every gas's purge volume and rate, units in the column
+  /// headers rather than repeated per cell, wrapped in horizontal scrolling
+  /// for narrow screens (issue #1876) -- the same pattern
+  /// `blender_procedure_card.dart` uses for its own dense table. Both figures
+  /// are entered once, next to their bank on the Fill gases settings card,
+  /// and shown here as plain text rather than a second, easily-drifting
+  /// entry point for the same numbers.
+  Widget _flushFeeTable(
     BuildContext context,
     WidgetRef ref,
-    int index,
     AppSettings settings,
     UnitFormatter units,
     String currency,
   ) {
-    final role = BlenderGasRole.values[index];
-    final label = blenderGasRoleLabel(context, role);
-    final price = ref.watch(blenderGasPricesProvider)[index];
-    final volumeLiters = ref
-        .watch(blenderFlushFeeGasesProvider)[index]
-        .volumeLiters;
-    final style = Theme.of(context).textTheme.bodyMedium;
-    return Padding(
-      key: Key('blender-flush-fee-row-${role.name}'),
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 5,
-            child: Text(
-              '$label ${context.l10n.gasCalculators_blender_flushFeeVolume}',
-              style: style,
-            ),
+    final prices = ref.watch(blenderGasPricesProvider);
+    final flushGases = ref.watch(blenderFlushFeeGasesProvider);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        headingRowHeight: 32,
+        dataRowMinHeight: 36,
+        dataRowMaxHeight: 44,
+        columns: [
+          DataColumn(
+            label: Text(context.l10n.gasCalculators_blender_flushFeeColumnGas),
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              '${formatRoundedForInput(litersToDisplayVolume(volumeLiters, settings), 2)} '
-              '${units.volumeSymbol}',
-              key: Key('blender-flush-fee-volume-${role.name}'),
-              style: style,
-              textAlign: TextAlign.end,
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              price == null
-                  ? ''
-                  : '${formatRoundedForInput(pricePer100LitersToDisplay(price, settings), 2)} '
-                        '$currency/100${units.volumeSymbol}',
-              key: Key('blender-flush-fee-price-${role.name}'),
-              style: style,
-              textAlign: TextAlign.end,
-            ),
+          DataColumn(label: Text(units.volumeSymbol), numeric: true),
+          DataColumn(
+            label: Text('$currency/100${units.volumeSymbol}'),
+            numeric: true,
           ),
         ],
+        rows: [
+          for (var i = 0; i < BlenderGasRole.values.length; i++)
+            _flushFeeGasRow(
+              context,
+              BlenderGasRole.values[i],
+              settings,
+              flushGases[i].volumeLiters,
+              prices[i],
+            ),
+        ],
       ),
+    );
+  }
+
+  DataRow _flushFeeGasRow(
+    BuildContext context,
+    BlenderGasRole role,
+    AppSettings settings,
+    double volumeLiters,
+    double? price,
+  ) {
+    return DataRow(
+      key: ValueKey('blender-flush-fee-row-${role.name}'),
+      cells: [
+        DataCell(Text(blenderGasRoleLabel(context, role))),
+        DataCell(
+          Text(
+            formatRoundedForInput(
+              litersToDisplayVolume(volumeLiters, settings),
+              2,
+            ),
+            key: Key('blender-flush-fee-volume-${role.name}'),
+          ),
+        ),
+        DataCell(
+          Text(
+            price == null
+                ? ''
+                : formatRoundedForInput(
+                    pricePer100LitersToDisplay(price, settings),
+                    2,
+                  ),
+            key: Key('blender-flush-fee-price-${role.name}'),
+          ),
+        ),
+      ],
     );
   }
 }

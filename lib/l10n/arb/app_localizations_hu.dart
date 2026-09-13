@@ -13338,6 +13338,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Öblítési térfogat';
 
   @override
+  String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return '$gas tömlőöblítés';
   }

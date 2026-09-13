@@ -180,16 +180,14 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  for (var i = 0; i < BlenderGasRole.values.length; i++)
-                    _flushFeeLine(
-                      context,
-                      i,
-                      flushGases[i],
-                      flushMultiplier,
-                      currency,
-                      units,
-                      settings,
-                    ),
+                  _flushFeeTable(
+                    context,
+                    flushGases,
+                    flushMultiplier,
+                    currency,
+                    units,
+                    settings,
+                  ),
                   const SizedBox(height: 4),
                 ],
                 for (final f in fills)
@@ -501,65 +499,83 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     }
   }
 
-  /// One structured flush-fee line: the gas, its purge volume, and what that
-  /// volume costs at the configured rate. Derived from settings rather than
-  /// stored in [blenderBilledFillsProvider] — nothing in that append-only
-  /// list is "first" by construction, so a fee meant to sit once at the top
-  /// of the bill has to live outside it (issue #1335).
-  Widget _flushFeeLine(
+  /// The hose-purge fee for every gas role, one `DataTable` row each: the
+  /// gas, its purge volume, and what that volume costs at the configured
+  /// rate. Units sit once in the column headers, wrapped in horizontal
+  /// scrolling for narrow screens (issue #1876) -- the same pattern
+  /// `blender_procedure_card.dart` and `BlenderBillingCard`'s own flush-fee
+  /// table use. Derived from settings rather than stored in
+  /// [blenderBilledFillsProvider] — nothing in that append-only list is
+  /// "first" by construction, so a fee meant to sit once at the top of the
+  /// bill has to live outside it (issue #1335).
+  Widget _flushFeeTable(
     BuildContext context,
-    int index,
-    FlushFeeGasSetting gas,
+    List<FlushFeeGasSetting> flushGases,
     int multiplier,
     String currency,
     UnitFormatter units,
     AppSettings settings,
   ) {
-    final role = BlenderGasRole.values[index];
-    final label = blenderGasRoleLabel(context, role);
-    final price = ref.watch(blenderGasPricesProvider)[role.index];
-    final cost = flushFeeCost(gas.volumeLiters * multiplier, price);
-    final style = Theme.of(context).textTheme.bodyMedium;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              multiplier > 1 ? '$label  ×$multiplier' : label,
-              style: style,
-            ),
+    final prices = ref.watch(blenderGasPricesProvider);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        headingRowHeight: 32,
+        dataRowMinHeight: 36,
+        dataRowMaxHeight: 44,
+        columns: [
+          DataColumn(
+            label: Text(context.l10n.gasCalculators_blender_flushFeeColumnGas),
           ),
-          // Read-only: this role's flush volume is entered once, on the Fill
-          // gases settings card (blender_fill_gases_card.dart), next to its
-          // price, and shown here as plain text rather than a second,
-          // easily-drifting entry point for the same number (issue #42
-          // follow-up). Plain text, not a disabled-looking field: an
-          // InputDecorator still reads as an inert input control (issue #44
-          // follow-up).
-          SizedBox(
-            width: 72,
-            child: Text(
-              '${formatRoundedForInput(litersToDisplayVolume(gas.volumeLiters, settings), 2)} '
-              '${units.volumeSymbol}',
-              key: Key('blender-flush-fee-liters-${role.name}'),
-              style: style,
-              textAlign: TextAlign.end,
+          DataColumn(label: Text(units.volumeSymbol), numeric: true),
+          DataColumn(label: Text(currency), numeric: true),
+        ],
+        rows: [
+          for (var i = 0; i < BlenderGasRole.values.length; i++)
+            _flushFeeRow(
+              context,
+              BlenderGasRole.values[i],
+              flushGases[i],
+              multiplier,
+              prices[i],
+              units,
+              settings,
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 2,
-            child: Text(
-              cost == null ? '' : formatMoney(cost, currency),
-              style: style,
-              textAlign: TextAlign.end,
-            ),
-          ),
         ],
       ),
+    );
+  }
+
+  DataRow _flushFeeRow(
+    BuildContext context,
+    BlenderGasRole role,
+    FlushFeeGasSetting gas,
+    int multiplier,
+    double? price,
+    UnitFormatter units,
+    AppSettings settings,
+  ) {
+    final label = blenderGasRoleLabel(context, role);
+    final cost = flushFeeCost(gas.volumeLiters * multiplier, price);
+    return DataRow(
+      cells: [
+        DataCell(Text(multiplier > 1 ? '$label  ×$multiplier' : label)),
+        // Read-only: this role's flush volume is entered once, on the Fill
+        // gases settings card (blender_fill_gases_card.dart), next to its
+        // price, and shown here as plain text rather than a second,
+        // easily-drifting entry point for the same number (issue #42
+        // follow-up).
+        DataCell(
+          Text(
+            formatRoundedForInput(
+              litersToDisplayVolume(gas.volumeLiters, settings),
+              2,
+            ),
+            key: Key('blender-flush-fee-liters-${role.name}'),
+          ),
+        ),
+        DataCell(Text(cost == null ? '' : formatFixedForInput(cost, 2))),
+      ],
     );
   }
 

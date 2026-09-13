@@ -13275,6 +13275,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Spoelvolume';
 
   @override
+  String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return '$gas slang spoelen';
   }

@@ -22455,6 +22455,12 @@ abstract class AppLocalizations {
   /// **'Purge volume'**
   String get gasCalculators_blender_flushFeeVolume;
 
+  /// No description provided for @gasCalculators_blender_flushFeeColumnGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas'**
+  String get gasCalculators_blender_flushFeeColumnGas;
+
   /// No description provided for @gasCalculators_blender_flushFeeLine.
   ///
   /// In en, this message translates to:

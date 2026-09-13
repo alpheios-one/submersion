@@ -13425,6 +13425,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_flushFeeVolume => 'Volume de purge';
 
   @override
+  String get gasCalculators_blender_flushFeeColumnGas => 'Gas';
+
+  @override
   String gasCalculators_blender_flushFeeLine(String gas) {
     return 'Purge du flexible $gas';
   }
