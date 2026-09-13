@@ -335,6 +335,14 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
   /// fill order since reconfigured (PR #1215 review). Keying by role rather
   /// than by bank position keeps this correct however the fill order is
   /// arranged (issue #42).
+  /// A compact table of the currently priced gases, units and currency in
+  /// the column header instead of repeated after every entry (issue #1876).
+  /// Zipped by role against the gas that role *currently* holds, matching
+  /// how the price fields there are labelled - not by grouping historical
+  /// invoice lines, which may have been filled under a fill order since
+  /// reconfigured (PR #1215 review). Keying by role rather than by bank
+  /// position keeps this correct however the fill order is arranged
+  /// (issue #42).
   Widget _tariffSummary(
     BuildContext context,
     AppSettings settings,
@@ -343,25 +351,60 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
     final topupO2 = ref.watch(blenderTopupO2PercentProvider);
     final prices = ref.watch(blenderGasPricesProvider);
     final units = UnitFormatter(settings);
-    final parts = <String>[];
-    for (final role in BlenderGasRole.values) {
-      final price = prices[role.index];
-      if (price == null) continue;
-      final display = pricePer100LitersToDisplay(price, settings);
-      parts.add(
-        '${formatPreciseGasName(context, gasForRole(role, topupO2))} '
-        '${formatMoney(display, currency)}/100${units.volumeSymbol}',
-      );
-    }
-    if (parts.isEmpty) return const SizedBox.shrink();
+    final rows = <DataRow>[
+      for (final role in BlenderGasRole.values)
+        if (prices[role.index] case final price?)
+          DataRow(
+            cells: [
+              DataCell(
+                Text(formatPreciseGasName(context, gasForRole(role, topupO2))),
+              ),
+              DataCell(
+                Text(
+                  formatFixedForInput(
+                    pricePer100LitersToDisplay(price, settings),
+                    2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    ];
+    if (rows.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
+    final mutedStyle = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: Text(
-        '${context.l10n.gasCalculators_blender_tariff}: ${parts.join('  ·  ')}',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.l10n.gasCalculators_blender_tariff, style: mutedStyle),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              headingRowHeight: 24,
+              dataRowMinHeight: 24,
+              dataRowMaxHeight: 28,
+              dividerThickness: 0,
+              headingTextStyle: mutedStyle,
+              dataTextStyle: mutedStyle,
+              columns: [
+                DataColumn(
+                  label: Text(
+                    context.l10n.gasCalculators_blender_flushFeeColumnGas,
+                  ),
+                ),
+                DataColumn(
+                  label: Text('$currency/100${units.volumeSymbol}'),
+                  numeric: true,
+                ),
+              ],
+              rows: rows,
+            ),
+          ),
+        ],
       ),
     );
   }

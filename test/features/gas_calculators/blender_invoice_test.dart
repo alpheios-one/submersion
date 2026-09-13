@@ -600,14 +600,13 @@ void main() {
       ];
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Current tariff'), findsOneWidget);
-      expect(find.textContaining('1.20/100L'), findsOneWidget);
-      // Unpriced banks are left out rather than shown as a placeholder.
-      final tariffLine = tester
-          .widgetList<Text>(find.byType(Text))
-          .where((t) => t.data?.contains('Current tariff') ?? false)
-          .single;
-      expect(tariffLine.data, isNot(contains('null')));
+      expect(find.text('Current tariff'), findsOneWidget);
+      // The unit and currency sit once in the column header now, not
+      // repeated after every priced gas.
+      expect(find.textContaining('CHF/100L'), findsOneWidget);
+      expect(find.text('1.20'), findsOneWidget);
+      // Unpriced banks are left out rather than shown as a placeholder row.
+      expect(find.textContaining('null'), findsNothing);
     });
 
     testWidgets('no tariff line is shown when nothing is priced', (
