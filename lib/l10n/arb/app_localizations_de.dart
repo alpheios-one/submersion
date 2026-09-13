@@ -13348,7 +13348,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String gasCalculators_blender_billedDate(String date) {
-    return 'Rechnung vom $date';
+    return 'Gasbezug vom $date';
   }
 
   @override

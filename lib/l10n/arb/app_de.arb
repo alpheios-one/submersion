@@ -134,7 +134,7 @@
   "gasCalculators_blender_flushFeeVolume": "Spülvolumen",
   "gasCalculators_blender_flushFeeLine": "{gas}-Schlauchspülung",
   "gasCalculators_blender_billed": "Abgerechnet",
-  "gasCalculators_blender_billedDate": "Rechnung vom {date}",
+  "gasCalculators_blender_billedDate": "Gasbezug vom {date}",
   "gasCalculators_blender_billedDateEdit": "Rechnungsdatum ändern",
   "gasCalculators_blender_tariff": "Tarif",
   "gasCalculators_blender_billedNone": "Noch nichts abgerechnet. Schliesse eine Füllung ab und speichere sie hier.",
