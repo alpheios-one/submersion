@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/flush_fee.dart';
@@ -52,6 +53,12 @@ Future<WidgetRef> _pump(
 }
 
 void main() {
+  late String? previousLocale;
+
+  setUp(() => previousLocale = Intl.defaultLocale);
+
+  tearDown(() => Intl.defaultLocale = previousLocale);
+
   testWidgets('rows are labelled by role, not by bank number', (tester) async {
     // Issue #42: banks are identities (oxygen, helium, topup) rather than
     // positions, and the defaults fill oxygen, then helium, then topup.
@@ -270,5 +277,65 @@ void main() {
       find.byKey(const Key('blender-flush-fee-volume-o2')),
     );
     expect(o2Volume.controller?.text, '40');
+  });
+
+  testWidgets('a dot under a German locale shows an inline error and keeps the '
+      'previous price instead of silently discarding it', (tester) async {
+    // Under de, '.' is the grouping separator, not the decimal one, so
+    // "12.5" is unreadable rather than 12,5 (#1091's fix). The field must
+    // say so instead of quietly wiping out the stored price.
+    Intl.defaultLocale = 'de';
+    await _pump(
+      tester,
+      overrides: [
+        blenderGasPricesProvider.overrideWith((ref) => const [9.5, null, null]),
+      ],
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('blender-gas-price-o2')),
+      '12.5',
+    );
+    await tester.pump();
+
+    final field = tester.widget<TextField>(
+      find.byKey(const Key('blender-gas-price-o2')),
+    );
+    expect(field.decoration?.errorText, isNotNull);
+  });
+
+  testWidgets('a dot under a German locale shows an inline error on the flush '
+      'volume field too', (tester) async {
+    Intl.defaultLocale = 'de';
+    await _pump(tester);
+
+    await tester.enterText(
+      find.byKey(const Key('blender-flush-fee-volume-o2')),
+      '12.5',
+    );
+    await tester.pump();
+
+    final field = tester.widget<TextField>(
+      find.byKey(const Key('blender-flush-fee-volume-o2')),
+    );
+    expect(field.decoration?.errorText, isNotNull);
+  });
+
+  testWidgets('a valid comma decimal under a German locale clears the error', (
+    tester,
+  ) async {
+    Intl.defaultLocale = 'de';
+    await _pump(tester);
+
+    await tester.enterText(
+      find.byKey(const Key('blender-gas-price-o2')),
+      '12,5',
+    );
+    await tester.pump();
+
+    final field = tester.widget<TextField>(
+      find.byKey(const Key('blender-gas-price-o2')),
+    );
+    expect(field.decoration?.errorText, isNull);
   });
 }

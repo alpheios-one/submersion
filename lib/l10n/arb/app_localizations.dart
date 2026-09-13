@@ -22348,6 +22348,12 @@ abstract class AppLocalizations {
   /// **'Price per 100 {unit}'**
   String gasCalculators_blender_unitPrice(String unit);
 
+  /// No description provided for @gasCalculators_blender_invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number (decimal separator: \"{separator}\")'**
+  String gasCalculators_blender_invalidNumber(String separator);
+
   /// No description provided for @gasCalculators_blender_currency.
   ///
   /// In en, this message translates to:

@@ -13209,6 +13209,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String gasCalculators_blender_invalidNumber(String separator) {
+    return 'Enter a valid number (decimal separator: \"$separator\")';
+  }
+
+  @override
   String get gasCalculators_blender_currency => 'Valuta';
 
   @override

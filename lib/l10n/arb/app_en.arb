@@ -7611,6 +7611,14 @@
   "gasCalculators_blender_cylinderVolume": "Cylinder water capacity",
   "gasCalculators_blender_cylinderPresets": "Presets",
   "gasCalculators_blender_unitPrice": "Price per 100 {unit}",
+  "gasCalculators_blender_invalidNumber": "Enter a valid number (decimal separator: \"{separator}\")",
+  "@gasCalculators_blender_invalidNumber": {
+    "placeholders": {
+      "separator": {
+        "type": "String"
+      }
+    }
+  },
   "gasCalculators_blender_currency": "Currency",
   "gasCalculators_blender_currencyFollowsUnits": "Follows Settings > Units > Default currency",
   "gasCalculators_blender_manageCylinderSizes": "Manage cylinder sizes",

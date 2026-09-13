@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/locale_number_symbols.dart';
 import 'package:submersion/core/utils/number_input.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gas_calculators/domain/blending/blender_gas_role.dart';
@@ -158,34 +159,71 @@ class BlenderFillGasesCard extends ConsumerWidget {
     BlenderGasRole role,
     UnitFormatter units,
   ) {
-    return TextField(
-      key: Key('blender-gas-price-${role.name}'),
-      controller: priceControllers[role.index],
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-      decoration: InputDecoration(
-        labelText: context.l10n.gasCalculators_blender_unitPrice(
-          units.volumeSymbol,
+    final controller = priceControllers[role.index];
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) => TextField(
+        key: Key('blender-gas-price-${role.name}'),
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+        ],
+        decoration: InputDecoration(
+          labelText: context.l10n.gasCalculators_blender_unitPrice(
+            units.volumeSymbol,
+          ),
+          errorText: _invalidNumberText(context, controller.text),
+          isDense: true,
+          border: const OutlineInputBorder(),
         ),
-        isDense: true,
-        border: const OutlineInputBorder(),
+        onChanged: (_) => _onPriceChanged(ref),
+        onEditingComplete: () => saveBlenderPreferences(ref),
+        onSubmitted: (_) => saveBlenderPreferences(ref),
       ),
-      onChanged: (_) => _onPriceChanged(ref),
-      onEditingComplete: () => saveBlenderPreferences(ref),
-      onSubmitted: (_) => saveBlenderPreferences(ref),
+    );
+  }
+
+  /// The error to show under a decimal field when [text] is non-blank but
+  /// cannot be read as a number in the active locale -- e.g. a diver typing
+  /// "." under a German locale, where '.' is the grouping separator rather
+  /// than the decimal one, and `parseUserDecimal` deliberately refuses to
+  /// guess (#1091). Without this the field just silently kept the diver's old
+  /// price instead of saying why.
+  String? _invalidNumberText(BuildContext context, String text) {
+    if (text.trim().isEmpty || parseUserDecimal(text) != null) return null;
+    return context.l10n.gasCalculators_blender_invalidNumber(
+      localeNumberFormat().symbols.DECIMAL_SEP,
     );
   }
 
   /// Rebuilds the whole role-indexed price list from every row's controller.
+  ///
+  /// Blank text clears a role's price to null (no price set yet). Unreadable,
+  /// non-blank text keeps whatever was stored before rather than silently
+  /// discarding a price the diver already entered -- the field's `errorText`
+  /// is what tells them the keystroke was rejected.
   void _onPriceChanged(WidgetRef ref) {
     final settings = ref.read(settingsProvider);
+    final previous = ref.read(blenderGasPricesProvider);
     ref.read(blenderGasPricesProvider.notifier).state = [
-      for (final c in priceControllers)
-        switch (parseUserDecimal(c.text)) {
-          final double entered => displayToPricePer100Liters(entered, settings),
-          null => null,
-        },
+      for (var i = 0; i < priceControllers.length; i++)
+        _priceOrKeep(priceControllers[i].text, previous, i, settings),
     ];
+  }
+
+  double? _priceOrKeep(
+    String text,
+    List<double?> previous,
+    int index,
+    AppSettings settings,
+  ) {
+    if (text.trim().isEmpty) return null;
+    final parsed = parseUserDecimal(text);
+    if (parsed == null) {
+      return index < previous.length ? previous[index] : null;
+    }
+    return displayToPricePer100Liters(parsed, settings);
   }
 
   Widget _flushVolumeField(
@@ -195,38 +233,64 @@ class BlenderFillGasesCard extends ConsumerWidget {
     UnitFormatter units,
   ) {
     final label = blenderGasRoleLabel(context, role);
-    return TextField(
-      key: Key('blender-flush-fee-volume-${role.name}'),
-      controller: flushVolumeControllers[role.index],
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
-      decoration: InputDecoration(
-        labelText:
-            '$label '
-            '${context.l10n.gasCalculators_blender_flushFeeVolume} '
-            '(${units.volumeSymbol})',
-        isDense: true,
-        border: const OutlineInputBorder(),
+    final controller = flushVolumeControllers[role.index];
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) => TextField(
+        key: Key('blender-flush-fee-volume-${role.name}'),
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+        ],
+        decoration: InputDecoration(
+          labelText:
+              '$label '
+              '${context.l10n.gasCalculators_blender_flushFeeVolume} '
+              '(${units.volumeSymbol})',
+          errorText: _invalidNumberText(context, controller.text),
+          isDense: true,
+          border: const OutlineInputBorder(),
+        ),
+        onChanged: (_) => _onFlushVolumeChanged(ref),
+        onEditingComplete: () => saveBlenderPreferences(ref),
+        onSubmitted: (_) => saveBlenderPreferences(ref),
       ),
-      onChanged: (_) => _onFlushVolumeChanged(ref),
-      onEditingComplete: () => saveBlenderPreferences(ref),
-      onSubmitted: (_) => saveBlenderPreferences(ref),
     );
   }
 
   /// Rebuilds the whole role-indexed flush-volume list from every row's
-  /// controller, mirroring [_onPriceChanged].
+  /// controller, mirroring [_onPriceChanged]: blank clears to zero (no purge
+  /// volume set), unreadable non-blank text keeps whatever was stored before
+  /// instead of silently zeroing a volume the diver already entered.
   void _onFlushVolumeChanged(WidgetRef ref) {
     final settings = ref.read(settingsProvider);
+    final previous = ref.read(blenderFlushFeeGasesProvider);
     ref.read(blenderFlushFeeGasesProvider.notifier).state = [
-      for (final c in flushVolumeControllers)
+      for (var i = 0; i < flushVolumeControllers.length; i++)
         FlushFeeGasSetting(
-          volumeLiters: displayVolumeToLiters(
-            parseUserDecimal(c.text) ?? 0,
+          volumeLiters: _flushVolumeOrKeep(
+            flushVolumeControllers[i].text,
+            previous,
+            i,
             settings,
           ),
         ),
     ];
+  }
+
+  double _flushVolumeOrKeep(
+    String text,
+    List<FlushFeeGasSetting> previous,
+    int index,
+    AppSettings settings,
+  ) {
+    if (text.trim().isEmpty) return 0;
+    final parsed = parseUserDecimal(text);
+    if (parsed == null) {
+      return index < previous.length ? previous[index].volumeLiters : 0;
+    }
+    return displayVolumeToLiters(parsed, settings);
   }
 
   void _move(WidgetRef ref, List<BlenderGasRole> order, int from, int to) {
