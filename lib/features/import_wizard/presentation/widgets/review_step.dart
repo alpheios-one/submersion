@@ -41,15 +41,17 @@ class ReviewStep extends ConsumerWidget {
 
     // Compute projected dive numbers for the review list.
     final nextDiveNumber = ref.watch(nextDiveNumberProvider).whenData((v) => v);
-    final projectedDiveNumbers = _computeProjectedDiveNumbers(
+    final projectedDiveNumbers = computeProjectedDiveNumbers(
       bundle: bundle,
       nextDiveNumber: nextDiveNumber.value,
-      retainSource: state.retainSourceDiveNumbers,
+      retainSource:
+          state.retainSourceDiveNumbers && bundle.hasSourceDiveNumbers,
       selections: state.selections[ImportEntityType.dives] ?? const {},
       duplicateActions:
           state.duplicateActions[ImportEntityType.dives] ?? const {},
       duplicateIndices:
           bundle.groups[ImportEntityType.dives]?.duplicateIndices ?? const {},
+      nextDiveNumberByTarget: bundle.nextDiveNumberByTarget,
     );
 
     final existingTags = ref.watch(tagsProvider).valueOrNull ?? const <Tag>[];
@@ -72,16 +74,23 @@ class ReviewStep extends ConsumerWidget {
   /// Only assigns numbers to dives that will actually be imported as new
   /// (selected non-duplicates + duplicates with "Import as New" action).
   /// Skipped and consolidated dives are excluded.
-  static Map<int, int>? _computeProjectedDiveNumbers({
+  ///
+  /// With [retainSource] on, each dive shows the number its source recorded.
+  /// A dive whose source recorded none gets no projected number: what it
+  /// ends up with depends on the source, so the preview does not guess
+  /// (issue #1832).
+  @visibleForTesting
+  static Map<int, int>? computeProjectedDiveNumbers({
     required ImportBundle bundle,
     required int? nextDiveNumber,
     required bool retainSource,
     required Set<int> selections,
     required Map<int, DuplicateAction> duplicateActions,
     required Set<int> duplicateIndices,
+    Map<String, int> nextDiveNumberByTarget = const {},
   }) {
     final group = bundle.groups[ImportEntityType.dives];
-    if (group == null || nextDiveNumber == null) return null;
+    if (group == null) return null;
 
     final items = group.items;
 
@@ -99,19 +108,41 @@ class ReviewStep extends ConsumerWidget {
       }
     }
 
-    // Build (index, startTime) pairs for sorting.
-    final indexed = <(int, DateTime)>[];
-    for (final i in importIndices) {
-      final time = items[i].diveData?.startTime ?? DateTime(0);
-      indexed.add((i, time));
+    if (retainSource) {
+      return {for (final i in importIndices) i: ?items[i].diveData?.diveNumber};
     }
-    indexed.sort((a, b) => a.$2.compareTo(b.$2));
+    if (nextDiveNumber == null && nextDiveNumberByTarget.isEmpty) return null;
 
-    // Assign numbers oldest-first.
+    // Each profile numbers its own dives (issue #1893). A dive without a
+    // target label belongs to the import's only profile when there is one,
+    // otherwise to the active profile.
+    int? baseFor(String? targetKey) {
+      if (targetKey != null) {
+        return nextDiveNumberByTarget[targetKey] ?? nextDiveNumber;
+      }
+      return nextDiveNumberByTarget.length == 1
+          ? nextDiveNumberByTarget.values.single
+          : nextDiveNumber;
+    }
+
+    // Build (index, startTime) pairs per profile for sorting.
+    final byTarget = <String?, List<(int, DateTime)>>{};
+    for (final i in importIndices) {
+      (byTarget[items[i].target?.key] ??= []).add((
+        i,
+        items[i].diveData?.startTime ?? DateTime(0),
+      ));
+    }
+
+    // Assign numbers oldest-first within each profile.
     final result = <int, int>{};
-    for (var n = 0; n < indexed.length; n++) {
-      final itemIndex = indexed[n].$1;
-      result[itemIndex] = nextDiveNumber + n;
+    for (final MapEntry(key: target, value: indexed) in byTarget.entries) {
+      final base = baseFor(target);
+      if (base == null) continue;
+      indexed.sort((a, b) => a.$2.compareTo(b.$2));
+      for (var n = 0; n < indexed.length; n++) {
+        result[indexed[n].$1] = base + n;
+      }
     }
     return result;
   }
@@ -339,6 +370,8 @@ class _EntityTab extends StatelessWidget {
         availableActions: availableActions,
         pendingIndices: state.pendingFor(type),
         onToggleSelection: (i) => notifier.toggleSelection(type, i),
+        onSetSelections: (indices, select) =>
+            notifier.setSelections(type, indices, select),
         onDuplicateActionChanged: (i, a) {
           notifier.setDuplicateAction(type, i, a);
           _showActionSnackbar(
@@ -652,6 +685,7 @@ class _ImportOptionsSheetState extends State<_ImportOptionsSheet> {
   Widget build(BuildContext context) {
     final state = _currentState;
     if (state == null) return const SizedBox.shrink();
+    final hasSourceNumbers = state.bundle?.hasSourceDiveNumbers ?? false;
 
     return SingleChildScrollView(
       // Second line of defense: isScrollControlled at the call site already
@@ -670,14 +704,22 @@ class _ImportOptionsSheetState extends State<_ImportOptionsSheet> {
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
+          // Disabled, and saying why, when no dive in this source carries a
+          // number: an enabled switch that changes nothing is what issue
+          // #1832 reported.
           SwitchListTile(
             title: Text(context.l10n.universalImport_label_retainDiveNumbers),
             subtitle: Text(
-              context.l10n.universalImport_label_retainDiveNumbersSubtitle,
+              hasSourceNumbers
+                  ? context.l10n.universalImport_label_retainDiveNumbersSubtitle
+                  : context
+                        .l10n
+                        .universalImport_label_retainDiveNumbersUnavailable,
             ),
-            value: state.retainSourceDiveNumbers,
-            onChanged: (value) =>
-                widget.notifier.setRetainSourceDiveNumbers(value),
+            value: hasSourceNumbers && state.retainSourceDiveNumbers,
+            onChanged: hasSourceNumbers
+                ? (value) => widget.notifier.setRetainSourceDiveNumbers(value)
+                : null,
           ),
           // Session-only override of the diver's saved auto-tag preference
           // (issue #998 follow-up). Starts from that preference -- whatever

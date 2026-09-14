@@ -4,11 +4,23 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
 void main() {
   group('ImportFormat', () {
     test('has all expected values', () {
-      expect(ImportFormat.values, hasLength(16));
+      expect(ImportFormat.values, hasLength(19));
     });
 
     test('displayName for each format', () {
       expect(ImportFormat.csv.displayName, 'CSV');
+      expect(
+        ImportFormat.submersionDivesCsv.displayName,
+        'Submersion Dives CSV',
+      );
+      expect(
+        ImportFormat.submersionSitesCsv.displayName,
+        'Submersion Sites CSV',
+      );
+      expect(
+        ImportFormat.submersionEquipmentCsv.displayName,
+        'Submersion Equipment CSV',
+      );
       expect(ImportFormat.uddf.displayName, 'UDDF');
       expect(ImportFormat.macdiveXml.displayName, 'MacDive XML');
       expect(ImportFormat.macdiveSqlite.displayName, 'MacDive SQLite');
@@ -45,6 +57,9 @@ void main() {
         expect(ImportFormat.macdiveSqlite.isSupported, isTrue);
         expect(ImportFormat.danDl7.isSupported, isTrue);
         expect(ImportFormat.ratioXml.isSupported, isTrue);
+        expect(ImportFormat.submersionDivesCsv.isSupported, isTrue);
+        expect(ImportFormat.submersionSitesCsv.isSupported, isTrue);
+        expect(ImportFormat.submersionEquipmentCsv.isSupported, isTrue);
       },
     );
 
@@ -147,7 +162,7 @@ void main() {
   group('SourceOverrideOption', () {
     group('supported list', () {
       test('contains expected number of entries', () {
-        expect(SourceOverrideOption.supported.length, 19);
+        expect(SourceOverrideOption.supported.length, 22);
       });
 
       test('contains Submersion CSV entry', () {

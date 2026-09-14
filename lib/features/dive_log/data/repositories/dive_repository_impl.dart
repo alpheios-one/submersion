@@ -198,21 +198,21 @@ class DiveRepository {
   /// filter most sessions never switch on. This is no worse than the
   /// dives-only tick it replaces.
   Stream<void> watchDiveListChanges() => _db
-      .tableUpdates(
-        TableUpdateQuery.allOf([
-          TableUpdateQuery.onTable(_db.dives),
-          TableUpdateQuery.onTable(_db.diveSites),
-          TableUpdateQuery.onTable(_db.trips),
-          TableUpdateQuery.onTable(_db.diveSafetyFindings),
-          // Row chips: tag membership and tag names, and the dive-type
-          // badges. The type NAMES resolve through their own provider, so
-          // only the junction is needed for them.
-          TableUpdateQuery.onTable(_db.diveTags),
-          TableUpdateQuery.onTable(_db.tags),
-          TableUpdateQuery.onTable(_db.diveDiveTypes),
-        ]),
-      )
+      .tableUpdates(TableUpdateQuery.allOf(_diveListTables))
       .debounce(changeTickDebounce);
+
+  List<TableUpdateQuery> get _diveListTables => [
+    TableUpdateQuery.onTable(_db.dives),
+    TableUpdateQuery.onTable(_db.diveSites),
+    TableUpdateQuery.onTable(_db.trips),
+    TableUpdateQuery.onTable(_db.diveSafetyFindings),
+    // Row chips: tag membership and tag names, and the dive-type badges. The
+    // type NAMES resolve through their own provider, so only the junction is
+    // needed for them.
+    TableUpdateQuery.onTable(_db.diveTags),
+    TableUpdateQuery.onTable(_db.tags),
+    TableUpdateQuery.onTable(_db.diveDiveTypes),
+  ];
 
   /// Change tick for [getDiveIdsMatchingEquipmentAttrs]: the dives, both
   /// gear links, the items (their type) and their attribute rows.
@@ -229,6 +229,40 @@ class DiveRepository {
         ]),
       )
       .debounce(changeTickDebounce);
+
+  /// [watchDiveListChanges] plus the tables the buddy filters read
+  /// ([DiveFilterState.readsBuddyLinks]), for a list filtered by buddy.
+  /// See [_buddyLinkTables].
+  Stream<void> watchDiveListChangesWithBuddyLinks() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([..._diveListTables, ..._buddyLinkTables]),
+      )
+      .debounce(changeTickDebounce);
+
+  /// [watchDivesChanges] plus the tables the buddy filters read, for a
+  /// dives-tick consumer filtered by buddy. See [_buddyLinkTables].
+  Stream<void> watchDivesChangesWithBuddyLinks() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          TableUpdateQuery.onTable(_db.dives),
+          ..._buddyLinkTables,
+        ]),
+      )
+      .debounce(changeTickDebounce);
+
+  /// The `dive_buddies` junction and `buddies`, whose name the buddy-name
+  /// filter matches. A sync pull of a buddy link writes only `dive_buddies`
+  /// (the parent dive is never restamped, #1769), and a merge or rename
+  /// writes no `dives` row either, so no plain dive tick sees them (#1915).
+  ///
+  /// They join a consumer's own tick rather than forming a second one: the
+  /// dive editor's link writers touch `dive_buddies` and then bump the dive
+  /// row outside a transaction, and two separately debounced ticks would
+  /// reload the list once for each write.
+  List<TableUpdateQuery> get _buddyLinkTables => [
+    TableUpdateQuery.onTable(_db.diveBuddies),
+    TableUpdateQuery.onTable(_db.buddies),
+  ];
 
   /// Aggregate change-tick for the dive DETAIL page: fires when ANY table that
   /// feeds a dive's detail view is written -- including a sync applying remote
@@ -2828,6 +2862,49 @@ class DiveRepository {
     }
   }
 
+  /// How many of [diveIds] carry a dive number that another dive of the same
+  /// diver also carries.
+  ///
+  /// Reports the clashes "Retain source dive numbers" can leave behind, with
+  /// an existing dive or between two dives of the same import, so the diver
+  /// is told instead of the number being silently changed (issue #1832).
+  /// Unnumbered dives never count.
+  // stats-scope-exempt: numbering integrity, must see every dive or it misses a clash
+  Future<int> countDivesSharingDiveNumber(List<String> diveIds) async {
+    try {
+      var count = 0;
+      for (final chunk in seriesIdChunks(diveIds.toSet().toList())) {
+        final placeholders = List.filled(chunk.length, '?').join(', ');
+        // The shared numbers are found in ONE grouped pass over `dives`,
+        // then joined to the imported rows. A correlated EXISTS per imported
+        // dive has no (diver_id, dive_number) index to use, so it scanned
+        // the whole table once per row: 0.68 s against 0.01 s for 900
+        // imported dives in a 50,000-dive log.
+        final row = await _db
+            .customSelect(
+              'SELECT COUNT(*) AS n FROM dives d '
+              'JOIN (SELECT diver_id, dive_number FROM dives '
+              'WHERE dive_number IS NOT NULL '
+              'GROUP BY diver_id, dive_number HAVING COUNT(*) > 1) shared '
+              'ON shared.dive_number = d.dive_number '
+              'AND shared.diver_id IS d.diver_id '
+              'WHERE d.id IN ($placeholders)',
+              variables: [for (final id in chunk) Variable.withString(id)],
+            )
+            .getSingle();
+        count += row.data['n'] as int;
+      }
+      return count;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to count dives sharing a dive number',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get the next dive number for a given date.
   ///
   /// Delegates to [getNextDiveNumber] (MAX + 1) to avoid duplicate numbers
@@ -4631,25 +4708,7 @@ class DiveRepository {
             ..orderBy([OrderingTerm.asc(_db.gasSwitches.timestamp)]);
 
       final rows = await query.get();
-      return rows.map((row) {
-        final gs = row.readTable(_db.gasSwitches);
-        final tank = row.readTable(_db.diveTanks);
-
-        return GasSwitchWithTank(
-          gasSwitch: GasSwitch(
-            id: gs.id,
-            diveId: gs.diveId,
-            timestamp: gs.timestamp,
-            tankId: gs.tankId,
-            depth: gs.depth,
-            createdAt: DateTime.fromMillisecondsSinceEpoch(gs.createdAt),
-          ),
-          tankName: tank.tankName ?? 'Tank ${tank.tankOrder + 1}',
-          gasMix: _formatGasMixName(tank.o2Percent, tank.hePercent),
-          o2Fraction: tank.o2Percent / 100.0,
-          heFraction: tank.hePercent / 100.0,
-        );
-      }).toList();
+      return rows.map(_mapGasSwitchRow).toList();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get gas switches for dive: $diveId',
@@ -4658,6 +4717,69 @@ class DiveRepository {
       );
       return [];
     }
+  }
+
+  /// [getGasSwitchesForDive] for many dives at once, keyed by dive id; a
+  /// dive without switches is absent.
+  ///
+  /// One statement per [kSeriesIdChunkSize] ids instead of one per dive, so
+  /// the full UDDF export costs the same for any logbook size (issue #1867).
+  /// Each dive keeps the per-dive read's timestamp order, and a failure is
+  /// logged and yields no switches, as that read's does.
+  Future<Map<String, List<GasSwitchWithTank>>> getGasSwitchesForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return {};
+    try {
+      final byDive = <String, List<GasSwitchWithTank>>{};
+      for (final chunk in seriesIdChunks(diveIds)) {
+        final rows =
+            await (_db.select(_db.gasSwitches).join([
+                    innerJoin(
+                      _db.diveTanks,
+                      _db.diveTanks.id.equalsExp(_db.gasSwitches.tankId),
+                    ),
+                  ])
+                  ..where(_db.gasSwitches.diveId.isIn(chunk))
+                  ..orderBy([OrderingTerm.asc(_db.gasSwitches.timestamp)]))
+                .get();
+        for (final row in rows) {
+          final gasSwitch = _mapGasSwitchRow(row);
+          byDive
+              .putIfAbsent(gasSwitch.gasSwitch.diveId, () => [])
+              .add(gasSwitch);
+        }
+      }
+      return byDive;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get gas switches for ${diveIds.length} dives',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return {};
+    }
+  }
+
+  /// A `gas_switches` row joined to its `dive_tanks` row.
+  GasSwitchWithTank _mapGasSwitchRow(TypedResult row) {
+    final gs = row.readTable(_db.gasSwitches);
+    final tank = row.readTable(_db.diveTanks);
+
+    return GasSwitchWithTank(
+      gasSwitch: GasSwitch(
+        id: gs.id,
+        diveId: gs.diveId,
+        timestamp: gs.timestamp,
+        tankId: gs.tankId,
+        depth: gs.depth,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(gs.createdAt),
+      ),
+      tankName: tank.tankName ?? 'Tank ${tank.tankOrder + 1}',
+      gasMix: _formatGasMixName(tank.o2Percent, tank.hePercent),
+      o2Fraction: tank.o2Percent / 100.0,
+      heFraction: tank.hePercent / 100.0,
+    );
   }
 
   /// Format gas mix as a readable name (e.g., "Air", "EAN32", "Tx 21/35")
