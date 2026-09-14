@@ -4795,6 +4795,9 @@ class AppDatabase extends _$AppDatabase {
     // types and tags) shipped first, and a rung at or below the shipped
     // version never runs its onUpgrade step, so this one sits above both.
     218,
+    // v219: equipment_sets.auto_apply_on_computer_import (issue #1020).
+    // Additive column, default off. Column-only rung, no backfill.
+    219,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
