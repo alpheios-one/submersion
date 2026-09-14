@@ -11,6 +11,15 @@ import 'package:flutter/services.dart';
 /// that is [smartParseUserDecimal]'s job once the diver is done typing. This
 /// formatter only stops a second separator and stops either side from
 /// growing past its digit budget.
+///
+/// Known, accepted limitation: under a comma-decimal locale, a locale-valid
+/// grouped integer like "4.350" (meaning 4350, e.g. a psi pressure) has the
+/// same shape as three rejected fraction digits, so this formatter blocks
+/// that keystroke even though [smartParseUserDecimal] would read it
+/// correctly. A diver hitting this can still type the digits without the
+/// grouping separator (e.g. "4350"); making the cap locale-aware to lift it
+/// would conflict with the digit budget every other field on the same
+/// contract depends on (see blender_decimal_digits_formatter_test.dart).
 class BlenderDecimalDigitsFormatter extends TextInputFormatter {
   const BlenderDecimalDigitsFormatter({
     this.maxIntDigits = 3,
@@ -37,16 +46,7 @@ class BlenderDecimalDigitsFormatter extends TextInputFormatter {
     }
     final intDigits = sepIndex;
     final fractionDigits = text.length - sepIndex - 1;
-    if (intDigits > maxIntDigits) return oldValue;
-    // Exactly three digits after the separator is also the shape of a
-    // locale-valid grouped integer (a comma-decimal locale's "4.350" meaning
-    // 4350, e.g. a psi pressure) -- smartParseUserDecimal already treats
-    // that shape specially (parsing it directly under a locale where it is
-    // grouping, and reporting it as genuinely unreadable otherwise), so it
-    // is let through here rather than this locale-agnostic formatter
-    // rejecting a keystroke the parser would have accepted (issue #1876
-    // Copilot review).
-    if (fractionDigits > maxFractionDigits && fractionDigits != 3) {
+    if (intDigits > maxIntDigits || fractionDigits > maxFractionDigits) {
       return oldValue;
     }
     return newValue;
