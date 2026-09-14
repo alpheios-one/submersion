@@ -722,47 +722,41 @@ class _BlenderInvoiceCardState extends ConsumerState<BlenderInvoiceCard> {
               // A single overflow menu instead of two separate icons: on the
               // narrowest phones two full-size IconButtons plus the label and
               // total left no room to breathe (issue #1876 follow-up).
-              SizedBox(
-                width: kBilledLineTrailingWidth,
-                // A `SizedBox` only constrains its child's width, not where
-                // the child sits within it -- an un-aligned PopupMenuButton
-                // centers in the reserved 80px, leaving visible space to its
-                // right. `Align` is what actually pins it to the card's edge
-                // (issue #1876 follow-up; the earlier `padding: EdgeInsets
-                // .zero` alone was not enough).
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: PopupMenuButton<_FillLineAction>(
-                    key: Key('blender-fill-line-menu-${fill.id}'),
-                    icon: const Icon(Icons.more_vert, size: 18),
-                    padding: EdgeInsets.zero,
-                    tooltip: context.l10n.gasCalculators_blender_lineActions(
-                      fill.label,
-                    ),
-                    onSelected: (action) => switch (action) {
-                      _FillLineAction.edit => _editLine(fill),
-                      _FillLineAction.delete => _delete(fill),
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: _FillLineAction.edit,
-                        child: Text(
-                          context.l10n.gasCalculators_blender_editLine(
-                            fill.label,
-                          ),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: _FillLineAction.delete,
-                        child: Text(
-                          context.l10n.gasCalculators_blender_deleteLine(
-                            fill.label,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              //
+              // No SizedBox/Align wrapper: that reserved a fixed width wider
+              // than the button's own footprint and centered it there,
+              // leaving visible space to the button's right even once
+              // centered within its own box. The button's standard 48px tap
+              // target stays intact (Material's minimum, deliberately not
+              // shrunk) -- it is just the trailing child of the Row now, with
+              // nothing reserved after it, so its own edge is the Row's edge.
+              PopupMenuButton<_FillLineAction>(
+                key: Key('blender-fill-line-menu-${fill.id}'),
+                icon: const Icon(Icons.more_vert, size: 18),
+                padding: EdgeInsets.zero,
+                tooltip: context.l10n.gasCalculators_blender_lineActions(
+                  fill.label,
                 ),
+                onSelected: (action) => switch (action) {
+                  _FillLineAction.edit => _editLine(fill),
+                  _FillLineAction.delete => _delete(fill),
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _FillLineAction.edit,
+                    child: Text(
+                      context.l10n.gasCalculators_blender_editLine(fill.label),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: _FillLineAction.delete,
+                    child: Text(
+                      context.l10n.gasCalculators_blender_deleteLine(
+                        fill.label,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

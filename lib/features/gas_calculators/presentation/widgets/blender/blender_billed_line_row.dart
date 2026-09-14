@@ -9,14 +9,6 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// so the header's units line up over the values they label.
 const List<int> kBilledLineFlex = [3, 3, 3, 3, 3];
 
-/// The width a fill's overflow menu button occupies in its title row.
-/// Deliberately unrelated to [kBilledLineFlex] now: the title row (mix name,
-/// total, menu) is its own simple layout rather than forced onto the same
-/// grid as the gas-line columns below it, which only made both harder to
-/// size well (issue #1876 follow-up). Two compact `IconButton`-equivalent
-/// widths' worth of room for the single `PopupMenuButton` that replaced them.
-const double kBilledLineTrailingWidth = 80;
-
 /// The column header for a block of [BlenderBilledLineRow]s, units included
 /// so they are not repeated on every line (issue #1876). Shown once above
 /// each fill's itemisation, in [BlenderInvoiceCard] and the read-only archive
