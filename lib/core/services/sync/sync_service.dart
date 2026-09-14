@@ -2707,10 +2707,12 @@ class SyncService {
     ],
     // siteTypeId has no FK (a custom type may arrive after its links), so
     // only the site is a parent, as with diveDiveTypes.
-    'siteSiteTypes': [(field: 'siteId', parent: 'diveSites', nullable: false)],
+    'siteSiteTypes': [
+      (field: 'siteId', parent: 'diveSites', nullable: false, alsoClear: []),
+    ],
     'siteTags': [
-      (field: 'siteId', parent: 'diveSites', nullable: false),
-      (field: 'tagId', parent: 'tags', nullable: false),
+      (field: 'siteId', parent: 'diveSites', nullable: false, alsoClear: []),
+      (field: 'tagId', parent: 'tags', nullable: false, alsoClear: []),
     ],
     'mediaSpecies': [
       (field: 'mediaId', parent: 'media', nullable: false, alsoClear: []),
