@@ -316,20 +316,44 @@ void main() {
       expect(more, cert);
     });
 
-    testWidgets('the action row shows the agency and title of the '
-        'certification', (tester) async {
+    testWidgets('the action row shows the derived title when the stored '
+        'name matches the level', (tester) async {
       await _pumpGrid(
         tester,
         certifications: [
           _makeCert(
             id: 'cert-1',
+            name: 'Open Water',
             agency: CertificationAgency.ssi,
             level: CertificationLevel.openWater,
           ),
         ],
       );
 
-      expect(find.text('SSI - Open Water'), findsOneWidget);
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey('actionRowTitle'))).data,
+        'Open Water',
+      );
+    });
+
+    testWidgets('the action row shows the custom name, not the credentials '
+        'line, so the card stays identifiable', (tester) async {
+      await _pumpGrid(
+        tester,
+        certifications: [
+          _makeCert(
+            id: 'cert-1',
+            name: 'Bali OW w/ Made',
+            agency: CertificationAgency.padi,
+            level: CertificationLevel.openWater,
+          ),
+        ],
+      );
+
+      expect(
+        tester.widget<Text>(find.byKey(const ValueKey('actionRowTitle'))).data,
+        'Bali OW w/ Made',
+      );
     });
   });
 

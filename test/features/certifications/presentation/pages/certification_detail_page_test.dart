@@ -403,6 +403,7 @@ void main() {
             ).overrideWith((ref) async => null),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: CertificationDetailPage(

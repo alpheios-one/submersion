@@ -2538,7 +2538,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_wallet_tooltip_add => 'Tanusitvany hozzaadasa';
 
   @override
-  String get certifications_wallet_tooltip_moreOptions => 'Tovabbi lehetosegek';
+  String get certifications_wallet_tooltip_moreOptions => 'További lehetőségek';
 
   @override
   String get certifications_wallet_tooltip_share => 'Tanusitvany megosztasa';

@@ -16,6 +16,7 @@ import 'package:submersion/features/certifications/domain/entities/certification
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/certifications/presentation/certification_level_display.dart';
+import 'package:submersion/features/certifications/presentation/widgets/certification_ecard.dart';
 import 'package:submersion/features/certifications/presentation/certification_title_l10n.dart';
 import 'package:submersion/features/certifications/presentation/certification_agency_display.dart';
 
@@ -793,8 +794,7 @@ class _CertificationDetailContent extends ConsumerWidget {
           child: GestureDetector(
             onTap: () => _showFullscreenPhoto(context, imageData, label),
             child: AspectRatio(
-              // Matches CertificationEcard.aspectRatio (CR80 credit card).
-              aspectRatio: 1.586,
+              aspectRatio: CertificationEcard.aspectRatio,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),

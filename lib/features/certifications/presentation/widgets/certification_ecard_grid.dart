@@ -93,20 +93,19 @@ class _CertificationEcardGridState extends State<CertificationEcardGrid> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final contentWidth = math.max(
-          0.0,
-          constraints.maxWidth - _kSpacing * 2,
-        );
+        final contentWidth = constraints.maxWidth - _kSpacing * 2;
+        // Narrower than the grid's own padding: there is no positive space
+        // to lay a card out in, so build nothing rather than a zero-height
+        // tile that still tries to fit an action row into it.
+        if (contentWidth <= 0) {
+          return const SizedBox.shrink();
+        }
         final columns = math.max(1, (contentWidth / _kMaxCardWidth).ceil());
-        final cellWidth = contentWidth > 0
-            ? (contentWidth - _kSpacing * (columns - 1)) / columns
-            : contentWidth;
+        final cellWidth = (contentWidth - _kSpacing * (columns - 1)) / columns;
         final cardHeight = cellWidth / CertificationEcard.aspectRatio;
         final actionRowHeight = _actionRowExtent(context);
         final tileHeight = cardHeight + _kSpacing / 2 + actionRowHeight;
-        final aspectRatio = tileHeight > 0 && cellWidth > 0
-            ? cellWidth / tileHeight
-            : 1.0;
+        final aspectRatio = cellWidth / tileHeight;
 
         return GridView.builder(
           padding: const EdgeInsets.all(_kSpacing),
@@ -157,7 +156,8 @@ class _CertificationEcardGridState extends State<CertificationEcardGrid> {
       children: [
         Expanded(
           child: Text(
-            certificationCredentialsLineL10n(certification, l10n),
+            certificationTitleL10n(certification, l10n),
+            key: const ValueKey('actionRowTitle'),
             style: theme.textTheme.bodyMedium,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
